@@ -1,3 +1,5 @@
+![](https://github.com/mooltiverse/nyx/workflows/build/badge.svg?branch=master)
+
 # Nyx
 Nyx is a semantic release tool built around [Git](https://git-scm.com/) with some unique features. The term *semantic release* means [semantic versioning](https://semver.org/) compliance in the first place, with the addition of several features pertaining the release *process* like:
 
@@ -51,6 +53,9 @@ We are also contemplating *ChatOps* features and integrations.
 *Nyx* lets you publish additional artifacts (i.e. release notes or pages) as well as send notifications (i.e. to Slack channels) upon configurable events.
 
 The templates are configurable and allow to add specific contents like links to Docker images or software repositories.
+
+## Microservices versioning
+We are contemplating the implementation of additional features that allow to version a group of projects and their dependencies automatically. This is the case of microservices, when each service has its own lifecycle and version numbers but downstream services need to test, build and deliver also taking into account upstream ones.
 
 ## No technology constraints
 *Nyx* is written in Java and that's the only technological constraint to run. You can use the `java` executable to run *Nyx* from the command line or use its Docker container.

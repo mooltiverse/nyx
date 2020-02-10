@@ -1,0 +1,68 @@
+/*------------------------------------------------------------------------------
+  Plugins DSL block
+  https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
+------------------------------------------------------------------------------*/
+plugins {
+  id 'base'                 // See: https://docs.gradle.org/current/userguide/base_plugin.html
+  id 'java'                 // See: https://docs.gradle.org/current/userguide/java_plugin.html
+  id 'java-library'         // See: https://docs.gradle.org/current/userguide/java_library_plugin.html
+  id 'maven-publish'        // See: https://docs.gradle.org/current/userguide/publishing_maven.html
+  id 'java-gradle-plugin'   // See: https://docs.gradle.org/current/userguide/java_gradle_plugin.html
+
+  //id 'checkstyle'           // See: https://docs.gradle.org/current/userguide/checkstyle_plugin.html
+  //id 'pmd'                  // See: https://docs.gradle.org/current/userguide/pmd_plugin.html
+
+  // See: https://bmuschko.github.io/gradle-docker-plugin/
+  id 'com.bmuschko.docker-remote-api' version '6.1.3'
+
+  // Builds a dependency tree of Gradle tasks, i.e. 'gradle build taskTree'
+  // This plugin can be commented out and used only when needed.
+  // See: https://github.com/dorongold/gradle-task-tree
+  id "com.dorongold.task-tree" version "1.5"
+}
+
+/*------------------------------------------------------------------------------
+  Project overall attributes
+------------------------------------------------------------------------------*/
+group   = 'com.mooltiverse.oss.nyx.gradle'
+version = '0.0.1'
+
+/*------------------------------------------------------------------------------
+  Repositories and dependencies
+  https://docs.gradle.org/current/userguide/dependency_management_for_java_projects.html
+------------------------------------------------------------------------------*/
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  api 'org.eclipse.jgit:org.eclipse.jgit:5.6.0.201912101111-r'
+
+  implementation 'net.sourceforge.argparse4j:argparse4j:0.8.1'
+}
+
+test {
+  useJUnitPlatform()
+}
+
+publishing {
+  publications {
+    nyx(MavenPublication) {
+      from components.java
+    }
+  }
+
+  repositories {
+    mavenCentral()
+  }
+}
+
+task images(type: com.bmuschko.gradle.docker.tasks.image.DockerBuildImage) {
+  description 'Builds the Docker images'
+  group 'Build'
+  dependsOn assemble
+  tasks.build.dependsOn images
+
+  inputDir = buildDir
+  dockerFile = project.file('src/main/docker/Dockerfile')
+}
