@@ -23,7 +23,7 @@ import java.util.Objects;
  * @param <V> the type of value represented by this handler. It must be a class around a primitive type like
  * {@link String} or {@link Integer}.
  */
-abstract class AbstractSimpleValueHandler<V> extends AbstractValueHandler implements SimpleValueHandler<V> {
+abstract class AbstractSimpleValueHandler<V extends Object> extends AbstractValueHandler implements SimpleValueHandler<V> {
     /**
      * The value held by this handler
      */

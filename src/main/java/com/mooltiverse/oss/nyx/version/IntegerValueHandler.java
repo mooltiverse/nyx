@@ -18,7 +18,7 @@ package com.mooltiverse.oss.nyx.version;
 /**
  * A simple handler holding an {@link Integer} value.
  */
-class IntegerValueHandler extends AbstractSimpleValueHandler<Integer> {
+class IntegerValueHandler extends ObjectValueHandler<Integer> {
     /**
      * Builds the value handler with the given value.
      *
@@ -41,6 +41,13 @@ class IntegerValueHandler extends AbstractSimpleValueHandler<Integer> {
      */
     protected IntegerValueHandler(String value) {
         super(validate(value));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public int compareTo(Integer o) {
+        return value.compareTo(o);
     }
 
     /**
@@ -88,12 +95,5 @@ class IntegerValueHandler extends AbstractSimpleValueHandler<Integer> {
 
         // let the other version of the validate() method check if it's positive
         return validate(intValue);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public int compareTo(Integer o) {
-        return value.compareTo(o);
     }
 }

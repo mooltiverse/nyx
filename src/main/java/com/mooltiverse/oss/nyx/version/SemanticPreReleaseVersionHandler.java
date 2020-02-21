@@ -45,7 +45,7 @@ import java.util.List;
  * Similarly, <code>1.2.3</code> can bump value anonymously the value at index <code>0</code>, resulting in
  * <code>1.2.3-0</code> or the named value <code>pre</code>, resulting in <code>1.2.3-pre.0</code>.
  */
-class SemanticPreReleaseVersionHandler extends CompositeValueHandler {
+class SemanticPreReleaseVersionHandler extends CompositeObjectValueHandler {
     /**
      * Builds the value handler with the given children values.
      *
@@ -56,7 +56,7 @@ class SemanticPreReleaseVersionHandler extends CompositeValueHandler {
      * @throws IllegalArgumentException if the given values are illegal or there isn't any non <code>null</code> item
      */
     @SuppressWarnings("unchecked")
-    private SemanticPreReleaseVersionHandler(List<ValueHandler> children) {
+    private SemanticPreReleaseVersionHandler(List<ObjectValueHandler> children) {
         super(DEFAULT_SEPARATOR, children);
     }
 
@@ -73,7 +73,7 @@ class SemanticPreReleaseVersionHandler extends CompositeValueHandler {
      * @throws IllegalArgumentException if the given string contains illegal characters
      */
     static SemanticPreReleaseVersionHandler valueOf(String s) {
-        List<ValueHandler> handlers = new ArrayList<ValueHandler>();
+        List<ObjectValueHandler> handlers = new ArrayList<ObjectValueHandler>();
         for (String part: split(s, DEFAULT_SEPARATOR)) {
             AbstractSimpleValueHandler handler = null;
             boolean isInteger = false;

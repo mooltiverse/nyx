@@ -196,7 +196,6 @@ public class SemanticVersionTests {
                 // they are actually illegal numbers, bu they can be sanitized to legal ones
                 arguments("1.2.3-0123", null, "1.2.3-123", "1.2.3-0123", "1.2.3-123"),
                 arguments("1.2.3-0123.0123", null, "1.2.3-123.123", "1.2.3-0123.0123", "1.2.3-123.123"),
-                arguments("1.0.0-alpha_beta", null, "java.lang.IllegalArgumentException", "java.lang.IllegalArgumentException", "java.lang.IllegalArgumentException"),
                 arguments("01.1.1", null, "1.1.1", "01.1.1", "1.1.1"),
                 arguments("1.01.1", null, "1.1.1", "1.01.1", "1.1.1"),
                 arguments("1.1.01", null, "1.1.1", "1.1.01", "1.1.1"),
@@ -379,6 +378,16 @@ public class SemanticVersionTests {
             assertEquals(preString, sv.getPrerelease());
             assertEquals(buildString, sv.getBuild());
         }
+
+        @ParameterizedTest(name = "#{index} valueOf(''{0}'', true) ==> ''{arguments}''")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownSanitizableVersions")
+        void valueOfSanitizableString(String version) {
+            // the method must fail without sanitization and succeed when using sanitization
+            assertThrows(IllegalArgumentException.class, () -> SemanticVersion.valueOf(version));
+            assertThrows(IllegalArgumentException.class, () -> SemanticVersion.valueOf(version, false).toString());
+            assertNotEquals(version, SemanticVersion.valueOf(version, true).toString());
+            assertEquals(SemanticVersion.sanitize(version), SemanticVersion.valueOf(version, true).toString());
+        }
     }
 
     @Nested
@@ -420,6 +429,15 @@ public class SemanticVersionTests {
             String coreString = identifiersToString(List.of(String.valueOf(major), String.valueOf(minor), String.valueOf(patch)));
             assertEquals(coreString, SemanticVersion.valueOf(version).getCore());
         }
+
+        @ParameterizedTest(name = "#{index} getCoreIdentifiers(''{0}'') ==> ''{1}.{2}.{3}''")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
+        void getCoreIdentifiers(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
+            assertEquals(3, SemanticVersion.valueOf(version).getCoreIdentifiers().length);
+            assertEquals(Integer.valueOf(major), SemanticVersion.valueOf(version).getCoreIdentifiers()[0]);
+            assertEquals(Integer.valueOf(minor), SemanticVersion.valueOf(version).getCoreIdentifiers()[1]);
+            assertEquals(Integer.valueOf(patch), SemanticVersion.valueOf(version).getCoreIdentifiers()[2]);
+        }
     }
 
     @Nested
@@ -431,6 +449,17 @@ public class SemanticVersionTests {
             String preString = identifiersToString(pre);
             assertEquals(preString, SemanticVersion.valueOf(version).getPrerelease());
         }
+
+        @ParameterizedTest(name = "#{index} getPrereleaseIdentifiers(''{0}'') ==> ''{4}''")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
+        void getPrereleaseIdentifiers(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
+            if (pre != null) {
+                assertEquals(pre.size(), SemanticVersion.valueOf(version).getPrereleaseIdentifiers().length);
+                for (String s: pre) {
+                    assertEquals(s.toString(), SemanticVersion.valueOf(version).getPrereleaseIdentifiers()[pre.indexOf(s)].toString());
+                }
+            }
+        }
     }
 
     @Nested
@@ -441,6 +470,17 @@ public class SemanticVersionTests {
         void getBuild(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
             String buildString = identifiersToString(build);
             assertEquals(buildString, SemanticVersion.valueOf(version).getBuild());
+        }
+
+        @ParameterizedTest(name = "#{index} getBuildIdentifiers(''{0}'') ==> ''{4}''")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
+        void getBuildIdentifiers(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
+            if (build != null) {
+                assertEquals(build.size(), SemanticVersion.valueOf(version).getBuildIdentifiers().length);
+                for (String s: build) {
+                    assertEquals(s.toString(), SemanticVersion.valueOf(version).getBuildIdentifiers()[build.indexOf(s)].toString());
+                }
+            }
         }
     }
 

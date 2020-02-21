@@ -18,7 +18,7 @@ package com.mooltiverse.oss.nyx.version;
 /**
  * A simple handler holding a {@link String} value.
  */
-class StringValueHandler extends AbstractSimpleValueHandler<String> {
+class StringValueHandler extends ObjectValueHandler<String> {
     /**
      * The range of allowed characters in string identifiers.
      *
@@ -46,6 +46,13 @@ class StringValueHandler extends AbstractSimpleValueHandler<String> {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public int compareTo(String o) {
+        return value.compareTo(o);
+    }
+
+    /**
      * Validates the given value to make sure it's legal.
      *
      * @param value the value to validate
@@ -62,12 +69,5 @@ class StringValueHandler extends AbstractSimpleValueHandler<String> {
         if (!value.matches(ALLOWED_CHARACTERS_REGEXP_PATTERN))
             throw new IllegalArgumentException(String.format("Illegal characters found in handler value %s. Only characters in range "+ALLOWED_CHARACTERS+" are allowed", value));
         return value;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public int compareTo(String o) {
-        return value.compareTo(o);
     }
 }

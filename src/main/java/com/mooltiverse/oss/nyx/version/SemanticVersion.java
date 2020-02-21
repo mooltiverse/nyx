@@ -325,7 +325,7 @@ public class SemanticVersion extends AbstractVersion implements Comparable<Seman
     }
 
     /**
-     * Returns a SemanticVersion instance representing the specified String value.
+     * Returns a SemanticVersion instance representing the specified String value. No sanitization attempt is done.
      *
      * @param s the string to parse
      *
@@ -334,6 +334,7 @@ public class SemanticVersion extends AbstractVersion implements Comparable<Seman
      * @throws NullPointerException if the given string is <code>null</code>
      * @throws IllegalArgumentException if the given string doesn't represent a legal semantic version
      *
+     * @see #valueOf(String, boolean)
      * @see #sanitizePrefix(String)
      */
     public static SemanticVersion valueOf(String s) {
@@ -361,6 +362,31 @@ public class SemanticVersion extends AbstractVersion implements Comparable<Seman
             return new SemanticVersion(coreHandler, preReleaseHandler, buildHandler);
         }
         else throw new IllegalArgumentException(String.format("The string %s does not contain a valid semantic number", s));
+    }
+
+    /**
+     * This method is a shorthand for {@link #valueOf(String)} and {@link #sanitize(String)}.
+     * <br>
+     * Returns a SemanticVersion instance representing the specified String value. If <code>sanitize</code> is
+     * <code>true</code> this method will try to sanitize the given string before parsing so that if there are
+     * illegal characters like a prefix or leading zeroes in numeric identifiers they are removed.
+     * <br>
+     * When sanitization is enabled on a string that actually needs sanitization the string representation of the
+     * returned object will not exactly match the input value.
+     *
+     * @param s the string to parse
+     * @param sanitize optionally enables sanitization before parsing
+     *
+     * @return the new SemanticVersion instance representing the given string.
+     *
+     * @throws NullPointerException if the given string is <code>null</code>
+     * @throws IllegalArgumentException if the given string doesn't represent a legal semantic version
+     *
+     * @see #valueOf(String)
+     * @see #sanitizePrefix(String)
+     */
+    public static SemanticVersion valueOf(String s, boolean sanitize) {
+        return valueOf(sanitize ? sanitize(s) : s);
     }
 
     /**
@@ -581,6 +607,18 @@ public class SemanticVersion extends AbstractVersion implements Comparable<Seman
     }
 
     /**
+     * Returns an array of the single identifiers of the core part of the version
+     *
+     * @return the identifiers of the core part of the version.
+     */
+    public Integer[] getCoreIdentifiers() {
+        Integer[] res = new Integer[coreHandler.children.size()];
+        for (int i=0; i<coreHandler.children.size(); i++)
+            res[i] = coreHandler.children.get(i).value;
+        return res;
+    }
+
+    /**
      * Returns the prerelease part of the version, if any, or <code>null</code> otherwise.
      *
      * @return the prerelease part of the version.
@@ -590,11 +628,42 @@ public class SemanticVersion extends AbstractVersion implements Comparable<Seman
     }
 
     /**
+     * Returns an array of the single identifiers of the prerelease part of the version, if any, or <code>null</code>
+     * otherwise.
+     *
+     * @return the identifiers of the prerelease part of the version. The objects in the array can be either {@link Integer}
+     * or {@link String}.
+     */
+    public Object[] getPrereleaseIdentifiers() {
+        if (prereleaseHandler == null)
+            return null;
+        Object[] res = new Object[prereleaseHandler.children.size()];
+        for (int i=0; i<prereleaseHandler.children.size(); i++)
+            res[i] = prereleaseHandler.children.get(i).value;
+        return res;
+    }
+
+    /**
      * Returns the build part of the version, if any, or <code>null</code> otherwise.
      *
      * @return the build part of the version.
      */
     public String getBuild() {
         return buildHandler == null ? null : buildHandler.toString();
+    }
+
+    /**
+     * Returns an array of the single identifiers of the build part of the version, if any, or <code>null</code>
+     * otherwise.
+     *
+     * @return the identifiers of the build part of the version.
+     */
+    public String[] getBuildIdentifiers() {
+        if (buildHandler == null)
+            return null;
+        String[] res = new String[buildHandler.children.size()];
+        for (int i=0; i<buildHandler.children.size(); i++)
+            res[i] = buildHandler.children.get(i).value;
+        return res;
     }
 }
