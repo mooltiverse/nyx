@@ -18,7 +18,7 @@ package com.mooltiverse.oss.nyx.version;
 /**
  * The identifiers used for core version numbers.
  */
-enum CoreIdentifiers {
+public enum CoreIdentifiers {
     /**
      * The major number.
      */
@@ -71,5 +71,23 @@ enum CoreIdentifiers {
      */
     int getPosition() {
         return position;
+    }
+
+    /**
+     * Returns the value with the given name.
+     *
+     * @param name the name of the identifier to search
+     *
+     * @return the value with the given name.
+     *
+     * @throws NullPointerException if <code>null</code> is passed
+     * @throws IllegalArgumentException if there is no identifier with the given name
+     */
+    static CoreIdentifiers byName(String name) {
+        for (CoreIdentifiers ci: CoreIdentifiers.values())
+            if (ci.getName().equals(name))
+                return ci;
+        // if none is found fall back to valueOf()
+        return CoreIdentifiers.valueOf(name);
     }
 }

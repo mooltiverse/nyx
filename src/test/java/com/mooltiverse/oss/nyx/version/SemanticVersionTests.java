@@ -85,8 +85,8 @@ public class SemanticVersionTests {
             arguments("1.2.3----R-S.12.9.1--.12+meta", 1, 2, 3, Arrays.asList("---R-S", "12", "9", "1--", "12"), Arrays.asList("meta")),
             arguments("1.2.3----RC-SNAPSHOT.12.9.1--.12", 1, 2, 3, Arrays.asList("---RC-SNAPSHOT", "12", "9", "1--", "12"), null),
             arguments("1.0.0+0.build.1-rc.10000aaa-kk-0.1", 1, 0, 0, null, Arrays.asList("0", "build", "1-rc", "10000aaa-kk-0", "1")),
-            //Let's use just the biggest int here
-            arguments(String.valueOf(Integer.MAX_VALUE)+"."+String.valueOf(Integer.MAX_VALUE)+"."+String.valueOf(Integer.MAX_VALUE), Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE, null, null),
+            //Let's use just the biggest int here. just make it -1 to support bumps
+            arguments(String.valueOf(Integer.MAX_VALUE-1)+"."+String.valueOf(Integer.MAX_VALUE-1)+"."+String.valueOf(Integer.MAX_VALUE-1), Integer.MAX_VALUE-1, Integer.MAX_VALUE-1, Integer.MAX_VALUE-1, null, null),
             arguments("1.0.0-0A.is.legal", 1, 0, 0, Arrays.asList("0A", "is", "legal"), null)
         );
     }
@@ -762,10 +762,134 @@ public class SemanticVersionTests {
 
     @Nested
     @DisplayName("SemanticVersion.bump")
-    class BumpTests {
-        @Test
-        @DisplayName("Bump the major number")
-        void bumpMajor() {
+    class BumpErrorTests {
+        @ParameterizedTest(name = "#{index} bump(''{arguments}'') ==> IllegalArgumentException")
+        @EmptySource
+        void exceptionUsingBumpWithEmptyString(String bump) {
+            assertThrows(IllegalArgumentException.class, () -> SemanticVersion.valueOf(SemanticVersion.DEFAULT_INITIAL_VERSION).bump(bump));
+        }
+
+        @ParameterizedTest(name = "#{index} bump(''{arguments}'') ==> IllegalArgumentException")
+        @NullSource
+        void exceptionUsingBumpWithNullString(String bump) {
+            assertThrows(NullPointerException.class, () -> SemanticVersion.valueOf(SemanticVersion.DEFAULT_INITIAL_VERSION).bump(bump));
+        }
+
+        @ParameterizedTest(name = "#{index} bump(''{arguments}'') ==> RuntimeException")
+        @NullAndEmptySource
+        void exceptionUsingBumpWithNullOrEmptyString(String bump) {
+            assertThrows(RuntimeException.class, () -> SemanticVersion.valueOf(SemanticVersion.DEFAULT_INITIAL_VERSION).bump(bump));
+        }
+    }
+
+    @Nested
+    @DisplayName("SemanticVersion.bumpMajor")
+    class BumpMajorTests {
+        @ParameterizedTest(name = "#{index} bumpMajor(''{0}'')")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
+        void bumpMajor(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
+            SemanticVersion sv1 = SemanticVersion.valueOf(version);
+            SemanticVersion sv2 = sv1.bumpMajor();
+
+            assertEquals(major+1, sv2.getMajor());
+            assertEquals(0, sv2.getMinor());
+            assertEquals(0, sv2.getPatch());
+        }
+
+        @ParameterizedTest(name = "#{index} bump(''MAJOR'', ''{0}'')")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
+        void bumpMajorWithEnum(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
+            SemanticVersion sv1 = SemanticVersion.valueOf(version);
+            SemanticVersion sv2 = sv1.bump(CoreIdentifiers.MAJOR);
+
+            assertEquals(major+1, sv2.getMajor());
+            assertEquals(0, sv2.getMinor());
+            assertEquals(0, sv2.getPatch());
+        }
+
+        @ParameterizedTest(name = "#{index} bump(''major'', ''{0}'')")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
+        void bumpMajorWithString(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
+            SemanticVersion sv1 = SemanticVersion.valueOf(version);
+            SemanticVersion sv2 = sv1.bump("major");
+
+            assertEquals(major+1, sv2.getMajor());
+            assertEquals(0, sv2.getMinor());
+            assertEquals(0, sv2.getPatch());
+        }
+    }
+
+    @Nested
+    @DisplayName("SemanticVersion.bumpMinor")
+    class BumpMinorTests {
+        @ParameterizedTest(name = "#{index} bumpMinor(''{0}'')")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
+        void bumpMinor(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
+            SemanticVersion sv1 = SemanticVersion.valueOf(version);
+            SemanticVersion sv2 = sv1.bumpMinor();
+
+            assertEquals(major, sv2.getMajor());
+            assertEquals(minor+1, sv2.getMinor());
+            assertEquals(0, sv2.getPatch());
+        }
+
+        @ParameterizedTest(name = "#{index} bump(''MINOR'', ''{0}'')")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
+        void bumpMinorWithEnum(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
+            SemanticVersion sv1 = SemanticVersion.valueOf(version);
+            SemanticVersion sv2 = sv1.bump(CoreIdentifiers.MINOR);
+
+            assertEquals(major, sv2.getMajor());
+            assertEquals(minor+1, sv2.getMinor());
+            assertEquals(0, sv2.getPatch());
+        }
+
+        @ParameterizedTest(name = "#{index} bump(''minor'', ''{0}'')")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
+        void bumpMinorWithString(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
+            SemanticVersion sv1 = SemanticVersion.valueOf(version);
+            SemanticVersion sv2 = sv1.bump("minor");
+
+            assertEquals(major, sv2.getMajor());
+            assertEquals(minor+1, sv2.getMinor());
+            assertEquals(0, sv2.getPatch());
+        }
+    }
+
+    @Nested
+    @DisplayName("SemanticVersion.bumpPatch")
+    class BumpPatchTests {
+        @ParameterizedTest(name = "#{index} bumpPatch(''{0}'')")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
+        void bumpPatch(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
+            SemanticVersion sv1 = SemanticVersion.valueOf(version);
+            SemanticVersion sv2 = sv1.bumpPatch();
+
+            assertEquals(major, sv2.getMajor());
+            assertEquals(minor, sv2.getMinor());
+            assertEquals(patch+1, sv2.getPatch());
+        }
+
+        @ParameterizedTest(name = "#{index} bump(''PATCH'', ''{0}'')")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
+        void bumpPatchWithEnum(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
+            SemanticVersion sv1 = SemanticVersion.valueOf(version);
+            SemanticVersion sv2 = sv1.bump(CoreIdentifiers.PATCH);
+
+            assertEquals(major, sv2.getMajor());
+            assertEquals(minor, sv2.getMinor());
+            assertEquals(patch+1, sv2.getPatch());
+        }
+
+        @ParameterizedTest(name = "#{index} bump(''patch'', ''{0}'')")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
+        void bumpPatchWithString(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
+            SemanticVersion sv1 = SemanticVersion.valueOf(version);
+            SemanticVersion sv2 = sv1.bump("patch");
+
+            assertEquals(major, sv2.getMajor());
+            assertEquals(minor, sv2.getMinor());
+            assertEquals(patch+1, sv2.getPatch());
         }
     }
 }

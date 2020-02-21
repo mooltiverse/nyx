@@ -598,6 +598,76 @@ public class SemanticVersion extends AbstractVersion implements Comparable<Seman
     }
 
     /**
+     * Returns a new instance with the major number of this current instance incremented by one and the minor and patch
+     * numbers reset to zero. Prerelease and build parts are left intact.
+     *
+     * @return a new instance with the major number of this current instance incremented by one and the minor and patch
+     * numbers reset to zero.
+     */
+    public SemanticVersion bumpMajor() {
+        return new SemanticVersion(coreHandler.bumpMajor(), prereleaseHandler, buildHandler);
+    }
+
+    /**
+     * Returns a new instance with the major number of this current instance, the minor number incremented by one and
+     * the patch number reset to zero. Prerelease and build parts are left intact.
+     *
+     * @return a new instance with the major number of this current instance, the minor number incremented by one and
+     * the patch number reset to zero.
+     */
+    public SemanticVersion bumpMinor() {
+        return new SemanticVersion(coreHandler.bumpMinor(), prereleaseHandler, buildHandler);
+    }
+
+    /**
+     * Returns a new instance with the major and minor numbers of this current instance and the patch number
+     * incremented by one. Prerelease and build parts are left intact.
+     *
+     * @return a new instance with the major and minor numbers of this current instance and the patch number
+     *      * incremented by one.
+     */
+    public SemanticVersion bumpPatch() {
+        return new SemanticVersion(coreHandler.bumpPatch(), prereleaseHandler, buildHandler);
+    }
+
+    /**
+     * Returns a new instance with the number identified by the given value bumped.
+     *
+     * @param id the selector of the identifier to bump
+     *
+     * @return a new instance with the number identified by the given value bumped.
+     *
+     * @throws NullPointerException if <code>null</code> is passed
+     */
+    public SemanticVersion bump(CoreIdentifiers id) {
+        Objects.requireNonNull(id);
+        switch (id)
+        {
+            case MAJOR: return bumpMajor();
+            case MINOR: return bumpMinor();
+            case PATCH: return bumpPatch();
+            default: throw new IllegalArgumentException(id.toString());
+        }
+    }
+
+    /**
+     * Returns a new instance with the number identified by the given value bumped. Legal values are the strings at
+     * {@link CoreIdentifiers}, namely <code>major</code>, <code>minor</code>, <code>patch</code>.
+     *
+     * @param id the name of the identifier to bump
+     *
+     * @return a new instance with the number identified by the given value bumped.
+     *
+     * @throws NullPointerException if <code>null</code> is passed
+     * @throws IllegalArgumentException if there is no identifier with the given name
+     *
+     * @see CoreIdentifiers
+     */
+    public SemanticVersion bump(String id) {
+        return bump(CoreIdentifiers.byName(id));
+    }
+
+    /**
      * Returns the core part (<code>major.minor.patch</code>) of the version as a string.
      *
      * @return the core part of the version as a string.

@@ -74,6 +74,39 @@ class SemanticCoreVersionHandler extends CompositeIntegerValueHandler {
     }
 
     /**
+     * Returns a new instance with the major number of this current instance incremented by one and the minor and patch
+     * numbers reset to zero.
+     *
+     * @return a new instance with the major number of this current instance incremented by one and the minor and patch
+     * numbers reset to zero.
+     */
+    SemanticCoreVersionHandler bumpMajor() {
+       return new SemanticCoreVersionHandler(super.get(0)+1, 0, 0);
+    }
+
+    /**
+     * Returns a new instance with the major number of this current instance, the minor number incremented by one and
+     * the patch number reset to zero.
+     *
+     * @return a new instance with the major number of this current instance, the minor number incremented by one and
+     * the patch number reset to zero.
+     */
+    SemanticCoreVersionHandler bumpMinor() {
+        return new SemanticCoreVersionHandler(super.get(0), super.get(1)+1, 0);
+    }
+
+    /**
+     * Returns a new instance with the major and minor numbers of this current instance and the patch number
+     * incremented by one.
+     *
+     * @return a new instance with the major and minor numbers of this current instance and the patch number
+     *      * incremented by one.
+     */
+    SemanticCoreVersionHandler bumpPatch() {
+        return new SemanticCoreVersionHandler(super.get(0), super.get(1), super.get(2)+1);
+    }
+
+    /**
      * Returns an handler instance representing the specified String value.
      *
      * @param s the string to parse (in the <code>x.y.x</code> format)
