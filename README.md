@@ -74,6 +74,7 @@ Nyx will be available as:
 * command line tool, as an executable jar
 * a Docker image
 * plugins and and extensions for multiple build tools, starting with [Gradle](https://gradle.org/) and [Bazel](https://bazel.build/)
+* [GitHub Actions](https://help.github.com/en/actions/building-actions)
 
 We don't know **when** *Nyx* will be available yet.
 
