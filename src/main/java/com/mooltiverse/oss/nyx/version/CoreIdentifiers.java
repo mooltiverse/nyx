@@ -74,7 +74,8 @@ public enum CoreIdentifiers {
     }
 
     /**
-     * Returns the value with the given name.
+     * Returns the value with the given name. This method differs from {@link #valueOf(String)} as it also takes into
+     * account the internal names returned by {@link #getName()}, not just the enum value.
      *
      * @param name the name of the identifier to search
      *
@@ -82,6 +83,9 @@ public enum CoreIdentifiers {
      *
      * @throws NullPointerException if <code>null</code> is passed
      * @throws IllegalArgumentException if there is no identifier with the given name
+     *
+     * @see #getName()
+     * @see #hasName(String)
      */
     static CoreIdentifiers byName(String name) {
         for (CoreIdentifiers ci: CoreIdentifiers.values())
@@ -89,5 +93,26 @@ public enum CoreIdentifiers {
                 return ci;
         // if none is found fall back to valueOf()
         return CoreIdentifiers.valueOf(name);
+    }
+
+    /**
+     * Returns <code>true</code> if there is a value with the given name. This method can be used to invoke
+     * {@link #byName(String)} or {@link #valueOf(String)} safely.
+     *
+     * @param name the name of the identifier to search
+     *
+     * @return <code>true</code> if there is a value with the given name.
+     *
+     * @throws NullPointerException if <code>null</code> is passed
+     *
+     * @see #getName()
+     * @see #hasName(String)
+     * @see #valueOf(String)
+     */
+    static boolean hasName(String name) {
+        for (CoreIdentifiers ci: CoreIdentifiers.values())
+            if (ci.getName().equals(name) || ci.toString().equals(name))
+                return true;
+        return false;
     }
 }

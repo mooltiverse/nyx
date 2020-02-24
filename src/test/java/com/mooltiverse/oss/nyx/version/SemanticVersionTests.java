@@ -37,19 +37,18 @@ import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.junit.jupiter.params.provider.ValueSource;
 
 @DisplayName("SemanticVersion")
 public class SemanticVersionTests {
     /**
      * A {@link MethodSource} method that returns structured data to test semantic versions.
      * Each returned argument has the fields:<br>
-     * - version: the entire string representation of the version
-     * - major: the major number
-     * - minor: the minor number
-     * - patch: the patch number
-     * - prerelease: an (optional) List of strings, each representing one identifier in the prerelease part
-     * - build: an (optional) List of strings, each representing one identifier in the build part
+     * - version: the entire string representation of the version<br>
+     * - major: the major number<br>
+     * - minor: the minor number<br>
+     * - patch: the patch number<br>
+     * - prerelease: an (optional) List of strings, each representing one identifier in the prerelease part<br>
+     * - build: an (optional) List of strings, each representing one identifier in the build part<br>
      *
      * @return a stream of arguments representing correct versions
      */
@@ -94,7 +93,7 @@ public class SemanticVersionTests {
     /**
      * A {@link MethodSource} method that returns structured data to test semantic versions.
      * Each returned argument has the fields:<br>
-     * - version: the entire string representation of the version
+     * - version: the entire string representation of the version<br>
      *
      * @return a stream of arguments representing incorrect versions
      */
@@ -147,59 +146,118 @@ public class SemanticVersionTests {
     /**
      * A {@link MethodSource} method that returns structured data to test semantic versions.
      * Each returned argument has the fields:<br>
-     * - version: the entire string representation of the original version
-     * - prefix: if the original version has a prefix, it's the expected outcome of the invocation of the getPrefix() method, otherwise null means that the version has no prefix and getPrefix() is expected to return null
-     * - sanitizedOutcome: the expected outcome of the entire sanitization over the original string or the name of the class of the expected exception, if the method is expected to throw one
-     * - sanitizedPrefixOutcome: the expected outcome of sanitizePrefix() over the original string or the name of the class of the expected exception, if the method is expected to throw one
-     * - sanitizedNumberOutcome: the expected outcome of sanitizeNumbers() over the original string or the name of the class of the expected exception, if the method is expected to throw one
+     * - version: the entire string representation of the original version<br>
+     * - prefix: if the original version has a prefix, it's the expected outcome of the invocation of the getPrefix() method, otherwise null means that the version has no prefix and getPrefix() is expected to return null<br>
+     * - sanitizedOutcome: the expected outcome of the entire sanitization over the original string or the name of the class of the expected exception, if the method is expected to throw one<br>
+     * - sanitizedPrefixOutcome: the expected outcome of sanitizePrefix() over the original string or the name of the class of the expected exception, if the method is expected to throw one<br>
+     * - sanitizedNumberOutcome: the expected outcome of sanitizeNumbers() over the original string or the name of the class of the expected exception, if the method is expected to throw one<br>
      *
      * @return a stream of arguments representing incorrect versions that can be sanitized
      */
     static Stream<Arguments> wellKnownSanitizableVersions() {
         return Stream.of(
-                // common prefixes
-                arguments("v1.2.3", "v", "1.2.3", "1.2.3", "v1.2.3"),
-                arguments("v1.2.3-alpha.1", "v", "1.2.3-alpha.1", "1.2.3-alpha.1", "v1.2.3-alpha.1"),
-                arguments("v1.2.3-alpha.1+build.2", "v", "1.2.3-alpha.1+build.2", "1.2.3-alpha.1+build.2", "v1.2.3-alpha.1+build.2"),
-                arguments("v1.2.3-alpha.1.delta-q.whatever+build.2.20200101", "v", "1.2.3-alpha.1.delta-q.whatever+build.2.20200101", "1.2.3-alpha.1.delta-q.whatever+build.2.20200101", "v1.2.3-alpha.1.delta-q.whatever+build.2.20200101"),
-                arguments("ver1.2.3", "ver", "1.2.3", "1.2.3", "ver1.2.3"),
-                arguments("ver-1.2.3", "ver-", "1.2.3", "1.2.3", "ver-1.2.3"),
-                arguments("ver.1.2.3", "ver.", "1.2.3", "1.2.3", "ver.1.2.3"),
-                arguments("version1.2.3", "version", "1.2.3", "1.2.3", "version1.2.3"),
-                arguments("version-1.2.3", "version-", "1.2.3", "1.2.3", "version-1.2.3"),
-                arguments("version.1.2.3", "version.", "1.2.3", "1.2.3", "version.1.2.3"),
-                arguments("r1.2.3", "r", "1.2.3", "1.2.3", "r1.2.3"),
-                arguments("rel1.2.3", "rel", "1.2.3", "1.2.3", "rel1.2.3"),
-                arguments("rel-1.2.3", "rel-", "1.2.3", "1.2.3", "rel-1.2.3"),
-                arguments("rel.1.2.3", "rel.", "1.2.3", "1.2.3", "rel.1.2.3"),
-                arguments("release1.2.3", "release", "1.2.3", "1.2.3", "release1.2.3"),
-                arguments("release-1.2.3", "release-", "1.2.3", "1.2.3", "release-1.2.3"),
-                arguments("release.1.2.3", "release.", "1.2.3", "1.2.3", "release.1.2.3"),
-                // spurious prefixes
-                arguments("-1.2.3", "-", "1.2.3", "1.2.3", "-1.2.3"),
-                arguments("!1.2.3", "!", "1.2.3", "1.2.3", "!1.2.3"),
-                arguments("+1.2.3", "+", "1.2.3", "1.2.3", "+1.2.3"),
-                arguments("!(trash)v1.2.3", "!(trash)v", "1.2.3", "1.2.3", "!(trash)v1.2.3"),
-                // leading zeroes
-                arguments("01.02.03", null, "1.2.3", "01.02.03", "1.2.3"),
-                arguments("01.02.03-alpha", null, "1.2.3-alpha", "01.02.03-alpha", "1.2.3-alpha"),
-                arguments("01.02.03-alpha.0", null, "1.2.3-alpha.0", "01.02.03-alpha.0", "1.2.3-alpha.0"),
-                arguments("01.02.03-alpha+beta", null, "1.2.3-alpha+beta", "01.02.03-alpha+beta", "1.2.3-alpha+beta"),
-                arguments("01.02.03-alpha+beta.0", null, "1.2.3-alpha+beta.0", "01.02.03-alpha+beta.0", "1.2.3-alpha+beta.0"),
-                arguments("01.02.03+beta", null, "1.2.3+beta", "01.02.03+beta", "1.2.3+beta"),
-                arguments("01.02.03+beta.0", null, "1.2.3+beta.0", "01.02.03+beta.0", "1.2.3+beta.0"),
-                arguments("01.02.03-alpha.0+beta.0", null, "1.2.3-alpha.0+beta.0", "01.02.03-alpha.0+beta.0", "1.2.3-alpha.0+beta.0"),
-                arguments("01.02.03-alpha.01+beta.02", null, "1.2.3-alpha.1+beta.02", "01.02.03-alpha.01+beta.02", "1.2.3-alpha.1+beta.02"),
-                arguments("000001.000002.000003", null, "1.2.3", "000001.000002.000003", "1.2.3"),
-                arguments("000001.000002.000003-alpha.00345+beta-00678", null, "1.2.3-alpha.345+beta-00678", "000001.000002.000003-alpha.00345+beta-00678", "1.2.3-alpha.345+beta-00678"),
-                // These are taken from https://regex101.com/r/vkijKf/1/, linked from https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
-                // they are actually illegal numbers, bu they can be sanitized to legal ones
-                arguments("1.2.3-0123", null, "1.2.3-123", "1.2.3-0123", "1.2.3-123"),
-                arguments("1.2.3-0123.0123", null, "1.2.3-123.123", "1.2.3-0123.0123", "1.2.3-123.123"),
-                arguments("01.1.1", null, "1.1.1", "01.1.1", "1.1.1"),
-                arguments("1.01.1", null, "1.1.1", "1.01.1", "1.1.1"),
-                arguments("1.1.01", null, "1.1.1", "1.1.01", "1.1.1"),
-                arguments("-1.0.3-gamma+b7718", "-", "1.0.3-gamma+b7718", "1.0.3-gamma+b7718", "-1.0.3-gamma+b7718")
+            // common prefixes
+            arguments("v1.2.3", "v", "1.2.3", "1.2.3", "v1.2.3"),
+            arguments("v1.2.3-alpha.1", "v", "1.2.3-alpha.1", "1.2.3-alpha.1", "v1.2.3-alpha.1"),
+            arguments("v1.2.3-alpha.1+build.2", "v", "1.2.3-alpha.1+build.2", "1.2.3-alpha.1+build.2", "v1.2.3-alpha.1+build.2"),
+            arguments("v1.2.3-alpha.1.delta-q.whatever+build.2.20200101", "v", "1.2.3-alpha.1.delta-q.whatever+build.2.20200101", "1.2.3-alpha.1.delta-q.whatever+build.2.20200101", "v1.2.3-alpha.1.delta-q.whatever+build.2.20200101"),
+            arguments("ver1.2.3", "ver", "1.2.3", "1.2.3", "ver1.2.3"),
+            arguments("ver-1.2.3", "ver-", "1.2.3", "1.2.3", "ver-1.2.3"),
+            arguments("ver.1.2.3", "ver.", "1.2.3", "1.2.3", "ver.1.2.3"),
+            arguments("version1.2.3", "version", "1.2.3", "1.2.3", "version1.2.3"),
+            arguments("version-1.2.3", "version-", "1.2.3", "1.2.3", "version-1.2.3"),
+            arguments("version.1.2.3", "version.", "1.2.3", "1.2.3", "version.1.2.3"),
+            arguments("r1.2.3", "r", "1.2.3", "1.2.3", "r1.2.3"),
+            arguments("rel1.2.3", "rel", "1.2.3", "1.2.3", "rel1.2.3"),
+            arguments("rel-1.2.3", "rel-", "1.2.3", "1.2.3", "rel-1.2.3"),
+            arguments("rel.1.2.3", "rel.", "1.2.3", "1.2.3", "rel.1.2.3"),
+            arguments("release1.2.3", "release", "1.2.3", "1.2.3", "release1.2.3"),
+            arguments("release-1.2.3", "release-", "1.2.3", "1.2.3", "release-1.2.3"),
+            arguments("release.1.2.3", "release.", "1.2.3", "1.2.3", "release.1.2.3"),
+            // spurious prefixes
+            arguments("-1.2.3", "-", "1.2.3", "1.2.3", "-1.2.3"),
+            arguments("!1.2.3", "!", "1.2.3", "1.2.3", "!1.2.3"),
+            arguments("+1.2.3", "+", "1.2.3", "1.2.3", "+1.2.3"),
+            arguments("!(trash)v1.2.3", "!(trash)v", "1.2.3", "1.2.3", "!(trash)v1.2.3"),
+            // leading zeroes
+            arguments("01.02.03", null, "1.2.3", "01.02.03", "1.2.3"),
+            arguments("01.02.03-alpha", null, "1.2.3-alpha", "01.02.03-alpha", "1.2.3-alpha"),
+            arguments("01.02.03-alpha.0", null, "1.2.3-alpha.0", "01.02.03-alpha.0", "1.2.3-alpha.0"),
+            arguments("01.02.03-alpha+beta", null, "1.2.3-alpha+beta", "01.02.03-alpha+beta", "1.2.3-alpha+beta"),
+            arguments("01.02.03-alpha+beta.0", null, "1.2.3-alpha+beta.0", "01.02.03-alpha+beta.0", "1.2.3-alpha+beta.0"),
+            arguments("01.02.03+beta", null, "1.2.3+beta", "01.02.03+beta", "1.2.3+beta"),
+            arguments("01.02.03+beta.0", null, "1.2.3+beta.0", "01.02.03+beta.0", "1.2.3+beta.0"),
+            arguments("01.02.03-alpha.0+beta.0", null, "1.2.3-alpha.0+beta.0", "01.02.03-alpha.0+beta.0", "1.2.3-alpha.0+beta.0"),
+            arguments("01.02.03-alpha.01+beta.02", null, "1.2.3-alpha.1+beta.02", "01.02.03-alpha.01+beta.02", "1.2.3-alpha.1+beta.02"),
+            arguments("000001.000002.000003", null, "1.2.3", "000001.000002.000003", "1.2.3"),
+            arguments("000001.000002.000003-alpha.00345+beta-00678", null, "1.2.3-alpha.345+beta-00678", "000001.000002.000003-alpha.00345+beta-00678", "1.2.3-alpha.345+beta-00678"),
+            // These are taken from https://regex101.com/r/vkijKf/1/, linked from https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
+            // they are actually illegal numbers, bu they can be sanitized to legal ones
+            arguments("1.2.3-0123", null, "1.2.3-123", "1.2.3-0123", "1.2.3-123"),
+            arguments("1.2.3-0123.0123", null, "1.2.3-123.123", "1.2.3-0123.0123", "1.2.3-123.123"),
+            arguments("01.1.1", null, "1.1.1", "01.1.1", "1.1.1"),
+            arguments("1.01.1", null, "1.1.1", "1.01.1", "1.1.1"),
+            arguments("1.1.01", null, "1.1.1", "1.1.01", "1.1.1"),
+            arguments("-1.0.3-gamma+b7718", "-", "1.0.3-gamma+b7718", "1.0.3-gamma+b7718", "-1.0.3-gamma+b7718")
+        );
+    }
+
+    /**
+     * A {@link MethodSource} method that returns structured data to test bumping the prerelease of semantic versions.
+     * Each returned argument has the fields:<br>
+     * - version: the entire string representation of the version<br>
+     * - bumpId: the identifier to bump<br>
+     * - expectedOutcomeFromBump: the outcome expected after invoking bump(bumpId), unless an exception is expected<br>
+     * - expectedOutcomeFromBumpPrerelease: the outcome expected after invoking bumpPrerelease(bumpId), unless an exception is expected<br>
+     * - expectedException: the class of the expected expection, if any. If an exception is expected the other expected strings are ignored<br>
+     *
+     * @return a stream of arguments representing versions and their expected values after bumping
+     */
+    static Stream<Arguments> bumpPrereleaseVersions() {
+        return Stream.of(
+            arguments("1.2.3", "alpha", "1.2.3-alpha.0", "1.2.3-alpha.0", null),
+            arguments("1.2.3", "beta", "1.2.3-beta.0", "1.2.3-beta.0", null),
+            arguments("1.2.3", "gamma", "1.2.3-gamma.0", "1.2.3-gamma.0", null),
+            arguments("1.2.3", "delta", "1.2.3-delta.0", "1.2.3-delta.0", null),
+            arguments("1.2.3", "rc", "1.2.3-rc.0", "1.2.3-rc.0", null),
+            arguments("1.2.3", ".", null, null, IllegalArgumentException.class),
+            arguments("1.2.3", "alpha.", null, null, IllegalArgumentException.class),
+            arguments("1.2.3", "alpha.beta", null, null, IllegalArgumentException.class),
+            arguments("1.2.3", "0", null, null, IllegalArgumentException.class),
+            arguments("1.2.3", "1", null, null, IllegalArgumentException.class),
+            arguments("1.2.3", "alpha.0", null, null, IllegalArgumentException.class),
+            arguments("1.2.3", "alpha.1", null, null, IllegalArgumentException.class),
+            arguments("1.2.3", "!", null, null, IllegalArgumentException.class),
+            arguments("1.2.3", "+", null, null, IllegalArgumentException.class),
+
+            //the build part must be unaffected by bumps
+            arguments("1.2.3+alpha", "alpha", "1.2.3-alpha.0+alpha", "1.2.3-alpha.0+alpha", null),
+            arguments("1.2.3+alpha.1", "alpha", "1.2.3-alpha.0+alpha.1", "1.2.3-alpha.0+alpha.1", null),
+            arguments("1.2.3+beta", "alpha", "1.2.3-alpha.0+beta", "1.2.3-alpha.0+beta", null),
+
+            // test when the identifier appears multiple times
+            arguments("1.2.3-alpha", "alpha", "1.2.3-alpha.0", "1.2.3-alpha.0", null),
+            arguments("1.2.3-alpha.0", "alpha", "1.2.3-alpha.1", "1.2.3-alpha.1", null),
+            arguments("1.2.3-alpha.1", "alpha", "1.2.3-alpha.2", "1.2.3-alpha.2", null),
+            arguments("1.2.3-alpha.alpha", "alpha", "1.2.3-alpha.0.alpha", "1.2.3-alpha.0.alpha", null),
+            arguments("1.2.3-alpha.0.alpha", "alpha", "1.2.3-alpha.1.alpha.0", "1.2.3-alpha.1.alpha.0", null),
+            arguments("1.2.3-alpha+alpha.beta.alpha", "alpha", "1.2.3-alpha.0+alpha.beta.alpha", "1.2.3-alpha.0+alpha.beta.alpha", null),
+            arguments("1.2.3-alpha.0+alpha.beta.alpha", "alpha", "1.2.3-alpha.1+alpha.beta.alpha", "1.2.3-alpha.1+alpha.beta.alpha", null),
+            arguments("1.2.3-alpha.1+alpha.beta.alpha", "alpha", "1.2.3-alpha.2+alpha.beta.alpha", "1.2.3-alpha.2+alpha.beta.alpha", null),
+            arguments("1.2.3-alpha.alpha+alpha.beta.alpha", "alpha", "1.2.3-alpha.0.alpha+alpha.beta.alpha", "1.2.3-alpha.0.alpha+alpha.beta.alpha", null),
+            arguments("1.2.3-alpha.0.alpha+alpha.beta.alpha", "alpha", "1.2.3-alpha.1.alpha.0+alpha.beta.alpha", "1.2.3-alpha.1.alpha.0+alpha.beta.alpha", null),
+
+            // these are edge cases, in which a core component is bumped by its name. The core() method is expected to bump that specific core component
+            // while the bumpPrerelease() method is expected to bump the prerelease component, leaving the core identifiers untouched
+            arguments("1.2.3", "major", "2.0.0", "1.2.3-major.0", null),
+            arguments("1.2.3", "minor", "1.3.0", "1.2.3-minor.0", null),
+            arguments("1.2.3", "patch", "1.2.4", "1.2.3-patch.0", null),
+            arguments("1.2.3-major", "major", "2.0.0-major", "1.2.3-major.0", null),
+            arguments("1.2.3-minor", "minor", "1.3.0-minor", "1.2.3-minor.0", null),
+            arguments("1.2.3-patch", "patch", "1.2.4-patch", "1.2.3-patch.0", null),
+            arguments("1.2.3-major.3", "major", "2.0.0-major.3", "1.2.3-major.4", null),
+            arguments("1.2.3-minor.3", "minor", "1.3.0-minor.3", "1.2.3-minor.4", null),
+            arguments("1.2.3-patch.3", "patch", "1.2.4-patch.3", "1.2.3-patch.4", null)
         );
     }
 
@@ -780,6 +838,17 @@ public class SemanticVersionTests {
         void exceptionUsingBumpWithNullOrEmptyString(String bump) {
             assertThrows(RuntimeException.class, () -> SemanticVersion.valueOf(SemanticVersion.DEFAULT_INITIAL_VERSION).bump(bump));
         }
+
+        @ParameterizedTest(name = "#{index} bump(''{0}'', ''{1}'') ==> ''{2}'' or ''{4}''")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#bumpPrereleaseVersions")
+        @SuppressWarnings("unchecked")
+        void bumpIdWithArbitraryString(String version, String bumpId, String expectedOutcomeFromBump, String expectedOutcomeFromBumpPrerelease, Class expectedException) {
+            SemanticVersion sv = SemanticVersion.valueOf(version);
+            if (expectedException == null) {
+                assertEquals(expectedOutcomeFromBump, sv.bump(bumpId).toString());
+            }
+            else assertThrows(expectedException, () -> sv.bump(bumpId));
+        }
     }
 
     @Nested
@@ -890,6 +959,21 @@ public class SemanticVersionTests {
             assertEquals(major, sv2.getMajor());
             assertEquals(minor, sv2.getMinor());
             assertEquals(patch+1, sv2.getPatch());
+        }
+    }
+
+    @Nested
+    @DisplayName("SemanticVersion.bumpPrerelease")
+    class BumpPrereleaseTests {
+        @ParameterizedTest(name = "#{index} bumpPrerelease(''{0}'', ''{1}'') ==> ''{3}'' or ''{4}''")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#bumpPrereleaseVersions")
+        @SuppressWarnings("unchecked")
+        void bumpIdWithArbitraryString(String version, String bumpId, String expectedOutcomeFromBump, String expectedOutcomeFromBumpPrerelease, Class expectedException) {
+            SemanticVersion sv = SemanticVersion.valueOf(version);
+            if (expectedException == null) {
+                assertEquals(expectedOutcomeFromBumpPrerelease, sv.bumpPrerelease(bumpId).toString());
+            }
+            else assertThrows(expectedException, () -> sv.bump(bumpId));
         }
     }
 }

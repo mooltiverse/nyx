@@ -45,6 +45,11 @@ public class SemanticVersion extends AbstractVersion implements Comparable<Seman
     public static final char BUILD_MARKER = '+';
 
     /**
+     * The default value to start from when bumping an identifier that has no numeric value yet. {@value}
+     */
+    public static final int DEFAULT_BUMP_VALUE = 0;
+
+    /**
      * A relaxed version of the {@link #SEMANTIC_VERSION_PATTERN} that works also when a prefix appears at the beginning
      * of the version string or some zeroes appear in front of numbers.
      * Value is: {@value}
@@ -651,20 +656,91 @@ public class SemanticVersion extends AbstractVersion implements Comparable<Seman
     }
 
     /**
-     * Returns a new instance with the number identified by the given value bumped. Legal values are the strings at
-     * {@link CoreIdentifiers}, namely <code>major</code>, <code>minor</code>, <code>patch</code>.
+     * Returns a new instance with the number identified by the given value bumped in the prerelease part. The core and
+     * the build blocks (if present) are left unchanged.
+     * <br>
+     * If this version doesn't have a prerelease block the returned version will have one, containing two identifiers:
+     * the given string and the following number <code>.0</code>.
+     * <br>
+     * If this version already has a prerelease block without any identifier that equals the given id, then the returned
+     * version has all the previous prerelease identifiers preceded by the two new identifiers the given string and
+     * the following number <code>.0</code>.
+     * If this version already has a prerelease block that contains a string identifier equal to the given id there are
+     * two options: if the selected identifier already has a numeric value that follows, the returned version will have
+     * that numeric identifier incremented by one; if the selected identifier doesn't have a numeric identifier that
+     * follows, a new numeric identifiers is added after the string with the initial value <code>.0</code>.
+     * <br>
+     * If the version already has multiple identifiers in the prerelease block that equal to the given value then all of
+     * them will be bumped. In case they have different numeric values (or missing) each occurrence is bumped
+     * independently according to the above rules.
+     * <br>
+     * Examples of invoking <code>bumpPrerelease("alpha")</code> on different versions:<br>
+     * - <code>1.2.3 = 1.2.3-alpha.0</code><br>
+     * - <code>1.2.3-alpha = 1.2.3-alpha.0</code><br>
+     * - <code>1.2.3-alpha.beta = 1.2.3-alpha.0.beta</code><br>
+     * - <code>1.2.3-gamma = 1.2.3-alpha.0.gamma</code><br>
+     * - <code>1.2.3-gamma.delta = 1.2.3-alpha.0.gamma.delta</code><br>
+     * - <code>1.2.3+999 = 1.2.3-alpha.0+999</code><br>
+     * - <code>1.2.3-alpha+999 = 1.2.3-alpha.0+999</code><br>
+     * - <code>1.2.3-alpha.beta+999 = 1.2.3-alpha.0.beta+999</code><br>
+     * - <code>1.2.3-gamma+999 = 1.2.3-alpha.0.gamma+999</code><br>
+     * - <code>1.2.3-gamma.delta+999 = 1.2.3-alpha.0.gamma.delta+999</code><br>
+     * - <code>1.2.3-alpha.alpha.1.alpha.2 = 1.2.3-alpha.0.alpha.2.alpha.3</code><br>
+     *
+     * @param id the selector of the identifier to bump
+     *
+     * @return a new instance with the number identified by the given value bumped.
+     *
+     * @throws NullPointerException if <code>null</code> is passed
+     * @throws IllegalArgumentException if the given string is empty, contains illegal characters or represents a number
+     */
+    public SemanticVersion bumpPrerelease(String id) {
+        Objects.requireNonNull(id);
+        if (id.isEmpty())
+            throw new IllegalArgumentException("Can't bump an empty identifier");
+        boolean isNumber = false;
+        try {
+            Integer.valueOf(id);
+            isNumber = true;
+        }
+        catch (NumberFormatException nfe) {
+            // ok, it's not a number
+        }
+        if (isNumber)
+            throw new IllegalArgumentException(String.format("The value %s is numeric ant can't be used as a string identifier in the prerelease", id));
+
+        return new SemanticVersion(coreHandler, prereleaseHandler == null ? SemanticPreReleaseVersionHandler.of(id, Integer.valueOf(DEFAULT_BUMP_VALUE)) : prereleaseHandler.bump(id, DEFAULT_BUMP_VALUE), buildHandler);
+    }
+
+    /**
+     * Returns a new instance with the number identified by the given value bumped. If the given value represents a core
+     * identifier ({@link CoreIdentifiers}, namely <code>major</code>, <code>minor</code>, <code>patch</code>) then that
+     * identifier is bumped, otherwise the given id is used to bump a prerelease identifier by invoking
+     * {@link #bumpPrerelease(String)}.
+     * <br>
+     * In other words this method is a shorthand for {@link #bump(CoreIdentifiers)} and {@link #bumpPrerelease(String)},
+     * the latter being used only when the given id is not a core identifier.
+     * <br>
+     * If the version already has multiple identifiers in the prerelease block that equal to the given value then all of
+     * them will be bumped. In case they have different numeric values (or missing) each occurrence is bumped
+     * independently according to the above rules.
      *
      * @param id the name of the identifier to bump
      *
      * @return a new instance with the number identified by the given value bumped.
      *
      * @throws NullPointerException if <code>null</code> is passed
-     * @throws IllegalArgumentException if there is no identifier with the given name
+     * @throws IllegalArgumentException if the given string is empty, contains illegal characters or represents a number
      *
      * @see CoreIdentifiers
+     * @see #bump(CoreIdentifiers)
+     * @see #bumpPrerelease(String)
      */
     public SemanticVersion bump(String id) {
-        return bump(CoreIdentifiers.byName(id));
+        Objects.requireNonNull(id);
+        if (CoreIdentifiers.hasName(id))
+            return bump(CoreIdentifiers.byName(id));
+        else return bumpPrerelease(id);
     }
 
     /**
