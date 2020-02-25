@@ -29,7 +29,7 @@ class SemanticCoreVersionHandler extends CompositeIntegerValueHandler {
      *
      * @throws IllegalArgumentException if a given value is illegal (i.e. negative)
      */
-    private SemanticCoreVersionHandler(int major, int minor, int patch) {
+    SemanticCoreVersionHandler(int major, int minor, int patch) {
         super(new IntegerValueHandler(major), new IntegerValueHandler(minor), new IntegerValueHandler(patch));
     }
 
@@ -42,7 +42,7 @@ class SemanticCoreVersionHandler extends CompositeIntegerValueHandler {
      *
      * @throws IllegalArgumentException if a given value is illegal (i.e. negative)
      */
-    private SemanticCoreVersionHandler(String major, String minor, String patch) {
+    SemanticCoreVersionHandler(String major, String minor, String patch) {
         super(new IntegerValueHandler(major), new IntegerValueHandler(minor), new IntegerValueHandler(patch));
     }
 
@@ -121,26 +121,5 @@ class SemanticCoreVersionHandler extends CompositeIntegerValueHandler {
         if (parts.length != 3)
             throw new IllegalArgumentException(String.format("The string %s is not composed of 3 integers", s));
         return new SemanticCoreVersionHandler(parts[0], parts[1], parts[2]);
-    }
-
-    /**
-     * Returns an handler instance representing the specified values.
-     *
-     * @param major the major number
-     * @param minor the minor number
-     * @param patch the patch number
-     *
-     * @return the new handler instance representing the given values.
-     *
-     * @throws NullPointerException if any of the given strings is <code>null</code>
-     * @throws IllegalArgumentException if the given strings don't represent a legal semantic core version number
-     */
-    static SemanticCoreVersionHandler valueOf(String major, String minor, String patch) {
-        try {
-            return new SemanticCoreVersionHandler(major, minor, patch);
-        }
-        catch (IllegalArgumentException iae) {
-            throw new IllegalArgumentException(String.format("The strings %s, %s, %s are not valid integers", major, minor, patch), iae);
-        }
     }
 }

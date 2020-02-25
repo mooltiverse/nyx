@@ -212,4 +212,22 @@ class CompositeValueHandler<H extends ValueHandler> extends AbstractValueHandler
     public List<H> getChildren() {
         return children;
     }
+
+    /**
+     * Utility method that returns <code>true</code> if all the elements in the given array are <code>null</code>,
+     * <code>false</code> otherwise.
+     *
+     * @param items the array to check
+     *
+     * @return <code>true</code> if all the elements in the given array are <code>null</code>
+     *
+     * @throws NullPointerException if the given array is <code>null</code>
+     */
+    public static boolean allNulls(Object[] items) {
+        Objects.requireNonNull(items);
+        for (Object item: items)
+            if (item != null)
+                return false;
+        return true;
+    }
 }

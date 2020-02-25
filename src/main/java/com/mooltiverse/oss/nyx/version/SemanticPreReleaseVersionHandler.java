@@ -72,7 +72,7 @@ class SemanticPreReleaseVersionHandler extends CompositeObjectValueHandler {
      * @throws IllegalArgumentException if the given identifiers are not {@link String} or {@link Integer} instances, if
      * numeric values are not positive integers or string values contain illegal characters or are empty.
      */
-    static SemanticPreReleaseVersionHandler of(Object... identifiers) {
+    static SemanticPreReleaseVersionHandler valueOf(Object... identifiers) {
         Objects.requireNonNull(identifiers);
         if (identifiers.length == 0)
             throw new IllegalArgumentException("Can't build the list of identifiers from an empty list");
@@ -115,7 +115,7 @@ class SemanticPreReleaseVersionHandler extends CompositeObjectValueHandler {
      * @throws IllegalArgumentException if the given string contains illegal characters
      */
     static SemanticPreReleaseVersionHandler valueOf(String s) {
-        return of((Object[]) split(s, DEFAULT_SEPARATOR));
+        return valueOf((Object[]) split(s, DEFAULT_SEPARATOR));
     }
 
     /**
@@ -180,6 +180,6 @@ class SemanticPreReleaseVersionHandler extends CompositeObjectValueHandler {
             identifiers.add(0, id);
             identifiers.add(1, Integer.valueOf(defaultNumber));
         }
-        return of(identifiers.toArray());
+        return valueOf(identifiers.toArray());
     }
 }

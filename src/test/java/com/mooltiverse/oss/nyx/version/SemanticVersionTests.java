@@ -392,6 +392,68 @@ public class SemanticVersionTests {
     }
 
     @Nested
+    @DisplayName("SemanticVersion constructors")
+    class ConstructorsTests {
+        @Test
+        @DisplayName("new SemanticVersion() with negative numbers")
+        void exceptionUsingNegativeNumbers() {
+            assertThrows(IllegalArgumentException.class, () -> new SemanticVersion(0, 0, -1));
+            assertThrows(IllegalArgumentException.class, () -> new SemanticVersion(0, -1, 0));
+            assertThrows(IllegalArgumentException.class, () -> new SemanticVersion(-1, 0, 0));
+            assertThrows(IllegalArgumentException.class, () -> new SemanticVersion(0, 0, -1, null, null));
+            assertThrows(IllegalArgumentException.class, () -> new SemanticVersion(0, -1, 0, null, null));
+            assertThrows(IllegalArgumentException.class, () -> new SemanticVersion(-1, 0, 0, null, null));
+        }
+
+        @ParameterizedTest(name = "#{index} new SemanticVersion(''{1}'',''{2}'',''{3}'',''null'',''null'')")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
+        void noExceptionUsingNullIdentifiers(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
+            SemanticVersion sv = new SemanticVersion(major, minor, patch, null, null);
+            String coreString = identifiersToString(List.of(String.valueOf(major), String.valueOf(minor), String.valueOf(patch)));
+
+            assertEquals(major, sv.getMajor());
+            assertEquals(minor, sv.getMinor());
+            assertEquals(patch, sv.getPatch());
+            assertEquals(coreString, sv.getCore());
+        }
+
+        @ParameterizedTest(name = "#{index} new SemanticVersion(''{1}'',''{2}'',''{3}'',''[]'',''[]'')")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
+        void noExceptionUsingEmptyIdentifiers(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
+            SemanticVersion sv = new SemanticVersion(major, minor, patch, new Object[0], new String[0]);
+            String coreString = identifiersToString(List.of(String.valueOf(major), String.valueOf(minor), String.valueOf(patch)));
+
+            assertEquals(major, sv.getMajor());
+            assertEquals(minor, sv.getMinor());
+            assertEquals(patch, sv.getPatch());
+            assertEquals(coreString, sv.getCore());
+        }
+
+        @ParameterizedTest(name = "#{index} new SemanticVersion(''{1}'',''{2}'',''{3}'') ==> ''{0}''")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
+        void constructor1(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
+            SemanticVersion sv = new SemanticVersion(major, minor, patch);
+            String coreString = identifiersToString(List.of(String.valueOf(major), String.valueOf(minor), String.valueOf(patch)));
+
+            assertEquals(coreString, sv.toString());
+            assertEquals(major, sv.getMajor());
+            assertEquals(minor, sv.getMinor());
+            assertEquals(patch, sv.getPatch());
+        }
+
+        @ParameterizedTest(name = "#{index} new SemanticVersion(''{1}'',''{2}'',''{3}'',''null'',''null'') ==> ''{0}''")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
+        void constructor2(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
+            SemanticVersion sv = new SemanticVersion(major, minor, patch, pre == null ? null : pre.toArray(new Object[0]), build == null ? null : build.toArray(new String[0]));
+
+            assertEquals(version, sv.toString());
+            assertEquals(major, sv.getMajor());
+            assertEquals(minor, sv.getMinor());
+            assertEquals(patch, sv.getPatch());
+        }
+    }
+
+    @Nested
     @DisplayName("SemanticVersion.valueOf")
     class ValueOfTests {
         @ParameterizedTest(name = "#{index} valueOf(''{arguments}'') ==> IllegalArgumentException")
@@ -459,6 +521,25 @@ public class SemanticVersionTests {
     }
 
     @Nested
+    @DisplayName("SemanticVersion.setMajor")
+    class SetMajorTests {
+        @ParameterizedTest(name = "#{index} setMajor(''{1}'')")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
+        void setMajor(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
+            SemanticVersion sv = SemanticVersion.valueOf(SemanticVersion.DEFAULT_INITIAL_VERSION);
+            assumeTrue(SemanticVersion.DEFAULT_INITIAL_VERSION.equals(sv.toString()));
+            assumeTrue(0 == sv.getMajor());
+
+            sv = sv.setMajor(major);
+            assertEquals(major, sv.getMajor());
+            assertEquals(1, sv.getMinor());
+            assertEquals(0, sv.getPatch());
+            assertNull(sv.getPrerelease());
+            assertNull(sv.getBuild());
+        }
+    }
+
+    @Nested
     @DisplayName("SemanticVersion.getMinor")
     class GetMinorTests {
         @ParameterizedTest(name = "#{index} getMinor(''{0}'') ==> ''{2}''")
@@ -469,12 +550,50 @@ public class SemanticVersionTests {
     }
 
     @Nested
+    @DisplayName("SemanticVersion.setMinor")
+    class SetMinorTests {
+        @ParameterizedTest(name = "#{index} setMinor(''{1}'')")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
+        void setMinor(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
+            SemanticVersion sv = SemanticVersion.valueOf(SemanticVersion.DEFAULT_INITIAL_VERSION);
+            assumeTrue(SemanticVersion.DEFAULT_INITIAL_VERSION.equals(sv.toString()));
+            assumeTrue(1 == sv.getMinor());
+
+            sv = sv.setMinor(minor);
+            assertEquals(0, sv.getMajor());
+            assertEquals(minor, sv.getMinor());
+            assertEquals(0, sv.getPatch());
+            assertNull(sv.getPrerelease());
+            assertNull(sv.getBuild());
+        }
+    }
+
+    @Nested
     @DisplayName("SemanticVersion.getPatch")
     class GetPatchTests {
         @ParameterizedTest(name = "#{index} getPatch(''{0}'') ==> ''{3}''")
         @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
         void getPatch(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
             assertEquals(patch, SemanticVersion.valueOf(version).getPatch());
+        }
+    }
+
+    @Nested
+    @DisplayName("SemanticVersion.setPatch")
+    class SetPatchTests {
+        @ParameterizedTest(name = "#{index} setPatch(''{1}'')")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
+        void setPatch(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
+            SemanticVersion sv = SemanticVersion.valueOf(SemanticVersion.DEFAULT_INITIAL_VERSION);
+            assumeTrue(SemanticVersion.DEFAULT_INITIAL_VERSION.equals(sv.toString()));
+            assumeTrue(0 == sv.getPatch());
+
+            sv = sv.setPatch(patch);
+            assertEquals(0, sv.getMajor());
+            assertEquals(1, sv.getMinor());
+            assertEquals(patch, sv.getPatch());
+            assertNull(sv.getPrerelease());
+            assertNull(sv.getBuild());
         }
     }
 
@@ -499,8 +618,29 @@ public class SemanticVersionTests {
     }
 
     @Nested
+    @DisplayName("SemanticVersion.setCore")
+    class SetCoreTests {
+        @ParameterizedTest(name = "#{index} setCore(''{1}'', ''{2}'', ''{3}'')")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
+        void setCore(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
+            SemanticVersion sv = SemanticVersion.valueOf(SemanticVersion.DEFAULT_INITIAL_VERSION);
+            assumeTrue(SemanticVersion.DEFAULT_INITIAL_VERSION.equals(sv.toString()));
+            assumeTrue(0 == sv.getMajor());
+            assumeTrue(1 == sv.getMinor());
+            assumeTrue(0 == sv.getPatch());
+
+            sv = sv.setCore(major, minor, patch);
+            assertEquals(major, sv.getMajor());
+            assertEquals(minor, sv.getMinor());
+            assertEquals(patch, sv.getPatch());
+            assertNull(sv.getPrerelease());
+            assertNull(sv.getBuild());
+        }
+    }
+
+    @Nested
     @DisplayName("SemanticVersion.getPrerelease")
-    class GetgetPrereleaseTests {
+    class GetPrereleaseTests {
         @ParameterizedTest(name = "#{index} getPrerelease(''{0}'') ==> ''{4}''")
         @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
         void getPrerelease(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
@@ -517,6 +657,30 @@ public class SemanticVersionTests {
                     assertEquals(s.toString(), SemanticVersion.valueOf(version).getPrereleaseIdentifiers()[pre.indexOf(s)].toString());
                 }
             }
+        }
+    }
+
+    @Nested
+    @DisplayName("SemanticVersion.setPrerelease")
+    class SetPrereleaseTests {
+        @ParameterizedTest(name = "#{index} setPrerelease(''{4}'')")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
+        void setPrerelease(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
+            SemanticVersion sv = SemanticVersion.valueOf(SemanticVersion.DEFAULT_INITIAL_VERSION);
+            assumeTrue(SemanticVersion.DEFAULT_INITIAL_VERSION.equals(sv.toString()));
+            assumeTrue(0 == sv.getMajor());
+            assumeTrue(1 == sv.getMinor());
+            assumeTrue(0 == sv.getPatch());
+            assumeTrue(null == sv.getPrerelease());
+            assumeTrue(null == sv.getBuild());
+
+            sv = sv.setCore(major, minor, patch);
+            sv = sv.setBuild(build == null ? null : build.toArray(new String[0]));
+            sv = sv.setPrerelease(pre == null ? null : pre.toArray());
+            assertEquals(major, sv.getMajor());
+            assertEquals(minor, sv.getMinor());
+            assertEquals(patch, sv.getPatch());
+            assertEquals(version, sv.toString());
         }
     }
 
@@ -539,6 +703,30 @@ public class SemanticVersionTests {
                     assertEquals(s.toString(), SemanticVersion.valueOf(version).getBuildIdentifiers()[build.indexOf(s)].toString());
                 }
             }
+        }
+    }
+
+    @Nested
+    @DisplayName("SemanticVersion.setBuild")
+    class SetBuildTests {
+        @ParameterizedTest(name = "#{index} setBuild(''{5}'')")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
+        void setPrerelease(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
+            SemanticVersion sv = SemanticVersion.valueOf(SemanticVersion.DEFAULT_INITIAL_VERSION);
+            assumeTrue(SemanticVersion.DEFAULT_INITIAL_VERSION.equals(sv.toString()));
+            assumeTrue(0 == sv.getMajor());
+            assumeTrue(1 == sv.getMinor());
+            assumeTrue(0 == sv.getPatch());
+            assumeTrue(null == sv.getPrerelease());
+            assumeTrue(null == sv.getBuild());
+
+            sv = sv.setCore(major, minor, patch);
+            sv = sv.setPrerelease(pre == null ? null : pre.toArray());
+            sv = sv.setBuild(build == null ? null : build.toArray(new String[0]));
+            assertEquals(major, sv.getMajor());
+            assertEquals(minor, sv.getMinor());
+            assertEquals(patch, sv.getPatch());
+            assertEquals(version, sv.toString());
         }
     }
 

@@ -17,6 +17,7 @@ package com.mooltiverse.oss.nyx.version;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * The specialization of a Build version number as per <a href="https://semver.org/">Semantic Versioning 2.0.0</a>.
@@ -43,12 +44,39 @@ class SemanticBuildVersionHandler extends CompositeStringValueHandler {
      * @return the new handler instance representing the given string.
      *
      * @throws NullPointerException if the given string is <code>null</code>
-     * @throws IllegalArgumentException if the given string contains illegal characters
+     * @throws IllegalArgumentException if the given string contains illegal characters or there isn't any non
+     * <code>null</code> item
      */
     static SemanticBuildVersionHandler valueOf(String s) {
+        Objects.requireNonNull(s);
         List<StringValueHandler> handlers = new ArrayList<StringValueHandler>();
+        if (s.isEmpty())
+            throw new IllegalArgumentException("Can't build the list of identifiers from an empty string");
         for (String part: split(s, DEFAULT_SEPARATOR))
             handlers.add(new StringValueHandler(part));
+        return new SemanticBuildVersionHandler(handlers);
+    }
+
+    /**
+     * Returns an handler instance representing the specified String values.
+     *
+     * @param s the strings to parse
+     *
+     * @return the new handler instance representing the given string.
+     *
+     * @throws NullPointerException if the given string is <code>null</code>
+     * @throws IllegalArgumentException if the given string contains illegal characters or there isn't any non
+     * <code>null</code> item
+     */
+    static SemanticBuildVersionHandler valueOf(String... s) {
+        Objects.requireNonNull(s);
+        if (s.length == 0)
+            throw new IllegalArgumentException("Can't build the list of identifiers from an empty list");
+        List<StringValueHandler> handlers = new ArrayList<StringValueHandler>();
+        for (String item: s)
+            if (!item.isEmpty())
+                for (String part: split(item, DEFAULT_SEPARATOR))
+                    handlers.add(new StringValueHandler(part));
         return new SemanticBuildVersionHandler(handlers);
     }
 }

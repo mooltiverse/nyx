@@ -25,6 +25,10 @@ import java.util.regex.Pattern;
 
 /**
  * The implementation of a <a href="https://semver.org/">Semantic Versioning 2.0.0</a> compliant version.
+ * <br>
+ * Instances of this class are <b>immutable</b> so whenever you alter some values you actually receive a new instance.
+ * <br>
+ * To get new instances you can also use one of the {@link #valueOf(String)} methods.
  */
 public class SemanticVersion extends AbstractVersion implements Comparable<SemanticVersion> {
     /**
@@ -83,6 +87,44 @@ public class SemanticVersion extends AbstractVersion implements Comparable<Seman
      * The handler of the build part of the version. It may be <code>null</code>.
      */
     private final SemanticBuildVersionHandler buildHandler;
+
+    /**
+     * Builds a new version object with the given values.
+     *
+     * @param major the <code>major</code> number
+     * @param minor the <code>minor</code> number
+     * @param patch the <code>patch</code> number
+     *
+     * @throws IllegalArgumentException if one of <code>major</code>, <code>minor</code>, <code>patch</code> is
+     * negative
+     */
+    public SemanticVersion(int major, int minor, int patch) {
+        this(major, minor, patch, null, null);
+    }
+
+    /**
+     * Builds a new version object with the given values.
+     *
+     * @param major the <code>major</code> number
+     * @param minor the <code>minor</code> number
+     * @param patch the <code>patch</code> number
+     * @param prereleaseIdentifiers the <code>prereleaseIdentifiers</code> the array of {@link Integer} or {@link String}
+     * objects to use as identifiers in the prerelease block. <code>null</code> items are ignored. Integers and strings
+     * representing integers must not have leading zeroes or represent negative numbers. If the array is <code>null</code>
+     * then the instance will have no prerelease block
+     * @param buildIdentifiers the <code>buildIdentifiers</code> the array of  {@link String} to use as identifiers in
+     * the build block. <code>null</code> items are ignored. If the array is <code>null</code> then the instance will
+     * have no build block
+     *
+     * @throws IllegalArgumentException if one of <code>major</code>, <code>minor</code>, <code>patch</code> is
+     * negative or one object in the <code>prereleaseIdentifiers</code> represents a negative integer (either when
+     * passed as an {@link Integer} or {@link String}) or have leading zeroes. This exception is also raised when objects
+     * in the <code>prereleaseIdentifiers</code> are not of type {@link Integer} or {@link String} or when string
+     * identifiers in the <code>prereleaseIdentifiers</code> or <code>buildIdentifiers</code> contain illegal characters
+     */
+    public SemanticVersion(int major, int minor, int patch, Object[] prereleaseIdentifiers, String[] buildIdentifiers) {
+        this(new SemanticCoreVersionHandler(major, minor, patch), prereleaseIdentifiers == null || prereleaseIdentifiers.length == 0 || CompositeValueHandler.allNulls(prereleaseIdentifiers) ? null : SemanticPreReleaseVersionHandler.valueOf(prereleaseIdentifiers), buildIdentifiers == null || buildIdentifiers.length == 0 || CompositeValueHandler.allNulls(buildIdentifiers) ? null :  SemanticBuildVersionHandler.valueOf(buildIdentifiers));
+    }
 
     /**
      * Builds the version with the given handlers values.
@@ -356,7 +398,7 @@ public class SemanticVersion extends AbstractVersion implements Comparable<Seman
             // group 4 (optional) is the prerelease
             // group 5 (optional) is the build
 
-            SemanticCoreVersionHandler coreHandler = SemanticCoreVersionHandler.valueOf(m.group(1), m.group(2), m.group(3));
+            SemanticCoreVersionHandler coreHandler = new SemanticCoreVersionHandler(m.group(1), m.group(2), m.group(3));
             SemanticPreReleaseVersionHandler preReleaseHandler = null;
             if ((m.group(4) != null) && (!m.group(4).isEmpty()))
                 preReleaseHandler = SemanticPreReleaseVersionHandler.valueOf(m.group(4));
@@ -603,6 +645,177 @@ public class SemanticVersion extends AbstractVersion implements Comparable<Seman
     }
 
     /**
+     * Returns the core part (<code>major.minor.patch</code>) of the version as a string.
+     *
+     * @return the core part of the version as a string.
+     */
+    public String getCore() {
+        return coreHandler.toString();
+    }
+
+    /**
+     * Returns an array of the single identifiers of the core part of the version
+     *
+     * @return the identifiers of the core part of the version.
+     */
+    public Integer[] getCoreIdentifiers() {
+        Integer[] res = new Integer[coreHandler.children.size()];
+        for (int i=0; i<coreHandler.children.size(); i++)
+            res[i] = coreHandler.children.get(i).value;
+        return res;
+    }
+
+    /**
+     * Returns the prerelease part of the version, if any, or <code>null</code> otherwise.
+     *
+     * @return the prerelease part of the version.
+     */
+    public String getPrerelease() {
+        return prereleaseHandler == null ? null : prereleaseHandler.toString();
+    }
+
+    /**
+     * Returns an array of the single identifiers of the prerelease part of the version, if any, or <code>null</code>
+     * otherwise.
+     *
+     * @return the identifiers of the prerelease part of the version. The objects in the array can be either {@link Integer}
+     * or {@link String}.
+     */
+    public Object[] getPrereleaseIdentifiers() {
+        if (prereleaseHandler == null)
+            return null;
+        Object[] res = new Object[prereleaseHandler.children.size()];
+        for (int i=0; i<prereleaseHandler.children.size(); i++)
+            res[i] = prereleaseHandler.children.get(i).value;
+        return res;
+    }
+
+    /**
+     * Returns the build part of the version, if any, or <code>null</code> otherwise.
+     *
+     * @return the build part of the version.
+     */
+    public String getBuild() {
+        return buildHandler == null ? null : buildHandler.toString();
+    }
+
+    /**
+     * Returns an array of the single identifiers of the build part of the version, if any, or <code>null</code>
+     * otherwise.
+     *
+     * @return the identifiers of the build part of the version.
+     */
+    public String[] getBuildIdentifiers() {
+        if (buildHandler == null)
+            return null;
+        String[] res = new String[buildHandler.children.size()];
+        for (int i=0; i<buildHandler.children.size(); i++)
+            res[i] = buildHandler.children.get(i).value;
+        return res;
+    }
+
+    /**
+     * Returns a new version object with the <code>major</code>, <code>minor</code> and <code>patch</code> numbers set
+     * to the given values. This method doesn't reset any number and the prerelease and build blocks are left unchanged.
+     *
+     * @param major the major number to set
+     * @param minor the minor number to set
+     * @param patch the patch number to set
+     *
+     * @return the new version instance
+     *
+     * @throws IllegalArgumentException if any of the given values is negative
+     */
+    public SemanticVersion setCore(int major, int minor, int patch) {
+        return new SemanticVersion(new SemanticCoreVersionHandler(major, minor, patch), prereleaseHandler, buildHandler);
+    }
+
+    /**
+     * Returns a new version object with the <code>major</code> number set to the given value.
+     * This method doesn't reset any number and the prerelease and build blocks are left unchanged.
+     *
+     * @param major the major number to set
+     *
+     * @return the new version instance
+     *
+     * @throws IllegalArgumentException if the given values is negative
+     */
+    public SemanticVersion setMajor(int major) {
+        return new SemanticVersion(new SemanticCoreVersionHandler(major, coreHandler.getMinor(), coreHandler.getPatch()), prereleaseHandler, buildHandler);
+    }
+
+    /**
+     * Returns a new version object with the <code>minor</code> number set to the given value.
+     * This method doesn't reset any number and the prerelease and build blocks are left unchanged.
+     *
+     * @param minor the minor number to set
+     *
+     * @return the new version instance
+     *
+     * @throws IllegalArgumentException if the given values is negative
+     */
+    public SemanticVersion setMinor(int minor) {
+        return new SemanticVersion(new SemanticCoreVersionHandler(coreHandler.getMajor(), minor, coreHandler.getPatch()), prereleaseHandler, buildHandler);
+    }
+
+    /**
+     * Returns a new version object with the <code>patch</code> number set to the given value.
+     * This method doesn't reset any number and the prerelease and build blocks are left unchanged.
+     *
+     * @param patch the patch number to set
+     *
+     * @return the new version instance
+     *
+     * @throws IllegalArgumentException if the given values is negative
+     */
+    public SemanticVersion setPatch(int patch) {
+        return new SemanticVersion(new SemanticCoreVersionHandler(coreHandler.getMajor(), coreHandler.getMinor(), patch), prereleaseHandler, buildHandler);
+    }
+
+    /**
+     * Returns a new version object with the prerelease part set to the given values. If a <code>null</code> value or an array
+     * of all <code>null</code> values is passed then the returned version will have no prerelease part, otherwise it will have
+     * all of the given non <code>null</code> identifiers, with the core and build elements of this version instance.
+     *
+     * @param identifiers the identifiers to use for the new version instance, or <code>null</code> to remove the
+     * prerelease block. All non <code>null</code> items must be {@link String} or {@link Integer} instances.
+     * {@link String} instances representing numeric values will be interpreted as {@link Integer}.
+     *
+     * @return the new version instance
+     *
+     * @throws IllegalArgumentException if some non <code>null</code> item passed contains illegal characters, if a
+     * given number is negative or contains leading zeroes or any item is not an instance of {@link String} or
+     * {@link Integer}
+     */
+    public SemanticVersion setPrerelease(Object... identifiers) {
+        SemanticPreReleaseVersionHandler spvh = null;
+        if ((identifiers != null) && (identifiers.length > 0) && (!CompositeValueHandler.allNulls(identifiers))) {
+            spvh = SemanticPreReleaseVersionHandler.valueOf(identifiers);
+        }
+        return new SemanticVersion(coreHandler, spvh, buildHandler);
+    }
+
+    /**
+     * Returns a new version object with the build part set to the given values. If a <code>null</code> value or an array
+     * of all <code>null</code> values is passed then the returned version will have no build part, otherwise it will have
+     * all of the given non <code>null</code> identifiers, with the core and prerelease elements of this version instance.
+     *
+     * @param identifiers the identifiers to use for the new version instance, or <code>null</code> to remove the
+     * build block
+     *
+     * @return the new version instance
+     *
+     * @throws IllegalArgumentException if some non <code>null</code> item passed contains illegal characters
+     */
+    public SemanticVersion setBuild(String... identifiers) {
+        SemanticBuildVersionHandler sbvh = null;
+        if ((identifiers != null) && (identifiers.length > 0) && (!CompositeValueHandler.allNulls(identifiers))) {
+            sbvh = SemanticBuildVersionHandler.valueOf(identifiers);
+        }
+        return new SemanticVersion(coreHandler, prereleaseHandler, sbvh);
+    }
+
+    /**
      * Returns a new instance with the major number of this current instance incremented by one and the minor and patch
      * numbers reset to zero. Prerelease and build parts are left intact.
      *
@@ -709,7 +922,7 @@ public class SemanticVersion extends AbstractVersion implements Comparable<Seman
         if (isNumber)
             throw new IllegalArgumentException(String.format("The value %s is numeric ant can't be used as a string identifier in the prerelease", id));
 
-        return new SemanticVersion(coreHandler, prereleaseHandler == null ? SemanticPreReleaseVersionHandler.of(id, Integer.valueOf(DEFAULT_BUMP_VALUE)) : prereleaseHandler.bump(id, DEFAULT_BUMP_VALUE), buildHandler);
+        return new SemanticVersion(coreHandler, prereleaseHandler == null ? SemanticPreReleaseVersionHandler.valueOf(id, Integer.valueOf(DEFAULT_BUMP_VALUE)) : prereleaseHandler.bump(id, DEFAULT_BUMP_VALUE), buildHandler);
     }
 
     /**
@@ -741,75 +954,5 @@ public class SemanticVersion extends AbstractVersion implements Comparable<Seman
         if (CoreIdentifiers.hasName(id))
             return bump(CoreIdentifiers.byName(id));
         else return bumpPrerelease(id);
-    }
-
-    /**
-     * Returns the core part (<code>major.minor.patch</code>) of the version as a string.
-     *
-     * @return the core part of the version as a string.
-     */
-    public String getCore() {
-        return coreHandler.toString();
-    }
-
-    /**
-     * Returns an array of the single identifiers of the core part of the version
-     *
-     * @return the identifiers of the core part of the version.
-     */
-    public Integer[] getCoreIdentifiers() {
-        Integer[] res = new Integer[coreHandler.children.size()];
-        for (int i=0; i<coreHandler.children.size(); i++)
-            res[i] = coreHandler.children.get(i).value;
-        return res;
-    }
-
-    /**
-     * Returns the prerelease part of the version, if any, or <code>null</code> otherwise.
-     *
-     * @return the prerelease part of the version.
-     */
-    public String getPrerelease() {
-        return prereleaseHandler == null ? null : prereleaseHandler.toString();
-    }
-
-    /**
-     * Returns an array of the single identifiers of the prerelease part of the version, if any, or <code>null</code>
-     * otherwise.
-     *
-     * @return the identifiers of the prerelease part of the version. The objects in the array can be either {@link Integer}
-     * or {@link String}.
-     */
-    public Object[] getPrereleaseIdentifiers() {
-        if (prereleaseHandler == null)
-            return null;
-        Object[] res = new Object[prereleaseHandler.children.size()];
-        for (int i=0; i<prereleaseHandler.children.size(); i++)
-            res[i] = prereleaseHandler.children.get(i).value;
-        return res;
-    }
-
-    /**
-     * Returns the build part of the version, if any, or <code>null</code> otherwise.
-     *
-     * @return the build part of the version.
-     */
-    public String getBuild() {
-        return buildHandler == null ? null : buildHandler.toString();
-    }
-
-    /**
-     * Returns an array of the single identifiers of the build part of the version, if any, or <code>null</code>
-     * otherwise.
-     *
-     * @return the identifiers of the build part of the version.
-     */
-    public String[] getBuildIdentifiers() {
-        if (buildHandler == null)
-            return null;
-        String[] res = new String[buildHandler.children.size()];
-        for (int i=0; i<buildHandler.children.size(); i++)
-            res[i] = buildHandler.children.get(i).value;
-        return res;
     }
 }
