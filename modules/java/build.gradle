@@ -1,0 +1,76 @@
+subprojects {
+    /*------------------------------------------------------------------------------
+      Plugins DSL block
+      https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
+    ------------------------------------------------------------------------------*/
+    apply plugin: 'java'                 // See: https://docs.gradle.org/current/userguide/java_plugin.html
+    apply plugin: 'maven-publish'        // See: https://docs.gradle.org/current/userguide/publishing_maven.html
+    apply plugin: 'jacoco'               // See: https://docs.gradle.org/current/userguide/jacoco_plugin.html
+    apply plugin: 'signing'              // See: https://docs.gradle.org/current/userguide/signing_plugin.html
+
+    //apply plugin: 'checkstyle'         // See: https://docs.gradle.org/current/userguide/checkstyle_plugin.html
+    //apply plugin: 'pmd'                // See: https://docs.gradle.org/current/userguide/pmd_plugin.html
+
+    /*------------------------------------------------------------------------------
+      Repositories and dependencies
+      https://docs.gradle.org/current/userguide/dependency_management_for_java_projects.html
+    */
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        testImplementation 'org.junit.jupiter:junit-jupiter:5.6.0'
+    }
+
+    /*------------------------------------------------------------------------------
+      Extension configurations
+    ------------------------------------------------------------------------------*/
+    //java {
+    //    withJavadocJar()
+    //    withSourcesJar()
+    //}
+    compileJava {
+        //options.warnings      = false
+        //options.deprecation   = false
+        options.compilerArgs  += ["-Xlint:unchecked"]
+    }
+    compileTestJava {
+        //options.warnings      = false
+        //options.deprecation   = false
+        options.compilerArgs  += ["-Xlint:unchecked"]
+    }
+
+    javadoc {
+        options {
+            // Link generated javadocs to external docs
+            links 'https://docs.oracle.com/en/java/javase/13/docs/api/'
+            links 'https://download.eclipse.org/jgit/site/5.6.0.201912101111-r/apidocs/'
+            links 'https://argparse4j.github.io/apidocs/'
+            links 'https://junit.org/junit5/docs/current/api/'
+        }
+        test {
+            useJUnitPlatform()
+            testLogging {
+                events "passed", "skipped", "failed"
+            }
+        }
+    }
+
+    jacocoTestReport {
+        reports {
+            html.enabled true
+            xml.enabled true
+        }
+    }
+
+    /*------------------------------------------------------------------------------
+      Additional task dependencies
+    ------------------------------------------------------------------------------*/
+    tasks.build.dependsOn tasks.javadoc
+
+    tasks.test.finalizedBy tasks.jacocoTestReport
+}
+
+/*------------------------------------------------------------------------------
+  Additional task dependencies
+------------------------------------------------------------------------------*/

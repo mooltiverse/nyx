@@ -1,0 +1,62 @@
+/*------------------------------------------------------------------------------
+  Plugins DSL block
+  https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
+------------------------------------------------------------------------------*/
+plugins {
+    id 'application'          // See: https://docs.gradle.org/current/userguide/application_plugin.html
+}
+
+/*------------------------------------------------------------------------------
+  Repositories and dependencies
+  https://docs.gradle.org/current/userguide/dependency_management_for_java_projects.html
+*/
+dependencies {
+    implementation project(':modules:java:version')
+    implementation project(':modules:java:api')
+    implementation project(':modules:java:core')
+
+    implementation 'net.sourceforge.argparse4j:argparse4j:0.8.1'
+}
+
+applicationName = rootProject.name
+
+application {
+    mainClassName = 'com.mooltiverse.oss.nyx.cli.Nyx'
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifact distZip
+            artifact distTar
+            pom {
+                name = project.name
+                description = rootProject.description
+                url = 'https://github.com/mooltiverse/nyx'
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:git://github.com/mooltiverse/nyx.git'
+                    developerConnection = 'scm:git:ssh://github.com/mooltiverse/nyx.git'
+                    url = 'https://github.com/mooltiverse/nyx'
+                }
+            }
+        }
+    }
+
+    repositories {
+        //mavenCentral()
+        maven {
+            name = 'local'
+            url = "file://${buildDir}/repo"
+        }
+    }
+}
+
+signing {
+    sign publishing.publications.mavenJava
+}

@@ -1,0 +1,43 @@
+/*------------------------------------------------------------------------------
+  Plugins DSL block
+  https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
+------------------------------------------------------------------------------*/
+plugins {
+    id 'java-library'         // See: https://docs.gradle.org/current/userguide/java_library_plugin.html
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            pom {
+                name = project.name
+                description = rootProject.description
+                url = 'https://github.com/mooltiverse/nyx'
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:git://github.com/mooltiverse/nyx.git'
+                    developerConnection = 'scm:git:ssh://github.com/mooltiverse/nyx.git'
+                    url = 'https://github.com/mooltiverse/nyx'
+                }
+            }
+        }
+    }
+
+    repositories {
+        //mavenCentral()
+        maven {
+            name = 'local'
+            url = "file://${buildDir}/repo"
+        }
+    }
+}
+
+signing {
+    sign publishing.publications.mavenJava
+}

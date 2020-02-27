@@ -1,0 +1,19 @@
+/*------------------------------------------------------------------------------
+  Plugins DSL block
+  https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
+------------------------------------------------------------------------------*/
+plugins {
+    // See: https://github.com/palantir/gradle-docker
+    id 'com.palantir.docker' version '0.25.0'
+}
+
+docker {
+    name rootProject.name
+    dockerfile project.file('src/main/docker/Dockerfile')
+}
+
+/*------------------------------------------------------------------------------
+  Additional task dependencies
+------------------------------------------------------------------------------*/
+tasks.docker.dependsOn(':modules:java:cli:build')
+tasks.build.dependsOn tasks.docker
