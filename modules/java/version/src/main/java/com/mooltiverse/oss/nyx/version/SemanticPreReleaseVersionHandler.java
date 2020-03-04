@@ -61,7 +61,7 @@ class SemanticPreReleaseVersionHandler extends CompositeObjectValueHandler {
 
     /**
      * Creates a new handler instance with the given identifiers. Each element bust be either a {@link String} or
-     * {@link Integer}. <code>null</<code> values are ignored, but items cannot be all <code>null</<code>. {@link String}
+     * {@link Integer}. <code>null</code> values are ignored, but items cannot be all <code>null</code>. {@link String}
      * items must not be empty or contain illegal characters while {@link Integer} must be positive.
      *
      * @param identifiers the items to build the handler with

@@ -7,9 +7,14 @@ plugins {
     id 'com.palantir.docker' version '0.25.0'
 }
 
+/*------------------------------------------------------------------------------
+  Local sub-project properties
+------------------------------------------------------------------------------*/
+description = 'The Nyx Docker image'
+
 docker {
-    name rootProject.name
-    dockerfile project.file('src/main/docker/Dockerfile')
+    name        rootProject.name
+    dockerfile  project.file('src/main/docker/Dockerfile')
 }
 
 /*------------------------------------------------------------------------------

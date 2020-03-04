@@ -127,6 +127,8 @@ class CompositeValueHandler<H extends ValueHandler> extends AbstractValueHandler
      * @throws NullPointerException if the given value is <code>null</code>
      * @throws IllegalArgumentException if the given list contains illegal values or does not contain any non
      * <code>null</code> item
+     *
+     * @param <H> the type of child handlers that the composite handler accepts
      */
     static <H extends ValueHandler> List<H> validate(List<H> children) {
         List<H> result = new ArrayList<H>();
