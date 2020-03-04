@@ -16,9 +16,7 @@ description = 'The Nyx command line interface.'
   https://docs.gradle.org/current/userguide/dependency_management_for_java_projects.html
 */
 dependencies {
-    implementation project(':modules:java:version')
-    implementation project(':modules:java:api')
-    implementation project(':modules:java:core')
+    implementation project(':modules:java:lib:core')
 
     implementation 'net.sourceforge.argparse4j:argparse4j:0.8.1'
 }

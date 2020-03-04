@@ -13,12 +13,12 @@ plugins {
 description = 'The Nyx Docker image'
 
 docker {
-    name        rootProject.name
+    name rootProject.name
     dockerfile  project.file('src/main/docker/Dockerfile')
 }
 
 /*------------------------------------------------------------------------------
   Additional task dependencies
 ------------------------------------------------------------------------------*/
-tasks.docker.dependsOn(':modules:java:cli:build')
+tasks.docker.dependsOn(':modules:java:lib:cli:build')
 tasks.build.dependsOn tasks.docker

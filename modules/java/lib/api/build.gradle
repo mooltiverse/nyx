@@ -9,13 +9,12 @@ plugins {
 /*------------------------------------------------------------------------------
   Local sub-project properties
 ------------------------------------------------------------------------------*/
-description = 'The Nyx core including main classes and core plugins.'
+description = 'The Nyx API, used to develop Nyx plugins.'
 
 /*------------------------------------------------------------------------------
   Repositories and dependencies
   https://docs.gradle.org/current/userguide/dependency_management_for_java_projects.html
 */
 dependencies {
-    api project(':modules:java:version')
-    api project(':modules:java:api')
+    api project(':modules:java:lib:version')
 }
