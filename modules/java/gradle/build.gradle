@@ -37,12 +37,11 @@ gradlePlugin {
 }
 
 pluginBundle {
-    //description = project.description
     website = 'https://github.com/mooltiverse/nyx'
     vcsUrl = 'https://github.com/mooltiverse/nyx.git'
     tags = [ 'auto-versioning', 'changelog', 'continuous delivery', 'git', 'github', 'gitlab', 'release', 'semantic', 'semantic-release', 'semantic-version', 'semver', 'version', 'versioning' ]
 
-/*    plugins {
+    /*plugins {
         nyxPlugin {
             id = rootProject.group
             displayName = 'Nyx Gradle plugin'
@@ -50,8 +49,8 @@ pluginBundle {
             tags = [ 'auto-versioning', 'changelog', 'continuous delivery', 'git', 'github', 'gitlab', 'release', 'semantic', 'semantic-release', 'semantic-version', 'semver', 'version', 'versioning' ]
             version = project.version
         }
-    }
-*/
+    }*/
+
     mavenCoordinates {
         // Overriding the groupId requires manual approval
         groupId = project.group
