@@ -2,6 +2,8 @@
 
 [![javadoc](https://javadoc.io/badge2/com.mooltiverse.oss.nyx/java/javadoc.svg)](https://javadoc.io/doc/com.mooltiverse.oss.nyx/java)
 
+[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg)](CODE_OF_CONDUCT.md)
+
 # Nyx
 Nyx is a semantic release tool built around [Git](https://git-scm.com/) with some unique features. The term *semantic release* means [semantic versioning](https://semver.org/) compliance in the first place, with the addition of several features pertaining the release *process* like:
 
