@@ -64,22 +64,24 @@ task setupPublishPluginCredentials() {
     group = 'Publishing'
     description = 'Sets the system properties from environment variables gradlePublishKey and gradlePublishSecret to allow the Gradle Plugin Publish to authenticate'
 
-    def key = findProperty("gradlePublishKey")
-    def secret = findProperty("gradlePublishSecret")
+    doLast {
+        def key = findProperty("gradlePublishKey")
+        def secret = findProperty("gradlePublishSecret")
 
-    if( !key || !secret)
-    {
-        throw new RuntimeException("gradlePublishKey and/or gradlePublishSecret are not defined environment variables")
+        if( !key || !secret)
+        {
+            logger.warn("Warning: gradlePublishKey and/or gradlePublishSecret are not defined environment variables. This might be ok if not running the publishing tasks but if you need to publish the Gradle Plugin this prevents the publication.")
+        }
+
+        System.properties.setProperty("gradle.publish.key", key)
+        System.properties.setProperty("gradle.publish.secret", secret)
     }
-
-    System.properties.setProperty("gradle.publish.key", key)
-    System.properties.setProperty("gradle.publish.secret", secret)
 }
 
 task publish() {
     group = 'Publishing'
     description = 'Publishes the plugin to the Gradle Plugins Portal'
-    //dependsOn publishPlugins
+    dependsOn publishPlugins
 }
 
 /*------------------------------------------------------------------------------
