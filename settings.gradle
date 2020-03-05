@@ -1,0 +1,10 @@
+rootProject.name = 'nyx'
+
+include 'modules:java'
+include 'modules:java:lib'
+include 'modules:java:lib:version'
+include 'modules:java:lib:api'
+include 'modules:java:lib:core'
+include 'modules:java:lib:cli'
+include 'modules:java:gradle'
+include 'modules:docker'

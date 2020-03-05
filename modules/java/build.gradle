@@ -1,0 +1,140 @@
+/*------------------------------------------------------------------------------
+  Plugins DSL block
+  https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
+------------------------------------------------------------------------------*/
+plugins {
+}
+
+/*------------------------------------------------------------------------------
+  Local sub-project properties
+------------------------------------------------------------------------------*/
+description = 'All the Nyx Java artifacts'
+
+/*------------------------------------------------------------------------------
+  This is the configuration for this project and all sub-projects
+------------------------------------------------------------------------------*/
+allprojects {
+    /*------------------------------------------------------------------------------
+      Plugins DSL block
+      https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
+    ------------------------------------------------------------------------------*/
+    apply plugin: 'java'                 // See: https://docs.gradle.org/current/userguide/java_plugin.html
+
+    /*------------------------------------------------------------------------------
+      Repositories and dependencies
+      https://docs.gradle.org/current/userguide/dependency_management_for_java_projects.html
+    */
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        testImplementation 'org.junit.jupiter:junit-jupiter:5.6.0'
+    }
+
+    /*------------------------------------------------------------------------------
+      Extension configurations
+    ------------------------------------------------------------------------------*/
+    compileJava {
+        //options.warnings      = false
+        //options.deprecation   = false
+        options.compilerArgs  += ["-Xlint:unchecked"]
+    }
+    compileTestJava {
+        //options.warnings      = false
+        //options.deprecation   = false
+        options.compilerArgs  += ["-Xlint:unchecked"]
+    }
+
+    java {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+
+        withSourcesJar()
+        withJavadocJar()
+    }
+
+    javadoc {
+        options {
+            // Link generated javadocs to external docs
+            links 'https://docs.oracle.com/en/java/javase/13/docs/api/'
+            links 'https://download.eclipse.org/jgit/site/5.6.0.201912101111-r/apidocs/'
+            links 'https://argparse4j.github.io/apidocs/'
+            links 'https://docs.gradle.org/current/javadoc/'
+            links 'https://junit.org/junit5/docs/current/api/'
+        }
+    }
+
+    /*------------------------------------------------------------------------------
+      Additional task dependencies
+    ------------------------------------------------------------------------------*/
+    tasks.build.dependsOn tasks.javadoc
+}
+
+/*------------------------------------------------------------------------------
+  This is the configuration for all sub-projects, but not this project
+------------------------------------------------------------------------------*/
+subprojects {
+    /*------------------------------------------------------------------------------
+      Plugins DSL block
+      https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
+    ------------------------------------------------------------------------------*/
+    apply plugin: 'jacoco'               // See: https://docs.gradle.org/current/userguide/jacoco_plugin.html
+
+    //apply plugin: 'checkstyle'         // See: https://docs.gradle.org/current/userguide/checkstyle_plugin.html
+    //apply plugin: 'pmd'                // See: https://docs.gradle.org/current/userguide/pmd_plugin.html
+
+    /*------------------------------------------------------------------------------
+      Extension configurations
+    ------------------------------------------------------------------------------*/
+    test {
+        useJUnitPlatform()
+        testLogging {
+            events "passed", "skipped", "failed"
+        }
+    }
+
+    jacocoTestReport {
+        reports {
+            html.enabled true
+            xml.enabled true
+        }
+    }
+
+    /*------------------------------------------------------------------------------
+      Additional task dependencies
+    ------------------------------------------------------------------------------*/
+    tasks.test.finalizedBy tasks.jacocoTestReport
+}
+
+/*------------------------------------------------------------------------------
+  This is the configuration for this project only
+------------------------------------------------------------------------------*/
+
+// For this all-inclusive project, alter the sources and classpath of the 'javadoc' task and the 'sourcesJar' task
+// created by (java.withSourcesJar()) so that they include sources from all sub-projets
+javadoc.source(subprojects.collect { it.sourceSets.main.allJava })
+javadoc.classpath = files(subprojects.collect { it.sourceSets.main.compileClasspath })
+sourcesJar.from(subprojects.collect { it.sourceSets.main.allJava })
+
+/*------------------------------------------------------------------------------
+  Additional tasks
+------------------------------------------------------------------------------*/
+// See: https://docs.gradle.org/current/javadoc/org/gradle/api/plugins/JavaPluginExtension.html#withJavadocJar--
+task javadocPrivate(type: Javadoc) {
+    group = 'Documentation'
+    description = 'Generates an additional global javadoc from all the modules with the private visibility (useful for development of this same project only)'
+    source subprojects.collect { it.sourceSets.main.allJava }
+    classpath = files(subprojects.collect { it.sourceSets.main.compileClasspath })
+    options.memberLevel = JavadocMemberLevel.PRIVATE
+    options.links 'https://docs.oracle.com/en/java/javase/13/docs/api/'
+    options.links 'https://download.eclipse.org/jgit/site/5.6.0.201912101111-r/apidocs/'
+    options.links 'https://argparse4j.github.io/apidocs/'
+    options.links 'https://docs.gradle.org/current/javadoc/'
+    options.links 'https://junit.org/junit5/docs/current/api/'
+    destinationDir = file("${project.docsDir}/javadoc-private")
+}
+
+/*------------------------------------------------------------------------------
+  Additional task dependencies
+------------------------------------------------------------------------------*/
+tasks.build.dependsOn tasks.javadocPrivate

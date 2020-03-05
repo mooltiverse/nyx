@@ -1,0 +1,28 @@
+/*------------------------------------------------------------------------------
+  Plugins DSL block
+  https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
+------------------------------------------------------------------------------*/
+plugins {
+    id 'application'          // See: https://docs.gradle.org/current/userguide/application_plugin.html
+}
+
+/*------------------------------------------------------------------------------
+  Local sub-project properties
+------------------------------------------------------------------------------*/
+description = 'The Nyx command line interface.'
+
+/*------------------------------------------------------------------------------
+  Repositories and dependencies
+  https://docs.gradle.org/current/userguide/dependency_management_for_java_projects.html
+*/
+dependencies {
+    implementation project(':modules:java:lib:core')
+
+    implementation 'net.sourceforge.argparse4j:argparse4j:0.8.1'
+}
+
+applicationName = rootProject.name
+
+application {
+    mainClassName = 'com.mooltiverse.oss.nyx.cli.Nyx'
+}

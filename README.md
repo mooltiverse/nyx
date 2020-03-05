@@ -1,3 +1,9 @@
+![](https://github.com/mooltiverse/nyx/workflows/build/badge.svg?branch=master)
+
+[![javadoc](https://javadoc.io/badge2/com.mooltiverse.oss.nyx/java/javadoc.svg)](https://javadoc.io/doc/com.mooltiverse.oss.nyx/java)
+
+[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg)](CODE_OF_CONDUCT.md)
+
 # Nyx
 Nyx is a semantic release tool built around [Git](https://git-scm.com/) with some unique features. The term *semantic release* means [semantic versioning](https://semver.org/) compliance in the first place, with the addition of several features pertaining the release *process* like:
 
@@ -52,6 +58,9 @@ We are also contemplating *ChatOps* features and integrations.
 
 The templates are configurable and allow to add specific contents like links to Docker images or software repositories.
 
+## Microservices versioning
+We are contemplating the implementation of additional features that allow to version a group of projects and their dependencies automatically. This is the case of microservices, when each service has its own lifecycle and version numbers but downstream services need to test, build and deliver also taking into account upstream ones.
+
 ## No technology constraints
 *Nyx* is written in Java and that's the only technological constraint to run. You can use the `java` executable to run *Nyx* from the command line or use its Docker container.
 
@@ -69,6 +78,7 @@ Nyx will be available as:
 * command line tool, as an executable jar
 * a Docker image
 * plugins and and extensions for multiple build tools, starting with [Gradle](https://gradle.org/) and [Bazel](https://bazel.build/)
+* [GitHub Actions](https://help.github.com/en/actions/building-actions)
 
 We don't know **when** *Nyx* will be available yet.
 
