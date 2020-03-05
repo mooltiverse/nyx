@@ -59,12 +59,30 @@ pluginBundle {
     }
 }
 
+// See https://github.com/gradle/gradle/issues/1246
+task setupPublishPluginCredentials() {
+    group = 'Publishing'
+    description = 'Sets the system properties from environment variables gradlePublishKey and gradlePublishSecret to allow the Gradle Plugin Publish to authenticate'
+
+    def key = findProperty("gradlePublishKey")
+    def secret = findProperty("gradlePublishSecret")
+
+    if( !key || !secret)
+    {
+        throw new RuntimeException("gradlePublishKey and/or gradlePublishSecret are not defined environment variables")
+    }
+
+    System.properties.setProperty("gradle.publish.key", key)
+    System.properties.setProperty("gradle.publish.secret", secret)
+}
+
 task publish() {
     group = 'Publishing'
     description = 'Publishes the plugin to the Gradle Plugins Portal'
-    dependsOn publishPlugins
+    //dependsOn publishPlugins
 }
 
 /*------------------------------------------------------------------------------
   Additional task dependencies
 ------------------------------------------------------------------------------*/
+tasks.publishPlugins.dependsOn tasks.setupPublishPluginCredentials
