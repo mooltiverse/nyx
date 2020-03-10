@@ -120,6 +120,7 @@ When authoring content make sure that:
 To test the site, get into the `docs` directory and run:
 
 ```shell script
+$ bundle update
 $ bundle exec jekyll serve --watch
 ```
 
