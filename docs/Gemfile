@@ -1,21 +1,7 @@
 source "https://rubygems.org"
-# Jekyll gem replaced as per Minimal Mistakes requirement (https://mmistakes.github.io/minimal-mistakes/docs/quick-start-guide/#update-gemfile)
-gem "jekyll", "~> 3.5"
 
-# If you have any plugins, put them here!
-group :jekyll_plugins do
-  gem "jekyll-feed", "~> 0.12"
-end
+# The following is the only gem required when using the theme as remote_theme (see _config.yml)
+gem "github-pages", group: :jekyll_plugins
 
-# Windows and JRuby does not include zoneinfo files, so bundle the tzinfo-data gem
-# and associated library.
-install_if -> { RUBY_PLATFORM =~ %r!mingw|mswin|java! } do
-  gem "tzinfo", "~> 1.2"
-  gem "tzinfo-data"
-end
-
-# Performance-booster for watching directories on Windows
-gem "wdm", "~> 0.1.1", :install_if => Gem.win_platform?
-
-# Minimal mistakes theme (https://mmistakes.github.io/minimal-mistakes/)
-gem "minimal-mistakes-jekyll"
+# The following shoudl't be needed but... it is. See https://github.com/mmistakes/minimal-mistakes/issues/1937
+gem "jekyll-include-cache", group: :jekyll_plugins
