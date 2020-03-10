@@ -5,3 +5,6 @@ _site
 .bundle/
 vendor
 build
+Gemfile.lock
+gradle.rb
+
