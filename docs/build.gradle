@@ -1,0 +1,53 @@
+/*------------------------------------------------------------------------------
+  Plugins DSL block
+  https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
+------------------------------------------------------------------------------*/
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        /* check jruby-gradle.org for the latest release */
+        classpath "com.github.jruby-gradle:jruby-gradle-plugin:[1.1.4,2.0)"
+    }
+}
+
+apply plugin: 'com.github.jruby-gradle.base'
+
+import com.github.jrubygradle.JRubyExec
+
+/*------------------------------------------------------------------------------
+  Local sub-project properties
+------------------------------------------------------------------------------*/
+description = 'The Nyx documentation site'
+
+dependencies {
+    jrubyExec 'rubygems:bundler:2.1.4'
+    jrubyExec 'rubygems:jekyll:3.8.6'
+}
+
+
+task testJekyllSite(type: JRubyExec) {
+    description 'Tests rendering the documentation site using Jekyll'
+    group = 'Test'
+
+    workingDir projectDir
+    script 'bundle'
+    scriptArgs 'exec', 'jekyll', 'build', '--destination', buildDir
+}
+
+/*------------------------------------------------------------------------------
+  Additional tasks
+------------------------------------------------------------------------------*/
+task test() {
+    group = 'Test'
+    description = 'Tests the documentation site'
+
+    dependsOn testJekyllSite
+}
+
+/*------------------------------------------------------------------------------
+  Additional task dependencies
+------------------------------------------------------------------------------*/
+tasks.build.dependsOn tasks.test

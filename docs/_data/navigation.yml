@@ -1,0 +1,58 @@
+main:
+  - title: "Guide"
+    url: /getting-started/introduction/
+  - title: "Examples"
+    url: /examples/
+  - title: "Categories"
+    url: /categories/
+  - title: "Tags"
+    url: /tags/
+
+nav-guide:
+  - title: Getting Started
+    url: /getting-started/
+    children:
+      - title: "Introduction"
+        url: /getting-started/introduction/
+      - title: "Quick-Start"
+        url: /getting-started/quick-start/
+      - title: "Structure"
+        url: /getting-started/structure/
+      - title: "Installation"
+        url: /getting-started/installation/
+      - title: "Upgrading"
+        url: /getting-started/upgrading/
+  - title: Java API
+    children:
+      - title: "Configuration"
+        url: /docs/configuration/
+  - title: Gradle Plugin
+    children:
+      - title: "Working with Posts"
+        url: /docs/posts/
+  - title: Docker Image
+    children:
+      - title: "Working with Posts"
+        url: /docs/posts/
+  - title: Configuration
+    children:
+      - title: "Working with Posts"
+        url: /docs/posts/
+  - title: Troubleshooting
+    children:
+      - title: "Working with Posts"
+        url: /docs/posts/
+  - title: F.A.Q.
+    url: /faq/
+  - title: Meta
+    children:
+      - title: "Changelog"
+        url: https://github.com/mooltiverse/nyx/releases
+      - title: "Code of Conduct"
+        url: https://github.com/mooltiverse/nyx/blob/master/CODE_OF_CONDUCT.md
+      - title: "Contributing"
+        url: https://github.com/mooltiverse/nyx/blob/master/CONTRIBUTING.md
+      - title: "License"
+        url: https://github.com/mooltiverse/nyx/blob/master/LICENSE.md
+      - title: "Sponsor"
+        url: /meta/sponsor/
