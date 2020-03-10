@@ -78,10 +78,10 @@ subprojects {
       Plugins DSL block
       https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
     ------------------------------------------------------------------------------*/
-    apply plugin: 'jacoco'               // See: https://docs.gradle.org/current/userguide/jacoco_plugin.html
+    apply plugin: 'jacoco'                              // See: https://docs.gradle.org/current/userguide/jacoco_plugin.html
 
-    //apply plugin: 'checkstyle'         // See: https://docs.gradle.org/current/userguide/checkstyle_plugin.html
-    //apply plugin: 'pmd'                // See: https://docs.gradle.org/current/userguide/pmd_plugin.html
+    //apply plugin: 'checkstyle'                        // See: https://docs.gradle.org/current/userguide/checkstyle_plugin.html
+    //apply plugin: 'pmd'                               // See: https://docs.gradle.org/current/userguide/pmd_plugin.html
 
     /*------------------------------------------------------------------------------
       Extension configurations
