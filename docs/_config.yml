@@ -332,16 +332,3 @@ defaults:
       toc: true
       sidebar:
         nav: "nav-guide"
-
-# GitHub pages settings
-# See https://help.github.com/en/github/working-with-github-pages/about-github-pages-and-jekyll#configuring-jekyll-in-your-github-pages-site
-#lsi: false
-#safe: true
-#source: [your repo's top level directory]
-#incremental: false
-#highlighter: rouge
-#gist:
-#  noscript: false
-#kramdown:
-#  math_engine: mathjax
-#  syntax_highlighter: rouge
