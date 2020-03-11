@@ -14,34 +14,49 @@ nav-guide:
     children:
       - title: "Introduction"
         url: /getting-started/introduction/
-      - title: "Quick-Start"
-        url: /getting-started/quick-start/
-      - title: "Structure"
-        url: /getting-started/structure/
-      - title: "Installation"
-        url: /getting-started/installation/
-      - title: "Upgrading"
-        url: /getting-started/upgrading/
+#      - title: "Quick-Start"
+#        url: /getting-started/quick-start/
+#      - title: "Structure"
+#        url: /getting-started/structure/
+#      - title: "Installation"
+#        url: /getting-started/installation/
+#      - title: "Upgrade"
+#        url: /getting-started/upgrade/
+#  - title: Java API
+#    children:
+#      - title: "Configuration"
+#        url: /docs/configuration/
+#  - title: Gradle Plugin
+#    children:
+#      - title: "Working with Posts"
+#        url: /docs/posts/
+#  - title: Docker Image
+#    children:
+#      - title: "Working with Posts"
+#        url: /docs/posts/
+#  - title: Configuration
+#    children:
+#      - title: "Working with Posts"
+#        url: /docs/posts/
+#  - title: Troubleshooting
+#    children:
+#      - title: "Working with Posts"
+#        url: /docs/posts/
   - title: Java API
+    url: /java-api/
     children:
-      - title: "Configuration"
-        url: /docs/configuration/
-  - title: Gradle Plugin
+    - title: "Using the Version API"
+      url: /java-api/using-the-version-api/
+  - title: Extending Nyx
+    url: /extending/
     children:
-      - title: "Working with Posts"
-        url: /docs/posts/
-  - title: Docker Image
+    - title: "Implementing Java plugins"
+      url: /extending/implementing-java-plugins/
+  - title: Best Practice
+    url: /best-practice/
     children:
-      - title: "Working with Posts"
-        url: /docs/posts/
-  - title: Configuration
-    children:
-      - title: "Working with Posts"
-        url: /docs/posts/
-  - title: Troubleshooting
-    children:
-      - title: "Working with Posts"
-        url: /docs/posts/
+    - title: "Workflow"
+      url: /best-practice/workflow/
   - title: F.A.Q.
     url: /faq/
   - title: Meta
