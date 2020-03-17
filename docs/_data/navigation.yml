@@ -10,10 +10,15 @@ main:
 
 nav-guide:
   - title: Getting Started
-    url: /getting-started/
     children:
       - title: "Introduction"
         url: /getting-started/introduction/
+  - title: In Depth
+    children:
+      - title: "Design Principles"
+        url: /in-depth/design-principles/
+#      - title: "Configuration"
+#        url: /in-depth/configuration/
 #      - title: "Quick-Start"
 #        url: /getting-started/quick-start/
 #      - title: "Structure"
@@ -42,26 +47,25 @@ nav-guide:
 #    children:
 #      - title: "Working with Posts"
 #        url: /docs/posts/
-  - title: Java API
-    url: /java-api/
+  - title: Java Library
     children:
-    - title: "Using the Version API"
-      url: /java-api/using-the-version-api/
-  - title: Extending Nyx
-    url: /extending/
-    children:
-    - title: "Implementing Java plugins"
-      url: /extending/implementing-java-plugins/
+    - title: "The Semantic Version Library"
+      url: /java-library/using-the-version-library/
+#  - title: Extending Nyx
+#    children:
+#    - title: "Implementing Java plugins"
+#      url: /extending/implementing-java-plugins/
   - title: Best Practice
-    url: /best-practice/
     children:
-    - title: "Workflow"
-      url: /best-practice/workflow/
+    - title: "Build process, tools and environments"
+      url: /best-practice/build-process-tools-and-environments/
   - title: F.A.Q.
     url: /faq/
+  - title: "Examples"
+    url: /examples/
   - title: Meta
     children:
-      - title: "Changelog"
+      - title: "Releases & Changelog"
         url: https://github.com/mooltiverse/nyx/releases
       - title: "Code of Conduct"
         url: https://github.com/mooltiverse/nyx/blob/master/CODE_OF_CONDUCT.md

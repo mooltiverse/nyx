@@ -33,7 +33,7 @@ Always write a clear log message for your commits. One-line messages are fine fo
 
 ```text
 $ git commit -m "A brief summary of the commit
-> 
+>
 > A paragraph describing what changed and its impact."
 ```
 
@@ -116,6 +116,7 @@ When authoring content make sure that:
 
 * the [front matter](https://jekyllrb.com/docs/front-matter/) of your pages is properly defined, with special regards to the *title*, [*layout*](https://mmistakes.github.io/minimal-mistakes/docs/layouts/), [*permalink*](https://mmistakes.github.io/minimal-mistakes/docs/pages/) (for pages), [*tags* and *categories*](https://mmistakes.github.io/minimal-mistakes/docs/layouts/#taxonomy-archives) (for posts and examples)
 * content is properly formatted using the right [helpers](https://mmistakes.github.io/minimal-mistakes/docs/helpers/) and [utility classes](https://mmistakes.github.io/minimal-mistakes/docs/utility-classes/)
+* you have a basic knowledge of [Kramdown](https://kramdown.gettalong.org/), the Markdown superset used by Jekyll
 
 To test the site, get into the `docs` directory and run:
 

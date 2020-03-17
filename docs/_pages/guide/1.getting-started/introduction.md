@@ -1,8 +1,8 @@
 ---
-title: Using the Version API
+title: Introduction to Nyx
 layout: single
 toc: true
-permalink: /java-api/using-the-version-api/
+permalink: /getting-started/introduction/
 ---
 
 **TODO**: this page hasn't been written yet.
