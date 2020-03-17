@@ -9,7 +9,7 @@
 # Nyx
 Nyx is a portable and extensible automatic semantic release tool with several availability options. With Nyx you can put release management on auto pilot regardless of the kind of project, languages, tools and technologies. You can use the tools out of the box or you can extend them with your own customizations or even build your own using the Nyx libraries.
 
-Check out the [**documetation**](https://mooltiverse.github.io/nyx/) now for any further information.
+Check out the [**documentation**](https://mooltiverse.github.io/nyx/) now for any further information.
 
 ## Project Status
 **THE PROJECT IS IN ITS EARLY STAGES SO ONLY A FEW COMPONENTS HAVE BEEN RELEASED. PLEASE SEE THE [DOCUMENTATION](https://mooltiverse.github.io/nyx/#project-status) TO KNOW THE CURRENT STATUS**
