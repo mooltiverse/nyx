@@ -10,43 +10,62 @@ main:
 
 nav-guide:
   - title: Getting Started
-    url: /getting-started/
     children:
       - title: "Introduction"
         url: /getting-started/introduction/
-      - title: "Quick-Start"
-        url: /getting-started/quick-start/
-      - title: "Structure"
-        url: /getting-started/structure/
-      - title: "Installation"
-        url: /getting-started/installation/
-      - title: "Upgrading"
-        url: /getting-started/upgrading/
-  - title: Java API
+  - title: In Depth
     children:
-      - title: "Configuration"
-        url: /docs/configuration/
-  - title: Gradle Plugin
+      - title: "Design Principles"
+        url: /in-depth/design-principles/
+#      - title: "Configuration"
+#        url: /in-depth/configuration/
+#      - title: "Quick-Start"
+#        url: /getting-started/quick-start/
+#      - title: "Structure"
+#        url: /getting-started/structure/
+#      - title: "Installation"
+#        url: /getting-started/installation/
+#      - title: "Upgrade"
+#        url: /getting-started/upgrade/
+#  - title: Java API
+#    children:
+#      - title: "Configuration"
+#        url: /docs/configuration/
+#  - title: Gradle Plugin
+#    children:
+#      - title: "Working with Posts"
+#        url: /docs/posts/
+#  - title: Docker Image
+#    children:
+#      - title: "Working with Posts"
+#        url: /docs/posts/
+#  - title: Configuration
+#    children:
+#      - title: "Working with Posts"
+#        url: /docs/posts/
+#  - title: Troubleshooting
+#    children:
+#      - title: "Working with Posts"
+#        url: /docs/posts/
+  - title: Java Library
     children:
-      - title: "Working with Posts"
-        url: /docs/posts/
-  - title: Docker Image
+    - title: "The Semantic Version Library"
+      url: /java-library/using-the-version-library/
+#  - title: Extending Nyx
+#    children:
+#    - title: "Implementing Java plugins"
+#      url: /extending/implementing-java-plugins/
+  - title: Best Practice
     children:
-      - title: "Working with Posts"
-        url: /docs/posts/
-  - title: Configuration
-    children:
-      - title: "Working with Posts"
-        url: /docs/posts/
-  - title: Troubleshooting
-    children:
-      - title: "Working with Posts"
-        url: /docs/posts/
+    - title: "Build process, tools and environments"
+      url: /best-practice/build-process-tools-and-environments/
   - title: F.A.Q.
     url: /faq/
+  - title: "Examples"
+    url: /examples/
   - title: Meta
     children:
-      - title: "Changelog"
+      - title: "Releases & Changelog"
         url: https://github.com/mooltiverse/nyx/releases
       - title: "Code of Conduct"
         url: https://github.com/mooltiverse/nyx/blob/master/CODE_OF_CONDUCT.md

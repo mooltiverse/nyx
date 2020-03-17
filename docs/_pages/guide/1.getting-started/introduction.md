@@ -5,6 +5,5 @@ toc: true
 permalink: /getting-started/introduction/
 ---
 
-## Release types
-
-## Branching model
+**TODO**: this page hasn't been written yet.
+{: .notice--warning}
