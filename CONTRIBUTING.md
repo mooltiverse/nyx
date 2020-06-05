@@ -53,7 +53,7 @@ You also need a local copy of the repository that you can get by running:
 $ git clone https://github.com/mooltiverse/nyx.git
 ```
 
-You can use any IDE, although we commonly use [IntelliJ Idea](https://www.jetbrains.com/idea/).
+You can use any IDE, just make sure you don't clutter the repo with IDE files.
 
 ### Repository organization and layout
 
