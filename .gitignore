@@ -1,6 +1,11 @@
-/.idea/
-/.gradle/
+# Gradle cache build files
 build/
+/.gradle/
+
+# IntelliJ Idea files
+/.idea/
+
+# Visual Studio Code files
 .settings/
 .project
 .classpath
