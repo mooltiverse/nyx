@@ -32,6 +32,11 @@ import java.util.Objects;
  */
 class CompositeValueHandler<H extends ValueHandler> extends AbstractValueHandler {
     /**
+     * Serial version UID to comply with {@link java.io.Serializable}
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * The nested handlers.
      */
     protected final List<H> children;

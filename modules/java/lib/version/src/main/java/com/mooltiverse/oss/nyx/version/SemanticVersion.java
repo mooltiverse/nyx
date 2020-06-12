@@ -32,6 +32,11 @@ import java.util.regex.Pattern;
  */
 public class SemanticVersion extends AbstractVersion implements Comparable<SemanticVersion> {
     /**
+     * Serial version UID to comply with {@link java.io.Serializable}
+     */
+    private static final long serialVersionUID = 1L;
+    
+    /**
      * The default initial version that can be used when non version is yet available.
      */
     public static final String DEFAULT_INITIAL_VERSION = "0.1.0";

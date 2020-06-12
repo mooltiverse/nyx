@@ -23,6 +23,11 @@ package com.mooltiverse.oss.nyx.version;
  */
 class ObjectValueHandler<V extends Object> extends AbstractSimpleValueHandler<V> {
     /**
+     * Serial version UID to comply with {@link java.io.Serializable}
+     */
+    private static final long serialVersionUID = 1L;
+    
+    /**
      * Builds the value handler with the given value.
      *
      * @param value the handler value

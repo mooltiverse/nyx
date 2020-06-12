@@ -24,6 +24,11 @@ import java.util.Objects;
  */
 class SemanticBuildVersionHandler extends CompositeStringValueHandler {
     /**
+     * Serial version UID to comply with {@link java.io.Serializable}
+     */
+    private static final long serialVersionUID = 1L;
+    
+    /**
      * Builds the value handler with the given children values.
      *
      * @param children the children of this composite handler. There must be at least one non <code>null</code> value.

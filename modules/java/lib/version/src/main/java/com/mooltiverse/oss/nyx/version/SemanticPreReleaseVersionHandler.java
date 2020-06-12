@@ -46,6 +46,11 @@ import java.util.*;
  */
 class SemanticPreReleaseVersionHandler extends CompositeObjectValueHandler {
     /**
+     * Serial version UID to comply with {@link java.io.Serializable}
+     */
+    private static final long serialVersionUID = 1L;
+    
+    /**
      * Builds the value handler with the given children values.
      *
      * @param children the children of this composite handler. There must be at least one non <code>null</code> value.
@@ -54,7 +59,6 @@ class SemanticPreReleaseVersionHandler extends CompositeObjectValueHandler {
      * @throws NullPointerException if the given list of children is <code>null</code>
      * @throws IllegalArgumentException if the given values are illegal or there isn't any non <code>null</code> item
      */
-    @SuppressWarnings("unchecked")
     private SemanticPreReleaseVersionHandler(List<ObjectValueHandler> children) {
         super(DEFAULT_SEPARATOR, children);
     }
@@ -79,8 +83,6 @@ class SemanticPreReleaseVersionHandler extends CompositeObjectValueHandler {
 
         List<ObjectValueHandler> handlers = new ArrayList<ObjectValueHandler>();
         for (Object id: identifiers) {
-            AbstractSimpleValueHandler handler = null;
-
             if (id == null) {
                 // just skip it
             }

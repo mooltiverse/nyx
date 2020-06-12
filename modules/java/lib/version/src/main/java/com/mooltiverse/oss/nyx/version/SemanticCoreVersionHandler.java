@@ -21,6 +21,11 @@ package com.mooltiverse.oss.nyx.version;
  */
 class SemanticCoreVersionHandler extends CompositeIntegerValueHandler {
     /**
+     * Serial version UID to comply with {@link java.io.Serializable}
+     */
+    private static final long serialVersionUID = 1L;
+    
+    /**
      * Builds the value handler with the given values.
      *
      * @param major the major number

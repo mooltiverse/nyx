@@ -20,6 +20,11 @@ package com.mooltiverse.oss.nyx.version;
  */
 class StringValueHandler extends ObjectValueHandler<String> {
     /**
+     * Serial version UID to comply with {@link java.io.Serializable}
+     */
+    private static final long serialVersionUID = 1L;
+    
+    /**
      * The range of allowed characters in string identifiers.
      *
      * {@value}

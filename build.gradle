@@ -22,9 +22,15 @@ allprojects {
       Project overall attributes
     ------------------------------------------------------------------------------*/
     group   = 'com.mooltiverse.oss.nyx'
-    version = '0.0.1-alpha.27'
+    version = '0.0.1-alpha.28'
 
     // The followings can be removed once we start using the Nyx plugin
     ext.isReleaseVersion = version.matches("^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\$")
     ext.isPrereleaseVersion = version.matches("^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))\$")
 }
+
+task test() {
+  description 'Runs all tests'
+  group 'Verification'
+}
+tasks.check.dependsOn tasks.test

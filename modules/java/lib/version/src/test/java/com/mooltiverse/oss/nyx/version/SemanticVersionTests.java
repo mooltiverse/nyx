@@ -799,7 +799,7 @@ public class SemanticVersionTests {
 
         @ParameterizedTest(name = "#{index} sanitize(''{0}'') ==> ''{2}''")
         @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownSanitizableVersions")
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings({"unchecked", "rawtypes"})
         void sanitize(String version, String expectedPrefix, String expectedSanitizeOutcomeOrException, String expectedSanitizePrefixOutcomeOrException, String expectedSanitizeNumberOutcomeOrException) {
             // see if the excepted outcome is an exception
             Class expectedException = null;
@@ -820,7 +820,7 @@ public class SemanticVersionTests {
 
         @ParameterizedTest(name = "#{index} sanitizeNumbers(''{0}'') ==> ''{5}''")
         @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownSanitizableVersions")
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings({"unchecked", "rawtypes"})
         void sanitizeNumbers(String version, String expectedPrefix, String expectedSanitizeOutcomeOrException, String expectedSanitizePrefixOutcomeOrException, String expectedSanitizeNumberOutcomeOrException) {
             // see if the excepted outcome is an exception
             Class expectedException = null;
@@ -841,7 +841,7 @@ public class SemanticVersionTests {
 
         @ParameterizedTest(name = "#{index} sanitizePrefix(''{0}'') ==> ''{3}''")
         @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownSanitizableVersions")
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings({"unchecked", "rawtypes"})
         void sanitizePrefix(String version, String expectedPrefix, String expectedSanitizeOutcomeOrException, String expectedSanitizePrefixOutcomeOrException, String expectedSanitizeNumberOutcomeOrException) {
             // see if the excepted outcome is an exception
             Class expectedException = null;
@@ -866,7 +866,7 @@ public class SemanticVersionTests {
     class GetPrefixTests {
         @ParameterizedTest(name = "#{index} getPrefix(''{0}'') ==> ''{1}'' or ''{3}''")
         @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownSanitizableVersions")
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings({"unchecked", "rawtypes"})
         void getPrefix(String version, String expectedPrefix, String expectedSanitizeOutcomeOrException, String expectedSanitizePrefixOutcomeOrException, String expectedSanitizeNumberOutcomeOrException) {
             // see if the excepted outcome is an exception
             Class expectedException = null;
@@ -901,7 +901,7 @@ public class SemanticVersionTests {
         @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
         void equalsToEmptyString(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
             SemanticVersion sv = SemanticVersion.valueOf(version);
-            assertFalse(sv.equals(""));
+            assertFalse(sv.toString().equals(""));
             assertNotEquals(sv, "");
         }
 
@@ -1029,7 +1029,7 @@ public class SemanticVersionTests {
 
         @ParameterizedTest(name = "#{index} bump(''{0}'', ''{1}'') ==> ''{2}'' or ''{4}''")
         @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#bumpPrereleaseVersions")
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings({"unchecked", "rawtypes"})
         void bumpIdWithArbitraryString(String version, String bumpId, String expectedOutcomeFromBump, String expectedOutcomeFromBumpPrerelease, Class expectedException) {
             SemanticVersion sv = SemanticVersion.valueOf(version);
             if (expectedException == null) {
@@ -1155,7 +1155,7 @@ public class SemanticVersionTests {
     class BumpPrereleaseTests {
         @ParameterizedTest(name = "#{index} bumpPrerelease(''{0}'', ''{1}'') ==> ''{3}'' or ''{4}''")
         @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#bumpPrereleaseVersions")
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings({"unchecked", "rawtypes"})
         void bumpIdWithArbitraryString(String version, String bumpId, String expectedOutcomeFromBump, String expectedOutcomeFromBumpPrerelease, Class expectedException) {
             SemanticVersion sv = SemanticVersion.valueOf(version);
             if (expectedException == null) {

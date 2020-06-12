@@ -20,6 +20,11 @@ package com.mooltiverse.oss.nyx.version;
  */
 abstract class AbstractIdentifier implements Identifier {
     /**
+     * Serial version UID to comply with {@link java.io.Serializable}
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * Default constructor made protected.
      */
     protected AbstractIdentifier() {

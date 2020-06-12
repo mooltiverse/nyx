@@ -22,6 +22,11 @@ import java.util.List;
  */
 class CompositeObjectValueHandler extends CompositeValueHandler<ObjectValueHandler> {
     /**
+     * Serial version UID to comply with {@link java.io.Serializable}
+     */
+    private static final long serialVersionUID = 1L;
+    
+    /**
      * Builds the value handler with the given separator and children values.
      *
      * @param separator the separator used for the string representation to separate children values

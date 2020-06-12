@@ -25,6 +25,11 @@ import java.util.Objects;
  */
 abstract class AbstractSimpleValueHandler<V extends Object> extends AbstractValueHandler implements SimpleValueHandler<V> {
     /**
+     * Serial version UID to comply with {@link java.io.Serializable}
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * The value held by this handler
      */
     protected final V value;

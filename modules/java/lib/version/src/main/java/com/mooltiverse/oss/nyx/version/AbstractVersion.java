@@ -22,17 +22,14 @@ import java.util.Objects;
  */
 abstract class AbstractVersion extends AbstractIdentifier implements Version {
     /**
+     * Serial version UID to comply with {@link java.io.Serializable}
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * The value handler used internally by this version class
      */
     private final ValueHandler handler;
-
-    /**
-     * Default constructor hidden on purpose.
-     */
-    private AbstractVersion() {
-        super();
-        this.handler = null;
-    }
 
     /**
      * Builds the version with the given value handler.
