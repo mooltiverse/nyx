@@ -15,14 +15,21 @@
  */
 package com.mooltiverse.oss.nyx.version;
 
+import java.util.Objects;
+
 /**
  * A simple handler holding a {@link String} value.
  */
-class StringValueHandler extends ObjectValueHandler<String> {
+class StringValueHandler extends SimpleValueHandler implements Comparable<String> {
     /**
      * Serial version UID to comply with {@link java.io.Serializable}
      */
     private static final long serialVersionUID = 1L;
+
+    /**
+     * The value held by this handler
+     */
+    private final String value;
     
     /**
      * The range of allowed characters in string identifiers.
@@ -47,14 +54,8 @@ class StringValueHandler extends ObjectValueHandler<String> {
      * @throws IllegalArgumentException if the given value is illegal
      */
     protected StringValueHandler(String value) {
-        super(validate(value));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public int compareTo(String o) {
-        return value.compareTo(o);
+        super();
+        this.value = validate(value);
     }
 
     /**
@@ -67,12 +68,26 @@ class StringValueHandler extends ObjectValueHandler<String> {
      * @throws NullPointerException if the given value is <code>null</code>
      * @throws IllegalArgumentException if the given value is illegal
      */
-    static String validate(String value) {
-        AbstractSimpleValueHandler.validate(value);
+    private static String validate(String value) {
+        Objects.requireNonNull(value, "Handler value cannot be null");
         if (value.isEmpty())
             throw new IllegalArgumentException("Handler string value cannot be empty");
         if (!value.matches(ALLOWED_CHARACTERS_REGEXP_PATTERN))
             throw new IllegalArgumentException(String.format("Illegal characters found in handler value %s. Only characters in range "+ALLOWED_CHARACTERS+" are allowed", value));
+        return value;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public int compareTo(String o) {
+        return value.compareTo(o);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public final String getValue() {
         return value;
     }
 }

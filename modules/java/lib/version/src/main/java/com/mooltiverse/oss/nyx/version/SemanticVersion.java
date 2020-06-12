@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
  * <br>
  * To get new instances you can also use one of the {@link #valueOf(String)} methods.
  */
-public class SemanticVersion extends AbstractVersion implements Comparable<SemanticVersion> {
+public class SemanticVersion extends Version implements Comparable<SemanticVersion> {
     /**
      * Serial version UID to comply with {@link java.io.Serializable}
      */
@@ -140,14 +140,24 @@ public class SemanticVersion extends AbstractVersion implements Comparable<Seman
      *
      * @throws NullPointerException if the core handler is <code>null</code>
      */
-    @SuppressWarnings("unchecked")
     private SemanticVersion(SemanticCoreVersionHandler coreHandler, SemanticPreReleaseVersionHandler prereleaseHandler, SemanticBuildVersionHandler buildHandler) {
-        super(new CompositeValueHandler(coreHandler, prereleaseHandler, buildHandler));
+        super();
+        
         Objects.requireNonNull(coreHandler, "Can't build a valid semantic version without the core version numbers");
 
         this.coreHandler = coreHandler;
         this.prereleaseHandler = prereleaseHandler;
         this.buildHandler = buildHandler;
+    }
+
+    /**
+     * Returns a hash code value for the object.
+     *
+     * @return a hash code value for this object.
+     */
+    @Override
+    public int hashCode() {
+        return 19 * coreHandler.hashCode() * (prereleaseHandler == null ? 1 : 23 * prereleaseHandler.hashCode()) * (buildHandler == null ? 1 : 29 * buildHandler.hashCode());
     }
 
     /**
@@ -264,8 +274,8 @@ public class SemanticVersion extends AbstractVersion implements Comparable<Seman
             // by comparing each dot separated identifier from left to right until a difference is found as follows:
             // identifiers consisting of only digits are compared numerically and identifiers with letters or hyphens
             // are compared lexically in ASCII sort order.
-            Iterator thisIterator = prereleaseHandler.getChildren().iterator();
-            Iterator otherIterator = v.prereleaseHandler.getChildren().iterator();
+            Iterator<? extends SimpleValueHandler> thisIterator = prereleaseHandler.getChildren().iterator();
+            Iterator<? extends SimpleValueHandler> otherIterator = v.prereleaseHandler.getChildren().iterator();
 
             while (thisIterator.hasNext()) {
                 if (otherIterator.hasNext()) {
@@ -666,7 +676,7 @@ public class SemanticVersion extends AbstractVersion implements Comparable<Seman
     public Integer[] getCoreIdentifiers() {
         Integer[] res = new Integer[coreHandler.children.size()];
         for (int i=0; i<coreHandler.children.size(); i++)
-            res[i] = coreHandler.children.get(i).value;
+            res[i] = coreHandler.get(i);
         return res;
     }
 
@@ -691,7 +701,7 @@ public class SemanticVersion extends AbstractVersion implements Comparable<Seman
             return null;
         Object[] res = new Object[prereleaseHandler.children.size()];
         for (int i=0; i<prereleaseHandler.children.size(); i++)
-            res[i] = prereleaseHandler.children.get(i).value;
+            res[i] = prereleaseHandler.children.get(i).getValue();
         return res;
     }
 
@@ -715,7 +725,7 @@ public class SemanticVersion extends AbstractVersion implements Comparable<Seman
             return null;
         String[] res = new String[buildHandler.children.size()];
         for (int i=0; i<buildHandler.children.size(); i++)
-            res[i] = buildHandler.children.get(i).value;
+            res[i] = buildHandler.get(i);
         return res;
     }
 

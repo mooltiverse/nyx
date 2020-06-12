@@ -16,16 +16,52 @@
 package com.mooltiverse.oss.nyx.version;
 
 /**
- * A value handler that holds a simple value like {@link String} or {@link Integer}.
- *
- * @param <V> the type of value represented by this handler. It must be a class around a primitive type like
- * {@link String} or {@link Integer}.
+ * A value handler that holds a simple {@link Object} value like {@link String} or {@link Integer}.
  */
-interface SimpleValueHandler<V> extends ValueHandler, Comparable<V> {
+abstract class SimpleValueHandler extends ValueHandler {
     /**
-     * Returns the value held by the handler.
-     *
-     * @return the value held by the handler.
+     * Serial version UID to comply with {@link java.io.Serializable}
      */
-    public V getValue();
+    private static final long serialVersionUID = 1L;
+    
+    /**
+     * Builds the value handler
+     */
+    protected SimpleValueHandler() {
+        super();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public int hashCode() {
+        return 31 * getValue().hashCode();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (this == obj)
+            return true;
+        if (!this.getClass().isInstance(obj))
+            return false;
+        return getValue().equals(this.getClass().cast(obj).getValue());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return getValue().toString();
+    }
+
+    /**
+     * Returns the value held by this handler
+     */
+    public abstract Object getValue();
 }

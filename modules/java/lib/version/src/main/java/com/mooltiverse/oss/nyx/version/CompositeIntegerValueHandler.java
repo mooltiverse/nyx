@@ -21,7 +21,7 @@ import java.util.List;
 /**
  * A composite value handler that only accepts {@link IntegerValueHandler}s as children.
  */
-class CompositeIntegerValueHandler extends CompositeValueHandler<IntegerValueHandler> {
+class CompositeIntegerValueHandler extends CompositeValueHandler {
     /**
      * Serial version UID to comply with {@link java.io.Serializable}
      */
@@ -91,7 +91,7 @@ class CompositeIntegerValueHandler extends CompositeValueHandler<IntegerValueHan
      * @throws IndexOutOfBoundsException if the given index is out of range
      */
     public int get(int i) {
-        return children.get(i).getValue().intValue();
+        return Integer.class.cast(children.get(i).getValue()).intValue();
     }
 
     /**

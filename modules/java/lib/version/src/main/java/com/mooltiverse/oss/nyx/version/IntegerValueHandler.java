@@ -15,14 +15,21 @@
  */
 package com.mooltiverse.oss.nyx.version;
 
+import java.util.Objects;
+
 /**
  * A simple handler holding an {@link Integer} value.
  */
-class IntegerValueHandler extends ObjectValueHandler<Integer> {
+class IntegerValueHandler extends SimpleValueHandler implements Comparable<Integer> {
     /**
      * Serial version UID to comply with {@link java.io.Serializable}
      */
     private static final long serialVersionUID = 1L;
+
+    /**
+     * The value held by this handler
+     */
+    private final Integer value;
     
     /**
      * Builds the value handler with the given value.
@@ -33,7 +40,8 @@ class IntegerValueHandler extends ObjectValueHandler<Integer> {
      * @throws IllegalArgumentException if the given value is illegal
      */
     protected IntegerValueHandler(Integer value) {
-        super(validate(value));
+        super();
+        this.value = validate(value);
     }
 
     /**
@@ -45,14 +53,8 @@ class IntegerValueHandler extends ObjectValueHandler<Integer> {
      * @throws IllegalArgumentException if the given value is illegal
      */
     protected IntegerValueHandler(String value) {
-        super(validate(value));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public int compareTo(Integer o) {
-        return value.compareTo(o);
+        super();
+        this.value = validate(value);
     }
 
     /**
@@ -65,8 +67,8 @@ class IntegerValueHandler extends ObjectValueHandler<Integer> {
      * @throws NullPointerException if the given value is <code>null</code>
      * @throws IllegalArgumentException if the given value is illegal
      */
-    static Integer validate(Integer value) {
-        AbstractSimpleValueHandler.validate(value);
+    private static Integer validate(Integer value) {
+        Objects.requireNonNull(value, "Handler value cannot be null");
         if (value.intValue() < 0)
             throw new IllegalArgumentException(String.format("Integer value cannot be negative. %d was passed.", value));
         return value;
@@ -82,8 +84,8 @@ class IntegerValueHandler extends ObjectValueHandler<Integer> {
      * @throws NullPointerException if the given value is <code>null</code>
      * @throws IllegalArgumentException if the given value is illegal
      */
-    static Integer validate(String value) {
-        AbstractSimpleValueHandler.validate(value);
+    private static Integer validate(String value) {
+        Objects.requireNonNull(value, "Handler value cannot be null");
 
         Integer intValue = null;
         try {
@@ -100,5 +102,20 @@ class IntegerValueHandler extends ObjectValueHandler<Integer> {
 
         // let the other version of the validate() method check if it's positive
         return validate(intValue);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int compareTo(Integer o) {
+        return value.compareTo(o);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public final Integer getValue() {
+        return value;
     }
 }

@@ -18,9 +18,9 @@ package com.mooltiverse.oss.nyx.version;
 import java.util.List;
 
 /**
- * A composite value handler that only accepts {@link ObjectValueHandler}s as children.
+ * A composite value handler that only accepts {@link SimpleValueHandler}s as children.
  */
-class CompositeObjectValueHandler extends CompositeValueHandler<ObjectValueHandler> {
+class CompositeObjectValueHandler extends CompositeValueHandler {
     /**
      * Serial version UID to comply with {@link java.io.Serializable}
      */
@@ -36,7 +36,7 @@ class CompositeObjectValueHandler extends CompositeValueHandler<ObjectValueHandl
      * <code>null</code> item
      * @throws IllegalArgumentException if the given values are illegal
      */
-    protected CompositeObjectValueHandler(char separator, ObjectValueHandler... children) {
+    protected CompositeObjectValueHandler(char separator, SimpleValueHandler... children) {
         super(separator, children);
     }
 
@@ -49,7 +49,7 @@ class CompositeObjectValueHandler extends CompositeValueHandler<ObjectValueHandl
      * <code>null</code> item
      * @throws IllegalArgumentException if the given values are illegal
      */
-    protected CompositeObjectValueHandler(ObjectValueHandler... children) {
+    protected CompositeObjectValueHandler(SimpleValueHandler... children) {
         super(children);
     }
 
@@ -63,7 +63,7 @@ class CompositeObjectValueHandler extends CompositeValueHandler<ObjectValueHandl
      * <code>null</code> item
      * @throws IllegalArgumentException if the given values are illegal
      */
-    protected CompositeObjectValueHandler(char separator, List<ObjectValueHandler> children) {
+    protected CompositeObjectValueHandler(char separator, List<SimpleValueHandler> children) {
         super(separator, children);
     }
 
@@ -76,7 +76,7 @@ class CompositeObjectValueHandler extends CompositeValueHandler<ObjectValueHandl
      * <code>null</code> item
      * @throws IllegalArgumentException if the given values are illegal
      */
-    protected CompositeObjectValueHandler(List<ObjectValueHandler> children) {
+    protected CompositeObjectValueHandler(List<SimpleValueHandler> children) {
         super(children);
     }
 

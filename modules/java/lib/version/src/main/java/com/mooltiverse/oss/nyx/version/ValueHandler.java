@@ -15,9 +15,21 @@
  */
 package com.mooltiverse.oss.nyx.version;
 
+import java.io.Serializable;
+
 /**
- * A value handler is an object that handles simple or composite values belonging to versions. In case of composite
- * values, this interface hides the complexity of managing nested objects presenting them as one.
+ * A value handler is an object that handles simple or composite values belonging to versions.
  */
-interface ValueHandler extends Identifier {
+abstract class ValueHandler implements Cloneable, Serializable {
+    /**
+     * Serial version UID to comply with {@link java.io.Serializable}
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * Builds the handler.
+     */
+    protected ValueHandler() {
+        super();
+    }
 }

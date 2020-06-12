@@ -23,14 +23,9 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * A value handler that holds nested handlers and can form a hierarchy of values, where leaves are simple
- * values like {@link String} or {@link Integer}.
- * This implementation manages the nested handlers of the composite handler and adds the string representation of the
- * composition.
- *
- * @param <H> the type of child handlers that the composite handler accepts
+ * A value handler that holds nested {@link SimpleValueHandler}s.
  */
-class CompositeValueHandler<H extends ValueHandler> extends AbstractValueHandler {
+class CompositeValueHandler extends ValueHandler {
     /**
      * Serial version UID to comply with {@link java.io.Serializable}
      */
@@ -39,7 +34,7 @@ class CompositeValueHandler<H extends ValueHandler> extends AbstractValueHandler
     /**
      * The nested handlers.
      */
-    protected final List<H> children;
+    protected final List<? extends SimpleValueHandler> children;
 
     /**
      * Store the immutable string representation to avoid repetitive formatting.
@@ -71,10 +66,10 @@ class CompositeValueHandler<H extends ValueHandler> extends AbstractValueHandler
      * @throws IllegalArgumentException if the given value is illegal or doesn't contain any non <code>null</code> item
      */
     @SafeVarargs
-    protected CompositeValueHandler(char separator, H... children) {
+    protected CompositeValueHandler(char separator, SimpleValueHandler... children) {
         super();
         this.separator = separator;
-        this.children = validate(Arrays.<H>asList(children));
+        this.children = validate(Arrays.<SimpleValueHandler>asList(children));
     }
 
     /**
@@ -87,7 +82,7 @@ class CompositeValueHandler<H extends ValueHandler> extends AbstractValueHandler
      * @throws IllegalArgumentException if the given value is illegal or doesn't contain any non <code>null</code> item
      */
     @SafeVarargs
-    protected CompositeValueHandler(H... children) {
+    protected CompositeValueHandler(SimpleValueHandler... children) {
         this(DEFAULT_SEPARATOR, children);
     }
 
@@ -101,7 +96,7 @@ class CompositeValueHandler<H extends ValueHandler> extends AbstractValueHandler
      * @throws NullPointerException if the given list of children is <code>null</code>
      * @throws IllegalArgumentException if the given value is illegal or doesn't contain any non <code>null</code> item
      */
-    protected CompositeValueHandler(char separator, List<H> children) {
+    protected CompositeValueHandler(char separator, List<? extends SimpleValueHandler> children) {
         super();
         this.separator = separator;
         this.children = validate(children);
@@ -116,7 +111,7 @@ class CompositeValueHandler<H extends ValueHandler> extends AbstractValueHandler
      * @throws NullPointerException if the given list of children is <code>null</code>
      * @throws IllegalArgumentException if the given value is illegal or doesn't contain any non <code>null</code> item
      */
-    protected CompositeValueHandler(List<H> children) {
+    protected CompositeValueHandler(List<? extends SimpleValueHandler> children) {
         this(DEFAULT_SEPARATOR, children);
     }
 
@@ -132,30 +127,27 @@ class CompositeValueHandler<H extends ValueHandler> extends AbstractValueHandler
      * @throws NullPointerException if the given value is <code>null</code>
      * @throws IllegalArgumentException if the given list contains illegal values or does not contain any non
      * <code>null</code> item
-     *
-     * @param <H> the type of child handlers that the composite handler accepts
      */
-    static <H extends ValueHandler> List<H> validate(List<H> children) {
-        List<H> result = new ArrayList<H>();
+    static List<? extends SimpleValueHandler> validate(List<? extends SimpleValueHandler> children) {
+        List<SimpleValueHandler> result = new ArrayList<SimpleValueHandler>();
 
         Objects.requireNonNull(children, "The list of nested value handlers cannot be null");
-        for (H o: children) {
+        for (SimpleValueHandler o: children) {
             if (o != null)
                 result.add(o);
         }
         if (result.isEmpty())
             throw new IllegalArgumentException("The list of nested value handlers doesn't contain any non-null value");
 
-        return Collections.<H>unmodifiableList(result);
+        return Collections.<SimpleValueHandler>unmodifiableList(result);
     }
 
     /**
      * {@inheritDoc}
      */
-    @Override
     public int hashCode() {
         int hash = 31 * Character.valueOf(separator).hashCode();
-        for (H c : children)
+        for (SimpleValueHandler c : children)
             hash = hash * 37 * c.hashCode();
         return hash;
     }
@@ -171,7 +163,7 @@ class CompositeValueHandler<H extends ValueHandler> extends AbstractValueHandler
             return true;
         if (!this.getClass().isInstance(obj))
             return false;
-        if (!children.equals(CompositeValueHandler.class.cast(obj).children))
+        if (!children.equals(this.getClass().cast(obj).children))
             return false;
         return true;
     }
@@ -182,7 +174,7 @@ class CompositeValueHandler<H extends ValueHandler> extends AbstractValueHandler
     public String toString() {
         if (renderedString == null) {
             StringBuilder sb = new StringBuilder();
-            Iterator<H> i = children.iterator();
+            Iterator<? extends SimpleValueHandler> i = children.iterator();
             while (i.hasNext()) {
                 sb.append(i.next().toString());
                 if (i.hasNext())
@@ -216,7 +208,7 @@ class CompositeValueHandler<H extends ValueHandler> extends AbstractValueHandler
      *
      * @return the list direct children of this composite.
      */
-    public List<H> getChildren() {
+    public List<? extends SimpleValueHandler> getChildren() {
         return children;
     }
 

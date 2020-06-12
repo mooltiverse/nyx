@@ -15,7 +15,10 @@
  */
 package com.mooltiverse.oss.nyx.version;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * The specialization of a Prerelease version number as per <a href="https://semver.org/">Semantic Versioning 2.0.0</a>.
@@ -59,7 +62,7 @@ class SemanticPreReleaseVersionHandler extends CompositeObjectValueHandler {
      * @throws NullPointerException if the given list of children is <code>null</code>
      * @throws IllegalArgumentException if the given values are illegal or there isn't any non <code>null</code> item
      */
-    private SemanticPreReleaseVersionHandler(List<ObjectValueHandler> children) {
+    private SemanticPreReleaseVersionHandler(List<SimpleValueHandler> children) {
         super(DEFAULT_SEPARATOR, children);
     }
 
@@ -81,7 +84,7 @@ class SemanticPreReleaseVersionHandler extends CompositeObjectValueHandler {
         if (identifiers.length == 0)
             throw new IllegalArgumentException("Can't build the list of identifiers from an empty list");
 
-        List<ObjectValueHandler> handlers = new ArrayList<ObjectValueHandler>();
+        List<SimpleValueHandler> handlers = new ArrayList<SimpleValueHandler>();
         for (Object id: identifiers) {
             if (id == null) {
                 // just skip it
@@ -155,21 +158,21 @@ class SemanticPreReleaseVersionHandler extends CompositeObjectValueHandler {
 
         List<Object> identifiers = new ArrayList<Object>();
         boolean bumped = false;
-        Iterator<ObjectValueHandler> childrenIterator = children.iterator();
+        Iterator<? extends SimpleValueHandler> childrenIterator = children.iterator();
         while (childrenIterator.hasNext()) {
-            ObjectValueHandler ovh = childrenIterator.next();
-            identifiers.add(ovh.value);
-            if (String.class.isInstance(ovh.value) && String.class.cast(ovh.value).equals(id)) {
+            SimpleValueHandler ovh = childrenIterator.next();
+            identifiers.add(ovh.getValue());
+            if (String.class.isInstance(ovh.getValue()) && String.class.cast(ovh.getValue()).equals(id)) {
                 // if the identifier is found see if the next identifier is a number and, if so, bump its value,
                 // otherwise create one
                 bumped = true;
                 if (childrenIterator.hasNext()) {
                     ovh = childrenIterator.next();
-                    if (Integer.class.isInstance(ovh.value))
-                        identifiers.add(Integer.valueOf(Integer.class.cast(ovh.value).intValue()+1));
+                    if (Integer.class.isInstance(ovh.getValue()))
+                        identifiers.add(Integer.valueOf(Integer.class.cast(ovh.getValue()).intValue()+1));
                     else {
                         identifiers.add(Integer.valueOf(defaultNumber)); // insert a new Integer value handler with the default value
-                        identifiers.add(ovh.value); // re-add the non-integer value handler
+                        identifiers.add(ovh.getValue()); // re-add the non-integer value handler
                     }
                 }
                 else {

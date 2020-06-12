@@ -15,8 +15,27 @@
  */
 package com.mooltiverse.oss.nyx.version;
 
+import java.io.Serializable;
+
 /**
- * This interface models a version, regardless of the convention (Semantic, Maven etc).
+ * The superclass of Version classes.
  */
-interface Version extends Identifier {
+abstract class Version implements Cloneable, Serializable {
+    /**
+     * Serial version UID to comply with {@link java.io.Serializable}
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * Builds the version.
+     */
+    protected Version() {
+        super();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public abstract int hashCode();
 }
