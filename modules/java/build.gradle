@@ -453,7 +453,7 @@ task javadocPrivate(type: Javadoc) {
 tasks.build.dependsOn tasks.javadocPrivate
 
 // Publish artifacts to the Staging Sonatype Nexus
-//tasks.publish.dependsOn tasks.publishToSonatype
+// tasks.publish.dependsOn tasks.publishToSonatype
 // Retrieve and print the stagingProfileId using the getStagingProfile task provided by the
 // 'io.codearte.nexus-staging' plugin. The Id is also available at https://oss.sonatype.org/service/local/staging/profiles
 // when the browser has an authenticated session to Sonatype Nexus
