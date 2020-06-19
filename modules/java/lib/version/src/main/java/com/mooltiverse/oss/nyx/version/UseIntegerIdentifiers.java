@@ -15,21 +15,22 @@
  */
 package com.mooltiverse.oss.nyx.version;
 
-import java.io.Serializable;
-
 /**
- * A value handler is an object that handles simple or composite values belonging to versions.
+ * This enum tells when to use Integers instead of Strings as Identifiers
  */
-abstract class ValueHandler implements Cloneable, Serializable {
+enum UseIntegerIdentifiers {
     /**
-     * Serial version UID to comply with {@link java.io.Serializable}
+     * Always use Integer identifiers, Strings are not allowed
      */
-    private static final long serialVersionUID = 1L;
+    ALWAYS,
 
     /**
-     * Builds the handler.
+     * Never use Integer identifiers, only Strings are allowed
      */
-    protected ValueHandler() {
-        super();
-    }
+    NEVER,
+
+    /**
+     * Use Integers when possible (when Strings can be converted to Integers), otherwise fallback to Strings.
+     */
+    WHEN_POSSIBLE;
 }

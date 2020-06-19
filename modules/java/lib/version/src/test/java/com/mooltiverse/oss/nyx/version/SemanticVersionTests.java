@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Random;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.DisplayName;
@@ -41,7 +42,7 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 @DisplayName("SemanticVersion")
 public class SemanticVersionTests {
     /**
-     * A {@link MethodSource} method that returns structured data to test semantic versions.
+     * A {@link MethodSource} method that returns valid structured data to test semantic versions.
      * Each returned argument has the fields:<br>
      * - version: the entire string representation of the version<br>
      * - major: the major number<br>
@@ -91,66 +92,69 @@ public class SemanticVersionTests {
     }
 
     /**
-     * A {@link MethodSource} method that returns structured data to test semantic versions.
+     * A {@link MethodSource} method that returns invalid structured data to test semantic versions.
+     * These strings should not parse to a correct version as they are illegal by some mean.
+     * 
      * Each returned argument has the fields:<br>
      * - version: the entire string representation of the version<br>
+     * - expectedException: the class of the expected expection when parsing the string<br>
      *
      * @return a stream of arguments representing incorrect versions
      */
     static Stream<Arguments> wellKnownInvalidVersions() {
         return Stream.of(
             // This list is taken from https://regex101.com/r/vkijKf/1/, linked from https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
-            arguments("1"),
-            arguments("1.2"),
-            arguments("1.2.3-0123"),
-            arguments("1.2.3-0123.0123"),
-            arguments("1.1.2+.123"),
-            arguments("+invalid"),
-            arguments("-invalid"),
-            arguments("-invalid+invalid"),
-            arguments("-invalid.01"),
-            arguments("alpha"),
-            arguments("alpha.beta"),
-            arguments("alpha.beta.1"),
-            arguments("alpha.1"),
-            arguments("alpha+beta"),
-            arguments("alpha_beta"),
-            arguments("alpha."),
-            arguments("alpha.."),
-            arguments("beta"),
-            arguments("1.0.0-alpha_beta"),
-            arguments("-alpha."),
-            arguments("1.0.0-alpha.."),
-            arguments("1.0.0-alpha..1"),
-            arguments("1.0.0-alpha...1"),
-            arguments("1.0.0-alpha....1"),
-            arguments("1.0.0-alpha.....1"),
-            arguments("1.0.0-alpha......1"),
-            arguments("1.0.0-alpha.......1"),
-            arguments("01.1.1"),
-            arguments("1.01.1"),
-            arguments("1.1.01"),
-            arguments("1.2"),
-            arguments("1.2.3.DEV"),
-            arguments("1.2-SNAPSHOT"),
-            arguments("1.2.31.2.3----RC-SNAPSHOT.12.09.1--..12+788"),
-            arguments("1.2-RC-SNAPSHOT"),
-            arguments("-1.0.3-gamma+b7718"),
-            arguments("+justmeta"),
-            arguments("9.8.7+meta+meta"),
-            arguments("9.8.7-whatever+meta+meta"),
-            arguments("99999999999999999999999.999999999999999999.99999999999999999----RC-SNAPSHOT.12.09.1--------------------------------..12")
+            arguments("1", IllegalArgumentException.class),
+            arguments("1.2", IllegalArgumentException.class),
+            arguments("1.2.3-0123", IllegalArgumentException.class),
+            arguments("1.2.3-0123.0123", IllegalArgumentException.class),
+            arguments("1.1.2+.123", IllegalArgumentException.class),
+            arguments("+invalid", IllegalArgumentException.class),
+            arguments("-invalid", IllegalArgumentException.class),
+            arguments("-invalid+invalid", IllegalArgumentException.class),
+            arguments("-invalid.01", IllegalArgumentException.class),
+            arguments("alpha", IllegalArgumentException.class),
+            arguments("alpha.beta", IllegalArgumentException.class),
+            arguments("alpha.beta.1", IllegalArgumentException.class),
+            arguments("alpha.1", IllegalArgumentException.class),
+            arguments("alpha+beta", IllegalArgumentException.class),
+            arguments("alpha_beta", IllegalArgumentException.class),
+            arguments("alpha.", IllegalArgumentException.class),
+            arguments("alpha..", IllegalArgumentException.class),
+            arguments("beta", IllegalArgumentException.class),
+            arguments("1.0.0-alpha_beta", IllegalArgumentException.class),
+            arguments("-alpha.", IllegalArgumentException.class),
+            arguments("1.0.0-alpha..", IllegalArgumentException.class),
+            arguments("1.0.0-alpha..1", IllegalArgumentException.class),
+            arguments("1.0.0-alpha...1", IllegalArgumentException.class),
+            arguments("1.0.0-alpha....1", IllegalArgumentException.class),
+            arguments("1.0.0-alpha.....1", IllegalArgumentException.class),
+            arguments("1.0.0-alpha......1", IllegalArgumentException.class),
+            arguments("1.0.0-alpha.......1", IllegalArgumentException.class),
+            arguments("01.1.1", IllegalArgumentException.class),
+            arguments("1.01.1", IllegalArgumentException.class),
+            arguments("1.1.01", IllegalArgumentException.class),
+            arguments("1.2", IllegalArgumentException.class),
+            arguments("1.2.3.DEV", IllegalArgumentException.class),
+            arguments("1.2-SNAPSHOT", IllegalArgumentException.class),
+            arguments("1.2.31.2.3----RC-SNAPSHOT.12.09.1--..12+788", IllegalArgumentException.class),
+            arguments("1.2-RC-SNAPSHOT", IllegalArgumentException.class),
+            arguments("-1.0.3-gamma+b7718", IllegalArgumentException.class),
+            arguments("+justmeta", IllegalArgumentException.class),
+            arguments("9.8.7+meta+meta", IllegalArgumentException.class),
+            arguments("9.8.7-whatever+meta+meta", IllegalArgumentException.class),
+            arguments("99999999999999999999999.999999999999999999.99999999999999999----RC-SNAPSHOT.12.09.1--------------------------------..12", IllegalArgumentException.class)
         );
     }
 
     /**
      * A {@link MethodSource} method that returns structured data to test semantic versions.
      * Each returned argument has the fields:<br>
-     * - version: the entire string representation of the original version<br>
+     * - version: the entire string representation of the sanitizeable original version<br>
      * - prefix: if the original version has a prefix, it's the expected outcome of the invocation of the getPrefix() method, otherwise null means that the version has no prefix and getPrefix() is expected to return null<br>
-     * - sanitizedOutcome: the expected outcome of the entire sanitization over the original string or the name of the class of the expected exception, if the method is expected to throw one<br>
-     * - sanitizedPrefixOutcome: the expected outcome of sanitizePrefix() over the original string or the name of the class of the expected exception, if the method is expected to throw one<br>
-     * - sanitizedNumberOutcome: the expected outcome of sanitizeNumbers() over the original string or the name of the class of the expected exception, if the method is expected to throw one<br>
+     * - sanitizedOutcome: the expected outcome of the entire sanitization over the original string<br>
+     * - sanitizedPrefixOutcome: the expected outcome of sanitizePrefix() over the original string<br>
+     * - sanitizedNumberOutcome: the expected outcome of sanitizeNumbers() over the original string<br>
      *
      * @return a stream of arguments representing incorrect versions that can be sanitized
      */
@@ -203,73 +207,388 @@ public class SemanticVersionTests {
     }
 
     /**
-     * A {@link MethodSource} method that returns structured data to test bumping the prerelease of semantic versions.
+     * A {@link MethodSource} method that returns structured data to test bumping of semantic versions.
      * Each returned argument has the fields:<br>
-     * - version: the entire string representation of the version<br>
+     * - version: the entire string representation of the starting version<br>
      * - bumpId: the identifier to bump<br>
-     * - expectedOutcomeFromBump: the outcome expected after invoking bump(bumpId), unless an exception is expected<br>
-     * - expectedOutcomeFromBumpPrerelease: the outcome expected after invoking bumpPrerelease(bumpId), unless an exception is expected<br>
-     * - expectedException: the class of the expected expection, if any. If an exception is expected the other expected strings are ignored<br>
+     * - expectedOutcomeFromBump: the outcome expected after invoking bump(bumpId)<br>
+     * - expectedOutcomeFromBumpPrerelease: the outcome expected after invoking bumpPrerelease(bumpId)<br>
      *
      * @return a stream of arguments representing versions and their expected values after bumping
      */
-    static Stream<Arguments> bumpPrereleaseVersions() {
+    static Stream<Arguments> wellKnownValidBumpAttributes() {
         return Stream.of(
-            arguments("1.2.3", "alpha", "1.2.3-alpha.0", "1.2.3-alpha.0", null),
-            arguments("1.2.3", "beta", "1.2.3-beta.0", "1.2.3-beta.0", null),
-            arguments("1.2.3", "gamma", "1.2.3-gamma.0", "1.2.3-gamma.0", null),
-            arguments("1.2.3", "delta", "1.2.3-delta.0", "1.2.3-delta.0", null),
-            arguments("1.2.3", "rc", "1.2.3-rc.0", "1.2.3-rc.0", null),
-            arguments("1.2.3", ".", null, null, IllegalArgumentException.class),
-            arguments("1.2.3", "alpha.", null, null, IllegalArgumentException.class),
-            arguments("1.2.3", "alpha.beta", null, null, IllegalArgumentException.class),
-            arguments("1.2.3", "0", null, null, IllegalArgumentException.class),
-            arguments("1.2.3", "1", null, null, IllegalArgumentException.class),
-            arguments("1.2.3", "alpha.0", null, null, IllegalArgumentException.class),
-            arguments("1.2.3", "alpha.1", null, null, IllegalArgumentException.class),
-            arguments("1.2.3", "!", null, null, IllegalArgumentException.class),
-            arguments("1.2.3", "+", null, null, IllegalArgumentException.class),
+            arguments("1.2.3", "alpha", "1.2.3-alpha.0", "1.2.3-alpha.0"),
+            arguments("1.2.3", "beta", "1.2.3-beta.0", "1.2.3-beta.0"),
+            arguments("1.2.3", "gamma", "1.2.3-gamma.0", "1.2.3-gamma.0"),
+            arguments("1.2.3", "delta", "1.2.3-delta.0", "1.2.3-delta.0"),
+            arguments("1.2.3", "rc", "1.2.3-rc.0", "1.2.3-rc.0"),
 
             //the build part must be unaffected by bumps
-            arguments("1.2.3+alpha", "alpha", "1.2.3-alpha.0+alpha", "1.2.3-alpha.0+alpha", null),
-            arguments("1.2.3+alpha.1", "alpha", "1.2.3-alpha.0+alpha.1", "1.2.3-alpha.0+alpha.1", null),
-            arguments("1.2.3+beta", "alpha", "1.2.3-alpha.0+beta", "1.2.3-alpha.0+beta", null),
+            arguments("1.2.3+alpha", "alpha", "1.2.3-alpha.0+alpha", "1.2.3-alpha.0+alpha"),
+            arguments("1.2.3+alpha.1", "alpha", "1.2.3-alpha.0+alpha.1", "1.2.3-alpha.0+alpha.1"),
+            arguments("1.2.3+beta", "alpha", "1.2.3-alpha.0+beta", "1.2.3-alpha.0+beta"),
 
             // test when the identifier appears multiple times
-            arguments("1.2.3-alpha", "alpha", "1.2.3-alpha.0", "1.2.3-alpha.0", null),
-            arguments("1.2.3-alpha.0", "alpha", "1.2.3-alpha.1", "1.2.3-alpha.1", null),
-            arguments("1.2.3-alpha.1", "alpha", "1.2.3-alpha.2", "1.2.3-alpha.2", null),
-            arguments("1.2.3-alpha.alpha", "alpha", "1.2.3-alpha.0.alpha", "1.2.3-alpha.0.alpha", null),
-            arguments("1.2.3-alpha.0.alpha", "alpha", "1.2.3-alpha.1.alpha.0", "1.2.3-alpha.1.alpha.0", null),
-            arguments("1.2.3-alpha+alpha.beta.alpha", "alpha", "1.2.3-alpha.0+alpha.beta.alpha", "1.2.3-alpha.0+alpha.beta.alpha", null),
-            arguments("1.2.3-alpha.0+alpha.beta.alpha", "alpha", "1.2.3-alpha.1+alpha.beta.alpha", "1.2.3-alpha.1+alpha.beta.alpha", null),
-            arguments("1.2.3-alpha.1+alpha.beta.alpha", "alpha", "1.2.3-alpha.2+alpha.beta.alpha", "1.2.3-alpha.2+alpha.beta.alpha", null),
-            arguments("1.2.3-alpha.alpha+alpha.beta.alpha", "alpha", "1.2.3-alpha.0.alpha+alpha.beta.alpha", "1.2.3-alpha.0.alpha+alpha.beta.alpha", null),
-            arguments("1.2.3-alpha.0.alpha+alpha.beta.alpha", "alpha", "1.2.3-alpha.1.alpha.0+alpha.beta.alpha", "1.2.3-alpha.1.alpha.0+alpha.beta.alpha", null),
+            arguments("1.2.3-alpha", "alpha", "1.2.3-alpha.0", "1.2.3-alpha.0"),
+            arguments("1.2.3-alpha.0", "alpha", "1.2.3-alpha.1", "1.2.3-alpha.1"),
+            arguments("1.2.3-alpha.1", "alpha", "1.2.3-alpha.2", "1.2.3-alpha.2"),
+            arguments("1.2.3-alpha.alpha", "alpha", "1.2.3-alpha.0.alpha", "1.2.3-alpha.0.alpha"),
+            arguments("1.2.3-alpha.0.alpha", "alpha", "1.2.3-alpha.1.alpha.0", "1.2.3-alpha.1.alpha.0"),
+            arguments("1.2.3-alpha+alpha.beta.alpha", "alpha", "1.2.3-alpha.0+alpha.beta.alpha", "1.2.3-alpha.0+alpha.beta.alpha"),
+            arguments("1.2.3-alpha.0+alpha.beta.alpha", "alpha", "1.2.3-alpha.1+alpha.beta.alpha", "1.2.3-alpha.1+alpha.beta.alpha"),
+            arguments("1.2.3-alpha.1+alpha.beta.alpha", "alpha", "1.2.3-alpha.2+alpha.beta.alpha", "1.2.3-alpha.2+alpha.beta.alpha"),
+            arguments("1.2.3-alpha.alpha+alpha.beta.alpha", "alpha", "1.2.3-alpha.0.alpha+alpha.beta.alpha", "1.2.3-alpha.0.alpha+alpha.beta.alpha"),
+            arguments("1.2.3-alpha.0.alpha+alpha.beta.alpha", "alpha", "1.2.3-alpha.1.alpha.0+alpha.beta.alpha", "1.2.3-alpha.1.alpha.0+alpha.beta.alpha"),
 
             // these are edge cases, in which a core component is bumped by its name. The core() method is expected to bump that specific core component
             // while the bumpPrerelease() method is expected to bump the prerelease component, leaving the core identifiers untouched
-            arguments("1.2.3", "major", "2.0.0", "1.2.3-major.0", null),
-            arguments("1.2.3", "minor", "1.3.0", "1.2.3-minor.0", null),
-            arguments("1.2.3", "patch", "1.2.4", "1.2.3-patch.0", null),
-            arguments("1.2.3-major", "major", "2.0.0-major", "1.2.3-major.0", null),
-            arguments("1.2.3-minor", "minor", "1.3.0-minor", "1.2.3-minor.0", null),
-            arguments("1.2.3-patch", "patch", "1.2.4-patch", "1.2.3-patch.0", null),
-            arguments("1.2.3-major.3", "major", "2.0.0-major.3", "1.2.3-major.4", null),
-            arguments("1.2.3-minor.3", "minor", "1.3.0-minor.3", "1.2.3-minor.4", null),
-            arguments("1.2.3-patch.3", "patch", "1.2.4-patch.3", "1.2.3-patch.4", null)
+            arguments("1.2.3", "major", "2.0.0", "1.2.3-major.0"),
+            arguments("1.2.3", "minor", "1.3.0", "1.2.3-minor.0"),
+            arguments("1.2.3", "patch", "1.2.4", "1.2.3-patch.0"),
+            arguments("1.2.3-major", "major", "2.0.0-major", "1.2.3-major.0"),
+            arguments("1.2.3-minor", "minor", "1.3.0-minor", "1.2.3-minor.0"),
+            arguments("1.2.3-patch", "patch", "1.2.4-patch", "1.2.3-patch.0"),
+            arguments("1.2.3-major.3", "major", "2.0.0-major.3", "1.2.3-major.4"),
+            arguments("1.2.3-minor.3", "minor", "1.3.0-minor.3", "1.2.3-minor.4"),
+            arguments("1.2.3-patch.3", "patch", "1.2.4-patch.3", "1.2.3-patch.4")
         );
     }
 
     /**
-     * An ordered list of valid version strings (according to SemVer).
+     * A {@link MethodSource} method that returns structured data to test bumping of semantic versions.
+     * Each returned argument has the fields:<br>
+     * - version: the entire string representation of the version<br>
+     * - bumpId: the identifier to bump<br>
+     * - expectedException: the class of the expected expection<br>
+     *
+     * @return a stream of arguments representing versions and their expected exceptions after bumping
+     */
+    static Stream<Arguments> wellKnownInvalidBumpAttributes() {
+        return Stream.of(
+            arguments("1.2.3", ".", IllegalArgumentException.class),
+            arguments("1.2.3", "alpha.", IllegalArgumentException.class),
+            arguments("1.2.3", "alpha.beta", IllegalArgumentException.class),
+            arguments("1.2.3", "0", IllegalArgumentException.class),
+            arguments("1.2.3", "1", IllegalArgumentException.class),
+            arguments("1.2.3", "alpha.0", IllegalArgumentException.class),
+            arguments("1.2.3", "alpha.1", IllegalArgumentException.class),
+            arguments("1.2.3", "!", IllegalArgumentException.class),
+            arguments("1.2.3", "+", IllegalArgumentException.class)
+        );
+    }
+
+    /**
+     * A {@link MethodSource} method that returns structured data to test setting a prerelease attribute of semantic versions.
+     * Each returned argument has the fields:<br>
+     * - version: the entire string representation of the starting version<br>
+     * - attributeName: the name identifier to set<br>
+     * - attributeValue: the value identifier to set<br>
+     * - expectedOutcomeFromSetPrereleaseAttributeWithoutValue: the outcome expected after invoking setPrereleaseAttribute(attributeName)<br>
+     * - expectedOutcomeFromSetPrereleaseAttributeWithValue: the outcome expected after invoking setPrereleaseAttribute(attributeName, attributeValue)<br>
+     *
+     * @return a stream of arguments representing versions and their expected values after bumping
+     */
+    static Stream<Arguments> wellKnownValidPrereleaseAttributes() {
+        return Stream.of(
+            arguments("1.2.3", "build", 123, "1.2.3-build", "1.2.3-build.123"),
+
+            //if the attribute is already present with that value the return unchanged
+            arguments("1.2.3-build", "build", 123, "1.2.3-build", "1.2.3-build.123"),
+            arguments("1.2.3-build.123", "build", 123, "1.2.3-build.123", "1.2.3-build.123"),
+
+            //the build part must be unaffected by setPrereleaseAttribute, only the prerelease part
+            arguments("1.2.3+build", "build", 123, "1.2.3-build+build", "1.2.3-build.123+build"),
+            arguments("1.2.3+build.1", "build", 123, "1.2.3-build+build.1", "1.2.3-build.123+build.1"),
+            arguments("1.2.3+build.123", "build", 123, "1.2.3-build+build.123", "1.2.3-build.123+build.123"),
+            arguments("1.2.3+build.timestamp", "build", 123, "1.2.3-build+build.timestamp", "1.2.3-build.123+build.timestamp"),
+            arguments("1.2.3+build.1.timestamp", "build", 123, "1.2.3-build+build.1.timestamp", "1.2.3-build.123+build.1.timestamp"),
+            arguments("1.2.3+build.123.timestamp", "build", 123, "1.2.3-build+build.123.timestamp", "1.2.3-build.123+build.123.timestamp"),
+            arguments("1.2.3+build.timestamp.20200101", "build", 123, "1.2.3-build+build.timestamp.20200101", "1.2.3-build.123+build.timestamp.20200101"),
+            arguments("1.2.3+build.1.timestamp.20200101", "build", 123, "1.2.3-build+build.1.timestamp.20200101", "1.2.3-build.123+build.1.timestamp.20200101"),
+            arguments("1.2.3+build.123.timestamp.20200101", "build", 123, "1.2.3-build+build.123.timestamp.20200101", "1.2.3-build.123+build.123.timestamp.20200101"),
+
+            //other build attributes must be unaffected by setBuildAttribute, unless they come after the matched identifier (in which case they are overwritten)
+            arguments("1.2.3+timestamp", "build", 123, "1.2.3-build+timestamp", "1.2.3-build.123+timestamp"),
+            arguments("1.2.3+timestamp.1", "build", 123, "1.2.3-build+timestamp.1", "1.2.3-build.123+timestamp.1"),
+            arguments("1.2.3+timestamp.123", "build", 123, "1.2.3-build+timestamp.123", "1.2.3-build.123+timestamp.123"),
+
+            arguments("1.2.3-build.567+build.timestamp", "build", 123, "1.2.3-build.567+build.timestamp", "1.2.3-build.123+build.timestamp"),                           // overwrites 567 if the value is not null
+            arguments("1.2.3-build.567+build.timestamp.1", "build", 123, "1.2.3-build.567+build.timestamp.1", "1.2.3-build.123+build.timestamp.1"),                     // overwrites 567 if the value is not null
+            arguments("1.2.3-build.567+build.timestamp.123", "build", 123, "1.2.3-build.567+build.timestamp.123", "1.2.3-build.123+build.timestamp.123")                // overwrites 567 if the value is not null
+        );
+    }
+
+    /**
+     * A {@link MethodSource} method that returns structured data to test setting a prerelease attribute of semantic versions.
+     * Each returned argument has the fields:<br>
+     * - version: the entire string representation of the version<br>
+     * - attributeName: the name identifier to set<br>
+     * - attributeValue: the value identifier to set<br>
+     * - expectedExceptionWithoutValue: the class of the expected expection when invoking setPrereleaseAttribute(attributeName), if any. If <code>null</code> no exception is expected in this case<br>
+     * - expectedExceptionWithValue: the class of the expected expection when invoking setPrereleaseAttribute(attributeName), if any. If <code>null</code> no exception is expected in this case<br>
+     *
+     * @return a stream of arguments representing versions and their expected values after bumping
+     */
+    static Stream<Arguments> wellKnownInvalidPrereleaseAttributes() {
+        return Stream.of(
+            arguments("1.2.3", null, null, NullPointerException.class, NullPointerException.class),
+            arguments("1.2.3", null, 123, NullPointerException.class, NullPointerException.class),
+            arguments("1.2.3-alpha", null, null, NullPointerException.class, NullPointerException.class),
+            arguments("1.2.3+beta", null, 123, NullPointerException.class, NullPointerException.class),
+            arguments("1.2.3-alpha+beta", null, 123, NullPointerException.class, NullPointerException.class),
+            
+            arguments("1.2.3", "", 123, IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3", "build", -123, null, IllegalArgumentException.class),
+            arguments("1.2.3", ".", 123, IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3", "build.", 123, IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3", "build.beta", 123, IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3", "build.0", 123, IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3", "build.1", 123, IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-alpha", "", 123, IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-alpha", "build", -123, null, IllegalArgumentException.class),
+            arguments("1.2.3-alpha", ".", 123, IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-alpha", "build.", 123, IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-alpha", "build.beta", 123, IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-alpha", "build.0", 123, IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-alpha", "build.1", 123, IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3+beta", "", 123, IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3+beta", "build", -123, null, IllegalArgumentException.class),
+            arguments("1.2.3+beta", ".", 123, IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3+beta", "build.", 123, IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3+beta", "build.beta", 123, IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3+beta", "build.0", 123, IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3+beta", "build.1", 123, IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-alpha+beta", "", 123, IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-alpha+beta", "build", -123, null, IllegalArgumentException.class),
+            arguments("1.2.3-alpha+beta", ".", 123, IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-alpha+beta", "build.", 123, IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-alpha+beta", "build.beta", 123, IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-alpha+beta", "build.0", 123, IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-alpha+beta", "build.1", 123, IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-build", "", 123, IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-build", "build", -123, null, IllegalArgumentException.class),
+            arguments("1.2.3-build", ".", 123, IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-build", "build.", 123, IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-build", "build.beta", 123, IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-build", "build.0", 123, IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-build", "build.1", 123, IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3+build", "", 123, IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3+build", "build", -123, null, IllegalArgumentException.class),
+            arguments("1.2.3+build", ".", 123, IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3+build", "build.", 123, IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3+build", "build.beta", 123, IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3+build", "build.0", 123, IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3+build", "build.1", 123, IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-build+build", "", 123, IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-build+build", "build", -123, null, IllegalArgumentException.class),
+            arguments("1.2.3-build+build", ".", 123, IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-build+build", "build.", 123, IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-build+build", "build.beta", 123, IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-build+build", "build.0", 123, IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-build+build", "build.1", 123, IllegalArgumentException.class, IllegalArgumentException.class),
+
+            arguments("1.2.3", "!", 123, IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3", "+", 123, IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-alpha", "!", 123, IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-alpha", "+", 123, IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3+beta", "!", 123, IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3+beta", "+", 123, IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-alpha+beta", "!", 123, IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-alpha+beta", "+", 123, IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-build", "!", 123, IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-build", "+", 123, IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3+build", "!", 123, IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3+build", "+", 123, IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-build+build", "!", 123, IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-build+build", "+", 123, IllegalArgumentException.class, IllegalArgumentException.class)
+        );
+    }
+
+    /**
+     * A {@link MethodSource} method that returns structured data to test setting a build attribute of semantic versions.
+     * Each returned argument has the fields:<br>
+     * - version: the entire string representation of the starting version<br>
+     * - attributeName: the name identifier to set<br>
+     * - attributeValue: the value identifier to set<br>
+     * - expectedOutcomeFromSetBuildAttributeWithoutValue: the outcome expected after invoking setBuildAttribute(attributeName)<br>
+     * - expectedOutcomeFromSetBuildAttributeWithValue: the outcome expected after invoking setBuildAttribute(attributeName, attributeValue)<br>
+     *
+     * @return a stream of arguments representing versions and their expected values after bumping
+     */
+    static Stream<Arguments> wellKnownValidBuildAttributes() {
+        return Stream.of(
+            arguments("1.2.3", "build", "123", "1.2.3+build", "1.2.3+build.123"),
+
+            //if the attribute is already present with that value the return unchanged
+            arguments("1.2.3+build", "build", "123", "1.2.3+build", "1.2.3+build.123"),
+            arguments("1.2.3+build.123", "build", "123", "1.2.3+build.123", "1.2.3+build.123"),
+
+            //the pre-release part must be unaffected by setBuildAttribute, only the build part
+            arguments("1.2.3-build", "build", "123", "1.2.3-build+build", "1.2.3-build+build.123"),
+            arguments("1.2.3-build.1", "build", "123", "1.2.3-build.1+build", "1.2.3-build.1+build.123"),
+            arguments("1.2.3-build.123", "build", "123", "1.2.3-build.123+build", "1.2.3-build.123+build.123"),
+            arguments("1.2.3-build+timestamp", "build", "123", "1.2.3-build+timestamp.build", "1.2.3-build+timestamp.build.123"),
+            arguments("1.2.3-build.1+timestamp", "build", "123", "1.2.3-build.1+timestamp.build", "1.2.3-build.1+timestamp.build.123"),
+            arguments("1.2.3-build.123+timestamp", "build", "123", "1.2.3-build.123+timestamp.build", "1.2.3-build.123+timestamp.build.123"),
+            arguments("1.2.3-build+timestamp.20200101", "build", "123", "1.2.3-build+timestamp.20200101.build", "1.2.3-build+timestamp.20200101.build.123"),
+            arguments("1.2.3-build.1+timestamp.20200101", "build", "123", "1.2.3-build.1+timestamp.20200101.build", "1.2.3-build.1+timestamp.20200101.build.123"),
+            arguments("1.2.3-build.123+timestamp.20200101", "build", "123", "1.2.3-build.123+timestamp.20200101.build", "1.2.3-build.123+timestamp.20200101.build.123"),
+
+            //other build attributes must be unaffected by setBuildAttribute, unless they come after the matched identifier (in which case they are overwritten)
+            arguments("1.2.3+timestamp", "build", "123", "1.2.3+timestamp.build", "1.2.3+timestamp.build.123"),
+            arguments("1.2.3+timestamp.1", "build", "123", "1.2.3+timestamp.1.build", "1.2.3+timestamp.1.build.123"),
+            arguments("1.2.3+timestamp.123", "build", "123", "1.2.3+timestamp.123.build", "1.2.3+timestamp.123.build.123"),
+            arguments("1.2.3+build.timestamp", "build", "123", "1.2.3+build.timestamp", "1.2.3+build.123"),                           // overwrites timestamp if the value is not null
+            arguments("1.2.3+build.timestamp.1", "build", "123", "1.2.3+build.timestamp.1", "1.2.3+build.123.1"),                     // overwrites timestamp if the value is not null
+            arguments("1.2.3+build.timestamp.123", "build", "123", "1.2.3+build.timestamp.123", "1.2.3+build.123.123")                // overwrites timestamp if the value is not null
+        );
+    }
+
+    /**
+     * A {@link MethodSource} method that returns structured data to test setting a build attribute of semantic versions.
+     * Each returned argument has the fields:<br>
+     * - version: the entire string representation of the version<br>
+     * - attributeName: the name identifier to set<br>
+     * - attributeValue: the value identifier to set<br>
+     * - expectedExceptionWithoutValue: the class of the expected expection when invoking setBuildAttribute(attributeName), if any. If <code>null</code> no exception is expected in this case<br>
+     * - expectedExceptionWithValue: the class of the expected expection when invoking setBuildAttribute(attributeName), if any. If <code>null</code> no exception is expected in this case<br>
+     *
+     * @return a stream of arguments representing versions and their expected values after bumping
+     */
+    static Stream<Arguments> wellKnownInvalidBuildAttributes() {
+        return Stream.of(
+            arguments("1.2.3", null, null, NullPointerException.class, NullPointerException.class),
+            arguments("1.2.3", null, "123", NullPointerException.class, NullPointerException.class),
+            arguments("1.2.3-alpha", null, null, NullPointerException.class, NullPointerException.class),
+            arguments("1.2.3+beta", null, "123", NullPointerException.class, NullPointerException.class),
+            arguments("1.2.3-alpha+beta", null, "123", NullPointerException.class, NullPointerException.class),
+            
+            arguments("1.2.3", "", "123", IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3", "build", "", null, IllegalArgumentException.class),
+            arguments("1.2.3", ".", "123", IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3", "build", ".", null, IllegalArgumentException.class),
+            arguments("1.2.3", "build.", "123", IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3", "build", "123.", null, IllegalArgumentException.class),
+            arguments("1.2.3", "build.beta", "123", IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3", "build", "123.456", null, IllegalArgumentException.class),
+            arguments("1.2.3", "build.0", "123", IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3", "build", "123.0", null, IllegalArgumentException.class),
+            arguments("1.2.3", "build.1", "123", IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3", "build", "123.1", null, IllegalArgumentException.class),
+            arguments("1.2.3-alpha", "", "123", IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-alpha", "build", "", null, IllegalArgumentException.class),
+            arguments("1.2.3-alpha", ".", "123", IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-alpha", "build", ".", null, IllegalArgumentException.class),
+            arguments("1.2.3-alpha", "build.", "123", IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-alpha", "build", "123.", null, IllegalArgumentException.class),
+            arguments("1.2.3-alpha", "build.beta", "123", IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-alpha", "build", "123.456", null, IllegalArgumentException.class),
+            arguments("1.2.3-alpha", "build.0", "123", IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-alpha", "build", "123.0", null, IllegalArgumentException.class),
+            arguments("1.2.3-alpha", "build.1", "123", IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-alpha", "build", "123.1", null, IllegalArgumentException.class),
+            arguments("1.2.3+beta", "", "123", IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3+beta", "build", "", null, IllegalArgumentException.class),
+            arguments("1.2.3+beta", ".", "123", IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3+beta", "build", ".", null, IllegalArgumentException.class),
+            arguments("1.2.3+beta", "build.", "123", IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3+beta", "build", "123.", null, IllegalArgumentException.class),
+            arguments("1.2.3+beta", "build.beta", "123", IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3+beta", "build", "123.456", null, IllegalArgumentException.class),
+            arguments("1.2.3+beta", "build.0", "123", IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3+beta", "build", "123.0", null, IllegalArgumentException.class),
+            arguments("1.2.3+beta", "build.1", "123", IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3+beta", "build", "123.1", null, IllegalArgumentException.class),
+            arguments("1.2.3-alpha+beta", "", "123", IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-alpha+beta", "build", "", null, IllegalArgumentException.class),
+            arguments("1.2.3-alpha+beta", ".", "123", IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-alpha+beta", "build", ".", null, IllegalArgumentException.class),
+            arguments("1.2.3-alpha+beta", "build.", "123", IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-alpha+beta", "build", "123.", null, IllegalArgumentException.class),
+            arguments("1.2.3-alpha+beta", "build.beta", "123", IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-alpha+beta", "build", "123.456", null, IllegalArgumentException.class),
+            arguments("1.2.3-alpha+beta", "build.0", "123", IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-alpha+beta", "build", "123.0", null, IllegalArgumentException.class),
+            arguments("1.2.3-alpha+beta", "build.1", "123", IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-alpha+beta", "build", "123.1", null, IllegalArgumentException.class),
+            arguments("1.2.3-build", "", "123", IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-build", "build", "", null, IllegalArgumentException.class),
+            arguments("1.2.3-build", ".", "123", IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-build", "build", ".", null, IllegalArgumentException.class),
+            arguments("1.2.3-build", "build.", "123", IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-build", "build", "123.", null, IllegalArgumentException.class),
+            arguments("1.2.3-build", "build.beta", "123", IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-build", "build", "123.456", null, IllegalArgumentException.class),
+            arguments("1.2.3-build", "build.0", "123", IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-build", "build", "123.0", null, IllegalArgumentException.class),
+            arguments("1.2.3-build", "build.1", "123", IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-build", "build", "123.1", null, IllegalArgumentException.class),
+            arguments("1.2.3+build", "", "123", IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3+build", "build", "", null, IllegalArgumentException.class),
+            arguments("1.2.3+build", ".", "123", IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3+build", "build", ".", null, IllegalArgumentException.class),
+            arguments("1.2.3+build", "build.", "123", IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3+build", "build", "123.", null, IllegalArgumentException.class),
+            arguments("1.2.3+build", "build.beta", "123", IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3+build", "build", "123.456", null, IllegalArgumentException.class),
+            arguments("1.2.3+build", "build.0", "123", IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3+build", "build", "123.0", null, IllegalArgumentException.class),
+            arguments("1.2.3+build", "build.1", "123", IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3+build", "build", "123.1", null, IllegalArgumentException.class),
+            arguments("1.2.3-build+build", "", "123", IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-build+build", "build", "", null, IllegalArgumentException.class),
+            arguments("1.2.3-build+build", ".", "123", IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-build+build", "build", ".", null, IllegalArgumentException.class),
+            arguments("1.2.3-build+build", "build.", "123", IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-build+build", "build", "123.", null, IllegalArgumentException.class),
+            arguments("1.2.3-build+build", "build.beta", "123", IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-build+build", "build", "123.456", null, IllegalArgumentException.class),
+            arguments("1.2.3-build+build", "build.0", "123", IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-build+build", "build", "123.0", null, IllegalArgumentException.class),
+            arguments("1.2.3-build+build", "build.1", "123", IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-build+build", "build", "123.1", null, IllegalArgumentException.class),
+
+            arguments("1.2.3", "!", "123", IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3", "build", "!", null, IllegalArgumentException.class),
+            arguments("1.2.3", "+", "123", IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3", "build", "+", null, IllegalArgumentException.class),
+            arguments("1.2.3-alpha", "!", "123", IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-alpha", "build", "!", null, IllegalArgumentException.class),
+            arguments("1.2.3-alpha", "+", "123", IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-alpha", "build", "+", null, IllegalArgumentException.class),
+            arguments("1.2.3+beta", "!", "123", IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3+beta", "build", "!", null, IllegalArgumentException.class),
+            arguments("1.2.3+beta", "+", "123", IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3+beta", "build", "+", null, IllegalArgumentException.class),
+            arguments("1.2.3-alpha+beta", "!", "123", IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-alpha+beta", "build", "!", null, IllegalArgumentException.class),
+            arguments("1.2.3-alpha+beta", "+", "123", IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-alpha+beta", "build", "+", null, IllegalArgumentException.class),
+            arguments("1.2.3-build", "!", "123", IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-build", "build", "!", null, IllegalArgumentException.class),
+            arguments("1.2.3-build", "+", "123", IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-build", "build", "+", null, IllegalArgumentException.class),
+            arguments("1.2.3+build", "!", "123", IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3+build", "build", "!", null, IllegalArgumentException.class),
+            arguments("1.2.3+build", "+", "123", IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3+build", "build", "+", null, IllegalArgumentException.class),
+            arguments("1.2.3-build+build", "!", "123", IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-build+build", "build", "!", null, IllegalArgumentException.class),
+            arguments("1.2.3-build+build", "+", "123", IllegalArgumentException.class, IllegalArgumentException.class),
+            arguments("1.2.3-build+build", "build", "+", null, IllegalArgumentException.class)
+        );
+    }
+
+    /**
+     * An ordered list of valid version strings (according to SemVer). This list can be used to check ordering among semantic versions.
      *
      * @return an ordered list of valid version strings (according to SemVer)
      *
      * @see SemanticVersion#compareTo(SemanticVersion)
      * @see SemanticVersion#equals(Object)
      */
-    static String[] wellOrderedVersionsArray = new String[] {
+    static String[] wellKnownOrderedSemanticVersionsArray = new String[] {
         "0.0.0-alpha+build",
         "0.0.0-alpha+build-123",
         "0.0.0-alpha+build-a",
@@ -359,14 +678,14 @@ public class SemanticVersionTests {
     };
 
     /**
-     * A {@link MethodSource} method that returns the stream of ordered versions.
+     * A {@link MethodSource} method that returns the stream of well known ordered semantic versions.
      *
      * @return a stream of ordered versions.
      *
-     * @see #wellOrderedVersionsArray
+     * @see #wellKnownOrderedSemanticVersionsArray
      */
-    static Stream<String> wellOrderedVersions() {
-        return Stream.of(wellOrderedVersionsArray);
+    static Stream<String> wellKnownOrderedSemanticVersions() {
+        return Stream.of(wellKnownOrderedSemanticVersionsArray);
     }
 
     /**
@@ -391,11 +710,25 @@ public class SemanticVersionTests {
         return sb.toString();
     }
 
+    /**
+     * Generates a random string containing only alphabetic characters
+     * 
+     * @param length the length of the string to generate
+     * 
+     * @return the generated string
+     */
+    static String randomAlphabeticString(int length) {
+        int leftLimit = 97; // letter 'a'
+        int rightLimit = 122; // letter 'z'
+     
+        return new Random().ints(leftLimit, rightLimit + 1).limit(length).collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append).toString();
+    }
+
     @Nested
     @DisplayName("SemanticVersion constructors")
     class ConstructorsTests {
         @Test
-        @DisplayName("new SemanticVersion() with negative numbers")
+        @DisplayName("new SemanticVersion() with negative numbers throws IllegalArgumentException")
         void exceptionUsingNegativeNumbers() {
             assertThrows(IllegalArgumentException.class, () -> new SemanticVersion(0, 0, -1));
             assertThrows(IllegalArgumentException.class, () -> new SemanticVersion(0, -1, 0));
@@ -405,7 +738,7 @@ public class SemanticVersionTests {
             assertThrows(IllegalArgumentException.class, () -> new SemanticVersion(-1, 0, 0, null, null));
         }
 
-        @ParameterizedTest(name = "#{index} new SemanticVersion(''{1}'',''{2}'',''{3}'',''null'',''null'')")
+        @ParameterizedTest(name = "new SemanticVersion(''{1}'',''{2}'',''{3}'',''null'',''null'') == ''{1}.{2}.{3}''")
         @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
         void noExceptionUsingNullIdentifiers(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
             SemanticVersion sv = new SemanticVersion(major, minor, patch, null, null);
@@ -417,7 +750,7 @@ public class SemanticVersionTests {
             assertEquals(coreString, sv.getCore());
         }
 
-        @ParameterizedTest(name = "#{index} new SemanticVersion(''{1}'',''{2}'',''{3}'',''[]'',''[]'')")
+        @ParameterizedTest(name = "new SemanticVersion(''{1}'',''{2}'',''{3}'',''[]'',''[]'') == ''{1}.{2}.{3}''")
         @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
         void noExceptionUsingEmptyIdentifiers(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
             SemanticVersion sv = new SemanticVersion(major, minor, patch, new Object[0], new String[0]);
@@ -429,7 +762,7 @@ public class SemanticVersionTests {
             assertEquals(coreString, sv.getCore());
         }
 
-        @ParameterizedTest(name = "#{index} new SemanticVersion(''{1}'',''{2}'',''{3}'') ==> ''{0}''")
+        @ParameterizedTest(name = "new SemanticVersion(''{1}'',''{2}'',''{3}'') == ''{1}.{2}.{3}''")
         @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
         void constructor1(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
             SemanticVersion sv = new SemanticVersion(major, minor, patch);
@@ -441,7 +774,7 @@ public class SemanticVersionTests {
             assertEquals(patch, sv.getPatch());
         }
 
-        @ParameterizedTest(name = "#{index} new SemanticVersion(''{1}'',''{2}'',''{3}'',''null'',''null'') ==> ''{0}''")
+        @ParameterizedTest(name = "new SemanticVersion(''{1}'',''{2}'',''{3}'',''null'',''null'') == ''{1}.{2}.{3}''")
         @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
         void constructor2(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
             SemanticVersion sv = new SemanticVersion(major, minor, patch, pre == null ? null : pre.toArray(new Object[0]), build == null ? null : build.toArray(new String[0]));
@@ -456,50 +789,44 @@ public class SemanticVersionTests {
     @Nested
     @DisplayName("SemanticVersion.valueOf")
     class ValueOfTests {
-        @ParameterizedTest(name = "#{index} valueOf(''{arguments}'') ==> IllegalArgumentException")
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'') throws IllegalArgumentException")
         @EmptySource
         void exceptionUsingValueOfWithEmptyString(String version) {
             assertThrows(IllegalArgumentException.class, () -> SemanticVersion.valueOf(version));
         }
 
-        @ParameterizedTest(name = "#{index} valueOf(''{arguments}'') ==> NullPointerException")
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'') throws NullPointerException")
         @NullSource
         void exceptionUsingValueOfWithNullString(String version) {
             assertThrows(NullPointerException.class, () -> SemanticVersion.valueOf(version));
         }
 
-        @ParameterizedTest(name = "#{index} valueOf(''{arguments}'') ==> RuntimeException")
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'') throws RuntimeException")
         @NullAndEmptySource
         void exceptionUsingValueOfWithNullOrEmptyString(String version) {
             assertThrows(RuntimeException.class, () -> SemanticVersion.valueOf(version));
         }
 
-        @ParameterizedTest(name = "#{index} valueOf(''{arguments}'') ==> IllegalArgumentException")
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'') throws ''{1}''")
         @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownInvalidVersions")
-        void exceptionUsingValueOfWithInvalidVersion(String version) {
-            assertThrows(IllegalArgumentException.class, () -> SemanticVersion.valueOf(version));
+        void exceptionUsingValueOfWithInvalidVersion(String version, Class<? extends Exception> expectedException) {
+            assertThrows(expectedException, () -> SemanticVersion.valueOf(version));
         }
 
-        @ParameterizedTest(name = "#{index} valueOf(''{0}'') ==> ''{arguments}''")
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').toString() == ''{0}''")
         @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
         void valueOfValidString(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
-            String coreString = identifiersToString(List.of(String.valueOf(major), String.valueOf(minor), String.valueOf(patch)));
-            String preString = identifiersToString(pre);
-            String buildString = identifiersToString(build);
-
-            SemanticVersion sv = SemanticVersion.valueOf(version);
-
-            assertEquals(version, sv.toString());
-            assertEquals(major, sv.getMajor());
-            assertEquals(minor, sv.getMinor());
-            assertEquals(patch, sv.getPatch());
-
-            assertEquals(coreString, sv.getCore());
-            assertEquals(preString, sv.getPrerelease());
-            assertEquals(buildString, sv.getBuild());
+            assertEquals(version, SemanticVersion.valueOf(version).toString());
         }
 
-        @ParameterizedTest(name = "#{index} valueOf(''{0}'', true) ==> ''{arguments}''")
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'', true).toString() == ''{0}''")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
+        void valueOfSanitizedString(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
+            // test that invoking valueOf with sanitization on a valid string returns the same string
+            assertEquals(version, SemanticVersion.valueOf(version, true).toString());
+        }
+
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'', true).toString() == SemanticVersion.sanitize(''{0}'')")
         @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownSanitizableVersions")
         void valueOfSanitizableString(String version) {
             // the method must fail without sanitization and succeed when using sanitization
@@ -513,7 +840,7 @@ public class SemanticVersionTests {
     @Nested
     @DisplayName("SemanticVersion.getMajor")
     class GetMajorTests {
-        @ParameterizedTest(name = "#{index} getMajor(''{0}'') ==> ''{1}''")
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').getMajor() == ''{1}''")
         @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
         void getMajor(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
             assertEquals(major, SemanticVersion.valueOf(version).getMajor());
@@ -523,7 +850,7 @@ public class SemanticVersionTests {
     @Nested
     @DisplayName("SemanticVersion.setMajor")
     class SetMajorTests {
-        @ParameterizedTest(name = "#{index} setMajor(''{1}'')")
+        @ParameterizedTest(name = "Semanticversion.valueOf(SemanticVersion.DEFAULT_INITIAL_VERSION).setMajor(''{1}'') == ''{1}''")
         @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
         void setMajor(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
             SemanticVersion sv = SemanticVersion.valueOf(SemanticVersion.DEFAULT_INITIAL_VERSION);
@@ -532,6 +859,8 @@ public class SemanticVersionTests {
 
             sv = sv.setMajor(major);
             assertEquals(major, sv.getMajor());
+
+            // ancillary tests, just to make sure the operation didn't affect other fields
             assertEquals(1, sv.getMinor());
             assertEquals(0, sv.getPatch());
             assertNull(sv.getPrerelease());
@@ -542,7 +871,7 @@ public class SemanticVersionTests {
     @Nested
     @DisplayName("SemanticVersion.getMinor")
     class GetMinorTests {
-        @ParameterizedTest(name = "#{index} getMinor(''{0}'') ==> ''{2}''")
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').getMinor() == ''{2}''")
         @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
         void getMinor(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
             assertEquals(minor, SemanticVersion.valueOf(version).getMinor());
@@ -552,7 +881,7 @@ public class SemanticVersionTests {
     @Nested
     @DisplayName("SemanticVersion.setMinor")
     class SetMinorTests {
-        @ParameterizedTest(name = "#{index} setMinor(''{1}'')")
+        @ParameterizedTest(name = "Semanticversion.valueOf(SemanticVersion.DEFAULT_INITIAL_VERSION).setMinor(''{2}'') == ''{2}''")
         @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
         void setMinor(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
             SemanticVersion sv = SemanticVersion.valueOf(SemanticVersion.DEFAULT_INITIAL_VERSION);
@@ -560,8 +889,10 @@ public class SemanticVersionTests {
             assumeTrue(1 == sv.getMinor());
 
             sv = sv.setMinor(minor);
-            assertEquals(0, sv.getMajor());
             assertEquals(minor, sv.getMinor());
+
+            // ancillary tests, just to make sure the operation didn't affect other fields
+            assertEquals(0, sv.getMajor());
             assertEquals(0, sv.getPatch());
             assertNull(sv.getPrerelease());
             assertNull(sv.getBuild());
@@ -571,7 +902,7 @@ public class SemanticVersionTests {
     @Nested
     @DisplayName("SemanticVersion.getPatch")
     class GetPatchTests {
-        @ParameterizedTest(name = "#{index} getPatch(''{0}'') ==> ''{3}''")
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').getPatch() == ''{3}''")
         @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
         void getPatch(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
             assertEquals(patch, SemanticVersion.valueOf(version).getPatch());
@@ -581,7 +912,7 @@ public class SemanticVersionTests {
     @Nested
     @DisplayName("SemanticVersion.setPatch")
     class SetPatchTests {
-        @ParameterizedTest(name = "#{index} setPatch(''{1}'')")
+        @ParameterizedTest(name = "Semanticversion.valueOf(SemanticVersion.DEFAULT_INITIAL_VERSION).setPatch(''{3}'') == ''{3}''")
         @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
         void setPatch(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
             SemanticVersion sv = SemanticVersion.valueOf(SemanticVersion.DEFAULT_INITIAL_VERSION);
@@ -589,9 +920,11 @@ public class SemanticVersionTests {
             assumeTrue(0 == sv.getPatch());
 
             sv = sv.setPatch(patch);
+            assertEquals(patch, sv.getPatch());
+
+            // ancillary tests, just to make sure the operation didn't affect other fields
             assertEquals(0, sv.getMajor());
             assertEquals(1, sv.getMinor());
-            assertEquals(patch, sv.getPatch());
             assertNull(sv.getPrerelease());
             assertNull(sv.getBuild());
         }
@@ -600,14 +933,14 @@ public class SemanticVersionTests {
     @Nested
     @DisplayName("SemanticVersion.getCore")
     class GetCoreTests {
-        @ParameterizedTest(name = "#{index} getCore(''{0}'') ==> ''{1}.{2}.{3}''")
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').getCore() == ''{1}.{2}.{3}''")
         @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
         void getCore(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
             String coreString = identifiersToString(List.of(String.valueOf(major), String.valueOf(minor), String.valueOf(patch)));
             assertEquals(coreString, SemanticVersion.valueOf(version).getCore());
         }
 
-        @ParameterizedTest(name = "#{index} getCoreIdentifiers(''{0}'') ==> ''{1}.{2}.{3}''")
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').getCoreIdentifiers(''{0}'') == ''{1}.{2}.{3}''")
         @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
         void getCoreIdentifiers(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
             assertEquals(3, SemanticVersion.valueOf(version).getCoreIdentifiers().length);
@@ -620,7 +953,7 @@ public class SemanticVersionTests {
     @Nested
     @DisplayName("SemanticVersion.setCore")
     class SetCoreTests {
-        @ParameterizedTest(name = "#{index} setCore(''{1}'', ''{2}'', ''{3}'')")
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').setCore(''{1}'', ''{2}'', ''{3}'')")
         @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
         void setCore(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
             SemanticVersion sv = SemanticVersion.valueOf(SemanticVersion.DEFAULT_INITIAL_VERSION);
@@ -641,14 +974,14 @@ public class SemanticVersionTests {
     @Nested
     @DisplayName("SemanticVersion.getPrerelease")
     class GetPrereleaseTests {
-        @ParameterizedTest(name = "#{index} getPrerelease(''{0}'') ==> ''{4}''")
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').getPrerelease() == ''{4}''")
         @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
         void getPrerelease(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
             String preString = identifiersToString(pre);
             assertEquals(preString, SemanticVersion.valueOf(version).getPrerelease());
         }
 
-        @ParameterizedTest(name = "#{index} getPrereleaseIdentifiers(''{0}'') ==> ''{4}''")
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').getPrereleaseIdentifiers() ==> ''{4}''")
         @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
         void getPrereleaseIdentifiers(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
             if (pre != null) {
@@ -663,7 +996,7 @@ public class SemanticVersionTests {
     @Nested
     @DisplayName("SemanticVersion.setPrerelease")
     class SetPrereleaseTests {
-        @ParameterizedTest(name = "#{index} setPrerelease(''{4}'')")
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').setPrerelease(''{4}'')")
         @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
         void setPrerelease(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
             SemanticVersion sv = SemanticVersion.valueOf(SemanticVersion.DEFAULT_INITIAL_VERSION);
@@ -687,14 +1020,14 @@ public class SemanticVersionTests {
     @Nested
     @DisplayName("SemanticVersion.getBuild")
     class GetBuildTests {
-        @ParameterizedTest(name = "#{index} getBuild(''{0}'') ==> ''{5}''")
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').getBuild() == ''{5}''")
         @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
         void getBuild(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
             String buildString = identifiersToString(build);
             assertEquals(buildString, SemanticVersion.valueOf(version).getBuild());
         }
 
-        @ParameterizedTest(name = "#{index} getBuildIdentifiers(''{0}'') ==> ''{4}''")
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').getBuildIdentifiers(''{0}'') ==> ''{5}''")
         @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
         void getBuildIdentifiers(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
             if (build != null) {
@@ -709,7 +1042,7 @@ public class SemanticVersionTests {
     @Nested
     @DisplayName("SemanticVersion.setBuild")
     class SetBuildTests {
-        @ParameterizedTest(name = "#{index} setBuild(''{5}'')")
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').setBuild(''{5}'')")
         @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
         void setPrerelease(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
             SemanticVersion sv = SemanticVersion.valueOf(SemanticVersion.DEFAULT_INITIAL_VERSION);
@@ -733,7 +1066,7 @@ public class SemanticVersionTests {
     @Nested
     @DisplayName("SemanticVersion.toString")
     class ToStringTests {
-        @ParameterizedTest(name = "#{index} toString(''{0}'') ==> ''{0}''")
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').toString(''{0}'') ==> ''{0}''")
         @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
         void toString(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
             assertEquals(version, SemanticVersion.valueOf(version).toString());
@@ -743,153 +1076,93 @@ public class SemanticVersionTests {
     @Nested
     @DisplayName("SemanticVersion.sanitize")
     class SanitizeTests {
-        @ParameterizedTest(name = "#{index} sanitize(''{arguments}'') ==> IllegalArgumentException")
+        @ParameterizedTest(name = "Semanticversion.sanitize(''{0}'') throws IllegalArgumentException")
         @EmptySource
         void exceptionUsingSanitizeWithEmptyString(String version) {
             assertThrows(IllegalArgumentException.class, () -> SemanticVersion.sanitize(version));
         }
 
-        @ParameterizedTest(name = "#{index} sanitizePrefix(''{arguments}'') ==> IllegalArgumentException")
+        @ParameterizedTest(name = "Semanticversion.sanitizePrefix(''{0}'') throws IllegalArgumentException")
         @EmptySource
         void exceptionUsingSanitizePrefixWithEmptyString(String version) {
             assertThrows(IllegalArgumentException.class, () -> SemanticVersion.sanitizePrefix(version));
         }
 
-        @ParameterizedTest(name = "#{index} sanitizeNumbers(''{arguments}'') ==> IllegalArgumentException")
+        @ParameterizedTest(name = "Semanticversion.sanitizeNumbers(''{0}'') throws IllegalArgumentException")
         @EmptySource
         void exceptionUsingSanitizeNumbersWithEmptyString(String version) {
             assertThrows(IllegalArgumentException.class, () -> SemanticVersion.sanitizeNumbers(version));
         }
 
-        @ParameterizedTest(name = "#{index} sanitize(''{arguments}'') ==> NullPointerException")
+        @ParameterizedTest(name = "Semanticversion.sanitize(''{0}'') throws NullPointerException")
         @NullSource
         void exceptionUsingSanitizeWithNullString(String version) {
             assertThrows(NullPointerException.class, () -> SemanticVersion.sanitize(version));
         }
 
-        @ParameterizedTest(name = "#{index} sanitizePrefix(''{arguments}'') ==> NullPointerException")
+        @ParameterizedTest(name = "Semanticversion.sanitizePrefix(''{0}'') throws NullPointerException")
         @NullSource
         void exceptionUsingSanitizePrefixWithNullString(String version) {
             assertThrows(NullPointerException.class, () -> SemanticVersion.sanitizePrefix(version));
         }
 
-        @ParameterizedTest(name = "#{index} sanitizeNumbers(''{arguments}'') ==> NullPointerException")
+        @ParameterizedTest(name = "Semanticversion.sanitizeNumbers(''{0}'') throws NullPointerException")
         @NullSource
         void exceptionUsingSanitizeNumbersWithNullString(String version) {
             assertThrows(NullPointerException.class, () -> SemanticVersion.sanitizeNumbers(version));
         }
 
-        @ParameterizedTest(name = "#{index} sanitize(''{0}'') ==> ''{0}''")
+        @ParameterizedTest(name = "Semanticversion.sanitize(''{0}'') == ''{0}''")
         @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
         void sanitizeWithValidString(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
             assertEquals(version, SemanticVersion.sanitize(version));
         }
 
-        @ParameterizedTest(name = "#{index} sanitizeNumbers(''{0}'') ==> ''{0}''")
+        @ParameterizedTest(name = "Semanticversion.sanitizeNumbers(''{0}'') == ''{0}''")
         @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
         void sanitizeNumbersWithValidString(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
             assertEquals(version, SemanticVersion.sanitizeNumbers(version));
         }
 
-        @ParameterizedTest(name = "#{index} sanitizePrefix(''{0}'') ==> ''{0}''")
+        @ParameterizedTest(name = "Semanticversion.sanitizePrefix(''{0}'') == ''{0}''")
         @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
         void sanitizePrefixWithValidString(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
             assertEquals(version, SemanticVersion.sanitizePrefix(version));
         }
 
-        @ParameterizedTest(name = "#{index} sanitize(''{0}'') ==> ''{2}''")
+        @ParameterizedTest(name = "Semanticversion.sanitize(''{0}'') == ''{2}''")
         @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownSanitizableVersions")
-        @SuppressWarnings({"unchecked", "rawtypes"})
-        void sanitize(String version, String expectedPrefix, String expectedSanitizeOutcomeOrException, String expectedSanitizePrefixOutcomeOrException, String expectedSanitizeNumberOutcomeOrException) {
-            // see if the excepted outcome is an exception
-            Class expectedException = null;
-            try {
-                expectedException = Class.forName(expectedSanitizeOutcomeOrException);
-            }
-            catch (ClassNotFoundException cnfe) {
-                // the expected outcome is a string value, not an exception
-            }
-
-            if (expectedException == null) {
-                assertEquals(expectedSanitizeOutcomeOrException, SemanticVersion.sanitize(version));
-            }
-            else {
-                assertThrows(expectedException, () -> SemanticVersion.sanitize(version));
-            }
+        void sanitize(String version, String expectedPrefix, String expectedSanitizeOutcome, String expectedSanitizePrefixOutcome, String expectedSanitizeNumberOutcome) {
+            assertEquals(expectedSanitizeOutcome, SemanticVersion.sanitize(version));
         }
 
-        @ParameterizedTest(name = "#{index} sanitizeNumbers(''{0}'') ==> ''{5}''")
+        @ParameterizedTest(name = "Semanticversion.sanitizePrefix(''{0}'') == ''{3}''")
         @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownSanitizableVersions")
-        @SuppressWarnings({"unchecked", "rawtypes"})
-        void sanitizeNumbers(String version, String expectedPrefix, String expectedSanitizeOutcomeOrException, String expectedSanitizePrefixOutcomeOrException, String expectedSanitizeNumberOutcomeOrException) {
-            // see if the excepted outcome is an exception
-            Class expectedException = null;
-            try {
-                expectedException = Class.forName(expectedSanitizeNumberOutcomeOrException);
-            }
-            catch (ClassNotFoundException cnfe) {
-                // the expected outcome is a string value, not an exception
-            }
-
-            if (expectedException == null) {
-                assertEquals(expectedSanitizeNumberOutcomeOrException, SemanticVersion.sanitizeNumbers(version));
-            }
-            else {
-                assertThrows(expectedException, () -> SemanticVersion.sanitizeNumbers(version));
-            }
+        void sanitizePrefix(String version, String expectedPrefix, String expectedSanitizeOutcome, String expectedSanitizePrefixOutcome, String expectedSanitizeNumberOutcome) {
+            assertEquals(expectedSanitizePrefixOutcome, SemanticVersion.sanitizePrefix(version));
         }
 
-        @ParameterizedTest(name = "#{index} sanitizePrefix(''{0}'') ==> ''{3}''")
+        @ParameterizedTest(name = "Semanticversion.sanitizeNumbers(''{0}'') == ''{4}''")
         @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownSanitizableVersions")
-        @SuppressWarnings({"unchecked", "rawtypes"})
-        void sanitizePrefix(String version, String expectedPrefix, String expectedSanitizeOutcomeOrException, String expectedSanitizePrefixOutcomeOrException, String expectedSanitizeNumberOutcomeOrException) {
-            // see if the excepted outcome is an exception
-            Class expectedException = null;
-            try {
-                expectedException = Class.forName(expectedSanitizePrefixOutcomeOrException);
-            }
-            catch (ClassNotFoundException cnfe) {
-                // the expected outcome is a string value, not an exception
-            }
-
-            if (expectedException == null) {
-                assertEquals(expectedSanitizePrefixOutcomeOrException, SemanticVersion.sanitizePrefix(version));
-            }
-            else {
-                assertThrows(expectedException, () -> SemanticVersion.sanitizePrefix(version));
-            }
+        void sanitizeNumbers(String version, String expectedPrefix, String expectedSanitizeOutcome, String expectedSanitizePrefixOutcome, String expectedSanitizeNumberOutcome) {
+            assertEquals(expectedSanitizeNumberOutcome, SemanticVersion.sanitizeNumbers(version));
         }
     }
 
     @Nested
     @DisplayName("SemanticVersion.getPrefix")
     class GetPrefixTests {
-        @ParameterizedTest(name = "#{index} getPrefix(''{0}'') ==> ''{1}'' or ''{3}''")
+        @ParameterizedTest(name = "Semanticversion.getPrefix(''{0}'') == ''{1}''")
         @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownSanitizableVersions")
-        @SuppressWarnings({"unchecked", "rawtypes"})
         void getPrefix(String version, String expectedPrefix, String expectedSanitizeOutcomeOrException, String expectedSanitizePrefixOutcomeOrException, String expectedSanitizeNumberOutcomeOrException) {
-            // see if the excepted outcome is an exception
-            Class expectedException = null;
-            try {
-                expectedException = Class.forName(expectedSanitizePrefixOutcomeOrException);
-            }
-            catch (ClassNotFoundException cnfe) {
-                // the expected outcome is a string value, not an exception
-            }
-
-            if (expectedException == null) {
-                assertEquals(expectedPrefix, SemanticVersion.getPrefix(version));
-            }
-            else {
-                assertThrows(expectedException, () -> SemanticVersion.getPrefix(version));
-            }
+            assertEquals(expectedPrefix, SemanticVersion.getPrefix(version));
         }
     }
 
     @Nested
     @DisplayName("SemanticVersion.equals")
     class EqualsTests {
-        @ParameterizedTest(name = "#{index} equals(''{0}'', null) ==> false")
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').equals(null) == false")
         @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
         void equalsToNull(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
             SemanticVersion sv = SemanticVersion.valueOf(version);
@@ -897,7 +1170,7 @@ public class SemanticVersionTests {
             assertNotEquals(sv, null);
         }
 
-        @ParameterizedTest(name = "#{index} equals(''{0}'', '''') ==> false")
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').equals('''') == false")
         @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
         void equalsToEmptyString(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
             SemanticVersion sv = SemanticVersion.valueOf(version);
@@ -905,7 +1178,7 @@ public class SemanticVersionTests {
             assertNotEquals(sv, "");
         }
 
-        @ParameterizedTest(name = "#{index} equals(''{0}'', ''{0}'') ==> true")
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').equals(''0'') == true")
         @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
         void equalsToSameInstance(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
             SemanticVersion sv = SemanticVersion.valueOf(version);
@@ -913,7 +1186,7 @@ public class SemanticVersionTests {
             assertEquals(sv, sv);
         }
 
-        @ParameterizedTest(name = "#{index} equals(''{0}'', ''{0}'') ==> true")
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').equals(Semanticversion.valueOf(''{0}'')) == true")
         @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
         void equalsToOtherInstanceWithSameStringvalue(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
             SemanticVersion sv1 = SemanticVersion.valueOf(version);
@@ -927,14 +1200,14 @@ public class SemanticVersionTests {
     @Nested
     @DisplayName("SemanticVersion.compareTo")
     class CompareToTests {
-        @ParameterizedTest(name = "#{index} compareTo(''{0}'', [...])")
-        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellOrderedVersions")
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').compareTo([...])")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownOrderedSemanticVersions")
         void compareTo(String version) {
             SemanticVersion sv = SemanticVersion.valueOf(version);
 
             // The version parameter is just one value picked from the following array so we can test the order of that
             // element throughout the entire array.
-            List<String> versionsList = Arrays.<String>asList(SemanticVersionTests.wellOrderedVersionsArray);
+            List<String> versionsList = Arrays.<String>asList(SemanticVersionTests.wellKnownOrderedSemanticVersionsArray);
             int itemPosition = versionsList.indexOf(version);
             // double check the given item is in the list
             assumeTrue(versionsList.contains(version));
@@ -951,15 +1224,15 @@ public class SemanticVersionTests {
             }
         }
 
-        @ParameterizedTest(name = "#{index} ''{0}'' Comparator.naturalOrder()")
-        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellOrderedVersions")
+        @ParameterizedTest(name = "Comparator.naturalOrder([...])")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownOrderedSemanticVersions")
         void comparatorNaturalOrder(String version) {
             SemanticVersion sv = SemanticVersion.valueOf(version);
             Comparator<SemanticVersion> comparator = Comparator.naturalOrder();
 
             // The version parameter is just one value picked from the following array so we can test the order of that
             // element throughout the entire array.
-            List<String> versionsList = Arrays.<String>asList(SemanticVersionTests.wellOrderedVersionsArray);
+            List<String> versionsList = Arrays.<String>asList(SemanticVersionTests.wellKnownOrderedSemanticVersionsArray);
             int itemPosition = versionsList.indexOf(version);
             // double check the given item is in the list
             assumeTrue(versionsList.contains(version));
@@ -980,11 +1253,11 @@ public class SemanticVersionTests {
         @DisplayName("Collections.sort()")
         void collectionsSort() {
             List<SemanticVersion> orderedlist = new ArrayList<SemanticVersion>();
-            for (String s: SemanticVersionTests.wellOrderedVersionsArray)
+            for (String s: SemanticVersionTests.wellKnownOrderedSemanticVersionsArray)
                 orderedlist.add(SemanticVersion.valueOf(s));
 
             List<SemanticVersion> shuffledlist = new ArrayList<SemanticVersion>();
-            for (String s: SemanticVersionTests.wellOrderedVersionsArray)
+            for (String s: SemanticVersionTests.wellKnownOrderedSemanticVersionsArray)
                 shuffledlist.add(SemanticVersion.valueOf(s));
             Collections.shuffle(shuffledlist);
 
@@ -1009,40 +1282,41 @@ public class SemanticVersionTests {
     @Nested
     @DisplayName("SemanticVersion.bump")
     class BumpErrorTests {
-        @ParameterizedTest(name = "#{index} bump(''{arguments}'') ==> IllegalArgumentException")
+        @ParameterizedTest(name = "Semanticversion.valueOf(SemanticVersion.DEFAULT_INITIAL_VERSION).bump(''{0}'') throws IllegalArgumentException")
         @EmptySource
         void exceptionUsingBumpWithEmptyString(String bump) {
             assertThrows(IllegalArgumentException.class, () -> SemanticVersion.valueOf(SemanticVersion.DEFAULT_INITIAL_VERSION).bump(bump));
         }
 
-        @ParameterizedTest(name = "#{index} bump(''{arguments}'') ==> IllegalArgumentException")
+        @ParameterizedTest(name = "Semanticversion.valueOf(SemanticVersion.DEFAULT_INITIAL_VERSION).bump(''{0}'') throws NullPointerException")
         @NullSource
         void exceptionUsingBumpWithNullString(String bump) {
             assertThrows(NullPointerException.class, () -> SemanticVersion.valueOf(SemanticVersion.DEFAULT_INITIAL_VERSION).bump(bump));
         }
 
-        @ParameterizedTest(name = "#{index} bump(''{arguments}'') ==> RuntimeException")
+        @ParameterizedTest(name = "Semanticversion.valueOf(SemanticVersion.DEFAULT_INITIAL_VERSION).bump(''{0}'') throws RuntimeException")
         @NullAndEmptySource
         void exceptionUsingBumpWithNullOrEmptyString(String bump) {
             assertThrows(RuntimeException.class, () -> SemanticVersion.valueOf(SemanticVersion.DEFAULT_INITIAL_VERSION).bump(bump));
         }
 
-        @ParameterizedTest(name = "#{index} bump(''{0}'', ''{1}'') ==> ''{2}'' or ''{4}''")
-        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#bumpPrereleaseVersions")
-        @SuppressWarnings({"unchecked", "rawtypes"})
-        void bumpIdWithArbitraryString(String version, String bumpId, String expectedOutcomeFromBump, String expectedOutcomeFromBumpPrerelease, Class expectedException) {
-            SemanticVersion sv = SemanticVersion.valueOf(version);
-            if (expectedException == null) {
-                assertEquals(expectedOutcomeFromBump, sv.bump(bumpId).toString());
-            }
-            else assertThrows(expectedException, () -> sv.bump(bumpId));
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').bump(''{1}'') == ''{2}''")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidBumpAttributes")
+        void bumpWithValidAttribute(String version, String bumpId, String expectedOutcomeFromBump, String expectedOutcomeFromBumpPrerelease) {
+            assertEquals(expectedOutcomeFromBump, SemanticVersion.valueOf(version).bump(bumpId).toString());
+        }
+
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').bump(''{1}'') throws ''{2}''")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownInvalidBumpAttributes")
+        void exceptionUsingBumpWithInvalidAttribute(String version, String bumpId, Class<? extends Exception> expectedException) {
+            assertThrows(expectedException, () -> SemanticVersion.valueOf(version).bump(bumpId));
         }
     }
 
     @Nested
     @DisplayName("SemanticVersion.bumpMajor")
     class BumpMajorTests {
-        @ParameterizedTest(name = "#{index} bumpMajor(''{0}'')")
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').bumpMajor() == ''{1}+1.{2}.{3}''")
         @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
         void bumpMajor(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
             SemanticVersion sv1 = SemanticVersion.valueOf(version);
@@ -1053,7 +1327,7 @@ public class SemanticVersionTests {
             assertEquals(0, sv2.getPatch());
         }
 
-        @ParameterizedTest(name = "#{index} bump(''MAJOR'', ''{0}'')")
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').bump(CoreIdentifiers.MAJOR) == ''{1}+1.{2}.{3}''")
         @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
         void bumpMajorWithEnum(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
             SemanticVersion sv1 = SemanticVersion.valueOf(version);
@@ -1064,7 +1338,7 @@ public class SemanticVersionTests {
             assertEquals(0, sv2.getPatch());
         }
 
-        @ParameterizedTest(name = "#{index} bump(''major'', ''{0}'')")
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').bump(''major'') == ''{1}+1.{2}.{3}''")
         @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
         void bumpMajorWithString(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
             SemanticVersion sv1 = SemanticVersion.valueOf(version);
@@ -1079,7 +1353,7 @@ public class SemanticVersionTests {
     @Nested
     @DisplayName("SemanticVersion.bumpMinor")
     class BumpMinorTests {
-        @ParameterizedTest(name = "#{index} bumpMinor(''{0}'')")
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').bumpMinor() == ''{1}.{2}+1.{3}''")
         @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
         void bumpMinor(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
             SemanticVersion sv1 = SemanticVersion.valueOf(version);
@@ -1090,7 +1364,7 @@ public class SemanticVersionTests {
             assertEquals(0, sv2.getPatch());
         }
 
-        @ParameterizedTest(name = "#{index} bump(''MINOR'', ''{0}'')")
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').bump(CoreIdentifiers.MINOR) == ''{1}.{2}+1.{3}''")
         @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
         void bumpMinorWithEnum(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
             SemanticVersion sv1 = SemanticVersion.valueOf(version);
@@ -1101,7 +1375,7 @@ public class SemanticVersionTests {
             assertEquals(0, sv2.getPatch());
         }
 
-        @ParameterizedTest(name = "#{index} bump(''minor'', ''{0}'')")
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').bump(''minor'') == ''{1}.{2}+1.{3}''")
         @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
         void bumpMinorWithString(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
             SemanticVersion sv1 = SemanticVersion.valueOf(version);
@@ -1116,7 +1390,7 @@ public class SemanticVersionTests {
     @Nested
     @DisplayName("SemanticVersion.bumpPatch")
     class BumpPatchTests {
-        @ParameterizedTest(name = "#{index} bumpPatch(''{0}'')")
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').bumpPatch() == ''{1}.{2}.{3}+1''")
         @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
         void bumpPatch(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
             SemanticVersion sv1 = SemanticVersion.valueOf(version);
@@ -1127,7 +1401,7 @@ public class SemanticVersionTests {
             assertEquals(patch+1, sv2.getPatch());
         }
 
-        @ParameterizedTest(name = "#{index} bump(''PATCH'', ''{0}'')")
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').bump(CoreIdentifiers.PATCH) == ''{1}.{2}.{3}+1''")
         @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
         void bumpPatchWithEnum(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
             SemanticVersion sv1 = SemanticVersion.valueOf(version);
@@ -1138,7 +1412,7 @@ public class SemanticVersionTests {
             assertEquals(patch+1, sv2.getPatch());
         }
 
-        @ParameterizedTest(name = "#{index} bump(''patch'', ''{0}'')")
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').bump(''patch'') == ''{1}.{2}.{3}+1''")
         @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
         void bumpPatchWithString(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
             SemanticVersion sv1 = SemanticVersion.valueOf(version);
@@ -1153,15 +1427,457 @@ public class SemanticVersionTests {
     @Nested
     @DisplayName("SemanticVersion.bumpPrerelease")
     class BumpPrereleaseTests {
-        @ParameterizedTest(name = "#{index} bumpPrerelease(''{0}'', ''{1}'') ==> ''{3}'' or ''{4}''")
-        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#bumpPrereleaseVersions")
-        @SuppressWarnings({"unchecked", "rawtypes"})
-        void bumpIdWithArbitraryString(String version, String bumpId, String expectedOutcomeFromBump, String expectedOutcomeFromBumpPrerelease, Class expectedException) {
-            SemanticVersion sv = SemanticVersion.valueOf(version);
-            if (expectedException == null) {
-                assertEquals(expectedOutcomeFromBumpPrerelease, sv.bumpPrerelease(bumpId).toString());
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').bumpPrerelease(''{1}'') == ''{3}''")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidBumpAttributes")
+        void bumpPrereleaseWithValidAttribute(String version, String bumpId, String expectedOutcomeFromBump, String expectedOutcomeFromBumpPrerelease) {
+            assertEquals(expectedOutcomeFromBumpPrerelease, SemanticVersion.valueOf(version).bumpPrerelease(bumpId).toString());
+        }
+
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').bumpPrerelease(''{1}'') throws ''{2}''")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownInvalidBumpAttributes")
+        void exceptionUsingBumpPrereleaseWithInvalidAttribute(String version, String bumpId, Class<? extends Exception> expectedException) {
+            assertThrows(expectedException, () -> SemanticVersion.valueOf(version).bumpPrerelease(bumpId));
+        }
+    }
+
+    @Nested
+    @DisplayName("SemanticVersion.hasPrereleaseAttribute")
+    class HasPrereleaseAttributeTests {
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').setPrereleaseAttribute(''{1}'').hasPrereleaseAttribute(''{1}'') == true")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidPrereleaseAttributes")
+        void hasPrereleaseAttributeWithValidStringName(String version, String name, Integer value, String expectedOutcomeFromSetPrereleaseAttributeWithoutValue, String expectedOutcomeFromSetPrereleaseAttributeWithValue) {
+            assertTrue(SemanticVersion.valueOf(version).setPrereleaseAttribute(name).hasPrereleaseAttribute(name));
+        }
+
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').setPrereleaseAttribute(''{1}'').hasPrereleaseAttribute(''X'') == false")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidPrereleaseAttributes")
+        void hasPrereleaseAttributesWithValidCharacter(String version, String name, Integer value, String expectedOutcomeFromSetPrereleaseAttributeWithoutValue, String expectedOutcomeFromSetPrereleaseAttributeWithValue) {
+            // try with a short (1 char) string that is surely missing from the original string
+            assumeFalse(version.contains("X"));
+            assertFalse(SemanticVersion.valueOf(version).setPrereleaseAttribute(name).hasPrereleaseAttribute("X"));
+        }
+
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').setPrereleaseAttribute(''{1}'').hasPrereleaseAttribute(''mockidentifier'') == false")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidPrereleaseAttributes")
+        void hasPrereleaseAttributeWithValidMockIdentifier(String version, String name, Integer value, String expectedOutcomeFromSetPrereleaseAttributeWithoutValue, String expectedOutcomeFromSetPrereleaseAttributeWithValue) {
+            assumeFalse(version.contains("mockidentifier"));
+            assertFalse(SemanticVersion.valueOf(version).setPrereleaseAttribute(name).hasPrereleaseAttribute("mockidentifier"));
+        }
+
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').hasPrereleaseAttribute(''{1}'') == false")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidPrereleaseAttributes")
+        void falseUsingHasPrereleaseAttributeWithNullString(String version, String name, Integer value, String expectedOutcomeFromSetPrereleaseAttributeWithoutValue, String expectedOutcomeFromSetPrereleaseAttributeWithValue) {
+            assertFalse(SemanticVersion.valueOf(version).hasPrereleaseAttribute(null));
+        }
+
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').hasPrereleaseAttribute(''{1}'') == false")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidPrereleaseAttributes")
+        void falseUsingHasPrereleaseAttributeWithEmptyString(String version, String name, Integer value, String expectedOutcomeFromSetPrereleaseAttributeWithoutValue, String expectedOutcomeFromSetPrereleaseAttributeWithValue) {
+            assertFalse(SemanticVersion.valueOf(version).hasPrereleaseAttribute(""));
+            assertFalse(SemanticVersion.valueOf(version).hasPrereleaseAttribute("   "));
+        }
+    }
+
+    @Nested
+    @DisplayName("SemanticVersion.getPrereleaseAttribute")
+    class GetPrereleaseAttributeTests {
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').setPrereleaseAttribute(''{1}'', , ''{2}'').getPrereleaseAttributeValue(''{1}'') == , ''{2}''")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidPrereleaseAttributes")
+        void getPrereleaseAttributeValueWithValidStringName(String version, String name, Integer value, String expectedOutcomeFromSetPrereleaseAttributeWithoutValue, String expectedOutcomeFromSetPrereleaseAttributeWithValue) {
+            assertEquals(value, SemanticVersion.valueOf(version).setPrereleaseAttribute(name, value).getPrereleaseAttributeValue(name));
+        }
+
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').setPrereleaseAttribute(''{1}'').getPrereleaseAttributeValue(''X'') == null")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidPrereleaseAttributes")
+        void getPrereleaseAttributeValueWithValidCharacter(String version, String name, Integer value, String expectedOutcomeFromSetPrereleaseAttributeWithoutValue, String expectedOutcomeFromSetPrereleaseAttributeWithValue) {
+            // try with a short (1 char) string that is surely missing from the original string
+            assumeFalse(version.contains("X"));
+            assertNull(SemanticVersion.valueOf(version).setPrereleaseAttribute(name).getPrereleaseAttributeValue("X"));
+        }
+
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').setPrereleaseAttribute(''{1}'').getPrereleaseAttributeValue(''mockidentifier'') == null")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidPrereleaseAttributes")
+        void getPrereleaseAttributeValueWithValidMockIdentifier(String version, String name, Integer value, String expectedOutcomeFromSetPrereleaseAttributeWithoutValue, String expectedOutcomeFromSetPrereleaseAttributeWithValue) {
+            assumeFalse(version.contains("mockidentifier"));
+            assertNull(SemanticVersion.valueOf(version).setPrereleaseAttribute(name).getPrereleaseAttributeValue("mockidentifier"));
+        }
+
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').getPrereleaseAttributeValue(''{1}'') == null")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidPrereleaseAttributes")
+        void nullUsingGetPrereleaseAttributeValueWithNullString(String version, String name, Integer value, String expectedOutcomeFromSetPrereleaseAttributeWithoutValue, String expectedOutcomeFromSetPrereleaseAttributeWithValue) {
+            assertNull(SemanticVersion.valueOf(version).getPrereleaseAttributeValue(null));
+        }
+
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').getPrereleaseAttributeValue(''{1}'') == null")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidPrereleaseAttributes")
+        void nullUsingGetPrereleaseAttributeValueWithEmptyString(String version, String name, Integer value, String expectedOutcomeFromSetPrereleaseAttributeWithoutValue, String expectedOutcomeFromSetPrereleaseAttributeWithValue) {
+            assertNull(SemanticVersion.valueOf(version).getPrereleaseAttributeValue(""));
+            assertNull(SemanticVersion.valueOf(version).getPrereleaseAttributeValue("   "));
+        }
+    }
+
+    @Nested
+    @DisplayName("SemanticVersion.setPrereleaseAttribute")
+    class SetPrereleaseAttributeTests {
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').setPrereleaseAttribute(''{1}'') == ''{3}''")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidPrereleaseAttributes")
+        void setPrereleaseAttributeWithValidStringName(String version, String name, Integer value, String expectedOutcomeFromSetPrereleaseAttributeWithoutValue, String expectedOutcomeFromSetPrereleaseAttributeWithValue) {
+            assertEquals(expectedOutcomeFromSetPrereleaseAttributeWithoutValue, SemanticVersion.valueOf(version).setPrereleaseAttribute(name).toString()); // this overloaded version is a shorthand for the next one, but test both
+            assertEquals(expectedOutcomeFromSetPrereleaseAttributeWithoutValue, SemanticVersion.valueOf(version).setPrereleaseAttribute(name, null).toString());
+        }
+
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').setPrereleaseAttribute(''{1}'', ''{2}'') == ''{4}''")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidPrereleaseAttributes")
+        void setPrereleaseAttributeWithValidStringNameAndValue(String version, String name, Integer value, String expectedOutcomeFromSetPrereleaseAttributeWithoutValue, String expectedOutcomeFromSetPrereleaseAttributeWithValue) {
+            assertEquals(expectedOutcomeFromSetPrereleaseAttributeWithValue, SemanticVersion.valueOf(version).setPrereleaseAttribute(name, value).toString());
+        }
+        
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').setPrereleaseAttribute(''{1}'') throws ''{3}''")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownInvalidPrereleaseAttributes")
+        void exceptionUsingSetPrereleaseAttributeWithInvalidStringName(String version, String name, Integer value, Class<? extends Exception> expectedExceptionWithoutValue, Class<? extends Exception> expectedExceptionWithValue) {
+            if (expectedExceptionWithoutValue == null) {
+                // If no exception is expected just test it anyway, just expecting no exception to be thrown
+                SemanticVersion.valueOf(version).setPrereleaseAttribute(name); // this overloaded version is a shorthand for the next one, but test both
+                SemanticVersion.valueOf(version).setPrereleaseAttribute(name, null);
             }
-            else assertThrows(expectedException, () -> sv.bump(bumpId));
+            else {
+                assertThrows(expectedExceptionWithoutValue, () -> SemanticVersion.valueOf(version).setPrereleaseAttribute(name)); // this overloaded version is a shorthand for the next one, but test both
+                assertThrows(expectedExceptionWithoutValue, () -> SemanticVersion.valueOf(version).setPrereleaseAttribute(name, null));
+            }
+        }
+
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').setPrereleaseAttribute(''{1}'', ''{2}'') throws ''{4}''")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownInvalidPrereleaseAttributes")
+        void exceptionUsingSetPrereleaseAttributeWithInvalidStringNameAndValue(String version, String name, Integer value, Class<? extends Exception> expectedExceptionWithoutValue, Class<? extends Exception> expectedExceptionWithValue) {
+            if (expectedExceptionWithValue == null) {
+                // If no exception is expected just test it anyway, just expecting no exception to be thrown
+                SemanticVersion.valueOf(version).setPrereleaseAttribute(name, value);
+            }
+            else {
+                assertThrows(expectedExceptionWithValue, () -> SemanticVersion.valueOf(version).setPrereleaseAttribute(name, value));
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("SemanticVersion.removePrereleaseAttribute")
+    class RemovePrereleaseAttributeTests {
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').setPrereleaseAttribute(''random'').removePrereleaseAttribute(''random'') == ''{0}''")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidPrereleaseAttributes")
+        void removePrereleaseAttributeWithValidStringName(String version, String name, Integer value, String expectedOutcomeFromSetPrereleaseAttributeWithoutValue, String expectedOutcomeFromSetPrereleaseAttributeWithValue) {
+            // to avoid any potential conflicts with existing strings in the passed version we generate another random string
+            String randomName = randomAlphabeticString(5);
+
+            SemanticVersion sv1 = SemanticVersion.valueOf(version); // first generate the plain version
+            assumeFalse(sv1.toString().contains(randomName)); // check that the random string is not there
+            SemanticVersion sv2 = sv1.setPrereleaseAttribute(randomName); // now add the random string as Prerelease attribute
+            assumeTrue(sv2.toString().contains(randomName)); // check that the attribute is there
+
+            SemanticVersion sv3 = sv2.removePrereleaseAttribute(randomName, false); // remove the attribute only
+            assertFalse(sv3.toString().contains(randomName));
+
+            SemanticVersion sv4 = sv2.removePrereleaseAttribute(randomName, true); // also remove the value (which is not present)
+            assertFalse(sv4.toString().contains(randomName));
+
+            // now check that the two version, removing the value and not removing it, are exactly the same
+            assertEquals(sv3, sv4);
+            assertEquals(sv3.toString(), sv4.toString());
+
+            // now check that the original version and the last one are equal
+            assertEquals(sv1, sv3);
+            assertEquals(sv1.toString(), sv3.toString());
+        }
+
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').removePrereleaseAttribute(''random'') == ''{0}''")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidPrereleaseAttributes")
+        void removeMissingPrereleaseAttributeWithValidStringName(String version, String name, Integer value, String expectedOutcomeFromSetPrereleaseAttributeWithoutValue, String expectedOutcomeFromSetPrereleaseAttributeWithValue) {
+            // to avoid any potential conflicts with existing strings in the passed version we generate another random string
+            String randomName = randomAlphabeticString(5);
+
+            SemanticVersion sv1 = SemanticVersion.valueOf(version); // first generate the plain version
+            assumeFalse(sv1.toString().contains(randomName)); // check that the random string is not there
+            
+            SemanticVersion sv2 = sv1.removePrereleaseAttribute(randomName, false); // remove the attribute only
+            assertFalse(sv2.toString().contains(randomName));
+
+            SemanticVersion sv3 = sv1.removePrereleaseAttribute(randomName, true); // also remove the value (which is not present)
+            assertFalse(sv3.toString().contains(randomName));
+
+            // now check that the three versions are the same
+            assertEquals(sv1, sv2);
+            assertEquals(sv1, sv3);
+            assertEquals(sv1.toString(), sv2.toString());
+            assertEquals(sv1.toString(), sv3.toString());
+        }
+
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').setPrereleaseAttribute(''random'', ''random'').removePrereleaseAttribute(''random'', true) == ''{0}''")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidPrereleaseAttributes")
+        void removePrereleaseAttributeWithValidStringNameAndValue(String version, String name, Integer value, String expectedOutcomeFromSetPrereleaseAttributeWithoutValue, String expectedOutcomeFromSetPrereleaseAttributeWithValue) {
+            // to avoid any potential conflicts with existing strings in the passed version we generate another random string
+            String randomName = randomAlphabeticString(5);
+            Integer randomValue = new Random().nextInt();
+            if (randomValue.intValue()<0) // make sure it's positive
+                randomValue = randomValue*-1;
+
+            SemanticVersion sv1 = SemanticVersion.valueOf(version); // first generate the plain version
+            assumeFalse(sv1.toString().contains(randomName)); // check that the random string is not there
+            assumeFalse(sv1.toString().contains(randomValue.toString())); // check that the random string is not there
+            SemanticVersion sv2 = sv1.setPrereleaseAttribute(randomName, randomValue); // now add the random string as Prerelease attribute and its value
+
+            assumeTrue(sv2.toString().contains(randomName)); // check that the attribute is there
+            assumeTrue(sv2.toString().contains(randomValue.toString())); // check that the attribute is there
+
+            SemanticVersion sv3 = sv2.removePrereleaseAttribute(randomName, false); // remove the attribute only
+            assertFalse(sv3.toString().contains(randomName));
+            assertTrue(sv3.toString().contains(randomValue.toString())); // the value must be still there
+
+            SemanticVersion sv4 = sv2.removePrereleaseAttribute(randomName, true); // also remove the value (which is not present)
+            assertFalse(sv4.toString().contains(randomName));
+            assertFalse(sv4.toString().contains(randomValue.toString())); // the value must be gone
+
+            // now check that the two version, removing the value and not removing it, are different
+            assertNotEquals(sv3, sv4);
+            assertNotEquals(sv3.toString(), sv4.toString());
+
+            // now check that the original version and the last one are equal
+            assertEquals(sv1, sv4);
+            assertEquals(sv1.toString(), sv4.toString());
+        }
+
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').removePrereleaseAttribute('''', true/false) == ''{0}''")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidPrereleaseAttributes")
+        void removePrereleaseAttributeWithEmptyStringName(String version, String name, Integer value, String expectedOutcomeFromSetPrereleaseAttributeWithoutValue, String expectedOutcomeFromSetPrereleaseAttributeWithValue) {
+            assertEquals(SemanticVersion.valueOf(version).toString(), SemanticVersion.valueOf(version).removePrereleaseAttribute("", false).toString());
+            assertEquals(SemanticVersion.valueOf(version).toString(), SemanticVersion.valueOf(version).removePrereleaseAttribute("", true).toString());
+
+            assertEquals(SemanticVersion.valueOf(version).toString(), SemanticVersion.valueOf(version).removePrereleaseAttribute("  ", false).toString());
+            assertEquals(SemanticVersion.valueOf(version).toString(), SemanticVersion.valueOf(version).removePrereleaseAttribute("  ", true).toString());
+        }
+
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').removePrereleaseAttribute(null, true/false) == ''{0}''")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidPrereleaseAttributes")
+        void removePrereleaseAttributeWithNullStringName(String version, String name, Integer value, String expectedOutcomeFromSetPrereleaseAttributeWithoutValue, String expectedOutcomeFromSetPrereleaseAttributeWithValue) {
+            assertEquals(SemanticVersion.valueOf(version).toString(), SemanticVersion.valueOf(version).removePrereleaseAttribute(null, false).toString());
+            assertEquals(SemanticVersion.valueOf(version).toString(), SemanticVersion.valueOf(version).removePrereleaseAttribute(null, true).toString());
+        }
+    }
+
+    @Nested
+    @DisplayName("SemanticVersion.hasBuildAttribute")
+    class HasBuildAttributeTests {
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').setBuildAttribute(''{1}'').hasBuildAttribute(''{1}'') == true")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidBuildAttributes")
+        void hasBuildAttributeWithValidStringName(String version, String name, String value, String expectedOutcomeFromSetBuildAttributeWithoutValue, String expectedOutcomeFromSetBuildAttributeWithValue) {
+            assertTrue(SemanticVersion.valueOf(version).setBuildAttribute(name).hasBuildAttribute(name));
+        }
+
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').setBuildAttribute(''{1}'').hasBuildAttribute(''X'') == false")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidBuildAttributes")
+        void hasBuildAttributesWithValidCharacter(String version, String name, String value, String expectedOutcomeFromSetBuildAttributeWithoutValue, String expectedOutcomeFromSetBuildAttributeWithValue) {
+            // try with a short (1 char) string that is surely missing from the original string
+            assumeFalse(version.contains("X"));
+            assertFalse(SemanticVersion.valueOf(version).setBuildAttribute(name).hasBuildAttribute("X"));
+        }
+
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').setBuildAttribute(''{1}'').hasBuildAttribute(''mockidentifier'') == false")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidBuildAttributes")
+        void hasBuildAttributeWithValidMockIdentifier(String version, String name, String value, String expectedOutcomeFromSetBuildAttributeWithoutValue, String expectedOutcomeFromSetBuildAttributeWithValue) {
+            assumeFalse(version.contains("mockidentifier"));
+            assertFalse(SemanticVersion.valueOf(version).setBuildAttribute(name).hasBuildAttribute("mockidentifier"));
+        }
+
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').hasBuildAttribute(''{1}'') == false")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidBuildAttributes")
+        void falseUsingHasBuildAttributeWithNullString(String version, String name, String value, String expectedOutcomeFromSetBuildAttributeWithoutValue, String expectedOutcomeFromSetBuildAttributeWithValue) {
+            assertFalse(SemanticVersion.valueOf(version).hasBuildAttribute(null));
+        }
+
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').hasBuildAttribute(''{1}'') == false")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidBuildAttributes")
+        void falseUsingHasBuildAttributeWithEmptyString(String version, String name, String value, String expectedOutcomeFromSetBuildAttributeWithoutValue, String expectedOutcomeFromSetBuildAttributeWithValue) {
+            assertFalse(SemanticVersion.valueOf(version).hasBuildAttribute(""));
+            assertFalse(SemanticVersion.valueOf(version).hasBuildAttribute("   "));
+        }
+    }
+
+    @Nested
+    @DisplayName("SemanticVersion.getBuildAttribute")
+    class GetBuildAttributeTests {
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').setBuildAttribute(''{1}'', , ''{2}'').getBuildAttributeValue(''{1}'') == , ''{2}''")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidBuildAttributes")
+        void getBuildAttributeValueWithValidStringName(String version, String name, String value, String expectedOutcomeFromSetBuildAttributeWithoutValue, String expectedOutcomeFromSetBuildAttributeWithValue) {
+            assertEquals(value, SemanticVersion.valueOf(version).setBuildAttribute(name, value).getBuildAttributeValue(name));
+        }
+
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').setBuildAttribute(''{1}'').getBuildAttributeValue(''X'') == null")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidBuildAttributes")
+        void getBuildAttributeValueWithValidCharacter(String version, String name, String value, String expectedOutcomeFromSetBuildAttributeWithoutValue, String expectedOutcomeFromSetBuildAttributeWithValue) {
+            // try with a short (1 char) string that is surely missing from the original string
+            assumeFalse(version.contains("X"));
+            assertNull(SemanticVersion.valueOf(version).setBuildAttribute(name).getBuildAttributeValue("X"));
+        }
+
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').setBuildAttribute(''{1}'').getBuildAttributeValue(''mockidentifier'') == null")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidBuildAttributes")
+        void getBuildAttributeValueWithValidMockIdentifier(String version, String name, String value, String expectedOutcomeFromSetBuildAttributeWithoutValue, String expectedOutcomeFromSetBuildAttributeWithValue) {
+            assumeFalse(version.contains("mockidentifier"));
+            assertNull(SemanticVersion.valueOf(version).setBuildAttribute(name).getBuildAttributeValue("mockidentifier"));
+        }
+
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').getBuildAttributeValue(''{1}'') == null")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidBuildAttributes")
+        void nullUsingGetBuildAttributeValueWithNullString(String version, String name, String value, String expectedOutcomeFromSetBuildAttributeWithoutValue, String expectedOutcomeFromSetBuildAttributeWithValue) {
+            assertNull(SemanticVersion.valueOf(version).getBuildAttributeValue(null));
+        }
+
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').getBuildAttributeValue(''{1}'') == null")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidBuildAttributes")
+        void nullUsingGetBuildAttributeValueWithEmptyString(String version, String name, String value, String expectedOutcomeFromSetBuildAttributeWithoutValue, String expectedOutcomeFromSetBuildAttributeWithValue) {
+            assertNull(SemanticVersion.valueOf(version).getBuildAttributeValue(""));
+            assertNull(SemanticVersion.valueOf(version).getBuildAttributeValue("   "));
+        }
+    }
+
+    @Nested
+    @DisplayName("SemanticVersion.setBuildAttribute")
+    class SetBuildAttributeTests {
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').setBuildAttribute(''{1}'') == ''{3}''")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidBuildAttributes")
+        void setBuildAttributeWithValidStringName(String version, String name, String value, String expectedOutcomeFromSetBuildAttributeWithoutValue, String expectedOutcomeFromSetBuildAttributeWithValue) {
+            assertEquals(expectedOutcomeFromSetBuildAttributeWithoutValue, SemanticVersion.valueOf(version).setBuildAttribute(name).toString()); // this overloaded version is a shorthand for the next one, but test both
+            assertEquals(expectedOutcomeFromSetBuildAttributeWithoutValue, SemanticVersion.valueOf(version).setBuildAttribute(name, null).toString());
+        }
+
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').setBuildAttribute(''{1}'', ''{2}'') == ''{4}''")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidBuildAttributes")
+        void setBuildAttributeWithValidStringNameAndValue(String version, String name, String value, String expectedOutcomeFromSetBuildAttributeWithoutValue, String expectedOutcomeFromSetBuildAttributeWithValue) {
+            assertEquals(expectedOutcomeFromSetBuildAttributeWithValue, SemanticVersion.valueOf(version).setBuildAttribute(name, value).toString());
+        }
+        
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').setBuildAttribute(''{1}'') throws ''{3}''")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownInvalidBuildAttributes")
+        void exceptionUsingSetBuildAttributeWithInvalidStringName(String version, String name, String value, Class<? extends Exception> expectedExceptionWithoutValue, Class<? extends Exception> expectedExceptionWithValue) {
+            if (expectedExceptionWithoutValue == null) {
+                // If no exception is expected just test it anyway, just expecting no exception to be thrown
+                SemanticVersion.valueOf(version).setBuildAttribute(name); // this overloaded version is a shorthand for the next one, but test both
+                SemanticVersion.valueOf(version).setBuildAttribute(name, null);
+            }
+            else {
+                assertThrows(expectedExceptionWithoutValue, () -> SemanticVersion.valueOf(version).setBuildAttribute(name)); // this overloaded version is a shorthand for the next one, but test both
+                assertThrows(expectedExceptionWithoutValue, () -> SemanticVersion.valueOf(version).setBuildAttribute(name, null));
+            }
+        }
+
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').setBuildAttribute(''{1}'', ''{2}'') throws ''{4}''")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownInvalidBuildAttributes")
+        void exceptionUsingSetBuildAttributeWithInvalidStringNameAndValue(String version, String name, String value, Class<? extends Exception> expectedExceptionWithoutValue, Class<? extends Exception> expectedExceptionWithValue) {
+            if (expectedExceptionWithValue == null) {
+                // If no exception is expected just test it anyway, just expecting no exception to be thrown
+                SemanticVersion.valueOf(version).setBuildAttribute(name, value);
+            }
+            else {
+                assertThrows(expectedExceptionWithValue, () -> SemanticVersion.valueOf(version).setBuildAttribute(name, value));
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("SemanticVersion.removeBuildAttribute")
+    class RemoveBuildAttributeTests {
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').setBuildAttribute(''random'').removeBuildAttribute(''random'') == ''{0}''")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidBuildAttributes")
+        void removeBuildAttributeWithValidStringName(String version, String name, String value, String expectedOutcomeFromSetBuildAttributeWithoutValue, String expectedOutcomeFromSetBuildAttributeWithValue) {
+            // to avoid any potential conflicts with existing strings in the passed version we generate another random string
+            String randomName = randomAlphabeticString(5);
+
+            SemanticVersion sv1 = SemanticVersion.valueOf(version); // first generate the plain version
+            assumeFalse(sv1.toString().contains(randomName)); // check that the random string is not there
+            SemanticVersion sv2 = sv1.setBuildAttribute(randomName); // now add the random string as build attribute
+            assumeTrue(sv2.toString().contains(randomName)); // check that the attribute is there
+
+            SemanticVersion sv3 = sv2.removeBuildAttribute(randomName, false); // remove the attribute only
+            assertFalse(sv3.toString().contains(randomName));
+
+            SemanticVersion sv4 = sv2.removeBuildAttribute(randomName, true); // also remove the value (which is not present)
+            assertFalse(sv4.toString().contains(randomName));
+
+            // now check that the two version, removing the value and not removing it, are exactly the same
+            assertEquals(sv3, sv4);
+            assertEquals(sv3.toString(), sv4.toString());
+
+            // now check that the original version and the last one are equal
+            assertEquals(sv1, sv3);
+            assertEquals(sv1.toString(), sv3.toString());
+        }
+
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').removeBuildAttribute(''random'') == ''{0}''")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidBuildAttributes")
+        void removeMissingBuildAttributeWithValidStringName(String version, String name, String value, String expectedOutcomeFromSetBuildAttributeWithoutValue, String expectedOutcomeFromSetBuildAttributeWithValue) {
+            // to avoid any potential conflicts with existing strings in the passed version we generate another random string
+            String randomName = randomAlphabeticString(5);
+
+            SemanticVersion sv1 = SemanticVersion.valueOf(version); // first generate the plain version
+            assumeFalse(sv1.toString().contains(randomName)); // check that the random string is not there
+            
+            SemanticVersion sv2 = sv1.removeBuildAttribute(randomName, false); // remove the attribute only
+            assertFalse(sv2.toString().contains(randomName));
+
+            SemanticVersion sv3 = sv1.removeBuildAttribute(randomName, true); // also remove the value (which is not present)
+            assertFalse(sv3.toString().contains(randomName));
+
+            // now check that the three versions are the same
+            assertEquals(sv1, sv2);
+            assertEquals(sv1, sv3);
+            assertEquals(sv1.toString(), sv2.toString());
+            assertEquals(sv1.toString(), sv3.toString());
+        }
+
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').setBuildAttribute(''random'', ''random'').removeBuildAttribute(''random'', true) == ''{0}''")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidBuildAttributes")
+        void removeBuildAttributeWithValidStringNameAndValue(String version, String name, String value, String expectedOutcomeFromSetBuildAttributeWithoutValue, String expectedOutcomeFromSetBuildAttributeWithValue) {
+            // to avoid any potential conflicts with existing strings in the passed version we generate another random string
+            String randomName = randomAlphabeticString(5);
+            String randomValue = randomAlphabeticString(8);
+
+            SemanticVersion sv1 = SemanticVersion.valueOf(version); // first generate the plain version
+            assumeFalse(sv1.toString().contains(randomName)); // check that the random string is not there
+            assumeFalse(sv1.toString().contains(randomValue)); // check that the random string is not there
+            SemanticVersion sv2 = sv1.setBuildAttribute(randomName, randomValue); // now add the random string as build attribute and its value
+            assumeTrue(sv2.toString().contains(randomName)); // check that the attribute is there
+            assumeTrue(sv2.toString().contains(randomValue)); // check that the attribute is there
+
+            SemanticVersion sv3 = sv2.removeBuildAttribute(randomName, false); // remove the attribute only
+            assertFalse(sv3.toString().contains(randomName));
+            assertTrue(sv3.toString().contains(randomValue)); // the value must be still there
+
+            SemanticVersion sv4 = sv2.removeBuildAttribute(randomName, true); // also remove the value (which is not present)
+            assertFalse(sv4.toString().contains(randomName));
+            assertFalse(sv4.toString().contains(randomValue)); // the value must be gone
+
+            // now check that the two version, removing the value and not removing it, are different
+            assertNotEquals(sv3, sv4);
+            assertNotEquals(sv3.toString(), sv4.toString());
+
+            // now check that the original version and the last one are equal
+            assertEquals(sv1, sv4);
+            assertEquals(sv1.toString(), sv4.toString());
+        }
+
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').removeBuildAttribute('''', true/false) == ''{0}''")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidBuildAttributes")
+        void removeBuildAttributeWithEmptyStringName(String version, String name, String value, String expectedOutcomeFromSetBuildAttributeWithoutValue, String expectedOutcomeFromSetBuildAttributeWithValue) {
+            assertEquals(SemanticVersion.valueOf(version).toString(), SemanticVersion.valueOf(version).removeBuildAttribute("", false).toString());
+            assertEquals(SemanticVersion.valueOf(version).toString(), SemanticVersion.valueOf(version).removeBuildAttribute("", true).toString());
+
+            assertEquals(SemanticVersion.valueOf(version).toString(), SemanticVersion.valueOf(version).removeBuildAttribute("  ", false).toString());
+            assertEquals(SemanticVersion.valueOf(version).toString(), SemanticVersion.valueOf(version).removeBuildAttribute("  ", true).toString());
+        }
+
+        @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'').removeBuildAttribute(null, true/false) == ''{0}''")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidBuildAttributes")
+        void removeBuildAttributeWithNullStringName(String version, String name, String value, String expectedOutcomeFromSetBuildAttributeWithoutValue, String expectedOutcomeFromSetBuildAttributeWithValue) {
+            assertEquals(SemanticVersion.valueOf(version).toString(), SemanticVersion.valueOf(version).removeBuildAttribute(null, false).toString());
+            assertEquals(SemanticVersion.valueOf(version).toString(), SemanticVersion.valueOf(version).removeBuildAttribute(null, true).toString());
         }
     }
 }

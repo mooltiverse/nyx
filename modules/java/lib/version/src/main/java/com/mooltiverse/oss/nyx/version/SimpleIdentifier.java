@@ -16,24 +16,28 @@
 package com.mooltiverse.oss.nyx.version;
 
 /**
- * A value handler that holds a simple {@link Object} value like {@link String} or {@link Integer}.
+ * An identifier modelling a simple {@link Object} value like {@link String} or {@link Integer}.
+ * 
+ * In <a href="https://semver.org/">Semantic Versioning 2.0.0</a> parlance, an identifier can be
+ * numeric or alphanumeric.
  */
-abstract class SimpleValueHandler extends ValueHandler {
+abstract class SimpleIdentifier extends Identifier {
     /**
      * Serial version UID to comply with {@link java.io.Serializable}
      */
     private static final long serialVersionUID = 1L;
     
     /**
-     * Builds the value handler
+     * Default contstructor, protected on purpose.
      */
-    protected SimpleValueHandler() {
+    protected SimpleIdentifier() {
         super();
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public int hashCode() {
         return 31 * getValue().hashCode();
     }
@@ -59,9 +63,4 @@ abstract class SimpleValueHandler extends ValueHandler {
     public String toString() {
         return getValue().toString();
     }
-
-    /**
-     * Returns the value held by this handler
-     */
-    public abstract Object getValue();
 }

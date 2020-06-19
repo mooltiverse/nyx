@@ -18,43 +18,54 @@ package com.mooltiverse.oss.nyx.version;
 import java.io.Serializable;
 
 /**
- * The superclass of Version classes.
+ * An identifier is a simple value, part of a composite value.
  */
-abstract class Version implements Cloneable, Serializable {
+abstract class Identifier implements Cloneable, Serializable {
     /**
      * Serial version UID to comply with {@link java.io.Serializable}
      */
     private static final long serialVersionUID = 1L;
 
     /**
-     * Builds the version.
+     * Default contstructor, protected on purpose.
      */
-    protected Version() {
+    protected Identifier() {
         super();
     }
 
     /**
-     * Returns the hash code for this object
+     * Returns the underlying value held by this identifier.
      * 
-     * @return the hash code for this object
+     * @return the underlying value held by this identifier
      */
-    @Override
+    public abstract Object getValue();
+
+    /**
+     * Returns a has code value for this object.
+     * 
+     * @return a has code value for this object.
+     * 
+     * @see Object#hashCode()
+     */
     public abstract int hashCode();
 
     /**
-     * Returns <code>true</code> if this version is equal to the given object, <code>false otherwise</code>
+     * Tests the given object for equality against this instance.
      * 
-     * @param obj the object to compare to
+     * @return <code>true</code> if this object is the same as the obj argument; <code>false</code> otherwise.
      * 
-     * @return <code>true</code> if this version is equal to the given object, <code>false otherwise</code>
+     * @see Object#equals(Object)
      */
     @Override
     public abstract boolean equals(Object obj);
 
     /**
-     * Returns the string representation of this version
+     * Returns a string representation of the object, coherent with the identigfier scope,
+     * suitable for generating a version string.
      * 
-     * @return the string representation of this version
+     * @return a string representation of the object
+     * 
+     * @see Object#toString()
      */
     @Override
     public abstract String toString();

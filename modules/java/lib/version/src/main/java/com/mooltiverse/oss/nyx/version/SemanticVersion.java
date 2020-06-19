@@ -26,7 +26,8 @@ import java.util.regex.Pattern;
 /**
  * The implementation of a <a href="https://semver.org/">Semantic Versioning 2.0.0</a> compliant version.
  * <br>
- * Instances of this class are <b>immutable</b> so whenever you alter some values you actually receive a new instance.
+ * Instances of this class are <b>immutable</b> so whenever you alter some values you actually receive a
+ * new instance holding the new value, while the old one remains unchanged.
  * <br>
  * To get new instances you can also use one of the {@link #valueOf(String)} methods.
  */
@@ -35,6 +36,11 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
      * Serial version UID to comply with {@link java.io.Serializable}
      */
     private static final long serialVersionUID = 1L;
+
+    /**
+     * The default value to start from when bumping an identifier that has no numeric value yet. {@value}
+     */
+    private static final int DEFAULT_BUMP_VALUE = 0;
     
     /**
      * The default initial version that can be used when non version is yet available.
@@ -46,17 +52,12 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
      * used as separator only at the first occurrence while other occurrences are considered legal characters in the
      * pre-release and the build identifiers.
      */
-    public static final char PRERELEASE_MARKER = '-';
+    public static final char PRERELEASE_DELIMITER = '-';
 
     /**
      * The character that marks the separation between the core or the pre-release part and the build part.
      */
-    public static final char BUILD_MARKER = '+';
-
-    /**
-     * The default value to start from when bumping an identifier that has no numeric value yet. {@value}
-     */
-    public static final int DEFAULT_BUMP_VALUE = 0;
+    public static final char BUILD_DELIMITER = '+';
 
     /**
      * A relaxed version of the {@link #SEMANTIC_VERSION_PATTERN} that works also when a prefix appears at the beginning
@@ -65,7 +66,7 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
      *
      * @see #SEMANTIC_VERSION_PATTERN
      */
-    public static final String SEMANTIC_VERSION_RELAXED_PATTERN = "([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(?:-((?:[0-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:[0-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$";
+    public static final String SEMANTIC_VERSION_PATTERN_RELAXED = "([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(?:-((?:[0-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:[0-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$";
 
     /**
      * The regexp pattern taken directly from <a href="https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string">Semantic Versioning 2.0.0</a>
@@ -79,19 +80,19 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
     private transient String renderedString = null;
 
     /**
-     * The handler of the core version part. It can't be <code>null</code>.
+     * The identifier of the core version part. It can't be <code>null</code>.
      */
-    private final SemanticCoreVersionHandler coreHandler;
+    private final SemanticVersionCoreIdentifier coreIdentifier;
 
     /**
-     * The handler of the pre-release part of the version. It may be <code>null</code>.
+     * The identifier of the pre-release part of the version. It may be <code>null</code>.
      */
-    private final SemanticPreReleaseVersionHandler prereleaseHandler;
+    private final SemanticVersionPreReleaseIdentifier prereleaseIdentifier;
 
     /**
-     * The handler of the build part of the version. It may be <code>null</code>.
+     * The identifier of the build part of the version. It may be <code>null</code>.
      */
-    private final SemanticBuildVersionHandler buildHandler;
+    private final SemanticVersionBuildIdentifier buildIdentifier;
 
     /**
      * Builds a new version object with the given values.
@@ -128,26 +129,26 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
      * identifiers in the <code>prereleaseIdentifiers</code> or <code>buildIdentifiers</code> contain illegal characters
      */
     public SemanticVersion(int major, int minor, int patch, Object[] prereleaseIdentifiers, String[] buildIdentifiers) {
-        this(new SemanticCoreVersionHandler(major, minor, patch), prereleaseIdentifiers == null || prereleaseIdentifiers.length == 0 || CompositeValueHandler.allNulls(prereleaseIdentifiers) ? null : SemanticPreReleaseVersionHandler.valueOf(prereleaseIdentifiers), buildIdentifiers == null || buildIdentifiers.length == 0 || CompositeValueHandler.allNulls(buildIdentifiers) ? null :  SemanticBuildVersionHandler.valueOf(buildIdentifiers));
+        this(SemanticVersionCoreIdentifier.valueOf(major, minor, patch), Parser.hasValues(prereleaseIdentifiers) ? SemanticVersionPreReleaseIdentifier.valueOf(true, prereleaseIdentifiers) : null, Parser.hasValues(buildIdentifiers) ? SemanticVersionBuildIdentifier.valueOf(true, buildIdentifiers) : null);
     }
 
     /**
-     * Builds the version with the given handlers values.
+     * Builds the version with the given identifier values.
      *
-     * @param coreHandler the handler of the core version part. It can't be <code>null</code>.
-     * @param prereleaseHandler the handler of the pre-release part of the version. It may be <code>null</code>.
-     * @param buildHandler the handler of the build part of the version. It may be <code>null</code>.
+     * @param coreIdentifier the identifier of the core version part. It can't be <code>null</code>.
+     * @param prereleaseIdentifier the identifier of the pre-release part of the version. It may be <code>null</code>.
+     * @param buildIdentifier the identifier of the build part of the version. It may be <code>null</code>.
      *
-     * @throws NullPointerException if the core handler is <code>null</code>
+     * @throws NullPointerException if the core identifier is <code>null</code>
      */
-    private SemanticVersion(SemanticCoreVersionHandler coreHandler, SemanticPreReleaseVersionHandler prereleaseHandler, SemanticBuildVersionHandler buildHandler) {
+    private SemanticVersion(SemanticVersionCoreIdentifier coreIdentifier, SemanticVersionPreReleaseIdentifier prereleaseIdentifier, SemanticVersionBuildIdentifier buildIdentifier) {
         super();
         
-        Objects.requireNonNull(coreHandler, "Can't build a valid semantic version without the core version numbers");
+        Objects.requireNonNull(coreIdentifier, "Can't build a valid semantic version without the core version numbers");
 
-        this.coreHandler = coreHandler;
-        this.prereleaseHandler = prereleaseHandler;
-        this.buildHandler = buildHandler;
+        this.coreIdentifier = coreIdentifier;
+        this.prereleaseIdentifier = prereleaseIdentifier;
+        this.buildIdentifier = buildIdentifier;
     }
 
     /**
@@ -157,7 +158,7 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
      */
     @Override
     public int hashCode() {
-        return 19 * coreHandler.hashCode() * (prereleaseHandler == null ? 1 : 23 * prereleaseHandler.hashCode()) * (buildHandler == null ? 1 : 29 * buildHandler.hashCode());
+        return 19 * coreIdentifier.hashCode() * (prereleaseIdentifier == null ? 1 : 23 * prereleaseIdentifier.hashCode()) * (buildIdentifier == null ? 1 : 29 * buildIdentifier.hashCode());
     }
 
     /**
@@ -180,21 +181,21 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
             return false;
 
         SemanticVersion otherVersion = SemanticVersion.class.cast(obj);
-        if (!coreHandler.equals(otherVersion.coreHandler))
+        if (!coreIdentifier.equals(otherVersion.coreIdentifier))
             return false;
 
-        if (prereleaseHandler == null) {
-            if (otherVersion.prereleaseHandler != null)
+        if (prereleaseIdentifier == null) {
+            if (otherVersion.prereleaseIdentifier != null)
                 return false;
         }
-        else if (!prereleaseHandler.equals(otherVersion.prereleaseHandler))
+        else if (!prereleaseIdentifier.equals(otherVersion.prereleaseIdentifier))
             return false;
 
-        if (buildHandler == null) {
-            if (otherVersion.buildHandler != null)
+        if (buildIdentifier == null) {
+            if (otherVersion.buildIdentifier != null)
                 return false;
         }
-        else if (!buildHandler.equals(otherVersion.buildHandler))
+        else if (!buildIdentifier.equals(otherVersion.buildIdentifier))
             return false;
 
         return true;
@@ -260,22 +261,22 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
             return getPatch() - v.getPatch();
 
         // Rule #11
-        if ((prereleaseHandler != null) || (v.prereleaseHandler != null)) {
+        if ((prereleaseIdentifier != null) || (v.prereleaseIdentifier != null)) {
             // When major, minor, and patch are equal, a pre-release version has lower precedence than a normal version.
             // Example: 1.0.0-alpha < 1.0.0.
             // So if only one has the prerelease block, that means it has lower precedence (comes first)
-            if ((prereleaseHandler != null) && (v.prereleaseHandler == null))
+            if ((prereleaseIdentifier != null) && (v.prereleaseIdentifier == null))
                 return -1;
-            else if ((prereleaseHandler == null) && (v.prereleaseHandler != null))
+            else if ((prereleaseIdentifier == null) && (v.prereleaseIdentifier != null))
                 return 1;
         }
-        if (prereleaseHandler != null) {
+        if (prereleaseIdentifier != null) {
             // Precedence for two pre-release versions with the same major, minor, and patch version MUST be determined
             // by comparing each dot separated identifier from left to right until a difference is found as follows:
             // identifiers consisting of only digits are compared numerically and identifiers with letters or hyphens
             // are compared lexically in ASCII sort order.
-            Iterator<? extends SimpleValueHandler> thisIterator = prereleaseHandler.getChildren().iterator();
-            Iterator<? extends SimpleValueHandler> otherIterator = v.prereleaseHandler.getChildren().iterator();
+            Iterator<? extends Identifier> thisIterator = prereleaseIdentifier.getValue().iterator();
+            Iterator<? extends Identifier> otherIterator = v.prereleaseIdentifier.getValue().iterator();
 
             while (thisIterator.hasNext()) {
                 if (otherIterator.hasNext()) {
@@ -333,29 +334,29 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
         }
 
         // Rule #10 (amended to achieve total order)
-        if ((buildHandler != null) || (v.buildHandler != null)) {
+        if ((buildIdentifier != null) || (v.buildIdentifier != null)) {
             // Although the build part should be ignored from SemVer specs, the compareTo method needs to differentiate
             // versions that have the same core and prerelease but different build parts.
             // We chose to be consistent with rule #10 (about prerelease) so the version that has a build part has
             // When major, minor, and patch and prerelease are equal, a build version has lower precedence than a normal
             // (or normal-prerelease) version.
             // Example: 1.0.0-alpha+build < 1.0.0-alpha, and 1.0.0+build < 1.0.0.
-            if ((buildHandler != null) && (v.buildHandler == null))
+            if ((buildIdentifier != null) && (v.buildIdentifier == null))
                 return -1;
-            else if ((buildHandler == null) && (v.buildHandler != null))
+            else if ((buildIdentifier == null) && (v.buildIdentifier != null))
                 return 1;
         }
         // If no difference is found, let's consider the number of items in the build part. This is not requested by
         // SemVer but, again, we use the same behavior as for prerelease. So the set that has less elements has less
         // precedence (comes first in order).
-        if ((buildHandler != null) && (v.buildHandler != null)) {
-            if (buildHandler.children.size() != v.buildHandler.children.size())
-                return v.buildHandler.children.size() - buildHandler.children.size();
+        if ((buildIdentifier != null) && (v.buildIdentifier != null)) {
+            if (buildIdentifier.children.size() != v.buildIdentifier.children.size())
+                return v.buildIdentifier.children.size() - buildIdentifier.children.size();
         }
 
         // If no difference has been found yet, let's just compare the build parts as strings
-        if ((buildHandler != null) && (buildHandler.toString().compareTo(v.buildHandler.toString()) != 0))
-            return buildHandler.toString().compareTo(v.buildHandler.toString());
+        if ((buildIdentifier != null) && (buildIdentifier.toString().compareTo(v.buildIdentifier.toString()) != 0))
+            return buildIdentifier.toString().compareTo(v.buildIdentifier.toString());
 
         // As a last resort, compare the string version of both entities. This is not requested (explicitly) by SemVer
         // but it's still compliant with it and with Comparable as well.
@@ -372,14 +373,14 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
     @Override
     public String toString() {
         if (renderedString == null) {
-            StringBuilder sb = new StringBuilder(coreHandler.toString());
-            if (prereleaseHandler != null) {
-                sb.append(PRERELEASE_MARKER);
-                sb.append(prereleaseHandler.toString());
+            StringBuilder sb = new StringBuilder(coreIdentifier.toString());
+            if (prereleaseIdentifier != null) {
+                sb.append(PRERELEASE_DELIMITER);
+                sb.append(prereleaseIdentifier.toString());
             }
-            if (buildHandler != null) {
-                sb.append(BUILD_MARKER);
-                sb.append(buildHandler.toString());
+            if (buildIdentifier != null) {
+                sb.append(BUILD_DELIMITER);
+                sb.append(buildIdentifier.toString());
             }
             renderedString = sb.toString();
         }
@@ -401,7 +402,7 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
      */
     public static SemanticVersion valueOf(String s) {
         Objects.requireNonNull(s, "Can't parse a null string");
-        if (s.isEmpty())
+        if (s.isBlank())
             throw new IllegalArgumentException("Can't parse an empty string");
 
         Matcher m = Pattern.compile(SEMANTIC_VERSION_PATTERN).matcher(s);
@@ -413,15 +414,15 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
             // group 4 (optional) is the prerelease
             // group 5 (optional) is the build
 
-            SemanticCoreVersionHandler coreHandler = new SemanticCoreVersionHandler(m.group(1), m.group(2), m.group(3));
-            SemanticPreReleaseVersionHandler preReleaseHandler = null;
-            if ((m.group(4) != null) && (!m.group(4).isEmpty()))
-                preReleaseHandler = SemanticPreReleaseVersionHandler.valueOf(m.group(4));
-            SemanticBuildVersionHandler buildHandler = null;
-            if ((m.group(5) != null) && (!m.group(5).isEmpty()))
-                buildHandler = SemanticBuildVersionHandler.valueOf(m.group(5));
+            SemanticVersionCoreIdentifier coreIdentifier = SemanticVersionCoreIdentifier.valueOf(m.group(1), m.group(2), m.group(3));
+            SemanticVersionPreReleaseIdentifier preReleaseIdentifier = null;
+            if ((m.group(4) != null) && (!m.group(4).isBlank()))
+                preReleaseIdentifier = SemanticVersionPreReleaseIdentifier.valueOf(true, m.group(4));
+            SemanticVersionBuildIdentifier buildIdentifier = null;
+            if ((m.group(5) != null) && (!m.group(5).isBlank()))
+                buildIdentifier = SemanticVersionBuildIdentifier.valueOf(true, m.group(5));
 
-            return new SemanticVersion(coreHandler, preReleaseHandler, buildHandler);
+            return new SemanticVersion(coreIdentifier, preReleaseIdentifier, buildIdentifier);
         }
         else throw new IllegalArgumentException(String.format("The string %s does not contain a valid semantic number", s));
     }
@@ -494,7 +495,7 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
      */
     public static String sanitizeNumbers(String s) {
         Objects.requireNonNull(s, "Can't parse a null string");
-        if (s.isEmpty())
+        if (s.isBlank())
             throw new IllegalArgumentException("Can't parse an empty string");
 
         StringBuilder result = new StringBuilder();
@@ -504,7 +505,7 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
         if (prefix != null)
             result.append(prefix);
 
-        Matcher m = Pattern.compile(SEMANTIC_VERSION_RELAXED_PATTERN).matcher(s);
+        Matcher m = Pattern.compile(SEMANTIC_VERSION_PATTERN_RELAXED).matcher(s);
         if (m.find()) {
             // group 0 is the entire version string
             // group 1 is the major number
@@ -519,12 +520,12 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
                 if (integer.intValue()<0)
                     throw new IllegalArgumentException(String.format("Can't sanitize negative number %d in %s", integer, s));
                 result.append(integer.toString());
-                result.append(CompositeValueHandler.DEFAULT_SEPARATOR);
+                result.append(CompositeIdentifier.DEFAULT_SEPARATOR);
                 integer = Integer.valueOf(m.group(2));
                 if (integer.intValue()<0)
                     throw new IllegalArgumentException(String.format("Can't sanitize negative number %d in %s", integer, s));
                 result.append(integer.toString());
-                result.append(CompositeValueHandler.DEFAULT_SEPARATOR);
+                result.append(CompositeIdentifier.DEFAULT_SEPARATOR);
                 integer = Integer.valueOf(m.group(3));
                 if (integer.intValue()<0)
                     throw new IllegalArgumentException(String.format("Can't sanitize negative number %d in %s", integer, s));
@@ -537,12 +538,10 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
             // Go through all identifiers in the prerelease part. If they can convert to an integer just do it and
             // append their string representation to the output, this automatically removes leading zeroes.
             // If they can't be converted to numberst just append them as they are.
-            if ((m.group(4) != null) && (!m.group(4).isEmpty())) {
-                result.append(PRERELEASE_MARKER);
-                //String[] identifiers = m.group(4).split("["+CompositeValueHandler.DEFAULT_SEPARATOR+"]");
-                List<String> identifiers = Arrays.asList(m.group(4).split("["+CompositeValueHandler.DEFAULT_SEPARATOR+"]"));
+            if ((m.group(4) != null) && (!m.group(4).isBlank())) {
+                result.append(PRERELEASE_DELIMITER);
+                List<String> identifiers = Arrays.asList(m.group(4).split("["+CompositeIdentifier.DEFAULT_SEPARATOR+"]"));
                 Iterator<String> idIterator = identifiers.iterator();
-                //for (String identifier: identifiers) {
                 while (idIterator.hasNext()) {
                     String identifier = idIterator.next();
                     try {
@@ -553,14 +552,14 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
                         result.append(identifier);
                     }
                     if (idIterator.hasNext())
-                        result.append(CompositeValueHandler.DEFAULT_SEPARATOR);
+                        result.append(CompositeIdentifier.DEFAULT_SEPARATOR);
                 }
 
             }
 
             // append the build part just as it was
-            if ((m.group(5) != null) && (!m.group(5).isEmpty())) {
-                result.append(BUILD_MARKER);
+            if ((m.group(5) != null) && (!m.group(5).isBlank())) {
+                result.append(BUILD_DELIMITER);
                 result.append(m.group(5));
             }
         }
@@ -590,10 +589,10 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
      */
     public static String sanitizePrefix(String s) {
         Objects.requireNonNull(s, "Can't sanitize a null string");
-        if (s.isEmpty())
+        if (s.isBlank())
             throw new IllegalArgumentException("Can't sanitize an empty string");
 
-        Matcher m = Pattern.compile(SEMANTIC_VERSION_RELAXED_PATTERN).matcher(s);
+        Matcher m = Pattern.compile(SEMANTIC_VERSION_PATTERN_RELAXED).matcher(s);
         if (m.find()) {
             // group 0 is the entire version string
             return m.group(0);
@@ -619,10 +618,10 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
      */
     public static String getPrefix(String s) {
         Objects.requireNonNull(s, "Can't parse a null string");
-        if (s.isEmpty())
+        if (s.isBlank())
             return null;
 
-        Matcher m = Pattern.compile(SEMANTIC_VERSION_RELAXED_PATTERN).matcher(s);
+        Matcher m = Pattern.compile(SEMANTIC_VERSION_PATTERN_RELAXED).matcher(s);
         if (m.find()) {
             // group 0 is the entire version string
             if (s.equals(m.group(0)))
@@ -638,7 +637,7 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
      * @return the major version number
      */
     public int getMajor() {
-        return coreHandler.getMajor();
+        return coreIdentifier.getMajor();
     }
 
     /**
@@ -647,7 +646,7 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
      * @return the minor version number
      */
     public int getMinor() {
-        return coreHandler.getMinor();
+        return coreIdentifier.getMinor();
     }
 
     /**
@@ -656,7 +655,7 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
      * @return the patch version number
      */
     public int getPatch() {
-        return coreHandler.getPatch();
+        return coreIdentifier.getPatch();
     }
 
     /**
@@ -665,7 +664,7 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
      * @return the core part of the version as a string.
      */
     public String getCore() {
-        return coreHandler.toString();
+        return coreIdentifier.toString();
     }
 
     /**
@@ -674,9 +673,9 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
      * @return the identifiers of the core part of the version.
      */
     public Integer[] getCoreIdentifiers() {
-        Integer[] res = new Integer[coreHandler.children.size()];
-        for (int i=0; i<coreHandler.children.size(); i++)
-            res[i] = coreHandler.get(i);
+        Integer[] res = new Integer[coreIdentifier.children.size()];
+        for (int i=0; i<coreIdentifier.children.size(); i++)
+            res[i] = coreIdentifier.get(i);
         return res;
     }
 
@@ -686,7 +685,7 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
      * @return the prerelease part of the version.
      */
     public String getPrerelease() {
-        return prereleaseHandler == null ? null : prereleaseHandler.toString();
+        return prereleaseIdentifier == null ? null : prereleaseIdentifier.toString();
     }
 
     /**
@@ -697,11 +696,11 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
      * or {@link String}.
      */
     public Object[] getPrereleaseIdentifiers() {
-        if (prereleaseHandler == null)
+        if (prereleaseIdentifier == null)
             return null;
-        Object[] res = new Object[prereleaseHandler.children.size()];
-        for (int i=0; i<prereleaseHandler.children.size(); i++)
-            res[i] = prereleaseHandler.children.get(i).getValue();
+        Object[] res = new Object[prereleaseIdentifier.children.size()];
+        for (int i=0; i<prereleaseIdentifier.children.size(); i++)
+            res[i] = prereleaseIdentifier.children.get(i).getValue();
         return res;
     }
 
@@ -711,7 +710,7 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
      * @return the build part of the version.
      */
     public String getBuild() {
-        return buildHandler == null ? null : buildHandler.toString();
+        return buildIdentifier == null ? null : buildIdentifier.toString();
     }
 
     /**
@@ -721,11 +720,11 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
      * @return the identifiers of the build part of the version.
      */
     public String[] getBuildIdentifiers() {
-        if (buildHandler == null)
+        if (buildIdentifier == null)
             return null;
-        String[] res = new String[buildHandler.children.size()];
-        for (int i=0; i<buildHandler.children.size(); i++)
-            res[i] = buildHandler.get(i);
+        String[] res = new String[buildIdentifier.children.size()];
+        for (int i=0; i<buildIdentifier.children.size(); i++)
+            res[i] = buildIdentifier.get(i);
         return res;
     }
 
@@ -742,7 +741,7 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
      * @throws IllegalArgumentException if any of the given values is negative
      */
     public SemanticVersion setCore(int major, int minor, int patch) {
-        return new SemanticVersion(new SemanticCoreVersionHandler(major, minor, patch), prereleaseHandler, buildHandler);
+        return new SemanticVersion(SemanticVersionCoreIdentifier.valueOf(major, minor, patch), prereleaseIdentifier, buildIdentifier);
     }
 
     /**
@@ -756,7 +755,7 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
      * @throws IllegalArgumentException if the given values is negative
      */
     public SemanticVersion setMajor(int major) {
-        return new SemanticVersion(new SemanticCoreVersionHandler(major, coreHandler.getMinor(), coreHandler.getPatch()), prereleaseHandler, buildHandler);
+        return new SemanticVersion(SemanticVersionCoreIdentifier.valueOf(major, coreIdentifier.getMinor(), coreIdentifier.getPatch()), prereleaseIdentifier, buildIdentifier);
     }
 
     /**
@@ -770,7 +769,7 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
      * @throws IllegalArgumentException if the given values is negative
      */
     public SemanticVersion setMinor(int minor) {
-        return new SemanticVersion(new SemanticCoreVersionHandler(coreHandler.getMajor(), minor, coreHandler.getPatch()), prereleaseHandler, buildHandler);
+        return new SemanticVersion(SemanticVersionCoreIdentifier.valueOf(coreIdentifier.getMajor(), minor, coreIdentifier.getPatch()), prereleaseIdentifier, buildIdentifier);
     }
 
     /**
@@ -784,7 +783,7 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
      * @throws IllegalArgumentException if the given values is negative
      */
     public SemanticVersion setPatch(int patch) {
-        return new SemanticVersion(new SemanticCoreVersionHandler(coreHandler.getMajor(), coreHandler.getMinor(), patch), prereleaseHandler, buildHandler);
+        return new SemanticVersion(SemanticVersionCoreIdentifier.valueOf(coreIdentifier.getMajor(), coreIdentifier.getMinor(), patch), prereleaseIdentifier, buildIdentifier);
     }
 
     /**
@@ -795,6 +794,7 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
      * @param identifiers the identifiers to use for the new version instance, or <code>null</code> to remove the
      * prerelease block. All non <code>null</code> items must be {@link String} or {@link Integer} instances.
      * {@link String} instances representing numeric values will be interpreted as {@link Integer}.
+     * If the current version had a pre-release part it is completely replaced by the given identifiers.
      *
      * @return the new version instance
      *
@@ -803,17 +803,18 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
      * {@link Integer}
      */
     public SemanticVersion setPrerelease(Object... identifiers) {
-        SemanticPreReleaseVersionHandler spvh = null;
-        if ((identifiers != null) && (identifiers.length > 0) && (!CompositeValueHandler.allNulls(identifiers))) {
-            spvh = SemanticPreReleaseVersionHandler.valueOf(identifiers);
+        SemanticVersionPreReleaseIdentifier svpri = null;
+        if (Parser.hasValues(identifiers)) {
+            svpri = SemanticVersionPreReleaseIdentifier.valueOf(true, identifiers);
         }
-        return new SemanticVersion(coreHandler, spvh, buildHandler);
+        return new SemanticVersion(coreIdentifier, svpri, buildIdentifier);
     }
 
     /**
      * Returns a new version object with the build part set to the given values. If a <code>null</code> value or an array
      * of all <code>null</code> values is passed then the returned version will have no build part, otherwise it will have
      * all of the given non <code>null</code> identifiers, with the core and prerelease elements of this version instance.
+     * If the current version had a build part it is completely replaced by the given identifiers.
      *
      * @param identifiers the identifiers to use for the new version instance, or <code>null</code> to remove the
      * build block
@@ -823,11 +824,234 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
      * @throws IllegalArgumentException if some non <code>null</code> item passed contains illegal characters
      */
     public SemanticVersion setBuild(String... identifiers) {
-        SemanticBuildVersionHandler sbvh = null;
-        if ((identifiers != null) && (identifiers.length > 0) && (!CompositeValueHandler.allNulls(identifiers))) {
-            sbvh = SemanticBuildVersionHandler.valueOf(identifiers);
+        SemanticVersionBuildIdentifier svbi = null;
+        if (Parser.hasValues(identifiers)) {
+            svbi = SemanticVersionBuildIdentifier.valueOf(true, identifiers);
         }
-        return new SemanticVersion(coreHandler, prereleaseHandler, sbvh);
+        return new SemanticVersion(coreIdentifier, prereleaseIdentifier, svbi);
+    }
+
+    /**
+     * Returns <code>true</code> if an attribute with the given name is present in the prerelease part, <code>false</code> otherwise.
+     *
+     * @param name the name of the attribute to look up. If <code>null</code> or empty <code>false</code> is returned
+     *
+     * @return <code>true</code> if an attribute with the given name is present in the prerelease part, <code>false</code> otherwise.
+     */
+    public boolean hasPrereleaseAttribute(String name) {
+        return prereleaseIdentifier == null ? false : prereleaseIdentifier.hasAttribute(name);
+    }
+
+    /**
+     * Returns <code>true</code> if an attribute with the given name is present in the build part, <code>false</code> otherwise.
+     *
+     * @param name the name of the attribute to look up. If <code>null</code> or empty <code>false</code> is returned
+     *
+     * @return <code>true</code> if an attribute with the given name is present in the build part, <code>false</code> otherwise.
+     */
+    public boolean hasBuildAttribute(String name) {
+        return buildIdentifier == null ? false : buildIdentifier.hasAttribute(name);
+    }
+
+    /**
+     * If an attribute with the given name is present in the prerelease part, return the identifier after that, otherwise return <code>null</code>.
+     *
+     * @param name the name of the attribute to look up. If <code>null</code> or empty <code>null</code> is returned
+     *
+     * @return the attribute after the given name if such attribute is found in the prerelease part and there is another attribute after it,
+     * otherwise <code>null</code>
+     */
+    public Integer getPrereleaseAttributeValue(String name) {
+        return prereleaseIdentifier == null ? null : prereleaseIdentifier.getAttributeValue(name);
+    }
+
+    /**
+     * If an attribute with the given name is present in the build part, return the identifier after that, otherwise return <code>null</code>.
+     *
+     * @param name the name of the attribute to look up. If <code>null</code> or empty <code>null</code> is returned
+     *
+     * @return the attribute after the given name if such attribute is found in the build part and there is another attribute after it,
+     * otherwise <code>null</code>
+     */
+    public String getBuildAttributeValue(String name) {
+        return buildIdentifier == null ? null : buildIdentifier.getAttributeValue(name);
+    }
+
+    /**
+     * Returns a new version object with the new attribute added or replaced in the prerelease part. This method tries to be
+     * less intrusive as it only works on the given attribute (and its optional value) while leaving the other attributes
+     * unchanged.
+     * <br>
+     * If this version doesn't have a prerelease part, the returned version will have one with the new attribute appended
+     * (and its value as well, if not <code>null</code>).
+     * <br>
+     * If this version already has a prerelease part with no identifier matching the given attribute name then the returned
+     * version will have the same prerelease part as the current one with the new attribute appended (and its value as well,
+     * if not <code>null</code>).
+     * <br>
+     * If this version already has a prerelease part that contains an identifier matching the given attribute name then
+     * the identifier matching the attribute name is left unchanged and if the given value is not <code>null</code>,
+     * the next identifier is added or replaced with the given value.<br>
+     * <b>ATTENTION: if the value is not <code>null</code> the current identifier after the name (if any) is replaced
+     * if it's a numeric identifier.</b>
+     * <br>
+     * Examples of invoking <code>setPrereleaseAttribute("build")</code> with <code>null</code> value:<br>
+     * - <code>1.2.3 = 1.2.3-build</code><br>
+     * - <code>1.2.3-alpha = 1.2.3-alpha.build</code><br>
+     * - <code>1.2.3-alpha.beta = 1.2.3-alpha.beta.build</code><br>
+     * - <code>1.2.3+timestamp = 1.2.3-build+timestamp</code><br>
+     * - <code>1.2.3-alpha+timestamp.20200101 = 1.2.3-alpha.build+timestamp.20200101</code><br>
+     * - <code>1.2.3-build = 1.2.3-build</code> (unchanged)<br>
+     * - <code>1.2.3-build.12345 = 1.2.3-build.12345</code> (unchanged)<br>
+     * - <code>1.2.3-build.12345.timestamp.20200101 = 1.2.3-build.12345.timestamp.20200101</code> (unchanged)<br>
+     * <br>
+     * Examples of invoking <code>setPrereleaseAttribute("build")</code> with <code>12345</code> value:<br>
+     * - <code>1.2.3 = 1.2.3-build.12345</code><br>
+     * - <code>1.2.3-alpha = 1.2.3-alpha.build.12345</code><br>
+     * - <code>1.2.3-alpha.beta = 1.2.3-alpha.beta.build.12345</code><br>
+     * - <code>1.2.3+timestamp = 1.2.3-build.12345+timestamp</code><br>
+     * - <code>1.2.3-alpha+timestamp.20200101 = 1.2.3-alpha.build.12345+timestamp.20200101</code><br>
+     * - <code>1.2.3-build = 1.2.3-build.12345</code><br>
+     * - <code>1.2.3-build.12345 = 1.2.3-build.12345</code> (unchanged)<br>
+     * - <code>1.2.3-build.12345.timestamp.20200101 = 1.2.3-build.12345.timestamp.20200101</code> (unchanged)<br>
+     *
+     * @param name the name to set for the attribute
+     * @param value the value to set for the attribute, or <code>null</code> just set the attribute name, ignoring the value
+     *
+     * @return the new version instance
+     *
+     * @throws IllegalArgumentException if the given name or value contains illegal characters
+     * @throws NullPointerException if the attribute name is <code>null</code>
+     */
+    public SemanticVersion setPrereleaseAttribute(String name, Integer value) {
+        Objects.requireNonNull(name, "Can't set a null attribute name");
+
+        // SemanticVersionBuildIdentifier.valueOf does not accept a null for a second parameter (value) so we need to discriminate here
+        if (prereleaseIdentifier == null)
+            return new SemanticVersion(coreIdentifier, value == null ? SemanticVersionPreReleaseIdentifier.valueOf(false, name) : SemanticVersionPreReleaseIdentifier.valueOf(false, name, value), buildIdentifier);
+        else return new SemanticVersion(coreIdentifier, prereleaseIdentifier.setAttribute(name, value), buildIdentifier);
+    }
+
+    /**
+     * Returns a new version object with the new attribute added or replaced in the prerelease part. 
+     * This method is a shorthand for {@link #setPrereleaseAttribute(String, Integer) setPrereleaseAttribute(value, null)} to only
+     * set a simple identifier instead of a pair.
+     *
+     * @param name the name to set for the attribute
+     *
+     * @return the new version instance
+     *
+     * @throws IllegalArgumentException if the given name contains illegal characters
+     * @throws NullPointerException if the attribute name is <code>null</code>
+     * 
+     * @see #setPrereleaseAttribute(String, Integer)
+     */
+    public SemanticVersion setPrereleaseAttribute(String name) {
+        return setPrereleaseAttribute(name, null);
+    }
+
+    /**
+     * Returns a new version object with the new attribute added or replaced in the build part. This method tries to be
+     * less intrusive as it only works on the given attribute (and its optional value) while leaving the other attributes
+     * unchanged.
+     * <br>
+     * If this version doesn't have a build part, the returned version will have one with the new attribute appended
+     * (and its value as well, if not <code>null</code>).
+     * <br>
+     * If this version already has a build part with no identifier matching the given attribute name then the returned
+     * version will have the same build part as the current one with the new attribute appended (and its value as well,
+     * if not <code>null</code>).
+     * <br>
+     * If this version already has a build part that contains an identifier matching the given attribute name then
+     * the identifier matching the attribute name is left unchanged and if the given value is not <code>null</code>,
+     * the next identifier is added or replaced with the given value.<br>
+     * <b>ATTENTION: if the value is not <code>null</code> the current identifier after the name (if any) is replaced
+     * without further consideration.</b>
+     * <br>
+     * Examples of invoking <code>setBuildAttribute("build")</code> with <code>null</code> value:<br>
+     * - <code>1.2.3 = 1.2.3+build</code><br>
+     * - <code>1.2.3-alpha = 1.2.3-alpha+build</code><br>
+     * - <code>1.2.3-alpha.beta = 1.2.3-alpha.beta+build</code><br>
+     * - <code>1.2.3+timestamp = 1.2.3+timestamp.build</code><br>
+     * - <code>1.2.3-alpha+timestamp.20200101 = 1.2.3-alpha+timestamp.20200101.build</code><br>
+     * - <code>1.2.3+build = 1.2.3+build</code> (unchanged)<br>
+     * - <code>1.2.3+build.12345 = 1.2.3+build.12345</code> (unchanged)<br>
+     * - <code>1.2.3+build.12345.timestamp.20200101 = 1.2.3+build.12345.timestamp.20200101</code> (unchanged)<br>
+     * <br>
+     * Examples of invoking <code>setBuildAttribute("build")</code> with <code>12345</code> value:<br>
+     * - <code>1.2.3 = 1.2.3+build.12345</code><br>
+     * - <code>1.2.3-alpha = 1.2.3-alpha+build.12345</code><br>
+     * - <code>1.2.3-alpha.beta = 1.2.3-alpha.beta+build.12345</code><br>
+     * - <code>1.2.3+timestamp = 1.2.3+timestamp.build.12345</code><br>
+     * - <code>1.2.3-alpha+timestamp.20200101 = 1.2.3-alpha+timestamp.20200101.build.12345</code><br>
+     * - <code>1.2.3+build = 1.2.3+build.12345</code><br>
+     * - <code>1.2.3+build.12345 = 1.2.3+build.12345</code> (unchanged)<br>
+     * - <code>1.2.3+build.12345.timestamp.20200101 = 1.2.3+build.12345.timestamp.20200101</code> (unchanged)<br>
+     *
+     * @param name the name to set for the attribute
+     * @param value the value to set for the attribute, or <code>null</code> just set the attribute name, ignoring the value
+     *
+     * @return the new version instance
+     *
+     * @throws IllegalArgumentException if the given name or value contains illegal characters
+     * @throws NullPointerException if the attribute name is <code>null</code>
+     */
+    public SemanticVersion setBuildAttribute(String name, String value) {
+        Objects.requireNonNull(name, "Can't set a null attribute name");
+
+        // SemanticVersionBuildIdentifier.valueOf does not accept a null for a second parameter (value) so we need to discriminate here
+        if (buildIdentifier == null)
+            return new SemanticVersion(coreIdentifier, prereleaseIdentifier, value == null ? SemanticVersionBuildIdentifier.valueOf(false, name) : SemanticVersionBuildIdentifier.valueOf(false, name, value));
+        else return new SemanticVersion(coreIdentifier, prereleaseIdentifier, buildIdentifier.setAttribute(name, value));
+    }
+
+    /**
+     * Returns a new version object with the new attribute added or replaced in the build part. 
+     * This method is a shorthand for {@link #setBuildAttribute(String, String) setBuildAttribute(value, null)} to only
+     * set a simple identifier instead of a pair.
+     *
+     * @param name the name to set for the attribute
+     *
+     * @return the new version instance
+     *
+     * @throws IllegalArgumentException if the given name contains illegal characters
+     * @throws NullPointerException if the attribute name is <code>null</code>
+     * 
+     * @see #setBuildAttribute(String, String)
+     */
+    public SemanticVersion setBuildAttribute(String name) {
+        return setBuildAttribute(name, null);
+    }
+
+    /**
+     * Returns a new instance with the new attribute removed from the prerelease part, if any was present, otherwise the same version is returned.
+     * If the attribute is found and <code>removeValue</code> is <code>true</code> then also the attribute value (the attribute after the
+     * one identified by <code>name</code>) is removed, unless there are no more attributes after <code>name</code> or the value attribute
+     * is not numeric.
+     *
+     * @param name the name of the attribute to remove from the prerelease part, if present. If <code>null</code> or empty no action is taken
+     * @param removeValue if <code>true</code> also the attribute after <code>name</code> is removed (if any)
+     *
+     * @return the new instance, which might be the same of the current object if no attribute with the given <code>name</code>
+     * is present
+     */
+    public SemanticVersion removePrereleaseAttribute(String name, boolean removeValue) {
+        return prereleaseIdentifier == null ? this : new SemanticVersion(coreIdentifier, prereleaseIdentifier.removeAttribute(name, removeValue), buildIdentifier);
+    }
+
+    /**
+     * Returns a new instance with the new attribute removed from the build part, if any was present, otherwise the same version is returned.
+     * If the attribute is found and <code>removeValue</code> is <code>true</code> then also the attribute value (the attribute after the
+     * one identified by <code>name</code>) is removed, unless there are no more attributes after <code>name</code>.
+     *
+     * @param name the name of the attribute to remove from the build part, if present. If <code>null</code> or empty no action is taken
+     * @param removeValue if <code>true</code> also the attribute after <code>name</code> is removed (if any)
+     *
+     * @return the new instance, which might be the same of the current object if no attribute with the given <code>name</code>
+     * is present
+     */
+    public SemanticVersion removeBuildAttribute(String name, boolean removeValue) {
+        return buildIdentifier == null ? this : new SemanticVersion(coreIdentifier, prereleaseIdentifier, buildIdentifier.removeAttribute(name, removeValue));
     }
 
     /**
@@ -838,7 +1062,7 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
      * numbers reset to zero.
      */
     public SemanticVersion bumpMajor() {
-        return new SemanticVersion(coreHandler.bumpMajor(), prereleaseHandler, buildHandler);
+        return new SemanticVersion(coreIdentifier.bumpMajor(), prereleaseIdentifier, buildIdentifier);
     }
 
     /**
@@ -849,7 +1073,7 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
      * the patch number reset to zero.
      */
     public SemanticVersion bumpMinor() {
-        return new SemanticVersion(coreHandler.bumpMinor(), prereleaseHandler, buildHandler);
+        return new SemanticVersion(coreIdentifier.bumpMinor(), prereleaseIdentifier, buildIdentifier);
     }
 
     /**
@@ -860,7 +1084,7 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
      *      * incremented by one.
      */
     public SemanticVersion bumpPatch() {
-        return new SemanticVersion(coreHandler.bumpPatch(), prereleaseHandler, buildHandler);
+        return new SemanticVersion(coreIdentifier.bumpPatch(), prereleaseIdentifier, buildIdentifier);
     }
 
     /**
@@ -923,21 +1147,20 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
      * @throws IllegalArgumentException if the given string is empty, contains illegal characters or represents a number
      */
     public SemanticVersion bumpPrerelease(String id) {
-        Objects.requireNonNull(id);
-        if (id.isEmpty())
+        Objects.requireNonNull(id, "Can't bump a null identifier");
+        if (id.isBlank())
             throw new IllegalArgumentException("Can't bump an empty identifier");
-        boolean isNumber = false;
+
         try {
             Integer.valueOf(id);
-            isNumber = true;
+            // it's a number and can't be bumped
+            throw new IllegalArgumentException(String.format("The value %s is numeric ant can't be used as a string identifier in the prerelease", id));
         }
         catch (NumberFormatException nfe) {
-            // ok, it's not a number
+            // ok, not a number. Proceed
         }
-        if (isNumber)
-            throw new IllegalArgumentException(String.format("The value %s is numeric ant can't be used as a string identifier in the prerelease", id));
 
-        return new SemanticVersion(coreHandler, prereleaseHandler == null ? SemanticPreReleaseVersionHandler.valueOf(id, Integer.valueOf(DEFAULT_BUMP_VALUE)) : prereleaseHandler.bump(id, DEFAULT_BUMP_VALUE), buildHandler);
+        return new SemanticVersion(coreIdentifier, prereleaseIdentifier == null ? SemanticVersionPreReleaseIdentifier.valueOf(false, id, Integer.valueOf(DEFAULT_BUMP_VALUE)) : prereleaseIdentifier.bump(id, DEFAULT_BUMP_VALUE), buildIdentifier);
     }
 
     /**
@@ -965,7 +1188,10 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
      * @see #bumpPrerelease(String)
      */
     public SemanticVersion bump(String id) {
-        Objects.requireNonNull(id);
+        Objects.requireNonNull(id, "Can't bump a null identifier");
+        if (id.isBlank())
+            throw new IllegalArgumentException("Can't bump an empty identifier");
+
         if (CoreIdentifiers.hasName(id))
             return bump(CoreIdentifiers.byName(id));
         else return bumpPrerelease(id);
