@@ -3,15 +3,61 @@
   https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
 ------------------------------------------------------------------------------*/
 plugins {
-    /* Since we use Sonatype Nexus OSS to stage the Maven publications before they are released to Maven Central we
-     * can't simply use the 'maven-publish' plugin because of some (pointless) peculiarities of Sonatype's Nexus that
-     * cause error often times. These errors usually drive to:
-     * - staging repository fragmented into several repositories
-     * - timeouts occurring during connecctions
+    /* Direct publishing to Maven Central is forbidden because contents need a bunch of validation steps to succeed.
+     * These validation steps wouldn't be necessary if we publish to private Maven repositories or others but in order
+     * to cope with Maven Central we need to use the Sonatype Open Source Software Repository Hosting (a.k.a. Sonatype OSSRH),
+     * which takes care of the validation and publication.
+     * 
+     * This complicates things as getting the contents to Maven Central actually needs a workflow to run. From our
+     * perspective here the workflows cosists of two steps:
+     * 1. publication to a Staging repository hosted on Sonatype Nexus (https://oss.sonatype.org/)
+     * 2. promote the Staging repository and release to Maven Central (https://search.maven.org/)
+     *
+     * With a little more detail:
+     * - step 1 completes with an apparently simple Maven publication to a staging repository but:
+     *      - a new Staging repository needs to be created at each publication, so additional initialization is required
+     *      - Sonatype Nexus is extremely slow so it needs peculiar timeouts and retries
+     *      - Sonatype Nexus needs some additional fields to be handled (i.e. 'stagingProfileId') which are also
+     *        needed in the next step (promoting) so they need to be shared with other plugins
+     * - step 2 is completely specific to Sonatype OSSRH as it needs to start the validation (by Promoting the repository)
+     *   and only when it succeeds (usually after several minutes, like ~10-20) publish the repository contents to Maven central
+     *   (which means Close and Release the Staging repository). During all this time the plugin retries to Promote
+     *   the repository on a regular basis to check ths current status and this is why so many retries (200-300) are required.
+     *
+     * If the above steps succeed it will take a while (a few minutes or more) before the content is visible on Maven Central.
+     *
+     * This is why we cannot simply use the 'maven-publish' plugin and, instead, we need:
+     * - Nexus Publish Plugin ('de.marcphilipp.nexus-publish') to publish contents to the staging repository (step 1)
+     *   This plugin is configured in the 'nexusPublishing' section where we can add the 'special' Nexus repositories
+     *   (considering that the 'sonatype' repository already comes with URLs preconfigured). Regular Maven repositories
+     *   that do not need the 'special' initialization must be configured in the regular Maven Publish plugin
+     *   section, not here. The plugin creates dynamically so many tasks (by repostotory, publications etc) but the
+     *   only one we need to explicitly care about is 'publishToSonatype', which actually initializes the
+     *   staging repository and loads the artifacts.
+     *   ATTENTION: this plugin depends on the regular 'maven-publish' plugin, which then is still there. What this
+     *   plugin does is just adding custom configurations to the 'sonatype' repositories in its specific configuration
+     *   and create all the 'initialization' tasks that 'publishToSonatype' depends on to properly initialize Nexus
+     *   repositories.
+     *   In other words: OTHER REGULAR MAVEN REPOSITORIES CAN STILL BE HANDLED BY THE STANDARD MAVEN PUBLISH PLUGIN
+     *   as long as they are configured outside of the 'nexusPublishing' specific section.
+     * - Nexus Staging Plugin ('io.codearte.nexus-staging') to close and promote the staging repository to Maven Central (step 2).
+     *   This plugin is configured in the 'nexusStaging' section and creates two additional tasks we use:
+     *      - 'closeAndReleaseRepository' does the actual promotion of the staging repository to Closed and released.
+     *        It must run after the publication to the Staging repository is complete
+     *      - 'getStagingProfile' is an utility task that enables to retrieve the Staging Profile ID dynamically instead
+     *        of hardcoding it
+     *   When this plugin fails it's usually because of the Sonatype Nexus server being too slow or faulty (this happens
+     *   more often that it should), or because there are some old stale Staging repositories pending. In this case you
+     *   see a message like "Wrong number of received repositories in state" and you can clean them up by connecting
+     *   to https://oss.sonatype.org/, log in with the project service account, click on 'Staging Repositories' and
+     *   delete the stale ones, if any.
+     * 
+     * Just for the records, if using the 'maven-publish' plugin even just for step 1 (publishing to the Staging repository)
+     * we face many issues like::
+     * - Staging repository fragmented into several repositories
+     * - timeouts occurring during connections
      * - subsequent invocation of the 'closeAndReleaseRepository' task from the 'io.codearte.nexus-staging' plugin to
      *   fail with errors
-     * Moreover, Sonatype Nexus is extremely slow in accepting and processing the content (it often takes several
-     * minutes) and this is often the cause of several timeouts.
      * The issues are documented at the Nexus Publish plugin home page (https://github.com/marcphilipp/nexus-publish-plugin/)
      * and, among others, at:
      * - https://github.com/Codearte/gradle-nexus-staging-plugin/issues/76
@@ -23,7 +69,12 @@ plugins {
      *
      * This is why instead of using the 'maven-publish' plugin we need to use the 'de.marcphilipp.nexus-publish' plugin,
      * (which in turn uses the 'maven-publish' but also adds workarounds to it)
+     *
+     * Another plugin used here is the 'signing' plugin, which just takes care of signing content before their publication
+     * (otherwise, without signatures, they woudln't pass the validation steps).
      */
+    
+    // 'maven-publish' is implicitly applied by 'de.marcphilipp.nexus-publish'
     //id 'maven-publish'                                   // See: https://docs.gradle.org/current/userguide/publishing_maven.html
     id 'signing'                                         // See: https://docs.gradle.org/current/userguide/signing_plugin.html
     id 'de.marcphilipp.nexus-publish' version '0.4.0'    // See: https://github.com/marcphilipp/nexus-publish-plugin/
@@ -226,12 +277,21 @@ publishing {
         }
     }
 
-    // The classical Maven repo definition is suspended in favor of the 'sonatype' repository provided by the
-    // 'de.marcphilipp.nexus-publish' pugin (see the 'nexusPublishing' extension below)
-    /*repositories {
+    repositories {
+        // The GitHub Packages repository, visible at https://github.com/mooltiverse/nyx/packages
         maven {
-            // This is the staging repository to MavenCentral
-            name = 'sonatypeNexusOSS'
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/"+nyxOrganizationID+"/"+nyxID)
+            credentials {
+                username = findProperty("gitHubUser")
+                password = findProperty("gitHubToken")
+            }
+        }
+
+        // The Sonatype Nexus repository is configured as the 'sonatype' repository in the 'nexusPublishing' section below
+        // as it needs additional initialization tasks provided by the Nexus Publish Plugin.
+        /*maven {
+            name = 'SonatypeNexusOSS'
 
             // Select the right repo URL, depending on the version type
             def releaseStagingRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
@@ -242,8 +302,8 @@ publishing {
                 username findProperty("ossrhUsername")
                 password findProperty("ossrhPassword")
             }
-        }
-    }*/
+        }*/
+    }
 }
 
 // PGP artifacts signing before publishing
@@ -331,18 +391,23 @@ signing {
     sign publishing.publications
 }
 
-// Publish to Sonatype Nexus staging
-// See: https://github.com/marcphilipp/nexus-publish-plugin/
+// Publish to Sonatype Nexus staging repository
 // Once the content is published to Sonatype Nexus and before it's released to Maven Central you can see the repo using
 // the Nexus UI at https://oss.sonatype.org/index.html#stagingRepositories in the Staging Repositories section
+// See: https://github.com/marcphilipp/nexus-publish-plugin/
 nexusPublishing {
     // Sonatype Nexus is so slow that the plugin often needs several minutes to upload (ofter ~5 minutes)
     connectTimeout = java.time.Duration.ofMinutes(10)
     clientTimeout = java.time.Duration.ofMinutes(10)
 
+    // These repositories are in addition to the other regular Maven repositories that may have been configured for the Maven Publish
+    // plugin. These ones will be handled by the Nexus Publish Plugin as Sonatype repositories with all of their peculiarities
+    // (like the need to be initialized etc). Maven repositories other than Sonatype must be configured to the regular Maven Publish
+    // plugin section.
     repositories {
         packageGroup = 'com.mooltiverse'
-        //stagingProfileId = '302fa0a0346251' // see below on how to retrieve this
+        //stagingProfileId = '302fa0a0346251' // see below on how to retrieve this automatically through the getStagingProfile task
+        // 'sonatype' is preconfigured by the Nexus Publish Plugin with proper URLs.
         sonatype {
             username = findProperty("ossrhUsername")
             password = findProperty("ossrhPassword")
@@ -350,15 +415,16 @@ nexusPublishing {
     }
 }
 
-// Release from the Sonatype Nexus staging to Maven Central
+// Promote (validate) and Release from the Sonatype Nexus Staging repository to Maven Central
 // Note that after the plugin exits succesfully it may take ~10-15 minutes to get the content visible on Maven Central.
 // Once done the content is publicly available at https://repo.maven.apache.org/maven2/com/mooltiverse/oss/nyx/
+// See https://github.com/Codearte/gradle-nexus-staging-plugin/
 nexusStaging {
     // Nexus is terribly slow, at times it take more than 100 tries (and ~10-20 minutes) to process
     numberOfRetries = 200
 
     packageGroup = 'com.mooltiverse'
-    //stagingProfileId = '302fa0a0346251' // see below on how to retrieve this
+    //stagingProfileId = '302fa0a0346251' // see below on how to retrieve this automatically through the getStagingProfile task
     username findProperty("ossrhUsername")
     password findProperty("ossrhPassword")
 }
@@ -386,12 +452,12 @@ task javadocPrivate(type: Javadoc) {
 ------------------------------------------------------------------------------*/
 tasks.build.dependsOn tasks.javadocPrivate
 
-// Publish artifacts to the staging Sonatype Nexus
-tasks.publish.dependsOn tasks.publishToSonatype
+// Publish artifacts to the Staging Sonatype Nexus
+//tasks.publish.dependsOn tasks.publishToSonatype
 // Retrieve and print the stagingProfileId using the getStagingProfile task provided by the
 // 'io.codearte.nexus-staging' plugin. The Id is also available at https://oss.sonatype.org/service/local/staging/profiles
 // when the browser has an authenticated session to Sonatype Nexus
 tasks.publishToSonatype.dependsOn tasks.getStagingProfile
-// After successful publishing to the staging Sonatype Nexus repository release it to Maven Central
-// (it may take ~10-20 minutes)
-tasks.publish.finalizedBy tasks.closeAndReleaseRepository
+// After successful publishing to the Staging Sonatype Nexus repository trigger the validation and release it to Maven Central
+// (it may take ~10-20 minutes) and so many retries
+tasks.publishToSonatype.finalizedBy tasks.closeAndReleaseRepository

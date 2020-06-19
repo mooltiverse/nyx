@@ -3,7 +3,7 @@
   https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
 ------------------------------------------------------------------------------*/
 plugins {
-    // Builds a dependency tree of Gradle tasks, i.e. 'gradle <task> taskTree'
+    // Builds a dependency tree of Gradle tasks, i.e. './gradlew <task> taskTree'
     // This plugin can be commented out and used only when needed.
     // See: https://github.com/dorongold/gradle-task-tree
     id "com.dorongold.task-tree" version "1.5"

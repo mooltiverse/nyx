@@ -41,6 +41,8 @@ jobs:
         run: chmod +x gradlew
       - name: Publish with Gradle
         env:
+          ORG_GRADLE_PROJECT_gitHubUser: ${{ secrets.GITHUB_USERNAME }}
+          ORG_GRADLE_PROJECT_gitHubToken: ${{ secrets.GITHUB_TOKEN }}
           ORG_GRADLE_PROJECT_ossrhUsername: ${{ secrets.MAVEN_USER }}
           ORG_GRADLE_PROJECT_ossrhPassword: ${{ secrets.MAVEN_PASSWORD }}
           ORG_GRADLE_PROJECT_signingKeyBase64: ${{ secrets.GPG_PRIVATE_KEY_BASE64 }}
