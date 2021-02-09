@@ -1,0 +1,481 @@
+/*------------------------------------------------------------------------------
+  Plugins DSL block
+  https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
+------------------------------------------------------------------------------*/
+plugins {
+    /* Direct publishing to Maven Central is forbidden because contents need a bunch of validation steps to succeed.
+     * These validation steps wouldn't be necessary if we publish to private Maven repositories or others but in order
+     * to cope with Maven Central we need to use the Sonatype Open Source Software Repository Hosting (a.k.a. Sonatype OSSRH),
+     * which takes care of the validation and publication.
+     * 
+     * This complicates things as getting the contents to Maven Central actually needs a workflow to run. From our
+     * perspective here the workflows cosists of two steps:
+     * 1. publication to a Staging repository hosted on Sonatype Nexus (https://oss.sonatype.org/)
+     * 2. promote the Staging repository and release to Maven Central (https://search.maven.org/)
+     *
+     * With a little more detail:
+     * - step 1 completes with an apparently simple Maven publication to a staging repository but:
+     *      - a new Staging repository needs to be created at each publication, so additional initialization is required
+     *      - Sonatype Nexus is extremely slow so it needs peculiar timeouts and retries
+     *      - Sonatype Nexus needs some additional fields to be handled (i.e. 'stagingProfileId') which are also
+     *        needed in the next step (promoting) so they need to be shared with other plugins
+     * - step 2 is completely specific to Sonatype OSSRH as it needs to start the validation (by Promoting the repository)
+     *   and only when it succeeds (usually after several minutes, like ~10-20) publish the repository contents to Maven central
+     *   (which means Close and Release the Staging repository). During all this time the plugin retries to Promote
+     *   the repository on a regular basis to check ths current status and this is why so many retries (200-300) are required.
+     *
+     * If the above steps succeed it will take a while (a few minutes or more) before the content is visible on Maven Central.
+     *
+     * This is why we cannot simply use the 'maven-publish' plugin and, instead, we need:
+     * - Nexus Publish Plugin ('de.marcphilipp.nexus-publish') to publish contents to the staging repository (step 1)
+     *   This plugin is configured in the 'nexusPublishing' section where we can add the 'special' Nexus repositories
+     *   (considering that the 'sonatype' repository already comes with URLs preconfigured). Regular Maven repositories
+     *   that do not need the 'special' initialization must be configured in the regular Maven Publish plugin
+     *   section, not here. The plugin creates dynamically so many tasks (by repostotory, publications etc) but the
+     *   only one we need to explicitly care about is 'publishToSonatype', which actually initializes the
+     *   staging repository and loads the artifacts.
+     *   ATTENTION: this plugin depends on the regular 'maven-publish' plugin, which then is still there. What this
+     *   plugin does is just adding custom configurations to the 'sonatype' repositories in its specific configuration
+     *   and create all the 'initialization' tasks that 'publishToSonatype' depends on to properly initialize Nexus
+     *   repositories.
+     *   In other words: OTHER REGULAR MAVEN REPOSITORIES CAN STILL BE HANDLED BY THE STANDARD MAVEN PUBLISH PLUGIN
+     *   as long as they are configured outside of the 'nexusPublishing' specific section.
+     * - Nexus Staging Plugin ('io.codearte.nexus-staging') to close and promote the staging repository to Maven Central (step 2).
+     *   This plugin is configured in the 'nexusStaging' section and creates two additional tasks we use:
+     *      - 'closeAndReleaseRepository' does the actual promotion of the staging repository to Closed and released.
+     *        It must run after the publication to the Staging repository is complete
+     *      - 'getStagingProfile' is an utility task that enables to retrieve the Staging Profile ID dynamically instead
+     *        of hardcoding it
+     *   When this plugin fails it's usually because of the Sonatype Nexus server being too slow or faulty (this happens
+     *   more often that it should), or because there are some old stale Staging repositories pending. In this case you
+     *   see a message like "Wrong number of received repositories in state" and you can clean them up by connecting
+     *   to https://oss.sonatype.org/, log in with the project service account, click on 'Staging Repositories' and
+     *   delete the stale ones, if any.
+     * 
+     * Just for the records, if using the 'maven-publish' plugin even just for step 1 (publishing to the Staging repository)
+     * we face many issues like::
+     * - Staging repository fragmented into several repositories
+     * - timeouts occurring during connections
+     * - subsequent invocation of the 'closeAndReleaseRepository' task from the 'io.codearte.nexus-staging' plugin to
+     *   fail with errors
+     * The issues are documented at the Nexus Publish plugin home page (https://github.com/marcphilipp/nexus-publish-plugin/)
+     * and, among others, at:
+     * - https://github.com/Codearte/gradle-nexus-staging-plugin/issues/76
+     * - https://github.com/gradle/gradle/issues/5711#issuecomment-430170888
+     * - https://github.com/travis-ci/travis-ci/issues/9555#issuecomment-428799836
+     * - https://issues.sonatype.org/browse/OSSRH-6262
+     * - https://issues.sonatype.org/browse/OSSRH-5454
+     * - https://github.com/researchgate/gradle-release/issues/244#issuecomment-372794864
+     *
+     * This is why instead of using the 'maven-publish' plugin we need to use the 'de.marcphilipp.nexus-publish' plugin,
+     * (which in turn uses the 'maven-publish' but also adds workarounds to it)
+     *
+     * Another plugin used here is the 'signing' plugin, which just takes care of signing content before their publication
+     * (otherwise, without signatures, they woudln't pass the validation steps).
+     */
+    
+    // 'maven-publish' is implicitly applied by 'de.marcphilipp.nexus-publish'
+    //id 'maven-publish'                                   // See: https://docs.gradle.org/current/userguide/publishing_maven.html
+    id 'signing'                                         // See: https://docs.gradle.org/current/userguide/signing_plugin.html
+    id 'de.marcphilipp.nexus-publish' version '0.4.0'    // See: https://github.com/marcphilipp/nexus-publish-plugin/
+    id 'io.codearte.nexus-staging' version '0.21.2'      // See: https://github.com/Codearte/gradle-nexus-staging-plugin/
+}
+
+/*------------------------------------------------------------------------------
+  Local sub-project properties
+------------------------------------------------------------------------------*/
+description = 'All the Nyx Java artifacts'
+
+/*------------------------------------------------------------------------------
+  This is the configuration for this project and all sub-projects
+------------------------------------------------------------------------------*/
+allprojects {
+    /*------------------------------------------------------------------------------
+      Plugins DSL block
+      https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
+    ------------------------------------------------------------------------------*/
+    apply plugin: 'java'                 // See: https://docs.gradle.org/current/userguide/java_plugin.html
+    apply plugin: 'eclipse'              // See: https://docs.gradle.org/current/userguide/eclipse_plugin.html
+
+    // The Eclipse plugin is also used for VSCode. Without it, VSCode always overwrites the .project and .classpath files with defaults
+    eclipse {
+        classpath {
+            defaultOutputDir = file('build/vscode/bin/default')
+        }
+    }
+
+    /*------------------------------------------------------------------------------
+      Repositories and dependencies
+      https://docs.gradle.org/current/userguide/dependency_management_for_java_projects.html
+    */
+    repositories {
+        mavenCentral()
+        maven {
+            name = "mavenDir"
+            // This repository is useful to check artifacts and their layout before they are published
+            url = "file://${buildDir}/maven"
+        }
+    }
+    dependencies {
+        testImplementation 'org.junit.jupiter:junit-jupiter:5.6.0'
+    }
+
+    /*------------------------------------------------------------------------------
+      Extension configurations
+    ------------------------------------------------------------------------------*/
+    compileJava {
+        //options.warnings      = false
+        //options.deprecation   = false
+        options.compilerArgs  += ["-Xlint:unchecked"]
+    }
+    compileTestJava {
+        //options.warnings      = false
+        //options.deprecation   = false
+        options.compilerArgs  += ["-Xlint:unchecked"]
+    }
+
+    java {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+
+        withSourcesJar()
+        withJavadocJar()
+    }
+
+    javadoc {
+        options {
+            // Link generated javadocs to external docs
+            links 'https://download.eclipse.org/jgit/site/5.8.1.202007141445-r/apidocs/'
+            links 'https://www.slf4j.org/apidocs/'
+            links 'https://docs.gradle.org/current/javadoc/'
+            links 'https://junit.org/junit5/docs/current/api/'
+            links 'https://docs.oracle.com/en/java/javase/13/docs/api/'
+        }
+    }
+
+    /*------------------------------------------------------------------------------
+      Additional task dependencies
+    ------------------------------------------------------------------------------*/
+    tasks.build.dependsOn tasks.javadoc
+}
+
+/*------------------------------------------------------------------------------
+  This is the configuration for all sub-projects, but not this project
+------------------------------------------------------------------------------*/
+subprojects {
+    /*------------------------------------------------------------------------------
+      Plugins DSL block
+      https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
+    ------------------------------------------------------------------------------*/
+    apply plugin: 'jacoco'                              // See: https://docs.gradle.org/current/userguide/jacoco_plugin.html
+
+    //apply plugin: 'checkstyle'                        // See: https://docs.gradle.org/current/userguide/checkstyle_plugin.html
+    //apply plugin: 'pmd'                               // See: https://docs.gradle.org/current/userguide/pmd_plugin.html
+
+    /*------------------------------------------------------------------------------
+      Extension configurations
+    ------------------------------------------------------------------------------*/
+    test {
+        useJUnitPlatform()
+        testLogging {
+            events "passed", "skipped", "failed"
+        }
+    }
+
+    jacocoTestReport {
+        reports {
+            html.enabled true
+            xml.enabled true
+        }
+    }
+
+    /*------------------------------------------------------------------------------
+      Additional task dependencies
+    ------------------------------------------------------------------------------*/
+    tasks.test.finalizedBy tasks.jacocoTestReport
+}
+
+/*------------------------------------------------------------------------------
+  This is the configuration for this project only
+------------------------------------------------------------------------------*/
+
+// For this all-inclusive project, alter the sources and classpath of the 'javadoc' task and the 'sourcesJar' task
+// created by (java.withSourcesJar()) so that they include sources from all sub-projets
+javadoc.source(subprojects.collect { it.sourceSets.main.allJava })
+javadoc.classpath = files(subprojects.collect { it.sourceSets.main.compileClasspath })
+sourcesJar.from(subprojects.collect { it.sourceSets.main.allJava })
+
+/*------------------------------------------------------------------------------
+  Test reports
+------------------------------------------------------------------------------*/
+// Aggregate test reports from subprojects into one.
+task testReport(type: TestReport) {
+    destinationDir = file("$buildDir/reports/tests/all")
+    // Include the results from the "test" task in all subprojects
+    reportOn subprojects*.test
+}
+tasks.test.finalizedBy tasks.testReport
+
+/*------------------------------------------------------------------------------
+  Publications
+------------------------------------------------------------------------------*/
+// Maven publications are configured here for all subprojects to grant more consistency when dealing with Sonatype
+// Nexus.
+// Here we create one Maven publication for each subproject.
+subprojects.each {sub ->
+    publishing {
+        publications {
+            "$sub.name"(MavenPublication) {
+                artifactId = sub.name
+                from sub.components.java
+
+                pom {
+                    name = sub.name
+                    // sub.description fails to evaluate because it's not yet available when publications are defined
+                    description = "$sub.group:$sub.name:$sub.version $sub.description"
+                    url = nyxHomeURL
+                    licenses {
+                        license {
+                            name = nyxLicenseName
+                            url = nyxLicenseURL
+                        }
+                    }
+                    developers {
+                        developer {
+                            id = nyxID
+                            name = nyxTeamName
+                            email = nyxTeamEmail
+                            organization = nyxOrganizationName
+                            organizationUrl = nyxOrganizationURL
+                        }
+                    }
+                    scm {
+                        connection = nyxGitURL
+                        developerConnection = nyxGitURL
+                        url = nyxHomeURL
+                    }
+                }
+            }
+        }
+    }
+}
+
+publishing {
+    publications {
+        // The local project (all inclusive java library) publication
+        // This is the publication for the umbrella project, basically providing all the java sources and javadocs
+        allJava(MavenPublication) {
+            artifactId = project.name
+            from project.components.java
+
+            pom {
+                name = project.name
+                description = project.description
+                url = nyxHomeURL
+                licenses {
+                    license {
+                        name = nyxLicenseName
+                        url = nyxLicenseURL
+                    }
+                }
+                developers {
+                    developer {
+                        id = nyxID
+                        name = nyxTeamName
+                        email = nyxTeamEmail
+                        organization = nyxOrganizationName
+                        organizationUrl = nyxOrganizationURL
+                    }
+                }
+                scm {
+                    connection = nyxGitURL
+                    developerConnection = nyxGitURL
+                    url = nyxHomeURL
+                }
+            }
+        }
+    }
+
+    repositories {
+        // The GitHub Packages repository, visible at https://github.com/mooltiverse/nyx/packages
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/"+nyxOrganizationID+"/"+nyxID)
+            credentials {
+                username = findProperty("gitHubUser")
+                password = findProperty("gitHubToken")
+            }
+        }
+
+        // The Sonatype Nexus repository is configured as the 'sonatype' repository in the 'nexusPublishing' section below
+        // as it needs additional initialization tasks provided by the Nexus Publish Plugin.
+        /*maven {
+            name = 'SonatypeNexusOSS'
+
+            // Select the right repo URL, depending on the version type
+            def releaseStagingRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+            def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releaseStagingRepoUrl
+
+            credentials {
+                username findProperty("ossrhUsername")
+                password findProperty("ossrhPassword")
+            }
+        }*/
+    }
+}
+
+// PGP artifacts signing before publishing
+// See: https://docs.gradle.org/current/userguide/signing_plugin.html
+// In order to generate the keypair:
+// 1. install gpg (see https://gnupg.org/). Note that while there is a version for Windows, these instructions apply
+//    to the Linux version, and the two have a few differences.
+// 2. define a strong passphrase
+// 3. generate a key pair using the passphrase you have chosen and a valid id and email. In our case the name is
+//    'Mooltiverse Nyx Project and the email 'nyx.project@mooltiverse.com'.
+//    For other values just use the defaults (RSA 2048):
+//      $ gpg --gen-key
+//      gpg: checking the trustdb
+//      gpg: 3 marginal(s) needed, 1 complete(s) needed, PGP trust model
+//      gpg: depth: 0  valid:   1  signed:   0  trust: 0-, 0q, 0n, 0m, 0f, 1u
+//      pub   2048R/AA42BF82 2020-02-28
+//      Key fingerprint = F93C B38B 5F19 BE68 11CB  B16C 4FC3 053A AA42 BF82
+//      uid                  Mooltiverse Nyx Project <nyx.project@mooltiverse.com>
+//      sub   2048R/7EE0E228 2020-02-28
+// 4. double check to see the generated keys:
+//      $ gpg --list-keys
+//      /home/user/.gnupg/pubring.gpg
+//      -----------------------------
+//      pub   2048R/AA42BF82 2020-02-28
+//      uid                  Mooltiverse Nyx Project <nyx.project@mooltiverse.com>
+//      sub   2048R/7EE0E228 2020-02-28
+//
+//    Take note of the Key ID. In this case it's AA42BF82.
+// 5. publish the public key to public servers (note you need the Key ID above):
+//      $ gpg --keyserver hkp://pool.sks-keyservers.net --send-keys AA42BF82
+// 6. make sure the key is available on the public servers:
+//      $ gpg --keyserver hkp://pool.sks-keyservers.net --search-keys AA42BF82
+// 7. export the secret keys as ASCII armor (keep it safe, even if it's protected by the passphrase). The exported key
+//    will be used, along with the passphrase (and Key ID), to set a property or an environment variable when
+//    signing the artifacts to publish. If using it from a text file the command would be:
+//      $ gpg --armor --export-secret-key AA42BF82 > ~/.gnupg/seckey.asc
+//    however we need to use the key from a property or an environment variable and this requires some escaping or
+//    encoding to preserve the newline. The simplest method is to just replace newlines with the '\n' sequence. In
+//    this case just use the command:
+//      $ gpg --armor --export-secret-key AA42BF82 | awk 'NR == 1 { print "" } 1' ORS='\\n' > ~/.gnupg/seckey.asc
+//    The content of the seckey.asc file, in this case, works well when passed as a property but not as an
+//    environment variable as many platforms will try to decode themselves the '\n' sequence.
+//    So the third option, the safest, is to use base64 encoding using the command:
+//      $ gpg --armor --export-secret-key AA42BF82 | base64 -w 0 > ~/.gnupg/seckey.asc
+//    This way the content of the seckey.asc is safe (note the -w 0 option to disable line wrapping). The only
+//    downside is that before using the value we need to decode it from base64.
+//    Since it's the safest (and more portable), we are using this method.
+// 9. take the entire content of the 'seckey.asc' file to set the 'ORG_GRADLE_PROJECT_signingKeyBase64' environment
+//    variable. See below about the usage of such variable.
+//
+// For more see:
+// - https://central.sonatype.org/pages/working-with-pgp-signatures.html
+// - https://maven.apache.org/repository/guide-central-repository-upload.html
+// - https://stackoverflow.com/questions/1251999/how-can-i-replace-a-newline-n-using-sed/14853319#14853319
+signing {
+    // With the keypair created as per the instructions above we can sign the artifacts to publish.
+    // However we don't want the passphrase or the private key (even if it's protected by the passphrase) stored
+    // in cleartext files or publicly available on the Git repo so we use variables in the CI/CD environments to
+    // store them.
+    // By using the 'findProperty' we can fetch those values from environment variables named:
+    // - ORG_GRADLE_PROJECT_signingKeyBase64: we use this base 64 encoded version instead of the plain
+    //   ORG_GRADLE_PROJECT_signingKey to make it safer and more portable, avoiding escaping and transcoding issues
+    //   about newlines (see comments above about this).
+    // - ORG_GRADLE_PROJECT_signingPassword
+    //
+    // For more see:
+    // - https://docs.gradle.org/current/userguide/signing_plugin.html#sec:in-memory-keys
+
+    // The signingKey is set by base64 decoding the value of signingKeyBase64 (i.e. from the environment variable
+    // ORG_GRADLE_PROJECT_signingKeyBase64)
+    // It's available only on CI/CD configurations allowed to sign and publish, otherwise it's null
+    def signingKeyBase64 = findProperty("signingKeyBase64")
+    def signingKey = signingKeyBase64 == null ? "" : new String(signingKeyBase64.decodeBase64())
+    // The signingPassword is taken from a property or the environment variable ORG_GRADLE_PROJECT_signingPassword
+    def signingPassword = findProperty("signingPassword")
+
+    def signingCredentialsAvailable = (signingKey != null) && (signingPassword != null)
+
+    useInMemoryPgpKeys(signingKey, signingPassword)
+
+    // Sign only for release and prerelease versions
+    required { (isReleaseVersion || isPrereleaseVersion) && signingCredentialsAvailable && gradle.taskGraph.hasTask("publish") }
+
+    //sign publishing.publications.mavenJava
+    sign publishing.publications
+}
+
+// Publish to Sonatype Nexus staging repository
+// Once the content is published to Sonatype Nexus and before it's released to Maven Central you can see the repo using
+// the Nexus UI at https://oss.sonatype.org/index.html#stagingRepositories in the Staging Repositories section
+// See: https://github.com/marcphilipp/nexus-publish-plugin/
+nexusPublishing {
+    // Sonatype Nexus is so slow that the plugin often needs several minutes to upload (ofter ~5 minutes)
+    connectTimeout = java.time.Duration.ofMinutes(10)
+    clientTimeout = java.time.Duration.ofMinutes(10)
+
+    // These repositories are in addition to the other regular Maven repositories that may have been configured for the Maven Publish
+    // plugin. These ones will be handled by the Nexus Publish Plugin as Sonatype repositories with all of their peculiarities
+    // (like the need to be initialized etc). Maven repositories other than Sonatype must be configured to the regular Maven Publish
+    // plugin section.
+    repositories {
+        packageGroup = 'com.mooltiverse'
+        //stagingProfileId = '302fa0a0346251' // see below on how to retrieve this automatically through the getStagingProfile task
+        // 'sonatype' is preconfigured by the Nexus Publish Plugin with proper URLs.
+        sonatype {
+            username = findProperty("ossrhUsername")
+            password = findProperty("ossrhPassword")
+        }
+    }
+}
+
+// Promote (validate) and Release from the Sonatype Nexus Staging repository to Maven Central
+// Note that after the plugin exits succesfully it may take ~10-15 minutes to get the content visible on Maven Central.
+// Once done the content is publicly available at https://repo.maven.apache.org/maven2/com/mooltiverse/oss/nyx/
+// See https://github.com/Codearte/gradle-nexus-staging-plugin/
+nexusStaging {
+    // Nexus is terribly slow, at times it take more than 100 tries (and ~10-20 minutes) to process
+    numberOfRetries = 200
+
+    packageGroup = 'com.mooltiverse'
+    //stagingProfileId = '302fa0a0346251' // see below on how to retrieve this automatically through the getStagingProfile task
+    username findProperty("ossrhUsername")
+    password findProperty("ossrhPassword")
+}
+
+/*------------------------------------------------------------------------------
+  Additional tasks
+------------------------------------------------------------------------------*/
+// See: https://docs.gradle.org/current/javadoc/org/gradle/api/plugins/JavaPluginExtension.html#withJavadocJar--
+task javadocPrivate(type: Javadoc) {
+    group = 'Documentation'
+    description = 'Generates an additional global javadoc from all the modules with the private visibility (useful for development of this same project only)'
+    source subprojects.collect { it.sourceSets.main.allJava }
+    classpath = files(subprojects.collect { it.sourceSets.main.compileClasspath })
+    options.memberLevel = JavadocMemberLevel.PRIVATE
+    options.links 'https://docs.oracle.com/en/java/javase/13/docs/api/'
+    options.links 'https://download.eclipse.org/jgit/site/5.6.0.201912101111-r/apidocs/'
+    options.links 'https://docs.gradle.org/current/javadoc/'
+    options.links 'https://junit.org/junit5/docs/current/api/'
+    destinationDir = file("${project.docsDir}/javadoc-private")
+}
+
+/*------------------------------------------------------------------------------
+  Additional task dependencies
+------------------------------------------------------------------------------*/
+tasks.build.dependsOn tasks.javadocPrivate
+
+// Publish artifacts to the Staging Sonatype Nexus
+// tasks.publish.dependsOn tasks.publishToSonatype
+// Retrieve and print the stagingProfileId using the getStagingProfile task provided by the
+// 'io.codearte.nexus-staging' plugin. The Id is also available at https://oss.sonatype.org/service/local/staging/profiles
+// when the browser has an authenticated session to Sonatype Nexus
+tasks.publishToSonatype.dependsOn tasks.getStagingProfile
+// After successful publishing to the Staging Sonatype Nexus repository trigger the validation and release it to Maven Central
+// (it may take ~10-20 minutes) and so many retries
+tasks.publishToSonatype.finalizedBy tasks.closeAndReleaseRepository

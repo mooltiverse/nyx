@@ -1,0 +1,19 @@
+/*------------------------------------------------------------------------------
+  Plugins DSL block
+  https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
+------------------------------------------------------------------------------*/
+plugins {
+    id 'java-library'         // See: https://docs.gradle.org/current/userguide/java_library_plugin.html
+}
+
+/*------------------------------------------------------------------------------
+  Local sub-project properties
+------------------------------------------------------------------------------*/
+description = 'The Nyx Java library providing the version classes, without any other dependency. Useful to manipulate versions on your own.'
+
+/*------------------------------------------------------------------------------
+  Repositories and dependencies
+  https://docs.gradle.org/current/userguide/dependency_management_for_java_projects.html
+*/
+dependencies {
+}

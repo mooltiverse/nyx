@@ -1,0 +1,23 @@
+/*------------------------------------------------------------------------------
+  Plugins DSL block
+  https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
+------------------------------------------------------------------------------*/
+plugins {
+    id 'java-library'         // See: https://docs.gradle.org/current/userguide/java_library_plugin.html
+}
+
+/*------------------------------------------------------------------------------
+  Local sub-project properties
+------------------------------------------------------------------------------*/
+description = 'The Nyx core including main classes and core plugins.'
+
+/*------------------------------------------------------------------------------
+  Repositories and dependencies
+  https://docs.gradle.org/current/userguide/dependency_management_for_java_projects.html
+*/
+dependencies {
+  // Import dependencies from other modules of this project
+  api         project(':modules:java:lib:git')
+  api         'org.slf4j:slf4j-api:1.7.30'                      // SLF4J API (http://www.slf4j.org/)
+  runtimeOnly 'org.slf4j:slf4j-jdk14:1.7.30'                    // SLF4J JDK1.4 Logger is used as a fallback when no logging implementations are available in the classpath
+}

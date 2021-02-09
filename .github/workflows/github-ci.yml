@@ -1,0 +1,56 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up JDK 11
+      uses: actions/setup-java@v1
+      with:
+        java-version: 11
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+    - name: Build with Gradle
+      run: ./gradlew build
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up JDK 11
+      uses: actions/setup-java@v1
+      with:
+        java-version: 11
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+    - name: Test with Gradle
+      run: ./gradlew test
+
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Publish with Gradle
+        env:
+          # See the top level https://github.com/mooltiverse/nyx/blob/master/CONTRIBUTING.md#contributing-code file for details about passing these values when testing locally
+          ORG_GRADLE_PROJECT_gitHubUser: ${{ secrets.GITHUB_USERNAME }}
+          ORG_GRADLE_PROJECT_gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          ORG_GRADLE_PROJECT_ossrhUsername: ${{ secrets.MAVEN_USER }}
+          ORG_GRADLE_PROJECT_ossrhPassword: ${{ secrets.MAVEN_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingKeyBase64: ${{ secrets.GPG_PRIVATE_KEY_BASE64 }}
+          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.GPC_PASSPHRASE }}
+          ORG_GRADLE_PROJECT_gradlePublishKey: ${{ secrets.GRADLE_PLUGIN_PUBLISH_KEY }}
+          ORG_GRADLE_PROJECT_gradlePublishSecret: ${{ secrets.GRADLE_PLUGIN_PUBLISH_SECRET }}
+          ORG_GRADLE_PROJECT_gitHubTestUserToken: ${{ secrets.TEST_GITHUB_USER_TOKEN }}   # The test user token to test Nyx GitHub features
+          ORG_GRADLE_PROJECT_gitLabTestUserToken: ${{ secrets.TEST_GITLAB_USER_TOKEN }}   # The test user token to test Nyx GitLab features
+        run: ./gradlew publish
+

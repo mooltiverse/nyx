@@ -1,0 +1,89 @@
+/*------------------------------------------------------------------------------
+  Plugins DSL block
+  https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
+------------------------------------------------------------------------------*/
+plugins {
+    id 'java-gradle-plugin'                             // See: https://docs.gradle.org/current/userguide/java_gradle_plugin.html
+    id 'com.gradle.plugin-publish' version '0.12.0'     // See: https://guides.gradle.org/publishing-plugins-to-gradle-plugin-portal/ and https://plugins.gradle.org/docs/publish-plugin
+}
+
+/*------------------------------------------------------------------------------
+  Local sub-project properties
+------------------------------------------------------------------------------*/
+description = 'The Nyx Gradle plugin automates the sematic release process for Gradle projects using semantic versioning and leveraging the Git branching model.'
+
+/*------------------------------------------------------------------------------
+  Repositories and dependencies
+  https://docs.gradle.org/current/userguide/dependency_management_for_java_projects.html
+*/
+dependencies {
+  // Import dependencies from other modules of this project
+  implementation project(':modules:java:lib:core')
+}
+
+/*------------------------------------------------------------------------------
+  Extension configurations
+------------------------------------------------------------------------------*/
+gradlePlugin {
+    plugins {
+        nyxPlugin {
+            id = rootProject.group
+            displayName = 'Nyx Gradle plugin'
+            description = project.description
+            implementationClass = 'com.mooltiverse.oss.nyx.gradle.NyxGradlePlugin'
+        }
+    }
+}
+
+pluginBundle {
+    website = 'https://github.com/mooltiverse/nyx'
+    vcsUrl = 'https://github.com/mooltiverse/nyx.git'
+    tags = [ 'auto-versioning', 'changelog', 'continuous delivery', 'git', 'github', 'gitlab', 'release', 'semantic', 'semantic-release', 'semantic-version', 'semver', 'version', 'versioning' ]
+
+    /*plugins {
+        nyxPlugin {
+            id = rootProject.group
+            displayName = 'Nyx Gradle plugin'
+            description = project.description
+            tags = [ 'auto-versioning', 'changelog', 'continuous delivery', 'git', 'github', 'gitlab', 'release', 'semantic', 'semantic-release', 'semantic-version', 'semver', 'version', 'versioning' ]
+            version = project.version
+        }
+    }*/
+
+    mavenCoordinates {
+        // Overriding the groupId requires manual approval
+        groupId = project.group
+        //artifactId = project.name
+        version = project.version
+    }
+}
+
+// See https://github.com/gradle/gradle/issues/1246
+task setupPublishPluginCredentials() {
+    group = 'Publishing'
+    description = 'Sets the system properties from environment variables gradlePublishKey and gradlePublishSecret to allow the Gradle Plugin Publish to authenticate'
+
+    doLast {
+        def key = findProperty("gradlePublishKey")
+        def secret = findProperty("gradlePublishSecret")
+
+        if( !key || !secret)
+        {
+            logger.warn("Warning: gradlePublishKey and/or gradlePublishSecret are not defined environment variables. This might be ok if not running the publishing tasks but if you need to publish the Gradle Plugin this prevents the publication.")
+        }
+
+        System.properties.setProperty("gradle.publish.key", key)
+        System.properties.setProperty("gradle.publish.secret", secret)
+    }
+}
+
+task publish() {
+    group = 'Publishing'
+    description = 'Publishes the plugin to the Gradle Plugins Portal'
+    dependsOn publishPlugins
+}
+
+/*------------------------------------------------------------------------------
+  Additional task dependencies
+------------------------------------------------------------------------------*/
+tasks.publishPlugins.dependsOn tasks.setupPublishPluginCredentials

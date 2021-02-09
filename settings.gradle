@@ -1,0 +1,11 @@
+rootProject.name = 'nyx'
+
+include 'modules:java'
+include 'modules:java:lib'
+include 'modules:java:lib:version'
+include 'modules:java:lib:git'
+include 'modules:java:lib:core'
+include 'modules:java:gradle'
+// re-enable the Docker module once we have something to build and publish
+//include 'modules:docker'
+//include 'docs'
