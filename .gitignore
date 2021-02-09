@@ -1,0 +1,16 @@
+# Build outputs
+build/
+
+# Gradle files
+/.gradle/
+
+# IntelliJ Idea files
+/.idea/
+
+# Visual Studio Code files
+.vscode/
+.settings/
+
+# Visual Studio Code files that are generated locally by Gradle plugins
+.classpath
+.project
