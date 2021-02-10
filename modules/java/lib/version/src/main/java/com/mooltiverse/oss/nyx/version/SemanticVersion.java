@@ -40,7 +40,7 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
     /**
      * The default value to start from when bumping an identifier that has no numeric value yet. {@value}
      */
-    private static final int DEFAULT_BUMP_VALUE = 0;
+    private static final int DEFAULT_BUMP_VALUE = 1;
     
     /**
      * The default initial version that can be used when non version is yet available.
@@ -1116,11 +1116,11 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
      * <br>
      * If this version already has a prerelease block without any identifier that equals the given id, then the returned
      * version has all the previous prerelease identifiers preceded by the two new identifiers the given string and
-     * the following number <code>.0</code>.
+     * the following number <code>.1</code>.
      * If this version already has a prerelease block that contains a string identifier equal to the given id there are
      * two options: if the selected identifier already has a numeric value that follows, the returned version will have
      * that numeric identifier incremented by one; if the selected identifier doesn't have a numeric identifier that
-     * follows, a new numeric identifiers is added after the string with the initial value <code>.0</code>.
+     * follows, a new numeric identifiers is added after the string with the initial value <code>.1</code>.
      * <br>
      * If the version already has multiple identifiers in the prerelease block that equal to the given value then all of
      * them will be bumped. In case they have different numeric values (or missing) each occurrence is bumped

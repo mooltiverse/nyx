@@ -218,37 +218,37 @@ public class SemanticVersionTests {
      */
     static Stream<Arguments> wellKnownValidBumpAttributes() {
         return Stream.of(
-            arguments("1.2.3", "alpha", "1.2.3-alpha.0", "1.2.3-alpha.0"),
-            arguments("1.2.3", "beta", "1.2.3-beta.0", "1.2.3-beta.0"),
-            arguments("1.2.3", "gamma", "1.2.3-gamma.0", "1.2.3-gamma.0"),
-            arguments("1.2.3", "delta", "1.2.3-delta.0", "1.2.3-delta.0"),
-            arguments("1.2.3", "rc", "1.2.3-rc.0", "1.2.3-rc.0"),
+            arguments("1.2.3", "alpha", "1.2.3-alpha.1", "1.2.3-alpha.1"),
+            arguments("1.2.3", "beta", "1.2.3-beta.1", "1.2.3-beta.1"),
+            arguments("1.2.3", "gamma", "1.2.3-gamma.1", "1.2.3-gamma.1"),
+            arguments("1.2.3", "delta", "1.2.3-delta.1", "1.2.3-delta.1"),
+            arguments("1.2.3", "rc", "1.2.3-rc.1", "1.2.3-rc.1"),
 
             //the build part must be unaffected by bumps
-            arguments("1.2.3+alpha", "alpha", "1.2.3-alpha.0+alpha", "1.2.3-alpha.0+alpha"),
-            arguments("1.2.3+alpha.1", "alpha", "1.2.3-alpha.0+alpha.1", "1.2.3-alpha.0+alpha.1"),
-            arguments("1.2.3+beta", "alpha", "1.2.3-alpha.0+beta", "1.2.3-alpha.0+beta"),
+            arguments("1.2.3+alpha", "alpha", "1.2.3-alpha.1+alpha", "1.2.3-alpha.1+alpha"),
+            arguments("1.2.3+alpha.1", "alpha", "1.2.3-alpha.1+alpha.1", "1.2.3-alpha.1+alpha.1"),
+            arguments("1.2.3+beta", "alpha", "1.2.3-alpha.1+beta", "1.2.3-alpha.1+beta"),
 
             // test when the identifier appears multiple times
-            arguments("1.2.3-alpha", "alpha", "1.2.3-alpha.0", "1.2.3-alpha.0"),
+            arguments("1.2.3-alpha", "alpha", "1.2.3-alpha.1", "1.2.3-alpha.1"),
             arguments("1.2.3-alpha.0", "alpha", "1.2.3-alpha.1", "1.2.3-alpha.1"),
             arguments("1.2.3-alpha.1", "alpha", "1.2.3-alpha.2", "1.2.3-alpha.2"),
-            arguments("1.2.3-alpha.alpha", "alpha", "1.2.3-alpha.0.alpha", "1.2.3-alpha.0.alpha"),
-            arguments("1.2.3-alpha.0.alpha", "alpha", "1.2.3-alpha.1.alpha.0", "1.2.3-alpha.1.alpha.0"),
-            arguments("1.2.3-alpha+alpha.beta.alpha", "alpha", "1.2.3-alpha.0+alpha.beta.alpha", "1.2.3-alpha.0+alpha.beta.alpha"),
+            arguments("1.2.3-alpha.alpha", "alpha", "1.2.3-alpha.1.alpha", "1.2.3-alpha.1.alpha"),
+            arguments("1.2.3-alpha.0.alpha", "alpha", "1.2.3-alpha.1.alpha.1", "1.2.3-alpha.1.alpha.1"),
+            arguments("1.2.3-alpha+alpha.beta.alpha", "alpha", "1.2.3-alpha.1+alpha.beta.alpha", "1.2.3-alpha.1+alpha.beta.alpha"),
             arguments("1.2.3-alpha.0+alpha.beta.alpha", "alpha", "1.2.3-alpha.1+alpha.beta.alpha", "1.2.3-alpha.1+alpha.beta.alpha"),
             arguments("1.2.3-alpha.1+alpha.beta.alpha", "alpha", "1.2.3-alpha.2+alpha.beta.alpha", "1.2.3-alpha.2+alpha.beta.alpha"),
-            arguments("1.2.3-alpha.alpha+alpha.beta.alpha", "alpha", "1.2.3-alpha.0.alpha+alpha.beta.alpha", "1.2.3-alpha.0.alpha+alpha.beta.alpha"),
-            arguments("1.2.3-alpha.0.alpha+alpha.beta.alpha", "alpha", "1.2.3-alpha.1.alpha.0+alpha.beta.alpha", "1.2.3-alpha.1.alpha.0+alpha.beta.alpha"),
+            arguments("1.2.3-alpha.alpha+alpha.beta.alpha", "alpha", "1.2.3-alpha.1.alpha+alpha.beta.alpha", "1.2.3-alpha.1.alpha+alpha.beta.alpha"),
+            arguments("1.2.3-alpha.0.alpha+alpha.beta.alpha", "alpha", "1.2.3-alpha.1.alpha.1+alpha.beta.alpha", "1.2.3-alpha.1.alpha.1+alpha.beta.alpha"),
 
             // these are edge cases, in which a core component is bumped by its name. The core() method is expected to bump that specific core component
             // while the bumpPrerelease() method is expected to bump the prerelease component, leaving the core identifiers untouched
-            arguments("1.2.3", "major", "2.0.0", "1.2.3-major.0"),
-            arguments("1.2.3", "minor", "1.3.0", "1.2.3-minor.0"),
-            arguments("1.2.3", "patch", "1.2.4", "1.2.3-patch.0"),
-            arguments("1.2.3-major", "major", "2.0.0-major", "1.2.3-major.0"),
-            arguments("1.2.3-minor", "minor", "1.3.0-minor", "1.2.3-minor.0"),
-            arguments("1.2.3-patch", "patch", "1.2.4-patch", "1.2.3-patch.0"),
+            arguments("1.2.3", "major", "2.0.0", "1.2.3-major.1"),
+            arguments("1.2.3", "minor", "1.3.0", "1.2.3-minor.1"),
+            arguments("1.2.3", "patch", "1.2.4", "1.2.3-patch.1"),
+            arguments("1.2.3-major", "major", "2.0.0-major", "1.2.3-major.1"),
+            arguments("1.2.3-minor", "minor", "1.3.0-minor", "1.2.3-minor.1"),
+            arguments("1.2.3-patch", "patch", "1.2.4-patch", "1.2.3-patch.1"),
             arguments("1.2.3-major.3", "major", "2.0.0-major.3", "1.2.3-major.4"),
             arguments("1.2.3-minor.3", "minor", "1.3.0-minor.3", "1.2.3-minor.4"),
             arguments("1.2.3-patch.3", "patch", "1.2.4-patch.3", "1.2.3-patch.4")
