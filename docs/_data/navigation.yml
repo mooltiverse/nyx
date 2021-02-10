@@ -1,0 +1,196 @@
+# The horizontal menu on top of the page
+main:
+  - title: "User Guide"
+    url: /guide/user/
+  - title: "Developer Guide"
+    url: /guide/developer/
+  - title: Help
+    url: /help/
+  - title: "Categories"
+    url: /categories/
+  - title: "Tags"
+    url: /tags/
+
+# The default left-hand navigation bar
+nav-main:
+  - title: User Guide
+    url: /guide/user/
+  - title: "Developer Guide"
+    url: /guide/developer/
+  - title: Help
+    url: /help/
+    children:
+      - title: F.A.Q.
+        url: /faq/
+      - title: "Examples"
+        url: /examples/
+      - title: "Troubleshooting"
+        url: /troubleshooting/
+      - title: "Support"
+        url: /meta/support/
+  - title: Meta
+    children:
+      - title: "Releases & Changelog"
+        url: https://github.com/mooltiverse/nyx/releases
+      - title: "Code of Conduct"
+        url: https://github.com/mooltiverse/nyx/blob/master/CODE_OF_CONDUCT.md
+      - title: "Contributing"
+        url: https://github.com/mooltiverse/nyx/blob/master/CONTRIBUTING.md
+      - title: "License"
+        url: https://github.com/mooltiverse/nyx/blob/master/LICENSE.md
+      - title: "Sponsor"
+        url: /meta/sponsor/
+
+# The left-hand navigation bar used when in the User Guide
+nav-user-guide:
+  - title: Quick Start
+    url: /guide/user/quick-start/
+    children:
+#      - title: "Command Line"
+#        url: /guide/user/quick-start/command-line/
+#      - title: "Gradle Plugin"
+#        url: /guide/user/quick-start/gradle-plugin/
+#  - title: Introduction
+#    url: /guide/user/introduction/
+#    children:
+#      - title: "How Nyx Works"
+#        url: /guide/user/introduction/how-nyx-works/
+#      - title: "Usage"
+#        url: /guide/user/introduction/usage/
+#      - title: "Configuration Methods"
+#        url: /guide/user/introduction/configuration-methods/
+#      - title: "Standard Configurations"
+#        url: /guide/user/introduction/standard-configurations/
+#      - title: "Dynamic Configurations"
+#        url: /guide/user/introduction/dynamic-configurations/
+#      - title: "Version Schemes"
+#        url: /guide/user/introduction/version-schemes/
+#      - title: "Release Strategy"
+#        url: /guide/user/introduction/release-strategy/
+#      - title: "Commit Message Conventions"
+#        url: /guide/user/introduction/commit-message-conventions/
+#      - title: "Artifacts and Publications"
+#        url: /guide/user/introduction/artifacts-and-publications/
+#  - title: Configuration Reference
+#    url: /guide/user/configuration-reference/
+#    children:
+#      - title: "Expressions"
+#        url: /guide/user/configuration-reference/expressions/
+#      - title: "Templates"
+#        url: /guide/user/configuration-reference/templates/
+#      - title: "Global Options"
+#        url: /guide/user/configuration-reference/global-options/
+#      - title: "Commit Message Conventions"
+#        url: /guide/user/configuration-reference/commit-message-conventions/
+#      - title: "Environments"
+#        url: /guide/user/configuration-reference/environments/
+#      - title: "Services"
+#        url: /guide/user/configuration-reference/services/
+#      - title: "Extra Identifiers"
+#        url: /guide/user/configuration-reference/extra-identifiers/
+#      - title: "Release Types"
+#        url: /guide/user/configuration-reference/release-types/
+#      - title: "Artifacts"
+#        url: /guide/user/configuration-reference/artifacts/
+#      - title: "Configuration Examples"
+#        url: /guide/user/configuration-reference/configuration-examples/
+#  - title: Configuration Presets
+#    url: /guide/user/configuration-presets/
+#    children:
+#      - title: "Simple"
+#        url: /guide/user/configuration-presets/simple/
+#  - title: State Reference
+#    url: /guide/user/state-reference/
+#    children:
+#      - title: "Global Attributes"
+#        url: /guide/user/state-reference/global-attributes/
+#      - title: "Release Scope Attributes"
+#        url: /guide/user/state-reference/release-scope-attributes/
+#      - title: "Commit History Attributes"
+#        url: /guide/user/state-reference/commit-history-attributes/
+#      - title: "Environment Attributes"
+#        url: /guide/user/state-reference/environment-attributes/
+#      - title: "Release Type Attributes"
+#        url: /guide/user/state-reference/release-type-attributes/
+#      - title: "Artifacts Attributes"
+#        url: /guide/user/state-reference/artifacts-attributes/
+#      - title: "State Examples"
+#        url: /guide/user/state-reference/state-examples/
+#  - title: Best Practice
+#    url: /guide/user/best-practice/
+#    children:
+#    - title: "Branching Models"
+#      url: /guide/user/best-practice/branching-models/
+#    - title: "Automation"
+#      url: /guide/user/best-practice/automation/
+#  - title: In Depth
+#    url: /guide/user/in-depth/
+#    children:
+#      - title: "Design Principles"
+#        url: /guide/user/in-depth/design-principles/
+#      - title: "Internals"
+#        url: /guide/user/in-depth/internals/
+#  - title: Transitioning
+#    url: /guide/user/transitioning/
+#    children:
+#    - title: "From Semantic Release"
+#      url: /guide/user/transitioning/from-semantic-release/
+  - title: Help
+    url: /help/
+    children:
+      - title: F.A.Q.
+        url: /faq/
+      - title: "Examples"
+        url: /examples/
+      - title: "Troubleshooting"
+        url: /troubleshooting/
+      - title: "Support"
+        url: /meta/support/
+  - title: Meta
+    children:
+      - title: "Releases & Changelog"
+        url: https://github.com/mooltiverse/nyx/releases
+      - title: "Code of Conduct"
+        url: https://github.com/mooltiverse/nyx/blob/master/CODE_OF_CONDUCT.md
+      - title: "Contributing"
+        url: https://github.com/mooltiverse/nyx/blob/master/CONTRIBUTING.md
+      - title: "License"
+        url: https://github.com/mooltiverse/nyx/blob/master/LICENSE.md
+      - title: "Sponsor"
+        url: /meta/sponsor/
+
+# The left-hand navigation bar used when in the Developer Guide
+nav-developer-guide:
+#  - title: Go
+#    url: /guide/developer/go/
+#    children:
+#    - title: "Semantic Version"
+#      url: /guide/developer/go/semantic-version/
+  - title: Java
+    url: /guide/developer/java/
+    children:
+    - title: "Semantic Version"
+      url: /guide/developer/java/semantic-version/
+  - title: Help
+    url: /help/
+    children:
+      - title: F.A.Q.
+        url: /faq/
+      - title: "Examples"
+        url: /examples/
+      - title: "Troubleshooting"
+        url: /troubleshooting/
+      - title: "Support"
+        url: /meta/support/
+  - title: Meta
+    children:
+      - title: "Releases & Changelog"
+        url: https://github.com/mooltiverse/nyx/releases
+      - title: "Code of Conduct"
+        url: https://github.com/mooltiverse/nyx/blob/master/CODE_OF_CONDUCT.md
+      - title: "Contributing"
+        url: https://github.com/mooltiverse/nyx/blob/master/CONTRIBUTING.md
+      - title: "License"
+        url: https://github.com/mooltiverse/nyx/blob/master/LICENSE.md
+      - title: "Sponsor"
+        url: /meta/sponsor/
