@@ -7,7 +7,7 @@ permalink: /meta/support/
 
 You can find support for Nyx by:
 
-* browsing the [troubleshooting posts]({{ site.baseurl }}/categories/#troubleshooting), the [frequently asked questions]({{ site.baseurl }}/categories/#faq) and the available [examples]({{ site.baseurl }}/examples/)
+* browsing the [troubleshooting posts]({{ site.baseurl }}/troubleshooting/), the [frequently asked questions]({{ site.baseurl }}/faq/) and the available [examples]({{ site.baseurl }}/examples/)
 * searching the past [issues](https://github.com/mooltiverse/nyx/issues) or
 * posting a new issue in case you can't find your questions covered by previous threads.
 
