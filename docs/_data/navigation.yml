@@ -116,13 +116,13 @@ nav-user-guide:
 #        url: /guide/user/state-reference/artifacts-attributes/
 #      - title: "State Examples"
 #        url: /guide/user/state-reference/state-examples/
-#  - title: Best Practice
-#    url: /guide/user/best-practice/
-#    children:
-#    - title: "Branching Models"
-#      url: /guide/user/best-practice/branching-models/
-#    - title: "Automation"
-#      url: /guide/user/best-practice/automation/
+  - title: Best Practice
+    url: /guide/user/best-practice/
+    children:
+    - title: "Branching Models"
+      url: /guide/user/best-practice/branching-models/
+    - title: "Build and Automation"
+      url: /guide/user/best-practice/build-and-automation/
 #  - title: In Depth
 #    url: /guide/user/in-depth/
 #    children:
