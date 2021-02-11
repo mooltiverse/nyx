@@ -11,4 +11,4 @@ When seeking for help on Nyx you have several options:
 * check out the [troubleshooting posts]({{ site.baseurl }}/troubleshooting/)
 * take a look at the [frequently asked questions]({{ site.baseurl }}/faq/)
 
-If the above didn't help you can [ask for community support]({{ site.baseurl }}{% link _pages/meta/support.md %}).
+If the above didn't help you can [ask for community support]({{ site.baseurl }}{% link _pages/help/support.md %}).

@@ -27,7 +27,7 @@ nav-main:
       - title: "Troubleshooting"
         url: /troubleshooting/
       - title: "Support"
-        url: /meta/support/
+        url: /help/support/
   - title: Meta
     children:
       - title: "Releases & Changelog"
@@ -145,7 +145,7 @@ nav-user-guide:
       - title: "Troubleshooting"
         url: /troubleshooting/
       - title: "Support"
-        url: /meta/support/
+        url: /help/support/
   - title: Meta
     children:
       - title: "Releases & Changelog"
@@ -181,7 +181,7 @@ nav-developer-guide:
       - title: "Troubleshooting"
         url: /troubleshooting/
       - title: "Support"
-        url: /meta/support/
+        url: /help/support/
   - title: Meta
     children:
       - title: "Releases & Changelog"

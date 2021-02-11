@@ -2,7 +2,7 @@
 title: Support
 layout: single
 toc: false
-permalink: /meta/support/
+permalink: /help/support/
 ---
 
 You can find support for Nyx by:
