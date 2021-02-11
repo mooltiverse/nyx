@@ -63,8 +63,8 @@ nav-user-guide:
 #        url: /guide/user/introduction/standard-configurations/
 #      - title: "Dynamic Configurations"
 #        url: /guide/user/introduction/dynamic-configurations/
-#      - title: "Version Schemes"
-#        url: /guide/user/introduction/version-schemes/
+      - title: "Version Schemes"
+        url: /guide/user/introduction/version-schemes/
 #      - title: "Release Strategy"
 #        url: /guide/user/introduction/release-strategy/
 #      - title: "Commit Message Conventions"
