@@ -48,15 +48,15 @@ nav-user-guide:
     children:
 #      - title: "Command Line"
 #        url: /guide/user/quick-start/command-line/
-#      - title: "Gradle Plugin"
-#        url: /guide/user/quick-start/gradle-plugin/
-#  - title: Introduction
-#    url: /guide/user/introduction/
-#    children:
-#      - title: "How Nyx Works"
-#        url: /guide/user/introduction/how-nyx-works/
-#      - title: "Usage"
-#        url: /guide/user/introduction/usage/
+      - title: "Gradle Plugin"
+        url: /guide/user/quick-start/gradle-plugin/
+  - title: Introduction
+    url: /guide/user/introduction/
+    children:
+      - title: "How Nyx Works"
+        url: /guide/user/introduction/how-nyx-works/
+      - title: "Usage"
+        url: /guide/user/introduction/usage/
 #      - title: "Configuration Methods"
 #        url: /guide/user/introduction/configuration-methods/
 #      - title: "Standard Configurations"
@@ -71,15 +71,15 @@ nav-user-guide:
 #        url: /guide/user/introduction/commit-message-conventions/
 #      - title: "Artifacts and Publications"
 #        url: /guide/user/introduction/artifacts-and-publications/
-#  - title: Configuration Reference
-#    url: /guide/user/configuration-reference/
-#    children:
+  - title: Configuration Reference
+    url: /guide/user/configuration-reference/
+    children:
 #      - title: "Expressions"
 #        url: /guide/user/configuration-reference/expressions/
 #      - title: "Templates"
 #        url: /guide/user/configuration-reference/templates/
-#      - title: "Global Options"
-#        url: /guide/user/configuration-reference/global-options/
+      - title: "Global Options"
+        url: /guide/user/configuration-reference/global-options/
 #      - title: "Commit Message Conventions"
 #        url: /guide/user/configuration-reference/commit-message-conventions/
 #      - title: "Environments"
