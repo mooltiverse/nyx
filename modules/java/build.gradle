@@ -79,6 +79,9 @@ plugins {
     id 'signing'                                         // See: https://docs.gradle.org/current/userguide/signing_plugin.html
     id 'de.marcphilipp.nexus-publish' version '0.4.0'    // See: https://github.com/marcphilipp/nexus-publish-plugin/
     id 'io.codearte.nexus-staging' version '0.21.2'      // See: https://github.com/Codearte/gradle-nexus-staging-plugin/
+    
+    // This plugin allows to have additional test sets, configured in a testSets block, like integrationTest and functionalTest
+    id 'org.unbroken-dome.test-sets' version '3.0.1'     // See: https://github.com/unbroken-dome/gradle-testsets-plugin
 }
 
 /*------------------------------------------------------------------------------
@@ -94,8 +97,8 @@ allprojects {
       Plugins DSL block
       https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
     ------------------------------------------------------------------------------*/
-    apply plugin: 'java'                 // See: https://docs.gradle.org/current/userguide/java_plugin.html
-    apply plugin: 'eclipse'              // See: https://docs.gradle.org/current/userguide/eclipse_plugin.html
+    apply plugin: 'java'                                // See: https://docs.gradle.org/current/userguide/java_plugin.html
+    apply plugin: 'eclipse'                             // See: https://docs.gradle.org/current/userguide/eclipse_plugin.html
 
     // The Eclipse plugin is also used for VSCode. Without it, VSCode always overwrites the .project and .classpath files with defaults
     eclipse {
@@ -172,14 +175,32 @@ subprojects {
     //apply plugin: 'checkstyle'                        // See: https://docs.gradle.org/current/userguide/checkstyle_plugin.html
     //apply plugin: 'pmd'                               // See: https://docs.gradle.org/current/userguide/pmd_plugin.html
 
+    // This plugin allows to have additional test sets, configured in a testSets block (see below)
+    apply plugin:  'org.unbroken-dome.test-sets'        // See: https://github.com/unbroken-dome/gradle-testsets-plugin
+
     /*------------------------------------------------------------------------------
       Extension configurations
     ------------------------------------------------------------------------------*/
-    test {
+    // Additional test sets available through the 'org.unbroken-dome.test-sets'
+    // These tests are better isolated from unit tests (in the src/test directory of each sub project)
+    // as they may take longer.
+    testSets {
+        // Integration tests can be implemented in the directory src/integrationTest/[java|groovy]
+        integrationTest
+
+        // Functional tests can be implemented in the directory src/functionalTest/[java|groovy]
+        functionalTest
+    }
+
+    // This includes all test sets like regular unit tests, integration and functional tests
+    tasks.withType(Test) {
         useJUnitPlatform()
         testLogging {
             events "passed", "skipped", "failed"
         }
+
+        //minHeapSize = "128m"
+        //maxHeapSize = "1024m"
     }
 
     jacocoTestReport {
@@ -192,6 +213,9 @@ subprojects {
     /*------------------------------------------------------------------------------
       Additional task dependencies
     ------------------------------------------------------------------------------*/
+    tasks.test.dependsOn tasks.integrationTest
+    tasks.test.dependsOn tasks.functionalTest
+
     tasks.test.finalizedBy tasks.jacocoTestReport
 }
 
@@ -212,7 +236,7 @@ sourcesJar.from(subprojects.collect { it.sourceSets.main.allJava })
 task testReport(type: TestReport) {
     destinationDir = file("$buildDir/reports/tests/all")
     // Include the results from the "test" task in all subprojects
-    reportOn subprojects*.test
+    reportOn subprojects*.test, subprojects*.integrationTest, subprojects*.functionalTest
 }
 tasks.test.finalizedBy tasks.testReport
 
