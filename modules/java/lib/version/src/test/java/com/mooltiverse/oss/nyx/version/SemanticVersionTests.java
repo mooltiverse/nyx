@@ -582,11 +582,6 @@ public class SemanticVersionTests {
 
     /**
      * An ordered list of valid version strings (according to SemVer). This list can be used to check ordering among semantic versions.
-     *
-     * @return an ordered list of valid version strings (according to SemVer)
-     *
-     * @see SemanticVersion#compareTo(SemanticVersion)
-     * @see SemanticVersion#equals(Object)
      */
     static String[] wellKnownOrderedSemanticVersionsArray = new String[] {
         "0.0.0-alpha+build",

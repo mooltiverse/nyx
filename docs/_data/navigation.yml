@@ -123,13 +123,15 @@ nav-user-guide:
       url: /guide/user/best-practice/branching-models/
     - title: "Build and Automation"
       url: /guide/user/best-practice/build-and-automation/
-#  - title: In Depth
-#    url: /guide/user/in-depth/
-#    children:
+  - title: In Depth
+    url: /guide/user/in-depth/
+    children:
 #      - title: "Design Principles"
 #        url: /guide/user/in-depth/design-principles/
 #      - title: "Internals"
 #        url: /guide/user/in-depth/internals/
+      - title: "Gradle Plugin"
+        url: /guide/user/in-depth/gradle-plugin/
 #  - title: Transitioning
 #    url: /guide/user/transitioning/
 #    children:

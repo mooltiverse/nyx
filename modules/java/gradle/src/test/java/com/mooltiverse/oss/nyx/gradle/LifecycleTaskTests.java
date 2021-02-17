@@ -15,22 +15,13 @@
  */
 package com.mooltiverse.oss.nyx.gradle;
 
-//import com.mooltiverse.oss.nyx.version.Scheme;
+import org.junit.jupiter.api.DisplayName;
 
 /**
- * The plugin configuration object.
+ * Tests the lifecycle Gradle task.<br>
+ * 
+ * This test class tests the {@link LifecycleTask} class and also provides generic methods used by subclasses.
  */
-public class NyxGradlePluginExtension {
-    /**
-     * When <code>true</code> no changes will be applied by any mean. Instead they are just logged
-     * (if the current verbosity doesn't filter the logging out).
-     */
-    //private boolean dryRun = false;
-
-    /**
-     * The versioning scheme to use.
-     * 
-     * @see Scheme for the available schemes
-     */
-    //private String scheme = Scheme.SEMVER.toString();
+@DisplayName("LifecycleTask")
+public class LifecycleTaskTests extends AbstractTaskTests {
 }

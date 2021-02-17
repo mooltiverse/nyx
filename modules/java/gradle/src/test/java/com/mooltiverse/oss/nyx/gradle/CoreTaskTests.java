@@ -15,15 +15,13 @@
  */
 package com.mooltiverse.oss.nyx.gradle;
 
-import org.gradle.api.DefaultTask;
+import org.junit.jupiter.api.DisplayName;
 
-import org.gradle.api.tasks.TaskAction;
-
-public class HelloNyxTask extends DefaultTask {
-    @TaskAction
-    public void greet() {
-        
-        
-        System.out.println("Hello all by Nyx");
-    }
+/**
+ * Tests the core Gradle task.<br>
+ * 
+ * This test class tests the {@link CoreTask} class and also provides generic methods used by subclasses.
+ */
+@DisplayName("CoreTask")
+public class CoreTaskTests extends AbstractTaskTests {
 }

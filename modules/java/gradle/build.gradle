@@ -30,7 +30,7 @@ gradlePlugin {
             id = rootProject.group
             displayName = 'Nyx Gradle plugin'
             description = project.description
-            implementationClass = 'com.mooltiverse.oss.nyx.gradle.NyxGradlePlugin'
+            implementationClass = 'com.mooltiverse.oss.nyx.gradle.NyxPlugin'
         }
     }
 }
