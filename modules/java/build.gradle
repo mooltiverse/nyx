@@ -213,10 +213,12 @@ subprojects {
     /*------------------------------------------------------------------------------
       Additional task dependencies
     ------------------------------------------------------------------------------*/
-    tasks.test.dependsOn tasks.integrationTest
-    tasks.test.dependsOn tasks.functionalTest
+    tasks.check.dependsOn tasks.integrationTest
+    tasks.check.dependsOn tasks.functionalTest
+    tasks.integrationTest.shouldRunAfter tasks.test
+    tasks.functionalTest.shouldRunAfter tasks.integrationTest
 
-    tasks.test.finalizedBy tasks.jacocoTestReport
+    tasks.check.finalizedBy tasks.jacocoTestReport
 }
 
 /*------------------------------------------------------------------------------
@@ -238,7 +240,7 @@ task testReport(type: TestReport) {
     // Include the results from the "test" task in all subprojects
     reportOn subprojects*.test, subprojects*.integrationTest, subprojects*.functionalTest
 }
-tasks.test.finalizedBy tasks.testReport
+tasks.check.finalizedBy tasks.testReport
 
 /*------------------------------------------------------------------------------
   Publications
