@@ -18,8 +18,7 @@ package com.mooltiverse.oss.nyx.gradle;
 /**
  * The abstract superclass for all Nyx core tasks.
  * 
- * Core tasks, as opposite to {@link LifecycleTask} are those performing some concrete
- * actions.
+ * Core tasks, as opposite to {@link LifecycleTask} are those performing some concrete actions.
  */
 abstract class CoreTask extends AbstractTask {
     /**
@@ -27,5 +26,19 @@ abstract class CoreTask extends AbstractTask {
      */
     public CoreTask() {
         super();
+    }
+
+    /**
+     * Configures the task by defining properties common to all core tasks. Also invokes the superclass
+     * method.
+     * 
+     * Child classes should invoke this method during the configuration phase.
+     * 
+     * @param task the task to configure
+     * 
+     * @see AbstractTask#configure(AbstractTask)
+     */
+    protected static void configure(AbstractTask task) {
+        AbstractTask.configure(task);
     }
 }

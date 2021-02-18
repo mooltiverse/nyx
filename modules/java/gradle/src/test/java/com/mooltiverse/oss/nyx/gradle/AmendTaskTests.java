@@ -126,56 +126,6 @@ public class AmendTaskTests extends CoreTaskTests {
             // now also run eager tests, which would invalidate the lazy tests if executed after this
             testForTaskAvailabilityEagerly(project, AmendTask.NAME, AmendTask.class);
         }
-
-        /**
-         * Tests the task using eager methods.
-         * 
-         * Eager methods are those that return the Task and its related values regardless
-         * of whether the Task is using Configuration Avoidance (https://docs.gradle.org/current/userguide/task_configuration_avoidance.html)
-         * or not.
-         * 
-         * Eager methods create an instance of the Task even if it hasn't been used yet.
-         */
-        @Test
-        @DisplayName("AmendTask.define() -> test eager task creation")
-        void defineEagerTest() {
-            Project project = ProjectBuilder.builder().build();
-
-            // pre-flight sanity checks
-            testForTaskUnavailability(project, AmendTask.NAME, AmendTask.class);
-
-            // create the task for the new project
-            assertNotNull(AmendTask.define(project));
-
-            // run the eager tests using the superclass method
-            testForTaskAvailabilityEagerly(project, AmendTask.NAME, AmendTask.class);
-        }
-
-        /**
-         * Tests the task using lazy methods.
-         * 
-         * Lazy methods are those that comply with
-         * Configuration Avoidance (https://docs.gradle.org/current/userguide/task_configuration_avoidance.html)
-         * and only return the task when actually needed or, instead of the actual task, return a Provider
-         * object, which is in charge of managing its deferred creation.
-         */
-        @Test
-        @DisplayName("AmendTask.define() -> test deferred task creation")
-        void defineLazyTest() {
-            Project project = ProjectBuilder.builder().build();
-
-            // pre-flight sanity checks
-            testForTaskUnavailability(project, AmendTask.NAME, AmendTask.class);
-
-            // create the task for the new project
-            assertNotNull(AmendTask.define(project));
-
-            // run the lazy tests using the superclass method
-            testForTaskAvailabilityLazily(project, AmendTask.NAME, AmendTask.class);
-
-            // now also run eager tests, which would invalidate the lazy tests if executed after this
-            testForTaskAvailabilityEagerly(project, AmendTask.NAME, AmendTask.class);
-        }
     }
 
     /**

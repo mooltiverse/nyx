@@ -43,44 +43,6 @@ abstract class AbstractTask extends DefaultTask {
     }
 
     /**
-     * Configures the task by setting the group name.
-     * 
-     * Child classes should invoke this method during the configuration phase.
-     * 
-     * @param task the task to configure
-     */
-    protected static void configure(AbstractTask task) {
-        task.setGroup(GROUP);
-    }
-
-    /**
-     * Registers the task into the given project.
-     * 
-     * The task is defined lazily so it will be actually created by Gradle only when needed, according to the 
-     * <a href="https://docs.gradle.org/current/userguide/task_configuration_avoidance.html">Configuration Avoidance</a>.
-     * 
-     * For this reason {@link TaskContainer#register(String, Class)} is used instead of {@link TaskContainer#create(String, Class)}.
-     * 
-     * @param <T> the task class
-     * 
-     * @param project the project to define the task for
-     * @param name the name to egister the task with
-     * @param type the task class
-     * @param configurationAction the optional action used to configure the task upon creation. It may be <code>null</code>
-     * 
-     * @return the task provider used for the task definition
-     */
-    protected static <T extends Task> TaskProvider<T> define(Project project, String name, Class<T> type, @Nullable Action<? super T> configurationAction) {
-        project.getLogger().debug("Registering Nyx task with name: %s", name);
-
-        TaskProvider<T> taskProvider = project.getTasks().register(name, type, configurationAction);
-
-        project.getLogger().debug("Nyx task registered with name: %s", name);
-
-        return taskProvider;
-    }
-
-    /**
      * Returns the provider for the task with the given name or <code>null</code> if no task has been registered or created
      * with such name in the given project.
      * 
@@ -100,5 +62,43 @@ abstract class AbstractTask extends DefaultTask {
         catch (UnknownTaskException ute) {
             return null;
         }
+    }
+
+    /**
+     * Registers the task into the given project.
+     * 
+     * The task is defined lazily so it will be actually created by Gradle only when needed, according to the 
+     * <a href="https://docs.gradle.org/current/userguide/task_configuration_avoidance.html">Configuration Avoidance</a>.
+     * 
+     * For this reason {@link TaskContainer#register(String, Class)} is used instead of {@link TaskContainer#create(String, Class)} internally.
+     * 
+     * @param <T> the task class
+     * 
+     * @param project the project to define the task for
+     * @param name the name to register the task with
+     * @param type the task class
+     * @param configurationAction the optional action used to configure the task upon creation. It may be <code>null</code>
+     * 
+     * @return the task provider used for the task definition
+     */
+    protected static <T extends Task> TaskProvider<T> define(Project project, String name, Class<T> type, @Nullable Action<? super T> configurationAction) {
+        project.getLogger().debug("Registering Nyx task with name: {}", name);
+
+        TaskProvider<T> taskProvider = project.getTasks().register(name, type, configurationAction);
+
+        project.getLogger().debug("Nyx task registered with name: {}", name);
+
+        return taskProvider;
+    }
+
+    /**
+     * Configures the task by setting the group name.
+     * 
+     * Child classes should invoke this method during the configuration phase.
+     * 
+     * @param task the task to configure
+     */
+    protected static void configure(AbstractTask task) {
+        task.setGroup(GROUP);
     }
 }

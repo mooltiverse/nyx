@@ -17,15 +17,16 @@ package com.mooltiverse.oss.nyx.gradle;
 
 import javax.inject.Inject;
 
-import org.gradle.api.Action;
 import org.gradle.api.Project;
+import org.gradle.api.provider.Property;
+import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.tasks.TaskProvider;
 
 /**
  * The task running the Amend command.
  */
-public class AmendTask extends CoreTask {
+public abstract class AmendTask extends CoreTask {
     /**
      * The decription of the task. This also appears in Gradle help.
      */
@@ -44,21 +45,6 @@ public class AmendTask extends CoreTask {
         super();
     }
 
-    @TaskAction
-    public void amend() {
-        getLogger().info("Running AmendTask: {}", NAME); // TODO: replace this with business logic
-    }
-
-    /**
-     * Configures the task.
-     * 
-     * @param task the task to configure
-     */
-    protected static void configure(AmendTask task) {
-        AbstractTask.configure(task);
-        task.setDescription(DESCRIPTION);
-    }
-
     /**
      * Registers the task into the given project. The task is lazily registered, for deferred creation.
      * 
@@ -70,5 +56,30 @@ public class AmendTask extends CoreTask {
      */
     public static TaskProvider<AmendTask> define(Project project) {
         return define(project, NAME, AmendTask.class, task -> configure(task));
+    }
+
+    /**
+     * Configures the task (group, description, dependencies, properties).
+     * 
+     * This method is invoked upon configuration as it's passed in the register(...) phase (see {@link #define(Project)}).
+     * 
+     * @param task the task to configure
+     */
+    protected static void configure(AmendTask task) {
+        CoreTask.configure(task);
+        task.setDescription(DESCRIPTION);
+
+        // This task has no dependencies to configure
+    }
+
+    /**
+     * The actual business method for this task.
+     * 
+     * Gradle knows this is the method to run upon task execution thanks to the {@link TaskAction} annotation.
+     */
+    @TaskAction
+    public void amend() {
+        // TODO: replace this method body with actual business logic, invoking the Nyx backing class
+        getLogger().info("Running AmendTask: {}", NAME);
     }
 }

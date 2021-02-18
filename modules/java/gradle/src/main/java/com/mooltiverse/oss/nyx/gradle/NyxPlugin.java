@@ -20,7 +20,6 @@ import java.util.Objects;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
-import org.gradle.api.tasks.TaskProvider;
 
 /**
  * The main plugin class.
@@ -50,10 +49,13 @@ public class NyxPlugin implements Plugin<Project> {
      */
     @Override
     public void apply(Project project) {
-      // Create the project extension
       project.getLogger().info("Applying Nyx plugin");
 
+      // Create the project extension. This must be done first as tasks
+      // need it to be already available when they are defined
       createExtensions(project);
+
+      // Define the tasks
       defineTasks(project);
 
       project.getLogger().debug("Nyx plugin applied");
@@ -65,11 +67,9 @@ public class NyxPlugin implements Plugin<Project> {
      * @param project the project to create the extension in
      */
     protected void createExtensions(Project project) {
-      project.getLogger().debug("Creating Nyx extension with name: %s", Extension.NAME);
-
-      project.getExtensions().create(Extension.NAME, Extension.class);
-
-      project.getLogger().debug("Nyx extension created with name: %s", Extension.NAME);
+      project.getLogger().debug("Creating Nyx extension with name: {}", NyxExtension.NAME);
+      project.getExtensions().create(NyxExtension.NAME, NyxExtension.class);
+      project.getLogger().debug("Nyx extension created with name: {}", NyxExtension.NAME);
     } 
 
     /**
@@ -78,8 +78,12 @@ public class NyxPlugin implements Plugin<Project> {
      * @param project the project to define the tasks in
      */
     protected void defineTasks(Project project) {
-      // Create the tasks.
-      project.getLogger().info("Defining Nyx tasks");
+      project.getLogger().debug("Defining Nyx tasks");
+
+      // Define lifecycle tasks. These tasks are defined conditionally, only if they haven't been defined
+      // elsewhere, i.e. by some other (core) plugin.
+      // These tasks are define first to allow core tasks to set dependencies on lifecycle tasks, if they need so.
+      ReleaseTask.conditionallyDefine(project);
 
       // Define core tasks
       AmendTask.define(project);
@@ -88,34 +92,31 @@ public class NyxPlugin implements Plugin<Project> {
       MakeTask.define(project);
       PublishTask.define(project);
 
-      // Define lifecycle tasks, if there is no task with the same name already registered
-      TaskProvider<ReleaseTask> releaseTaskProvider = ReleaseTask.conditionallyDefine(project);
-
-      // Lifecycle tasks dependencies
+      // Define lifecycle tasks dependencies
       // These dependencies can't be defined inside each task's configure() method as it may lead
-      // to unexpected behavior (see https://docs.gradle.org/current/userguide/task_configuration_avoidance.html#sec:task_configuration_avoidance_general, bullet #2)
+      // to unexpected behavior (see https://docs.gradle.org/current/userguide/task_configuration_avoidance.html#sec:task_configuration_avoidance_general, bullet #2).
+      // The dependencies below make no difference whether the tasks are defined by this plugin or elsewhere.
 
-      // if there is a 'release' task defined (outside this plugin) make it dependent on the Publish task
-      if (Objects.isNull(releaseTaskProvider)) {
-        Task releaseLifecycleTask = project.getTasks().findByName("release");
-        if (!Objects.isNull(releaseLifecycleTask)) {
-            releaseLifecycleTask.dependsOn(PublishTask.NAME);
-        }
+      // Make the 'release' task dependent on the Publish task. There must be one as we define it
+      // within the plugin if not already defined elsewhere.
+      Task releaseLifecycleTask = project.getTasks().findByName(ReleaseTask.NAME);
+      if (!Objects.isNull(releaseLifecycleTask)) {
+          releaseLifecycleTask.dependsOn(PublishTask.NAME);
       }
 
-      // make the 'assemble' task depend on this one, if any
+      // If there is an 'assemble' task defined make it dependent on the MakeTask
       Task assembleLifecycleTask = project.getTasks().findByName("assemble");
       if (!Objects.isNull(assembleLifecycleTask)) {
           assembleLifecycleTask.dependsOn(MakeTask.NAME);
       }
 
-      // make the 'build' task depend on this one, if any
+      // If there is a 'build' task defined make it dependent on the MakeTask
       Task buildLifecycleTask = project.getTasks().findByName("build");
       if (!Objects.isNull(buildLifecycleTask)) {
           buildLifecycleTask.dependsOn(MakeTask.NAME);
       }
 
-      // make the 'clean' task depend on this one, if any
+      // If there is a 'clean' task defined make it dependent on the CleanTask
       Task cleanLifecycleTask = project.getTasks().findByName("clean");
       if (!Objects.isNull(cleanLifecycleTask)) {
           cleanLifecycleTask.dependsOn(CleanTask.NAME);

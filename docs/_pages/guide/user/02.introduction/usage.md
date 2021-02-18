@@ -81,7 +81,7 @@ You can find more on the Gradle Plugin internals [here]({{ site.baseurl }}{% lin
 In order to run the Gradle plugin you need:
 
 * Java release `1.8` or later
-* Gradle release `4.9` or later. Tests have been successfully executed up to release `6.8.2`. [Here](https://gradle.org/releases/) you can find the list of available releases.
+* Gradle release `5.5` or later. Tests have been successfully executed up to release `6.8.2`. [Here](https://gradle.org/releases/) you can find the list of available releases.
 
 ### Core tasks
 

@@ -18,13 +18,15 @@ package com.mooltiverse.oss.nyx.gradle;
 import javax.inject.Inject;
 
 import org.gradle.api.Project;
+import org.gradle.api.provider.Property;
+import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.tasks.TaskProvider;
 
 /**
  * The task running the Make command.
  */
-public class MakeTask extends CoreTask {
+public abstract class MakeTask extends CoreTask {
     /**
      * The decription of the task. This also appears in Gradle help.
      */
@@ -43,22 +45,6 @@ public class MakeTask extends CoreTask {
         super();
     }
 
-    @TaskAction
-    public void make() {
-        getLogger().info("Running MakeTask: {}", NAME); // TODO: replace this with business logic
-    }
-
-    /**
-     * Configures the task.
-     * 
-     * @param task the task to configure
-     */
-    protected static void configure(MakeTask task) {
-        AbstractTask.configure(task);
-        task.setDescription(DESCRIPTION);
-        task.dependsOn(InferTask.NAME);
-    }
-
     /**
      * Registers the task into the given project. The task is lazily registered, for deferred creation.
      * 
@@ -70,5 +56,31 @@ public class MakeTask extends CoreTask {
      */
     public static TaskProvider<MakeTask> define(Project project) {
         return define(project, NAME, MakeTask.class, task -> configure(task));
+    }
+
+    /**
+     * Configures the task (group, description, dependencies, properties).
+     * 
+     * This method is invoked upon configuration as it's passed in the register(...) phase (see {@link #define(Project)}).
+     * 
+     * @param task the task to configure
+     */
+    protected static void configure(MakeTask task) {
+        CoreTask.configure(task);
+        task.setDescription(DESCRIPTION);
+
+        // Configure dependencies
+        task.dependsOn(InferTask.NAME);
+    }
+
+    /**
+     * The actual business method for this task.
+     * 
+     * Gradle knows this is the method to run upon task execution thanks to the {@link TaskAction} annotation.
+     */
+    @TaskAction
+    public void make() {
+        // TODO: replace this method body with actual business logic, invoking the Nyx backing class
+        getLogger().info("Running MakeTask: {}", NAME);
     }
 }

@@ -15,19 +15,18 @@
  */
 package com.mooltiverse.oss.nyx.gradle;
 
-import java.util.Objects;
-
 import javax.inject.Inject;
 
 import org.gradle.api.Project;
-import org.gradle.api.Task;
+import org.gradle.api.provider.Property;
+import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.tasks.TaskProvider;
 
 /**
  * The task running the Clean command.
  */
-public class CleanTask extends CoreTask {
+public abstract class CleanTask extends CoreTask {
     /**
      * The decription of the task. This also appears in Gradle help.
      */
@@ -46,27 +45,6 @@ public class CleanTask extends CoreTask {
         super();
     }
 
-    @TaskAction
-    public void clean() {
-        getLogger().info("Running CleanTask: {}", NAME); // TODO: replace this with business logic
-    }
-
-    /**
-     * Configures the task.
-     * 
-     * @param task the task to configure
-     */
-    protected static void configure(CleanTask task) {
-        AbstractTask.configure(task);
-        task.setDescription(DESCRIPTION);
-
-        // make the 'clean' task depend on this one, if any
-        Task cleanLifecycleTask = task.getProject().getTasks().findByName("clean");
-        if (!Objects.isNull(cleanLifecycleTask)) {
-            cleanLifecycleTask.dependsOn(task);
-        }
-    }
-
     /**
      * Registers the task into the given project. The task is lazily registered, for deferred creation.
      * 
@@ -78,5 +56,30 @@ public class CleanTask extends CoreTask {
      */
     public static TaskProvider<CleanTask> define(Project project) {
         return define(project, NAME, CleanTask.class, task -> configure(task));
+    }
+
+    /**
+     * Configures the task (group, description, dependencies, properties).
+     * 
+     * This method is invoked upon configuration as it's passed in the register(...) phase (see {@link #define(Project)}).
+     * 
+     * @param task the task to configure
+     */
+    protected static void configure(CleanTask task) {
+        CoreTask.configure(task);
+        task.setDescription(DESCRIPTION);
+
+        // This task has no dependencies to configure
+    }
+
+    /**
+     * The actual business method for this task.
+     * 
+     * Gradle knows this is the method to run upon task execution thanks to the {@link TaskAction} annotation.
+     */
+    @TaskAction
+    public void clean() {
+        // TODO: replace this method body with actual business logic, invoking the Nyx backing class
+        getLogger().info("Running CleanTask: {}", NAME);
     }
 }

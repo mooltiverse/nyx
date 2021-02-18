@@ -52,7 +52,6 @@ public class ReleaseTask extends LifecycleTask {
     protected static void configure(ReleaseTask task) {
         AbstractTask.configure(task);
         task.setDescription(DESCRIPTION);
-        task.dependsOn(PublishTask.NAME);
     }
 
     /**

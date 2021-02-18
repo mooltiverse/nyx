@@ -28,10 +28,8 @@ import org.eclipse.jgit.internal.storage.file.FileRepository;
 
 /**
  * The Nyx main class.
- * 
- * @param <V> the type of version implementation handled by Nyx.
  */
-public class Nyx<V extends Version> {
+public class Nyx {
     /**
      * The Git repository instance.
      */
@@ -87,7 +85,7 @@ public class Nyx<V extends Version> {
      * @throws IllegalStateException if the repository was not initialized or no previous
      * version could be detected.
      */
-    public V getPreviousVersion() {
+    public Version getPreviousVersion() {
 return null;
     }
 
@@ -106,7 +104,7 @@ return null;
      * @throws IllegalArgumentException if the given default version is not allowed as a value for
      * the version type <code>V</code>
      */
-    public V getPreviousVersion(String defaultVersion) {
+    public Version getPreviousVersion(String defaultVersion) {
         Objects.requireNonNull(defaultVersion, "Default version can't be null");
         if (defaultVersion.isBlank())
             throw new IllegalArgumentException("Default version cannot be empty");

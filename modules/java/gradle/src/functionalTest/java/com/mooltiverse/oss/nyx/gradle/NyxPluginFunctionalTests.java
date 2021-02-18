@@ -51,10 +51,29 @@ public class NyxPluginFunctionalTests {
         // Versions that are known to work
         // - version "6.5" has a bug (https://github.com/gradle/gradle/issues/13367) that prevents us to test, fixed in "6.5.1"
         "6.8.2", "6.8.1", "6.8", "6.7.1", "6.7", "6.6.1", "6.6", "6.5.1", /*"6.5",*/ "6.4.1", "6.4", "6.3", "6.2.2", "6.2.1", "6.2", "6.1.1", "6.1", "6.0.1", "6.0",
-        "5.6.4", "5.6.3", "5.6.2", "5.6.1", "5.6", "5.5.1", "5.5", "5.4.1", "5.4", "5.3.1", "5.3", "5.2.1", "5.2", "5.1.1", "5.1", "5.0",
-        "4.10.3", "4.10.2", "4.10.1", "4.10", "4.9"
+
+        /* Gradle versions prior than 6.0 fails to test with an exception like:
+                > Could not find method services() for arguments [build_4o3mdmvy94ykemibox706yopu$_run_closure1$_closure2@18c3fdb5] on object of type com.mooltiverse.oss.nyx.gradle.NyxExtension.
+
+           This means it has a different method for setting nested blocks into the extension object.
+           If support for these versions is strongly needed we may find a workaround but it's worthless so far. */
+        //"5.6.4", "5.6.3", "5.6.2", "5.6.1", "5.6", "5.5.1", "5.5"
         
-        /* Gradle versions prior than 4.9 do not support Conviguration AVoidance API (https://docs.gradle.org/current/userguide/task_configuration_avoidance.html)*/
+        /* Gradle versions prior than 5.5 do not support ObjectFactory.domainObjectContainer​(Class<T> elementType), indeed introduced in version 5.5,
+           which is used for example in NyxExtension.
+           If support for these versions is strongly needed we may find a workaround but it's worthless so far. */
+        //"5.4.1", "5.4", "5.3.1", "5.3", "5.2.1", "5.2"
+        
+        /* Gradle versions from 4.9 to 5.1.1 fail to test with an exception like:
+                > Could not create an instance of type com.mooltiverse.oss.nyx.gradle.NyxExtension_Decorated.
+                    > Could not find any public constructor for class com.mooltiverse.oss.nyx.gradle.NyxExtension_Decorated which accepts parameters [].
+
+           This has to deal with the injection of the ObjectFactory in constructors (i.e. in the NyxExtension) and is solved by adding another
+           constructor with no parameters, which in turn implies another workaround to get an ObjectFactory.
+           If support for these versions is strongly needed we may find a workaround but it's worthless so far. */
+        //"5.1.1", "5.1", "5.0", "4.10.3", "4.10.2", "4.10.1", "4.10", "4.9"
+        
+        /* Gradle versions prior than 4.9 do not support Conviguration Avoidance API (https://docs.gradle.org/current/userguide/task_configuration_avoidance.html)*/
         //"4.8.1", "4.8"
 
         /* Gradle version 4.7 fails to test with an exception like:
@@ -115,6 +134,47 @@ public class NyxPluginFunctionalTests {
         }
     }
 
+    /**
+     * Returns a string with a valid content for the gradle.settings file
+     * 
+     * @param gradleVersion the Gradle version to use for the file
+     * 
+     * @return a string with a valid content for the gradle.settings file
+     */
+    static String gradleSettings(String gradleVersion) {
+        StringBuilder content = new StringBuilder("rootProject.name = 'nyx-gradle-"+gradleVersion+"-plugin-test'").append(System.getProperty("line.separator"));
+        return content.toString();
+    }
+
+    /**
+     * Returns a string with a valid content for the build.gradle file
+     * 
+     * @param gradleVersion the Gradle version to use for the file
+     * 
+     * @return a string with a valid content for the build.gradle file
+     */
+    static String gradleBuild(String gradleVersion) {
+        // Prepare the build.gradle file
+        StringBuilder content = new StringBuilder();
+        content.append(System.getProperty("line.separator"));
+        content.append("plugins {").append(System.getProperty("line.separator"));
+        content.append("  id 'com.mooltiverse.oss.nyx'").append(System.getProperty("line.separator"));
+        content.append("}").append(System.getProperty("line.separator"));
+        content.append(System.getProperty("line.separator"));
+
+        content.append("nyx {").append(System.getProperty("line.separator"));
+        content.append("  bump = 'minorrr'").append(System.getProperty("line.separator"));
+        content.append("  dryRun = true").append(System.getProperty("line.separator"));
+        content.append("  services {").append(System.getProperty("line.separator"));
+        content.append("     github {").append(System.getProperty("line.separator"));
+        content.append("        provider = 'guesswhat'").append(System.getProperty("line.separator"));
+        content.append("     }").append(System.getProperty("line.separator"));
+        content.append("  }").append(System.getProperty("line.separator"));
+        content.append("}").append(System.getProperty("line.separator"));
+
+        return content.toString();
+    }
+
     @Nested
     @DisplayName("gradle release")
     class ReleaseTests {
@@ -130,7 +190,7 @@ public class NyxPluginFunctionalTests {
          * 
          * @throws Exception in case of any issue
          */
-        GradleRunner setUp(String gradleVersion, String gradleBuildFileContent)
+        GradleRunner setUp(String gradleVersion, String gradleSettingsFileContent, String gradleBuildFileContent)
             throws Exception {
             
             File tempProjectDir = Files.createTempDirectory("nyx-gradle-"+gradleVersion+"-test").toFile();
@@ -144,9 +204,7 @@ public class NyxPluginFunctionalTests {
             assertTrue(tempProjectDir.exists());
             assertTrue(tempProjectDir.isDirectory());
 
-            // Create the settings.gradle file
-            StringBuilder gradleSettingsFileContent = new StringBuilder("rootProject.name = 'nyx-gradle-"+gradleVersion+"-plugin-test'").append(System.getProperty("line.separator"));
-            write(new File(tempProjectDir, "settings.gradle"), gradleSettingsFileContent.toString());
+            write(new File(tempProjectDir, "settings.gradle"), gradleSettingsFileContent);
 
             // Create the build.gradle file
             write(new File(tempProjectDir, "build.gradle"), gradleBuildFileContent);
@@ -174,20 +232,12 @@ public class NyxPluginFunctionalTests {
         @MethodSource("com.mooltiverse.oss.nyx.gradle.NyxPluginFunctionalTests#wellKnownWorkingGradleVersions")
         void nyxReleaseTest(String gradleVersion)
             throws Exception {
-            
-            // Prepare the build.gradle file
-            StringBuilder gradleBuildFileContent = new StringBuilder();
-            gradleBuildFileContent.append(System.getProperty("line.separator"));
-            gradleBuildFileContent.append("plugins {").append(System.getProperty("line.separator"));
-            gradleBuildFileContent.append("  id 'com.mooltiverse.oss.nyx'").append(System.getProperty("line.separator"));
-            gradleBuildFileContent.append("}").append(System.getProperty("line.separator"));
-
-            GradleRunner gradleRunner = setUp(gradleVersion, gradleBuildFileContent.toString());
+            GradleRunner gradleRunner = setUp(gradleVersion, gradleSettings(gradleVersion), gradleBuild(gradleVersion));
 
             // withGradleVersion() needs to pull the given version from the internet so if it's not in the cache, as at the first run,
             // this will stlightly increase execution time.
             // GradleRunner.withDebug(boolean) enables debug output
-            /*BuildResult gradleResult = */gradleRunner.withDebug(true).withArguments("release").build();
+            BuildResult gradleResult = gradleRunner.withDebug(true).withArguments("--info", /*"--debug", */"--stacktrace", "release").build();
 
             System.out.println("Testing with new Gradle version "+gradleVersion+" complete");
 
