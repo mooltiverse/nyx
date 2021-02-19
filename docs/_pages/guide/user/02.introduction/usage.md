@@ -81,7 +81,49 @@ You can find more on the Gradle Plugin internals [here]({{ site.baseurl }}{% lin
 In order to run the Gradle plugin you need:
 
 * Java release `1.8` or later
-* Gradle release `5.5` or later. Tests have been successfully executed up to release `6.8.2`. [Here](https://gradle.org/releases/) you can find the list of available releases.
+* Gradle release `6.0` or later. Tests have been successfully executed up to release `6.8.2`. [Here](https://gradle.org/releases/) you can find the list of available releases.
+
+### Apply the plugin
+
+To apply the [plugin](https://plugins.gradle.org/plugin/com.mooltiverse.oss.nyx) (using the [plugin DSL](https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block)) edit your `build.gradle` file and add the new plugin:
+
+```groovy
+plugins {
+  id "com.mooltiverse.oss.nyx" version "{{ site.data.nyx.version }}"
+}
+```
+
+Now you need to [configure the plugin](#configure-the-plugin) before you can run any task.
+
+### Configure the plugin
+
+You have different means to configure the plugin and in these sections we'll introduce you to all of them. Whichever combination of configuration means you use, see the [configuration reference]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/index.md %}) for a detailed description of each option.
+
+The [`version`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#version) configuration option is not handled like other options because it would overlap [Gradle's standard `version` project property](https://docs.gradle.org/current/userguide/writing_build_scripts.html#sec:standard_project_properties). The plugin reads and writes the standard Gradle option to provide a consistent behavior and reduce impact on existing build scripts. See [here]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#the-version-in-gradle-scripts) for more.
+{: .notice--warning}
+
+TODO: insert links here to the various configuration means and a short description on how to use a hybrid configuration approach, mixing different means.
+{: .notice--warning}
+
+#### Using the extension
+
+The easier way to configure Nyx is via a Gradle *extension*, which is a configuration block named `nyx` you add inside your `build.gradle` script, like this:
+
+```groovy
+plugins {
+  id "com.mooltiverse.oss.nyx" version "{{ site.data.nyx.version }}"
+}
+
+nyx {
+  // configuration options here...
+  // TODO: add the bare minimum options here
+}
+```
+
+#### Using configuration files
+
+TODO: write this section
+{: .notice--warning}
 
 ### Core tasks
 

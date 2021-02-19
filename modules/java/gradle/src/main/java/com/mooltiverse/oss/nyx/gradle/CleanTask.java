@@ -30,7 +30,7 @@ public abstract class CleanTask extends CoreTask {
     /**
      * The decription of the task. This also appears in Gradle help.
      */
-    public static final String DESCRIPTION = "Reverts the release process to ints initial state";
+    public static final String DESCRIPTION = "Deletes local release artifacts and reverts the release process to its initial state";
 
     /**
      * The name of the task. This is the name of the task to use inside Gradle scripts.

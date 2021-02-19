@@ -22,6 +22,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
 
@@ -150,15 +152,25 @@ public class NyxPluginFunctionalTests {
      * Returns a string with a valid content for the build.gradle file
      * 
      * @param gradleVersion the Gradle version to use for the file
+     * @param plugins an optional map of plugins to apply, where names are plugin IDs and values are their versions. The version may be <code>null</code>
+     * or empty for core plugins. If the entire map is <code>null</code> no plugins are applied. The Nyc plugin is added by default and doesn't need to be added.
      * 
      * @return a string with a valid content for the build.gradle file
      */
-    static String gradleBuild(String gradleVersion) {
+    static String gradleBuild(String gradleVersion, Map<String, String> plugins) {
         // Prepare the build.gradle file
         StringBuilder content = new StringBuilder();
         content.append(System.getProperty("line.separator"));
         content.append("plugins {").append(System.getProperty("line.separator"));
         content.append("  id 'com.mooltiverse.oss.nyx'").append(System.getProperty("line.separator"));
+        if (!Objects.isNull(plugins)) {
+            for (Map.Entry<String, String> entry: plugins.entrySet()) {
+                content.append("  id '"+entry.getKey()+"' ");
+                if (!Objects.isNull(entry.getValue()) && !entry.getValue().isEmpty())
+                    content.append(" version '"+entry.getValue()+"'");
+                content.append(System.getProperty("line.separator"));
+            }
+        }
         content.append("}").append(System.getProperty("line.separator"));
         content.append(System.getProperty("line.separator"));
 
@@ -175,64 +187,94 @@ public class NyxPluginFunctionalTests {
         return content.toString();
     }
 
+    /**
+     * Instantiates a new GradleRunner to use for tests, using the given Gradle version.
+     * A new temporary directory is created for each test and used by the runner.
+     * The settings.gradle is created with a standard content while the build.gradle file is created with the given content.
+     * 
+     * @param gradleVersion the Gradle version to test against
+     * @oaram gradleBuildFileContent the content of the build.gradle to create in the project directory
+     * 
+     * @return the runner to use for tests, already using the temporary directory
+     * 
+     * @throws Exception in case of any issue
+     */
+    GradleRunner setUp(String gradleVersion, String gradleSettingsFileContent, String gradleBuildFileContent)
+        throws Exception {
+        
+        File tempProjectDir = Files.createTempDirectory("nyx-gradle-"+gradleVersion+"-test").toFile();
+
+        // let the VM delete the directories on exit
+        tempProjectDir.deleteOnExit(); 
+        System.out.println("Set up tests into directory: "+tempProjectDir.getAbsolutePath());
+
+        // do a couple extra checks to avoid messing up with the project dir
+        assertFalse(Objects.isNull(tempProjectDir));
+        assertTrue(tempProjectDir.exists());
+        assertTrue(tempProjectDir.isDirectory());
+
+        write(new File(tempProjectDir, "settings.gradle"), gradleSettingsFileContent);
+
+        // Create the build.gradle file
+        write(new File(tempProjectDir, "build.gradle"), gradleBuildFileContent);
+
+        // withPluginClasspath() puts the Nyx plugin into the classpath
+        return GradleRunner.create().withGradleVersion(gradleVersion).withProjectDir(tempProjectDir).withPluginClasspath().forwardOutput();
+    }
+
+    /**
+     * Tries to clean up resources used for tests.
+     * 
+     * @param runner the Gradle runner used for the tests
+     * 
+     * @throws Exception in case of any issue
+     */
+    void tearDown(GradleRunner runner)
+        throws Exception {
+        System.out.println("Tear down tests into directory: "+runner.getProjectDir().getAbsolutePath());
+
+        // the directory is cleaned up on exit as it was created with the deleteOnExit() option
+        // nothing to do yet.
+    }
+
+    @Nested
+    @DisplayName("gradle tasks")
+    class TasksTests {
+        @ParameterizedTest(name = "Gradle Version: ''{0}'' - gradle tasks (clean project)")
+        @MethodSource("com.mooltiverse.oss.nyx.gradle.NyxPluginFunctionalTests#wellKnownWorkingGradleVersions")
+        void gradleTasksOnCleanProjectTest(String gradleVersion)
+            throws Exception {
+            GradleRunner gradleRunner = setUp(gradleVersion, gradleSettings(gradleVersion), gradleBuild(gradleVersion, null));
+
+            BuildResult gradleResult = gradleRunner.withDebug(true).withArguments("tasks").build();
+
+            System.out.println("Testing with new Gradle version "+gradleVersion+" complete");
+
+            tearDown(gradleRunner);
+        }
+
+        @ParameterizedTest(name = "Gradle Version: ''{0}'' - gradle tasks (project with base plugin)")
+        @MethodSource("com.mooltiverse.oss.nyx.gradle.NyxPluginFunctionalTests#wellKnownWorkingGradleVersions")
+        void gradleTasksOnBaseProjectTest(String gradleVersion)
+            throws Exception {
+            GradleRunner gradleRunner = setUp(gradleVersion, gradleSettings(gradleVersion), gradleBuild(gradleVersion, Map.of("base", "")));
+
+            BuildResult gradleResult = gradleRunner.withDebug(true).withArguments("tasks").build();
+
+            System.out.println("Testing with new Gradle version "+gradleVersion+" complete");
+
+            tearDown(gradleRunner);
+        }
+    }
+
     @Nested
     @DisplayName("gradle release")
     class ReleaseTests {
-        /**
-         * Instantiates a new GradleRunner to use for tests, using the given Gradle version.
-         * A new temporary directory is created for each test and used by the runner.
-         * The settings.gradle is created with a standard content while the build.gradle file is created with the given content.
-         * 
-         * @param gradleVersion the Gradle version to test against
-         * @oaram gradleBuildFileContent the content of the build.gradle to create in the project directory
-         * 
-         * @return the runner to use for tests, already using the temporary directory
-         * 
-         * @throws Exception in case of any issue
-         */
-        GradleRunner setUp(String gradleVersion, String gradleSettingsFileContent, String gradleBuildFileContent)
-            throws Exception {
-            
-            File tempProjectDir = Files.createTempDirectory("nyx-gradle-"+gradleVersion+"-test").toFile();
-
-            // let the VM delete the directories on exit
-            tempProjectDir.deleteOnExit(); 
-            System.out.println("Set up tests into directory: "+tempProjectDir.getAbsolutePath());
-
-            // do a couple extra checks to avoid messing up with the project dir
-            assertFalse(Objects.isNull(tempProjectDir));
-            assertTrue(tempProjectDir.exists());
-            assertTrue(tempProjectDir.isDirectory());
-
-            write(new File(tempProjectDir, "settings.gradle"), gradleSettingsFileContent);
-
-            // Create the build.gradle file
-            write(new File(tempProjectDir, "build.gradle"), gradleBuildFileContent);
-
-            // withPluginClasspath() puts the Nyx plugin into the classpath
-            return GradleRunner.create().withGradleVersion(gradleVersion).withProjectDir(tempProjectDir).withPluginClasspath().forwardOutput();
-        }
-
-        /**
-         * Tries to clean up resources used for tests.
-         * 
-         * @param runner the Gradle runner used for the tests
-         * 
-         * @throws Exception in case of any issue
-         */
-        void tearDown(GradleRunner runner)
-            throws Exception {
-            System.out.println("Tear down tests into directory: "+runner.getProjectDir().getAbsolutePath());
-
-            // the directory is cleaned up on exit as it was created with the deleteOnExit() option
-            // nothing to do yet.
-        }
-
         @ParameterizedTest(name = "Gradle Version: ''{0}'' - gradle release")
         @MethodSource("com.mooltiverse.oss.nyx.gradle.NyxPluginFunctionalTests#wellKnownWorkingGradleVersions")
         void nyxReleaseTest(String gradleVersion)
             throws Exception {
-            GradleRunner gradleRunner = setUp(gradleVersion, gradleSettings(gradleVersion), gradleBuild(gradleVersion));
+            GradleRunner gradleRunner = setUp(gradleVersion, gradleSettings(gradleVersion), gradleBuild(gradleVersion, null));
 
             // withGradleVersion() needs to pull the given version from the internet so if it's not in the cache, as at the first run,
             // this will stlightly increase execution time.

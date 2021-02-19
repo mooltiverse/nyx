@@ -136,7 +136,7 @@ public abstract class NyxExtension {
      * This property uses the {@link Property#convention(Object)} to define the default value so
      * when users are good with the default value they don't need to define it in the build script.
      */
-    private Property<String> verbosity = getObjectfactory().property(String.class).convention("quiet"); // TODO: read the default value from Nyx configuration classes
+    private Property<String> verbosity = getObjectfactory().property(String.class).convention("quiet"); // TODO: read the default value Gradle logger and map it to Nyx supported levels
 
     /**
      * The nested 'services' block.

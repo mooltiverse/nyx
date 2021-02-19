@@ -30,7 +30,7 @@ public abstract class InferTask extends CoreTask {
     /**
      * The decription of the task. This also appears in Gradle help.
      */
-    public static final String DESCRIPTION = "Collects informations from the Git repository and generates the release data set";
+    public static final String DESCRIPTION = "Collects informations from the local Git repository to generate the new version and plan the release actions";
 
     /**
      * The name of the task. This is the name of the task to use inside Gradle scripts.

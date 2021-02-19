@@ -54,6 +54,8 @@ Sets the working directory for Nyx. The directory is where Nyx searches for the 
 
 By default Nyx uses the process' working directory for this.
 
+The [**Gradle plugin**]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#using-the-gradle-plugin) reads the current working directory by the [`projectDir`](https://docs.gradle.org/current/userguide/writing_build_scripts.html#sec:standard_project_properties) property by default, unless it's overridden by this configuration.
+
 ### Dry run
 
 | ------------------------- | ---------------------------------------------------------------------------------------- |

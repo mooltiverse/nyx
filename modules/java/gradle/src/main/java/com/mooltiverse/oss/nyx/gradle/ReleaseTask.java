@@ -29,7 +29,7 @@ public class ReleaseTask extends LifecycleTask {
     /**
      * The decription of the task. This also appears in Gradle help.
      */
-    public static final String DESCRIPTION = "Releases the current project";
+    public static final String DESCRIPTION = "Runs all the release tasks";
 
     /**
      * The name of the task. This is the name of the task to use inside Gradle scripts.

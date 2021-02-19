@@ -31,7 +31,7 @@ public abstract class PublishTask extends CoreTask {
     /**
      * The decription of the task. This also appears in Gradle help.
      */
-    public static final String DESCRIPTION = "Publishes the current release to the configured services";
+    public static final String DESCRIPTION = "Publishes the new release to remote services and emits notifications";
 
     /**
      * The name of the task. This is the name of the task to use inside Gradle scripts.

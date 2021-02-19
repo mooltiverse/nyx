@@ -30,7 +30,7 @@ public abstract class AmendTask extends CoreTask {
     /**
      * The decription of the task. This also appears in Gradle help.
      */
-    public static final String DESCRIPTION = "Integrates the local repository with extra information required to build the release";
+    public static final String DESCRIPTION = "Integrates the local repository history with extra information from remotes";
 
     /**
      * The name of the task. This is the name of the task to use inside Gradle scripts.
