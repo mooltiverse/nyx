@@ -31,7 +31,7 @@ plugins {
      *   This plugin is configured in the 'nexusPublishing' section where we can add the 'special' Nexus repositories
      *   (considering that the 'sonatype' repository already comes with URLs preconfigured). Regular Maven repositories
      *   that do not need the 'special' initialization must be configured in the regular Maven Publish plugin
-     *   section, not here. The plugin creates dynamically so many tasks (by repostotory, publications etc) but the
+     *   section, not here. The plugin creates dynamically so many tasks (by repository, publications etc) but the
      *   only one we need to explicitly care about is 'publishToSonatype', which actually initializes the
      *   staging repository and loads the artifacts.
      *   ATTENTION: this plugin depends on the regular 'maven-publish' plugin, which then is still there. What this
@@ -100,10 +100,18 @@ allprojects {
     apply plugin: 'java'                                // See: https://docs.gradle.org/current/userguide/java_plugin.html
     apply plugin: 'eclipse'                             // See: https://docs.gradle.org/current/userguide/eclipse_plugin.html
 
-    // The Eclipse plugin is also used for VSCode. Without it, VSCode always overwrites the .project and .classpath files with defaults
+    // The Eclipse plugin is also used for VSCode.
+    // This plugin generates .project and .classpath files used by Eclipse and/or VSCode based on the Gradle configurations.
+    // Without this the IDE overwrites those files with its own (wrong) versions that are missing a bunch of classpath items
+    // To clean and generate new .project and .classpath files run ./gradlew cleanEclipse eclipse
     eclipse {
+        // control how the .project files are generated
+        /*project {
+        }*/
+        // control how the .classpath files are generated
         classpath {
-            defaultOutputDir = file('build/vscode/bin/default')
+            defaultOutputDir = file('build/classes')    // the default output directory for java .class files
+            containsTestFixtures = true                 // expose test classes to dependent projects
         }
     }
 
