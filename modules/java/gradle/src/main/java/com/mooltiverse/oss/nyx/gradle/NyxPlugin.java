@@ -68,7 +68,14 @@ public class NyxPlugin implements Plugin<Project> {
      */
     protected void createExtensions(Project project) {
       project.getLogger().debug("Creating Nyx extension with name: {}", NyxExtension.NAME);
-      project.getExtensions().create(NyxExtension.NAME, NyxExtension.class);
+      NyxExtension extension = project.getExtensions().create(NyxExtension.NAME, NyxExtension.class);
+
+      // sets the default log level to the extension
+      // for some unknown reasons, Project.getLogging().getLevel() returns <code>null</code> so in that case
+      // we'll just leave the extension use its default
+      if (!Objects.isNull(project.getLogging().getLevel())) {
+        extension.getVerbosity().set(project.getLogging().getLevel());
+      }
       project.getLogger().debug("Nyx extension created with name: {}", NyxExtension.NAME);
     } 
 

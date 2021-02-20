@@ -24,6 +24,7 @@ import java.util.stream.Stream;
 
 import org.gradle.api.Project;
 import org.gradle.api.Task;
+import org.gradle.api.logging.LogLevel;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -199,6 +200,95 @@ public class PublishTaskTests extends CoreTaskTests {
                     dependencyFound = true;
             }
             assertTrue(dependencyFound);
+        }
+    }
+
+    /**
+     * Performs checks on the task properties.
+     */
+    @Nested
+    @DisplayName("PublishTask.properties")
+    class DefaultsTests {
+        @Test
+        @DisplayName("PublishTask.getBump() default")
+        void getBumpDefaultTest()
+            throws Exception {
+            // apply the plugin to a new project and retrieve the task
+            PublishTask task = PublishTask.class.cast(newTestProject(null, true).getTasks().findByName(PublishTask.NAME));
+
+            assertTrue(task.getBump().isPresent());
+            assertEquals("", task.getBump().get()); // TODO: read the default value from Nyx configuration classes
+        }
+
+        @Test
+        @DisplayName("PublishTask.getDirectory() default")
+        void getDirectoryDefaultTest()
+            throws Exception {
+            // apply the plugin to a new project and retrieve the task
+            Project project = newTestProject(null, true);
+            PublishTask task = PublishTask.class.cast(project.getTasks().findByName(PublishTask.NAME));
+
+            // the default must be the project directory
+            assertTrue(task.getDirectory().isPresent());
+            assertEquals(project.getProjectDir(), task.getDirectory().get().getAsFile());
+        }
+
+        @Test
+        @DisplayName("PublishTask.getDryRun() default")
+        void getDryRunDefaultTest()
+            throws Exception {
+            // apply the plugin to a new project and retrieve the task
+            PublishTask task = PublishTask.class.cast(newTestProject(null, true).getTasks().findByName(PublishTask.NAME));
+
+            assertTrue(task.getDryRun().isPresent());
+            assertEquals(Boolean.FALSE, task.getDryRun().get()); // TODO: read the default value from Nyx configuration classes
+        }
+
+        @Test
+        @DisplayName("PublishTask.getReleasePrefix() default")
+        void getReleasePrefixDefaultTest()
+            throws Exception {
+            // apply the plugin to a new project and retrieve the task
+            PublishTask task = PublishTask.class.cast(newTestProject(null, true).getTasks().findByName(PublishTask.NAME));
+
+            assertTrue(task.getReleasePrefix().isPresent());
+            assertEquals("v", task.getReleasePrefix().get()); // TODO: read the default value from Nyx configuration classes
+        }
+
+        @Test
+        @DisplayName("PublishTask.getReleasePrefixLenient() default")
+        void getReleasePrefixLenientDefaultTest()
+            throws Exception {
+            // apply the plugin to a new project and retrieve the task
+            PublishTask task = PublishTask.class.cast(newTestProject(null, true).getTasks().findByName(PublishTask.NAME));
+
+            assertTrue(task.getReleasePrefixLenient().isPresent());
+            assertEquals(Boolean.TRUE, task.getReleasePrefixLenient().get()); // TODO: read the default value from Nyx configuration classes
+        }
+
+        @Test
+        @DisplayName("PublishTask.getScheme() default")
+        void getSchemeDefaultTest()
+            throws Exception {
+            // apply the plugin to a new project and retrieve the task
+            PublishTask task = PublishTask.class.cast(newTestProject(null, true).getTasks().findByName(PublishTask.NAME));
+
+            assertTrue(task.getScheme().isPresent());
+            assertEquals("semver", task.getScheme().get()); // TODO: read the default value from Nyx configuration classes
+        }
+
+        @Test
+        @DisplayName("PublishTask.getVerbosity() default")
+        void getVerbosityDefaultTest()
+            throws Exception {
+            // apply the plugin to a new project and retrieve the task
+            Project project = newTestProject(null, true);
+            PublishTask task = PublishTask.class.cast(project.getTasks().getByName(PublishTask.NAME));
+
+            assertTrue(task.getVerbosity().isPresent());
+            if (Objects.isNull(project.getLogging().getLevel()))
+                assertEquals(LogLevel.QUIET, task.getVerbosity().get()); // TODO: read the default value Gradle logger and map it to Nyx supported levels
+            else assertEquals(project.getLogging().getLevel(), task.getVerbosity().get()); // TODO: read the default value Gradle logger and map it to Nyx supported levels
         }
     }
 }

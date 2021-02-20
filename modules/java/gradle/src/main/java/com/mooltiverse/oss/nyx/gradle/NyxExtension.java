@@ -20,6 +20,7 @@ import javax.inject.Inject;
 import org.gradle.api.NamedDomainObjectContainer;
 import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.file.ProjectLayout;
+import org.gradle.api.logging.LogLevel;
 import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.provider.Property;
 import org.gradle.api.provider.Provider;
@@ -131,12 +132,14 @@ public abstract class NyxExtension {
 
     /**
      * The 'verbosity' property.
-     * Default is taken from the Gradle current verbosity.
+     * Default is taken from the Gradle current project verbosity. If the current project verbosity is
+     * <code>null</code> (Project.getLogging().getLevel() returns null for some reason) use the
+     * {@link LogLevel#QUIET} default.
      * 
      * This property uses the {@link Property#convention(Object)} to define the default value so
      * when users are good with the default value they don't need to define it in the build script.
      */
-    private Property<String> verbosity = getObjectfactory().property(String.class).convention("quiet"); // TODO: read the default value Gradle logger and map it to Nyx supported levels
+    private Property<LogLevel> verbosity = getObjectfactory().property(LogLevel.class).convention(LogLevel.QUIET); // TODO: read the default value Gradle logger and map it to Nyx supported levels
 
     /**
      * The nested 'services' block.
@@ -243,7 +246,7 @@ public abstract class NyxExtension {
      * 
      * TODO: add a link to constants from Nyx configuration classes
      */
-    public Property<String> getVerbosity() {
+    public Property<LogLevel> getVerbosity() {
         return verbosity;
     }
 

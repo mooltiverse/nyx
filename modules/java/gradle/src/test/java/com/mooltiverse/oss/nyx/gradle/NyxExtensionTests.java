@@ -17,7 +17,10 @@ package com.mooltiverse.oss.nyx.gradle;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.Objects;
+
 import org.gradle.api.Project;
+import org.gradle.api.logging.LogLevel;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -107,10 +110,13 @@ public class NyxExtensionTests extends AbstractTests  {
         void getVerbosityDefaultTest()
             throws Exception {
             // apply the plugin to a new project and retrieve the extension
-            NyxExtension extension = newTestProject(null, true).getExtensions().getByType(NyxExtension.class);
+            Project project = newTestProject(null, true);
+            NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
 
             assertTrue(extension.getVerbosity().isPresent());
-            assertEquals("quiet", extension.getVerbosity().get()); // TODO: read the default value Gradle logger and map it to Nyx supported levels
+            if (Objects.isNull(project.getLogging().getLevel()))
+                assertEquals(LogLevel.QUIET, extension.getVerbosity().get()); // TODO: read the default value Gradle logger and map it to Nyx supported levels
+            else assertEquals(project.getLogging().getLevel(), extension.getVerbosity().get()); // TODO: read the default value Gradle logger and map it to Nyx supported levels
         }
     }
 }
