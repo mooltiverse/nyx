@@ -16,16 +16,12 @@
 package com.mooltiverse.oss.nyx.gradle;
 
 import static org.junit.jupiter.api.Assertions.*;
-//import static org.junit.jupiter.api.Assumptions.*;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
-//import java.util.Objects;
 import java.util.stream.Stream;
 
 import org.gradle.api.Project;
 import org.gradle.api.Task;
-
-import org.gradle.testfixtures.ProjectBuilder;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -71,8 +67,6 @@ public class ReleaseTaskTests extends LifecycleTaskTests {
 
     /**
      * Performs checks on the task at the time it is defined.
-     * 
-     * Tests are available for both cases: when the task is defined via NyxPlugin.apply(...) and when it's defined alone via conditionallyDefine(Project).
      */
     @Nested
     @DisplayName("ReleaseTask.conditionallyDefine")
@@ -88,8 +82,9 @@ public class ReleaseTaskTests extends LifecycleTaskTests {
          */
         @Test
         @DisplayName("NyxPlugin.apply() to call ReleaseTask.conditionallyDefine() -> test eager task creation")
-        void conditionallyDefineViaNyxPluginApplyEagerTest() {
-            Project project = ProjectBuilder.builder().build();
+        void conditionallyDefineViaNyxPluginApplyEagerTest()
+            throws Exception {
+            Project project = newTestProject(null, false);
 
             // pre-flight sanity checks
             testForTaskUnavailability(project, ReleaseTask.NAME, ReleaseTask.class);
@@ -111,8 +106,9 @@ public class ReleaseTaskTests extends LifecycleTaskTests {
          */
         @Test
         @DisplayName("NyxPlugin.apply() to call ReleaseTask.conditionallyDefine() -> test deferred task creation")
-        void conditionallyDefineViaNyxPluginApplyLazyTest() {
-            Project project = ProjectBuilder.builder().build();
+        void conditionallyDefineViaNyxPluginApplyLazyTest()
+            throws Exception {
+            Project project = newTestProject(null, false);
 
             // pre-flight sanity checks
             testForTaskUnavailability(project, ReleaseTask.NAME, ReleaseTask.class);
@@ -138,8 +134,9 @@ public class ReleaseTaskTests extends LifecycleTaskTests {
          */
         @Test
         @DisplayName("ReleaseTask.conditionallyDefine() -> test eager task creation")
-        void conditionallyDefineEagerTest() {
-            Project project = ProjectBuilder.builder().build();
+        void conditionallyDefineEagerTest()
+            throws Exception {
+            Project project = newTestProject(null, false);
 
             // pre-flight sanity checks
             testForTaskUnavailability(project, ReleaseTask.NAME, ReleaseTask.class);
@@ -161,8 +158,9 @@ public class ReleaseTaskTests extends LifecycleTaskTests {
          */
         @Test
         @DisplayName("ReleaseTask.conditionallyDefine() -> test deferred task creation")
-        void conditionallyDefineLazyTest() {
-            Project project = ProjectBuilder.builder().build();
+        void conditionallyDefineLazyTest()
+            throws Exception {
+            Project project = newTestProject(null, false);
 
             // pre-flight sanity checks
             testForTaskUnavailability(project, ReleaseTask.NAME, ReleaseTask.class);
@@ -182,8 +180,9 @@ public class ReleaseTaskTests extends LifecycleTaskTests {
          */
         @Test
         @DisplayName("NyxPlugin.apply() to call ReleaseTask.conditionallyDefine() does not define task when another already exists")
-        void conditionallyDefineViaNyxPluginApplyWhenTaskAlreadyExistsTest() {
-            Project project = ProjectBuilder.builder().build();
+        void conditionallyDefineViaNyxPluginApplyWhenTaskAlreadyExistsTest()
+            throws Exception {
+            Project project = newTestProject(null, false);
 
             // pre-flight sanity checks
             testForTaskUnavailability(project, ReleaseTask.NAME, ReleaseTask.class);
@@ -205,8 +204,9 @@ public class ReleaseTaskTests extends LifecycleTaskTests {
          */
         @Test
         @DisplayName("ReleaseTask.conditionallyDefine() does not define task when another already exists")
-        void conditionallyDefineWhenTaskAlreadyExistsTest() {
-            Project project = ProjectBuilder.builder().build();
+        void conditionallyDefineWhenTaskAlreadyExistsTest()
+            throws Exception {
+            Project project = newTestProject(null, false);
 
             // pre-flight sanity checks
             testForTaskUnavailability(project, ReleaseTask.NAME, ReleaseTask.class);
@@ -232,27 +232,27 @@ public class ReleaseTaskTests extends LifecycleTaskTests {
     class ConfigureTests {
         @Test
         @DisplayName("ReleaseTask.getDescription()")
-        void descriptionTest() {
-            Project project = ProjectBuilder.builder().build();
-            project.getPluginManager().apply(NyxPlugin.ID);
+        void descriptionTest()
+            throws Exception {
+            Project project = newTestProject(null, true);
 
             assertEquals(ReleaseTask.DESCRIPTION, project.getTasks().getByName(ReleaseTask.NAME).getDescription());
         }
 
         @Test
         @DisplayName("ReleaseTask.getGroup()")
-        void groupTest() {
-            Project project = ProjectBuilder.builder().build();
-            project.getPluginManager().apply(NyxPlugin.ID);
+        void groupTest()
+            throws Exception {
+            Project project = newTestProject(null, true);
 
             assertEquals(ReleaseTask.GROUP, project.getTasks().getByName(ReleaseTask.NAME).getGroup());
         }
 
         @Test
         @DisplayName("ReleaseTask.getDependencies().size() >= known dependencies")
-        void getDependencyCount() {
-            Project project = ProjectBuilder.builder().build();
-            project.getPluginManager().apply(NyxPlugin.ID);
+        void getDependencyCount()
+            throws Exception {
+            Project project = newTestProject(null, true);
 
             Task task = project.getTasks().getByName(ReleaseTask.NAME);
 
@@ -262,9 +262,9 @@ public class ReleaseTaskTests extends LifecycleTaskTests {
 
         @ParameterizedTest(name = "ReleaseTask.getDependencies() contains ''{0}''")
         @MethodSource("com.mooltiverse.oss.nyx.gradle.ReleaseTaskTests#wellKnownTaskEfferentDependencies")
-        void getDependency(String name, Class<?> clazz) {
-            Project project = ProjectBuilder.builder().build();
-            project.getPluginManager().apply(NyxPlugin.ID);
+        void getDependency(String name, Class<?> clazz)
+            throws Exception {
+            Project project = newTestProject(null, true);
             Task task = project.getTasks().getByName(ReleaseTask.NAME);
 
             boolean dependencyFound = false;
@@ -278,8 +278,9 @@ public class ReleaseTaskTests extends LifecycleTaskTests {
         /* TEST SUSPENDED AS THERE ARE NO KNOWN DEPENDENCIES TO TEST
         @ParameterizedTest(name = "Project.getTasks().findByName(''{0}'').getDependencies() contains ReleaseTask")
         @MethodSource("com.mooltiverse.oss.nyx.gradle.ReleaseTaskTests#wellKnownTaskAfferentDependencies")
-        void testAfferentDependency(String name, Class<?> clazz) {
-            Project project = ProjectBuilder.builder().build();
+        void testAfferentDependency(String name, Class<?> clazz)
+            throws Exception {
+            Project project = newTestProject(null, false);
 
             // if it's an external plugin (clazz == null) and it's not yet available, just create it before applying the plugin
             if (Objects.isNull(clazz) && Objects.isNull(project.getTasks().findByName(name)))

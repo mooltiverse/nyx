@@ -22,17 +22,22 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
 
 import org.gradle.testkit.runner.BuildResult;
+import org.gradle.testkit.runner.BuildTask;
 import org.gradle.testkit.runner.GradleRunner;
+import org.gradle.testkit.runner.TaskOutcome;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 /**
@@ -45,14 +50,14 @@ import org.junit.jupiter.params.provider.MethodSource;
 @DisplayName("NyxPlugin.Functional")
 public class NyxPluginFunctionalTests {
     /**
-     * An ordered list of Gradle versions to succesfully test against.
+     * An array of Gradle versions to succesfully test against.
      * 
      * The list is taken from https://gradle.org/releases/.
      */
     static String[] wellKnownWorkingGradleVersionsArray = new String[] {
         // Versions that are known to work
         // - version "6.5" has a bug (https://github.com/gradle/gradle/issues/13367) that prevents us to test, fixed in "6.5.1"
-        "6.8.2", "6.8.1", "6.8", "6.7.1", "6.7", "6.6.1", "6.6", "6.5.1", /*"6.5",*/ "6.4.1", "6.4", "6.3", "6.2.2", "6.2.1", "6.2", "6.1.1", "6.1", "6.0.1", "6.0",
+        "6.8.2"//, "6.8.1", "6.8", "6.7.1", "6.7", "6.6.1", "6.6", "6.5.1", /*"6.5",*/ "6.4.1", "6.4", "6.3", "6.2.2", "6.2.1", "6.2", "6.1.1", "6.1", "6.0.1", "6.0",
 
         /* Gradle versions prior than 6.0 fails to test with an exception like:
                 > Could not find method services() for arguments [build_4o3mdmvy94ykemibox706yopu$_run_closure1$_closure2@18c3fdb5] on object of type com.mooltiverse.oss.nyx.gradle.NyxExtension.
@@ -115,6 +120,162 @@ public class NyxPluginFunctionalTests {
     }
 
     /**
+     * A bidimensional array of Gradle plugins to test.
+     * 
+     * Each element is a pair of strings representing a plugin ID and its version. The version is empty for core plugins.
+     * 
+     * These plugins are tested to make sure they don't change Nyx's or the plugin's behavior.
+     */
+    static String[][] wellKnownWorkingPluginsArray = new String[][] {
+        // The list of core plugins is taken from https://docs.gradle.org/current/userguide/plugin_reference.html
+        // Some are commented out just to narrow the test time. In the end we don't expect much conflicts with external
+        // plugins unless some users give us notice of some in particular
+        {"java",                        ""},
+        {"java-platform",               ""},
+        {"groovy",                      ""},
+        {"scala",                       ""},
+        {"antlr",                       ""},
+
+        {"base",                        ""},
+        //{"signing",                     ""},
+        //{"java-gradle-plugin",          ""},
+        //{"project-report",              ""},
+
+        //{"cpp-application",             ""},
+        //{"cpp-library",                 ""},
+        //{"cpp-unit-test",               ""},
+        //{"swift-application",           ""},
+        //{"swift-library",               ""},
+        //{"xctest",                      ""},
+
+        {"application",                 ""},
+        //{"war",                         ""},
+        //{"ear",                         ""},
+        //{"maven-publish",               ""},
+        //{"ivy-publish",                 ""},
+        {"maven",                       ""},
+        //{"distribution",                ""},
+        //{"java-library-distribution",   ""},
+
+        //{"checkstyle",                  ""},
+        //{"pmd",                         ""},
+        //{"jacoco",                      ""},
+        //{"codenarc",                    ""},
+
+        //{"eclipse",                     ""},
+        //{"eclipse-wtp",                 ""},
+        //{"idea",                        ""},
+        //{"visual-studio",               ""},
+        //{"xcode",                       ""}
+    };
+
+    /**
+     * A collection of tasks to run from gradle. For each task, whose name is the key in the map, there value is a nested map.
+     * In the nested map, each key is a task name and the value is the expected outcome, modelled as a org.gradle.testkit.runner.TaskOutcome,
+     * which is the status of the single task as the result of the execution. A null outcome means that the task should not have run.
+     */
+    static Map<String,Map<String,TaskOutcome>> wellKnownTasksAndOutcomes = new HashMap<String,Map<String,TaskOutcome>>(){
+        private static final long serialVersionUID = 1L;
+        {
+            put(CleanTask.NAME, new HashMap<String,TaskOutcome>(){
+                private static final long serialVersionUID = 1L;
+                {
+                    put(CleanTask.NAME, TaskOutcome.SUCCESS);
+                    put(AmendTask.NAME, null);
+                    put(InferTask.NAME, null);
+                    put(MakeTask.NAME, null);
+                    put(PublishTask.NAME, null);
+                    put(ReleaseTask.NAME, null);
+                }
+            });
+            put(AmendTask.NAME, new HashMap<String,TaskOutcome>(){
+                private static final long serialVersionUID = 1L;
+                {
+                    put(CleanTask.NAME, null);
+                    put(AmendTask.NAME, TaskOutcome.SUCCESS);
+                    put(InferTask.NAME, null);
+                    put(MakeTask.NAME, null);
+                    put(PublishTask.NAME, null);
+                    put(ReleaseTask.NAME, null);
+                }
+            });
+            put(InferTask.NAME, new HashMap<String,TaskOutcome>(){
+                private static final long serialVersionUID = 1L;
+                {
+                    put(CleanTask.NAME, null);
+                    put(AmendTask.NAME, TaskOutcome.SUCCESS);
+                    put(InferTask.NAME, TaskOutcome.SUCCESS);
+                    put(MakeTask.NAME, null);
+                    put(PublishTask.NAME, null);
+                    put(ReleaseTask.NAME, null);
+                }
+            });
+            put(MakeTask.NAME, new HashMap<String,TaskOutcome>(){
+                private static final long serialVersionUID = 1L;
+                {
+                    put(CleanTask.NAME, null);
+                    put(AmendTask.NAME, TaskOutcome.SUCCESS);
+                    put(InferTask.NAME, TaskOutcome.SUCCESS);
+                    put(MakeTask.NAME, TaskOutcome.SUCCESS);
+                    put(PublishTask.NAME, null);
+                    put(ReleaseTask.NAME, null);
+                }
+            });
+            put(PublishTask.NAME, new HashMap<String,TaskOutcome>(){
+                private static final long serialVersionUID = 1L;
+                {
+                    put(CleanTask.NAME, null);
+                    put(AmendTask.NAME, TaskOutcome.SUCCESS);
+                    put(InferTask.NAME, TaskOutcome.SUCCESS);
+                    put(MakeTask.NAME, TaskOutcome.SUCCESS);
+                    put(PublishTask.NAME, TaskOutcome.SUCCESS);
+                    put(ReleaseTask.NAME, null);
+                }
+            });
+            put(ReleaseTask.NAME, new HashMap<String,TaskOutcome>(){
+                private static final long serialVersionUID = 1L;
+                {
+                    put(CleanTask.NAME, null);
+                    put(AmendTask.NAME, TaskOutcome.SUCCESS);
+                    put(InferTask.NAME, TaskOutcome.SUCCESS);
+                    put(MakeTask.NAME, TaskOutcome.SUCCESS);
+                    put(PublishTask.NAME, TaskOutcome.SUCCESS);
+                    put(ReleaseTask.NAME, TaskOutcome.SUCCESS);
+                }
+            });
+
+        }
+    };
+
+    /**
+     * A {@link MethodSource} method that returns valid structured data to test gradle tasks.
+     * This is actually a combination of other values.
+     * 
+     * Each returned argument has the fields:<br>
+     * - task: the task to run against the script<br>
+     * - outcomes: a map where names are task names and values are the expected outcome for each task, as defined by the org.gradle.testkit.runner.TaskOutcome enum<br>
+     * - gradle version: a gradle version to test against<br>
+     * - plugin id: the ID of a plugin to apply to the script<br>
+     * - plugin version: the version of a plugin to apply to the script, may be empty for core plugins<br>
+     * - positive files: a list of local path names to files that must exist after the run<br>
+     * - negative files: a list of local path names to files that must NOT exist after the run<br>
+     *
+     * @return a stream of arguments representing test suites
+     */
+    static Stream<Arguments> wellKnownTestSuites() {
+        ArrayList<Arguments> arguments = new ArrayList<Arguments>();
+        for (Map.Entry<String,Map<String,TaskOutcome>> taskAndOutcome: wellKnownTasksAndOutcomes.entrySet()) {
+            for (String gradleversion: wellKnownWorkingGradleVersionsArray) {
+                for (int p=0; p<wellKnownWorkingPluginsArray.length; p++) {
+                    // positive and negative files are not modelled yet
+                    arguments.add(Arguments.of(taskAndOutcome.getKey(), taskAndOutcome.getValue(), gradleversion, wellKnownWorkingPluginsArray[p][0], wellKnownWorkingPluginsArray[p][1], List.<String>of(), List.<String>of()));
+                }
+            }
+        }
+        return arguments.stream();
+    }
+
+    /**
      * Writes the given content to the given file.
      * 
      * @param destination the file to write to
@@ -137,7 +298,7 @@ public class NyxPluginFunctionalTests {
     }
 
     /**
-     * Returns a string with a valid content for the gradle.settings file
+     * Returns a string with a valid content for the gradle.settings file.
      * 
      * @param gradleVersion the Gradle version to use for the file
      * 
@@ -158,7 +319,6 @@ public class NyxPluginFunctionalTests {
      * @return a string with a valid content for the build.gradle file
      */
     static String gradleBuild(String gradleVersion, Map<String, String> plugins) {
-        // Prepare the build.gradle file
         StringBuilder content = new StringBuilder();
         content.append(System.getProperty("line.separator"));
         content.append("plugins {").append(System.getProperty("line.separator"));
@@ -175,7 +335,7 @@ public class NyxPluginFunctionalTests {
         content.append(System.getProperty("line.separator"));
 
         content.append("nyx {").append(System.getProperty("line.separator"));
-        content.append("  bump = 'minorrr'").append(System.getProperty("line.separator"));
+        content.append("  bump = 'minor'").append(System.getProperty("line.separator"));
         content.append("  dryRun = true").append(System.getProperty("line.separator"));
         content.append("  services {").append(System.getProperty("line.separator"));
         content.append("     github {").append(System.getProperty("line.separator"));
@@ -240,48 +400,50 @@ public class NyxPluginFunctionalTests {
     @Nested
     @DisplayName("gradle tasks")
     class TasksTests {
-        @ParameterizedTest(name = "Gradle Version: ''{0}'' - gradle tasks (clean project)")
+        @ParameterizedTest(name = "gradle tasks [Gradle Version: {0}]")
         @MethodSource("com.mooltiverse.oss.nyx.gradle.NyxPluginFunctionalTests#wellKnownWorkingGradleVersions")
-        void gradleTasksOnCleanProjectTest(String gradleVersion)
+        void gradleTasksTest(String gradleVersion)
             throws Exception {
             GradleRunner gradleRunner = setUp(gradleVersion, gradleSettings(gradleVersion), gradleBuild(gradleVersion, null));
-
-            BuildResult gradleResult = gradleRunner.withDebug(true).withArguments("tasks").build();
-
-            System.out.println("Testing with new Gradle version "+gradleVersion+" complete");
-
-            tearDown(gradleRunner);
-        }
-
-        @ParameterizedTest(name = "Gradle Version: ''{0}'' - gradle tasks (project with base plugin)")
-        @MethodSource("com.mooltiverse.oss.nyx.gradle.NyxPluginFunctionalTests#wellKnownWorkingGradleVersions")
-        void gradleTasksOnBaseProjectTest(String gradleVersion)
-            throws Exception {
-            GradleRunner gradleRunner = setUp(gradleVersion, gradleSettings(gradleVersion), gradleBuild(gradleVersion, Map.of("base", "")));
-
-            BuildResult gradleResult = gradleRunner.withDebug(true).withArguments("tasks").build();
-
-            System.out.println("Testing with new Gradle version "+gradleVersion+" complete");
-
+            // GradleRunner.withDebug(boolean) enables debug output
+            gradleRunner.withArguments("tasks").build();
             tearDown(gradleRunner);
         }
     }
 
     @Nested
-    @DisplayName("gradle release")
-    class ReleaseTests {
-        @ParameterizedTest(name = "Gradle Version: ''{0}'' - gradle release")
-        @MethodSource("com.mooltiverse.oss.nyx.gradle.NyxPluginFunctionalTests#wellKnownWorkingGradleVersions")
-        void nyxReleaseTest(String gradleVersion)
+    @DisplayName("gradle task(*)")
+    class TaskTests {
+        @ParameterizedTest(name = "gradle {0} [Gradle Version: {2}, Plugin {3}:{4}]")
+        @MethodSource("com.mooltiverse.oss.nyx.gradle.NyxPluginFunctionalTests#wellKnownTestSuites")
+        void gradleTasksTest(String target, Map<String,TaskOutcome> taskOutcomes, String gradleVersion, String pluginID, String pluginVersion, List<String> positiveFiles, List<String> negativeFiles)
             throws Exception {
             GradleRunner gradleRunner = setUp(gradleVersion, gradleSettings(gradleVersion), gradleBuild(gradleVersion, null));
 
-            // withGradleVersion() needs to pull the given version from the internet so if it's not in the cache, as at the first run,
-            // this will stlightly increase execution time.
             // GradleRunner.withDebug(boolean) enables debug output
-            BuildResult gradleResult = gradleRunner.withDebug(true).withArguments("--info", /*"--debug", */"--stacktrace", "release").build();
-
-            System.out.println("Testing with new Gradle version "+gradleVersion+" complete");
+            BuildResult gradleResult = gradleRunner.withDebug(true).withArguments(/*"--info", "--debug", "--stacktrace",*/ target).build();
+            System.out.println("Executed task: "+target);System.out.flush();
+            
+            for (Map.Entry<String,TaskOutcome> taskOutcome: taskOutcomes.entrySet()) {
+                boolean taskFound = false;
+                System.out.println("  Testing outcome for task: "+taskOutcome.getKey());System.out.flush();
+                for (BuildTask buildTask: gradleResult.getTasks()) {
+                    System.out.println("    Evaluating task: "+buildTask.getPath());System.out.flush();
+                    if (buildTask.getPath().endsWith(taskOutcome.getKey())) {
+                        taskFound = true;
+                        System.out.println("      Task "+taskOutcome.getKey()+" match found.  Outcome is: "+buildTask.getOutcome()+", expected was "+taskOutcome.getValue());System.out.flush();
+                        assertEquals(taskOutcome.getValue(), buildTask.getOutcome(), "When running gradle "+target+" expected outcome for task "+buildTask.getPath()+" was "+taskOutcome.getValue()+" but actual value was "+buildTask.getOutcome());
+                    }
+                    else {
+                        System.out.println("      Skipping task "+taskOutcome.getKey());System.out.flush();
+                    }
+                }
+                System.out.println("  Task "+taskOutcome.getKey()+"="+taskOutcome.getValue()+" found: "+taskFound);System.out.flush();
+                if (Objects.isNull(taskOutcome.getValue())) {
+                    assertFalse(taskFound, "Task "+taskOutcome.getKey()+" was not expected to be part of the build but it was");
+                }
+                else assertTrue(taskFound, "Task "+taskOutcome.getKey()+" was expected to be part of the build but it was not");
+            }
 
             tearDown(gradleRunner);
         }

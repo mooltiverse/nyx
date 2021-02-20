@@ -22,8 +22,6 @@ import java.util.Objects;
 
 import org.gradle.api.Project;
 
-import org.gradle.testfixtures.ProjectBuilder;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -34,14 +32,15 @@ import org.junit.jupiter.api.Test;
  * This class focuses on unit tests, while {@link NyxPluginFunctionalTests} focuses on unit tests.
  */
 @DisplayName("NyxPlugin")
-public class NyxPluginTests {
+public class NyxPluginTests extends AbstractTests {
     @Nested
     @DisplayName("NyxPlugin.apply")
     class ApplyTests {
         @Test
         @DisplayName("NyxPlugin.apply()")
-        void applyTest() {
-            Project project = ProjectBuilder.builder().build();
+        void applyTest()
+            throws Exception {
+            Project project = newTestProject(null, false);
 
             // Make sure the plugin isn't there before apply. Only safe methods are used
             // ... with PluginManager (Project.getPluginManager())...

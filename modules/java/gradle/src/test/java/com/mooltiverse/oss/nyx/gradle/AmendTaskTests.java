@@ -25,8 +25,6 @@ import java.util.stream.Stream;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
 
-import org.gradle.testfixtures.ProjectBuilder;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -71,8 +69,6 @@ public class AmendTaskTests extends CoreTaskTests {
 
     /**
      * Performs checks on the task at the time it is defined.
-     * 
-     * Tests are available for both cases: when the task is defined via NyxPlugin.apply(...) and when it's defined alone via define(Project).
      */
     @Nested
     @DisplayName("PublishTask.define")
@@ -88,8 +84,9 @@ public class AmendTaskTests extends CoreTaskTests {
          */
         @Test
         @DisplayName("NyxPlugin.apply() to call AmendTask.define() -> test eager task creation")
-        void defineViaNyxPluginApplyEagerTest() {
-            Project project = ProjectBuilder.builder().build();
+        void defineViaNyxPluginApplyEagerTest() 
+            throws Exception {
+            Project project = newTestProject(null, false);
 
             // pre-flight sanity checks
             testForTaskUnavailability(project, AmendTask.NAME, AmendTask.class);
@@ -111,8 +108,9 @@ public class AmendTaskTests extends CoreTaskTests {
          */
         @Test
         @DisplayName("NyxPlugin.apply() to call AmendTask.define() -> test deferred task creation")
-        void defineViaNyxPluginApplyLazyTest() {
-            Project project = ProjectBuilder.builder().build();
+        void defineViaNyxPluginApplyLazyTest()
+            throws Exception {
+            Project project = newTestProject(null, false);
 
             // pre-flight sanity checks
             testForTaskUnavailability(project, AmendTask.NAME, AmendTask.class);
@@ -136,27 +134,27 @@ public class AmendTaskTests extends CoreTaskTests {
     class ConfigureTests {
         @Test
         @DisplayName("AmendTask.getDescription()")
-        void descriptionTest() {
-            Project project = ProjectBuilder.builder().build();
-            project.getPluginManager().apply(NyxPlugin.ID);
+        void descriptionTest() 
+            throws Exception {
+            Project project = newTestProject(null, true);
 
             assertEquals(AmendTask.DESCRIPTION, project.getTasks().getByName(AmendTask.NAME).getDescription());
         }
 
         @Test
         @DisplayName("AmendTask.getGroup()")
-        void groupTest() {
-            Project project = ProjectBuilder.builder().build();
-            project.getPluginManager().apply(NyxPlugin.ID);
+        void groupTest() 
+            throws Exception {
+            Project project = newTestProject(null, true);
 
             assertEquals(AmendTask.GROUP, project.getTasks().getByName(AmendTask.NAME).getGroup());
         }
 
         @Test
         @DisplayName("AmendTask.getDependencies().size() >= known dependencies")
-        void getDependencyCount() {
-            Project project = ProjectBuilder.builder().build();
-            project.getPluginManager().apply(NyxPlugin.ID);
+        void getDependencyCount()
+            throws Exception {
+            Project project = newTestProject(null, true);
 
             Task task = project.getTasks().getByName(AmendTask.NAME);
 
@@ -168,8 +166,7 @@ public class AmendTaskTests extends CoreTaskTests {
         @ParameterizedTest(name = "AmendTask.getDependencies() contains ''{0}''")
         @MethodSource("com.mooltiverse.oss.nyx.gradle.AmendTaskTests#wellKnownTaskEfferentDependencies")
         void getDependency(String name, Class<?> clazz) {
-            Project project = ProjectBuilder.builder().build();
-            project.getPluginManager().apply(NyxPlugin.ID);
+            Project project = newTestProject(null, true);
             Task task = project.getTasks().getByName(AmendTask.NAME);
 
             boolean dependencyFound = false;
@@ -182,8 +179,9 @@ public class AmendTaskTests extends CoreTaskTests {
 
         @ParameterizedTest(name = "Project.getTasks().findByName(''{0}'').getDependencies() contains AmendTask")
         @MethodSource("com.mooltiverse.oss.nyx.gradle.AmendTaskTests#wellKnownTaskAfferentDependencies")
-        void testAfferentDependency(String name, Class<?> clazz) {
-            Project project = ProjectBuilder.builder().build();
+        void testAfferentDependency(String name, Class<?> clazz) 
+            throws Exception {
+            Project project = newTestProject(null, false);
 
             // if it's an external plugin (clazz == null) and it's not yet available, just create it before applying the plugin
             if (Objects.isNull(clazz) && Objects.isNull(project.getTasks().findByName(name)))

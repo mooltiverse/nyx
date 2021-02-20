@@ -31,7 +31,7 @@ import org.junit.jupiter.api.DisplayName;
  * This test class tests the {@link AbstractTask} class and also provides generic methods used by subclasses.
  */
 @DisplayName("AbstractTask")
-public class AbstractTaskTests {
+public class AbstractTaskTests extends AbstractTests {
 
     /**
      * Makes sure the task with the given name or class is not available using both eager and lazy methods.

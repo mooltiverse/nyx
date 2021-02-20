@@ -91,7 +91,7 @@ public abstract class NyxExtension {
      * This property uses the {@link Property#convention(Provider)} to define the default value so
      * when users are good with the default value they don't need to define it in the build script.
      */
-    private DirectoryProperty directory = getObjectfactory().directoryProperty().value(getProjectLayout().getProjectDirectory()); // TODO: read the default value from Nyx configuration classes
+    private DirectoryProperty directory = getObjectfactory().directoryProperty().value(getProjectLayout().getProjectDirectory());
 
     /**
      * The 'dryRun' property.
@@ -131,7 +131,7 @@ public abstract class NyxExtension {
 
     /**
      * The 'verbosity' property.
-     * Default is "quiet".
+     * Default is taken from the Gradle current verbosity.
      * 
      * This property uses the {@link Property#convention(Object)} to define the default value so
      * when users are good with the default value they don't need to define it in the build script.

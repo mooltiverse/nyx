@@ -25,8 +25,6 @@ import java.util.stream.Stream;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
 
-import org.gradle.testfixtures.ProjectBuilder;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -71,8 +69,6 @@ public class InferTaskTests extends CoreTaskTests {
 
     /**
      * Performs checks on the task at the time it is defined.
-     * 
-     * Tests are available for both cases: when the task is defined via NyxPlugin.apply(...) and when it's defined alone via define(Project).
      */
     @Nested
     @DisplayName("PublishTask.define")
@@ -88,8 +84,9 @@ public class InferTaskTests extends CoreTaskTests {
          */
         @Test
         @DisplayName("NyxPlugin.apply() to call InferTask.define() -> test eager task creation")
-        void defineViaNyxPluginApplyEagerTest() {
-            Project project = ProjectBuilder.builder().build();
+        void defineViaNyxPluginApplyEagerTest()
+            throws Exception {
+            Project project = newTestProject(null, false);
 
             // pre-flight sanity checks
             testForTaskUnavailability(project, InferTask.NAME, InferTask.class);
@@ -111,8 +108,9 @@ public class InferTaskTests extends CoreTaskTests {
          */
         @Test
         @DisplayName("NyxPlugin.apply() to call InferTask.define() -> test deferred task creation")
-        void defineViaNyxPluginApplyLazyTest() {
-            Project project = ProjectBuilder.builder().build();
+        void defineViaNyxPluginApplyLazyTest()
+            throws Exception {
+            Project project = newTestProject(null, false);
 
             // pre-flight sanity checks
             testForTaskUnavailability(project, InferTask.NAME, InferTask.class);
@@ -136,27 +134,27 @@ public class InferTaskTests extends CoreTaskTests {
     class ConfigureTests {
         @Test
         @DisplayName("InferTask.getDescription()")
-        void descriptionTest() {
-            Project project = ProjectBuilder.builder().build();
-            project.getPluginManager().apply(NyxPlugin.ID);
+        void descriptionTest()
+            throws Exception {
+            Project project = newTestProject(null, true);
 
             assertEquals(InferTask.DESCRIPTION, project.getTasks().getByName(InferTask.NAME).getDescription());
         }
 
         @Test
         @DisplayName("InferTask.getGroup()")
-        void groupTest() {
-            Project project = ProjectBuilder.builder().build();
-            project.getPluginManager().apply(NyxPlugin.ID);
+        void groupTest()
+            throws Exception {
+            Project project = newTestProject(null, true);
 
             assertEquals(InferTask.GROUP, project.getTasks().getByName(InferTask.NAME).getGroup());
         }
 
         @Test
         @DisplayName("InferTask.getDependencies().size() >= known dependencies")
-        void getDependencyCount() {
-            Project project = ProjectBuilder.builder().build();
-            project.getPluginManager().apply(NyxPlugin.ID);
+        void getDependencyCount()
+            throws Exception {
+            Project project = newTestProject(null, true);
 
             Task task = project.getTasks().getByName(InferTask.NAME);
 
@@ -166,9 +164,9 @@ public class InferTaskTests extends CoreTaskTests {
 
         @ParameterizedTest(name = "InferTask.getDependencies() contains ''{0}''")
         @MethodSource("com.mooltiverse.oss.nyx.gradle.InferTaskTests#wellKnownTaskEfferentDependencies")
-        void getDependency(String name, Class<?> clazz) {
-            Project project = ProjectBuilder.builder().build();
-            project.getPluginManager().apply(NyxPlugin.ID);
+        void getDependency(String name, Class<?> clazz)
+            throws Exception {
+            Project project = newTestProject(null, true);
             Task task = project.getTasks().getByName(InferTask.NAME);
 
             boolean dependencyFound = false;
@@ -181,8 +179,9 @@ public class InferTaskTests extends CoreTaskTests {
 
         @ParameterizedTest(name = "Project.getTasks().findByName(''{0}'').getDependencies() contains InferTask")
         @MethodSource("com.mooltiverse.oss.nyx.gradle.InferTaskTests#wellKnownTaskAfferentDependencies")
-        void testAfferentDependency(String name, Class<?> clazz) {
-            Project project = ProjectBuilder.builder().build();
+        void testAfferentDependency(String name, Class<?> clazz)
+            throws Exception {
+            Project project = newTestProject(null, false);
 
             // if it's an external plugin (clazz == null) and it's not yet available, just create it before applying the plugin
             if (Objects.isNull(clazz) && Objects.isNull(project.getTasks().findByName(name)))
