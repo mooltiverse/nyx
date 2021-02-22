@@ -15,7 +15,7 @@ These are the top level options in the configuration:
 | [`releasePrefix`](#release-prefix)                        | string  | `--release-prefix=<PREFIX>`                               | `NYX_RELEASE_PREFIX=<PREFIX>`                                 | `releasePrefix`                                               | `v`      |
 | [`releasePrefixLenient`](#release-prefix-lenient)         | boolean | `--release-prefix-lenient`, `--release-prefix-lenient=true|false` | `NYX_RELEASE_PREFIX_LENIENT=true|false`               | `releasePrefixLenient`                                        | `true`   |
 | [`scheme`](#scheme)                                       | string  | `--scheme=<NAME>`                                         | `NYX_SCHEME=<NAME>`                                           | `scheme`                                                      | `semver` |
-| [`verbosity`](#verbosity)                                 | string  | `--verbosity=<LEVEL>`, `--fatal`, `--error`, `--quiet`, `--warning`, `--info`, `--debug`, `--trace` | `NYX_VERBOSITY=<LEVEL>` | `verbosity`                                               | `quiet`  |
+| [`verbosity`](#verbosity)                                 | string  | `--verbosity=<LEVEL>`, `--fatal`, `--error`, `--warning`, `--info`, `--debug`, `--trace` | `NYX_VERBOSITY=<LEVEL>`        | `verbosity`                                                   | `warning`|
 | [`version`](#version)                                     | string  | `-v <VERSION>`, `--version=<VERSION>`                     | `NYX_VERSION=<VERSION>`                                       | `version`                                                     | N/A      |
 
 ### Bump
@@ -130,8 +130,8 @@ Selects the [version scheme]({{ site.baseurl }}{% link _pages/guide/user/02.intr
 | ------------------------- | ---------------------------------------------------------------------------------------- |
 | Name                      | `verbosity`                                                                              |
 | Type                      | string                                                                                   |
-| Default                   | `quiet`                                                                                  |
-| Command Line Option       | `--verbosity=<LEVEL>`, `--fatal`, `--error`, `--quiet`, `--warning`, `--info`, `--debug`, `--trace` |
+| Default                   | `warning`                                                                                |
+| Command Line Option       | `--verbosity=<LEVEL>`, `--fatal`, `--error`, `--warning`, `--info`, `--debug`, `--trace` |
 | Environment Variable      | `NYX_VERBOSITY=<LEVEL>`                                                                  |
 | Configuration File Option | `verbosity`                                                                              |
 | Related state attributes  |                                                                                          |
@@ -140,17 +140,16 @@ Controls the amount of output emitted by Nyx, where values are:
 
 * `fatal`: only prints critical errors that prevent Nyx to complete. No output is printed when no fatal error is encountered
 * `error`: only prints errors along with some essential informations
-* `quiet`: only prints important essential output (like the generated version number)
-* `warning`: only prints errors and warnings along with some essential informations
+* `warning`: only prints errors and warnings along with some essential informations (like the generated version number)
 * `info` : prints high level informations about the internal action that Nyx runs
 * `debug`: prints informations obout internals that can be useful to debug Nyx in case of anomalies
 * `trace`: this is the most verbose option that prints lots of informations, including internals
 
-The [**command line**]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#using-the-command-line) supports a shorthand option for each verbosity level so you can also use `--fatal`, `--error`, `--quiet`, `--warning`, `--info`, `--debug`, `--trace` instead of `--verbosity=<LEVEL>`. When multiple verbosity levels are given, the most verbose one is used.
+The [**command line**]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#using-the-command-line) supports a shorthand option for each verbosity level so you can also use `--fatal`, `--error`, `--warning`, `--info`, `--debug`, `--trace` instead of `--verbosity=<LEVEL>`. When multiple verbosity levels are given, the most verbose one is used.
 
 The [**Gradle plugin**]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#using-the-gradle-plugin) infers the verbosity by the [Gradle log level](https://docs.gradle.org/current/userguide/command_line_interface.html#setting_log_level) by default, unless it's overridden by this configuration. When doing so, [Gradle log levels](https://docs.gradle.org/current/userguide/logging.html#logLevels) translate to Nyx verbosity levels as follows:
 
-* `QUIET` > `quiet`
+* `QUIET` > `warning`
 * `WARN` > `warning`
 * `INFO` > `info`
 * `DEBUG` > `debug`
