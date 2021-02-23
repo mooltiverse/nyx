@@ -17,18 +17,20 @@ package com.mooltiverse.oss.nyx.gradle;
 
 import javax.inject.Inject;
 
+import org.gradle.api.Action;
 import org.gradle.api.Project;
-import org.gradle.api.provider.Property;
-import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.tasks.TaskProvider;
 
+import com.mooltiverse.oss.nyx.Nyx;
+import com.mooltiverse.oss.nyx.configuration.ConfigurationException;
+
 /**
- * The task running the Infer command.
+ * The task running the Infer command by invoking the {@link Nyx#infer()} method on the backing Nyx instance.
  */
 public abstract class InferTask extends CoreTask {
     /**
-     * The decription of the task. This also appears in Gradle help.
+     * The description of the task. This also appears in Gradle help.
      */
     public static final String DESCRIPTION = "Collects informations from the local Git repository to generate the new version and plan the release actions";
 
@@ -50,7 +52,7 @@ public abstract class InferTask extends CoreTask {
      * 
      * @param project the project to define the task for
      * 
-     * @return the task provider used for the task definition
+     * @return the task provider used for the deferred task instantiation
      * 
      * @see #define(Project, String, Class, Action)
      */
@@ -61,26 +63,39 @@ public abstract class InferTask extends CoreTask {
     /**
      * Configures the task (group, description, dependencies, properties).
      * 
-     * This method is invoked upon configuration as it's passed in the register(...) phase (see {@link #define(Project)}).
+     * This method is lazily invoked by Gradle (only when actually needed) as its reference is passed as an {@link Action} during the
+     * {@link #define(Project, String, Class, Action)} phase.
      * 
      * @param task the task to configure
+     * 
+     * @see #define(Project)
      */
     protected static void configure(InferTask task) {
+        task.getLogger().debug("Configuring task: {} - {}", task.getName(), InferTask.NAME);
+
         CoreTask.configure(task);
         task.setDescription(DESCRIPTION);
 
         // Configure dependencies
         task.dependsOn(AmendTask.NAME);
+
+        task.getLogger().debug("Task: {} - {} configured", task.getName(), InferTask.NAME);
     }
 
     /**
-     * The actual business method for this task.
+     * The actual business method for this task. This method runs the {@link Nyx#infer()} method on the shared
+     * singleton Nyx instance.
      * 
      * Gradle knows this is the method to run upon task execution thanks to the {@link TaskAction} annotation.
+     * 
+     * @throws ConfigurationException in case of any configuration related issue arises
      */
     @TaskAction
-    public void infer() {
-        // TODO: replace this method body with actual business logic, invoking the Nyx backing class
+    public void infer()
+        throws ConfigurationException {
         getLogger().info("Running InferTask: {}", NAME);
+
+        // just a draft to test the wireframing between objects
+        nyx().infer();
     }
 }

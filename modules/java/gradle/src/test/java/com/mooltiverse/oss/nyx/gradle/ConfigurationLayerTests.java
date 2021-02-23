@@ -20,7 +20,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.Objects;
 
 import org.gradle.api.Project;
-import org.gradle.api.logging.LogLevel;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -29,94 +28,101 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests the Gradle task.<br>
  */
-@DisplayName("Extension")
-public class NyxExtensionTests extends AbstractTests  {
+@DisplayName("ConfigurationLayer")
+public class ConfigurationLayerTests extends AbstractTests  {
     /**
      * Performs checks on the extension default values at the time it is created.
      */
     @Nested
-    @DisplayName("NyxExtension defaults")
+    @DisplayName("ConfigurationLayer defaults")
     class DefaultsTests {
         @Test
-        @DisplayName("NyxExtension.getBump() default")
+        @DisplayName("ConfigurationLayer.getBump() default")
         void getBumpDefaultTest()
             throws Exception {
-            // apply the plugin to a new project and retrieve the extension
+            // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
             NyxExtension extension = newTestProject(null, true).getExtensions().getByType(NyxExtension.class);
+            ConfigurationLayer configurationLayer = new ConfigurationLayer(extension);
 
             assertFalse(extension.getBump().isPresent());
-            assertNull(extension.getBump().getOrNull());
+            assertNull(configurationLayer.getBump());
         }
 
         @Test
-        @DisplayName("NyxExtension.getDirectory() default")
+        @DisplayName("ConfigurationLayer.getDirectory() default")
         void getDirectoryDefaultTest()
             throws Exception {
-            // apply the plugin to a new project and retrieve the extension
+            // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
             Project project = newTestProject(null, true);
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
+            ConfigurationLayer configurationLayer = new ConfigurationLayer(extension);
 
             // the default must be the project directory
             assertTrue(extension.getDirectory().isPresent());
-            assertEquals(project.getProjectDir(), extension.getDirectory().get().getAsFile());
+            assertEquals(project.getProjectDir().getAbsolutePath(), configurationLayer.getDirectory().getAbsolutePath());
         }
 
         @Test
-        @DisplayName("NyxExtension.getDryRun() default")
+        @DisplayName("ConfigurationLayer.getDryRun() default")
         void getDryRunDefaultTest()
             throws Exception {
-            // apply the plugin to a new project and retrieve the extension
+            // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
             NyxExtension extension = newTestProject(null, true).getExtensions().getByType(NyxExtension.class);
+            ConfigurationLayer configurationLayer = new ConfigurationLayer(extension);
 
             assertFalse(extension.getDryRun().isPresent());
-            assertNull(extension.getDryRun().getOrNull());
+            assertNull(configurationLayer.getDryRun());
         }
 
         @Test
-        @DisplayName("NyxExtension.getReleasePrefix() default")
+        @DisplayName("ConfigurationLayer.getReleasePrefix() default")
         void getReleasePrefixDefaultTest()
             throws Exception {
-            // apply the plugin to a new project and retrieve the extension
+            // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
             NyxExtension extension = newTestProject(null, true).getExtensions().getByType(NyxExtension.class);
+            ConfigurationLayer configurationLayer = new ConfigurationLayer(extension);
 
             assertFalse(extension.getReleasePrefix().isPresent());
-            assertNull(extension.getReleasePrefix().getOrNull());
+            assertNull(configurationLayer.getReleasePrefix());
         }
 
         @Test
-        @DisplayName("NyxExtension.getReleasePrefixLenient() default")
+        @DisplayName("ConfigurationLayer.getReleasePrefixLenient() default")
         void getReleasePrefixLenientDefaultTest()
             throws Exception {
-            // apply the plugin to a new project and retrieve the extension
+            // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
             NyxExtension extension = newTestProject(null, true).getExtensions().getByType(NyxExtension.class);
+            ConfigurationLayer configurationLayer = new ConfigurationLayer(extension);
 
             assertFalse(extension.getReleasePrefixLenient().isPresent());
-            assertNull(extension.getReleasePrefixLenient().getOrNull());
+            assertNull(configurationLayer.getReleasePrefixLenient());
         }
 
         @Test
-        @DisplayName("NyxExtension.getScheme() default")
+        @DisplayName("ConfigurationLayer.getScheme() default")
         void getSchemeDefaultTest()
             throws Exception {
-            // apply the plugin to a new project and retrieve the extension
+            // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
             NyxExtension extension = newTestProject(null, true).getExtensions().getByType(NyxExtension.class);
+            ConfigurationLayer configurationLayer = new ConfigurationLayer(extension);
 
             assertFalse(extension.getScheme().isPresent());
-            assertNull(extension.getScheme().getOrNull());
+            assertNull(configurationLayer.getScheme());
         }
 
         @Test
-        @DisplayName("NyxExtension.getVerbosity() default")
+        @DisplayName("ConfigurationLayer.getVerbosity() default")
         void getVerbosityDefaultTest()
             throws Exception {
-            // apply the plugin to a new project and retrieve the extension
+            // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
             Project project = newTestProject(null, true);
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
+            ConfigurationLayer configurationLayer = new ConfigurationLayer(extension);
 
             assertTrue(extension.getVerbosity().isPresent());
             if (Objects.isNull(project.getLogging().getLevel()))
-                assertEquals(LogLevel.QUIET, extension.getVerbosity().get()); // TODO: read the default value Gradle logger and map it to Nyx supported levels
-            else assertEquals(project.getLogging().getLevel(), extension.getVerbosity().get()); // TODO: read the default value Gradle logger and map it to Nyx supported levels
+                {}//assertEquals(LogLevel.QUIET, configurationLayer.getVerbosity()); // TODO: read the default value Gradle logger and map it to Nyx supported levels
+            else assertEquals(project.getLogging().getLevel(), configurationLayer.getVerbosity()); // TODO: read the default value Gradle logger and map it to Nyx supported levels
         }
     }
 }

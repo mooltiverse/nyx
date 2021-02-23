@@ -64,6 +64,30 @@ public class Configuration implements Root {
     }
 
     /**
+     * Adds, replaces or removes the layer at the {@link LayerPriority#PLUGIN} level.
+     * 
+     * @param layer the configuration layer to set at the {@link LayerPriority#PLUGIN} level.
+     * If {@code null} any existing configuration layer at the same level is removed (if any).
+     * 
+     * @return a reference to this object.
+     * 
+     * @throws ConfigurationException in case the given configuration has issues preventing
+     * it from being used.
+     */
+    public synchronized Configuration withPluginConfiguration(ConfigurationLayer layer)
+        throws ConfigurationException {
+        if (Objects.isNull(layer)) {
+            if (layers.containsKey(LayerPriority.PLUGIN))
+                layers.remove(LayerPriority.PLUGIN);
+        }
+        else layers.put(LayerPriority.PLUGIN, layer);
+
+        // TODO: invoce a method (yet to implement) to set overall values like logging verbosity, current directory and dry run
+
+        return this;
+    }
+
+    /**
      * {@inheritDoc}
      */
     public String getBump()

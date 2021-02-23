@@ -22,6 +22,7 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+import org.gradle.api.Action;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
 
@@ -201,6 +202,30 @@ public class MakeTaskTests extends CoreTaskTests {
                     dependencyFound = true;
             }
             assertTrue(dependencyFound);
+        }
+    }
+
+    /**
+     * Performs checks on the task execution.
+     */
+    @Nested
+    @DisplayName("MakeTask.execute")
+    class ExecuteTests {
+        @Test
+        @DisplayName("MakeTask.getActions().execute()")
+        void testActionsexecute() 
+            throws Exception {
+            Project project = newTestProject(null, false);
+
+            // apply the plugin
+            project.getPluginManager().apply(NyxPlugin.ID);
+
+            // Retrieve the dependent task
+            Task task = project.getTasks().getByName(MakeTask.NAME);
+
+            for (Action<? super Task> action: task.getActions()) {
+                action.execute(task);
+            }
         }
     }
 }

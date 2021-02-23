@@ -28,6 +28,8 @@ import org.gradle.api.tasks.TaskProvider;
 
 /**
  * The abstract superclass for all Nyx tasks.
+ * 
+ * This class provides some utility methods to register, create and retrieve providers and properties for child classes.
  */
 abstract class AbstractTask extends DefaultTask {
     /**
@@ -45,6 +47,9 @@ abstract class AbstractTask extends DefaultTask {
     /**
      * Returns the provider for the task with the given name or <code>null</code> if no task has been registered or created
      * with such name in the given project.
+     * 
+     * The returned provider can also be used to set a property and is used for lazy instantiation so the task represented
+     * by the provider will only be created when it's actually needed.
      * 
      * This is the same as {@link TaskCollection#named(String)} but in case there is no such task returns <code>null</code>
      * instead of throwing an exception. For this reason this method does not trigger the creation of the task if it was
@@ -65,12 +70,14 @@ abstract class AbstractTask extends DefaultTask {
     }
 
     /**
-     * Registers the task into the given project.
+     * Registers the task into the given project. Once the task is registered it's not yet instantiated but, instead, a provider object is returned.
+     * The provider can also be used to set properties. What's important is that the provider does not instantiate the task until it's actually
+     * needed and this prevents unnecessary load.
      * 
      * The task is defined lazily so it will be actually created by Gradle only when needed, according to the 
      * <a href="https://docs.gradle.org/current/userguide/task_configuration_avoidance.html">Configuration Avoidance</a>.
      * 
-     * For this reason {@link TaskContainer#register(String, Class)} is used instead of {@link TaskContainer#create(String, Class)} internally.
+     * For this reason {@link TaskContainer#register(String, Class, Action)} is used instead of {@link TaskContainer#create(String, Class, Action)} internally.
      * 
      * @param <T> the task class
      * 
@@ -79,7 +86,7 @@ abstract class AbstractTask extends DefaultTask {
      * @param type the task class
      * @param configurationAction the optional action used to configure the task upon creation. It may be <code>null</code>
      * 
-     * @return the task provider used for the task definition
+     * @return the task provider used for the deferred task instantiation
      */
     protected static <T extends Task> TaskProvider<T> define(Project project, String name, Class<T> type, @Nullable Action<? super T> configurationAction) {
         project.getLogger().debug("Registering Nyx task with name: {}", name);
@@ -92,7 +99,8 @@ abstract class AbstractTask extends DefaultTask {
     }
 
     /**
-     * Configures the task by setting the group name.
+     * Configures the task by setting the group name. All tasks invoking this method will belong to the {@link #GROUP} group
+     * (onless they override it).
      * 
      * Child classes should invoke this method during the configuration phase.
      * 

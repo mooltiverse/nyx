@@ -22,6 +22,7 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+import org.gradle.api.Action;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
 
@@ -200,6 +201,30 @@ public class CleanTaskTests extends CoreTaskTests {
                     dependencyFound = true;
             }
             assertTrue(dependencyFound);
+        }
+    }
+
+    /**
+     * Performs checks on the task execution.
+     */
+    @Nested
+    @DisplayName("CleanTask.execute")
+    class ExecuteTests {
+        @Test
+        @DisplayName("CleanTask.getActions().execute()")
+        void testActionsexecute() 
+            throws Exception {
+            Project project = newTestProject(null, false);
+
+            // apply the plugin
+            project.getPluginManager().apply(NyxPlugin.ID);
+
+            // Retrieve the dependent task
+            Task task = project.getTasks().getByName(CleanTask.NAME);
+
+            for (Action<? super Task> action: task.getActions()) {
+                action.execute(task);
+            }
         }
     }
 }

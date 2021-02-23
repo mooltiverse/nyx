@@ -22,7 +22,9 @@ import org.gradle.api.Project;
 import org.gradle.api.Task;
 
 /**
- * The main plugin class.
+ * The main plugin class. This is the entry point used by Gradle to define the contents of the plugin: extension, tasks and other
+ * objects. When configuring the project, Gradle invokes the {@link #apply(Project)} method, which is in turn responsible for registering
+ * all the plugin resources.
  * 
  * See <a href="https://docs.gradle.org/current/userguide/custom_plugins.html">Developing Custom Gradle Plugins</a> for an introduction
  * on custom Gradle plugin development.
@@ -41,11 +43,11 @@ public class NyxPlugin implements Plugin<Project> {
     }
 
     /**
-     * Applies the plugin to the given project.
+     * Creates and registers all the plugin resources for the given project.
      * 
-     * @param project the project the plugin is applied to
+     * @param project the project the plugin is applied to and resources created into
      * 
-     * @see org.gradle.api.Plugin#apply(Object)
+     * @see Plugin#apply(Object)
      */
     @Override
     public void apply(Project project) {
@@ -68,19 +70,14 @@ public class NyxPlugin implements Plugin<Project> {
      */
     protected void createExtensions(Project project) {
       project.getLogger().debug("Creating Nyx extension with name: {}", NyxExtension.NAME);
-      NyxExtension extension = project.getExtensions().create(NyxExtension.NAME, NyxExtension.class);
 
-      // sets the default log level to the extension
-      // for some unknown reasons, Project.getLogging().getLevel() returns <code>null</code> so in that case
-      // we'll just leave the extension use its default
-      if (!Objects.isNull(project.getLogging().getLevel())) {
-        extension.getVerbosity().set(project.getLogging().getLevel());
-      }
+      NyxExtension.create(project);
+
       project.getLogger().debug("Nyx extension created with name: {}", NyxExtension.NAME);
-    } 
+    }
 
     /**
-     * Sets up the tasks to the project.
+     * Sets up the tasks and dependencies to the project.
      * 
      * @param project the project to define the tasks in
      */
@@ -129,6 +126,6 @@ public class NyxPlugin implements Plugin<Project> {
           cleanLifecycleTask.dependsOn(CleanTask.NAME);
       }
 
-      project.getLogger().debug("Nyx tasks definition complete");
+      project.getLogger().debug("Nyx tasks defined");
     }
 }

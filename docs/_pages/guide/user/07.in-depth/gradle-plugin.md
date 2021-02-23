@@ -13,6 +13,6 @@ See the [Quick Start]({{ site.baseurl }}{% link _pages/guide/user/01.quick-start
 
 ### Deferred task creation
 
-In order to match [configuration avoidance](https://docs.gradle.org/current/userguide/task_configuration_avoidance.html) the plugin *registers* the tasks to the gradle project instead of *creating* them. This means that Gradle will only instantiate them when needed to improve the overall performances and avoid unnecessary tasks to run when not needed.
+According to [configuration avoidance](https://docs.gradle.org/current/userguide/task_configuration_avoidance.html) the plugin *registers* the tasks to the gradle project instead of *creating* them. This means that Gradle will only instantiate them when needed to improve the overall performances and avoid unnecessary tasks to run when not needed.
 
 For more see the [`register`](https://docs.gradle.org/current/javadoc/org/gradle/api/tasks/TaskContainer.html#register-java.lang.String-java.lang.Class-) and [`create`](https://docs.gradle.org/current/javadoc/org/gradle/api/tasks/TaskContainer.html#create-java.lang.String-java.lang.Class-) methods on the [`TaskContainer`](https://docs.gradle.org/current/javadoc/org/gradle/api/tasks/TaskContainer.html) class.

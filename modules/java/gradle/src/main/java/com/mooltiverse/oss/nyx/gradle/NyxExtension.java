@@ -15,9 +15,12 @@
  */
 package com.mooltiverse.oss.nyx.gradle;
 
+import java.util.Objects;
+
 import javax.inject.Inject;
 
 import org.gradle.api.NamedDomainObjectContainer;
+import org.gradle.api.Project;
 import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.file.ProjectLayout;
 import org.gradle.api.logging.LogLevel;
@@ -25,8 +28,11 @@ import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.provider.Property;
 import org.gradle.api.provider.Provider;
 
+import com.mooltiverse.oss.nyx.configuration.Defaults;
+
 /**
- * The plugin configuration object.
+ * The plugin configuration object. This object is responsible for reading the {@code nyx {...} } configuration block that users
+ * define within the {@code build.gradle} script.
  * 
  * See <a href="https://docs.gradle.org/current/userguide/implementing_gradle_plugins.html#modeling_dsl_like_apis">Modeling DSL-like APIs</a>
  * for more o developing extension.
@@ -45,6 +51,59 @@ public abstract class NyxExtension {
      * The name of the extension object. This is the name of the configuration block inside Gradle scripts.
      */
     public static final String NAME = "nyx";
+
+    /**
+     * The 'bump' property.
+     */
+    private Property<String> bump = getObjectfactory().property(String.class);
+
+    /**
+     * The 'directory' property.
+     * Default is taken from the Gradle project directory.
+     * 
+     * This property uses the {@link Property#convention(Provider)} to define the default value so
+     * when users are good with the default value they don't need to define it in the build script.
+     */
+    private DirectoryProperty directory = getObjectfactory().directoryProperty().value(getProjectLayout().getProjectDirectory());
+
+    /**
+     * The 'dryRun' property.
+     */
+    private Property<Boolean> dryRun = getObjectfactory().property(Boolean.class);
+
+    /**
+     * The 'releasePrefix' property.
+     */
+    private Property<String> releasePrefix = getObjectfactory().property(String.class);
+
+    /**
+     * The 'releasePrefixLenient' property.
+     */
+    private Property<Boolean> releasePrefixLenient = getObjectfactory().property(Boolean.class);
+
+    /**
+     * The 'scheme' property.
+     */
+    private Property<String> scheme = getObjectfactory().property(String.class);
+
+    /**
+     * The 'verbosity' property.
+     * Default is taken from the Gradle current project verbosity. If the current project verbosity is
+     * <code>null</code> (Project.getLogging().getLevel() returns null for some reason) use the
+     * {@link LogLevel#QUIET} default.
+     * 
+     * This property uses the {@link Property#convention(Object)} to define the default value so
+     * when users are good with the default value they don't need to define it in the build script.
+     */
+    private Property<LogLevel> verbosity = getObjectfactory().property(LogLevel.class).convention(LogLevel.QUIET); // TODO: read the default value Gradle logger and map it to Nyx supported levels
+
+    /**
+     * The nested 'services' block.
+     * Default is an empty list of Service objects.
+     * 
+     * @see Service
+     */
+    private NamedDomainObjectContainer<Service> services = getObjectfactory().domainObjectContainer(Service.class); // TODO: review this. Consider this just an example for when we'll have nested values
 
     /**
      * Returns an object factory instance.
@@ -77,77 +136,24 @@ public abstract class NyxExtension {
     protected abstract ProjectLayout getProjectLayout();
 
     /**
-     * The 'bump' property.
-     * Default is "".
+     * Creates the extension into the given project.
      * 
-     * This property uses the {@link Property#convention(Object)} to define the default value so
-     * when users are good with the default value they don't need to define it in the build script.
+     * @param project the project to create the extension into
+     * 
+     * @return the extension instance, within the given project
      */
-    private Property<String> bump = getObjectfactory().property(String.class).convention(""); // TODO: read the default value from Nyx configuration classes
+    public static NyxExtension create(Project project) {
+        NyxExtension extension = project.getExtensions().create(NyxExtension.NAME, NyxExtension.class);
 
-    /**
-     * The 'directory' property.
-     * Default is taken from the Gradle project directory.
-     * 
-     * This property uses the {@link Property#convention(Provider)} to define the default value so
-     * when users are good with the default value they don't need to define it in the build script.
-     */
-    private DirectoryProperty directory = getObjectfactory().directoryProperty().value(getProjectLayout().getProjectDirectory());
+        // sets the default log level to the extension
+        // for some unknown reasons, Project.getLogging().getLevel() returns <code>null</code> so in that case
+        // we'll just leave the extension use its default
+        if (!Objects.isNull(project.getLogging().getLevel())) {
+            extension.getVerbosity().set(project.getLogging().getLevel());
+        }
 
-    /**
-     * The 'dryRun' property.
-     * Default is <code>false</code>.
-     * 
-     * This property uses the {@link Property#convention(Object)} to define the default value so
-     * when users are good with the default value they don't need to define it in the build script.
-     */
-    private Property<Boolean> dryRun = getObjectfactory().property(Boolean.class).convention(Boolean.FALSE); // TODO: read the default value from Nyx configuration classes
-
-    /**
-     * The 'releasePrefix' property.
-     * Default is "v".
-     * 
-     * This property uses the {@link Property#convention(Object)} to define the default value so
-     * when users are good with the default value they don't need to define it in the build script.
-     */
-    private Property<String> releasePrefix = getObjectfactory().property(String.class).convention("v"); // TODO: read the default value from Nyx configuration classes
-
-    /**
-     * The 'releasePrefixLenient' property.
-     * Default is <code>true</code>.
-     * 
-     * This property uses the {@link Property#convention(Object)} to define the default value so
-     * when users are good with the default value they don't need to define it in the build script.
-     */
-    private Property<Boolean> releasePrefixLenient = getObjectfactory().property(Boolean.class).convention(Boolean.TRUE); // TODO: read the default value from Nyx configuration classes
-
-    /**
-     * The 'scheme' property.
-     * Default is "semver".
-     * 
-     * This property uses the {@link Property#convention(Object)} to define the default value so
-     * when users are good with the default value they don't need to define it in the build script.
-     */
-    private Property<String> scheme = getObjectfactory().property(String.class).convention("semver"); // TODO: read the default value from Nyx configuration classes
-
-    /**
-     * The 'verbosity' property.
-     * Default is taken from the Gradle current project verbosity. If the current project verbosity is
-     * <code>null</code> (Project.getLogging().getLevel() returns null for some reason) use the
-     * {@link LogLevel#QUIET} default.
-     * 
-     * This property uses the {@link Property#convention(Object)} to define the default value so
-     * when users are good with the default value they don't need to define it in the build script.
-     */
-    private Property<LogLevel> verbosity = getObjectfactory().property(LogLevel.class).convention(LogLevel.QUIET); // TODO: read the default value Gradle logger and map it to Nyx supported levels
-
-    /**
-     * The nested 'services' block.
-     * Default is an empty list of Service objects.
-     * 
-     * @see Service
-     */
-    private NamedDomainObjectContainer<Service> services = getObjectfactory().domainObjectContainer(Service.class); // TODO: read the default value from Nyx configuration classes
+        return extension;
+    }
 
     /**
      * Returns the name of the version identifier to bump. When this is set by the user it overrides
@@ -157,8 +163,6 @@ public abstract class NyxExtension {
      * safer for old Gradle versions we support.
      * 
      * @return the name of the version identifier to bump
-     * 
-     * TODO: add a link to constants from Nyx configuration classes
      */
     public Property<String> getBump() {
         return bump;
@@ -188,7 +192,7 @@ public abstract class NyxExtension {
      * @return the flag that, when <code>true</code>, prevents Nyx from applying any change to the repository or any
      * other resource
      * 
-     * TODO: add a link to constants from Nyx configuration classes
+     * @see Defaults#DRY_RUN
      */
     public Property<Boolean> getDryRun() {
         return dryRun;
@@ -202,7 +206,7 @@ public abstract class NyxExtension {
      * 
      * @return the prefix used to generate release names
      * 
-     * TODO: add a link to constants from Nyx configuration classes
+     * @see Defaults#RELEASE_PREFIX
      */
     public Property<String> getReleasePrefix() {
         return releasePrefix;
@@ -216,7 +220,7 @@ public abstract class NyxExtension {
      * 
      * @return the flag that, when <code>true</code>, lets Nyx interpret release names with whatever prefix
      * 
-     * TODO: add a link to constants from Nyx configuration classes
+     * @see Defaults#RELEASE_PREFIX_LENIENT
      */
     public Property<Boolean> getReleasePrefixLenient() {
         return releasePrefixLenient;
@@ -230,7 +234,7 @@ public abstract class NyxExtension {
      * 
      * @return the versioning scheme to use
      * 
-     * TODO: add a link to constants from Nyx configuration classes
+     * @see Defaults#SCHEME
      */
     public Property<String> getScheme() {
         return scheme;
@@ -274,11 +278,6 @@ public abstract class NyxExtension {
         private final String name;
 
         /**
-         * The service provider.
-         */
-        private String provider;
-
-        /**
          * Constructor.
          * 
          * This constructor is required as per the {@link NamedDomainObjectContainer} specification.
@@ -297,24 +296,6 @@ public abstract class NyxExtension {
          */
         public String getName() {
             return name;
-        }
-
-        /**
-         * Returns the provider for the service.
-         * 
-         * @return the provider for the service.
-         */
-        public String getProvider() {
-            return provider;
-        }
-
-        /**
-         * Sets the provider for the service.
-         * 
-         * @param provider the provider for the service.
-         */
-        public void setProvider(String provider) {
-            this.provider = provider;
         }
 
         // TODO: add the Services properties to this class

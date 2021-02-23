@@ -50,6 +50,11 @@ import org.junit.jupiter.params.provider.MethodSource;
 @DisplayName("NyxPlugin.Functional")
 public class NyxPluginFunctionalTests {
     /**
+     * Shorthand for System.getProperty("line.separator")
+     */
+    public static final String LINE_SEPARATOR = System.getProperty("line.separator");
+
+    /**
      * An array of Gradle versions to succesfully test against.
      * 
      * The list is taken from https://gradle.org/releases/.
@@ -305,12 +310,12 @@ public class NyxPluginFunctionalTests {
      * @return a string with a valid content for the gradle.settings file
      */
     static String gradleSettings(String gradleVersion) {
-        StringBuilder content = new StringBuilder("rootProject.name = 'nyx-gradle-"+gradleVersion+"-plugin-test'").append(System.getProperty("line.separator"));
+        StringBuilder content = new StringBuilder("rootProject.name = 'nyx-gradle-"+gradleVersion+"-plugin-test'").append(LINE_SEPARATOR);
         return content.toString();
     }
 
     /**
-     * Returns a string with a valid content for the build.gradle file
+     * Returns a string with a valid content for the build.gradle file. The returned file only has the plugins block.
      * 
      * @param gradleVersion the Gradle version to use for the file
      * @param plugins an optional map of plugins to apply, where names are plugin IDs and values are their versions. The version may be <code>null</code>
@@ -318,31 +323,62 @@ public class NyxPluginFunctionalTests {
      * 
      * @return a string with a valid content for the build.gradle file
      */
-    static String gradleBuild(String gradleVersion, Map<String, String> plugins) {
+    static String gradleEmptyBuild(String gradleVersion, Map<String, String> plugins) {
         StringBuilder content = new StringBuilder();
-        content.append(System.getProperty("line.separator"));
-        content.append("plugins {").append(System.getProperty("line.separator"));
-        content.append("  id 'com.mooltiverse.oss.nyx'").append(System.getProperty("line.separator"));
+        content.append(LINE_SEPARATOR);
+        content.append("plugins {").append(LINE_SEPARATOR);
+        content.append("  id 'com.mooltiverse.oss.nyx'").append(LINE_SEPARATOR);
         if (!Objects.isNull(plugins)) {
             for (Map.Entry<String, String> entry: plugins.entrySet()) {
                 content.append("  id '"+entry.getKey()+"' ");
                 if (!Objects.isNull(entry.getValue()) && !entry.getValue().isEmpty())
                     content.append(" version '"+entry.getValue()+"'");
-                content.append(System.getProperty("line.separator"));
+                content.append(LINE_SEPARATOR);
             }
         }
-        content.append("}").append(System.getProperty("line.separator"));
-        content.append(System.getProperty("line.separator"));
+        content.append("}").append(LINE_SEPARATOR);
+        content.append(LINE_SEPARATOR);
 
-        content.append("nyx {").append(System.getProperty("line.separator"));
-        content.append("  bump = 'minor'").append(System.getProperty("line.separator"));
-        content.append("  dryRun = true").append(System.getProperty("line.separator"));
-        content.append("  services {").append(System.getProperty("line.separator"));
-        content.append("     github {").append(System.getProperty("line.separator"));
-        content.append("        provider = 'guesswhat'").append(System.getProperty("line.separator"));
-        content.append("     }").append(System.getProperty("line.separator"));
-        content.append("  }").append(System.getProperty("line.separator"));
-        content.append("}").append(System.getProperty("line.separator"));
+        content.append("nyx {").append(LINE_SEPARATOR);
+        content.append("  bump = 'minor'").append(LINE_SEPARATOR);
+        content.append("  dryRun = true").append(LINE_SEPARATOR);
+        content.append("  services {").append(LINE_SEPARATOR);
+        content.append("     github {").append(LINE_SEPARATOR);
+        //content.append("        provider = 'guesswhat'").append(LINE_SEPARATOR);
+        content.append("     }").append(LINE_SEPARATOR);
+        content.append("  }").append(LINE_SEPARATOR);
+        content.append("}").append(LINE_SEPARATOR);
+
+        return content.toString();
+    }
+
+    /**
+     * Returns a string with a valid content for the build.gradle file. The returned file the plugins block plus a simple extension configuration.
+     * 
+     * @param gradleVersion the Gradle version to use for the file
+     * @param plugins an optional map of plugins to apply, where names are plugin IDs and values are their versions. The version may be <code>null</code>
+     * or empty for core plugins. If the entire map is <code>null</code> no plugins are applied. The Nyc plugin is added by default and doesn't need to be added.
+     * 
+     * @return a string with a valid content for the build.gradle file
+     */
+    static String gradleSimpleBuild(String gradleVersion, Map<String, String> plugins) {
+        StringBuilder content = new StringBuilder();
+
+        content.append(LINE_SEPARATOR);
+        // start from the empty build, with just the plugins defined
+        content.append(gradleEmptyBuild(gradleVersion, plugins)).append(LINE_SEPARATOR);
+        content.append(LINE_SEPARATOR);
+
+        // then add the extension configuration
+        content.append("nyx {").append(LINE_SEPARATOR);
+        content.append("  bump = 'minor'").append(LINE_SEPARATOR);
+        content.append("  dryRun = true").append(LINE_SEPARATOR);
+        content.append("  services {").append(LINE_SEPARATOR);
+        content.append("     github {").append(LINE_SEPARATOR);
+        //content.append("        provider = 'guesswhat'").append(LINE_SEPARATOR);
+        content.append("     }").append(LINE_SEPARATOR);
+        content.append("  }").append(LINE_SEPARATOR);
+        content.append("}").append(LINE_SEPARATOR);
 
         return content.toString();
     }
@@ -400,12 +436,20 @@ public class NyxPluginFunctionalTests {
     @Nested
     @DisplayName("gradle tasks")
     class TasksTests {
-        @ParameterizedTest(name = "gradle tasks [Gradle Version: {0}]")
+        @ParameterizedTest(name = "gradle tasks [Gradle Version: {0}, empty build script]")
         @MethodSource("com.mooltiverse.oss.nyx.gradle.NyxPluginFunctionalTests#wellKnownWorkingGradleVersions")
-        void gradleTasksTest(String gradleVersion)
+        void gradleTasksWithEmptyScriptTest(String gradleVersion)
             throws Exception {
-            GradleRunner gradleRunner = setUp(gradleVersion, gradleSettings(gradleVersion), gradleBuild(gradleVersion, null));
-            // GradleRunner.withDebug(boolean) enables debug output
+            GradleRunner gradleRunner = setUp(gradleVersion, gradleSettings(gradleVersion), gradleEmptyBuild(gradleVersion, null));
+            gradleRunner.withArguments("tasks").build();
+            tearDown(gradleRunner);
+        }
+
+        @ParameterizedTest(name = "gradle tasks [Gradle Version: {0}, simple build script]")
+        @MethodSource("com.mooltiverse.oss.nyx.gradle.NyxPluginFunctionalTests#wellKnownWorkingGradleVersions")
+        void gradleTasksWithSimpleScriptTest(String gradleVersion)
+            throws Exception {
+            GradleRunner gradleRunner = setUp(gradleVersion, gradleSettings(gradleVersion), gradleSimpleBuild(gradleVersion, null));
             gradleRunner.withArguments("tasks").build();
             tearDown(gradleRunner);
         }
@@ -414,14 +458,48 @@ public class NyxPluginFunctionalTests {
     @Nested
     @DisplayName("gradle task(*)")
     class TaskTests {
-        @ParameterizedTest(name = "gradle {0} [Gradle Version: {2}, Plugin {3}:{4}]")
+        @ParameterizedTest(name = "gradle {0} [Gradle Version: {2}, Plugin {3}:{4}, empty build script]")
         @MethodSource("com.mooltiverse.oss.nyx.gradle.NyxPluginFunctionalTests#wellKnownTestSuites")
-        void gradleTasksTest(String target, Map<String,TaskOutcome> taskOutcomes, String gradleVersion, String pluginID, String pluginVersion, List<String> positiveFiles, List<String> negativeFiles)
+        void gradleTaskWithEmptyScriptTest(String target, Map<String,TaskOutcome> taskOutcomes, String gradleVersion, String pluginID, String pluginVersion, List<String> positiveFiles, List<String> negativeFiles)
             throws Exception {
-            GradleRunner gradleRunner = setUp(gradleVersion, gradleSettings(gradleVersion), gradleBuild(gradleVersion, null));
+            GradleRunner gradleRunner = setUp(gradleVersion, gradleSettings(gradleVersion), gradleEmptyBuild(gradleVersion, null));
 
             // GradleRunner.withDebug(boolean) enables debug output
-            BuildResult gradleResult = gradleRunner.withDebug(true).withArguments(/*"--info", "--debug", "--stacktrace",*/ target).build();
+            BuildResult gradleResult = gradleRunner.withDebug(true).withArguments("--info", /*"--debug",*/ "--stacktrace", target).build();
+            System.out.println("Executed task: "+target);System.out.flush();
+            
+            for (Map.Entry<String,TaskOutcome> taskOutcome: taskOutcomes.entrySet()) {
+                boolean taskFound = false;
+                System.out.println("  Testing outcome for task: "+taskOutcome.getKey());System.out.flush();
+                for (BuildTask buildTask: gradleResult.getTasks()) {
+                    System.out.println("    Evaluating task: "+buildTask.getPath());System.out.flush();
+                    if (buildTask.getPath().endsWith(taskOutcome.getKey())) {
+                        taskFound = true;
+                        System.out.println("      Task "+taskOutcome.getKey()+" match found.  Outcome is: "+buildTask.getOutcome()+", expected was "+taskOutcome.getValue());System.out.flush();
+                        assertEquals(taskOutcome.getValue(), buildTask.getOutcome(), "When running gradle "+target+" expected outcome for task "+buildTask.getPath()+" was "+taskOutcome.getValue()+" but actual value was "+buildTask.getOutcome());
+                    }
+                    else {
+                        System.out.println("      Skipping task "+taskOutcome.getKey());System.out.flush();
+                    }
+                }
+                System.out.println("  Task "+taskOutcome.getKey()+"="+taskOutcome.getValue()+" found: "+taskFound);System.out.flush();
+                if (Objects.isNull(taskOutcome.getValue())) {
+                    assertFalse(taskFound, "Task "+taskOutcome.getKey()+" was not expected to be part of the build but it was");
+                }
+                else assertTrue(taskFound, "Task "+taskOutcome.getKey()+" was expected to be part of the build but it was not");
+            }
+
+            tearDown(gradleRunner);
+        }
+
+        @ParameterizedTest(name = "gradle {0} [Gradle Version: {2}, Plugin {3}:{4}, simple build script]")
+        @MethodSource("com.mooltiverse.oss.nyx.gradle.NyxPluginFunctionalTests#wellKnownTestSuites")
+        void gradleTaskWithSimpleScriptTest(String target, Map<String,TaskOutcome> taskOutcomes, String gradleVersion, String pluginID, String pluginVersion, List<String> positiveFiles, List<String> negativeFiles)
+            throws Exception {
+            GradleRunner gradleRunner = setUp(gradleVersion, gradleSettings(gradleVersion), gradleSimpleBuild(gradleVersion, null));
+
+            // GradleRunner.withDebug(boolean) enables debug output
+            BuildResult gradleResult = gradleRunner.withDebug(true).withArguments("--info", /*"--debug",*/ "--stacktrace", target).build();
             System.out.println("Executed task: "+target);System.out.flush();
             
             for (Map.Entry<String,TaskOutcome> taskOutcome: taskOutcomes.entrySet()) {

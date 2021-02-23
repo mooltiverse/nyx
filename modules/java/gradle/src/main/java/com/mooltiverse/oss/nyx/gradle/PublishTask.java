@@ -17,20 +17,20 @@ package com.mooltiverse.oss.nyx.gradle;
 
 import javax.inject.Inject;
 
+import org.gradle.api.Action;
 import org.gradle.api.Project;
-import org.gradle.api.file.DirectoryProperty;
-import org.gradle.api.logging.LogLevel;
-import org.gradle.api.provider.Property;
-import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.tasks.TaskProvider;
 
+import com.mooltiverse.oss.nyx.Nyx;
+import com.mooltiverse.oss.nyx.configuration.ConfigurationException;
+
 /**
- * The task running the Publish command.
+ * The task running the Publish command by invoking the {@link Nyx#publish()} method on the backing Nyx instance.
  */
 public abstract class PublishTask extends CoreTask {
     /**
-     * The decription of the task. This also appears in Gradle help.
+     * The description of the task. This also appears in Gradle help.
      */
     public static final String DESCRIPTION = "Publishes the new release to remote services and emits notifications";
 
@@ -48,67 +48,11 @@ public abstract class PublishTask extends CoreTask {
     }
 
     /**
-     * @return see {@link NyxExtension#getBump()}
-     * 
-     * @see NyxExtension#getBump()
-     */
-    @Input
-    public abstract Property<String> getBump();
-
-    /**
-     * @return see {@link NyxExtension#getDirectory()}
-     * 
-     * @see NyxExtension#getDirectory()
-     */
-    @Input
-    public abstract DirectoryProperty getDirectory();
-
-    /**
-     * @return see {@link NyxExtension#getDryRun()}
-     * 
-     * @see NyxExtension#getDryRun()
-     */
-    @Input
-    public abstract Property<Boolean> getDryRun();
-
-    /**
-     * @return see {@link NyxExtension#getReleasePrefix()}
-     * 
-     * @see NyxExtension#getReleasePrefix()
-     */
-    @Input
-    public abstract Property<String> getReleasePrefix();
-
-    /**
-     * @return see {@link NyxExtension#getReleasePrefixLenient()}
-     * 
-     * @see NyxExtension#getReleasePrefixLenient()
-     */
-    @Input
-    public abstract Property<Boolean> getReleasePrefixLenient();
-
-    /**
-     * @return see {@link NyxExtension#getScheme()}
-     * 
-     * @see NyxExtension#getScheme()
-     */
-    @Input
-    public abstract Property<String> getScheme();
-
-    /**
-     * @return see {@link NyxExtension#getVerbosity()}
-     * 
-     * @see NyxExtension#getVerbosity()
-     */
-    @Input
-    public abstract Property<LogLevel> getVerbosity();
-
-    /**
      * Registers the task into the given project. The task is lazily registered, for deferred creation.
      * 
      * @param project the project to define the task for
      * 
-     * @return the task provider used for the task definition
+     * @return the task provider used for the deferred task instantiation
      * 
      * @see #define(Project, String, Class, Action)
      */
@@ -119,53 +63,39 @@ public abstract class PublishTask extends CoreTask {
     /**
      * Configures the task (group, description, dependencies, properties).
      * 
-     * This method is invoked upon configuration as it's passed in the register(...) phase (see {@link #define(Project)}).
+     * This method is lazily invoked by Gradle (only when actually needed) as its reference is passed as an {@link Action} during the
+     * {@link #define(Project, String, Class, Action)} phase.
      * 
      * @param task the task to configure
+     * 
+     * @see #define(Project)
      */
     protected static void configure(PublishTask task) {
+        task.getLogger().debug("Configuring task: {} - {}", task.getName(), PublishTask.NAME);
+
         CoreTask.configure(task);
         task.setDescription(DESCRIPTION);
 
         // Configure dependencies
         task.dependsOn(MakeTask.NAME);
 
-        // Configure task properties so that they're bridged to the properties from the extension.
-        // Here we retrieve the properties from the extension and pass them as providers to this tasks' properties.
-        NyxExtension extension = task.getProject().getExtensions().getByType(NyxExtension.class);
-        task.getBump().set(extension.getBump());
-        task.getDirectory().set(extension.getDirectory());
-        task.getDryRun().set(extension.getDryRun());
-        task.getReleasePrefix().set(extension.getReleasePrefix());
-        task.getReleasePrefixLenient().set(extension.getReleasePrefixLenient());
-        task.getScheme().set(extension.getScheme());
-        task.getVerbosity().set(extension.getVerbosity());
+        task.getLogger().debug("Task: {} - {} configured", task.getName(), PublishTask.NAME);
     }
 
     /**
-     * The actual business method for this task.
+     * The actual business method for this task. This method runs the {@link Nyx#publish()} method on the shared
+     * singleton Nyx instance.
      * 
      * Gradle knows this is the method to run upon task execution thanks to the {@link TaskAction} annotation.
+     * 
+     * @throws ConfigurationException in case of any configuration related issue arises
      */
     @TaskAction
-    public void publish() {
-        // TODO: replace this method body with actual business logic, invoking the Nyx backing class
+    public void publish()
+        throws ConfigurationException {
         getLogger().info("Running PublishTask: {}", NAME);
-        getLogger().info("Running PublishTask properties:");
-        getLogger().info("      bump:                    {}", getBump().get());
-        getLogger().info("      directory:               {}", getDirectory().get());
-        getLogger().info("      dryRun:                  {}", getDryRun().get());
-        getLogger().info("      getReleasePrefix:        {}", getReleasePrefix().get());
-        getLogger().info("      getReleasePrefixLenient: {}", getReleasePrefixLenient().get());
-        getLogger().info("      getScheme:               {}", getScheme().get());
-        getLogger().info("      getVerbosity:            {}", getVerbosity().get());
-
-        NyxExtension extension = getProject().getExtensions().getByType(NyxExtension.class);
-        getLogger().info("      getServices:             #{}", extension.getServices().size());
-        for (NyxExtension.Service service: extension.getServices()) {
-            getLogger().info("      - {}:                   ", service.getName());
-            getLogger().info("        provider:              {}", service.getProvider());
-        }
         
+        // just a draft to test the wireframing between objects
+        nyx().publish();
     }
 }
