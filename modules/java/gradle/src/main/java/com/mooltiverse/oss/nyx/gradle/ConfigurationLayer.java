@@ -20,8 +20,7 @@ import java.util.Objects;
 
 import org.gradle.api.file.DirectoryProperty;
 
-import org.slf4j.event.Level;
-
+import com.mooltiverse.oss.nyx.configuration.Verbosity;
 import com.mooltiverse.oss.nyx.version.Scheme;
 
 /**
@@ -48,6 +47,7 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getBump() {
         return extension.getBump().getOrNull();
     }
@@ -55,6 +55,7 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
     /**
      * {@inheritDoc}
      */
+    @Override
     public File getDirectory() {
         DirectoryProperty directoryProperty = extension.getDirectory();
         return Objects.isNull(directoryProperty) ? null : directoryProperty.getAsFile().get();
@@ -63,6 +64,7 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
     /**
      * {@inheritDoc}
      */
+    @Override
     public Boolean getDryRun() {
         return extension.getDryRun().getOrNull();
     }
@@ -70,6 +72,7 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getReleasePrefix() {
         return extension.getReleasePrefix().getOrNull();
     }
@@ -77,6 +80,7 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
     /**
      * {@inheritDoc}
      */
+    @Override
     public Boolean getReleasePrefixLenient() {
         return extension.getReleasePrefixLenient().getOrNull();
     }
@@ -84,6 +88,7 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
     /**
      * {@inheritDoc}
      */
+    @Override
     public Scheme getScheme() {
         return null; // TODO: adapt the value to a Scheme
     }
@@ -91,7 +96,8 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
     /**
      * {@inheritDoc}
      */
-    public Level getVerbosity(){
-        return null; // TODO: adapt the value to the Nyx verbosity
+    @Override
+    public Verbosity getVerbosity(){
+        return extension.getVerbosity().getOrNull();
     }
 }

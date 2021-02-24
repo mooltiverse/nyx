@@ -132,7 +132,7 @@ abstract class CoreTask extends AbstractTask {
         if (hasSharedProperty(NYX_INSTANCE_PROPERTY))
             return Nyx.class.cast(retrieveSharedProperty(NYX_INSTANCE_PROPERTY));
         else {
-            Nyx instance = Nyx.newInstance();
+            Nyx instance = new Nyx();
             instance.configuration().withPluginConfiguration(new ConfigurationLayer(retrieveExtension()));
             storeSharedProperty(NYX_INSTANCE_PROPERTY, instance);
             return Nyx.class.cast(retrieveSharedProperty(NYX_INSTANCE_PROPERTY));

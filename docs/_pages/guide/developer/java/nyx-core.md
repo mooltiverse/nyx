@@ -83,5 +83,10 @@ TODO: write this section
 
 ### Logging
 
-TODO: write this section
-{: .notice--warning}
+Nyx uses [SLF4J](http://www.slf4j.org/) for logging and since it's an adapter to various [logging frameworks](http://www.slf4j.org/manual.html#swapping) it doesn't address any implementation specific setting or feature. What Nyx does is just sending log messages to SLF4J, but what actually happens behind SLF4J is out of Nyx's scope.
+
+This means that if you're using one of the SLF4J [supported frameworks](http://www.slf4j.org/manual.html#swapping) you can have Nyx emit its logs conforming to the rest of your application. If you don't, just deploy and configure one of the supported frameworks along with Nyx.
+
+This is why the [`verbosity`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#verbosity) configuration option is ignored by the Java implementation of Nyx.
+
+Log events are decorated with markers to let you categorize, colorize and filter them if you wish. The list of used markers is modelled in the [`Markers` class](https://github.com/mooltiverse/nyx/blob/master/modules/java/lib/core/src/main/java/com/mooltiverse/oss/nyx/log/Markers.java).

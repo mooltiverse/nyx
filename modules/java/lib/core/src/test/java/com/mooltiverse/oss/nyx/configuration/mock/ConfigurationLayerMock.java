@@ -17,9 +17,8 @@ package com.mooltiverse.oss.nyx.configuration.mock;
 
 import java.io.File;
 
-import org.slf4j.event.Level;
-
 import com.mooltiverse.oss.nyx.configuration.ConfigurationLayer;
+import com.mooltiverse.oss.nyx.configuration.Verbosity;
 import com.mooltiverse.oss.nyx.version.Scheme;
 
 /**
@@ -61,7 +60,7 @@ public class ConfigurationLayerMock implements ConfigurationLayer {
     /**
      * The value returned by this mock object.
      */
-    public static final Level VERBOSITY = Level.TRACE;
+    public static final Verbosity VERBOSITY = Verbosity.TRACE;
 
     /**
      * Default constructor
@@ -73,6 +72,7 @@ public class ConfigurationLayerMock implements ConfigurationLayer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getBump() {
         return BUMP;
     }
@@ -80,6 +80,7 @@ public class ConfigurationLayerMock implements ConfigurationLayer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public File getDirectory() {
         return DIRECTORY;
     }
@@ -87,6 +88,7 @@ public class ConfigurationLayerMock implements ConfigurationLayer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Boolean getDryRun() {
         return DRY_RUN;
     }
@@ -94,6 +96,7 @@ public class ConfigurationLayerMock implements ConfigurationLayer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getReleasePrefix() {
         return RELEASE_PREFIX;
     }
@@ -101,6 +104,7 @@ public class ConfigurationLayerMock implements ConfigurationLayer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Boolean getReleasePrefixLenient() {
         return RELEASE_PREFIX_LENIENT;
     }
@@ -108,6 +112,7 @@ public class ConfigurationLayerMock implements ConfigurationLayer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Scheme getScheme() {
         return Scheme.SEMVER;
     }
@@ -115,7 +120,8 @@ public class ConfigurationLayerMock implements ConfigurationLayer {
     /**
      * {@inheritDoc}
      */
-    public Level getVerbosity(){
+    @Override
+    public Verbosity getVerbosity(){
         return VERBOSITY;
     }
 }

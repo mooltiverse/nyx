@@ -17,8 +17,6 @@ package com.mooltiverse.oss.nyx.configuration;
 
 import java.io.File;
 
-import org.slf4j.event.Level;
-
 import com.mooltiverse.oss.nyx.version.Scheme;
 
 /**
@@ -101,12 +99,16 @@ public interface Root extends Block {
     /**
      * Returns the logging verbosity level as it's defined by this configuration.
      * 
+     * Please note that the verbosity option is actually ignored in this library implementation as the event filtering based
+     * on the verbosity needs to be configured outside this library, depending on the logging framework deployed along with SLF4J.
+     * See <a href="http://www.slf4j.org/manual.html#swapping">here</a> for more.
+     * 
      * @return the logging verbosity level as it's defined by this configuration
      * or {@code null} if the value hasn't been defined.
      * 
      * @throws ConfigurationException in case the option has been defined but has
      * incorrect values or it can't be resolved.
      */
-    public Level getVerbosity()
+    public Verbosity getVerbosity()
         throws ConfigurationException;
 }

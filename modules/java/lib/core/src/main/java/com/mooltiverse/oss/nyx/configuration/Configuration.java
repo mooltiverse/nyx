@@ -15,12 +15,15 @@
  */
 package com.mooltiverse.oss.nyx.configuration;
 
+import static com.mooltiverse.oss.nyx.log.Markers.CONFIGURATION;
+
 import java.io.File;
 
 import java.util.EnumMap;
 import java.util.Objects;
 
-import org.slf4j.event.Level;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.mooltiverse.oss.nyx.version.Scheme;
 
@@ -30,6 +33,11 @@ import com.mooltiverse.oss.nyx.version.Scheme;
  * Instances of this configuration used by Nyx can be retrieved by {@link com.mooltiverse.oss.nyx.Nyx#configuration()}.
  */
 public class Configuration implements Root {
+    /**
+     * The private logger instance
+     */
+    private static final Logger logger = LoggerFactory.getLogger(Configuration.class);
+
     /**
      * The internal representation of the configuration layers.
      * 
@@ -45,22 +53,18 @@ public class Configuration implements Root {
     };
 
     /**
-     * Default constructor hidden on purpose.
-     */
-    private Configuration() {
-        super();
-        // TODO: add the code to load standard local (see LayerPriority#CUSTOM_LOCAL_FILE) and shared (see LayerPriority#STANDARD_SHARED_FILE) configuration files, if found
-    }
-
-    /**
-     * Returns a new configuration object at its initial state.
-     * 
-     * @return a new configuration object at its initial state
+     * Default constructor. Returns a new configuration object at its initial state.
+     * Instances if this class are created using the {@link com.mooltiverse.oss.nyx.Nyx#configuration()} method.
      * 
      * See {@link com.mooltiverse.oss.nyx.Nyx#configuration()}
+     * 
+     * @throws ConfigurationException in case default configuration objects prevent this configuration to be created correctly
      */
-    public static Configuration initial() {
-        return new Configuration();
+    public Configuration()
+        throws ConfigurationException {
+        super();
+        logger.debug(CONFIGURATION, "New configuration object");
+        // TODO: add the code to load standard local (see LayerPriority#CUSTOM_LOCAL_FILE) and shared (see LayerPriority#STANDARD_SHARED_FILE) configuration files, if found
     }
 
     /**
@@ -77,12 +81,16 @@ public class Configuration implements Root {
     public synchronized Configuration withPluginConfiguration(ConfigurationLayer layer)
         throws ConfigurationException {
         if (Objects.isNull(layer)) {
+            logger.debug(CONFIGURATION, "Removing the existing {} configuration layer, if any", LayerPriority.PLUGIN);
             if (layers.containsKey(LayerPriority.PLUGIN))
                 layers.remove(LayerPriority.PLUGIN);
         }
-        else layers.put(LayerPriority.PLUGIN, layer);
+        else {
+            logger.debug(CONFIGURATION, "Adding or replacing the {} configuration layer", LayerPriority.PLUGIN);
+            layers.put(LayerPriority.PLUGIN, layer);
+        }
 
-        // TODO: invoce a method (yet to implement) to set overall values like logging verbosity, current directory and dry run
+        // TODO: invoke a method (yet to implement) to set overall values like logging verbosity, current directory and dry run
 
         return this;
     }
@@ -90,13 +98,16 @@ public class Configuration implements Root {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getBump()
         throws ConfigurationException {
-        // TODO: add TRACE log events here to tell how the resolution happens
+        logger.trace(CONFIGURATION, "Retrieving the {} configuration option", "bump");
         for (ConfigurationLayer layer: layers.values()) {
             String bump = layer.getBump();
-            if (!Objects.isNull(bump))
+            if (!Objects.isNull(bump)) {
+                logger.trace(CONFIGURATION, "The {} configuration option value is: {}", "bump", bump);
                 return bump;
+            }
         }
         return DefaultLayer.getInstance().getBump();
     }
@@ -104,13 +115,16 @@ public class Configuration implements Root {
     /**
      * {@inheritDoc}
      */
+    @Override
     public File getDirectory()
         throws ConfigurationException {
-        // TODO: add TRACE log events here to tell how the resolution happens
+        logger.trace(CONFIGURATION, "Retrieving the {} configuration option", "directory");
         for (ConfigurationLayer layer: layers.values()) {
             File directory = layer.getDirectory();
-            if (!Objects.isNull(directory))
+            if (!Objects.isNull(directory)) {
+                logger.trace(CONFIGURATION, "The {} configuration option value is: {}", "directory", directory.getAbsolutePath());
                 return directory;
+            }
         }
         return DefaultLayer.getInstance().getDirectory();
     }
@@ -118,13 +132,16 @@ public class Configuration implements Root {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Boolean getDryRun()
         throws ConfigurationException {
-        // TODO: add TRACE log events here to tell how the resolution happens
+        logger.trace(CONFIGURATION, "Retrieving the {} configuration option", "dryRun");
         for (ConfigurationLayer layer: layers.values()) {
             Boolean dryRun = layer.getDryRun();
-            if (!Objects.isNull(dryRun))
+            if (!Objects.isNull(dryRun)) {
+                logger.trace(CONFIGURATION, "The {} configuration option value is: {}", "dryRun", dryRun);
                 return dryRun;
+            }
         }
         return DefaultLayer.getInstance().getDryRun();
     }
@@ -132,13 +149,16 @@ public class Configuration implements Root {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getReleasePrefix()
         throws ConfigurationException {
-        // TODO: add TRACE log events here to tell how the resolution happens
+        logger.trace(CONFIGURATION, "Retrieving the {} configuration option", "releasePrefix");
         for (ConfigurationLayer layer: layers.values()) {
             String releasePrefix = layer.getReleasePrefix();
-            if (!Objects.isNull(releasePrefix))
+            if (!Objects.isNull(releasePrefix)) {
+                logger.trace(CONFIGURATION, "The {} configuration option value is: {}", "releasePrefix", releasePrefix);
                 return releasePrefix;
+            }
         }
         return DefaultLayer.getInstance().getReleasePrefix();
     }
@@ -146,13 +166,16 @@ public class Configuration implements Root {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Boolean getReleasePrefixLenient()
         throws ConfigurationException {
-        // TODO: add TRACE log events here to tell how the resolution happens
+        logger.trace(CONFIGURATION, "Retrieving the {} configuration option", "releasePrefixLenient");
         for (ConfigurationLayer layer: layers.values()) {
             Boolean releasePrefixLenient = layer.getReleasePrefixLenient();
-            if (!Objects.isNull(releasePrefixLenient))
+            if (!Objects.isNull(releasePrefixLenient)) {
+                logger.trace(CONFIGURATION, "The {} configuration option value is: {}", "releasePrefixLenient", releasePrefixLenient);
                 return releasePrefixLenient;
+            }
         }
         return DefaultLayer.getInstance().getReleasePrefixLenient();
     }
@@ -160,13 +183,16 @@ public class Configuration implements Root {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Scheme getScheme()
         throws ConfigurationException {
-        // TODO: add TRACE log events here to tell how the resolution happens
+        logger.trace(CONFIGURATION, "Retrieving the {} configuration option", "scheme");
         for (ConfigurationLayer layer: layers.values()) {
             Scheme scheme = layer.getScheme();
-            if (!Objects.isNull(scheme))
+            if (!Objects.isNull(scheme)) {
+                logger.trace(CONFIGURATION, "The {} configuration option value is: {}", "scheme", scheme);
                 return scheme;
+            }
         }
         return DefaultLayer.getInstance().getScheme();
     }
@@ -174,13 +200,16 @@ public class Configuration implements Root {
     /**
      * {@inheritDoc}
      */
-    public Level getVerbosity()
+    @Override
+    public Verbosity getVerbosity()
         throws ConfigurationException {
-        // TODO: add TRACE log events here to tell how the resolution happens
+        logger.trace(CONFIGURATION, "Retrieving the {} configuration option", "verbosity");
         for (ConfigurationLayer layer: layers.values()) {
-            Level verbosity = layer.getVerbosity();
-            if (!Objects.isNull(verbosity))
+            Verbosity verbosity = layer.getVerbosity();
+            if (!Objects.isNull(verbosity)) {
+                logger.trace(CONFIGURATION, "The {} configuration option value is: {}", "verbosity", verbosity);
                 return verbosity;
+            }
         }
         return DefaultLayer.getInstance().getVerbosity();
     }

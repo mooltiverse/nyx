@@ -119,10 +119,10 @@ public class ConfigurationLayerTests extends AbstractTests  {
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
             ConfigurationLayer configurationLayer = new ConfigurationLayer(extension);
 
-            assertTrue(extension.getVerbosity().isPresent());
+            assertFalse(extension.getVerbosity().isPresent());
             if (Objects.isNull(project.getLogging().getLevel()))
-                {}//assertEquals(LogLevel.QUIET, configurationLayer.getVerbosity()); // TODO: read the default value Gradle logger and map it to Nyx supported levels
-            else assertEquals(project.getLogging().getLevel(), configurationLayer.getVerbosity()); // TODO: read the default value Gradle logger and map it to Nyx supported levels
+                assertNull(configurationLayer.getVerbosity());
+            else assertEquals(project.getLogging().getLevel(), configurationLayer.getVerbosity().getLevel());
         }
     }
 }

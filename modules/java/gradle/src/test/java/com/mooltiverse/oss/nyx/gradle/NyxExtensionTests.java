@@ -113,10 +113,10 @@ public class NyxExtensionTests extends AbstractTests  {
             Project project = newTestProject(null, true);
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
 
-            assertTrue(extension.getVerbosity().isPresent());
+            assertFalse(extension.getVerbosity().isPresent());
             if (Objects.isNull(project.getLogging().getLevel()))
-                assertEquals(LogLevel.QUIET, extension.getVerbosity().get()); // TODO: read the default value Gradle logger and map it to Nyx supported levels
-            else assertEquals(project.getLogging().getLevel(), extension.getVerbosity().get()); // TODO: read the default value Gradle logger and map it to Nyx supported levels
+                assertNull(extension.getVerbosity().getOrNull());
+            else assertEquals(project.getLogging().getLevel(), extension.getVerbosity().get());
         }
     }
 }

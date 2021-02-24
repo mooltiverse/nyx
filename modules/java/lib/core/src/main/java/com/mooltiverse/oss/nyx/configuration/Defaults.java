@@ -17,8 +17,6 @@ package com.mooltiverse.oss.nyx.configuration;
 
 import java.io.File;
 
-import org.slf4j.event.Level;
-
 import com.mooltiverse.oss.nyx.version.Scheme;
 
 /**
@@ -57,7 +55,11 @@ public interface Defaults {
     public static final Scheme SCHEME = Scheme.SEMVER;
 
     /**
-     * The logging level. Value: {@link Level#WARN}
+     * The logging level. Value: {@link Verbosity#WARNING}.
+     * 
+     * Please note that the verbosity option is actually ignored in this library implementation as the event filtering based
+     * on the verbosity needs to be configured outside this library, depending on the logging framework deployed along with SLF4J.
+     * See <a href="http://www.slf4j.org/manual.html#swapping">here</a> for more.
      */
-    public static final Level VERBOSITY = Level.WARN;
+    public static final Verbosity VERBOSITY = Verbosity.WARNING;
 }

@@ -15,10 +15,13 @@
  */
 package com.mooltiverse.oss.nyx.configuration;
 
+import static com.mooltiverse.oss.nyx.log.Markers.DEFAULT;;
+
 import java.io.File;
 import java.util.Objects;
 
-import org.slf4j.event.Level;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.mooltiverse.oss.nyx.version.Scheme;
 
@@ -27,6 +30,11 @@ import com.mooltiverse.oss.nyx.version.Scheme;
  * retrieved via the static {@link #getInstance()} method.
  */
 class DefaultLayer implements ConfigurationLayer, Defaults {
+    /**
+     * The private logger instance
+     */
+    private static final Logger logger = LoggerFactory.getLogger(Configuration.class);
+
     private static DefaultLayer instance = null;
     /**
      * Default constructor is private on purpose.
@@ -49,56 +57,70 @@ class DefaultLayer implements ConfigurationLayer, Defaults {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getBump()
         throws ConfigurationException {
+        logger.trace(DEFAULT, "Retrieving the default {} configuration option: {}", "bump", BUMP);
         return BUMP;
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public File getDirectory()
         throws ConfigurationException {
+        logger.trace(DEFAULT, "Retrieving the default {} configuration option: {}", "directory", DIRECTORY);
         return DIRECTORY;
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public Boolean getDryRun()
         throws ConfigurationException {
+        logger.trace(DEFAULT, "Retrieving the default {} configuration option: {}", "dryRun", DRY_RUN);
         return DRY_RUN;
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getReleasePrefix()
         throws ConfigurationException {
+        logger.trace(DEFAULT, "Retrieving the default {} configuration option: {}", "releasePrefix", RELEASE_PREFIX);
         return RELEASE_PREFIX;
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public Boolean getReleasePrefixLenient()
         throws ConfigurationException {
+        logger.trace(DEFAULT, "Retrieving the default {} configuration option: {}", "releasePrefixLenient", RELEASE_PREFIX_LENIENT);
         return RELEASE_PREFIX_LENIENT;
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public Scheme getScheme()
         throws ConfigurationException {
+        logger.trace(DEFAULT, "Retrieving the default {} configuration option: {}", "scheme", SCHEME);
         return SCHEME;
     }
 
     /**
      * {@inheritDoc}
      */
-    public Level getVerbosity()
+    @Override
+    public Verbosity getVerbosity()
         throws ConfigurationException {
+        logger.trace(DEFAULT, "Retrieving the default {} configuration option: {}", "verbosity", VERBOSITY);
         return VERBOSITY;
     }
 }

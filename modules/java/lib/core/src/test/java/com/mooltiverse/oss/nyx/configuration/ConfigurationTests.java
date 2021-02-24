@@ -38,49 +38,49 @@ public class ConfigurationTests {
         @DisplayName("Configuration.getBump()")
         void getBumpTest()
             throws Exception {
-            assertEquals(Defaults.BUMP, Configuration.initial().getBump());
+            assertEquals(Defaults.BUMP, new Configuration().getBump());
         }
 
         @Test
         @DisplayName("Configuration.getDirectory()")
         void getDirectoryTest()
             throws Exception {
-            assertEquals(Defaults.DIRECTORY, Configuration.initial().getDirectory());
+            assertEquals(Defaults.DIRECTORY, new Configuration().getDirectory());
         }
 
         @Test
         @DisplayName("Configuration.getDryRun()")
         void getDryRunTest()
             throws Exception {
-            assertEquals(Defaults.DRY_RUN, Configuration.initial().getDryRun());
+            assertEquals(Defaults.DRY_RUN, new Configuration().getDryRun());
         }
 
         @Test
         @DisplayName("Configuration.getReleasePrefix()")
         void getReleasePrefixTest()
             throws Exception {
-            assertEquals(Defaults.RELEASE_PREFIX, Configuration.initial().getReleasePrefix());
+            assertEquals(Defaults.RELEASE_PREFIX, new Configuration().getReleasePrefix());
         }
 
         @Test
         @DisplayName("Configuration.getReleasePrefixLenient()")
         void getReleasePrefixLenientTest()
             throws Exception {
-            assertEquals(Defaults.RELEASE_PREFIX_LENIENT, Configuration.initial().getReleasePrefixLenient());
+            assertEquals(Defaults.RELEASE_PREFIX_LENIENT, new Configuration().getReleasePrefixLenient());
         }
 
         @Test
         @DisplayName("Configuration.getScheme()")
         void getSchemeTest()
             throws Exception {
-            assertEquals(Defaults.SCHEME, Configuration.initial().getScheme());
+            assertEquals(Defaults.SCHEME, new Configuration().getScheme());
         }
 
         @Test
         @DisplayName("Configuration.getVerbosity()")
         void getVerbosityTest()
             throws Exception {
-            assertEquals(Defaults.VERBOSITY, Configuration.initial().getVerbosity());
+            assertEquals(Defaults.VERBOSITY, new Configuration().getVerbosity());
         }
     }
 
@@ -94,7 +94,7 @@ public class ConfigurationTests {
         @DisplayName("Configuration.withPluginConfiguration(MOCK).getBump()")
         void getBumpTest()
             throws Exception {
-            Configuration configuration = Configuration.initial();
+            Configuration configuration = new Configuration();
 
             // in order to make the test meaningful, make sure the default and mock values are different
             assumeTrue(Objects.isNull(Defaults.BUMP) && !Objects.isNull(ConfigurationLayerMock.BUMP));
@@ -113,7 +113,7 @@ public class ConfigurationTests {
         @DisplayName("Configuration.withPluginConfiguration(MOCK).getDirectory()")
         void getDirectoryTest()
             throws Exception {
-            Configuration configuration = Configuration.initial();
+            Configuration configuration = new Configuration();
 
             // in order to make the test meaningful, make sure the default and mock values are different
             assumeFalse(Defaults.DIRECTORY.equals(ConfigurationLayerMock.DIRECTORY));
@@ -132,7 +132,7 @@ public class ConfigurationTests {
         @DisplayName("Configuration.withPluginConfiguration(MOCK).getDryRun()")
         void getDryRunTest()
             throws Exception {
-            Configuration configuration = Configuration.initial();
+            Configuration configuration = new Configuration();
 
             // in order to make the test meaningful, make sure the default and mock values are different
             assumeFalse(Defaults.DRY_RUN.equals(ConfigurationLayerMock.DRY_RUN));
@@ -151,7 +151,7 @@ public class ConfigurationTests {
         @DisplayName("Configuration.withPluginConfiguration(MOCK).getReleasePrefix()")
         void getReleasePrefixTest()
             throws Exception {
-            Configuration configuration = Configuration.initial();
+            Configuration configuration = new Configuration();
 
             // in order to make the test meaningful, make sure the default and mock values are different
             assumeFalse(Defaults.RELEASE_PREFIX.equals(ConfigurationLayerMock.RELEASE_PREFIX));
@@ -170,7 +170,7 @@ public class ConfigurationTests {
         @DisplayName("Configuration.withPluginConfiguration(MOCK).getReleasePrefixLenient()")
         void getReleasePrefixLenientTest()
             throws Exception {
-            Configuration configuration = Configuration.initial();
+            Configuration configuration = new Configuration();
 
             // in order to make the test meaningful, make sure the default and mock values are different
             assumeFalse(Defaults.RELEASE_PREFIX_LENIENT.equals(ConfigurationLayerMock.RELEASE_PREFIX_LENIENT));
@@ -189,7 +189,7 @@ public class ConfigurationTests {
         @DisplayName("Configuration.withPluginConfiguration(MOCK).getScheme()")
         void getSchemeTest()
             throws Exception {
-            Configuration configuration = Configuration.initial();
+            Configuration configuration = new Configuration();
 
             // since there is only one scheme available, this assumption can't be assumed
             //assumeFalse(Defaults.SCHEME.equals(ConfigurationLayerMock.SCHEME));
@@ -208,7 +208,7 @@ public class ConfigurationTests {
         @DisplayName("Configuration.withPluginConfiguration(MOCK).getVerbosity()")
         void getVerbosityTest()
             throws Exception {
-            Configuration configuration = Configuration.initial();
+            Configuration configuration = new Configuration();
 
             // in order to make the test meaningful, make sure the default and mock values are different
             assumeFalse(Defaults.VERBOSITY.equals(ConfigurationLayerMock.VERBOSITY));

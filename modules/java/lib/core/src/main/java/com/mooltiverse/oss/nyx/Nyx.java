@@ -15,7 +15,12 @@
  */
 package com.mooltiverse.oss.nyx;
 
+import static com.mooltiverse.oss.nyx.log.Markers.MAIN;
+
 import java.util.Objects;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.mooltiverse.oss.nyx.configuration.Configuration;
 import com.mooltiverse.oss.nyx.configuration.ConfigurationException;
@@ -24,6 +29,11 @@ import com.mooltiverse.oss.nyx.configuration.ConfigurationException;
  * The Nyx entry point and main class.
  */
 public class Nyx {
+    /**
+     * The private logger instance
+     */
+    private static final Logger logger = LoggerFactory.getLogger(Nyx.class);
+
     /**
      * The internal configuration object.
      * 
@@ -34,17 +44,9 @@ public class Nyx {
     /**
      * Default constructor hidden on purpose.
      */
-    private Nyx() {
+    public Nyx() {
         super();
-    }
-
-    /**
-     * Returns a new instance of this class.
-     * 
-     * @return a new instance of this class.
-     */
-    public static Nyx newInstance() {
-        return new Nyx();
+        logger.trace(MAIN, "New Nyx instance");
     }
 
     /**
@@ -57,7 +59,8 @@ public class Nyx {
     public synchronized Configuration configuration()
         throws ConfigurationException {
         if (Objects.isNull(configuration)) {
-            configuration = Configuration.initial();
+            logger.debug(MAIN, "Instantiating the initial configuration");
+            configuration = new Configuration();
         }
         return configuration;
     }
@@ -67,7 +70,8 @@ public class Nyx {
      */
     public void amend() {
         // TODO: implement this method
-        System.out.println(">>> Nyx.amend() invoked on backing instance "+this);System.out.flush(); // This is just a smoke detection output
+        // the following are just temporary smoke detection outputs
+        logger.info(MAIN, "Nyx.amend()");
     }
 
     /**
@@ -75,7 +79,8 @@ public class Nyx {
      */
     public void clean() {
         // TODO: implement this method
-        System.out.println(">>> Nyx.clean() invoked on backing instance "+this);System.out.flush(); // This is just a smoke detection output
+        // the following are just temporary smoke detection outputs
+        logger.info(MAIN, "Nyx.clean()");
     }
 
     /**
@@ -83,7 +88,8 @@ public class Nyx {
      */
     public void infer() {
         // TODO: implement this method
-        System.out.println(">>> Nyx.infer() invoked on backing instance "+this);System.out.flush(); // This is just a smoke detection output
+        // the following are just temporary smoke detection outputs
+        logger.info(MAIN, "Nyx.infer()");
     }
 
     /**
@@ -91,7 +97,8 @@ public class Nyx {
      */
     public void make() {
         // TODO: implement this method
-        System.out.println(">>> Nyx.make() invoked on backing instance "+this);System.out.flush(); // This is just a smoke detection output
+        // the following are just temporary smoke detection outputs
+        logger.info(MAIN, "Nyx.make()");
     }
 
     /**
@@ -99,6 +106,7 @@ public class Nyx {
      */
     public void publish() {
         // TODO: implement this method
-        System.out.println(">>> Nyx.publish() invoked on backing instance "+this);System.out.flush(); // This is just a smoke detection output
+        // the following are just temporary smoke detection outputs
+        logger.info(MAIN, "Nyx.publish()");
     }
 }

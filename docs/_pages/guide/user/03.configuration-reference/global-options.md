@@ -147,7 +147,9 @@ Controls the amount of output emitted by Nyx, where values are:
 
 The [**command line**]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#using-the-command-line) supports a shorthand option for each verbosity level so you can also use `--fatal`, `--error`, `--warning`, `--info`, `--debug`, `--trace` instead of `--verbosity=<LEVEL>`. When multiple verbosity levels are given, the most verbose one is used.
 
-The [**Gradle plugin**]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#using-the-gradle-plugin) infers the verbosity by the [Gradle log level](https://docs.gradle.org/current/userguide/command_line_interface.html#setting_log_level).
+The [Java library]({{ site.baseurl }}{% link _pages/guide/developer/java/nyx-core.md %}) ignores this setting as it is supposed to be managed by the application using the library, as explained [here]({{ site.baseurl }}{% link _pages/guide/developer/java/nyx-core.md %}#logging).
+
+The [**Gradle plugin**]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#using-the-gradle-plugin) manages its own [log level](https://docs.gradle.org/current/userguide/command_line_interface.html#setting_log_level) and being the Nyx plugin a [library]({{ site.baseurl }}{% link _pages/guide/developer/java/nyx-core.md %}) used by Gradle, it just conforms to Gradle's verbosity. In other words, when using the Gradle plugin you just have to set Gradle's verbosity.
 
 ### Version
 

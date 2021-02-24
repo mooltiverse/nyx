@@ -23,12 +23,12 @@ import org.gradle.api.NamedDomainObjectContainer;
 import org.gradle.api.Project;
 import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.file.ProjectLayout;
-import org.gradle.api.logging.LogLevel;
 import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.provider.Property;
 import org.gradle.api.provider.Provider;
 
 import com.mooltiverse.oss.nyx.configuration.Defaults;
+import com.mooltiverse.oss.nyx.configuration.Verbosity;
 
 /**
  * The plugin configuration object. This object is responsible for reading the {@code nyx {...} } configuration block that users
@@ -88,14 +88,11 @@ public abstract class NyxExtension {
 
     /**
      * The 'verbosity' property.
-     * Default is taken from the Gradle current project verbosity. If the current project verbosity is
-     * <code>null</code> (Project.getLogging().getLevel() returns null for some reason) use the
-     * {@link LogLevel#QUIET} default.
      * 
-     * This property uses the {@link Property#convention(Object)} to define the default value so
-     * when users are good with the default value they don't need to define it in the build script.
+     * Please note that the verbosity option is actually ignored in this plugin implementation and the backing Nyx implementation
+     * as it's controlled by Gradle.
      */
-    private Property<LogLevel> verbosity = getObjectfactory().property(LogLevel.class).convention(LogLevel.QUIET); // TODO: read the default value Gradle logger and map it to Nyx supported levels
+    private Property<Verbosity> verbosity = getObjectfactory().property(Verbosity.class);
 
     /**
      * The nested 'services' block.
@@ -143,14 +140,11 @@ public abstract class NyxExtension {
      * @return the extension instance, within the given project
      */
     public static NyxExtension create(Project project) {
+        project.getLogger().debug("Creating Nyx extension with name: {}", NyxExtension.NAME);
+
         NyxExtension extension = project.getExtensions().create(NyxExtension.NAME, NyxExtension.class);
 
-        // sets the default log level to the extension
-        // for some unknown reasons, Project.getLogging().getLevel() returns <code>null</code> so in that case
-        // we'll just leave the extension use its default
-        if (!Objects.isNull(project.getLogging().getLevel())) {
-            extension.getVerbosity().set(project.getLogging().getLevel());
-        }
+        project.getLogger().debug("Nyx extension created with name: {}", NyxExtension.NAME);
 
         return extension;
     }
@@ -243,6 +237,9 @@ public abstract class NyxExtension {
     /**
      * Returns the logging verbosity.
      * 
+     * Please note that the verbosity option is actually ignored in this plugin implementation and the backing Nyx implementation
+     * as it's controlled by Gradle.
+     * 
      * We provide an implementation of this method instead of using the abstract definition as it's
      * safer for old Gradle versions we support.
      * 
@@ -250,7 +247,7 @@ public abstract class NyxExtension {
      * 
      * TODO: add a link to constants from Nyx configuration classes
      */
-    public Property<LogLevel> getVerbosity() {
+    public Property<Verbosity> getVerbosity() {
         return verbosity;
     }
 
