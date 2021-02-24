@@ -15,8 +15,6 @@
  */
 package com.mooltiverse.oss.nyx.gradle;
 
-import java.util.Objects;
-
 import javax.inject.Inject;
 
 import org.gradle.api.NamedDomainObjectContainer;
@@ -244,8 +242,6 @@ public abstract class NyxExtension {
      * safer for old Gradle versions we support.
      * 
      * @return the logging verbosity
-     * 
-     * TODO: add a link to constants from Nyx configuration classes
      */
     public Property<Verbosity> getVerbosity() {
         return verbosity;

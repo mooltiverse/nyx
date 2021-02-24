@@ -15,7 +15,7 @@
  */
 package com.mooltiverse.oss.nyx.configuration;
 
-import static com.mooltiverse.oss.nyx.log.Markers.DEFAULT;;
+import static com.mooltiverse.oss.nyx.log.Markers.DEFAULT;
 
 import java.io.File;
 import java.util.Objects;
