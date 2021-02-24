@@ -20,6 +20,8 @@ import java.io.File;
 import com.mooltiverse.oss.nyx.configuration.ConfigurationLayer;
 import com.mooltiverse.oss.nyx.configuration.Scheme;
 import com.mooltiverse.oss.nyx.configuration.Verbosity;
+import com.mooltiverse.oss.nyx.version.SemanticVersion;
+import com.mooltiverse.oss.nyx.version.Version;
 
 /**
  * A fake configuration layer, with (possibly) unique values that allow the tests to distinguish
@@ -61,6 +63,11 @@ public class ConfigurationLayerMock implements ConfigurationLayer {
      * The value returned by this mock object.
      */
     public static final Verbosity VERBOSITY = Verbosity.TRACE;
+
+    /**
+     * The value returned by this mock object.
+     */
+    public static final Version VERSION = SemanticVersion.valueOf("11.12.13");
 
     /**
      * Default constructor
@@ -123,5 +130,13 @@ public class ConfigurationLayerMock implements ConfigurationLayer {
     @Override
     public Verbosity getVerbosity(){
         return VERBOSITY;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Version getVersion(){
+        return VERSION;
     }
 }

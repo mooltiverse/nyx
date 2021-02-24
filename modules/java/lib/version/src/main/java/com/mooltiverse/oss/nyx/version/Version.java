@@ -52,6 +52,13 @@ public abstract class Version implements Cloneable, Serializable {
     public abstract boolean equals(Object obj);
 
     /**
+     * Returns the scheme that identifies the implementation
+     * 
+     * @return the scheme that identifies the implementation
+     */
+    public abstract Scheme getScheme();
+
+    /**
      * Returns the string representation of this version
      * 
      * @return the string representation of this version

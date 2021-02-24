@@ -133,7 +133,8 @@ abstract class CoreTask extends AbstractTask {
             return Nyx.class.cast(retrieveSharedProperty(NYX_INSTANCE_PROPERTY));
         else {
             Nyx instance = new Nyx();
-            instance.configuration().withPluginConfiguration(new ConfigurationLayer(retrieveExtension()));
+            // The 'version' is a standard Gradle project property (https://docs.gradle.org/current/userguide/writing_build_scripts.html#sec:standard_project_properties)
+            instance.configuration().withPluginConfiguration(new ConfigurationLayer(retrieveExtension(), getProject().findProperty("version")));
             storeSharedProperty(NYX_INSTANCE_PROPERTY, instance);
             return Nyx.class.cast(retrieveSharedProperty(NYX_INSTANCE_PROPERTY));
         }

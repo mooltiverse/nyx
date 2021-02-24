@@ -1069,6 +1069,16 @@ public class SemanticVersionTests {
     }
 
     @Nested
+    @DisplayName("SemanticVersion.getScheme")
+    class GetSchemeTests {
+        @Test
+        @DisplayName("Semanticversion.getScheme() ==> Scheme.SEMVER")
+        void getScheme() {
+            assertEquals(Scheme.SEMVER, SemanticVersion.valueOf("1.1.1").getScheme());
+        }
+    }
+
+    @Nested
     @DisplayName("SemanticVersion.sanitize")
     class SanitizeTests {
         @ParameterizedTest(name = "Semanticversion.sanitize(''{0}'') throws IllegalArgumentException")

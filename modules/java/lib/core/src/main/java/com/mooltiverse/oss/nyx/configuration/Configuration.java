@@ -25,6 +25,8 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mooltiverse.oss.nyx.version.Version;
+
 /**
  * The Nyx configuration.
  * 
@@ -210,5 +212,22 @@ public class Configuration implements Root {
             }
         }
         return DefaultLayer.getInstance().getVerbosity();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Version getVersion()
+        throws ConfigurationException {
+        logger.trace(CONFIGURATION, "Retrieving the {} configuration option", "version");
+        for (ConfigurationLayer layer: layers.values()) {
+            Version version = layer.getVersion();
+            if (!Objects.isNull(version)) {
+                logger.trace(CONFIGURATION, "The {} configuration option value is: {}", "version", version);
+                return version;
+            }
+        }
+        return DefaultLayer.getInstance().getVersion();
     }
 }

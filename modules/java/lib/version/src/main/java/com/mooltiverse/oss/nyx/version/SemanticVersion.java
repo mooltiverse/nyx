@@ -248,6 +248,7 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
      *
      * @see Comparable#compareTo(Object)
      */
+    @Override
     public int compareTo(SemanticVersion v) {
         if (v == null)
             return 1;
@@ -361,6 +362,15 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
         // As a last resort, compare the string version of both entities. This is not requested (explicitly) by SemVer
         // but it's still compliant with it and with Comparable as well.
         return toString().compareTo(v.toString());
+    }
+
+    /**
+     * Returns {@link Scheme#SEMVER}.
+     * 
+     * @return {@link Scheme#SEMVER}
+     */
+    public final Scheme getScheme() {
+        return Scheme.SEMVER;
     }
 
     /**

@@ -61,7 +61,7 @@ public abstract class NyxExtension {
      * This property uses the {@link Property#convention(Provider)} to define the default value so
      * when users are good with the default value they don't need to define it in the build script.
      */
-    private DirectoryProperty directory = getObjectfactory().directoryProperty().value(getProjectLayout().getProjectDirectory());
+    private DirectoryProperty directory = getObjectfactory().directoryProperty().convention(getProjectLayout().getProjectDirectory());
 
     /**
      * The 'dryRun' property.

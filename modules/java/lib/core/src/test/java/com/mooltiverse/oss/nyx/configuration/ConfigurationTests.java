@@ -82,6 +82,13 @@ public class ConfigurationTests {
             throws Exception {
             assertEquals(Defaults.VERBOSITY, new Configuration().getVerbosity());
         }
+
+        @Test
+        @DisplayName("Configuration.getVersion()")
+        void getVersionTest()
+            throws Exception {
+            assertEquals(Defaults.VERSION, new Configuration().getVersion());
+        }
     }
 
     /**
@@ -221,6 +228,25 @@ public class ConfigurationTests {
 
             // now remove the plugin configuration and test that now default values are returned again
             assertEquals(Defaults.VERBOSITY, configuration.withPluginConfiguration(null).getVerbosity());
+        }
+
+        @Test
+        @DisplayName("Configuration.withPluginConfiguration(MOCK).getVersion()")
+        void getVersionTest()
+            throws Exception {
+            Configuration configuration = new Configuration();
+
+            // in order to make the test meaningful, make sure the default and mock values are different
+            assumeTrue(Objects.isNull(Defaults.VERSION) && !Objects.isNull(ConfigurationLayerMock.VERSION));
+
+            // make sure the initial values come from defaults, until we inject the plugin configuration
+            assumeTrue(Objects.isNull(Defaults.VERSION) && Objects.isNull(configuration.getVersion()));
+            
+            // inject the plugin configuration and test the new value is returned from that
+            assertEquals(ConfigurationLayerMock.VERSION, configuration.withPluginConfiguration(new ConfigurationLayerMock()).getVersion());
+
+            // now remove the plugin configuration and test that now default values are returned again
+            assertEquals(Defaults.VERSION, configuration.withPluginConfiguration(null).getVersion());
         }
     }
 }

@@ -17,6 +17,8 @@ package com.mooltiverse.oss.nyx.configuration;
 
 import java.io.File;
 
+import com.mooltiverse.oss.nyx.version.Version;
+
 /**
  * A utility interface that collects default configuration values.
  */
@@ -60,4 +62,9 @@ public interface Defaults {
      * See <a href="http://www.slf4j.org/manual.html#swapping">here</a> for more.
      */
     public static final Verbosity VERBOSITY = Verbosity.WARNING;
+
+    /**
+     * The default version. Value: <code>null</code>
+     */
+    public static final Version VERSION = null;
 }

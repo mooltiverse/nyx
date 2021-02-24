@@ -17,6 +17,8 @@ package com.mooltiverse.oss.nyx.configuration;
 
 import java.io.File;
 
+import com.mooltiverse.oss.nyx.version.Version;
+
 /**
  * This interface models the root configuration block, with globl options.
  */
@@ -108,5 +110,17 @@ public interface Root extends Block {
      * incorrect values or it can't be resolved.
      */
     public Verbosity getVerbosity()
+        throws ConfigurationException;
+
+    /**
+     * Returns the version defined by this configuration.
+     * 
+     * @return the version defined by this configuration
+     * or {@code null} if the value hasn't been defined.
+     * 
+     * @throws ConfigurationException in case the option has been defined but has
+     * incorrect values or it can't be resolved.
+     */
+    public Version getVersion()
         throws ConfigurationException;
 }

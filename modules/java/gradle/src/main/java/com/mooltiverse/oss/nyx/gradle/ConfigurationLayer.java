@@ -23,6 +23,8 @@ import org.gradle.api.file.DirectoryProperty;
 import com.mooltiverse.oss.nyx.configuration.ConfigurationException;
 import com.mooltiverse.oss.nyx.configuration.Scheme;
 import com.mooltiverse.oss.nyx.configuration.Verbosity;
+import com.mooltiverse.oss.nyx.version.Version;
+import com.mooltiverse.oss.nyx.version.VersionFactory;
 
 /**
  * This class is an adapter to allow the extension to be used as a Nyx configuration layer.
@@ -34,15 +36,24 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
     private final NyxExtension extension;
 
     /**
+     * The project version, as defined by the user in Gradle's {@code version} property.
+     * May be {@code null} if the user has not defined any {@code version} property in the script
+     */
+    private final Object projectVersion;
+
+    /**
      * Standard constructor.
      * 
      * @param extension the extension instance to be adapted to a configuration layer
+     * @param projectVersion the Gradle project version, which may be {@code null} if the user has not defined
+     * any {@code version} property in the script
      */
-    ConfigurationLayer(NyxExtension extension) {
+    ConfigurationLayer(NyxExtension extension, Object projectVersion) {
         super();
         if (Objects.isNull(extension))
             throw new IllegalArgumentException("Cannot build a configuration layer adapter with a null extension");
         this.extension = extension;
+        this.projectVersion = projectVersion;
     }
 
     /**
@@ -118,5 +129,33 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
             }
         }
         else return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Version getVersion()
+        throws ConfigurationException {
+        // when to 'version' property is defined, Gradle does not return null but instead the 'unspecified' string which, to us,
+        // means there is no version defined, just like it was null
+        if (Objects.isNull(projectVersion) || "unspecified".equals(projectVersion))
+            return null;
+        else {
+            try {
+                // TODO: replace the hardcoded use of SEMVER with a resolved scheme
+                //
+                // While using SEMVER as the scheme here is suitable for now as it's the only supported scheme, this must
+                // be resolved against all configuration layers. See also #37 (https://github.com/mooltiverse/nyx/issues/37).
+                //
+                // Moreover, we also need to consider if the getReleasePrefixLenient option has been set and, if not, the getReleasePrefix
+                // to know if the parsing has to tolerate prefixes and, if so, if any prefix or just one.
+                // Again, we enable sanitization as it's suitable for now but this must be fixed as soon as possible
+                return VersionFactory.valueOf(Scheme.SEMVER.getScheme(), projectVersion.toString(), true);
+            }
+            catch (IllegalArgumentException iae) {
+                throw new ConfigurationException(String.format("Illegal value '%s' provided for project property '%s'", projectVersion, "version"), iae);
+            }
+        }
     }
 }
