@@ -147,14 +147,7 @@ Controls the amount of output emitted by Nyx, where values are:
 
 The [**command line**]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#using-the-command-line) supports a shorthand option for each verbosity level so you can also use `--fatal`, `--error`, `--warning`, `--info`, `--debug`, `--trace` instead of `--verbosity=<LEVEL>`. When multiple verbosity levels are given, the most verbose one is used.
 
-The [**Gradle plugin**]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#using-the-gradle-plugin) infers the verbosity by the [Gradle log level](https://docs.gradle.org/current/userguide/command_line_interface.html#setting_log_level) by default, unless it's overridden by this configuration. When doing so, [Gradle log levels](https://docs.gradle.org/current/userguide/logging.html#logLevels) translate to Nyx verbosity levels as follows:
-
-* `QUIET` > `warning`
-* `WARN` > `warning`
-* `INFO` > `info`
-* `DEBUG` > `debug`
-
-You need to override the verbosity level if you want to set it to `fatal`, `error`, `trace` as Gradle has no corresponding value.
+The [**Gradle plugin**]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#using-the-gradle-plugin) infers the verbosity by the [Gradle log level](https://docs.gradle.org/current/userguide/command_line_interface.html#setting_log_level).
 
 ### Version
 

@@ -14,4 +14,5 @@ All artifacts are available at the [Maven Central](https://search.maven.org/sear
 
 The available libraries are:
 
-* **[Semantic Version]({{ site.baseurl }}{% link _pages/guide/developer/java/semantic-version.md %})** is a flexible implementation of the [Semantic Versioning](https://semver.org/) specification with full support for parsing, ordering, bumping and manipulating versions and their identifiers
+* **[Nyx Core]({{ site.baseurl }}{% link _pages/guide/developer/java/nyx-core.md %})**: the entire Nyx implementation available as a library for you to embed and use
+* **[Semantic Version]({{ site.baseurl }}{% link _pages/guide/developer/java/semantic-version.md %})**: a flexible implementation of the [Semantic Versioning](https://semver.org/) specification with full support for parsing, ordering, bumping and manipulating versions and their identifiers

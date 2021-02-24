@@ -19,7 +19,7 @@ You can download the jar file directly from the [Maven Central](https://repo.mav
 ### Using Maven
 When using Maven just add the following dependency to your `POM`:
 
-```manifest
+```xml
 <dependency>
   <groupId>com.mooltiverse.oss.nyx</groupId>
   <artifactId>version</artifactId>
@@ -28,12 +28,27 @@ When using Maven just add the following dependency to your `POM`:
 ```
 
 Your local Maven setup will likely use the [Maven Central](https://repo.maven.apache.org/maven2/com/mooltiverse/oss/nyx/version/) repository by default but if you like to use the [GitHub Packages](https://github.com/mooltiverse/nyx/packages/) repository you can follow [these instructions](https://help.github.com/en/packages/using-github-packages-with-your-projects-ecosystem/configuring-apache-maven-for-use-with-github-packages).
+{: .notice--info}
 
 ### Using Ivy
 When using Ivy just add the following dependency:
 
-```manifest
+```xml
 <dependency org="com.mooltiverse.oss.nyx" name="version" rev="{{ site.data.nyx.version }}" />
+```
+
+### Using Gradle
+
+If you're using the Groovy DLS add this to the dependencies your script:
+
+```groovy
+implementation 'com.mooltiverse.oss.nyx:version:{{ site.data.nyx.version }}'
+```
+
+while if you're using the Kotlin DSL use this dependency:
+
+```kotlin
+implementation("com.mooltiverse.oss.nyx:version:{{ site.data.nyx.version }}")
 ```
 
 ## API docs

@@ -171,6 +171,8 @@ nav-developer-guide:
   - title: Java
     url: /guide/developer/java/
     children:
+    - title: "Nyx Core"
+      url: /guide/developer/java/nyx-core/
     - title: "Semantic Version"
       url: /guide/developer/java/semantic-version/
   - title: Help
