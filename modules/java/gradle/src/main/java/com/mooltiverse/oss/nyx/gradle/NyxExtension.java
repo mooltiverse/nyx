@@ -26,8 +26,6 @@ import org.gradle.api.provider.Property;
 import org.gradle.api.provider.Provider;
 
 import com.mooltiverse.oss.nyx.configuration.Defaults;
-import com.mooltiverse.oss.nyx.configuration.Scheme;
-import com.mooltiverse.oss.nyx.configuration.Verbosity;
 
 /**
  * The plugin configuration object. This object is responsible for reading the {@code nyx {...} } configuration block that users
@@ -83,7 +81,7 @@ public abstract class NyxExtension {
     /**
      * The 'scheme' property.
      */
-    private Property<Scheme> scheme = getObjectfactory().property(Scheme.class);
+    private Property<String> scheme = getObjectfactory().property(String.class);
 
     /**
      * The 'verbosity' property.
@@ -91,7 +89,7 @@ public abstract class NyxExtension {
      * Please note that the verbosity option is actually ignored in this plugin implementation and the backing Nyx implementation
      * as it's controlled by Gradle.
      */
-    private Property<Verbosity> verbosity = getObjectfactory().property(Verbosity.class);
+    private Property<String> verbosity = getObjectfactory().property(String.class);
 
     /**
      * The nested 'services' block.
@@ -229,7 +227,7 @@ public abstract class NyxExtension {
      * 
      * @see Defaults#SCHEME
      */
-    public Property<Scheme> getScheme() {
+    public Property<String> getScheme() {
         return scheme;
     }
 
@@ -244,7 +242,7 @@ public abstract class NyxExtension {
      * 
      * @return the logging verbosity
      */
-    public Property<Verbosity> getVerbosity() {
+    public Property<String> getVerbosity() {
         return verbosity;
     }
 

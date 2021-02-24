@@ -20,6 +20,7 @@ import java.util.Objects;
 
 import org.gradle.api.file.DirectoryProperty;
 
+import com.mooltiverse.oss.nyx.configuration.ConfigurationException;
 import com.mooltiverse.oss.nyx.configuration.Scheme;
 import com.mooltiverse.oss.nyx.configuration.Verbosity;
 
@@ -89,15 +90,33 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
      * {@inheritDoc}
      */
     @Override
-    public Scheme getScheme() {
-        return extension.getScheme().getOrNull();
+    public Scheme getScheme()
+        throws ConfigurationException {
+        if (extension.getScheme().isPresent() && !Objects.isNull(extension.getScheme().getOrNull())) {
+            try {
+                return Scheme.from(extension.getScheme().get());
+            }
+            catch (IllegalArgumentException iae) {
+                throw new ConfigurationException(String.format("Illegal value '%s' provided for configuration option '%s'", extension.getScheme().get(), "scheme"), iae);
+            }
+        }
+        else return null;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Verbosity getVerbosity(){
-        return extension.getVerbosity().getOrNull();
+    public Verbosity getVerbosity()
+        throws ConfigurationException {
+        if (extension.getVerbosity().isPresent() && !Objects.isNull(extension.getVerbosity().getOrNull())) {
+            try {
+                return Verbosity.from(extension.getVerbosity().get());
+            }
+            catch (IllegalArgumentException iae) {
+                throw new ConfigurationException(String.format("Illegal value '%s' provided for configuration option '%s'", extension.getVerbosity().get(), "verbosity"), iae);
+            }
+        }
+        else return null;
     }
 }

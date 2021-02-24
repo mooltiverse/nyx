@@ -25,6 +25,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import com.mooltiverse.oss.nyx.configuration.ConfigurationException;
+
 /**
  * Tests the Gradle task.<br>
  */
@@ -123,6 +125,109 @@ public class ConfigurationLayerTests extends AbstractTests  {
             if (Objects.isNull(project.getLogging().getLevel()))
                 assertNull(configurationLayer.getVerbosity());
             else assertEquals(project.getLogging().getLevel(), configurationLayer.getVerbosity().getLevel());
+        }
+    }
+
+    /**
+     * Performs checks on the extension values and verifies that errors are raised when wrong values are provided
+     */
+    @Nested
+    @DisplayName("ConfigurationLayer wrong values")
+    class WrongValueTests {
+        /* This test is commented because it has nothing to test
+        @Test
+        @DisplayName("ConfigurationLayer.getBump() with wrong values throws ConfigurationException")
+        void getBumpWrongValueTest()
+            throws Exception {
+            // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
+            Project project = newTestProject(null, true);
+            NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
+            ConfigurationLayer configurationLayer = new ConfigurationLayer(extension);
+
+            // no idea of how to test wrong values here
+        }*/
+
+        /* This test is commented because it has nothing to test
+        @Test
+        @DisplayName("ConfigurationLayer.getDirectory() with wrong values throws ConfigurationException")
+        void getDirectoryWrongValueTest()
+            throws Exception {
+            // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
+            Project project = newTestProject(null, true);
+            NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
+            ConfigurationLayer configurationLayer = new ConfigurationLayer(extension);
+
+            // no idea of how to test wrong values here
+            // since the property is already modelled as a boolean, Gradle provides the validation for this
+        }*/
+
+        /* This test is commented because it has nothing to test
+        @Test
+        @DisplayName("ConfigurationLayer.getDryRun() with wrong values throws ConfigurationException")
+        void getDryRunWrongValueTest()
+            throws Exception {
+            // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
+            Project project = newTestProject(null, true);
+            NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
+            ConfigurationLayer configurationLayer = new ConfigurationLayer(extension);
+
+            // no idea of how to test wrong values here
+            // since the property is already modelled as a boolean, Gradle provides the validation for this
+        }*/
+
+        /* This test is commented because it has nothing to test
+        @Test
+        @DisplayName("ConfigurationLayer.getReleasePrefix() with wrong values throws ConfigurationException")
+        void getReleasePrefixWrongValueTest()
+            throws Exception {
+            // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
+            Project project = newTestProject(null, true);
+            NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
+            ConfigurationLayer configurationLayer = new ConfigurationLayer(extension);
+
+            // no idea of how to test wrong values here
+        }*/
+
+        /* This test is commented because it has nothing to test
+        @Test
+        @DisplayName("ConfigurationLayer.getReleasePrefixLenient() with wrong values throws ConfigurationException")
+        void getReleasePrefixLenientWrongValueTest()
+            throws Exception {
+            // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
+            Project project = newTestProject(null, true);
+            NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
+            ConfigurationLayer configurationLayer = new ConfigurationLayer(extension);
+
+            // no idea of how to test wrong values here
+            // since the property is already modelled as a boolean, Gradle provides the validation for this
+        }*/
+
+        @Test
+        @DisplayName("ConfigurationLayer.getScheme() with wrong values throws ConfigurationException")
+        void getSchemeWrongValueTest()
+            throws Exception {
+            // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
+            Project project = newTestProject(null, true);
+            NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
+            ConfigurationLayer configurationLayer = new ConfigurationLayer(extension);
+
+            // set the property with an illegal value
+            extension.getScheme().set("illegalscheme");
+            assertThrows(ConfigurationException.class, () -> { configurationLayer.getScheme(); });
+        }
+
+        @Test
+        @DisplayName("ConfigurationLayer.getVerbosity() with wrong values throws ConfigurationException")
+        void getVerbosityWrongValueTest()
+            throws Exception {
+            // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
+            Project project = newTestProject(null, true);
+            NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
+            ConfigurationLayer configurationLayer = new ConfigurationLayer(extension);
+
+            // set the property with an illegal value
+            extension.getVerbosity().set("illegalverbosity");
+            assertThrows(ConfigurationException.class, () -> { configurationLayer.getVerbosity(); });
         }
     }
 }
