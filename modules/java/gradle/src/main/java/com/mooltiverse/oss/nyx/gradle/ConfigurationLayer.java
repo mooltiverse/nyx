@@ -20,8 +20,8 @@ import java.util.Objects;
 
 import org.gradle.api.file.DirectoryProperty;
 
+import com.mooltiverse.oss.nyx.configuration.Scheme;
 import com.mooltiverse.oss.nyx.configuration.Verbosity;
-import com.mooltiverse.oss.nyx.version.Scheme;
 
 /**
  * This class is an adapter to allow the extension to be used as a Nyx configuration layer.
@@ -90,7 +90,7 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
      */
     @Override
     public Scheme getScheme() {
-        return null; // TODO: adapt the value to a Scheme
+        return extension.getScheme().getOrNull();
     }
 
     /**

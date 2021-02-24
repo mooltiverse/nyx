@@ -17,8 +17,6 @@ package com.mooltiverse.oss.nyx.configuration;
 
 import java.io.File;
 
-import com.mooltiverse.oss.nyx.version.Scheme;
-
 /**
  * A utility interface that collects default configuration values.
  */

@@ -23,8 +23,6 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.mooltiverse.oss.nyx.version.Scheme;
-
 /**
  * The default configuration layer. This is a singleton class so instances are to be
  * retrieved via the static {@link #getInstance()} method.

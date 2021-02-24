@@ -26,6 +26,7 @@ import org.gradle.api.provider.Property;
 import org.gradle.api.provider.Provider;
 
 import com.mooltiverse.oss.nyx.configuration.Defaults;
+import com.mooltiverse.oss.nyx.configuration.Scheme;
 import com.mooltiverse.oss.nyx.configuration.Verbosity;
 
 /**
@@ -82,7 +83,7 @@ public abstract class NyxExtension {
     /**
      * The 'scheme' property.
      */
-    private Property<String> scheme = getObjectfactory().property(String.class);
+    private Property<Scheme> scheme = getObjectfactory().property(Scheme.class);
 
     /**
      * The 'verbosity' property.
@@ -228,7 +229,7 @@ public abstract class NyxExtension {
      * 
      * @see Defaults#SCHEME
      */
-    public Property<String> getScheme() {
+    public Property<Scheme> getScheme() {
         return scheme;
     }
 
