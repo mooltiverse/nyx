@@ -72,7 +72,7 @@ public class AmendTaskTests extends CoreTaskTests {
      * Performs checks on the task at the time it is defined.
      */
     @Nested
-    @DisplayName("PublishTask.define")
+    @DisplayName("AmendTask.define")
     class DefineTests {
         /**
          * Tests the task using eager methods.

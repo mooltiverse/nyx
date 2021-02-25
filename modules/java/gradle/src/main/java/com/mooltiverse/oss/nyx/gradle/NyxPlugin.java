@@ -94,6 +94,7 @@ public class NyxPlugin implements Plugin<Project> {
       CleanTask.define(project);
       InferTask.define(project);
       MakeTask.define(project);
+      MarkTask.define(project);
       PublishTask.define(project);
 
       // Define lifecycle tasks dependencies

@@ -16,6 +16,7 @@ Nyx provides the same features in all the available versions but the means to in
 | [Help](#help)                               | `help`                                 | N/A                                    |
 | [Infer](#infer)                             | `infer`                                | [`nyxInfer`](#nyxinfer)                |
 | [Make](#make)                               | `make`                                 | [`nyxMake`](#nyxmake)                  |
+| [Mark](#mark)                               | `mark`                                 | [`nyxMark`](#nyxmark)                  |
 | [Publish](#publish)                         | `publish`                              | [`nyxPublish`](#nyxpublish)            |
 
 ### Amend
@@ -41,6 +42,11 @@ TODO: write this section
 {: .notice--warning}
 
 ### Make
+
+TODO: write this section
+{: .notice--warning}
+
+### Mark
 
 TODO: write this section
 {: .notice--warning}
@@ -154,13 +160,19 @@ This task depends on the [`nyxAmend`](#nyxamend) task while [`nyxMake`](#nyxmake
 
 Runs the [`make`](#make) command.
 
-This task depends on the [`nyxInfer`](#nyxinfer) task. Moreover, if lifecycle tasks like `assemble` and `build` are defined (like when using the [Base](https://docs.gradle.org/current/userguide/base_plugin.html) they are attached with a dependency on this task.
+This task depends on the [`nyxInfer`](#nyxinfer) task while [`nyxMark`](#nyxmark) depends on on this task. Moreover, if lifecycle tasks like `assemble` and `build` are defined (like when using the [Base](https://docs.gradle.org/current/userguide/base_plugin.html) they are attached with a dependency on this task.
+
+#### `nyxMark`
+
+Runs the [`mark`](#mark) command.
+
+This task depends on the [`nyxMake`](#nyxmake) task while [`nyxPublish`](#nyxpublish) depends on on this task.
 
 #### `nyxPublish`
 
 Runs the [`publish`](#publish) command.
 
-This task depends on the [`nyxMake`](#nyxmake) task while the [`release`](#release) task is attached to depend on this task.
+This task depends on the [`nyxMark`](#nyxmark) task while the [`release`](#release) task is attached to depend on this task.
 
 ### Lifecycle tasks
 

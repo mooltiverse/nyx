@@ -26,24 +26,24 @@ import com.mooltiverse.oss.nyx.Nyx;
 import com.mooltiverse.oss.nyx.NyxException;
 
 /**
- * The task running the Publish command by invoking the {@link Nyx#publish()} method on the backing Nyx instance.
+ * The task running the Mark command by invoking the {@link Nyx#mark()} method on the backing Nyx instance.
  */
-public abstract class PublishTask extends CoreTask {
+public abstract class MarkTask extends CoreTask {
     /**
      * The description of the task. This also appears in Gradle help.
      */
-    public static final String DESCRIPTION = "Publishes the new release to remote services and emits notifications";
+    public static final String DESCRIPTION = "Marks the release by tagging and committing the repository";
 
     /**
      * The name of the task. This is the name of the task to use inside Gradle scripts.
      */
-    public static final String NAME = "nyxPublish";
+    public static final String NAME = "nyxMark";
 
     /**
      * Default constructor
      */
     @Inject
-    public PublishTask() {
+    public MarkTask() {
         super();
     }
 
@@ -56,8 +56,8 @@ public abstract class PublishTask extends CoreTask {
      * 
      * @see #define(Project, String, Class, Action)
      */
-    public static TaskProvider<PublishTask> define(Project project) {
-        return define(project, NAME, PublishTask.class, task -> configure(task));
+    public static TaskProvider<MarkTask> define(Project project) {
+        return define(project, NAME, MarkTask.class, task -> configure(task));
     }
 
     /**
@@ -70,20 +70,20 @@ public abstract class PublishTask extends CoreTask {
      * 
      * @see #define(Project)
      */
-    protected static void configure(PublishTask task) {
-        task.getLogger().debug("Configuring task: {} - {}", task.getName(), PublishTask.NAME);
+    protected static void configure(MarkTask task) {
+        task.getLogger().debug("Configuring task: {} - {}", task.getName(), MarkTask.NAME);
 
         CoreTask.configure(task);
         task.setDescription(DESCRIPTION);
 
         // Configure dependencies
-        task.dependsOn(MarkTask.NAME);
+        task.dependsOn(MakeTask.NAME);
 
-        task.getLogger().debug("Task: {} - {} configured", task.getName(), PublishTask.NAME);
+        task.getLogger().debug("Task: {} - {} configured", task.getName(), MarkTask.NAME);
     }
 
     /**
-     * The actual business method for this task. This method runs the {@link Nyx#publish()} method on the shared
+     * The actual business method for this task. This method runs the {@link Nyx#mark()} method on the shared
      * singleton Nyx instance.
      * 
      * Gradle knows this is the method to run upon task execution thanks to the {@link TaskAction} annotation.
@@ -91,11 +91,11 @@ public abstract class PublishTask extends CoreTask {
      * @throws NyxException in case of any exception when invoking the backing instance
      */
     @TaskAction
-    public void publish()
+    public void mark()
         throws NyxException {
-        getLogger().info("Running PublishTask: {}", NAME);
-        
+        getLogger().info("Running MarkTask: {}", NAME);
+
         // just a draft to test the wireframing between objects
-        nyx().publish();
+        nyx().mark();
     }
 }

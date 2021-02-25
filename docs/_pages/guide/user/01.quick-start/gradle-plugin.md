@@ -46,6 +46,7 @@ nyxAmend - Integrates the local repository history with extra information from r
 nyxClean - Deletes local release artifacts and reverts the release process to its initial state
 nyxInfer - Collects informations from the local Git repository to generate the new version and plan the release actions
 nyxMake - Builds the configured local release artifacts
+nyxMark - Marks the release by tagging and committing the repository
 nyxPublish - Publishes the new release to remote services and emits notifications
 release - Runs all the release tasks
 

@@ -26,6 +26,7 @@ import com.mooltiverse.oss.nyx.command.Amend;
 import com.mooltiverse.oss.nyx.command.Clean;
 import com.mooltiverse.oss.nyx.command.Infer;
 import com.mooltiverse.oss.nyx.command.Make;
+import com.mooltiverse.oss.nyx.command.Mark;
 import com.mooltiverse.oss.nyx.command.Publish;
 import com.mooltiverse.oss.nyx.configuration.Configuration;
 import com.mooltiverse.oss.nyx.configuration.ConfigurationException;
@@ -129,6 +130,7 @@ public class Nyx {
         // TODO: implement this method
         // the following are just temporary smoke detection outputs
         logger.info(MAIN, "Nyx.clean()");
+        new Clean(state()).run();
     }
 
     /**
@@ -144,7 +146,7 @@ public class Nyx {
         // TODO: implement this method
         // the following are just temporary smoke detection outputs
         logger.info(MAIN, "Nyx.infer()");
-        return null;
+        return new Infer(state()).run();
     }
 
     /**
@@ -160,7 +162,23 @@ public class Nyx {
         // TODO: implement this method
         // the following are just temporary smoke detection outputs
         logger.info(MAIN, "Nyx.make()");
-        return null;
+        return new Make(state()).run();
+    }
+
+    /**
+     * TODO: write the docs here
+     * 
+     * @return the same state object reference returned by {@link #state()}, which might have been updated by this command
+     * 
+     * @throws ConfigurationException in case the configuration can't be loaded for some reason.
+     * @throws StateException in case the state is invalid for some reason.
+     */
+    public State mark()
+        throws ConfigurationException, StateException {
+        // TODO: implement this method
+        // the following are just temporary smoke detection outputs
+        logger.info(MAIN, "Nyx.mark()");
+        return new Mark(state()).run();
     }
 
     /**
@@ -176,6 +194,6 @@ public class Nyx {
         // TODO: implement this method
         // the following are just temporary smoke detection outputs
         logger.info(MAIN, "Nyx.publish()");
-        return null;
+        return new Publish(state()).run();
     }
 }

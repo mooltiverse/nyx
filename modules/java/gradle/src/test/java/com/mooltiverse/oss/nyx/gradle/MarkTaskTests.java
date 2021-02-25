@@ -36,8 +36,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 /**
  * Tests the Gradle task.<br>
  */
-@DisplayName("MakeTask")
-public class MakeTaskTests extends CoreTaskTests {
+@DisplayName("MarkTask")
+public class MarkTaskTests extends CoreTaskTests {
     /**
      * A {@link MethodSource} method that returns valid dependencies for this task.
      * Each returned argument has the fields:<br>
@@ -49,7 +49,7 @@ public class MakeTaskTests extends CoreTaskTests {
      */
     static Stream<Arguments> wellKnownTaskEfferentDependencies() {
         return Stream.of(
-            arguments(InferTask.NAME, InferTask.class)
+            arguments(MakeTask.NAME, MakeTask.class)
         );
     }
 
@@ -64,9 +64,7 @@ public class MakeTaskTests extends CoreTaskTests {
      */
     static Stream<Arguments> wellKnownTaskAfferentDependencies() {
         return Stream.of(
-            arguments(MarkTask.NAME, MarkTask.class),
-            arguments("build", null),
-            arguments("assemble", null)
+            arguments(PublishTask.NAME, PublishTask.class)
         );
     }
 
@@ -74,7 +72,7 @@ public class MakeTaskTests extends CoreTaskTests {
      * Performs checks on the task at the time it is defined.
      */
     @Nested
-    @DisplayName("MakeTask.define")
+    @DisplayName("MarkTask.define")
     class DefineTests {
         /**
          * Tests the task using eager methods.
@@ -86,19 +84,19 @@ public class MakeTaskTests extends CoreTaskTests {
          * Eager methods create an instance of the Task even if it hasn't been used yet.
          */
         @Test
-        @DisplayName("NyxPlugin.apply() to call MakeTask.define() -> test eager task creation")
+        @DisplayName("NyxPlugin.apply() to call MarkTask.define() -> test eager task creation")
         void defineViaNyxPluginApplyEagerTest()
             throws Exception {
             Project project = newTestProject(null, false);
 
             // pre-flight sanity checks
-            testForTaskUnavailability(project, MakeTask.NAME, MakeTask.class);
+            testForTaskUnavailability(project, MarkTask.NAME, MarkTask.class);
 
             // apply the plugin
             project.getPluginManager().apply(NyxPlugin.ID);
 
             // run the eager tests using the superclass method
-            testForTaskAvailabilityEagerly(project, MakeTask.NAME, MakeTask.class);
+            testForTaskAvailabilityEagerly(project, MarkTask.NAME, MarkTask.class);
         }
 
         /**
@@ -110,22 +108,22 @@ public class MakeTaskTests extends CoreTaskTests {
          * object, which is in charge of managing its deferred creation.
          */
         @Test
-        @DisplayName("NyxPlugin.apply() to call MakeTask.define() -> test deferred task creation")
+        @DisplayName("NyxPlugin.apply() to call MarkTask.define() -> test deferred task creation")
         void defineViaNyxPluginApplyLazyTest()
             throws Exception {
             Project project = newTestProject(null, false);
 
             // pre-flight sanity checks
-            testForTaskUnavailability(project, MakeTask.NAME, MakeTask.class);
+            testForTaskUnavailability(project, MarkTask.NAME, MarkTask.class);
 
             // apply the plugin
             project.getPluginManager().apply(NyxPlugin.ID);
 
             // run the lazy tests using the superclass method
-            testForTaskAvailabilityLazily(project, MakeTask.NAME, MakeTask.class);
+            testForTaskAvailabilityLazily(project, MarkTask.NAME, MarkTask.class);
 
             // now also run eager tests, which would invalidate the lazy tests if executed after this
-            testForTaskAvailabilityEagerly(project, MakeTask.NAME, MakeTask.class);
+            testForTaskAvailabilityEagerly(project, MarkTask.NAME, MarkTask.class);
         }
     }
 
@@ -133,44 +131,44 @@ public class MakeTaskTests extends CoreTaskTests {
      * Performs checks on the task configuration.
      */
     @Nested
-    @DisplayName("MakeTask.configure")
+    @DisplayName("MarkTask.configure")
     class ConfigureTests {
         @Test
-        @DisplayName("MakeTask.getDescription()")
+        @DisplayName("MarkTask.getDescription()")
         void descriptionTest()
             throws Exception {
             Project project = newTestProject(null, true);
 
-            assertEquals(MakeTask.DESCRIPTION, project.getTasks().getByName(MakeTask.NAME).getDescription());
+            assertEquals(MarkTask.DESCRIPTION, project.getTasks().getByName(MarkTask.NAME).getDescription());
         }
 
         @Test
-        @DisplayName("MakeTask.getGroup()")
+        @DisplayName("MarkTask.getGroup()")
         void groupTest()
             throws Exception {
             Project project = newTestProject(null, true);
 
-            assertEquals(MakeTask.GROUP, project.getTasks().getByName(MakeTask.NAME).getGroup());
+            assertEquals(MarkTask.GROUP, project.getTasks().getByName(MarkTask.NAME).getGroup());
         }
 
         @Test
-        @DisplayName("MakeTask.getDependencies().size() >= known dependencies")
+        @DisplayName("MarkTask.getDependencies().size() >= known dependencies")
         void getDependencyCount()
             throws Exception {
             Project project = newTestProject(null, true);
 
-            Task task = project.getTasks().getByName(MakeTask.NAME);
+            Task task = project.getTasks().getByName(MarkTask.NAME);
 
             assertTrue(task.getTaskDependencies().getDependencies(task).size() >= wellKnownTaskEfferentDependencies().count());
             
         }
 
-        @ParameterizedTest(name = "MakeTask.getDependencies() contains ''{0}''")
-        @MethodSource("com.mooltiverse.oss.nyx.gradle.MakeTaskTests#wellKnownTaskEfferentDependencies")
+        @ParameterizedTest(name = "MarkTask.getDependencies() contains ''{0}''")
+        @MethodSource("com.mooltiverse.oss.nyx.gradle.MarkTaskTests#wellKnownTaskEfferentDependencies")
         void getDependency(String name, Class<?> clazz)
             throws Exception {
             Project project = newTestProject(null, true);
-            Task task = project.getTasks().getByName(MakeTask.NAME);
+            Task task = project.getTasks().getByName(MarkTask.NAME);
 
             boolean dependencyFound = false;
             for (Task dependency: task.getTaskDependencies().getDependencies(task)) {
@@ -180,8 +178,8 @@ public class MakeTaskTests extends CoreTaskTests {
             assertTrue(dependencyFound);
         }
 
-        @ParameterizedTest(name = "Project.getTasks().findByName(''{0}'').getDependencies() contains MakeTask")
-        @MethodSource("com.mooltiverse.oss.nyx.gradle.MakeTaskTests#wellKnownTaskAfferentDependencies")
+        @ParameterizedTest(name = "Project.getTasks().findByName(''{0}'').getDependencies() contains MarkTask")
+        @MethodSource("com.mooltiverse.oss.nyx.gradle.MarkTaskTests#wellKnownTaskAfferentDependencies")
         void testAfferentDependency(String name, Class<?> clazz)
             throws Exception {
             Project project = newTestProject(null, false);
@@ -198,7 +196,7 @@ public class MakeTaskTests extends CoreTaskTests {
             assumeFalse(Objects.isNull(task));
             boolean dependencyFound = false;
             for (Task dependency: task.getTaskDependencies().getDependencies(task)) {
-                if (MakeTask.NAME.equals(dependency.getName()))
+                if (MarkTask.NAME.equals(dependency.getName()))
                     dependencyFound = true;
             }
             assertTrue(dependencyFound);
@@ -209,10 +207,10 @@ public class MakeTaskTests extends CoreTaskTests {
      * Performs checks on the task execution.
      */
     @Nested
-    @DisplayName("MakeTask.execute")
+    @DisplayName("MarkTask.execute")
     class ExecuteTests {
         @Test
-        @DisplayName("MakeTask.getActions().execute()")
+        @DisplayName("MarkTask.getActions().execute()")
         void testActionsexecute() 
             throws Exception {
             Project project = newTestProject(null, false);
@@ -221,7 +219,7 @@ public class MakeTaskTests extends CoreTaskTests {
             project.getPluginManager().apply(NyxPlugin.ID);
 
             // Retrieve the dependent task
-            Task task = project.getTasks().getByName(MakeTask.NAME);
+            Task task = project.getTasks().getByName(MarkTask.NAME);
 
             for (Action<? super Task> action: task.getActions()) {
                 action.execute(task);

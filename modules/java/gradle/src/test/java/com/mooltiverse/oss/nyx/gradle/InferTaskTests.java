@@ -72,7 +72,7 @@ public class InferTaskTests extends CoreTaskTests {
      * Performs checks on the task at the time it is defined.
      */
     @Nested
-    @DisplayName("PublishTask.define")
+    @DisplayName("InferTask.define")
     class DefineTests {
         /**
          * Tests the task using eager methods.

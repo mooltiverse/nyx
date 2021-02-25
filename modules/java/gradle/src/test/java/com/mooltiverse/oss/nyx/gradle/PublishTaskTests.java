@@ -49,7 +49,7 @@ public class PublishTaskTests extends CoreTaskTests {
      */
     static Stream<Arguments> wellKnownTaskEfferentDependencies() {
         return Stream.of(
-            arguments(MakeTask.NAME, MakeTask.class)
+            arguments(MarkTask.NAME, MarkTask.class)
         );
     }
 
