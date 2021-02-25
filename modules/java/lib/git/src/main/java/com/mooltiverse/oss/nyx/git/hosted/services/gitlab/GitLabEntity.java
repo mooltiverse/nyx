@@ -44,7 +44,7 @@ abstract class GitLabEntity {
      * 
      * @param session the session associated with this entity
      * 
-     * @throws NullPointerException if the given session is <code>null</code>
+     * @throws NullPointerException if the given session is {@code null}
      */
     protected GitLabEntity(GitLabSession session) {
         super();
@@ -77,7 +77,7 @@ abstract class GitLabEntity {
      * 
      * @return the map with all the attributes from the given node
      * 
-     * @throws NullPointerException if the given node is <code>null</code>
+     * @throws NullPointerException if the given node is {@code null}
      */
     protected static Map<String, Object> toAttributeMap(JsonNode node) {
         Objects.requireNonNull(node, "Can't parse attributes from a null node");

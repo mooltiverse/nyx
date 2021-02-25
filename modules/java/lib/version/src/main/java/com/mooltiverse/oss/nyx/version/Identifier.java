@@ -52,7 +52,7 @@ abstract class Identifier implements Cloneable, Serializable {
     /**
      * Tests the given object for equality against this instance.
      * 
-     * @return <code>true</code> if this object is the same as the obj argument; <code>false</code> otherwise.
+     * @return {@code true} if this object is the same as the obj argument; {@code false} otherwise.
      * 
      * @see Object#equals(Object)
      */

@@ -45,7 +45,7 @@ public interface GitUser {
     /**
      * Returns the full name of this user.
      * 
-     * @return the full name of this user. If not vailable then <code>null</code> is returned.
+     * @return the full name of this user. If not vailable then {@code null} is returned.
      */
     public String geFullName();
 

@@ -23,7 +23,7 @@ import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.tasks.TaskProvider;
 
 import com.mooltiverse.oss.nyx.Nyx;
-import com.mooltiverse.oss.nyx.configuration.ConfigurationException;
+import com.mooltiverse.oss.nyx.NyxException;
 
 /**
  * The task running the Make command by invoking the {@link Nyx#make()} method on the backing Nyx instance.
@@ -88,11 +88,11 @@ public abstract class MakeTask extends CoreTask {
      * 
      * Gradle knows this is the method to run upon task execution thanks to the {@link TaskAction} annotation.
      * 
-     * @throws ConfigurationException in case of any configuration related issue arises
+     * @throws NyxException in case of any exception when invoking the backing instance
      */
     @TaskAction
     public void make()
-        throws ConfigurationException {
+        throws NyxException {
         getLogger().info("Running MakeTask: {}", NAME);
 
         // just a draft to test the wireframing between objects

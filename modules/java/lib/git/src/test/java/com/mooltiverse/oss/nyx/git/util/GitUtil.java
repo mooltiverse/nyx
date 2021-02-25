@@ -39,8 +39,8 @@ public class GitUtil {
      * @param out the stream to print to
      * @param marker an optional string that can be used as a marker in the separator, to make
      * it easier to jump to one dumo or the other when the output contains a lot of dumps.
-     * If <code>null</code> a default marker is printed.
-     * @param start prints different characters if this flac is <code>true</code> or <code>false</code>
+     * If {@code null} a default marker is printed.
+     * @param start prints different characters if this flac is {@code true} or {@code false}
      * improving readability.
      * 
      * @return
@@ -138,8 +138,8 @@ public class GitUtil {
      * Runs the command (and options) given in the input array in the given directory and redirecting the output to the given stream.
      * 
      * @param command the command and options as they must appear on the command line, in order. The first element is the command.
-     * @param env the environment vaiables to set, or <code>null</code> if no environment variable needs to be set
-     * @param directory the directory to run the command in, or <code>null</code> to use the current working directory
+     * @param env the environment vaiables to set, or {@code null} if no environment variable needs to be set
+     * @param directory the directory to run the command in, or {@code null} to use the current working directory
      * @param out the output stream to redirect the output to
      */
     private static void runCommand(String[] command, String[] env, File directory, OutputStream out)

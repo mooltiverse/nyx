@@ -43,7 +43,7 @@ public class InferTaskTests extends CoreTaskTests {
      * Each returned argument has the fields:<br>
      * - taskName: the name of the task that represent the dependency<br>
      * - taskClass: the class of the task that represent the dependency, available for tasks provided by this plugin only,
-     *   <code>null</code> for tasks defined elsewhere (i.e. lifecycle tasks provided by other plugins)<br>
+     *   {@code null} for tasks defined elsewhere (i.e. lifecycle tasks provided by other plugins)<br>
      *
      * @return a stream of arguments representing dependencies
      */
@@ -58,7 +58,7 @@ public class InferTaskTests extends CoreTaskTests {
      * Each returned argument has the fields:<br>
      * - taskName: the name of the dependent task<br>
      * - taskClass: the class of the dependent task, available for tasks provided by this plugin only,
-     *   <code>null</code> for tasks defined elsewhere (i.e. lifecycle tasks provided by other plugins)<br>
+     *   {@code null} for tasks defined elsewhere (i.e. lifecycle tasks provided by other plugins)<br>
      *
      * @return a stream of arguments representing dependencies
      */

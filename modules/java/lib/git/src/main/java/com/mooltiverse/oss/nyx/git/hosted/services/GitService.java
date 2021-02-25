@@ -23,12 +23,12 @@ import java.net.URI;
 public interface GitService {
     /**
      * Safely checks if the underlying implementation supports the given operation. If this
-     * method returns <code>true</code> then the underlying class will not raise any
+     * method returns {@code true} then the underlying class will not raise any
      * {@link UnsupportedOperationException} when invoking the specific methods.
      * 
      * @param feature the feature to check for support.
      * 
-     * @return <code>true</code> if the operation is supported, <code>false</code> otherwise
+     * @return {@code true} if the operation is supported, {@code false} otherwise
      */
     public boolean supports(GitServiceFeature feature);
 
@@ -43,7 +43,7 @@ public interface GitService {
      * Tries to contact the remote server to verify it's reachable and healthy. Please note that this method
      * sends unauthenticated requests that may fail because of rate limits so use it with care.
      * 
-     * @return <code>true</code> if the operation succeeds, <code>false</code> otherwise
+     * @return {@code true} if the operation succeeds, {@code false} otherwise
      * 
      * @throws UnsupportedOperationException if the underlying implementation does not
      * {@link #supports(GitServiceFeature) support} the {@link GitServiceFeature#PING} feature.
@@ -59,7 +59,7 @@ public interface GitService {
      * 
      * @throws GitTransportException if a transport related error occurs while communicating with the server
      * @throws GitAuthenticationException if authentication fails
-     * @throws NullPointerException if the given token is <code>null</code>
+     * @throws NullPointerException if the given token is {@code null}
      * @throws IllegalArgumentException if given token is illegal for some reason (i.e. is an empry string)
      * @throws UnsupportedOperationException if the underlying implementation does not
      * {@link #supports(GitServiceFeature) support} the {@link GitServiceFeature#TOKEN_AUTHENTICATION} feature.

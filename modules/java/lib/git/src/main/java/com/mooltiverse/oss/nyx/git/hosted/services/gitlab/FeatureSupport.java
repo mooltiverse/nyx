@@ -35,9 +35,9 @@ class FeatureSupport {
      * 
      * @param feature the feature to check for support.
      * 
-     * @return <code>true</code> if the operation is supported, <code>false</code> otherwise
+     * @return {@code true} if the operation is supported, {@code false} otherwise
      * 
-     * @throws NullPointerException if a <code>null</code> feature is passed
+     * @throws NullPointerException if a {@code null} feature is passed
      */
     static boolean supports(GitServiceFeature feature) {
         Objects.requireNonNull(feature, "Can't check if the feature is supported for a null feature");

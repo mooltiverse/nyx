@@ -325,8 +325,8 @@ public class SemanticVersionTests {
      * - version: the entire string representation of the version<br>
      * - attributeName: the name identifier to set<br>
      * - attributeValue: the value identifier to set<br>
-     * - expectedExceptionWithoutValue: the class of the expected expection when invoking setPrereleaseAttribute(attributeName), if any. If <code>null</code> no exception is expected in this case<br>
-     * - expectedExceptionWithValue: the class of the expected expection when invoking setPrereleaseAttribute(attributeName), if any. If <code>null</code> no exception is expected in this case<br>
+     * - expectedExceptionWithoutValue: the class of the expected expection when invoking setPrereleaseAttribute(attributeName), if any. If {@code null} no exception is expected in this case<br>
+     * - expectedExceptionWithValue: the class of the expected expection when invoking setPrereleaseAttribute(attributeName), if any. If {@code null} no exception is expected in this case<br>
      *
      * @return a stream of arguments representing versions and their expected values after bumping
      */
@@ -451,8 +451,8 @@ public class SemanticVersionTests {
      * - version: the entire string representation of the version<br>
      * - attributeName: the name identifier to set<br>
      * - attributeValue: the value identifier to set<br>
-     * - expectedExceptionWithoutValue: the class of the expected expection when invoking setBuildAttribute(attributeName), if any. If <code>null</code> no exception is expected in this case<br>
-     * - expectedExceptionWithValue: the class of the expected expection when invoking setBuildAttribute(attributeName), if any. If <code>null</code> no exception is expected in this case<br>
+     * - expectedExceptionWithoutValue: the class of the expected expection when invoking setBuildAttribute(attributeName), if any. If {@code null} no exception is expected in this case<br>
+     * - expectedExceptionWithValue: the class of the expected expection when invoking setBuildAttribute(attributeName), if any. If {@code null} no exception is expected in this case<br>
      *
      * @return a stream of arguments representing versions and their expected values after bumping
      */

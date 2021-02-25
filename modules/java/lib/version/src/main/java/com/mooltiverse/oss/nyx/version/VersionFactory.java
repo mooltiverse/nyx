@@ -46,7 +46,7 @@ public class VersionFactory {
     /**
      * Returns a Version instance representing the specified String value. No sanitization attempt is done.
      * <br>
-     * If <code>sanitize</code> is <code>true</code> this method will try to sanitize the given string before parsing so that if there are
+     * If {@code sanitize} is {@code true} this method will try to sanitize the given string before parsing so that if there are
      * illegal characters like a prefix or leading zeroes in numeric identifiers they are removed.
      * <br>
      * When sanitization is enabled on a string that actually needs sanitization the string representation of the

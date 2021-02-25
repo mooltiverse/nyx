@@ -30,9 +30,9 @@ class CompositeObjectIdentifier extends CompositeIdentifier {
      * Builds the identifier with the given nested identifiers and separator.
      *
      * @param separator the separator used for the string representation to separate children values
-     * @param children the children of this composite identifier. It can't be <code>null</code> or contain <code>null</code> values
+     * @param children the children of this composite identifier. It can't be {@code null} or contain {@code null} values
      *
-     * @throws NullPointerException if the given list of children is <code>null</code> or contains <code>null</code> values
+     * @throws NullPointerException if the given list of children is {@code null} or contains {@code null} values
      * @throws IllegalArgumentException if the given list of children contains illegal values
      */
     protected CompositeObjectIdentifier(char separator, SimpleIdentifier... children) {
@@ -42,9 +42,9 @@ class CompositeObjectIdentifier extends CompositeIdentifier {
     /**
      * Builds the identifier with the given nested identifiers and the default separator.
      *
-     * @param children the children of this composite identifier. It can't be <code>null</code> or contain <code>null</code> values
+     * @param children the children of this composite identifier. It can't be {@code null} or contain {@code null} values
      *
-     * @throws NullPointerException if the given list of children is <code>null</code> or contains <code>null</code> values
+     * @throws NullPointerException if the given list of children is {@code null} or contains {@code null} values
      * @throws IllegalArgumentException if the given list of children contains illegal values
      */
     protected CompositeObjectIdentifier(SimpleIdentifier... children) {
@@ -55,9 +55,9 @@ class CompositeObjectIdentifier extends CompositeIdentifier {
      * Builds the identifier with the given nested identifiers and separator.
      *
      * @param separator the separator used for the string representation to separate children values
-     * @param children the children of this composite identifier. It can't be <code>null</code> or contain <code>null</code> values
+     * @param children the children of this composite identifier. It can't be {@code null} or contain {@code null} values
      *
-     * @throws NullPointerException if the given list of children is <code>null</code> or contains <code>null</code> values
+     * @throws NullPointerException if the given list of children is {@code null} or contains {@code null} values
      * @throws IllegalArgumentException if the given list of children contains illegal values
      */
     protected CompositeObjectIdentifier(char separator, List<SimpleIdentifier> children) {
@@ -67,9 +67,9 @@ class CompositeObjectIdentifier extends CompositeIdentifier {
     /**
      * Builds the identifier with the given nested identifiers and the default separator.
      *
-     * @param children the children of this composite identifier. It can't be <code>null</code> or contain <code>null</code> values
+     * @param children the children of this composite identifier. It can't be {@code null} or contain {@code null} values
      *
-     * @throws NullPointerException if the given list of children is <code>null</code> or contains <code>null</code> values
+     * @throws NullPointerException if the given list of children is {@code null} or contains {@code null} values
      * @throws IllegalArgumentException if the given list of children contains illegal values
      */
     protected CompositeObjectIdentifier(List<SimpleIdentifier> children) {
@@ -80,16 +80,16 @@ class CompositeObjectIdentifier extends CompositeIdentifier {
      * Returns an identifier representing the specified String value. The string is split using the
      * default separator.
      *
-     * @param multipleIdentifiers when <code>true</code> the given string is parsed as it (may) contain multiple
+     * @param multipleIdentifiers when {@code true} the given string is parsed as it (may) contain multiple
      * identifiers, separated by the default separator, so this method may yield to multiple identifiers.
-     * When <code>false</code> the given string is expected to have a single identifier so if the given
+     * When {@code false} the given string is expected to have a single identifier so if the given
      * string has multiple identifiers an exception is thrown.
      * @param s the string to parse
      * @param integersPolicy the flag specifying how to parse integers
      *
      * @return the new identifier representing the given string.
      *
-     * @throws NullPointerException if the given string is <code>null</code>
+     * @throws NullPointerException if the given string is {@code null}
      * @throws IllegalArgumentException if the given string contains illegal identifiers
      */
     static CompositeObjectIdentifier valueOf(boolean multipleIdentifiers, String s, UseIntegerIdentifiers integersPolicy) {
@@ -99,9 +99,9 @@ class CompositeObjectIdentifier extends CompositeIdentifier {
      /**
      * Returns an identifier representing the specified String value.
      *
-     * @param multipleIdentifiers when <code>true</code> the given string is parsed as it (may) contain multiple
+     * @param multipleIdentifiers when {@code true} the given string is parsed as it (may) contain multiple
      * identifiers, separated by the given separator, so this method may yield to multiple identifiers.
-     * When <code>false</code> the given string is expected to have a single identifier so if the given
+     * When {@code false} the given string is expected to have a single identifier so if the given
      * string has multiple identifiers an exception is thrown.
      * @param s the string to parse
      * @param separator the separator used for the string representation to separate children values
@@ -109,7 +109,7 @@ class CompositeObjectIdentifier extends CompositeIdentifier {
      *
      * @return the new identifier representing the given string.
      *
-     * @throws NullPointerException if the given string is <code>null</code>
+     * @throws NullPointerException if the given string is {@code null}
      * @throws IllegalArgumentException if the given string contains illegal identifiers
      */
     static CompositeObjectIdentifier valueOf(boolean multipleIdentifiers, String s, char separator, UseIntegerIdentifiers integersPolicy) {

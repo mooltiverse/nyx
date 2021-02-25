@@ -81,7 +81,7 @@ public class GitLab implements GitService {
      * @param uri the URI to use as the base for API invocations
      * 
      * @throws GitTransportException if the given URI can't be reached or does not expose valid APIs
-     * @throws NullPointerException if the given URI is <code>null</code>
+     * @throws NullPointerException if the given URI is {@code null}
      * @throws IllegalArgumentException if the given URI is illegal (i.e. empty, malformed etc)
      */
     private GitLab(URI uri)
@@ -117,7 +117,7 @@ public class GitLab implements GitService {
      * @return an instance using the given API URI
      * 
      * @throws GitTransportException if the given URI can't be reached or does not expose valid APIs
-     * @throws NullPointerException if the given URI is <code>null</code>
+     * @throws NullPointerException if the given URI is {@code null}
      * @throws IllegalArgumentException if the given URI is illegal (i.e. empty or malformed)
      */
     public static GitLab instance(String apiURI)
@@ -139,7 +139,7 @@ public class GitLab implements GitService {
      * @return an instance using the given API URI
      * 
      * @throws GitTransportException if the given URI can't be reached or does not expose valid APIs
-     * @throws NullPointerException if the given URI is <code>null</code>
+     * @throws NullPointerException if the given URI is {@code null}
      * @throws IllegalArgumentException if the given URI is illegal (i.e. empty or malformed)
      */
     public static GitLab instance(URI apiURI)

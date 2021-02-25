@@ -134,7 +134,7 @@ public class FileSystemUtil {
      * Returns all files in the given directory (and its sub directories).
      * 
      * @param directory the directory to list the files from.
-     * @param subdirs if <code>true</code> also include subdirs.
+     * @param subdirs if {@code true} also include subdirs.
      * 
      * @return the collection of files resulting from the search
      */
@@ -148,8 +148,8 @@ public class FileSystemUtil {
      * @param directory the directory to list the files from.
      * @param filters a collection of strings representing filters for file names not to be included.
      * If a file name is equal or {@link String#matches(String) matches} (using a regex) one of these strings
-     * it will be skipped. If the collection is <code>null</code> or empty no filters will be applied.
-     * @param subdirs if <code>true</code> also include subdirs.
+     * it will be skipped. If the collection is {@code null} or empty no filters will be applied.
+     * @param subdirs if {@code true} also include subdirs.
      * 
      * @return the collection of files resulting from the search
      */
@@ -185,8 +185,8 @@ public class FileSystemUtil {
      * Creates a new temporary file with a random name in the given directory.
      * 
      * @param dir the directory to create the file in.
-     * @param suffix the file name prefix. If <code>null</code> the file will have a random prefix.
-     * @param suffix the file extension. If <code>null</code> the file will have the <code>.tmp</code> extension.
+     * @param suffix the file name prefix. If {@code null} the file will have a random prefix.
+     * @param suffix the file extension. If {@code null} the file will have the {@code .tmp} extension.
      * 
      * @return the file that has been created
      * 
@@ -215,9 +215,9 @@ public class FileSystemUtil {
 
     /**
      * Creates a number of new temporary files with both binary and text content in the given directory.
-     * Binary files have the <code>.bin</code> extension and an increasing size depending on how
+     * Binary files have the {@code .bin} extension and an increasing size depending on how
      * many are created.
-     * Text files have the <code>.txt</code> extension and an increasing size depending on how
+     * Text files have the {@code .txt} extension and an increasing size depending on how
      * many are created.
      * 
      * @param dir the directory to create the file in.
@@ -279,8 +279,8 @@ public class FileSystemUtil {
      * Creates a new temporaty file with a random name and binary content in the given directory.
      * 
      * @param dir the directory to create the file in.
-     * @param suffix the file name prefix. If <code>null</code> the file will have a random prefix.
-     * @param suffix the file extension. If <code>null</code> the file will have the <code>.tmp</code> extension.
+     * @param suffix the file name prefix. If {@code null} the file will have a random prefix.
+     * @param suffix the file extension. If {@code null} the file will have the {@code .tmp} extension.
      * @param length the number of bytes to write to the target file.
      * 
      * @return the file that has been created
@@ -298,8 +298,8 @@ public class FileSystemUtil {
      * Creates a new temporary file with a random name and text content in the given directory.
      * 
      * @param dir the directory to create the file in.
-     * @param suffix the file name prefix. If <code>null</code> the file will have a random prefix.
-     * @param suffix the file extension. If <code>null</code> the file will have the <code>.tmp</code> extension.
+     * @param suffix the file name prefix. If {@code null} the file will have a random prefix.
+     * @param suffix the file extension. If {@code null} the file will have the {@code .tmp} extension.
      * @param lines the number of lines to write to the target file.
      * @param length the length of lines to write to the target file.
      * 

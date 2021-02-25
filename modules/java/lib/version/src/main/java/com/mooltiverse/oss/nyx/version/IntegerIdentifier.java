@@ -38,7 +38,7 @@ class IntegerIdentifier extends SimpleIdentifier implements Comparable<Integer> 
      *
      * @param value the identifier value
      *
-     * @throws NullPointerException if the given value is <code>null</code>
+     * @throws NullPointerException if the given value is {@code null}
      * @throws IllegalArgumentException if the given value is illegal for some reason, like including forbidden characters
      */
     protected IntegerIdentifier(Integer value) {
@@ -51,11 +51,11 @@ class IntegerIdentifier extends SimpleIdentifier implements Comparable<Integer> 
      *
      * @param value the identifier value
      *
-     * @throws NullPointerException if the given value is <code>null</code>
+     * @throws NullPointerException if the given value is {@code null}
      * @throws IllegalArgumentException if the given value is illegal.
      * When the string cannot be converted to an integer because it's not an integer representation the exception will
      * also carry a {@link NumberFormatException} as its {@link Throwable#getCause() root cause}, otherwise the root
-     * cause may me <code>null</code>.
+     * cause may me {@code null}.
      */
     protected IntegerIdentifier(String value) {
         super();
@@ -82,11 +82,11 @@ class IntegerIdentifier extends SimpleIdentifier implements Comparable<Integer> 
      * 
      * @return the identifier instance
      *
-     * @throws NullPointerException if the given value is <code>null</code>
+     * @throws NullPointerException if the given value is {@code null}
      * @throws IllegalArgumentException if the given value is illegal for some reason, like including forbidden characters.
      * When the string cannot be converted to an integer because it's not an integer representation the exception will
      * also carry a {@link NumberFormatException} as its {@link Throwable#getCause() root cause}, otherwise the root
-     * cause may me <code>null</code>.
+     * cause may me {@code null}.
      */
     public static IntegerIdentifier valueOf(String value) {
         return new IntegerIdentifier(value);

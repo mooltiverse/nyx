@@ -52,7 +52,7 @@ final class Parser {
      *
      * @return the same value passed as input
      *
-     * @throws NullPointerException if the given value is <code>null</code>
+     * @throws NullPointerException if the given value is {@code null}
      * @throws IllegalArgumentException if the given value is illegal for some reason, like including forbidden characters
      */
     static String validateStringIdentifier(String value) {
@@ -70,12 +70,12 @@ final class Parser {
      * This method returns the same value received as input if validation passes, otherwise an exception is thrown.
      *
      * @param value the value to validate
-     * @param allowNegative if <code>false</code> negative integers are not allowed so if the given value represents
-     * a negative integer an {@link IllegalArgumentException} is thrown. If <code>true</code> this check is not performed.
+     * @param allowNegative if {@code false} negative integers are not allowed so if the given value represents
+     * a negative integer an {@link IllegalArgumentException} is thrown. If {@code true} this check is not performed.
      *
      * @return the same value passed as input, converted to Integer
      *
-     * @throws NullPointerException if the given value is <code>null</code>
+     * @throws NullPointerException if the given value is {@code null}
      * @throws IllegalArgumentException if the given value is illegal for some reason, like including forbidden characters
      */
     static Integer validateIntegerIdentifier(Integer value, boolean allowNegative) {
@@ -91,20 +91,20 @@ final class Parser {
      * This method returns the same value received as input if validation passes, otherwise an exception is thrown.
      * 
      * @param value the value to validate
-     * @param allowNegative if <code>false</code> negative integers are not allowed so if the given value represents
-     * a negative integer an {@link IllegalArgumentException} is thrown. If <code>true</code> this check is not performed.
-     * @param allowExtraCharacters if <code>false</code> this method also makes sure that no extra characters not affecting
-     * the acual value are present. Those may be a leading sign or leading zeroes. If <code>true</code> this check is not performed.
+     * @param allowNegative if {@code false} negative integers are not allowed so if the given value represents
+     * a negative integer an {@link IllegalArgumentException} is thrown. If {@code true} this check is not performed.
+     * @param allowExtraCharacters if {@code false} this method also makes sure that no extra characters not affecting
+     * the acual value are present. Those may be a leading sign or leading zeroes. If {@code true} this check is not performed.
      * When this flag is enabled this method makes sure that the string representation of converted integer returns the
      * same as the input value, otherwise it means that some extra characters were present.
      *
      * @return the same value passed as input, converted to Integer
      *
-     * @throws NullPointerException if the given value is <code>null</code>
+     * @throws NullPointerException if the given value is {@code null}
      * @throws IllegalArgumentException if the given value is illegal for some reason, like including forbidden characters.
      * When the string cannot be converted to an integer because it's not an integer representation the exception will
      * also carry a {@link NumberFormatException} as its {@link Throwable#getCause() root cause}, otherwise the root
-     * cause may me <code>null</code>.
+     * cause may me {@code null}.
      */
     static Integer validateIntegerIdentifier(String value, boolean allowNegative, boolean allowExtraCharacters) {
         Objects.requireNonNull(value, "Identifier value cannot be null");
@@ -129,15 +129,15 @@ final class Parser {
     }
 
     /**
-     * Validates the given list of elements to make sure it's legal, mening it's not <code>null</code>, it's not
-     * empty and does not contain <code>null</code> values.
+     * Validates the given list of elements to make sure it's legal, mening it's not {@code null}, it's not
+     * empty and does not contain {@code null} values.
      *
      * @param elements the list to validate
      *
      * @return the same list passed as input if the validation succeeds
      *
-     * @throws NullPointerException if the given list is <code>null</code>
-     * @throws IllegalArgumentException if the given list contains illegal values or contains <code>null</code> items
+     * @throws NullPointerException if the given list is {@code null}
+     * @throws IllegalArgumentException if the given list contains illegal values or contains {@code null} items
      * 
      * @param <T> the type of items in the list to validate
      */
@@ -157,7 +157,7 @@ final class Parser {
      *
      * @return the array of sub strings
      *
-     * @throws NullPointerException if the given string is <code>null</code>
+     * @throws NullPointerException if the given string is {@code null}
      * @throws IllegalArgumentException if the given string is empty or contains illegal characters
      */
     static String[] split(String s, char separator) {
@@ -170,12 +170,12 @@ final class Parser {
     }
 
     /**
-     * Utility method that returns <code>true</code> if the given array is not <code>null</code>, it's not empty
-     * and all the elements in the given array are not <code>null</code>, <code>false</code> otherwise.
+     * Utility method that returns {@code true} if the given array is not {@code null}, it's not empty
+     * and all the elements in the given array are not {@code null}, {@code false} otherwise.
      *
      * @param items the array to check
      *
-     * @return <code>true</code> if the given array contains valid elements
+     * @return {@code true} if the given array contains valid elements
      */
     static boolean hasValues(Object[] items) {
         if ((items == null) || (items.length == 0))
@@ -195,7 +195,7 @@ final class Parser {
      *
      * @return the list of identifiers representing the given string.
      *
-     * @throws NullPointerException if the given string is <code>null</code>
+     * @throws NullPointerException if the given string is {@code null}
      * @throws IllegalArgumentException if the given string contains illegal identifiers
      */
     static List<StringIdentifier> toStringIdentifiers(String s, char separator) {
@@ -213,7 +213,7 @@ final class Parser {
      *
      * @return the list of identifiers representing the given strings.
      *
-     * @throws NullPointerException if the given string array is <code>null</code> or contains <code>null</code> values
+     * @throws NullPointerException if the given string array is {@code null} or contains {@code null} values
      * @throws IllegalArgumentException if the given string contains illegal identifiers
      */
     static List<StringIdentifier> toStringIdentifiers(String[] s) {
@@ -236,7 +236,7 @@ final class Parser {
      *
      * @return the list of identifiers representing the given string.
      *
-     * @throws NullPointerException if the given string is <code>null</code>
+     * @throws NullPointerException if the given string is {@code null}
      * @throws IllegalArgumentException if the given string contains illegal identifiers
      */
     static List<IntegerIdentifier> toIntegerIdentifiers(String s, char separator) {
@@ -254,11 +254,11 @@ final class Parser {
      *
      * @return the list of identifiers representing the given strings.
      *
-     * @throws NullPointerException if the given string array is <code>null</code> or contains <code>null</code> values
+     * @throws NullPointerException if the given string array is {@code null} or contains {@code null} values
      * @throws IllegalArgumentException if the given string contains illegal identifiers.
      * When the string cannot be converted to an integer because it's not an integer representation the exception will
      * also carry a {@link NumberFormatException} as its {@link Throwable#getCause() root cause}, otherwise the root
-     * cause may me <code>null</code>.
+     * cause may me {@code null}.
      */
     static List<IntegerIdentifier> toIntegerIdentifiers(String[] s) {
         Objects.requireNonNull(s, "Can't parse null string array");
@@ -281,7 +281,7 @@ final class Parser {
      *
      * @return the list of identifiers representing the given string.
      *
-     * @throws NullPointerException if the given string is <code>null</code>
+     * @throws NullPointerException if the given string is {@code null}
      * @throws IllegalArgumentException if the given string contains illegal identifiers
      */
     static List<SimpleIdentifier> toIdentifiers(String s, char separator, UseIntegerIdentifiers integersPolicy) {
@@ -300,7 +300,7 @@ final class Parser {
      *
      * @return the list of identifiers representing the given strings.
      *
-     * @throws NullPointerException if the given string array is <code>null</code> or contains <code>null</code> values
+     * @throws NullPointerException if the given string array is {@code null} or contains {@code null} values
      * @throws IllegalArgumentException if the given string contains illegal identifiers
      */
     static List<SimpleIdentifier> toIdentifiers(String[] s, UseIntegerIdentifiers integersPolicy) {
@@ -337,18 +337,18 @@ final class Parser {
     }
 
     /**
-     * Returns an identifier representing the specified String value. If the <code>integersPolicy</code>
-     * flag is <code>ALWAYS</code> or the given string represents an integer and the <code>integersPolicy</code>
-     * flag is <code>WHEN_POSSIBLE</code> then the returned identifier is an {@link IntegerIdentifier},
+     * Returns an identifier representing the specified String value. If the {@code integersPolicy}
+     * flag is {@code ALWAYS} or the given string represents an integer and the {@code integersPolicy}
+     * flag is {@code WHEN_POSSIBLE} then the returned identifier is an {@link IntegerIdentifier},
      * otherwise it's a {@link StringIdentifier}.
      *
      * @param s the string to parse
      * @param integersPolicy the flag specifying how to parse integers
      *
-     * @return the parsed identifier. The type depends on the <code>integersPolicy</code> flag and the
+     * @return the parsed identifier. The type depends on the {@code integersPolicy} flag and the
      * content of the given string
      *
-     * @throws NullPointerException if the given string is <code>null</code>
+     * @throws NullPointerException if the given string is {@code null}
      * @throws IllegalArgumentException if the given string contains illegal identifiers
      */
     static SimpleIdentifier toIdentifier(String s, UseIntegerIdentifiers integersPolicy) {

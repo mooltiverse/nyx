@@ -18,8 +18,8 @@ package com.mooltiverse.oss.nyx.version;
 import java.util.List;
 
 /**
- * The specialization of a Core version number allows exactly 3 positive integers, the <code>major</code>,
- * <code>minor</code> and <code>patch</code> as per <a href="https://semver.org/">Semantic Versioning 2.0.0</a>.
+ * The specialization of a Core version number allows exactly 3 positive integers, the {@code major},
+ * {@code minor} and {@code patch} as per <a href="https://semver.org/">Semantic Versioning 2.0.0</a>.
  */
 class SemanticVersionCoreIdentifier extends CompositeIntegerIdentifier {
     /**
@@ -32,7 +32,7 @@ class SemanticVersionCoreIdentifier extends CompositeIntegerIdentifier {
      *
      * @param children the children of this identifier. It must have exactly 3 elements
      *
-     * @throws NullPointerException if the given list of children is <code>null</code> or contains <code>null</code> values
+     * @throws NullPointerException if the given list of children is {@code null} or contains {@code null} values
      * @throws IllegalArgumentException if the given list of children contains illegal values
      */
     private SemanticVersionCoreIdentifier(List<IntegerIdentifier> children) {
@@ -62,7 +62,7 @@ class SemanticVersionCoreIdentifier extends CompositeIntegerIdentifier {
      * @throws IllegalArgumentException if a given value is illegal (i.e. negative).
      * When the string cannot be converted to an integer because it's not an integer representation the exception will
      * also carry a {@link NumberFormatException} as its {@link Throwable#getCause() root cause}, otherwise the root
-     * cause may me <code>null</code>.
+     * cause may me {@code null}.
      */
     private SemanticVersionCoreIdentifier(String major, String minor, String patch) {
         super(IntegerIdentifier.valueOf(major), IntegerIdentifier.valueOf(minor), IntegerIdentifier.valueOf(patch));
@@ -71,11 +71,11 @@ class SemanticVersionCoreIdentifier extends CompositeIntegerIdentifier {
     /**
      * Returns an identifier instance representing the specified String value.
      *
-     * @param s the string to parse (in the <code>x.y.x</code> format)
+     * @param s the string to parse (in the {@code x.y.x} format)
      *
      * @return the new identifier instance representing the given string.
      *
-     * @throws NullPointerException if the given string is <code>null</code>
+     * @throws NullPointerException if the given string is {@code null}
      * @throws IllegalArgumentException if the given string doesn't represent a legal semantic core version
      */
     static SemanticVersionCoreIdentifier valueOf(String s) {
@@ -91,7 +91,7 @@ class SemanticVersionCoreIdentifier extends CompositeIntegerIdentifier {
      *
      * @return the new identifier instance representing the given values.
      *
-     * @throws IllegalArgumentException if a given value is <code>null</code>
+     * @throws IllegalArgumentException if a given value is {@code null}
      * @throws IllegalArgumentException if a given value is illegal (i.e. negative)
      */
     static SemanticVersionCoreIdentifier valueOf(Integer major, Integer minor, Integer patch) {
@@ -107,7 +107,7 @@ class SemanticVersionCoreIdentifier extends CompositeIntegerIdentifier {
      *
      * @return the new identifier instance representing the given values.
      *
-     * @throws IllegalArgumentException if a given value is <code>null</code>
+     * @throws IllegalArgumentException if a given value is {@code null}
      * @throws IllegalArgumentException if a given value is illegal (i.e. negative)
      */
     static SemanticVersionCoreIdentifier valueOf(String major, String minor, String patch) {

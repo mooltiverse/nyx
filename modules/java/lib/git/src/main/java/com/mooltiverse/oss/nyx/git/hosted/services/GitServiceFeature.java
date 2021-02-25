@@ -22,7 +22,7 @@ package com.mooltiverse.oss.nyx.git.hosted.services;
  * the method throws an {@link UnsupportedOperationException}.
  * <br>
  * In order to safely know if an operation is supported you can query the service object via
- * the <code>supports</code> method.
+ * the {@code supports} method.
  */
 public enum GitServiceFeature {
     /**
@@ -58,9 +58,9 @@ public enum GitServiceFeature {
     }
 
     /**
-     * Returns <code>true</code> if the feature is optional.
+     * Returns {@code true} if the feature is optional.
      * 
-     * @return <code>true</code> if the feature is optional
+     * @return {@code true} if the feature is optional
      */
     public boolean isOptional() {
         return optional;

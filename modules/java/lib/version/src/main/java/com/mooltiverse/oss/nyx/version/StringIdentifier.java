@@ -39,7 +39,7 @@ class StringIdentifier extends SimpleIdentifier implements Comparable<String> {
      *
      * @param value the identifier value
      *
-     * @throws NullPointerException if the given value is <code>null</code>
+     * @throws NullPointerException if the given value is {@code null}
      * @throws IllegalArgumentException if the given value is illegal for some reason, like including forbidden characters
      */
     protected StringIdentifier(String value) {
@@ -54,7 +54,7 @@ class StringIdentifier extends SimpleIdentifier implements Comparable<String> {
      * 
      * @return the identifier instance
      *
-     * @throws NullPointerException if the given value is <code>null</code>
+     * @throws NullPointerException if the given value is {@code null}
      * @throws IllegalArgumentException if the given value is illegal for some reason, like including forbidden characters
      */
     public static StringIdentifier valueOf(String value) {

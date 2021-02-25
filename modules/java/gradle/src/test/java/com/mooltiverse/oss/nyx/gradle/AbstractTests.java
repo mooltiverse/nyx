@@ -33,8 +33,8 @@ public class AbstractTests {
     /**
      * Instantiates a new project to be used for tests.
      * 
-     * @param projectDir the project directory. If <code>null</code> a new temporary directory is created
-     * @param applyNyxPlugin if <code>true</code> the Nyx plugin will be applied to the project
+     * @param projectDir the project directory. If {@code null} a new temporary directory is created
+     * @param applyNyxPlugin if {@code true} the Nyx plugin will be applied to the project
      * 
      * @return the test project
      * 

@@ -55,7 +55,7 @@ public class ReleaseTask extends LifecycleTask {
      * 
      * @param project the project to define the task for
      * 
-     * @return the task provider used for the deferred task instantiation or <code>null</code> if a task with the same
+     * @return the task provider used for the deferred task instantiation or {@code null} if a task with the same
      * name was already registered
      * 
      * @see #define(Project, String, Class, Action)

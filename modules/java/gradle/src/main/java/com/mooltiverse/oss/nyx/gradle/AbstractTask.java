@@ -45,20 +45,20 @@ abstract class AbstractTask extends DefaultTask {
     }
 
     /**
-     * Returns the provider for the task with the given name or <code>null</code> if no task has been registered or created
+     * Returns the provider for the task with the given name or {@code null} if no task has been registered or created
      * with such name in the given project.
      * 
      * The returned provider can also be used to set a property and is used for lazy instantiation so the task represented
      * by the provider will only be created when it's actually needed.
      * 
-     * This is the same as {@link TaskCollection#named(String)} but in case there is no such task returns <code>null</code>
+     * This is the same as {@link TaskCollection#named(String)} but in case there is no such task returns {@code null}
      * instead of throwing an exception. For this reason this method does not trigger the creation of the task if it was
      * only registered, according to <a href="https://docs.gradle.org/current/userguide/task_configuration_avoidance.html">Configuration Avoidance</a>.
      * 
      * @param project the project to look up the task into
      * @param name the name of the task to look up
      * 
-     * @return the provider for the given task or <code>null</code> if there is no such task
+     * @return the provider for the given task or {@code null} if there is no such task
      */
     protected static TaskProvider<Task> findTask(Project project, String name) {
         try {
@@ -84,7 +84,7 @@ abstract class AbstractTask extends DefaultTask {
      * @param project the project to define the task for
      * @param name the name to register the task with
      * @param type the task class
-     * @param configurationAction the optional action used to configure the task upon creation. It may be <code>null</code>
+     * @param configurationAction the optional action used to configure the task upon creation. It may be {@code null}
      * 
      * @return the task provider used for the deferred task instantiation
      */

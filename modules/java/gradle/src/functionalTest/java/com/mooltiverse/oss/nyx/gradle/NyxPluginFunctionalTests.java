@@ -318,8 +318,8 @@ public class NyxPluginFunctionalTests {
      * Returns a string with a valid content for the build.gradle file. The returned file only has the plugins block.
      * 
      * @param gradleVersion the Gradle version to use for the file
-     * @param plugins an optional map of plugins to apply, where names are plugin IDs and values are their versions. The version may be <code>null</code>
-     * or empty for core plugins. If the entire map is <code>null</code> no plugins are applied. The Nyc plugin is added by default and doesn't need to be added.
+     * @param plugins an optional map of plugins to apply, where names are plugin IDs and values are their versions. The version may be {@code null}
+     * or empty for core plugins. If the entire map is {@code null} no plugins are applied. The Nyc plugin is added by default and doesn't need to be added.
      * 
      * @return a string with a valid content for the build.gradle file
      */
@@ -356,8 +356,8 @@ public class NyxPluginFunctionalTests {
      * Returns a string with a valid content for the build.gradle file. The returned file the plugins block plus a simple extension configuration.
      * 
      * @param gradleVersion the Gradle version to use for the file
-     * @param plugins an optional map of plugins to apply, where names are plugin IDs and values are their versions. The version may be <code>null</code>
-     * or empty for core plugins. If the entire map is <code>null</code> no plugins are applied. The Nyc plugin is added by default and doesn't need to be added.
+     * @param plugins an optional map of plugins to apply, where names are plugin IDs and values are their versions. The version may be {@code null}
+     * or empty for core plugins. If the entire map is {@code null} no plugins are applied. The Nyc plugin is added by default and doesn't need to be added.
      * 
      * @return a string with a valid content for the build.gradle file
      */

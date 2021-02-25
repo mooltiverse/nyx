@@ -66,7 +66,7 @@ public class GitHubSession implements GitSession {
      * 
      * @throws GitTransportException if a transport related error occurs while communicating with the server
      * @throws GitAuthenticationException if authentication fails
-     * @throws NullPointerException if any of the given objects is <code>null</code>
+     * @throws NullPointerException if any of the given objects is {@code null}
      * @throws IllegalArgumentException if any of the given objects is illegal for some reason (i.e. the token is an empry string)
      */
     private GitHubSession(GitHub service, String token) 
@@ -91,7 +91,7 @@ public class GitHubSession implements GitSession {
      * 
      * @throws GitAuthenticationException if authentication fails
      * @throws GitTransportException if a transport related error occurs while communicating with the server
-     * @throws NullPointerException if any of the given objects is <code>null</code>
+     * @throws NullPointerException if any of the given objects is {@code null}
      * @throws IllegalArgumentException if any of the given objects is illegal for some reason (i.e. the token is an empry string)
      */
     static GitHubSession authenticateWithToken(GitHub service, String token)

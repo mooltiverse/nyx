@@ -125,7 +125,7 @@ nyx
 |   \--- java                       # Java sub modules
 |        +--- gradle                # Gradle plugin sub module
 |        \--- lib                   # Java libraries sub modules
-|             +--- core             # Java Core library sub module
+|             +--- main             # Java Main library sub module
 |             +--- git              # Java Git library sub module
 |             \--- version          # Java Version library sub module
 +-- build.gradle                    # Gradle build script (main)

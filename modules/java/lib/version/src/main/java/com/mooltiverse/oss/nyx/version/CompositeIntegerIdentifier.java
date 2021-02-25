@@ -30,9 +30,9 @@ class CompositeIntegerIdentifier extends CompositeIdentifier {
      * Builds the identifier with the given nested identifiers and separator.
      *
      * @param separator the separator used for the string representation to separate children values
-     * @param children the children of this composite identifier. It can't be <code>null</code> or contain <code>null</code> values
+     * @param children the children of this composite identifier. It can't be {@code null} or contain {@code null} values
      *
-     * @throws NullPointerException if the given list of children is <code>null</code> or contains <code>null</code> values
+     * @throws NullPointerException if the given list of children is {@code null} or contains {@code null} values
      * @throws IllegalArgumentException if the given list of children contains illegal values
      */
     protected CompositeIntegerIdentifier(char separator, IntegerIdentifier... children) {
@@ -42,9 +42,9 @@ class CompositeIntegerIdentifier extends CompositeIdentifier {
     /**
      * Builds the identifier with the given nested identifiers and the default separator.
      *
-     * @param children the children of this composite identifier. It can't be <code>null</code> or contain <code>null</code> values
+     * @param children the children of this composite identifier. It can't be {@code null} or contain {@code null} values
      *
-     * @throws NullPointerException if the given list of children is <code>null</code> or contains <code>null</code> values
+     * @throws NullPointerException if the given list of children is {@code null} or contains {@code null} values
      * @throws IllegalArgumentException if the given list of children contains illegal values
      */
     protected CompositeIntegerIdentifier(IntegerIdentifier... children) {
@@ -55,9 +55,9 @@ class CompositeIntegerIdentifier extends CompositeIdentifier {
      * Builds the identifier with the given nested identifiers and separator.
      *
      * @param separator the separator used for the string representation to separate children values
-     * @param children the children of this composite identifier. It can't be <code>null</code> or contain <code>null</code> values
+     * @param children the children of this composite identifier. It can't be {@code null} or contain {@code null} values
      *
-     * @throws NullPointerException if the given list of children is <code>null</code> or contains <code>null</code> values
+     * @throws NullPointerException if the given list of children is {@code null} or contains {@code null} values
      * @throws IllegalArgumentException if the given list of children contains illegal values
      */
     protected CompositeIntegerIdentifier(char separator, List<IntegerIdentifier> children) {
@@ -67,9 +67,9 @@ class CompositeIntegerIdentifier extends CompositeIdentifier {
     /**
      * Builds the identifier with the given nested identifiers and the default separator.
      *
-     * @param children the children of this composite identifier. It can't be <code>null</code> or contain <code>null</code> values
+     * @param children the children of this composite identifier. It can't be {@code null} or contain {@code null} values
      *
-     * @throws NullPointerException if the given list of children is <code>null</code> or contains <code>null</code> values
+     * @throws NullPointerException if the given list of children is {@code null} or contains {@code null} values
      * @throws IllegalArgumentException if the given list of children contains illegal values
      */
     protected CompositeIntegerIdentifier(List<IntegerIdentifier> children) {
@@ -84,7 +84,7 @@ class CompositeIntegerIdentifier extends CompositeIdentifier {
      *
      * @return the new identifier representing the given string.
      *
-     * @throws NullPointerException if the given string is <code>null</code>
+     * @throws NullPointerException if the given string is {@code null}
      * @throws IllegalArgumentException if the given string doesn't hold positive integers
      */
     static CompositeIntegerIdentifier valueOf(String s) {
@@ -99,7 +99,7 @@ class CompositeIntegerIdentifier extends CompositeIdentifier {
      *
      * @return the new identifier representing the given string.
      *
-     * @throws NullPointerException if the given string is <code>null</code>
+     * @throws NullPointerException if the given string is {@code null}
      * @throws IllegalArgumentException if the given string doesn't hold positive integers
      */
     static CompositeIntegerIdentifier valueOf(String s, char separator) {

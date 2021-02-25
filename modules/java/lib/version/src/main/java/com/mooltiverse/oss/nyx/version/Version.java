@@ -42,11 +42,11 @@ public abstract class Version implements Cloneable, Serializable {
     public abstract int hashCode();
 
     /**
-     * Returns <code>true</code> if this version is equal to the given object, <code>false otherwise</code>
+     * Returns {@code true} if this version is equal to the given object, {@code false} otherwise
      * 
      * @param obj the object to compare to
      * 
-     * @return <code>true</code> if this version is equal to the given object, <code>false otherwise</code>
+     * @return {@code true} if this version is equal to the given object, {@code false} otherwise
      */
     @Override
     public abstract boolean equals(Object obj);

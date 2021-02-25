@@ -57,9 +57,9 @@ abstract class CompositeIdentifier extends Identifier {
      * Builds the identifier with the given nested identifiers and separator.
      *
      * @param separator the separator used for the string representation to separate children values
-     * @param children the children of this composite identifier. It can't be <code>null</code> or contain <code>null</code> values
+     * @param children the children of this composite identifier. It can't be {@code null} or contain {@code null} values
      *
-     * @throws NullPointerException if the given list of children is <code>null</code> or contains <code>null</code> values
+     * @throws NullPointerException if the given list of children is {@code null} or contains {@code null} values
      * @throws IllegalArgumentException if the given list of children contains illegal values
      */
     @SafeVarargs
@@ -72,9 +72,9 @@ abstract class CompositeIdentifier extends Identifier {
     /**
      * Builds the identifier with the given nested identifiers and the default separator.
      *
-     * @param children the children of this composite identifier. It can't be <code>null</code> or contain <code>null</code> values
+     * @param children the children of this composite identifier. It can't be {@code null} or contain {@code null} values
      *
-     * @throws NullPointerException if the given list of children is <code>null</code> or contains <code>null</code> values
+     * @throws NullPointerException if the given list of children is {@code null} or contains {@code null} values
      * @throws IllegalArgumentException if the given list of children contains illegal values
      */
     @SafeVarargs
@@ -86,9 +86,9 @@ abstract class CompositeIdentifier extends Identifier {
      * Builds the identifier with the given nested identifiers and separator.
      *
      * @param separator the separator used for the string representation to separate children values
-     * @param children the children of this composite identifier. It can't be <code>null</code> or contain <code>null</code> values
+     * @param children the children of this composite identifier. It can't be {@code null} or contain {@code null} values
      *
-     * @throws NullPointerException if the given list of children is <code>null</code> or contains <code>null</code> values
+     * @throws NullPointerException if the given list of children is {@code null} or contains {@code null} values
      * @throws IllegalArgumentException if the given list of children contains illegal values
      */
     protected CompositeIdentifier(char separator, List<? extends Identifier> children) {
@@ -100,9 +100,9 @@ abstract class CompositeIdentifier extends Identifier {
     /**
      * Builds the identifier with the given nested identifiers and the default separator.
      *
-     * @param children the children of this composite identifier. It can't be <code>null</code> or contain <code>null</code> values
+     * @param children the children of this composite identifier. It can't be {@code null} or contain {@code null} values
      *
-     * @throws NullPointerException if the given list of children is <code>null</code> or contains <code>null</code> values
+     * @throws NullPointerException if the given list of children is {@code null} or contains {@code null} values
      * @throws IllegalArgumentException if the given list of children contains illegal values
      */
     protected CompositeIdentifier(List<? extends Identifier> children) {

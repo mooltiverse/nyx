@@ -174,13 +174,13 @@ public abstract class NyxExtension {
     }
 
     /**
-     * Returns the flag that, when <code>true</code>, prevents Nyx from applying any change to the repository or any
+     * Returns the flag that, when {@code true}, prevents Nyx from applying any change to the repository or any
      * other resource.
      * 
      * We provide an implementation of this method instead of using the abstract definition as it's
      * safer for old Gradle versions we support.
      * 
-     * @return the flag that, when <code>true</code>, prevents Nyx from applying any change to the repository or any
+     * @return the flag that, when {@code true}, prevents Nyx from applying any change to the repository or any
      * other resource
      * 
      * @see Defaults#DRY_RUN
@@ -204,12 +204,12 @@ public abstract class NyxExtension {
     }
 
     /**
-     * Returns the flag that, when <code>true</code>, lets Nyx interpret release names with whatever prefix.
+     * Returns the flag that, when {@code true}, lets Nyx interpret release names with whatever prefix.
      * 
      * We provide an implementation of this method instead of using the abstract definition as it's
      * safer for old Gradle versions we support.
      * 
-     * @return the flag that, when <code>true</code>, lets Nyx interpret release names with whatever prefix
+     * @return the flag that, when {@code true}, lets Nyx interpret release names with whatever prefix
      * 
      * @see Defaults#RELEASE_PREFIX_LENIENT
      */

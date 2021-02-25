@@ -41,7 +41,7 @@ public class GitServiceFactory {
      * @return an instance using the default API URI.
      * 
      * @throws GitTransportException if the default URI can't be reached or does not expose valid APIs
-     * @throws NullPointerException if the given provider is <code>null</code>
+     * @throws NullPointerException if the given provider is {@code null}
      * @throws IllegalArgumentException if the given provider is not supported
      */
     public static GitService instance(GitProvider provider)
@@ -64,7 +64,7 @@ public class GitServiceFactory {
      * @return an instance using the given API URI
      * 
      * @throws GitTransportException if the given URI can't be reached or does not expose valid APIs
-     * @throws NullPointerException if the given URI or provider is <code>null</code>
+     * @throws NullPointerException if the given URI or provider is {@code null}
      * @throws IllegalArgumentException if the given provider is not supported or the given URI is illegal (i.e. empty or malformed)
      * @throws UnsupportedOperationException if the requested provider does not support the {@link GitServiceFeature#CUSTOM_ENDPOINT} feature
      */
@@ -88,7 +88,7 @@ public class GitServiceFactory {
      * @return an instance using the given API URI
      * 
      * @throws GitTransportException if the given URI can't be reached or does not expose valid APIs
-     * @throws NullPointerException if the given URI provider is <code>null</code>
+     * @throws NullPointerException if the given URI provider is {@code null}
      * @throws IllegalArgumentException if the given provider is not supported or the given URI is illegal (i.e. empty or malformed)
      * @throws UnsupportedOperationException if the requested provider does not support the {@link GitServiceFeature#CUSTOM_ENDPOINT} feature
      */

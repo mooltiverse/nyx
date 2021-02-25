@@ -18,7 +18,7 @@ description = 'The Nyx Gradle plugin automates the sematic release process for G
 */
 dependencies {
   // Import dependencies from other modules of this project
-  implementation project(':modules:java:lib:core')
+  implementation project(':modules:java:lib:main')
 }
 
 /*------------------------------------------------------------------------------

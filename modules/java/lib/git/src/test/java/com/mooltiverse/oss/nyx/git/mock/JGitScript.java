@@ -83,10 +83,10 @@ public class JGitScript {
     /**
      * Returns a Git instance on a new repository.
      * 
-     * @param dir the directory to create the repository in. It can't be <code>null</code>.
-     * @param bare if <code>true</code> the repository is initialized as a bare repository, otherwise it will have a work tree.
-     * If <code>initialize</code> is <code>false</code> this parameter is ignored.
-     * @param initialize if <code>true</code> the repository has to be initialized, otherwise <code>false</code>.
+     * @param dir the directory to create the repository in. It can't be {@code null}.
+     * @param bare if {@code true} the repository is initialized as a bare repository, otherwise it will have a work tree.
+     * If {@code initialize} is {@code false} this parameter is ignored.
+     * @param initialize if {@code true} the repository has to be initialized, otherwise {@code false}.
      * 
      * @return the new Git instance.
      * 
@@ -138,9 +138,9 @@ public class JGitScript {
      * Tags the given object with the given name.
      * 
      * @param name the tag name
-     * @param message the tag message (used only for annotated tags, otherwise can be <code>null</code>)
+     * @param message the tag message (used only for annotated tags, otherwise can be {@code null})
      * @param target the object to tag
-     * @param annotated if <code>true</code> the tag will be an annotated tag, otherwise it  will be a lightweight tag
+     * @param annotated if {@code true} the tag will be an annotated tag, otherwise it  will be a lightweight tag
      * 
      * @return the new tag
      * 
@@ -187,8 +187,8 @@ public class JGitScript {
      * 
      * @param directoryCount the number of directories to create
      * @param fileCount the number of files to create for each directory
-     * @param commit set it to <code>true</code> to make a commit
-     * @param annotatedTag set it to <code>true</code> to apply an annotated tag on the commit (ignored if <code>commit</code> is <code>false</code>)
+     * @param commit set it to {@code true} to make a commit
+     * @param annotatedTag set it to {@code true} to apply an annotated tag on the commit (ignored if {@code commit} is {@code false})
      * 
      * @return the batch ID, a string with a random sequence used as a seed for names and IDs in this run.
      * 
@@ -225,8 +225,8 @@ public class JGitScript {
      * 
      * @param branchesCount the number of branches to create
      * @param commitCount the number of commits to create for each branch
-     * @param note set it to <code>true</code> to create a note for each commit
-     * @param lightweightTag set it to <code>true</code> to apply a lightweight tag on the commits
+     * @param note set it to {@code true} to create a note for each commit
+     * @param lightweightTag set it to {@code true} to apply a lightweight tag on the commits
      * 
      * @return the batch ID, a string with a random sequence used as a seed for names and IDs in this run.
      * 

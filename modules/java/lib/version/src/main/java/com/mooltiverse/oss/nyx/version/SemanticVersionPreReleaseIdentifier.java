@@ -33,19 +33,19 @@ import java.util.Objects;
  * <br><br>
  * Examples:
  * <br><br>
- * <code>1.2.3-4</code> can bump the (anonymous) value at index <code>0</code>, resulting in <code>1.2.3-5</code>.
+ * {@code 1.2.3-4} can bump the (anonymous) value at index {@code 0}, resulting in {@code 1.2.3-5}.
  * <br><br>
- * <code>1.2.3-alpha.4</code> can bump the named value <code>alpha</code>, resulting in <code>1.2.3-alpha.5</code>. This
- * is equivalent to bumping the value at index <code>1</code> as it was anonymous.
+ * {@code 1.2.3-alpha.4} can bump the named value {@code alpha}, resulting in {@code 1.2.3-alpha.5}. This
+ * is equivalent to bumping the value at index {@code 1} as it was anonymous.
  * <br><br>
- * <code>1.2.3-beta</code> can bump the named value <code>beta</code>, resulting in <code>1.2.3-beta.0</code> (assuming
- * the default start number is <code>0</code>). This is equivalent to bumping the value at index <code>1</code> as it
+ * {@code 1.2.3-beta} can bump the named value {@code beta}, resulting in {@code 1.2.3-beta.0} (assuming
+ * the default start number is {@code 0}). This is equivalent to bumping the value at index {@code 1} as it
  * was anonymous.
  * <br>
- * <code>1.2.3-beta</code> can bump the named value <code>gamma</code>, resulting in <code>1.2.3-beta.gamma.0</code>.
+ * {@code 1.2.3-beta} can bump the named value {@code gamma}, resulting in {@code 1.2.3-beta.gamma.0}.
  * <br><br>
- * Similarly, <code>1.2.3</code> can bump value anonymously the value at index <code>0</code>, resulting in
- * <code>1.2.3-0</code> or the named value <code>pre</code>, resulting in <code>1.2.3-pre.0</code>.
+ * Similarly, {@code 1.2.3} can bump value anonymously the value at index {@code 0}, resulting in
+ * {@code 1.2.3-0} or the named value {@code pre}, resulting in {@code 1.2.3-pre.0}.
  */
 class SemanticVersionPreReleaseIdentifier extends CompositeObjectIdentifier {
     /**
@@ -56,9 +56,9 @@ class SemanticVersionPreReleaseIdentifier extends CompositeObjectIdentifier {
     /**
      * Builds the pre-release identifier with the given values.
      *
-     * @param children the children of this composite identifier. It can't be <code>null</code> or contain <code>null</code> values
+     * @param children the children of this composite identifier. It can't be {@code null} or contain {@code null} values
      *
-     * @throws NullPointerException if the given list of children is <code>null</code> or contains <code>null</code> values
+     * @throws NullPointerException if the given list of children is {@code null} or contains {@code null} values
      * @throws IllegalArgumentException if the given list of children contains illegal values
      */
     private SemanticVersionPreReleaseIdentifier(List<SimpleIdentifier> children) {
@@ -70,15 +70,15 @@ class SemanticVersionPreReleaseIdentifier extends CompositeObjectIdentifier {
      * as integers and must be positive. If a numeric part is preceded by a string part then they both have the same name.
      * String values produce identifiers with the same name as their value even when they aren't followed by a numeric part.
      *
-     * @param multipleIdentifiers when <code>true</code> the given string is parsed as it (may) contain multiple
+     * @param multipleIdentifiers when {@code true} the given string is parsed as it (may) contain multiple
      * identifiers, separated by the default separator, so this method may yield to multiple identifiers.
-     * When <code>false</code> the given string is expected to have a single identifier so if the given
+     * When {@code false} the given string is expected to have a single identifier so if the given
      * string has multiple identifiers an exception is thrown.
      * @param s the string to parse
      *
      * @return the new identifier instance representing the given string.
      *
-     * @throws NullPointerException if the given string is <code>null</code>
+     * @throws NullPointerException if the given string is {@code null}
      * @throws IllegalArgumentException if the given string contains illegal characters
      */
     static SemanticVersionPreReleaseIdentifier valueOf(boolean multipleIdentifiers, String s) {
@@ -91,18 +91,18 @@ class SemanticVersionPreReleaseIdentifier extends CompositeObjectIdentifier {
      * Creates a new identifier instance with the given identifiers. When elements of the given list are {@link Integer}
      * instances they are treated as numeric identifiers. All other object types are read using their {@link Object#toString()}
      * method. If the string returned by {@link Object#toString()} can be parsed to a positive integer then it is converted
-     * to a numeric identifier, otherwise it's used as a {@link String}.Items cannot be all <code>null</code>.
+     * to a numeric identifier, otherwise it's used as a {@link String}.Items cannot be all {@code null}.
      * String representations of objects must not be empty or contain illegal characters while {@link Integer} must be positive.
      *
-     * @param multipleIdentifiers when <code>true</code> the given string is parsed as it (may) contain multiple
+     * @param multipleIdentifiers when {@code true} the given string is parsed as it (may) contain multiple
      * identifiers, separated by the default separator, so this method may yield to multiple identifiers.
-     * When <code>false</code> the given string is expected to have a single identifier so if the given
+     * When {@code false} the given string is expected to have a single identifier so if the given
      * string has multiple identifiers an exception is thrown.
      * @param items the items to build the identifier with
      *
      * @return the new identifier instance representing the given string.
      *
-     * @throws NullPointerException if the the isn't at least one parameter that is not <code>null</code>
+     * @throws NullPointerException if the the isn't at least one parameter that is not {@code null}
      * @throws IllegalArgumentException if the given identifiers are not legal instances, if
      * numeric values are not positive integers or string values contain illegal characters or are empty.
      */
@@ -128,12 +128,12 @@ class SemanticVersionPreReleaseIdentifier extends CompositeObjectIdentifier {
      * <br>
      * If this identifier has no identifier that equals the given id, then the returned identifier version has all the
      * previous identifiers followed by the two new identifiers: the given string and the following number
-     * <code>defaultNumber</code>.
+     * {@code defaultNumber}.
      * <br>
      * If this identifier already has a string identifier equal to the given id there are two options: if the selected
      * identifier already has a numeric value that follows, the returned identifier will have that numeric identifier
      * incremented by one; if the selected identifier doesn't have a numeric identifier that follows, a new numeric
-     * identifiers is added after the string with the initial value <code>defaultNumber</code>.
+     * identifiers is added after the string with the initial value {@code defaultNumber}.
      * <br>
      * If this identifier already has multiple identifiers that equal to the given value then all of them will be bumped.
      * In case they have different numeric values (or missing) each occurrence is bumped independently according to the
@@ -141,13 +141,13 @@ class SemanticVersionPreReleaseIdentifier extends CompositeObjectIdentifier {
      *
      * @param id the selector of the identifier to bump
      * @param defaultNumber the default number to use when the given identifier doesn't have a numeric part following
-     * the string. This is usually set to <code>0</code> or <code>1</code>. It must be a non-negative integer.
+     * the string. This is usually set to {@code 0} or {@code 1}. It must be a non-negative integer.
      *
      * @return a new instance with the number identified by the given value bumped.
      *
-     * @throws NullPointerException if <code>null</code> is passed
+     * @throws NullPointerException if {@code null} is passed
      * @throws IllegalArgumentException if the given string is empty, contains illegal characters or represents a number
-     * or if <code>defaultNumber</code> is negative.
+     * or if {@code defaultNumber} is negative.
      */
     SemanticVersionPreReleaseIdentifier bump(String id, int defaultNumber) {
         Objects.requireNonNull(id, "Can't bump a null identifier");
@@ -190,11 +190,11 @@ class SemanticVersionPreReleaseIdentifier extends CompositeObjectIdentifier {
     }
 
     /**
-     * Returns <code>true</code> if an attribute with the given name is present, <code>false</code> otherwise.
+     * Returns {@code true} if an attribute with the given name is present, {@code false} otherwise.
      *
-     * @param name the name of the attribute to look up. If <code>null</code> or empty <code>false</code> is returned
+     * @param name the name of the attribute to look up. If {@code null} or empty {@code false} is returned
      *
-     * @return <code>true</code> if an attribute with the given name is present, <code>false</code> otherwise.
+     * @return {@code true} if an attribute with the given name is present, {@code false} otherwise.
      */
     boolean hasAttribute(String name) {
         if ((name == null) || (name.isBlank()))
@@ -205,12 +205,12 @@ class SemanticVersionPreReleaseIdentifier extends CompositeObjectIdentifier {
 
     /**
      * If an attribute with the given name is present, return the identifier after that if and only if it's a numeric
-     * identifier, otherwise return <code>null</code>.
+     * identifier, otherwise return {@code null}.
      *
-     * @param name the name of the attribute to look up. If <code>null</code> or empty <code>null</code> is returned
+     * @param name the name of the attribute to look up. If {@code null} or empty {@code null} is returned
      *
      * @return the attribute after the given name if such attribute is found and there is another numeric attribute after it,
-     * otherwise <code>null</code>
+     * otherwise {@code null}
      */
     Integer getAttributeValue(String name) {
         if ((name == null) || (name.isBlank()))
@@ -233,18 +233,18 @@ class SemanticVersionPreReleaseIdentifier extends CompositeObjectIdentifier {
      * only works on the given attribute (and its optional value) while leaving the other attributes unchanged.
      * <br>
      * If this instance already has a prerelease part that contains an identifier matching the given attribute name then
-     * the identifier matching the attribute name is left unchanged and if the given value is not <code>null</code>,
-     * the next identifier is added or replaced with the given value. <b>ATTENTION: if the value is not <code>null</code>
+     * the identifier matching the attribute name is left unchanged and if the given value is not {@code null},
+     * the next identifier is added or replaced with the given value. <b>ATTENTION: if the value is not {@code null}
      * the identifier after the name is replaced if is a numeric identifier, otherwise it's added after the identifier name.</b>
      * <br>
      *
      * @param name the name to set for the attribute
-     * @param value the value to set for the attribute, or <code>null</code> just set the attribute name, ignoring the value
+     * @param value the value to set for the attribute, or {@code null} just set the attribute name, ignoring the value
      *
      * @return the new instance
      *
      * @throws IllegalArgumentException if the given name or value contains illegal characters
-     * @throws NullPointerException if the attribute name is <code>null</code>
+     * @throws NullPointerException if the attribute name is {@code null}
      */
     SemanticVersionPreReleaseIdentifier setAttribute(String name, Integer value) {
         Objects.requireNonNull(name, "Can't set the attribute name to a null identifier");
@@ -286,17 +286,17 @@ class SemanticVersionPreReleaseIdentifier extends CompositeObjectIdentifier {
 
     /**
      * Returns a new instance with the new attribute removed, if any was present, otherwise the same version is returned.
-     * If the attribute is found and <code>removeValue</code> then also the attribute value (the attribute after the
-     * one identified by <code>name</code>) is removed (if it's a numeric value), unless there are no more attributes after <code>name</code>.
+     * If the attribute is found and {@code removeValue} then also the attribute value (the attribute after the
+     * one identified by {@code name}) is removed (if it's a numeric value), unless there are no more attributes after {@code name}.
      * If, after the removal of the attribute (and optionally its value, if any) there are no attributes left,
-     * the return value is <code>null</code>
+     * the return value is {@code null}
      *
-     * @param name the name of the attribute to remove, if present. If <code>null</code> or empty no action is taken
-     * @param removeValue if <code>true</code> also the attribute after <code>name</code> is removed (if any and if it's numeric)
+     * @param name the name of the attribute to remove, if present. If {@code null} or empty no action is taken
+     * @param removeValue if {@code true} also the attribute after {@code name} is removed (if any and if it's numeric)
      *
-     * @return the new instance, which might be the same of the current object if no attribute with the given <code>name</code>
+     * @return the new instance, which might be the same of the current object if no attribute with the given {@code name}
      * is present. If, after the removal of the attribute (and optionally its value, if any) there are no attributes left,
-     * the return value is <code>null</code>
+     * the return value is {@code null}
      */
     SemanticVersionPreReleaseIdentifier removeAttribute(String name, boolean removeValue) {
         if (!hasAttribute(name))

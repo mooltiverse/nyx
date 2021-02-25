@@ -80,28 +80,28 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
     private transient String renderedString = null;
 
     /**
-     * The identifier of the core version part. It can't be <code>null</code>.
+     * The identifier of the core version part. It can't be {@code null}.
      */
     private final SemanticVersionCoreIdentifier coreIdentifier;
 
     /**
-     * The identifier of the pre-release part of the version. It may be <code>null</code>.
+     * The identifier of the pre-release part of the version. It may be {@code null}.
      */
     private final SemanticVersionPreReleaseIdentifier prereleaseIdentifier;
 
     /**
-     * The identifier of the build part of the version. It may be <code>null</code>.
+     * The identifier of the build part of the version. It may be {@code null}.
      */
     private final SemanticVersionBuildIdentifier buildIdentifier;
 
     /**
      * Builds a new version object with the given values.
      *
-     * @param major the <code>major</code> number
-     * @param minor the <code>minor</code> number
-     * @param patch the <code>patch</code> number
+     * @param major the {@code major} number
+     * @param minor the {@code minor} number
+     * @param patch the {@code patch} number
      *
-     * @throws IllegalArgumentException if one of <code>major</code>, <code>minor</code>, <code>patch</code> is
+     * @throws IllegalArgumentException if one of {@code major}, {@code minor}, {@code patch} is
      * negative
      */
     public SemanticVersion(int major, int minor, int patch) {
@@ -111,22 +111,22 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
     /**
      * Builds a new version object with the given values.
      *
-     * @param major the <code>major</code> number
-     * @param minor the <code>minor</code> number
-     * @param patch the <code>patch</code> number
-     * @param prereleaseIdentifiers the <code>prereleaseIdentifiers</code> the array of {@link Integer} or {@link String}
-     * objects to use as identifiers in the prerelease block. <code>null</code> items are ignored. Integers and strings
-     * representing integers must not have leading zeroes or represent negative numbers. If the array is <code>null</code>
+     * @param major the {@code major} number
+     * @param minor the {@code minor} number
+     * @param patch the {@code patch} number
+     * @param prereleaseIdentifiers the {@code prereleaseIdentifiers} the array of {@link Integer} or {@link String}
+     * objects to use as identifiers in the prerelease block. {@code null} items are ignored. Integers and strings
+     * representing integers must not have leading zeroes or represent negative numbers. If the array is {@code null}
      * then the instance will have no prerelease block
-     * @param buildIdentifiers the <code>buildIdentifiers</code> the array of  {@link String} to use as identifiers in
-     * the build block. <code>null</code> items are ignored. If the array is <code>null</code> then the instance will
+     * @param buildIdentifiers the {@code buildIdentifiers} the array of  {@link String} to use as identifiers in
+     * the build block. {@code null} items are ignored. If the array is {@code null} then the instance will
      * have no build block
      *
-     * @throws IllegalArgumentException if one of <code>major</code>, <code>minor</code>, <code>patch</code> is
-     * negative or one object in the <code>prereleaseIdentifiers</code> represents a negative integer (either when
+     * @throws IllegalArgumentException if one of {@code major}, {@code minor}, {@code patch} is
+     * negative or one object in the {@code prereleaseIdentifiers} represents a negative integer (either when
      * passed as an {@link Integer} or {@link String}) or have leading zeroes. This exception is also raised when objects
-     * in the <code>prereleaseIdentifiers</code> are not of type {@link Integer} or {@link String} or when string
-     * identifiers in the <code>prereleaseIdentifiers</code> or <code>buildIdentifiers</code> contain illegal characters
+     * in the {@code prereleaseIdentifiers} are not of type {@link Integer} or {@link String} or when string
+     * identifiers in the {@code prereleaseIdentifiers} or {@code buildIdentifiers} contain illegal characters
      */
     public SemanticVersion(int major, int minor, int patch, Object[] prereleaseIdentifiers, String[] buildIdentifiers) {
         this(SemanticVersionCoreIdentifier.valueOf(major, minor, patch), Parser.hasValues(prereleaseIdentifiers) ? SemanticVersionPreReleaseIdentifier.valueOf(true, prereleaseIdentifiers) : null, Parser.hasValues(buildIdentifiers) ? SemanticVersionBuildIdentifier.valueOf(true, buildIdentifiers) : null);
@@ -135,11 +135,11 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
     /**
      * Builds the version with the given identifier values.
      *
-     * @param coreIdentifier the identifier of the core version part. It can't be <code>null</code>.
-     * @param prereleaseIdentifier the identifier of the pre-release part of the version. It may be <code>null</code>.
-     * @param buildIdentifier the identifier of the build part of the version. It may be <code>null</code>.
+     * @param coreIdentifier the identifier of the core version part. It can't be {@code null}.
+     * @param prereleaseIdentifier the identifier of the pre-release part of the version. It may be {@code null}.
+     * @param buildIdentifier the identifier of the build part of the version. It may be {@code null}.
      *
-     * @throws NullPointerException if the core identifier is <code>null</code>
+     * @throws NullPointerException if the core identifier is {@code null}
      */
     private SemanticVersion(SemanticVersionCoreIdentifier coreIdentifier, SemanticVersionPreReleaseIdentifier prereleaseIdentifier, SemanticVersionBuildIdentifier buildIdentifier) {
         super();
@@ -167,7 +167,7 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
      *
      * @param obj the reference object with which to compare.
      * 
-     * @return <code>true</code> if this object is the same as the <code>obj</code> argument; <code>false</code> otherwise.
+     * @return {@code true} if this object is the same as the {@code obj} argument; {@code false} otherwise.
      * 
      * @see Object#equals(Object)
      */
@@ -404,7 +404,7 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
      *
      * @return the new SemanticVersion instance representing the given string.
      *
-     * @throws NullPointerException if the given string is <code>null</code>
+     * @throws NullPointerException if the given string is {@code null}
      * @throws IllegalArgumentException if the given string doesn't represent a legal semantic version
      *
      * @see #valueOf(String, boolean)
@@ -440,8 +440,8 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
     /**
      * This method is a shorthand for {@link #valueOf(String)} and {@link #sanitize(String)}.
      * <br>
-     * Returns a SemanticVersion instance representing the specified String value. If <code>sanitize</code> is
-     * <code>true</code> this method will try to sanitize the given string before parsing so that if there are
+     * Returns a SemanticVersion instance representing the specified String value. If {@code sanitize} is
+     * {@code true} this method will try to sanitize the given string before parsing so that if there are
      * illegal characters like a prefix or leading zeroes in numeric identifiers they are removed.
      * <br>
      * When sanitization is enabled on a string that actually needs sanitization the string representation of the
@@ -452,7 +452,7 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
      *
      * @return the new SemanticVersion instance representing the given string.
      *
-     * @throws NullPointerException if the given string is <code>null</code>
+     * @throws NullPointerException if the given string is {@code null}
      * @throws IllegalArgumentException if the given string doesn't represent a legal semantic version
      *
      * @see #valueOf(String)
@@ -473,7 +473,7 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
      *
      * @return the sanitized semantic string version
      *
-     * @throws NullPointerException if the given string is <code>null</code>
+     * @throws NullPointerException if the given string is {@code null}
      * @throws IllegalArgumentException if the given string doesn't represent a semantic version, even tolerating
      * the aspects to sanitize
      *
@@ -486,7 +486,7 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
 
     /**
      * Takes the given string and tries to parse it as a semantic version number, even with illegal characters or prefix.
-     * All numeric identifiers in the core version (<code>major.minor.patch</code>) and in the prerelease metadata are
+     * All numeric identifiers in the core version ({@code major.minor.patch}) and in the prerelease metadata are
      * sanitized by removing all leading zeroes to make them compliant. Numeric identifiers in the build metadata part
      * are left intact, even when they have leading zeroes.
      * If the given string contains a prefix (see {@link #sanitizePrefix(String)}) or illegal characters  they are left
@@ -497,7 +497,7 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
      *
      * @return the string given as input with the illegal leading zeroes removed.
      *
-     * @throws NullPointerException if the given string is <code>null</code>
+     * @throws NullPointerException if the given string is {@code null}
      * @throws IllegalArgumentException if the given string doesn't represent a legal semantic version, even tolerating
      * the prefix
      *
@@ -580,9 +580,9 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
 
     /**
      * Takes the given string and tries to parse it as a semantic version with an optional prefix (which may be any
-     * string before the core <code>major.minor.patch</code> numbers). The returned string is the semantic version passed
+     * string before the core {@code major.minor.patch} numbers). The returned string is the semantic version passed
      * as input with the prefix removed. If no prefix is present then the returned string is the same as the one passed
-     * as input. Prefixes are often used (i.e. the 'v' used it Git tags or <code>release-</code>, <code>rel</code> etc)
+     * as input. Prefixes are often used (i.e. the 'v' used it Git tags or {@code release-}, {@code rel} etc)
      * so this method helps in stripping those prefixes to get a compliant semantic version.
      *
      * @param s a semantic version string which may have an additional prefix to be removed
@@ -590,7 +590,7 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
      * @return the string given as input with the prefix removed, if any, or the same string passed as input if no prefix
      * was found.
      *
-     * @throws NullPointerException if the given string is <code>null</code>
+     * @throws NullPointerException if the given string is {@code null}
      * @throws IllegalArgumentException if the given string doesn't represent a legal semantic version, even tolerating
      * the prefix
      *
@@ -612,15 +612,15 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
 
     /**
      * Takes the given string and tries to parse it as a semantic version with an optional prefix (which may be any
-     * string before the core <code>major.minor.patch</code> numbers). The returned string is the prefix before the core
-     * version number, if any, or <code>null</code> otherwise.
+     * string before the core {@code major.minor.patch} numbers). The returned string is the prefix before the core
+     * version number, if any, or {@code null} otherwise.
      *
      * @param s a semantic version string which may have an additional prefix to be isolated
      *
-     * @return the prefix in the given semantic version string, if any, or <code>null</code> otherwise. <code>null</code>
+     * @return the prefix in the given semantic version string, if any, or {@code null} otherwise. {@code null}
      * is also returned when the given string is empty.
      *
-     * @throws NullPointerException if the given string is <code>null</code>
+     * @throws NullPointerException if the given string is {@code null}
      * @throws IllegalArgumentException if the given string is not empty but doesn't represent a legal semantic version,
      * even tolerating the prefix
      *
@@ -669,7 +669,7 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
     }
 
     /**
-     * Returns the core part (<code>major.minor.patch</code>) of the version as a string.
+     * Returns the core part ({@code major.minor.patch}) of the version as a string.
      *
      * @return the core part of the version as a string.
      */
@@ -690,7 +690,7 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
     }
 
     /**
-     * Returns the prerelease part of the version, if any, or <code>null</code> otherwise.
+     * Returns the prerelease part of the version, if any, or {@code null} otherwise.
      *
      * @return the prerelease part of the version.
      */
@@ -699,7 +699,7 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
     }
 
     /**
-     * Returns an array of the single identifiers of the prerelease part of the version, if any, or <code>null</code>
+     * Returns an array of the single identifiers of the prerelease part of the version, if any, or {@code null}
      * otherwise.
      *
      * @return the identifiers of the prerelease part of the version. The objects in the array can be either {@link Integer}
@@ -715,7 +715,7 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
     }
 
     /**
-     * Returns the build part of the version, if any, or <code>null</code> otherwise.
+     * Returns the build part of the version, if any, or {@code null} otherwise.
      *
      * @return the build part of the version.
      */
@@ -724,7 +724,7 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
     }
 
     /**
-     * Returns an array of the single identifiers of the build part of the version, if any, or <code>null</code>
+     * Returns an array of the single identifiers of the build part of the version, if any, or {@code null}
      * otherwise.
      *
      * @return the identifiers of the build part of the version.
@@ -739,7 +739,7 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
     }
 
     /**
-     * Returns a new version object with the <code>major</code>, <code>minor</code> and <code>patch</code> numbers set
+     * Returns a new version object with the {@code major}, {@code minor} and {@code patch} numbers set
      * to the given values. This method doesn't reset any number and the prerelease and build blocks are left unchanged.
      *
      * @param major the major number to set
@@ -755,7 +755,7 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
     }
 
     /**
-     * Returns a new version object with the <code>major</code> number set to the given value.
+     * Returns a new version object with the {@code major} number set to the given value.
      * This method doesn't reset any number and the prerelease and build blocks are left unchanged.
      *
      * @param major the major number to set
@@ -769,7 +769,7 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
     }
 
     /**
-     * Returns a new version object with the <code>minor</code> number set to the given value.
+     * Returns a new version object with the {@code minor} number set to the given value.
      * This method doesn't reset any number and the prerelease and build blocks are left unchanged.
      *
      * @param minor the minor number to set
@@ -783,7 +783,7 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
     }
 
     /**
-     * Returns a new version object with the <code>patch</code> number set to the given value.
+     * Returns a new version object with the {@code patch} number set to the given value.
      * This method doesn't reset any number and the prerelease and build blocks are left unchanged.
      *
      * @param patch the patch number to set
@@ -797,18 +797,18 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
     }
 
     /**
-     * Returns a new version object with the prerelease part set to the given values. If a <code>null</code> value or an array
-     * of all <code>null</code> values is passed then the returned version will have no prerelease part, otherwise it will have
-     * all of the given non <code>null</code> identifiers, with the core and build elements of this version instance.
+     * Returns a new version object with the prerelease part set to the given values. If a {@code null} value or an array
+     * of all {@code null} values is passed then the returned version will have no prerelease part, otherwise it will have
+     * all of the given non {@code null} identifiers, with the core and build elements of this version instance.
      *
-     * @param identifiers the identifiers to use for the new version instance, or <code>null</code> to remove the
-     * prerelease block. All non <code>null</code> items must be {@link String} or {@link Integer} instances.
+     * @param identifiers the identifiers to use for the new version instance, or {@code null} to remove the
+     * prerelease block. All non {@code null} items must be {@link String} or {@link Integer} instances.
      * {@link String} instances representing numeric values will be interpreted as {@link Integer}.
      * If the current version had a pre-release part it is completely replaced by the given identifiers.
      *
      * @return the new version instance
      *
-     * @throws IllegalArgumentException if some non <code>null</code> item passed contains illegal characters, if a
+     * @throws IllegalArgumentException if some non {@code null} item passed contains illegal characters, if a
      * given number is negative or contains leading zeroes or any item is not an instance of {@link String} or
      * {@link Integer}
      */
@@ -821,17 +821,17 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
     }
 
     /**
-     * Returns a new version object with the build part set to the given values. If a <code>null</code> value or an array
-     * of all <code>null</code> values is passed then the returned version will have no build part, otherwise it will have
-     * all of the given non <code>null</code> identifiers, with the core and prerelease elements of this version instance.
+     * Returns a new version object with the build part set to the given values. If a {@code null} value or an array
+     * of all {@code null} values is passed then the returned version will have no build part, otherwise it will have
+     * all of the given non {@code null} identifiers, with the core and prerelease elements of this version instance.
      * If the current version had a build part it is completely replaced by the given identifiers.
      *
-     * @param identifiers the identifiers to use for the new version instance, or <code>null</code> to remove the
+     * @param identifiers the identifiers to use for the new version instance, or {@code null} to remove the
      * build block
      *
      * @return the new version instance
      *
-     * @throws IllegalArgumentException if some non <code>null</code> item passed contains illegal characters
+     * @throws IllegalArgumentException if some non {@code null} item passed contains illegal characters
      */
     public SemanticVersion setBuild(String... identifiers) {
         SemanticVersionBuildIdentifier svbi = null;
@@ -842,46 +842,46 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
     }
 
     /**
-     * Returns <code>true</code> if an attribute with the given name is present in the prerelease part, <code>false</code> otherwise.
+     * Returns {@code true} if an attribute with the given name is present in the prerelease part, {@code false} otherwise.
      *
-     * @param name the name of the attribute to look up. If <code>null</code> or empty <code>false</code> is returned
+     * @param name the name of the attribute to look up. If {@code null} or empty {@code false} is returned
      *
-     * @return <code>true</code> if an attribute with the given name is present in the prerelease part, <code>false</code> otherwise.
+     * @return {@code true} if an attribute with the given name is present in the prerelease part, {@code false} otherwise.
      */
     public boolean hasPrereleaseAttribute(String name) {
         return prereleaseIdentifier == null ? false : prereleaseIdentifier.hasAttribute(name);
     }
 
     /**
-     * Returns <code>true</code> if an attribute with the given name is present in the build part, <code>false</code> otherwise.
+     * Returns {@code true} if an attribute with the given name is present in the build part, {@code false} otherwise.
      *
-     * @param name the name of the attribute to look up. If <code>null</code> or empty <code>false</code> is returned
+     * @param name the name of the attribute to look up. If {@code null} or empty {@code false} is returned
      *
-     * @return <code>true</code> if an attribute with the given name is present in the build part, <code>false</code> otherwise.
+     * @return {@code true} if an attribute with the given name is present in the build part, {@code false} otherwise.
      */
     public boolean hasBuildAttribute(String name) {
         return buildIdentifier == null ? false : buildIdentifier.hasAttribute(name);
     }
 
     /**
-     * If an attribute with the given name is present in the prerelease part, return the identifier after that, otherwise return <code>null</code>.
+     * If an attribute with the given name is present in the prerelease part, return the identifier after that, otherwise return {@code null}.
      *
-     * @param name the name of the attribute to look up. If <code>null</code> or empty <code>null</code> is returned
+     * @param name the name of the attribute to look up. If {@code null} or empty {@code null} is returned
      *
      * @return the attribute after the given name if such attribute is found in the prerelease part and there is another attribute after it,
-     * otherwise <code>null</code>
+     * otherwise {@code null}
      */
     public Integer getPrereleaseAttributeValue(String name) {
         return prereleaseIdentifier == null ? null : prereleaseIdentifier.getAttributeValue(name);
     }
 
     /**
-     * If an attribute with the given name is present in the build part, return the identifier after that, otherwise return <code>null</code>.
+     * If an attribute with the given name is present in the build part, return the identifier after that, otherwise return {@code null}.
      *
-     * @param name the name of the attribute to look up. If <code>null</code> or empty <code>null</code> is returned
+     * @param name the name of the attribute to look up. If {@code null} or empty {@code null} is returned
      *
      * @return the attribute after the given name if such attribute is found in the build part and there is another attribute after it,
-     * otherwise <code>null</code>
+     * otherwise {@code null}
      */
     public String getBuildAttributeValue(String name) {
         return buildIdentifier == null ? null : buildIdentifier.getAttributeValue(name);
@@ -893,45 +893,45 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
      * unchanged.
      * <br>
      * If this version doesn't have a prerelease part, the returned version will have one with the new attribute appended
-     * (and its value as well, if not <code>null</code>).
+     * (and its value as well, if not {@code null}).
      * <br>
      * If this version already has a prerelease part with no identifier matching the given attribute name then the returned
      * version will have the same prerelease part as the current one with the new attribute appended (and its value as well,
-     * if not <code>null</code>).
+     * if not {@code null}).
      * <br>
      * If this version already has a prerelease part that contains an identifier matching the given attribute name then
-     * the identifier matching the attribute name is left unchanged and if the given value is not <code>null</code>,
+     * the identifier matching the attribute name is left unchanged and if the given value is not {@code null},
      * the next identifier is added or replaced with the given value.<br>
-     * <b>ATTENTION: if the value is not <code>null</code> the current identifier after the name (if any) is replaced
+     * <b>ATTENTION: if the value is not {@code null} the current identifier after the name (if any) is replaced
      * if it's a numeric identifier.</b>
      * <br>
-     * Examples of invoking <code>setPrereleaseAttribute("build")</code> with <code>null</code> value:<br>
-     * - <code>1.2.3 = 1.2.3-build</code><br>
-     * - <code>1.2.3-alpha = 1.2.3-alpha.build</code><br>
-     * - <code>1.2.3-alpha.beta = 1.2.3-alpha.beta.build</code><br>
-     * - <code>1.2.3+timestamp = 1.2.3-build+timestamp</code><br>
-     * - <code>1.2.3-alpha+timestamp.20200101 = 1.2.3-alpha.build+timestamp.20200101</code><br>
-     * - <code>1.2.3-build = 1.2.3-build</code> (unchanged)<br>
-     * - <code>1.2.3-build.12345 = 1.2.3-build.12345</code> (unchanged)<br>
-     * - <code>1.2.3-build.12345.timestamp.20200101 = 1.2.3-build.12345.timestamp.20200101</code> (unchanged)<br>
+     * Examples of invoking {@code setPrereleaseAttribute("build")} with {@code null} value:<br>
+     * - {@code 1.2.3 = 1.2.3-build}<br>
+     * - {@code 1.2.3-alpha = 1.2.3-alpha.build}<br>
+     * - {@code 1.2.3-alpha.beta = 1.2.3-alpha.beta.build}<br>
+     * - {@code 1.2.3+timestamp = 1.2.3-build+timestamp}<br>
+     * - {@code 1.2.3-alpha+timestamp.20200101 = 1.2.3-alpha.build+timestamp.20200101}<br>
+     * - {@code 1.2.3-build = 1.2.3-build} (unchanged)<br>
+     * - {@code 1.2.3-build.12345 = 1.2.3-build.12345} (unchanged)<br>
+     * - {@code 1.2.3-build.12345.timestamp.20200101 = 1.2.3-build.12345.timestamp.20200101} (unchanged)<br>
      * <br>
-     * Examples of invoking <code>setPrereleaseAttribute("build")</code> with <code>12345</code> value:<br>
-     * - <code>1.2.3 = 1.2.3-build.12345</code><br>
-     * - <code>1.2.3-alpha = 1.2.3-alpha.build.12345</code><br>
-     * - <code>1.2.3-alpha.beta = 1.2.3-alpha.beta.build.12345</code><br>
-     * - <code>1.2.3+timestamp = 1.2.3-build.12345+timestamp</code><br>
-     * - <code>1.2.3-alpha+timestamp.20200101 = 1.2.3-alpha.build.12345+timestamp.20200101</code><br>
-     * - <code>1.2.3-build = 1.2.3-build.12345</code><br>
-     * - <code>1.2.3-build.12345 = 1.2.3-build.12345</code> (unchanged)<br>
-     * - <code>1.2.3-build.12345.timestamp.20200101 = 1.2.3-build.12345.timestamp.20200101</code> (unchanged)<br>
+     * Examples of invoking {@code setPrereleaseAttribute("build")} with {@code 12345} value:<br>
+     * - {@code 1.2.3 = 1.2.3-build.12345}<br>
+     * - {@code 1.2.3-alpha = 1.2.3-alpha.build.12345}<br>
+     * - {@code 1.2.3-alpha.beta = 1.2.3-alpha.beta.build.12345}<br>
+     * - {@code 1.2.3+timestamp = 1.2.3-build.12345+timestamp}<br>
+     * - {@code 1.2.3-alpha+timestamp.20200101 = 1.2.3-alpha.build.12345+timestamp.20200101}<br>
+     * - {@code 1.2.3-build = 1.2.3-build.12345}<br>
+     * - {@code 1.2.3-build.12345 = 1.2.3-build.12345} (unchanged)<br>
+     * - {@code 1.2.3-build.12345.timestamp.20200101 = 1.2.3-build.12345.timestamp.20200101} (unchanged)<br>
      *
      * @param name the name to set for the attribute
-     * @param value the value to set for the attribute, or <code>null</code> just set the attribute name, ignoring the value
+     * @param value the value to set for the attribute, or {@code null} just set the attribute name, ignoring the value
      *
      * @return the new version instance
      *
      * @throws IllegalArgumentException if the given name or value contains illegal characters
-     * @throws NullPointerException if the attribute name is <code>null</code>
+     * @throws NullPointerException if the attribute name is {@code null}
      */
     public SemanticVersion setPrereleaseAttribute(String name, Integer value) {
         Objects.requireNonNull(name, "Can't set a null attribute name");
@@ -952,7 +952,7 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
      * @return the new version instance
      *
      * @throws IllegalArgumentException if the given name contains illegal characters
-     * @throws NullPointerException if the attribute name is <code>null</code>
+     * @throws NullPointerException if the attribute name is {@code null}
      * 
      * @see #setPrereleaseAttribute(String, Integer)
      */
@@ -966,45 +966,45 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
      * unchanged.
      * <br>
      * If this version doesn't have a build part, the returned version will have one with the new attribute appended
-     * (and its value as well, if not <code>null</code>).
+     * (and its value as well, if not {@code null}).
      * <br>
      * If this version already has a build part with no identifier matching the given attribute name then the returned
      * version will have the same build part as the current one with the new attribute appended (and its value as well,
-     * if not <code>null</code>).
+     * if not {@code null}).
      * <br>
      * If this version already has a build part that contains an identifier matching the given attribute name then
-     * the identifier matching the attribute name is left unchanged and if the given value is not <code>null</code>,
+     * the identifier matching the attribute name is left unchanged and if the given value is not {@code null},
      * the next identifier is added or replaced with the given value.<br>
-     * <b>ATTENTION: if the value is not <code>null</code> the current identifier after the name (if any) is replaced
+     * <b>ATTENTION: if the value is not {@code null} the current identifier after the name (if any) is replaced
      * without further consideration.</b>
      * <br>
-     * Examples of invoking <code>setBuildAttribute("build")</code> with <code>null</code> value:<br>
-     * - <code>1.2.3 = 1.2.3+build</code><br>
-     * - <code>1.2.3-alpha = 1.2.3-alpha+build</code><br>
-     * - <code>1.2.3-alpha.beta = 1.2.3-alpha.beta+build</code><br>
-     * - <code>1.2.3+timestamp = 1.2.3+timestamp.build</code><br>
-     * - <code>1.2.3-alpha+timestamp.20200101 = 1.2.3-alpha+timestamp.20200101.build</code><br>
-     * - <code>1.2.3+build = 1.2.3+build</code> (unchanged)<br>
-     * - <code>1.2.3+build.12345 = 1.2.3+build.12345</code> (unchanged)<br>
-     * - <code>1.2.3+build.12345.timestamp.20200101 = 1.2.3+build.12345.timestamp.20200101</code> (unchanged)<br>
+     * Examples of invoking {@code setBuildAttribute("build")} with {@code null} value:<br>
+     * - {@code 1.2.3 = 1.2.3+build}<br>
+     * - {@code 1.2.3-alpha = 1.2.3-alpha+build}<br>
+     * - {@code 1.2.3-alpha.beta = 1.2.3-alpha.beta+build}<br>
+     * - {@code 1.2.3+timestamp = 1.2.3+timestamp.build}<br>
+     * - {@code 1.2.3-alpha+timestamp.20200101 = 1.2.3-alpha+timestamp.20200101.build}<br>
+     * - {@code 1.2.3+build = 1.2.3+build} (unchanged)<br>
+     * - {@code 1.2.3+build.12345 = 1.2.3+build.12345} (unchanged)<br>
+     * - {@code 1.2.3+build.12345.timestamp.20200101 = 1.2.3+build.12345.timestamp.20200101} (unchanged)<br>
      * <br>
-     * Examples of invoking <code>setBuildAttribute("build")</code> with <code>12345</code> value:<br>
-     * - <code>1.2.3 = 1.2.3+build.12345</code><br>
-     * - <code>1.2.3-alpha = 1.2.3-alpha+build.12345</code><br>
-     * - <code>1.2.3-alpha.beta = 1.2.3-alpha.beta+build.12345</code><br>
-     * - <code>1.2.3+timestamp = 1.2.3+timestamp.build.12345</code><br>
-     * - <code>1.2.3-alpha+timestamp.20200101 = 1.2.3-alpha+timestamp.20200101.build.12345</code><br>
-     * - <code>1.2.3+build = 1.2.3+build.12345</code><br>
-     * - <code>1.2.3+build.12345 = 1.2.3+build.12345</code> (unchanged)<br>
-     * - <code>1.2.3+build.12345.timestamp.20200101 = 1.2.3+build.12345.timestamp.20200101</code> (unchanged)<br>
+     * Examples of invoking {@code setBuildAttribute("build")} with {@code 12345} value:<br>
+     * - {@code 1.2.3 = 1.2.3+build.12345}<br>
+     * - {@code 1.2.3-alpha = 1.2.3-alpha+build.12345}<br>
+     * - {@code 1.2.3-alpha.beta = 1.2.3-alpha.beta+build.12345}<br>
+     * - {@code 1.2.3+timestamp = 1.2.3+timestamp.build.12345}<br>
+     * - {@code 1.2.3-alpha+timestamp.20200101 = 1.2.3-alpha+timestamp.20200101.build.12345}<br>
+     * - {@code 1.2.3+build = 1.2.3+build.12345}<br>
+     * - {@code 1.2.3+build.12345 = 1.2.3+build.12345} (unchanged)<br>
+     * - {@code 1.2.3+build.12345.timestamp.20200101 = 1.2.3+build.12345.timestamp.20200101} (unchanged)<br>
      *
      * @param name the name to set for the attribute
-     * @param value the value to set for the attribute, or <code>null</code> just set the attribute name, ignoring the value
+     * @param value the value to set for the attribute, or {@code null} just set the attribute name, ignoring the value
      *
      * @return the new version instance
      *
      * @throws IllegalArgumentException if the given name or value contains illegal characters
-     * @throws NullPointerException if the attribute name is <code>null</code>
+     * @throws NullPointerException if the attribute name is {@code null}
      */
     public SemanticVersion setBuildAttribute(String name, String value) {
         Objects.requireNonNull(name, "Can't set a null attribute name");
@@ -1025,7 +1025,7 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
      * @return the new version instance
      *
      * @throws IllegalArgumentException if the given name contains illegal characters
-     * @throws NullPointerException if the attribute name is <code>null</code>
+     * @throws NullPointerException if the attribute name is {@code null}
      * 
      * @see #setBuildAttribute(String, String)
      */
@@ -1035,14 +1035,14 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
 
     /**
      * Returns a new instance with the new attribute removed from the prerelease part, if any was present, otherwise the same version is returned.
-     * If the attribute is found and <code>removeValue</code> is <code>true</code> then also the attribute value (the attribute after the
-     * one identified by <code>name</code>) is removed, unless there are no more attributes after <code>name</code> or the value attribute
+     * If the attribute is found and {@code removeValue} is {@code true} then also the attribute value (the attribute after the
+     * one identified by {@code name}) is removed, unless there are no more attributes after {@code name} or the value attribute
      * is not numeric.
      *
-     * @param name the name of the attribute to remove from the prerelease part, if present. If <code>null</code> or empty no action is taken
-     * @param removeValue if <code>true</code> also the attribute after <code>name</code> is removed (if any)
+     * @param name the name of the attribute to remove from the prerelease part, if present. If {@code null} or empty no action is taken
+     * @param removeValue if {@code true} also the attribute after {@code name} is removed (if any)
      *
-     * @return the new instance, which might be the same of the current object if no attribute with the given <code>name</code>
+     * @return the new instance, which might be the same of the current object if no attribute with the given {@code name}
      * is present
      */
     public SemanticVersion removePrereleaseAttribute(String name, boolean removeValue) {
@@ -1051,13 +1051,13 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
 
     /**
      * Returns a new instance with the new attribute removed from the build part, if any was present, otherwise the same version is returned.
-     * If the attribute is found and <code>removeValue</code> is <code>true</code> then also the attribute value (the attribute after the
-     * one identified by <code>name</code>) is removed, unless there are no more attributes after <code>name</code>.
+     * If the attribute is found and {@code removeValue} is {@code true} then also the attribute value (the attribute after the
+     * one identified by {@code name}) is removed, unless there are no more attributes after {@code name}.
      *
-     * @param name the name of the attribute to remove from the build part, if present. If <code>null</code> or empty no action is taken
-     * @param removeValue if <code>true</code> also the attribute after <code>name</code> is removed (if any)
+     * @param name the name of the attribute to remove from the build part, if present. If {@code null} or empty no action is taken
+     * @param removeValue if {@code true} also the attribute after {@code name} is removed (if any)
      *
-     * @return the new instance, which might be the same of the current object if no attribute with the given <code>name</code>
+     * @return the new instance, which might be the same of the current object if no attribute with the given {@code name}
      * is present
      */
     public SemanticVersion removeBuildAttribute(String name, boolean removeValue) {
@@ -1104,7 +1104,7 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
      *
      * @return a new instance with the number identified by the given value bumped.
      *
-     * @throws NullPointerException if <code>null</code> is passed
+     * @throws NullPointerException if {@code null} is passed
      */
     public SemanticVersion bump(CoreIdentifiers id) {
         Objects.requireNonNull(id);
@@ -1122,38 +1122,38 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
      * the build blocks (if present) are left unchanged.
      * <br>
      * If this version doesn't have a prerelease block the returned version will have one, containing two identifiers:
-     * the given string and the following number <code>.0</code>.
+     * the given string and the following number {@code .0}.
      * <br>
      * If this version already has a prerelease block without any identifier that equals the given id, then the returned
      * version has all the previous prerelease identifiers preceded by the two new identifiers the given string and
-     * the following number <code>.1</code>.
+     * the following number {@code .1}.
      * If this version already has a prerelease block that contains a string identifier equal to the given id there are
      * two options: if the selected identifier already has a numeric value that follows, the returned version will have
      * that numeric identifier incremented by one; if the selected identifier doesn't have a numeric identifier that
-     * follows, a new numeric identifiers is added after the string with the initial value <code>.1</code>.
+     * follows, a new numeric identifiers is added after the string with the initial value {@code .1}.
      * <br>
      * If the version already has multiple identifiers in the prerelease block that equal to the given value then all of
      * them will be bumped. In case they have different numeric values (or missing) each occurrence is bumped
      * independently according to the above rules.
      * <br>
-     * Examples of invoking <code>bumpPrerelease("alpha")</code> on different versions:<br>
-     * - <code>1.2.3 = 1.2.3-alpha.0</code><br>
-     * - <code>1.2.3-alpha = 1.2.3-alpha.0</code><br>
-     * - <code>1.2.3-alpha.beta = 1.2.3-alpha.0.beta</code><br>
-     * - <code>1.2.3-gamma = 1.2.3-alpha.0.gamma</code><br>
-     * - <code>1.2.3-gamma.delta = 1.2.3-alpha.0.gamma.delta</code><br>
-     * - <code>1.2.3+999 = 1.2.3-alpha.0+999</code><br>
-     * - <code>1.2.3-alpha+999 = 1.2.3-alpha.0+999</code><br>
-     * - <code>1.2.3-alpha.beta+999 = 1.2.3-alpha.0.beta+999</code><br>
-     * - <code>1.2.3-gamma+999 = 1.2.3-alpha.0.gamma+999</code><br>
-     * - <code>1.2.3-gamma.delta+999 = 1.2.3-alpha.0.gamma.delta+999</code><br>
-     * - <code>1.2.3-alpha.alpha.1.alpha.2 = 1.2.3-alpha.0.alpha.2.alpha.3</code><br>
+     * Examples of invoking {@code bumpPrerelease("alpha")} on different versions:<br>
+     * - {@code 1.2.3 = 1.2.3-alpha.0}<br>
+     * - {@code 1.2.3-alpha = 1.2.3-alpha.0}<br>
+     * - {@code 1.2.3-alpha.beta = 1.2.3-alpha.0.beta}<br>
+     * - {@code 1.2.3-gamma = 1.2.3-alpha.0.gamma}<br>
+     * - {@code 1.2.3-gamma.delta = 1.2.3-alpha.0.gamma.delta}<br>
+     * - {@code 1.2.3+999 = 1.2.3-alpha.0+999}<br>
+     * - {@code 1.2.3-alpha+999 = 1.2.3-alpha.0+999}<br>
+     * - {@code 1.2.3-alpha.beta+999 = 1.2.3-alpha.0.beta+999}<br>
+     * - {@code 1.2.3-gamma+999 = 1.2.3-alpha.0.gamma+999}<br>
+     * - {@code 1.2.3-gamma.delta+999 = 1.2.3-alpha.0.gamma.delta+999}<br>
+     * - {@code 1.2.3-alpha.alpha.1.alpha.2 = 1.2.3-alpha.0.alpha.2.alpha.3}<br>
      *
      * @param id the selector of the identifier to bump
      *
      * @return a new instance with the number identified by the given value bumped.
      *
-     * @throws NullPointerException if <code>null</code> is passed
+     * @throws NullPointerException if {@code null} is passed
      * @throws IllegalArgumentException if the given string is empty, contains illegal characters or represents a number
      */
     public SemanticVersion bumpPrerelease(String id) {
@@ -1175,7 +1175,7 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
 
     /**
      * Returns a new instance with the number identified by the given value bumped. If the given value represents a core
-     * identifier ({@link CoreIdentifiers}, namely <code>major</code>, <code>minor</code>, <code>patch</code>) then that
+     * identifier ({@link CoreIdentifiers}, namely {@code major}, {@code minor}, {@code patch}) then that
      * identifier is bumped, otherwise the given id is used to bump a prerelease identifier by invoking
      * {@link #bumpPrerelease(String)}.
      * <br>
@@ -1190,7 +1190,7 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
      *
      * @return a new instance with the number identified by the given value bumped.
      *
-     * @throws NullPointerException if <code>null</code> is passed
+     * @throws NullPointerException if {@code null} is passed
      * @throws IllegalArgumentException if the given string is empty, contains illegal characters or represents a number
      *
      * @see CoreIdentifiers

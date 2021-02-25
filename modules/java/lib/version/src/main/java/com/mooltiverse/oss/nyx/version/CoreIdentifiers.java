@@ -40,7 +40,7 @@ public enum CoreIdentifiers {
     private final String name;
 
     /**
-     * The relative position of this identifier (starting from <code>0</code>).
+     * The relative position of this identifier (starting from {@code 0}).
      */
     private final int position;
 
@@ -48,7 +48,7 @@ public enum CoreIdentifiers {
      * Constructor.
      *
      * @param name the identifier name.
-     * @param position the relative position of this identifier (starting from <code>0</code>).
+     * @param position the relative position of this identifier (starting from {@code 0}).
      */
     private CoreIdentifiers(String name, int position) {
         this.name = name;
@@ -65,7 +65,7 @@ public enum CoreIdentifiers {
     }
 
     /**
-     * Returns the relative position of this identifier (starting from <code>0</code>).
+     * Returns the relative position of this identifier (starting from {@code 0}).
      *
      * @return the relative position of this identifier.
      */
@@ -81,7 +81,7 @@ public enum CoreIdentifiers {
      *
      * @return the value with the given name.
      *
-     * @throws NullPointerException if <code>null</code> is passed
+     * @throws NullPointerException if {@code null} is passed
      * @throws IllegalArgumentException if there is no identifier with the given name
      *
      * @see #getName()
@@ -96,14 +96,14 @@ public enum CoreIdentifiers {
     }
 
     /**
-     * Returns <code>true</code> if there is a value with the given name. This method can be used to invoke
+     * Returns {@code true} if there is a value with the given name. This method can be used to invoke
      * {@link #byName(String)} or {@link #valueOf(String)} safely.
      *
      * @param name the name of the identifier to search
      *
-     * @return <code>true</code> if there is a value with the given name.
+     * @return {@code true} if there is a value with the given name.
      *
-     * @throws NullPointerException if <code>null</code> is passed
+     * @throws NullPointerException if {@code null} is passed
      *
      * @see #getName()
      * @see #hasName(String)

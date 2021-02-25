@@ -35,9 +35,9 @@ class SemanticVersionBuildIdentifier extends CompositeStringIdentifier {
     /**
      * Builds the value identifier with the given values.
      *
-     * @param children the children of this composite identifier. It can't be <code>null</code> or contain <code>null</code> values
+     * @param children the children of this composite identifier. It can't be {@code null} or contain {@code null} values
      *
-     * @throws NullPointerException if the given list of children is <code>null</code> or contains <code>null</code> values
+     * @throws NullPointerException if the given list of children is {@code null} or contains {@code null} values
      * @throws IllegalArgumentException if the given list of children contains illegal values
      */
     private SemanticVersionBuildIdentifier(List<StringIdentifier> children) {
@@ -47,17 +47,17 @@ class SemanticVersionBuildIdentifier extends CompositeStringIdentifier {
     /**
      * Returns an identifier instance representing the specified String value.
      *
-     * @param multipleIdentifiers when <code>true</code> the given string is parsed as it (may) contain multiple
+     * @param multipleIdentifiers when {@code true} the given string is parsed as it (may) contain multiple
      * identifiers, separated by the default separator, so this method may yield to multiple identifiers.
-     * When <code>false</code> the given string is expected to have a single identifier so if the given
+     * When {@code false} the given string is expected to have a single identifier so if the given
      * string has multiple identifiers an exception is thrown.
      * @param s the string to parse
      *
      * @return the new identifier instance representing the given string.
      *
-     * @throws NullPointerException if the given string is <code>null</code>
+     * @throws NullPointerException if the given string is {@code null}
      * @throws IllegalArgumentException if the given string contains illegal characters or there isn't any non
-     * <code>null</code> item
+     * {@code null} item
      */
     static SemanticVersionBuildIdentifier valueOf(boolean multipleIdentifiers, String s) {
         if (multipleIdentifiers)
@@ -68,17 +68,17 @@ class SemanticVersionBuildIdentifier extends CompositeStringIdentifier {
     /**
      * Returns an identifier instance representing the specified String values.
      *
-     * @param multipleIdentifiers when <code>true</code> the given string is parsed as it (may) contain multiple
+     * @param multipleIdentifiers when {@code true} the given string is parsed as it (may) contain multiple
      * identifiers, separated by the default separator, so this method may yield to multiple identifiers.
-     * When <code>false</code> the given string is expected to have a single identifier so if the given
+     * When {@code false} the given string is expected to have a single identifier so if the given
      * string has multiple identifiers an exception is thrown.
      * @param items the strings to parse
      *
      * @return the new identifier instance representing the given string.
      *
-     * @throws NullPointerException if the given strings is <code>null</code>
+     * @throws NullPointerException if the given strings is {@code null}
      * @throws IllegalArgumentException if the given string contains illegal characters or there isn't any non
-     * <code>null</code> item
+     * {@code null} item
      */
     static SemanticVersionBuildIdentifier valueOf(boolean multipleIdentifiers, String... items) {
         Objects.requireNonNull(items, "Can't build the list of identifiers from a null list");
@@ -95,11 +95,11 @@ class SemanticVersionBuildIdentifier extends CompositeStringIdentifier {
     }
 
     /**
-     * Returns <code>true</code> if an attribute with the given name is present, <code>false</code> otherwise.
+     * Returns {@code true} if an attribute with the given name is present, {@code false} otherwise.
      *
-     * @param name the name of the attribute to look up. If <code>null</code> or empty <code>false</code> is returned
+     * @param name the name of the attribute to look up. If {@code null} or empty {@code false} is returned
      *
-     * @return <code>true</code> if an attribute with the given name is present, <code>false</code> otherwise.
+     * @return {@code true} if an attribute with the given name is present, {@code false} otherwise.
      */
     boolean hasAttribute(String name) {
         if ((name == null) || (name.isBlank()))
@@ -109,12 +109,12 @@ class SemanticVersionBuildIdentifier extends CompositeStringIdentifier {
     }
 
     /**
-     * If an attribute with the given name is present, return the identifier after that, otherwise return <code>null</code>.
+     * If an attribute with the given name is present, return the identifier after that, otherwise return {@code null}.
      *
-     * @param name the name of the attribute to look up. If <code>null</code> or empty <code>null</code> is returned
+     * @param name the name of the attribute to look up. If {@code null} or empty {@code null} is returned
      *
      * @return the attribute after the given name if such attribute is found and there is another attribute after it,
-     * otherwise <code>null</code>
+     * otherwise {@code null}
      */
     String getAttributeValue(String name) {
         if ((name == null) || (name.isBlank()))
@@ -135,18 +135,18 @@ class SemanticVersionBuildIdentifier extends CompositeStringIdentifier {
      * only works on the given attribute (and its optional value) while leaving the other attributes unchanged.
      * <br>
      * If this instance already has a build part that contains an identifier matching the given attribute name then
-     * the identifier matching the attribute name is left unchanged and if the given value is not <code>null</code>,
-     * the next identifier is added or replaced with the given value. <b>ATTENTION: if the value is not <code>null</code>
+     * the identifier matching the attribute name is left unchanged and if the given value is not {@code null},
+     * the next identifier is added or replaced with the given value. <b>ATTENTION: if the value is not {@code null}
      * the identifier after the name is replaced without further consideration.</b>
      * <br>
      *
      * @param name the name to set for the attribute
-     * @param value the value to set for the attribute, or <code>null</code> just set the attribute name, ignoring the value
+     * @param value the value to set for the attribute, or {@code null} just set the attribute name, ignoring the value
      *
      * @return the new instance
      *
      * @throws IllegalArgumentException if the given name or value contains illegal characters
-     * @throws NullPointerException if the attribute name is <code>null</code>
+     * @throws NullPointerException if the attribute name is {@code null}
      */
     SemanticVersionBuildIdentifier setAttribute(String name, String value) {
         Objects.requireNonNull(name, "Can't set the attribute name to a null identifier");
@@ -184,17 +184,17 @@ class SemanticVersionBuildIdentifier extends CompositeStringIdentifier {
 
     /**
      * Returns a new instance with the new attribute removed, if any was present, otherwise the same version is returned.
-     * If the attribute is found and <code>removeValue</code> then also the attribute value (the attribute after the
-     * one identified by <code>name</code>) is removed, unless there are no more attributes after <code>name</code>.
+     * If the attribute is found and {@code removeValue} then also the attribute value (the attribute after the
+     * one identified by {@code name}) is removed, unless there are no more attributes after {@code name}.
      * If, after the removal of the attribute (and optionally its value, if any) there are no attributes left,
-     * the return value is <code>null</code>
+     * the return value is {@code null}
      *
-     * @param name the name of the attribute to remove, if present. If <code>null</code> or empty no action is taken
-     * @param removeValue if <code>true</code> also the attribute after <code>name</code> is removed (if any)
+     * @param name the name of the attribute to remove, if present. If {@code null} or empty no action is taken
+     * @param removeValue if {@code true} also the attribute after {@code name} is removed (if any)
      *
-     * @return the new instance, which might be the same of the current object if no attribute with the given <code>name</code>
+     * @return the new instance, which might be the same of the current object if no attribute with the given {@code name}
      * is present. If, after the removal of the attribute (and optionally its value, if any) there are no attributes left,
-     * the return value is <code>null</code>
+     * the return value is {@code null}
      */
     SemanticVersionBuildIdentifier removeAttribute(String name, boolean removeValue) {
         if (!hasAttribute(name))

@@ -52,7 +52,7 @@ public class GitHubUser extends GitHubEntity implements GitUser {
      * @param session the session associated with this object
      * @param attributes the map of attributes for this object
      * 
-     * @throws NullPointerException if the given session or attributes map is <code>null</code>
+     * @throws NullPointerException if the given session or attributes map is {@code null}
      * @throws IllegalArgumentException if the map of attributes is empty
      */
     private GitHubUser(GitHubSession session, Map<String, Object> attributes) {
@@ -94,19 +94,19 @@ public class GitHubUser extends GitHubEntity implements GitUser {
     }
 
     /**
-     * Retrieves the user attributes using the given session. If the given used name is <code>null</code>
+     * Retrieves the user attributes using the given session. If the given used name is {@code null}
      * then the current authenticated user for the given session is retrieved, otherwise the user with the
      * given name is fetched.
      * 
      * @param session the session to use to fetch the user data
      * @param userName the login of the user to retrieve, or 
      * 
-     * @return the attributes of the requested user <code>null</code> to fetch the data for the authenticated
+     * @return the attributes of the requested user {@code null} to fetch the data for the authenticated
      * user in the given session
      * 
      * @throws GitTransportException if a transport related error occurs while communicating with the server
      * @throws GitAuthenticationException if authentication fails
-     * @throws NullPointerException if the given session is <code>null</code>
+     * @throws NullPointerException if the given session is {@code null}
      */
     private static Map<String, Object> getUserAttributes(GitHubSession session, String userName)
         throws GitTransportException, GitAuthenticationException {
@@ -165,7 +165,7 @@ public class GitHubUser extends GitHubEntity implements GitUser {
      * 
      * @throws GitTransportException if a transport related error occurs while communicating with the server
      * @throws GitAuthenticationException if authentication fails
-     * @throws NullPointerException if the given session is <code>null</code>
+     * @throws NullPointerException if the given session is {@code null}
      */
     public static GitHubUser getAuthenticatedUser(GitHubSession session)
         throws GitTransportException, GitAuthenticationException {

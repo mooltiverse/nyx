@@ -54,7 +54,7 @@ public class Repository {
      * 
      * @param jGit the backing JGit object.
      * 
-     * @throws NullPointerException if the given object is <code>null</code>
+     * @throws NullPointerException if the given object is {@code null}
      * @throws IllegalArgumentException if the given object is illegal for some reason, like referring to an illegal repository
      * @throws IOException in case of any I/O issue accessing the repository
      */
@@ -72,7 +72,7 @@ public class Repository {
      * 
      * @return the new repository object.
      * 
-     * @throws NullPointerException if the given object is <code>null</code>
+     * @throws NullPointerException if the given object is {@code null}
      * @throws IllegalArgumentException if the given object is illegal for some reason, like referring to an illegal repository
      * @throws IOException in case of any I/O issue accessing the repository
      */
@@ -90,7 +90,7 @@ public class Repository {
      * 
      * @return the new repository object.
      * 
-     * @throws NullPointerException if the given object is <code>null</code>
+     * @throws NullPointerException if the given object is {@code null}
      * @throws IllegalArgumentException if the given object is illegal for some reason, like referring to an illegal repository
      * @throws IOException in case of any I/O issue accessing the repository
      */
