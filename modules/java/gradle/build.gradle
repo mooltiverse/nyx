@@ -13,12 +13,21 @@ plugins {
 description = 'The Nyx Gradle plugin automates the sematic release process for Gradle projects using semantic versioning and leveraging the Git branching model.'
 
 /*------------------------------------------------------------------------------
+  Configurations
+*/
+configurations {
+}
+
+/*------------------------------------------------------------------------------
   Repositories and dependencies
   https://docs.gradle.org/current/userguide/dependency_management_for_java_projects.html
 */
 dependencies {
   // Import dependencies from other modules of this project
   implementation project(':modules:java:lib:main')
+
+  // Add this dependency to use the Git scripts from the git subproject into this project tests
+  testImplementation project(path: ':modules:java:lib:git', configuration: 'testExport')
 }
 
 /*------------------------------------------------------------------------------

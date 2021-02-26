@@ -12,15 +12,27 @@ plugins {
 description = 'The Nyx Git library.'
 
 /*------------------------------------------------------------------------------
+  Configurations
+*/
+configurations {
+  // Create a new configuration used by other projects to use classes from this project.
+  // In particular we need the Git scripts (in the test source set) to be available for other projects.
+  // This is actually not trivial and we had to follow directions from this post:
+  // - https://softnoise.wordpress.com/2014/09/07/gradle-sub-project-test-dependencies-in-multi-project-builds/
+  testExport.extendsFrom(testRuntime)
+}
+
+/*------------------------------------------------------------------------------
   Repositories and dependencies
   https://docs.gradle.org/current/userguide/dependency_management_for_java_projects.html
 */
 dependencies {
-  api project(':modules:java:lib:version')                      // Import dependencies from other modules of this project
-  api 'org.eclipse.jgit:org.eclipse.jgit:5.8.1.202007141445-r'  // JGit (https://www.eclipse.org/jgit/)
-  api 'org.slf4j:slf4j-api:1.7.30'                              // SLF4J API (http://www.slf4j.org/)
+  api                    'org.eclipse.jgit:org.eclipse.jgit:5.10.0.202012080955-r'  // JGit (https://www.eclipse.org/jgit/)
+  implementation         'org.slf4j:slf4j-api:1.7.30'                               // SLF4J API (http://www.slf4j.org/)
+  implementation         'com.fasterxml.jackson.core:jackson-databind:2.12.0'       // Jackson JSON library (https://github.com/FasterXML/jackson)
 
-  implementation  'com.fasterxml.jackson.core:jackson-databind:2.10.0'  // Jackson JSON library (https://github.com/FasterXML/jackson)
+  // See the 'testExport' about this
+  testExport             sourceSets.test.output
 }
 
 test {

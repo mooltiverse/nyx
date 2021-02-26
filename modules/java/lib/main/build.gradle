@@ -12,11 +12,18 @@ plugins {
 description = 'The Nyx main library and entry point.'
 
 /*------------------------------------------------------------------------------
+  Configurations
+*/
+configurations {
+}
+
+/*------------------------------------------------------------------------------
   Repositories and dependencies
   https://docs.gradle.org/current/userguide/dependency_management_for_java_projects.html
 */
 dependencies {
   // Import dependencies from other modules of this project
-  api         project(':modules:java:lib:git')
-  api         'org.slf4j:slf4j-api:1.7.30'                      // SLF4J API (http://www.slf4j.org/)
+  api            project(':modules:java:lib:version')
+  api            project(':modules:java:lib:git')
+  implementation         'org.slf4j:slf4j-api:1.7.30'   // SLF4J API (http://www.slf4j.org/)
 }

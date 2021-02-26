@@ -106,8 +106,7 @@ allprojects {
     // To clean and generate new .project and .classpath files run ./gradlew cleanEclipse eclipse
     eclipse {
         // control how the .project files are generated
-        /*project {
-        }*/
+        //project {}
         // control how the .classpath files are generated
         classpath {
             defaultOutputDir = file('build/classes')    // the default output directory for java .class files
@@ -129,6 +128,7 @@ allprojects {
     }
     dependencies {
         testImplementation 'org.junit.jupiter:junit-jupiter:5.6.0'
+        testRuntimeOnly    'org.junit.jupiter:junit-jupiter-engine'
     }
 
     /*------------------------------------------------------------------------------
@@ -198,6 +198,13 @@ subprojects {
 
         // Functional tests can be implemented in the directory src/functionalTest/[java|groovy]
         functionalTest
+    }
+
+    configurations {
+        // make integrations tests extend unit tests
+        integrationTestImplementation.extendsFrom testImplementation
+        // make functional tests extend integration (and unit) tests
+        functionalTestImplementation.extendsFrom integrationTestImplementation
     }
 
     // This includes all test sets like regular unit tests, integration and functional tests
