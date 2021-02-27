@@ -24,9 +24,12 @@ import com.mooltiverse.oss.nyx.version.SemanticVersion;
 import com.mooltiverse.oss.nyx.version.Version;
 
 /**
- * A fake configuration layer, with (possibly) unique values that allow the tests to distinguish
+ * A fake configuration layer, with (possibly) unique default values that allow the tests to distinguish
  * when values come from this object or others. Baseline is the default values as this class tries
  * to have all of its values different from that, allowing tests to compare they are not equal.
+ * 
+ * Values can also be set for more complex tests. Please note that Nyx doesn't resolve values twice
+ * so you should set values only before you pass this object to Nyx.
  */
 public class ConfigurationLayerMock implements ConfigurationLayer {
     /**
@@ -70,6 +73,46 @@ public class ConfigurationLayerMock implements ConfigurationLayer {
     public static final Version VERSION = SemanticVersion.valueOf("11.12.13");
 
     /**
+     * The value returned by this mock object.
+     */
+    public String bump = BUMP;
+
+    /**
+     * The value returned by this mock object. This is an abstract path and does not exists on the file system.
+     */
+    public File directory = DIRECTORY;
+
+    /**
+     * The value returned by this mock object.
+     */
+    public Boolean dryRun = DRY_RUN;
+
+    /**
+     * The value returned by this mock object.
+     */
+    public String releasePrefix = RELEASE_PREFIX;
+
+    /**
+     * The value returned by this mock object.
+     */
+    public Boolean releasePrefixLenient = RELEASE_PREFIX_LENIENT;
+
+    /**
+     * The value returned by this mock object.
+     */
+    public Scheme scheme = SCHEME;
+
+    /**
+     * The value returned by this mock object.
+     */
+    public Verbosity verbosity = VERBOSITY;
+
+    /**
+     * The value returned by this mock object.
+     */
+    public Version version = VERSION;
+
+    /**
      * Default constructor
      */
     public ConfigurationLayerMock() {
@@ -81,7 +124,7 @@ public class ConfigurationLayerMock implements ConfigurationLayer {
      */
     @Override
     public String getBump() {
-        return BUMP;
+        return bump;
     }
 
     /**
@@ -89,7 +132,7 @@ public class ConfigurationLayerMock implements ConfigurationLayer {
      */
     @Override
     public File getDirectory() {
-        return DIRECTORY;
+        return directory;
     }
 
     /**
@@ -97,7 +140,7 @@ public class ConfigurationLayerMock implements ConfigurationLayer {
      */
     @Override
     public Boolean getDryRun() {
-        return DRY_RUN;
+        return dryRun;
     }
 
     /**
@@ -105,7 +148,7 @@ public class ConfigurationLayerMock implements ConfigurationLayer {
      */
     @Override
     public String getReleasePrefix() {
-        return RELEASE_PREFIX;
+        return releasePrefix;
     }
 
     /**
@@ -113,7 +156,7 @@ public class ConfigurationLayerMock implements ConfigurationLayer {
      */
     @Override
     public Boolean getReleasePrefixLenient() {
-        return RELEASE_PREFIX_LENIENT;
+        return releasePrefixLenient;
     }
 
     /**
@@ -121,7 +164,7 @@ public class ConfigurationLayerMock implements ConfigurationLayer {
      */
     @Override
     public Scheme getScheme() {
-        return Scheme.SEMVER;
+        return scheme;
     }
 
     /**
@@ -129,7 +172,7 @@ public class ConfigurationLayerMock implements ConfigurationLayer {
      */
     @Override
     public Verbosity getVerbosity(){
-        return VERBOSITY;
+        return verbosity;
     }
 
     /**
@@ -137,6 +180,6 @@ public class ConfigurationLayerMock implements ConfigurationLayer {
      */
     @Override
     public Version getVersion(){
-        return VERSION;
+        return version;
     }
 }

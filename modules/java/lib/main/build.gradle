@@ -26,4 +26,7 @@ dependencies {
   api            project(':modules:java:lib:version')
   api            project(':modules:java:lib:git')
   implementation         'org.slf4j:slf4j-api:1.7.30'   // SLF4J API (http://www.slf4j.org/)
+
+  // Add this dependency to use the Git scripts from the git subproject into this project tests
+  testImplementation project(path: ':modules:java:lib:git', configuration: 'testExport')
 }

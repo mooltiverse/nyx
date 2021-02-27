@@ -22,6 +22,7 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mooltiverse.oss.nyx.git.local.Repository;
 import com.mooltiverse.oss.nyx.state.State;
 
 /**
@@ -34,6 +35,11 @@ abstract class AbstractCommand implements Command {
     private static final Logger logger = LoggerFactory.getLogger(AbstractCommand.class);
 
     /**
+     * The private instance of the Git repository.
+     */
+    private final Repository repository;
+
+    /**
      * The private instance of the state.
      */
     private final State state;
@@ -42,13 +48,16 @@ abstract class AbstractCommand implements Command {
      * Standard constructor.
      * 
      * @param state the state reference
+     * @param repository the repository reference
      * 
-     * @throws NullPointerException if the given argument is {@code null}
+     * @throws NullPointerException if a given argument is {@code null}
      */
-    protected AbstractCommand(State state) {
+    protected AbstractCommand(State state, Repository repository) {
         super();
-        Objects.requireNonNull(state);
+        Objects.requireNonNull(state, "The State object cannot be null");
+        Objects.requireNonNull(repository, "The Repository object cannot be null");
         this.state = state;
+        this.repository = repository;
         logger.debug(COMMAND, "New command object");
     }
 
@@ -60,5 +69,14 @@ abstract class AbstractCommand implements Command {
     @Override
     public final State getState() {
         return state;
+    }
+
+    /**
+     * Returns the repository object.
+     * 
+     * @return the repository object.
+     */
+    public final Repository getRepository() {
+        return repository;
     }
 }

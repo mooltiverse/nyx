@@ -26,11 +26,20 @@ import org.eclipse.jgit.lib.Ref;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+import org.slf4j.MarkerFactory;
 
 /**
  * A local repository implementation that encapsulates the backing <a href="https://www.eclipse.org/jgit/">JGit</a> library.
+ * 
+ * This class just provide coarse grained methods functional to Nyx purposes.
  */
 public class Repository {
+    /**
+     * The {@code GIT} marker, used when logging events.
+     */
+    private static Marker GIT = MarkerFactory.getMarker("GIT");
+
     /**
      * The private logger instance
      */
@@ -40,14 +49,6 @@ public class Repository {
      * The private instance of the underlying Git object.
      */
     private final Git jGit;
-
-    /**
-     * Default constructor is hidden on purpose.
-     */
-    private Repository() {
-        super();
-        this.jGit = null;
-    }
 
     /**
      * Builds the instance using the given backing object.

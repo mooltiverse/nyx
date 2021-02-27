@@ -15,12 +15,10 @@
  */
 package com.mooltiverse.oss.nyx.git.hosted.services;
 
-import com.mooltiverse.oss.nyx.git.GitException;
-
 /**
  * A generic Git exception class that indicates an issue with a remote service.
  */
-public class GitServiceException extends GitException {
+public class GitServiceException extends Exception {
     /**
      * The serial version ID
      */

@@ -13,21 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mooltiverse.oss.nyx.git.mock;
+package com.mooltiverse.oss.nyx.git.script;
 
 import com.mooltiverse.oss.nyx.git.util.FileSystemUtil;
 import com.mooltiverse.oss.nyx.git.util.RandomUtil;
 
 import java.io.File;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.List;
 import java.util.Objects;
 
-import org.eclipse.jgit.api.AddNoteCommand;
 import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.TagCommand;
 
 import org.eclipse.jgit.dircache.DirCache;
 
@@ -35,11 +31,8 @@ import org.eclipse.jgit.lib.Ref;
 
 import org.eclipse.jgit.notes.Note;
 
-import org.eclipse.jgit.revwalk.RevBlob;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevObject;
-import org.eclipse.jgit.revwalk.RevTag;
-import org.eclipse.jgit.revwalk.RevTree;
 
 import org.eclipse.jgit.transport.RemoteConfig;
 import org.eclipse.jgit.transport.URIish;
@@ -55,19 +48,7 @@ public class JGitScript {
     public final Git git;
 
     /**
-     * Creates a new repository in the given directory.
-     * 
-     * @param directory the directory to create the repository in
-     * 
-     * @throws Exception in case of any issue
-     */
-    public JGitScript(File directory)
-        throws Exception {
-        this(newRepository(directory, false, true));
-    }
-
-    /**
-     * Creates a new instance on the given instance.
+     * Creates a new script instance using the given backing git instance.
      * 
      * @param git the backing git instance
      * 
@@ -79,6 +60,22 @@ public class JGitScript {
         Objects.requireNonNull(git);
         this.git = git;
     }
+
+    /**
+     * Creates a new script instance in the given directory.
+     * 
+     * @param directory the directory to create the repository in
+     * 
+     * @throws Exception in case of any issue
+     */
+    public JGitScript(File directory)
+        throws Exception {
+        this(Git.open(directory));
+    }
+
+    /***********************************************************************************************************************
+     * LOW LEVEL COMMANDS
+     ***********************************************************************************************************************/
 
     /**
      * Returns a Git instance on a new repository.
@@ -101,6 +98,92 @@ public class JGitScript {
     }
 
     /**
+     * Returns the working directory for the repository
+     * 
+     * @return the working directory for the repository
+     */
+    public File getWorkingDirectory() {
+        return git.getRepository().getWorkTree();
+    }
+
+    /***********************************************************************************************************************
+     * HIGH LEVEL COMMANDS
+     ***********************************************************************************************************************/
+
+    /**
+     * Returns a new script instance that uses the backing Git object
+     * 
+     * @param git the backing Git object
+     * 
+     * @return the new instance
+     * 
+     * @throws Exception in case of any issue
+     */
+    public static JGitScript from(Git git)
+        throws Exception {
+        return new JGitScript(git);
+    }
+
+    /**
+     * Returns a new script instance working in the given directory
+     * 
+     * @param directory the working directory for the script. It must exist and already have a Git repository in it
+     * 
+     * @return the new instance
+     * 
+     * @throws Exception in case of any issue
+     */
+    public static JGitScript from(File directory)
+        throws Exception {
+        return new JGitScript(directory);
+    }
+
+    /**
+     * Returns a new script instance for a new repository to be created and initialized in the given directory
+     * 
+     * @param directory the working directory for the script. It must exist and be empty
+     * 
+     * @return the new instance
+     * 
+     * @throws Exception in case of any issue
+     */
+    public static JGitScript fromScratch(File directory)
+        throws Exception {
+        return new JGitScript(newRepository(directory, false, true));
+    }
+
+    /**
+     * Returns a new script instance for a new repository to be created in the given directory
+     * 
+     * @param directory the working directory for the script. It must exist and be empty
+     * @param initialize if {@code true} the new repository is also initialized
+     * 
+     * @return the new instance
+     * 
+     * @throws Exception in case of any issue
+     */
+    public static JGitScript fromScratch(File directory, boolean initialize)
+        throws Exception {
+        return new JGitScript(newRepository(directory, false, initialize));
+    }
+
+    /**
+     * Returns a new script instance for a new repository to be created in a new temporary directory
+     * 
+     * @param initialize if {@code true} the new repository is also initialized
+     * 
+     * @return the new instance
+     * 
+     * @throws Exception in case of any issue
+     * 
+     * @see #getWorkingDirectory() to get the repository directory
+     */
+    public static JGitScript fromScratch(boolean initialize)
+        throws Exception {
+        return new JGitScript(newRepository(FileSystemUtil.newTempDirectory(null, null), false, initialize));
+    }
+
+    /**
      * Stages changes and commits to the Git repository using the current branch.
      * 
      * @param message the commit message.
@@ -109,7 +192,7 @@ public class JGitScript {
      * 
      * @throws Exception in case of any issue
      */
-    public RevCommit createCommit(String message)
+    /*public RevCommit createCommit(String message)
         throws Exception {
 
         // stage contents
@@ -117,7 +200,7 @@ public class JGitScript {
 
         // commit
         return git.commit().setMessage(message).call();
-    }
+    }*/
 
     /**
      * Creates a new branch and checks it out.
@@ -128,11 +211,11 @@ public class JGitScript {
      * 
      * @throws Exception in case of any issue
      */
-    public Ref createBranch(String name)
+    /*public Ref createBranch(String name)
         throws Exception {
         // create the branch and check it out
         return git.checkout().setCreateBranch(true).setName(name).call();
-    }
+    }*/
 
     /**
      * Tags the given object with the given name.
@@ -146,10 +229,10 @@ public class JGitScript {
      * 
      * @throws Exception in case of any issue
      */
-    public Ref createTag(String name, String message, RevObject target, boolean annotated)
+    /*public Ref createTag(String name, String message, RevObject target, boolean annotated)
         throws Exception {
         return annotated ? git.tag().setAnnotated(true).setObjectId(target).setName(name).setMessage(message).call() : git.tag().setAnnotated(false).setObjectId(target).setName(name).setForceUpdate(true).call();
-    }
+    }*/
 
     /**
      * Creates a note on given object with the given message.
@@ -161,10 +244,10 @@ public class JGitScript {
      * 
      * @throws Exception in case of any issue
      */
-    public Note createNote(String message, RevObject target)
+    /*public Note createNote(String message, RevObject target)
         throws Exception {
         return git.notesAdd().setObjectId(target).setMessage(message).call();
-    }
+    }*/
 
     /**
      * Creates a new remote.
@@ -176,10 +259,10 @@ public class JGitScript {
      * 
      * @throws Exception in case of any issue
      */
-    public RemoteConfig createRemote(String name, String uri)
+    /*public RemoteConfig createRemote(String name, String uri)
         throws Exception {
         return git.remoteAdd().setName(name).setUri(new URIish(uri)).call();
-    }
+    }*/
 
     /**
      * A coarse command that creates a number of repository objects.
@@ -194,7 +277,7 @@ public class JGitScript {
      * 
      * @throws Exception in case of any issue
      */
-    public String batchCreateObjects(int directoryCount, int fileCount, boolean commit, boolean annotatedTag)
+    /*public String batchCreateObjects(int directoryCount, int fileCount, boolean commit, boolean annotatedTag)
         throws Exception {
 
         String batchID = RandomUtil.randomAlphabeticString(4);
@@ -217,7 +300,7 @@ public class JGitScript {
         }
 
         return batchID;
-    }
+    }*/
 
     /**
      * A coarse command that creates a number of repository references.
@@ -232,7 +315,7 @@ public class JGitScript {
      * 
      * @throws Exception in case of any issue
      */
-    public String batchCreateReferences(int branchesCount, int commitCount, boolean note, boolean lightweightTag)
+    /*public String batchCreateReferences(int branchesCount, int commitCount, boolean note, boolean lightweightTag)
         throws Exception {
 
         String batchID = RandomUtil.randomAlphabeticString(4);
@@ -255,7 +338,7 @@ public class JGitScript {
         }
 
         return batchID;
-    }
+    }*/
 
     /**
      * A coarse command that creates a number of remote references.
@@ -267,7 +350,7 @@ public class JGitScript {
      * 
      * @throws Exception in case of any issue
      */
-    public String batchCreateRemotes(int remotesCount)
+    /*public String batchCreateRemotes(int remotesCount)
         throws Exception {
 
         String batchID = RandomUtil.randomAlphabeticString(4);
@@ -277,5 +360,5 @@ public class JGitScript {
         }
 
         return batchID;
-    }
+    }*/
 }

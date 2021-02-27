@@ -21,9 +21,13 @@ import static org.junit.jupiter.api.Assumptions.*;
 import java.util.Objects;
 
 import org.gradle.api.Project;
+import org.gradle.api.Task;
 import org.gradle.api.tasks.TaskContainer;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Tests the Gradle task.<br>
@@ -31,7 +35,7 @@ import org.junit.jupiter.api.DisplayName;
  * This test class tests the {@link AbstractTask} class and also provides generic methods used by subclasses.
  */
 @DisplayName("AbstractTask")
-public class AbstractTaskTests extends AbstractTests {
+public abstract class AbstractTaskTests extends AbstractTests {
 
     /**
      * Makes sure the task with the given name or class is not available using both eager and lazy methods.
@@ -44,7 +48,7 @@ public class AbstractTaskTests extends AbstractTests {
      * @param name the task name
      * @param type the task class
      */
-    protected <T extends AbstractTask> void testForTaskUnavailability(Project project, String name, Class<T> type) {
+    protected static <T extends AbstractTask> void testForTaskUnavailability(Project project, String name, Class<T> type) {
         // Make sure the tasks isn't there before the plugin is applied or the task created or registered
         // Only safe methods are used
 
@@ -73,7 +77,7 @@ public class AbstractTaskTests extends AbstractTests {
      * @param name the name the task is registered with
      * @param type the task class
      */
-    protected <T extends AbstractTask> void testForTaskAvailabilityLazily(Project project, String name, Class<T> type) {
+    protected static <T extends AbstractTask> void testForTaskAvailabilityLazily(Project project, String name, Class<T> type) {
         // I couldn't find any method to tell if the object has been configured and not yet created.
         // Comments below on single method invocation.
 
@@ -106,7 +110,7 @@ public class AbstractTaskTests extends AbstractTests {
      * @param name the name the task is registered with
      * @param type the task class
      */
-    protected <T extends AbstractTask> void testForTaskAvailabilityEagerly(Project project, String name, Class<T> type) {
+    protected static <T extends AbstractTask> void testForTaskAvailabilityEagerly(Project project, String name, Class<T> type) {
         // ... with TaskContainer (Project.getTasks())...
         assertNotNull(project.getTasks().findByName(name));
         assertTrue(type.isInstance(project.getTasks().findByName(name)));
@@ -115,5 +119,60 @@ public class AbstractTaskTests extends AbstractTests {
         assertNotNull(project.getTasks().getByName(name));
         assertTrue(type.isInstance(project.getTasks().getByName(name)));
         assertEquals(1, project.getTasks().withType(type).size());
+    }
+
+    /**
+     * Performs checks on the task status after it's been configured.
+     */
+    @Nested
+    @DisplayName("Configuration")
+    static class ConfigurationTests {
+        @ParameterizedTest(name = "{2}.getDescription()")
+        @MethodSource("com.mooltiverse.oss.nyx.gradle.TestData#allTasksArguments")
+        void getDescriptionTest(String taskName, Class<? extends CoreTask> taskClass, String taskClassSimpleName)
+            throws Exception {
+            Project project = newTestProject(null, true);
+
+            assertEquals(taskClass.getDeclaredField("DESCRIPTION").get(null), project.getTasks().getByName(taskName).getDescription());
+        }
+
+        @ParameterizedTest(name = "{2}.getGroup()")
+        @MethodSource("com.mooltiverse.oss.nyx.gradle.TestData#allTasksArguments")
+        void getGroupTest(String taskName, Class<? extends CoreTask> taskClass, String taskClassSimpleName)
+            throws Exception {
+            Project project = newTestProject(null, true);
+
+            assertEquals(AbstractTask.GROUP, project.getTasks().getByName(taskName).getGroup());
+        }
+
+        @ParameterizedTest(name = "{2}.getDependencies().size() == known direct dependencies")
+        @MethodSource("com.mooltiverse.oss.nyx.gradle.TestData#allTasksArguments")
+        void getDependencyCount(String taskName, Class<? extends CoreTask> taskClass, String taskClassSimpleName)
+            throws Exception {
+            Project project = newTestProject(null, true);
+
+            Task task = project.getTasks().getByName(taskName);
+
+            assertEquals(task.getTaskDependencies().getDependencies(task).size(), TestData.allTaskEfferentDirectDependencies.get(taskName).size(), String.format("Task %s is expected to have %d dependencies but has %d", taskName, TestData.allTaskEfferentDirectDependencies.get(taskName).size(), task.getTaskDependencies().getDependencies(task).size()));
+        }
+
+        @ParameterizedTest(name = "{2}.getDependencies().contains(<all known direct efferent dependencies>)")
+        @MethodSource("com.mooltiverse.oss.nyx.gradle.TestData#allTasksArguments")
+        void getDependency(String taskName, Class<? extends CoreTask> taskClass, String taskClassSimpleName)
+            throws Exception {
+            Project project = newTestProject(null, true);
+
+            Task task = project.getTasks().getByName(taskName);
+
+            
+            for (String dependency: TestData.allTaskEfferentDirectDependencies.get(taskName)) {
+                boolean dependencyFound = false;
+                for (Task taskDependency: task.getTaskDependencies().getDependencies(task)) {
+                    if (dependency.equals(taskDependency.getName()))
+                        dependencyFound = true;
+                }
+                assertTrue(dependencyFound);
+            }
+        }
     }
 }

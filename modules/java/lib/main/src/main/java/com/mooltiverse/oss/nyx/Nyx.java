@@ -17,6 +17,8 @@ package com.mooltiverse.oss.nyx;
 
 import static com.mooltiverse.oss.nyx.log.Markers.MAIN;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Objects;
 
 import org.slf4j.Logger;
@@ -30,6 +32,7 @@ import com.mooltiverse.oss.nyx.command.Mark;
 import com.mooltiverse.oss.nyx.command.Publish;
 import com.mooltiverse.oss.nyx.configuration.Configuration;
 import com.mooltiverse.oss.nyx.configuration.ConfigurationException;
+import com.mooltiverse.oss.nyx.git.local.Repository;
 import com.mooltiverse.oss.nyx.state.State;
 import com.mooltiverse.oss.nyx.state.StateException;
 
@@ -51,6 +54,16 @@ public class Nyx {
      * @see #configuration()
      */
     private Configuration configuration = null;
+
+    /**
+     * The internal Git repository object.
+     * 
+     * This object is lazily initialized so in order to make sure you get a valid reference you should always use
+     * {@link #repository()} instead of reading this member.
+     * 
+     * @see #repository()
+     */
+    private Repository repository = null;
 
     /**
      * The internal state object.
@@ -92,6 +105,28 @@ public class Nyx {
      * @return the state
      * 
      * @throws ConfigurationException in case the configuration can't be loaded for some reason.
+     */
+    public synchronized Repository repository()
+        throws ConfigurationException {
+        if (Objects.isNull(repository)) {
+            File repoDir = configuration().getDirectory();
+            logger.debug(MAIN, "Instantiating the Git repository in {}", repoDir);
+            try {
+                repository = Repository.open(repoDir);
+            }
+            catch (IOException ioe) {
+                throw new ConfigurationException(String.format("The directory %s is not accessible or does not contain a valid Git repository", repoDir.getAbsolutePath()), ioe);
+            }
+        }
+        return repository;
+    }
+
+    /**
+     * Returns the state.
+     * 
+     * @return the state
+     * 
+     * @throws ConfigurationException in case the configuration can't be loaded for some reason.
      * @throws StateException in case the state is invalid for some reason.
      */
     public synchronized State state()
@@ -116,7 +151,7 @@ public class Nyx {
         // TODO: implement this method
         // the following are just temporary smoke detection outputs
         logger.info(MAIN, "Nyx.amend()");
-        return new Amend(state()).run();
+        return new Amend(state(), repository()).run();
     }
 
     /**
@@ -130,7 +165,7 @@ public class Nyx {
         // TODO: implement this method
         // the following are just temporary smoke detection outputs
         logger.info(MAIN, "Nyx.clean()");
-        new Clean(state()).run();
+        new Clean(state(), repository()).run();
     }
 
     /**
@@ -146,7 +181,7 @@ public class Nyx {
         // TODO: implement this method
         // the following are just temporary smoke detection outputs
         logger.info(MAIN, "Nyx.infer()");
-        return new Infer(state()).run();
+        return new Infer(state(), repository()).run();
     }
 
     /**
@@ -162,7 +197,7 @@ public class Nyx {
         // TODO: implement this method
         // the following are just temporary smoke detection outputs
         logger.info(MAIN, "Nyx.make()");
-        return new Make(state()).run();
+        return new Make(state(), repository()).run();
     }
 
     /**
@@ -178,7 +213,7 @@ public class Nyx {
         // TODO: implement this method
         // the following are just temporary smoke detection outputs
         logger.info(MAIN, "Nyx.mark()");
-        return new Mark(state()).run();
+        return new Mark(state(), repository()).run();
     }
 
     /**
@@ -194,6 +229,6 @@ public class Nyx {
         // TODO: implement this method
         // the following are just temporary smoke detection outputs
         logger.info(MAIN, "Nyx.publish()");
-        return new Publish(state()).run();
+        return new Publish(state(), repository()).run();
     }
 }

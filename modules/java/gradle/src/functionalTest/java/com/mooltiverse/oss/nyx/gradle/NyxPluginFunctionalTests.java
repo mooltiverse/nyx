@@ -17,10 +17,11 @@ package com.mooltiverse.oss.nyx.gradle;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,6 +41,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import com.mooltiverse.oss.nyx.git.script.JGitScript;
+
 /**
  * Functional tests for the Gradle plugin.<br>
  * 
@@ -49,11 +52,6 @@ import org.junit.jupiter.params.provider.MethodSource;
  */
 @DisplayName("NyxPlugin.Functional")
 public class NyxPluginFunctionalTests {
-    /**
-     * Shorthand for System.getProperty("line.separator")
-     */
-    public static final String LINE_SEPARATOR = System.getProperty("line.separator");
-
     /**
      * An array of Gradle versions to succesfully test against.
      * 
@@ -266,7 +264,6 @@ public class NyxPluginFunctionalTests {
                     put(ReleaseTask.NAME, TaskOutcome.SUCCESS);
                 }
             });
-
         }
     };
 
@@ -308,9 +305,9 @@ public class NyxPluginFunctionalTests {
      */
     static void write(File destination, String content)
         throws IOException {
-        BufferedWriter output = null;
+        FileWriter output = null;
         try {
-            output = new BufferedWriter(new FileWriter(destination));
+            output = new FileWriter(destination);
             output.write(content);
         }
         finally {
@@ -328,8 +325,12 @@ public class NyxPluginFunctionalTests {
      * @return a string with a valid content for the gradle.settings file
      */
     static String gradleSettings(String gradleVersion) {
-        StringBuilder content = new StringBuilder("rootProject.name = 'nyx-gradle-"+gradleVersion+"-plugin-test'").append(LINE_SEPARATOR);
-        return content.toString();
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(stringWriter);
+
+        printWriter.println("rootProject.name = 'nyx-gradle-"+gradleVersion+"-plugin-test'");
+
+        return stringWriter.toString();
     }
 
     /**
@@ -342,32 +343,33 @@ public class NyxPluginFunctionalTests {
      * @return a string with a valid content for the build.gradle file
      */
     static String gradleEmptyBuild(String gradleVersion, Map<String, String> plugins) {
-        StringBuilder content = new StringBuilder();
-        content.append(LINE_SEPARATOR);
-        content.append("plugins {").append(LINE_SEPARATOR);
-        content.append("  id 'com.mooltiverse.oss.nyx'").append(LINE_SEPARATOR);
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(stringWriter);
+
+        printWriter.println("plugins {");
+        printWriter.println("  id 'com.mooltiverse.oss.nyx'");
         if (!Objects.isNull(plugins)) {
             for (Map.Entry<String, String> entry: plugins.entrySet()) {
-                content.append("  id '"+entry.getKey()+"' ");
+                printWriter.println("  id '"+entry.getKey()+"' ");
                 if (!Objects.isNull(entry.getValue()) && !entry.getValue().isEmpty())
-                    content.append(" version '"+entry.getValue()+"'");
-                content.append(LINE_SEPARATOR);
+                printWriter.println(" version '"+entry.getValue()+"'");
+                printWriter.println();
             }
         }
-        content.append("}").append(LINE_SEPARATOR);
-        content.append(LINE_SEPARATOR);
+        printWriter.println("}");
+        printWriter.println();
 
-        content.append("nyx {").append(LINE_SEPARATOR);
-        content.append("  bump = 'minor'").append(LINE_SEPARATOR);
-        content.append("  dryRun = true").append(LINE_SEPARATOR);
-        content.append("  services {").append(LINE_SEPARATOR);
-        content.append("     github {").append(LINE_SEPARATOR);
-        //content.append("        provider = 'guesswhat'").append(LINE_SEPARATOR);
-        content.append("     }").append(LINE_SEPARATOR);
-        content.append("  }").append(LINE_SEPARATOR);
-        content.append("}").append(LINE_SEPARATOR);
+        printWriter.println("nyx {");
+        printWriter.println("  bump = 'minor'");
+        printWriter.println("  dryRun = true");
+        printWriter.println("  services {");
+        printWriter.println("     github {");
+        //printWriter.println("        provider = 'guesswhat'");
+        printWriter.println("     }");
+        printWriter.println("  }");
+        printWriter.println("}");
 
-        return content.toString();
+        return stringWriter.toString();
     }
 
     /**
@@ -380,43 +382,46 @@ public class NyxPluginFunctionalTests {
      * @return a string with a valid content for the build.gradle file
      */
     static String gradleSimpleBuild(String gradleVersion, Map<String, String> plugins) {
-        StringBuilder content = new StringBuilder();
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(stringWriter);
 
-        content.append(LINE_SEPARATOR);
+        printWriter.println();
         // start from the empty build, with just the plugins defined
-        content.append(gradleEmptyBuild(gradleVersion, plugins)).append(LINE_SEPARATOR);
-        content.append(LINE_SEPARATOR);
+        printWriter.println(gradleEmptyBuild(gradleVersion, plugins));
+        printWriter.println();
 
         // then add the extension configuration
-        content.append("nyx {").append(LINE_SEPARATOR);
-        content.append("  bump = 'minor'").append(LINE_SEPARATOR);
-        content.append("  dryRun = true").append(LINE_SEPARATOR);
-        content.append("  services {").append(LINE_SEPARATOR);
-        content.append("     github {").append(LINE_SEPARATOR);
-        //content.append("        provider = 'guesswhat'").append(LINE_SEPARATOR);
-        content.append("     }").append(LINE_SEPARATOR);
-        content.append("  }").append(LINE_SEPARATOR);
-        content.append("}").append(LINE_SEPARATOR);
+        printWriter.println("nyx {");
+        printWriter.println("  bump = 'minor'");
+        printWriter.println("  dryRun = true");
+        printWriter.println("  services {");
+        printWriter.println("     github {");
+        //printWriter.println("        provider = 'guesswhat'");
+        printWriter.println("     }");
+        printWriter.println("  }");
+        printWriter.println("}");
 
-        return content.toString();
+        return stringWriter.toString();
     }
 
     /**
      * Instantiates a new GradleRunner to use for tests, using the given Gradle version.
-     * A new temporary directory is created for each test and used by the runner.
+     * A new temporary directory is created for each test and used by the runner if none is given.
      * The settings.gradle is created with a standard content while the build.gradle file is created with the given content.
      * 
+     * @param directory the directory to create the runner in. If {@code null} a new one is created
      * @param gradleVersion the Gradle version to test against
+     * @oaram gradleSettingsFileContent the content of the settings.gradle to create in the project directory
      * @oaram gradleBuildFileContent the content of the build.gradle to create in the project directory
      * 
      * @return the runner to use for tests, already using the temporary directory
      * 
      * @throws Exception in case of any issue
      */
-    GradleRunner setUp(String gradleVersion, String gradleSettingsFileContent, String gradleBuildFileContent)
+    GradleRunner setUp(File directory, String gradleVersion, String gradleSettingsFileContent, String gradleBuildFileContent)
         throws Exception {
         
-        File tempProjectDir = Files.createTempDirectory("nyx-gradle-"+gradleVersion+"-test").toFile();
+        File tempProjectDir = Objects.isNull(directory) ? Files.createTempDirectory("nyx-gradle-"+gradleVersion+"-test").toFile() : directory;
 
         // let the VM delete the directories on exit
         tempProjectDir.deleteOnExit(); 
@@ -454,21 +459,55 @@ public class NyxPluginFunctionalTests {
     @Nested
     @DisplayName("gradle tasks")
     class TasksTests {
+        /**
+         * Test running 'gradle tasks' with no exceptions using the given runner and Gradle version.
+         * This is a generic method to be invoked by actual tests.
+         * 
+         * @param gradleRunner the runner
+         * @param gradleVersion the Gradle version to use
+         * 
+         * @throws Exception in case of any issues
+         */
+        void runGradleTasks(GradleRunner gradleRunner, String gradleVersion)
+            throws Exception {
+            assertDoesNotThrow(() -> gradleRunner.withArguments("tasks").build());
+        }
+
+        /**
+         * Test running 'gradle tasks' with an empty build script.
+         * 
+         * @param gradleVersion the Gradle version to use
+         * 
+         * @throws Exception in case of any issues
+         */
         @ParameterizedTest(name = "gradle tasks [Gradle Version: {0}, empty build script]")
         @MethodSource("com.mooltiverse.oss.nyx.gradle.NyxPluginFunctionalTests#wellKnownWorkingGradleVersions")
-        void gradleTasksWithEmptyScriptTest(String gradleVersion)
+        void runGradleTasksWithEmptyScriptTest(String gradleVersion)
             throws Exception {
-            GradleRunner gradleRunner = setUp(gradleVersion, gradleSettings(gradleVersion), gradleEmptyBuild(gradleVersion, null));
-            gradleRunner.withArguments("tasks").build();
+                // use an empty directory as for running 'tasks' there must be no need for the Git repository
+            GradleRunner gradleRunner = setUp(null, gradleVersion, gradleSettings(gradleVersion), gradleEmptyBuild(gradleVersion, null));
+
+            runGradleTasks(gradleRunner, gradleVersion);
+
             tearDown(gradleRunner);
         }
 
+        /**
+         * Test running 'gradle tasks' with a simple build script.
+         * 
+         * @param gradleVersion the Gradle version to use
+         * 
+         * @throws Exception in case of any issues
+         */
         @ParameterizedTest(name = "gradle tasks [Gradle Version: {0}, simple build script]")
         @MethodSource("com.mooltiverse.oss.nyx.gradle.NyxPluginFunctionalTests#wellKnownWorkingGradleVersions")
-        void gradleTasksWithSimpleScriptTest(String gradleVersion)
+        void runGradleTasksWithSimpleScriptTest(String gradleVersion)
             throws Exception {
-            GradleRunner gradleRunner = setUp(gradleVersion, gradleSettings(gradleVersion), gradleSimpleBuild(gradleVersion, null));
-            gradleRunner.withArguments("tasks").build();
+            // use an empty directory as for running 'tasks' there must be no need for the Git repository
+            GradleRunner gradleRunner = setUp(null, gradleVersion, gradleSettings(gradleVersion), gradleSimpleBuild(gradleVersion, null));
+
+            runGradleTasks(gradleRunner, gradleVersion);
+
             tearDown(gradleRunner);
         }
     }
@@ -476,16 +515,18 @@ public class NyxPluginFunctionalTests {
     @Nested
     @DisplayName("gradle task(*)")
     class TaskTests {
-        @ParameterizedTest(name = "gradle {0} [Gradle Version: {2}, Plugin {3}:{4}, empty build script]")
-        @MethodSource("com.mooltiverse.oss.nyx.gradle.NyxPluginFunctionalTests#wellKnownTestSuites")
-        void gradleTaskWithEmptyScriptTest(String target, Map<String,TaskOutcome> taskOutcomes, String gradleVersion, String pluginID, String pluginVersion, List<String> positiveFiles, List<String> negativeFiles)
+        /**
+         * Test running the given task with no exceptions using the given runner and Gradle version.
+         * This is a generic method to be invoked by actual tests.
+         * 
+         * @throws Exception in case of any issues
+         */
+        void runGradleTask(GradleRunner gradleRunner, String target, Map<String,TaskOutcome> taskOutcomes, String gradleVersion, String pluginID, String pluginVersion, List<String> positiveFiles, List<String> negativeFiles)
             throws Exception {
-            GradleRunner gradleRunner = setUp(gradleVersion, gradleSettings(gradleVersion), gradleEmptyBuild(gradleVersion, null));
-
             // GradleRunner.withDebug(boolean) enables debug output
             BuildResult gradleResult = gradleRunner.withDebug(true).withArguments("--info", /*"--debug",*/ "--stacktrace", target).build();
             System.out.println("Executed task: "+target);System.out.flush();
-            
+
             for (Map.Entry<String,TaskOutcome> taskOutcome: taskOutcomes.entrySet()) {
                 boolean taskFound = false;
                 System.out.println("  Testing outcome for task: "+taskOutcome.getKey());System.out.flush();
@@ -506,40 +547,61 @@ public class NyxPluginFunctionalTests {
                 }
                 else assertTrue(taskFound, "Task "+taskOutcome.getKey()+" was expected to be part of the build but it was not");
             }
+        }
+
+        /**
+         * Test that an exception is thrown when running ina directory that contains no Git repository.
+         * 
+         * @param gradleVersion the Gradle version to use
+         * 
+         * @throws Exception in case of any issues
+         */
+        @ParameterizedTest(name = "gradle {0} [Gradle Version: {2}, Plugin {3}:{4}, empty build script]")
+        @MethodSource("com.mooltiverse.oss.nyx.gradle.NyxPluginFunctionalTests#wellKnownTestSuites")
+        void exceptionRuningGradleTaskWithNoGitRepository(String target, Map<String,TaskOutcome> taskOutcomes, String gradleVersion, String pluginID, String pluginVersion, List<String> positiveFiles, List<String> negativeFiles)
+            throws Exception {
+            GradleRunner gradleRunner = setUp(null, gradleVersion, gradleSettings(gradleVersion), gradleEmptyBuild(gradleVersion, null));
+
+            // Gradle wraps these exception so let's not make assumptions on the type
+            assertThrows(Exception.class, () -> runGradleTask(gradleRunner, target, taskOutcomes, gradleVersion, pluginID, pluginVersion, positiveFiles, negativeFiles) );
 
             tearDown(gradleRunner);
         }
 
+        /**
+         * Test running the given task with no exceptions using the given Gradle version on an emty script.
+         * 
+         * @param gradleVersion the Gradle version to use
+         * 
+         * @throws Exception in case of any issues
+         */
+        @ParameterizedTest(name = "gradle {0} [Gradle Version: {2}, Plugin {3}:{4}, empty build script]")
+        @MethodSource("com.mooltiverse.oss.nyx.gradle.NyxPluginFunctionalTests#wellKnownTestSuites")
+        void runGradleTaskWithEmptyScriptTest(String target, Map<String,TaskOutcome> taskOutcomes, String gradleVersion, String pluginID, String pluginVersion, List<String> positiveFiles, List<String> negativeFiles)
+            throws Exception {
+            JGitScript gitScript = JGitScript.fromScratch(true); // create the new directory with a new Git repository inside
+            GradleRunner gradleRunner = setUp(gitScript.getWorkingDirectory(), gradleVersion, gradleSettings(gradleVersion), gradleEmptyBuild(gradleVersion, null));
+
+            runGradleTask(gradleRunner, target, taskOutcomes, gradleVersion, pluginID, pluginVersion, positiveFiles, negativeFiles);
+
+            tearDown(gradleRunner);
+        }
+
+        /**
+         * Test running the given task with no exceptions using the given Gradle version on a simple script.
+         * 
+         * @param gradleVersion the Gradle version to use
+         * 
+         * @throws Exception in case of any issues
+         */
         @ParameterizedTest(name = "gradle {0} [Gradle Version: {2}, Plugin {3}:{4}, simple build script]")
         @MethodSource("com.mooltiverse.oss.nyx.gradle.NyxPluginFunctionalTests#wellKnownTestSuites")
-        void gradleTaskWithSimpleScriptTest(String target, Map<String,TaskOutcome> taskOutcomes, String gradleVersion, String pluginID, String pluginVersion, List<String> positiveFiles, List<String> negativeFiles)
+        void runGradleTaskWithSimpleScriptTest(String target, Map<String,TaskOutcome> taskOutcomes, String gradleVersion, String pluginID, String pluginVersion, List<String> positiveFiles, List<String> negativeFiles)
             throws Exception {
-            GradleRunner gradleRunner = setUp(gradleVersion, gradleSettings(gradleVersion), gradleSimpleBuild(gradleVersion, null));
+            JGitScript gitScript = JGitScript.fromScratch(true); // create the new directory with a new Git repository inside
+            GradleRunner gradleRunner = setUp(gitScript.getWorkingDirectory(), gradleVersion, gradleSettings(gradleVersion), gradleSimpleBuild(gradleVersion, null));
 
-            // GradleRunner.withDebug(boolean) enables debug output
-            BuildResult gradleResult = gradleRunner.withDebug(true).withArguments("--info", /*"--debug",*/ "--stacktrace", target).build();
-            System.out.println("Executed task: "+target);System.out.flush();
-            
-            for (Map.Entry<String,TaskOutcome> taskOutcome: taskOutcomes.entrySet()) {
-                boolean taskFound = false;
-                System.out.println("  Testing outcome for task: "+taskOutcome.getKey());System.out.flush();
-                for (BuildTask buildTask: gradleResult.getTasks()) {
-                    System.out.println("    Evaluating task: "+buildTask.getPath());System.out.flush();
-                    if (buildTask.getPath().endsWith(taskOutcome.getKey())) {
-                        taskFound = true;
-                        System.out.println("      Task "+taskOutcome.getKey()+" match found.  Outcome is: "+buildTask.getOutcome()+", expected was "+taskOutcome.getValue());System.out.flush();
-                        assertEquals(taskOutcome.getValue(), buildTask.getOutcome(), "When running gradle "+target+" expected outcome for task "+buildTask.getPath()+" was "+taskOutcome.getValue()+" but actual value was "+buildTask.getOutcome());
-                    }
-                    else {
-                        System.out.println("      Skipping task "+taskOutcome.getKey());System.out.flush();
-                    }
-                }
-                System.out.println("  Task "+taskOutcome.getKey()+"="+taskOutcome.getValue()+" found: "+taskFound);System.out.flush();
-                if (Objects.isNull(taskOutcome.getValue())) {
-                    assertFalse(taskFound, "Task "+taskOutcome.getKey()+" was not expected to be part of the build but it was");
-                }
-                else assertTrue(taskFound, "Task "+taskOutcome.getKey()+" was expected to be part of the build but it was not");
-            }
+            runGradleTask(gradleRunner, target, taskOutcomes, gradleVersion, pluginID, pluginVersion, positiveFiles, negativeFiles);
 
             tearDown(gradleRunner);
         }

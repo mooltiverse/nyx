@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -75,7 +76,7 @@ public class FileSystemUtil {
     }
 
     /**
-     * Returns a string with the hierarchical representation of the directory contents
+     * Returns a string with the hierarchical representation of the directory contents.
      * 
      * @param directory the directory to render
      * @param maxDepth the maximum depth of objects to render (starting from 1 with the given directory)
@@ -100,7 +101,8 @@ public class FileSystemUtil {
     }
 
     /**
-     * Returns a string with the hierarchical representation of the directory item (file or directory)
+     * Returns a string with the hierarchical representation of the directory item (file or directory). This method
+     * is recursive and allows to render any level of depth.
      * 
      * @param sb the string builder to append the output to
      * @param lineStart is the initial part of the line
@@ -198,6 +200,23 @@ public class FileSystemUtil {
     }
 
     /**
+     * Creates a new temporary directory with a random name in the given directory.
+     * 
+     * @param dir the parent directory to create the subdirectory in. If {@code null} the default temporary directory is used
+     * @param prefix an optional prefix for the directory name. It may be {@code null}
+     * 
+     * @return the directory that has been created
+     * 
+     * @throws Exception in case of any exception
+     */
+    public static File newTempDirectory(File parent, String prefix)
+        throws Exception {
+        File res = Objects.isNull(parent) ? Files.createTempDirectory(prefix).toFile() : Files.createTempDirectory(parent.toPath(), prefix).toFile();
+        res.deleteOnExit();
+        return res;
+    }
+
+    /**
      * Creates a new directory with a random name in the given directory.
      * 
      * @param dir the directory to create the subdirectory in.
@@ -208,7 +227,7 @@ public class FileSystemUtil {
      */
     public static File newDirectory(File dir)
         throws Exception {
-        File res = new File(dir.getAbsolutePath()+"/"+RandomUtil.randomAlphabeticString(5));
+        File res = new File(dir.getAbsolutePath()+File.pathSeparator+RandomUtil.randomAlphabeticString(5));
         res.mkdirs();
         return res;
     }

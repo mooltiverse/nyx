@@ -29,7 +29,7 @@ import org.junit.jupiter.api.DisplayName;
  * Abstract utility methods and tests for all tests in the plugin package
  */
 @DisplayName("AbstractTests")
-public class AbstractTests {
+public abstract class AbstractTests {
     /**
      * Instantiates a new project to be used for tests.
      * 

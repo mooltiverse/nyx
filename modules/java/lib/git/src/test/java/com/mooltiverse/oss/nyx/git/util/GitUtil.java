@@ -98,7 +98,7 @@ public class GitUtil {
      */
     public static void printRepositoryStatus(File directory, OutputStream out)
         throws Exception {
-        runCommand(new String[]{"git", "status"}, null, directory, out);
+        RuntimeUtil.runCommand(new String[]{"git", "status"}, null, directory, out);
     }
 
     /**
@@ -109,7 +109,7 @@ public class GitUtil {
      */
     public static void printRepositoryObjects(File directory, OutputStream out)
         throws Exception {
-        runCommand(new String[]{"git", "rev-list", "--objects", "--all"}, null, directory, out);
+        RuntimeUtil.runCommand(new String[]{"git", "rev-list", "--objects", "--all"}, null, directory, out);
     }
 
     /**
@@ -120,7 +120,7 @@ public class GitUtil {
      */
     public static void printRepositoryTags(File directory, OutputStream out)
         throws Exception {
-        runCommand(new String[]{"git", "tag", "--list", "-n"}, null, directory, out);
+        RuntimeUtil.runCommand(new String[]{"git", "tag", "--list", "-n"}, null, directory, out);
     }
 
     /**
@@ -131,23 +131,6 @@ public class GitUtil {
      */
     public static void printRepositoryCommitHistory(File directory, OutputStream out)
         throws Exception {
-        runCommand(new String[]{"git", "log", "--decorate=full", "--source"}, null, directory, out);
-    }
-
-    /**
-     * Runs the command (and options) given in the input array in the given directory and redirecting the output to the given stream.
-     * 
-     * @param command the command and options as they must appear on the command line, in order. The first element is the command.
-     * @param env the environment vaiables to set, or {@code null} if no environment variable needs to be set
-     * @param directory the directory to run the command in, or {@code null} to use the current working directory
-     * @param out the output stream to redirect the output to
-     */
-    private static void runCommand(String[] command, String[] env, File directory, OutputStream out)
-        throws Exception {
-        Process p = new ProcessBuilder(command).directory(directory).redirectErrorStream(true).start();
-        p.waitFor();
-        out.write(p.getInputStream().readAllBytes());
-        out.flush();
-        p.destroy();
+        RuntimeUtil.runCommand(new String[]{"git", "log", "--decorate=full", "--source"}, null, directory, out);
     }
 }

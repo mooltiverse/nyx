@@ -22,6 +22,7 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mooltiverse.oss.nyx.git.local.Repository;
 import com.mooltiverse.oss.nyx.state.State;
 
 /**
@@ -37,11 +38,12 @@ public class Make extends AbstractCommand {
      * Standard constructor.
      * 
      * @param state the state reference
+     * @param repository the repository reference
      * 
-     * @throws NullPointerException if the given argument is {@code null}
+     * @throws NullPointerException if a given argument is {@code null}
      */
-    public Make(State state) {
-        super(state);
+    public Make(State state, Repository repository) {
+        super(state, repository);
         logger.debug(COMMAND, "New Make command object");
     }
 
