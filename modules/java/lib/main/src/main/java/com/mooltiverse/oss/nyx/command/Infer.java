@@ -27,12 +27,24 @@ import com.mooltiverse.oss.nyx.state.State;
 
 /**
  * The Infer command takes care of inferring and computing informations in order to make a new release.
+ * 
+ * This class is not meant to be used in multi-threaded environments.
  */
 public class Infer extends AbstractCommand {
     /**
      * The private logger instance
      */
     private static final Logger logger = LoggerFactory.getLogger(Infer.class);
+
+    /**
+     * The name used for the internal state attribute where we store the timestamp
+     * of the last execution of this command.
+     * 
+     * The name is prefixed with this class name to avoid clashes with other attributes.
+     * 
+     * @see State#getInternals()
+     */
+    private static final String INTERNAL_EXECUTED = Infer.class.getSimpleName().concat(".").concat("executed").concat("last");
 
     /**
      * Standard constructor.
@@ -44,20 +56,32 @@ public class Infer extends AbstractCommand {
      */
     public Infer(State state, Repository repository) {
         super(state, repository);
-        logger.debug(COMMAND, "New Publish command object");
+        logger.debug(COMMAND, "New Infer command object");
     }
 
     /**
-     * Runs the command and returns the updated reference to the state object.
-     * 
-     * @return the updated reference to the state object. The returned object is the same instance passed
-     * in the constructor.
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isUpToDate() {
+        // TODO: implement the up-to-date checks here
+        // for now let's just check if the task has executed by seeing if we have stored the last
+        // execution time. Also see where the attribute is stored in the run() method
+        return !Objects.isNull(state().getInternals().get(INTERNAL_EXECUTED));
+    }
+
+    /**
+     * {@inheritDoc}
      */
     @Override
     public State run() {
         // TODO: implement this method
         // the following are just temporary smoke detection outputs
         logger.info(COMMAND, "Infer.run()");
-        return getState();
+
+        // store the last execution time, used in the up-to-date checks
+        state().getInternals().put(INTERNAL_EXECUTED, Long.toString(System.currentTimeMillis()));
+
+        return state();
     }
 }

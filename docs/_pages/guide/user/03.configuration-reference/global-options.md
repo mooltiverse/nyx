@@ -27,7 +27,7 @@ These are the top level options in the configuration:
 | Command Line Option       | `-b <NAME>`, `--bump=<NAME>`                                                             |
 | Environment Variable      | `NYX_BUMP=<NAME>`                                                                        |
 | Configuration File Option | `bump`                                                                                   |
-| Related state attributes  | [TODO: put the link to the *version* state attribute here](){: .btn .btn--info .btn--small} |
+| Related state attributes  | [version]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#version){: .btn .btn--info .btn--small} |
 
 Instructs Nyx on which identifier to bump on the past version in order to build the new version.
 
@@ -48,7 +48,7 @@ This option has no effect if [`version`](#version) is also used.
 | Command Line Option       | `-d <PATH>`, `--directory=<PATH>`                                                        |
 | Environment Variable      | `NYX_DIRECTORY=<PATH>`                                                                   |
 | Configuration File Option | `directory`                                                                              |
-| Related state attributes  | [TODO: put the link to the *directory* state attribute here](){: .btn .btn--info .btn--small} |
+| Related state attributes  | [directory]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#directory){: .btn .btn--info .btn--small} |
 
 Sets the working directory for Nyx. The directory is where Nyx searches for the Git repository and is also used as the base path when relative paths to local files or directories.
 
@@ -121,7 +121,7 @@ When used with no value on the command line (i.e. `--release-prefix-lenient` alo
 | Command Line Option       | `--scheme=<NAME>`                                                                        |
 | Environment Variable      | `NYX_SCHEME=<NAME>`                                                                      |
 | Configuration File Option | `scheme`                                                                                 |
-| Related state attributes  | [TODO: put the link to the *scheme* state attribute here](){: .btn .btn--info .btn--small} |
+| Related state attributes  | [scheme]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#scheme){: .btn .btn--info .btn--small} [version]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#version){: .btn .btn--info .btn--small} |
 
 Selects the [version scheme]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/version-schemes.md %}) to use. Defaults to [`semver`]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/version-schemes.md %}#semantic-versioning-semver).
 
@@ -160,7 +160,7 @@ The [**Gradle plugin**]({{ site.baseurl }}{% link _pages/guide/user/02.introduct
 | Command Line Option       | `-v <VERSION>`, `--version=<VERSION>`                                                    |
 | Environment Variable      | `NYX_VERSION=<VERSION>`                                                                  |
 | Configuration File Option | `version`                                                                                |
-| Related state attributes  | [TODO: put the link to the *version* state attribute here](){: .btn .btn--info .btn--small} |
+| Related state attributes  | [version]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#version){: .btn .btn--info .btn--small} |
 
 Overrides the version and prevents Nyx to [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer). When overriding this value you take over the tool and go the *manual versioning* way so Nyx won't try to read past versions from the commit history nor determine which identifiers to bump.
 

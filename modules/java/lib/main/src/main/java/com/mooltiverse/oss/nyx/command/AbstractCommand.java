@@ -27,8 +27,12 @@ import com.mooltiverse.oss.nyx.state.State;
 
 /**
  * The common superclass for Nyx commands.
+ * 
+ * This class is not meant to be used in multi-threaded environments.
+ * 
+ * All implementing classes must have a public constructor that accept a {@link State} and a {@link Repository} parameter.
  */
-abstract class AbstractCommand implements Command {
+public abstract class AbstractCommand implements Command {
     /**
      * The private logger instance
      */
@@ -62,12 +66,10 @@ abstract class AbstractCommand implements Command {
     }
 
     /**
-     * Returns the state object.
-     * 
-     * @return the state object.
+     * {@inheritDoc}
      */
     @Override
-    public final State getState() {
+    public final State state() {
         return state;
     }
 
@@ -76,7 +78,7 @@ abstract class AbstractCommand implements Command {
      * 
      * @return the repository object.
      */
-    public final Repository getRepository() {
+    public final Repository repository() {
         return repository;
     }
 }

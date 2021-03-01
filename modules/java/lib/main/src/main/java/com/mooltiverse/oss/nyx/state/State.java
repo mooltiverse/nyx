@@ -17,6 +17,9 @@ package com.mooltiverse.oss.nyx.state;
 
 import static com.mooltiverse.oss.nyx.log.Markers.STATE;
 
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import org.slf4j.Logger;
@@ -24,6 +27,9 @@ import org.slf4j.LoggerFactory;
 
 import com.mooltiverse.oss.nyx.Nyx;
 import com.mooltiverse.oss.nyx.configuration.Configuration;
+import com.mooltiverse.oss.nyx.configuration.ConfigurationException;
+import com.mooltiverse.oss.nyx.configuration.Scheme;
+import com.mooltiverse.oss.nyx.version.Version;
 
 /**
  * The State class holds a number of attributes resulting from the execution of one or more command and so represents
@@ -34,16 +40,31 @@ import com.mooltiverse.oss.nyx.configuration.Configuration;
  * 
  * There must be only one instance of this class for every execution and it's retrieved by {@link Nyx#state()}.
  */
-public class State {
+public class State implements Root {
     /**
      * The private logger instance
      */
     private static final Logger logger = LoggerFactory.getLogger(State.class);
 
     /**
+     * The map containing the internal attributes.
+     */
+    private final Map<String, String> internals = new HashMap<String, String>();
+
+    /**
      * The private immutable instance of the configuration.
      */
     private final Configuration configuration;
+
+    /**
+     * The latest timestamp that was taken.
+     */
+    private Long timestamp = Long.valueOf(System.currentTimeMillis());
+
+    /**
+     * The version that has been inferred.
+     */
+    private Version version = null;
     
     /**
      * Standard constructor.
@@ -57,14 +78,109 @@ public class State {
         Objects.requireNonNull(configuration);
         this.configuration = configuration;
         logger.debug(STATE, "New state object");
+
+        // TODO: add the logic to load a previous state file, with special regard to the future 'resume' option (https://github.com/mooltiverse/nyx/issues/42)
+
+        // restoring from file gets the timestamp from previous runs, so we need to update it
+        touchTimestamp();
     }
 
     /**
-     * Returns the configuration object. The configuration is a live reference.
-     * 
-     * @return the configuration object.
+     * {@inheritDoc}
      */
+    @Override
     public Configuration getConfiguration() {
         return configuration;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public File getDirectory()
+        throws StateException {
+        try {
+            return getConfiguration().getDirectory();
+        }
+        catch (ConfigurationException ce) {
+            throw new StateException(ce);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Map<String, String> getInternals() {
+        return internals;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Scheme getScheme()
+        throws StateException {
+        try {
+            return getConfiguration().getScheme();
+        }
+        catch (ConfigurationException ce) {
+            throw new StateException(ce);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Long getTimestamp() {
+        return timestamp;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Version getVersion() {
+        return version;
+    }
+
+    /**
+     * Sets the version attribute.
+     * 
+     * @param version the version attribute to set for this state.
+     * 
+     * @see #getVersion()
+     * 
+     * @throws StateException in case the attribute has incorrect values (i.e. if the given scheme {Version#getScheme()}
+     * doesn't match the configured scheme).
+     * 
+     * @see Version#getScheme()
+     * @see Configuration#getScheme()
+     */
+    public void setVersion(Version version)
+        throws StateException {
+        try {
+            if (!getConfiguration().getScheme().getScheme().equals(version.getScheme())) {
+                throw new StateException(String.format("The given version %s scheme %s (%s) does not match the configured scheme %s", version.toString(), version.getScheme(), Scheme.from(version.getScheme()), getConfiguration().getScheme()));
+            }
+        }
+        catch (ConfigurationException ce) {
+            throw new StateException(ce);
+        }
+        
+        this.version = version;
+    }
+
+    /**
+     * Updates the current timestamp and returns the updated value.
+     * 
+     * @return the updated timestamp.
+     * 
+     * @see #getTimestamp()
+     */
+    public Long touchTimestamp() {
+        timestamp = Long.valueOf(System.currentTimeMillis());
+        return timestamp;
     }
 }

@@ -57,8 +57,8 @@ nav-user-guide:
         url: /guide/user/introduction/how-nyx-works/
       - title: "Usage"
         url: /guide/user/introduction/usage/
-#      - title: "Configuration Methods"
-#        url: /guide/user/introduction/configuration-methods/
+      - title: "Configuration Methods"
+        url: /guide/user/introduction/configuration-methods/
 #      - title: "Standard Configurations"
 #        url: /guide/user/introduction/standard-configurations/
 #      - title: "Dynamic Configurations"
@@ -99,11 +99,11 @@ nav-user-guide:
 #    children:
 #      - title: "Simple"
 #        url: /guide/user/configuration-presets/simple/
-#  - title: State Reference
-#    url: /guide/user/state-reference/
-#    children:
-#      - title: "Global Attributes"
-#        url: /guide/user/state-reference/global-attributes/
+  - title: State Reference
+    url: /guide/user/state-reference/
+    children:
+      - title: "Global Attributes"
+        url: /guide/user/state-reference/global-attributes/
 #      - title: "Release Scope Attributes"
 #        url: /guide/user/state-reference/release-scope-attributes/
 #      - title: "Commit History Attributes"

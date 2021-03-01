@@ -17,6 +17,7 @@ package com.mooltiverse.oss.nyx.configuration;
 
 import java.io.File;
 
+import com.mooltiverse.oss.nyx.state.State;
 import com.mooltiverse.oss.nyx.version.Version;
 
 /**
@@ -39,6 +40,8 @@ public interface Root extends Block {
      * @return the configured value for this option or {@code null} if the value hasn't been defined.
      * 
      * @throws ConfigurationException in case the option has been defined but has incorrect values or it can't be resolved.
+     * 
+     * @see State#getDirectory()
      */
     public File getDirectory()
         throws ConfigurationException;
