@@ -13,18 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mooltiverse.oss.nyx.configuration;
+package com.mooltiverse.oss.nyx.data;
 
 import java.util.Objects;
 
 /**
- * This class maps version {@link com.mooltiverse.oss.nyx.version.Scheme}s and the corresponding configuration options, whose string representations
- * may not always match the {@link com.mooltiverse.oss.nyx.version.Scheme} values.
+ * This class maps version {@link com.mooltiverse.oss.nyx.version.Scheme}s and the corresponding configuration options or state attributes,
+ * whose string representations may not always match the {@link com.mooltiverse.oss.nyx.version.Scheme} values.
  * 
  * Although there is a one to one mapping with these values and those in the version {@link com.mooltiverse.oss.nyx.version.Scheme}
- * the two must not be confused. This class is meant to map configuration values (lowercase strings) to version {@link com.mooltiverse.oss.nyx.version.Scheme}.
+ * the two must not be confused. This class is meant to map configuration values and state attributes (lowercase strings)
+ * to version {@link com.mooltiverse.oss.nyx.version.Scheme}.
  * 
- * In other words, here is the mapping between version schemes and the string values users can use in configuration to ask for those schemes.
+ * In other words, this is is the mapping between version schemes and the string values users can use in configuration to ask for those
+ * schemes or returned by state attributes.
  * 
  * @see com.mooltiverse.oss.nyx.version.Scheme
  */
@@ -42,7 +44,7 @@ public enum Scheme {
     private final com.mooltiverse.oss.nyx.version.Scheme scheme;
 
     /**
-     * The scheme value used in configuration (the lowercase string).
+     * The scheme value used in configuration options or state attributes (the lowercase string).
      */
     private final String value;
 
@@ -50,7 +52,7 @@ public enum Scheme {
      * Builds the enumeration item.
      * 
      * @param scheme the version scheme
-     * @param value the scheme value used in configuration
+     * @param value the scheme value used in configuration ot state
      */
     private Scheme(com.mooltiverse.oss.nyx.version.Scheme scheme, String value) {
         this.scheme = scheme;
@@ -67,7 +69,8 @@ public enum Scheme {
     }
 
     /**
-     * Returns the string representation of this scheme. This string is also used in configuration options.
+     * Returns the string representation of this scheme. This string is also used in configuration options
+     * and state attributes.
      * 
      * @return the string representation of this scheme
      */

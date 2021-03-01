@@ -26,6 +26,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mooltiverse.oss.nyx.Nyx;
+import com.mooltiverse.oss.nyx.data.DataAccessException;
+import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
+import com.mooltiverse.oss.nyx.data.Scheme;
+import com.mooltiverse.oss.nyx.data.Verbosity;
 import com.mooltiverse.oss.nyx.version.Version;
 
 /**
@@ -73,10 +77,11 @@ public class Configuration implements Root {
      * 
      * See {@link Nyx#configuration()}
      * 
-     * @throws ConfigurationException in case default configuration objects prevent this configuration to be created correctly
+     * @throws DataAccessException in case data cannot be read or accessed.
+     * @throws IllegalPropertyException in case some option has been defined but has incorrect values or it can't be resolved.
      */
     public Configuration()
-        throws ConfigurationException {
+        throws DataAccessException, IllegalPropertyException {
         super();
         logger.debug(CONFIGURATION, "New configuration object");
         // TODO: add the code to load standard local (see LayerPriority#CUSTOM_LOCAL_FILE) and shared (see LayerPriority#STANDARD_SHARED_FILE) configuration files, if found
@@ -90,10 +95,11 @@ public class Configuration implements Root {
      * 
      * @return a reference to this same object.
      * 
-     * @throws ConfigurationException in case the given configuration has issues preventing it from being used.
+     * @throws DataAccessException in case data cannot be read or accessed.
+     * @throws IllegalPropertyException in case some option has been defined but has incorrect values or it can't be resolved.
      */
     public synchronized Configuration withPluginConfiguration(ConfigurationLayer layer)
-        throws ConfigurationException {
+        throws DataAccessException, IllegalPropertyException {
         if (Objects.isNull(layer)) {
             logger.debug(CONFIGURATION, "Removing the existing {} configuration layer, if any", LayerPriority.PLUGIN);
             if (layers.containsKey(LayerPriority.PLUGIN))
@@ -112,7 +118,7 @@ public class Configuration implements Root {
      */
     @Override
     public String getBump()
-        throws ConfigurationException {
+        throws DataAccessException, IllegalPropertyException {
         logger.trace(CONFIGURATION, "Retrieving the {} configuration option", "bump");
         for (ConfigurationLayer layer: layers.values()) {
             String bump = layer.getBump();
@@ -129,7 +135,7 @@ public class Configuration implements Root {
      */
     @Override
     public File getDirectory()
-        throws ConfigurationException {
+        throws DataAccessException, IllegalPropertyException {
         logger.trace(CONFIGURATION, "Retrieving the {} configuration option", "directory");
         for (ConfigurationLayer layer: layers.values()) {
             File directory = layer.getDirectory();
@@ -146,7 +152,7 @@ public class Configuration implements Root {
      */
     @Override
     public Boolean getDryRun()
-        throws ConfigurationException {
+        throws DataAccessException, IllegalPropertyException {
         logger.trace(CONFIGURATION, "Retrieving the {} configuration option", "dryRun");
         for (ConfigurationLayer layer: layers.values()) {
             Boolean dryRun = layer.getDryRun();
@@ -163,7 +169,7 @@ public class Configuration implements Root {
      */
     @Override
     public String getReleasePrefix()
-        throws ConfigurationException {
+        throws DataAccessException, IllegalPropertyException {
         logger.trace(CONFIGURATION, "Retrieving the {} configuration option", "releasePrefix");
         for (ConfigurationLayer layer: layers.values()) {
             String releasePrefix = layer.getReleasePrefix();
@@ -180,7 +186,7 @@ public class Configuration implements Root {
      */
     @Override
     public Boolean getReleasePrefixLenient()
-        throws ConfigurationException {
+        throws DataAccessException, IllegalPropertyException {
         logger.trace(CONFIGURATION, "Retrieving the {} configuration option", "releasePrefixLenient");
         for (ConfigurationLayer layer: layers.values()) {
             Boolean releasePrefixLenient = layer.getReleasePrefixLenient();
@@ -197,7 +203,7 @@ public class Configuration implements Root {
      */
     @Override
     public Scheme getScheme()
-        throws ConfigurationException {
+        throws DataAccessException, IllegalPropertyException {
         logger.trace(CONFIGURATION, "Retrieving the {} configuration option", "scheme");
         for (ConfigurationLayer layer: layers.values()) {
             Scheme scheme = layer.getScheme();
@@ -214,7 +220,7 @@ public class Configuration implements Root {
      */
     @Override
     public Verbosity getVerbosity()
-        throws ConfigurationException {
+        throws DataAccessException, IllegalPropertyException {
         logger.trace(CONFIGURATION, "Retrieving the {} configuration option", "verbosity");
         for (ConfigurationLayer layer: layers.values()) {
             Verbosity verbosity = layer.getVerbosity();
@@ -231,7 +237,7 @@ public class Configuration implements Root {
      */
     @Override
     public Version getVersion()
-        throws ConfigurationException {
+        throws DataAccessException, IllegalPropertyException {
         logger.trace(CONFIGURATION, "Retrieving the {} configuration option", "version");
         for (ConfigurationLayer layer: layers.values()) {
             Version version = layer.getVersion();

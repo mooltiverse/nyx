@@ -13,18 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mooltiverse.oss.nyx.state;
+package com.mooltiverse.oss.nyx.data;
 
-import com.mooltiverse.oss.nyx.Nyx;
 import com.mooltiverse.oss.nyx.NyxException;
 
 /**
- * This exception models an issue pertaining the state and its attributes.
- * 
- * @see Nyx#configuration()
- * @see State
+ * This exception models an issue pertaining data access. Examples are when data can't be
+ * read from the file system or from the network.
  */
-public class StateException extends NyxException {
+public class DataAccessException extends NyxException {
     /**
      * Default serial version UID
      */
@@ -35,7 +32,7 @@ public class StateException extends NyxException {
      * The cause is not initialized, and may subsequently be initialized by a
      * call to {@link #initCause}.
      */
-    public StateException() {
+    public DataAccessException() {
         super();
     }
 
@@ -47,7 +44,7 @@ public class StateException extends NyxException {
      * @param message the detail message. The detail message is saved for
      * later retrieval by the {@link #getMessage()} method.
      */
-    public StateException(String message) {
+    public DataAccessException(String message) {
         super(message);
     }
 
@@ -59,7 +56,7 @@ public class StateException extends NyxException {
      * @param cause the cause (which is saved for later retrieval by the
      * {@link #getCause()} method).
      */
-    public StateException(String message, Throwable cause) {
+    public DataAccessException(String message, Throwable cause) {
         super(message, cause);
     }
 
@@ -69,7 +66,7 @@ public class StateException extends NyxException {
      * @param cause the cause (which is saved for later retrieval by the
      * {@link #getCause()} method).
      */
-    public StateException(Throwable cause) {
+    public DataAccessException(Throwable cause) {
         super(cause);
     }
 }

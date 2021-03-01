@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mooltiverse.oss.nyx.configuration;
+package com.mooltiverse.oss.nyx.data;
 
 /**
- * This interface models the behavior of a layer within the multi-layered configuration.
+ * This interface models the behavior of a layer within multi-layered data structures.
  */
 public interface Layer {
 }

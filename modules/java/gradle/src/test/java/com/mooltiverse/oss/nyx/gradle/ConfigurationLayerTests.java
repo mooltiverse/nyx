@@ -25,7 +25,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import com.mooltiverse.oss.nyx.configuration.ConfigurationException;
+import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
 
 /**
  * Tests the Gradle task.<br>
@@ -225,7 +225,7 @@ public class ConfigurationLayerTests extends AbstractTests  {
         }*/
 
         @Test
-        @DisplayName("ConfigurationLayer.getScheme() with wrong values throws ConfigurationException")
+        @DisplayName("ConfigurationLayer.getScheme() with wrong values throws IllegalPropertyException")
         void getSchemeWrongValueTest()
             throws Exception {
             // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
@@ -235,11 +235,11 @@ public class ConfigurationLayerTests extends AbstractTests  {
 
             // set the property with an illegal value
             extension.getScheme().set("illegalscheme");
-            assertThrows(ConfigurationException.class, () -> { configurationLayer.getScheme(); });
+            assertThrows(IllegalPropertyException.class, () -> { configurationLayer.getScheme(); });
         }
 
         @Test
-        @DisplayName("ConfigurationLayer.getVerbosity() with wrong values throws ConfigurationException")
+        @DisplayName("ConfigurationLayer.getVerbosity() with wrong values throws IllegalPropertyException")
         void getVerbosityWrongValueTest()
             throws Exception {
             // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
@@ -249,11 +249,11 @@ public class ConfigurationLayerTests extends AbstractTests  {
 
             // set the property with an illegal value
             extension.getVerbosity().set("illegalverbosity");
-            assertThrows(ConfigurationException.class, () -> { configurationLayer.getVerbosity(); });
+            assertThrows(IllegalPropertyException.class, () -> { configurationLayer.getVerbosity(); });
         }
 
         @Test
-        @DisplayName("ConfigurationLayer.getVersion() with wrong values throws ConfigurationException")
+        @DisplayName("ConfigurationLayer.getVersion() with wrong values throws IllegalPropertyException")
         void getVersionWrongValueTest()
             throws Exception {
             // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
@@ -264,7 +264,7 @@ public class ConfigurationLayerTests extends AbstractTests  {
             // the 'version' property is a project standard property, not defined in the extension
             // and is passed directly to the ConfigurationLayer constructor
             ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, "notaversion");
-            assertThrows(ConfigurationException.class, () -> { configurationLayer.getVersion(); });
+            assertThrows(IllegalPropertyException.class, () -> { configurationLayer.getVersion(); });
         }
     }
 }

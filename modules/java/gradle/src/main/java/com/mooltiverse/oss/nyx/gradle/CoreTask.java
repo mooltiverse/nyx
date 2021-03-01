@@ -21,7 +21,8 @@ import org.gradle.api.Project;
 import org.gradle.api.plugins.ExtensionContainer;
 
 import com.mooltiverse.oss.nyx.Nyx;
-import com.mooltiverse.oss.nyx.configuration.ConfigurationException;
+import com.mooltiverse.oss.nyx.data.DataAccessException;
+import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
 
 /**
  * The abstract superclass for all Nyx core tasks.
@@ -125,10 +126,11 @@ abstract class CoreTask extends AbstractTask {
      * 
      * @return a shared backing Nyx instance to be used by all tasks within the project.
      * 
-     * @throws ConfigurationException in case of issues when passing the extension values to the Nyx configuration
+     * @throws DataAccessException in case the configuration can't be loaded for some reason.
+     * @throws IllegalPropertyException in case the configuration has some illegal options.
      */
     protected synchronized Nyx nyx()
-        throws ConfigurationException {
+        throws DataAccessException, IllegalPropertyException {
         if (hasSharedProperty(NYX_INSTANCE_PROPERTY))
             return Nyx.class.cast(retrieveSharedProperty(NYX_INSTANCE_PROPERTY));
         else {

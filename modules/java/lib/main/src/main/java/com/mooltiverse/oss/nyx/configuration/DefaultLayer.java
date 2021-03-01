@@ -23,6 +23,10 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mooltiverse.oss.nyx.data.DataAccessException;
+import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
+import com.mooltiverse.oss.nyx.data.Scheme;
+import com.mooltiverse.oss.nyx.data.Verbosity;
 import com.mooltiverse.oss.nyx.version.Version;
 
 /**
@@ -65,7 +69,7 @@ class DefaultLayer implements ConfigurationLayer, Defaults {
      */
     @Override
     public String getBump()
-        throws ConfigurationException {
+        throws DataAccessException, IllegalPropertyException {
         logger.trace(DEFAULT, "Retrieving the default {} configuration option: {}", "bump", BUMP);
         return BUMP;
     }
@@ -75,7 +79,7 @@ class DefaultLayer implements ConfigurationLayer, Defaults {
      */
     @Override
     public File getDirectory()
-        throws ConfigurationException {
+        throws DataAccessException, IllegalPropertyException {
         logger.trace(DEFAULT, "Retrieving the default {} configuration option: {}", "directory", DIRECTORY);
         return DIRECTORY;
     }
@@ -85,7 +89,7 @@ class DefaultLayer implements ConfigurationLayer, Defaults {
      */
     @Override
     public Boolean getDryRun()
-        throws ConfigurationException {
+        throws DataAccessException, IllegalPropertyException {
         logger.trace(DEFAULT, "Retrieving the default {} configuration option: {}", "dryRun", DRY_RUN);
         return DRY_RUN;
     }
@@ -95,7 +99,7 @@ class DefaultLayer implements ConfigurationLayer, Defaults {
      */
     @Override
     public String getReleasePrefix()
-        throws ConfigurationException {
+        throws DataAccessException, IllegalPropertyException {
         logger.trace(DEFAULT, "Retrieving the default {} configuration option: {}", "releasePrefix", RELEASE_PREFIX);
         return RELEASE_PREFIX;
     }
@@ -105,7 +109,7 @@ class DefaultLayer implements ConfigurationLayer, Defaults {
      */
     @Override
     public Boolean getReleasePrefixLenient()
-        throws ConfigurationException {
+        throws DataAccessException, IllegalPropertyException {
         logger.trace(DEFAULT, "Retrieving the default {} configuration option: {}", "releasePrefixLenient", RELEASE_PREFIX_LENIENT);
         return RELEASE_PREFIX_LENIENT;
     }
@@ -115,7 +119,7 @@ class DefaultLayer implements ConfigurationLayer, Defaults {
      */
     @Override
     public Scheme getScheme()
-        throws ConfigurationException {
+        throws DataAccessException, IllegalPropertyException {
         logger.trace(DEFAULT, "Retrieving the default {} configuration option: {}", "scheme", SCHEME);
         return SCHEME;
     }
@@ -125,7 +129,7 @@ class DefaultLayer implements ConfigurationLayer, Defaults {
      */
     @Override
     public Verbosity getVerbosity()
-        throws ConfigurationException {
+        throws DataAccessException, IllegalPropertyException {
         logger.trace(DEFAULT, "Retrieving the default {} configuration option: {}", "verbosity", VERBOSITY);
         return VERBOSITY;
     }
@@ -135,7 +139,7 @@ class DefaultLayer implements ConfigurationLayer, Defaults {
      */
     @Override
     public Version getVersion()
-        throws ConfigurationException {
+        throws DataAccessException, IllegalPropertyException {
         logger.trace(DEFAULT, "Retrieving the default {} configuration option: {}", "version", VERSION);
         return VERSION;
     }

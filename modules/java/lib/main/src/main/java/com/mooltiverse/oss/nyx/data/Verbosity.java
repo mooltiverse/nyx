@@ -13,18 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mooltiverse.oss.nyx.configuration;
+package com.mooltiverse.oss.nyx.data;
 
 import java.util.Objects;
 
 import org.slf4j.event.Level;
 
 /**
- * This class maps log {@link Level}s and the corresponding configuration options, whose string representations
- * may not always match the {@link Level} values.
+ * This class maps log {@link Level}s and the corresponding configuration options and state attributes,
+ * whose string representations may not always match the {@link Level} values.
  * 
  * In other words, here is the mapping between logging levels and the string values users can use in configuration
- * to ask for those logging levels.
+ * and state to ask for those logging levels.
  */
 public enum Verbosity {
     /**
@@ -76,7 +76,7 @@ public enum Verbosity {
     private final Level level;
 
     /**
-     * The verbosity level value, also used in configuration.
+     * The verbosity level value, also used in configuration and state.
      */
     private final String value;
 
@@ -84,7 +84,7 @@ public enum Verbosity {
      * Builds the enumeration item.
      * 
      * @param level the SLF4J corresponding logging level
-     * @param value the verbosity level value, also used in configuration
+     * @param value the verbosity level value, also used in configuration and state
      */
     private Verbosity(Level level, String value) {
         this.level = level;
@@ -101,7 +101,8 @@ public enum Verbosity {
     }
 
     /**
-     * Returns the string representation of this verbosity level. This string is also used in configuration options.
+     * Returns the string representation of this verbosity level. This string is also used in configuration options
+     * and state attributes.
      * 
      * @return the string representation of this verbosity level
      */

@@ -15,6 +15,8 @@
  */
 package com.mooltiverse.oss.nyx.configuration;
 
+import com.mooltiverse.oss.nyx.data.Layer;
+
 /**
  * This interface models the behavior of a root block layer within the multi-layered configuration.
  */

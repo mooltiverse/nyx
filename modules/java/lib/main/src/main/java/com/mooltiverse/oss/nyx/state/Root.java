@@ -21,11 +21,14 @@ import java.util.Map;
 import com.mooltiverse.oss.nyx.Nyx;
 import com.mooltiverse.oss.nyx.command.Infer;
 import com.mooltiverse.oss.nyx.configuration.Configuration;
-import com.mooltiverse.oss.nyx.configuration.Scheme;
+import com.mooltiverse.oss.nyx.data.DataAccessException;
+import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
+import com.mooltiverse.oss.nyx.data.Block;
+import com.mooltiverse.oss.nyx.data.Scheme;
 import com.mooltiverse.oss.nyx.version.Version;
 
 /**
- * This interface models the root state block, with global options.
+ * This interface models the state root block, with global attributes.
  */
 public interface Root extends Block {
     /**
@@ -38,14 +41,15 @@ public interface Root extends Block {
     /**
      * Returns the directory used as the working directory as it's defined by the configuration.
      * 
-     * @return the current value for this option.
+     * @return the current value for this attribute.
      * 
-     * @throws StateException in case the attribute has incorrect values or it can't be resolved.
+     * @throws DataAccessException in case the attribute cannot be read or accessed.
+     * @throws IllegalPropertyException in case the attribute has been defined but has incorrect values or it can't be resolved.
      * 
      * @see Configuration#getDirectory()
      */
     public File getDirectory()
-        throws StateException;
+        throws DataAccessException, IllegalPropertyException;
 
     /**
      * Returns the live map of internal attributes.
@@ -67,14 +71,15 @@ public interface Root extends Block {
     public Map<String, String> getInternals();
 
     /**
-     * Returns the versioning scheme used as it's defined by this configuration.
+     * Returns the versioning scheme used as it's defined by the configuration.
      * 
-     * @return the current value for this option.
+     * @return the current value for this attribute.
      * 
-     * @throws StateException in case the attribute has incorrect values or it can't be resolved.
+     * @throws DataAccessException in case the attribute cannot be read or accessed.
+     * @throws IllegalPropertyException in case the attribute has been defined but has incorrect values or it can't be resolved.
      */
     public Scheme getScheme()
-        throws StateException;
+        throws DataAccessException, IllegalPropertyException;
 
     /**
      * Returns the current timestamp.
@@ -89,12 +94,13 @@ public interface Root extends Block {
      * 
      * @return the current version inferred by Nyx. This is {@code null} until {@link Nyx#infer()} has run.
      * 
-     * @throws StateException in case the attribute has incorrect values or it can't be resolved.
+     * @throws DataAccessException in case the attribute cannot be read or accessed.
+     * @throws IllegalPropertyException in case the attribute has been defined but has incorrect values or it can't be resolved.
      * 
      * @see Configuration#getVersion()
      * @see Nyx#infer()
      * @see Infer
      */
     public Version getVersion()
-        throws StateException;
+        throws DataAccessException, IllegalPropertyException;
 }

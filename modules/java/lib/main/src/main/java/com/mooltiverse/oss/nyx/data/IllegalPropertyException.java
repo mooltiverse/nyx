@@ -13,18 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mooltiverse.oss.nyx.configuration;
+package com.mooltiverse.oss.nyx.data;
 
-import com.mooltiverse.oss.nyx.Nyx;
 import com.mooltiverse.oss.nyx.NyxException;
 
 /**
- * This exception models an issue pertaining the configuration and its options.
- * 
- * @see Nyx#configuration()
- * @see Configuration
+ * This exception models an issue pertaining a data property.
  */
-public class ConfigurationException extends NyxException {
+public class IllegalPropertyException extends NyxException {
     /**
      * Default serial version UID
      */
@@ -35,7 +31,7 @@ public class ConfigurationException extends NyxException {
      * The cause is not initialized, and may subsequently be initialized by a
      * call to {@link #initCause}.
      */
-    public ConfigurationException() {
+    public IllegalPropertyException() {
         super();
     }
 
@@ -47,7 +43,7 @@ public class ConfigurationException extends NyxException {
      * @param message the detail message. The detail message is saved for
      * later retrieval by the {@link #getMessage()} method.
      */
-    public ConfigurationException(String message) {
+    public IllegalPropertyException(String message) {
         super(message);
     }
 
@@ -59,7 +55,7 @@ public class ConfigurationException extends NyxException {
      * @param cause the cause (which is saved for later retrieval by the
      * {@link #getCause()} method).
      */
-    public ConfigurationException(String message, Throwable cause) {
+    public IllegalPropertyException(String message, Throwable cause) {
         super(message, cause);
     }
 
@@ -69,7 +65,7 @@ public class ConfigurationException extends NyxException {
      * @param cause the cause (which is saved for later retrieval by the
      * {@link #getCause()} method).
      */
-    public ConfigurationException(Throwable cause) {
+    public IllegalPropertyException(Throwable cause) {
         super(cause);
     }
 }

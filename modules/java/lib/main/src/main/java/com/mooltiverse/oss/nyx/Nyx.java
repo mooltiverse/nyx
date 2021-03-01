@@ -37,10 +37,10 @@ import com.mooltiverse.oss.nyx.command.Make;
 import com.mooltiverse.oss.nyx.command.Mark;
 import com.mooltiverse.oss.nyx.command.Publish;
 import com.mooltiverse.oss.nyx.configuration.Configuration;
-import com.mooltiverse.oss.nyx.configuration.ConfigurationException;
+import com.mooltiverse.oss.nyx.data.DataAccessException;
+import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
 import com.mooltiverse.oss.nyx.git.local.Repository;
 import com.mooltiverse.oss.nyx.state.State;
-import com.mooltiverse.oss.nyx.state.StateException;
 
 /**
  * The Nyx entry point and main class.
@@ -103,10 +103,11 @@ public class Nyx {
      * 
      * @return the configuration
      * 
-     * @throws ConfigurationException in case the configuration can't be loaded for some reason.
+     * @throws DataAccessException in case the configuration can't be loaded for some reason.
+     * @throws IllegalPropertyException in case the configuration has some illegal options.
      */
     public Configuration configuration()
-        throws ConfigurationException {
+        throws DataAccessException, IllegalPropertyException {
         if (Objects.isNull(configuration)) {
             logger.debug(MAIN, "Instantiating the initial configuration");
             configuration = new Configuration();
@@ -119,10 +120,11 @@ public class Nyx {
      * 
      * @return the state
      * 
-     * @throws ConfigurationException in case the configuration can't be loaded for some reason.
+     * @throws DataAccessException in case the configuration can't be loaded for some reason.
+     * @throws IllegalPropertyException in case the configuration has some illegal options.
      */
     public Repository repository()
-        throws ConfigurationException {
+        throws DataAccessException, IllegalPropertyException {
         if (Objects.isNull(repository)) {
             File repoDir = configuration().getDirectory();
             logger.debug(MAIN, "Instantiating the Git repository in {}", repoDir);
@@ -130,7 +132,7 @@ public class Nyx {
                 repository = Repository.open(repoDir);
             }
             catch (IOException ioe) {
-                throw new ConfigurationException(String.format("The directory %s is not accessible or does not contain a valid Git repository", repoDir.getAbsolutePath()), ioe);
+                throw new DataAccessException(String.format("The directory %s is not accessible or does not contain a valid Git repository", repoDir.getAbsolutePath()), ioe);
             }
         }
         return repository;
@@ -141,11 +143,11 @@ public class Nyx {
      * 
      * @return the state
      * 
-     * @throws ConfigurationException in case the configuration can't be loaded for some reason.
-     * @throws StateException in case the state is invalid for some reason.
+     * @throws DataAccessException in case the configuration can't be loaded for some reason.
+     * @throws IllegalPropertyException in case the configuration has some illegal options.
      */
     public State state()
-        throws ConfigurationException, StateException {
+        throws DataAccessException, IllegalPropertyException {
         if (Objects.isNull(state)) {
             logger.debug(MAIN, "Instantiating the initial state");
             state = new State(configuration());
@@ -164,11 +166,11 @@ public class Nyx {
      * 
      * @return the return value of the {@link AbstractCommand#run()} method, invoked against the given command
      * 
-     * @throws ConfigurationException in case the configuration can't be loaded for some reason.
-     * @throws StateException in case the state is invalid for some reason.
+     * @throws DataAccessException in case the configuration can't be loaded for some reason.
+     * @throws IllegalPropertyException in case the configuration has some illegal options.
      */
     private <T extends AbstractCommand> State runCommand(Class<T> clazz, boolean useCache)
-        throws ConfigurationException, StateException {
+        throws DataAccessException, IllegalPropertyException {
         
         Objects.requireNonNull(clazz, "Cannot instantiate the command from a null class");
 
@@ -220,13 +222,13 @@ public class Nyx {
      * 
      * @return the same state object reference returned by {@link #state()}, which might have been updated by this command
      * 
-     * @throws ConfigurationException in case the configuration can't be loaded for some reason.
-     * @throws StateException in case the state is invalid for some reason.
+     * @throws DataAccessException in case the configuration can't be loaded for some reason.
+     * @throws IllegalPropertyException in case the configuration has some illegal options.
      * 
-     * @See Amend
+     * @see Amend
      */
     public State amend()
-        throws ConfigurationException, StateException {
+        throws DataAccessException, IllegalPropertyException {
         logger.debug(MAIN, "Nyx.amend()");
 
         // this command has no dependencies
@@ -239,13 +241,13 @@ public class Nyx {
      * Runs the {@link Clean} command and removes all the cached instances of internally referenced objects to restore the
      * state of this class to its initial state.
      * 
-     * @throws ConfigurationException in case the configuration can't be loaded for some reason.
-     * @throws StateException in case the state is invalid for some reason.
+     * @throws DataAccessException in case the configuration can't be loaded for some reason.
+     * @throws IllegalPropertyException in case the configuration has some illegal options.
      * 
      * @see Clean
      */
     public void clean()
-        throws ConfigurationException, StateException {
+        throws DataAccessException, IllegalPropertyException {
         logger.debug(MAIN, "Nyx.clean()");
 
         // this command has no dependencies
@@ -264,13 +266,13 @@ public class Nyx {
      * 
      * @return the same state object reference returned by {@link #state()}, which might have been updated by this command
      * 
-     * @throws ConfigurationException in case the configuration can't be loaded for some reason.
-     * @throws StateException in case the state is invalid for some reason.
+     * @throws DataAccessException in case the configuration can't be loaded for some reason.
+     * @throws IllegalPropertyException in case the configuration has some illegal options.
      * 
-     * @See Infer
+     * @see Infer
      */
     public State infer()
-        throws ConfigurationException, StateException {
+        throws DataAccessException, IllegalPropertyException {
         logger.debug(MAIN, "Nyx.infer()");
 
         // run dependent tasks first
@@ -285,13 +287,13 @@ public class Nyx {
      * 
      * @return the same state object reference returned by {@link #state()}, which might have been updated by this command
      * 
-     * @throws ConfigurationException in case the configuration can't be loaded for some reason.
-     * @throws StateException in case the state is invalid for some reason.
+     * @throws DataAccessException in case the configuration can't be loaded for some reason.
+     * @throws IllegalPropertyException in case the configuration has some illegal options.
      * 
-     * @See Make
+     * @see Make
      */
     public State make()
-        throws ConfigurationException, StateException {
+        throws DataAccessException, IllegalPropertyException {
         logger.debug(MAIN, "Nyx.make()");
 
         // run dependent tasks first
@@ -306,13 +308,13 @@ public class Nyx {
      * 
      * @return the same state object reference returned by {@link #state()}, which might have been updated by this command
      * 
-     * @throws ConfigurationException in case the configuration can't be loaded for some reason.
-     * @throws StateException in case the state is invalid for some reason.
+     * @throws DataAccessException in case the configuration can't be loaded for some reason.
+     * @throws IllegalPropertyException in case the configuration has some illegal options.
      * 
-     * @See Mark
+     * @see Mark
      */
     public State mark()
-        throws ConfigurationException, StateException {
+        throws DataAccessException, IllegalPropertyException {
         logger.debug(MAIN, "Nyx.mark()");
 
         // run dependent tasks first
@@ -327,13 +329,13 @@ public class Nyx {
      * 
      * @return the same state object reference returned by {@link #state()}, which might have been updated by this command
      * 
-     * @throws ConfigurationException in case the configuration can't be loaded for some reason.
-     * @throws StateException in case the state is invalid for some reason.
+     * @throws DataAccessException in case the configuration can't be loaded for some reason.
+     * @throws IllegalPropertyException in case the configuration has some illegal options.
      * 
-     * @See Publish
+     * @see Publish
      */
     public State publish()
-        throws ConfigurationException, StateException {
+        throws DataAccessException, IllegalPropertyException {
         logger.debug(MAIN, "Nyx.publish()");
 
         // run dependent tasks first

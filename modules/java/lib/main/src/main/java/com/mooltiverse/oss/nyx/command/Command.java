@@ -29,7 +29,7 @@ public interface Command {
     public State state();
 
     /**
-     * Returns {@code true} if this command is up to date, which means that the internal state ({@see #getState()}) would not
+     * Returns {@code true} if this command is up to date, which means that the internal state ({@link #state()}) would not
      * chanhe by running ({@link #run()}) the command again. It other words, when this method returns {@code true} any
      * invocation of the ({@link #run()}) method is needless and idempotent about the state.
      * 
@@ -37,7 +37,7 @@ public interface Command {
      * 
      * @return {@code true} if this command is up to date
      * 
-     * @see #getState()
+     * @see #state()
      * @see #run()
      */
     public boolean isUpToDate();
@@ -50,7 +50,7 @@ public interface Command {
      * or {@code null} if the command has cleared the state.
      * 
      * @see #isUpToDate()
-     * @see #getState()
+     * @see #state()
      */
     public State run();
 }

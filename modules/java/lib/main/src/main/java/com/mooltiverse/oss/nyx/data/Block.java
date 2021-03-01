@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mooltiverse.oss.nyx.state;
+package com.mooltiverse.oss.nyx.data;
 
 /**
- * This interface models the behavior of a block of attributes within the state.
+ * This interface models the behavior of a block of properties.
  */
 public interface Block {
 }

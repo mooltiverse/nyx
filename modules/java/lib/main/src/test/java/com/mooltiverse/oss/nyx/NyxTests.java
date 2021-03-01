@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import com.mooltiverse.oss.nyx.configuration.Configuration;
-import com.mooltiverse.oss.nyx.configuration.ConfigurationException;
+import com.mooltiverse.oss.nyx.data.DataAccessException;
 import com.mooltiverse.oss.nyx.configuration.mock.ConfigurationLayerMock;
 import com.mooltiverse.oss.nyx.git.local.Repository;
 import com.mooltiverse.oss.nyx.git.script.JGitScript;
@@ -65,12 +65,12 @@ public class NyxTests {
     @DisplayName("Nyx.repository")
     class RepositoryTests {
         @Test
-        @DisplayName("Nyx.repository() throws ConfigurationException in empty directory")
+        @DisplayName("Nyx.repository() throws DataAccessException in empty directory")
         void repositoryThrowsExceptionInEmptyDirectoryTest()
             throws Exception {
 
             // the Nyx instance created this way runs in the local sources directory, with no Git repository itself, so it's supposed to throw an exception
-            assertThrows(ConfigurationException.class, () -> new Nyx().repository());
+            assertThrows(DataAccessException.class, () -> new Nyx().repository());
         }
 
         @Test

@@ -18,8 +18,8 @@ package com.mooltiverse.oss.nyx.configuration.mock;
 import java.io.File;
 
 import com.mooltiverse.oss.nyx.configuration.ConfigurationLayer;
-import com.mooltiverse.oss.nyx.configuration.Scheme;
-import com.mooltiverse.oss.nyx.configuration.Verbosity;
+import com.mooltiverse.oss.nyx.data.Scheme;
+import com.mooltiverse.oss.nyx.data.Verbosity;
 import com.mooltiverse.oss.nyx.version.SemanticVersion;
 import com.mooltiverse.oss.nyx.version.Version;
 

@@ -27,8 +27,9 @@ import org.slf4j.LoggerFactory;
 
 import com.mooltiverse.oss.nyx.Nyx;
 import com.mooltiverse.oss.nyx.configuration.Configuration;
-import com.mooltiverse.oss.nyx.configuration.ConfigurationException;
-import com.mooltiverse.oss.nyx.configuration.Scheme;
+import com.mooltiverse.oss.nyx.data.DataAccessException;
+import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
+import com.mooltiverse.oss.nyx.data.Scheme;
 import com.mooltiverse.oss.nyx.version.Version;
 
 /**
@@ -98,13 +99,8 @@ public class State implements Root {
      */
     @Override
     public File getDirectory()
-        throws StateException {
-        try {
-            return getConfiguration().getDirectory();
-        }
-        catch (ConfigurationException ce) {
-            throw new StateException(ce);
-        }
+        throws DataAccessException, IllegalPropertyException {
+        return getConfiguration().getDirectory();
     }
 
     /**
@@ -120,13 +116,8 @@ public class State implements Root {
      */
     @Override
     public Scheme getScheme()
-        throws StateException {
-        try {
-            return getConfiguration().getScheme();
-        }
-        catch (ConfigurationException ce) {
-            throw new StateException(ce);
-        }
+        throws DataAccessException, IllegalPropertyException {
+        return getConfiguration().getScheme();
     }
 
     /**
@@ -141,7 +132,8 @@ public class State implements Root {
      * {@inheritDoc}
      */
     @Override
-    public Version getVersion() {
+    public Version getVersion() 
+        throws DataAccessException, IllegalPropertyException {
         return version;
     }
 
@@ -152,21 +144,16 @@ public class State implements Root {
      * 
      * @see #getVersion()
      * 
-     * @throws StateException in case the attribute has incorrect values (i.e. if the given scheme {Version#getScheme()}
-     * doesn't match the configured scheme).
+     * @throws DataAccessException in case the attribute cannot be read or accessed.
+     * @throws IllegalPropertyException in case the attribute has been defined but has incorrect values or it can't be resolved.
      * 
      * @see Version#getScheme()
      * @see Configuration#getScheme()
      */
     public void setVersion(Version version)
-        throws StateException {
-        try {
-            if (!getConfiguration().getScheme().getScheme().equals(version.getScheme())) {
-                throw new StateException(String.format("The given version %s scheme %s (%s) does not match the configured scheme %s", version.toString(), version.getScheme(), Scheme.from(version.getScheme()), getConfiguration().getScheme()));
-            }
-        }
-        catch (ConfigurationException ce) {
-            throw new StateException(ce);
+        throws DataAccessException, IllegalPropertyException {
+        if (!getConfiguration().getScheme().getScheme().equals(version.getScheme())) {
+            throw new IllegalPropertyException(String.format("The given version %s scheme %s (%s) does not match the configured scheme %s", version.toString(), version.getScheme(), Scheme.from(version.getScheme()), getConfiguration().getScheme()));
         }
         
         this.version = version;

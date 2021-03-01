@@ -17,6 +17,8 @@ package com.mooltiverse.oss.nyx.configuration;
 
 import java.io.File;
 
+import com.mooltiverse.oss.nyx.data.Scheme;
+import com.mooltiverse.oss.nyx.data.Verbosity;
 import com.mooltiverse.oss.nyx.version.Version;
 
 /**

@@ -20,9 +20,9 @@ import java.util.Objects;
 
 import org.gradle.api.file.DirectoryProperty;
 
-import com.mooltiverse.oss.nyx.configuration.ConfigurationException;
-import com.mooltiverse.oss.nyx.configuration.Scheme;
-import com.mooltiverse.oss.nyx.configuration.Verbosity;
+import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
+import com.mooltiverse.oss.nyx.data.Scheme;
+import com.mooltiverse.oss.nyx.data.Verbosity;
 import com.mooltiverse.oss.nyx.version.Version;
 import com.mooltiverse.oss.nyx.version.VersionFactory;
 
@@ -102,13 +102,13 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
      */
     @Override
     public Scheme getScheme()
-        throws ConfigurationException {
+        throws IllegalPropertyException {
         if (extension.getScheme().isPresent() && !Objects.isNull(extension.getScheme().getOrNull())) {
             try {
                 return Scheme.from(extension.getScheme().get());
             }
             catch (IllegalArgumentException iae) {
-                throw new ConfigurationException(String.format("Illegal value '%s' provided for configuration option '%s'", extension.getScheme().get(), "scheme"), iae);
+                throw new IllegalPropertyException(String.format("Illegal value '%s' provided for configuration option '%s'", extension.getScheme().get(), "scheme"), iae);
             }
         }
         else return null;
@@ -119,13 +119,13 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
      */
     @Override
     public Verbosity getVerbosity()
-        throws ConfigurationException {
+        throws IllegalPropertyException {
         if (extension.getVerbosity().isPresent() && !Objects.isNull(extension.getVerbosity().getOrNull())) {
             try {
                 return Verbosity.from(extension.getVerbosity().get());
             }
             catch (IllegalArgumentException iae) {
-                throw new ConfigurationException(String.format("Illegal value '%s' provided for configuration option '%s'", extension.getVerbosity().get(), "verbosity"), iae);
+                throw new IllegalPropertyException(String.format("Illegal value '%s' provided for configuration option '%s'", extension.getVerbosity().get(), "verbosity"), iae);
             }
         }
         else return null;
@@ -136,7 +136,7 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
      */
     @Override
     public Version getVersion()
-        throws ConfigurationException {
+        throws IllegalPropertyException {
         // when to 'version' property is defined, Gradle does not return null but instead the 'unspecified' string which, to us,
         // means there is no version defined, just like it was null
         if (Objects.isNull(projectVersion) || "unspecified".equals(projectVersion))
@@ -154,7 +154,7 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
                 return VersionFactory.valueOf(Scheme.SEMVER.getScheme(), projectVersion.toString(), true);
             }
             catch (IllegalArgumentException iae) {
-                throw new ConfigurationException(String.format("Illegal value '%s' provided for project property '%s'", projectVersion, "version"), iae);
+                throw new IllegalPropertyException(String.format("Illegal value '%s' provided for project property '%s'", projectVersion, "version"), iae);
             }
         }
     }
