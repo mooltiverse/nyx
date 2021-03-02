@@ -26,15 +26,15 @@ import com.mooltiverse.oss.nyx.git.local.Repository;
 import com.mooltiverse.oss.nyx.state.State;
 
 /**
- * The Amend command takes care of fixing the local Git repository, if needed.
+ * The Arrange command takes care of fixing the local Git repository, if needed.
  * 
  * This class is not meant to be used in multi-threaded environments.
  */
-public class Amend extends AbstractCommand {
+public class Arrange extends AbstractCommand {
     /**
      * The private logger instance
      */
-    private static final Logger logger = LoggerFactory.getLogger(Amend.class);
+    private static final Logger logger = LoggerFactory.getLogger(Arrange.class);
 
     /**
      * The name used for the internal state attribute where we store the timestamp
@@ -44,7 +44,7 @@ public class Amend extends AbstractCommand {
      * 
      * @see State#getInternals()
      */
-    private static final String INTERNAL_EXECUTED = Amend.class.getSimpleName().concat(".").concat("executed").concat("last");
+    private static final String INTERNAL_EXECUTED = Arrange.class.getSimpleName().concat(".").concat("executed").concat("last");
 
     /**
      * Standard constructor.
@@ -54,9 +54,9 @@ public class Amend extends AbstractCommand {
      * 
      * @throws NullPointerException if a given argument is {@code null}
      */
-    public Amend(State state, Repository repository) {
+    public Arrange(State state, Repository repository) {
         super(state, repository);
-        logger.debug(COMMAND, "New Amend command object");
+        logger.debug(COMMAND, "New Arrange command object");
     }
 
     /**
@@ -77,7 +77,7 @@ public class Amend extends AbstractCommand {
     public State run() {
         // TODO: implement this method
         // the following are just temporary smoke detection outputs
-        logger.info(COMMAND, "Amend.run()");
+        logger.info(COMMAND, "Arrange.run()");
 
         // store the last execution time, used in the up-to-date checks
         state().getInternals().put(INTERNAL_EXECUTED, Long.toString(System.currentTimeMillis()));

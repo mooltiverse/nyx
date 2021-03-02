@@ -90,7 +90,7 @@ public class NyxPlugin implements Plugin<Project> {
       ReleaseTask.conditionallyDefine(project);
 
       // Define core tasks
-      AmendTask.define(project);
+      ArrangeTask.define(project);
       CleanTask.define(project);
       InferTask.define(project);
       MakeTask.define(project);

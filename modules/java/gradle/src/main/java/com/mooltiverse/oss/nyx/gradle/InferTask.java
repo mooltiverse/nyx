@@ -77,7 +77,7 @@ public abstract class InferTask extends CoreTask {
         task.setDescription(DESCRIPTION);
 
         // Configure dependencies
-        task.dependsOn(AmendTask.NAME);
+        task.dependsOn(ArrangeTask.NAME);
 
         task.getLogger().debug("Task: {} - {} configured", task.getName(), InferTask.NAME);
     }

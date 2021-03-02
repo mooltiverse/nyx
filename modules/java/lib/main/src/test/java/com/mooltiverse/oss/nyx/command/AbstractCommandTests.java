@@ -43,7 +43,7 @@ public class AbstractCommandTests {
     static Map<String,Class<? extends AbstractCommand>> commands = new HashMap<String,Class<? extends AbstractCommand>>(){
         private static final long serialVersionUID = 1L;
         {
-            put(Amend.class.getSimpleName(),   Amend.class);
+            put(Arrange.class.getSimpleName(), Arrange.class);
             put(Clean.class.getSimpleName(),   Clean.class);
             put(Infer.class.getSimpleName(),   Infer.class);
             put(Make.class.getSimpleName(),    Make.class);

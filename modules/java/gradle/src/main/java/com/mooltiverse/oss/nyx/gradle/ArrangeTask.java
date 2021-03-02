@@ -26,9 +26,9 @@ import com.mooltiverse.oss.nyx.Nyx;
 import com.mooltiverse.oss.nyx.NyxException;
 
 /**
- * The task running the Amend command by invoking the {@link Nyx#amend()} method on the backing Nyx instance.
+ * The task running the Arrange command by invoking the {@link Nyx#arrange()} method on the backing Nyx instance.
  */
-public abstract class AmendTask extends CoreTask {
+public abstract class ArrangeTask extends CoreTask {
     /**
      * The description of the task. This also appears in Gradle help.
      */
@@ -37,13 +37,13 @@ public abstract class AmendTask extends CoreTask {
     /**
      * The name of the task. This is the name of the task to use inside Gradle scripts.
      */
-    public static final String NAME = "nyxAmend";
+    public static final String NAME = "nyxArrange";
 
     /**
      * Default constructor
      */
     @Inject
-    public AmendTask() {
+    public ArrangeTask() {
         super();
     }
 
@@ -56,8 +56,8 @@ public abstract class AmendTask extends CoreTask {
      * 
      * @see #define(Project, String, Class, Action)
      */
-    public static TaskProvider<AmendTask> define(Project project) {
-        return define(project, NAME, AmendTask.class, task -> configure(task));
+    public static TaskProvider<ArrangeTask> define(Project project) {
+        return define(project, NAME, ArrangeTask.class, task -> configure(task));
     }
 
     /**
@@ -70,19 +70,19 @@ public abstract class AmendTask extends CoreTask {
      * 
      * @see #define(Project)
      */
-    protected static void configure(AmendTask task) {
-        task.getLogger().debug("Configuring task: {} - {}", task.getName(), AmendTask.NAME);
+    protected static void configure(ArrangeTask task) {
+        task.getLogger().debug("Configuring task: {} - {}", task.getName(), ArrangeTask.NAME);
 
         CoreTask.configure(task);
         task.setDescription(DESCRIPTION);
 
         // This task has no dependencies to configure
 
-        task.getLogger().debug("Task: {} - {} configured", task.getName(), AmendTask.NAME);
+        task.getLogger().debug("Task: {} - {} configured", task.getName(), ArrangeTask.NAME);
     }
 
     /**
-     * The actual business method for this task. This method runs the {@link Nyx#amend()} method on the shared
+     * The actual business method for this task. This method runs the {@link Nyx#arrange()} method on the shared
      * singleton Nyx instance.
      * 
      * Gradle knows this is the method to run upon task execution thanks to the {@link TaskAction} annotation.
@@ -90,11 +90,11 @@ public abstract class AmendTask extends CoreTask {
      * @throws NyxException in case of any exception when invoking the backing instance
      */
     @TaskAction
-    public void amend()
+    public void arrange()
         throws NyxException {
-        getLogger().info("Running AmendTask: {}", NAME);
+        getLogger().info("Running ArrangeTask: {}", NAME);
 
         // just a draft to test the wireframing between objects
-        nyx().amend();
+        nyx().arrange();
     }
 }

@@ -19,6 +19,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.DisplayName;
 
-@DisplayName("Amend")
-public class AmendTests extends AbstractCommandTests {
+@DisplayName("Arrange")
+public class ArrangeTests extends AbstractCommandTests {
 }

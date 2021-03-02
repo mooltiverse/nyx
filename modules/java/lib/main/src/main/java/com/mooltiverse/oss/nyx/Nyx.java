@@ -29,7 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mooltiverse.oss.nyx.command.AbstractCommand;
-import com.mooltiverse.oss.nyx.command.Amend;
+import com.mooltiverse.oss.nyx.command.Arrange;
 import com.mooltiverse.oss.nyx.command.Clean;
 import com.mooltiverse.oss.nyx.command.Command;
 import com.mooltiverse.oss.nyx.command.Infer;
@@ -218,23 +218,23 @@ public class Nyx {
     }
 
     /**
-     * Runs the {@link Amend} command and returns the updated state.
+     * Runs the {@link Arrange} command and returns the updated state.
      * 
      * @return the same state object reference returned by {@link #state()}, which might have been updated by this command
      * 
      * @throws DataAccessException in case the configuration can't be loaded for some reason.
      * @throws IllegalPropertyException in case the configuration has some illegal options.
      * 
-     * @see Amend
+     * @see Arrange
      */
-    public State amend()
+    public State arrange()
         throws DataAccessException, IllegalPropertyException {
-        logger.debug(MAIN, "Nyx.amend()");
+        logger.debug(MAIN, "Nyx.arrange()");
 
         // this command has no dependencies
 
         // run the command
-        return runCommand(Amend.class, true);
+        return runCommand(Arrange.class, true);
     }
 
     /**
@@ -276,7 +276,7 @@ public class Nyx {
         logger.debug(MAIN, "Nyx.infer()");
 
         // run dependent tasks first
-        amend();
+        arrange();
 
         // run the command
         return runCommand(Infer.class, true);

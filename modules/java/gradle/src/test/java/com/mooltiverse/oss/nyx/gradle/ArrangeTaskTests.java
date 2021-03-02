@@ -20,6 +20,6 @@ import org.junit.jupiter.api.DisplayName;
 /**
  * Tests the Gradle task.<br>
  */
-@DisplayName("AmendTask")
-public class AmendTaskTests extends CoreTaskTests {
+@DisplayName("ArrangeTask")
+public class ArrangeTaskTests extends CoreTaskTests {
 }

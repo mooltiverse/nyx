@@ -11,7 +11,7 @@ Nyx provides the same features in all the available versions but the means to in
 
 | Name                                        | Command Line Command                   | Gradle Task Name                       |
 | ------------------------------------------- | -------------------------------------- | -------------------------------------- |
-| [Amend](#amend)                             | `amend`                                | [`nyxAmend`](#nyxamend)                |
+| [Arrange](#arrange)                         | `arrange`                              | [`nyxArrange`](#nyxarrange)            |
 | [Clean](#clean)                             | `clean`                                | [`nyxClean`](#nyxclean)                |
 | [Help](#help)                               | `help`                                 | N/A                                    |
 | [Infer](#infer)                             | `infer`                                | [`nyxInfer`](#nyxinfer)                |
@@ -19,7 +19,7 @@ Nyx provides the same features in all the available versions but the means to in
 | [Mark](#mark)                               | `mark`                                 | [`nyxMark`](#nyxmark)                  |
 | [Publish](#publish)                         | `publish`                              | [`nyxPublish`](#nyxpublish)            |
 
-### Amend
+### Arrange
 
 TODO: write this section
 {: .notice--warning}
@@ -138,9 +138,9 @@ Once the plugin is applied the following tasks and [dependencies](https://docs.g
 When running Gradle there is no specific task to run the [`help`](#help) command but you can use Gradle's commands like `gradle --help` to print the generic command line help or `gradle tasks [--all]` to see the list of available tasks. See the [Gradle Command-Line Interface](https://docs.gradle.org/current/userguide/command_line_interface.html) for more.
 {: .notice--info}
 
-#### `nyxAmend`
+#### `nyxArrange`
 
-Runs the [`amend`](#amend) command.
+Runs the [`arrange`](#arrange) command.
 
 This task has no efferent dependecies defined but [`nyxInfer`](#nyxinfer) depends on on this task.
 
@@ -154,7 +154,7 @@ This task has no efferent dependecies but if the `clean` lifecycle task is defin
 
 Runs the [`infer`](#infer) command.
 
-This task depends on the [`nyxAmend`](#nyxamend) task while [`nyxMake`](#nyxmake) depends on on this task.
+This task depends on the [`nyxArrange`](#nyxarrange) task while [`nyxMake`](#nyxmake) depends on on this task.
 
 #### `nyxMake`
 
