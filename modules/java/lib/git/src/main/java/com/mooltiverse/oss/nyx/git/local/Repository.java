@@ -18,16 +18,24 @@ package com.mooltiverse.oss.nyx.git.local;
 import java.io.File;
 import java.io.IOException;
 
+import java.util.Iterator;
 import java.util.Objects;
 
 import org.eclipse.jgit.api.Git;
-
-import org.eclipse.jgit.lib.Ref;
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.JGitInternalException;
+import org.eclipse.jgit.errors.NoWorkTreeException;
+import org.eclipse.jgit.errors.RevisionSyntaxException;
+import org.eclipse.jgit.lib.Constants;
+import org.eclipse.jgit.lib.ObjectId;
+import org.eclipse.jgit.revwalk.RevCommit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
+
+import com.mooltiverse.oss.nyx.git.GitException;
 
 /**
  * A local repository implementation that encapsulates the backing <a href="https://www.eclipse.org/jgit/">JGit</a> library.
@@ -81,6 +89,8 @@ public class Repository {
         throws IOException {
         Objects.requireNonNull(directory, "Can't create a repository instance with a null directory");
 
+        logger.debug(GIT, "Opening repository in directory {}", directory.getAbsolutePath());
+
         return new Repository(Git.open(directory));
     }
 
@@ -102,5 +112,54 @@ public class Repository {
             throw new IllegalArgumentException("Can't create a repository instance with a blank directory");
 
         return open(new File(directory));
+    }
+
+    /**
+     * Returns the SHA-1 identifier of the last commit in the current branch.
+     * 
+     * @return the SHA-1 identifier of the last commit in the current branch or {@code code} if the repository has no commits yet.
+     * 
+     * @throws GitException in case some propblem is encountered with the underlying Git repository
+     */
+    public String getLatestCommit()
+        throws GitException {
+        try {
+            ObjectId head = jGit.getRepository().resolve(Constants.HEAD);
+            if (Objects.isNull(head)) {
+                logger.debug(GIT, "Repository cannot resolve HEAD. Unable to find the latest commit.");
+                return null;
+            }
+            Iterator<RevCommit> iterator = jGit.log().add(head).setMaxCount(1).call().iterator();
+            if (iterator.hasNext()) {
+                String commitSHA = iterator.next().getName();
+                logger.debug(GIT, "Repository latest commit is {}", commitSHA);
+                return commitSHA;
+            }
+            else {
+                logger.debug(GIT, "Repository has no commits.");
+                return null;
+            }
+        }
+        catch (RevisionSyntaxException | JGitInternalException | GitAPIException | IOException e) {
+            throw new GitException(e);
+        }
+    }
+
+    /**
+     * Returns {@code true} if the repository is clean, which is when no differences exist between the working tree, the index,
+     * and the current {@code HEAD}.
+     * 
+     * @return {@code true} if the repository is clean, {@code false} otherwise.
+     * 
+     * @throws GitException in case some propblem is encountered with the underlying Git repository
+     */
+    public boolean isClean()
+        throws GitException {
+        try {
+            return jGit.status().call().isClean();
+        }
+        catch (GitAPIException | NoWorkTreeException e) {
+            throw new GitException(e);
+        }
     }
 }

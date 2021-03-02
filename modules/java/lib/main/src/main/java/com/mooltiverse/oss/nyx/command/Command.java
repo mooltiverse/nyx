@@ -15,6 +15,9 @@
  */
 package com.mooltiverse.oss.nyx.command;
 
+import com.mooltiverse.oss.nyx.RepositoryException;
+import com.mooltiverse.oss.nyx.data.DataAccessException;
+import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
 import com.mooltiverse.oss.nyx.state.State;
 
 /**
@@ -30,17 +33,23 @@ public interface Command {
 
     /**
      * Returns {@code true} if this command is up to date, which means that the internal state ({@link #state()}) would not
-     * chanhe by running ({@link #run()}) the command again. It other words, when this method returns {@code true} any
+     * change by running ({@link #run()}) the command again. It other words, when this method returns {@code true} any
      * invocation of the ({@link #run()}) method is needless and idempotent about the state.
      * 
-     * This method uses the quickest method to verify whether the state is up to date or not.
+     * This method uses the quickest method to verify whether the state is up to date or not. This method must not rely on
+     * dependencies and it must always evaluate its own status independently.
      * 
      * @return {@code true} if this command is up to date
+     * 
+     * @throws DataAccessException in case the configuration can't be loaded for some reason.
+     * @throws IllegalPropertyException in case the configuration has some illegal options.
+     * @throws RepositoryException in case of unexpected issues when accessing the Git repository.
      * 
      * @see #state()
      * @see #run()
      */
-    public boolean isUpToDate();
+    public boolean isUpToDate()
+        throws DataAccessException, IllegalPropertyException, RepositoryException;
 
     /**
      * Runs the command and returns the updated reference to the state object. In order to improve performances you should only
@@ -49,8 +58,13 @@ public interface Command {
      * @return the updated reference to the state object. The returned object is the same instance passed in the constructor
      * or {@code null} if the command has cleared the state.
      * 
+     * @throws DataAccessException in case the configuration can't be loaded for some reason.
+     * @throws IllegalPropertyException in case the configuration has some illegal options.
+     * @throws RepositoryException in case of unexpected issues when accessing the Git repository.
+     * 
      * @see #isUpToDate()
      * @see #state()
      */
-    public State run();
+    public State run()
+        throws DataAccessException, IllegalPropertyException, RepositoryException;
 }

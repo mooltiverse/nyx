@@ -129,21 +129,4 @@ public class AbstractCommandTests {
             assertNotNull(getCommandInstance(commandClass, new State(new Configuration()), Repository.open(JGitScript.fromScratch(true).getWorkingDirectory())).state());
         }
     }
-
-    @Nested
-    @DisplayName("AbstractCommand.isUpToDate")
-    static class UpToDateTests {
-        /**
-         * Check that the isUpToDate() returns {@code false} when the command instance is just created and {@code true} after one execution
-         */
-        @ParameterizedTest(name = "{0}.isUpToDate()")
-        @MethodSource("com.mooltiverse.oss.nyx.command.AbstractCommandTests#commandsArguments")
-        void isUpToDateTest(String commandClassSimpleName, Class<? extends AbstractCommand> commandClass)
-            throws Exception {
-            AbstractCommand command = getCommandInstance(commandClass, new State(new Configuration()), Repository.open(JGitScript.fromScratch(true).getWorkingDirectory()));
-            assertFalse(command.isUpToDate());
-            command.run();
-            assertTrue(command.isUpToDate());
-        }
-    }
 }

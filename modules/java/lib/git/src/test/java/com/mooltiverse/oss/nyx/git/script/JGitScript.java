@@ -16,26 +16,24 @@
 package com.mooltiverse.oss.nyx.git.script;
 
 import com.mooltiverse.oss.nyx.git.util.FileSystemUtil;
+import com.mooltiverse.oss.nyx.git.util.GitUtil;
 import com.mooltiverse.oss.nyx.git.util.RandomUtil;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.OutputStream;
 
-import java.util.List;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.Objects;
 
 import org.eclipse.jgit.api.Git;
-
-import org.eclipse.jgit.dircache.DirCache;
-
+import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.Ref;
-
-import org.eclipse.jgit.notes.Note;
-
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevObject;
-
-import org.eclipse.jgit.transport.RemoteConfig;
-import org.eclipse.jgit.transport.URIish;
 
 /**
  * An utility class used to run a sequence of commands on a JGit repository. This class is used
@@ -104,6 +102,116 @@ public class JGitScript {
      */
     public File getWorkingDirectory() {
         return git.getRepository().getWorkTree();
+    }
+
+    /**
+     * Adds the given number of text files to the repository root directory. Files have content but they are not staged or committed.
+     * 
+     * @param count the number of files to add
+     * 
+     * @return the collection of the new files
+     * 
+     * @throws Exception in case of any issue
+     */
+    public Collection<File> addRandomTextFiles(int count)
+        throws Exception {
+        Collection<File> res = new ArrayList<File>();
+        for (int i=0; i<=count; i++) {
+            File f = new File(git.getRepository().getWorkTree(), RandomUtil.randomAlphabeticString(5).concat(".txt"));
+            FileWriter fw = new FileWriter(f);
+            fw.write(RandomUtil.randomAlphabeticString(5));
+            fw.flush();
+            fw.close();
+            res.add(f);
+        }
+
+        return res;
+    }
+
+    /**
+     * Commits the staged files with the given commit message.
+     * 
+     * @param message the commit message
+     * 
+     * @return the resulting commit object
+     * 
+     * @throws Exception in case of any issue
+     */
+    public RevCommit commitFiles(String message)
+        throws Exception {
+        return git.commit().setMessage(message).call();
+    }
+
+    /**
+     * Tags the given object with the given name.
+     * 
+     * @param name the tag name
+     * @param message the tag message (used only for annotated tags, otherwise can be {@code null})
+     * @param target the object to tag
+     * 
+     * @return the resulting tag
+     * 
+     * @throws Exception in case of any issue
+     */
+    public Ref createTag(String name, String message, RevObject target)
+        throws Exception {
+        return Objects.isNull(message) ? git.tag().setAnnotated(false).setObjectId(target).setName(name).setForceUpdate(true).call() : git.tag().setAnnotated(true).setObjectId(target).setName(name).setMessage(message).call();
+    }
+
+    /**
+     * Returns the collection of regular files in the repository root directory.
+     * 
+     * @return the collection of the files in the repository directory
+     * 
+     * @throws Exception in case of any issue
+     */
+    public Collection<File> getFiles()
+        throws Exception {
+        Collection<File> res = new ArrayList<File>();
+        Collections.addAll(res, git.getRepository().getWorkTree().listFiles((File f) -> f.isFile())); // avoid adding the ".git" directory (and any other directory)
+        return res;
+    }
+
+    /**
+     * Returns the last commit in the current branch.
+     * 
+     * @return the last commit in the current branch or {@code null} if the repository has no commits yet
+     * 
+     * @throws Exception in case of any issue
+     */
+    public RevCommit getLastCommit()
+        throws Exception {
+        Iterator<RevCommit> iterator = git.log().add(git.getRepository().resolve(Constants.HEAD)).setMaxCount(1).call().iterator();
+        if (iterator.hasNext())
+            return iterator.next();
+        else return null;
+    }
+
+    /**
+     * Adds all the local files to the staging area, without committing.
+     * 
+     * @throws Exception in case of any issue
+     */
+    public void stageFiles()
+        throws Exception {
+        git.add().setUpdate(false).addFilepattern(".").call();
+    }
+
+    /**
+     * Replaces the content of the given files with new random content.
+     * 
+     * @param files the collection of files to update
+     * 
+     * @throws Exception in case of any issue
+     */
+    public void updateFiles(Collection<File> files)
+        throws Exception {
+        for (File f: files) {
+            FileWriter fw = new FileWriter(f);
+            fw.write(RandomUtil.randomAlphabeticString(5));
+            fw.flush();
+            fw.close();
+        }
     }
 
     /***********************************************************************************************************************
@@ -184,23 +292,152 @@ public class JGitScript {
     }
 
     /**
-     * Stages changes and commits to the Git repository using the current branch.
+     * Adds a batch of operations to the git repository in the current branch.
+     * A batch is made of change to all the files in the repository (new files are added if there is none), a commit
+     * and a lightweight tag on the commit.
      * 
-     * @param message the commit message.
+     * @param tagName the tag name to create on the commit
      * 
-     * @return the new commit object
+     * @return this same instance
      * 
      * @throws Exception in case of any issue
      */
-    /*public RevCommit createCommit(String message)
+    public JGitScript addBatch(String tagName)
         throws Exception {
+        return addBatch(tagName, null);
+    }
 
-        // stage contents
-        DirCache dirCache = git.add().setUpdate(false).addFilepattern(".").call();
+    /**
+     * Adds a batch of operations to the git repository in the current branch.
+     * A batch is made of change to all the files in the repository (new files are added if there is none), a commit
+     * and a tag on the commit. The tag is lightweight if {@code tagMessage} is {@code null}, otherwise
+     * it is annotated.
+     * 
+     * @param tagName the tag name to create on the commit
+     * @param tagMessage the tag message to create on the commit, makes the tag annotated
+     * 
+     * @return this same instance
+     * 
+     * @throws Exception in case of any issue
+     */
+    public JGitScript addBatch(String tagName, String tagMessage)
+        throws Exception {
+        if (getFiles().isEmpty())
+            withFiles();
+        return stage().commit().tag(tagName, tagMessage);
+    }
 
-        // commit
-        return git.commit().setMessage(message).call();
-    }*/
+    /**
+     * Commits the staged changes with a random commit message
+     * 
+     * @return this same instance
+     * 
+     * @throws Exception in case of any issue
+     */
+    public JGitScript commit()
+        throws Exception {
+        return commit("Commit ".concat(RandomUtil.randomAlphabeticString(3)));
+    }
+
+    /**
+     * Commits the staged changes with the given commit message
+     * 
+     * @param message the commit message
+     * 
+     * @return this same instance
+     * 
+     * @throws Exception in case of any issue
+     */
+    public JGitScript commit(String message)
+        throws Exception {
+        commitFiles(message);
+        return this;
+    }
+
+    /**
+     * Prints repository informations to the given output stream.
+     * 
+     * @param out the stream to print the info to
+     * 
+     * @return this same instance
+     * 
+     * @throws Exception in case of any issue
+     */
+    public JGitScript printInfo(OutputStream out)
+        throws Exception {
+        GitUtil.printRepositoryInfo(git.getRepository().getWorkTree(), out, null);
+        return this;
+    }
+
+    /**
+     * Adds the modified contents to the sraging area.
+     * 
+     * @return this same instance
+     * 
+     * @throws Exception in case of any issue
+     */
+    public JGitScript stage()
+        throws Exception {
+        stageFiles();
+        return this;
+    }
+
+    /**
+     * Tags the latest commit with the given name. The tag is a lightweight tag unless the given message is not {@code null},
+     * in which case the message is used for the annotation.
+     * 
+     * @param name the tag value
+     * @param message the optional tag message
+     * 
+     * @return this same instance
+     * 
+     * @throws Exception in case of any issue
+     */
+    public JGitScript tag(String name, String message)
+        throws Exception {
+        createTag(name, message, getLastCommit());
+        return this;
+    }
+
+    /**
+     * Changes the contents of all files in the repository. Changes are not staged or committed.
+     * 
+     * @return this same instance
+     * 
+     * @throws Exception in case of any issue
+     */
+    public JGitScript updateFiles()
+        throws Exception {
+        updateFiles(getFiles());
+        return this;
+    }
+
+    /**
+     * Adds some files (one) to the repository. Files have content but they are not staged or committed.
+     * 
+     * @return this same instance
+     * 
+     * @throws Exception in case of any issue
+     */
+    public JGitScript withFiles()
+        throws Exception {
+        return withFiles(1);
+    }
+
+    /**
+     * Adds the given number of files to the repository. Files have content but they are not staged or committed.
+     * 
+     * @param count the number of files to add
+     * 
+     * @return this same instance
+     * 
+     * @throws Exception in case of any issue
+     */
+    public JGitScript withFiles(int count)
+        throws Exception {
+        addRandomTextFiles(count);
+        return this;
+    }    
 
     /**
      * Creates a new branch and checks it out.
@@ -215,38 +452,6 @@ public class JGitScript {
         throws Exception {
         // create the branch and check it out
         return git.checkout().setCreateBranch(true).setName(name).call();
-    }*/
-
-    /**
-     * Tags the given object with the given name.
-     * 
-     * @param name the tag name
-     * @param message the tag message (used only for annotated tags, otherwise can be {@code null})
-     * @param target the object to tag
-     * @param annotated if {@code true} the tag will be an annotated tag, otherwise it  will be a lightweight tag
-     * 
-     * @return the new tag
-     * 
-     * @throws Exception in case of any issue
-     */
-    /*public Ref createTag(String name, String message, RevObject target, boolean annotated)
-        throws Exception {
-        return annotated ? git.tag().setAnnotated(true).setObjectId(target).setName(name).setMessage(message).call() : git.tag().setAnnotated(false).setObjectId(target).setName(name).setForceUpdate(true).call();
-    }*/
-
-    /**
-     * Creates a note on given object with the given message.
-     * 
-     * @param message the note message
-     * @param target the object to put the note on
-     * 
-     * @return the new note
-     * 
-     * @throws Exception in case of any issue
-     */
-    /*public Note createNote(String message, RevObject target)
-        throws Exception {
-        return git.notesAdd().setObjectId(target).setMessage(message).call();
     }*/
 
     /**

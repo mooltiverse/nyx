@@ -22,6 +22,9 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mooltiverse.oss.nyx.RepositoryException;
+import com.mooltiverse.oss.nyx.data.DataAccessException;
+import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
 import com.mooltiverse.oss.nyx.git.local.Repository;
 import com.mooltiverse.oss.nyx.state.State;
 
@@ -44,7 +47,7 @@ public class Arrange extends AbstractCommand {
      * 
      * @see State#getInternals()
      */
-    private static final String INTERNAL_EXECUTED = Arrange.class.getSimpleName().concat(".").concat("executed").concat("last");
+    private static final String INTERNAL_EXECUTED = Arrange.class.getSimpleName().concat(".").concat("last").concat(".").concat("executed");
 
     /**
      * Standard constructor.
@@ -63,7 +66,8 @@ public class Arrange extends AbstractCommand {
      * {@inheritDoc}
      */
     @Override
-    public boolean isUpToDate() {
+    public boolean isUpToDate()
+        throws DataAccessException, IllegalPropertyException, RepositoryException {
         // TODO: implement the up-to-date checks here
         // for now let's just check if the task has executed by seeing if we have stored the last
         // execution time. Also see where the attribute is stored in the run() method
@@ -71,17 +75,35 @@ public class Arrange extends AbstractCommand {
     }
 
     /**
+     * This method stores the state internal attributes used for up-to-date checks so that subsequent invocations
+     * of the {@link #isUpToDate()} method can find them and determine if the command is already up to date.
+     * 
+     * This method is meant to be invoked at the end of a succesful {@link #run()}.
+     * 
+     * @throws DataAccessException in case the configuration can't be loaded for some reason.
+     * @throws IllegalPropertyException in case the configuration has some illegal options.
+     * @throws RepositoryException in case of unexpected issues when accessing the Git repository.
+     * 
+     * @see #isUpToDate()
+     * @see State#getInternals()
+     */
+    private void storeStatusAttributes()
+        throws DataAccessException, IllegalPropertyException, RepositoryException {
+        // store the last execution time
+        state().getInternals().put(INTERNAL_EXECUTED, Long.toString(System.currentTimeMillis()));
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
-    public State run() {
+    public State run()
+        throws DataAccessException, IllegalPropertyException, RepositoryException {
         // TODO: implement this method
         // the following are just temporary smoke detection outputs
         logger.info(COMMAND, "Arrange.run()");
 
-        // store the last execution time, used in the up-to-date checks
-        state().getInternals().put(INTERNAL_EXECUTED, Long.toString(System.currentTimeMillis()));
-
+        storeStatusAttributes();
         return state();
     }
 }
