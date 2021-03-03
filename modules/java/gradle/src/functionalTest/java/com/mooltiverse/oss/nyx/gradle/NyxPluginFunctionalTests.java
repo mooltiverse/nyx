@@ -357,17 +357,6 @@ public class NyxPluginFunctionalTests {
             }
         }
         printWriter.println("}");
-        printWriter.println();
-
-        printWriter.println("nyx {");
-        printWriter.println("  bump = 'minor'");
-        printWriter.println("  dryRun = true");
-        printWriter.println("  services {");
-        printWriter.println("     github {");
-        //printWriter.println("        provider = 'guesswhat'");
-        printWriter.println("     }");
-        printWriter.println("  }");
-        printWriter.println("}");
 
         return stringWriter.toString();
     }

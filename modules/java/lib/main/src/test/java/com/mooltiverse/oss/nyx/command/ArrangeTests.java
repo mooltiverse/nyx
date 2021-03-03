@@ -46,4 +46,9 @@ public class ArrangeTests extends AbstractCommandTests {
             assertTrue(command.isUpToDate());
         }
     }
+
+    @Nested
+    @DisplayName("Arrange.run")
+    static class RunTests {
+    }
 }

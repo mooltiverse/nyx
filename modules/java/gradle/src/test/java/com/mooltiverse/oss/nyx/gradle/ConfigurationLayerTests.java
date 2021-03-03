@@ -15,6 +15,8 @@
  */
 package com.mooltiverse.oss.nyx.gradle;
 
+import static org.gradle.api.Project.DEFAULT_VERSION;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Objects;
@@ -141,7 +143,7 @@ public class ConfigurationLayerTests extends AbstractTests  {
             // set the property with an illegal value
             // the 'version' property is a project standard property, not defined in the extension
             // and is passed directly to the ConfigurationLayer constructor
-            ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, "unspecified");
+            ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, DEFAULT_VERSION);
             assertNull(configurationLayer.getVersion());
 
             // but also test with null, for safety

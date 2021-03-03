@@ -15,6 +15,10 @@
  */
 package com.mooltiverse.oss.nyx.gradle;
 
+import static org.gradle.api.Project.DEFAULT_VERSION;
+
+import static com.mooltiverse.oss.nyx.gradle.Constants.GRADLE_VERSION_PROPERTY_NAME;
+
 import java.io.File;
 import java.util.Objects;
 
@@ -139,7 +143,7 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
         throws IllegalPropertyException {
         // when to 'version' property is defined, Gradle does not return null but instead the 'unspecified' string which, to us,
         // means there is no version defined, just like it was null
-        if (Objects.isNull(projectVersion) || "unspecified".equals(projectVersion))
+        if (Objects.isNull(projectVersion) || DEFAULT_VERSION.equals(projectVersion))
             return null;
         else {
             try {
@@ -154,7 +158,7 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
                 return VersionFactory.valueOf(Scheme.SEMVER.getScheme(), projectVersion.toString(), true);
             }
             catch (IllegalArgumentException iae) {
-                throw new IllegalPropertyException(String.format("Illegal value '%s' provided for project property '%s'", projectVersion, "version"), iae);
+                throw new IllegalPropertyException(String.format("Illegal value '%s' provided for project property '%s'", projectVersion, GRADLE_VERSION_PROPERTY_NAME), iae);
             }
         }
     }

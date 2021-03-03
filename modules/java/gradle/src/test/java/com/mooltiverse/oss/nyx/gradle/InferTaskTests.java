@@ -15,11 +15,107 @@
  */
 package com.mooltiverse.oss.nyx.gradle;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assumptions.*;
+
+import static com.mooltiverse.oss.nyx.gradle.Constants.GRADLE_VERSION_PROPERTY_NAME;
+
+import org.gradle.api.Action;
+import org.gradle.api.Project;
+import org.gradle.api.Task;
+
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+
+import com.mooltiverse.oss.nyx.Nyx;
+import com.mooltiverse.oss.nyx.git.script.JGitScript;
 
 /**
  * Tests the Gradle task.<br>
  */
 @DisplayName("InferTask")
 public class InferTaskTests extends CoreTaskTests {
+    /**
+     * Performs checks on the task business actions.
+     */
+    @Nested
+    @DisplayName("InferTask.Actions")
+    static class ActionTests {
+        @Test
+        @DisplayName("InferTask throws Exception when running in a directory with valid but empty Git repository")
+        void testActionsExecuteWithoutExceptionsInValidGitProjectDirectoryAndNoDirectoryConfigurationOption()
+            throws Exception {
+            JGitScript gitScript = JGitScript.fromScratch(true);
+            Project project = newTestProject(gitScript.getWorkingDirectory(), false);
+    
+            // apply the plugin
+            project.getPluginManager().apply(NyxPlugin.ID);
+    
+            // Retrieve the dependent task
+            Task task = project.getTasks().getByName(InferTask.NAME);
+    
+            for (Action<? super Task> action: task.getActions()) {
+                // the task throws an exception as it has no way to infer the version
+                assertThrows(Exception.class, () -> action.execute(task));
+            }
+        }
+
+        @Test
+        @DisplayName("InferTask throws Exception when running in a directory with valid but empty Git repository passed as the 'directory' configuration option")
+        void testActionsExecuteWithoutExceptionsInEmptyGitProjectDirectoryAndValidDirectoryConfigurationOption()
+        throws Exception {
+            // the test project is created in a new empty directory
+            Project project = newTestProject(null, false);
+    
+            // apply the plugin
+            project.getPluginManager().apply(NyxPlugin.ID);
+    
+            // a Git repository is created in a different temporary directory
+            JGitScript gitScript = JGitScript.fromScratch(true);
+    
+            //make sure the Gradle working directory and the Git repository directory are not the same
+            assumeFalse(project.getBuildDir().equals(gitScript.getWorkingDirectory()));
+            assumeFalse(project.getBuildDir().getAbsolutePath().equals(gitScript.getWorkingDirectory().getAbsolutePath()));
+    
+            // the valid Git directory, different than the current working directory, is passed as the 'directory' configuration option through the extension
+            project.getExtensions().getByType(NyxExtension.class).getDirectory().set(gitScript.getWorkingDirectory());
+    
+            // Retrieve the dependent task
+            Task task = project.getTasks().getByName(InferTask.NAME);
+    
+            for (Action<? super Task> action: task.getActions()) {
+                // the task throws an exception as it has no way to infer the version
+                assertThrows(Exception.class, () -> action.execute(task));
+            }
+        }
+
+        @Test
+        @DisplayName("InferTask run with version overridden by user")
+        void runWithVersionOverriddenByUserTest()
+            throws Exception {
+            JGitScript gitScript = JGitScript.fromScratch(true);
+            Project project = newTestProject(gitScript.getWorkingDirectory(), false);
+
+            // set the project property
+            project.setProperty(GRADLE_VERSION_PROPERTY_NAME, "1.2.3");
+    
+            // apply the plugin
+            project.getPluginManager().apply(NyxPlugin.ID);
+
+            // Retrieve the dependent task
+            Task task = project.getTasks().getByName(InferTask.NAME);
+    
+            for (Action<? super Task> action: task.getActions()) {
+                action.execute(task);
+            }
+
+            // make sure the project version is now set to the value we passed (this could be true even if Nyx didn't do anything)
+            // as we set the value earlier
+            assertEquals("1.2.3", project.findProperty(GRADLE_VERSION_PROPERTY_NAME));
+
+            // make sure that the state associated to the Nyx extra property also has the same version set
+            assertEquals("1.2.3", Nyx.class.cast(project.getExtensions().getExtraProperties().get(CoreTask.NYX_INSTANCE_PROPERTY)).state().getVersion().toString());
+        }
+    }
 }

@@ -27,9 +27,13 @@ import com.mooltiverse.oss.nyx.data.DataAccessException;
 import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
 import com.mooltiverse.oss.nyx.git.local.Repository;
 import com.mooltiverse.oss.nyx.state.State;
+import com.mooltiverse.oss.nyx.version.Version;
 
 /**
  * The Infer command takes care of inferring and computing informations in order to make a new release.
+ * 
+ * After this task is executed the state object has:<br>
+ * - the {@code version} attribute set to the release version
  * 
  * This class is not meant to be used in multi-threaded environments.
  */
@@ -68,9 +72,10 @@ public class Infer extends AbstractCommand {
     @Override
     public boolean isUpToDate()
         throws DataAccessException, IllegalPropertyException, RepositoryException {
-        // this command is considered up to date only when the repository is clean and the latest
-        // commit (there must be at least one) didn't change
-        return isRepositoryClean() && !Objects.isNull(state().getInternals().get(INTERNAL_LAST_COMMIT)) && state().getInternals().get(INTERNAL_LAST_COMMIT).equals(getlatestCommit());
+        // This command is considered up to date only when the repository is clean and the latest
+        // commit (there must be at least one) didn't change.
+        // The State must already have a version set also.
+        return isRepositoryClean() && !Objects.isNull(state().getInternals().get(INTERNAL_LAST_COMMIT)) && state().getInternals().get(INTERNAL_LAST_COMMIT).equals(getlatestCommit()) /*&& !Objects.isNull(state().getVersion())*/; // TODO: uncomment this check when the version is inferred from the Git history
     }
 
     /**
@@ -100,9 +105,18 @@ public class Infer extends AbstractCommand {
     @Override
     public State run()
         throws DataAccessException, IllegalPropertyException, RepositoryException {
-        // TODO: implement this method
-        // the following are just temporary smoke detection outputs
         logger.info(COMMAND, "Infer.run()");
+
+        Version version = state().getConfiguration().getVersion();
+
+        if (Objects.isNull(version)) {
+            // TODO: infer the version
+        }
+        else {
+            // the version was overridden by user
+            logger.info(COMMAND, "Version overridden by user: {}", version.toString());
+            state().setVersion(version);
+        }
 
         storeStatusAttributes();
         return state();

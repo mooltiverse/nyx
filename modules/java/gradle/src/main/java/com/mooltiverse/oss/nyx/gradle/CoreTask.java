@@ -15,6 +15,8 @@
  */
 package com.mooltiverse.oss.nyx.gradle;
 
+import static com.mooltiverse.oss.nyx.gradle.Constants.GRADLE_VERSION_PROPERTY_NAME;
+
 import javax.annotation.Nullable;
 
 import org.gradle.api.Project;
@@ -136,7 +138,7 @@ abstract class CoreTask extends AbstractTask {
         else {
             Nyx instance = new Nyx();
             // The 'version' is a standard Gradle project property (https://docs.gradle.org/current/userguide/writing_build_scripts.html#sec:standard_project_properties)
-            instance.configuration().withPluginConfiguration(new ConfigurationLayer(retrieveExtension(), getProject().findProperty("version")));
+            instance.configuration().withPluginConfiguration(new ConfigurationLayer(retrieveExtension(), getProject().findProperty(GRADLE_VERSION_PROPERTY_NAME)));
             storeSharedProperty(NYX_INSTANCE_PROPERTY, instance);
             return Nyx.class.cast(retrieveSharedProperty(NYX_INSTANCE_PROPERTY));
         }

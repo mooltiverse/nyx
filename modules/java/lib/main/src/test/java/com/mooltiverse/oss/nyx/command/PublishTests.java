@@ -46,4 +46,9 @@ public class PublishTests extends AbstractCommandTests {
             assertTrue(command.isUpToDate());
         }
     }
+
+    @Nested
+    @DisplayName("Publish.run")
+    static class RunTests {
+    }
 }

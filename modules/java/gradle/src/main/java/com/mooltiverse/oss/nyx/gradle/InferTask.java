@@ -15,6 +15,8 @@
  */
 package com.mooltiverse.oss.nyx.gradle;
 
+import static com.mooltiverse.oss.nyx.gradle.Constants.GRADLE_VERSION_PROPERTY_NAME;
+
 import javax.inject.Inject;
 
 import org.gradle.api.Action;
@@ -97,5 +99,8 @@ public abstract class InferTask extends CoreTask {
 
         // just a draft to test the wireframing between objects
         nyx().infer();
+
+        // reflect the version property in the Nyx state to the Gradle project
+        getProject().setProperty(GRADLE_VERSION_PROPERTY_NAME, nyx().state().getVersion().toString());
     }
 }
