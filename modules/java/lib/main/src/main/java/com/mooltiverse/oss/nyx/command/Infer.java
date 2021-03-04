@@ -22,6 +22,7 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mooltiverse.oss.nyx.ReleaseException;
 import com.mooltiverse.oss.nyx.RepositoryException;
 import com.mooltiverse.oss.nyx.data.DataAccessException;
 import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
@@ -104,7 +105,7 @@ public class Infer extends AbstractCommand {
      */
     @Override
     public State run()
-        throws DataAccessException, IllegalPropertyException, RepositoryException {
+        throws DataAccessException, IllegalPropertyException, RepositoryException, ReleaseException {
         logger.info(COMMAND, "Infer.run()");
 
         Version version = state().getConfiguration().getVersion();
