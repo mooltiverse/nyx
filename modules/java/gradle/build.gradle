@@ -26,8 +26,8 @@ dependencies {
   // Import dependencies from other modules of this project
   implementation project(':modules:java:lib:main')
 
-  // Add this dependency to use the Git scripts from the git subproject into this project tests
-  testImplementation project(path: ':modules:java:lib:git', configuration: 'testExport')
+  // Add this dependency to use the Git scripts from the main subproject into this project tests
+  testImplementation project(path: ':modules:java:lib:main', configuration: 'testExport')
 }
 
 /*------------------------------------------------------------------------------

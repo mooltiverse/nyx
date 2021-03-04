@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
 import com.mooltiverse.oss.nyx.configuration.Configuration;
 import com.mooltiverse.oss.nyx.data.DataAccessException;
 import com.mooltiverse.oss.nyx.configuration.mock.ConfigurationLayerMock;
-import com.mooltiverse.oss.nyx.git.local.Repository;
+import com.mooltiverse.oss.nyx.git.Repository;
 import com.mooltiverse.oss.nyx.git.script.JGitScript;
 import com.mooltiverse.oss.nyx.state.State;
 
@@ -58,7 +58,7 @@ public class NyxTests {
     /**
      * Performs checks against the repository.
      * 
-     * Note that repository details are tested in the {@link com.mooltiverse.oss.nyx.git.local.RepositoryTest} class.
+     * Note that repository details are tested in the {@link com.mooltiverse.oss.nyx.git.JGitRepositoryTest} class.
      * Here only the Nyx class behavior pertaining the repository handling is tested.
      */
     @Nested

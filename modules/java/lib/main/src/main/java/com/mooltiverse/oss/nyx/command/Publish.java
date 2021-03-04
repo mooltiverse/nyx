@@ -23,10 +23,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mooltiverse.oss.nyx.ReleaseException;
-import com.mooltiverse.oss.nyx.RepositoryException;
 import com.mooltiverse.oss.nyx.data.DataAccessException;
 import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
-import com.mooltiverse.oss.nyx.git.local.Repository;
+import com.mooltiverse.oss.nyx.git.GitException;
+import com.mooltiverse.oss.nyx.git.Repository;
 import com.mooltiverse.oss.nyx.state.State;
 
 /**
@@ -68,7 +68,7 @@ public class Publish extends AbstractCommand {
      */
     @Override
     public boolean isUpToDate()
-        throws DataAccessException, IllegalPropertyException, RepositoryException {
+        throws DataAccessException, IllegalPropertyException, GitException {
         // TODO: implement the up-to-date checks here
         // for now let's just check if the task has executed by seeing if we have stored the last
         // execution time. Also see where the attribute is stored in the run() method
@@ -83,13 +83,13 @@ public class Publish extends AbstractCommand {
      * 
      * @throws DataAccessException in case the configuration can't be loaded for some reason.
      * @throws IllegalPropertyException in case the configuration has some illegal options.
-     * @throws RepositoryException in case of unexpected issues when accessing the Git repository.
+     * @throws GitException in case of unexpected issues when accessing the Git repository.
      * 
      * @see #isUpToDate()
      * @see State#getInternals()
      */
     private void storeStatusAttributes()
-        throws DataAccessException, IllegalPropertyException, RepositoryException {
+        throws DataAccessException, IllegalPropertyException, GitException {
         // store the last execution time
         state().getInternals().put(INTERNAL_EXECUTED, Long.toString(System.currentTimeMillis()));
     }
@@ -99,7 +99,7 @@ public class Publish extends AbstractCommand {
      */
     @Override
     public State run()
-        throws DataAccessException, IllegalPropertyException, RepositoryException, ReleaseException {
+        throws DataAccessException, IllegalPropertyException, GitException, ReleaseException {
         // TODO: implement this method
         // the following are just temporary smoke detection outputs
         logger.info(COMMAND, "Publish.run()");

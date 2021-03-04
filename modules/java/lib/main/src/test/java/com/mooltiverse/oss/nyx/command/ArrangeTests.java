@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import com.mooltiverse.oss.nyx.configuration.Configuration;
-import com.mooltiverse.oss.nyx.git.local.Repository;
+import com.mooltiverse.oss.nyx.git.Git;
 import com.mooltiverse.oss.nyx.git.script.JGitScript;
 import com.mooltiverse.oss.nyx.state.State;
 
@@ -40,7 +40,7 @@ public class ArrangeTests extends AbstractCommandTests {
         void isUpToDateTest()
             throws Exception {
             JGitScript script = JGitScript.fromScratch(true);
-            AbstractCommand command = getCommandInstance(Arrange.class, new State(new Configuration()), Repository.open(script.getWorkingDirectory()));
+            AbstractCommand command = getCommandInstance(Arrange.class, new State(new Configuration()), Git.open(script.getWorkingDirectory()));
             assertFalse(command.isUpToDate());
             command.run();
             assertTrue(command.isUpToDate());

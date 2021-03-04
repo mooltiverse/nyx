@@ -205,7 +205,7 @@ public abstract class NyxExtension {
      * 
      * @see Defaults#DRY_RUN
      */
-    public Property<String> getInitialversion() {
+    public Property<String> getInitialVersion() {
         return initialVersion;
     }
 

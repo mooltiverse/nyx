@@ -211,7 +211,7 @@ public class ConfigurationLayerTests extends AbstractTests  {
             // since the property is already modelled as a boolean, Gradle provides the validation for this
         }*/
 
-        @Test
+        /*@Test
         @DisplayName("ConfigurationLayer.getInitialVersion() with wrong values throws ConfigurationException")
         void getInitialVersionWrongValueTest()
             throws Exception {
@@ -220,8 +220,9 @@ public class ConfigurationLayerTests extends AbstractTests  {
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
             ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
 
-            pass wring values here for the initial version
-        }
+            // no idea of how to test wrong values here
+            // since the property is already modelled as a boolean, Gradle provides the validation for this
+        }*/
 
         /* This test is commented because it has nothing to test
         @Test

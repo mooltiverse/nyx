@@ -22,9 +22,8 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.mooltiverse.oss.nyx.RepositoryException;
 import com.mooltiverse.oss.nyx.git.GitException;
-import com.mooltiverse.oss.nyx.git.local.Repository;
+import com.mooltiverse.oss.nyx.git.Repository;
 import com.mooltiverse.oss.nyx.state.State;
 
 /**
@@ -89,17 +88,17 @@ public abstract class AbstractCommand implements Command {
      * 
      * @return the SHA-1 identifier of the last commit in the current branch or {@code code} if the repository has no commits yet.
      * 
-     * @throws RepositoryException in case of unexpected issues when accessing the Git repository.
+     * @throws GitException in case of unexpected issues when accessing the Git repository.
      * 
      * @see #repository()
      */
     protected String getlatestCommit()
-        throws RepositoryException {
+        throws GitException {
         try {
             return repository().getLatestCommit();
         }
         catch (GitException ge) {
-            throw new RepositoryException(ge);
+            throw new GitException(ge);
         }
     }
 
@@ -108,17 +107,17 @@ public abstract class AbstractCommand implements Command {
      * 
      * @return {@code true} if the repository is in a clean state (no uncommitted changes).
      * 
-     * @throws RepositoryException in case of unexpected issues when accessing the Git repository.
+     * @throws GitException in case of unexpected issues when accessing the Git repository.
      * 
      * @see #repository()
      */
     protected boolean isRepositoryClean()
-        throws RepositoryException {
+        throws GitException {
         try {
             return repository().isClean();
         }
         catch (GitException ge) {
-            throw new RepositoryException(ge);
+            throw new GitException(ge);
         }
     }
 }

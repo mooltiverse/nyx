@@ -23,10 +23,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mooltiverse.oss.nyx.ReleaseException;
-import com.mooltiverse.oss.nyx.RepositoryException;
 import com.mooltiverse.oss.nyx.data.DataAccessException;
 import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
-import com.mooltiverse.oss.nyx.git.local.Repository;
+import com.mooltiverse.oss.nyx.git.GitException;
+import com.mooltiverse.oss.nyx.git.Repository;
 import com.mooltiverse.oss.nyx.state.State;
 import com.mooltiverse.oss.nyx.version.Version;
 
@@ -72,7 +72,7 @@ public class Infer extends AbstractCommand {
      */
     @Override
     public boolean isUpToDate()
-        throws DataAccessException, IllegalPropertyException, RepositoryException {
+        throws DataAccessException, IllegalPropertyException, GitException {
         // This command is considered up to date only when the repository is clean and the latest
         // commit (there must be at least one) didn't change.
         // The State must already have a version set also.
@@ -87,13 +87,13 @@ public class Infer extends AbstractCommand {
      * 
      * @throws DataAccessException in case the configuration can't be loaded for some reason.
      * @throws IllegalPropertyException in case the configuration has some illegal options.
-     * @throws RepositoryException in case of unexpected issues when accessing the Git repository.
+     * @throws GitException in case of unexpected issues when accessing the Git repository.
      * 
      * @see #isUpToDate()
      * @see State#getInternals()
      */
     private void storeStatusAttributes()
-        throws DataAccessException, IllegalPropertyException, RepositoryException {
+        throws DataAccessException, IllegalPropertyException, GitException {
         // store the last commit SHA-1
         String latestCommit = getlatestCommit();
         if (!Objects.isNull(latestCommit))
@@ -105,7 +105,7 @@ public class Infer extends AbstractCommand {
      */
     @Override
     public State run()
-        throws DataAccessException, IllegalPropertyException, RepositoryException, ReleaseException {
+        throws DataAccessException, IllegalPropertyException, GitException, ReleaseException {
         logger.info(COMMAND, "Infer.run()");
 
         Version version = state().getConfiguration().getVersion();

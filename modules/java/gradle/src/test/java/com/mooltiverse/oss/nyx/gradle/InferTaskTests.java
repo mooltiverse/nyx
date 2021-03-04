@@ -72,7 +72,7 @@ public class InferTaskTests extends CoreTaskTests {
             project.getPluginManager().apply(NyxPlugin.ID);
     
             // a Git repository is created in a different temporary directory
-            JGitScript gitScript = JGitScript.fromScratch(true);
+            JGitScript gitScript = JGitScript.fromScratch(true).addBatch("tag");
     
             //make sure the Gradle working directory and the Git repository directory are not the same
             assumeFalse(project.getBuildDir().equals(gitScript.getWorkingDirectory()));
@@ -94,7 +94,7 @@ public class InferTaskTests extends CoreTaskTests {
         @DisplayName("InferTask run with version overridden by user")
         void runWithVersionOverriddenByUserTest()
             throws Exception {
-            JGitScript gitScript = JGitScript.fromScratch(true);
+            JGitScript gitScript = JGitScript.fromScratch(true).addBatch("tag");
             Project project = newTestProject(gitScript.getWorkingDirectory(), false);
 
             // set the project property

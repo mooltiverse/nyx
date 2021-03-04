@@ -15,6 +15,11 @@ description = 'The Nyx main library and entry point.'
   Configurations
 */
 configurations {
+  // Create a new configuration used by other projects to use classes from this project.
+  // In particular we need the Git scripts (in the test source set) to be available for other projects.
+  // This is actually not trivial and we had to follow directions from this post:
+  // - https://softnoise.wordpress.com/2014/09/07/gradle-sub-project-test-dependencies-in-multi-project-builds/
+  testExport.extendsFrom(testRuntime)
 }
 
 /*------------------------------------------------------------------------------
@@ -24,9 +29,9 @@ configurations {
 dependencies {
   // Import dependencies from other modules of this project
   api            project(':modules:java:lib:version')
-  api            project(':modules:java:lib:git')
   implementation         'org.slf4j:slf4j-api:1.7.30'   // SLF4J API (http://www.slf4j.org/)
+  implementation         'org.eclipse.jgit:org.eclipse.jgit:5.10.0.202012080955-r'  // JGit (https://www.eclipse.org/jgit/)
 
-  // Add this dependency to use the Git scripts from the git subproject into this project tests
-  testImplementation project(path: ':modules:java:lib:git', configuration: 'testExport')
+  // See the 'testExport' about this
+  testExport             sourceSets.test.output
 }
