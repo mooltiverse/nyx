@@ -15,6 +15,7 @@
  */
 package com.mooltiverse.oss.nyx.command;
 
+import com.mooltiverse.oss.nyx.ReleaseException;
 import com.mooltiverse.oss.nyx.RepositoryException;
 import com.mooltiverse.oss.nyx.data.DataAccessException;
 import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
@@ -61,10 +62,11 @@ public interface Command {
      * @throws DataAccessException in case the configuration can't be loaded for some reason.
      * @throws IllegalPropertyException in case the configuration has some illegal options.
      * @throws RepositoryException in case of unexpected issues when accessing the Git repository.
+     * @throws ReleaseException if the task is unable to complete for reasons due to the release process.
      * 
      * @see #isUpToDate()
      * @see #state()
      */
     public State run()
-        throws DataAccessException, IllegalPropertyException, RepositoryException;
+        throws DataAccessException, IllegalPropertyException, RepositoryException, ReleaseException;
 }

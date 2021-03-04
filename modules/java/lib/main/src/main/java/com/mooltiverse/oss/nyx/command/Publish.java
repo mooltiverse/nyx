@@ -22,6 +22,7 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mooltiverse.oss.nyx.ReleaseException;
 import com.mooltiverse.oss.nyx.RepositoryException;
 import com.mooltiverse.oss.nyx.data.DataAccessException;
 import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
@@ -98,7 +99,7 @@ public class Publish extends AbstractCommand {
      */
     @Override
     public State run()
-        throws DataAccessException, IllegalPropertyException, RepositoryException {
+        throws DataAccessException, IllegalPropertyException, RepositoryException, ReleaseException {
         // TODO: implement this method
         // the following are just temporary smoke detection outputs
         logger.info(COMMAND, "Publish.run()");

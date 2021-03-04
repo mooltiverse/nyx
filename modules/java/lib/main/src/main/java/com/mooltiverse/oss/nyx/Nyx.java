@@ -170,9 +170,10 @@ public class Nyx {
      * @throws DataAccessException in case the configuration can't be loaded for some reason.
      * @throws IllegalPropertyException in case the configuration has some illegal options.
      * @throws RepositoryException in case of unexpected issues when accessing the Git repository.
+     * @throws ReleaseException if the task is unable to complete for reasons due to the release process.
      */
     private <T extends AbstractCommand> State runCommand(Class<T> clazz, boolean useCache)
-        throws DataAccessException, IllegalPropertyException, RepositoryException {
+        throws DataAccessException, IllegalPropertyException, RepositoryException, ReleaseException {
         
         Objects.requireNonNull(clazz, "Cannot instantiate the command from a null class");
 
@@ -227,11 +228,12 @@ public class Nyx {
      * @throws DataAccessException in case the configuration can't be loaded for some reason.
      * @throws IllegalPropertyException in case the configuration has some illegal options.
      * @throws RepositoryException in case of unexpected issues when accessing the Git repository.
+     * @throws ReleaseException if the task is unable to complete for reasons due to the release process.
      * 
      * @see Arrange
      */
     public State arrange()
-        throws DataAccessException, IllegalPropertyException, RepositoryException {
+        throws DataAccessException, IllegalPropertyException, RepositoryException, ReleaseException {
         logger.debug(MAIN, "Nyx.arrange()");
 
         // this command has no dependencies
@@ -247,11 +249,12 @@ public class Nyx {
      * @throws DataAccessException in case the configuration can't be loaded for some reason.
      * @throws IllegalPropertyException in case the configuration has some illegal options.
      * @throws RepositoryException in case of unexpected issues when accessing the Git repository.
+     * @throws ReleaseException if the task is unable to complete for reasons due to the release process.
      * 
      * @see Clean
      */
     public void clean()
-        throws DataAccessException, IllegalPropertyException, RepositoryException {
+        throws DataAccessException, IllegalPropertyException, RepositoryException, ReleaseException {
         logger.debug(MAIN, "Nyx.clean()");
 
         // this command has no dependencies
@@ -273,11 +276,12 @@ public class Nyx {
      * @throws DataAccessException in case the configuration can't be loaded for some reason.
      * @throws IllegalPropertyException in case the configuration has some illegal options.
      * @throws RepositoryException in case of unexpected issues when accessing the Git repository.
+     * @throws ReleaseException if the task is unable to complete for reasons due to the release process.
      * 
      * @see Infer
      */
     public State infer()
-        throws DataAccessException, IllegalPropertyException, RepositoryException {
+        throws DataAccessException, IllegalPropertyException, RepositoryException, ReleaseException {
         logger.debug(MAIN, "Nyx.infer()");
 
         // run dependent tasks first
@@ -295,11 +299,12 @@ public class Nyx {
      * @throws DataAccessException in case the configuration can't be loaded for some reason.
      * @throws IllegalPropertyException in case the configuration has some illegal options.
      * @throws RepositoryException in case of unexpected issues when accessing the Git repository.
+     * @throws ReleaseException if the task is unable to complete for reasons due to the release process.
      * 
      * @see Make
      */
     public State make()
-        throws DataAccessException, IllegalPropertyException, RepositoryException {
+        throws DataAccessException, IllegalPropertyException, RepositoryException, ReleaseException {
         logger.debug(MAIN, "Nyx.make()");
 
         // run dependent tasks first
@@ -317,11 +322,12 @@ public class Nyx {
      * @throws DataAccessException in case the configuration can't be loaded for some reason.
      * @throws IllegalPropertyException in case the configuration has some illegal options.
      * @throws RepositoryException in case of unexpected issues when accessing the Git repository.
+     * @throws ReleaseException if the task is unable to complete for reasons due to the release process.
      * 
      * @see Mark
      */
     public State mark()
-        throws DataAccessException, IllegalPropertyException, RepositoryException {
+        throws DataAccessException, IllegalPropertyException, RepositoryException, ReleaseException {
         logger.debug(MAIN, "Nyx.mark()");
 
         // run dependent tasks first
@@ -339,11 +345,12 @@ public class Nyx {
      * @throws DataAccessException in case the configuration can't be loaded for some reason.
      * @throws IllegalPropertyException in case the configuration has some illegal options.
      * @throws RepositoryException in case of unexpected issues when accessing the Git repository.
+     * @throws ReleaseException if the task is unable to complete for reasons due to the release process.
      * 
      * @see Publish
      */
     public State publish()
-        throws DataAccessException, IllegalPropertyException, RepositoryException {
+        throws DataAccessException, IllegalPropertyException, RepositoryException, ReleaseException {
         logger.debug(MAIN, "Nyx.publish()");
 
         // run dependent tasks first
