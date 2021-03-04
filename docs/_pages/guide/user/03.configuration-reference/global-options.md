@@ -12,6 +12,7 @@ These are the top level options in the configuration:
 | [`bump`](#bump)                                           | string  | `-b <NAME>`, `--bump=<NAME>`                              | `NYX_BUMP=<NAME>`                                             | `bump`                                                        | N/A      |
 | [`directory`](#directory)                                 | string  | `-d <PATH>`, `--directory=<PATH>`                         | `NYX_DIRECTORY=<PATH>`                                        | `directory`                                                   | Current working directory |
 | [`dryRun`](#dry-run)                                      | boolean | `--dry-run`, `--dry-run=true|false`                       | `NYX_DRY_RUN=true|false`                                      | `dryRun`                                                      | `false`  |
+| [`initialVersion`](#initial-version)                      | string  | `--initial-version=<VERSION>`                             | `NYX_INITIAL_VERSION=<VERSION>`                               | `initialVersion`                                              | Depends on the configured [version scheme](#scheme) |
 | [`releasePrefix`](#release-prefix)                        | string  | `--release-prefix=<PREFIX>`                               | `NYX_RELEASE_PREFIX=<PREFIX>`                                 | `releasePrefix`                                               | `v`      |
 | [`releasePrefixLenient`](#release-prefix-lenient)         | boolean | `--release-prefix-lenient`, `--release-prefix-lenient=true|false` | `NYX_RELEASE_PREFIX_LENIENT=true|false`               | `releasePrefixLenient`                                        | `true`   |
 | [`scheme`](#scheme)                                       | string  | `--scheme=<NAME>`                                         | `NYX_SCHEME=<NAME>`                                           | `scheme`                                                      | `semver` |
@@ -72,6 +73,23 @@ When this flag is set to `true` no action altering the repository state, either 
 When used with no value on the command line (i.e. `--dry-run` alone) `true` is assumed.
 
 When enabling this flag you probably want to raise the [verbosity](#verbosity).
+
+### Initial version
+
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `initialVersion`                                                                         |
+| Type                      | string                                                                                   |
+| Default                   | Depends on the configured [version scheme](#scheme)                                      |
+| Command Line Option       | `--initial-version=<VERSION>`                                                            |
+| Environment Variable      | `NYX_INITIAL_VERSION=<VERSION>`                                                          |
+| Configuration File Option | `initialVersion`                                                                         |
+| Related state attributes  | [scheme]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#scheme){: .btn .btn--info .btn--small} [version]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#version){: .btn .btn--info .btn--small} |
+
+The default version to use when no previous version can be [inferred]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer) from the commit history (i.e. when the repository has no tagged releases yet). When not specified this value is determined by the configured [version scheme]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/version-schemes.md %}).
+
+This might be useful for project bootstrapping only (from Nyx's perspective) when the default initial version just doesn't fit your need. Remember that this value will be considered **just once** because after the first release (which *consumes* this option) there will be a previous version in the commit history.
+
+This value is ignored when the [version](#version) option is used.
 
 ### Release prefix
 

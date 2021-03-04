@@ -79,6 +79,18 @@ public class ConfigurationLayerTests extends AbstractTests  {
         }
 
         @Test
+        @DisplayName("ConfigurationLayer.getInitialVersion() default")
+        void getInitialVersionTest()
+            throws Exception {
+            // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
+            NyxExtension extension = newTestProject(null, true).getExtensions().getByType(NyxExtension.class);
+            ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
+
+            assertFalse(extension.getInitialVersion().isPresent());
+            assertNull(configurationLayer.getInitialVersion());
+        }
+
+        @Test
         @DisplayName("ConfigurationLayer.getReleasePrefix() default")
         void getReleasePrefixDefaultTest()
             throws Exception {
@@ -198,6 +210,18 @@ public class ConfigurationLayerTests extends AbstractTests  {
             // no idea of how to test wrong values here
             // since the property is already modelled as a boolean, Gradle provides the validation for this
         }*/
+
+        @Test
+        @DisplayName("ConfigurationLayer.getInitialVersion() with wrong values throws ConfigurationException")
+        void getInitialVersionWrongValueTest()
+            throws Exception {
+            // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
+            Project project = newTestProject(null, true);
+            NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
+            ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
+
+            pass wring values here for the initial version
+        }
 
         /* This test is commented because it has nothing to test
         @Test

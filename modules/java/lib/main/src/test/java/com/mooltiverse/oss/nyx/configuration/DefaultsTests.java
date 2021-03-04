@@ -16,11 +16,15 @@
 package com.mooltiverse.oss.nyx.configuration;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assumptions.*;
 
 import java.io.File;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import com.mooltiverse.oss.nyx.data.Scheme;
+import com.mooltiverse.oss.nyx.version.SemanticVersion;
 
 @DisplayName("Defaults")
 public class DefaultsTests {
@@ -29,5 +33,13 @@ public class DefaultsTests {
     void directoryTest()
         throws Exception {
         assertEquals(new File(System.getProperty("user.dir")), Defaults.DIRECTORY);
+    }
+
+    @Test
+    @DisplayName("Defaults.INITIAL_VERSION")
+    void initialVersionTest()
+        throws Exception {
+        assumeTrue(Scheme.SEMVER.equals(Defaults.SCHEME));
+        assertEquals(SemanticVersion.DEFAULT_INITIAL_VERSION, Defaults.INITIAL_VERSION.toString());
     }
 }

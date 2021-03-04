@@ -54,6 +54,17 @@ public interface Root extends Block {
         throws DataAccessException, IllegalPropertyException;
 
     /**
+     * Returns the initial version defined by this configuration to use when no past version is available in the commit history.
+     * 
+     * @return the configured value for this option or {@code null} if the value hasn't been defined.
+     * 
+     * @throws DataAccessException in case the option cannot be read or accessed.
+     * @throws IllegalPropertyException in case the option has been defined but has incorrect values or it can't be resolved.
+     */
+    public Version getInitialVersion()
+        throws DataAccessException, IllegalPropertyException;
+
+    /**
      * Returns the value of the dry run flag as it's defined by this configuration.
      * 
      * @return the configured value for this option or {@code null} if the value hasn't been defined.

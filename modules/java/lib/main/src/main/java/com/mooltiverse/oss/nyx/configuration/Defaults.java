@@ -20,6 +20,7 @@ import java.io.File;
 import com.mooltiverse.oss.nyx.data.Scheme;
 import com.mooltiverse.oss.nyx.data.Verbosity;
 import com.mooltiverse.oss.nyx.version.Version;
+import com.mooltiverse.oss.nyx.version.VersionFactory;
 
 /**
  * A utility interface that collects default configuration values.
@@ -40,6 +41,13 @@ public interface Defaults {
      * The flag that prevents to alter any repository state and instead just log the actions that would be taken. Value: {@code false}
      */
     public static final Boolean DRY_RUN = Boolean.FALSE;
+
+    /**
+     * The initial version to use. Value: {@link Scheme#SEMVER}
+     * 
+     * This strongly depends on the {@link #SCHEME} and as long as it's {@link Scheme#SEMVER}, we use that to select the initial version.
+     */
+    public static final Version INITIAL_VERSION = VersionFactory.defaultInitial(Scheme.SEMVER.getScheme());
 
     /**
      * The default prefix to add at the beginning of a version identifier to generate the release identifier. Value: {@value}

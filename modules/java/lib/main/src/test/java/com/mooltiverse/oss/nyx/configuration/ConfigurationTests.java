@@ -155,6 +155,25 @@ public class ConfigurationTests {
         }
 
         @Test
+        @DisplayName("Configuration.withPluginConfiguration(MOCK).getInitialVersion()")
+        void getInitialVersionTest()
+            throws Exception {
+            Configuration configuration = new Configuration();
+
+            // in order to make the test meaningful, make sure the default and mock values are different
+            assumeFalse(Defaults.INITIAL_VERSION.equals(ConfigurationLayerMock.INITIAL_VERSION));
+
+            // make sure the initial values come from defaults, until we inject the plugin configuration
+            assumeTrue(Defaults.INITIAL_VERSION.equals(configuration.getInitialVersion()));
+            
+            // inject the plugin configuration and test the new value is returned from that
+            assertEquals(ConfigurationLayerMock.INITIAL_VERSION, configuration.withPluginConfiguration(new ConfigurationLayerMock()).getInitialVersion());
+
+            // now remove the plugin configuration and test that now default values are returned again
+            assertEquals(Defaults.INITIAL_VERSION, configuration.withPluginConfiguration(null).getInitialVersion());
+        }
+
+        @Test
         @DisplayName("Configuration.withPluginConfiguration(MOCK).getReleasePrefix()")
         void getReleasePrefixTest()
             throws Exception {

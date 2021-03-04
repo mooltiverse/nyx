@@ -168,6 +168,23 @@ public class Configuration implements Root {
      * {@inheritDoc}
      */
     @Override
+    public Version getInitialVersion()
+        throws DataAccessException, IllegalPropertyException {
+        logger.trace(CONFIGURATION, "Retrieving the {} configuration option", "initialVersion");
+        for (ConfigurationLayer layer: layers.values()) {
+            Version initialVersion = layer.getInitialVersion();
+            if (!Objects.isNull(initialVersion)) {
+                logger.trace(CONFIGURATION, "The {} configuration option value is: {}", "initialVersion", initialVersion);
+                return initialVersion;
+            }
+        }
+        return DefaultLayer.getInstance().getInitialVersion();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String getReleasePrefix()
         throws DataAccessException, IllegalPropertyException {
         logger.trace(CONFIGURATION, "Retrieving the {} configuration option", "releasePrefix");

@@ -50,6 +50,11 @@ public class ConfigurationLayerMock implements ConfigurationLayer {
     /**
      * The value returned by this mock object.
      */
+    public static final Version INITIAL_VERSION = SemanticVersion.valueOf("0.9.9");
+
+    /**
+     * The value returned by this mock object.
+     */
     public static final String RELEASE_PREFIX = "mock";
 
     /**
@@ -86,6 +91,11 @@ public class ConfigurationLayerMock implements ConfigurationLayer {
      * The value returned by this mock object.
      */
     public Boolean dryRun = DRY_RUN;
+
+    /**
+     * The value returned by this mock object.
+     */
+    public Version initialVersion = INITIAL_VERSION;
 
     /**
      * The value returned by this mock object.
@@ -141,6 +151,14 @@ public class ConfigurationLayerMock implements ConfigurationLayer {
     @Override
     public Boolean getDryRun() {
         return dryRun;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Version getInitialVersion(){
+        return initialVersion;
     }
 
     /**

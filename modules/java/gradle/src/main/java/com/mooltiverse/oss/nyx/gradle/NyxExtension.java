@@ -69,6 +69,11 @@ public abstract class NyxExtension {
     private Property<Boolean> dryRun = getObjectfactory().property(Boolean.class);
 
     /**
+     * The 'initialVersion' property.
+     */
+    private Property<String> initialVersion = getObjectfactory().property(String.class);
+
+    /**
      * The 'releasePrefix' property.
      */
     private Property<String> releasePrefix = getObjectfactory().property(String.class);
@@ -187,6 +192,21 @@ public abstract class NyxExtension {
      */
     public Property<Boolean> getDryRun() {
         return dryRun;
+    }
+
+    /**
+     * Returns the initial version to use when no past version can be inferred from the commit history.
+     * 
+     * We provide an implementation of this method instead of using the abstract definition as it's
+     * safer for old Gradle versions we support.
+     * 
+     * @return the flag that, when {@code true}, prevents Nyx from applying any change to the repository or any
+     * other resource
+     * 
+     * @see Defaults#DRY_RUN
+     */
+    public Property<String> getInitialversion() {
+        return initialVersion;
     }
 
     /**

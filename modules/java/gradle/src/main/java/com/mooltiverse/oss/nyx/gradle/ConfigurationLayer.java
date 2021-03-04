@@ -23,6 +23,7 @@ import java.io.File;
 import java.util.Objects;
 
 import org.gradle.api.file.DirectoryProperty;
+import org.gradle.api.provider.Property;
 
 import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
 import com.mooltiverse.oss.nyx.data.Scheme;
@@ -83,6 +84,14 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
     @Override
     public Boolean getDryRun() {
         return extension.getDryRun().getOrNull();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Version getInitialversion() {
+        return extension.getInitialversion().isPresent() ? VersionFactory.valueOf(getScheme().getScheme(), extension.getInitialversion().get(), getReleasePrefixLenient()) : null;
     }
 
     /**

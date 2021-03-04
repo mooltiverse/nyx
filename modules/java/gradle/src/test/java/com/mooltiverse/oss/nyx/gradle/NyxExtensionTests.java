@@ -72,6 +72,17 @@ public class NyxExtensionTests extends AbstractTests  {
         }
 
         @Test
+        @DisplayName("NyxExtension.getInitialVersion() default")
+        void getInitialVersionDefaultTest()
+            throws Exception {
+            // apply the plugin to a new project and retrieve the extension
+            NyxExtension extension = newTestProject(null, true).getExtensions().getByType(NyxExtension.class);
+
+            assertFalse(extension.getInitialVersion().isPresent());
+            assertNull(extension.getInitialVersion().getOrNull());
+        }
+
+        @Test
         @DisplayName("NyxExtension.getReleasePrefix() default")
         void getReleasePrefixDefaultTest()
             throws Exception {

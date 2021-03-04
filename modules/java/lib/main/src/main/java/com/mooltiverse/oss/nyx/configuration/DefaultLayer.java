@@ -98,6 +98,16 @@ class DefaultLayer implements ConfigurationLayer, Defaults {
      * {@inheritDoc}
      */
     @Override
+    public Version getInitialVersion()
+        throws DataAccessException, IllegalPropertyException {
+        logger.trace(DEFAULT, "Retrieving the default {} configuration option: {}", "initialVersion", INITIAL_VERSION);
+        return INITIAL_VERSION;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String getReleasePrefix()
         throws DataAccessException, IllegalPropertyException {
         logger.trace(DEFAULT, "Retrieving the default {} configuration option: {}", "releasePrefix", RELEASE_PREFIX);
