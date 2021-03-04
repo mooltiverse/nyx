@@ -374,6 +374,40 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
     }
 
     /**
+     * Returns {@code true} if the given string is a legal semantic version which, for example, can be parsed using
+     * {@link #valueOf(String)} without exceptions.
+     * <br>
+     * This method uses a strict criteria, without trying to sanitize the given string.
+     * 
+     * @param s the string version to check.
+     * 
+     * @return {@code true} if the given string represents a legal semantic version, {@code false} otherwise.
+     * 
+     * @see #valueOf(String)
+     */
+    public static boolean isLegal(String s) {
+        return isLegal(s, false);
+    }
+
+    /**
+     * Returns {@code true} if the given string is a legal semantic version which, for example, can be parsed using
+     * {@link #valueOf(String, boolean)} without exceptions.
+     * 
+     * @param s the string version to check.
+     * @param prefixLenient when {@code true} prefixes are tolerated even if they are not strictly legal from the
+     * semantic version specification perspective.
+     * 
+     * @return {@code true} if the given string represents a legal semantic version, {@code false} otherwise.
+     * 
+     * @see #valueOf(String, boolean)
+     */
+    public static boolean isLegal(String s, boolean prefixLenient) {
+        Objects.requireNonNull(s, "Can't parse a null string");
+        Matcher m = Pattern.compile(prefixLenient ? SEMANTIC_VERSION_PATTERN_RELAXED : SEMANTIC_VERSION_PATTERN).matcher(s);
+        return m.find();
+    }
+
+    /**
      * Returns a string representation of the object.
      *
      * @return a string representation of the object.
@@ -408,6 +442,7 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
      * @throws IllegalArgumentException if the given string doesn't represent a legal semantic version
      *
      * @see #valueOf(String, boolean)
+     * @see #isLegal(String)
      * @see #sanitizePrefix(String)
      */
     public static SemanticVersion valueOf(String s) {

@@ -17,8 +17,8 @@ The above statement is about the versioning strategy only. You can still use Mav
 {: .notice--info}
 
 | ----------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| Related configuration options | [scheme]({{ site.baseurl }}/configuration/global-options/#scheme){: .btn .btn--success .btn--small}          |
-| Related state attributes      | [TODO: put the link to the *scheme* state attribute here](){: .btn .btn--info .btn--small}                   |
+| Related configuration options | [scheme]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#scheme){: .btn .btn--success .btn--small} |
+| Related state attributes      | [scheme]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#scheme){: .btn .btn--info .btn--small} [version]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#version){: .btn .btn--info .btn--small} |
 {: .notice--info}
 
 ### Semantic Versioning (SemVer)

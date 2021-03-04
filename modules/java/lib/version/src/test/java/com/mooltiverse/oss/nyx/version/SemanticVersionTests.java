@@ -782,6 +782,50 @@ public class SemanticVersionTests {
     }
 
     @Nested
+    @DisplayName("SemanticVersion.isLegal")
+    class IsLegalTests {
+        @ParameterizedTest(name = "Semanticversion.isLegal(''{0}'') == false")
+        @EmptySource
+        void isLegalWithEmptyString(String version) {
+            assertFalse(SemanticVersion.isLegal(version));
+        }
+
+        @ParameterizedTest(name = "Semanticversion.isLegal(''{0}'') throws NullPointerException")
+        @NullSource
+        void exceptionUsingIsLegalWithNullString(String version) {
+            assertThrows(NullPointerException.class, () -> SemanticVersion.isLegal(version));
+        }
+
+        @ParameterizedTest(name = "Semanticversion.isLegal(''{0}'') == false")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownInvalidVersions")
+        void isLegalWithInvalidVersion(String version, Class<? extends Exception> expectedException) {
+            assertFalse(SemanticVersion.isLegal(version));
+        }
+
+        @ParameterizedTest(name = "Semanticversion.isLegal(''{0}'') == true")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
+        void isLegalValidString(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
+            assertTrue(SemanticVersion.isLegal(version));
+        }
+
+        @ParameterizedTest(name = "Semanticversion.isLegal(''{0}'', true) == true")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
+        void isLegalSanitizedString(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
+            // test invoking isLegal with prefix tolerance
+            assertTrue(SemanticVersion.isLegal(version, true));
+        }
+
+        @ParameterizedTest(name = "Semanticversion.isLegal(''{0}'', true) == true")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownSanitizableVersions")
+        void isLegalSanitizableString(String version) {
+            // the method must fail without toleration and succeed when using toleration
+            assertFalse(SemanticVersion.isLegal(version));
+            assertFalse(SemanticVersion.isLegal(version, false));
+            assertTrue(SemanticVersion.isLegal(version, true));
+        }
+    }
+
+    @Nested
     @DisplayName("SemanticVersion.valueOf")
     class ValueOfTests {
         @ParameterizedTest(name = "Semanticversion.valueOf(''{0}'') throws IllegalArgumentException")

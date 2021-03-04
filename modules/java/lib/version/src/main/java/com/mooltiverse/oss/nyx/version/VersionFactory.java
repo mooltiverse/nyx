@@ -29,6 +29,65 @@ public class VersionFactory {
     }
 
     /**
+     * Returns a Version instance representing the default initial value to use for the given scheme.
+     *
+     * @param scheme the scheme to get the initial version for
+     *
+     * @return the new Version instance representing the default initial value. The concrete class depends on the given {@code scheme}
+     *
+     * @throws NullPointerException if the given arguument is {@code null}
+     */
+    public static final Version defaultInitial(Scheme scheme) {
+        Objects.requireNonNull(scheme, "Scheme is required");
+        switch (scheme) {
+            case SEMVER:  return SemanticVersion.valueOf(SemanticVersion.DEFAULT_INITIAL_VERSION);
+            //MAVEN: not yet supported
+            default: throw new IllegalArgumentException(String.format("Illegal or unsupporte scheme %s", scheme));
+        }
+    }
+
+    /**
+     * Returns {@code true} if the given string is a legal version which, for example, can be parsed using
+     * {@link #valueOf(Scheme, String)} without exceptions using the implementation selected by the given scheme.
+     * <br>
+     * This method uses a strict criteria, without trying to sanitize the given string.
+     * 
+     * @param scheme the scheme the check against.
+     * @param s the string version to check.
+     * 
+     * @return {@code true} if the given string represents a legal version sing the implementation selected
+     * by the given scheme, {@code false} otherwise.
+     * 
+     * @see #valueOf(Scheme, String)
+     */
+    public static boolean isLegal(Scheme scheme, String s) {
+        return isLegal(scheme, s, false);
+    }
+
+    /**
+     * Returns {@code true} if the given string is a legal version which, for example, can be parsed using
+     * {@link #valueOf(Scheme, String, boolean)} without exceptions using the implementation selected by the given scheme.
+     * 
+     * @param scheme the scheme the check against.
+     * @param s the string version to check.
+     * @param prefixLenient when {@code true} prefixes are tolerated even if they are not strictly legal from the
+     * version scheme specification perspective.
+     * 
+     * @return {@code true} if the given string represents a legal version sing the implementation selected
+     * by the given scheme, {@code false} otherwise.
+     * 
+     * @see #valueOf(Scheme, String, boolean)
+     */
+    public static boolean isLegal(Scheme scheme, String s, boolean prefixLenient) {
+        Objects.requireNonNull(s, "Can't parse a null string");
+        switch (scheme) {
+            case SEMVER:  return SemanticVersion.isLegal(s, prefixLenient);
+            //MAVEN: not yet supported
+            default: throw new IllegalArgumentException(String.format("Illegal or unsupporte scheme %s", scheme));
+        }
+    }
+
+    /**
      * Returns a Version instance representing the specified String value. No sanitization attempt is done.
      *
      * @param scheme the scheme the version belongs to

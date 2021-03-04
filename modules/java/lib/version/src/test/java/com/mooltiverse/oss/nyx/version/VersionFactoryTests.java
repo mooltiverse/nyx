@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -29,6 +30,66 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 
 @DisplayName("VersionFactory")
 public class VersionFactoryTests {
+    @Nested
+    @DisplayName("VersionFactory.defaultInitial")
+    class DefaultInitialTests {
+        @Test
+        @DisplayName("VersionFactory.defaultInitial(null) throws NullPointerException")
+        void exceptionUsingDefaultInitialWithNullString() {
+            assertThrows(NullPointerException.class, () -> VersionFactory.defaultInitial(null));
+        }
+
+        @Test
+        @DisplayName("VersionFactory.defaultInitial(Scheme.SEMVER).toString() == "+SemanticVersion.DEFAULT_INITIAL_VERSION)
+        void defaultInitial() {
+            assertEquals(SemanticVersion.DEFAULT_INITIAL_VERSION, VersionFactory.defaultInitial(Scheme.SEMVER).toString());
+        }
+    }
+
+    @Nested
+    @DisplayName("VersionFactory.isLegal")
+    class IsLegalTests {
+        @ParameterizedTest(name = "VersionFactory.isLegal(Scheme.SEMVER, ''{0}'') == false")
+        @EmptySource
+        void isLegalWithEmptyString(String version) {
+            assertFalse(VersionFactory.isLegal(Scheme.SEMVER, version));
+        }
+
+        @ParameterizedTest(name = "VersionFactory.isLegal(Scheme.SEMVER, ''{0}'') throws NullPointerException")
+        @NullSource
+        void exceptionUsingIsLegalWithNullString(String version) {
+            assertThrows(NullPointerException.class, () -> VersionFactory.isLegal(Scheme.SEMVER, version));
+        }
+
+        @ParameterizedTest(name = "VersionFactory.isLegal(Scheme.SEMVER, ''{0}'') == false")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownInvalidVersions")
+        void isLegalWithInvalidVersion(String version, Class<? extends Exception> expectedException) {
+            assertFalse(VersionFactory.isLegal(Scheme.SEMVER, version));
+        }
+
+        @ParameterizedTest(name = "VersionFactory.isLegal(Scheme.SEMVER, ''{0}'') == true")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
+        void isLegalValidString(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
+            assertTrue(VersionFactory.isLegal(Scheme.SEMVER, version));
+        }
+
+        @ParameterizedTest(name = "VersionFactory.isLegal(Scheme.SEMVER, ''{0}'', true) == true")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
+        void isLegalSanitizedString(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
+            // test invoking isLegal with prefix tolerance
+            assertTrue(VersionFactory.isLegal(Scheme.SEMVER, version, true));
+        }
+
+        @ParameterizedTest(name = "VersionFactory.isLegal(Scheme.SEMVER, ''{0}'', true) == true")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownSanitizableVersions")
+        void isLegalSanitizableString(String version) {
+            // the method must fail without toleration and succeed when using toleration
+            assertFalse(VersionFactory.isLegal(Scheme.SEMVER, version));
+            assertFalse(VersionFactory.isLegal(Scheme.SEMVER, version, false));
+            assertTrue(VersionFactory.isLegal(Scheme.SEMVER, version, true));
+        }
+    }
+
     @Nested
     @DisplayName("VersionFactory.valueOf")
     class ValueOfTests {
