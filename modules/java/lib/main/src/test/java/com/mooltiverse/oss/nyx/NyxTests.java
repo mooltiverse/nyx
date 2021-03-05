@@ -25,7 +25,7 @@ import com.mooltiverse.oss.nyx.configuration.Configuration;
 import com.mooltiverse.oss.nyx.data.DataAccessException;
 import com.mooltiverse.oss.nyx.configuration.mock.ConfigurationLayerMock;
 import com.mooltiverse.oss.nyx.git.Repository;
-import com.mooltiverse.oss.nyx.git.script.JGitScript;
+import com.mooltiverse.oss.nyx.git.script.GitScript;
 import com.mooltiverse.oss.nyx.state.State;
 
 @DisplayName("Nyx")
@@ -81,9 +81,8 @@ public class NyxTests {
             Nyx nyx = new Nyx();
 
             // initialize a repository in a new directory and pass the directory to the configuration. We'll use the plugin configuration layer to pass the directory
-            JGitScript jGitScript = JGitScript.fromScratch(true);
             ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-            configurationMock.directory = jGitScript.getWorkingDirectory();
+            configurationMock.directory = GitScript.fromScratch().getWorkingDirectory();
             nyx.configuration().withPluginConfiguration(configurationMock);
 
             // check that no exception is thrown when the Nyx configuration receives a valid Git repository.
@@ -99,7 +98,7 @@ public class NyxTests {
 
             // initialize a repository in a new directory and pass the directory to the configuration. We'll use the plugin configuration layer to pass the directory
             ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-            configurationMock.directory = JGitScript.fromScratch(true).getWorkingDirectory();
+            configurationMock.directory = GitScript.fromScratch().getWorkingDirectory();
             nyx.configuration().withPluginConfiguration(configurationMock);
 
             Repository repository = nyx.repository();

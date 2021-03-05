@@ -28,7 +28,7 @@ import com.mooltiverse.oss.nyx.configuration.Configuration;
 import com.mooltiverse.oss.nyx.configuration.mock.ConfigurationLayerMock;
 import com.mooltiverse.oss.nyx.git.Git;
 import com.mooltiverse.oss.nyx.git.GitException;
-import com.mooltiverse.oss.nyx.git.script.JGitScript;
+import com.mooltiverse.oss.nyx.git.script.GitScript;
 import com.mooltiverse.oss.nyx.state.State;
 import com.mooltiverse.oss.nyx.version.SemanticVersion;
 
@@ -45,7 +45,7 @@ public class InferTests extends AbstractCommandTests {
         @DisplayName("Infer.isUpToDate()")
         void isUpToDateTest()
             throws Exception {
-            JGitScript script = JGitScript.fromScratch(true);
+            GitScript script = GitScript.fromScratch();
             AbstractCommand command = getCommandInstance(Infer.class, new State(new Configuration()), Git.open(script.getWorkingDirectory()));
             assertFalse(command.isUpToDate());
 
@@ -54,7 +54,7 @@ public class InferTests extends AbstractCommandTests {
             assertFalse(command.isUpToDate());
 
             // add some commits to the repository
-            script.addBatch("11.12.13");
+            script.addCommitWithTag("11.12.13");
             assertFalse(command.isUpToDate());
 
             // now after one run the task should be up to date
@@ -74,7 +74,7 @@ public class InferTests extends AbstractCommandTests {
         @DisplayName("Infer.run() with version overridden by user")
         void runWithVersionOverriddenByUserTest()
             throws Exception {
-            JGitScript script = JGitScript.fromScratch(true);
+            GitScript script = GitScript.fromScratch();
             Configuration configuration = new Configuration();
             ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
             State state = new State(configuration);

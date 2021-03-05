@@ -41,7 +41,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import com.mooltiverse.oss.nyx.git.script.JGitScript;
+import com.mooltiverse.oss.nyx.git.script.GitScript;
+import com.mooltiverse.oss.nyx.git.script.GitScenario;
 
 /**
  * Functional tests for the Gradle plugin.<br>
@@ -568,8 +569,8 @@ public class NyxPluginFunctionalTests {
         @MethodSource("com.mooltiverse.oss.nyx.gradle.NyxPluginFunctionalTests#wellKnownTestSuites")
         void runGradleTaskWithEmptyScriptTest(String target, Map<String,TaskOutcome> taskOutcomes, String gradleVersion, String pluginID, String pluginVersion, List<String> positiveFiles, List<String> negativeFiles)
             throws Exception {
-            JGitScript gitScript = JGitScript.fromScratch(true); // create the new directory with a new Git repository inside
-            GradleRunner gradleRunner = setUp(gitScript.getWorkingDirectory(), gradleVersion, gradleSettings(gradleVersion), gradleEmptyBuild(gradleVersion, null));
+            GitScript script = GitScenario.InitialCommit.realize(); // create the new directory with a new Git repository inside
+            GradleRunner gradleRunner = setUp(script.getWorkingDirectory(), gradleVersion, gradleSettings(gradleVersion), gradleEmptyBuild(gradleVersion, null));
 
             runGradleTask(gradleRunner, target, taskOutcomes, gradleVersion, pluginID, pluginVersion, positiveFiles, negativeFiles);
 
@@ -587,8 +588,8 @@ public class NyxPluginFunctionalTests {
         @MethodSource("com.mooltiverse.oss.nyx.gradle.NyxPluginFunctionalTests#wellKnownTestSuites")
         void runGradleTaskWithSimpleScriptTest(String target, Map<String,TaskOutcome> taskOutcomes, String gradleVersion, String pluginID, String pluginVersion, List<String> positiveFiles, List<String> negativeFiles)
             throws Exception {
-            JGitScript gitScript = JGitScript.fromScratch(true); // create the new directory with a new Git repository inside
-            GradleRunner gradleRunner = setUp(gitScript.getWorkingDirectory(), gradleVersion, gradleSettings(gradleVersion), gradleSimpleBuild(gradleVersion, null));
+            GitScript script = GitScenario.InitialCommit.realize(); // create the new directory with a new Git repository inside
+            GradleRunner gradleRunner = setUp(script.getWorkingDirectory(), gradleVersion, gradleSettings(gradleVersion), gradleSimpleBuild(gradleVersion, null));
 
             runGradleTask(gradleRunner, target, taskOutcomes, gradleVersion, pluginID, pluginVersion, positiveFiles, negativeFiles);
 

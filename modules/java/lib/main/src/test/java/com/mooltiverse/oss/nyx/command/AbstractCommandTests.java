@@ -33,7 +33,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import com.mooltiverse.oss.nyx.configuration.Configuration;
 import com.mooltiverse.oss.nyx.git.Git;
 import com.mooltiverse.oss.nyx.git.Repository;
-import com.mooltiverse.oss.nyx.git.script.JGitScript;
+import com.mooltiverse.oss.nyx.git.script.GitScript;
 import com.mooltiverse.oss.nyx.state.State;
 
 @DisplayName("AbstractCommand")
@@ -99,7 +99,7 @@ public class AbstractCommandTests {
         @MethodSource("com.mooltiverse.oss.nyx.command.AbstractCommandTests#commandsArguments")
         void constructorTest(String commandClassSimpleName, Class<? extends AbstractCommand> commandClass)
             throws Exception {
-            assertNotNull(getCommandInstance(commandClass, new State(new Configuration()), Git.open(JGitScript.fromScratch(true).getWorkingDirectory())));
+            assertNotNull(getCommandInstance(commandClass, new State(new Configuration()), Git.open(GitScript.fromScratch().getWorkingDirectory())));
         }
     }
 
@@ -113,7 +113,7 @@ public class AbstractCommandTests {
         @MethodSource("com.mooltiverse.oss.nyx.command.AbstractCommandTests#commandsArguments")
         void repositoryTest(String commandClassSimpleName, Class<? extends AbstractCommand> commandClass)
             throws Exception {
-            assertNotNull(getCommandInstance(commandClass, new State(new Configuration()), Git.open(JGitScript.fromScratch(true).getWorkingDirectory())).repository());
+            assertNotNull(getCommandInstance(commandClass, new State(new Configuration()), Git.open(GitScript.fromScratch().getWorkingDirectory())).repository());
         }
     }
 
@@ -127,7 +127,7 @@ public class AbstractCommandTests {
         @MethodSource("com.mooltiverse.oss.nyx.command.AbstractCommandTests#commandsArguments")
         void stateTest(String commandClassSimpleName, Class<? extends AbstractCommand> commandClass)
             throws Exception {
-            assertNotNull(getCommandInstance(commandClass, new State(new Configuration()), Git.open(JGitScript.fromScratch(true).getWorkingDirectory())).state());
+            assertNotNull(getCommandInstance(commandClass, new State(new Configuration()), Git.open(GitScript.fromScratch().getWorkingDirectory())).state());
         }
     }
 }

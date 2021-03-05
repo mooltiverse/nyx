@@ -28,7 +28,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import com.mooltiverse.oss.nyx.git.script.JGitScript;
+import com.mooltiverse.oss.nyx.git.script.GitScript;
 
 @DisplayName("JGitRepository")
 public class JGitRepositoryTest {
@@ -89,14 +89,14 @@ public class JGitRepositoryTest {
         @Test
         public void openFileTest()
             throws Exception {
-            assertNotNull(JGitRepository.open(JGitScript.fromScratch(true).getWorkingDirectory()));
+            assertNotNull(JGitRepository.open(GitScript.fromScratch().getWorkingDirectory()));
         }
 
         @DisplayName("JGitRepository.open(String)")
         @Test
         public void openStringTest()
             throws Exception {
-            assertNotNull(JGitRepository.open(JGitScript.fromScratch(true).getWorkingDirectory().getAbsolutePath()));
+            assertNotNull(JGitRepository.open(GitScript.fromScratch().getWorkingDirectory().getAbsolutePath()));
         }
     }
 
@@ -108,7 +108,7 @@ public class JGitRepositoryTest {
         public void exceptionWithRepositoryWithNoCommits()
             throws Exception {
             // start with a new repository, just initialized
-            JGitScript script = JGitScript.fromScratch(true);
+            GitScript script = GitScript.fromScratch();
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
 
             assertThrows(GitException.class, () -> repository.getLatestCommit());
@@ -118,7 +118,7 @@ public class JGitRepositoryTest {
             assertThrows(GitException.class, () -> repository.getLatestCommit());
 
             // stage the files without committing
-            script.stage();
+            script.andStage();
             assertThrows(GitException.class, () -> repository.getLatestCommit());
         }
 
@@ -127,15 +127,15 @@ public class JGitRepositoryTest {
         public void getLatestCommitTest()
             throws Exception {
             // start with a new repository, just initialized
-            JGitScript script = JGitScript.fromScratch(true);
+            GitScript script = GitScript.fromScratch();
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
             assertThrows(GitException.class, () -> repository.getLatestCommit());
             
             // add and stage some files
-            script.withFiles().stage();
+            script.withFiles().andStage();
 
             // commit the files and get the commit SHA
-            String commitSHA1 = script.commitFiles("Test commit").getId().getName();
+            String commitSHA1 = script.commit("Test commit").getId().getName();
             assumeFalse(Objects.isNull(commitSHA1));
             assertNotNull(repository.getLatestCommit());
             assertEquals(commitSHA1, repository.getLatestCommit());
@@ -145,7 +145,7 @@ public class JGitRepositoryTest {
 
             // repeat the above with new changes
             script.withFiles(2);
-            String commitSHA2 = script.commitFiles("Test another commit").getId().getName();
+            String commitSHA2 = script.commit("Test another commit").getId().getName();
             assertNotEquals(commitSHA1, commitSHA2);
             assumeFalse(Objects.isNull(commitSHA2));
             assertNotNull(repository.getLatestCommit());
@@ -164,7 +164,7 @@ public class JGitRepositoryTest {
         public void exceptionWithRepositoryWithNoCommits()
             throws Exception {
             // start with a new repository, just initialized
-            JGitScript script = JGitScript.fromScratch(true);
+            GitScript script = GitScript.fromScratch();
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
             
             assertThrows(GitException.class, () -> repository.getRootCommit());
@@ -174,7 +174,7 @@ public class JGitRepositoryTest {
             assertThrows(GitException.class, () -> repository.getRootCommit());
 
             // stage the files without committing
-            script.stage();
+            script.andStage();
             assertThrows(GitException.class, () -> repository.getRootCommit());
         }
 
@@ -183,15 +183,15 @@ public class JGitRepositoryTest {
         public void getRootCommitTest()
             throws Exception {
             // start with a new repository, just initialized
-            JGitScript script = JGitScript.fromScratch(true);
+            GitScript script = GitScript.fromScratch();
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
             assertThrows(GitException.class, () -> repository.getRootCommit());
             
             // add and stage some files
-            script.withFiles().stage();
+            script.withFiles().andStage();
 
             // commit the files and get the commit SHA
-            String commitSHA1 = script.commitFiles("Test commit").getId().getName();
+            String commitSHA1 = script.commit("Test commit").getId().getName();
             assumeFalse(Objects.isNull(commitSHA1));
             assertNotNull(repository.getRootCommit());
             assertEquals(commitSHA1, repository.getRootCommit());
@@ -201,7 +201,7 @@ public class JGitRepositoryTest {
 
             // repeat the above with new changes
             script.withFiles(2);
-            String commitSHA2 = script.commitFiles("Test another commit").getId().getName();
+            String commitSHA2 = script.commit("Test another commit").getId().getName();
             assertNotEquals(commitSHA1, commitSHA2);
             assumeFalse(Objects.isNull(commitSHA2));
             assertNotNull(repository.getRootCommit());
@@ -220,7 +220,7 @@ public class JGitRepositoryTest {
         public void isCleanTest()
             throws Exception {
             // start with a new repository, just initialized
-            JGitScript script = JGitScript.fromScratch(true);
+            GitScript script = GitScript.fromScratch();
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
             assertTrue(repository.isClean());
             
@@ -229,11 +229,11 @@ public class JGitRepositoryTest {
             assertFalse(repository.isClean());
 
             // stage the files without committing
-            script.stage();
+            script.andStage();
             assertFalse(repository.isClean());
 
             // commit the files, now we're clean again
-            script.commit();
+            script.andCommit();
             assertTrue(repository.isClean());
         }
     }

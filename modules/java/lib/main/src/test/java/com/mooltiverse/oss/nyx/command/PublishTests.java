@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test;
 
 import com.mooltiverse.oss.nyx.configuration.Configuration;
 import com.mooltiverse.oss.nyx.git.Git;
-import com.mooltiverse.oss.nyx.git.script.JGitScript;
+import com.mooltiverse.oss.nyx.git.script.GitScript;
 import com.mooltiverse.oss.nyx.state.State;
 
 @DisplayName("Publish")
@@ -39,8 +39,7 @@ public class PublishTests extends AbstractCommandTests {
         @DisplayName("Publish.isUpToDate()")
         void isUpToDateTest()
             throws Exception {
-            JGitScript script = JGitScript.fromScratch(true);
-            AbstractCommand command = getCommandInstance(Publish.class, new State(new Configuration()), Git.open(script.getWorkingDirectory()));
+            AbstractCommand command = getCommandInstance(Publish.class, new State(new Configuration()), Git.open(GitScript.fromScratch().getWorkingDirectory()));
             assertFalse(command.isUpToDate());
             command.run();
             assertTrue(command.isUpToDate());

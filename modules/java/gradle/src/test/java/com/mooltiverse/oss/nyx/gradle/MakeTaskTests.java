@@ -25,7 +25,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import com.mooltiverse.oss.nyx.git.script.JGitScript;
+import com.mooltiverse.oss.nyx.git.script.GitScript;
+import com.mooltiverse.oss.nyx.git.script.GitScenario;
 
 /**
  * Tests the Gradle task.<br>
@@ -49,14 +50,14 @@ public class MakeTaskTests extends CoreTaskTests {
             project.getPluginManager().apply(NyxPlugin.ID);
     
             // a Git repository is created in a different temporary directory
-            JGitScript gitScript = JGitScript.fromScratch(true).addBatch("tag");
+            GitScript script = GitScenario.InitialCommit.realize();
     
             //make sure the Gradle working directory and the Git repository directory are not the same
-            assumeFalse(project.getBuildDir().equals(gitScript.getWorkingDirectory()));
-            assumeFalse(project.getBuildDir().getAbsolutePath().equals(gitScript.getWorkingDirectory().getAbsolutePath()));
+            assumeFalse(project.getBuildDir().equals(script.getWorkingDirectory()));
+            assumeFalse(project.getBuildDir().getAbsolutePath().equals(script.getWorkingDirectory().getAbsolutePath()));
     
             // the valid Git directory, different than the current working directory, is passed as the 'directory' configuration option through the extension
-            project.getExtensions().getByType(NyxExtension.class).getDirectory().set(gitScript.getWorkingDirectory());
+            project.getExtensions().getByType(NyxExtension.class).getDirectory().set(script.getWorkingDirectory());
     
             // Retrieve the dependent task
             Task task = project.getTasks().getByName(MakeTask.NAME);
@@ -70,8 +71,7 @@ public class MakeTaskTests extends CoreTaskTests {
         @DisplayName("MakeTask run without exceptions when running in a directory with a valid Git repository")
         void testActionsExecuteWithoutExceptionsInValidGitProjectDirectoryAndNoDirectoryConfigurationOption()
             throws Exception {
-            JGitScript gitScript = JGitScript.fromScratch(true).addBatch("tag");
-            Project project = newTestProject(gitScript.getWorkingDirectory(), false);
+            Project project = newTestProject(GitScenario.InitialCommit.realize().getWorkingDirectory(), false);
     
             // apply the plugin
             project.getPluginManager().apply(NyxPlugin.ID);

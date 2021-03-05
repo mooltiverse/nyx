@@ -86,6 +86,10 @@ public class GitUtil {
         printRepositoryCommitHistory(directory, out);
         printSeparator(ps, "REPOSITORY COMMIT HISTORY", false);
 
+        printSeparator(ps, "REPOSITORY COMMIT GRAPH", true);
+        printRepositoryCommitGraph(directory, out);
+        printSeparator(ps, "REPOSITORY COMMIT GRAPH", false);
+
         printSeparator(ps, marker, false);
         ps.flush();
     }
@@ -132,5 +136,17 @@ public class GitUtil {
     public static void printRepositoryCommitHistory(File directory, OutputStream out)
         throws Exception {
         RuntimeUtil.runCommand(new String[]{"git", "log", "--decorate=full", "--source"}, null, directory, out);
+    }
+
+    /**
+     * Dumps the list of repository commits with a graph.
+     * 
+     * @param directory the repository to dump the informations about
+     * @param out the stream to write to
+     */
+    public static void printRepositoryCommitGraph(File directory, OutputStream out)
+        throws Exception {
+        RuntimeUtil.runCommand(new String[]{"git", "log", "--all", "--decorate", "--oneline", "--graph"}, null, directory, out);
+        
     }
 }
