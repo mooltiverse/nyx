@@ -17,8 +17,6 @@ package com.mooltiverse.oss.nyx.gradle;
 
 import static com.mooltiverse.oss.nyx.gradle.Constants.GRADLE_VERSION_PROPERTY_NAME;
 
-import javax.annotation.Nullable;
-
 import org.gradle.api.Project;
 import org.gradle.api.plugins.ExtensionContainer;
 
@@ -98,7 +96,7 @@ abstract class CoreTask extends AbstractTask {
      * @param name the name of the property to store
      * @param value the value of the property to store
      */
-    protected void storeSharedProperty(String name, @Nullable Object value) {
+    protected void storeSharedProperty(String name, Object value) {
         getProject().getExtensions().getExtraProperties().set(name, value);
     }
 
@@ -111,7 +109,6 @@ abstract class CoreTask extends AbstractTask {
      * @return the value of the shared property with the given name, if any, or {@code null} if no property
      * with such name is available
      */
-    @Nullable
     protected Object retrieveSharedProperty(String name) {
         return getProject().getExtensions().getExtraProperties().get(name);
     }

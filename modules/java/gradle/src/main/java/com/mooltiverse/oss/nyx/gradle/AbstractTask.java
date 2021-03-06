@@ -15,8 +15,6 @@
  */
 package com.mooltiverse.oss.nyx.gradle;
 
-import javax.annotation.Nullable;
-
 import org.gradle.api.Action;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.Project;
@@ -88,7 +86,7 @@ abstract class AbstractTask extends DefaultTask {
      * 
      * @return the task provider used for the deferred task instantiation
      */
-    protected static <T extends Task> TaskProvider<T> define(Project project, String name, Class<T> type, @Nullable Action<? super T> configurationAction) {
+    protected static <T extends Task> TaskProvider<T> define(Project project, String name, Class<T> type, Action<? super T> configurationAction) {
         project.getLogger().debug("Registering Nyx task with name: {}", name);
 
         TaskProvider<T> taskProvider = project.getTasks().register(name, type, configurationAction);
