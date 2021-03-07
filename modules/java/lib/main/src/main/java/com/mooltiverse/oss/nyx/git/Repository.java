@@ -15,17 +15,39 @@
  */
 package com.mooltiverse.oss.nyx.git;
 
+import java.util.Set;
+
+import com.mooltiverse.oss.nyx.data.Tag;
+
 /**
  * This interface models coarse grained, implementation independent methods used by Nyx to access a Git repository.
  */
 public interface Repository {
     /**
+     * Browse the repository commit history using the given {@code visitor} to inspect each commit. Commits are
+     * evaluated in Git's natural order, from the most recent to oldest.
+     * 
+     * @param start the optional SHA-1 id of the commit to start from. If {@code null} the latest commit in the
+     * current branch ({@code HEAD}) is used. This can be a long or abbreviated SHA-1.
+     * @param end the optional SHA-1 id of the commit to end with, included. If {@code null} the repository root
+     * commit is used (until the given {@code visitor} returns {@code false}). If this commit is not reachable
+     * from the start it will be ignored. This can be a long or abbreviated SHA-1.
+     * @param visitor the visitor function that will receive commit data to evaluate. If {@code null} this method
+     * takes no action.
+     * 
+     * @throws GitException in case some problem is encountered with the underlying Git repository, including when
+     * the repository has no commits yet.
+     */
+    public void walkHistory(String start, String end, CommitVisitor visitor)
+        throws GitException;
+
+    /**
      * Returns the SHA-1 identifier of the last commit in the current branch.
      * 
      * @return the SHA-1 identifier of the last commit in the current branch.
      * 
-     * @throws GitException in case some propblem is encountered with the underlying Git repository, including when
-     * the repository has no commits yet.
+     * @throws GitException in case some problem is encountered with the underlying Git repository, including when
+     * the repository has no commits yet or is in the 'detached HEAD' state.
      */
     public String getLatestCommit()
         throws GitException;
@@ -35,10 +57,22 @@ public interface Repository {
      * 
      * @return the SHA-1 identifier of the first commit in the repository.
      * 
-     * @throws GitException in case some propblem is encountered with the underlying Git repository, including when
-     * the repository has no commits yet.
+     * @throws GitException in case some problem is encountered with the underlying Git repository, including when
+     * the repository has no commits yet or is in the 'detached HEAD' state.
      */
     public String getRootCommit()
+        throws GitException;
+
+    /**
+     * Returns a set of abjects representing all the tags for the given commit.
+     * 
+     * @param commit the SHA-1 identifier of the commit to get the tags for. It can be a full or abbreviated SHA-1.
+     * 
+     * @return the set of abjects representing all the tags for the given commit.
+     * 
+     * @throws GitException in case some problem is encountered with the underlying Git repository.
+     */
+    public Set<Tag> getCommitTags(String commit)
         throws GitException;
 
     /**
@@ -47,7 +81,8 @@ public interface Repository {
      * 
      * @return {@code true} if the repository is clean, {@code false} otherwise.
      * 
-     * @throws GitException in case some propblem is encountered with the underlying Git repository
+     * @throws GitException in case some problem is encountered with the underlying Git repository, including when
+     * the repository has no commits yet or is in the 'detached HEAD' state.
      */
     public boolean isClean()
         throws GitException;

@@ -13,6 +13,9 @@ TODO: write the introductory section here
 TODO: write this section
 {: .notice--warning}
 
+When merge commits are encountered scanning the commit history Nyx follows the [first parent](https://git-scm.com/docs/git-log#Documentation/git-log.txt---first-parent) commit to stay on the main branch.
+{: .notice--info}
+
 ## Make
 
 TODO: write this section

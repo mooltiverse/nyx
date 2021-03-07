@@ -18,15 +18,24 @@ package com.mooltiverse.oss.nyx.git;
 import java.io.File;
 import java.io.IOException;
 
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Objects;
+import java.util.Set;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.JGitInternalException;
+import org.eclipse.jgit.errors.AmbiguousObjectException;
+import org.eclipse.jgit.errors.MissingObjectException;
 import org.eclipse.jgit.errors.NoWorkTreeException;
 import org.eclipse.jgit.errors.RevisionSyntaxException;
+import org.eclipse.jgit.errors.RevWalkException;
+import org.eclipse.jgit.lib.AnyObjectId;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.ObjectId;
+import org.eclipse.jgit.lib.Ref;
+import org.eclipse.jgit.lib.RefDatabase;
 import org.eclipse.jgit.revwalk.RevSort;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
@@ -35,6 +44,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
+
+import com.mooltiverse.oss.nyx.data.Tag;
 
 /**
  * A local repository implementation that encapsulates the backing <a href="https://www.eclipse.org/jgit/">JGit</a> library.
@@ -112,6 +123,114 @@ class JGitRepository implements Repository {
     }
 
     /**
+     * Resolves the object with the given {@code id} in the repository.
+     * 
+     * This method is an utility wrapper around {@link org.eclipse.jgit.lib.Repository#resolve(String)} which never returns
+     * {@code null} and throws {@link GitException} if the identifier cannot be resolved or any other exception occurs.
+     * 
+     * @param id the object identifier to resolve. It can't be {@code null}. If it's a SHA-1 it can be long or abbreviated.
+     * For allowed values see {@link org.eclipse.jgit.lib.Repository#resolve(String)}
+     * 
+     * @return the resolved object for the given identifier, never {@code null}
+     * 
+     * @throws GitException in case the given identifier cannot be resolved or any other issue is encountered
+     * 
+     * @see org.eclipse.jgit.lib.Repository#resolve(String)
+     */
+    private ObjectId resolve(String id)
+        throws GitException {
+        Objects.requireNonNull(id, "Cannot resolve null identifiers");
+
+        try {
+            ObjectId res = jGit.getRepository().resolve(id);
+            if (Objects.isNull(res))
+            {
+                if (Constants.HEAD.equals(id))
+                    logger.warn(GIT, "Repository identifier {} cannot be resolved. This means that the repository has just been initialized and has no commits yet or the repository is in a 'detached HEAD' state. See the documentation to fix this.", Constants.HEAD);
+                throw new GitException(String.format("Identifier %s cannot be resolved", id));
+            }
+            else return res;
+        }
+        catch (AmbiguousObjectException aoe) {
+            throw new GitException(String.format("The {} identifier cannot be resolved uniquely as it resolves to multiple objects in the repository. If this is a shortened SHA identifier try using more charachers to disambiguate.", id), aoe);
+        }
+        catch (RevisionSyntaxException rse) {
+            throw new GitException(String.format("The {} identifier cannot be resolved as the expression is not supported by this implementation.", id), rse);
+        }
+        catch (IOException ioe) {
+            throw new GitException(String.format("The {} identifier cannot be resolved", id), ioe);
+        }
+    }
+
+    /**
+     * Resolves the commit with the given {@code id} using the repository object and returns it as a typed object.
+     * In case you need to use the returned object with a {@link RevWalk} use the {@link #parseCommit(RevWalk, String)}
+     * version of this method.
+     * 
+     * This method is an utility wrapper around {@link org.eclipse.jgit.lib.Repository#parseCommit(AnyObjectId)} which never returns
+     * {@code null} and throws {@link GitException} if the identifier cannot be resolved or any other exception occurs.
+     * 
+     * @param id the commit identifier to resolve. It must be a long or abbreviated SHA-1 but not {@code null}.
+     * 
+     * @return the parsed commit object for the given identifier, never {@code null}
+     * 
+     * @throws GitException in case the given identifier cannot be resolved or any other issue is encountered
+     * 
+     * @see #resolve(String)
+     * @see #parseCommit(RevWalk, String)
+     * @see org.eclipse.jgit.lib.Repository#parseCommit(AnyObjectId)
+     */
+    /*private RevCommit parseCommit(String id)
+        throws GitException {
+        Objects.requireNonNull(id, "Cannot parse a commit from a null identifier");
+
+        try {
+            return jGit.getRepository().parseCommit(resolve(id));
+        }
+        catch (MissingObjectException moe) {
+            throw new GitException(String.format("The {} commit identifier cannot be resolved as there is no such commit.", id), moe);
+        }
+        catch (IOException ioe) {
+            throw new GitException(String.format("The {} commit identifier cannot be resolved to a valid commit", id), ioe);
+        }
+    }*/
+
+    /**
+     * Resolves the commit with the given {@code id} using the given {@link RevWalk} object and returns it as a typed object.
+     * In case you need to use the returned object with a {@link RevWalk} instance you should use this version of the method instead
+     * of {@link #parseCommit(String)} as {@link RevWalk} would throw exceptions if the object is parsed elsewhere.
+     * 
+     * This method is an utility wrapper around {@link RevWalk#parseCommit(AnyObjectId)} which never returns
+     * {@code null} and throws {@link GitException} if the identifier cannot be resolved or any other exception occurs.
+     * 
+     * @param rw the {@link RevWalk} instance to use to parse the commit, cannot be {@code null}.
+     * @param id the commit identifier to resolve. It must be a long or abbreviated SHA-1 but not {@code null}.
+     * 
+     * @return the parsed commit object for the given identifier, never {@code null}
+     * 
+     * @throws GitException in case the given identifier cannot be resolved or any other issue is encountered
+     * 
+     * @see #resolve(String)
+     * @see #parseCommit(String)
+     * @see RevWalk#parseCommit(AnyObjectId)
+     */
+    private RevCommit parseCommit(RevWalk rw, String id)
+        throws GitException {
+        Objects.requireNonNull(rw, "The RevWalk cannot be null");
+        Objects.requireNonNull(id, "Cannot parse a commit from a null identifier");
+
+        try {
+            return rw.parseCommit(resolve(id));
+        }
+        catch (MissingObjectException moe) {
+            throw new GitException(String.format("The {} commit identifier cannot be resolved as there is no such commit.", id), moe);
+        }
+        catch (IOException ioe) {
+            throw new GitException(String.format("The {} commit identifier cannot be resolved to a valid commit", id), ioe);
+        }
+    }
+
+    /**
      * Returns the first commit starting from the given revision. Different sort options can be provided (i.e. to get the last commit instead of the first).
      * 
      * @param startFrom a name that will be resolved first when looking for the commit. This is resolved using {@link org.eclipse.jgit.lib.Repository#resolve(String)} and may
@@ -130,18 +249,16 @@ class JGitRepository implements Repository {
         Objects.requireNonNull(startFrom, "The starting revision object is required");
         RevWalk rw = new RevWalk(jGit.getRepository());
         try {
-            ObjectId start = jGit.getRepository().resolve(startFrom);
-            if (Objects.isNull(start))
-                throw new GitException(String.format("Repository cannot resolve %s. Unable to peek the commit.", startFrom));
-
-            RevCommit base = rw.parseCommit(start);
             if (!Objects.isNull(sort))
                 rw.sort(sort);
-            rw.markStart(base);
+            rw.markStart(parseCommit(rw, startFrom));
             return rw.next();
         }
+        catch (MissingObjectException moe) {
+            throw new GitException(String.format("Cannot peek the {} commit likely because of a broken link in the object database.", startFrom), moe);
+        }
         catch (RevisionSyntaxException | JGitInternalException | IOException e) {
-            throw new GitException(e);
+            throw new GitException(String.format("Cannot peek the {} commit.", startFrom), e);
         }
         finally {
             rw.close();
@@ -155,7 +272,7 @@ class JGitRepository implements Repository {
     public String getLatestCommit()
         throws GitException {
         String commitSHA = peekCommit(Constants.HEAD, null).getName();
-        logger.debug(GIT, "Repository root commit is {}", commitSHA);
+        logger.debug(GIT, "Repository latest commit in HEAD branch is {}", commitSHA);
         return commitSHA;
     }
 
@@ -174,13 +291,83 @@ class JGitRepository implements Repository {
      * {@inheritDoc}
      */
     @Override
+    public Set<Tag> getCommitTags(String commit)
+        throws GitException {
+        Set<Tag> res = new HashSet<Tag>();
+        try {
+            RefDatabase refDatabase = jGit.getRepository().getRefDatabase();
+            for (Ref tagRef: refDatabase.getRefsByPrefix(Constants.R_TAGS)) {
+                // refs must be peeled in order to see if they're annoteted or lightweight
+                tagRef = refDatabase.peel(tagRef);
+
+                // when it's an annotated tag tagRef.getPeeledObjectId() is not null,
+                // while for lightweight tags tagRef.getPeeledObjectId() is null
+                if (Objects.isNull(tagRef.getPeeledObjectId()))
+                {
+                    if (tagRef.getObjectId().getName().startsWith(commit))
+                        res.add(ObjectFactory.tagFrom(tagRef));
+                }
+                else {
+                    // it's an annotated tag
+                    if (tagRef.getPeeledObjectId().getName().startsWith(commit))
+                        res.add(ObjectFactory.tagFrom(tagRef));
+                }
+            }
+        }
+        catch (IOException e) {
+            throw new GitException("Cannot list repository tags");
+        }
+        return res;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean isClean()
         throws GitException {
         try {
             return jGit.status().call().isClean();
         }
         catch (GitAPIException | NoWorkTreeException e) {
-            throw new GitException(e);
+            throw new GitException("Unable to query the repository status.", e);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void walkHistory(String start, String end, CommitVisitor visitor)
+        throws GitException {
+        if (Objects.isNull(visitor))
+            return;
+        logger.debug(GIT, "Walking commit history. Start commit boundary is {}. End commit boundary is {}", Objects.isNull(start) ? "not defined" : start, Objects.isNull(end) ? "not defined" : end);
+
+        RevWalk rw = new RevWalk(jGit.getRepository());
+        try {
+            // follow the first parent upon merge commits
+            rw.setFirstParent(true); // this must always be called before markStart
+            logger.debug(GIT, "Upon merge commits only the first parent is considered.");
+
+            rw.markStart(parseCommit(rw, Objects.isNull(start) ? Constants.HEAD : start));
+            Iterator<RevCommit> commitIterator = rw.iterator();
+            while (commitIterator.hasNext()) {
+                RevCommit commit = commitIterator.next();
+                logger.trace(GIT, "Visiting commit {}", commit.getId().getName());
+                boolean visitorContinues = visitor.visit(ObjectFactory.commitFrom(commit, getCommitTags(commit.getId().getName())));
+                if (!visitorContinues || (!Objects.isNull(end) && commit.getId().getName().startsWith(end)))
+                    break;
+            }
+        }
+        catch (RevWalkException rwe) {
+            throw new GitException("Cannot walk through commits.", rwe);
+        }
+        catch (RevisionSyntaxException | JGitInternalException | IOException e) {
+            throw new GitException("An error occurred while walking through commits", e);
+        }
+        finally {
+            rw.close();
         }
     }
 }

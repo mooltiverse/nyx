@@ -467,4 +467,18 @@ public class GitTestRepository {
             return res;
         }
     }
+
+    /**
+     * Peels the given object using the repository Ref Database.
+     * 
+     * @param ref the object to peel.
+     * 
+     * @return the peeled object.
+     * 
+     * @throws Exception in case of any issue
+     */
+    public Ref peel(Ref ref)
+        throws Exception {
+        return git.getRepository().getRefDatabase().peel(ref);
+    }
 }

@@ -20,6 +20,8 @@ import static org.junit.jupiter.api.Assumptions.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import java.nio.file.Files;
 import java.util.Objects;
@@ -28,7 +30,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import org.eclipse.jgit.revwalk.RevCommit;
+
+import com.mooltiverse.oss.nyx.data.Commit;
 import com.mooltiverse.oss.nyx.git.script.GitScript;
+import com.mooltiverse.oss.nyx.git.script.GitScenario;
 
 @DisplayName("JGitRepository")
 public class JGitRepositoryTest {
@@ -235,6 +241,169 @@ public class JGitRepositoryTest {
             // commit the files, now we're clean again
             script.andCommit();
             assertTrue(repository.isClean());
+        }
+    }
+
+    @Nested
+    @DisplayName("JGitRepository.getCommitTags")
+    class GetCommitTagsTest {
+        @DisplayName("JGitRepository.getCommitTags()")
+        @Test
+        public void getCommitTagsTest()
+            throws Exception {
+            // start with a new repository, just initialized
+            GitScript script = GitScript.fromScratch();
+            Repository repository = JGitRepository.open(script.getWorkingDirectory());
+
+            // add a commit
+            script.withFiles().andStage();
+            RevCommit commit = script.commit("A message");
+            
+            // test with no tags
+            assertEquals(0, repository.getCommitTags(commit.getId().getName()).size());
+
+            // test with one lightweight tag
+            script.tag("l1", null);
+            assertEquals(1, repository.getCommitTags(commit.getId().getName()).size());
+            assertEquals("l1", repository.getCommitTags(commit.getId().getName()).iterator().next().getName());
+            assertFalse(repository.getCommitTags(commit.getId().getName()).iterator().next().isAnnotated());
+
+            // test with one more tag
+            script.tag("a1", "Tag message");
+            assertEquals(2, repository.getCommitTags(commit.getId().getName()).size());
+        }
+    }
+
+    @Nested
+    @DisplayName("JGitRepository.walkHistory")
+    class WalkhistoryTest {
+        @DisplayName("JGitRepository.walkHistory(CommitVisitor) with CommitVisitor stopping browsing")
+        @Test
+        public void walkHistoryWithVisitorStoppingBrowsingTest()
+            throws Exception {
+            // start with a new repository, just initialized
+            GitScript script = GitScenario.TwoBranchesShort.realize();
+            Repository repository = JGitRepository.open(script.getWorkingDirectory());
+
+            // Keep track of the visited commits
+            List<Commit> visitedCommits = new ArrayList<Commit>();
+
+            // make the visitor stop after 2 commits
+            repository.walkHistory(null, null, c -> {
+                visitedCommits.add(c);
+                return visitedCommits.size() < 2;
+            });
+
+            assertEquals(2, visitedCommits.size());
+        }
+
+        @DisplayName("JGitRepository.walkHistory(CommitVisitor) with no boundaries")
+        @Test
+        public void walkHistoryWithNoBoundariesTest()
+            throws Exception {
+            // start with a new repository, just initialized
+            GitScript script = GitScenario.TwoBranchesShort.realize();
+            Repository repository = JGitRepository.open(script.getWorkingDirectory());
+
+            // Keep track of the visited commits
+            List<Commit> visitedCommits = new ArrayList<Commit>();
+
+            repository.walkHistory(null, null, c -> {
+                visitedCommits.add(c);
+                return true;
+            });
+
+            assertEquals(10, visitedCommits.size());
+            // make sure the last one is the root commit
+            assertTrue(visitedCommits.get(visitedCommits.size()-1).getParents().isEmpty());
+            assertEquals(repository.getRootCommit(), visitedCommits.get(visitedCommits.size()-1).getSHA());
+        }
+
+        @DisplayName("JGitRepository.walkHistory(CommitVisitor) with start boundary")
+        @Test
+        public void walkHistoryWithStartBoundaryTest()
+            throws Exception {
+            // start with a new repository, just initialized
+            GitScript script = GitScenario.TwoBranchesShort.realize();
+            Repository repository = JGitRepository.open(script.getWorkingDirectory());
+            // Keep track of the visited commits
+            List<Commit> visitedCommits = new ArrayList<Commit>();
+
+            repository.walkHistory(null, null, c -> {
+                visitedCommits.add(c);
+                return true;
+            });
+
+            assertEquals(10, visitedCommits.size());
+            
+            // now browse again with a start boundary (starting at the 3rd commit)
+            List<Commit> boundaryVisitedCommits = new ArrayList<Commit>();
+            repository.walkHistory(visitedCommits.get(2).getSHA(), null, c -> {
+                boundaryVisitedCommits.add(c);
+                return true;
+            });
+
+            assertEquals(visitedCommits.size()-2, boundaryVisitedCommits.size());
+            assertEquals(visitedCommits.get(2).getSHA(), boundaryVisitedCommits.get(0).getSHA()); // test the first visited commit
+            assertEquals(visitedCommits.get(visitedCommits.size()-1).getSHA(), boundaryVisitedCommits.get(boundaryVisitedCommits.size()-1).getSHA()); // test the last visited commit
+        }
+
+        @DisplayName("JGitRepository.walkHistory(CommitVisitor) with end boundary")
+        @Test
+        public void walkHistoryWithEndBoundaryTest()
+            throws Exception {
+            // start with a new repository, just initialized
+            GitScript script = GitScenario.TwoBranchesShort.realize();
+            Repository repository = JGitRepository.open(script.getWorkingDirectory());
+            // Keep track of the visited commits
+            List<Commit> visitedCommits = new ArrayList<Commit>();
+
+            repository.walkHistory(null, null, c -> {
+                visitedCommits.add(c);
+                return true;
+            });
+
+            assertEquals(10, visitedCommits.size());
+            
+            // now browse again with an end boundary (ending at the Nth-2 commit)
+            List<Commit> boundaryVisitedCommits = new ArrayList<Commit>();
+            repository.walkHistory(null, visitedCommits.get(visitedCommits.size()-3).getSHA(), c -> {
+                boundaryVisitedCommits.add(c);
+                return true;
+            });
+
+            assertEquals(visitedCommits.size()-2, boundaryVisitedCommits.size());
+            assertEquals(visitedCommits.get(0).getSHA(), boundaryVisitedCommits.get(0).getSHA()); // test the first visited commit
+            assertEquals(visitedCommits.get(visitedCommits.size()-3).getSHA(), boundaryVisitedCommits.get(boundaryVisitedCommits.size()-1).getSHA()); // test the last visited commit
+        }
+
+        @DisplayName("JGitRepository.walkHistory(CommitVisitor) with both boundaries")
+        @Test
+        public void walkHistoryWithBothBoundariesTest()
+            throws Exception {
+            // start with a new repository, just initialized
+            GitScript script = GitScenario.TwoBranchesShort.realize();
+            Repository repository = JGitRepository.open(script.getWorkingDirectory());
+            // Keep track of the visited commits
+            List<Commit> visitedCommits = new ArrayList<Commit>();
+
+            repository.walkHistory(null, null, c -> {
+                visitedCommits.add(c);
+                return true;
+            });
+
+            assertEquals(10, visitedCommits.size());
+            
+            // now browse again with an end boundary (starting at the 3rd commit and ending at the Nth-2 commit)
+            List<Commit> boundaryVisitedCommits = new ArrayList<Commit>();
+            repository.walkHistory(visitedCommits.get(2).getSHA(), visitedCommits.get(visitedCommits.size()-3).getSHA(), c -> {
+                boundaryVisitedCommits.add(c);
+                return true;
+            });
+
+            assertEquals(visitedCommits.size()-4, boundaryVisitedCommits.size());
+            assertEquals(visitedCommits.get(2).getSHA(), boundaryVisitedCommits.get(0).getSHA()); // test the first visited commit
+            assertEquals(visitedCommits.get(visitedCommits.size()-3).getSHA(), boundaryVisitedCommits.get(boundaryVisitedCommits.size()-1).getSHA()); // test the last visited commit
         }
     }
 }
