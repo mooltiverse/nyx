@@ -37,11 +37,11 @@ public class PublishTaskTests extends CoreTaskTests {
      * Performs checks on the task business actions.
      */
     @Nested
-    @DisplayName("PublishTask.Actions")
+    @DisplayName("PublishTask.Actions.execute")
     static class ActionTests {
         @Test
-        @DisplayName("PublishTask run without exceptions when running in a directory with no Git repository but with a 'directory' configuration option")
-        void testActionsExecuteWithoutExceptionsInEmptyGitProjectDirectoryAndValidDirectoryConfigurationOption()
+        @DisplayName("PublishTask.getActions().execute() doesn't throw exceptions without a valid Git repository in custom directory")
+        void noExceptionOnExecuteWithValidGitRepositoryInCustomDirectoryTest()
         throws Exception {
             // the test project is created in a new empty directory
             Project project = newTestProject(null, false);
@@ -68,8 +68,8 @@ public class PublishTaskTests extends CoreTaskTests {
         }
 
         @Test
-        @DisplayName("PublishTask run without exceptions when running in a directory with a valid Git repository")
-        void testActionsExecuteWithoutExceptionsInValidGitProjectDirectoryAndNoDirectoryConfigurationOption()
+        @DisplayName("PublishTask.getActions().execute() doesn't throw exceptions without a valid Git repository in working directory")
+        void noExceptionOnExecuteWithValidGitRepositoryInWorkingDirectoryTest()
             throws Exception {
             Project project = newTestProject(GitScenario.InitialCommit.realize().getWorkingDirectory(), false);
     

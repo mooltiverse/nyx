@@ -22,5 +22,4 @@ import org.junit.jupiter.api.DisplayName;
  */
 @DisplayName("ReleaseTask")
 public class ReleaseTaskTests extends LifecycleTaskTests {
-
 }

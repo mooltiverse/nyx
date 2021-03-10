@@ -16,7 +16,6 @@
 package com.mooltiverse.oss.nyx.command;
 
 import java.lang.reflect.Constructor;
-
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
@@ -89,13 +88,13 @@ public class AbstractCommandTests {
     }
 
     @Nested
-    @DisplayName("AbstractCommand.constructor")
+    @DisplayName("Constructor")
     static class ConstructorTests {
         /**
          * Test that the given class has the required 2 arguments constructor and that it doesn't fail as long as it
          * has non null parameters
          */
-        @ParameterizedTest(name = "{0}(State, Repository) constructor")
+        @ParameterizedTest(name = "{0}(State, Repository)")
         @MethodSource("com.mooltiverse.oss.nyx.command.AbstractCommandTests#commandsArguments")
         void constructorTest(String commandClassSimpleName, Class<? extends AbstractCommand> commandClass)
             throws Exception {
@@ -104,7 +103,7 @@ public class AbstractCommandTests {
     }
 
     @Nested
-    @DisplayName("AbstractCommand.repository")
+    @DisplayName("Repository")
     static class RepositoryTests {
         /**
          * Check that the repository() method never returns a {@code null} object
@@ -118,7 +117,7 @@ public class AbstractCommandTests {
     }
 
     @Nested
-    @DisplayName("AbstractCommand.state")
+    @DisplayName("State")
     static class StateTests {
         /**
          * Check that the state() method never returns a {@code null} object

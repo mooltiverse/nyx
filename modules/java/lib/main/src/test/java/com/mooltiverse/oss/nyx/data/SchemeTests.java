@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test;
 @DisplayName("Scheme")
 public class SchemeTests {
     @Test
-    @DisplayName("Scheme.getScheme")
+    @DisplayName("Scheme.VALUE.getScheme()")
     void getSchemeTest()
         throws Exception {
 
@@ -31,7 +31,7 @@ public class SchemeTests {
     }
 
     @Test
-    @DisplayName("Scheme.getValue")
+    @DisplayName("Scheme.VALUE.getValue()")
     void getValueTest()
         throws Exception {
 

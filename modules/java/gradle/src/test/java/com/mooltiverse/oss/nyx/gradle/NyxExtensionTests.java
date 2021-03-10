@@ -34,10 +34,10 @@ public class NyxExtensionTests extends AbstractTests  {
      * Performs checks on the extension default values at the time it is created.
      */
     @Nested
-    @DisplayName("NyxExtension defaults")
+    @DisplayName("NyxExtension default values")
     class DefaultsTests {
         @Test
-        @DisplayName("NyxExtension.getBump() default")
+        @DisplayName("NyxExtension.getBump() default value")
         void getBumpDefaultTest()
             throws Exception {
             // apply the plugin to a new project and retrieve the extension
@@ -48,7 +48,7 @@ public class NyxExtensionTests extends AbstractTests  {
         }
 
         @Test
-        @DisplayName("NyxExtension.getDirectory() default")
+        @DisplayName("NyxExtension.getDirectory() default value")
         void getDirectoryDefaultTest()
             throws Exception {
             // apply the plugin to a new project and retrieve the extension
@@ -61,7 +61,7 @@ public class NyxExtensionTests extends AbstractTests  {
         }
 
         @Test
-        @DisplayName("NyxExtension.getDryRun() default")
+        @DisplayName("NyxExtension.getDryRun() default value")
         void getDryRunDefaultTest()
             throws Exception {
             // apply the plugin to a new project and retrieve the extension
@@ -72,7 +72,7 @@ public class NyxExtensionTests extends AbstractTests  {
         }
 
         @Test
-        @DisplayName("NyxExtension.getInitialVersion() default")
+        @DisplayName("NyxExtension.getInitialVersion() default value")
         void getInitialVersionDefaultTest()
             throws Exception {
             // apply the plugin to a new project and retrieve the extension
@@ -83,18 +83,7 @@ public class NyxExtensionTests extends AbstractTests  {
         }
 
         @Test
-        @DisplayName("NyxExtension.getReleasePrefix() default")
-        void getReleasePrefixDefaultTest()
-            throws Exception {
-            // apply the plugin to a new project and retrieve the extension
-            NyxExtension extension = newTestProject(null, true).getExtensions().getByType(NyxExtension.class);
-
-            assertFalse(extension.getReleasePrefix().isPresent());
-            assertNull(extension.getReleasePrefix().getOrNull());
-        }
-
-        @Test
-        @DisplayName("NyxExtension.getReleaseLenient() default")
+        @DisplayName("NyxExtension.getReleaseLenient() default value")
         void getReleaseLenientDefaultTest()
             throws Exception {
             // apply the plugin to a new project and retrieve the extension
@@ -105,7 +94,18 @@ public class NyxExtensionTests extends AbstractTests  {
         }
 
         @Test
-        @DisplayName("NyxExtension.getScheme() default")
+        @DisplayName("NyxExtension.getReleasePrefix() default value")
+        void getReleasePrefixDefaultTest()
+            throws Exception {
+            // apply the plugin to a new project and retrieve the extension
+            NyxExtension extension = newTestProject(null, true).getExtensions().getByType(NyxExtension.class);
+
+            assertFalse(extension.getReleasePrefix().isPresent());
+            assertNull(extension.getReleasePrefix().getOrNull());
+        }
+
+        @Test
+        @DisplayName("NyxExtension.getScheme() default value")
         void getSchemeDefaultTest()
             throws Exception {
             // apply the plugin to a new project and retrieve the extension
@@ -116,7 +116,7 @@ public class NyxExtensionTests extends AbstractTests  {
         }
 
         @Test
-        @DisplayName("NyxExtension.getVerbosity() default")
+        @DisplayName("NyxExtension.getVerbosity() default value")
         void getVerbosityDefaultTest()
             throws Exception {
             // apply the plugin to a new project and retrieve the extension

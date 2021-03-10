@@ -40,8 +40,8 @@ public class CleanTaskTests extends CoreTaskTests {
     @DisplayName("CleanTask.Actions")
     static class ActionTests {
         @Test
-        @DisplayName("CleanTask run without exceptions when running in a directory with no Git repository but with a 'directory' configuration option")
-        void testActionsExecuteWithoutExceptionsInEmptyGitProjectDirectoryAndValidDirectoryConfigurationOption()
+        @DisplayName("CleanTask.getActions().execute() doesn't throw exceptions without a valid Git repository in custom directory")
+        void noExceptionOnExecuteWithValidGitRepositoryInCustomDirectoryTest()
         throws Exception {
             // the test project is created in a new empty directory
             Project project = newTestProject(null, false);
@@ -68,8 +68,8 @@ public class CleanTaskTests extends CoreTaskTests {
         }
 
         @Test
-        @DisplayName("CleanTask run without exceptions when running in a directory with a valid Git repository")
-        void testActionsExecuteWithoutExceptionsInValidGitProjectDirectoryAndNoDirectoryConfigurationOption()
+        @DisplayName("CleanTask.getActions().execute() doesn't throw exceptions without a valid Git repository in working directory")
+        void noExceptionOnExecuteWithValidGitRepositoryInWorkingDirectoryTest()
             throws Exception {
             Project project = newTestProject(GitScenario.InitialCommit.realize().getWorkingDirectory(), false);
     

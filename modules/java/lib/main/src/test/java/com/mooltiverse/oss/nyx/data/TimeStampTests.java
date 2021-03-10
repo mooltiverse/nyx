@@ -18,26 +18,28 @@ package com.mooltiverse.oss.nyx.data;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Date;
+import java.util.SimpleTimeZone;
+import java.util.TimeZone;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-@DisplayName("Action")
-public class ActionTest {
+@DisplayName("TimeStamp")
+public class TimeStampTests {
     @Test
-    @DisplayName("Action()")
+    @DisplayName("TimeStamp()")
     void constructorTest()
         throws Exception {
-        Identity identity = new Identity("commit", null);
-        TimeStamp timeStamp = new TimeStamp(new Date(), null);
-
-        Action action = new Action(identity, timeStamp);
-        assertEquals(identity.getName(), action.getIdentity().getName());
-        assertEquals(timeStamp.getTimeStamp(), action.getTimeStamp().getTimeStamp());
+        Date date = new Date();
+        TimeZone zone = new SimpleTimeZone(SimpleTimeZone.UTC_TIME, "UTC");
+        
+        TimeStamp timeStamp = new TimeStamp(date, zone);
+        assertEquals(date, timeStamp.getTimeStamp());
+        assertEquals(zone, timeStamp.getTimeZone());
 
         // test with null values
-        assertThrows(NullPointerException.class, () -> new Action(null, null));
-        assertThrows(NullPointerException.class, () -> new Action(null, timeStamp));
-        assertDoesNotThrow(() -> new Action(identity, null));
+        assertThrows(NullPointerException.class, () -> new TimeStamp(null, null));
+        assertThrows(NullPointerException.class, () -> new TimeStamp(null, zone));
+        assertDoesNotThrow(() -> new TimeStamp(date, null));
     }
 }

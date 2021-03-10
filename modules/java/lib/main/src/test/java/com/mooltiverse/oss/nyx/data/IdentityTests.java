@@ -17,29 +17,22 @@ package com.mooltiverse.oss.nyx.data;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.Date;
-import java.util.SimpleTimeZone;
-import java.util.TimeZone;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-@DisplayName("TimeStamp")
-public class TimeStampTest {
+@DisplayName("Identity")
+public class IdentityTests {
     @Test
-    @DisplayName("TimeStamp()")
+    @DisplayName("Identity()")
     void constructorTest()
         throws Exception {
-        Date date = new Date();
-        TimeZone zone = new SimpleTimeZone(SimpleTimeZone.UTC_TIME, "UTC");
-        
-        TimeStamp timeStamp = new TimeStamp(date, zone);
-        assertEquals(date, timeStamp.getTimeStamp());
-        assertEquals(zone, timeStamp.getTimeZone());
+        Identity identity = new Identity("John", "jdoe@example.com");
+        assertEquals("John", identity.getName());
+        assertEquals("jdoe@example.com", identity.getEmail());
 
         // test with null values
-        assertThrows(NullPointerException.class, () -> new TimeStamp(null, null));
-        assertThrows(NullPointerException.class, () -> new TimeStamp(null, zone));
-        assertDoesNotThrow(() -> new TimeStamp(date, null));
+        assertThrows(NullPointerException.class, () -> new Identity(null, null));
+        assertThrows(NullPointerException.class, () -> new Identity(null, "jdoe@example.com"));
+        assertDoesNotThrow(() -> new Identity("John", null));
     }
 }

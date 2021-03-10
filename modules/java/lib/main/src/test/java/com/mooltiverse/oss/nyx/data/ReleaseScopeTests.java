@@ -25,7 +25,7 @@ import com.mooltiverse.oss.nyx.version.SemanticVersion;
 @DisplayName("ReleaseScope")
 public class ReleaseScopeTests {
     @Test
-    @DisplayName("ReleaseScope constructor")
+    @DisplayName("ReleaseScope()")
     void constructorTest()
         throws Exception {
 
@@ -43,7 +43,7 @@ public class ReleaseScopeTests {
     }
 
     @Test
-    @DisplayName("ReleaseScope previous version")
+    @DisplayName("ReleaseScope.getPreviousVersion()")
     void previousVersionTest()
         throws Exception {
 
@@ -54,7 +54,7 @@ public class ReleaseScopeTests {
     }
 
     @Test
-    @DisplayName("ReleaseScope previous version commit")
+    @DisplayName("ReleaseScope.getPreviousVersionCommit()")
     void previousVersionCommitTest()
         throws Exception {
 
@@ -65,7 +65,7 @@ public class ReleaseScopeTests {
     }
 
     @Test
-    @DisplayName("ReleaseScope initial commit")
+    @DisplayName("ReleaseScope.getInitialCommit()")
     void initialCommitTest()
         throws Exception {
 
@@ -76,7 +76,7 @@ public class ReleaseScopeTests {
     }
 
     @Test
-    @DisplayName("ReleaseScope final commit")
+    @DisplayName("ReleaseScope.getFinalCommit()")
     void finalCommitTest()
         throws Exception {
 

@@ -152,13 +152,13 @@ class JGitRepository implements Repository {
             else return res;
         }
         catch (AmbiguousObjectException aoe) {
-            throw new GitException(String.format("The {} identifier cannot be resolved uniquely as it resolves to multiple objects in the repository. If this is a shortened SHA identifier try using more charachers to disambiguate.", id), aoe);
+            throw new GitException(String.format("The %s identifier cannot be resolved uniquely as it resolves to multiple objects in the repository. If this is a shortened SHA identifier try using more charachers to disambiguate.", id), aoe);
         }
         catch (RevisionSyntaxException rse) {
-            throw new GitException(String.format("The {} identifier cannot be resolved as the expression is not supported by this implementation.", id), rse);
+            throw new GitException(String.format("The %s identifier cannot be resolved as the expression is not supported by this implementation.", id), rse);
         }
         catch (IOException ioe) {
-            throw new GitException(String.format("The {} identifier cannot be resolved", id), ioe);
+            throw new GitException(String.format("The %s identifier cannot be resolved", id), ioe);
         }
     }
 
@@ -188,10 +188,10 @@ class JGitRepository implements Repository {
             return jGit.getRepository().parseCommit(resolve(id));
         }
         catch (MissingObjectException moe) {
-            throw new GitException(String.format("The {} commit identifier cannot be resolved as there is no such commit.", id), moe);
+            throw new GitException(String.format("The %s commit identifier cannot be resolved as there is no such commit.", id), moe);
         }
         catch (IOException ioe) {
-            throw new GitException(String.format("The {} commit identifier cannot be resolved to a valid commit", id), ioe);
+            throw new GitException(String.format("The %s commit identifier cannot be resolved to a valid commit", id), ioe);
         }
     }*/
 
@@ -222,10 +222,10 @@ class JGitRepository implements Repository {
             return rw.parseCommit(resolve(id));
         }
         catch (MissingObjectException moe) {
-            throw new GitException(String.format("The {} commit identifier cannot be resolved as there is no such commit.", id), moe);
+            throw new GitException(String.format("The %s commit identifier cannot be resolved as there is no such commit.", id), moe);
         }
         catch (IOException ioe) {
-            throw new GitException(String.format("The {} commit identifier cannot be resolved to a valid commit", id), ioe);
+            throw new GitException(String.format("The %s commit identifier cannot be resolved to a valid commit", id), ioe);
         }
     }
 
@@ -254,10 +254,10 @@ class JGitRepository implements Repository {
             return rw.next();
         }
         catch (MissingObjectException moe) {
-            throw new GitException(String.format("Cannot peek the {} commit likely because of a broken link in the object database.", startFrom), moe);
+            throw new GitException(String.format("Cannot peek the %s commit likely because of a broken link in the object database.", startFrom), moe);
         }
         catch (RevisionSyntaxException | JGitInternalException | IOException e) {
-            throw new GitException(String.format("Cannot peek the {} commit.", startFrom), e);
+            throw new GitException(String.format("Cannot peek the %s commit.", startFrom), e);
         }
         finally {
             rw.close();
@@ -349,7 +349,14 @@ class JGitRepository implements Repository {
             rw.setFirstParent(true); // this must always be called before markStart
             logger.debug(GIT, "Upon merge commits only the first parent is considered.");
 
-            rw.markStart(parseCommit(rw, Objects.isNull(start) ? Constants.HEAD : start));
+            RevCommit startCommit = parseCommit(rw, Objects.isNull(start) ? Constants.HEAD : start);
+            logger.trace(GIT, "Start boundary resolved to commit {}", startCommit.getId().getName());
+            rw.markStart(startCommit);
+
+            // make sure the end commit can be resolved, if not null, or throw an exception
+            RevCommit endCommit = Objects.isNull(end) ? null : parseCommit(rw, end);
+            logger.trace(GIT, "End boundary resolved to commit {}", Objects.isNull(endCommit) ? "not defined" : endCommit.getId().getName());
+
             Iterator<RevCommit> commitIterator = rw.iterator();
             while (commitIterator.hasNext()) {
                 RevCommit commit = commitIterator.next();

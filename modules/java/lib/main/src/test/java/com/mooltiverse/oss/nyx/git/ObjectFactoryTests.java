@@ -37,7 +37,7 @@ import com.mooltiverse.oss.nyx.data.TimeStamp;
 import com.mooltiverse.oss.nyx.git.script.GitScript;
 
 @DisplayName("ObjectFactory")
-public class ObjectFactoryTest {
+public class ObjectFactoryTests {
     @Nested
     @DisplayName("ObjectFactory")
     class OpenTest {

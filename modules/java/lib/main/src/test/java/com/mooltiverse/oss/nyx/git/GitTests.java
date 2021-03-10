@@ -29,10 +29,10 @@ import org.junit.jupiter.api.Test;
 import com.mooltiverse.oss.nyx.git.script.GitScript;
 
 @DisplayName("Git")
-public class GitTest {
+public class GitTests {
     @Nested
     @DisplayName("Git.open")
-    class OpenTest {
+    class OpenTests {
         @DisplayName("Git.open(null) throws NullPointerException")
         @Test
         public void exceptionWithNullDirectoryAsFile()
@@ -55,28 +55,28 @@ public class GitTest {
             assertThrows(IllegalArgumentException.class, () -> Git.open("  "));
         }
 
-        @DisplayName("Git.open(<RUBBISHDIRECTORYNAME>) throws IOException")
+        @DisplayName("Git.open(String) throws IOException with non existent directory")
         @Test
         public void exceptionWithNonExistingDirectoryAsString()
             throws Exception {
             assertThrows(IOException.class, () -> Git.open("adirectorywiththisnamesuredoesnotexists"));
         }
 
-        @DisplayName("Git.open(<RUBBISHDIRECTORYNAME>) throws IOException")
+        @DisplayName("Git.open(File) throws IOException with non existent directory")
         @Test
         public void exceptionWithNonExistingDirectoryAsFile()
             throws Exception {
             assertThrows(IOException.class, () -> Git.open(new File("adirectorywiththisnamesuredoesnotexists")));
         }
 
-        @DisplayName("Git.open(<EMPTYDIRECTORY>) throws IOException")
+        @DisplayName("Git.open(String) throws IOException with empty directory")
         @Test
         public void exceptionWithNewEmptyDirectoryAsString()
             throws Exception {
             assertThrows(IOException.class, () -> Git.open(Files.createTempDirectory(null).toAbsolutePath().toString()));
         }
 
-        @DisplayName("Git.open(<EMPTYDIRECTORY>) throws IOException")
+        @DisplayName("Git.open(File) throws IOException with empty directory")
         @Test
         public void exceptionWithNewEmptyDirectoryAsFile()
             throws Exception {

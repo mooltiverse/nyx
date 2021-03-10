@@ -31,7 +31,7 @@ import com.mooltiverse.oss.nyx.version.Version;
  * Values can also be set for more complex tests. Please note that Nyx doesn't resolve values twice
  * so you should set values only before you pass this object to Nyx.
  */
-public class ConfigurationLayerMock implements ConfigurationLayer {
+public class CustomConfigurationLayerMock implements ConfigurationLayer {
     /**
      * The value returned by this mock object.
      */
@@ -125,7 +125,7 @@ public class ConfigurationLayerMock implements ConfigurationLayer {
     /**
      * Default constructor
      */
-    public ConfigurationLayerMock() {
+    public CustomConfigurationLayerMock() {
         super();
     }
 

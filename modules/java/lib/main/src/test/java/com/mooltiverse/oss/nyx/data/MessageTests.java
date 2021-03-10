@@ -23,7 +23,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 @DisplayName("Message")
-public class MessageTest {
+public class MessageTests {
     @Test
     @DisplayName("Message()")
     void constructorTest()

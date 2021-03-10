@@ -46,9 +46,9 @@ public class LifecycleTaskTests extends AbstractTaskTests {
          * 
          * Eager methods create an instance of the Task even if it hasn't been used yet.
          */
-        @ParameterizedTest(name = "NyxPlugin.apply() to call {2}.conditionallyDefine() -> test eager task creation")
+        @ParameterizedTest(name = "NyxPlugin.apply() ==> {2}.conditionallyDefine() ==> {2} is eagerly available")
         @MethodSource("com.mooltiverse.oss.nyx.gradle.TestData#lifecycleTasksArguments")
-        void conditionallyDefineViaNyxPluginApplyEagerTest(String taskName, Class<? extends CoreTask> taskClass, String taskClassSimpleName) 
+        void taskEagerlyAvailableAfterNyxPluginApplyTest(String taskName, Class<? extends CoreTask> taskClass, String taskClassSimpleName) 
             throws Exception {
             Project project = newTestProject(null, false);
 
@@ -70,9 +70,9 @@ public class LifecycleTaskTests extends AbstractTaskTests {
          * and only return the task when actually needed or, instead of the actual task, return a Provider
          * object, which is in charge of managing its deferred creation.
          */
-        @ParameterizedTest(name = "NyxPlugin.apply() to call {2}.conditionallyDefine() -> test deferred task creation")
+        @ParameterizedTest(name = "NyxPlugin.apply() ==> {2}.conditionallyDefine() ==> {2} is lazily available")
         @MethodSource("com.mooltiverse.oss.nyx.gradle.TestData#lifecycleTasksArguments")
-        void defineViaNyxPluginApplyLazyTest(String taskName, Class<? extends CoreTask> taskClass, String taskClassSimpleName)
+        void taskLazilyAvailableAfterNyxPluginApplyTest(String taskName, Class<? extends CoreTask> taskClass, String taskClassSimpleName)
             throws Exception {
             Project project = newTestProject(null, false);
 
@@ -84,67 +84,12 @@ public class LifecycleTaskTests extends AbstractTaskTests {
 
             // run the lazy tests using the superclass method
             testForTaskAvailabilityLazily(project, taskName, taskClass);
-
-            // now also run eager tests, which would invalidate the lazy tests if executed after this
-            testForTaskAvailabilityEagerly(project, taskName, taskClass);
-        }
-
-        /**
-         * Tests the task using eager methods.
-         * 
-         * Eager methods are those that return the Task and its related values regardless
-         * of whether the Task is using Configuration Avoidance (https://docs.gradle.org/current/userguide/task_configuration_avoidance.html)
-         * or not.
-         * 
-         * Eager methods create an instance of the Task even if it hasn't been used yet.
-         */
-        @ParameterizedTest(name = "{2}.conditionallyDefine() -> test eager task creation")
-        @MethodSource("com.mooltiverse.oss.nyx.gradle.TestData#lifecycleTasksArguments")
-        void conditionallyDefineEagerTest(String taskName, Class<? extends CoreTask> taskClass, String taskClassSimpleName)
-            throws Exception {
-            Project project = newTestProject(null, false);
-
-            // pre-flight sanity checks
-            testForTaskUnavailability(project, taskName, taskClass);
-
-            // create the task for the new project
-            assertNotNull(ReleaseTask.conditionallyDefine(project));
-
-            // run the eager tests using the superclass method
-            testForTaskAvailabilityEagerly(project, taskName, taskClass);
-        }
-
-        /**
-         * Tests the task using lazy methods.
-         * 
-         * Lazy methods are those that comply with
-         * Configuration Avoidance (https://docs.gradle.org/current/userguide/task_configuration_avoidance.html)
-         * and only return the task when actually needed or, instead of the actual task, return a Provider
-         * object, which is in charge of managing its deferred creation.
-         */
-        @ParameterizedTest(name = "{2}.conditionallyDefine() -> test deferred task creation")
-        @MethodSource("com.mooltiverse.oss.nyx.gradle.TestData#lifecycleTasksArguments")
-        void conditionallyDefineLazyTest(String taskName, Class<? extends CoreTask> taskClass, String taskClassSimpleName)
-            throws Exception {
-            Project project = newTestProject(null, false);
-
-            // pre-flight sanity checks
-            testForTaskUnavailability(project, taskName, taskClass);
-
-            // create the task for the new project
-            assertNotNull(ReleaseTask.conditionallyDefine(project));
-
-            // run the lazy tests using the superclass method
-            testForTaskAvailabilityLazily(project, taskName, taskClass);
-
-            // now also run eager tests, which would invalidate the lazy tests if executed after this
-            testForTaskAvailabilityEagerly(project, taskName, taskClass);
         }
 
         /**
          * Tests the task is not created when another task with the same name already exists
          */
-        @ParameterizedTest(name = "NyxPlugin.apply() to call {2}.conditionallyDefine() does not define task when another already exists")
+        @ParameterizedTest(name = "NyxPlugin.apply() ==> {2}.conditionallyDefine() does not override task with the same name")
         @MethodSource("com.mooltiverse.oss.nyx.gradle.TestData#lifecycleTasksArguments")
         void conditionallyDefineViaNyxPluginApplyWhenTaskAlreadyExistsTest(String taskName, Class<? extends CoreTask> taskClass, String taskClassSimpleName)
             throws Exception {
@@ -168,7 +113,7 @@ public class LifecycleTaskTests extends AbstractTaskTests {
         /**
          * Tests the task is not created when another task with the same name already exists
          */
-        @ParameterizedTest(name = "{2}.conditionallyDefine() does not define task when another already exists")
+        @ParameterizedTest(name = "{2}.conditionallyDefine() does not override task with the same name")
         @MethodSource("com.mooltiverse.oss.nyx.gradle.TestData#lifecycleTasksArguments")
         void conditionallyDefineWhenTaskAlreadyExistsTest(String taskName, Class<? extends CoreTask> taskClass, String taskClassSimpleName)
             throws Exception {

@@ -110,7 +110,6 @@ allprojects {
         // control how the .classpath files are generated
         classpath {
             defaultOutputDir = file('build/classes')    // the default output directory for java .class files
-            containsTestFixtures = true                 // expose test classes to dependent projects
         }
     }
 

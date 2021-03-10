@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
 @DisplayName("Verbosity")
 public class VerbosityTests {
     @Test
-    @DisplayName("Verbosity.getLevel")
+    @DisplayName("Verbosity.VALUE.getLevel()")
     void getLevelTest()
         throws Exception {
 
@@ -38,7 +38,7 @@ public class VerbosityTests {
     }
 
     @Test
-    @DisplayName("Verbosity.getValue")
+    @DisplayName("Verbosity.VALUE.getValue()")
     void getValueTest()
         throws Exception {
 

@@ -40,8 +40,8 @@ public class ArrangeTaskTests extends CoreTaskTests {
     @DisplayName("ArrangeTask.Actions")
     static class ActionTests {
         @Test
-        @DisplayName("ArrangeTask run without exceptions when running in a directory with no Git repository but with a 'directory' configuration option")
-        void testActionsExecuteWithoutExceptionsInEmptyGitProjectDirectoryAndValidDirectoryConfigurationOption()
+        @DisplayName("ArrangeTask.getActions().execute() doesn't throw exceptions without a valid Git repository in custom directory")
+        void noExceptionOnExecuteWithValidGitRepositoryInCustomDirectoryTest()
         throws Exception {
             // the test project is created in a new empty directory
             Project project = newTestProject(null, false);
@@ -68,8 +68,8 @@ public class ArrangeTaskTests extends CoreTaskTests {
         }
 
         @Test
-        @DisplayName("ArrangeTask run without exceptions when running in a directory with a valid Git repository")
-        void testActionsExecuteWithoutExceptionsInValidGitProjectDirectoryAndNoDirectoryConfigurationOption()
+        @DisplayName("ArrangeTask.getActions().execute() doesn't throw exceptions without a valid Git repository in working directory")
+        void noExceptionOnExecuteWithValidGitRepositoryInWorkingDirectoryTest()
             throws Exception {
             Project project = newTestProject(GitScenario.InitialCommit.realize().getWorkingDirectory(), false);
     

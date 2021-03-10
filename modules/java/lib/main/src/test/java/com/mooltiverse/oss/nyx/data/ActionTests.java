@@ -17,22 +17,27 @@ package com.mooltiverse.oss.nyx.data;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.Date;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-@DisplayName("Identity")
-public class IdentityTest {
+@DisplayName("Action")
+public class ActionTests {
     @Test
-    @DisplayName("Identity()")
+    @DisplayName("Action()")
     void constructorTest()
         throws Exception {
-        Identity identity = new Identity("John", "jdoe@example.com");
-        assertEquals("John", identity.getName());
-        assertEquals("jdoe@example.com", identity.getEmail());
+        Identity identity = new Identity("commit", null);
+        TimeStamp timeStamp = new TimeStamp(new Date(), null);
+
+        Action action = new Action(identity, timeStamp);
+        assertEquals(identity.getName(), action.getIdentity().getName());
+        assertEquals(timeStamp.getTimeStamp(), action.getTimeStamp().getTimeStamp());
 
         // test with null values
-        assertThrows(NullPointerException.class, () -> new Identity(null, null));
-        assertThrows(NullPointerException.class, () -> new Identity(null, "jdoe@example.com"));
-        assertDoesNotThrow(() -> new Identity("John", null));
+        assertThrows(NullPointerException.class, () -> new Action(null, null));
+        assertThrows(NullPointerException.class, () -> new Action(null, timeStamp));
+        assertDoesNotThrow(() -> new Action(identity, null));
     }
 }

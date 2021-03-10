@@ -29,7 +29,7 @@ import com.mooltiverse.oss.nyx.state.State;
 @DisplayName("Arrange")
 public class ArrangeTests extends AbstractCommandTests {
     @Nested
-    @DisplayName("Arrange.isUpToDate")
+    @DisplayName("Arrange isUpToDate")
     static class UpToDateTests {
         /**
          * Check that the isUpToDate() returns {@code false} when the command instance is just created and {@code true} after one execution in a repository
@@ -40,6 +40,8 @@ public class ArrangeTests extends AbstractCommandTests {
         void isUpToDateTest()
             throws Exception {
             AbstractCommand command = getCommandInstance(Arrange.class, new State(new Configuration()), Git.open(GitScript.fromScratch().getWorkingDirectory()));
+
+            // simply test that running it twice returns false at the first run and true the second
             assertFalse(command.isUpToDate());
             command.run();
             assertTrue(command.isUpToDate());
@@ -47,7 +49,13 @@ public class ArrangeTests extends AbstractCommandTests {
     }
 
     @Nested
-    @DisplayName("Arrange.run")
+    @DisplayName("Arrange run")
     static class RunTests {
+        /*@Test
+        @DisplayName("Arrange.run() throws exception with a valid but empty Git repository in working directory")
+        void stateTest()
+            throws Exception {
+            assertThrows(GitException.class, () -> getCommandInstance(Arrange.class, new State(new Configuration()), Git.open(GitScript.fromScratch().getWorkingDirectory())).run());
+        }*/
     }
 }

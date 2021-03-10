@@ -38,10 +38,10 @@ public class ConfigurationLayerTests extends AbstractTests  {
      * Performs checks on the extension default values at the time it is created.
      */
     @Nested
-    @DisplayName("ConfigurationLayer defaults")
+    @DisplayName("ConfigurationLayer default values")
     class DefaultsTests {
         @Test
-        @DisplayName("ConfigurationLayer.getBump() default")
+        @DisplayName("ConfigurationLayer.getBump() default value")
         void getBumpDefaultTest()
             throws Exception {
             // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
@@ -53,7 +53,7 @@ public class ConfigurationLayerTests extends AbstractTests  {
         }
 
         @Test
-        @DisplayName("ConfigurationLayer.getDirectory() default")
+        @DisplayName("ConfigurationLayer.getDirectory() default value")
         void getDirectoryDefaultTest()
             throws Exception {
             // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
@@ -67,7 +67,7 @@ public class ConfigurationLayerTests extends AbstractTests  {
         }
 
         @Test
-        @DisplayName("ConfigurationLayer.getDryRun() default")
+        @DisplayName("ConfigurationLayer.getDryRun() default value")
         void getDryRunDefaultTest()
             throws Exception {
             // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
@@ -79,7 +79,7 @@ public class ConfigurationLayerTests extends AbstractTests  {
         }
 
         @Test
-        @DisplayName("ConfigurationLayer.getInitialVersion() default")
+        @DisplayName("ConfigurationLayer.getInitialVersion() default value")
         void getInitialVersionTest()
             throws Exception {
             // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
@@ -91,19 +91,7 @@ public class ConfigurationLayerTests extends AbstractTests  {
         }
 
         @Test
-        @DisplayName("ConfigurationLayer.getReleasePrefix() default")
-        void getReleasePrefixDefaultTest()
-            throws Exception {
-            // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
-            NyxExtension extension = newTestProject(null, true).getExtensions().getByType(NyxExtension.class);
-            ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
-
-            assertFalse(extension.getReleasePrefix().isPresent());
-            assertNull(configurationLayer.getReleasePrefix());
-        }
-
-        @Test
-        @DisplayName("ConfigurationLayer.getReleaseLenient() default")
+        @DisplayName("ConfigurationLayer.getReleaseLenient() default value")
         void getReleaseLenientDefaultTest()
             throws Exception {
             // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
@@ -115,7 +103,19 @@ public class ConfigurationLayerTests extends AbstractTests  {
         }
 
         @Test
-        @DisplayName("ConfigurationLayer.getScheme() default")
+        @DisplayName("ConfigurationLayer.getReleasePrefix() default value")
+        void getReleasePrefixDefaultTest()
+            throws Exception {
+            // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
+            NyxExtension extension = newTestProject(null, true).getExtensions().getByType(NyxExtension.class);
+            ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
+
+            assertFalse(extension.getReleasePrefix().isPresent());
+            assertNull(configurationLayer.getReleasePrefix());
+        }
+
+        @Test
+        @DisplayName("ConfigurationLayer.getScheme() default value")
         void getSchemeDefaultTest()
             throws Exception {
             // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
@@ -127,7 +127,7 @@ public class ConfigurationLayerTests extends AbstractTests  {
         }
 
         @Test
-        @DisplayName("ConfigurationLayer.getVerbosity() default")
+        @DisplayName("ConfigurationLayer.getVerbosity() default value")
         void getVerbosityDefaultTest()
             throws Exception {
             // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
@@ -142,7 +142,7 @@ public class ConfigurationLayerTests extends AbstractTests  {
         }
 
         @Test
-        @DisplayName("ConfigurationLayer.getVersion() default")
+        @DisplayName("ConfigurationLayer.getVersion() default value")
         void getVersionDefaultTest()
             throws Exception {
             // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
@@ -172,8 +172,8 @@ public class ConfigurationLayerTests extends AbstractTests  {
     class WrongValueTests {
         /* This test is commented because it has nothing to test
         @Test
-        @DisplayName("ConfigurationLayer.getBump() with wrong values throws ConfigurationException")
-        void getBumpWrongValueTest()
+        @DisplayName("ConfigurationLayer.getBump().set() throws IllegalPropertyException with illegal value")
+        void exceptionUsingGetBumpWithWrongValueTest()
             throws Exception {
             // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
             Project project = newTestProject(null, true);
@@ -185,8 +185,8 @@ public class ConfigurationLayerTests extends AbstractTests  {
 
         /* This test is commented because it has nothing to test
         @Test
-        @DisplayName("ConfigurationLayer.getDirectory() with wrong values throws ConfigurationException")
-        void getDirectoryWrongValueTest()
+        @DisplayName("ConfigurationLayer.getDirectory().set() throws IllegalPropertyException with illegal value")
+        void exceptionUsingGetDirectoryWithWrongValueTest()
             throws Exception {
             // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
             Project project = newTestProject(null, true);
@@ -199,8 +199,8 @@ public class ConfigurationLayerTests extends AbstractTests  {
 
         /* This test is commented because it has nothing to test
         @Test
-        @DisplayName("ConfigurationLayer.getDryRun() with wrong values throws ConfigurationException")
-        void getDryRunWrongValueTest()
+        @DisplayName("ConfigurationLayer.getDryRun().set() throws IllegalPropertyException with illegal value")
+        void exceptionUsingGetDryRunWithWrongValueTest()
             throws Exception {
             // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
             Project project = newTestProject(null, true);
@@ -212,8 +212,8 @@ public class ConfigurationLayerTests extends AbstractTests  {
         }*/
 
         /*@Test
-        @DisplayName("ConfigurationLayer.getInitialVersion() with wrong values throws ConfigurationException")
-        void getInitialVersionWrongValueTest()
+        @DisplayName("ConfigurationLayer.getInitialVersion().set() throws IllegalPropertyException with illegal value")
+        void exceptionUsingGetInitialVersionWithWrongValueTest()
             throws Exception {
             // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
             Project project = newTestProject(null, true);
@@ -226,8 +226,8 @@ public class ConfigurationLayerTests extends AbstractTests  {
 
         /* This test is commented because it has nothing to test
         @Test
-        @DisplayName("ConfigurationLayer.getReleasePrefix() with wrong values throws ConfigurationException")
-        void getReleasePrefixWrongValueTest()
+        @DisplayName("ConfigurationLayer.getReleasePrefix().set() throws IllegalPropertyException with illegal value")
+        void exceptionUsingGetReleasePrefixWithWrongValueTest()
             throws Exception {
             // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
             Project project = newTestProject(null, true);
@@ -239,8 +239,8 @@ public class ConfigurationLayerTests extends AbstractTests  {
 
         /* This test is commented because it has nothing to test
         @Test
-        @DisplayName("ConfigurationLayer.getReleaseLenient() with wrong values throws ConfigurationException")
-        void getReleaseLenientWrongValueTest()
+        @DisplayName("ConfigurationLayer.getReleaseLenient().set() throws IllegalPropertyException with illegal value")
+        void exceptionUsingGetReleaseLenientWithWrongValueTest()
             throws Exception {
             // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
             Project project = newTestProject(null, true);
@@ -252,8 +252,8 @@ public class ConfigurationLayerTests extends AbstractTests  {
         }*/
 
         @Test
-        @DisplayName("ConfigurationLayer.getScheme() with wrong values throws IllegalPropertyException")
-        void getSchemeWrongValueTest()
+        @DisplayName("ConfigurationLayer.getScheme().set() throws IllegalPropertyException with illegal value")
+        void exceptionUsingGetSchemeWithWrongValueTest()
             throws Exception {
             // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
             Project project = newTestProject(null, true);
@@ -266,8 +266,8 @@ public class ConfigurationLayerTests extends AbstractTests  {
         }
 
         @Test
-        @DisplayName("ConfigurationLayer.getVerbosity() with wrong values throws IllegalPropertyException")
-        void getVerbosityWrongValueTest()
+        @DisplayName("ConfigurationLayer.getVerbosity().set() throws IllegalPropertyException with illegal value")
+        void exceptionUsingGetVerbosityWithWrongValueTest()
             throws Exception {
             // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
             Project project = newTestProject(null, true);
@@ -280,8 +280,8 @@ public class ConfigurationLayerTests extends AbstractTests  {
         }
 
         @Test
-        @DisplayName("ConfigurationLayer.getVersion() with wrong values throws IllegalPropertyException")
-        void getVersionWrongValueTest()
+        @DisplayName("ConfigurationLayer.getVersion() throws IllegalPropertyException with illegal value")
+        void exceptionUsingGetVersionWithWrongValueTest()
             throws Exception {
             // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
             Project project = newTestProject(null, true);

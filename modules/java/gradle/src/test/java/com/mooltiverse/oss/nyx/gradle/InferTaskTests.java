@@ -44,8 +44,8 @@ public class InferTaskTests extends CoreTaskTests {
     @DisplayName("InferTask.Actions")
     static class ActionTests {
         @Test
-        @DisplayName("InferTask throws Exception when running in a directory with valid but empty Git repository")
-        void testActionsExecuteWithoutExceptionsInValidGitProjectDirectoryAndNoDirectoryConfigurationOption()
+        @DisplayName("InferTask.getActions().execute() throws exception with a valid but empty Git repository in working directory")
+        void exceptionOnExecuteWithValidButEmptyGitRepositoryInWorkingDirectoryTest()
             throws Exception {
             Project project = newTestProject(GitScript.fromScratch().getWorkingDirectory(), false);
     
@@ -62,8 +62,8 @@ public class InferTaskTests extends CoreTaskTests {
         }
 
         @Test
-        @DisplayName("InferTask throws Exception when running in a directory with valid but empty Git repository passed as the 'directory' configuration option")
-        void testActionsExecuteWithoutExceptionsInEmptyGitProjectDirectoryAndValidDirectoryConfigurationOption()
+        @DisplayName("InferTask.getActions().execute() with a valid but empty Git repository in custom directory ==> default initial version")
+        void runWithEmptyRepositoryTest()
         throws Exception {
             // the test project is created in a new empty directory
             Project project = newTestProject(null, false);
@@ -85,16 +85,13 @@ public class InferTaskTests extends CoreTaskTests {
             Task task = project.getTasks().getByName(InferTask.NAME);
     
             for (Action<? super Task> action: task.getActions()) {
-                // the task throws an exception as it has no way to infer the version
-                //assertThrows(Exception.class, () -> action.execute(task));
-
-                //TODO: fix this test: no exception is thrown but no release must be issued
+                //TODO: check outputs from the State
                 action.execute(task);
             }
         }
 
         @Test
-        @DisplayName("InferTask run with version overridden by user")
+        @DisplayName("InferTask.getActions().execute() with version override ==> custom version")
         void runWithVersionOverriddenByUserTest()
             throws Exception {
             Project project = newTestProject(GitScenario.InitialCommit.realize().getWorkingDirectory(), false);

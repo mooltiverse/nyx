@@ -37,10 +37,10 @@ import com.mooltiverse.oss.nyx.git.script.GitScript;
 import com.mooltiverse.oss.nyx.git.script.GitScenario;
 
 @DisplayName("JGitRepository")
-public class JGitRepositoryTest {
+public class JGitRepositoryTests {
     @Nested
     @DisplayName("JGitRepository.open")
-    class OpenTest {
+    class OpenTests {
         @DisplayName("JGitRepository.open(null) throws NullPointerException")
         @Test
         public void exceptionWithNullDirectoryAsFile()
@@ -63,28 +63,28 @@ public class JGitRepositoryTest {
             assertThrows(IllegalArgumentException.class, () -> JGitRepository.open("  "));
         }
 
-        @DisplayName("JGitRepository.open(<RUBBISHDIRECTORYNAME>) throws IOException")
+        @DisplayName("JGitRepository.open(String) throws IOException with non existent directory")
         @Test
         public void exceptionWithNonExistingDirectoryAsString()
             throws Exception {
             assertThrows(IOException.class, () -> JGitRepository.open("adirectorywiththisnamesuredoesnotexists"));
         }
 
-        @DisplayName("JGitRepository.open(<RUBBISHDIRECTORYNAME>) throws IOException")
+        @DisplayName("JGitRepository.open(File) throws IOException with non existent directory")
         @Test
         public void exceptionWithNonExistingDirectoryAsFile()
             throws Exception {
             assertThrows(IOException.class, () -> JGitRepository.open(new File("adirectorywiththisnamesuredoesnotexists")));
         }
 
-        @DisplayName("JGitRepository.open(<EMPTYDIRECTORY>) throws IOException")
+        @DisplayName("JGitRepository.open(String) throws IOException with empty directory")
         @Test
         public void exceptionWithNewEmptyDirectoryAsString()
             throws Exception {
             assertThrows(IOException.class, () -> JGitRepository.open(Files.createTempDirectory(null).toAbsolutePath().toString()));
         }
 
-        @DisplayName("JGitRepository.open(<EMPTYDIRECTORY>) throws IOException")
+        @DisplayName("JGitRepository.open(File) throws IOException with empty directory")
         @Test
         public void exceptionWithNewEmptyDirectoryAsFile()
             throws Exception {
@@ -108,8 +108,8 @@ public class JGitRepositoryTest {
 
     @Nested
     @DisplayName("JGitRepository.getLatestCommit")
-    class GetLatestCommitTest {
-        @DisplayName("JGitRepository.getLatestCommit() throws GitException")
+    class GetLatestCommitTests {
+        @DisplayName("JGitRepository.getLatestCommit() throws GitException without commits")
         @Test
         public void exceptionWithRepositoryWithNoCommits()
             throws Exception {
@@ -135,7 +135,6 @@ public class JGitRepositoryTest {
             // start with a new repository, just initialized
             GitScript script = GitScript.fromScratch();
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
-            assertThrows(GitException.class, () -> repository.getLatestCommit());
             
             // add and stage some files
             script.withFiles().andStage();
@@ -164,8 +163,8 @@ public class JGitRepositoryTest {
 
     @Nested
     @DisplayName("JGitRepository.getRootCommit")
-    class GetRootCommitTest {
-        @DisplayName("JGitRepository.getRootCommit() throws GitException")
+    class GetRootCommitTests {
+        @DisplayName("JGitRepository.getRootCommit() throws GitException without commits")
         @Test
         public void exceptionWithRepositoryWithNoCommits()
             throws Exception {
@@ -191,7 +190,6 @@ public class JGitRepositoryTest {
             // start with a new repository, just initialized
             GitScript script = GitScript.fromScratch();
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
-            assertThrows(GitException.class, () -> repository.getRootCommit());
             
             // add and stage some files
             script.withFiles().andStage();
@@ -220,7 +218,7 @@ public class JGitRepositoryTest {
 
     @Nested
     @DisplayName("JGitRepository.isClean")
-    class IsCleanTest {
+    class IsCleanTests {
         @DisplayName("JGitRepository.isClean()")
         @Test
         public void isCleanTest()
@@ -246,7 +244,29 @@ public class JGitRepositoryTest {
 
     @Nested
     @DisplayName("JGitRepository.getCommitTags")
-    class GetCommitTagsTest {
+    class GetCommitTagsTests {
+        @DisplayName("JGitRepository.getCommitTags(null) returns empty without commits")
+        @Test
+        public void getCommitTagsReturnsEmptyResultWithNullTest()
+            throws Exception {
+            // start with a new repository, just initialized
+            GitScript script = GitScript.fromScratch();
+            Repository repository = JGitRepository.open(script.getWorkingDirectory());
+
+            assertEquals(0, repository.getCommitTags(null).size());
+        }
+
+        @DisplayName("JGitRepository.getCommitTags() returns empty without commits")
+        @Test
+        public void getCommitTagsReturnsEmptyResultWithRepositoryWithNoCommitsTest()
+            throws Exception {
+            // start with a new repository, just initialized
+            GitScript script = GitScript.fromScratch();
+            Repository repository = JGitRepository.open(script.getWorkingDirectory());
+
+            assertEquals(0, repository.getCommitTags("").size());
+        }
+
         @DisplayName("JGitRepository.getCommitTags()")
         @Test
         public void getCommitTagsTest()
@@ -276,33 +296,13 @@ public class JGitRepositoryTest {
 
     @Nested
     @DisplayName("JGitRepository.walkHistory")
-    class WalkhistoryTest {
-        @DisplayName("JGitRepository.walkHistory(CommitVisitor) with CommitVisitor stopping browsing")
-        @Test
-        public void walkHistoryWithVisitorStoppingBrowsingTest()
-            throws Exception {
-            // start with a new repository, just initialized
-            GitScript script = GitScenario.TwoBranchesShort.realize();
-            Repository repository = JGitRepository.open(script.getWorkingDirectory());
-
-            // Keep track of the visited commits
-            List<Commit> visitedCommits = new ArrayList<Commit>();
-
-            // make the visitor stop after 2 commits
-            repository.walkHistory(null, null, c -> {
-                visitedCommits.add(c);
-                return visitedCommits.size() < 2;
-            });
-
-            assertEquals(2, visitedCommits.size());
-        }
-
-        @DisplayName("JGitRepository.walkHistory(CommitVisitor) with no boundaries")
+    class WalkhistoryTests {
+        @DisplayName("JGitRepository.walkHistory(null, null, CommitVisitor)")
         @Test
         public void walkHistoryWithNoBoundariesTest()
             throws Exception {
             // start with a new repository, just initialized
-            GitScript script = GitScenario.TwoBranchesShort.realize();
+            GitScript script = GitScenario.TwoMergedBranchesShort.realize();
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
 
             // Keep track of the visited commits
@@ -319,12 +319,45 @@ public class JGitRepositoryTest {
             assertEquals(repository.getRootCommit(), visitedCommits.get(visitedCommits.size()-1).getSHA());
         }
 
-        @DisplayName("JGitRepository.walkHistory(CommitVisitor) with start boundary")
+        @DisplayName("JGitRepository.walkHistory(null, null, CommitVisitor) throws GitException without commits")
+        @Test
+        public void exceptionWithRepositoryWithNoCommits()
+            throws Exception {
+            // start with an empty repository, just initialized
+            GitScript script = GitScript.fromScratch();
+            Repository repository = JGitRepository.open(script.getWorkingDirectory());
+
+            assertThrows(GitException.class, () -> repository.walkHistory(null, null, c -> {
+                return true;
+            }));
+        }
+
+        @DisplayName("JGitRepository.walkHistory(null, null, CommitVisitor) stopped by CommitVisitor")
+        @Test
+        public void walkHistoryWithVisitorStoppingBrowsingTest()
+            throws Exception {
+            // start with a new repository, just initialized
+            GitScript script = GitScenario.TwoMergedBranchesShort.realize();
+            Repository repository = JGitRepository.open(script.getWorkingDirectory());
+
+            // Keep track of the visited commits
+            List<Commit> visitedCommits = new ArrayList<Commit>();
+
+            // make the visitor stop after 2 commits
+            repository.walkHistory(null, null, c -> {
+                visitedCommits.add(c);
+                return visitedCommits.size() < 2;
+            });
+
+            assertEquals(2, visitedCommits.size());
+        }
+
+        @DisplayName("JGitRepository.walkHistory(start, null, CommitVisitor)")
         @Test
         public void walkHistoryWithStartBoundaryTest()
             throws Exception {
             // start with a new repository, just initialized
-            GitScript script = GitScenario.TwoBranchesShort.realize();
+            GitScript script = GitScenario.TwoMergedBranchesShort.realize();
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
             // Keep track of the visited commits
             List<Commit> visitedCommits = new ArrayList<Commit>();
@@ -348,12 +381,12 @@ public class JGitRepositoryTest {
             assertEquals(visitedCommits.get(visitedCommits.size()-1).getSHA(), boundaryVisitedCommits.get(boundaryVisitedCommits.size()-1).getSHA()); // test the last visited commit
         }
 
-        @DisplayName("JGitRepository.walkHistory(CommitVisitor) with end boundary")
+        @DisplayName("JGitRepository.walkHistory(null, end, CommitVisitor)")
         @Test
         public void walkHistoryWithEndBoundaryTest()
             throws Exception {
             // start with a new repository, just initialized
-            GitScript script = GitScenario.TwoBranchesShort.realize();
+            GitScript script = GitScenario.TwoMergedBranchesShort.realize();
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
             // Keep track of the visited commits
             List<Commit> visitedCommits = new ArrayList<Commit>();
@@ -377,12 +410,12 @@ public class JGitRepositoryTest {
             assertEquals(visitedCommits.get(visitedCommits.size()-3).getSHA(), boundaryVisitedCommits.get(boundaryVisitedCommits.size()-1).getSHA()); // test the last visited commit
         }
 
-        @DisplayName("JGitRepository.walkHistory(CommitVisitor) with both boundaries")
+        @DisplayName("JGitRepository.walkHistory(start, end, CommitVisitor)")
         @Test
         public void walkHistoryWithBothBoundariesTest()
             throws Exception {
             // start with a new repository, just initialized
-            GitScript script = GitScenario.TwoBranchesShort.realize();
+            GitScript script = GitScenario.TwoMergedBranchesShort.realize();
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
             // Keep track of the visited commits
             List<Commit> visitedCommits = new ArrayList<Commit>();
@@ -404,6 +437,97 @@ public class JGitRepositoryTest {
             assertEquals(visitedCommits.size()-4, boundaryVisitedCommits.size());
             assertEquals(visitedCommits.get(2).getSHA(), boundaryVisitedCommits.get(0).getSHA()); // test the first visited commit
             assertEquals(visitedCommits.get(visitedCommits.size()-3).getSHA(), boundaryVisitedCommits.get(boundaryVisitedCommits.size()-1).getSHA()); // test the last visited commit
+        }
+
+        @DisplayName("JGitRepository.walkHistory(start, null, CommitVisitor) throws GitException with unresolved boundary")
+        @Test
+        public void walkHistoryWithStartBoundaryUnresolvedTest()
+            throws Exception {
+            // start with a new repository, just initialized
+            GitScript script = GitScenario.TwoMergedBranchesShort.realize();
+            Repository repository = JGitRepository.open(script.getWorkingDirectory());
+            // Keep track of the visited commits
+            List<Commit> visitedCommits = new ArrayList<Commit>();
+
+            // this SHA is unknown to the repository, so it should throw an exception
+            assertThrows(GitException.class, () -> repository.walkHistory("d0a19fc5776dc0c0b1a8d869c1117dac71065870", null, c -> {
+                visitedCommits.add(c);
+                return true;
+            }));
+
+            assertEquals(0, visitedCommits.size());
+        }
+
+        @DisplayName("JGitRepository.walkHistory(null, end, CommitVisitor) throws GitException with unresolved boundary")
+        @Test
+        public void walkHistoryWithEndBoundaryUnresolvedTest()
+            throws Exception {
+            // start with a new repository, just initialized
+            GitScript script = GitScenario.TwoMergedBranchesShort.realize();
+            Repository repository = JGitRepository.open(script.getWorkingDirectory());
+            // Keep track of the visited commits
+            List<Commit> visitedCommits = new ArrayList<Commit>();
+
+            // this SHA is unknown to the repository, so it should throw an exception
+            assertThrows(GitException.class, () -> repository.walkHistory(null, "31cab6562ed66dfc71a4fcf65292a97fb81e0e75", c -> {
+                visitedCommits.add(c);
+                return true;
+            }));
+
+            assertEquals(0, visitedCommits.size());
+        }
+
+        @DisplayName("JGitRepository.walkHistory(start, end, CommitVisitor) throws GitException with unresolved boundaries")
+        @Test
+        public void walkHistoryWithBothBoundariesUnresolvedTest()
+            throws Exception {
+            // start with a new repository, just initialized
+            GitScript script = GitScenario.TwoMergedBranchesShort.realize();
+            Repository repository = JGitRepository.open(script.getWorkingDirectory());
+            // Keep track of the visited commits
+            List<Commit> visitedCommits = new ArrayList<Commit>();
+
+            // these two SHAs are unknown to the repository, so they should throw an exception
+            assertThrows(GitException.class, () -> repository.walkHistory("d0a19fc5776dc0c0b1a8d869c1117dac71065870", "31cab6562ed66dfc71a4fcf65292a97fb81e0e75", c -> {
+                visitedCommits.add(c);
+                return true;
+            }));
+
+            assertEquals(0, visitedCommits.size());
+        }
+
+        @DisplayName("JGitRepository.walkHistory(start, end, CommitVisitor) throws GitException with out-of-scope end boundary")
+        @Test
+        public void walkHistoryWithEndBoundaryOutOfScopeTest()
+            throws Exception {
+            // start with a new repository, just initialized
+            GitScript script = GitScenario.TwoUnmergedBranchesShort.realize();
+            Repository repository = JGitRepository.open(script.getWorkingDirectory());
+            // Keep track of the visited commits
+            List<Commit> visitedCommitsWithoutBoundaries = new ArrayList<Commit>();
+            List<Commit> visitedCommitsWithBoundaries = new ArrayList<Commit>();
+
+            // find out the SHA-1 of the alpha branch HEAD, so it's out of scope
+            script.checkout("alpha");
+            String alphaHead = script.getLastCommit().getId().getName();
+
+            // and switch back to the master branch
+            script.checkout("master");
+
+            // do a first walk with no boundaries
+            repository.walkHistory(null, null, c -> {
+                visitedCommitsWithoutBoundaries.add(c);
+                return true;
+            });
+
+            // now do the same walk with boundaries
+            // this boundary is out of the branch we're working in to the repository, so it should not affect the outcome
+            repository.walkHistory(null, alphaHead, c -> {
+                visitedCommitsWithBoundaries.add(c);
+                return true;
+            });
+
+            assertEquals(visitedCommitsWithoutBoundaries.size(), visitedCommitsWithBoundaries.size());
         }
     }
 }

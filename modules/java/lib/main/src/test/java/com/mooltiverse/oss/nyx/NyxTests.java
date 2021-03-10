@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test;
 
 import com.mooltiverse.oss.nyx.configuration.Configuration;
 import com.mooltiverse.oss.nyx.data.DataAccessException;
-import com.mooltiverse.oss.nyx.configuration.mock.ConfigurationLayerMock;
+import com.mooltiverse.oss.nyx.configuration.mock.EmptyConfigurationLayerMock;
 import com.mooltiverse.oss.nyx.git.Repository;
 import com.mooltiverse.oss.nyx.git.script.GitScript;
 import com.mooltiverse.oss.nyx.state.State;
@@ -58,7 +58,7 @@ public class NyxTests {
     /**
      * Performs checks against the repository.
      * 
-     * Note that repository details are tested in the {@link com.mooltiverse.oss.nyx.git.JGitRepositoryTest} class.
+     * Note that repository details are tested in the {@link com.mooltiverse.oss.nyx.git.JGitRepositoryTests} class.
      * Here only the Nyx class behavior pertaining the repository handling is tested.
      */
     @Nested
@@ -66,27 +66,11 @@ public class NyxTests {
     class RepositoryTests {
         @Test
         @DisplayName("Nyx.repository() throws DataAccessException in empty directory")
-        void repositoryThrowsExceptionInEmptyDirectoryTest()
+        void exceptionInEmptyDirectoryTest()
             throws Exception {
 
             // the Nyx instance created this way runs in the local sources directory, with no Git repository itself, so it's supposed to throw an exception
             assertThrows(DataAccessException.class, () -> new Nyx().repository());
-        }
-
-        @Test
-        @DisplayName("Nyx.repository() with valid Git directory")
-        void repositoryWithValidGitDirectoryTest()
-            throws Exception {
-
-            Nyx nyx = new Nyx();
-
-            // initialize a repository in a new directory and pass the directory to the configuration. We'll use the plugin configuration layer to pass the directory
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-            configurationMock.directory = GitScript.fromScratch().getWorkingDirectory();
-            nyx.configuration().withPluginConfiguration(configurationMock);
-
-            // check that no exception is thrown when the Nyx configuration receives a valid Git repository.
-            assertDoesNotThrow(() -> nyx.repository());
         }
 
         @Test
@@ -97,7 +81,7 @@ public class NyxTests {
             Nyx nyx = new Nyx();
 
             // initialize a repository in a new directory and pass the directory to the configuration. We'll use the plugin configuration layer to pass the directory
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
+            EmptyConfigurationLayerMock configurationMock = new EmptyConfigurationLayerMock();
             configurationMock.directory = GitScript.fromScratch().getWorkingDirectory();
             nyx.configuration().withPluginConfiguration(configurationMock);
 

@@ -124,53 +124,136 @@ public class NyxPluginFunctionalTests {
     }
 
     /**
-     * A bidimensional array of Gradle plugins to test.
-     * 
-     * Each element is a pair of strings representing a plugin ID and its version. The version is empty for core plugins.
+     * A list of maps, where each list item is a map that represent a known combination of plugins. For each combination
+     * of plugins (so for each map), every entry represents one plugin, where the key is the plugin ID and the value is
+     * the (optonal) plugin version. Core plugins have an empty string in place of the version.
      * 
      * These plugins are tested to make sure they don't change Nyx's or the plugin's behavior.
      */
-    static String[][] wellKnownWorkingPluginsArray = new String[][] {
-        // The list of core plugins is taken from https://docs.gradle.org/current/userguide/plugin_reference.html
-        // Some are commented out just to narrow the test time. In the end we don't expect much conflicts with external
-        // plugins unless some users give us notice of some in particular
-        {"java",                        ""},
-        {"java-platform",               ""},
-        {"groovy",                      ""},
-        {"scala",                       ""},
-        {"antlr",                       ""},
+    static List<Map<String,String>> wellKnownWorkingPluginCombinations = new ArrayList<Map<String,String>>(){
+        private static final long serialVersionUID = 1L;
+        {
+            // The list of core plugins is taken from https://docs.gradle.org/current/userguide/plugin_reference.html
+            // Some are commented out just to narrow the test time. In the end we don't expect much conflicts with external
+            // plugins unless some users give us notice of some in particular
 
-        {"base",                        ""},
-        //{"signing",                     ""},
-        //{"java-gradle-plugin",          ""},
-        //{"project-report",              ""},
+            // note that we never had any issue due to plugins so most of them are commented out to not spend hourse in useless test repetitions
 
-        //{"cpp-application",             ""},
-        //{"cpp-library",                 ""},
-        //{"cpp-unit-test",               ""},
-        //{"swift-application",           ""},
-        //{"swift-library",               ""},
-        //{"xctest",                      ""},
+            // ----- no plugins
+            add(new HashMap<String,String>(){   private static final long serialVersionUID = 1L; {
+            }});
 
-        {"application",                 ""},
-        //{"war",                         ""},
-        //{"ear",                         ""},
-        //{"maven-publish",               ""},
-        //{"ivy-publish",                 ""},
-        {"maven",                       ""},
-        //{"distribution",                ""},
-        //{"java-library-distribution",   ""},
+            // ----- single plugins
+            /*add(new HashMap<String,String>(){   private static final long serialVersionUID = 1L; {
+                put("java", "");
+            }});*/
+            /*add(new HashMap<String,String>(){   private static final long serialVersionUID = 1L; {
+                put("java-platform", "");
+            }});*/
+            /*add(new HashMap<String,String>(){   private static final long serialVersionUID = 1L; {
+                put("groovy", "");
+            }});*/
+            /*add(new HashMap<String,String>(){   private static final long serialVersionUID = 1L; {
+                put("scala", "");
+            }});*/
+            /*add(new HashMap<String,String>(){   private static final long serialVersionUID = 1L; {
+                put("antlr", "");
+            }});*/
+            /*add(new HashMap<String,String>(){   private static final long serialVersionUID = 1L; {
+                put("base", "");
+            }});*/
+            /*add(new HashMap<String,String>(){   private static final long serialVersionUID = 1L; {
+                put("signing", "");
+            }});*/
+            /*add(new HashMap<String,String>(){   private static final long serialVersionUID = 1L; {
+                put("java-gradle-plugin", "");
+            }});*/
+            /*add(new HashMap<String,String>(){   private static final long serialVersionUID = 1L; {
+                put("project-report", "");
+            }});*/
 
-        //{"checkstyle",                  ""},
-        //{"pmd",                         ""},
-        //{"jacoco",                      ""},
-        //{"codenarc",                    ""},
+            /*add(new HashMap<String,String>(){   private static final long serialVersionUID = 1L; {
+                put("cpp-application", "");
+            }});*/
+            /*add(new HashMap<String,String>(){   private static final long serialVersionUID = 1L; {
+                put("cpp-library", "");
+            }});*/
+            /*add(new HashMap<String,String>(){   private static final long serialVersionUID = 1L; {
+                put("cpp-unit-test", "");
+            }});*/
+            /*add(new HashMap<String,String>(){   private static final long serialVersionUID = 1L; {
+                put("swift-application", "");
+            }});*/
+            /*add(new HashMap<String,String>(){   private static final long serialVersionUID = 1L; {
+                put("swift-library", "");
+            }});*/
+            /*add(new HashMap<String,String>(){   private static final long serialVersionUID = 1L; {
+                put("xctest", "");
+            }});*/
 
-        //{"eclipse",                     ""},
-        //{"eclipse-wtp",                 ""},
-        //{"idea",                        ""},
-        //{"visual-studio",               ""},
-        //{"xcode",                       ""}
+            /*add(new HashMap<String,String>(){   private static final long serialVersionUID = 1L; {
+                put("application", "");
+            }});*/
+            /*add(new HashMap<String,String>(){   private static final long serialVersionUID = 1L; {
+                put("war", "");
+            }});*/
+            /*add(new HashMap<String,String>(){   private static final long serialVersionUID = 1L; {
+                put("ear", "");
+            }});*/
+            /*add(new HashMap<String,String>(){   private static final long serialVersionUID = 1L; {
+                put("maven-publish", "");
+            }});*/
+            /*add(new HashMap<String,String>(){   private static final long serialVersionUID = 1L; {
+                put("ivy-publish", "");
+            }});*/
+            /*add(new HashMap<String,String>(){   private static final long serialVersionUID = 1L; {
+                put("maven", "");
+            }});*/
+            /*add(new HashMap<String,String>(){   private static final long serialVersionUID = 1L; {
+                put("distribution", "");   }
+            });*/
+            /*add(new HashMap<String,String>(){   private static final long serialVersionUID = 1L; {
+                put("java-library-distribution", "");
+            }});*/
+
+            /*add(new HashMap<String,String>(){   private static final long serialVersionUID = 1L; {
+                put("checkstyle", "");
+            }});*/
+            /*add(new HashMap<String,String>(){   private static final long serialVersionUID = 1L; {
+                put("pmd", "");
+            }});*/
+            /*add(new HashMap<String,String>(){   private static final long serialVersionUID = 1L; {
+                put("jacoco", "");
+            }});*/
+            /*add(new HashMap<String,String>(){   private static final long serialVersionUID = 1L; {
+                put("codenarc", "");
+            }});*/
+
+            /*add(new HashMap<String,String>(){   private static final long serialVersionUID = 1L; {
+                put("eclipse", "");
+            }});*/
+            /*add(new HashMap<String,String>(){   private static final long serialVersionUID = 1L; {
+                put("eclipse-wtp", "");
+            }});*/
+            /*add(new HashMap<String,String>(){   private static final long serialVersionUID = 1L; {
+                put("idea", "");
+            }});*/
+            /*add(new HashMap<String,String>(){   private static final long serialVersionUID = 1L; {
+                put("visual-studio", "");
+            }});*/
+            /*add(new HashMap<String,String>(){   private static final long serialVersionUID = 1L; {
+                put("xcode", "");
+            }});*/
+
+            // ----- plugins combinations
+            add(new HashMap<String,String>(){   private static final long serialVersionUID = 1L; {
+                put("base", "");
+                put("java", "");
+                put("antlr", "");
+                put("application", "");
+                put("maven", "");
+            }});
+        }
     };
 
     /**
@@ -287,9 +370,9 @@ public class NyxPluginFunctionalTests {
         ArrayList<Arguments> arguments = new ArrayList<Arguments>();
         for (Map.Entry<String,Map<String,TaskOutcome>> taskAndOutcome: wellKnownTasksAndOutcomes.entrySet()) {
             for (String gradleversion: wellKnownWorkingGradleVersionsArray) {
-                for (int p=0; p<wellKnownWorkingPluginsArray.length; p++) {
-                    // positive and negative files are not modelled yet
-                    arguments.add(Arguments.of(taskAndOutcome.getKey(), taskAndOutcome.getValue(), gradleversion, wellKnownWorkingPluginsArray[p][0], wellKnownWorkingPluginsArray[p][1], List.<String>of(), List.<String>of()));
+                for (Map<String,String> pluginCombination: wellKnownWorkingPluginCombinations) {
+                    // positive and negative files are not modelled yet so the two last parameters are empty strings
+                    arguments.add(Arguments.of(taskAndOutcome.getKey(), taskAndOutcome.getValue(), gradleversion, pluginCombination, List.<String>of(), List.<String>of()));
                 }
             }
         }
@@ -353,7 +436,7 @@ public class NyxPluginFunctionalTests {
             for (Map.Entry<String, String> entry: plugins.entrySet()) {
                 printWriter.println("  id '"+entry.getKey()+"' ");
                 if (!Objects.isNull(entry.getValue()) && !entry.getValue().isEmpty())
-                printWriter.println(" version '"+entry.getValue()+"'");
+                    printWriter.println(" version '"+entry.getValue()+"'");
                 printWriter.println();
             }
         }
@@ -470,11 +553,11 @@ public class NyxPluginFunctionalTests {
          * 
          * @throws Exception in case of any issues
          */
-        @ParameterizedTest(name = "gradle tasks [Gradle Version: {0}, empty build script]")
+        @ParameterizedTest(name = "gradle tasks [Gradle Version: {0}, Script: empty]")
         @MethodSource("com.mooltiverse.oss.nyx.gradle.NyxPluginFunctionalTests#wellKnownWorkingGradleVersions")
         void runGradleTasksWithEmptyScriptTest(String gradleVersion)
             throws Exception {
-                // use an empty directory as for running 'tasks' there must be no need for the Git repository
+            // use an empty directory as for running 'tasks' there must be no need for the Git repository
             GradleRunner gradleRunner = setUp(null, gradleVersion, gradleSettings(gradleVersion), gradleEmptyBuild(gradleVersion, null));
 
             runGradleTasks(gradleRunner, gradleVersion);
@@ -489,7 +572,7 @@ public class NyxPluginFunctionalTests {
          * 
          * @throws Exception in case of any issues
          */
-        @ParameterizedTest(name = "gradle tasks [Gradle Version: {0}, simple build script]")
+        @ParameterizedTest(name = "gradle tasks [Gradle Version: {0}, Script: simple]")
         @MethodSource("com.mooltiverse.oss.nyx.gradle.NyxPluginFunctionalTests#wellKnownWorkingGradleVersions")
         void runGradleTasksWithSimpleScriptTest(String gradleVersion)
             throws Exception {
@@ -503,15 +586,15 @@ public class NyxPluginFunctionalTests {
     }
 
     @Nested
-    @DisplayName("gradle task(*)")
-    class TaskTests {
+    @DisplayName("gradle nyx*")
+    class NyxTaskTests {
         /**
          * Test running the given task with no exceptions using the given runner and Gradle version.
          * This is a generic method to be invoked by actual tests.
          * 
          * @throws Exception in case of any issues
          */
-        void runGradleTask(GradleRunner gradleRunner, String target, Map<String,TaskOutcome> taskOutcomes, String gradleVersion, String pluginID, String pluginVersion, List<String> positiveFiles, List<String> negativeFiles)
+        void runNyxTask(GradleRunner gradleRunner, String target, Map<String,TaskOutcome> taskOutcomes, String gradleVersion, List<String> positiveFiles, List<String> negativeFiles)
             throws Exception {
             // GradleRunner.withDebug(boolean) enables debug output
             BuildResult gradleResult = gradleRunner.withDebug(true).withArguments("--info", /*"--debug",*/ "--stacktrace", target).build();
@@ -524,7 +607,7 @@ public class NyxPluginFunctionalTests {
                     System.out.println("    Evaluating task: "+buildTask.getPath());System.out.flush();
                     if (buildTask.getPath().endsWith(taskOutcome.getKey())) {
                         taskFound = true;
-                        System.out.println("      Task "+taskOutcome.getKey()+" match found.  Outcome is: "+buildTask.getOutcome()+", expected was "+taskOutcome.getValue());System.out.flush();
+                        System.out.println("      Task "+taskOutcome.getKey()+" match found. Outcome is: "+buildTask.getOutcome()+", expected was "+taskOutcome.getValue());System.out.flush();
                         assertEquals(taskOutcome.getValue(), buildTask.getOutcome(), "When running gradle "+target+" expected outcome for task "+buildTask.getPath()+" was "+taskOutcome.getValue()+" but actual value was "+buildTask.getOutcome());
                     }
                     else {
@@ -540,20 +623,20 @@ public class NyxPluginFunctionalTests {
         }
 
         /**
-         * Test that an exception is thrown when running ina directory that contains no Git repository.
+         * Test that an exception is thrown when running in a directory that contains no Git repository.
          * 
          * @param gradleVersion the Gradle version to use
          * 
          * @throws Exception in case of any issues
          */
-        @ParameterizedTest(name = "gradle {0} [Gradle Version: {2}, Plugin {3}:{4}, empty build script]")
+        @ParameterizedTest(name = "gradle {0} [Gradle Version: {2}, Plugin {3}, Script: empty] ==> {1}")
         @MethodSource("com.mooltiverse.oss.nyx.gradle.NyxPluginFunctionalTests#wellKnownTestSuites")
-        void exceptionRuningGradleTaskWithNoGitRepository(String target, Map<String,TaskOutcome> taskOutcomes, String gradleVersion, String pluginID, String pluginVersion, List<String> positiveFiles, List<String> negativeFiles)
+        void exceptionRunningNyxTaskWithNoGitRepository(String target, Map<String,TaskOutcome> taskOutcomes, String gradleVersion, Map<String,String> pluginCombination, List<String> positiveFiles, List<String> negativeFiles)
             throws Exception {
-            GradleRunner gradleRunner = setUp(null, gradleVersion, gradleSettings(gradleVersion), gradleEmptyBuild(gradleVersion, null));
+            GradleRunner gradleRunner = setUp(null, gradleVersion, gradleSettings(gradleVersion), gradleEmptyBuild(gradleVersion, pluginCombination));
 
             // Gradle wraps these exception so let's not make assumptions on the type
-            assertThrows(Exception.class, () -> runGradleTask(gradleRunner, target, taskOutcomes, gradleVersion, pluginID, pluginVersion, positiveFiles, negativeFiles) );
+            assertThrows(Exception.class, () -> runNyxTask(gradleRunner, target, taskOutcomes, gradleVersion, positiveFiles, negativeFiles) );
 
             tearDown(gradleRunner);
         }
@@ -565,14 +648,14 @@ public class NyxPluginFunctionalTests {
          * 
          * @throws Exception in case of any issues
          */
-        @ParameterizedTest(name = "gradle {0} [Gradle Version: {2}, Plugin {3}:{4}, empty build script]")
+        @ParameterizedTest(name = "gradle {0} [Gradle Version: {2}, Plugins {3}, Script: empty] ==> {1}")
         @MethodSource("com.mooltiverse.oss.nyx.gradle.NyxPluginFunctionalTests#wellKnownTestSuites")
-        void runGradleTaskWithEmptyScriptTest(String target, Map<String,TaskOutcome> taskOutcomes, String gradleVersion, String pluginID, String pluginVersion, List<String> positiveFiles, List<String> negativeFiles)
+        void runNyxTaskWithEmptyScriptTest(String target, Map<String,TaskOutcome> taskOutcomes, String gradleVersion, Map<String,String> pluginCombination, List<String> positiveFiles, List<String> negativeFiles)
             throws Exception {
             GitScript script = GitScenario.InitialCommit.realize(); // create the new directory with a new Git repository inside
-            GradleRunner gradleRunner = setUp(script.getWorkingDirectory(), gradleVersion, gradleSettings(gradleVersion), gradleEmptyBuild(gradleVersion, null));
+            GradleRunner gradleRunner = setUp(script.getWorkingDirectory(), gradleVersion, gradleSettings(gradleVersion), gradleEmptyBuild(gradleVersion, pluginCombination));
 
-            runGradleTask(gradleRunner, target, taskOutcomes, gradleVersion, pluginID, pluginVersion, positiveFiles, negativeFiles);
+            runNyxTask(gradleRunner, target, taskOutcomes, gradleVersion, positiveFiles, negativeFiles);
 
             tearDown(gradleRunner);
         }
@@ -584,14 +667,14 @@ public class NyxPluginFunctionalTests {
          * 
          * @throws Exception in case of any issues
          */
-        @ParameterizedTest(name = "gradle {0} [Gradle Version: {2}, Plugin {3}:{4}, simple build script]")
+        @ParameterizedTest(name = "gradle {0} [Gradle Version: {2}, Plugins {3}, Script: simple] ==> {1}")
         @MethodSource("com.mooltiverse.oss.nyx.gradle.NyxPluginFunctionalTests#wellKnownTestSuites")
-        void runGradleTaskWithSimpleScriptTest(String target, Map<String,TaskOutcome> taskOutcomes, String gradleVersion, String pluginID, String pluginVersion, List<String> positiveFiles, List<String> negativeFiles)
+        void runNyxTaskWithSimpleScriptTest(String target, Map<String,TaskOutcome> taskOutcomes, String gradleVersion, Map<String,String> pluginCombination, List<String> positiveFiles, List<String> negativeFiles)
             throws Exception {
             GitScript script = GitScenario.InitialCommit.realize(); // create the new directory with a new Git repository inside
-            GradleRunner gradleRunner = setUp(script.getWorkingDirectory(), gradleVersion, gradleSettings(gradleVersion), gradleSimpleBuild(gradleVersion, null));
+            GradleRunner gradleRunner = setUp(script.getWorkingDirectory(), gradleVersion, gradleSettings(gradleVersion), gradleSimpleBuild(gradleVersion, pluginCombination));
 
-            runGradleTask(gradleRunner, target, taskOutcomes, gradleVersion, pluginID, pluginVersion, positiveFiles, negativeFiles);
+            runNyxTask(gradleRunner, target, taskOutcomes, gradleVersion, positiveFiles, negativeFiles);
 
             tearDown(gradleRunner);
         }

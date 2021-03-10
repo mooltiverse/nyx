@@ -29,17 +29,23 @@ import com.mooltiverse.oss.nyx.version.SemanticVersion;
 @DisplayName("Defaults")
 public class DefaultsTests {
     @Test
-    @DisplayName("Defaults.DIRECTORY")
+    @DisplayName("Defaults.DIRECTORY == System.getProperty('user.dir')")
     void directoryTest()
         throws Exception {
         assertEquals(new File(System.getProperty("user.dir")), Defaults.DIRECTORY);
     }
 
     @Test
-    @DisplayName("Defaults.INITIAL_VERSION")
-    void initialVersionTest()
+    @DisplayName("Defaults.SCHEME = Scheme.SEMVER")
+    void schemeTest()
         throws Exception {
         assumeTrue(Scheme.SEMVER.equals(Defaults.SCHEME));
+    }
+
+    @Test
+    @DisplayName("Defaults.INITIAL_VERSION = SemanticVersion.DEFAULT_INITIAL_VERSION")
+    void initialVersionTest()
+        throws Exception {
         assertEquals(SemanticVersion.DEFAULT_INITIAL_VERSION, Defaults.INITIAL_VERSION.toString());
     }
 }

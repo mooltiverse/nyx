@@ -127,7 +127,7 @@ public abstract class AbstractTaskTests extends AbstractTests {
     @Nested
     @DisplayName("Configuration")
     static class ConfigurationTests {
-        @ParameterizedTest(name = "{2}.getDescription()")
+        @ParameterizedTest(name = "{2}.getDescription() == {2}.DESCRIPTION")
         @MethodSource("com.mooltiverse.oss.nyx.gradle.TestData#allTasksArguments")
         void getDescriptionTest(String taskName, Class<? extends CoreTask> taskClass, String taskClassSimpleName)
             throws Exception {
@@ -136,7 +136,7 @@ public abstract class AbstractTaskTests extends AbstractTests {
             assertEquals(taskClass.getDeclaredField("DESCRIPTION").get(null), project.getTasks().getByName(taskName).getDescription());
         }
 
-        @ParameterizedTest(name = "{2}.getGroup()")
+        @ParameterizedTest(name = "{2}.getGroup() == {2}.FROUP")
         @MethodSource("com.mooltiverse.oss.nyx.gradle.TestData#allTasksArguments")
         void getGroupTest(String taskName, Class<? extends CoreTask> taskClass, String taskClassSimpleName)
             throws Exception {
@@ -145,7 +145,7 @@ public abstract class AbstractTaskTests extends AbstractTests {
             assertEquals(AbstractTask.GROUP, project.getTasks().getByName(taskName).getGroup());
         }
 
-        @ParameterizedTest(name = "{2}.getDependencies().size() == known direct dependencies")
+        @ParameterizedTest(name = "{2}.getDependencies().size() == <# of known direct dependencies>")
         @MethodSource("com.mooltiverse.oss.nyx.gradle.TestData#allTasksArguments")
         void getDependencyCount(String taskName, Class<? extends CoreTask> taskClass, String taskClassSimpleName)
             throws Exception {

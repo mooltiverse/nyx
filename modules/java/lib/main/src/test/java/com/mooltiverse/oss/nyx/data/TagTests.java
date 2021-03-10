@@ -21,7 +21,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 @DisplayName("Tag")
-public class TagTest {
+public class TagTests {
     @Test
     @DisplayName("Tag()")
     void constructorTest()

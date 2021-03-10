@@ -28,7 +28,7 @@ import com.mooltiverse.oss.nyx.version.SemanticVersion;
 @DisplayName("State")
 public class StateTests {
     @Nested
-    @DisplayName("State constructor")
+    @DisplayName("State")
     class ConstructorTests {
         @Test
         @DisplayName("State()")
@@ -38,11 +38,7 @@ public class StateTests {
             assertThrows(NullPointerException.class, () -> { new State(null); });
             assertDoesNotThrow(() -> { new State(new Configuration()); });
         }
-    }
 
-    @Nested
-    @DisplayName("State configuration")
-    class ConfigurationTests {
         @Test
         @DisplayName("State.getConfiguration()")
         void getConfigurationTest()
@@ -50,11 +46,7 @@ public class StateTests {
             Configuration configuration = new Configuration();
             assertEquals(configuration, new State(configuration).getConfiguration());
         }
-    }
 
-    @Nested
-    @DisplayName("State directory")
-    class DirectoryTests {
         @Test
         @DisplayName("State.getDirectory()")
         void getDirectoryTest()
@@ -63,11 +55,7 @@ public class StateTests {
             // make sure the state directory is the same from the configuration
             assertEquals(configuration.getDirectory(), new State(configuration).getDirectory());
         }
-    }
 
-    @Nested
-    @DisplayName("State internals")
-    class InternalsTests {
         @Test
         @DisplayName("State.getInternals()")
         void getInternalsTest()
@@ -79,11 +67,7 @@ public class StateTests {
             assertNotNull(state.getInternals());
             assertTrue(state.getInternals().isEmpty());
         }
-    }
 
-    @Nested
-    @DisplayName("State release scope")
-    class ReleaseScopeTests {
         @Test
         @DisplayName("State.getReleaseScope()")
         void getReleaseScopeTest()
@@ -92,11 +76,7 @@ public class StateTests {
             // make sure the release scope is initialized
             assertNotNull(new State(configuration).getReleaseScope());
         }
-    }
 
-    @Nested
-    @DisplayName("State scheme")
-    class SchemeTests {
         @Test
         @DisplayName("State.getScheme()")
         void getSchemeTest()
@@ -105,11 +85,7 @@ public class StateTests {
             // make sure the scheme is the same from the configuration
             assertEquals(configuration.getScheme(), new State(configuration).getScheme());
         }
-    }
 
-    @Nested
-    @DisplayName("State timestamp")
-    class TimestampTests {
         @Test
         @DisplayName("State.getTimestamp()")
         void getTimestampTest()
@@ -139,11 +115,7 @@ public class StateTests {
 
             assertNotEquals(oldTimestamp, state.getTimestamp());
         }
-    }
 
-    @Nested
-    @DisplayName("State version")
-    class VersionTests {
         @Test
         @DisplayName("State.getVersion()")
         void getVersionTest()

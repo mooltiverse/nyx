@@ -59,6 +59,36 @@ public class GitScenario {
     }
 
     /**
+     * A simple scenario with just the initial commit and another one, tagged as '1.2.3'.
+     */
+    public static class OneTaggedCommitCommit {
+        /**
+         * Constructor is private on purpose.
+         */
+        private OneTaggedCommitCommit() {
+            super();
+        }
+
+        /**
+         * Realizes this scenario in a new temporary directory and returns the script that was used.
+         * This yields to a repository like:
+         * 
+         * <pre>
+         * * b171fb9 (HEAD -> master) Initial commit
+         * * 65e445d (tag: 1.2.3) Commit xfp
+         * </pre>
+         * 
+         * @return the script used to realize the scenario. It can be used for further operations.
+         * 
+         * @throws Exception in case of any issue.
+         */
+        public static GitScript realize()
+            throws Exception {
+            return GitScript.fromScratch().withFiles().andCommit("Initial commit").addCommitWithTag("1.2.3");
+        }
+    }
+
+    /**
      * A simple scenario with few commits in the master branch only.
      */
     public static class OneBranchShort {
@@ -97,13 +127,72 @@ public class GitScenario {
     }
 
     /**
-     * A simple scenario with two branches (master and alpha) with a few merges between the two.
+     * A simple scenario with two branches (master and alpha) with a no merges between the two
      */
-    public static class TwoBranchesShort {
+    public static class TwoUnmergedBranchesShort {
         /**
          * Constructor is private on purpose.
          */
-        private TwoBranchesShort() {
+        private TwoUnmergedBranchesShort() {
+            super();
+        }
+
+        /**
+         * Realizes this scenario in a new temporary directory and returns the script that was used.
+         * This yields to a repository like:
+         * 
+         * <pre>
+         * * 7740039 (tag: 0.0.5-alpha.4, alpha) Commit fkn
+         * * 69dccb3 (tag: 0.0.5-alpha.3) Commit afr
+         * * da6971a (tag: 0.0.5-alpha.2) Commit mzt
+         * * d8a4cce (tag: 0.0.5-alpha.1) Commit fss
+         * | * b9829ae (HEAD -> master, tag: 0.1.5) Commit jux
+         * | * 501227b (tag: 0.1.4) Commit tvy
+         * | * 7cb8fea (tag: 0.1.3) Commit oxw
+         * | * b2aa5ff (tag: 0.1.2) Commit bot
+         * | * 9c82c72 (tag: 0.1.1) Commit wyo
+         * | * 91567bd (tag: 0.1.0) Commit urq
+         * |/  
+         * * 23a7e27 (tag: 0.0.4) Commit crp
+         * * 78d621d (tag: 0.0.3) Commit bdf
+         * * 541b69c (tag: 0.0.2) Commit sdd
+         * * 4a0a0f7 (tag: 0.0.1) Commit ott
+         * * 1cdc665 Initial commit
+         * </pre>
+         * 
+         * @return the script used to realize the scenario. It can be used for further operations.
+         * 
+         * @throws Exception in case of any issue.
+         */
+        public static GitScript realize()
+            throws Exception {
+            return GitScript.fromScratch().withFiles().andCommit("Initial commit")
+                .addCommitWithTagInBranch("master", "0.0.1")
+                .addCommitWithTagInBranch("master", "0.0.2", "Annotated tag to commit 0.0.2")
+                .addCommitWithTagInBranch("master", "0.0.3")
+                .addCommitWithTagInBranch("master", "0.0.4", "Annotated tag to commit 0.0.4")
+                .addCommitWithTagInBranch("alpha", "0.0.5-alpha.1", "Annotated tag to commit 0.0.5-alpha.1")
+                .addCommitWithTagInBranch("master", "0.1.0")
+                .addCommitWithTagInBranch("alpha", "0.0.5-alpha.2")
+                .addCommitWithTagInBranch("alpha", "0.0.5-alpha.3", "Annotated tag to commit 0.0.5-alpha.3")
+                .addCommitWithTagInBranch("master", "0.1.1")
+                .addCommitWithTagInBranch("alpha", "0.0.5-alpha.4")
+                .addCommitWithTagInBranch("master", "0.1.2")
+                .addCommitWithTagInBranch("master", "0.1.3")
+                .addCommitWithTagInBranch("master", "0.1.4")
+                .addCommitWithTagInBranch("master", "0.1.5");
+        }
+    }
+
+    /**
+     * A simple scenario with two branches (master and alpha) with a few merges between the two,
+     * merged at the end and in the middle.
+     */
+    public static class TwoMergedBranchesShort {
+        /**
+         * Constructor is private on purpose.
+         */
+        private TwoMergedBranchesShort() {
             super();
         }
 
@@ -143,7 +232,7 @@ public class GitScenario {
                 .addCommitWithTagInBranch("master", "0.0.2", "Annotated tag to commit 0.0.2")
                 .addCommitWithTagInBranch("master", "0.0.3")
                 .addCommitWithTagInBranch("master", "0.0.4", "Annotated tag to commit 0.0.4")
-                .addCommitWithTagInBranch("alpha", "0.0.6-alpha.1", "Annotated tag to commit 0.0.5-alpha.1")
+                .addCommitWithTagInBranch("alpha", "0.0.6-alpha.1", "Annotated tag to commit 0.0.6-alpha.1")
                 .addCommitWithTagInBranch("master", "0.0.5")
                 .addCommitWithTagInBranch("alpha", "0.0.6-alpha.2")
                 .andMergeIntoWithTag("master", "alpha", "Merge alpha > master", "0.0.6", null)

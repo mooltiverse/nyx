@@ -48,9 +48,9 @@ public class CoreTaskTests extends AbstractTaskTests {
          * 
          * Eager methods create an instance of the Task even if it hasn't been used yet.
          */
-        @ParameterizedTest(name = "NyxPlugin.apply() to call {2}.define() -> test eager task creation")
+        @ParameterizedTest(name = "NyxPlugin.apply() ==> {2}.define() ==> {2} is eagerly available")
         @MethodSource("com.mooltiverse.oss.nyx.gradle.TestData#coreTasksArguments")
-        void defineViaNyxPluginApplyEagerTest(String taskName, Class<? extends CoreTask> taskClass, String taskClassSimpleName) 
+        void taskEagerlyAvailableAfterNyxPluginApplyTest(String taskName, Class<? extends CoreTask> taskClass, String taskClassSimpleName) 
             throws Exception {
             Project project = newTestProject(null, false);
 
@@ -72,9 +72,9 @@ public class CoreTaskTests extends AbstractTaskTests {
          * and only return the task when actually needed or, instead of the actual task, return a Provider
          * object, which is in charge of managing its deferred creation.
          */
-        @ParameterizedTest(name = "NyxPlugin.apply() to call {2}.define() -> test deferred task creation")
+        @ParameterizedTest(name = "NyxPlugin.apply() ==> {2}.define() ==> {2} is lazily available")
         @MethodSource("com.mooltiverse.oss.nyx.gradle.TestData#coreTasksArguments")
-        void defineViaNyxPluginApplyLazyTest(String taskName, Class<? extends CoreTask> taskClass, String taskClassSimpleName)
+        void taskLazilyAvailableAfterNyxPluginApplyTest(String taskName, Class<? extends CoreTask> taskClass, String taskClassSimpleName)
             throws Exception {
             Project project = newTestProject(null, false);
 
@@ -86,9 +86,6 @@ public class CoreTaskTests extends AbstractTaskTests {
 
             // run the lazy tests using the superclass method
             testForTaskAvailabilityLazily(project, taskName, taskClass);
-
-            // now also run eager tests, which would invalidate the lazy tests if executed after this
-            testForTaskAvailabilityEagerly(project, taskName, taskClass);
         }
     }
 
@@ -98,9 +95,9 @@ public class CoreTaskTests extends AbstractTaskTests {
     @Nested
     @DisplayName("Working directory")
     static class WorkingDirectoryTests {
-        @ParameterizedTest(name = "{2}.getActions().execute() throws Exception when running in a directory with no Git repository and without a 'directory' configuration option")
+        @ParameterizedTest(name = "{2}.getActions().execute() throws Exception without a valid Git repository in working directory")
         @MethodSource("com.mooltiverse.oss.nyx.gradle.TestData#coreTasksArguments")
-        void exceptionOnActionsExecuteWithEmptyGitProjectDirectory(String taskName, Class<? extends CoreTask> taskClass, String taskClassSimpleName)
+        void exceptionOnExecuteWithoutValidGitRepositoryTest(String taskName, Class<? extends CoreTask> taskClass, String taskClassSimpleName)
             throws Exception {
             // the test project is created in a new empty directory
             Project project = newTestProject(null, false);

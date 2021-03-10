@@ -28,15 +28,17 @@ public interface Repository {
      * evaluated in Git's natural order, from the most recent to oldest.
      * 
      * @param start the optional SHA-1 id of the commit to start from. If {@code null} the latest commit in the
-     * current branch ({@code HEAD}) is used. This can be a long or abbreviated SHA-1.
+     * current branch ({@code HEAD}) is used. This can be a long or abbreviated SHA-1. If this commit cannot be
+     * resolved within the repository a {@link GitException} is thrown.
      * @param end the optional SHA-1 id of the commit to end with, included. If {@code null} the repository root
      * commit is used (until the given {@code visitor} returns {@code false}). If this commit is not reachable
-     * from the start it will be ignored. This can be a long or abbreviated SHA-1.
+     * from the start it will be ignored. This can be a long or abbreviated SHA-1. If this commit cannot be resolved
+     * within the repository a {@link GitException} is thrown.
      * @param visitor the visitor function that will receive commit data to evaluate. If {@code null} this method
      * takes no action.
      * 
      * @throws GitException in case some problem is encountered with the underlying Git repository, including when
-     * the repository has no commits yet.
+     * the repository has no commits yet or a given commit identifier cannot be resolved.
      */
     public void walkHistory(String start, String end, CommitVisitor visitor)
         throws GitException;
