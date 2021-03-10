@@ -118,10 +118,10 @@ class DefaultLayer implements ConfigurationLayer, Defaults {
      * {@inheritDoc}
      */
     @Override
-    public Boolean getReleasePrefixLenient()
+    public Boolean getReleaseLenient()
         throws DataAccessException, IllegalPropertyException {
-        logger.trace(DEFAULT, "Retrieving the default {} configuration option: {}", "releasePrefixLenient", RELEASE_PREFIX_LENIENT);
-        return RELEASE_PREFIX_LENIENT;
+        logger.trace(DEFAULT, "Retrieving the default {} configuration option: {}", "releaseLenient", RELEASE_LENIENT);
+        return RELEASE_LENIENT;
     }
 
     /**

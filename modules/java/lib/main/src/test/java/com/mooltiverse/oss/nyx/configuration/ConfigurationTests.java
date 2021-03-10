@@ -63,10 +63,10 @@ public class ConfigurationTests {
         }
 
         @Test
-        @DisplayName("Configuration.getReleasePrefixLenient()")
-        void getReleasePrefixLenientTest()
+        @DisplayName("Configuration.getReleaseLenient()")
+        void getReleaseLenientTest()
             throws Exception {
-            assertEquals(Defaults.RELEASE_PREFIX_LENIENT, new Configuration().getReleasePrefixLenient());
+            assertEquals(Defaults.RELEASE_LENIENT, new Configuration().getReleaseLenient());
         }
 
         @Test
@@ -193,22 +193,22 @@ public class ConfigurationTests {
         }
 
         @Test
-        @DisplayName("Configuration.withPluginConfiguration(MOCK).getReleasePrefixLenient()")
-        void getReleasePrefixLenientTest()
+        @DisplayName("Configuration.withPluginConfiguration(MOCK).getReleaseLenient()")
+        void getReleaseLenientTest()
             throws Exception {
             Configuration configuration = new Configuration();
 
             // in order to make the test meaningful, make sure the default and mock values are different
-            assumeFalse(Defaults.RELEASE_PREFIX_LENIENT.equals(ConfigurationLayerMock.RELEASE_PREFIX_LENIENT));
+            assumeFalse(Defaults.RELEASE_LENIENT.equals(ConfigurationLayerMock.RELEASE_LENIENT));
 
             // make sure the initial values come from defaults, until we inject the plugin configuration
-            assumeTrue(Defaults.RELEASE_PREFIX_LENIENT.equals(configuration.getReleasePrefixLenient()));
+            assumeTrue(Defaults.RELEASE_LENIENT.equals(configuration.getReleaseLenient()));
             
             // inject the plugin configuration and test the new value is returned from that
-            assertEquals(ConfigurationLayerMock.RELEASE_PREFIX_LENIENT, configuration.withPluginConfiguration(new ConfigurationLayerMock()).getReleasePrefixLenient());
+            assertEquals(ConfigurationLayerMock.RELEASE_LENIENT, configuration.withPluginConfiguration(new ConfigurationLayerMock()).getReleaseLenient());
 
             // now remove the plugin configuration and test that now default values are returned again
-            assertEquals(Defaults.RELEASE_PREFIX_LENIENT, configuration.withPluginConfiguration(null).getReleasePrefixLenient());
+            assertEquals(Defaults.RELEASE_LENIENT, configuration.withPluginConfiguration(null).getReleaseLenient());
         }
 
         @Test

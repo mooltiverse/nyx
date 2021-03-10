@@ -24,6 +24,7 @@ import com.mooltiverse.oss.nyx.configuration.Configuration;
 import com.mooltiverse.oss.nyx.data.DataAccessException;
 import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
 import com.mooltiverse.oss.nyx.data.Block;
+import com.mooltiverse.oss.nyx.data.ReleaseScope;
 import com.mooltiverse.oss.nyx.data.Scheme;
 import com.mooltiverse.oss.nyx.version.Version;
 
@@ -69,6 +70,17 @@ public interface Root extends Block {
      * @return the live map of internal attributes. The returned map is never {@code null}
      */
     public Map<String, String> getInternals();
+
+    /**
+     * Returns the object modelling the attributes defining the scope of the release.
+     * 
+     * @return the current value for this attribute.
+     * 
+     * @throws DataAccessException in case the attribute cannot be read or accessed.
+     * @throws IllegalPropertyException in case the attribute has been defined but has incorrect values or it can't be resolved.
+     */
+    public ReleaseScope getReleaseScope()
+        throws DataAccessException, IllegalPropertyException;
 
     /**
      * Returns the versioning scheme used as it's defined by the configuration.

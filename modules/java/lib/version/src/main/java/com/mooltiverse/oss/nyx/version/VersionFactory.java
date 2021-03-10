@@ -70,20 +70,20 @@ public class VersionFactory {
      * 
      * @param scheme the scheme the check against.
      * @param s the string version to check.
-     * @param prefixLenient when {@code true} prefixes are tolerated even if they are not strictly legal from the
-     * version scheme specification perspective.
+     * @param lenient when {@code true} prefixes and non critical extra characters are tolerated even if they are not
+     * strictly legal from the version scheme specification perspective.
      * 
      * @return {@code true} if the given string represents a legal version sing the implementation selected
      * by the given scheme, {@code false} otherwise.
      * 
      * @see #valueOf(Scheme, String, boolean)
      */
-    public static boolean isLegal(Scheme scheme, String s, boolean prefixLenient) {
+    public static boolean isLegal(Scheme scheme, String s, boolean lenient) {
         Objects.requireNonNull(s, "Can't parse a null string");
         switch (scheme) {
-            case SEMVER:  return SemanticVersion.isLegal(s, prefixLenient);
+            case SEMVER:  return SemanticVersion.isLegal(s, lenient);
             //MAVEN: not yet supported
-            default: throw new IllegalArgumentException(String.format("Illegal or unsupporte scheme %s", scheme));
+            default: throw new IllegalArgumentException(String.format("Illegal or unsupported scheme %s", scheme));
         }
     }
 

@@ -104,8 +104,8 @@ nav-user-guide:
     children:
       - title: "Global Attributes"
         url: /guide/user/state-reference/global-attributes/
-#      - title: "Release Scope Attributes"
-#        url: /guide/user/state-reference/release-scope-attributes/
+      - title: "Release Scope"
+        url: /guide/user/state-reference/release-scope/
 #      - title: "Commit History Attributes"
 #        url: /guide/user/state-reference/commit-history-attributes/
 #      - title: "Environment Attributes"

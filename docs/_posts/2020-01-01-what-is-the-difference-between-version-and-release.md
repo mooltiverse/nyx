@@ -6,7 +6,7 @@ categories: faq user
 tags: misc concepts
 ---
 
-Broadly speaking they are ofter used interchangeably but it depends on the perspective you're looking at it. If you're asking is probably because in Nyx they are sometimes used as different entities.
+Broadly speaking they are often used interchangeably but it depends on the perspective you're looking at it from. If you're asking is probably because in Nyx they are sometimes used as different entities.
 
 The difference is subtle and it all revolves around the prefix and is better explained by an example: `1.2.3` is a *version* identifier while `v1.2.3` is a *release* identifier, using `v` as the prefix.
 

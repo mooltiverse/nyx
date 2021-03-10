@@ -28,6 +28,7 @@ import com.mooltiverse.oss.nyx.configuration.Configuration;
 import com.mooltiverse.oss.nyx.configuration.mock.ConfigurationLayerMock;
 import com.mooltiverse.oss.nyx.git.Git;
 import com.mooltiverse.oss.nyx.git.GitException;
+import com.mooltiverse.oss.nyx.git.script.GitScenario;
 import com.mooltiverse.oss.nyx.git.script.GitScript;
 import com.mooltiverse.oss.nyx.state.State;
 import com.mooltiverse.oss.nyx.version.SemanticVersion;
@@ -49,8 +50,9 @@ public class InferTests extends AbstractCommandTests {
             AbstractCommand command = getCommandInstance(Infer.class, new State(new Configuration()), Git.open(script.getWorkingDirectory()));
             assertFalse(command.isUpToDate());
 
-            // running in an empty repository, with no commits, which will sill have the command to be not up to date
-            command.run();
+            // running in an empty repository, with no commits, throws an exception
+            
+            assertThrows(GitException.class, () -> command.run());
             assertFalse(command.isUpToDate());
 
             // add some commits to the repository
@@ -74,7 +76,7 @@ public class InferTests extends AbstractCommandTests {
         @DisplayName("Infer.run() with version overridden by user")
         void runWithVersionOverriddenByUserTest()
             throws Exception {
-            GitScript script = GitScript.fromScratch();
+            GitScript script = GitScenario.InitialCommit.realize();
             Configuration configuration = new Configuration();
             ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
             State state = new State(configuration);
@@ -83,7 +85,7 @@ public class InferTests extends AbstractCommandTests {
             assumeTrue(Objects.isNull(state.getVersion()));
             
             // at a first run, with no commits and no configurations, an exception is expected
-            assertThrows(GitException.class, () -> command.run());
+            //assertThrows(GitException.class, () -> command.run());
             assertNull(state.getVersion()); // the state still has a null version
 
             // inject the configuration mock at the plugin layer, still with no version set. the resulting version must not be null and be the same defined by the mock

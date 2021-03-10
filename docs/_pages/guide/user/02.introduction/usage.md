@@ -56,7 +56,6 @@ TODO: write this section
 TODO: write this section
 {: .notice--warning}
 
-
 ## Using the command line
 
 TODO: write this section

@@ -17,6 +17,8 @@ package com.mooltiverse.oss.nyx.command;
 
 import static com.mooltiverse.oss.nyx.log.Markers.COMMAND;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import org.slf4j.Logger;
@@ -24,11 +26,14 @@ import org.slf4j.LoggerFactory;
 
 import com.mooltiverse.oss.nyx.ReleaseException;
 import com.mooltiverse.oss.nyx.data.DataAccessException;
+import com.mooltiverse.oss.nyx.data.Scheme;
+import com.mooltiverse.oss.nyx.data.Tag;
 import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
 import com.mooltiverse.oss.nyx.git.GitException;
 import com.mooltiverse.oss.nyx.git.Repository;
 import com.mooltiverse.oss.nyx.state.State;
 import com.mooltiverse.oss.nyx.version.Version;
+import com.mooltiverse.oss.nyx.version.VersionFactory;
 
 /**
  * The Infer command takes care of inferring and computing informations in order to make a new release.
@@ -76,7 +81,7 @@ public class Infer extends AbstractCommand {
         // This command is considered up to date only when the repository is clean and the latest
         // commit (there must be at least one) didn't change.
         // The State must already have a version set also.
-        return isRepositoryClean() && !Objects.isNull(state().getInternals().get(INTERNAL_LAST_COMMIT)) && state().getInternals().get(INTERNAL_LAST_COMMIT).equals(getlatestCommit()) /*&& !Objects.isNull(state().getVersion())*/; // TODO: uncomment this check when the version is inferred from the Git history
+        return isRepositoryClean() && !Objects.isNull(state().getInternals().get(INTERNAL_LAST_COMMIT)) && state().getInternals().get(INTERNAL_LAST_COMMIT).equals(getLatestCommit()) && !Objects.isNull(state().getVersion());
     }
 
     /**
@@ -92,16 +97,42 @@ public class Infer extends AbstractCommand {
      * @see #isUpToDate()
      * @see State#getInternals()
      */
-    private void storeStatusAttributes()
+    private void storeStatusInternalAttributes()
         throws DataAccessException, IllegalPropertyException, GitException {
         // store the last commit SHA-1
-        String latestCommit = getlatestCommit();
+        String latestCommit = getLatestCommit();
         if (!Objects.isNull(latestCommit))
             state().getInternals().put(INTERNAL_LAST_COMMIT, latestCommit);
     }
 
     /**
-     * {@inheritDoc}
+     * Infers all the required informations to produce a new release from the Git repository.
+     * <br>
+     * Inputs to this task are:<br>
+     * - the Git repository and the commit history;<br>
+     * <br>
+     * Outputs from this task are all stored in the State object, with more detail:<br>
+     * - the {@code version} is defined with the new version identifier for the new release; if the user has overridden
+     *   the version by configuration that value is simply used and no inference is done; if the version is not overridden
+     *   by configuration and no previous versions can be found in the history the initial version from the
+     *   configuration is used<br>
+     * - the {@code releaseScope/previousVersion} and {@code releaseScope/previousVersionCommit} are defined with the
+     *   tag and SHA-1 of the previous release, if any; if no previous release is found or the version was overridden
+     *   by the user configuration they will be {@code null};<br>
+     * - the {@code releaseScope/initialCommit} is defined with the SHA-1 of the commit right after the
+     *   {@code releaseScope/previousVersionCommit} or, when {@code releaseScope/previousVersionCommit} can't be
+     *   inferred, the repository root commit SHA-1 is used; if the user overrides the version by configuration
+     *   this value remains {@code null}
+     * 
+     * @throws DataAccessException in case the configuration can't be loaded for some reason.
+     * @throws IllegalPropertyException in case the configuration has some illegal options.
+     * @throws GitException in case of unexpected issues when accessing the Git repository.
+     * @throws ReleaseException if the task is unable to complete for reasons due to the release process.
+     * 
+     * @return the updated reference to the state object. The returned object is the same instance passed in the constructor.
+     * 
+     * @see #isUpToDate()
+     * @see #state()
      */
     @Override
     public State run()
@@ -111,7 +142,110 @@ public class Infer extends AbstractCommand {
         Version version = state().getConfiguration().getVersion();
 
         if (Objects.isNull(version)) {
-            // TODO: infer the version
+            boolean releaseLenient = state().getConfiguration().getReleaseLenient().booleanValue();
+            Scheme scheme = state().getConfiguration().getScheme();
+            String bump = state().getConfiguration().getBump();
+
+            // this map is used to work around the 'local variables referenced from a lambda expression must be final or effectively final'
+            // that would be raised by compiler if we change simple non final values inside the lambda function
+            final Map<String,String> findings = new HashMap<String,String>();
+            // and these are the attribute names we use in the map
+            final String PREVIOUS_VERSION = "previousVersion";
+            final String PREVIOUS_VERSION_COMMIT = "previousVersionCommit";
+            final String PREVIOUS_VERSION_COMMIT_PLUS_1 = "previousVersionCommitPlusOne";
+            final String BUMP_COMPONENT = "bumpComponent";
+
+            logger.debug(COMMAND, "Walking the commit history...");
+            repository().walkHistory(null, null, c -> {
+                logger.debug(COMMAND, "Stepping by commit {}", c.getSHA());
+                logger.debug(COMMAND, "Commit {} has {} tags: {}", c.getSHA(), c.getTags().size(), c.getTags());
+
+                // inspect the tags in order to define the release scope
+                for (Tag tag: c.getTags()) {
+                    if (VersionFactory.isLegal(scheme.getScheme(), tag.getName(), releaseLenient)) {
+                        logger.debug(COMMAND, "Tag {} is a valid {} version and is used as the previousVersion. Likewise, {} is used as the previousVersionCommit", tag.getName(), scheme.toString(), c.getSHA());
+                        findings.put(PREVIOUS_VERSION, tag.getName());
+                        findings.put(PREVIOUS_VERSION_COMMIT, c.getSHA());
+                        break;
+                    }
+                    else {
+                        logger.debug(COMMAND, "Tag {} is not a valid {} version", tag.getName(), scheme.toString());
+                    }
+                }
+
+                // TODO: if 'bump' was not overridden by user config, inspect the commit message to figure out if we have to bump a specific version component based on that
+                if (Objects.isNull(bump)) {
+                    // each time we need to compare the 'bump' resulting from the previous commits with the one of the current commit and only store
+                    // the greatest in the findings map
+                }
+
+                // decide whether or not we need to keep walking to the next (previous) commit
+                // if we keep walking, store this curent commit as the previousVersionCommitPlusOne, which MAY become the initialCommit in the next loop
+                if (findings.containsKey(PREVIOUS_VERSION) && findings.containsKey(PREVIOUS_VERSION_COMMIT)) {
+                    return false;
+                }
+                else {
+                    findings.put(PREVIOUS_VERSION_COMMIT_PLUS_1, c.getSHA());
+                    return true;
+                }
+            });
+            logger.debug(COMMAND, "Walking the commit history finished.");
+
+            // set the state attributes about the previous version and its related commit
+            if (findings.containsKey(PREVIOUS_VERSION) && findings.containsKey(PREVIOUS_VERSION_COMMIT)) {
+                logger.debug(COMMAND, "Setting the previousVersion and previousVersionCommit state values to {} and {} respectively", findings.get(PREVIOUS_VERSION), findings.get(PREVIOUS_VERSION_COMMIT));
+                try {
+                    state().getReleaseScope().setPreviousVersion(VersionFactory.valueOf(scheme.getScheme(), findings.get(PREVIOUS_VERSION), releaseLenient));
+                    state().getReleaseScope().setPreviousVersionCommit(findings.get(PREVIOUS_VERSION_COMMIT));
+                }
+                catch (IllegalArgumentException iae) {
+                    throw new ReleaseException(String.format("The previous version %s cannot be parsed as a valid version identifier", findings.get(PREVIOUS_VERSION)), iae);
+                }
+            }
+            else {
+                logger.debug(COMMAND, "The commit history had no information about the previousVersion and previousVersionCommit so they will be null");
+                // set them to null in the state to make sure previous runs didn't leave stale values
+                state().getReleaseScope().setPreviousVersion(null);
+                state().getReleaseScope().setPreviousVersionCommit(null);
+            }
+
+            // now if we found the previous version commit the initial commit in the scope is the one next to it, otherwise the scope will start at the root commit
+            if (findings.containsKey(PREVIOUS_VERSION_COMMIT)) {
+                logger.debug(COMMAND, "Setting the initialCommit state value to {}", findings.get(PREVIOUS_VERSION_COMMIT_PLUS_1));
+                state().getReleaseScope().setInitialCommit(findings.get(PREVIOUS_VERSION_COMMIT_PLUS_1));
+            }
+            else {
+                String rootCommitSHA = repository().getRootCommit();
+                logger.debug(COMMAND, "The commit history had no information about the previousVersion and previousVersionCommit so the initialCommit is the repository root commit {}", rootCommitSHA);
+                state().getReleaseScope().setInitialCommit(rootCommitSHA);
+            }
+
+            // finally compute the version
+            // the previous version has been stored in the state above
+            if (Objects.isNull(state().getReleaseScope().getPreviousVersion())) {
+                version = state().getConfiguration().getInitialVersion();
+                logger.debug(COMMAND, "No previous version detected. Usining the initial version {}", version.toString());
+            }
+            else {
+                Version previousVersion = state().getReleaseScope().getPreviousVersion();
+                if (Objects.isNull(bump)) {
+                    if (findings.containsKey(BUMP_COMPONENT)) {
+                        logger.debug(COMMAND, "Bumping component {} on version {}", findings.get(BUMP_COMPONENT), previousVersion.toString());
+                        version = previousVersion.bump(findings.get(BUMP_COMPONENT));
+                    }
+                    else {
+                        logger.info(COMMAND, "The release scope does not contain any significant commit, version remains unchanged: {}", previousVersion.toString());
+                        version = previousVersion;
+                    }
+                }
+                else {
+                    logger.debug(COMMAND, "Bumping component {} on version {}", bump, previousVersion.toString());
+                    version = previousVersion.bump(bump);
+                }
+            }
+
+            logger.info(COMMAND, "Inferred version is: {}", version.toString());
+            state().setVersion(version);
         }
         else {
             // the version was overridden by user
@@ -119,7 +253,7 @@ public class Infer extends AbstractCommand {
             state().setVersion(version);
         }
 
-        storeStatusAttributes();
+        storeStatusInternalAttributes();
         return state();
     }
 }

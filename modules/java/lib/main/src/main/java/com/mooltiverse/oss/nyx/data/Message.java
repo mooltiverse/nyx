@@ -41,8 +41,8 @@ public class Message {
     /**
      * Constructor.
      * 
-     * @param full the full message. Cannot be {@code null}
-     * @param short the short message. Cannot be {@code null}
+     * @param fullMessage the full message. Cannot be {@code null}
+     * @param shortMessage the short message. Cannot be {@code null}
      * @param footers the map of message footers, where keys are names and values are values. Cannot be {@code null}
      */
     public Message(String fullMessage, String shortMessage, Map<String,String> footers) {

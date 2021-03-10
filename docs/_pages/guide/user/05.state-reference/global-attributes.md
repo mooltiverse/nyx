@@ -14,9 +14,10 @@ The following attributes are at the top of the hierarchy:
 | [`configuration`](#configuration)         | object  | The resolved configuration           |
 | [`directory`](#directory)                 | string  | Directory path                       |
 | [`internals`](#internals)                 | map     | Name-Value pairs                     |
+| [`releaseScope`](#release-scope)          | object  | The release scope attributes         |
 | [`scheme`](#scheme)                       | string  | `semver`                             |
 | [`timestamp`](#timestamp)                 | integer | A positive integer                   |
-| [`version`](#version)                     | string  | Valid version, when available        |
+| [`version`](#version)                     | string  | The current version                  |
 
 ### Configuration
 
@@ -24,6 +25,7 @@ The following attributes are at the top of the hierarchy:
 | Name                          | `configuration`                                                                          |
 | Type                          | object                                                                                   |
 | Related configuration options | The [entire configuration]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/index.md %}) |
+| Initialized by task           | *any*                                                                                    |
 
 This object holds a copy of the [entire configuration]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/index.md %}) **resolved** according to the [evaluation order]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}#evaluation-order).
 
@@ -33,6 +35,7 @@ This object holds a copy of the [entire configuration]({{ site.baseurl }}{% link
 | Name                          | `directory`                                                                              |
 | Type                          | string                                                                                   |
 | Related configuration options | [directory]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#directory){: .btn .btn--success .btn--small} |
+| Initialized by task           | *any*                                                                                    |
 
 The path of current working directory.
 
@@ -42,11 +45,22 @@ The path of current working directory.
 | Name                          | `internals`                                                                              |
 | Type                          | map                                                                                      |
 | Related configuration options |                                                                                          |
+| Initialized by task           | *any*                                                                                    |
 
 A map of attributes for internal use only.
 
 Using the attributes in this section is not supported. You should never rely on the attributes in this block as they may change at any time without any notice.
 {: .notice--warning}
+
+### Release scope
+
+| ----------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                          | `releaseScope`                                                                           |
+| Type                          | object                                                                                   |
+| Related configuration options | See the [details]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}) |
+| Initialized by task           | See the [details]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}) |
+
+This object collects several attributes defining the release scope. See the [details]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}).
 
 ### Scheme
 
@@ -54,6 +68,7 @@ Using the attributes in this section is not supported. You should never rely on 
 | Name                          | `scheme`                                                                                 |
 | Type                          | string                                                                                   |
 | Related configuration options | [initialVersion]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#initial-version){: .btn .btn--success .btn--small} [scheme]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#scheme){: .btn .btn--success .btn--small} |
+| Initialized by task           | *any*                                                                                    |
 
 The configured [version scheme]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/version-schemes.md %}).
 
@@ -63,6 +78,7 @@ The configured [version scheme]({{ site.baseurl }}{% link _pages/guide/user/02.i
 | Name                          | `timestamp`                                                                              |
 | Type                          | integer                                                                                  |
 | Related configuration options |                                                                                          |
+| Initialized by task           | *any*                                                                                    |
 
 The timestamp in the Unix format (seconds since Jan 01 1970. (UTC). Example: `1591802533`. See [here](https://www.unixtimestamp.com/) for examples.
 
@@ -78,6 +94,7 @@ If this is not used as the sole timestamp you may see a skew due to when the sys
 | Name                          | `version`                                                                                |
 | Type                          | string                                                                                   |
 | Related configuration options | [bump]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#bump){: .btn .btn--success .btn--small} [initialVersion]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#initial-version){: .btn .btn--success .btn--small} [scheme]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#scheme){: .btn .btn--success .btn--small} [version]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#version){: .btn .btn--success .btn--small} |
+| Initialized by task           | [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#infer){: .btn .btn--small} |
 
 The version that was [inferred]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer), unless the [`version`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#version) configuration option was passed to override inference. When the version is not overridden or inferred the [`initialVersion`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#initial-version) is used.
 

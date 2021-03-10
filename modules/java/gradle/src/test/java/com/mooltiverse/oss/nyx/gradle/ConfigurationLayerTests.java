@@ -103,15 +103,15 @@ public class ConfigurationLayerTests extends AbstractTests  {
         }
 
         @Test
-        @DisplayName("ConfigurationLayer.getReleasePrefixLenient() default")
-        void getReleasePrefixLenientDefaultTest()
+        @DisplayName("ConfigurationLayer.getReleaseLenient() default")
+        void getReleaseLenientDefaultTest()
             throws Exception {
             // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
             NyxExtension extension = newTestProject(null, true).getExtensions().getByType(NyxExtension.class);
             ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
 
-            assertFalse(extension.getReleasePrefixLenient().isPresent());
-            assertNull(configurationLayer.getReleasePrefixLenient());
+            assertFalse(extension.getReleaseLenient().isPresent());
+            assertNull(configurationLayer.getReleaseLenient());
         }
 
         @Test
@@ -239,8 +239,8 @@ public class ConfigurationLayerTests extends AbstractTests  {
 
         /* This test is commented because it has nothing to test
         @Test
-        @DisplayName("ConfigurationLayer.getReleasePrefixLenient() with wrong values throws ConfigurationException")
-        void getReleasePrefixLenientWrongValueTest()
+        @DisplayName("ConfigurationLayer.getReleaseLenient() with wrong values throws ConfigurationException")
+        void getReleaseLenientWrongValueTest()
             throws Exception {
             // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
             Project project = newTestProject(null, true);

@@ -176,7 +176,6 @@ public class Nyx {
      */
     private <T extends AbstractCommand> State runCommand(Class<T> clazz, boolean useCache)
         throws DataAccessException, IllegalPropertyException, GitException, ReleaseException {
-        
         Objects.requireNonNull(clazz, "Cannot instantiate the command from a null class");
 
         Command command = null;

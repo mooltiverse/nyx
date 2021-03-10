@@ -29,6 +29,7 @@ import com.mooltiverse.oss.nyx.Nyx;
 import com.mooltiverse.oss.nyx.configuration.Configuration;
 import com.mooltiverse.oss.nyx.data.DataAccessException;
 import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
+import com.mooltiverse.oss.nyx.data.ReleaseScope;
 import com.mooltiverse.oss.nyx.data.Scheme;
 import com.mooltiverse.oss.nyx.version.Version;
 
@@ -56,6 +57,11 @@ public class State implements Root {
      * The private immutable instance of the configuration.
      */
     private final Configuration configuration;
+
+    /**
+     * The private immutable instance of the release scope.
+     */
+    private final ReleaseScope releaseScope = new ReleaseScope();
 
     /**
      * The latest timestamp that was taken.
@@ -109,6 +115,14 @@ public class State implements Root {
     @Override
     public Map<String, String> getInternals() {
         return internals;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ReleaseScope getReleaseScope() {
+        return releaseScope;
     }
 
     /**

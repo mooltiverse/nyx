@@ -79,9 +79,9 @@ public abstract class NyxExtension {
     private Property<String> releasePrefix = getObjectfactory().property(String.class);
 
     /**
-     * The 'releasePrefixLenient' property.
+     * The 'releaseLenient' property.
      */
-    private Property<Boolean> releasePrefixLenient = getObjectfactory().property(Boolean.class);
+    private Property<Boolean> releaseLenient = getObjectfactory().property(Boolean.class);
 
     /**
      * The 'scheme' property.
@@ -231,10 +231,10 @@ public abstract class NyxExtension {
      * 
      * @return the flag that, when {@code true}, lets Nyx interpret release names with whatever prefix
      * 
-     * @see Defaults#RELEASE_PREFIX_LENIENT
+     * @see Defaults#RELEASE_LENIENT
      */
-    public Property<Boolean> getReleasePrefixLenient() {
-        return releasePrefixLenient;
+    public Property<Boolean> getReleaseLenient() {
+        return releaseLenient;
     }
 
     /**

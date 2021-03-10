@@ -394,16 +394,16 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
      * {@link #valueOf(String, boolean)} without exceptions.
      * 
      * @param s the string version to check.
-     * @param prefixLenient when {@code true} prefixes are tolerated even if they are not strictly legal from the
-     * semantic version specification perspective.
+     * @param lenient when {@code true} prefixes and non critical extra characters are tolerated even if they are not
+     * strictly legal from the semantic version specification perspective.
      * 
      * @return {@code true} if the given string represents a legal semantic version, {@code false} otherwise.
      * 
      * @see #valueOf(String, boolean)
      */
-    public static boolean isLegal(String s, boolean prefixLenient) {
+    public static boolean isLegal(String s, boolean lenient) {
         Objects.requireNonNull(s, "Can't parse a null string");
-        Matcher m = Pattern.compile(prefixLenient ? SEMANTIC_VERSION_PATTERN_RELAXED : SEMANTIC_VERSION_PATTERN).matcher(s);
+        Matcher m = Pattern.compile(lenient ? SEMANTIC_VERSION_PATTERN_RELAXED : SEMANTIC_VERSION_PATTERN).matcher(s);
         return m.find();
     }
 
@@ -1232,6 +1232,7 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
      * @see #bump(CoreIdentifiers)
      * @see #bumpPrerelease(String)
      */
+    @Override
     public SemanticVersion bump(String id) {
         Objects.requireNonNull(id, "Can't bump a null identifier");
         if (id.isBlank())

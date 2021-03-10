@@ -88,7 +88,7 @@ public class Mark extends AbstractCommand {
      * @see #isUpToDate()
      * @see State#getInternals()
      */
-    private void storeStatusAttributes()
+    private void storeStatusInternalAttributes()
         throws DataAccessException, IllegalPropertyException, GitException {
         // store the last execution time
         state().getInternals().put(INTERNAL_EXECUTED, Long.toString(System.currentTimeMillis()));
@@ -101,10 +101,11 @@ public class Mark extends AbstractCommand {
     public State run()
         throws DataAccessException, IllegalPropertyException, GitException, ReleaseException {
         // TODO: implement this method
+        // don't forget to set the last/final commit attribute in the release scope
         // the following are just temporary smoke detection outputs
         logger.info(COMMAND, "Mark.run()");
 
-        storeStatusAttributes();
+        storeStatusInternalAttributes();
         return state();
     }
 }

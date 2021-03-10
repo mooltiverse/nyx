@@ -92,7 +92,7 @@ public abstract class AbstractCommand implements Command {
      * 
      * @see #repository()
      */
-    protected String getlatestCommit()
+    protected String getLatestCommit()
         throws GitException {
         try {
             return repository().getLatestCommit();

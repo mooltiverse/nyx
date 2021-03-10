@@ -7,17 +7,17 @@ permalink: /guide/user/configuration-reference/global-options/
 
 These are the top level options in the configuration:
 
-| Name                                                      | Type    | Command Line Option                                       | Environment Variable                                          | Configuration File Option                                     | Default  |
-| --------------------------------------------------------- | ------- | --------------------------------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------- | -------- |
-| [`bump`](#bump)                                           | string  | `-b <NAME>`, `--bump=<NAME>`                              | `NYX_BUMP=<NAME>`                                             | `bump`                                                        | N/A      |
-| [`directory`](#directory)                                 | string  | `-d <PATH>`, `--directory=<PATH>`                         | `NYX_DIRECTORY=<PATH>`                                        | `directory`                                                   | Current working directory |
-| [`dryRun`](#dry-run)                                      | boolean | `--dry-run`, `--dry-run=true|false`                       | `NYX_DRY_RUN=true|false`                                      | `dryRun`                                                      | `false`  |
-| [`initialVersion`](#initial-version)                      | string  | `--initial-version=<VERSION>`                             | `NYX_INITIAL_VERSION=<VERSION>`                               | `initialVersion`                                              | Depends on the configured [version scheme](#scheme) |
-| [`releasePrefix`](#release-prefix)                        | string  | `--release-prefix=<PREFIX>`                               | `NYX_RELEASE_PREFIX=<PREFIX>`                                 | `releasePrefix`                                               | `v`      |
-| [`releasePrefixLenient`](#release-prefix-lenient)         | boolean | `--release-prefix-lenient`, `--release-prefix-lenient=true|false` | `NYX_RELEASE_PREFIX_LENIENT=true|false`               | `releasePrefixLenient`                                        | `true`   |
-| [`scheme`](#scheme)                                       | string  | `--scheme=<NAME>`                                         | `NYX_SCHEME=<NAME>`                                           | `scheme`                                                      | `semver` |
-| [`verbosity`](#verbosity)                                 | string  | `--verbosity=<LEVEL>`, `--fatal`, `--error`, `--warning`, `--info`, `--debug`, `--trace` | `NYX_VERBOSITY=<LEVEL>`        | `verbosity`                                                   | `warning`|
-| [`version`](#version)                                     | string  | `-v <VERSION>`, `--version=<VERSION>`                     | `NYX_VERSION=<VERSION>`                                       | `version`                                                     | N/A      |
+| Name                                                      | Type    | Command Line Option                                       | Environment Variable                                          | Default  |
+| --------------------------------------------------------- | ------- | --------------------------------------------------------- | ------------------------------------------------------------- | -------- |
+| [`bump`](#bump)                                           | string  | `-b <NAME>`, `--bump=<NAME>`                              | `NYX_BUMP=<NAME>`                                             | N/A      |
+| [`directory`](#directory)                                 | string  | `-d <PATH>`, `--directory=<PATH>`                         | `NYX_DIRECTORY=<PATH>`                                        | Current working directory |
+| [`dryRun`](#dry-run)                                      | boolean | `--dry-run`, `--dry-run=true|false`                       | `NYX_DRY_RUN=true|false`                                      | `false`  |
+| [`initialVersion`](#initial-version)                      | string  | `--initial-version=<VERSION>`                             | `NYX_INITIAL_VERSION=<VERSION>`                               |  Depends on the configured [version scheme](#scheme) |
+| [`releaseLenient`](#release-lenient)                      | boolean | `--release-lenient`, `--release-lenient=true|false`       | `NYX_RELEASE_LENIENT=true|false`                              | `true`   |
+| [`releasePrefix`](#release-prefix)                        | string  | `--release-prefix=<PREFIX>`                               | `NYX_RELEASE_PREFIX=<PREFIX>`                                 | `v`      |
+| [`scheme`](#scheme)                                       | string  | `--scheme=<NAME>`                                         | `NYX_SCHEME=<NAME>`                                           | `semver` |
+| [`verbosity`](#verbosity)                                 | string  | `--verbosity=<LEVEL>`, `--fatal`, `--error`, `--warning`, `--info`, `--debug`, `--trace` | `NYX_VERBOSITY=<LEVEL>`        | `warning`|
+| [`version`](#version)                                     | string  | `-v <VERSION>`, `--version=<VERSION>`                     | `NYX_VERSION=<VERSION>`                                       | N/A      |
 
 ### Bump
 
@@ -91,6 +91,25 @@ This might be useful for project bootstrapping only (from Nyx's perspective) whe
 
 This value is ignored when the [version](#version) option is used.
 
+### Release lenient
+
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `releaseLenient`                                                                         |
+| Type                      | boolean                                                                                  |
+| Default                   | `true`                                                                                   |
+| Command Line Option       | `--release-lenient`, `--release-lenient=true|false`                                      |
+| Environment Variable      | `NYX_RELEASE_LENIENT=true|false`                                                         |
+| Configuration File Option | `releaseLenient`                                                                         |
+| Related state attributes  |                                                                                          |
+
+When this option is enabled (it is by default), Nyx will attempt to tolerate prefixes and other unnecessary characters (like leading zeroes) when **reading** Git tags from the commit history. When `true`, tags like `vx.y.x`, `relx.y.x` etc will be detected as release tags (for *version* `x.y.x`), regardless of the [prefix Nyx uses to **generate** release names](#release-prefix). On the other hand, when this is `false`, Nyx will only detect tags strictly complying with the version [scheme](#scheme) and the [release prefix](#release-prefix) so, for instance, when `releasePrefix` is set to `v`, Nyx will only detect tags of the form `vx.y.x` while if the `releasePrefix` is not used, only `x.y.x` tags are detected, with no extra leading zeroes etc.
+
+With this option enabled the prefixes of tags parsed by Nyx don't need to use the same prefix as `releasePrefix` so, for instance, if `releasePrefix` is `v`, Nyx can parse tags like `x.y.x`, `vx.y.x`, `relx.y.x` etc.
+
+Unnecessary leading zeroes will still allow version numbers to be parsed although they will be sanitized upon parsing. For example, `1.02.3` has an offending `0` which will not cause the version to be rejected when this option is enabled. However, the version will be parsed as `1.2.3`, with the offending characted sanitized.
+
+When used with no value on the command line (i.e. `--release-lenient` alone) `true` is assumed.
+
 ### Release prefix
 
 | ------------------------- | ---------------------------------------------------------------------------------------- |
@@ -111,24 +130,7 @@ When specifying a custom prefix, only use alphanumeric characters (no numbers or
 Release names are not necessarily equal to versions. For example version `1.2.3` can be issued by the release named `v1.2.3`. This is a small difference but helps [coping with the strict interpretation of valid version identifiers]({{ site.baseurl }}{% link _posts/2020-01-01-what-is-the-difference-between-version-and-release.md %}).
 {: .notice--info}
 
-This option only affects the way Nyx **generates** release names and tags, while [`releasePrefixLenient`](#release-prefix-lenient) controls how tolerant Nyx is when **reading** release tags from the Git repository.
-
-### Release prefix lenient
-
-| ------------------------- | ---------------------------------------------------------------------------------------- |
-| Name                      | `releasePrefixLenient`                                                                   |
-| Type                      | boolean                                                                                  |
-| Default                   | `true`                                                                                   |
-| Command Line Option       | `--release-prefix-lenient`, `--release-prefix-lenient=true|false`                        |
-| Environment Variable      | `NYX_RELEASE_PREFIX_LENIENT=true|false`                                                  |
-| Configuration File Option | `releasePrefixLenient`                                                                   |
-| Related state attributes  |                                                                                          |
-
-When this option is enabled (it is by default), Nyx will attempt to tolerate prefixes when **reading** Git tags from the commit history. When `true`, tags like `vx.y.x`, `relx.y.x` etc will be detected as release tags (for *version* `x.y.x`), regardless of the [prefix Nyx uses to **generate** release names](#release-prefix). On the other hand, when this is `false`, Nyx will only detect tags strictly complying with the [release prefix](#release-prefix) so, for instance, when `releasePrefix` is set to `v`, Nyx will only detect tags of the form `vx.y.x` while if the `releasePrefix` is not used, only `x.y.x` tags are detected.
-
-The prefixes of tags parsed by Nyx with this option enabled don't need to use the same prefix as `releasePrefix` so, for instance, if `releasePrefix` is `v`, Nyx can parse tags like `x.y.x`, `vx.y.x`, `relx.y.x` etc.
-
-When used with no value on the command line (i.e. `--release-prefix-lenient` alone) `true` is assumed.
+This option only affects the way Nyx **generates** release names and tags, while [`releaseLenient`](#release-lenient) controls how tolerant Nyx is when **reading** release tags from the Git repository.
 
 ### Scheme
 

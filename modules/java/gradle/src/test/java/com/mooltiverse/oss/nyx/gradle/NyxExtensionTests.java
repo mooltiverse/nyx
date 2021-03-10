@@ -94,14 +94,14 @@ public class NyxExtensionTests extends AbstractTests  {
         }
 
         @Test
-        @DisplayName("NyxExtension.getReleasePrefixLenient() default")
-        void getReleasePrefixLenientDefaultTest()
+        @DisplayName("NyxExtension.getReleaseLenient() default")
+        void getReleaseLenientDefaultTest()
             throws Exception {
             // apply the plugin to a new project and retrieve the extension
             NyxExtension extension = newTestProject(null, true).getExtensions().getByType(NyxExtension.class);
 
-            assertFalse(extension.getReleasePrefixLenient().isPresent());
-            assertNull(extension.getReleasePrefixLenient().getOrNull());
+            assertFalse(extension.getReleaseLenient().isPresent());
+            assertNull(extension.getReleaseLenient().getOrNull());
         }
 
         @Test

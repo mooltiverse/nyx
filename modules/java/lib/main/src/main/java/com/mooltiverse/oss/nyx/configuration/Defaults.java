@@ -55,9 +55,9 @@ public interface Defaults {
     public static final String RELEASE_PREFIX = "v";
 
     /**
-     * The flag that alows reading releases from the history tolerating arbitrary prefixes. Value: {@code true}
+     * The flag that alows reading releases from the history tolerating arbitrary prefixes and extra non critical characters. Value: {@code true}
      */
-    public static final Boolean RELEASE_PREFIX_LENIENT = Boolean.TRUE;
+    public static final Boolean RELEASE_LENIENT = Boolean.TRUE;
 
     /**
      * The versioning scheme to use. Value: {@link Scheme#SEMVER}

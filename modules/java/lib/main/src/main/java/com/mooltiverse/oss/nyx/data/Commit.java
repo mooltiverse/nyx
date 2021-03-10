@@ -66,9 +66,9 @@ public class Commit {
      * @param date the commit date
      * @param parents the SHA-1 identifiers of parent commits. If the commit has no parents an empty,
      * non {@code null} list, must be passed
-     * @param commitAction the value holder about the author. Cannot be {@code null}
+     * @param authorAction the value holder about the author. Cannot be {@code null}
      * @param commitAction the value holder about the committer. Cannot be {@code null}
-     * @oaram message the commit message. Cannot be {@code null}
+     * @param message the commit message. Cannot be {@code null}
      * @param tags the tags applied to this commit. If the commit has no tags an empty,
      * non {@code null} set, must be passed
      */

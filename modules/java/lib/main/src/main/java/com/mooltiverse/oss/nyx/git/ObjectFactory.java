@@ -107,7 +107,7 @@ class ObjectFactory {
      * Note that the given reference must be peeled ({@link RefDatabase#peel(Ref)}) before this method
      * is invoked or this method will not be able to detect if the tag is annotated or lightweight.
      * 
-     * @param personIdent the git reference to get the data from.
+     * @param ref the git reference to get the data from.
      * 
      * @return the value object.
      */

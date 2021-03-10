@@ -91,7 +91,7 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
     @Override
     public Version getInitialVersion()
         throws IllegalPropertyException {
-        return extension.getInitialVersion().isPresent() ? VersionFactory.valueOf(getScheme().getScheme(), extension.getInitialVersion().get(), getReleasePrefixLenient()) : null;
+        return extension.getInitialVersion().isPresent() ? VersionFactory.valueOf(getScheme().getScheme(), extension.getInitialVersion().get(), getReleaseLenient()) : null;
     }
 
     /**
@@ -106,8 +106,8 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
      * {@inheritDoc}
      */
     @Override
-    public Boolean getReleasePrefixLenient() {
-        return extension.getReleasePrefixLenient().getOrNull();
+    public Boolean getReleaseLenient() {
+        return extension.getReleaseLenient().getOrNull();
     }
 
     /**
@@ -161,7 +161,7 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
                 // While using SEMVER as the scheme here is suitable for now as it's the only supported scheme, this must
                 // be resolved against all configuration layers. See also #37 (https://github.com/mooltiverse/nyx/issues/37).
                 //
-                // Moreover, we also need to consider if the getReleasePrefixLenient option has been set and, if not, the getReleasePrefix
+                // Moreover, we also need to consider if the getReleaseLenient option has been set and, if not, the getReleasePrefix
                 // to know if the parsing has to tolerate prefixes and, if so, if any prefix or just one.
                 // Again, we enable sanitization as it's suitable for now but this must be fixed as soon as possible
                 return VersionFactory.valueOf(Scheme.SEMVER.getScheme(), projectVersion.toString(), true);

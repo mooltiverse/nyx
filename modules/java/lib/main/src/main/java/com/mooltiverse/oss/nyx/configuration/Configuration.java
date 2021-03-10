@@ -202,17 +202,17 @@ public class Configuration implements Root {
      * {@inheritDoc}
      */
     @Override
-    public Boolean getReleasePrefixLenient()
+    public Boolean getReleaseLenient()
         throws DataAccessException, IllegalPropertyException {
-        logger.trace(CONFIGURATION, "Retrieving the {} configuration option", "releasePrefixLenient");
+        logger.trace(CONFIGURATION, "Retrieving the {} configuration option", "releaseLenient");
         for (ConfigurationLayer layer: layers.values()) {
-            Boolean releasePrefixLenient = layer.getReleasePrefixLenient();
-            if (!Objects.isNull(releasePrefixLenient)) {
-                logger.trace(CONFIGURATION, "The {} configuration option value is: {}", "releasePrefixLenient", releasePrefixLenient);
-                return releasePrefixLenient;
+            Boolean releaseLenient = layer.getReleaseLenient();
+            if (!Objects.isNull(releaseLenient)) {
+                logger.trace(CONFIGURATION, "The {} configuration option value is: {}", "releaseLenient", releaseLenient);
+                return releaseLenient;
             }
         }
-        return DefaultLayer.getInstance().getReleasePrefixLenient();
+        return DefaultLayer.getInstance().getReleaseLenient();
     }
 
     /**

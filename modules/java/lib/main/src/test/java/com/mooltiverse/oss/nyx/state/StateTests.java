@@ -82,6 +82,19 @@ public class StateTests {
     }
 
     @Nested
+    @DisplayName("State release scope")
+    class ReleaseScopeTests {
+        @Test
+        @DisplayName("State.getReleaseScope()")
+        void getReleaseScopeTest()
+            throws Exception {
+            Configuration configuration = new Configuration();
+            // make sure the release scope is initialized
+            assertNotNull(new State(configuration).getReleaseScope());
+        }
+    }
+
+    @Nested
     @DisplayName("State scheme")
     class SchemeTests {
         @Test

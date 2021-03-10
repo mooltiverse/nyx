@@ -197,8 +197,8 @@ class JGitRepository implements Repository {
 
     /**
      * Resolves the commit with the given {@code id} using the given {@link RevWalk} object and returns it as a typed object.
-     * In case you need to use the returned object with a {@link RevWalk} instance you should use this version of the method instead
-     * of {@link #parseCommit(String)} as {@link RevWalk} would throw exceptions if the object is parsed elsewhere.
+     * In case you need to use the returned object with a {@link RevWalk} instance you should use this version 
+     * as {@link RevWalk} would throw exceptions if the object is parsed elsewhere.
      * 
      * This method is an utility wrapper around {@link RevWalk#parseCommit(AnyObjectId)} which never returns
      * {@code null} and throws {@link GitException} if the identifier cannot be resolved or any other exception occurs.
@@ -211,7 +211,6 @@ class JGitRepository implements Repository {
      * @throws GitException in case the given identifier cannot be resolved or any other issue is encountered
      * 
      * @see #resolve(String)
-     * @see #parseCommit(String)
      * @see RevWalk#parseCommit(AnyObjectId)
      */
     private RevCommit parseCommit(RevWalk rw, String id)

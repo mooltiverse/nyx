@@ -60,7 +60,7 @@ public class ConfigurationLayerMock implements ConfigurationLayer {
     /**
      * The value returned by this mock object.
      */
-    public static final Boolean RELEASE_PREFIX_LENIENT = Boolean.FALSE;
+    public static final Boolean RELEASE_LENIENT = Boolean.FALSE;
 
     /**
      * The value returned by this mock object.
@@ -105,7 +105,7 @@ public class ConfigurationLayerMock implements ConfigurationLayer {
     /**
      * The value returned by this mock object.
      */
-    public Boolean releasePrefixLenient = RELEASE_PREFIX_LENIENT;
+    public Boolean releaseLenient = RELEASE_LENIENT;
 
     /**
      * The value returned by this mock object.
@@ -173,8 +173,8 @@ public class ConfigurationLayerMock implements ConfigurationLayer {
      * {@inheritDoc}
      */
     @Override
-    public Boolean getReleasePrefixLenient() {
-        return releasePrefixLenient;
+    public Boolean getReleaseLenient() {
+        return releaseLenient;
     }
 
     /**

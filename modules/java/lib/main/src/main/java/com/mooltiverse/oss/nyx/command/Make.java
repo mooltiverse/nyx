@@ -88,7 +88,7 @@ public class Make extends AbstractCommand {
      * @see #isUpToDate()
      * @see State#getInternals()
      */
-    private void storeStatusAttributes()
+    private void storeStatusInternalAttributes()
         throws DataAccessException, IllegalPropertyException, GitException {
         // store the last execution time
         state().getInternals().put(INTERNAL_EXECUTED, Long.toString(System.currentTimeMillis()));
@@ -104,7 +104,7 @@ public class Make extends AbstractCommand {
         // the following are just temporary smoke detection outputs
         logger.info(COMMAND, "Make.run()");
 
-        storeStatusAttributes();
+        storeStatusInternalAttributes();
         return state();
     }
 }

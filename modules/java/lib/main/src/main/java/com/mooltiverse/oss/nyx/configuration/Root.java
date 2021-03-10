@@ -87,7 +87,7 @@ public interface Root extends Block {
         throws DataAccessException, IllegalPropertyException;
 
     /**
-     * Returns the flag that enables tolerance in reading release names with arbitrary prefixes
+     * Returns the flag that enables tolerance in reading release names with arbitrary prefixes or extra non critical characters
      * as it's defined by this configuration.
      * 
      * @return the configured value for this option or {@code null} if the value hasn't been defined.
@@ -95,7 +95,7 @@ public interface Root extends Block {
      * @throws DataAccessException in case the option cannot be read or accessed.
      * @throws IllegalPropertyException in case the option has been defined but has incorrect values or it can't be resolved.
      */
-    public Boolean getReleasePrefixLenient()
+    public Boolean getReleaseLenient()
         throws DataAccessException, IllegalPropertyException;
 
     /**

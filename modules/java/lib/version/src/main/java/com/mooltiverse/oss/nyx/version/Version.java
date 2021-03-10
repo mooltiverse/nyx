@@ -65,4 +65,19 @@ public abstract class Version implements Cloneable, Serializable {
      */
     @Override
     public abstract String toString();
+
+    /**
+     * Returns a new instance with the number identified by the given value bumped. The supported identifiers depend
+     * on the concrete subclass.
+     * <br>
+     *
+     * @param id the name of the identifier to bump
+     *
+     * @return a new instance with the number identified by the given value bumped.
+     *
+     * @throws NullPointerException if {@code null} is passed
+     * @throws IllegalArgumentException if the given string is empty, contains illegal characters or does not represent
+     * a valid identifier to be bumped
+     */
+    public abstract Version bump(String id);
 }
