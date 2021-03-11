@@ -85,8 +85,18 @@ public class InferTaskTests extends CoreTaskTests {
             Task task = project.getTasks().getByName(InferTask.NAME);
     
             for (Action<? super Task> action: task.getActions()) {
-                //TODO: check outputs from the State
                 action.execute(task);
+                
+                // test the State attributes after execution
+                Nyx nyx = getNyxForTask(task);
+                assertNull(nyx.state().getBump());
+                assertEquals(nyx.state().getConfiguration().getScheme(), nyx.state().getScheme());
+                assertEquals(nyx.state().getConfiguration().getInitialVersion(), nyx.state().getVersion());
+                assertEquals(script.getCommits().get(0), nyx.state().getReleaseScope().getInitialCommit());
+                assertNull(nyx.state().getReleaseScope().getFinalCommit());
+                assertNull(nyx.state().getReleaseScope().getPreviousVersion());
+                assertNull(nyx.state().getReleaseScope().getPreviousVersionCommit());
+                assertEquals(Boolean.FALSE, nyx.state().getReleaseScope().getSignificant());
             }
         }
 
@@ -94,7 +104,9 @@ public class InferTaskTests extends CoreTaskTests {
         @DisplayName("InferTask.getActions().execute() with version override ==> custom version")
         void runWithVersionOverriddenByUserTest()
             throws Exception {
-            Project project = newTestProject(GitScenario.InitialCommit.realize().getWorkingDirectory(), false);
+            // a Git repository is created in a different temporary directory
+            GitScript script = GitScenario.InitialCommit.realize();
+            Project project = newTestProject(script.getWorkingDirectory(), false);
 
             // set the project property
             project.setProperty(GRADLE_VERSION_PROPERTY_NAME, "1.2.3");
@@ -107,6 +119,19 @@ public class InferTaskTests extends CoreTaskTests {
     
             for (Action<? super Task> action: task.getActions()) {
                 action.execute(task);
+
+                // test the State attributes after execution
+                // many values are not initialized because inference was skipped due to the version override
+                Nyx nyx = getNyxForTask(task);
+                assertNull(nyx.state().getBump());
+                assertEquals(nyx.state().getConfiguration().getScheme(), nyx.state().getScheme());
+                assertEquals("1.2.3", nyx.state().getConfiguration().getVersion().toString());
+                assertEquals(nyx.state().getConfiguration().getVersion(), nyx.state().getVersion());
+                assertNull(nyx.state().getReleaseScope().getInitialCommit());
+                assertNull(nyx.state().getReleaseScope().getFinalCommit());
+                assertNull(nyx.state().getReleaseScope().getPreviousVersion());
+                assertNull(nyx.state().getReleaseScope().getPreviousVersionCommit());
+                assertNull(nyx.state().getReleaseScope().getSignificant());
             }
 
             // make sure the project version is now set to the value we passed (this could be true even if Nyx didn't do anything)

@@ -49,14 +49,19 @@ public class State implements Root {
     private static final Logger logger = LoggerFactory.getLogger(State.class);
 
     /**
-     * The map containing the internal attributes.
+     * The version identifier bumped on the previous release to produce the new release, if any.
      */
-    private final Map<String, String> internals = new HashMap<String, String>();
+    private String bump = null;
 
     /**
      * The private immutable instance of the configuration.
      */
     private final Configuration configuration;
+
+    /**
+     * The map containing the internal attributes.
+     */
+    private final Map<String, String> internals = new HashMap<String, String>();
 
     /**
      * The private immutable instance of the release scope.
@@ -90,6 +95,30 @@ public class State implements Root {
 
         // restoring from file gets the timestamp from previous runs, so we need to update it
         touchTimestamp();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getBump()
+        throws DataAccessException, IllegalPropertyException {
+        return bump;
+    }
+
+    /**
+     * Sets the version identifier bumped on the previous release to produce the new release, if any.
+     * 
+     * @param bump the version identifier bumped on the previous release to produce the new release, if any.
+     * It may be {@code null}.
+     * 
+     * @see #getBump()
+     * 
+     * @throws DataAccessException in case the attribute cannot be read or accessed.
+     * @throws IllegalPropertyException in case the attribute has been defined but has incorrect values or it can't be resolved.
+     */
+    public void setBump(String bump) {
+        this.bump = bump;
     }
 
     /**
@@ -166,8 +195,8 @@ public class State implements Root {
      */
     public void setVersion(Version version)
         throws DataAccessException, IllegalPropertyException {
-        if (!getConfiguration().getScheme().getScheme().equals(version.getScheme())) {
-            throw new IllegalPropertyException(String.format("The given version %s scheme %s (%s) does not match the configured scheme %s", version.toString(), version.getScheme(), Scheme.from(version.getScheme()), getConfiguration().getScheme()));
+        if (!getScheme().getScheme().equals(version.getScheme())) {
+            throw new IllegalPropertyException(String.format("The given version %s scheme %s (%s) does not match the configured scheme %s", version.toString(), version.getScheme(), Scheme.from(version.getScheme()), getScheme()));
         }
         
         this.version = version;

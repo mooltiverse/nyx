@@ -36,6 +36,7 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.RefNotFoundException;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.Ref;
+import org.eclipse.jgit.lib.RefDatabase;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevObject;
@@ -178,6 +179,27 @@ public class GitTestRepository {
      */
     public Map<String,List<String>> getCommitsByBranch() {
         return commits;
+    }
+
+    /**
+     * Returns the SHA-1 of the commit the given tag points to, if any, or {@code null} otherwise.
+     * 
+     * @param tag the tag to search the commit for
+     * 
+     * @return the SHA-1 of the commit the given tag points to, if any, or {@code null} otherwise.
+     * 
+     * @throws Exception in case of any issue
+     */
+    public String getCommitByTag(String tag)
+        throws Exception {
+        RefDatabase refDatabase = git.getRepository().getRefDatabase();
+        for (Ref tagRef: refDatabase.getRefsByPrefix(Constants.R_TAGS)) {
+            if (tagRef.getName().replace(Constants.R_TAGS, "").equals(tag)) {
+                tagRef = refDatabase.peel(tagRef);
+                return Objects.isNull(tagRef.getPeeledObjectId()) ? tagRef.getObjectId().getName() : tagRef.getPeeledObjectId().getName();
+            }
+        }
+        return null;
     }
 
     /**

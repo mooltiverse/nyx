@@ -42,6 +42,11 @@ public class ReleaseScope {
     private Version previousVersion = null;
 
     /**
+     * The flag telling if the release scope contains significant commits.
+     */
+    private Boolean significant = null;
+
+    /**
      * Default constructor.
      */
     public ReleaseScope() {
@@ -55,13 +60,15 @@ public class ReleaseScope {
      * @param previousVersionCommit the SHA-1 identifier of the most recent past release commit. It may be {@code null}.
      * @param initialCommit the SHA-1 identifier of the first commit within the scope. It may be {@code null}.
      * @param finalCommit the SHA-1 identifier of the last commit within the scope. It may be {@code null}.
+     * @param significant the flag telling if the release scope contains significant commits. It may be {@code null}.
      */
-    public ReleaseScope(Version previousVersion, String previousVersionCommit, String initialCommit, String finalCommit) {
+    public ReleaseScope(Version previousVersion, String previousVersionCommit, String initialCommit, String finalCommit, Boolean significant) {
         super();
         this.previousVersion = previousVersion;
         this.previousVersionCommit = previousVersionCommit;
         this.initialCommit = initialCommit;
         this.finalCommit = finalCommit;
+        this.significant = significant;
     }
 
     /**
@@ -134,5 +141,23 @@ public class ReleaseScope {
      */
     public void setFinalCommit(String finalCommit) {
         this.finalCommit = finalCommit;
+    }
+
+    /**
+     * Returns the flag telling if the release scope contains significant commits.
+     * 
+     * @return the flag telling if the release scope contains significant commits. It may be {@code null}.
+     */
+    public Boolean getSignificant() {
+        return significant;
+    }
+
+    /**
+     * Sets the flag telling if the release scope contains significant commits.
+     * 
+     * @param significant the flag telling if the release scope contains significant commits. It may be {@code null}.
+     */
+    public void setSignificant(Boolean significant) {
+        this.significant = significant;
     }
 }

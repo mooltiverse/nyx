@@ -26,6 +26,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import com.mooltiverse.oss.nyx.Nyx;
+
 /**
  * Tests the core Gradle task.<br>
  * 
@@ -33,6 +35,20 @@ import org.junit.jupiter.params.provider.MethodSource;
  */
 @DisplayName("CoreTask")
 public class CoreTaskTests extends AbstractTaskTests {
+    /**
+     * Retrieves the shared Nyx instance for the task, used to inspect its values.
+     * 
+     * @param task the task to get the Nyx instance for
+     * 
+     * @return the shared Nyx instance for the task
+     * 
+     * @throws Exception in case of any issue
+     */
+    protected static Nyx getNyxForTask(Task task)
+        throws Exception {
+        return Nyx.class.cast(task.getProject().getExtensions().getExtraProperties().get(CoreTask.NYX_INSTANCE_PROPERTY));
+    }
+
     /**
      * Performs checks on the task status after it's been configured.
      */

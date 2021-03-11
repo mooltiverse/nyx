@@ -40,6 +40,28 @@ public class StateTests {
         }
 
         @Test
+        @DisplayName("State.getBump()")
+        void getBumpTest()
+            throws Exception {
+            Configuration configuration = new Configuration();
+            // make sure the bump is null in the beginning (it's set only after the Infer task has run)
+            State state = new State(configuration);
+            assertNull(state.getBump());
+        }
+
+        @Test
+        @DisplayName("State.setBump(String)")
+        void setBumpTest()
+            throws Exception {
+            Configuration configuration = new Configuration();
+            State state = new State(configuration);
+
+            String bump = "alpha";
+            state.setBump(bump);
+            assertEquals(bump, state.getBump());
+        }
+
+        @Test
         @DisplayName("State.getConfiguration()")
         void getConfigurationTest()
             throws Exception {

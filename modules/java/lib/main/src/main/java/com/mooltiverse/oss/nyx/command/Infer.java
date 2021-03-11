@@ -142,18 +142,22 @@ public class Infer extends AbstractCommand {
         Version version = state().getConfiguration().getVersion();
 
         if (Objects.isNull(version)) {
-            boolean releaseLenient = state().getConfiguration().getReleaseLenient().booleanValue();
-            Scheme scheme = state().getConfiguration().getScheme();
-            String bump = state().getConfiguration().getBump();
+            // these objects are fetched in advance from the state because they may throw an exception that we can't handle in the lambda expression
+            final boolean releaseLenient = state().getConfiguration().getReleaseLenient().booleanValue();
+            final Scheme scheme = state().getScheme();
 
             // this map is used to work around the 'local variables referenced from a lambda expression must be final or effectively final'
             // that would be raised by compiler if we change simple non final values inside the lambda function
             final Map<String,String> findings = new HashMap<String,String>();
             // and these are the attribute names we use in the map
+            final String BUMP_COMPONENT = "bumpComponent";
             final String PREVIOUS_VERSION = "previousVersion";
             final String PREVIOUS_VERSION_COMMIT = "previousVersionCommit";
             final String PREVIOUS_VERSION_COMMIT_PLUS_1 = "previousVersionCommitPlusOne";
-            final String BUMP_COMPONENT = "bumpComponent";
+            final String SIGNIFICANT = "significant"; // simply defining this object means it's true
+
+            if (!Objects.isNull(state().getConfiguration().getBump()))
+                findings.put(BUMP_COMPONENT, state().getConfiguration().getBump());
 
             logger.debug(COMMAND, "Walking the commit history...");
             repository().walkHistory(null, null, c -> {
@@ -173,8 +177,14 @@ public class Infer extends AbstractCommand {
                     }
                 }
 
-                // TODO: if 'bump' was not overridden by user config, inspect the commit message to figure out if we have to bump a specific version component based on that
-                if (Objects.isNull(bump)) {
+                if (findings.containsKey(BUMP_COMPONENT)) {
+                    // TODO: only set the SIGNIFICANT attribute if the commit really contains significant contents.
+                    // Until we are not able to inspect the commit messages let's just assume that if the user forces the 'bump' we have significant commits.
+                    findings.put(SIGNIFICANT, Boolean.TRUE.toString());
+                }
+                else {
+                    // TODO: if 'bump' was not overridden by user config, inspect the commit message to figure out if we have to bump a specific version component based on that
+
                     // each time we need to compare the 'bump' resulting from the previous commits with the one of the current commit and only store
                     // the greatest in the findings map
                 }
@@ -190,6 +200,17 @@ public class Infer extends AbstractCommand {
                 }
             });
             logger.debug(COMMAND, "Walking the commit history finished.");
+
+            // if we found the previous version commit the initial commit in the scope is the one next to it, otherwise the scope will start at the root commit
+            if (findings.containsKey(PREVIOUS_VERSION_COMMIT)) {
+                logger.debug(COMMAND, "Setting the initialCommit state value to {}", findings.get(PREVIOUS_VERSION_COMMIT_PLUS_1));
+                state().getReleaseScope().setInitialCommit(findings.get(PREVIOUS_VERSION_COMMIT_PLUS_1));
+            }
+            else {
+                String rootCommitSHA = repository().getRootCommit();
+                logger.debug(COMMAND, "The commit history had no information about the previousVersion and previousVersionCommit so the initialCommit is the repository root commit {}", rootCommitSHA);
+                state().getReleaseScope().setInitialCommit(rootCommitSHA);
+            }
 
             // set the state attributes about the previous version and its related commit
             if (findings.containsKey(PREVIOUS_VERSION) && findings.containsKey(PREVIOUS_VERSION_COMMIT)) {
@@ -209,43 +230,30 @@ public class Infer extends AbstractCommand {
                 state().getReleaseScope().setPreviousVersionCommit(null);
             }
 
-            // now if we found the previous version commit the initial commit in the scope is the one next to it, otherwise the scope will start at the root commit
-            if (findings.containsKey(PREVIOUS_VERSION_COMMIT)) {
-                logger.debug(COMMAND, "Setting the initialCommit state value to {}", findings.get(PREVIOUS_VERSION_COMMIT_PLUS_1));
-                state().getReleaseScope().setInitialCommit(findings.get(PREVIOUS_VERSION_COMMIT_PLUS_1));
-            }
-            else {
-                String rootCommitSHA = repository().getRootCommit();
-                logger.debug(COMMAND, "The commit history had no information about the previousVersion and previousVersionCommit so the initialCommit is the repository root commit {}", rootCommitSHA);
-                state().getReleaseScope().setInitialCommit(rootCommitSHA);
-            }
-
             // finally compute the version
             // the previous version has been stored in the state above
             if (Objects.isNull(state().getReleaseScope().getPreviousVersion())) {
                 version = state().getConfiguration().getInitialVersion();
-                logger.debug(COMMAND, "No previous version detected. Usining the initial version {}", version.toString());
+                logger.debug(COMMAND, "No previous version detected. Using the initial version {}", version.toString());
             }
             else {
                 Version previousVersion = state().getReleaseScope().getPreviousVersion();
-                if (Objects.isNull(bump)) {
-                    if (findings.containsKey(BUMP_COMPONENT)) {
-                        logger.debug(COMMAND, "Bumping component {} on version {}", findings.get(BUMP_COMPONENT), previousVersion.toString());
-                        version = previousVersion.bump(findings.get(BUMP_COMPONENT));
-                    }
-                    else {
-                        logger.info(COMMAND, "The release scope does not contain any significant commit, version remains unchanged: {}", previousVersion.toString());
-                        version = previousVersion;
-                    }
+                if (findings.containsKey(BUMP_COMPONENT)) {
+                    logger.debug(COMMAND, "Bumping component {} on version {}", findings.get(BUMP_COMPONENT), previousVersion.toString());
+                    version = previousVersion.bump(findings.get(BUMP_COMPONENT));
                 }
                 else {
-                    logger.debug(COMMAND, "Bumping component {} on version {}", bump, previousVersion.toString());
-                    version = previousVersion.bump(bump);
+                    logger.info(COMMAND, "The release scope does not contain any significant commit, version remains unchanged: {}", previousVersion.toString());
+                    version = previousVersion;
                 }
             }
 
             logger.info(COMMAND, "Inferred version is: {}", version.toString());
+
+            // store values to the state object
             state().setVersion(version);
+            state().setBump(findings.containsKey(BUMP_COMPONENT) ? findings.get(BUMP_COMPONENT) : null);
+            state().getReleaseScope().setSignificant(Boolean.valueOf(findings.containsKey(SIGNIFICANT)));
         }
         else {
             // the version was overridden by user

@@ -38,8 +38,7 @@ This command has no dependencies.
 
 ### Infer
 
-TODO: write this section
-{: .notice--warning}
+Scans the Git repository searching for significant information used to generate the new release. This command never applies any change as it just collects and computes all the required information to be used next.
 
 ### Make
 

@@ -33,8 +33,10 @@ Nyx is a best effort project and we can't commit to a deadline. Stay tuned for u
 
 Nyx libraries are available for you to embed them into your own projects:
 
+* the Main library:
+  * [Java version](https://mooltiverse.github.io/nyx/guide/developer/java/nyx-main/)
 * the [Semantic Version](https://semver.org/) library:
-  * [Java version](https://mooltiverse.github.io/nyx/java-library/using-the-version-library/)
+  * [Java version](https://mooltiverse.github.io/nyx/guide/developer/java/semantic-version/)
 
 ## Quick Links
 

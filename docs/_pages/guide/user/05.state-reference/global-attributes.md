@@ -9,15 +9,30 @@ permalink: /guide/user/state-reference/global-attributes/
 
 The following attributes are at the top of the hierarchy:
 
-| Name                                      | Type    | Values                               |
-| ----------------------------------------- | ------- | ------------------------------------ |
-| [`configuration`](#configuration)         | object  | The resolved configuration           |
-| [`directory`](#directory)                 | string  | Directory path                       |
-| [`internals`](#internals)                 | map     | Name-Value pairs                     |
-| [`releaseScope`](#release-scope)          | object  | The release scope attributes         |
-| [`scheme`](#scheme)                       | string  | `semver`                             |
-| [`timestamp`](#timestamp)                 | integer | A positive integer                   |
-| [`version`](#version)                     | string  | The current version                  |
+| Name                                      | Type    | Values                                      |
+| ----------------------------------------- | ------- | ------------------------------------------- |
+| [`bump`](#bump)                           | string  | The bumped version identifier               |
+| [`configuration`](#configuration)         | object  | The resolved configuration                  |
+| [`directory`](#directory)                 | string  | Directory path                              |
+| [`internals`](#internals)                 | map     | Name-Value pairs                            |
+| [`releaseScope`](#release-scope)          | object  | The release scope attributes                |
+| [`scheme`](#scheme)                       | string  | `semver`                                    |
+| [`timestamp`](#timestamp)                 | integer | A positive integer                          |
+| [`version`](#version)                     | string  | The current version                         |
+
+### Bump
+
+| ----------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                          | `bump`                                                                                   |
+| Type                          | string                                                                                   |
+| Related configuration options | [bump]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#bump){: .btn .btn--success .btn--small} [initialVersion]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#initial-version){: .btn .btn--success .btn--small} [scheme]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#scheme){: .btn .btn--success .btn--small} [version]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#version){: .btn .btn--success .btn--small} |
+| Initialized by task           | [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#infer){: .btn .btn--small} |
+
+This string contains the name of the identifier that has been dumped to make the new [`version`](#version) starting from the [previous one]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#previous-version). Version identifiers depend on the selected version [scheme](#scheme).
+
+This attribute is not initialized if the [`version`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#version) configuration option was passed to override inference or the [release scope]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}) does not contain [significant changes]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#significant) to be released.
+
+This attribute is not available until [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer) has run.
 
 ### Configuration
 
@@ -44,7 +59,7 @@ The path of current working directory.
 | ----------------------------- | ---------------------------------------------------------------------------------------- |
 | Name                          | `internals`                                                                              |
 | Type                          | map                                                                                      |
-| Related configuration options |                                                                                          |
+| Related configuration options | N/A                                                                                      |
 | Initialized by task           | *any*                                                                                    |
 
 A map of attributes for internal use only.
@@ -60,14 +75,14 @@ Using the attributes in this section is not supported. You should never rely on 
 | Related configuration options | See the [details]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}) |
 | Initialized by task           | See the [details]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}) |
 
-This object collects several attributes defining the release scope. See the [details]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}).
+This object collects several attributes defining the release scope, documented [here]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}).
 
 ### Scheme
 
 | ----------------------------- | ---------------------------------------------------------------------------------------- |
 | Name                          | `scheme`                                                                                 |
 | Type                          | string                                                                                   |
-| Related configuration options | [initialVersion]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#initial-version){: .btn .btn--success .btn--small} [scheme]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#scheme){: .btn .btn--success .btn--small} |
+| Related configuration options | [bump]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#bump){: .btn .btn--success .btn--small} [initialVersion]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#initial-version){: .btn .btn--success .btn--small} [releaseLenient]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#release-lenient){: .btn .btn--success .btn--small} [releasePrefix]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#release-prefix){: .btn .btn--success .btn--small} [scheme]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#scheme){: .btn .btn--success .btn--small} [version]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#version){: .btn .btn--success .btn--small} |
 | Initialized by task           | *any*                                                                                    |
 
 The configured [version scheme]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/version-schemes.md %}).
@@ -93,7 +108,7 @@ If this is not used as the sole timestamp you may see a skew due to when the sys
 | ----------------------------- | ---------------------------------------------------------------------------------------- |
 | Name                          | `version`                                                                                |
 | Type                          | string                                                                                   |
-| Related configuration options | [bump]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#bump){: .btn .btn--success .btn--small} [initialVersion]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#initial-version){: .btn .btn--success .btn--small} [scheme]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#scheme){: .btn .btn--success .btn--small} [version]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#version){: .btn .btn--success .btn--small} |
+| Related configuration options | [bump]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#bump){: .btn .btn--success .btn--small} [initialVersion]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#initial-version){: .btn .btn--success .btn--small} [releasePrefix]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#release-prefix){: .btn .btn--success .btn--small} [scheme]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#scheme){: .btn .btn--success .btn--small} [version]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#version){: .btn .btn--success .btn--small} |
 | Initialized by task           | [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#infer){: .btn .btn--small} |
 
 The version that was [inferred]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer), unless the [`version`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#version) configuration option was passed to override inference. When the version is not overridden or inferred the [`initialVersion`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#initial-version) is used.

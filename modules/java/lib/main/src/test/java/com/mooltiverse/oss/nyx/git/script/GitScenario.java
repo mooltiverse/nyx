@@ -74,8 +74,9 @@ public class GitScenario {
          * This yields to a repository like:
          * 
          * <pre>
-         * * b171fb9 (HEAD -> master) Initial commit
-         * * 65e445d (tag: 1.2.3) Commit xfp
+         * * c62d22e (HEAD -> master, tag: release-2.2.2) Commit non
+         * * c99c16e (tag: 1.2.3) Commit nip
+         * * f9d0cfa Initial commit
          * </pre>
          * 
          * @return the script used to realize the scenario. It can be used for further operations.

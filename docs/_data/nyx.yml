@@ -1,9 +1,9 @@
 # Nyx Version
 # This variable can be used as {{ site.data.nyx.version }} to parametrize the version of Nyx
 # TODO: Automnate setting this variable during the build provess
-version               : "0.0.2"
+version               : "0.0.2-alpha.1"
 
 # Nyx Release
 # This variable can be used as {{ site.data.nyx.release }} to parametrize the release of Nyx
 # TODO: Automnate setting this variable during the build provess
-release               : "v0.0.2"
+release               : "v0.0.2-alpha.1"

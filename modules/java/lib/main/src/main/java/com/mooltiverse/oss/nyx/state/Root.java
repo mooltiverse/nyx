@@ -33,6 +33,23 @@ import com.mooltiverse.oss.nyx.version.Version;
  */
 public interface Root extends Block {
     /**
+     * Returns the version identifier bumped on the previous release to produce the new release, if any.
+     * This value is only available after {@link Nyx#infer()} has run.
+     * 
+     * @return the version identifier bumped on the previous release to produce the new release, if any.
+     * It may be {@code null} if no identifier has been bumped (i.e. because no significant changes have
+     * been detected in the release scope or because inference was inhibited by values overridden by user).
+     * 
+     * @throws DataAccessException in case the attribute cannot be read or accessed.
+     * @throws IllegalPropertyException in case the attribute has been defined but has incorrect values or it can't be resolved.
+     * 
+     * @see #getReleaseScope()
+     * @see ReleaseScope#getSignificant()
+     */
+    public String getBump()
+        throws DataAccessException, IllegalPropertyException;
+
+    /**
      * Returns the configuration object. The configuration is a live reference.
      * 
      * @return the configuration object.

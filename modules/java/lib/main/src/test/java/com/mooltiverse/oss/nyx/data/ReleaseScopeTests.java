@@ -34,12 +34,14 @@ public class ReleaseScopeTests {
         assertNull(releaseScope.getPreviousVersionCommit());
         assertNull(releaseScope.getInitialCommit());
         assertNull(releaseScope.getFinalCommit());
+        assertNull(releaseScope.getSignificant());
         
-        releaseScope = new ReleaseScope(SemanticVersion.valueOf(SemanticVersion.DEFAULT_INITIAL_VERSION), "f9422bd6e5b0ac0ab0df2bffc280c3d4caa11b44", "e7c4419c1a9635a264b1d6c573ac2af71e1eeea6", "d0a19fc5776dc0c0b1a8d869c1117dac71065870");
+        releaseScope = new ReleaseScope(SemanticVersion.valueOf(SemanticVersion.DEFAULT_INITIAL_VERSION), "f9422bd6e5b0ac0ab0df2bffc280c3d4caa11b44", "e7c4419c1a9635a264b1d6c573ac2af71e1eeea6", "d0a19fc5776dc0c0b1a8d869c1117dac71065870", Boolean.TRUE);
         assertEquals(SemanticVersion.DEFAULT_INITIAL_VERSION, releaseScope.getPreviousVersion().toString());
         assertEquals("f9422bd6e5b0ac0ab0df2bffc280c3d4caa11b44", releaseScope.getPreviousVersionCommit());
         assertEquals("e7c4419c1a9635a264b1d6c573ac2af71e1eeea6", releaseScope.getInitialCommit());
         assertEquals("d0a19fc5776dc0c0b1a8d869c1117dac71065870", releaseScope.getFinalCommit());
+        assertEquals(Boolean.TRUE, releaseScope.getSignificant());
     }
 
     @Test
@@ -84,5 +86,16 @@ public class ReleaseScopeTests {
         assertNull(releaseScope.getFinalCommit());
         releaseScope.setFinalCommit("e7c4419c1a9635a264b1d6c573ac2af71e1eeea6");
         assertEquals("e7c4419c1a9635a264b1d6c573ac2af71e1eeea6", releaseScope.getFinalCommit());
+    }
+
+    @Test
+    @DisplayName("ReleaseScope.getSignificant()")
+    void significantTest()
+        throws Exception {
+
+        ReleaseScope releaseScope = new ReleaseScope();
+        assertNull(releaseScope.getSignificant());
+        releaseScope.setSignificant(Boolean.TRUE);
+        assertEquals(Boolean.TRUE, releaseScope.getSignificant());
     }
 }
