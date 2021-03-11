@@ -158,6 +158,12 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
             try {
                 // TODO: replace the hardcoded use of SEMVER with a resolved scheme
                 //
+                // This issue is common to all configuration layers when they need to resolve options using the entire configuration
+                // (not just their local values) because some options may be defined with higher priority in other layers.
+                // This example is significant for all layers because in order to resolve the Version option, the layer also needs
+                // to resolve the Scheme and ReleaseLenient options.
+                // One caveat is to prevent circular dependencies, as per https://github.com/mooltiverse/nyx/issues/37
+                //
                 // While using SEMVER as the scheme here is suitable for now as it's the only supported scheme, this must
                 // be resolved against all configuration layers. See also #37 (https://github.com/mooltiverse/nyx/issues/37).
                 //
