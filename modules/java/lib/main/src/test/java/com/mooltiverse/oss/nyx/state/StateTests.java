@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import com.mooltiverse.oss.nyx.configuration.Configuration;
+import com.mooltiverse.oss.nyx.configuration.mock.EmptyConfigurationLayerMock;
 import com.mooltiverse.oss.nyx.version.Version;
 import com.mooltiverse.oss.nyx.version.SemanticVersion;
 
@@ -149,15 +150,54 @@ public class StateTests {
         }
 
         @Test
-        @DisplayName("State.setVersion(Version)")
+        @DisplayName("State.getVersion() with prefix")
+        void getVersionWithPrefixTest()
+            throws Exception {
+            Configuration configuration = new Configuration();
+            EmptyConfigurationLayerMock configurationMock = new EmptyConfigurationLayerMock();
+            configuration.withPluginConfiguration(configurationMock);
+            State state = new State(configuration);
+
+            Version version = SemanticVersion.valueOf("1.2.3");
+            state.setVersionInternal(version);
+            
+            configurationMock.releasePrefix = "v";
+            assertEquals("v1.2.3", state.getVersion());
+
+            configurationMock.releasePrefix = "prefix";
+            assertEquals("prefix1.2.3", state.getVersion());
+        }
+
+        @Test
+        @DisplayName("State.getVersion() without prefix")
+        void getVersionWithoutPrefixTest()
+            throws Exception {
+            Configuration configuration = new Configuration();
+            EmptyConfigurationLayerMock configurationMock = new EmptyConfigurationLayerMock();
+            configuration.withPluginConfiguration(configurationMock);
+            State state = new State(configuration);
+
+            Version version = SemanticVersion.valueOf("1.2.3");
+            state.setVersionInternal(version);
+            
+            configurationMock.releasePrefix = null; // no effects, as the default is not null
+            assertEquals("v1.2.3", state.getVersion());
+
+            configurationMock.releasePrefix = ""; // this has effect and uses no prefix
+            assertEquals("1.2.3", state.getVersion());
+        }
+
+        @Test
+        @DisplayName("State.setVersion(String)")
         void setVersionTest()
             throws Exception {
             Configuration configuration = new Configuration();
             State state = new State(configuration);
 
             Version version = SemanticVersion.valueOf("1.2.3");
-            state.setVersion(version);
-            assertEquals(version, state.getVersion());
+            state.setVersionInternal(version);
+            assertEquals(version, state.getVersionInternal());
+            assertEquals(configuration.getReleasePrefix().concat(version.toString()), state.getVersion());
         }
 
         /*@Test

@@ -91,7 +91,8 @@ public class InferTaskTests extends CoreTaskTests {
                 Nyx nyx = getNyxForTask(task);
                 assertNull(nyx.state().getBump());
                 assertEquals(nyx.state().getConfiguration().getScheme(), nyx.state().getScheme());
-                assertEquals(nyx.state().getConfiguration().getInitialVersion(), nyx.state().getVersion());
+                assertEquals(nyx.state().getConfiguration().getReleasePrefix().concat(nyx.state().getConfiguration().getInitialVersion().toString()), nyx.state().getVersion());
+                assertEquals(nyx.state().getConfiguration().getInitialVersion().toString(), nyx.state().getVersionInternal().toString());
                 assertEquals(script.getCommits().get(0), nyx.state().getReleaseScope().getInitialCommit());
                 assertNull(nyx.state().getReleaseScope().getFinalCommit());
                 assertNull(nyx.state().getReleaseScope().getPreviousVersion());
@@ -126,7 +127,8 @@ public class InferTaskTests extends CoreTaskTests {
                 assertNull(nyx.state().getBump());
                 assertEquals(nyx.state().getConfiguration().getScheme(), nyx.state().getScheme());
                 assertEquals("1.2.3", nyx.state().getConfiguration().getVersion().toString());
-                assertEquals(nyx.state().getConfiguration().getVersion(), nyx.state().getVersion());
+                assertEquals(nyx.state().getConfiguration().getReleasePrefix().concat(nyx.state().getConfiguration().getVersion().toString()), nyx.state().getVersion());
+                assertEquals(nyx.state().getConfiguration().getVersion().toString(), nyx.state().getVersionInternal().toString());
                 assertNull(nyx.state().getReleaseScope().getInitialCommit());
                 assertNull(nyx.state().getReleaseScope().getFinalCommit());
                 assertNull(nyx.state().getReleaseScope().getPreviousVersion());
@@ -136,10 +138,10 @@ public class InferTaskTests extends CoreTaskTests {
 
             // make sure the project version is now set to the value we passed (this could be true even if Nyx didn't do anything)
             // as we set the value earlier
-            assertEquals("1.2.3", project.findProperty(GRADLE_VERSION_PROPERTY_NAME));
+            assertEquals("v1.2.3", project.findProperty(GRADLE_VERSION_PROPERTY_NAME));
 
             // make sure that the state associated to the Nyx extra property also has the same version set
-            assertEquals("1.2.3", Nyx.class.cast(project.getExtensions().getExtraProperties().get(CoreTask.NYX_INSTANCE_PROPERTY)).state().getVersion().toString());
+            assertEquals("v1.2.3", Nyx.class.cast(project.getExtensions().getExtraProperties().get(CoreTask.NYX_INSTANCE_PROPERTY)).state().getVersion());
         }
     }
 }

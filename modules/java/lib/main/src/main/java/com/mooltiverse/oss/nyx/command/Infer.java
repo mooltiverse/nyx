@@ -144,6 +144,7 @@ public class Infer extends AbstractCommand {
         if (Objects.isNull(version)) {
             // these objects are fetched in advance from the state because they may throw an exception that we can't handle in the lambda expression
             final boolean releaseLenient = state().getConfiguration().getReleaseLenient().booleanValue();
+            final String releasePrefix = state().getConfiguration().getReleasePrefix();
             final Scheme scheme = state().getScheme();
 
             // this map is used to work around the 'local variables referenced from a lambda expression must be final or effectively final'
@@ -166,7 +167,7 @@ public class Infer extends AbstractCommand {
 
                 // inspect the tags in order to define the release scope
                 for (Tag tag: c.getTags()) {
-                    if (VersionFactory.isLegal(scheme.getScheme(), tag.getName(), releaseLenient)) {
+                    if (releaseLenient ? VersionFactory.isLegal(scheme.getScheme(), tag.getName(), releaseLenient) : VersionFactory.isLegal(scheme.getScheme(), tag.getName(), releasePrefix)) {
                         logger.debug(COMMAND, "Tag {} is a valid {} version and is used as the previousVersion. Likewise, {} is used as the previousVersionCommit", tag.getName(), scheme.toString(), c.getSHA());
                         findings.put(PREVIOUS_VERSION, tag.getName());
                         findings.put(PREVIOUS_VERSION_COMMIT, c.getSHA());
@@ -216,7 +217,7 @@ public class Infer extends AbstractCommand {
             if (findings.containsKey(PREVIOUS_VERSION) && findings.containsKey(PREVIOUS_VERSION_COMMIT)) {
                 logger.debug(COMMAND, "Setting the previousVersion and previousVersionCommit state values to {} and {} respectively", findings.get(PREVIOUS_VERSION), findings.get(PREVIOUS_VERSION_COMMIT));
                 try {
-                    state().getReleaseScope().setPreviousVersion(VersionFactory.valueOf(scheme.getScheme(), findings.get(PREVIOUS_VERSION), releaseLenient));
+                    state().getReleaseScope().setPreviousVersion(releaseLenient ? VersionFactory.valueOf(scheme.getScheme(), findings.get(PREVIOUS_VERSION), releaseLenient) : VersionFactory.valueOf(scheme.getScheme(), findings.get(PREVIOUS_VERSION), releasePrefix));
                     state().getReleaseScope().setPreviousVersionCommit(findings.get(PREVIOUS_VERSION_COMMIT));
                 }
                 catch (IllegalArgumentException iae) {
@@ -251,14 +252,14 @@ public class Infer extends AbstractCommand {
             logger.info(COMMAND, "Inferred version is: {}", version.toString());
 
             // store values to the state object
-            state().setVersion(version);
+            state().setVersionInternal(version);
             state().setBump(findings.containsKey(BUMP_COMPONENT) ? findings.get(BUMP_COMPONENT) : null);
             state().getReleaseScope().setSignificant(Boolean.valueOf(findings.containsKey(SIGNIFICANT)));
         }
         else {
             // the version was overridden by user
             logger.info(COMMAND, "Version overridden by user: {}", version.toString());
-            state().setVersion(version);
+            state().setVersionInternal(version);
         }
 
         storeStatusInternalAttributes();

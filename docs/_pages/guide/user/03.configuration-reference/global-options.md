@@ -123,7 +123,7 @@ When used with no value on the command line (i.e. `--release-lenient` alone) `tr
 
 It's a common practice to add a leading string to version numbers to give releases a name. Common prefixes are `v` or `rel` but you might use anything, or no prefix at all.
 
-Nyx uses `v` as a default prefix so, provided versions like `x.y.x`, releases and tags are named `vx.y.x`. If you wish not to use any prefix set this option to null or an empty string.
+Nyx uses `v` as a default prefix so, provided versions like `x.y.x`, releases and tags are named `vx.y.x`. If you wish not to use any prefix set this option to an empty string (`null` would not elide the default prefix).
 
 When specifying a custom prefix, only use alphanumeric characters (no numbers or special characters).
 

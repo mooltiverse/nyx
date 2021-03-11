@@ -67,6 +67,9 @@ public class VersionFactory {
     /**
      * Returns {@code true} if the given string is a legal version which, for example, can be parsed using
      * {@link #valueOf(Scheme, String, boolean)} without exceptions using the implementation selected by the given scheme.
+     * <br>
+     * This method is different than {@link #isLegal(Scheme, String, String)} as it also sanitizes extra characters
+     * in the body of the version identifier instead of just an optional prefix (when {@code sanitize} is {@code true}).
      * 
      * @param scheme the scheme the check against.
      * @param s the string version to check.
@@ -85,6 +88,32 @@ public class VersionFactory {
             //MAVEN: not yet supported
             default: throw new IllegalArgumentException(String.format("Illegal or unsupported scheme %s", scheme));
         }
+    }
+
+    /**
+     * Returns {@code true} if the given string is a legal version which, for example, can be parsed using
+     * {@link #valueOf(Scheme, String, boolean)} without exceptions using the implementation selected by the given scheme.
+     * <br>
+     * This method is different than {@link #isLegal(Scheme, String, boolean)} as it only tolerates a prefix, while
+     * {@link #isLegal(Scheme, String, boolean)} is more lenient as it also sanitizes extra characters in the body
+     * of the version identifier (when {@code sanitize} is {@code true}).
+     * 
+     * @param scheme the scheme the check against.
+     * @param s the string version to check.
+     * @param prefix the initial string that is used for the version prefix. This will be stripped off from the given
+     * string representation of the version. It can be {@code null} or empty, in which case it's ignored. If not empty
+     * and the given version string doesn't start with this prefix, this prefix is ignored.
+     * 
+     * @return {@code true} if the given string represents a legal version sing the implementation selected
+     * by the given scheme, {@code false} otherwise.
+     * 
+     * @see #valueOf(Scheme, String, boolean)
+     */
+    public static boolean isLegal(Scheme scheme, String s, String prefix) {
+        Objects.requireNonNull(s, "Can't parse a null string");
+        if (!Objects.isNull(prefix) && s.startsWith(prefix))
+            s = s.replaceFirst(prefix, "");
+        return isLegal(scheme, s);
     }
 
     /**
@@ -110,6 +139,9 @@ public class VersionFactory {
      * <br>
      * When sanitization is enabled on a string that actually needs sanitization the string representation of the
      * returned object will not exactly match the input value.
+     * <br>
+     * This method is different than {@link #valueOf(Scheme, String, String)} as it also sanitizes extra characters
+     * in the body of the version identifier instead of just an optional prefix (when {@code sanitize} is {@code true}).
      *
      * @param scheme the scheme the version belongs to
      * @param s the string to parse
@@ -128,5 +160,30 @@ public class VersionFactory {
             //MAVEN: not yet supported
             default: throw new IllegalArgumentException(String.format("Illegal or unsupporte scheme %s", scheme));
         }
+    }
+
+    /**
+     * Returns a Version instance representing the specified String value.
+     * <br>
+     * This method is different than {@link #valueOf(Scheme, String, boolean)} as it only tolerates a prefix, while
+     * {@link #valueOf(Scheme, String, boolean)} is more lenient as it also sanitizes extra characters in the body
+     * of the version identifier (when {@code sanitize} is {@code true}).
+     *
+     * @param scheme the scheme the version belongs to
+     * @param s the string to parse
+     * @param prefix the initial string that is used for the version prefix. This will be stripped off from the given
+     * string representation of the version. It can be {@code null} or empty, in which case it's ignored. If not empty
+     * and the given version string doesn't start with this prefix, this prefix is ignored.
+     *
+     * @return the new Version instance representing the given string. The concrete class depends on the given {@code scheme}
+     *
+     * @throws NullPointerException if a given arguument is {@code null}
+     * @throws IllegalArgumentException if the given string doesn't represent a legal version, according to the selected scheme
+     */
+    public static final Version valueOf(Scheme scheme, String s, String prefix) {
+        Objects.requireNonNull(s, "Can't parse a null string");
+        if (!Objects.isNull(prefix) && s.startsWith(prefix))
+            s = s.replaceFirst(prefix, "");
+        return valueOf(scheme, s);
     }
 }

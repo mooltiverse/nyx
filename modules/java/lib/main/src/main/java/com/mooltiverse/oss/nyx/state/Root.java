@@ -26,7 +26,6 @@ import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
 import com.mooltiverse.oss.nyx.data.Block;
 import com.mooltiverse.oss.nyx.data.ReleaseScope;
 import com.mooltiverse.oss.nyx.data.Scheme;
-import com.mooltiverse.oss.nyx.version.Version;
 
 /**
  * This interface models the state root block, with global attributes.
@@ -120,6 +119,8 @@ public interface Root extends Block {
     /**
      * Returns the version inferred by Nyx, if any. If the version was overridden by configuration this will be the
      * same as {@link Configuration#getVersion()}. This value is only available after {@link Nyx#infer()} has run.
+     * <br>
+     * The returned version also has the configured prefix, if any.
      * 
      * @return the current version inferred by Nyx. This is {@code null} until {@link Nyx#infer()} has run.
      * 
@@ -130,6 +131,6 @@ public interface Root extends Block {
      * @see Nyx#infer()
      * @see Infer
      */
-    public Version getVersion()
+    public String getVersion()
         throws DataAccessException, IllegalPropertyException;
 }

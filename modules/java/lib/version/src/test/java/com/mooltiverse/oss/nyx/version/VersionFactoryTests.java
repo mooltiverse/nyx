@@ -73,6 +73,20 @@ public class VersionFactoryTests {
             assertTrue(VersionFactory.isLegal(Scheme.SEMVER, version));
         }
 
+        @ParameterizedTest(name = "VersionFactory.isLegal(Scheme.SEMVER, ''{0}'') == true")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
+        void isLegalValidStringWithPrefix(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
+            assertTrue(VersionFactory.isLegal(Scheme.SEMVER, "".concat(version), null));
+            assertTrue(VersionFactory.isLegal(Scheme.SEMVER, "".concat(version), ""));
+            assertTrue(VersionFactory.isLegal(Scheme.SEMVER, "v".concat(version), "v"));
+            assertTrue(VersionFactory.isLegal(Scheme.SEMVER, "prefix".concat(version), "prefix"));
+
+            assertFalse(VersionFactory.isLegal(Scheme.SEMVER, "v".concat(version), null));
+            assertFalse(VersionFactory.isLegal(Scheme.SEMVER, "v".concat(version), ""));
+            assertFalse(VersionFactory.isLegal(Scheme.SEMVER, "prefix".concat(version), null));
+            assertFalse(VersionFactory.isLegal(Scheme.SEMVER, "prefix".concat(version), ""));
+        }
+
         @ParameterizedTest(name = "VersionFactory.isLegal(Scheme.SEMVER, ''{0}'', true) == true")
         @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
         void isLegalSanitizedString(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
@@ -121,6 +135,20 @@ public class VersionFactoryTests {
         @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
         void valueOfValidString(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
             assertEquals(version, VersionFactory.valueOf(Scheme.SEMVER, version).toString());
+        }
+
+        @ParameterizedTest(name = "VersionFactory.valueOf(Scheme.SEMVER, ''{0}'', prefix).toString() == ''{0}''")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
+        void valueOfValidStringWithPrefix(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
+            assertEquals(version, VersionFactory.valueOf(Scheme.SEMVER, "".concat(version), null).toString());
+            assertEquals(version, VersionFactory.valueOf(Scheme.SEMVER, "".concat(version), "").toString());
+            assertEquals(version, VersionFactory.valueOf(Scheme.SEMVER, "v".concat(version), "v").toString());
+            assertEquals(version, VersionFactory.valueOf(Scheme.SEMVER, "prefix".concat(version), "prefix").toString());
+
+            assertThrows(IllegalArgumentException.class, () -> VersionFactory.valueOf(Scheme.SEMVER, "v".concat(version), null));
+            assertThrows(IllegalArgumentException.class, () -> VersionFactory.valueOf(Scheme.SEMVER, "v".concat(version), ""));
+            assertThrows(IllegalArgumentException.class, () -> VersionFactory.valueOf(Scheme.SEMVER, "prefix".concat(version), null));
+            assertThrows(IllegalArgumentException.class, () -> VersionFactory.valueOf(Scheme.SEMVER, "prefix".concat(version), ""));
         }
 
         @ParameterizedTest(name = "VersionFactory.valueOf(Scheme.SEMVER, ''{0}'', true).toString() == ''{0}''")

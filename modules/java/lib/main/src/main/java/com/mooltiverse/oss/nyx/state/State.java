@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mooltiverse.oss.nyx.Nyx;
+import com.mooltiverse.oss.nyx.command.Infer;
 import com.mooltiverse.oss.nyx.configuration.Configuration;
 import com.mooltiverse.oss.nyx.data.DataAccessException;
 import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
@@ -74,7 +75,8 @@ public class State implements Root {
     private Long timestamp = Long.valueOf(System.currentTimeMillis());
 
     /**
-     * The version that has been inferred.
+     * The version that has been inferred. Please note that this is just the internal representation
+     * and does not contemplate the configured prefix, if any.
      */
     private Version version = null;
     
@@ -113,9 +115,6 @@ public class State implements Root {
      * It may be {@code null}.
      * 
      * @see #getBump()
-     * 
-     * @throws DataAccessException in case the attribute cannot be read or accessed.
-     * @throws IllegalPropertyException in case the attribute has been defined but has incorrect values or it can't be resolved.
      */
     public void setBump(String bump) {
         this.bump = bump;
@@ -172,19 +171,35 @@ public class State implements Root {
     }
 
     /**
-     * {@inheritDoc}
+     * Returns the version inferred by Nyx, if any. If the version was overridden by configuration this will be the
+     * same as {@link Configuration#getVersion()}. This value is only available after {@link Nyx#infer()} has run.
+     * 
+     * This method returns the same as {@link #getVersionInternal()} but with the prefix, if configured.
+     * 
+     * @return the current version inferred by Nyx. This is {@code null} until {@link Nyx#infer()} has run.
+     * 
+     * @throws DataAccessException in case the attribute cannot be read or accessed.
+     * @throws IllegalPropertyException in case the attribute has been defined but has incorrect values or it can't be resolved.
+     * 
+     * @see Configuration#getVersion()
+     * @see Nyx#infer()
+     * @see Infer
      */
     @Override
-    public Version getVersion() 
+    public String getVersion() 
         throws DataAccessException, IllegalPropertyException {
-        return version;
+        if (Objects.isNull(version))
+            return null;
+        else return Objects.isNull(getConfiguration().getReleasePrefix()) ? version.toString() : getConfiguration().getReleasePrefix().concat(version.toString());
     }
 
     /**
-     * Sets the version attribute.
+     * Gets the version attribute. This method returns the internal representation of the {@link Version}, which does not include the prefix.
+     * If you need the prefix as well use {@link #getVersion()} instead.
      * 
-     * @param version the version attribute to set for this state.
+     * @return the version attribute to set for this state.
      * 
+     * @see #setVersionInternal(Version)
      * @see #getVersion()
      * 
      * @throws DataAccessException in case the attribute cannot be read or accessed.
@@ -193,11 +208,27 @@ public class State implements Root {
      * @see Version#getScheme()
      * @see Configuration#getScheme()
      */
-    public void setVersion(Version version)
+    public Version getVersionInternal()
         throws DataAccessException, IllegalPropertyException {
-        if (!getScheme().getScheme().equals(version.getScheme())) {
-            throw new IllegalPropertyException(String.format("The given version %s scheme %s (%s) does not match the configured scheme %s", version.toString(), version.getScheme(), Scheme.from(version.getScheme()), getScheme()));
-        }
+        
+        return version;
+    }
+
+    /**
+     * Sets the version attribute. This is the internal representation and does not contemplate the configured prefix, if any.
+     * 
+     * @param version the version attribute to set for this state.
+     * 
+     * @see #getVersionInternal()
+     * 
+     * @throws DataAccessException in case the attribute cannot be read or accessed.
+     * @throws IllegalPropertyException in case the attribute has been defined but has incorrect values or it can't be resolved.
+     * 
+     * @see Version#getScheme()
+     * @see Configuration#getScheme()
+     */
+    public void setVersionInternal(Version version)
+        throws DataAccessException, IllegalPropertyException {
         
         this.version = version;
     }

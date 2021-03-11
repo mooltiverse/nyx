@@ -88,7 +88,8 @@ public class InferTests extends AbstractCommandTests {
 
             assertNull(command.state().getBump());
             assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
-            assertEquals(Defaults.INITIAL_VERSION, command.run().getVersion());
+            assertEquals(Defaults.INITIAL_VERSION, command.run().getVersionInternal());
+            assertEquals(Defaults.RELEASE_PREFIX.concat(Defaults.INITIAL_VERSION.toString()), command.run().getVersion());
             assertEquals(script.getCommits().get(0), command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertNull(command.state().getReleaseScope().getPreviousVersion());
@@ -115,7 +116,8 @@ public class InferTests extends AbstractCommandTests {
 
             assertNull(command.state().getBump());
             assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
-            assertEquals(configurationMock.initialVersion.toString(), command.state().getVersion().toString());
+            assertEquals(configurationMock.initialVersion, command.state().getVersionInternal());
+            assertEquals(Defaults.RELEASE_PREFIX.concat(configurationMock.initialVersion.toString()), command.state().getVersion());
             assertEquals(script.getCommits().get(0), command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertNull(command.state().getReleaseScope().getPreviousVersion());
@@ -141,8 +143,8 @@ public class InferTests extends AbstractCommandTests {
 
             assertNull(command.state().getBump());
             assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
-            assertEquals(configurationMock.version, command.state().getVersion());
-            assertEquals(configurationMock.version.toString(), command.state().getVersion().toString());
+            assertEquals(configurationMock.version, command.state().getVersionInternal());
+            assertEquals(configurationMock.releasePrefix.concat(configurationMock.version.toString()), command.state().getVersion());
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertNull(command.state().getReleaseScope().getPreviousVersion());
@@ -155,9 +157,9 @@ public class InferTests extends AbstractCommandTests {
 
             assertNull(command.state().getBump());
             assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
-            assertEquals("1.2.3", command.state().getVersion().toString());
-            assertEquals(configurationMock.version, command.state().getVersion());
-            assertEquals(configurationMock.version.toString(), command.state().getVersion().toString());
+            assertEquals(configurationMock.releasePrefix.concat("1.2.3"), command.state().getVersion());
+            assertEquals(configurationMock.version, command.state().getVersionInternal());
+            assertEquals(configurationMock.releasePrefix.concat(configurationMock.version.toString()), command.state().getVersion());
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertNull(command.state().getReleaseScope().getPreviousVersion());
@@ -183,7 +185,8 @@ public class InferTests extends AbstractCommandTests {
 
             assertEquals(configurationMock.bump, command.state().getBump());
             assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
-            assertEquals("2.0.0", command.state().getVersion().toString());
+            assertEquals("2.0.0", command.state().getVersionInternal().toString());
+            assertEquals("v2.0.0", command.state().getVersion());
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("1.2.3", command.state().getReleaseScope().getPreviousVersion().toString());
@@ -195,7 +198,8 @@ public class InferTests extends AbstractCommandTests {
 
             assertEquals(configurationMock.bump, command.state().getBump());
             assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
-            assertEquals("1.3.0", command.state().getVersion().toString());
+            assertEquals("1.3.0", command.state().getVersionInternal().toString());
+            assertEquals("v1.3.0", command.state().getVersion());
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("1.2.3", command.state().getReleaseScope().getPreviousVersion().toString());
@@ -207,7 +211,8 @@ public class InferTests extends AbstractCommandTests {
 
             assertEquals(configurationMock.bump, command.state().getBump());
             assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
-            assertEquals("1.2.4", command.state().getVersion().toString());
+            assertEquals("1.2.4", command.state().getVersionInternal().toString());
+            assertEquals("v1.2.4", command.state().getVersion());
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("1.2.3", command.state().getReleaseScope().getPreviousVersion().toString());
@@ -219,7 +224,8 @@ public class InferTests extends AbstractCommandTests {
 
             assertEquals(configurationMock.bump, command.state().getBump());
             assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
-            assertEquals("1.2.3-alpha.1", command.state().getVersion().toString());
+            assertEquals("1.2.3-alpha.1", command.state().getVersionInternal().toString());
+            assertEquals("v1.2.3-alpha.1", command.state().getVersion());
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("1.2.3", command.state().getReleaseScope().getPreviousVersion().toString());
@@ -249,7 +255,8 @@ public class InferTests extends AbstractCommandTests {
 
             assertEquals(configurationMock.bump, command.state().getBump());
             assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
-            assertEquals("2.2.2", command.state().getVersion().toString());
+            assertEquals("2.2.2", command.state().getVersionInternal().toString());
+            assertEquals("v2.2.2", command.state().getVersion());
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("2.2.2", command.state().getReleaseScope().getPreviousVersion().toString());
@@ -279,7 +286,72 @@ public class InferTests extends AbstractCommandTests {
 
             assertEquals(configurationMock.bump, command.state().getBump());
             assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
-            assertEquals("1.2.3", command.state().getVersion().toString());
+            assertEquals("1.2.3", command.state().getVersionInternal().toString());
+            assertEquals("v1.2.3", command.state().getVersion());
+            assertEquals(script.getCommitByTag("release-2.2.2"), command.state().getReleaseScope().getInitialCommit());
+            assertNull(command.state().getReleaseScope().getFinalCommit());
+            assertEquals("1.2.3", command.state().getReleaseScope().getPreviousVersion().toString());
+            assertEquals(script.getCommitByTag("1.2.3"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
+        }
+
+        @Test
+        @DisplayName("Infer.run() without lenient release and with release prefix")
+        void runWithoutLenientAndWithPrefixReleaseTest()
+            throws Exception {
+            GitScript script = GitScenario.OneTaggedCommitCommit.realize(); // only one version tag: 1.2.3
+            Configuration configuration = new Configuration();
+            State state = new State(configuration);
+            EmptyConfigurationLayerMock configurationMock = new EmptyConfigurationLayerMock();
+
+            // inject the configuration mock at the plugin layer
+            configuration.withPluginConfiguration(configurationMock);
+
+            configurationMock.releaseLenient = Boolean.FALSE;
+            configurationMock.releasePrefix = "release-";
+
+            script.addCommitWithTag("release-2.2.2");
+
+            Infer command = getCommandInstance(Infer.class, state, Git.open(script.getWorkingDirectory()));
+            // the latest release must be the one that doesn't require the lenient parsing
+            command.run();
+
+            assertEquals(configurationMock.bump, command.state().getBump());
+            assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
+            assertEquals("2.2.2", command.state().getVersionInternal().toString());
+            assertEquals("release-2.2.2", command.state().getVersion());
+            assertNull(command.state().getReleaseScope().getInitialCommit());
+            assertNull(command.state().getReleaseScope().getFinalCommit());
+            assertEquals("2.2.2", command.state().getReleaseScope().getPreviousVersion().toString());
+            assertEquals(script.getCommitByTag("release-2.2.2"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
+        }
+
+        @Test
+        @DisplayName("Infer.run() without lenient release and without release prefix")
+        void runWithoutLenientAndWithoutPrefixReleaseTest()
+            throws Exception {
+            GitScript script = GitScenario.OneTaggedCommitCommit.realize(); // only one version tag: 1.2.3
+            Configuration configuration = new Configuration();
+            State state = new State(configuration);
+            EmptyConfigurationLayerMock configurationMock = new EmptyConfigurationLayerMock();
+
+            // inject the configuration mock at the plugin layer
+            configuration.withPluginConfiguration(configurationMock);
+
+            configurationMock.releaseLenient = Boolean.FALSE;
+            configurationMock.releasePrefix = ""; // null doesn't override the default, the empty string does
+
+            script.addCommitWithTag("release-2.2.2");
+
+            Infer command = getCommandInstance(Infer.class, state, Git.open(script.getWorkingDirectory()));
+            // the latest release must be the one that doesn't require the lenient parsing
+            command.run();
+
+            assertEquals(configurationMock.bump, command.state().getBump());
+            assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
+            assertEquals("1.2.3", command.state().getVersionInternal().toString());
+            assertEquals("1.2.3", command.state().getVersion());
             assertEquals(script.getCommitByTag("release-2.2.2"), command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("1.2.3", command.state().getReleaseScope().getPreviousVersion().toString());
@@ -300,7 +372,8 @@ public class InferTests extends AbstractCommandTests {
 
             assertNull(command.state().getBump());
             assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
-            assertEquals("0.0.4", command.state().getVersion().toString());
+            assertEquals("0.0.4", command.state().getVersionInternal().toString());
+            assertEquals("v0.0.4", command.state().getVersion());
             assertEquals(script.getCommits().get(script.getCommits().size()-1), command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion().toString());
@@ -322,7 +395,8 @@ public class InferTests extends AbstractCommandTests {
             
             assertNull(command.state().getBump());
             assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
-            assertEquals("0.0.4", command.state().getVersion().toString());
+            assertEquals("0.0.4", command.state().getVersionInternal().toString());
+            assertEquals("0.0.4", command.state().getVersion());
             assertEquals(script.getCommits().get(script.getCommits().size()-1), command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion().toString());
