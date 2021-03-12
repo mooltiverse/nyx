@@ -112,6 +112,9 @@ public class Infer extends AbstractCommand {
      * - the Git repository and the commit history;<br>
      * <br>
      * Outputs from this task are all stored in the State object, with more detail:<br>
+     * - {@code bump} is the version identifier that was bumped to get the new version; it's undefined if the user
+     *   has overridden the version by configuration or no previous versions to bump can be found in the history or
+     *   the release scope doesn't have significant commits<br>
      * - the {@code version} is defined with the new version identifier for the new release; if the user has overridden
      *   the version by configuration that value is simply used and no inference is done; if the version is not overridden
      *   by configuration and no previous versions can be found in the history the initial version from the
@@ -123,6 +126,8 @@ public class Infer extends AbstractCommand {
      *   {@code releaseScope/previousVersionCommit} or, when {@code releaseScope/previousVersionCommit} can't be
      *   inferred, the repository root commit SHA-1 is used; if the user overrides the version by configuration
      *   this value remains {@code null}
+     * - {@code releaseScope/significant} is {@code true} if the release scope contains significant commits (commits
+     *   whose messages bring informations about new versions)
      * 
      * @throws DataAccessException in case the configuration can't be loaded for some reason.
      * @throws IllegalPropertyException in case the configuration has some illegal options.

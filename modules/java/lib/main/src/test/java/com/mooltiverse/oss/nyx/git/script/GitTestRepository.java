@@ -37,9 +37,12 @@ import org.eclipse.jgit.api.errors.RefNotFoundException;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.RefDatabase;
+import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevObject;
+import org.eclipse.jgit.transport.RemoteConfig;
+import org.eclipse.jgit.transport.URIish;
 
 /**
  * A Git repository utility class used to test. This class is used to dynamically create a repository that can be used for tests
@@ -502,5 +505,41 @@ public class GitTestRepository {
     public Ref peel(Ref ref)
         throws Exception {
         return git.getRepository().getRefDatabase().peel(ref);
+    }
+
+    /**
+     * Returns the number of entries in the repository index.
+     * 
+     * @return the number of entries in the repository index.
+     * 
+     * @throws Exception in case of any issue
+     */
+    public int getIndexEntryCount()
+        throws Exception {
+        return git.getRepository().readDirCache().getEntryCount();
+    }
+
+    /**
+     * Returns the JGit repository backing this test repository
+     * 
+     * @return the JGit repository backing this test repository
+     */
+    public Repository getJGitRepository() {
+        return git.getRepository();
+    }
+
+    /**
+     * Adds the given repository to the configured remotes of this repository, using the given name.
+     * 
+     * @param repo the repository to add as remote
+     * @param name the name to use for the new remote repository in the local one
+     * 
+     * @return
+     * 
+     * @throws Exception in case of any issue
+     */
+    public RemoteConfig addRemote(Repository repo, String name)
+        throws Exception {
+        return git.remoteAdd().setName(name).setUri(new URIish(repo.getDirectory().toURI().toURL())).call();
     }
 }

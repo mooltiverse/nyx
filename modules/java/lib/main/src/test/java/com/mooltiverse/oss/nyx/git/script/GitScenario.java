@@ -45,7 +45,7 @@ public class GitScenario {
          * This yields to a repository like:
          * 
          * <pre>
-         * * b171fb9 (HEAD -> master) Initial commit
+         *   * 1f34b85 (HEAD -> master) Initial commit
          * </pre>
          * 
          * @return the script used to realize the scenario. It can be used for further operations.
@@ -74,9 +74,8 @@ public class GitScenario {
          * This yields to a repository like:
          * 
          * <pre>
-         * * c62d22e (HEAD -> master, tag: release-2.2.2) Commit non
-         * * c99c16e (tag: 1.2.3) Commit nip
-         * * f9d0cfa Initial commit
+         *   * 4f4ae06 (HEAD -> master, tag: 1.2.3) Commit sry
+         *   * 1607ec8 Initial commit
          * </pre>
          * 
          * @return the script used to realize the scenario. It can be used for further operations.
@@ -105,11 +104,12 @@ public class GitScenario {
          * This yields to a repository like:
          * 
          * <pre>
-         * * 65e445d (tag: 0.0.4) Commit xfp
-         * * 5685420 (tag: 0.0.3) Commit rit
-         * * 1c8e48d (tag: 0.0.2) Commit fux
-         * * 86f2d0d (tag: 0.0.1) Commit sfl
-         * * f3c543a Initial commit
+         *   * d84f8b5 (HEAD -> master) Commit mcv
+         *   * 285a204 (tag: 0.0.4) Commit trg
+         *   * eee5b39 (tag: 0.0.3) Commit kek
+         *   * 9acf054 (tag: 0.0.2) Commit vsg
+         *   * 3ef4102 (tag: 0.0.1) Commit oof
+         *   * 816da12 Initial commit
          * </pre>
          * 
          * @return the script used to realize the scenario. It can be used for further operations.
@@ -143,22 +143,22 @@ public class GitScenario {
          * This yields to a repository like:
          * 
          * <pre>
-         * * 7740039 (tag: 0.0.5-alpha.4, alpha) Commit fkn
-         * * 69dccb3 (tag: 0.0.5-alpha.3) Commit afr
-         * * da6971a (tag: 0.0.5-alpha.2) Commit mzt
-         * * d8a4cce (tag: 0.0.5-alpha.1) Commit fss
-         * | * b9829ae (HEAD -> master, tag: 0.1.5) Commit jux
-         * | * 501227b (tag: 0.1.4) Commit tvy
-         * | * 7cb8fea (tag: 0.1.3) Commit oxw
-         * | * b2aa5ff (tag: 0.1.2) Commit bot
-         * | * 9c82c72 (tag: 0.1.1) Commit wyo
-         * | * 91567bd (tag: 0.1.0) Commit urq
-         * |/  
-         * * 23a7e27 (tag: 0.0.4) Commit crp
-         * * 78d621d (tag: 0.0.3) Commit bdf
-         * * 541b69c (tag: 0.0.2) Commit sdd
-         * * 4a0a0f7 (tag: 0.0.1) Commit ott
-         * * 1cdc665 Initial commit
+         *   * 69b89ba (tag: 0.0.5-alpha.4, alpha) Commit lhj
+         *   | * 4c18c69 (HEAD -> master, tag: 0.1.5) Commit exx
+         *   * | e9a99f3 (tag: 0.0.5-alpha.3) Commit lib
+         *   | * 20265d3 (tag: 0.1.4) Commit ftb
+         *   * | f45f9d7 (tag: 0.0.5-alpha.2) Commit wys
+         *   | * c4525f0 (tag: 0.1.3) Commit mui
+         *   * | 0c63c69 (tag: 0.0.5-alpha.1) Commit khw
+         *   | * c8d4839 (tag: 0.1.2) Commit olj
+         *   | * c9885fa (tag: 0.1.1) Commit pfo
+         *   | * 428ee21 (tag: 0.1.0) Commit unp
+         *   |/  
+         *   * ed65004 (tag: 0.0.4) Commit hvp
+         *   * f82dae8 (tag: 0.0.3) Commit nvf
+         *   * 4804d5c (tag: 0.0.2) Commit kwd
+         *   * c4e58a1 (tag: 0.0.1) Commit wvi
+         *   * 74bbba1 Initial commit
          * </pre>
          * 
          * @return the script used to realize the scenario. It can be used for further operations.
@@ -202,24 +202,24 @@ public class GitScenario {
          * This yields to a repository like:
          * 
          * <pre>
-         * *   571ca16 (HEAD -> master, tag: 0.0.9) Merge alpha > master
-         * |\  
-         * | * d3112a7 (tag: 0.0.9-alpha.2, alpha) Commit bzx
-         * | * 3d98871 (tag: 0.0.9-alpha.1) Commit tsu
-         * * | 521a1f0 (tag: 0.0.8) Commit lpu
-         * * | 480d11f (tag: 0.0.7) Commit kcv
-         * |/  
-         * *   1b1b10c (tag: 0.0.6) Merge alpha > master
-         * |\  
-         * | * 911a9c9 (tag: 0.0.6-alpha.2) Commit kob
-         * | * 32c2d8a (tag: 0.0.6-alpha.1) Commit lyb
-         * * | d2852d4 (tag: 0.0.5) Commit zuz
-         * |/  
-         * * 4dcceaf (tag: 0.0.4) Commit dlc
-         * * c8c56e4 (tag: 0.0.3) Commit dru
-         * * d01ba0d (tag: 0.0.2) Commit pjl
-         * * 03df2ba (tag: 0.0.1) Commit kvl
-         * * e0ed7ff Initial commit
+         *   *   d372fcf (HEAD -> master, tag: 0.0.9) Merge alpha > master
+         *   |\  
+         *   * | b59e872 (tag: 0.0.8) Commit zmg
+         *   | * 7044f5c (tag: 0.0.9-alpha.2, alpha) Commit jmy
+         *   * | 89b80e6 (tag: 0.0.7) Commit voy
+         *   | * e7398b5 (tag: 0.0.9-alpha.1) Commit xod
+         *   |/  
+         *   *   c77fae5 (tag: 0.0.6) Merge alpha > master
+         *   |\  
+         *   * | 7557baa (tag: 0.0.5) Commit gfq
+         *   | * 666b6d3 (tag: 0.0.6-alpha.2) Commit dix
+         *   | * 6f2f878 (tag: 0.0.6-alpha.1) Commit owf
+         *   |/  
+         *   * 6dab481 (tag: 0.0.4) Commit fle
+         *   * fb5e77e (tag: 0.0.3) Commit xmi
+         *   * 77dd131 (tag: 0.0.2) Commit vdw
+         *   * 9c50fe4 (tag: 0.0.1) Commit aei
+         *   * 29affd6 Initial commit
          * </pre>
          * 
          * @return the script used to realize the scenario. It can be used for further operations.

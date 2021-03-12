@@ -15,14 +15,135 @@
  */
 package com.mooltiverse.oss.nyx.git;
 
+import java.util.Collection;
 import java.util.Set;
 
+import com.mooltiverse.oss.nyx.data.Commit;
+import com.mooltiverse.oss.nyx.data.Identity;
 import com.mooltiverse.oss.nyx.data.Tag;
 
 /**
  * This interface models coarse grained, implementation independent methods used by Nyx to access a Git repository.
  */
 public interface Repository {
+    /**
+     * Adds the given paths to the staging area.
+     * 
+     * @param paths the file patterns of the contents to add to stage. Cannot be {@code null} or empty. The path "{@code .}" represents
+     * all files in the working area so with that you can add all locally changed files.
+     * 
+     * @throws GitException in case some problem is encountered with the underlying Git repository, preventing to add paths.
+     * 
+     * @see #commit(String)
+     * @see #commit(String, Identity, Identity)
+     * @see #commit(Collection, String)
+     * @see #commit(Collection, String, Identity, Identity)
+     */
+    public void add(Collection<String> paths)
+        throws GitException;
+
+    /**
+     * Commits changes to the repository. Files to commit must be staged separately using {@link #add(Collection)}.
+     * 
+     * @param message the commit message. Cannot be {@code null}.
+     * 
+     * @return the object modelling the new commit that was created. Never {@code null}.
+     * 
+     * @throws GitException in case some problem is encountered with the underlying Git repository, preventing to commit.
+     * 
+     * @see #add(Collection)
+     */
+    public Commit commit(String message)
+        throws GitException;
+
+    /**
+     * Commits changes to the repository. Files to commit must be staged separately using {@link #add(Collection)}.
+     * 
+     * @param message the commit message. Cannot be {@code null}.
+     * @param author the object modelling the commit author informations. It may be {@code null}, in which case the default
+     * for the repository will be used
+     * @param committer the object modelling the committer informations. It may be {@code null}, in which case the default
+     * for the repository will be used
+     * 
+     * @return the object modelling the new commit that was created. Never {@code null}.
+     * 
+     * @throws GitException in case some problem is encountered with the underlying Git repository, preventing to commit.
+     * 
+     * @see #add(Collection)
+     */
+    public Commit commit(String message, Identity author, Identity committer)
+        throws GitException;
+
+    /**
+     * Adds the given files to the staging area and commits changes to the repository. This method is a shorthand
+     * for {@link #add(Collection)} and {@link #commit(String)}.
+     * 
+     * @param paths the file patterns of the contents to add to stage. Cannot be {@code null} or empty. The path "{@code .}" represents
+     * all files in the working area so with that you can add all locally changed files.
+     * @param message the commit message. Cannot be {@code null}.
+     * 
+     * @return the object modelling the new commit that was created. Never {@code null}.
+     * 
+     * @throws GitException in case some problem is encountered with the underlying Git repository, preventing to commit.
+     */
+    public Commit commit(Collection<String> paths, String message)
+        throws GitException;
+
+    /**
+     * Adds the given files to the staging area and commits changes to the repository. This method is a shorthand
+     * for {@link #add(Collection)} and {@link #commit(String, Identity, Identity)}.
+     * 
+     * @param paths the file patterns of the contents to add to stage. Cannot be {@code null} or empty. The path "{@code .}" represents
+     * all files in the working area so with that you can add all locally changed files.
+     * @param message the commit message. Cannot be {@code null}.
+     * @param author the object modelling the commit author informations. It may be {@code null}, in which case the default
+     * for the repository will be used
+     * @param committer the object modelling the committer informations. It may be {@code null}, in which case the default
+     * for the repository will be used
+     * 
+     * @return the object modelling the new commit that was created. Never {@code null}.
+     * 
+     * @throws GitException in case some problem is encountered with the underlying Git repository, preventing to commit.
+     */
+    public Commit commit(Collection<String> paths, String message, Identity author, Identity committer)
+        throws GitException;
+
+    /**
+     * Pushes local changes in the current branch to the default remote {@code origin}.
+     * 
+     * @return the local name of the remotes that has been pushed
+     * 
+     * @throws GitException in case some problem is encountered with the underlying Git repository, preventing to push.
+     */
+    public String push()
+        throws GitException;
+
+    /**
+     * Pushes local changes in the current branch to the given remote.
+     * 
+     * @param remote the name of the remote to push to. If {@code null} or empty the default remote name ({@code origin})
+     * is used.
+     * 
+     * @return the local name of the remotes that has been pushed
+     * 
+     * @throws GitException in case some problem is encountered with the underlying Git repository, preventing to push.
+     */
+    public String push(String remote)
+        throws GitException;
+
+    /**
+     * Pushes local changes in the current branch to the given remotes.
+     * 
+     * @param remotes the names of remotes to push to. If {@code null} or empty the default remote name ({@code origin})
+     * is used.
+     * 
+     * @return a collection with the local names of remotes that have been pushed
+     * 
+     * @throws GitException in case some problem is encountered with the underlying Git repository, preventing to push.
+     */
+    public Set<String> push(Collection<String> remotes)
+        throws GitException;
+
     /**
      * Browse the repository commit history using the given {@code visitor} to inspect each commit. Commits are
      * evaluated in Git's natural order, from the most recent to oldest.

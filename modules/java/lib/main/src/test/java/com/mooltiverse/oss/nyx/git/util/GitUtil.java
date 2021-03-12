@@ -146,7 +146,7 @@ public class GitUtil {
      */
     public static void printRepositoryCommitGraph(File directory, OutputStream out)
         throws Exception {
-        RuntimeUtil.runCommand(new String[]{"git", "log", "--all", "--decorate", "--oneline", "--graph"}, null, directory, out);
+        RuntimeUtil.runCommand(new String[]{"git", "log", "--all", "--decorate", "--oneline", "--graph", "--date-order"}, null, directory, out);
         
     }
 }

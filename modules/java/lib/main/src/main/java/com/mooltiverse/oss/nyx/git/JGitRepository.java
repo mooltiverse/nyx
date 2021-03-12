@@ -18,12 +18,16 @@ package com.mooltiverse.oss.nyx.git;
 import java.io.File;
 import java.io.IOException;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
 
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.AddCommand;
+import org.eclipse.jgit.api.CommitCommand;
+import org.eclipse.jgit.api.PushCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.JGitInternalException;
 import org.eclipse.jgit.errors.AmbiguousObjectException;
@@ -39,12 +43,14 @@ import org.eclipse.jgit.lib.RefDatabase;
 import org.eclipse.jgit.revwalk.RevSort;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
-
+import org.eclipse.jgit.transport.RefSpec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 
+import com.mooltiverse.oss.nyx.data.Commit;
+import com.mooltiverse.oss.nyx.data.Identity;
 import com.mooltiverse.oss.nyx.data.Tag;
 
 /**
@@ -120,6 +126,120 @@ class JGitRepository implements Repository {
             throw new IllegalArgumentException("Can't create a repository instance with a blank directory");
 
         return open(new File(directory));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void add(Collection<String> paths)
+        throws GitException {
+        try {
+            AddCommand command = jGit.add();
+            command.setUpdate(false); // match all files, not only those already in the index
+            for (String path: paths)
+                command.addFilepattern(path);
+
+            command.call();
+        }
+        catch (GitAPIException gae) {
+            throw new GitException("An error occurred when trying to add paths to the staging area", gae);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Commit commit(String message)
+        throws GitException {
+        return commit(message, null, null);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Commit commit(String message, Identity author, Identity committer)
+        throws GitException {
+        try {
+            CommitCommand command = jGit.commit();
+            command.setMessage(message);
+            command.setAllowEmpty(false); // we don't want to create empty commits
+            if (!Objects.isNull(author))
+                command.setAuthor(author.getName(), author.getEmail());
+            if (!Objects.isNull(committer))
+                command.setCommitter(committer.getName(), committer.getEmail());
+
+            return ObjectFactory.commitFrom(command.call(), Set.<Tag>of());
+        }
+        catch (GitAPIException gae) {
+            throw new GitException("An error occurred when trying to commit", gae);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Commit commit(Collection<String> paths, String message)
+        throws GitException {
+        return commit(paths, message, null, null);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Commit commit(Collection<String> paths, String message, Identity author, Identity committer)
+        throws GitException {
+        add(paths);
+        return commit(message, author, committer);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String push()
+        throws GitException {
+        return push(Constants.DEFAULT_REMOTE_NAME);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String push(String remote)
+        throws GitException {
+        try {
+            // get the current branch name
+            String currentBranchRef = jGit.getRepository().getFullBranch();
+            // the refspec is in the localBranch:remoteBranch form, and we assume they both have the same name here
+            RefSpec refSpec = new RefSpec(currentBranchRef.concat(":").concat(currentBranchRef));
+
+            PushCommand pushCommand = jGit.push().setRefSpecs(refSpec);
+            if (!Objects.isNull(remote) && !remote.isEmpty())
+                pushCommand.setRemote(remote);
+            pushCommand.call();
+            return pushCommand.getRemote();
+        }
+        catch (GitAPIException | IOException e) {
+            throw new GitException("An error occurred when trying to push", e);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Set<String> push(Collection<String> remotes)
+        throws GitException {
+        Set<String> res = new HashSet<String>();
+        for (String remote: remotes) {
+            res.add(push(remote));
+        }
+        return res;
     }
 
     /**

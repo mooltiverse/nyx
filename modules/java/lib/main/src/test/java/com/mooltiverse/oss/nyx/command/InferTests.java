@@ -386,7 +386,7 @@ public class InferTests extends AbstractCommandTests {
         void runWithSimpleCommitHistoryAndFurtherSignificantCommitsTest()
             throws Exception {
             // TODO: write this test once we're able to bump versions based on the commit history
-            /**GitScript script = GitScenario.OneBranchShort.realize(); // the latest tagged release is 0.0.4
+            /*GitScript script = GitScenario.OneBranchShort.realize(); // the latest tagged release is 0.0.4
             Configuration configuration = new Configuration();
             State state = new State(configuration);
             Infer command = getCommandInstance(Infer.class, state, Git.open(script.getWorkingDirectory()));

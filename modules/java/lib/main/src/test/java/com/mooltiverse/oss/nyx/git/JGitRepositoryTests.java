@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import java.nio.file.Files;
 import java.util.Objects;
@@ -33,6 +34,7 @@ import org.junit.jupiter.api.Test;
 import org.eclipse.jgit.revwalk.RevCommit;
 
 import com.mooltiverse.oss.nyx.data.Commit;
+import com.mooltiverse.oss.nyx.data.Identity;
 import com.mooltiverse.oss.nyx.git.script.GitScript;
 import com.mooltiverse.oss.nyx.git.script.GitScenario;
 
@@ -103,6 +105,381 @@ public class JGitRepositoryTests {
         public void openStringTest()
             throws Exception {
             assertNotNull(JGitRepository.open(GitScript.fromScratch().getWorkingDirectory().getAbsolutePath()));
+        }
+    }
+
+    @Nested
+    @DisplayName("JGitRepository.add")
+    class AddTests {
+        @DisplayName("JGitRepository.add() throws GitException with empty paths")
+        @Test
+        public void exceptionWithEmptyPaths()
+            throws Exception {
+            // start with a new repository, just initialized
+            GitScript script = GitScript.fromScratch();
+            Repository repository = JGitRepository.open(script.getWorkingDirectory());
+
+            assertThrows(GitException.class, () -> repository.add(new ArrayList<String>()));
+        }
+
+        @DisplayName("JGitRepository.add() throws NullPointerException with null paths")
+        @Test
+        public void exceptionWithNullPaths()
+            throws Exception {
+            // start with a new repository, just initialized
+            GitScript script = GitScript.fromScratch();
+            Repository repository = JGitRepository.open(script.getWorkingDirectory());
+
+            assertThrows(NullPointerException.class, () -> repository.add(null));
+        }
+
+        @DisplayName("JGitRepository.add()")
+        @Test
+        public void addTest()
+            throws Exception {
+            // start with a new repository, with just the initial commit
+            GitScript script = GitScenario.InitialCommit.realize();
+            Repository repository = JGitRepository.open(script.getWorkingDirectory());
+
+            // remember the cache count may increas of more than 1 for each added file
+            int cacheCount = script.getIndexEntryCount();
+            script.addRandomTextFiles(1);
+            repository.add(List.<String>of("."));
+            assertTrue(cacheCount+1 <= script.getIndexEntryCount());
+
+            cacheCount = script.getIndexEntryCount();
+            script.addRandomTextFiles(2);
+            repository.add(List.<String>of("."));
+            assertTrue(cacheCount+2 <= script.getIndexEntryCount());
+        }
+    }
+
+    @Nested
+    @DisplayName("JGitRepository.commit")
+    class CommitTests {
+        @DisplayName("JGitRepository.commit(String) throws GitException with null message")
+        @Test
+        public void exceptionWithNullMessageOn1Params()
+            throws Exception {
+            // start with a new repository, just initialized
+            GitScript script = GitScript.fromScratch();
+            Repository repository = JGitRepository.open(script.getWorkingDirectory());
+
+            script.addRandomTextFiles(1);
+            assertThrows(GitException.class, () -> repository.commit(null));
+        }
+
+        @DisplayName("JGitRepository.commit(String)")
+        @Test
+        public void commit1Params()
+            throws Exception {
+            // start with a new repository, with just the initial commit
+            GitScript script = GitScenario.InitialCommit.realize();
+            Repository repository = JGitRepository.open(script.getWorkingDirectory());
+
+            RevCommit prevLastCommit = script.getLastCommit();
+
+            script.addRandomTextFiles(1);
+            script.stage();
+
+            Commit commit = repository.commit("A message");
+
+            assertNotEquals(prevLastCommit.getId().getName(), script.getLastCommit().getId().getName());
+            assertEquals(script.getLastCommit().getId().getName(), commit.getSHA());
+            assertEquals(script.getLastCommit().getFullMessage(), commit.getMessage().getFullMessage());
+            assertEquals("A message", commit.getMessage().getFullMessage());
+        }
+
+        @DisplayName("JGitRepository.commit(Collection<String>, String) throws GitException with empty paths")
+        @Test
+        public void exceptionWithEmptyPathsOn2Params()
+            throws Exception {
+            // start with a new repository, just initialized
+            GitScript script = GitScript.fromScratch();
+            Repository repository = JGitRepository.open(script.getWorkingDirectory());
+
+            assertThrows(GitException.class, () -> repository.commit(new ArrayList<String>(), "A message"));
+        }
+
+        @DisplayName("JGitRepository.commit(Collection<String>, String) throws NullPointerException with null paths")
+        @Test
+        public void exceptionWithNullPathsOn2Params()
+            throws Exception {
+            // start with a new repository, just initialized
+            GitScript script = GitScript.fromScratch();
+            Repository repository = JGitRepository.open(script.getWorkingDirectory());
+
+            assertThrows(NullPointerException.class, () -> repository.commit(null, "A message"));
+        }
+
+        @DisplayName("JGitRepository.commit(Collection<String>, String) throws GitException with null message")
+        @Test
+        public void exceptionWithNullMessageOn2Params()
+            throws Exception {
+            // start with a new repository, just initialized
+            GitScript script = GitScript.fromScratch();
+            Repository repository = JGitRepository.open(script.getWorkingDirectory());
+
+            script.addRandomTextFiles(1);
+            assertThrows(GitException.class, () -> repository.commit(List.<String>of("."), null));
+        }
+
+        @DisplayName("JGitRepository.commit(Collection<String>, String)")
+        @Test
+        public void commit2Params()
+            throws Exception {
+            // start with a new repository, with just the initial commit
+            GitScript script = GitScenario.InitialCommit.realize();
+            Repository repository = JGitRepository.open(script.getWorkingDirectory());
+
+            RevCommit prevLastCommit = script.getLastCommit();
+
+            script.addRandomTextFiles(1);
+
+            Commit commit = repository.commit(List.<String>of("."), "A message");
+
+            assertNotEquals(prevLastCommit.getId().getName(), script.getLastCommit().getId().getName());
+            assertEquals(script.getLastCommit().getId().getName(), commit.getSHA());
+            assertEquals(script.getLastCommit().getFullMessage(), commit.getMessage().getFullMessage());
+            assertEquals("A message", commit.getMessage().getFullMessage());
+        }
+
+        @DisplayName("JGitRepository.commit(String, Identity, Identity) throws GitException with null message")
+        @Test
+        public void exceptionWithNullMessageOn3Params()
+            throws Exception {
+            // start with a new repository, just initialized
+            GitScript script = GitScript.fromScratch();
+            Repository repository = JGitRepository.open(script.getWorkingDirectory());
+
+            script.addRandomTextFiles(1);
+            assertThrows(GitException.class, () -> repository.commit(null, new Identity("John Doe", "jdoe@example.com"), new Identity("John Doe", "jdoe@example.com")));
+        }
+
+        @DisplayName("JGitRepository.commit(String, Identity, Identity)")
+        @Test
+        public void commit3Params()
+            throws Exception {
+            // start with a new repository, with just the initial commit
+            GitScript script = GitScenario.InitialCommit.realize();
+            Repository repository = JGitRepository.open(script.getWorkingDirectory());
+
+            RevCommit prevLastCommit = script.getLastCommit();
+
+            script.addRandomTextFiles(1);
+            script.stage();
+
+            Commit commit = repository.commit("A message", new Identity("John Doe", "jdoe@example.com"), new Identity("Sean Moe", "smoe@example.com"));
+
+            assertNotEquals(prevLastCommit.getId().getName(), script.getLastCommit().getId().getName());
+            assertEquals(script.getLastCommit().getId().getName(), commit.getSHA());
+            assertEquals(script.getLastCommit().getFullMessage(), commit.getMessage().getFullMessage());
+            assertEquals("A message", commit.getMessage().getFullMessage());
+
+            assertEquals(script.getLastCommit().getAuthorIdent().getName(), commit.getAuthorAction().getIdentity().getName());
+            assertEquals("John Doe", commit.getAuthorAction().getIdentity().getName());
+            assertEquals(script.getLastCommit().getAuthorIdent().getEmailAddress(), commit.getAuthorAction().getIdentity().getEmail());
+            assertEquals("jdoe@example.com", commit.getAuthorAction().getIdentity().getEmail());
+
+            assertEquals(script.getLastCommit().getCommitterIdent().getName(), commit.getCommitAction().getIdentity().getName());
+            assertEquals("Sean Moe", commit.getCommitAction().getIdentity().getName());
+            assertEquals(script.getLastCommit().getCommitterIdent().getEmailAddress(), commit.getCommitAction().getIdentity().getEmail());
+            assertEquals("smoe@example.com", commit.getCommitAction().getIdentity().getEmail());
+        }
+
+        @DisplayName("JGitRepository.commit(Collection<String>, String, Identity, Identity) throws GitException with empty paths")
+        @Test
+        public void exceptionWithEmptyPathsOn4Params()
+            throws Exception {
+            // start with a new repository, just initialized
+            GitScript script = GitScript.fromScratch();
+            Repository repository = JGitRepository.open(script.getWorkingDirectory());
+
+            assertThrows(GitException.class, () -> repository.commit(new ArrayList<String>(), "A message", new Identity("John Doe", "jdoe@example.com"), new Identity("John Doe", "jdoe@example.com")));
+        }
+
+        @DisplayName("JGitRepository.commit(Collection<String>, String, Identity, Identity) throws NullPointerException with null paths")
+        @Test
+        public void exceptionWithNullPathsOn4Params()
+            throws Exception {
+            // start with a new repository, just initialized
+            GitScript script = GitScript.fromScratch();
+            Repository repository = JGitRepository.open(script.getWorkingDirectory());
+
+            assertThrows(NullPointerException.class, () -> repository.commit(null, "A message", new Identity("John Doe", "jdoe@example.com"), new Identity("John Doe", "jdoe@example.com")));
+        }
+
+        @DisplayName("JGitRepository.commit(Collection<String>, String, Identity, Identity) throws GitException with null message")
+        @Test
+        public void exceptionWithNullMessageOn4Params()
+            throws Exception {
+            // start with a new repository, just initialized
+            GitScript script = GitScript.fromScratch();
+            Repository repository = JGitRepository.open(script.getWorkingDirectory());
+            
+            script.addRandomTextFiles(1);
+            assertThrows(GitException.class, () -> repository.commit(List.<String>of("."), null, new Identity("John Doe", "jdoe@example.com"), new Identity("John Doe", "jdoe@example.com")));
+        }
+
+        @DisplayName("JGitRepository.commit(Collection<String>, String, Identity, Identity)")
+        @Test
+        public void commit4Params()
+            throws Exception {
+            // start with a new repository, with just the initial commit
+            GitScript script = GitScenario.InitialCommit.realize();
+            Repository repository = JGitRepository.open(script.getWorkingDirectory());
+
+            RevCommit prevLastCommit = script.getLastCommit();
+
+            script.addRandomTextFiles(1);
+
+            Commit commit = repository.commit(List.<String>of("."), "A message", new Identity("John Doe", "jdoe@example.com"), new Identity("Sean Moe", "smoe@example.com"));
+
+            assertNotEquals(prevLastCommit.getId().getName(), script.getLastCommit().getId().getName());
+            assertEquals(script.getLastCommit().getId().getName(), commit.getSHA());
+            assertEquals(script.getLastCommit().getFullMessage(), commit.getMessage().getFullMessage());
+            assertEquals("A message", commit.getMessage().getFullMessage());
+            
+            assertEquals(script.getLastCommit().getAuthorIdent().getName(), commit.getAuthorAction().getIdentity().getName());
+            assertEquals("John Doe", commit.getAuthorAction().getIdentity().getName());
+            assertEquals(script.getLastCommit().getAuthorIdent().getEmailAddress(), commit.getAuthorAction().getIdentity().getEmail());
+            assertEquals("jdoe@example.com", commit.getAuthorAction().getIdentity().getEmail());
+
+            assertEquals(script.getLastCommit().getCommitterIdent().getName(), commit.getCommitAction().getIdentity().getName());
+            assertEquals("Sean Moe", commit.getCommitAction().getIdentity().getName());
+            assertEquals(script.getLastCommit().getCommitterIdent().getEmailAddress(), commit.getCommitAction().getIdentity().getEmail());
+            assertEquals("smoe@example.com", commit.getCommitAction().getIdentity().getEmail());
+        }
+    }
+
+    @Nested
+    @DisplayName("JGitRepository.push")
+    class PushTests {
+        @DisplayName("JGitRepository.push()")
+        @Test
+        public void pushTest()
+            throws Exception {
+            // start with a new repository, with an initial commit
+            GitScript script = GitScenario.InitialCommit.realize();
+
+            // also create two new empty repositories to use as remotes
+            GitScript remote1script = GitScript.fromScratch();
+            GitScript remote2script = GitScript.fromScratch();
+            script.addRemote(remote1script.getJGitRepository(), "origin");
+            script.addRemote(remote2script.getJGitRepository(), "custom");
+
+            Repository repository = JGitRepository.open(script.getWorkingDirectory());
+
+            // remotes still have no commits, so this must throw an exception
+            assertThrows(Exception.class, () -> remote1script.getLastCommit());
+            assertThrows(Exception.class, () -> remote2script.getLastCommit());
+
+            // make a first sync, just to have a starting commit in remotes as well
+            String pushedRemote = repository.push("custom");
+
+            // now the non-default remote 'custom' has the fisrt commit
+            assertEquals("custom", pushedRemote);
+            assertThrows(Exception.class, () -> remote1script.getLastCommit());
+            assertDoesNotThrow(() -> remote2script.getLastCommit());
+
+            // add a commit into the local repo and make sure it's not into the others
+            script.andCommit("A commit message");
+            assertThrows(Exception.class, () -> remote1script.getLastCommit());
+            assertNotEquals(script.getLastCommit().getId().getName(), remote2script.getLastCommit().getId().getName());
+
+            // now push and see the changes reflected
+            pushedRemote = repository.push("custom");
+
+            // changes are reflected to 'custom' only
+            assertEquals("custom", pushedRemote);
+            assertThrows(Exception.class, () -> remote1script.getLastCommit());
+            assertEquals(script.getLastCommit().getId().getName(), remote2script.getLastCommit().getId().getName());
+        }
+
+        @DisplayName("JGitRepository.push(String)")
+        @Test
+        public void pushToRemoteTest()
+            throws Exception {
+            // start with a new repository, with an initial commit
+            GitScript script = GitScenario.InitialCommit.realize();
+
+            // also create two new empty repositories to use as remotes
+            GitScript remote1script = GitScript.fromScratch();
+            GitScript remote2script = GitScript.fromScratch();
+            script.addRemote(remote1script.getJGitRepository(), "origin");
+            script.addRemote(remote2script.getJGitRepository(), "custom");
+
+            Repository repository = JGitRepository.open(script.getWorkingDirectory());
+
+            // remotes still have no commits, so this must throw an exception
+            assertThrows(Exception.class, () -> remote1script.getLastCommit());
+            assertThrows(Exception.class, () -> remote2script.getLastCommit());
+
+            // make a first sync, just to have a starting commit in remotes as well
+            String pushedRemote = repository.push();
+
+            // now the default remote 'origin' has the fisrt commit
+            assertEquals("origin", pushedRemote);
+            assertDoesNotThrow(() -> remote1script.getLastCommit());
+            assertThrows(Exception.class, () -> remote2script.getLastCommit());
+
+            // add a commit into the local repo and make sure it's not into the others
+            script.andCommit("A commit message");
+            assertNotEquals(script.getLastCommit().getId().getName(), remote1script.getLastCommit().getId().getName());
+            assertThrows(Exception.class, () -> remote2script.getLastCommit());
+
+            // now push (to the default 'origin') and see the changes reflected
+            pushedRemote = repository.push();
+
+            // changes are reflected to 'origin' only
+            assertEquals("origin", pushedRemote);
+            assertEquals(script.getLastCommit().getId().getName(), remote1script.getLastCommit().getId().getName());
+            assertThrows(Exception.class, () -> remote2script.getLastCommit());
+        }
+
+        @DisplayName("JGitRepository.push(Collection<String>)")
+        @Test
+        public void pushToRemotesTest()
+            throws Exception {
+            // start with a new repository, with an initial commit
+            GitScript script = GitScenario.InitialCommit.realize();
+
+            // also create two new empty repositories to use as remotes
+            GitScript remote1script = GitScript.fromScratch();
+            GitScript remote2script = GitScript.fromScratch();
+            script.addRemote(remote1script.getJGitRepository(), "origin");
+            script.addRemote(remote2script.getJGitRepository(), "custom");
+
+            Repository repository = JGitRepository.open(script.getWorkingDirectory());
+
+            // remotes still have no commits, so this must throw an exception
+            assertThrows(Exception.class, () -> remote1script.getLastCommit());
+            assertThrows(Exception.class, () -> remote2script.getLastCommit());
+
+            // make a first sync, just to have a starting commit in remotes as well
+            Set<String> pushedRemotes = repository.push(List.<String>of("origin", "custom"));
+
+            // now the remotes have the fisrt commit
+            assertTrue(pushedRemotes.contains("origin"));
+            assertTrue(pushedRemotes.contains("custom"));
+            assertEquals(2, pushedRemotes.size());
+            assertDoesNotThrow(() -> remote1script.getLastCommit());
+            assertDoesNotThrow(() -> remote2script.getLastCommit());
+
+            // add a commit into the local repo and make sure it's not into the others
+            script.andCommit("A commit message");
+            assertNotEquals(script.getLastCommit().getId().getName(), remote1script.getLastCommit().getId().getName());
+            assertNotEquals(script.getLastCommit().getId().getName(), remote2script.getLastCommit().getId().getName());
+
+            // now push (to the default 'origin') and see the changes reflected
+            pushedRemotes = repository.push(List.<String>of("origin", "custom"));
+
+            // changes are reflected to both remotes
+            assertTrue(pushedRemotes.contains("origin"));
+            assertTrue(pushedRemotes.contains("custom"));
+            assertEquals(2, pushedRemotes.size());
+            assertEquals(script.getLastCommit().getId().getName(), remote1script.getLastCommit().getId().getName());
+            assertEquals(script.getLastCommit().getId().getName(), remote2script.getLastCommit().getId().getName());
         }
     }
 

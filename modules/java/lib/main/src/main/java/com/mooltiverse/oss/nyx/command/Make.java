@@ -38,7 +38,7 @@ public class Make extends AbstractCommand {
     /**
      * The private logger instance
      */
-    private static final Logger logger = LoggerFactory.getLogger(Publish.class);
+    private static final Logger logger = LoggerFactory.getLogger(Make.class);
 
     /**
      * The name used for the internal state attribute where we store the timestamp
