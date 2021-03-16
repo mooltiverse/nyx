@@ -21,11 +21,56 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import com.mooltiverse.oss.nyx.configuration.Configuration;
 import com.mooltiverse.oss.nyx.git.Git;
 import com.mooltiverse.oss.nyx.git.Scenario;
+import com.mooltiverse.oss.nyx.state.State;
 
 @DisplayName("Publish")
-public class PublishTests extends AbstractCommandTests {
+public class PublishTests {
+    @Nested
+    @DisplayName("Publish constructor")
+    static class ConstructorTests {
+        /**
+         * Test that the given class has the required 2 arguments constructor and that it doesn't fail as long as it
+         * has non null parameters
+         */
+        @Test
+        @DisplayName("Publish()")
+        void constructorTest()
+            throws Exception {
+            assertNotNull(new Publish(new State(new Configuration()), Git.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory())));
+        }
+    }
+
+    @Nested
+    @DisplayName("Publish repository")
+    static class RepositoryTests {
+        /**
+         * Check that the repository() method never returns a {@code null} object
+         */
+        @Test
+        @DisplayName("Publish.repository()")
+        void repositoryTest()
+            throws Exception {
+            assertNotNull(new Publish(new State(new Configuration()), Git.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory())).repository());
+        }
+    }
+
+    @Nested
+    @DisplayName("Publish state")
+    static class StateTests {
+        /**
+         * Check that the state() method never returns a {@code null} object
+         */
+        @Test
+        @DisplayName("Publish.state()")
+        void stateTest()
+            throws Exception {
+            assertNotNull(new Publish(new State(new Configuration()), Git.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory())).state());
+        }
+    }
+
     @Nested
     @DisplayName("Publish isUpToDate")
     public static class UpToDateTests {
@@ -37,7 +82,7 @@ public class PublishTests extends AbstractCommandTests {
         @DisplayName("Publish.isUpToDate()")
         void isUpToDateTest()
             throws Exception {
-            Publish command = getCommandInstance(Publish.class, Git.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory()));
+            Publish command = new Publish(new State(new Configuration()), Git.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory()));
 
             // simply test that running it twice returns false at the first run and true the second
             assertFalse(command.isUpToDate());
@@ -53,7 +98,7 @@ public class PublishTests extends AbstractCommandTests {
         @DisplayName("Publish.run() throws exception with a valid but empty Git repository in working directory")
         void stateTest()
             throws Exception {
-            assertThrows(GitException.class, () -> getCommandInstance(Publish.class, Git.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory())).run());
+            assertThrows(GitException.class, () -> new Publish(new State(new Configuration()), Git.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory())).run());
         }*/
     }
 }

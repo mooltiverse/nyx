@@ -25,7 +25,7 @@ import com.mooltiverse.oss.nyx.configuration.Configuration;
 import com.mooltiverse.oss.nyx.data.DataAccessException;
 import com.mooltiverse.oss.nyx.configuration.mock.EmptyConfigurationLayerMock;
 import com.mooltiverse.oss.nyx.git.Repository;
-import com.mooltiverse.oss.nyx.git.script.GitScript;
+import com.mooltiverse.oss.nyx.git.Scenario;
 import com.mooltiverse.oss.nyx.state.State;
 
 @DisplayName("Nyx")
@@ -77,12 +77,11 @@ public class NyxTests {
         @DisplayName("Nyx.repository()")
         void repositoryTest()
             throws Exception {
-
             Nyx nyx = new Nyx();
 
             // initialize a repository in a new directory and pass the directory to the configuration. We'll use the plugin configuration layer to pass the directory
             EmptyConfigurationLayerMock configurationMock = new EmptyConfigurationLayerMock();
-            configurationMock.directory = GitScript.fromScratch().getWorkingDirectory();
+            configurationMock.directory = Scenario.FROM_SCRATCH.realize().getWorkingDirectory();
             nyx.configuration().withPluginConfiguration(configurationMock);
 
             Repository repository = nyx.repository();
@@ -106,7 +105,6 @@ public class NyxTests {
         @DisplayName("Nyx.state()")
         void stateTest()
             throws Exception {
-
             Nyx nyx = new Nyx();
             State state = nyx.state();
             

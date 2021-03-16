@@ -21,11 +21,56 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import com.mooltiverse.oss.nyx.configuration.Configuration;
 import com.mooltiverse.oss.nyx.git.Git;
 import com.mooltiverse.oss.nyx.git.Scenario;
+import com.mooltiverse.oss.nyx.state.State;
 
 @DisplayName("Clean")
-public class CleanTests extends AbstractCommandTests {
+public class CleanTests {
+    @Nested
+    @DisplayName("Clean constructor")
+    static class ConstructorTests {
+        /**
+         * Test that the given class has the required 2 arguments constructor and that it doesn't fail as long as it
+         * has non null parameters
+         */
+        @Test
+        @DisplayName("Clean()")
+        void constructorTest()
+            throws Exception {
+            assertNotNull(new Clean(new State(new Configuration()), Git.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory())));
+        }
+    }
+
+    @Nested
+    @DisplayName("Clean repository")
+    static class RepositoryTests {
+        /**
+         * Check that the repository() method never returns a {@code null} object
+         */
+        @Test
+        @DisplayName("Clean.repository()")
+        void repositoryTest()
+            throws Exception {
+            assertNotNull(new Clean(new State(new Configuration()), Git.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory())).repository());
+        }
+    }
+
+    @Nested
+    @DisplayName("Clean state")
+    static class StateTests {
+        /**
+         * Check that the state() method never returns a {@code null} object
+         */
+        @Test
+        @DisplayName("Clean.state()")
+        void stateTest()
+            throws Exception {
+            assertNotNull(new Clean(new State(new Configuration()), Git.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory())).state());
+        }
+    }
+
     @Nested
     @DisplayName("Clean isUpToDate")
     public static class UpToDateTests {
@@ -37,7 +82,7 @@ public class CleanTests extends AbstractCommandTests {
         @DisplayName("Clean.isUpToDate()")
         void isUpToDateTest()
             throws Exception {
-            Clean command = getCommandInstance(Clean.class, Git.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory()));
+            Clean command = new Clean(new State(new Configuration()), Git.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory()));
 
             // simply test that running it twice returns false at the first run and true the second
             assertFalse(command.isUpToDate());

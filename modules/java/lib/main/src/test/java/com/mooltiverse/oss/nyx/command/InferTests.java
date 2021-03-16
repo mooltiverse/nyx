@@ -24,6 +24,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import com.mooltiverse.oss.nyx.configuration.Configuration;
 import com.mooltiverse.oss.nyx.configuration.Defaults;
 import com.mooltiverse.oss.nyx.configuration.mock.CustomConfigurationLayerMock;
 import com.mooltiverse.oss.nyx.configuration.mock.EmptyConfigurationLayerMock;
@@ -31,10 +32,54 @@ import com.mooltiverse.oss.nyx.git.Git;
 import com.mooltiverse.oss.nyx.git.GitException;
 import com.mooltiverse.oss.nyx.git.Scenario;
 import com.mooltiverse.oss.nyx.git.Script;
+import com.mooltiverse.oss.nyx.state.State;
 import com.mooltiverse.oss.nyx.version.SemanticVersion;
 
 @DisplayName("Infer")
-public class InferTests extends AbstractCommandTests {
+public class InferTests {
+    @Nested
+    @DisplayName("Infer constructor")
+    static class ConstructorTests {
+        /**
+         * Test that the given class has the required 2 arguments constructor and that it doesn't fail as long as it
+         * has non null parameters
+         */
+        @Test
+        @DisplayName("Infer()")
+        void constructorTest()
+            throws Exception {
+            assertNotNull(new Infer(new State(new Configuration()), Git.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory())));
+        }
+    }
+
+    @Nested
+    @DisplayName("Infer repository")
+    static class RepositoryTests {
+        /**
+         * Check that the repository() method never returns a {@code null} object
+         */
+        @Test
+        @DisplayName("Infer.repository()")
+        void repositoryTest()
+            throws Exception {
+            assertNotNull(new Infer(new State(new Configuration()), Git.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory())).repository());
+        }
+    }
+
+    @Nested
+    @DisplayName("Infer state")
+    static class StateTests {
+        /**
+         * Check that the state() method never returns a {@code null} object
+         */
+        @Test
+        @DisplayName("Infer.state()")
+        void stateTest()
+            throws Exception {
+            assertNotNull(new Infer(new State(new Configuration()), Git.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory())).state());
+        }
+    }
+
     @Nested
     @DisplayName("Infer isUpToDate")
     public static class UpToDateTests {
@@ -47,7 +92,7 @@ public class InferTests extends AbstractCommandTests {
         void isUpToDateTest()
             throws Exception {
             Script script = Scenario.FROM_SCRATCH.realize();
-            Infer command = getCommandInstance(Infer.class, Git.open(script.getWorkingDirectory()));
+            Infer command = new Infer(new State(new Configuration()), Git.open(script.getWorkingDirectory()));
             assertFalse(command.isUpToDate());
 
             // running in an empty repository, with no commits, throws an exception
@@ -72,7 +117,7 @@ public class InferTests extends AbstractCommandTests {
         @DisplayName("Infer.run() throws exception with a valid but empty Git repository in working directory")
         void exceptionOnRunWithValidButEmptyGitRepositoryTest()
             throws Exception {
-            assertThrows(GitException.class, () -> getCommandInstance(Infer.class, Git.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory())).run());
+            assertThrows(GitException.class, () -> new Infer(new State(new Configuration()), Git.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory())).run());
         }
 
         @Test
@@ -80,7 +125,7 @@ public class InferTests extends AbstractCommandTests {
         void runWithJustInitializedRepositoryTest()
             throws Exception {
             Script script = Scenario.INITIAL_COMMIT.realize();
-            Infer command = getCommandInstance(Infer.class, Git.open(script.getWorkingDirectory()));
+            Infer command = new Infer(new State(new Configuration()), Git.open(script.getWorkingDirectory()));
 
             assertNull(command.state().getBump());
             assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
@@ -98,7 +143,7 @@ public class InferTests extends AbstractCommandTests {
         void runWithInitialVersionOverriddenByUserTest()
             throws Exception {
             Script script = Scenario.INITIAL_COMMIT.realize();
-            Infer command = getCommandInstance(Infer.class, Git.open(script.getWorkingDirectory()));
+            Infer command = new Infer(new State(new Configuration()), Git.open(script.getWorkingDirectory()));
             EmptyConfigurationLayerMock configurationMock = new EmptyConfigurationLayerMock();
 
             assumeTrue(Objects.isNull(command.state().getVersion()));
@@ -123,7 +168,7 @@ public class InferTests extends AbstractCommandTests {
         void runWithVersionOverriddenByUserTest()
             throws Exception {
             Script script = Scenario.INITIAL_COMMIT.realize();
-            Infer command = getCommandInstance(Infer.class, Git.open(script.getWorkingDirectory()));
+            Infer command = new Infer(new State(new Configuration()), Git.open(script.getWorkingDirectory()));
             CustomConfigurationLayerMock configurationMock = new CustomConfigurationLayerMock();
 
             assumeTrue(Objects.isNull(command.state().getVersion()));
@@ -161,7 +206,7 @@ public class InferTests extends AbstractCommandTests {
         void runWithBumpOverriddenByUserTest()
             throws Exception {
             Script script = Scenario.INITIAL_VERSION.realize();
-            Infer command = getCommandInstance(Infer.class, Git.open(script.getWorkingDirectory()));
+            Infer command = new Infer(new State(new Configuration()), Git.open(script.getWorkingDirectory()));
             EmptyConfigurationLayerMock configurationMock = new EmptyConfigurationLayerMock();
 
             command.state().getConfiguration().withPluginConfiguration(configurationMock);
@@ -223,7 +268,7 @@ public class InferTests extends AbstractCommandTests {
         void runWithLenientReleaseTest()
             throws Exception {
             Script script = Scenario.INITIAL_VERSION.realize();
-            Infer command = getCommandInstance(Infer.class, Git.open(script.getWorkingDirectory()));
+            Infer command = new Infer(new State(new Configuration()), Git.open(script.getWorkingDirectory()));
             EmptyConfigurationLayerMock configurationMock = new EmptyConfigurationLayerMock();
 
             command.state().getConfiguration().withPluginConfiguration(configurationMock);
@@ -248,7 +293,7 @@ public class InferTests extends AbstractCommandTests {
         void runWithoutLenientReleaseTest()
             throws Exception {
             Script script = Scenario.INITIAL_VERSION.realize();
-            Infer command = getCommandInstance(Infer.class, Git.open(script.getWorkingDirectory()));
+            Infer command = new Infer(new State(new Configuration()), Git.open(script.getWorkingDirectory()));
             EmptyConfigurationLayerMock configurationMock = new EmptyConfigurationLayerMock();
 
             command.state().getConfiguration().withPluginConfiguration(configurationMock);
@@ -273,7 +318,7 @@ public class InferTests extends AbstractCommandTests {
         void runWithoutLenientAndWithPrefixReleaseTest()
             throws Exception {
             Script script = Scenario.INITIAL_VERSION.realize();
-            Infer command = getCommandInstance(Infer.class, Git.open(script.getWorkingDirectory()));
+            Infer command = new Infer(new State(new Configuration()), Git.open(script.getWorkingDirectory()));
             EmptyConfigurationLayerMock configurationMock = new EmptyConfigurationLayerMock();
 
             command.state().getConfiguration().withPluginConfiguration(configurationMock);
@@ -299,7 +344,7 @@ public class InferTests extends AbstractCommandTests {
         void runWithoutLenientAndWithoutPrefixReleaseTest()
             throws Exception {
             Script script = Scenario.INITIAL_VERSION.realize();
-            Infer command = getCommandInstance(Infer.class, Git.open(script.getWorkingDirectory()));
+            Infer command = new Infer(new State(new Configuration()), Git.open(script.getWorkingDirectory()));
             EmptyConfigurationLayerMock configurationMock = new EmptyConfigurationLayerMock();
 
             command.state().getConfiguration().withPluginConfiguration(configurationMock);
@@ -325,7 +370,7 @@ public class InferTests extends AbstractCommandTests {
         void runWithSimpleCommitHistoryButNoFurtherSignificantCommitsTest()
             throws Exception {
             Script script = Scenario.ONE_BRANCH_SHORT.realize();
-            Infer command = getCommandInstance(Infer.class, Git.open(script.getWorkingDirectory()));
+            Infer command = new Infer(new State(new Configuration()), Git.open(script.getWorkingDirectory()));
 
             command.run();
 
@@ -345,7 +390,7 @@ public class InferTests extends AbstractCommandTests {
         void runWithSimpleCommitHistoryAndFurtherSignificantCommitsTest()
             throws Exception {
             // TODO: write this test once we're able to bump versions based on the commit history
-            /*Infer command = getCommandInstance(Infer.class, Git.open(Scenario.ONE_BRANCH_SHORT.realize().getWorkingDirectory()));
+            /*Infer command = new Infer(new State(new Configuration()), Git.open(Scenario.ONE_BRANCH_SHORT.realize().getWorkingDirectory()));
 
             command.run()
             

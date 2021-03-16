@@ -21,11 +21,56 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import com.mooltiverse.oss.nyx.configuration.Configuration;
 import com.mooltiverse.oss.nyx.git.Git;
 import com.mooltiverse.oss.nyx.git.Scenario;
+import com.mooltiverse.oss.nyx.state.State;
 
 @DisplayName("Make")
-public class MakeTests extends AbstractCommandTests {
+public class MakeTests {
+    @Nested
+    @DisplayName("Make constructor")
+    static class ConstructorTests {
+        /**
+         * Test that the given class has the required 2 arguments constructor and that it doesn't fail as long as it
+         * has non null parameters
+         */
+        @Test
+        @DisplayName("Make()")
+        void constructorTest()
+            throws Exception {
+            assertNotNull(new Make(new State(new Configuration()), Git.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory())));
+        }
+    }
+
+    @Nested
+    @DisplayName("Make repository")
+    static class RepositoryTests {
+        /**
+         * Check that the repository() method never returns a {@code null} object
+         */
+        @Test
+        @DisplayName("Make.repository()")
+        void repositoryTest()
+            throws Exception {
+            assertNotNull(new Make(new State(new Configuration()), Git.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory())).repository());
+        }
+    }
+
+    @Nested
+    @DisplayName("Make state")
+    static class StateTests {
+        /**
+         * Check that the state() method never returns a {@code null} object
+         */
+        @Test
+        @DisplayName("Make.state()")
+        void stateTest()
+            throws Exception {
+            assertNotNull(new Make(new State(new Configuration()), Git.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory())).state());
+        }
+    }
+
     @Nested
     @DisplayName("Make isUpToDate")
     public static class UpToDateTests {
@@ -37,7 +82,7 @@ public class MakeTests extends AbstractCommandTests {
         @DisplayName("Make.isUpToDate()")
         void isUpToDateTest()
             throws Exception {
-            Make command = getCommandInstance(Make.class, Git.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory()));
+            Make command = new Make(new State(new Configuration()), Git.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory()));
 
             // simply test that running it twice returns false at the first run and true the second
             assertFalse(command.isUpToDate());
@@ -53,7 +98,7 @@ public class MakeTests extends AbstractCommandTests {
         @DisplayName("Make.run() throws exception with a valid but empty Git repository in working directory")
         void stateTest()
             throws Exception {
-            assertThrows(GitException.class, () -> getCommandInstance(Make.class, Git.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory())).run());
+            assertThrows(GitException.class, () -> new Make(new State(new Configuration()), Git.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory())).run());
         }*/
     }
 }

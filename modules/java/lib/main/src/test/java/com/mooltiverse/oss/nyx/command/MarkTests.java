@@ -21,11 +21,56 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import com.mooltiverse.oss.nyx.configuration.Configuration;
 import com.mooltiverse.oss.nyx.git.Git;
 import com.mooltiverse.oss.nyx.git.Scenario;
+import com.mooltiverse.oss.nyx.state.State;
 
 @DisplayName("Mark")
-public class MarkTests extends AbstractCommandTests {
+public class MarkTests {
+    @Nested
+    @DisplayName("Mark constructor")
+    static class ConstructorTests {
+        /**
+         * Test that the given class has the required 2 arguments constructor and that it doesn't fail as long as it
+         * has non null parameters
+         */
+        @Test
+        @DisplayName("Mark()")
+        void constructorTest()
+            throws Exception {
+            assertNotNull(new Mark(new State(new Configuration()), Git.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory())));
+        }
+    }
+
+    @Nested
+    @DisplayName("Mark repository")
+    static class RepositoryTests {
+        /**
+         * Check that the repository() method never returns a {@code null} object
+         */
+        @Test
+        @DisplayName("Mark.repository()")
+        void repositoryTest()
+            throws Exception {
+            assertNotNull(new Mark(new State(new Configuration()), Git.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory())).repository());
+        }
+    }
+
+    @Nested
+    @DisplayName("Mark state")
+    static class StateTests {
+        /**
+         * Check that the state() method never returns a {@code null} object
+         */
+        @Test
+        @DisplayName("Mark.state()")
+        void stateTest()
+            throws Exception {
+            assertNotNull(new Mark(new State(new Configuration()), Git.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory())).state());
+        }
+    }
+
     @Nested
     @DisplayName("Mark isUpToDate")
     public static class UpToDateTests {
@@ -37,7 +82,7 @@ public class MarkTests extends AbstractCommandTests {
         @DisplayName("Mark.isUpToDate()")
         void isUpToDateTest()
             throws Exception {
-            Mark command = getCommandInstance(Mark.class, Git.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory()));
+            Mark command = new Mark(new State(new Configuration()), Git.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory()));
 
             // simply test that running it twice returns false at the first run and true the second
             assertFalse(command.isUpToDate());
@@ -53,7 +98,7 @@ public class MarkTests extends AbstractCommandTests {
         @DisplayName("Mark.run() throws exception with a valid but empty Git repository in working directory")
         void stateTest()
             throws Exception {
-            assertThrows(GitException.class, () -> getCommandInstance(Mark.class, Git.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory())).run());
+            assertThrows(GitException.class, () -> new Mark(new State(new Configuration()), Git.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory())).run());
         }*/
     }
 }
