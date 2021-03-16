@@ -24,22 +24,20 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import com.mooltiverse.oss.nyx.configuration.Configuration;
 import com.mooltiverse.oss.nyx.configuration.Defaults;
 import com.mooltiverse.oss.nyx.configuration.mock.CustomConfigurationLayerMock;
 import com.mooltiverse.oss.nyx.configuration.mock.EmptyConfigurationLayerMock;
 import com.mooltiverse.oss.nyx.git.Git;
 import com.mooltiverse.oss.nyx.git.GitException;
-import com.mooltiverse.oss.nyx.git.script.GitScenario;
-import com.mooltiverse.oss.nyx.git.script.GitScript;
-import com.mooltiverse.oss.nyx.state.State;
+import com.mooltiverse.oss.nyx.git.Scenario;
+import com.mooltiverse.oss.nyx.git.Script;
 import com.mooltiverse.oss.nyx.version.SemanticVersion;
 
 @DisplayName("Infer")
 public class InferTests extends AbstractCommandTests {
     @Nested
     @DisplayName("Infer isUpToDate")
-    static class UpToDateTests {
+    public static class UpToDateTests {
         /**
          * Check that the isUpToDate() returns {@code false} when the command instance is just created and {@code true} after one execution in a repository
          * with at least one commit and in a clean state.
@@ -48,8 +46,8 @@ public class InferTests extends AbstractCommandTests {
         @DisplayName("Infer.isUpToDate()")
         void isUpToDateTest()
             throws Exception {
-            GitScript script = GitScript.fromScratch();
-            AbstractCommand command = getCommandInstance(Infer.class, new State(new Configuration()), Git.open(script.getWorkingDirectory()));
+            Script script = Scenario.FROM_SCRATCH.realize();
+            Infer command = getCommandInstance(Infer.class, Git.open(script.getWorkingDirectory()));
             assertFalse(command.isUpToDate());
 
             // running in an empty repository, with no commits, throws an exception
@@ -57,7 +55,7 @@ public class InferTests extends AbstractCommandTests {
             assertFalse(command.isUpToDate());
 
             // add some commits to the repository and after one run the task should be up to date
-            script.addCommitWithTag("111.122.133");
+            script.andCommitWithTag("111.122.133");
             command.run();
             assertTrue(command.isUpToDate());
 
@@ -69,22 +67,20 @@ public class InferTests extends AbstractCommandTests {
 
     @Nested
     @DisplayName("Infer run")
-    static class RunTests {
+    public static class RunTests {
         @Test
         @DisplayName("Infer.run() throws exception with a valid but empty Git repository in working directory")
         void exceptionOnRunWithValidButEmptyGitRepositoryTest()
             throws Exception {
-            assertThrows(GitException.class, () -> getCommandInstance(Infer.class, new State(new Configuration()), Git.open(GitScript.fromScratch().getWorkingDirectory())).run());
+            assertThrows(GitException.class, () -> getCommandInstance(Infer.class, Git.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory())).run());
         }
 
         @Test
         @DisplayName("Infer.run() with a valid but just initialized Git repository")
         void runWithJustInitializedRepositoryTest()
             throws Exception {
-            GitScript script = GitScenario.InitialCommit.realize();
-            Configuration configuration = new Configuration();
-            State state = new State(configuration);
-            Infer command = getCommandInstance(Infer.class, state, Git.open(script.getWorkingDirectory()));
+            Script script = Scenario.INITIAL_COMMIT.realize();
+            Infer command = getCommandInstance(Infer.class, Git.open(script.getWorkingDirectory()));
 
             assertNull(command.state().getBump());
             assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
@@ -101,17 +97,14 @@ public class InferTests extends AbstractCommandTests {
         @DisplayName("Infer.run() with initial version override")
         void runWithInitialVersionOverriddenByUserTest()
             throws Exception {
-            GitScript script = GitScenario.InitialCommit.realize();
-            Configuration configuration = new Configuration();
+            Script script = Scenario.INITIAL_COMMIT.realize();
+            Infer command = getCommandInstance(Infer.class, Git.open(script.getWorkingDirectory()));
             EmptyConfigurationLayerMock configurationMock = new EmptyConfigurationLayerMock();
-            State state = new State(configuration);
-            Infer command = getCommandInstance(Infer.class, state, Git.open(script.getWorkingDirectory()));
 
             assumeTrue(Objects.isNull(command.state().getVersion()));
 
-            // inject the configuration mock at the plugin layer, with a custom initial version,
             configurationMock.initialVersion = SemanticVersion.valueOf("12.13.14");
-            configuration.withPluginConfiguration(configurationMock);
+            command.state().getConfiguration().withPluginConfiguration(configurationMock);
             command.run();
 
             assertNull(command.state().getBump());
@@ -129,16 +122,13 @@ public class InferTests extends AbstractCommandTests {
         @DisplayName("Infer.run() with version override")
         void runWithVersionOverriddenByUserTest()
             throws Exception {
-            GitScript script = GitScenario.InitialCommit.realize();
-            Configuration configuration = new Configuration();
+            Script script = Scenario.INITIAL_COMMIT.realize();
+            Infer command = getCommandInstance(Infer.class, Git.open(script.getWorkingDirectory()));
             CustomConfigurationLayerMock configurationMock = new CustomConfigurationLayerMock();
-            State state = new State(configuration);
-            Infer command = getCommandInstance(Infer.class, state, Git.open(script.getWorkingDirectory()));
 
             assumeTrue(Objects.isNull(command.state().getVersion()));
 
-            // inject the configuration mock at the plugin layer, which already has a version set. The resulting version must be the same defined by the mock
-            configuration.withPluginConfiguration(configurationMock);
+            command.state().getConfiguration().withPluginConfiguration(configurationMock);
             command.run();
 
             assertNull(command.state().getBump());
@@ -151,7 +141,6 @@ public class InferTests extends AbstractCommandTests {
             assertNull(command.state().getReleaseScope().getPreviousVersionCommit());
             assertNull(command.state().getReleaseScope().getSignificant());
 
-            // now set a version into the mock configuration and the resulting version must be the same
             configurationMock.version = SemanticVersion.valueOf("1.2.3");
             command.run();
 
@@ -171,26 +160,22 @@ public class InferTests extends AbstractCommandTests {
         @DisplayName("Infer.run() with bump override")
         void runWithBumpOverriddenByUserTest()
             throws Exception {
-            GitScript script = GitScenario.OneTaggedCommitCommit.realize(); // only one version tag: 1.2.3
-            Configuration configuration = new Configuration();
-            State state = new State(configuration);
+            Script script = Scenario.INITIAL_VERSION.realize();
+            Infer command = getCommandInstance(Infer.class, Git.open(script.getWorkingDirectory()));
             EmptyConfigurationLayerMock configurationMock = new EmptyConfigurationLayerMock();
 
-            // inject the configuration mock at the plugin layer
-            configuration.withPluginConfiguration(configurationMock);
-
-            Infer command = getCommandInstance(Infer.class, state, Git.open(script.getWorkingDirectory()));
+            command.state().getConfiguration().withPluginConfiguration(configurationMock);
             configurationMock.bump = "major";
             command.run();
 
             assertEquals(configurationMock.bump, command.state().getBump());
             assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
-            assertEquals("2.0.0", command.state().getVersionInternal().toString());
-            assertEquals("v2.0.0", command.state().getVersion());
+            assertEquals("1.0.0", command.state().getVersionInternal().toString());
+            assertEquals("v1.0.0", command.state().getVersion());
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
-            assertEquals("1.2.3", command.state().getReleaseScope().getPreviousVersion().toString());
-            assertEquals(script.getCommitByTag("1.2.3"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals("0.1.0", command.state().getReleaseScope().getPreviousVersion().toString());
+            assertEquals(script.getCommitByTag("0.1.0"), command.state().getReleaseScope().getPreviousVersionCommit());
             assertEquals(Boolean.TRUE, command.state().getReleaseScope().getSignificant()); // this is valid just as long as we don't inspect commit messages, then it's expected to change to false because there are no other commits than the one tagged in the scenario
 
             configurationMock.bump = "minor";
@@ -198,12 +183,12 @@ public class InferTests extends AbstractCommandTests {
 
             assertEquals(configurationMock.bump, command.state().getBump());
             assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
-            assertEquals("1.3.0", command.state().getVersionInternal().toString());
-            assertEquals("v1.3.0", command.state().getVersion());
+            assertEquals("0.2.0", command.state().getVersionInternal().toString());
+            assertEquals("v0.2.0", command.state().getVersion());
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
-            assertEquals("1.2.3", command.state().getReleaseScope().getPreviousVersion().toString());
-            assertEquals(script.getCommitByTag("1.2.3"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals("0.1.0", command.state().getReleaseScope().getPreviousVersion().toString());
+            assertEquals(script.getCommitByTag("0.1.0"), command.state().getReleaseScope().getPreviousVersionCommit());
             assertEquals(Boolean.TRUE, command.state().getReleaseScope().getSignificant()); // this is valid just as long as we don't inspect commit messages, then it's expected to change to false because there are no other commits than the one tagged in the scenario
 
             configurationMock.bump = "patch";
@@ -211,12 +196,12 @@ public class InferTests extends AbstractCommandTests {
 
             assertEquals(configurationMock.bump, command.state().getBump());
             assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
-            assertEquals("1.2.4", command.state().getVersionInternal().toString());
-            assertEquals("v1.2.4", command.state().getVersion());
+            assertEquals("0.1.1", command.state().getVersionInternal().toString());
+            assertEquals("v0.1.1", command.state().getVersion());
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
-            assertEquals("1.2.3", command.state().getReleaseScope().getPreviousVersion().toString());
-            assertEquals(script.getCommitByTag("1.2.3"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals("0.1.0", command.state().getReleaseScope().getPreviousVersion().toString());
+            assertEquals(script.getCommitByTag("0.1.0"), command.state().getReleaseScope().getPreviousVersionCommit());
             assertEquals(Boolean.TRUE, command.state().getReleaseScope().getSignificant()); // this is valid just as long as we don't inspect commit messages, then it's expected to change to false because there are no other commits than the one tagged in the scenario
 
             configurationMock.bump = "alpha";
@@ -224,12 +209,12 @@ public class InferTests extends AbstractCommandTests {
 
             assertEquals(configurationMock.bump, command.state().getBump());
             assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
-            assertEquals("1.2.3-alpha.1", command.state().getVersionInternal().toString());
-            assertEquals("v1.2.3-alpha.1", command.state().getVersion());
+            assertEquals("0.1.0-alpha.1", command.state().getVersionInternal().toString());
+            assertEquals("v0.1.0-alpha.1", command.state().getVersion());
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
-            assertEquals("1.2.3", command.state().getReleaseScope().getPreviousVersion().toString());
-            assertEquals(script.getCommitByTag("1.2.3"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals("0.1.0", command.state().getReleaseScope().getPreviousVersion().toString());
+            assertEquals(script.getCommitByTag("0.1.0"), command.state().getReleaseScope().getPreviousVersionCommit());
             assertEquals(Boolean.TRUE, command.state().getReleaseScope().getSignificant()); // this is valid just as long as we don't inspect commit messages, then it's expected to change to false because there are no other commits than the one tagged in the scenario
         }
 
@@ -237,20 +222,14 @@ public class InferTests extends AbstractCommandTests {
         @DisplayName("Infer.run() with lenient release")
         void runWithLenientReleaseTest()
             throws Exception {
-            GitScript script = GitScenario.OneTaggedCommitCommit.realize(); // only one version tag: 1.2.3
-            Configuration configuration = new Configuration();
-            State state = new State(configuration);
+            Script script = Scenario.INITIAL_VERSION.realize();
+            Infer command = getCommandInstance(Infer.class, Git.open(script.getWorkingDirectory()));
             EmptyConfigurationLayerMock configurationMock = new EmptyConfigurationLayerMock();
 
-            // inject the configuration mock at the plugin layer
-            configuration.withPluginConfiguration(configurationMock);
-
+            command.state().getConfiguration().withPluginConfiguration(configurationMock);
             configurationMock.releaseLenient = Boolean.TRUE;
-
-            script.addCommitWithTag("release-2.2.2");
-
-            Infer command = getCommandInstance(Infer.class, state, Git.open(script.getWorkingDirectory()));
-            // the latest release must be detected thanks to the lenient parsing
+            script.andCommitWithTag("release-2.2.2");
+            
             command.run();
 
             assertEquals(configurationMock.bump, command.state().getBump());
@@ -268,30 +247,24 @@ public class InferTests extends AbstractCommandTests {
         @DisplayName("Infer.run() without lenient release")
         void runWithoutLenientReleaseTest()
             throws Exception {
-            GitScript script = GitScenario.OneTaggedCommitCommit.realize(); // only one version tag: 1.2.3
-            Configuration configuration = new Configuration();
-            State state = new State(configuration);
+            Script script = Scenario.INITIAL_VERSION.realize();
+            Infer command = getCommandInstance(Infer.class, Git.open(script.getWorkingDirectory()));
             EmptyConfigurationLayerMock configurationMock = new EmptyConfigurationLayerMock();
 
-            // inject the configuration mock at the plugin layer
-            configuration.withPluginConfiguration(configurationMock);
-
+            command.state().getConfiguration().withPluginConfiguration(configurationMock);
             configurationMock.releaseLenient = Boolean.FALSE;
-
-            script.addCommitWithTag("release-2.2.2");
-
-            Infer command = getCommandInstance(Infer.class, state, Git.open(script.getWorkingDirectory()));
-            // the latest release must be the one that doesn't require the lenient parsing
+            script.andCommitWithTag("release-2.2.2");
+            
             command.run();
 
             assertEquals(configurationMock.bump, command.state().getBump());
             assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
-            assertEquals("1.2.3", command.state().getVersionInternal().toString());
-            assertEquals("v1.2.3", command.state().getVersion());
+            assertEquals("0.1.0", command.state().getVersionInternal().toString());
+            assertEquals("v0.1.0", command.state().getVersion());
             assertEquals(script.getCommitByTag("release-2.2.2"), command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
-            assertEquals("1.2.3", command.state().getReleaseScope().getPreviousVersion().toString());
-            assertEquals(script.getCommitByTag("1.2.3"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals("0.1.0", command.state().getReleaseScope().getPreviousVersion().toString());
+            assertEquals(script.getCommitByTag("0.1.0"), command.state().getReleaseScope().getPreviousVersionCommit());
             assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
         }
 
@@ -299,21 +272,15 @@ public class InferTests extends AbstractCommandTests {
         @DisplayName("Infer.run() without lenient release and with release prefix")
         void runWithoutLenientAndWithPrefixReleaseTest()
             throws Exception {
-            GitScript script = GitScenario.OneTaggedCommitCommit.realize(); // only one version tag: 1.2.3
-            Configuration configuration = new Configuration();
-            State state = new State(configuration);
+            Script script = Scenario.INITIAL_VERSION.realize();
+            Infer command = getCommandInstance(Infer.class, Git.open(script.getWorkingDirectory()));
             EmptyConfigurationLayerMock configurationMock = new EmptyConfigurationLayerMock();
 
-            // inject the configuration mock at the plugin layer
-            configuration.withPluginConfiguration(configurationMock);
-
+            command.state().getConfiguration().withPluginConfiguration(configurationMock);
             configurationMock.releaseLenient = Boolean.FALSE;
             configurationMock.releasePrefix = "release-";
-
-            script.addCommitWithTag("release-2.2.2");
-
-            Infer command = getCommandInstance(Infer.class, state, Git.open(script.getWorkingDirectory()));
-            // the latest release must be the one that doesn't require the lenient parsing
+            script.andCommitWithTag("release-2.2.2");
+            
             command.run();
 
             assertEquals(configurationMock.bump, command.state().getBump());
@@ -331,31 +298,25 @@ public class InferTests extends AbstractCommandTests {
         @DisplayName("Infer.run() without lenient release and without release prefix")
         void runWithoutLenientAndWithoutPrefixReleaseTest()
             throws Exception {
-            GitScript script = GitScenario.OneTaggedCommitCommit.realize(); // only one version tag: 1.2.3
-            Configuration configuration = new Configuration();
-            State state = new State(configuration);
+            Script script = Scenario.INITIAL_VERSION.realize();
+            Infer command = getCommandInstance(Infer.class, Git.open(script.getWorkingDirectory()));
             EmptyConfigurationLayerMock configurationMock = new EmptyConfigurationLayerMock();
 
-            // inject the configuration mock at the plugin layer
-            configuration.withPluginConfiguration(configurationMock);
-
+            command.state().getConfiguration().withPluginConfiguration(configurationMock);
             configurationMock.releaseLenient = Boolean.FALSE;
             configurationMock.releasePrefix = ""; // null doesn't override the default, the empty string does
+            script.andCommitWithTag("release-2.2.2");
 
-            script.addCommitWithTag("release-2.2.2");
-
-            Infer command = getCommandInstance(Infer.class, state, Git.open(script.getWorkingDirectory()));
-            // the latest release must be the one that doesn't require the lenient parsing
             command.run();
 
             assertEquals(configurationMock.bump, command.state().getBump());
             assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
-            assertEquals("1.2.3", command.state().getVersionInternal().toString());
-            assertEquals("1.2.3", command.state().getVersion());
+            assertEquals("0.1.0", command.state().getVersionInternal().toString());
+            assertEquals("0.1.0", command.state().getVersion());
             assertEquals(script.getCommitByTag("release-2.2.2"), command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
-            assertEquals("1.2.3", command.state().getReleaseScope().getPreviousVersion().toString());
-            assertEquals(script.getCommitByTag("1.2.3"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals("0.1.0", command.state().getReleaseScope().getPreviousVersion().toString());
+            assertEquals(script.getCommitByTag("0.1.0"), command.state().getReleaseScope().getPreviousVersionCommit());
             assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
         }
 
@@ -363,10 +324,8 @@ public class InferTests extends AbstractCommandTests {
         @DisplayName("Infer.run() with a simple linear commit history but no further significant commits")
         void runWithSimpleCommitHistoryButNoFurtherSignificantCommitsTest()
             throws Exception {
-            GitScript script = GitScenario.OneBranchShort.realize(); // the latest tagged release is 0.0.4
-            Configuration configuration = new Configuration();
-            State state = new State(configuration);
-            Infer command = getCommandInstance(Infer.class, state, Git.open(script.getWorkingDirectory()));
+            Script script = Scenario.ONE_BRANCH_SHORT.realize();
+            Infer command = getCommandInstance(Infer.class, Git.open(script.getWorkingDirectory()));
 
             command.run();
 
@@ -386,10 +345,7 @@ public class InferTests extends AbstractCommandTests {
         void runWithSimpleCommitHistoryAndFurtherSignificantCommitsTest()
             throws Exception {
             // TODO: write this test once we're able to bump versions based on the commit history
-            /*GitScript script = GitScenario.OneBranchShort.realize(); // the latest tagged release is 0.0.4
-            Configuration configuration = new Configuration();
-            State state = new State(configuration);
-            Infer command = getCommandInstance(Infer.class, state, Git.open(script.getWorkingDirectory()));
+            /*Infer command = getCommandInstance(Infer.class, Git.open(Scenario.ONE_BRANCH_SHORT.realize().getWorkingDirectory()));
 
             command.run()
             

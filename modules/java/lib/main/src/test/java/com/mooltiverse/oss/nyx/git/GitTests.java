@@ -26,8 +26,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import com.mooltiverse.oss.nyx.git.script.GitScript;
-
 @DisplayName("Git")
 public class GitTests {
     @Nested
@@ -87,14 +85,14 @@ public class GitTests {
         @Test
         public void openFileTest()
             throws Exception {
-            assertNotNull(Git.open(GitScript.fromScratch().getWorkingDirectory()));
+            assertNotNull(Git.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory()));
         }
 
         @DisplayName("Git.open(String)")
         @Test
         public void openStringTest()
             throws Exception {
-            assertNotNull(Git.open(GitScript.fromScratch().getWorkingDirectory().getAbsolutePath()));
+            assertNotNull(Git.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory().getAbsolutePath()));
         }
     }
 }

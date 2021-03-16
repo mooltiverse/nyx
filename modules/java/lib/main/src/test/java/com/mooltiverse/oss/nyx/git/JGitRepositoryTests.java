@@ -35,8 +35,6 @@ import org.eclipse.jgit.revwalk.RevCommit;
 
 import com.mooltiverse.oss.nyx.data.Commit;
 import com.mooltiverse.oss.nyx.data.Identity;
-import com.mooltiverse.oss.nyx.git.script.GitScript;
-import com.mooltiverse.oss.nyx.git.script.GitScenario;
 
 @DisplayName("JGitRepository")
 public class JGitRepositoryTests {
@@ -97,14 +95,14 @@ public class JGitRepositoryTests {
         @Test
         public void openFileTest()
             throws Exception {
-            assertNotNull(JGitRepository.open(GitScript.fromScratch().getWorkingDirectory()));
+            assertNotNull(JGitRepository.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory()));
         }
 
         @DisplayName("JGitRepository.open(String)")
         @Test
         public void openStringTest()
             throws Exception {
-            assertNotNull(JGitRepository.open(GitScript.fromScratch().getWorkingDirectory().getAbsolutePath()));
+            assertNotNull(JGitRepository.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory().getAbsolutePath()));
         }
     }
 
@@ -115,10 +113,7 @@ public class JGitRepositoryTests {
         @Test
         public void exceptionWithEmptyPaths()
             throws Exception {
-            // start with a new repository, just initialized
-            GitScript script = GitScript.fromScratch();
-            Repository repository = JGitRepository.open(script.getWorkingDirectory());
-
+            Repository repository = JGitRepository.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory());
             assertThrows(GitException.class, () -> repository.add(new ArrayList<String>()));
         }
 
@@ -126,10 +121,7 @@ public class JGitRepositoryTests {
         @Test
         public void exceptionWithNullPaths()
             throws Exception {
-            // start with a new repository, just initialized
-            GitScript script = GitScript.fromScratch();
-            Repository repository = JGitRepository.open(script.getWorkingDirectory());
-
+            Repository repository = JGitRepository.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory());
             assertThrows(NullPointerException.class, () -> repository.add(null));
         }
 
@@ -137,8 +129,7 @@ public class JGitRepositoryTests {
         @Test
         public void addTest()
             throws Exception {
-            // start with a new repository, with just the initial commit
-            GitScript script = GitScenario.InitialCommit.realize();
+            Script script = Scenario.INITIAL_COMMIT.realize();
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
 
             // remember the cache count may increas of more than 1 for each added file
@@ -161,8 +152,7 @@ public class JGitRepositoryTests {
         @Test
         public void exceptionWithNullMessageOn1Params()
             throws Exception {
-            // start with a new repository, just initialized
-            GitScript script = GitScript.fromScratch();
+            Script script = Scenario.FROM_SCRATCH.realize();
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
 
             script.addRandomTextFiles(1);
@@ -173,8 +163,7 @@ public class JGitRepositoryTests {
         @Test
         public void commit1Params()
             throws Exception {
-            // start with a new repository, with just the initial commit
-            GitScript script = GitScenario.InitialCommit.realize();
+            Script script = Scenario.INITIAL_COMMIT.realize();
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
 
             RevCommit prevLastCommit = script.getLastCommit();
@@ -194,10 +183,7 @@ public class JGitRepositoryTests {
         @Test
         public void exceptionWithEmptyPathsOn2Params()
             throws Exception {
-            // start with a new repository, just initialized
-            GitScript script = GitScript.fromScratch();
-            Repository repository = JGitRepository.open(script.getWorkingDirectory());
-
+            Repository repository = JGitRepository.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory());
             assertThrows(GitException.class, () -> repository.commit(new ArrayList<String>(), "A message"));
         }
 
@@ -205,9 +191,7 @@ public class JGitRepositoryTests {
         @Test
         public void exceptionWithNullPathsOn2Params()
             throws Exception {
-            // start with a new repository, just initialized
-            GitScript script = GitScript.fromScratch();
-            Repository repository = JGitRepository.open(script.getWorkingDirectory());
+            Repository repository = JGitRepository.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory());
 
             assertThrows(NullPointerException.class, () -> repository.commit(null, "A message"));
         }
@@ -216,8 +200,7 @@ public class JGitRepositoryTests {
         @Test
         public void exceptionWithNullMessageOn2Params()
             throws Exception {
-            // start with a new repository, just initialized
-            GitScript script = GitScript.fromScratch();
+            Script script = Scenario.FROM_SCRATCH.realize();
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
 
             script.addRandomTextFiles(1);
@@ -228,8 +211,7 @@ public class JGitRepositoryTests {
         @Test
         public void commit2Params()
             throws Exception {
-            // start with a new repository, with just the initial commit
-            GitScript script = GitScenario.InitialCommit.realize();
+            Script script = Scenario.INITIAL_COMMIT.realize();
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
 
             RevCommit prevLastCommit = script.getLastCommit();
@@ -248,8 +230,7 @@ public class JGitRepositoryTests {
         @Test
         public void exceptionWithNullMessageOn3Params()
             throws Exception {
-            // start with a new repository, just initialized
-            GitScript script = GitScript.fromScratch();
+            Script script = Scenario.FROM_SCRATCH.realize();
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
 
             script.addRandomTextFiles(1);
@@ -260,8 +241,7 @@ public class JGitRepositoryTests {
         @Test
         public void commit3Params()
             throws Exception {
-            // start with a new repository, with just the initial commit
-            GitScript script = GitScenario.InitialCommit.realize();
+            Script script = Scenario.INITIAL_COMMIT.realize();
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
 
             RevCommit prevLastCommit = script.getLastCommit();
@@ -291,10 +271,7 @@ public class JGitRepositoryTests {
         @Test
         public void exceptionWithEmptyPathsOn4Params()
             throws Exception {
-            // start with a new repository, just initialized
-            GitScript script = GitScript.fromScratch();
-            Repository repository = JGitRepository.open(script.getWorkingDirectory());
-
+            Repository repository = JGitRepository.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory());
             assertThrows(GitException.class, () -> repository.commit(new ArrayList<String>(), "A message", new Identity("John Doe", "jdoe@example.com"), new Identity("John Doe", "jdoe@example.com")));
         }
 
@@ -302,10 +279,7 @@ public class JGitRepositoryTests {
         @Test
         public void exceptionWithNullPathsOn4Params()
             throws Exception {
-            // start with a new repository, just initialized
-            GitScript script = GitScript.fromScratch();
-            Repository repository = JGitRepository.open(script.getWorkingDirectory());
-
+            Repository repository = JGitRepository.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory());
             assertThrows(NullPointerException.class, () -> repository.commit(null, "A message", new Identity("John Doe", "jdoe@example.com"), new Identity("John Doe", "jdoe@example.com")));
         }
 
@@ -313,8 +287,7 @@ public class JGitRepositoryTests {
         @Test
         public void exceptionWithNullMessageOn4Params()
             throws Exception {
-            // start with a new repository, just initialized
-            GitScript script = GitScript.fromScratch();
+            Script script = Scenario.FROM_SCRATCH.realize();
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
             
             script.addRandomTextFiles(1);
@@ -325,8 +298,7 @@ public class JGitRepositoryTests {
         @Test
         public void commit4Params()
             throws Exception {
-            // start with a new repository, with just the initial commit
-            GitScript script = GitScenario.InitialCommit.realize();
+            Script script = Scenario.INITIAL_COMMIT.realize();
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
 
             RevCommit prevLastCommit = script.getLastCommit();
@@ -359,14 +331,13 @@ public class JGitRepositoryTests {
         @Test
         public void pushTest()
             throws Exception {
-            // start with a new repository, with an initial commit
-            GitScript script = GitScenario.InitialCommit.realize();
+            Script script = Scenario.INITIAL_COMMIT.realize();
 
             // also create two new empty repositories to use as remotes
-            GitScript remote1script = GitScript.fromScratch();
-            GitScript remote2script = GitScript.fromScratch();
-            script.addRemote(remote1script.getJGitRepository(), "origin");
-            script.addRemote(remote2script.getJGitRepository(), "custom");
+            Script remote1script = Scenario.FROM_SCRATCH.realize();
+            Script remote2script = Scenario.FROM_SCRATCH.realize();
+            script.addRemote(remote1script.getGitDirectory(), "origin");
+            script.addRemote(remote2script.getGitDirectory(), "custom");
 
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
 
@@ -400,14 +371,13 @@ public class JGitRepositoryTests {
         @Test
         public void pushToRemoteTest()
             throws Exception {
-            // start with a new repository, with an initial commit
-            GitScript script = GitScenario.InitialCommit.realize();
+            Script script = Scenario.INITIAL_COMMIT.realize();
 
             // also create two new empty repositories to use as remotes
-            GitScript remote1script = GitScript.fromScratch();
-            GitScript remote2script = GitScript.fromScratch();
-            script.addRemote(remote1script.getJGitRepository(), "origin");
-            script.addRemote(remote2script.getJGitRepository(), "custom");
+            Script remote1script = Scenario.FROM_SCRATCH.realize();
+            Script remote2script = Scenario.FROM_SCRATCH.realize();
+            script.addRemote(remote1script.getGitDirectory(), "origin");
+            script.addRemote(remote2script.getGitDirectory(), "custom");
 
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
 
@@ -441,14 +411,13 @@ public class JGitRepositoryTests {
         @Test
         public void pushToRemotesTest()
             throws Exception {
-            // start with a new repository, with an initial commit
-            GitScript script = GitScenario.InitialCommit.realize();
+            Script script = Scenario.INITIAL_COMMIT.realize();
 
             // also create two new empty repositories to use as remotes
-            GitScript remote1script = GitScript.fromScratch();
-            GitScript remote2script = GitScript.fromScratch();
-            script.addRemote(remote1script.getJGitRepository(), "origin");
-            script.addRemote(remote2script.getJGitRepository(), "custom");
+            Script remote1script = Scenario.FROM_SCRATCH.realize();
+            Script remote2script = Scenario.FROM_SCRATCH.realize();
+            script.addRemote(remote1script.getGitDirectory(), "origin");
+            script.addRemote(remote2script.getGitDirectory(), "custom");
 
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
 
@@ -490,14 +459,13 @@ public class JGitRepositoryTests {
         @Test
         public void exceptionWithRepositoryWithNoCommits()
             throws Exception {
-            // start with a new repository, just initialized
-            GitScript script = GitScript.fromScratch();
+            Script script = Scenario.FROM_SCRATCH.realize();
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
 
             assertThrows(GitException.class, () -> repository.getLatestCommit());
             
             // add some new files and test
-            script.withFiles();
+            script.andAddFiles();
             assertThrows(GitException.class, () -> repository.getLatestCommit());
 
             // stage the files without committing
@@ -509,12 +477,11 @@ public class JGitRepositoryTests {
         @Test
         public void getLatestCommitTest()
             throws Exception {
-            // start with a new repository, just initialized
-            GitScript script = GitScript.fromScratch();
+            Script script = Scenario.FROM_SCRATCH.realize();
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
             
             // add and stage some files
-            script.withFiles().andStage();
+            script.andAddFiles().andStage();
 
             // commit the files and get the commit SHA
             String commitSHA1 = script.commit("Test commit").getId().getName();
@@ -526,7 +493,7 @@ public class JGitRepositoryTests {
             assertEquals(repository.getRootCommit(), repository.getLatestCommit());
 
             // repeat the above with new changes
-            script.withFiles(2);
+            script.andAddFiles(2);
             String commitSHA2 = script.commit("Test another commit").getId().getName();
             assertNotEquals(commitSHA1, commitSHA2);
             assumeFalse(Objects.isNull(commitSHA2));
@@ -545,14 +512,13 @@ public class JGitRepositoryTests {
         @Test
         public void exceptionWithRepositoryWithNoCommits()
             throws Exception {
-            // start with a new repository, just initialized
-            GitScript script = GitScript.fromScratch();
+            Script script = Scenario.FROM_SCRATCH.realize();
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
             
             assertThrows(GitException.class, () -> repository.getRootCommit());
             
             // add some new files and test
-            script.withFiles();
+            script.andAddFiles();
             assertThrows(GitException.class, () -> repository.getRootCommit());
 
             // stage the files without committing
@@ -564,12 +530,11 @@ public class JGitRepositoryTests {
         @Test
         public void getRootCommitTest()
             throws Exception {
-            // start with a new repository, just initialized
-            GitScript script = GitScript.fromScratch();
+            Script script = Scenario.FROM_SCRATCH.realize();
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
             
             // add and stage some files
-            script.withFiles().andStage();
+            script.andAddFiles().andStage();
 
             // commit the files and get the commit SHA
             String commitSHA1 = script.commit("Test commit").getId().getName();
@@ -581,7 +546,7 @@ public class JGitRepositoryTests {
             assertEquals(repository.getRootCommit(), repository.getLatestCommit());
 
             // repeat the above with new changes
-            script.withFiles(2);
+            script.andAddFiles(2);
             String commitSHA2 = script.commit("Test another commit").getId().getName();
             assertNotEquals(commitSHA1, commitSHA2);
             assumeFalse(Objects.isNull(commitSHA2));
@@ -600,13 +565,12 @@ public class JGitRepositoryTests {
         @Test
         public void isCleanTest()
             throws Exception {
-            // start with a new repository, just initialized
-            GitScript script = GitScript.fromScratch();
+            Script script = Scenario.FROM_SCRATCH.realize();
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
             assertTrue(repository.isClean());
             
             // add some new files and test
-            script.withFiles();
+            script.andAddFiles();
             assertFalse(repository.isClean());
 
             // stage the files without committing
@@ -626,10 +590,7 @@ public class JGitRepositoryTests {
         @Test
         public void getCommitTagsReturnsEmptyResultWithNullTest()
             throws Exception {
-            // start with a new repository, just initialized
-            GitScript script = GitScript.fromScratch();
-            Repository repository = JGitRepository.open(script.getWorkingDirectory());
-
+            Repository repository = JGitRepository.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory());
             assertEquals(0, repository.getCommitTags(null).size());
         }
 
@@ -637,10 +598,7 @@ public class JGitRepositoryTests {
         @Test
         public void getCommitTagsReturnsEmptyResultWithRepositoryWithNoCommitsTest()
             throws Exception {
-            // start with a new repository, just initialized
-            GitScript script = GitScript.fromScratch();
-            Repository repository = JGitRepository.open(script.getWorkingDirectory());
-
+            Repository repository = JGitRepository.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory());
             assertEquals(0, repository.getCommitTags("").size());
         }
 
@@ -648,12 +606,11 @@ public class JGitRepositoryTests {
         @Test
         public void getCommitTagsTest()
             throws Exception {
-            // start with a new repository, just initialized
-            GitScript script = GitScript.fromScratch();
+            Script script = Scenario.FROM_SCRATCH.realize();
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
 
             // add a commit
-            script.withFiles().andStage();
+            script.andAddFiles().andStage();
             RevCommit commit = script.commit("A message");
             
             // test with no tags
@@ -678,9 +635,7 @@ public class JGitRepositoryTests {
         @Test
         public void walkHistoryWithNoBoundariesTest()
             throws Exception {
-            // start with a new repository, just initialized
-            GitScript script = GitScenario.TwoMergedBranchesShort.realize();
-            Repository repository = JGitRepository.open(script.getWorkingDirectory());
+            Repository repository = JGitRepository.open(Scenario.TWO_BRANCH_SHORT_MERGED.realize().getWorkingDirectory());
 
             // Keep track of the visited commits
             List<Commit> visitedCommits = new ArrayList<Commit>();
@@ -700,10 +655,7 @@ public class JGitRepositoryTests {
         @Test
         public void exceptionWithRepositoryWithNoCommits()
             throws Exception {
-            // start with an empty repository, just initialized
-            GitScript script = GitScript.fromScratch();
-            Repository repository = JGitRepository.open(script.getWorkingDirectory());
-
+            Repository repository = JGitRepository.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory());
             assertThrows(GitException.class, () -> repository.walkHistory(null, null, c -> {
                 return true;
             }));
@@ -713,9 +665,7 @@ public class JGitRepositoryTests {
         @Test
         public void walkHistoryWithVisitorStoppingBrowsingTest()
             throws Exception {
-            // start with a new repository, just initialized
-            GitScript script = GitScenario.TwoMergedBranchesShort.realize();
-            Repository repository = JGitRepository.open(script.getWorkingDirectory());
+            Repository repository = JGitRepository.open(Scenario.TWO_BRANCH_SHORT_MERGED.realize().getWorkingDirectory());
 
             // Keep track of the visited commits
             List<Commit> visitedCommits = new ArrayList<Commit>();
@@ -733,9 +683,7 @@ public class JGitRepositoryTests {
         @Test
         public void walkHistoryWithStartBoundaryTest()
             throws Exception {
-            // start with a new repository, just initialized
-            GitScript script = GitScenario.TwoMergedBranchesShort.realize();
-            Repository repository = JGitRepository.open(script.getWorkingDirectory());
+            Repository repository = JGitRepository.open(Scenario.TWO_BRANCH_SHORT_MERGED.realize().getWorkingDirectory());
             // Keep track of the visited commits
             List<Commit> visitedCommits = new ArrayList<Commit>();
 
@@ -762,9 +710,7 @@ public class JGitRepositoryTests {
         @Test
         public void walkHistoryWithEndBoundaryTest()
             throws Exception {
-            // start with a new repository, just initialized
-            GitScript script = GitScenario.TwoMergedBranchesShort.realize();
-            Repository repository = JGitRepository.open(script.getWorkingDirectory());
+            Repository repository = JGitRepository.open(Scenario.TWO_BRANCH_SHORT_MERGED.realize().getWorkingDirectory());
             // Keep track of the visited commits
             List<Commit> visitedCommits = new ArrayList<Commit>();
 
@@ -791,9 +737,7 @@ public class JGitRepositoryTests {
         @Test
         public void walkHistoryWithBothBoundariesTest()
             throws Exception {
-            // start with a new repository, just initialized
-            GitScript script = GitScenario.TwoMergedBranchesShort.realize();
-            Repository repository = JGitRepository.open(script.getWorkingDirectory());
+            Repository repository = JGitRepository.open(Scenario.TWO_BRANCH_SHORT_MERGED.realize().getWorkingDirectory());
             // Keep track of the visited commits
             List<Commit> visitedCommits = new ArrayList<Commit>();
 
@@ -820,9 +764,7 @@ public class JGitRepositoryTests {
         @Test
         public void walkHistoryWithStartBoundaryUnresolvedTest()
             throws Exception {
-            // start with a new repository, just initialized
-            GitScript script = GitScenario.TwoMergedBranchesShort.realize();
-            Repository repository = JGitRepository.open(script.getWorkingDirectory());
+            Repository repository = JGitRepository.open(Scenario.TWO_BRANCH_SHORT_MERGED.realize().getWorkingDirectory());
             // Keep track of the visited commits
             List<Commit> visitedCommits = new ArrayList<Commit>();
 
@@ -839,9 +781,7 @@ public class JGitRepositoryTests {
         @Test
         public void walkHistoryWithEndBoundaryUnresolvedTest()
             throws Exception {
-            // start with a new repository, just initialized
-            GitScript script = GitScenario.TwoMergedBranchesShort.realize();
-            Repository repository = JGitRepository.open(script.getWorkingDirectory());
+            Repository repository = JGitRepository.open(Scenario.TWO_BRANCH_SHORT_MERGED.realize().getWorkingDirectory());
             // Keep track of the visited commits
             List<Commit> visitedCommits = new ArrayList<Commit>();
 
@@ -858,9 +798,7 @@ public class JGitRepositoryTests {
         @Test
         public void walkHistoryWithBothBoundariesUnresolvedTest()
             throws Exception {
-            // start with a new repository, just initialized
-            GitScript script = GitScenario.TwoMergedBranchesShort.realize();
-            Repository repository = JGitRepository.open(script.getWorkingDirectory());
+            Repository repository = JGitRepository.open(Scenario.TWO_BRANCH_SHORT_MERGED.realize().getWorkingDirectory());
             // Keep track of the visited commits
             List<Commit> visitedCommits = new ArrayList<Commit>();
 
@@ -877,8 +815,7 @@ public class JGitRepositoryTests {
         @Test
         public void walkHistoryWithEndBoundaryOutOfScopeTest()
             throws Exception {
-            // start with a new repository, just initialized
-            GitScript script = GitScenario.TwoUnmergedBranchesShort.realize();
+            Script script = Scenario.TWO_BRANCH_SHORT_UNMERGED.realize();
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
             // Keep track of the visited commits
             List<Commit> visitedCommitsWithoutBoundaries = new ArrayList<Commit>();

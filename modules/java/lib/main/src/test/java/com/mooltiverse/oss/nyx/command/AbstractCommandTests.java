@@ -32,11 +32,11 @@ import org.junit.jupiter.params.provider.MethodSource;
 import com.mooltiverse.oss.nyx.configuration.Configuration;
 import com.mooltiverse.oss.nyx.git.Git;
 import com.mooltiverse.oss.nyx.git.Repository;
-import com.mooltiverse.oss.nyx.git.script.GitScript;
+import com.mooltiverse.oss.nyx.git.Scenario;
 import com.mooltiverse.oss.nyx.state.State;
 
 @DisplayName("AbstractCommand")
-public class AbstractCommandTests {
+public abstract class AbstractCommandTests {
     /**
      * A map of the available commands, where keys are simple command class names and values are their classes.
      */
@@ -74,17 +74,16 @@ public class AbstractCommandTests {
      * Returns an instance of of the given command class.
      * 
      * @param the class to return an instance for
-     * @param state the state to pass to the constructor
      * @param repository the repository to pass to the constructor
      * 
      * @return the command instance
      * 
      * @throws Exception in case of any issue
      */
-    protected static <T extends AbstractCommand> T getCommandInstance(Class<T> clazz, State state, Repository repository)
+    protected static <T extends AbstractCommand> T getCommandInstance(Class<T> clazz, Repository repository)
         throws Exception {
         Constructor<T> constructor = clazz.getConstructor(State.class, Repository.class);
-        return constructor.newInstance(state, repository);
+        return constructor.newInstance(new State(new Configuration()), repository);
     }
 
     @Nested
@@ -98,7 +97,7 @@ public class AbstractCommandTests {
         @MethodSource("com.mooltiverse.oss.nyx.command.AbstractCommandTests#commandsArguments")
         void constructorTest(String commandClassSimpleName, Class<? extends AbstractCommand> commandClass)
             throws Exception {
-            assertNotNull(getCommandInstance(commandClass, new State(new Configuration()), Git.open(GitScript.fromScratch().getWorkingDirectory())));
+            assertNotNull(getCommandInstance(commandClass, Git.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory())));
         }
     }
 
@@ -112,7 +111,7 @@ public class AbstractCommandTests {
         @MethodSource("com.mooltiverse.oss.nyx.command.AbstractCommandTests#commandsArguments")
         void repositoryTest(String commandClassSimpleName, Class<? extends AbstractCommand> commandClass)
             throws Exception {
-            assertNotNull(getCommandInstance(commandClass, new State(new Configuration()), Git.open(GitScript.fromScratch().getWorkingDirectory())).repository());
+            assertNotNull(getCommandInstance(commandClass, Git.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory())).repository());
         }
     }
 
@@ -126,7 +125,7 @@ public class AbstractCommandTests {
         @MethodSource("com.mooltiverse.oss.nyx.command.AbstractCommandTests#commandsArguments")
         void stateTest(String commandClassSimpleName, Class<? extends AbstractCommand> commandClass)
             throws Exception {
-            assertNotNull(getCommandInstance(commandClass, new State(new Configuration()), Git.open(GitScript.fromScratch().getWorkingDirectory())).state());
+            assertNotNull(getCommandInstance(commandClass, Git.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory())).state());
         }
     }
 }

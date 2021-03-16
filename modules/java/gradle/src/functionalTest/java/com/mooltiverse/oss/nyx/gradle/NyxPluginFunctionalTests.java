@@ -41,8 +41,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import com.mooltiverse.oss.nyx.git.script.GitScript;
-import com.mooltiverse.oss.nyx.git.script.GitScenario;
+import com.mooltiverse.oss.nyx.git.Scenario;
 
 /**
  * Functional tests for the Gradle plugin.<br>
@@ -652,8 +651,7 @@ public class NyxPluginFunctionalTests {
         @MethodSource("com.mooltiverse.oss.nyx.gradle.NyxPluginFunctionalTests#wellKnownTestSuites")
         void runNyxTaskWithEmptyScriptTest(String target, Map<String,TaskOutcome> taskOutcomes, String gradleVersion, Map<String,String> pluginCombination, List<String> positiveFiles, List<String> negativeFiles)
             throws Exception {
-            GitScript script = GitScenario.InitialCommit.realize(); // create the new directory with a new Git repository inside
-            GradleRunner gradleRunner = setUp(script.getWorkingDirectory(), gradleVersion, gradleSettings(gradleVersion), gradleEmptyBuild(gradleVersion, pluginCombination));
+            GradleRunner gradleRunner = setUp(Scenario.INITIAL_COMMIT.realize().getWorkingDirectory(), gradleVersion, gradleSettings(gradleVersion), gradleEmptyBuild(gradleVersion, pluginCombination));
 
             runNyxTask(gradleRunner, target, taskOutcomes, gradleVersion, positiveFiles, negativeFiles);
 
@@ -671,8 +669,7 @@ public class NyxPluginFunctionalTests {
         @MethodSource("com.mooltiverse.oss.nyx.gradle.NyxPluginFunctionalTests#wellKnownTestSuites")
         void runNyxTaskWithSimpleScriptTest(String target, Map<String,TaskOutcome> taskOutcomes, String gradleVersion, Map<String,String> pluginCombination, List<String> positiveFiles, List<String> negativeFiles)
             throws Exception {
-            GitScript script = GitScenario.InitialCommit.realize(); // create the new directory with a new Git repository inside
-            GradleRunner gradleRunner = setUp(script.getWorkingDirectory(), gradleVersion, gradleSettings(gradleVersion), gradleSimpleBuild(gradleVersion, pluginCombination));
+            GradleRunner gradleRunner = setUp(Scenario.INITIAL_COMMIT.realize().getWorkingDirectory(), gradleVersion, gradleSettings(gradleVersion), gradleSimpleBuild(gradleVersion, pluginCombination));
 
             runNyxTask(gradleRunner, target, taskOutcomes, gradleVersion, positiveFiles, negativeFiles);
 

@@ -34,7 +34,6 @@ import com.mooltiverse.oss.nyx.data.Identity;
 import com.mooltiverse.oss.nyx.data.Message;
 import com.mooltiverse.oss.nyx.data.Tag;
 import com.mooltiverse.oss.nyx.data.TimeStamp;
-import com.mooltiverse.oss.nyx.git.script.GitScript;
 
 @DisplayName("ObjectFactory")
 public class ObjectFactoryTests {
@@ -45,8 +44,7 @@ public class ObjectFactoryTests {
         @Test
         public void actionFrom()
             throws Exception {
-            GitScript script = GitScript.fromScratch().withFiles();
-            RevCommit commit = script.commit("A message");
+            RevCommit commit = Scenario.FROM_SCRATCH.realize().andAddFiles().commit("A message");
 
             Action action = ObjectFactory.actionFrom(commit.getAuthorIdent());
 
@@ -61,8 +59,7 @@ public class ObjectFactoryTests {
         @Test
         public void timeStampFrom()
             throws Exception {
-            GitScript script = GitScript.fromScratch().withFiles();
-            RevCommit commit = script.commit("A message");
+            RevCommit commit = Scenario.FROM_SCRATCH.realize().andAddFiles().commit("A message");
 
             TimeStamp timeStamp = ObjectFactory.timeStampFrom(commit.getAuthorIdent());
 
@@ -74,8 +71,7 @@ public class ObjectFactoryTests {
         @Test
         public void identityFrom()
             throws Exception {
-            GitScript script = GitScript.fromScratch().withFiles();
-            RevCommit commit = script.commit("A message");
+            RevCommit commit = Scenario.FROM_SCRATCH.realize().andAddFiles().commit("A message");
 
             Identity identity = ObjectFactory.identityFrom(commit.getAuthorIdent());
 
@@ -121,7 +117,7 @@ public class ObjectFactoryTests {
             fullMessageBodyPrintWriter.println(messageFooters);
             String fullCommitMessage = fullMessageStringWriter.toString();
 
-            GitScript script = GitScript.fromScratch().withFiles();
+            Script script = Scenario.FROM_SCRATCH.realize().andAddFiles();
 
             // test with a message with just the simple message
             RevCommit commit = script.commit(messageHeader);
@@ -146,7 +142,7 @@ public class ObjectFactoryTests {
         @Test
         public void tagFrom()
             throws Exception {
-            GitScript script = GitScript.fromScratch().withFiles();
+            Script script = Scenario.FROM_SCRATCH.realize().andAddFiles();
 
             script.commit("Commit 1");
 
@@ -168,7 +164,7 @@ public class ObjectFactoryTests {
         @Test
         public void commitFrom()
             throws Exception {
-            GitScript script = GitScript.fromScratch().withFiles();
+            Script script = Scenario.FROM_SCRATCH.realize().andAddFiles();
 
             // test with a message with just the simple message
             RevCommit revCommit1 = script.commit("Commit 1");

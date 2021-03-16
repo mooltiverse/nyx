@@ -132,7 +132,7 @@ public abstract class AbstractTaskTests extends AbstractTests {
         void getDescriptionTest(String taskName, Class<? extends CoreTask> taskClass, String taskClassSimpleName)
             throws Exception {
             Project project = newTestProject(null, true);
-
+            
             assertEquals(taskClass.getDeclaredField("DESCRIPTION").get(null), project.getTasks().getByName(taskName).getDescription());
         }
 
@@ -150,7 +150,6 @@ public abstract class AbstractTaskTests extends AbstractTests {
         void getDependencyCount(String taskName, Class<? extends CoreTask> taskClass, String taskClassSimpleName)
             throws Exception {
             Project project = newTestProject(null, true);
-
             Task task = project.getTasks().getByName(taskName);
 
             assertEquals(task.getTaskDependencies().getDependencies(task).size(), TestData.allTaskEfferentDirectDependencies.get(taskName).size(), String.format("Task %s is expected to have %d dependencies but has %d", taskName, TestData.allTaskEfferentDirectDependencies.get(taskName).size(), task.getTaskDependencies().getDependencies(task).size()));
@@ -161,9 +160,7 @@ public abstract class AbstractTaskTests extends AbstractTests {
         void getDependency(String taskName, Class<? extends CoreTask> taskClass, String taskClassSimpleName)
             throws Exception {
             Project project = newTestProject(null, true);
-
             Task task = project.getTasks().getByName(taskName);
-
             
             for (String dependency: TestData.allTaskEfferentDirectDependencies.get(taskName)) {
                 boolean dependencyFound = false;

@@ -25,8 +25,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import com.mooltiverse.oss.nyx.git.script.GitScript;
-import com.mooltiverse.oss.nyx.git.script.GitScenario;
+import com.mooltiverse.oss.nyx.git.Scenario;
+import com.mooltiverse.oss.nyx.git.Script;
 
 /**
  * Tests the Gradle task.<br>
@@ -43,14 +43,9 @@ public class MakeTaskTests extends CoreTaskTests {
         @DisplayName("MakeTask.getActions().execute() doesn't throw exceptions without a valid Git repository in custom directory")
         void noExceptionOnExecuteWithValidGitRepositoryInCustomDirectoryTest()
         throws Exception {
-            // the test project is created in a new empty directory
+            Script script = Scenario.INITIAL_COMMIT.realize();
             Project project = newTestProject(null, false);
-    
-            // apply the plugin
             project.getPluginManager().apply(NyxPlugin.ID);
-    
-            // a Git repository is created in a different temporary directory
-            GitScript script = GitScenario.InitialCommit.realize();
     
             //make sure the Gradle working directory and the Git repository directory are not the same
             assumeFalse(project.getBuildDir().equals(script.getWorkingDirectory()));
@@ -59,7 +54,6 @@ public class MakeTaskTests extends CoreTaskTests {
             // the valid Git directory, different than the current working directory, is passed as the 'directory' configuration option through the extension
             project.getExtensions().getByType(NyxExtension.class).getDirectory().set(script.getWorkingDirectory());
     
-            // Retrieve the dependent task
             Task task = project.getTasks().getByName(MakeTask.NAME);
     
             for (Action<? super Task> action: task.getActions()) {
@@ -71,12 +65,9 @@ public class MakeTaskTests extends CoreTaskTests {
         @DisplayName("MakeTask.getActions().execute() doesn't throw exceptions without a valid Git repository in working directory")
         void noExceptionOnExecuteWithValidGitRepositoryInWorkingDirectoryTest()
             throws Exception {
-            Project project = newTestProject(GitScenario.InitialCommit.realize().getWorkingDirectory(), false);
-    
-            // apply the plugin
+            Project project = newTestProject(Scenario.INITIAL_COMMIT.realize().getWorkingDirectory(), false);
             project.getPluginManager().apply(NyxPlugin.ID);
     
-            // Retrieve the dependent task
             Task task = project.getTasks().getByName(MakeTask.NAME);
     
             for (Action<? super Task> action: task.getActions()) {

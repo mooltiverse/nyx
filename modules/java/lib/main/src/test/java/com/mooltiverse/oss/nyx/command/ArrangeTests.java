@@ -21,16 +21,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import com.mooltiverse.oss.nyx.configuration.Configuration;
 import com.mooltiverse.oss.nyx.git.Git;
-import com.mooltiverse.oss.nyx.git.script.GitScript;
-import com.mooltiverse.oss.nyx.state.State;
+import com.mooltiverse.oss.nyx.git.Scenario;
 
 @DisplayName("Arrange")
 public class ArrangeTests extends AbstractCommandTests {
     @Nested
     @DisplayName("Arrange isUpToDate")
-    static class UpToDateTests {
+    public static class UpToDateTests {
         /**
          * Check that the isUpToDate() returns {@code false} when the command instance is just created and {@code true} after one execution in a repository
          * with at least one commit and in a clean state
@@ -39,7 +37,7 @@ public class ArrangeTests extends AbstractCommandTests {
         @DisplayName("Arrange.isUpToDate()")
         void isUpToDateTest()
             throws Exception {
-            AbstractCommand command = getCommandInstance(Arrange.class, new State(new Configuration()), Git.open(GitScript.fromScratch().getWorkingDirectory()));
+            Arrange command = getCommandInstance(Arrange.class, Git.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory()));
 
             // simply test that running it twice returns false at the first run and true the second
             assertFalse(command.isUpToDate());
@@ -50,12 +48,12 @@ public class ArrangeTests extends AbstractCommandTests {
 
     @Nested
     @DisplayName("Arrange run")
-    static class RunTests {
+    public static class RunTests {
         /*@Test
         @DisplayName("Arrange.run() throws exception with a valid but empty Git repository in working directory")
         void stateTest()
             throws Exception {
-            assertThrows(GitException.class, () -> getCommandInstance(Arrange.class, new State(new Configuration()), Git.open(GitScript.fromScratch().getWorkingDirectory())).run());
+            assertThrows(GitException.class, () -> getCommandInstance(Arrange.class, Git.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory())).run());
         }*/
     }
 }

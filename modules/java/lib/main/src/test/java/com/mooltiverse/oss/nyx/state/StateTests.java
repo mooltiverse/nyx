@@ -44,9 +44,8 @@ public class StateTests {
         @DisplayName("State.getBump()")
         void getBumpTest()
             throws Exception {
-            Configuration configuration = new Configuration();
             // make sure the bump is null in the beginning (it's set only after the Infer task has run)
-            State state = new State(configuration);
+            State state = new State(new Configuration());
             assertNull(state.getBump());
         }
 
@@ -54,8 +53,7 @@ public class StateTests {
         @DisplayName("State.setBump(String)")
         void setBumpTest()
             throws Exception {
-            Configuration configuration = new Configuration();
-            State state = new State(configuration);
+            State state = new State(new Configuration());
 
             String bump = "alpha";
             state.setBump(bump);
@@ -83,8 +81,7 @@ public class StateTests {
         @DisplayName("State.getInternals()")
         void getInternalsTest()
             throws Exception {
-            Configuration configuration = new Configuration();
-            State state = new State(configuration);
+            State state = new State(new Configuration());
 
             // make sure the initial internals is never null and empty
             assertNotNull(state.getInternals());
@@ -95,9 +92,8 @@ public class StateTests {
         @DisplayName("State.getReleaseScope()")
         void getReleaseScopeTest()
             throws Exception {
-            Configuration configuration = new Configuration();
             // make sure the release scope is initialized
-            assertNotNull(new State(configuration).getReleaseScope());
+            assertNotNull(new State(new Configuration()).getReleaseScope());
         }
 
         @Test
@@ -113,9 +109,8 @@ public class StateTests {
         @DisplayName("State.getTimestamp()")
         void getTimestampTest()
             throws Exception {
-            Configuration configuration = new Configuration();
             // make sure the current timestamp is a fresh one
-            State state = new State(configuration);
+            State state = new State(new Configuration());
             assertTrue(System.currentTimeMillis() >= state.getTimestamp());
         }
 
@@ -123,9 +118,8 @@ public class StateTests {
         @DisplayName("State.touchTimestamp()")
         void touchTimestampTest()
             throws Exception {
-            Configuration configuration = new Configuration();
             // make sure that when touching the timestamp the new value is updated
-            State state = new State(configuration);
+            State state = new State(new Configuration());
 
             long oldTimestamp = state.getTimestamp();
             do {
@@ -143,9 +137,8 @@ public class StateTests {
         @DisplayName("State.getVersion()")
         void getVersionTest()
             throws Exception {
-            Configuration configuration = new Configuration();
             // make sure the version is null in the beginning (it's set only after the Infer task has run)
-            State state = new State(configuration);
+            State state = new State(new Configuration());
             assertNull(state.getVersion());
         }
 
@@ -204,8 +197,7 @@ public class StateTests {
         @DisplayName("State.setVersion(Version) throws exception when using wrong scheme")
         void setVersionWithWrongSchemeTest()
             throws Exception {
-            Configuration configuration = new Configuration();
-            State state = new State(configuration);
+            State state = new State(new Configuration());
 
             // here we should try passing a version whose scheme doesn't match the configured scheme
             // and make sure an exception is thrown

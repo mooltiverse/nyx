@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mooltiverse.oss.nyx.git.script;
+package com.mooltiverse.oss.nyx.git;
 
 import com.mooltiverse.oss.nyx.git.util.FileSystemUtil;
 import com.mooltiverse.oss.nyx.git.util.GitUtil;
@@ -37,7 +37,6 @@ import org.eclipse.jgit.api.errors.RefNotFoundException;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.RefDatabase;
-import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevObject;
@@ -48,7 +47,7 @@ import org.eclipse.jgit.transport.URIish;
  * A Git repository utility class used to test. This class is used to dynamically create a repository that can be used for tests
  * and exposes some high level methods and attributes.
  */
-public class GitTestRepository {
+public class Workbench {
     /**
      * The backing Git instance
      */
@@ -76,7 +75,7 @@ public class GitTestRepository {
      * 
      * @throws Exception in case of any issue
      */
-    private GitTestRepository(Git git)
+    private Workbench(Git git)
         throws Exception {
         super();
         Objects.requireNonNull(git);
@@ -90,7 +89,7 @@ public class GitTestRepository {
      * 
      * @throws Exception in case of any issue
      */
-    public GitTestRepository(File directory)
+    public Workbench(File directory)
         throws Exception {
         this(Git.open(directory));
     }
@@ -105,7 +104,7 @@ public class GitTestRepository {
      * 
      * @throws Exception in case of any exception
      */
-    public GitTestRepository(File directory, boolean bare, boolean initialize)
+    public Workbench(File directory, boolean bare, boolean initialize)
         throws Exception {
         super();
         if (initialize) {
@@ -121,7 +120,7 @@ public class GitTestRepository {
      * 
      * @throws Exception in case of any issue
      */
-    public GitTestRepository(boolean initialize)
+    public Workbench(boolean initialize)
         throws Exception {
         this(FileSystemUtil.newTempDirectory(null, null), false, initialize);
     }
@@ -131,9 +130,18 @@ public class GitTestRepository {
      * 
      * @throws Exception in case of any issue
      */
-    public GitTestRepository()
+    public Workbench()
         throws Exception {
         this(true);
+    }
+
+    /**
+     * Returns the Git metadata directory for the repository
+     * 
+     * @return the Git metadata directory for the repository
+     */
+    public final File getGitDirectory() {
+        return git.getRepository().getDirectory();
     }
 
     /**
@@ -180,7 +188,7 @@ public class GitTestRepository {
      * 
      * @return the a map in which keys are branch names and values are lists of all commits for those branches.
      */
-    public Map<String,List<String>> getCommitsByBranch() {
+    public Map<String,List<String>> getAllCommits() {
         return commits;
     }
 
@@ -225,7 +233,7 @@ public class GitTestRepository {
      * 
      * @return the list of all commit SHAs created in this repository for the given branch.
      */
-    public List<String> getCommits(String branch) {
+    public List<String> getCommitsByBranch(String branch) {
         return commits.get(branch);
     }
 
@@ -456,20 +464,6 @@ public class GitTestRepository {
     }
 
     /**
-     * Prints repository informations to the given output stream.
-     * 
-     * @param out the stream to print the info to
-     * 
-     * @return this same instance
-     * 
-     * @throws Exception in case of any issue
-     */
-    public void printInfo(OutputStream out)
-        throws Exception {
-        GitUtil.printRepositoryInfo(git.getRepository().getWorkTree(), out, null);
-    }
-
-    /**
      * Commits merge the contents of the given branch into the current one creating a commit with the given message.
      * 
      * @param fromBranch the name of the branch to merge from
@@ -491,6 +485,22 @@ public class GitTestRepository {
             commitsForBranch(getCurrentBranch()).add(res.getId().getName());
             return res;
         }
+    }
+
+    /**
+     * Adds the repository in the given metadata directory to the configured remotes of this repository, using the given name.
+     * This is only suitable for local repositories to be added as remotes to other local repositories.
+     * 
+     * @param gitDir the Git metadata directory of the repository to add as remote
+     * @param name the name to use for the new remote repository in the local one
+     * 
+     * @return
+     * 
+     * @throws Exception in case of any issue
+     */
+    public RemoteConfig addRemote(File gitDir, String name)
+        throws Exception {
+        return git.remoteAdd().setName(name).setUri(new URIish(gitDir.toURI().toURL())).call();
     }
 
     /**
@@ -520,26 +530,16 @@ public class GitTestRepository {
     }
 
     /**
-     * Returns the JGit repository backing this test repository
+     * Prints repository informations to the given output stream.
      * 
-     * @return the JGit repository backing this test repository
-     */
-    public Repository getJGitRepository() {
-        return git.getRepository();
-    }
-
-    /**
-     * Adds the given repository to the configured remotes of this repository, using the given name.
+     * @param out the stream to print the info to
      * 
-     * @param repo the repository to add as remote
-     * @param name the name to use for the new remote repository in the local one
-     * 
-     * @return
+     * @return this same instance
      * 
      * @throws Exception in case of any issue
      */
-    public RemoteConfig addRemote(Repository repo, String name)
+    public void printInfo(OutputStream out)
         throws Exception {
-        return git.remoteAdd().setName(name).setUri(new URIish(repo.getDirectory().toURI().toURL())).call();
+        GitUtil.printRepositoryInfo(git.getRepository().getWorkTree(), out, null);
     }
 }

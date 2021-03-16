@@ -29,9 +29,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import com.mooltiverse.oss.nyx.Nyx;
-import com.mooltiverse.oss.nyx.git.script.GitScript;
-import com.mooltiverse.oss.nyx.git.script.GitScenario;
-
+import com.mooltiverse.oss.nyx.git.Scenario;
+import com.mooltiverse.oss.nyx.git.Script;
 /**
  * Tests the Gradle task.<br>
  */
@@ -47,12 +46,9 @@ public class InferTaskTests extends CoreTaskTests {
         @DisplayName("InferTask.getActions().execute() throws exception with a valid but empty Git repository in working directory")
         void exceptionOnExecuteWithValidButEmptyGitRepositoryInWorkingDirectoryTest()
             throws Exception {
-            Project project = newTestProject(GitScript.fromScratch().getWorkingDirectory(), false);
-    
-            // apply the plugin
+            Project project = newTestProject(Scenario.FROM_SCRATCH.realize().getWorkingDirectory(), false);
             project.getPluginManager().apply(NyxPlugin.ID);
     
-            // Retrieve the dependent task
             Task task = project.getTasks().getByName(InferTask.NAME);
     
             for (Action<? super Task> action: task.getActions()) {
@@ -65,14 +61,9 @@ public class InferTaskTests extends CoreTaskTests {
         @DisplayName("InferTask.getActions().execute() with a valid but empty Git repository in custom directory ==> default initial version")
         void runWithEmptyRepositoryTest()
         throws Exception {
-            // the test project is created in a new empty directory
+            Script script = Scenario.INITIAL_COMMIT.realize();
             Project project = newTestProject(null, false);
-    
-            // apply the plugin
             project.getPluginManager().apply(NyxPlugin.ID);
-    
-            // a Git repository is created in a different temporary directory
-            GitScript script = GitScenario.InitialCommit.realize();
     
             //make sure the Gradle working directory and the Git repository directory are not the same
             assumeFalse(project.getBuildDir().equals(script.getWorkingDirectory()));
@@ -81,7 +72,6 @@ public class InferTaskTests extends CoreTaskTests {
             // the valid Git directory, different than the current working directory, is passed as the 'directory' configuration option through the extension
             project.getExtensions().getByType(NyxExtension.class).getDirectory().set(script.getWorkingDirectory());
     
-            // Retrieve the dependent task
             Task task = project.getTasks().getByName(InferTask.NAME);
     
             for (Action<? super Task> action: task.getActions()) {
@@ -105,17 +95,14 @@ public class InferTaskTests extends CoreTaskTests {
         @DisplayName("InferTask.getActions().execute() with version override ==> custom version")
         void runWithVersionOverriddenByUserTest()
             throws Exception {
-            // a Git repository is created in a different temporary directory
-            GitScript script = GitScenario.InitialCommit.realize();
+            Script script = Scenario.INITIAL_COMMIT.realize();
             Project project = newTestProject(script.getWorkingDirectory(), false);
 
             // set the project property
             project.setProperty(GRADLE_VERSION_PROPERTY_NAME, "1.2.3");
     
-            // apply the plugin
             project.getPluginManager().apply(NyxPlugin.ID);
 
-            // Retrieve the dependent task
             Task task = project.getTasks().getByName(InferTask.NAME);
     
             for (Action<? super Task> action: task.getActions()) {

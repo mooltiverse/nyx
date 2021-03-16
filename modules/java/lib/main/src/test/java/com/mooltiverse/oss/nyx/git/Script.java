@@ -13,17 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mooltiverse.oss.nyx.git.script;
+package com.mooltiverse.oss.nyx.git;
 
 import com.mooltiverse.oss.nyx.git.util.FileSystemUtil;
 import com.mooltiverse.oss.nyx.git.util.RandomUtil;
 
 import java.io.File;
+import java.util.Objects;
 
 /**
  * An utility class built on top of a test repository and providing some coarse grained commands to be used fluently.
  */
-public class GitScript extends GitTestRepository {
+public class Script extends Workbench {
     /**
      * Creates a new script instance in the given directory.
      * 
@@ -31,7 +32,7 @@ public class GitScript extends GitTestRepository {
      * 
      * @throws Exception in case of any issue
      */
-    protected GitScript(File directory)
+    protected Script(File directory)
         throws Exception {
         super(directory);
     }
@@ -46,7 +47,7 @@ public class GitScript extends GitTestRepository {
      * 
      * @throws Exception in case of any exception
      */
-    protected GitScript(File directory, boolean bare, boolean initialize)
+    protected Script(File directory, boolean bare, boolean initialize)
         throws Exception {
         super(directory, bare, initialize);
     }
@@ -60,9 +61,9 @@ public class GitScript extends GitTestRepository {
      * 
      * @throws Exception in case of any issue
      */
-    public static GitScript from(File directory)
+    public static Script from(File directory)
         throws Exception {
-        return new GitScript(directory);
+        return new Script(directory);
     }
 
     /**
@@ -74,9 +75,9 @@ public class GitScript extends GitTestRepository {
      * 
      * @throws Exception in case of any issue
      */
-    public static GitScript fromScratch(File directory)
+    public static Script fromScratch(File directory)
         throws Exception {
-        return new GitScript(directory, false, true);
+        return new Script(directory, false, true);
     }
 
     /**
@@ -87,79 +88,9 @@ public class GitScript extends GitTestRepository {
      * 
      * @see #getWorkingDirectory() to get the repository directory
      */
-    public static GitScript fromScratch()
+    public static Script fromScratch()
         throws Exception {
-        return new GitScript(FileSystemUtil.newTempDirectory(null, null), false, true);
-    }
-
-    /**
-     * Commits the staged changes with the given commit message
-     * 
-     * @param message the commit message
-     * 
-     * @return this same instance
-     * 
-     * @throws Exception in case of any issue
-     */
-    public GitScript andCommit(String message)
-        throws Exception {
-        commit(message);
-        return this;
-    }
-
-    /**
-     * Commits the staged changes with a random commit message
-     * 
-     * @return this same instance
-     * 
-     * @throws Exception in case of any issue
-     */
-    public GitScript andCommit()
-        throws Exception {
-        return andCommit("Commit ".concat(RandomUtil.randomAlphabeticString(3)));
-    }
-
-    /**
-     * Adds the modified contents to the sraging area.
-     * 
-     * @return this same instance
-     * 
-     * @throws Exception in case of any issue
-     */
-    public GitScript andStage()
-        throws Exception {
-        stage();
-        return this;
-    }
-
-    /**
-     * Tags the latest commit with the given name. The tag is a lightweight tag unless the given message is not {@code null},
-     * in which case the message is used for the annotation.
-     * 
-     * @param name the tag value
-     * @param message the optional tag message
-     * 
-     * @return this same instance
-     * 
-     * @throws Exception in case of any issue
-     */
-    public GitScript andTag(String name, String message)
-        throws Exception {
-        tag(name, message, getLastCommit());
-        return this;
-    }
-
-    /**
-     * Changes the contents of all files in the repository. Changes are not staged or committed.
-     * 
-     * @return this same instance
-     * 
-     * @throws Exception in case of any issue
-     */
-    public GitScript andUpdateFiles()
-        throws Exception {
-        updateAllFiles();
-        return this;
+        return new Script(FileSystemUtil.newTempDirectory(null, null), false, true);
     }
 
     /**
@@ -169,9 +100,9 @@ public class GitScript extends GitTestRepository {
      * 
      * @throws Exception in case of any issue
      */
-    public GitScript withFiles()
+    public Script andAddFiles()
         throws Exception {
-        return withFiles(1);
+        return andAddFiles(1);
     }
 
     /**
@@ -183,9 +114,80 @@ public class GitScript extends GitTestRepository {
      * 
      * @throws Exception in case of any issue
      */
-    public GitScript withFiles(int count)
+    public Script andAddFiles(int count)
         throws Exception {
         addRandomTextFiles(count);
+        return this;
+    }
+
+    /**
+     * Changes the contents of all files in the repository. Changes are not staged or committed.
+     * 
+     * @return this same instance
+     * 
+     * @throws Exception in case of any issue
+     */
+    public Script andUpdateFiles()
+        throws Exception {
+        updateAllFiles();
+        return this;
+    }
+
+    /**
+     * Adds the modified contents to the sraging area.
+     * 
+     * @return this same instance
+     * 
+     * @throws Exception in case of any issue
+     */
+    public Script andStage()
+        throws Exception {
+        stage();
+        return this;
+    }
+
+    /**
+     * Commits the staged changes with a random commit message
+     * 
+     * @return this same instance
+     * 
+     * @throws Exception in case of any issue
+     */
+    public Script andCommit()
+        throws Exception {
+        return andCommit(null);
+    }
+
+    /**
+     * Commits the staged changes with the given commit message
+     * 
+     * @param message the commit message. If {@code null} a random commit message is generated
+     * 
+     * @return this same instance
+     * 
+     * @throws Exception in case of any issue
+     */
+    public Script andCommit(String message)
+        throws Exception {
+        commit(Objects.isNull(message) ? "Commit ".concat(RandomUtil.randomAlphabeticString(3)) : message);
+        return this;
+    }
+
+    /**
+     * Tags the latest commit with the given name. The tag is a lightweight tag unless the given message is not {@code null},
+     * in which case the message is used for the annotation.
+     * 
+     * @param name the tag value
+     * @param message the optional tag message, if {@code null} no message is applied and the tag is lightweight,
+     * otherwise it's an annotated tag
+     * 
+     * @return this same instance
+     * 
+     * @throws Exception in case of any issue
+     */
+    public Script andTag(String name, String message)
+        throws Exception {
+        tag(name, message, getLastCommit());
         return this;
     }
 
@@ -198,7 +200,7 @@ public class GitScript extends GitTestRepository {
      * 
      * @throws Exception in case of any issue
      */
-    public GitScript inBranch(String name)
+    public Script inBranch(String name)
         throws Exception {
         checkout(name);
         return this;
@@ -215,9 +217,50 @@ public class GitScript extends GitTestRepository {
      * 
      * @throws Exception in case of any issue
      */
-    public GitScript addCommitWithTag(String tagName)
+    public Script andCommitWithTag(String tagName)
         throws Exception {
-        return addCommitWithTag(tagName, null);
+        return andCommitWithTag(tagName, null);
+    }
+
+    /**
+     * Adds a batch of operations to the git repository in the current branch.
+     * A batch is made of change to all the files in the repository (new files are added if there is none), a commit
+     * and a tag on the commit. The tag is lightweight if {@code tagMessage} is {@code null}, otherwise
+     * it is annotated.
+     * 
+     * @param tagName the tag name to create on the commit
+     * @param tagMessage the tag message to create on the commit, if not {@code null} makes the tag annotated
+     * otherwise the tag will be lightweight
+     * 
+     * @return this same instance
+     * 
+     * @throws Exception in case of any issue
+     */
+    public Script andCommitWithTag(String tagName, String tagMessage)
+        throws Exception {
+        return andCommitWithTag(null, tagName, tagMessage);
+    }
+
+    /**
+     * Adds a batch of operations to the git repository in the current branch.
+     * A batch is made of change to all the files in the repository (new files are added if there is none), a commit
+     * and a tag on the commit. The tag is lightweight if {@code tagMessage} is {@code null}, otherwise
+     * it is annotated.
+     * 
+     * @param commitMessage the commit message. If {@code null} a random message is generated
+     * @param tagName the tag name to create on the commit
+     * @param tagMessage the tag message to create on the commit, if not {@code null} makes the tag annotated
+     * otherwise the tag will be lightweight
+     * 
+     * @return this same instance
+     * 
+     * @throws Exception in case of any issue
+     */
+    public Script andCommitWithTag(String commitMessage, String tagName, String tagMessage)
+        throws Exception {
+        if (getFiles().isEmpty())
+            andAddFiles();
+        return andStage().andCommit(commitMessage).andTag(tagName, tagMessage);
     }
 
     /**
@@ -232,30 +275,10 @@ public class GitScript extends GitTestRepository {
      * 
      * @throws Exception in case of any issue
      */
-    public GitScript addCommitWithTagInBranch(String branchName, String tagName)
+    public Script andCommitWithTagInBranch(String branchName, String tagName)
         throws Exception {
         checkout(branchName);
-        return addCommitWithTag(tagName);
-    }
-
-    /**
-     * Adds a batch of operations to the git repository in the current branch.
-     * A batch is made of change to all the files in the repository (new files are added if there is none), a commit
-     * and a tag on the commit. The tag is lightweight if {@code tagMessage} is {@code null}, otherwise
-     * it is annotated.
-     * 
-     * @param tagName the tag name to create on the commit
-     * @param tagMessage the tag message to create on the commit, makes the tag annotated
-     * 
-     * @return this same instance
-     * 
-     * @throws Exception in case of any issue
-     */
-    public GitScript addCommitWithTag(String tagName, String tagMessage)
-        throws Exception {
-        if (getFiles().isEmpty())
-            withFiles();
-        return andStage().andCommit().andTag(tagName, tagMessage);
+        return andCommitWithTag(tagName);
     }
 
     /**
@@ -266,32 +289,38 @@ public class GitScript extends GitTestRepository {
      * 
      * @param branchName the name of the branch to create the commit in
      * @param tagName the tag name to create on the commit
-     * @param tagMessage the tag message to create on the commit, makes the tag annotated
+     * @param tagMessage the tag message to create on the commit, if not {@code null} makes the tag annotated
+     * otherwise the tag will be lightweight
      * 
      * @return this same instance
      * 
      * @throws Exception in case of any issue
      */
-    public GitScript addCommitWithTagInBranch(String branchName, String tagName, String tagMessage)
+    public Script andCommitWithTagInBranch(String branchName, String tagName, String tagMessage)
         throws Exception {
-        checkout(branchName);
-        return addCommitWithTag(tagName, tagMessage);
+        return andCommitWithTagInBranch(branchName, null, tagName, tagMessage);
     }
 
     /**
-     * Commits merge the contents of the given branch into the current one creating a commit with the given message.
+     * Adds a batch of operations to the git repository in the given branch.
+     * A batch is made of change to all the files in the repository (new files are added if there is none), a commit
+     * and a tag on the commit. The tag is lightweight if {@code tagMessage} is {@code null}, otherwise
+     * it is annotated.
      * 
-     * @param fromBranch the name of the branch to merge from
-     * @param message the commit message
+     * @param branchName the name of the branch to create the commit in
+     * @param commitMessage the commit message. If {@code null} a random message is generated
+     * @param tagName the tag name to create on the commit
+     * @param tagMessage the tag message to create on the commit, if not {@code null} makes the tag annotated
+     * otherwise the tag will be lightweight
      * 
      * @return this same instance
      * 
      * @throws Exception in case of any issue
      */
-    public GitScript andMergeFrom(String fromBranch, String message)
+    public Script andCommitWithTagInBranch(String branchName, String commitMessage, String tagName, String tagMessage)
         throws Exception {
-        merge(fromBranch, message);
-        return this;
+        checkout(branchName);
+        return andCommitWithTag(commitMessage, tagName, tagMessage);
     }
 
     /**
@@ -303,44 +332,93 @@ public class GitScript extends GitTestRepository {
      * 
      * @throws Exception in case of any issue
      */
-    public GitScript andMergeFrom(String fromBranch)
+    public Script andMergeFrom(String fromBranch)
         throws Exception {
-        return andMergeFrom(fromBranch, "Merge ".concat(RandomUtil.randomAlphabeticString(3)));
+        return andMergeFrom(fromBranch, null);
     }
 
     /**
      * Commits merge the contents of the given branch into the current one creating a commit with the given message.
      * 
      * @param fromBranch the name of the branch to merge from
-     * @param message the commit message
-     * @param tagName the name of the tag to apply to the merge commit
+     * @param commitMessage the commit message. If {@code null} a random message is generated
      * 
      * @return this same instance
      * 
      * @throws Exception in case of any issue
      */
-    public GitScript andMergeFromWithTag(String fromBranch, String message, String tagName)
+    public Script andMergeFrom(String fromBranch, String commitMessage)
         throws Exception {
-        return andMergeFromWithTag(fromBranch, message, tagName, null);
+        merge(fromBranch, Objects.isNull(commitMessage) ? "Merge ".concat(RandomUtil.randomAlphabeticString(3)) : commitMessage);
+        return this;
     }
 
     /**
      * Commits merge the contents of the given branch into the current one creating a commit with the given message.
      * 
      * @param fromBranch the name of the branch to merge from
-     * @param message the commit message
-     * @param tagName the name of the tag to apply to the merge commit
-     * @param tagMessage the message of the tag, if {@code null} the tag will be lightweight, otherwise it will be annotated
+     * @param commitMessage the commit message. If {@code null} a random message is generated
+     * @param tagMessage the tag message to create on the commit, if not {@code null} makes the tag annotated
+     * otherwise the tag will be lightweight
      * 
      * @return this same instance
      * 
      * @throws Exception in case of any issue
      */
-    public GitScript andMergeFromWithTag(String fromBranch, String message, String tagName, String tagMessage)
+    public Script andMergeFromWithTag(String fromBranch, String commitMessage, String tagName)
         throws Exception {
-        merge(fromBranch, message);
+        return andMergeFromWithTag(fromBranch, commitMessage, tagName, null);
+    }
+
+    /**
+     * Commits merge the contents of the given branch into the current one creating a commit with the given message.
+     * 
+     * @param fromBranch the name of the branch to merge from
+     * @param commitMessage the commit message. If {@code null} a random message is generated
+     * @param tagName the name of the tag to apply to the merge commit
+     * @param tagMessage the tag message to create on the commit, if not {@code null} makes the tag annotated
+     * otherwise the tag will be lightweight
+     * 
+     * @return this same instance
+     * 
+     * @throws Exception in case of any issue
+     */
+    public Script andMergeFromWithTag(String fromBranch, String commitMessage, String tagName, String tagMessage)
+        throws Exception {
+        merge(fromBranch, Objects.isNull(commitMessage) ? "Merge ".concat(RandomUtil.randomAlphabeticString(3)) : commitMessage);
         tag(tagName, tagMessage);
         return this;
+    }
+
+    /**
+     * Commits merge the contents of the current branch into the given one creating a commit with a random message. When this method
+     * returns the target branch is the current one.
+     * 
+     * @param toBranch the name of the branch to merge to, it will also be the current branch after the commit
+     * 
+     * @return this same instance
+     * 
+     * @throws Exception in case of any issue
+     */
+    public Script andMergeInto(String toBranch)
+        throws Exception {
+        return andMergeInto(toBranch, "Merge ".concat(RandomUtil.randomAlphabeticString(3)));
+    }
+
+    /**
+     * Commits merge the contents of the current branch into the given one creating a commit with the given message. When this method
+     * returns the target branch is the current one.
+     * 
+     * @param toBranch the name of the branch to merge to, it will also be the current branch after the commit
+     * @param commitMessage the commit message. If {@code null} a random message is generated
+     * 
+     * @return this same instance
+     * 
+     * @throws Exception in case of any issue
+     */
+    public Script andMergeInto(String toBranch, String commitMessage)
+        throws Exception {
+        return andMergeInto(toBranch, getCurrentBranch(), commitMessage);
     }
 
     /**
@@ -349,47 +427,16 @@ public class GitScript extends GitTestRepository {
      * 
      * @param toBranch the name of the branch to merge to, it will also be the current branch after the commit
      * @param fromBranch the name of the branch to merge from
-     * @param message the commit message
+     * @param commitMessage the commit message. If {@code null} a random message is generated
      * 
      * @return this same instance
      * 
      * @throws Exception in case of any issue
      */
-    public GitScript andMergeInto(String toBranch, String fromBranch, String message)
+    public Script andMergeInto(String toBranch, String fromBranch, String commitMessage)
         throws Exception {
         checkout(toBranch);
-        return andMergeFrom(fromBranch, message);
-    }
-
-    /**
-     * Commits merge the contents of the current branch into the given one creating a commit with the given message. When this method
-     * returns the target branch is the current one.
-     * 
-     * @param toBranch the name of the branch to merge to, it will also be the current branch after the commit
-     * @param message the commit message
-     * 
-     * @return this same instance
-     * 
-     * @throws Exception in case of any issue
-     */
-    public GitScript andMergeInto(String toBranch, String message)
-        throws Exception {
-        return andMergeInto(toBranch, getCurrentBranch(), message);
-    }
-
-    /**
-     * Commits merge the contents of the current branch into the given one creating a commit with a random message. When this method
-     * returns the target branch is the current one.
-     * 
-     * @param toBranch the name of the branch to merge to, it will also be the current branch after the commit
-     * 
-     * @return this same instance
-     * 
-     * @throws Exception in case of any issue
-     */
-    public GitScript andMergeInto(String toBranch)
-        throws Exception {
-        return andMergeInto(toBranch, "Merge ".concat(RandomUtil.randomAlphabeticString(3)));
+        return andMergeFrom(fromBranch, commitMessage);
     }
 
     /**
@@ -403,7 +450,7 @@ public class GitScript extends GitTestRepository {
      * 
      * @throws Exception in case of any issue
      */
-    public GitScript andMergeIntoWithTag(String toBranch, String tagName)
+    public Script andMergeIntoWithTag(String toBranch, String tagName)
         throws Exception {
         return andMergeIntoWithTag(toBranch, tagName, null);
     }
@@ -414,13 +461,14 @@ public class GitScript extends GitTestRepository {
      * 
      * @param toBranch the name of the branch to merge to, it will also be the current branch after the commit
      * @param tagName the name of the tag to apply to the merge commit
-     * @param tagMessage the message of the tag, if {@code null} the tag will be lightweight, otherwise it will be annotated
+     * @param tagMessage the tag message to create on the commit, if not {@code null} makes the tag annotated
+     * otherwise the tag will be lightweight
      * 
      * @return this same instance
      * 
      * @throws Exception in case of any issue
      */
-    public GitScript andMergeIntoWithTag(String toBranch, String tagName, String tagMessage)
+    public Script andMergeIntoWithTag(String toBranch, String tagName, String tagMessage)
         throws Exception {
         andMergeInto(toBranch, "Merge ".concat(RandomUtil.randomAlphabeticString(3)));
         tag(tagName, tagMessage);
@@ -433,20 +481,20 @@ public class GitScript extends GitTestRepository {
      * 
      * @param toBranch the name of the branch to merge to, it will also be the current branch after the commit
      * @param fromBranch the name of the branch to merge from
-     * @param message the commit message
+     * @param commitMessage the commit message. If {@code null} a random message is generated
      * @param tagName the name of the tag to apply to the merge commit
-     * @param tagMessage the message of the tag, if {@code null} the tag will be lightweight, otherwise it will be annotated
+     * @param tagMessage the tag message to create on the commit, if not {@code null} makes the tag annotated
+     * otherwise the tag will be lightweight
      * 
      * @return this same instance
      * 
      * @throws Exception in case of any issue
      */
-    public GitScript andMergeIntoWithTag(String toBranch, String fromBranch, String message, String tagName, String tagMessage)
+    public Script andMergeIntoWithTag(String toBranch, String fromBranch, String commitMessage, String tagName, String tagMessage)
         throws Exception {
         checkout(toBranch);
-        andMergeFrom(fromBranch, message);
+        andMergeFrom(fromBranch, commitMessage);
         tag(tagName, tagMessage);
         return this;
     }
 }
-
