@@ -1,0 +1,226 @@
+/*
+ * Copyright 2020 Mooltiverse
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.mooltiverse.oss.nyx.command.template;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.TestTemplate;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+import com.mooltiverse.oss.nyx.command.Command;
+import com.mooltiverse.oss.nyx.command.Commands;
+import com.mooltiverse.oss.nyx.git.Scenario;
+import com.mooltiverse.oss.nyx.git.Script;
+import com.mooltiverse.oss.nyx.git.Workbench;
+
+/**
+ * Test the TemplateInvocationContextProvider and its internal classes.
+ */
+@DisplayName("TemplateInvocationContextProvider")
+public class CommandInvocationContextProviderTests {
+    @Nested
+    @DisplayName("Baseline Script injection with @ExtendWith at the class level")
+    @ExtendWith(CommandInvocationContextProvider.class)
+    static class BaselineScriptInjectionTests1 {
+        @TestTemplate
+        @DisplayName("Baseline yields to different script instances when all parameters are annotated")
+        void baselineTest1(@Baseline(Scenario.INITIAL_COMMIT) Script script1, @Baseline(Scenario.INITIAL_COMMIT) Script script2)
+            throws Exception {
+            assertNotEquals(script1.hashCode(), script2.hashCode());
+        }
+
+        @TestTemplate
+        @DisplayName("Baseline yields to different script instances when all parameters and the method are annotated")
+        @Baseline(Scenario.INITIAL_COMMIT)
+        void baselineTest2(@Baseline(Scenario.INITIAL_COMMIT) Script script1, @Baseline(Scenario.INITIAL_COMMIT) Script script2)
+            throws Exception {
+            assertNotEquals(script1.hashCode(), script2.hashCode());
+        }
+
+        @TestTemplate
+        @DisplayName("Baseline yields to different script instances when one parameter is annotated and the other is not")
+        @Baseline(Scenario.INITIAL_COMMIT)
+        void baselineTest3(@Baseline(Scenario.INITIAL_COMMIT) Script script1, Script script2)
+            throws Exception {
+            assertNotEquals(script1.hashCode(), script2.hashCode());
+        }
+
+        @TestTemplate
+        @DisplayName("Baseline yields to same script instances when only the method is annotated")
+        @Baseline(Scenario.INITIAL_COMMIT)
+        void baselineTest4(Script script1, Script script2)
+            throws Exception {
+            assertEquals(script1.hashCode(), script2.hashCode());
+        }
+    }
+
+    @Nested
+    @DisplayName("Baseline Script injection with @ExtendWith at the method level")
+    static class BaselineScriptInjectionTests2 {
+        @TestTemplate
+        @ExtendWith(CommandInvocationContextProvider.class)
+        @DisplayName("Baseline yields to different script instances when all parameters are annotated")
+        void baselineTest1(@Baseline(Scenario.INITIAL_COMMIT) Script script1, @Baseline(Scenario.INITIAL_COMMIT) Script script2)
+            throws Exception {
+            assertNotEquals(script1.hashCode(), script2.hashCode());
+        }
+
+        @TestTemplate
+        @ExtendWith(CommandInvocationContextProvider.class)
+        @DisplayName("Baseline yields to different script instances when all parameters and the method are annotated")
+        @Baseline(Scenario.INITIAL_COMMIT)
+        void baselineTest2(@Baseline(Scenario.INITIAL_COMMIT) Script script1, @Baseline(Scenario.INITIAL_COMMIT) Script script2)
+            throws Exception {
+            assertNotEquals(script1.hashCode(), script2.hashCode());
+        }
+
+        @TestTemplate
+        @ExtendWith(CommandInvocationContextProvider.class)
+        @DisplayName("Baseline yields to different script instances when one parameter is annotated and the other is not")
+        @Baseline(Scenario.INITIAL_COMMIT)
+        void baselineTest3(@Baseline(Scenario.INITIAL_COMMIT) Script script1, Script script2)
+            throws Exception {
+            assertNotEquals(script1.hashCode(), script2.hashCode());
+        }
+
+        @TestTemplate
+        @ExtendWith(CommandInvocationContextProvider.class)
+        @DisplayName("Baseline yields to same script instances when only the method is annotated")
+        @Baseline(Scenario.INITIAL_COMMIT)
+        void baselineTest4(Script script1, Script script2)
+            throws Exception {
+            assertEquals(script1.hashCode(), script2.hashCode());
+        }
+    }
+
+    @Nested
+    @DisplayName("Baseline Workbench injection with @ExtendWith at the class level")
+    @ExtendWith(CommandInvocationContextProvider.class)
+    static class BaselineWorkbenchInjectionTests1 {
+        @TestTemplate
+        @DisplayName("Baseline yields to different workbench instances when all parameters are annotated")
+        void baselineTest1(@Baseline(Scenario.INITIAL_COMMIT) Workbench workbench1, @Baseline(Scenario.INITIAL_COMMIT) Workbench workbench2)
+            throws Exception {
+            assertNotEquals(workbench1.hashCode(), workbench2.hashCode());
+        }
+
+        @TestTemplate
+        @DisplayName("Baseline yields to different workbench instances when all parameters and the method are annotated")
+        @Baseline(Scenario.INITIAL_COMMIT)
+        void baselineTest2(@Baseline(Scenario.INITIAL_COMMIT) Workbench workbench1, @Baseline(Scenario.INITIAL_COMMIT) Workbench workbench2)
+            throws Exception {
+            assertNotEquals(workbench1.hashCode(), workbench2.hashCode());
+        }
+
+        @TestTemplate
+        @DisplayName("Baseline yields to different workbench instances when one parameter is annotated and the other is not")
+        @Baseline(Scenario.INITIAL_COMMIT)
+        void baselineTest3(@Baseline(Scenario.INITIAL_COMMIT) Workbench workbench1, Workbench workbench2)
+            throws Exception {
+            assertNotEquals(workbench1.hashCode(), workbench2.hashCode());
+        }
+
+        @TestTemplate
+        @DisplayName("Baseline yields to same workbench instances when only the method is annotated")
+        @Baseline(Scenario.INITIAL_COMMIT)
+        void baselineTest4(Workbench workbench1, Workbench workbench2)
+            throws Exception {
+            assertEquals(workbench1.hashCode(), workbench2.hashCode());
+        }
+    }
+
+    @Nested
+    @DisplayName("Baseline Workbench injection with @ExtendWith at the method level")
+    static class BaselineWorkbenchInjectionTests2 {
+        @TestTemplate
+        @ExtendWith(CommandInvocationContextProvider.class)
+        @DisplayName("Baseline yields to different workbench instances when all parameters are annotated")
+        void baselineTest1(@Baseline(Scenario.INITIAL_COMMIT) Workbench workbench1, @Baseline(Scenario.INITIAL_COMMIT) Workbench workbench2)
+            throws Exception {
+            assertNotEquals(workbench1.hashCode(), workbench2.hashCode());
+        }
+
+        @TestTemplate
+        @ExtendWith(CommandInvocationContextProvider.class)
+        @DisplayName("Baseline yields to different workbench instances when all parameters and the method are annotated")
+        @Baseline(Scenario.INITIAL_COMMIT)
+        void baselineTest2(@Baseline(Scenario.INITIAL_COMMIT) Workbench workbench1, @Baseline(Scenario.INITIAL_COMMIT) Workbench workbench2)
+            throws Exception {
+            assertNotEquals(workbench1.hashCode(), workbench2.hashCode());
+        }
+
+        @TestTemplate
+        @ExtendWith(CommandInvocationContextProvider.class)
+        @DisplayName("Baseline yields to different workbench instances when one parameter is annotated and the other is not")
+        @Baseline(Scenario.INITIAL_COMMIT)
+        void baselineTest3(@Baseline(Scenario.INITIAL_COMMIT) Workbench workbench1, Workbench workbench2)
+            throws Exception {
+            assertNotEquals(workbench1.hashCode(), workbench2.hashCode());
+        }
+
+        @TestTemplate
+        @ExtendWith(CommandInvocationContextProvider.class)
+        @DisplayName("Baseline yields to same workbench instances when only the method is annotated")
+        @Baseline(Scenario.INITIAL_COMMIT)
+        void baselineTest4(Workbench workbench1, Workbench workbench2)
+            throws Exception {
+            assertEquals(workbench1.hashCode(), workbench2.hashCode());
+        }
+    }
+
+    @Nested
+    @DisplayName("CommandProxy injection with @ExtendWith at the class level")
+    @ExtendWith(CommandInvocationContextProvider.class)
+    static class CommandProxyInjectionTests1 {
+        @TestTemplate
+        @DisplayName("CommandProxy injection when the parameter is annotated with @CommandFactory and @Baseline")
+        void commandProxyTest1(@CommandSelector(Commands.ARRANGE) @Baseline(Scenario.INITIAL_COMMIT) Command commandProxy)
+            throws Exception {
+            assertNotNull(commandProxy);
+        }
+
+        @TestTemplate
+        @DisplayName("CommandProxy injection when the method is annotated with @CommandFactory and @Baseline")
+        @Baseline(Scenario.INITIAL_COMMIT)
+        void commandProxyTest2(@CommandSelector(Commands.ARRANGE) Command commandProxy)
+            throws Exception {
+            assertNotNull(commandProxy);
+        }
+    }
+
+    @Nested
+    @DisplayName("CommandProxy injection with @ExtendWith at the method level")
+    static class CommandProxyInjectionTests2 {
+        @TestTemplate
+        @ExtendWith(CommandInvocationContextProvider.class)
+        @DisplayName("CommandProxy injection when the parameter is annotated with @CommandFactory and @Baseline")
+        void commandProxyTest1(@CommandSelector(Commands.ARRANGE) @Baseline(Scenario.INITIAL_COMMIT) Command commandProxy)
+            throws Exception {
+            assertNotNull(commandProxy);
+        }
+
+        @TestTemplate
+        @ExtendWith(CommandInvocationContextProvider.class)
+        @DisplayName("CommandProxy injection when the method is annotated with @CommandFactory and @Baseline")
+        @Baseline(Scenario.INITIAL_COMMIT)
+        void commandProxyTest2(@CommandSelector(Commands.ARRANGE) Command commandProxy)
+            throws Exception {
+            assertNotNull(commandProxy);
+        }
+    }
+}

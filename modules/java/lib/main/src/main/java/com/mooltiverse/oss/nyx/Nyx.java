@@ -19,11 +19,8 @@ import static com.mooltiverse.oss.nyx.log.Markers.MAIN;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Objects;
-import java.util.Map;
-import java.util.HashMap;
+import java.util.EnumMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +29,7 @@ import com.mooltiverse.oss.nyx.command.AbstractCommand;
 import com.mooltiverse.oss.nyx.command.Arrange;
 import com.mooltiverse.oss.nyx.command.Clean;
 import com.mooltiverse.oss.nyx.command.Command;
+import com.mooltiverse.oss.nyx.command.Commands;
 import com.mooltiverse.oss.nyx.command.Infer;
 import com.mooltiverse.oss.nyx.command.Make;
 import com.mooltiverse.oss.nyx.command.Mark;
@@ -88,9 +86,9 @@ public class Nyx {
     /**
      * This map stores instances of commands so that they can be reused.
      * 
-     * Instances are lazily created and stored here in their command methods.
+     * Instances are lazily created and stored here.
      */
-    private final Map<Class<? extends AbstractCommand>, Command> commands = new HashMap<Class<? extends AbstractCommand>, Command>();
+    private final EnumMap<Commands, Command> commands = new EnumMap<Commands,Command>(Commands.class);
 
     /**
      * Default constructor.
@@ -98,6 +96,21 @@ public class Nyx {
     public Nyx() {
         super();
         logger.trace(MAIN, "New Nyx instance");
+    }
+
+    /**
+     * Creates a new Nyx instance using the given repository for Git operations.
+     * 
+     * @param repository the Git repository to work on. If {@code null} the repository will be inferred by the
+     * directory option from the configuration ({@link Configuration#getDirectory()}), otherwise the configured
+     * directory will be ignored for Git operations.
+     * 
+     * @see Configuration#getDirectory()
+     */
+    public Nyx(Repository repository) {
+        super();
+        logger.trace(MAIN, "New Nyx instance");
+        this.repository = repository;
     }
 
     /**
@@ -159,13 +172,55 @@ public class Nyx {
     }
 
     /**
-     * Runs the command implemented by the given class through its {@link AbstractCommand#run()} and returns its result.
-     * If {@code useCache} is {@code true} the command instance is only created if not already cached from previous runs.
+     * Creates a command instance from the given command identifier.
      * 
-     * @param <T> the command type (class)
+     * @param command the identifier of the command to create the instance for
      * 
-     * @param clazz the command class
-     * @param useCache enables or disables the use of command instances
+     * @return the instance of the command, never {@code null}
+     * 
+     * @throws DataAccessException in case the configuration can't be loaded for some reason.
+     * @throws IllegalPropertyException in case the configuration has some illegal options.
+     * @throws GitException in case of unexpected issues when accessing the Git repository.
+     */
+    private Command newCommandInstance(Commands command)
+        throws DataAccessException, IllegalPropertyException, GitException {
+        switch (command) {
+            case ARRANGE: return new Arrange(state(), repository());
+            case CLEAN:   return new Clean(state(), repository());
+            case INFER:   return new Infer(state(), repository());
+            case MAKE:    return new Make(state(), repository());
+            case MARK:    return new Mark(state(), repository());
+            case PUBLISH: return new Publish(state(), repository());
+            default:      throw new IllegalArgumentException(String.format("Unknown command", command.toString()));
+        }
+    }
+
+    /**
+     * Gets a command instance. If the command is already in the internal cache that instance is returned,
+     * otherwise a new instance is created and stored for later use, before it's returned.
+     * 
+     * @param command the command
+     * 
+     * @return the instance of the command, never {@code null}
+     * 
+     * @throws DataAccessException in case the configuration can't be loaded for some reason.
+     * @throws IllegalPropertyException in case the configuration has some illegal options.
+     * @throws GitException in case of unexpected issues when accessing the Git repository.
+     */
+    private Command getCommandInstance(Commands command)
+        throws DataAccessException, IllegalPropertyException, GitException {
+        if (commands.containsKey(command))
+            return commands.get(command);
+        
+        Command res = newCommandInstance(command);
+        commands.put(command, res);
+        return res;
+    }
+
+    /**
+     * Runs the given command through its {@link AbstractCommand#run()} and returns its result.
+     * 
+     * @param command the command
      * 
      * @return the return value of the {@link AbstractCommand#run()} method, invoked against the given command
      * 
@@ -174,50 +229,70 @@ public class Nyx {
      * @throws GitException in case of unexpected issues when accessing the Git repository.
      * @throws ReleaseException if the task is unable to complete for reasons due to the release process.
      */
-    private <T extends AbstractCommand> State runCommand(Class<T> clazz, boolean useCache)
+    private State runCommand(Commands command)
         throws DataAccessException, IllegalPropertyException, GitException, ReleaseException {
-        Objects.requireNonNull(clazz, "Cannot instantiate the command from a null class");
+        Objects.requireNonNull(command, "Cannot instantiate the command from a null class");
 
-        Command command = null;
-
-        if (useCache) {
-            logger.debug(MAIN, "Trying to retrieve {} command from cache", clazz.getSimpleName());
-            command = commands.get(clazz);
-            logger.debug(MAIN, "No cached instances of the {} command found", clazz.getSimpleName());
-        }
-
-        if (Objects.isNull(command)) {
-            try {
-                logger.debug(MAIN, "Instantiating new command from {}", clazz.getSimpleName());
-                Constructor<T> constructor = clazz.getConstructor(State.class, Repository.class);
-                command = constructor.newInstance(state(), repository());
-                logger.debug(MAIN, "New command from {}: {}", clazz.getSimpleName(), command.hashCode());
-
-                if (useCache) {
-                    logger.debug(MAIN, "Storing command {} in cache", clazz.getSimpleName());
-                    commands.put(clazz, command);
-                }
-            }
-            catch (NoSuchMethodException nsme) {
-                String msg = String.format("Class %s does not implement the required constructor with 2 arguments %s and %s. This must be considered a Nyx internal error and reported to maintainers.", clazz.getName(), State.class.getName(), Repository.class.getName());
-                logger.error(msg, nsme);
-                throw new NoSuchMethodError(msg);
-            }
-            catch (SecurityException | IllegalAccessException | IllegalArgumentException | InstantiationException | InvocationTargetException | ExceptionInInitializerError t) {
-                String msg = String.format("Class %s cannot be instantiated. This must be considered a Nyx internal error and reported to maintainers.", clazz.getName());
-                logger.error(msg, t);
-                throw new InstantiationError(msg);
-            }
-        }
-
-        logger.debug(MAIN, "Running command {}", clazz.getSimpleName());
-        if (command.isUpToDate()) {
-            logger.debug(MAIN, "Command {} is up to date, skipping.", clazz.getSimpleName());
+        Command commandInstance = getCommandInstance(command);
+        if (commandInstance.isUpToDate()) {
+            logger.debug(MAIN, "Command {} is up to date, skipping.", command.toString());
             return state();
         }
         else {
-            logger.debug(MAIN, "Command {} is not up to date, running...", clazz.getSimpleName());
-            return command.run();
+            logger.debug(MAIN, "Command {} is not up to date, running...", command.toString());
+            return commandInstance.run();
+        }
+    }
+
+    /**
+     * Runs {@code true} if the given command has already run and is up to date, {@code false} otherwise.
+     * 
+     * @param command the command to query the status for
+     * 
+     * @return {@code true} if the given command has already run and is up to date, {@code false} otherwise.
+     * 
+     * @throws DataAccessException in case the configuration can't be loaded for some reason.
+     * @throws IllegalPropertyException in case the configuration has some illegal options.
+     * @throws GitException in case of unexpected issues when accessing the Git repository.
+     */
+    public boolean isUpToDate(Commands command)
+        throws DataAccessException, IllegalPropertyException, GitException {
+        logger.debug(MAIN, "Nyx.isUpTodate({})", command.toString());
+        Objects.requireNonNull(command, "Command cannot be null");
+
+        return commands.containsKey(command) && commands.get(command).isUpToDate();
+    }
+
+    /**
+     * Runs the given command.
+     * 
+     * @param command the identifier of the command to run.
+     * 
+     * @throws DataAccessException in case the configuration can't be loaded for some reason.
+     * @throws IllegalPropertyException in case the configuration has some illegal options.
+     * @throws GitException in case of unexpected issues when accessing the Git repository.
+     * @throws ReleaseException if the task is unable to complete for reasons due to the release process.
+     * 
+     * @see #arrange()
+     * @see #clean()
+     * @see #infer()
+     * @see #make()
+     * @see #mark()
+     * @see #publish()
+     * @see #state()
+     */
+    public void run(Commands command)
+        throws DataAccessException, IllegalPropertyException, GitException, ReleaseException {
+        logger.debug(MAIN, "Nyx.run({})", command.toString());
+        Objects.requireNonNull(command, "Command cannot be null");
+        switch (command) {
+            case ARRANGE: arrange(); break;
+            case CLEAN:   clean(); break;
+            case INFER:   infer(); break;
+            case MAKE:    make(); break;
+            case MARK:    mark(); break;
+            case PUBLISH: publish(); break;
+            default:      throw new IllegalArgumentException(String.format("Unknown command %", command));
         }
     }
 
@@ -232,6 +307,7 @@ public class Nyx {
      * @throws ReleaseException if the task is unable to complete for reasons due to the release process.
      * 
      * @see Arrange
+     * @see #run(Commands)
      */
     public State arrange()
         throws DataAccessException, IllegalPropertyException, GitException, ReleaseException {
@@ -240,12 +316,11 @@ public class Nyx {
         // this command has no dependencies
 
         // run the command
-        return runCommand(Arrange.class, true);
+        return runCommand(Commands.ARRANGE);
     }
 
     /**
-     * Runs the {@link Clean} command and removes all the cached instances of internally referenced objects to restore the
-     * state of this class to its initial state.
+     * Runs the {@link Clean} command to restore the state of the workspace to ints initial state.
      * 
      * @throws DataAccessException in case the configuration can't be loaded for some reason.
      * @throws IllegalPropertyException in case the configuration has some illegal options.
@@ -253,6 +328,7 @@ public class Nyx {
      * @throws ReleaseException if the task is unable to complete for reasons due to the release process.
      * 
      * @see Clean
+     * @see #run(Commands)
      */
     public void clean()
         throws DataAccessException, IllegalPropertyException, GitException, ReleaseException {
@@ -260,13 +336,8 @@ public class Nyx {
 
         // this command has no dependencies
 
-        // run the command (never cached)
-        runCommand(Clean.class, false);
-
-        // clean the cache and remove lazy instances
-        repository = null;
-        configuration = null;
-        state = null;
+        // run the command
+        runCommand(Commands.CLEAN);
     }
 
     /**
@@ -280,6 +351,7 @@ public class Nyx {
      * @throws ReleaseException if the task is unable to complete for reasons due to the release process.
      * 
      * @see Infer
+     * @see #run(Commands)
      */
     public State infer()
         throws DataAccessException, IllegalPropertyException, GitException, ReleaseException {
@@ -289,7 +361,7 @@ public class Nyx {
         arrange();
 
         // run the command
-        return runCommand(Infer.class, true);
+        return runCommand(Commands.INFER);
     }
 
     /**
@@ -303,6 +375,7 @@ public class Nyx {
      * @throws ReleaseException if the task is unable to complete for reasons due to the release process.
      * 
      * @see Make
+     * @see #run(Commands)
      */
     public State make()
         throws DataAccessException, IllegalPropertyException, GitException, ReleaseException {
@@ -312,7 +385,7 @@ public class Nyx {
         infer();
 
         // run the command
-        return runCommand(Make.class, true);
+        return runCommand(Commands.MAKE);
     }
 
     /**
@@ -326,6 +399,7 @@ public class Nyx {
      * @throws ReleaseException if the task is unable to complete for reasons due to the release process.
      * 
      * @see Mark
+     * @see #run(Commands)
      */
     public State mark()
         throws DataAccessException, IllegalPropertyException, GitException, ReleaseException {
@@ -335,7 +409,7 @@ public class Nyx {
         make();
 
         // run the command
-        return runCommand(Mark.class, true);
+        return runCommand(Commands.MARK);
     }
 
     /**
@@ -349,6 +423,7 @@ public class Nyx {
      * @throws ReleaseException if the task is unable to complete for reasons due to the release process.
      * 
      * @see Publish
+     * @see #run(Commands)
      */
     public State publish()
         throws DataAccessException, IllegalPropertyException, GitException, ReleaseException {
@@ -358,6 +433,6 @@ public class Nyx {
         mark();
 
         // run the command
-        return runCommand(Publish.class, true);
+        return runCommand(Commands.PUBLISH);
     }
 }

@@ -19,71 +19,62 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestTemplate;
+import org.junit.jupiter.api.extension.ExtendWith;
 
-import com.mooltiverse.oss.nyx.configuration.Configuration;
-import com.mooltiverse.oss.nyx.git.Git;
+import com.mooltiverse.oss.nyx.command.template.Baseline;
+import com.mooltiverse.oss.nyx.command.template.CommandInvocationContextProvider;
+import com.mooltiverse.oss.nyx.command.template.CommandSelector;
 import com.mooltiverse.oss.nyx.git.Scenario;
-import com.mooltiverse.oss.nyx.state.State;
 
 @DisplayName("Publish")
-public class PublishTests {
+public class PublishTestTemplates {
     @Nested
     @DisplayName("Publish constructor")
+    @ExtendWith(CommandInvocationContextProvider.class)
     static class ConstructorTests {
         /**
          * Test that the given class has the required 2 arguments constructor and that it doesn't fail as long as it
          * has non null parameters
          */
-        @Test
+        @TestTemplate
         @DisplayName("Publish()")
-        void constructorTest()
+        @Baseline(Scenario.FROM_SCRATCH)
+        void constructorTest(@CommandSelector(Commands.PUBLISH) Command command)
             throws Exception {
-            assertNotNull(new Publish(new State(new Configuration()), Git.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory())));
-        }
-    }
-
-    @Nested
-    @DisplayName("Publish repository")
-    static class RepositoryTests {
-        /**
-         * Check that the repository() method never returns a {@code null} object
-         */
-        @Test
-        @DisplayName("Publish.repository()")
-        void repositoryTest()
-            throws Exception {
-            assertNotNull(new Publish(new State(new Configuration()), Git.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory())).repository());
+            assertNotNull(command);
         }
     }
 
     @Nested
     @DisplayName("Publish state")
+    @ExtendWith(CommandInvocationContextProvider.class)
     static class StateTests {
         /**
          * Check that the state() method never returns a {@code null} object
          */
-        @Test
+        @TestTemplate
         @DisplayName("Publish.state()")
-        void stateTest()
+        @Baseline(Scenario.FROM_SCRATCH)
+        void stateTest(@CommandSelector(Commands.PUBLISH) Command command)
             throws Exception {
-            assertNotNull(new Publish(new State(new Configuration()), Git.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory())).state());
+            assertNotNull(command.state());
         }
     }
 
     @Nested
     @DisplayName("Publish isUpToDate")
+    @ExtendWith(CommandInvocationContextProvider.class)
     public static class UpToDateTests {
         /**
          * Check that the isUpToDate() returns {@code false} when the command instance is just created and {@code true} after one execution in a repository
          * with at least one commit and in a clean state
          */
-        @Test
+        @TestTemplate
         @DisplayName("Publish.isUpToDate()")
-        void isUpToDateTest()
+        @Baseline(Scenario.INITIAL_COMMIT)
+        void isUpToDateTest(@CommandSelector(Commands.PUBLISH) Command command)
             throws Exception {
-            Publish command = new Publish(new State(new Configuration()), Git.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory()));
-
             // simply test that running it twice returns false at the first run and true the second
             assertFalse(command.isUpToDate());
             command.run();
@@ -93,12 +84,14 @@ public class PublishTests {
 
     @Nested
     @DisplayName("Publish run")
+    @ExtendWith(CommandInvocationContextProvider.class)
     public static class RunTests {
-        /*@Test
+        /*@TestTemplate
         @DisplayName("Publish.run() throws exception with a valid but empty Git repository in working directory")
-        void stateTest()
+        @Baseline(Scenario.FROM_SCRATCH)
+        void stateTest(@CommandSelector(Commands.PUBLISH) Command command)
             throws Exception {
-            assertThrows(GitException.class, () -> new Publish(new State(new Configuration()), Git.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory())).run());
+            assertThrows(GitException.class, () -> command.run());
         }*/
     }
 }

@@ -19,71 +19,63 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestTemplate;
+import org.junit.jupiter.api.extension.ExtendWith;
 
-import com.mooltiverse.oss.nyx.configuration.Configuration;
-import com.mooltiverse.oss.nyx.git.Git;
+import com.mooltiverse.oss.nyx.command.template.Baseline;
+import com.mooltiverse.oss.nyx.command.template.CommandInvocationContextProvider;
+import com.mooltiverse.oss.nyx.command.template.CommandSelector;
 import com.mooltiverse.oss.nyx.git.Scenario;
-import com.mooltiverse.oss.nyx.state.State;
 
-@DisplayName("Arrange")
-public class ArrangeTests {
+@DisplayName("Clean")
+@ExtendWith(CommandInvocationContextProvider.class)
+public class CleanTestTemplates {
     @Nested
-    @DisplayName("Arrange constructor")
+    @DisplayName("Clean constructor")
+    @ExtendWith(CommandInvocationContextProvider.class)
     static class ConstructorTests {
         /**
          * Test that the given class has the required 2 arguments constructor and that it doesn't fail as long as it
          * has non null parameters
          */
-        @Test
-        @DisplayName("Arrange()")
-        void constructorTest()
+        @TestTemplate
+        @DisplayName("Clean()")
+        @Baseline(Scenario.FROM_SCRATCH)
+        void constructorTest(@CommandSelector(Commands.CLEAN) Command command)
             throws Exception {
-            assertNotNull(new Arrange(new State(new Configuration()), Git.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory())));
+            assertNotNull(command);
         }
     }
 
     @Nested
-    @DisplayName("Arrange repository")
-    static class RepositoryTests {
-        /**
-         * Check that the repository() method never returns a {@code null} object
-         */
-        @Test
-        @DisplayName("Arrange.repository()")
-        void repositoryTest()
-            throws Exception {
-            assertNotNull(new Arrange(new State(new Configuration()), Git.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory())).repository());
-        }
-    }
-
-    @Nested
-    @DisplayName("Arrange state")
+    @DisplayName("Clean state")
+    @ExtendWith(CommandInvocationContextProvider.class)
     static class StateTests {
         /**
          * Check that the state() method never returns a {@code null} object
          */
-        @Test
-        @DisplayName("Arrange.state()")
-        void stateTest()
+        @TestTemplate
+        @DisplayName("Clean.state()")
+        @Baseline(Scenario.FROM_SCRATCH)
+        void stateTest(@CommandSelector(Commands.CLEAN) Command command)
             throws Exception {
-            assertNotNull(new Arrange(new State(new Configuration()), Git.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory())).state());
+            assertNotNull(command.state());
         }
     }
 
     @Nested
-    @DisplayName("Arrange isUpToDate")
+    @DisplayName("Clean isUpToDate")
+    @ExtendWith(CommandInvocationContextProvider.class)
     public static class UpToDateTests {
         /**
          * Check that the isUpToDate() returns {@code false} when the command instance is just created and {@code true} after one execution in a repository
          * with at least one commit and in a clean state
          */
-        @Test
-        @DisplayName("Arrange.isUpToDate()")
-        void isUpToDateTest()
+        @TestTemplate
+        @DisplayName("Clean.isUpToDate()")
+        @Baseline(Scenario.INITIAL_COMMIT)
+        void isUpToDateTest(@CommandSelector(Commands.CLEAN) Command command)
             throws Exception {
-            Arrange command = new Arrange(new State(new Configuration()), Git.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory()));
-
             // simply test that running it twice returns false at the first run and true the second
             assertFalse(command.isUpToDate());
             command.run();
@@ -92,13 +84,15 @@ public class ArrangeTests {
     }
 
     @Nested
-    @DisplayName("Arrange run")
+    @DisplayName("Clean run")
+    @ExtendWith(CommandInvocationContextProvider.class)
     public static class RunTests {
-        /*@Test
-        @DisplayName("Arrange.run() throws exception with a valid but empty Git repository in working directory")
-        void stateTest()
+        /*@TestTemplate
+        @DisplayName("Clean.run() throws exception with a valid but empty Git repository in working directory")
+        @Baseline(Scenario.FROM_SCRATCH)
+        void stateTest(@CommandSelector(Commands.CLEAN) Command command)
             throws Exception {
-            assertThrows(GitException.class, () -> new Arrange(new State(new Configuration()), Git.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory())).run());
+            assertThrows(GitException.class, () -> command.run());
         }*/
     }
 }

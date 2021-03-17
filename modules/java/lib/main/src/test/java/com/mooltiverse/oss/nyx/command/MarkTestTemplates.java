@@ -19,71 +19,63 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestTemplate;
+import org.junit.jupiter.api.extension.ExtendWith;
 
-import com.mooltiverse.oss.nyx.configuration.Configuration;
-import com.mooltiverse.oss.nyx.git.Git;
+import com.mooltiverse.oss.nyx.command.template.Baseline;
+import com.mooltiverse.oss.nyx.command.template.CommandInvocationContextProvider;
+import com.mooltiverse.oss.nyx.command.template.CommandSelector;
 import com.mooltiverse.oss.nyx.git.Scenario;
-import com.mooltiverse.oss.nyx.state.State;
 
-@DisplayName("Make")
-public class MakeTests {
+@DisplayName("Mark")
+@ExtendWith(CommandInvocationContextProvider.class)
+public class MarkTestTemplates {
     @Nested
-    @DisplayName("Make constructor")
+    @DisplayName("Mark constructor")
+    @ExtendWith(CommandInvocationContextProvider.class)
     static class ConstructorTests {
         /**
          * Test that the given class has the required 2 arguments constructor and that it doesn't fail as long as it
          * has non null parameters
          */
-        @Test
-        @DisplayName("Make()")
-        void constructorTest()
+        @TestTemplate
+        @DisplayName("Mark()")
+        @Baseline(Scenario.FROM_SCRATCH)
+        void constructorTest(@CommandSelector(Commands.MARK) Command command)
             throws Exception {
-            assertNotNull(new Make(new State(new Configuration()), Git.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory())));
+            assertNotNull(command);
         }
     }
 
     @Nested
-    @DisplayName("Make repository")
-    static class RepositoryTests {
-        /**
-         * Check that the repository() method never returns a {@code null} object
-         */
-        @Test
-        @DisplayName("Make.repository()")
-        void repositoryTest()
-            throws Exception {
-            assertNotNull(new Make(new State(new Configuration()), Git.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory())).repository());
-        }
-    }
-
-    @Nested
-    @DisplayName("Make state")
+    @DisplayName("Mark state")
+    @ExtendWith(CommandInvocationContextProvider.class)
     static class StateTests {
         /**
          * Check that the state() method never returns a {@code null} object
          */
-        @Test
-        @DisplayName("Make.state()")
-        void stateTest()
+        @TestTemplate
+        @DisplayName("Mark.state()")
+        @Baseline(Scenario.FROM_SCRATCH)
+        void stateTest(@CommandSelector(Commands.MARK) Command command)
             throws Exception {
-            assertNotNull(new Make(new State(new Configuration()), Git.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory())).state());
+            assertNotNull(command.state());
         }
     }
 
     @Nested
-    @DisplayName("Make isUpToDate")
+    @DisplayName("Mark isUpToDate")
+    @ExtendWith(CommandInvocationContextProvider.class)
     public static class UpToDateTests {
         /**
          * Check that the isUpToDate() returns {@code false} when the command instance is just created and {@code true} after one execution in a repository
          * with at least one commit and in a clean state
          */
-        @Test
-        @DisplayName("Make.isUpToDate()")
-        void isUpToDateTest()
+        @TestTemplate
+        @DisplayName("Mark.isUpToDate()")
+        @Baseline(Scenario.INITIAL_COMMIT)
+        void isUpToDateTest(@CommandSelector(Commands.MARK) Command command)
             throws Exception {
-            Make command = new Make(new State(new Configuration()), Git.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory()));
-
             // simply test that running it twice returns false at the first run and true the second
             assertFalse(command.isUpToDate());
             command.run();
@@ -92,13 +84,15 @@ public class MakeTests {
     }
 
     @Nested
-    @DisplayName("Make run")
+    @DisplayName("Mark run")
+    @ExtendWith(CommandInvocationContextProvider.class)
     public static class RunTests {
-        /*@Test
-        @DisplayName("Make.run() throws exception with a valid but empty Git repository in working directory")
-        void stateTest()
+        /*@TestTemplate
+        @DisplayName("Mark.run() throws exception with a valid but empty Git repository in working directory")
+        @Baseline(Scenario.FROM_SCRATCH)
+        void stateTest(@CommandSelector(Commands.MARK) Command command)
             throws Exception {
-            assertThrows(GitException.class, () -> new Make(new State(new Configuration()), Git.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory())).run());
+            assertThrows(GitException.class, () -> command.run());
         }*/
     }
 }
