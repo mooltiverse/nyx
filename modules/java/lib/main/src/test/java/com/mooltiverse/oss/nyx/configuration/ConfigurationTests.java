@@ -16,15 +16,18 @@
 package com.mooltiverse.oss.nyx.configuration;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assumptions.*;
 
-import java.util.Objects;
+import java.io.File;
+import java.nio.file.Files;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import com.mooltiverse.oss.nyx.configuration.mock.CustomConfigurationLayerMock;
+import com.mooltiverse.oss.nyx.configuration.mock.ConfigurationLayerMock;
+import com.mooltiverse.oss.nyx.data.Scheme;
+import com.mooltiverse.oss.nyx.data.Verbosity;
+import com.mooltiverse.oss.nyx.version.SemanticVersion;
 
 @DisplayName("Configuration")
 public class ConfigurationTests {
@@ -45,7 +48,20 @@ public class ConfigurationTests {
         @DisplayName("Configuration.getDirectory() == Defaults.DIRECTORY")
         void getDirectoryTest()
             throws Exception {
+            Configuration.setDefaultDirectory(null); // make sure the default value is reset, in case previous tests left it dirty
             assertEquals(Defaults.DIRECTORY, new Configuration().getDirectory());
+        }
+
+        @Test
+        @DisplayName("Configuration.setDirectory(File)")
+        void setDirectoryTest()
+            throws Exception {
+            File directory = Files.createTempDirectory(null).toFile();
+            Configuration.setDefaultDirectory(directory);
+            
+            assertEquals(directory, new Configuration().getDirectory());
+
+            Configuration.setDefaultDirectory(null); // clean up
         }
 
         @Test
@@ -101,16 +117,22 @@ public class ConfigurationTests {
         @DisplayName("Configuration.withPluginConfiguration(MOCK).getBump() == MOCK.getBump()")
         void getBumpTest()
             throws Exception {
+            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
             Configuration configuration = new Configuration();
+            configurationMock.bump = "alpha";
 
             // in order to make the test meaningful, make sure the default and mock values are different
-            assumeTrue(Objects.isNull(Defaults.BUMP) && !Objects.isNull(CustomConfigurationLayerMock.BUMP));
+            assertNull(Defaults.BUMP);
+            assertNotNull(configurationMock.bump);
 
             // make sure the initial values come from defaults, until we inject the plugin configuration
-            assumeTrue(Objects.isNull(Defaults.BUMP) && Objects.isNull(configuration.getBump()));
+            assertNull(Defaults.BUMP);
+            assertNull(configuration.getBump());
             
             // inject the plugin configuration and test the new value is returned from that
-            assertEquals(CustomConfigurationLayerMock.BUMP, configuration.withPluginConfiguration(new CustomConfigurationLayerMock()).getBump());
+            configuration.withPluginConfiguration(configurationMock);
+
+            assertEquals(configurationMock.bump, configuration.getBump());
 
             // now remove the plugin configuration and test that now default values are returned again
             assertNull(configuration.withPluginConfiguration(null).getBump());
@@ -120,16 +142,20 @@ public class ConfigurationTests {
         @DisplayName("Configuration.withPluginConfiguration(MOCK).getDirectory() == MOCK.getDirectory()")
         void getDirectoryTest()
             throws Exception {
+            Configuration.setDefaultDirectory(null); // clean the singleton from previous runs
+            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
             Configuration configuration = new Configuration();
+            configurationMock.directory = new File(System.getProperty("java.io.tmpdir"), "this directory does not exists");
 
             // in order to make the test meaningful, make sure the default and mock values are different
-            assumeFalse(Defaults.DIRECTORY.equals(CustomConfigurationLayerMock.DIRECTORY));
+            assertNotEquals(Defaults.DIRECTORY, configurationMock.directory);
 
             // make sure the initial values come from defaults, until we inject the plugin configuration
-            assumeTrue(Defaults.DIRECTORY.equals(configuration.getDirectory()));
+            assertEquals(Defaults.DIRECTORY, configuration.getDirectory());
             
             // inject the plugin configuration and test the new value is returned from that
-            assertEquals(CustomConfigurationLayerMock.DIRECTORY, configuration.withPluginConfiguration(new CustomConfigurationLayerMock()).getDirectory());
+            configuration.withPluginConfiguration(configurationMock);
+            assertEquals(configurationMock.directory, configuration.getDirectory());
 
             // now remove the plugin configuration and test that now default values are returned again
             assertEquals(Defaults.DIRECTORY, configuration.withPluginConfiguration(null).getDirectory());
@@ -139,16 +165,19 @@ public class ConfigurationTests {
         @DisplayName("Configuration.withPluginConfiguration(MOCK).getDryRun() == MOCK.getDryRun()")
         void getDryRunTest()
             throws Exception {
+            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
             Configuration configuration = new Configuration();
+            configurationMock.dryRun = Boolean.TRUE;
 
             // in order to make the test meaningful, make sure the default and mock values are different
-            assumeFalse(Defaults.DRY_RUN.equals(CustomConfigurationLayerMock.DRY_RUN));
+            assertNotEquals(Defaults.DRY_RUN, configurationMock.dryRun);
 
             // make sure the initial values come from defaults, until we inject the plugin configuration
-            assumeTrue(Defaults.DRY_RUN.equals(configuration.getDryRun()));
+            assertEquals(Defaults.DRY_RUN, configuration.getDryRun());
             
             // inject the plugin configuration and test the new value is returned from that
-            assertEquals(CustomConfigurationLayerMock.DRY_RUN, configuration.withPluginConfiguration(new CustomConfigurationLayerMock()).getDryRun());
+            configuration.withPluginConfiguration(configurationMock);
+            assertEquals(configurationMock.dryRun, configuration.getDryRun());
 
             // now remove the plugin configuration and test that now default values are returned again
             assertEquals(Defaults.DRY_RUN, configuration.withPluginConfiguration(null).getDryRun());
@@ -158,16 +187,19 @@ public class ConfigurationTests {
         @DisplayName("Configuration.withPluginConfiguration(MOCK).getInitialVersion() == MOCK.getInitialVersion()")
         void getInitialVersionTest()
             throws Exception {
+            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
             Configuration configuration = new Configuration();
+            configurationMock.initialVersion = SemanticVersion.valueOf("9.9.9");
 
             // in order to make the test meaningful, make sure the default and mock values are different
-            assumeFalse(Defaults.INITIAL_VERSION.equals(CustomConfigurationLayerMock.INITIAL_VERSION));
+            assertNotEquals(Defaults.INITIAL_VERSION, configurationMock.initialVersion);
 
             // make sure the initial values come from defaults, until we inject the plugin configuration
-            assumeTrue(Defaults.INITIAL_VERSION.equals(configuration.getInitialVersion()));
+            assertEquals(Defaults.INITIAL_VERSION, configuration.getInitialVersion());
             
             // inject the plugin configuration and test the new value is returned from that
-            assertEquals(CustomConfigurationLayerMock.INITIAL_VERSION, configuration.withPluginConfiguration(new CustomConfigurationLayerMock()).getInitialVersion());
+            configuration.withPluginConfiguration(configurationMock);
+            assertEquals(configurationMock.initialVersion, configuration.getInitialVersion());
 
             // now remove the plugin configuration and test that now default values are returned again
             assertEquals(Defaults.INITIAL_VERSION, configuration.withPluginConfiguration(null).getInitialVersion());
@@ -177,16 +209,19 @@ public class ConfigurationTests {
         @DisplayName("Configuration.withPluginConfiguration(MOCK).getReleasePrefix() == MOCK.getReleasePrefix()")
         void getReleasePrefixTest()
             throws Exception {
+            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
             Configuration configuration = new Configuration();
+            configurationMock.releasePrefix = "testprefix";
 
             // in order to make the test meaningful, make sure the default and mock values are different
-            assumeFalse(Defaults.RELEASE_PREFIX.equals(CustomConfigurationLayerMock.RELEASE_PREFIX));
+            assertNotEquals(Defaults.RELEASE_PREFIX, configurationMock.releasePrefix);
 
             // make sure the initial values come from defaults, until we inject the plugin configuration
-            assumeTrue(Defaults.RELEASE_PREFIX.equals(configuration.getReleasePrefix()));
+            assertEquals(Defaults.RELEASE_PREFIX, configuration.getReleasePrefix());
             
             // inject the plugin configuration and test the new value is returned from that
-            assertEquals(CustomConfigurationLayerMock.RELEASE_PREFIX, configuration.withPluginConfiguration(new CustomConfigurationLayerMock()).getReleasePrefix());
+            configuration.withPluginConfiguration(configurationMock);
+            assertEquals(configurationMock.releasePrefix, configuration.getReleasePrefix());
 
             // now remove the plugin configuration and test that now default values are returned again
             assertEquals(Defaults.RELEASE_PREFIX, configuration.withPluginConfiguration(null).getReleasePrefix());
@@ -196,16 +231,19 @@ public class ConfigurationTests {
         @DisplayName("Configuration.withPluginConfiguration(MOCK).getReleaseLenient() == MOCK.getReleaseLenient()")
         void getReleaseLenientTest()
             throws Exception {
+            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
             Configuration configuration = new Configuration();
+            configurationMock.releaseLenient = Boolean.FALSE;
 
             // in order to make the test meaningful, make sure the default and mock values are different
-            assumeFalse(Defaults.RELEASE_LENIENT.equals(CustomConfigurationLayerMock.RELEASE_LENIENT));
+            assertNotEquals(Defaults.RELEASE_LENIENT, configurationMock.releaseLenient);
 
             // make sure the initial values come from defaults, until we inject the plugin configuration
-            assumeTrue(Defaults.RELEASE_LENIENT.equals(configuration.getReleaseLenient()));
+            assertEquals(Defaults.RELEASE_LENIENT, configuration.getReleaseLenient());
             
             // inject the plugin configuration and test the new value is returned from that
-            assertEquals(CustomConfigurationLayerMock.RELEASE_LENIENT, configuration.withPluginConfiguration(new CustomConfigurationLayerMock()).getReleaseLenient());
+            configuration.withPluginConfiguration(configurationMock);
+            assertEquals(configurationMock.releaseLenient, configuration.getReleaseLenient());
 
             // now remove the plugin configuration and test that now default values are returned again
             assertEquals(Defaults.RELEASE_LENIENT, configuration.withPluginConfiguration(null).getReleaseLenient());
@@ -215,16 +253,19 @@ public class ConfigurationTests {
         @DisplayName("Configuration.withPluginConfiguration(MOCK).getScheme() == MOCK.getScheme()")
         void getSchemeTest()
             throws Exception {
+            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
             Configuration configuration = new Configuration();
+            configurationMock.scheme = Scheme.SEMVER;
 
             // since there is only one scheme available, this assumption can't be assumed
-            //assumeFalse(Defaults.SCHEME.equals(ConfigurationLayerMock.SCHEME));
+            //assertNotEquals(Defaults.SCHEME, configurationMock.scheme);
 
             // make sure the initial values come from defaults, until we inject the plugin configuration
-            assumeTrue(Defaults.SCHEME.equals(configuration.getScheme()));
+            assertEquals(Defaults.SCHEME, configuration.getScheme());
             
             // inject the plugin configuration and test the new value is returned from that
-            assertEquals(CustomConfigurationLayerMock.SCHEME, configuration.withPluginConfiguration(new CustomConfigurationLayerMock()).getScheme());
+            configuration.withPluginConfiguration(configurationMock);
+            assertEquals(configurationMock.scheme, configuration.getScheme());
 
             // now remove the plugin configuration and test that now default values are returned again
             assertEquals(Defaults.SCHEME, configuration.withPluginConfiguration(null).getScheme());
@@ -234,16 +275,19 @@ public class ConfigurationTests {
         @DisplayName("Configuration.withPluginConfiguration(MOCK).getVerbosity() == MOCK.getVerbosity()")
         void getVerbosityTest()
             throws Exception {
+            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
             Configuration configuration = new Configuration();
+            configurationMock.verbosity = Verbosity.TRACE;
 
             // in order to make the test meaningful, make sure the default and mock values are different
-            assumeFalse(Defaults.VERBOSITY.equals(CustomConfigurationLayerMock.VERBOSITY));
+            assertNotEquals(Defaults.VERBOSITY, configurationMock.verbosity);
 
             // make sure the initial values come from defaults, until we inject the plugin configuration
-            assumeTrue(Defaults.VERBOSITY.equals(configuration.getVerbosity()));
+            assertEquals(Defaults.VERBOSITY, configuration.getVerbosity());
             
             // inject the plugin configuration and test the new value is returned from that
-            assertEquals(CustomConfigurationLayerMock.VERBOSITY, configuration.withPluginConfiguration(new CustomConfigurationLayerMock()).getVerbosity());
+            configuration.withPluginConfiguration(configurationMock);
+            assertEquals(configurationMock.verbosity, configuration.getVerbosity());
 
             // now remove the plugin configuration and test that now default values are returned again
             assertEquals(Defaults.VERBOSITY, configuration.withPluginConfiguration(null).getVerbosity());
@@ -253,16 +297,21 @@ public class ConfigurationTests {
         @DisplayName("Configuration.withPluginConfiguration(MOCK).getVersion() == MOCK.getVersion()")
         void getVersionTest()
             throws Exception {
+            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
             Configuration configuration = new Configuration();
+            configurationMock.version = SemanticVersion.valueOf("11.12.13");
 
             // in order to make the test meaningful, make sure the default and mock values are different
-            assumeTrue(Objects.isNull(Defaults.VERSION) && !Objects.isNull(CustomConfigurationLayerMock.VERSION));
+            assertNull(Defaults.VERSION);
+            assertNotNull(configurationMock.version);
 
             // make sure the initial values come from defaults, until we inject the plugin configuration
-            assumeTrue(Objects.isNull(Defaults.VERSION) && Objects.isNull(configuration.getVersion()));
+            assertNull(Defaults.VERSION);
+            assertNull(configuration.getVersion());
             
             // inject the plugin configuration and test the new value is returned from that
-            assertEquals(CustomConfigurationLayerMock.VERSION, configuration.withPluginConfiguration(new CustomConfigurationLayerMock()).getVersion());
+            configuration.withPluginConfiguration(configurationMock);
+            assertEquals(configurationMock.version, configuration.getVersion());
 
             // now remove the plugin configuration and test that now default values are returned again
             assertEquals(Defaults.VERSION, configuration.withPluginConfiguration(null).getVersion());

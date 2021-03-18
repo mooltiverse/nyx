@@ -47,6 +47,11 @@ class DefaultLayer implements ConfigurationLayer, Defaults {
     private static DefaultLayer instance = null;
 
     /**
+     * The directory returned by this layer.
+     */
+    private File directory = null;
+
+    /**
      * Default constructor is private on purpose.
      */
     private DefaultLayer() {
@@ -80,8 +85,17 @@ class DefaultLayer implements ConfigurationLayer, Defaults {
     @Override
     public File getDirectory()
         throws DataAccessException, IllegalPropertyException {
-        logger.trace(DEFAULT, "Retrieving the default {} configuration option: {}", "directory", DIRECTORY);
-        return DIRECTORY;
+        logger.trace(DEFAULT, "Retrieving the default {} configuration option: {}", "directory", Objects.isNull(directory) ? DIRECTORY : directory);
+        return Objects.isNull(directory) ? DIRECTORY : directory;
+    }
+
+    /**
+     * This method allows to override the default directory that will be returned by {@link #getDirectory()}.
+     * 
+     * @param directory the new default directory. If {@code null} then the standard default directory will be used.
+     */
+    public void setDirectory(File directory) {
+        this.directory = directory;
     }
 
     /**

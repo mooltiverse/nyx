@@ -32,7 +32,7 @@ public class PublishTestTemplates {
     @Nested
     @DisplayName("Publish constructor")
     @ExtendWith(CommandInvocationContextProvider.class)
-    static class ConstructorTests {
+    public static class ConstructorTests {
         /**
          * Test that the given class has the required 2 arguments constructor and that it doesn't fail as long as it
          * has non null parameters
@@ -49,7 +49,7 @@ public class PublishTestTemplates {
     @Nested
     @DisplayName("Publish state")
     @ExtendWith(CommandInvocationContextProvider.class)
-    static class StateTests {
+    public static class StateTests {
         /**
          * Check that the state() method never returns a {@code null} object
          */

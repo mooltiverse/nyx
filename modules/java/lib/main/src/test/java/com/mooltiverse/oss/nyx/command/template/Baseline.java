@@ -26,22 +26,30 @@ import com.mooltiverse.oss.nyx.git.Script;
 import com.mooltiverse.oss.nyx.git.Workbench;
 
 /**
- * This annotation can be used to inject a Git predefined scenario into tests. This scenario comes in the form of a
- * {@link Script}, {@link Workbench} object injected or the repository used to instantiate an injected {@link Command}.
+ * This annotation can be used to define a well known Git baseline to be realized in a Git repository when
+ * a test runs. Available baselines are defined as {@link Scenario}s, which indeed is the value that must be
+ * declared by this annotation. Baselines are realized in anew temporary directory each time.
  * <br>
- * The value for this annotation is the enum value representing the {@link Scenario} to be realized for the annotated element.
+ * The baseline being realized may be directly represented by a parameter that is injected into a test method
+ * (when the injected parameter is of type {@link Script}, {@link Workbench}) or osed by other objects
+ * (i.e. of type {@link Command}), which need a local Git repository to be realized before they are created.
  * <br>
- * This annotation is meaningful when resolving items of type {@link Script}, {@link Workbench} or {@link Command} and can be
- * applied on test method parameters, methods or classes. When applied to parameters it overrides other annotations of
- * the same type at the method level, which in turn overrides those at the class or interface level.
+ * This annotation can be applied directly on test method parameters, test methods or their declaring classes
+ * and where it is defined also defines its scope. When applied on a method parameter it's scope is not shared
+ * so, for example, if you define two {@link Script} parameters and the annotation is on parameters, their
+ * scenario is not shared and you must define the annotation on each parameter. If it's defined on the test method
+ * all parameters that need a baseline will use the same baseline unless they override at the parameter level.
+ * If you apply the annotation at the class level then it will be shared among all methods within the class
+ * and their parameters, unless overridden at the method or parameter scope.
  * <br>
- * The instance of the resolved value is scoped to where the annotation is applied so if, for example, is applied at
- * the method level, a parameter of the {@link Script}, {@link Workbench} or {@link Command} type will receive the
- * same script instance unless it defines the annotation again (with the same or another value).
- * <br>
- * In order for elements using this annotation to be resolved you need to use the {@link CommandInvocationContextProvider}.
+ * In order for elements using this annotation to be resolved you need to use the
+ * {@link CommandInvocationContextProvider} extension (<code>@ExtendWith(CommandInvocationContextProvider.class)</code>)
+ * on the test method or its declaring class.
  * 
+ * @see Command
  * @see CommandInvocationContextProvider
+ * @see Script
+ * @see Workbench
  */
 @Inherited
 @Retention(RetentionPolicy.RUNTIME)

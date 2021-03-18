@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test;
 
 import com.mooltiverse.oss.nyx.configuration.Configuration;
 import com.mooltiverse.oss.nyx.data.DataAccessException;
-import com.mooltiverse.oss.nyx.configuration.mock.EmptyConfigurationLayerMock;
+import com.mooltiverse.oss.nyx.configuration.mock.ConfigurationLayerMock;
 import com.mooltiverse.oss.nyx.git.Repository;
 import com.mooltiverse.oss.nyx.git.Scenario;
 import com.mooltiverse.oss.nyx.state.State;
@@ -80,7 +80,7 @@ public class NyxTests {
             Nyx nyx = new Nyx();
 
             // initialize a repository in a new directory and pass the directory to the configuration. We'll use the plugin configuration layer to pass the directory
-            EmptyConfigurationLayerMock configurationMock = new EmptyConfigurationLayerMock();
+            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
             configurationMock.directory = Scenario.FROM_SCRATCH.realize().getWorkingDirectory();
             nyx.configuration().withPluginConfiguration(configurationMock);
 

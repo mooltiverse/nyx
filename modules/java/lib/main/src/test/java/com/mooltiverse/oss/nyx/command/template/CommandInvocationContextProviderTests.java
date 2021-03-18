@@ -36,7 +36,7 @@ public class CommandInvocationContextProviderTests {
     @Nested
     @DisplayName("Baseline Script injection with @ExtendWith at the class level")
     @ExtendWith(CommandInvocationContextProvider.class)
-    static class BaselineScriptInjectionTests1 {
+    public static class BaselineScriptInjectionTests1 {
         @TestTemplate
         @DisplayName("Baseline yields to different script instances when all parameters are annotated")
         void baselineTest1(@Baseline(Scenario.INITIAL_COMMIT) Script script1, @Baseline(Scenario.INITIAL_COMMIT) Script script2)
@@ -71,7 +71,7 @@ public class CommandInvocationContextProviderTests {
 
     @Nested
     @DisplayName("Baseline Script injection with @ExtendWith at the method level")
-    static class BaselineScriptInjectionTests2 {
+    public static class BaselineScriptInjectionTests2 {
         @TestTemplate
         @ExtendWith(CommandInvocationContextProvider.class)
         @DisplayName("Baseline yields to different script instances when all parameters are annotated")
@@ -111,7 +111,7 @@ public class CommandInvocationContextProviderTests {
     @Nested
     @DisplayName("Baseline Workbench injection with @ExtendWith at the class level")
     @ExtendWith(CommandInvocationContextProvider.class)
-    static class BaselineWorkbenchInjectionTests1 {
+    public static class BaselineWorkbenchInjectionTests1 {
         @TestTemplate
         @DisplayName("Baseline yields to different workbench instances when all parameters are annotated")
         void baselineTest1(@Baseline(Scenario.INITIAL_COMMIT) Workbench workbench1, @Baseline(Scenario.INITIAL_COMMIT) Workbench workbench2)
@@ -146,7 +146,7 @@ public class CommandInvocationContextProviderTests {
 
     @Nested
     @DisplayName("Baseline Workbench injection with @ExtendWith at the method level")
-    static class BaselineWorkbenchInjectionTests2 {
+    public static class BaselineWorkbenchInjectionTests2 {
         @TestTemplate
         @ExtendWith(CommandInvocationContextProvider.class)
         @DisplayName("Baseline yields to different workbench instances when all parameters are annotated")
@@ -186,7 +186,7 @@ public class CommandInvocationContextProviderTests {
     @Nested
     @DisplayName("CommandProxy injection with @ExtendWith at the class level")
     @ExtendWith(CommandInvocationContextProvider.class)
-    static class CommandProxyInjectionTests1 {
+    public static class CommandProxyInjectionTests1 {
         @TestTemplate
         @DisplayName("CommandProxy injection when the parameter is annotated with @CommandFactory and @Baseline")
         void commandProxyTest1(@CommandSelector(Commands.ARRANGE) @Baseline(Scenario.INITIAL_COMMIT) Command commandProxy)
@@ -205,7 +205,7 @@ public class CommandInvocationContextProviderTests {
 
     @Nested
     @DisplayName("CommandProxy injection with @ExtendWith at the method level")
-    static class CommandProxyInjectionTests2 {
+    public static class CommandProxyInjectionTests2 {
         @TestTemplate
         @ExtendWith(CommandInvocationContextProvider.class)
         @DisplayName("CommandProxy injection when the parameter is annotated with @CommandFactory and @Baseline")

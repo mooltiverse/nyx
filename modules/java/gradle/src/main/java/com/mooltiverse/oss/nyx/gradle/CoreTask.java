@@ -23,13 +23,14 @@ import org.gradle.api.plugins.ExtensionContainer;
 import com.mooltiverse.oss.nyx.Nyx;
 import com.mooltiverse.oss.nyx.data.DataAccessException;
 import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
+import com.mooltiverse.oss.nyx.state.State;
 
 /**
  * The abstract superclass for all Nyx core tasks.
  * 
  * Core tasks, as opposite to {@link LifecycleTask} are those performing some concrete actions.
  */
-abstract class CoreTask extends AbstractTask {
+public abstract class CoreTask extends AbstractTask {
     /**
      * The name used to store and retrieve the extra property that holds the shared backing Nyx instance
      * that can be used by all tasks.
@@ -133,11 +134,26 @@ abstract class CoreTask extends AbstractTask {
         if (hasSharedProperty(NYX_INSTANCE_PROPERTY))
             return Nyx.class.cast(retrieveSharedProperty(NYX_INSTANCE_PROPERTY));
         else {
-            Nyx instance = new Nyx();
+            Nyx instance = new Nyx(getProject().getProjectDir());
             // The 'version' is a standard Gradle project property (https://docs.gradle.org/current/userguide/writing_build_scripts.html#sec:standard_project_properties)
             instance.configuration().withPluginConfiguration(new ConfigurationLayer(retrieveExtension(), getProject().findProperty(GRADLE_VERSION_PROPERTY_NAME)));
             storeSharedProperty(NYX_INSTANCE_PROPERTY, instance);
             return Nyx.class.cast(retrieveSharedProperty(NYX_INSTANCE_PROPERTY));
         }
+    }
+
+    /**
+     * Returns the state of the shared backing Nyx instance.
+     * 
+     * @return the state of the shared backing Nyx instance.
+     * 
+     * @throws DataAccessException in case the configuration can't be loaded for some reason.
+     * @throws IllegalPropertyException in case the configuration has some illegal options.
+     * 
+     * @see #nyx()
+     */
+    public State state()
+        throws DataAccessException, IllegalPropertyException {
+        return nyx().state();
     }
 }

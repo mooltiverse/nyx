@@ -148,6 +148,15 @@ public class Configuration implements Root {
     }
 
     /**
+     * This method allows to override the default directory that will be returned by {@link #getDirectory()}.
+     * 
+     * @param directory the new default directory. If {@code null} then the standard default directory will be used.
+     */
+    public static void setDefaultDirectory(File directory) {
+        DefaultLayer.getInstance().setDirectory(directory);
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override

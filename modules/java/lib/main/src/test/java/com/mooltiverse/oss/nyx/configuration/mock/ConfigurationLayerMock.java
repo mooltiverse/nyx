@@ -20,112 +20,61 @@ import java.io.File;
 import com.mooltiverse.oss.nyx.configuration.ConfigurationLayer;
 import com.mooltiverse.oss.nyx.data.Scheme;
 import com.mooltiverse.oss.nyx.data.Verbosity;
-import com.mooltiverse.oss.nyx.version.SemanticVersion;
 import com.mooltiverse.oss.nyx.version.Version;
 
 /**
- * A fake configuration layer, with (possibly) unique default values that allow the tests to distinguish
- * when values come from this object or others. Baseline is the default values as this class tries
- * to have all of its values different from that, allowing tests to compare they are not equal.
- * 
- * Values can also be set for more complex tests. Please note that Nyx doesn't resolve values twice
- * so you should set values only before you pass this object to Nyx.
+ * A fake configuration layer, with null or empty values to be set for specific purposes.
  */
-public class CustomConfigurationLayerMock implements ConfigurationLayer {
+public class ConfigurationLayerMock implements ConfigurationLayer {
     /**
      * The value returned by this mock object.
      */
-    public static final String BUMP = "mockIdentifier";
+    public String bump = null;
 
     /**
      * The value returned by this mock object. This is an abstract path and does not exists on the file system.
      */
-    public static final File DIRECTORY = new File(System.getProperty("java.io.tmpdir"), "mockDirectory");
+    public File directory = null;
 
     /**
      * The value returned by this mock object.
      */
-    public static final Boolean DRY_RUN = Boolean.TRUE;
+    public Boolean dryRun = null;
 
     /**
      * The value returned by this mock object.
      */
-    public static final Version INITIAL_VERSION = SemanticVersion.valueOf("0.9.9");
+    public Version initialVersion = null;
 
     /**
      * The value returned by this mock object.
      */
-    public static final String RELEASE_PREFIX = "mock";
+    public String releasePrefix = null;
 
     /**
      * The value returned by this mock object.
      */
-    public static final Boolean RELEASE_LENIENT = Boolean.FALSE;
+    public Boolean releaseLenient = null;
 
     /**
      * The value returned by this mock object.
      */
-    public static final Scheme SCHEME = Scheme.SEMVER;
+    public Scheme scheme = null;
 
     /**
      * The value returned by this mock object.
      */
-    public static final Verbosity VERBOSITY = Verbosity.TRACE;
+    public Verbosity verbosity = null;
 
     /**
      * The value returned by this mock object.
      */
-    public static final Version VERSION = SemanticVersion.valueOf("11.12.13");
-
-    /**
-     * The value returned by this mock object.
-     */
-    public String bump = BUMP;
-
-    /**
-     * The value returned by this mock object. This is an abstract path and does not exists on the file system.
-     */
-    public File directory = DIRECTORY;
-
-    /**
-     * The value returned by this mock object.
-     */
-    public Boolean dryRun = DRY_RUN;
-
-    /**
-     * The value returned by this mock object.
-     */
-    public Version initialVersion = INITIAL_VERSION;
-
-    /**
-     * The value returned by this mock object.
-     */
-    public String releasePrefix = RELEASE_PREFIX;
-
-    /**
-     * The value returned by this mock object.
-     */
-    public Boolean releaseLenient = RELEASE_LENIENT;
-
-    /**
-     * The value returned by this mock object.
-     */
-    public Scheme scheme = SCHEME;
-
-    /**
-     * The value returned by this mock object.
-     */
-    public Verbosity verbosity = VERBOSITY;
-
-    /**
-     * The value returned by this mock object.
-     */
-    public Version version = VERSION;
+    public Version version = null;
 
     /**
      * Default constructor
      */
-    public CustomConfigurationLayerMock() {
+    public ConfigurationLayerMock() {
         super();
     }
 

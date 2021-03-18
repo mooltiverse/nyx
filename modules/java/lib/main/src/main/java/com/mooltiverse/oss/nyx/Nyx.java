@@ -96,21 +96,24 @@ public class Nyx {
     public Nyx() {
         super();
         logger.trace(MAIN, "New Nyx instance");
+
+        // this is not actually needed for production but some tests may leave the default directory dirty, so this is safer
+        Configuration.setDefaultDirectory(null);
     }
 
     /**
-     * Creates a new Nyx instance using the given repository for Git operations.
+     * Creates a new Nyx instance using the given directory as the base directory.
      * 
-     * @param repository the Git repository to work on. If {@code null} the repository will be inferred by the
-     * directory option from the configuration ({@link Configuration#getDirectory()}), otherwise the configured
-     * directory will be ignored for Git operations.
+     * @param directory the default directory. If not {@code null} this overrides the configuration
+     * ({@link Configuration#getDirectory()}).
      * 
      * @see Configuration#getDirectory()
      */
-    public Nyx(Repository repository) {
+    public Nyx(File directory) {
         super();
-        logger.trace(MAIN, "New Nyx instance");
-        this.repository = repository;
+        logger.trace(MAIN, "New Nyx instance in directory {}", Objects.isNull(directory) ? "null" : directory.getAbsolutePath());
+        // just override the default directory right away in the singleton default layer
+        Configuration.setDefaultDirectory(directory);
     }
 
     /**

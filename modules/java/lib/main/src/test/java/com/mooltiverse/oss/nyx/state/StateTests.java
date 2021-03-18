@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import com.mooltiverse.oss.nyx.configuration.Configuration;
-import com.mooltiverse.oss.nyx.configuration.mock.EmptyConfigurationLayerMock;
+import com.mooltiverse.oss.nyx.configuration.mock.ConfigurationLayerMock;
 import com.mooltiverse.oss.nyx.version.Version;
 import com.mooltiverse.oss.nyx.version.SemanticVersion;
 
@@ -147,7 +147,7 @@ public class StateTests {
         void getVersionWithPrefixTest()
             throws Exception {
             Configuration configuration = new Configuration();
-            EmptyConfigurationLayerMock configurationMock = new EmptyConfigurationLayerMock();
+            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
             configuration.withPluginConfiguration(configurationMock);
             State state = new State(configuration);
 
@@ -166,7 +166,7 @@ public class StateTests {
         void getVersionWithoutPrefixTest()
             throws Exception {
             Configuration configuration = new Configuration();
-            EmptyConfigurationLayerMock configurationMock = new EmptyConfigurationLayerMock();
+            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
             configuration.withPluginConfiguration(configurationMock);
             State state = new State(configuration);
 

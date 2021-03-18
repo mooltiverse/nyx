@@ -96,7 +96,6 @@ public abstract class InferTask extends CoreTask {
     public void infer()
         throws NyxException {
         getLogger().info("Running InferTask: {}", NAME);
-
         // just a draft to test the wireframing between objects
         nyx().infer();
 

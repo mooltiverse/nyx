@@ -13,45 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mooltiverse.oss.nyx.command.template;
+package com.mooltiverse.oss.nyx.gradle.template;
 
-import com.mooltiverse.oss.nyx.Nyx;
+import org.gradle.api.Action;
+import org.gradle.api.Task;
+
 import com.mooltiverse.oss.nyx.ReleaseException;
 import com.mooltiverse.oss.nyx.command.Command;
-import com.mooltiverse.oss.nyx.command.Commands;
 import com.mooltiverse.oss.nyx.data.DataAccessException;
 import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
 import com.mooltiverse.oss.nyx.git.GitException;
+import com.mooltiverse.oss.nyx.gradle.CoreTask;
 import com.mooltiverse.oss.nyx.state.State;
 
 /**
  * This is a proxy implementation to be used in test templates and allows to run a command
- * through the {@link Nyx} class business methods.
+ * as a Gradle {@link Task}.
  */
-class NyxCommand implements Command {
+class GradleTaskCommand implements Command {
     /**
-     * The Nyx class private instance.
+     * The Gradle task private instance.
      */
-    private final Nyx nyx;
-
-    /**
-     * The command to be invoked by this class.
-     */
-    private final Commands command;
+    private final CoreTask task;
 
     /**
      * Constructor.
      * 
-     * @param nyx the Nyx instance to use to run the command
-     * @param command the command to run when the {@link #run()} method is invoked.
+     * @param task the Gradle task instance to use to run the command
      * 
      * @throws Exception in case of any issue
      */
-    public NyxCommand(Nyx nyx, Commands command)
-        throws Exception {
+    public GradleTaskCommand(CoreTask task) {
         super();
-        this.nyx = nyx;
-        this.command = command;
+        this.task = task;
     }
 
     /**
@@ -60,11 +54,11 @@ class NyxCommand implements Command {
     @Override
     public State state() {
         try {
-            return nyx.state();
+            return task.state();
         }
         catch (DataAccessException | IllegalPropertyException e) {
             // wrap any exception to an unchecked exception
-            throw new RuntimeException("Couldn't get the state from the Nyx class", e);
+            throw new RuntimeException("Couldn't get the state from the Nyx Gradle task", e);
         }
     }
 
@@ -74,7 +68,7 @@ class NyxCommand implements Command {
     @Override
     public boolean isUpToDate()
         throws DataAccessException, IllegalPropertyException, GitException {
-        return nyx.isUpToDate(command);
+        return task.getState().getUpToDate();
     }
 
     /**
@@ -83,7 +77,9 @@ class NyxCommand implements Command {
     @Override
     public State run()
         throws DataAccessException, IllegalPropertyException, GitException, ReleaseException {
-        nyx.run(command);
-        return nyx.state();
+        for (Action<? super Task> action: task.getActions()) {
+            action.execute(task);
+        }
+        return task.state();
     }
 }

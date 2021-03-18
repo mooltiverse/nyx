@@ -23,36 +23,41 @@ import org.gradle.api.Project;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestTemplate;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+import com.mooltiverse.oss.nyx.command.template.Baseline;
+import com.mooltiverse.oss.nyx.gradle.template.GradleCommandInvocationContextProvider;
+import com.mooltiverse.oss.nyx.git.Scenario;
 
 /**
  * Tests the Gradle task.<br>
  */
 @DisplayName("Extension")
-public class NyxExtensionTests extends AbstractTests  {
+public class NyxExtensionTestTemplates {
     /**
      * Performs checks on the extension default values at the time it is created.
      */
     @Nested
     @DisplayName("NyxExtension default values")
+    @ExtendWith(GradleCommandInvocationContextProvider.class)
     class DefaultsTests {
-        @Test
+        @TestTemplate
         @DisplayName("NyxExtension.getBump() default value")
-        void getBumpDefaultTest()
+        @Baseline(Scenario.FROM_SCRATCH)
+        void getBumpDefaultTest(Project project)
             throws Exception {
-            // apply the plugin to a new project and retrieve the extension
-            NyxExtension extension = newTestProject(null, true).getExtensions().getByType(NyxExtension.class);
+            NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
 
             assertFalse(extension.getBump().isPresent());
             assertNull(extension.getBump().getOrNull());
         }
 
-        @Test
+        @TestTemplate
         @DisplayName("NyxExtension.getDirectory() default value")
-        void getDirectoryDefaultTest()
+        @Baseline(Scenario.FROM_SCRATCH)
+        void getDirectoryDefaultTest(Project project)
             throws Exception {
-            // apply the plugin to a new project and retrieve the extension
-            Project project = newTestProject(null, true);
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
 
             // the default must be the project directory
@@ -60,67 +65,66 @@ public class NyxExtensionTests extends AbstractTests  {
             assertEquals(project.getProjectDir(), extension.getDirectory().get().getAsFile());
         }
 
-        @Test
+        @TestTemplate
         @DisplayName("NyxExtension.getDryRun() default value")
-        void getDryRunDefaultTest()
+        @Baseline(Scenario.FROM_SCRATCH)
+        void getDryRunDefaultTest(Project project)
             throws Exception {
-            // apply the plugin to a new project and retrieve the extension
-            NyxExtension extension = newTestProject(null, true).getExtensions().getByType(NyxExtension.class);
+            NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
 
             assertFalse(extension.getDryRun().isPresent());
             assertNull(extension.getDryRun().getOrNull());
         }
 
-        @Test
+        @TestTemplate
         @DisplayName("NyxExtension.getInitialVersion() default value")
-        void getInitialVersionDefaultTest()
+        @Baseline(Scenario.FROM_SCRATCH)
+        void getInitialVersionDefaultTest(Project project)
             throws Exception {
-            // apply the plugin to a new project and retrieve the extension
-            NyxExtension extension = newTestProject(null, true).getExtensions().getByType(NyxExtension.class);
+            NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
 
             assertFalse(extension.getInitialVersion().isPresent());
             assertNull(extension.getInitialVersion().getOrNull());
         }
 
-        @Test
+        @TestTemplate
         @DisplayName("NyxExtension.getReleaseLenient() default value")
-        void getReleaseLenientDefaultTest()
+        @Baseline(Scenario.FROM_SCRATCH)
+        void getReleaseLenientDefaultTest(Project project)
             throws Exception {
-            // apply the plugin to a new project and retrieve the extension
-            NyxExtension extension = newTestProject(null, true).getExtensions().getByType(NyxExtension.class);
+            NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
 
             assertFalse(extension.getReleaseLenient().isPresent());
             assertNull(extension.getReleaseLenient().getOrNull());
         }
 
-        @Test
+        @TestTemplate
         @DisplayName("NyxExtension.getReleasePrefix() default value")
-        void getReleasePrefixDefaultTest()
+        @Baseline(Scenario.FROM_SCRATCH)
+        void getReleasePrefixDefaultTest(Project project)
             throws Exception {
-            // apply the plugin to a new project and retrieve the extension
-            NyxExtension extension = newTestProject(null, true).getExtensions().getByType(NyxExtension.class);
+            NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
 
             assertFalse(extension.getReleasePrefix().isPresent());
             assertNull(extension.getReleasePrefix().getOrNull());
         }
 
-        @Test
+        @TestTemplate
         @DisplayName("NyxExtension.getScheme() default value")
-        void getSchemeDefaultTest()
+        @Baseline(Scenario.FROM_SCRATCH)
+        void getSchemeDefaultTest(Project project)
             throws Exception {
-            // apply the plugin to a new project and retrieve the extension
-            NyxExtension extension = newTestProject(null, true).getExtensions().getByType(NyxExtension.class);
+            NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
 
             assertFalse(extension.getScheme().isPresent());
             assertNull(extension.getScheme().getOrNull());
         }
 
-        @Test
+        @TestTemplate
         @DisplayName("NyxExtension.getVerbosity() default value")
-        void getVerbosityDefaultTest()
+        @Baseline(Scenario.FROM_SCRATCH)
+        void getVerbosityDefaultTest(Project project)
             throws Exception {
-            // apply the plugin to a new project and retrieve the extension
-            Project project = newTestProject(null, true);
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
 
             assertFalse(extension.getVerbosity().isPresent());

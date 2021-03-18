@@ -28,12 +28,11 @@ import com.mooltiverse.oss.nyx.command.template.CommandSelector;
 import com.mooltiverse.oss.nyx.git.Scenario;
 
 @DisplayName("Clean")
-@ExtendWith(CommandInvocationContextProvider.class)
 public class CleanTestTemplates {
     @Nested
     @DisplayName("Clean constructor")
     @ExtendWith(CommandInvocationContextProvider.class)
-    static class ConstructorTests {
+    public static class ConstructorTests {
         /**
          * Test that the given class has the required 2 arguments constructor and that it doesn't fail as long as it
          * has non null parameters
@@ -50,7 +49,7 @@ public class CleanTestTemplates {
     @Nested
     @DisplayName("Clean state")
     @ExtendWith(CommandInvocationContextProvider.class)
-    static class StateTests {
+    public static class StateTests {
         /**
          * Check that the state() method never returns a {@code null} object
          */

@@ -22,42 +22,46 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.Objects;
 
 import org.gradle.api.Project;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestTemplate;
 
+import com.mooltiverse.oss.nyx.command.template.Baseline;
 import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
+import com.mooltiverse.oss.nyx.git.Scenario;
+import com.mooltiverse.oss.nyx.gradle.template.GradleCommandInvocationContextProvider;
 
 /**
  * Tests the Gradle task.<br>
  */
 @DisplayName("ConfigurationLayer")
-public class ConfigurationLayerTests extends AbstractTests  {
+public class ConfigurationLayerTestTemplates {
     /**
      * Performs checks on the extension default values at the time it is created.
      */
     @Nested
     @DisplayName("ConfigurationLayer default values")
+    @ExtendWith(GradleCommandInvocationContextProvider.class)
     class DefaultsTests {
-        @Test
+        @TestTemplate
         @DisplayName("ConfigurationLayer.getBump() default value")
-        void getBumpDefaultTest()
+        @Baseline(Scenario.FROM_SCRATCH)
+        void getBumpDefaultTest(Project project)
             throws Exception {
-            // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
-            NyxExtension extension = newTestProject(null, true).getExtensions().getByType(NyxExtension.class);
+            NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
             ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
 
             assertFalse(extension.getBump().isPresent());
             assertNull(configurationLayer.getBump());
         }
 
-        @Test
+        @TestTemplate
         @DisplayName("ConfigurationLayer.getDirectory() default value")
-        void getDirectoryDefaultTest()
+        @Baseline(Scenario.FROM_SCRATCH)
+        void getDirectoryDefaultTest(Project project)
             throws Exception {
-            // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
-            Project project = newTestProject(null, true);
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
             ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
 
@@ -66,72 +70,71 @@ public class ConfigurationLayerTests extends AbstractTests  {
             assertEquals(project.getProjectDir().getAbsolutePath(), configurationLayer.getDirectory().getAbsolutePath());
         }
 
-        @Test
+        @TestTemplate
         @DisplayName("ConfigurationLayer.getDryRun() default value")
-        void getDryRunDefaultTest()
+        @Baseline(Scenario.FROM_SCRATCH)
+        void getDryRunDefaultTest(Project project)
             throws Exception {
-            // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
-            NyxExtension extension = newTestProject(null, true).getExtensions().getByType(NyxExtension.class);
+            NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
             ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
 
             assertFalse(extension.getDryRun().isPresent());
             assertNull(configurationLayer.getDryRun());
         }
 
-        @Test
+        @TestTemplate
         @DisplayName("ConfigurationLayer.getInitialVersion() default value")
-        void getInitialVersionTest()
+        @Baseline(Scenario.FROM_SCRATCH)
+        void getInitialVersionTest(Project project)
             throws Exception {
-            // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
-            NyxExtension extension = newTestProject(null, true).getExtensions().getByType(NyxExtension.class);
+            NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
             ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
 
             assertFalse(extension.getInitialVersion().isPresent());
             assertNull(configurationLayer.getInitialVersion());
         }
 
-        @Test
+        @TestTemplate
         @DisplayName("ConfigurationLayer.getReleaseLenient() default value")
-        void getReleaseLenientDefaultTest()
+        @Baseline(Scenario.FROM_SCRATCH)
+        void getReleaseLenientDefaultTest(Project project)
             throws Exception {
-            // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
-            NyxExtension extension = newTestProject(null, true).getExtensions().getByType(NyxExtension.class);
+            NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
             ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
 
             assertFalse(extension.getReleaseLenient().isPresent());
             assertNull(configurationLayer.getReleaseLenient());
         }
 
-        @Test
+        @TestTemplate
         @DisplayName("ConfigurationLayer.getReleasePrefix() default value")
-        void getReleasePrefixDefaultTest()
+        @Baseline(Scenario.FROM_SCRATCH)
+        void getReleasePrefixDefaultTest(Project project)
             throws Exception {
-            // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
-            NyxExtension extension = newTestProject(null, true).getExtensions().getByType(NyxExtension.class);
+            NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
             ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
 
             assertFalse(extension.getReleasePrefix().isPresent());
             assertNull(configurationLayer.getReleasePrefix());
         }
 
-        @Test
+        @TestTemplate
         @DisplayName("ConfigurationLayer.getScheme() default value")
-        void getSchemeDefaultTest()
+        @Baseline(Scenario.FROM_SCRATCH)
+        void getSchemeDefaultTest(Project project)
             throws Exception {
-            // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
-            NyxExtension extension = newTestProject(null, true).getExtensions().getByType(NyxExtension.class);
+            NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
             ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
 
             assertFalse(extension.getScheme().isPresent());
             assertNull(configurationLayer.getScheme());
         }
 
-        @Test
+        @TestTemplate
         @DisplayName("ConfigurationLayer.getVerbosity() default value")
-        void getVerbosityDefaultTest()
+        @Baseline(Scenario.FROM_SCRATCH)
+        void getVerbosityDefaultTest(Project project)
             throws Exception {
-            // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
-            Project project = newTestProject(null, true);
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
             ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
 
@@ -141,12 +144,11 @@ public class ConfigurationLayerTests extends AbstractTests  {
             else assertEquals(project.getLogging().getLevel(), configurationLayer.getVerbosity().getLevel());
         }
 
-        @Test
+        @TestTemplate
         @DisplayName("ConfigurationLayer.getVersion() default value")
-        void getVersionDefaultTest()
+        @Baseline(Scenario.FROM_SCRATCH)
+        void getVersionDefaultTest(Project project)
             throws Exception {
-            // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
-            Project project = newTestProject(null, true);
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
 
             // the extension has no 'version' property as it must be taken from the standard project property with the same name
@@ -169,14 +171,14 @@ public class ConfigurationLayerTests extends AbstractTests  {
      */
     @Nested
     @DisplayName("ConfigurationLayer wrong values")
+    @ExtendWith(GradleCommandInvocationContextProvider.class)
     class WrongValueTests {
         /* This test is commented because it has nothing to test
-        @Test
+        @TestTemplate
         @DisplayName("ConfigurationLayer.getBump().set() throws IllegalPropertyException with illegal value")
-        void exceptionUsingGetBumpWithWrongValueTest()
+        @Baseline(Scenario.FROM_SCRATCH)
+        void exceptionUsingGetBumpWithWrongValueTest(Project project)
             throws Exception {
-            // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
-            Project project = newTestProject(null, true);
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
             ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
 
@@ -184,12 +186,11 @@ public class ConfigurationLayerTests extends AbstractTests  {
         }*/
 
         /* This test is commented because it has nothing to test
-        @Test
+        @TestTemplate
         @DisplayName("ConfigurationLayer.getDirectory().set() throws IllegalPropertyException with illegal value")
-        void exceptionUsingGetDirectoryWithWrongValueTest()
+        @Baseline(Scenario.FROM_SCRATCH)
+        void exceptionUsingGetDirectoryWithWrongValueTest(Project project)
             throws Exception {
-            // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
-            Project project = newTestProject(null, true);
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
             ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
 
@@ -198,12 +199,11 @@ public class ConfigurationLayerTests extends AbstractTests  {
         }*/
 
         /* This test is commented because it has nothing to test
-        @Test
+        @TestTemplate
         @DisplayName("ConfigurationLayer.getDryRun().set() throws IllegalPropertyException with illegal value")
-        void exceptionUsingGetDryRunWithWrongValueTest()
+        @Baseline(Scenario.FROM_SCRATCH)
+        void exceptionUsingGetDryRunWithWrongValueTest(Project project)
             throws Exception {
-            // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
-            Project project = newTestProject(null, true);
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
             ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
 
@@ -211,12 +211,11 @@ public class ConfigurationLayerTests extends AbstractTests  {
             // since the property is already modelled as a boolean, Gradle provides the validation for this
         }*/
 
-        /*@Test
+        /*@TestTemplate
         @DisplayName("ConfigurationLayer.getInitialVersion().set() throws IllegalPropertyException with illegal value")
-        void exceptionUsingGetInitialVersionWithWrongValueTest()
+        @Baseline(Scenario.FROM_SCRATCH)
+        void exceptionUsingGetInitialVersionWithWrongValueTest(Project project)
             throws Exception {
-            // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
-            Project project = newTestProject(null, true);
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
             ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
 
@@ -225,12 +224,11 @@ public class ConfigurationLayerTests extends AbstractTests  {
         }*/
 
         /* This test is commented because it has nothing to test
-        @Test
+        @TestTemplate
         @DisplayName("ConfigurationLayer.getReleasePrefix().set() throws IllegalPropertyException with illegal value")
-        void exceptionUsingGetReleasePrefixWithWrongValueTest()
+        @Baseline(Scenario.FROM_SCRATCH)
+        void exceptionUsingGetReleasePrefixWithWrongValueTest(Project project)
             throws Exception {
-            // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
-            Project project = newTestProject(null, true);
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
             ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
 
@@ -238,12 +236,11 @@ public class ConfigurationLayerTests extends AbstractTests  {
         }*/
 
         /* This test is commented because it has nothing to test
-        @Test
+        @TestTemplate
         @DisplayName("ConfigurationLayer.getReleaseLenient().set() throws IllegalPropertyException with illegal value")
-        void exceptionUsingGetReleaseLenientWithWrongValueTest()
+        @Baseline(Scenario.FROM_SCRATCH)
+        void exceptionUsingGetReleaseLenientWithWrongValueTest(Project project)
             throws Exception {
-            // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
-            Project project = newTestProject(null, true);
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
             ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
 
@@ -251,12 +248,11 @@ public class ConfigurationLayerTests extends AbstractTests  {
             // since the property is already modelled as a boolean, Gradle provides the validation for this
         }*/
 
-        @Test
+        @TestTemplate
         @DisplayName("ConfigurationLayer.getScheme().set() throws IllegalPropertyException with illegal value")
-        void exceptionUsingGetSchemeWithWrongValueTest()
+        @Baseline(Scenario.FROM_SCRATCH)
+        void exceptionUsingGetSchemeWithWrongValueTest(Project project)
             throws Exception {
-            // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
-            Project project = newTestProject(null, true);
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
             ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
 
@@ -265,12 +261,11 @@ public class ConfigurationLayerTests extends AbstractTests  {
             assertThrows(IllegalPropertyException.class, () -> { configurationLayer.getScheme(); });
         }
 
-        @Test
+        @TestTemplate
         @DisplayName("ConfigurationLayer.getVerbosity().set() throws IllegalPropertyException with illegal value")
-        void exceptionUsingGetVerbosityWithWrongValueTest()
+        @Baseline(Scenario.FROM_SCRATCH)
+        void exceptionUsingGetVerbosityWithWrongValueTest(Project project)
             throws Exception {
-            // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
-            Project project = newTestProject(null, true);
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
             ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
 
@@ -279,12 +274,11 @@ public class ConfigurationLayerTests extends AbstractTests  {
             assertThrows(IllegalPropertyException.class, () -> { configurationLayer.getVerbosity(); });
         }
 
-        @Test
+        @TestTemplate
         @DisplayName("ConfigurationLayer.getVersion() throws IllegalPropertyException with illegal value")
-        void exceptionUsingGetVersionWithWrongValueTest()
+        @Baseline(Scenario.FROM_SCRATCH)
+        void exceptionUsingGetVersionWithWrongValueTest(Project project)
             throws Exception {
-            // apply the plugin to a new project and retrieve the extension and the configuration layer adapter
-            Project project = newTestProject(null, true);
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
 
             // set the property with an illegal value
