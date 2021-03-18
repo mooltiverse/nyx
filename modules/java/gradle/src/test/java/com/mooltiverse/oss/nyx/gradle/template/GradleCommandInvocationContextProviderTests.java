@@ -59,9 +59,19 @@ public class GradleCommandInvocationContextProviderTests {
     static class BaselineWorkbenchInjectionTests2 extends CommandInvocationContextProviderTests.BaselineWorkbenchInjectionTests2 {}
 
     @Nested
+    @DisplayName("Command injection with @ExtendWith at the class level")
+    @ExtendWith(GradleCommandInvocationContextProvider.class)
+    static class CommandInjectionTests1 extends CommandInvocationContextProviderTests.CommandInjectionTests1 {}
+
+    @Nested
     @DisplayName("CommandProxy injection with @ExtendWith at the class level")
     @ExtendWith(GradleCommandInvocationContextProvider.class)
     static class CommandProxyInjectionTests1 extends CommandInvocationContextProviderTests.CommandProxyInjectionTests1 {}
+
+    @Nested
+    @DisplayName("Command injection with @ExtendWith at the method level")
+    @ExtendWith(GradleCommandInvocationContextProvider.class)
+    static class CommandInjectionTests2 extends CommandInvocationContextProviderTests.CommandInjectionTests2 {}
 
     @Nested
     @DisplayName("CommandProxy injection with @ExtendWith at the method level")

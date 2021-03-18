@@ -31,8 +31,9 @@ import com.mooltiverse.oss.nyx.git.Workbench;
  * declared by this annotation. Baselines are realized in anew temporary directory each time.
  * <br>
  * The baseline being realized may be directly represented by a parameter that is injected into a test method
- * (when the injected parameter is of type {@link Script}, {@link Workbench}) or osed by other objects
- * (i.e. of type {@link Command}), which need a local Git repository to be realized before they are created.
+ * (when the injected parameter is of type {@link Script}, {@link Workbench}) or used by other objects
+ * (i.e. of type {@link Command} or {@link CommandProxy}), which need a local Git repository to be realized
+ * before they are created.
  * <br>
  * This annotation can be applied directly on test method parameters, test methods or their declaring classes
  * and where it is defined also defines its scope. When applied on a method parameter it's scope is not shared
@@ -46,7 +47,7 @@ import com.mooltiverse.oss.nyx.git.Workbench;
  * {@link CommandInvocationContextProvider} extension (<code>@ExtendWith(CommandInvocationContextProvider.class)</code>)
  * on the test method or its declaring class.
  * 
- * @see Command
+ * @see CommandProxy
  * @see CommandInvocationContextProvider
  * @see Script
  * @see Workbench

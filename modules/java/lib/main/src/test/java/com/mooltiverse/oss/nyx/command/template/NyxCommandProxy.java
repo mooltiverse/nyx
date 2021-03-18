@@ -17,7 +17,6 @@ package com.mooltiverse.oss.nyx.command.template;
 
 import com.mooltiverse.oss.nyx.Nyx;
 import com.mooltiverse.oss.nyx.ReleaseException;
-import com.mooltiverse.oss.nyx.command.Command;
 import com.mooltiverse.oss.nyx.command.Commands;
 import com.mooltiverse.oss.nyx.data.DataAccessException;
 import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
@@ -28,7 +27,7 @@ import com.mooltiverse.oss.nyx.state.State;
  * This is a proxy implementation to be used in test templates and allows to run a command
  * through the {@link Nyx} class business methods.
  */
-class NyxCommand implements Command {
+class NyxCommandProxy implements CommandProxy {
     /**
      * The Nyx class private instance.
      */
@@ -47,11 +46,19 @@ class NyxCommand implements Command {
      * 
      * @throws Exception in case of any issue
      */
-    public NyxCommand(Nyx nyx, Commands command)
+    public NyxCommandProxy(Nyx nyx, Commands command)
         throws Exception {
         super();
         this.nyx = nyx;
         this.command = command;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getContextname() {
+        return "nyx";
     }
 
     /**

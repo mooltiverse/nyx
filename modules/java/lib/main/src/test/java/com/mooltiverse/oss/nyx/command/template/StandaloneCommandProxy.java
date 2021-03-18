@@ -13,39 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mooltiverse.oss.nyx.gradle.template;
-
-import org.gradle.api.Action;
-import org.gradle.api.Task;
+package com.mooltiverse.oss.nyx.command.template;
 
 import com.mooltiverse.oss.nyx.ReleaseException;
-import com.mooltiverse.oss.nyx.command.template.CommandProxy;
+import com.mooltiverse.oss.nyx.command.Command;
 import com.mooltiverse.oss.nyx.data.DataAccessException;
 import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
 import com.mooltiverse.oss.nyx.git.GitException;
-import com.mooltiverse.oss.nyx.gradle.CoreTask;
 import com.mooltiverse.oss.nyx.state.State;
 
 /**
  * This is a proxy implementation to be used in test templates and allows to run a command
- * as a Gradle {@link Task}.
+ * standalone, so each method invocation is dispatched directly to the backing {@link Command} instance.
  */
-class GradleTaskCommand implements CommandProxy {
+class StandaloneCommandProxy implements CommandProxy {
     /**
-     * The Gradle task private instance.
+     * The backing command instance
      */
-    private final CoreTask task;
+    private final Command command;
 
     /**
      * Constructor.
      * 
-     * @param task the Gradle task instance to use to run the command
+     * @param command the backing standalone command instance
      * 
      * @throws Exception in case of any issue
      */
-    public GradleTaskCommand(CoreTask task) {
+    public StandaloneCommandProxy(Command command)
+        throws Exception {
         super();
-        this.task = task;
+        this.command = command;
     }
 
     /**
@@ -53,7 +50,7 @@ class GradleTaskCommand implements CommandProxy {
      */
     @Override
     public String getContextname() {
-        return "gradle";
+        return "standalone";
     }
 
     /**
@@ -61,13 +58,7 @@ class GradleTaskCommand implements CommandProxy {
      */
     @Override
     public State state() {
-        try {
-            return task.state();
-        }
-        catch (DataAccessException | IllegalPropertyException e) {
-            // wrap any exception to an unchecked exception
-            throw new RuntimeException("Couldn't get the state from the Nyx Gradle task", e);
-        }
+        return command.state();
     }
 
     /**
@@ -76,7 +67,7 @@ class GradleTaskCommand implements CommandProxy {
     @Override
     public boolean isUpToDate()
         throws DataAccessException, IllegalPropertyException, GitException {
-        return task.getState().getUpToDate();
+        return command.isUpToDate();
     }
 
     /**
@@ -85,9 +76,6 @@ class GradleTaskCommand implements CommandProxy {
     @Override
     public State run()
         throws DataAccessException, IllegalPropertyException, GitException, ReleaseException {
-        for (Action<? super Task> action: task.getActions()) {
-            action.execute(task);
-        }
-        return task.state();
+        return command.run();
     }
 }

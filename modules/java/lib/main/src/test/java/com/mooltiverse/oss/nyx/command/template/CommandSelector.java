@@ -25,11 +25,11 @@ import com.mooltiverse.oss.nyx.command.Command;
 import com.mooltiverse.oss.nyx.command.Commands;
 
 /**
- * This annotation can be used to define the type of command to inject when injecting a {@link Command}
- * into a test method as a method parameter.
+ * This annotation can be used to define the type of command to inject when injecting a {@link Command} or
+ * {@link CommandProxy} into a test method as a method parameter.
  * By mean of this annotation the command factory knows which command needs to be proxied and is able
  * to build the proxy for that specific command.
- * This annotation can be applied on the method or the {@link Command} parameter to be injected. When
+ * This annotation can be applied on the method or the {@link Command} or {@link CommandProxy} parameter to be injected. When
  * applied to the method it is shared by other parameters that may be injected on the same test method,
  * while when applied on the parameter its scope is limited to the parameter itself.
  * <br>
@@ -39,8 +39,8 @@ import com.mooltiverse.oss.nyx.command.Commands;
  * {@link CommandInvocationContextProvider} extension (<code>@ExtendWith(CommandInvocationContextProvider.class)</code>)
  * on the test method or its declaring class.
  * 
- * @see Command
  * @see CommandInvocationContextProvider
+ * @see CommandProxy
  * @see Baseline
  */
 @Inherited

@@ -24,6 +24,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import com.mooltiverse.oss.nyx.command.template.Baseline;
 import com.mooltiverse.oss.nyx.command.template.CommandInvocationContextProvider;
+import com.mooltiverse.oss.nyx.command.template.CommandProxy;
 import com.mooltiverse.oss.nyx.command.template.CommandSelector;
 import com.mooltiverse.oss.nyx.git.Scenario;
 
@@ -40,7 +41,7 @@ public class PublishTestTemplates {
         @TestTemplate
         @DisplayName("Publish()")
         @Baseline(Scenario.FROM_SCRATCH)
-        void constructorTest(@CommandSelector(Commands.PUBLISH) Command command)
+        void constructorTest(@CommandSelector(Commands.PUBLISH) CommandProxy command)
             throws Exception {
             assertNotNull(command);
         }
@@ -56,7 +57,7 @@ public class PublishTestTemplates {
         @TestTemplate
         @DisplayName("Publish.state()")
         @Baseline(Scenario.FROM_SCRATCH)
-        void stateTest(@CommandSelector(Commands.PUBLISH) Command command)
+        void stateTest(@CommandSelector(Commands.PUBLISH) CommandProxy command)
             throws Exception {
             assertNotNull(command.state());
         }
@@ -73,7 +74,7 @@ public class PublishTestTemplates {
         @TestTemplate
         @DisplayName("Publish.isUpToDate()")
         @Baseline(Scenario.INITIAL_COMMIT)
-        void isUpToDateTest(@CommandSelector(Commands.PUBLISH) Command command)
+        void isUpToDateTest(@CommandSelector(Commands.PUBLISH) CommandProxy command)
             throws Exception {
             // simply test that running it twice returns false at the first run and true the second
             assertFalse(command.isUpToDate());
@@ -89,7 +90,7 @@ public class PublishTestTemplates {
         /*@TestTemplate
         @DisplayName("Publish.run() throws exception with a valid but empty Git repository in working directory")
         @Baseline(Scenario.FROM_SCRATCH)
-        void stateTest(@CommandSelector(Commands.PUBLISH) Command command)
+        void stateTest(@CommandSelector(Commands.PUBLISH) CommandProxy command)
             throws Exception {
             assertThrows(GitException.class, () -> command.run());
         }*/

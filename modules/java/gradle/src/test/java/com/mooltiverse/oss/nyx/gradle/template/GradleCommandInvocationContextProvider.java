@@ -36,6 +36,7 @@ import com.mooltiverse.oss.nyx.command.Command;
 import com.mooltiverse.oss.nyx.command.Commands;
 import com.mooltiverse.oss.nyx.command.template.Baseline;
 import com.mooltiverse.oss.nyx.command.template.CommandInvocationContextProvider;
+import com.mooltiverse.oss.nyx.command.template.CommandProxy;
 import com.mooltiverse.oss.nyx.git.Script;
 import com.mooltiverse.oss.nyx.git.Workbench;
 import com.mooltiverse.oss.nyx.gradle.ArrangeTask;
@@ -55,8 +56,8 @@ import com.mooltiverse.oss.nyx.gradle.NyxPlugin;
  * With more details, for every template this provider produces one context to test commands invoked as Gradle tasks.
  * <br>
  * Moreover, this extension can inject common entities as method parameters so that you don't need to repeat the same
- * initialization code for all tests. The type of parameters that can be injected are {@link Command}, {@link Script}, {@link Workbench},
- * {@link Project} and {@link Task}.
+ * initialization code for all tests. The type of parameters that can be injected are {@link CommandProxy} (or {@link Command}),
+ * {@link Script}, {@link Workbench}, {@link Project} and {@link Task}.
  * <br>
  * In order to use this in templates you need to register this provider as a test extension declaratively in a test method,
  * like:<br>
@@ -80,7 +81,7 @@ import com.mooltiverse.oss.nyx.gradle.NyxPlugin;
  * Remember that the test method must use the {@link TestTemplate} annotation.
  * <br>
  * Parameters that can be resolved by this extension are:<br>
- * - {@link Command}: while you can use it just like other commands injected (see the 
+ * - {@link Command} or {@link CommandProxy}: while you can use it just like other commands injected (see the 
  *   {@link CommandInvocationContextProvider} ducumentation for more) the difference here is that the injected
  *   objects are backed by a Gradle task so when you run them, your are actually triggering a Gradle task
  *   (which in turn runs the backing command). This is useful to test a command using the Gradle plugin
@@ -93,18 +94,18 @@ import com.mooltiverse.oss.nyx.gradle.NyxPlugin;
  * - Gradle {@link Task}: when you declare a {@link Task} parameter it is injected with a task object
  *   running the task defined by the {@link CommandSelector} annotation, which must be present.
  *   Moreover, like for {@link Project} parameters, the {@link Baseline} annotation must be present.
- *   Objects of this type injected by this provider are almost equal to those injected as {@link Command}.
- *   It's up to you to use what you need to run your test.
+ *   Objects of this type injected by this provider are almost equal to those injected as {@link Command} or
+ *   {@link CommandProxy}. It's up to you to use what you need to run your test.
  * <br>
  * All the parameter types injected by the {@link CommandInvocationContextProvider} are also available through
- * this extension, but they may be backed by different implementations (like for the {@link Command}).
+ * this extension, but they may be backed by different implementations (like for the {@link CommandProxy}).
  * <br>
  * Example:<br>
  * <pre>
  *   @TestTemplate
  *   @ExtendWith(CommandInvocationContextProvider.class)
  *   @Baseline(Scenario.INITIAL_COMMIT)
- *   public void myTest(Project project, @CommandSelector(Commands.PUBLISH) Command command, Task task, Script script) {
+ *   public void myTest(Project project, @CommandSelector(Commands.PUBLISH) CommandProxy command, Task task, Script script) {
  *      ...
  *   }
  * </pre>
@@ -336,7 +337,7 @@ public class GradleCommandInvocationContextProvider extends CommandInvocationCon
          * Default constructor.
          */
         GradleCommandParameterResolver() {
-            super(Command.class);
+            super(CommandProxy.class);
         }
 
         /**
@@ -350,9 +351,9 @@ public class GradleCommandInvocationContextProvider extends CommandInvocationCon
          * @see ParameterResolver#resolveParameter(ParameterContext, ExtensionContext)
          */
         @Override
-        public Command resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext)
+        public CommandProxy resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext)
             throws ParameterResolutionException {
-            if (parameterContext.getParameter().getType().isAssignableFrom(Command.class)) {
+            if (parameterContext.getParameter().getType().isAssignableFrom(CommandProxy.class)) {
                 return new GradleTaskCommand(CoreTask.class.cast(resolveSharedTask(parameterContext, extensionContext, parameterContext.getDeclaringExecutable())));
             }
             else throw new ParameterResolutionException(String.format("Cannot resolve parameter %s in %s because its type %s is not supported by this resolver", parameterContext.getParameter().getName(), parameterContext.getParameter().getDeclaringExecutable().getName(), parameterContext.getParameter().getType().getName()));

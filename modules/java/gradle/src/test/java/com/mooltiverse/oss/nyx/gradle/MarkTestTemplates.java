@@ -25,9 +25,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.gradle.api.Project;
 
-import com.mooltiverse.oss.nyx.command.Command;
 import com.mooltiverse.oss.nyx.command.Commands;
 import com.mooltiverse.oss.nyx.command.template.Baseline;
+import com.mooltiverse.oss.nyx.command.template.CommandProxy;
 import com.mooltiverse.oss.nyx.command.template.CommandSelector;
 import com.mooltiverse.oss.nyx.gradle.template.GradleCommandInvocationContextProvider;
 import com.mooltiverse.oss.nyx.git.Scenario;
@@ -80,7 +80,7 @@ public class MarkTestTemplates {
         @TestTemplate
         @DisplayName("MarkTask.getActions().execute() doesn't throw exceptions without a valid Git repository in custom directory")
         @Baseline(Scenario.INITIAL_COMMIT)
-        void noExceptionOnExecuteWithValidGitRepositoryInCustomDirectoryTest(Project project, @CommandSelector(Commands.MARK) Command command, Script script)
+        void noExceptionOnExecuteWithValidGitRepositoryInCustomDirectoryTest(Project project, @CommandSelector(Commands.MARK) CommandProxy command, Script script)
         throws Exception {
             //make sure the Gradle working directory and the Git repository directory are not the same
             assertFalse(project.getBuildDir().equals(script.getWorkingDirectory()));
@@ -95,7 +95,7 @@ public class MarkTestTemplates {
         @TestTemplate
         @DisplayName("MarkTask.getActions().execute() doesn't throw exceptions without a valid Git repository in working directory")
         @Baseline(Scenario.INITIAL_COMMIT)
-        void noExceptionOnExecuteWithValidGitRepositoryInWorkingDirectoryTest(@CommandSelector(Commands.MARK) Command command)
+        void noExceptionOnExecuteWithValidGitRepositoryInWorkingDirectoryTest(@CommandSelector(Commands.MARK) CommandProxy command)
             throws Exception {
             assertDoesNotThrow(() -> command.run());
         }

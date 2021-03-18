@@ -184,12 +184,32 @@ public class CommandInvocationContextProviderTests {
     }
 
     @Nested
+    @DisplayName("Command injection with @ExtendWith at the class level")
+    @ExtendWith(CommandInvocationContextProvider.class)
+    public static class CommandInjectionTests1 {
+        @TestTemplate
+        @DisplayName("Command injection when the parameter is annotated with @CommandFactory and @Baseline")
+        void commandTest1(@CommandSelector(Commands.ARRANGE) @Baseline(Scenario.INITIAL_COMMIT) Command command)
+            throws Exception {
+            assertNotNull(command);
+        }
+
+        @TestTemplate
+        @DisplayName("Command injection when the method is annotated with @CommandFactory and @Baseline")
+        @Baseline(Scenario.INITIAL_COMMIT)
+        void commandTest2(@CommandSelector(Commands.ARRANGE) CommandProxy command)
+            throws Exception {
+            assertNotNull(command);
+        }
+    }
+
+    @Nested
     @DisplayName("CommandProxy injection with @ExtendWith at the class level")
     @ExtendWith(CommandInvocationContextProvider.class)
     public static class CommandProxyInjectionTests1 {
         @TestTemplate
         @DisplayName("CommandProxy injection when the parameter is annotated with @CommandFactory and @Baseline")
-        void commandProxyTest1(@CommandSelector(Commands.ARRANGE) @Baseline(Scenario.INITIAL_COMMIT) Command commandProxy)
+        void commandProxyTest1(@CommandSelector(Commands.ARRANGE) @Baseline(Scenario.INITIAL_COMMIT) CommandProxy commandProxy)
             throws Exception {
             assertNotNull(commandProxy);
         }
@@ -197,9 +217,30 @@ public class CommandInvocationContextProviderTests {
         @TestTemplate
         @DisplayName("CommandProxy injection when the method is annotated with @CommandFactory and @Baseline")
         @Baseline(Scenario.INITIAL_COMMIT)
-        void commandProxyTest2(@CommandSelector(Commands.ARRANGE) Command commandProxy)
+        void commandProxyTest2(@CommandSelector(Commands.ARRANGE) CommandProxy commandProxy)
             throws Exception {
             assertNotNull(commandProxy);
+        }
+    }
+
+    @Nested
+    @DisplayName("Command injection with @ExtendWith at the method level")
+    public static class CommandInjectionTests2 {
+        @TestTemplate
+        @ExtendWith(CommandInvocationContextProvider.class)
+        @DisplayName("Command injection when the parameter is annotated with @CommandFactory and @Baseline")
+        void commandTest1(@CommandSelector(Commands.ARRANGE) @Baseline(Scenario.INITIAL_COMMIT) Command command)
+            throws Exception {
+            assertNotNull(command);
+        }
+
+        @TestTemplate
+        @ExtendWith(CommandInvocationContextProvider.class)
+        @DisplayName("Command injection when the method is annotated with @CommandFactory and @Baseline")
+        @Baseline(Scenario.INITIAL_COMMIT)
+        void commandTest2(@CommandSelector(Commands.ARRANGE) Command command)
+            throws Exception {
+            assertNotNull(command);
         }
     }
 
@@ -209,7 +250,7 @@ public class CommandInvocationContextProviderTests {
         @TestTemplate
         @ExtendWith(CommandInvocationContextProvider.class)
         @DisplayName("CommandProxy injection when the parameter is annotated with @CommandFactory and @Baseline")
-        void commandProxyTest1(@CommandSelector(Commands.ARRANGE) @Baseline(Scenario.INITIAL_COMMIT) Command commandProxy)
+        void commandProxyTest1(@CommandSelector(Commands.ARRANGE) @Baseline(Scenario.INITIAL_COMMIT) CommandProxy commandProxy)
             throws Exception {
             assertNotNull(commandProxy);
         }
@@ -218,7 +259,7 @@ public class CommandInvocationContextProviderTests {
         @ExtendWith(CommandInvocationContextProvider.class)
         @DisplayName("CommandProxy injection when the method is annotated with @CommandFactory and @Baseline")
         @Baseline(Scenario.INITIAL_COMMIT)
-        void commandProxyTest2(@CommandSelector(Commands.ARRANGE) Command commandProxy)
+        void commandProxyTest2(@CommandSelector(Commands.ARRANGE) CommandProxy commandProxy)
             throws Exception {
             assertNotNull(commandProxy);
         }

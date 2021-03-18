@@ -54,7 +54,8 @@ import com.mooltiverse.oss.nyx.state.State;
  * invoked from the {@link Nyx} class. This means that each template is executed twice, one for each context, without duplicating test code.
  * <br>
  * Moreover, this extension can inject common entities as method parameters so that you don't need to repeat the same
- * initialization code for all tests. The type of parameters that can be injected are {@link Command}, {@link Script} and {@link Workbench}.
+ * initialization code for all tests. The type of parameters that can be injected are {@link CommandProxy} (or {@link Command}),
+ * {@link Script} and {@link Workbench}.
  * <br>
  * In order to use this in templates you need to register this provider as a test extension declaratively in a test method,
  * like:<br>
@@ -78,11 +79,14 @@ import com.mooltiverse.oss.nyx.state.State;
  * Remember that the test method must use the {@link TestTemplate} annotation.
  * <br>
  * Parameters that can be resolved by this extension are:<br>
- * - {@link Command}: whenever you declare a parameter of type {@link Command} in a test parameter
- *   a proxy to a specific Nyx command is injected. Although this is a standard interface, the
- *   class implementing the injected parameter depends on the context so it may be a standalone
- *   command or a wrapper that invokes the command specific business method on the {@link Nyx}
- *   class. In order for this provider to be able to select the right command for the proxy,
+ * - {@link Command} or {@link CommandProxy}: whenever you declare a parameter of type {@link Command}
+ *   or {@link CommandProxy} in a test parameter a proxy to a specific Nyx command is injected.
+ *   Although this is a standard interface, the class implementing the injected parameter depends
+ *   on the context so it may be a standalone command or a wrapper that invokes the command specific
+ *   business method on the {@link Nyx} class.
+ *   Please note that {@link Command} parameters will actually be {@link CommandProxy} objects
+ *   that are safely casted because {@link CommandProxy} inherits from {@link Command}.
+ *   In order for this provider to be able to select the right command for the proxy,
  *   the {@link CommandSelector} annotation must be present on the specific injected method
  *   parameter or on the test method. Moreover, the {@link Baseline} annotation must also be
  *   applied on the parameter or the method or the declaring class to let the provider know
@@ -93,14 +97,14 @@ import com.mooltiverse.oss.nyx.state.State;
  * <br>
  * The {@link Baseline} can be shared when applied to methods or classes. In this case they will
  * yield to the same objects, unless overridden in more specific contexts. For example, if you apply
- * it on a method and declare two parameters of thype {@link Command} and {@link Script} in the method
- * they will both yield use the same temporary directory that has been created with a Git repository
- * whose initial state depends on the {@link Baseline} annotation. Example:<br>
+ * it on a method and declare two parameters of type {@link CommandProxy} (or {@link Command}) and
+ * {@link Script} in the method they will both yield use the same temporary directory that has been
+ * created with a Git repository whose initial state depends on the {@link Baseline} annotation. Example:<br>
  * <pre>
  *   @TestTemplate
  *   @ExtendWith(CommandInvocationContextProvider.class)
  *   @Baseline(Scenario.INITIAL_COMMIT)
- *   public void myTest(@CommandSelector(Commands.PUBLISH) Command command, Script script) {
+ *   public void myTest(@CommandSelector(Commands.PUBLISH) CommandProxy command, Script script) {
  *      ...
  *   }
  * </pre>
@@ -399,15 +403,15 @@ public class CommandInvocationContextProvider implements TestTemplateInvocationC
     }
 
     /**
-     * This parameter resolver can resolve parameters of type {@link Command} and returns direct implementations
-     * of the {@link Command} interface, used for standalone command invocations.
+     * This parameter resolver can resolve parameters of type {@link Command} and {@link CommandProxy} and returns
+     * direct implementations of the {@link CommandProxy} interface, used for standalone command invocations.
      */
     public static class StandaloneCommandParameterResolver extends AbstractParameterResolver {
         /**
          * Default constructor.
          */
         public StandaloneCommandParameterResolver() {
-            super(Command.class);
+            super(CommandProxy.class);
         }
 
         /**
@@ -416,14 +420,14 @@ public class CommandInvocationContextProvider implements TestTemplateInvocationC
          * @param parameterContext the parameter context
          * @param extensionContext the extension context
          * 
-         * @return the resolved {@link Command} object, never {@code null}
+         * @return the resolved {@link CommandProxy} object, never {@code null}
          * 
          * @see ParameterResolver#resolveParameter(ParameterContext, ExtensionContext)
          */
         @Override
-        public Command resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext)
+        public CommandProxy resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext)
             throws ParameterResolutionException {
-            if (parameterContext.getParameter().getType().isAssignableFrom(Command.class)) {
+            if (parameterContext.getParameter().getType().isAssignableFrom(CommandProxy.class)) {
                 // first off let's find out which command has to be created
                 Commands commandName = resolveCommandSelector(parameterContext, extensionContext);
 
@@ -438,12 +442,12 @@ public class CommandInvocationContextProvider implements TestTemplateInvocationC
 
                 try {
                     switch (commandName) {
-                        case ARRANGE: return new Arrange(new State(new Configuration()), Git.open(script.getWorkingDirectory()));
-                        case CLEAN:   return new Clean(new State(new Configuration()), Git.open(script.getWorkingDirectory()));
-                        case INFER:   return new Infer(new State(new Configuration()), Git.open(script.getWorkingDirectory()));
-                        case MAKE:    return new Make(new State(new Configuration()), Git.open(script.getWorkingDirectory()));
-                        case MARK:    return new Mark(new State(new Configuration()), Git.open(script.getWorkingDirectory()));
-                        case PUBLISH: return new Publish(new State(new Configuration()), Git.open(script.getWorkingDirectory()));
+                        case ARRANGE: return new StandaloneCommandProxy(new Arrange(new State(new Configuration()), Git.open(script.getWorkingDirectory())));
+                        case CLEAN:   return new StandaloneCommandProxy(new Clean(new State(new Configuration()), Git.open(script.getWorkingDirectory())));
+                        case INFER:   return new StandaloneCommandProxy(new Infer(new State(new Configuration()), Git.open(script.getWorkingDirectory())));
+                        case MAKE:    return new StandaloneCommandProxy(new Make(new State(new Configuration()), Git.open(script.getWorkingDirectory())));
+                        case MARK:    return new StandaloneCommandProxy(new Mark(new State(new Configuration()), Git.open(script.getWorkingDirectory())));
+                        case PUBLISH: return new StandaloneCommandProxy(new Publish(new State(new Configuration()), Git.open(script.getWorkingDirectory())));
                         default:      throw new ParameterResolutionException(String.format("Unable to instantiate command % because it's unknown", commandName));
                     }
                 }
@@ -458,15 +462,15 @@ public class CommandInvocationContextProvider implements TestTemplateInvocationC
     }
 
     /**
-     * This parameter resolver can resolve parameters of type {@link Command} and returns implementations that run commands
-     * through the {@link Nyx} class using one of its business methods.
+     * This parameter resolver can resolve parameters of type {@link Command} and {@link CommandProxy} and returns
+     * implementations that run commands through the {@link Nyx} class using one of its business methods.
      */
     public static class NyxCommandParameterResolver extends AbstractParameterResolver {
         /**
          * Default constructor.
          */
         public NyxCommandParameterResolver() {
-            super(Command.class);
+            super(CommandProxy.class);
         }
 
         /**
@@ -475,14 +479,14 @@ public class CommandInvocationContextProvider implements TestTemplateInvocationC
          * @param parameterContext the parameter context
          * @param extensionContext the extension context
          * 
-         * @return the resolved {@link Command} object, never {@code null}
+         * @return the resolved {@link CommandProxy} object, never {@code null}
          * 
          * @see ParameterResolver#resolveParameter(ParameterContext, ExtensionContext)
          */
         @Override
-        public Command resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext)
+        public CommandProxy resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext)
             throws ParameterResolutionException {
-            if (parameterContext.getParameter().getType().isAssignableFrom(Command.class)) {
+            if (parameterContext.getParameter().getType().isAssignableFrom(CommandProxy.class)) {
                 // first off let's find out which command has to be created
                 Commands commandName = resolveCommandSelector(parameterContext, extensionContext);
 
@@ -496,7 +500,7 @@ public class CommandInvocationContextProvider implements TestTemplateInvocationC
                 }
 
                 try {
-                    return new NyxCommand(new Nyx(script.getWorkingDirectory()), commandName);
+                    return new NyxCommandProxy(new Nyx(script.getWorkingDirectory()), commandName);
                 }
                 catch (Exception e)
                 {
