@@ -33,5 +33,5 @@ public interface CommandProxy extends Command {
      * 
      * @return the name of the context this proxy run in.
      */
-    public String getContextname();
+    public String getContextName();
 }

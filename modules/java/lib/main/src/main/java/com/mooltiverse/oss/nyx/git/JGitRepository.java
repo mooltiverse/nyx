@@ -28,6 +28,7 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.AddCommand;
 import org.eclipse.jgit.api.CommitCommand;
 import org.eclipse.jgit.api.PushCommand;
+import org.eclipse.jgit.api.TagCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.JGitInternalException;
 import org.eclipse.jgit.errors.AmbiguousObjectException;
@@ -38,6 +39,7 @@ import org.eclipse.jgit.errors.RevWalkException;
 import org.eclipse.jgit.lib.AnyObjectId;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.ObjectId;
+import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.RefDatabase;
 import org.eclipse.jgit.revwalk.RevSort;
@@ -221,6 +223,7 @@ class JGitRepository implements Repository {
             PushCommand pushCommand = jGit.push().setRefSpecs(refSpec);
             if (!Objects.isNull(remote) && !remote.isEmpty())
                 pushCommand.setRemote(remote);
+            pushCommand.setPushTags();
             pushCommand.call();
             return pushCommand.getRemote();
         }
@@ -240,6 +243,57 @@ class JGitRepository implements Repository {
             res.add(push(remote));
         }
         return res;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Tag tag(String name)
+        throws GitException {
+        return tag(name, null);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Tag tag(String name, String message)
+        throws GitException {
+        return tag(name, message, null);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Tag tag(String name, String message, Identity tagger)
+        throws GitException {
+        return tag(null, name, message, tagger);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Tag tag(String target, String name, String message, Identity tagger)
+        throws GitException {
+        try {
+            TagCommand command = jGit.tag().setObjectId(parseCommit(Objects.isNull(target) ? getLatestCommit() : target));
+            if (Objects.isNull(message))
+                command.setAnnotated(false);
+            else {
+                command.setAnnotated(true);
+                command.setMessage(message);
+                if (!Objects.isNull(tagger)) {
+                    command.setTagger(new PersonIdent(tagger.getName(), tagger.getEmail()));
+                }
+            }
+            return ObjectFactory.tagFrom(jGit.getRepository().getRefDatabase().peel(command.setName(name).call()));
+        }
+        catch (GitAPIException | JGitInternalException | IOException e) {
+            throw new GitException("Unable to create Git tag", e);
+        }
     }
 
     /**
@@ -300,7 +354,7 @@ class JGitRepository implements Repository {
      * @see #parseCommit(RevWalk, String)
      * @see org.eclipse.jgit.lib.Repository#parseCommit(AnyObjectId)
      */
-    /*private RevCommit parseCommit(String id)
+    private RevCommit parseCommit(String id)
         throws GitException {
         Objects.requireNonNull(id, "Cannot parse a commit from a null identifier");
 
@@ -313,7 +367,7 @@ class JGitRepository implements Repository {
         catch (IOException ioe) {
             throw new GitException(String.format("The %s commit identifier cannot be resolved to a valid commit", id), ioe);
         }
-    }*/
+    }
 
     /**
      * Resolves the commit with the given {@code id} using the given {@link RevWalk} object and returns it as a typed object.
@@ -418,7 +472,6 @@ class JGitRepository implements Repository {
             for (Ref tagRef: refDatabase.getRefsByPrefix(Constants.R_TAGS)) {
                 // refs must be peeled in order to see if they're annoteted or lightweight
                 tagRef = refDatabase.peel(tagRef);
-
                 // when it's an annotated tag tagRef.getPeeledObjectId() is not null,
                 // while for lightweight tags tagRef.getPeeledObjectId() is null
                 if (Objects.isNull(tagRef.getPeeledObjectId()))

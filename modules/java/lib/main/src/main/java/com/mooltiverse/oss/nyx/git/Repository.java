@@ -145,6 +145,71 @@ public interface Repository {
         throws GitException;
 
     /**
+     * Tags the latest commit in the current branch with a tag with the given name. The resulting tag is lightweight.
+     * 
+     * @param name the name of the tag. Cannot be {@code null}
+     * 
+     * @return the object modelling the new tag that was created. Never {@code null}.
+     * 
+     * @throws GitException in case some problem is encountered with the underlying Git repository, preventing to tag
+     * (i.e. when the tag name is {@code null} or there is already a tag with the given name in the repository).
+     */
+    public Tag tag(String name)
+        throws GitException;
+
+    /**
+     * Tags the latest commit in the current branch with a tag with the given name and optional message.
+     * 
+     * @param name the name of the tag. Cannot be {@code null}
+     * @param message the optional tag message. If {@code null} the new tag will be lightweight, otherwise it will be an
+     * annotated tag
+     * 
+     * @return the object modelling the new tag that was created. Never {@code null}.
+     * 
+     * @throws GitException in case some problem is encountered with the underlying Git repository, preventing to tag
+     * (i.e. when the tag name is {@code null} or there is already a tag with the given name in the repository).
+     */
+    public Tag tag(String name, String message)
+        throws GitException;
+
+    /**
+     * Tags the latest commit in the current branch with a tag with the given name and optional message using the optional
+     * tagger identity.
+     * 
+     * @param name the name of the tag. Cannot be {@code null}
+     * @param message the optional tag message. If {@code null} the new tag will be lightweight, otherwise it will be an
+     * annotated tag
+     * @param tagger the optional identity of the tagger. If {@code null} Git defaults are used. If {@code message} is {@code null}
+     * this is ignored.
+     * 
+     * @return the object modelling the new tag that was created. Never {@code null}.
+     * 
+     * @throws GitException in case some problem is encountered with the underlying Git repository, preventing to tag
+     * (i.e. when the tag name is {@code null} or there is already a tag with the given name in the repository).
+     */
+    public Tag tag(String name, String message, Identity tagger)
+        throws GitException;
+
+    /**
+     * Tags the object represented by the given SHA-1 with a tag with the given name and optional message using the optional
+     * tagger identity.
+     * 
+     * @param target the SHA-1 identifier of the object to tag. If {@code null} the latest commit in the current branch is tagged.
+     * @param name the name of the tag. Cannot be {@code null}
+     * @param message the optional tag message. If {@code null} the new tag will be lightweight, otherwise it will be an
+     * annotated tag
+     * @param tagger the optional identity of the tagger. If {@code null} Git defaults are used. If {@code message} is {@code null}
+     * this is ignored.
+     * 
+     * @return the object modelling the new tag that was created. Never {@code null}.
+     * 
+     * @throws GitException in case some problem is encountered with the underlying Git repository, preventing to tag
+     * (i.e. when the tag name is {@code null} or there is already a tag with the given name in the repository).
+     */
+    public Tag tag(String target, String name, String message, Identity tagger)
+        throws GitException;
+
+    /**
      * Browse the repository commit history using the given {@code visitor} to inspect each commit. Commits are
      * evaluated in Git's natural order, from the most recent to oldest.
      * 

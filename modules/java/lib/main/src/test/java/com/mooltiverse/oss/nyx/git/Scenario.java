@@ -66,12 +66,13 @@ public enum Scenario {
      * This yields to a repository like:
      * 
      * <pre>
-     *   * d84f8b5 (HEAD -> master) Commit mcv
-     *   * 285a204 (tag: 0.0.4) Commit trg
-     *   * eee5b39 (tag: 0.0.3) Commit kek
-     *   * 9acf054 (tag: 0.0.2) Commit vsg
-     *   * 3ef4102 (tag: 0.0.1) Commit oof
-     *   * 816da12 Initial commit
+     *   * cb9423c (HEAD -> master) Untagged commit #2
+     *   * ddb0b9f Untagged commit #1
+     *   * 44944e7 (tag: 0.0.4) Commit lij
+     *   * 92cd45c (tag: 0.0.3) Commit aem
+     *   * 9709d14 (tag: 0.0.2) Commit gin
+     *   * c996caa (tag: 0.0.1) Commit rfi
+     *   * 2b0ce8c Initial commit
      * </pre>
      */
     ONE_BRANCH_SHORT( f -> Script.fromScratch(f).andAddFiles()
@@ -80,7 +81,8 @@ public enum Scenario {
         .andCommitWithTag("0.0.2", "Annotated tag to commit 0.0.2")
         .andCommitWithTag("0.0.3")
         .andCommitWithTag("0.0.4", "Annotated tag to commit 0.0.4")
-        .andCommit()
+        .andCommit("Untagged commit #1")
+        .andCommit("Untagged commit #2")
     ),
 
     /**

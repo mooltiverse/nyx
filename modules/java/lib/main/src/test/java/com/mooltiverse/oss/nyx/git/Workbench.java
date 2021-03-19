@@ -154,29 +154,102 @@ public class Workbench {
     }
 
     /**
-     * Returns a map of all annotated tags created by this repository, where keys are commit SHA and values are tag names.
+     * Returns the collection of regular files in the repository root directory.
      * 
-     * @return a map of all annotated tags created by this repository, where keys are commit SHA and values are tag names.
+     * @return the collection of regular files in the repository root directory.
+     * 
+     * @throws Exception in case of any issue
+     * 
+     * @see #addRandomTextWorkbenchFiles(int)
      */
-    public Map<String,String> getAnnotatedTags() {
+    public Collection<File> getFiles()
+        throws Exception {
+        Collection<File> res = new ArrayList<File>();
+        Collections.addAll(res, git.getRepository().getWorkTree().listFiles((File f) -> f.isFile())); // avoid adding the ".git" directory (and any other directory)
+        return res;
+    }
+
+    /**
+     * Replaces the content of the given files created using this workbench with new random content.
+     * 
+     * @param files the collection of files to update
+     * 
+     * @throws Exception in case of any issue
+     * 
+     * @see #getFiles()
+     */
+    public void updateWorkbenchFiles(Collection<File> files)
+        throws Exception {
+        for (File f: files) {
+            FileWriter fw = new FileWriter(f);
+            fw.write(RandomUtil.randomAlphabeticString(5));
+            fw.flush();
+            fw.close();
+        }
+    }
+
+    /**
+     * Replaces the content of all the files in the repository created using this workbench.
+
+     * @throws Exception in case of any issue
+     * 
+     * @see #getFiles()
+     */
+    public void updateAllWorkbenchFiles()
+        throws Exception {
+        updateWorkbenchFiles(getFiles());
+    }
+
+    /**
+     * Adds the given number of text files to the repository root directory. Files have content but they are not staged or committed.
+     * 
+     * @param count the number of files to add
+     * 
+     * @return the collection of the new files
+     * 
+     * @throws Exception in case of any issue
+     * 
+     * @see #getFiles()
+     */
+    public Collection<File> addRandomTextWorkbenchFiles(int count)
+        throws Exception {
+        Collection<File> res = new ArrayList<File>();
+        for (int i=0; i<=count; i++) {
+            File f = new File(git.getRepository().getWorkTree(), RandomUtil.randomAlphabeticString(5).concat(".txt"));
+            FileWriter fw = new FileWriter(f);
+            fw.write(RandomUtil.randomAlphabeticString(5));
+            fw.flush();
+            fw.close();
+            res.add(f);
+        }
+
+        return res;
+    }
+
+    /**
+     * Returns a map of all annotated tags created by this workbench, where keys are commit SHA and values are tag names.
+     * 
+     * @return a map of all annotated tags created by this workbench, where keys are commit SHA and values are tag names.
+     */
+    public Map<String,String> getWorkbenchAnnotatedTags() {
         return annotatedTags;
     }
 
     /**
-     * Returns a map of all lightweight tags created by this repository, where keys are commit SHA and values are tag names.
+     * Returns a map of all lightweight tags created by this workbench, where keys are commit SHA and values are tag names.
      * 
-     * @return a map of all lightweight tags created by this repository, where keys are commit SHA and values are tag names.
+     * @return a map of all lightweight tags created by this workbench, where keys are commit SHA and values are tag names.
      */
-    public Map<String,String> getLightweightTags() {
+    public Map<String,String> getWorkbenchLightweightTags() {
         return lightweightTags;
     }
 
     /**
-     * Returns a map of all tags created by this repository, where keys are commit SHA and values are tag names.
+     * Returns a map of all tags created by this workbench, where keys are commit SHA and values are tag names.
      * 
-     * @return a map of all tags created by this repository, where keys are commit SHA and values are tag names.
+     * @return a map of all tags created by this workbench, where keys are commit SHA and values are tag names.
      */
-    public Map<String,String> getAllTags() {
+    public Map<String,String> getAllWorkbenchTags() {
         Map<String,String> res = new HashMap<String,String>();
         res.putAll(annotatedTags);
         res.putAll(lightweightTags);
@@ -184,12 +257,100 @@ public class Workbench {
     }
 
     /**
-     * Returns the a map in which keys are branch names and values are lists of all commits for those branches.
+     * Returns the a map in which keys are branch names and values are lists of all commits created by this workbench for those branches.
      * 
-     * @return the a map in which keys are branch names and values are lists of all commits for those branches.
+     * @return the a map in which keys are branch names and values are lists of all commits created by this workbench for those branches.
      */
-    public Map<String,List<String>> getAllCommits() {
+    public Map<String,List<String>> getAllWorkbenchCommits() {
         return commits;
+    }
+
+    /**
+     * Returns the list of all commit SHAs created by this workbench in this repository.
+     * 
+     * @return the list of all commit SHAs created by this workbench in this repository.
+     */
+    public List<String> getWorkbenchCommits() {
+        List<String> res = new ArrayList<String>();
+        for (List<String> value: commits.values()) {
+            res.addAll(value);
+        }
+        return res;
+    }
+
+    /**
+     * Returns the list of all commit SHAs created by this workbench in this repository for the given branch.
+     * 
+     * @param branch the name of the branch the commits are requested
+     * 
+     * @return the list of all commit SHAs created by this workbench in this repository for the given branch.
+     */
+    public List<String> getWorkbenchCommitsByBranch(String branch) {
+        return commits.get(branch);
+    }
+
+    /**
+     * Returns the list of commits created using this workbench for the given branch. If the entry does not exist yet in the commits map
+     * it is created first, so this method is safer than commits.get(branch).
+     * 
+     * @param branch the branch to get the commits for
+     * 
+     * @return the list of commits for the given branch created using this workbench
+     */
+    private List<String> workbenchCommitsForBranch(String branch) {
+        List<String> res = commits.get(branch);
+        if (Objects.isNull(res)) {
+            res = new ArrayList<String>();
+            commits.put(branch, res);
+        }
+        return res;
+    }
+
+    /**
+     * Return a list of tag objects, resulting from a query to the underlying repository.
+     * 
+     * @return a list of tag objects, resulting from a query to the underlying repository. Keys are tag
+     * names (without prefix) and values are the tagged objects.
+     */
+    public Map<String,String> getTags()
+        throws Exception {
+        Map<String,String> res = new HashMap<String,String>();
+        RefDatabase refDatabase = git.getRepository().getRefDatabase();
+        for (Ref tagRef: refDatabase.getRefsByPrefix(Constants.R_TAGS)) {
+            // refs must be peeled in order to see if they're annoteted or lightweight
+            tagRef = refDatabase.peel(tagRef);
+
+            // when it's an annotated tag tagRef.getPeeledObjectId() is not null,
+            // while for lightweight tags tagRef.getPeeledObjectId() is null
+            if (Objects.isNull(tagRef.getPeeledObjectId()))
+            {
+                res.put(tagRef.getName().replace(Constants.R_TAGS, ""), tagRef.getObjectId().getName());
+            }
+            else {
+                // it's an annotated tag
+                res.put(tagRef.getName().replace(Constants.R_TAGS, ""), tagRef.getPeeledObjectId().getName());
+            }
+        }
+
+        return res;
+    }
+
+    /**
+     * Returns the list of all commit SHAs queried onto the repository.
+     * 
+     * @return the list of all commit SHAs queried onto the repository.
+     * 
+     * @throws Exception in case of any issue
+     */
+    public List<String> getCommits()
+        throws Exception {
+        List<String> res = new ArrayList<String>();
+        
+        Iterator<RevCommit> commitIterator = git.log().all().call().iterator();
+        while (commitIterator.hasNext())
+            res.add(commitIterator.next().getId().getName());
+
+        return res;
     }
 
     /**
@@ -211,120 +372,6 @@ public class Workbench {
             }
         }
         return null;
-    }
-
-    /**
-     * Returns the list of all commit SHAs created in this repository.
-     * 
-     * @return the list of all commit SHAs created in this repository.
-     */
-    public List<String> getCommits() {
-        List<String> res = new ArrayList<String>();
-        for (List<String> value: commits.values()) {
-            res.addAll(value);
-        }
-        return res;
-    }
-
-    /**
-     * Returns the list of all commit SHAs created in this repository for the given branch.
-     * 
-     * @param branch the name of the branch the commits are requested
-     * 
-     * @return the list of all commit SHAs created in this repository for the given branch.
-     */
-    public List<String> getCommitsByBranch(String branch) {
-        return commits.get(branch);
-    }
-
-    /**
-     * Returns the list of commits for the given branch. If the entry does not exist yet in the commits map
-     * it is created first, so this method is safer than commits.get(branch).
-     * 
-     * @param branch the branch to get the commits for
-     * 
-     * @return the list of commits for the given branch
-     */
-    private List<String> commitsForBranch(String branch) {
-        List<String> res = commits.get(branch);
-        if (Objects.isNull(res)) {
-            res = new ArrayList<String>();
-            commits.put(branch, res);
-        }
-        return res;
-    }
-
-    /**
-     * Adds the given number of text files to the repository root directory. Files have content but they are not staged or committed.
-     * 
-     * @param count the number of files to add
-     * 
-     * @return the collection of the new files
-     * 
-     * @throws Exception in case of any issue
-     * 
-     * @see #getFiles()
-     */
-    public Collection<File> addRandomTextFiles(int count)
-        throws Exception {
-        Collection<File> res = new ArrayList<File>();
-        for (int i=0; i<=count; i++) {
-            File f = new File(git.getRepository().getWorkTree(), RandomUtil.randomAlphabeticString(5).concat(".txt"));
-            FileWriter fw = new FileWriter(f);
-            fw.write(RandomUtil.randomAlphabeticString(5));
-            fw.flush();
-            fw.close();
-            res.add(f);
-        }
-
-        return res;
-    }
-
-    /**
-     * Returns the collection of regular files in the repository root directory.
-     * 
-     * @return the collection of the files in the repository directory
-     * 
-     * @throws Exception in case of any issue
-     * 
-     * @see #addRandomTextFiles(int)
-     */
-    public Collection<File> getFiles()
-        throws Exception {
-        Collection<File> res = new ArrayList<File>();
-        Collections.addAll(res, git.getRepository().getWorkTree().listFiles((File f) -> f.isFile())); // avoid adding the ".git" directory (and any other directory)
-        return res;
-    }
-
-    /**
-     * Replaces the content of the given files with new random content.
-     * 
-     * @param files the collection of files to update
-     * 
-     * @throws Exception in case of any issue
-     * 
-     * @see #getFiles()
-     */
-    public void updateFiles(Collection<File> files)
-        throws Exception {
-        for (File f: files) {
-            FileWriter fw = new FileWriter(f);
-            fw.write(RandomUtil.randomAlphabeticString(5));
-            fw.flush();
-            fw.close();
-        }
-    }
-
-    /**
-     * Replaces the content of all the files in the repository.
-
-     * @throws Exception in case of any issue
-     * 
-     * @see #getFiles()
-     */
-    public void updateAllFiles()
-        throws Exception {
-        updateFiles(getFiles());
     }
 
     /**
@@ -364,7 +411,7 @@ public class Workbench {
     public RevCommit commit(String message)
         throws Exception {
         RevCommit res = git.commit().setMessage(message).call();
-        commitsForBranch(getCurrentBranch()).add(res.getId().getName());
+        workbenchCommitsForBranch(getCurrentBranch()).add(res.getId().getName());
         return res;
     }
 
@@ -382,7 +429,7 @@ public class Workbench {
     public Ref tag(String name, String message, RevObject target)
         throws Exception {
         if (Objects.isNull(message)) {
-            Ref res = git.tag().setAnnotated(false).setObjectId(target).setName(name).setForceUpdate(true).call();
+            Ref res = git.tag().setAnnotated(false).setObjectId(target).setName(name).call();
             lightweightTags.put(target.getId().getName(), name);
             return res;
         }
@@ -482,7 +529,7 @@ public class Workbench {
         }
         else {
             RevCommit res = git.getRepository().parseCommit(mergeCommitId);
-            commitsForBranch(getCurrentBranch()).add(res.getId().getName());
+            workbenchCommitsForBranch(getCurrentBranch()).add(res.getId().getName());
             return res;
         }
     }

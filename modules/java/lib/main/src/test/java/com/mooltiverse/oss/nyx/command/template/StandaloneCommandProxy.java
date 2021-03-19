@@ -49,7 +49,7 @@ class StandaloneCommandProxy implements CommandProxy {
      * {@inheritDoc}
      */
     @Override
-    public String getContextname() {
+    public String getContextName() {
         return "standalone";
     }
 

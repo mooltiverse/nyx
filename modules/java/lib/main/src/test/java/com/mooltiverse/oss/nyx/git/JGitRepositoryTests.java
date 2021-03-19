@@ -35,6 +35,7 @@ import org.eclipse.jgit.revwalk.RevCommit;
 
 import com.mooltiverse.oss.nyx.data.Commit;
 import com.mooltiverse.oss.nyx.data.Identity;
+import com.mooltiverse.oss.nyx.data.Tag;
 
 @DisplayName("JGitRepository")
 public class JGitRepositoryTests {
@@ -134,12 +135,12 @@ public class JGitRepositoryTests {
 
             // remember the cache count may increas of more than 1 for each added file
             int cacheCount = script.getIndexEntryCount();
-            script.addRandomTextFiles(1);
+            script.addRandomTextWorkbenchFiles(1);
             repository.add(List.<String>of("."));
             assertTrue(cacheCount+1 <= script.getIndexEntryCount());
 
             cacheCount = script.getIndexEntryCount();
-            script.addRandomTextFiles(2);
+            script.addRandomTextWorkbenchFiles(2);
             repository.add(List.<String>of("."));
             assertTrue(cacheCount+2 <= script.getIndexEntryCount());
         }
@@ -155,7 +156,7 @@ public class JGitRepositoryTests {
             Script script = Scenario.FROM_SCRATCH.realize();
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
 
-            script.addRandomTextFiles(1);
+            script.addRandomTextWorkbenchFiles(1);
             assertThrows(GitException.class, () -> repository.commit(null));
         }
 
@@ -168,7 +169,7 @@ public class JGitRepositoryTests {
 
             RevCommit prevLastCommit = script.getLastCommit();
 
-            script.addRandomTextFiles(1);
+            script.addRandomTextWorkbenchFiles(1);
             script.stage();
 
             Commit commit = repository.commit("A message");
@@ -203,7 +204,7 @@ public class JGitRepositoryTests {
             Script script = Scenario.FROM_SCRATCH.realize();
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
 
-            script.addRandomTextFiles(1);
+            script.addRandomTextWorkbenchFiles(1);
             assertThrows(GitException.class, () -> repository.commit(List.<String>of("."), null));
         }
 
@@ -216,7 +217,7 @@ public class JGitRepositoryTests {
 
             RevCommit prevLastCommit = script.getLastCommit();
 
-            script.addRandomTextFiles(1);
+            script.addRandomTextWorkbenchFiles(1);
 
             Commit commit = repository.commit(List.<String>of("."), "A message");
 
@@ -233,7 +234,7 @@ public class JGitRepositoryTests {
             Script script = Scenario.FROM_SCRATCH.realize();
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
 
-            script.addRandomTextFiles(1);
+            script.addRandomTextWorkbenchFiles(1);
             assertThrows(GitException.class, () -> repository.commit(null, new Identity("John Doe", "jdoe@example.com"), new Identity("John Doe", "jdoe@example.com")));
         }
 
@@ -246,7 +247,7 @@ public class JGitRepositoryTests {
 
             RevCommit prevLastCommit = script.getLastCommit();
 
-            script.addRandomTextFiles(1);
+            script.addRandomTextWorkbenchFiles(1);
             script.stage();
 
             Commit commit = repository.commit("A message", new Identity("John Doe", "jdoe@example.com"), new Identity("Sean Moe", "smoe@example.com"));
@@ -290,7 +291,7 @@ public class JGitRepositoryTests {
             Script script = Scenario.FROM_SCRATCH.realize();
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
             
-            script.addRandomTextFiles(1);
+            script.addRandomTextWorkbenchFiles(1);
             assertThrows(GitException.class, () -> repository.commit(List.<String>of("."), null, new Identity("John Doe", "jdoe@example.com"), new Identity("John Doe", "jdoe@example.com")));
         }
 
@@ -303,7 +304,7 @@ public class JGitRepositoryTests {
 
             RevCommit prevLastCommit = script.getLastCommit();
 
-            script.addRandomTextFiles(1);
+            script.addRandomTextWorkbenchFiles(1);
 
             Commit commit = repository.commit(List.<String>of("."), "A message", new Identity("John Doe", "jdoe@example.com"), new Identity("Sean Moe", "smoe@example.com"));
 
@@ -329,46 +330,6 @@ public class JGitRepositoryTests {
     class PushTests {
         @DisplayName("JGitRepository.push()")
         @Test
-        public void pushTest()
-            throws Exception {
-            Script script = Scenario.INITIAL_COMMIT.realize();
-
-            // also create two new empty repositories to use as remotes
-            Script remote1script = Scenario.FROM_SCRATCH.realize();
-            Script remote2script = Scenario.FROM_SCRATCH.realize();
-            script.addRemote(remote1script.getGitDirectory(), "origin");
-            script.addRemote(remote2script.getGitDirectory(), "custom");
-
-            Repository repository = JGitRepository.open(script.getWorkingDirectory());
-
-            // remotes still have no commits, so this must throw an exception
-            assertThrows(Exception.class, () -> remote1script.getLastCommit());
-            assertThrows(Exception.class, () -> remote2script.getLastCommit());
-
-            // make a first sync, just to have a starting commit in remotes as well
-            String pushedRemote = repository.push("custom");
-
-            // now the non-default remote 'custom' has the fisrt commit
-            assertEquals("custom", pushedRemote);
-            assertThrows(Exception.class, () -> remote1script.getLastCommit());
-            assertDoesNotThrow(() -> remote2script.getLastCommit());
-
-            // add a commit into the local repo and make sure it's not into the others
-            script.andCommit("A commit message");
-            assertThrows(Exception.class, () -> remote1script.getLastCommit());
-            assertNotEquals(script.getLastCommit().getId().getName(), remote2script.getLastCommit().getId().getName());
-
-            // now push and see the changes reflected
-            pushedRemote = repository.push("custom");
-
-            // changes are reflected to 'custom' only
-            assertEquals("custom", pushedRemote);
-            assertThrows(Exception.class, () -> remote1script.getLastCommit());
-            assertEquals(script.getLastCommit().getId().getName(), remote2script.getLastCommit().getId().getName());
-        }
-
-        @DisplayName("JGitRepository.push(String)")
-        @Test
         public void pushToRemoteTest()
             throws Exception {
             Script script = Scenario.INITIAL_COMMIT.realize();
@@ -388,7 +349,7 @@ public class JGitRepositoryTests {
             // make a first sync, just to have a starting commit in remotes as well
             String pushedRemote = repository.push();
 
-            // now the default remote 'origin' has the fisrt commit
+            // now the default remote 'origin' has the first commit
             assertEquals("origin", pushedRemote);
             assertDoesNotThrow(() -> remote1script.getLastCommit());
             assertThrows(Exception.class, () -> remote2script.getLastCommit());
@@ -405,6 +366,46 @@ public class JGitRepositoryTests {
             assertEquals("origin", pushedRemote);
             assertEquals(script.getLastCommit().getId().getName(), remote1script.getLastCommit().getId().getName());
             assertThrows(Exception.class, () -> remote2script.getLastCommit());
+        }
+        
+        @DisplayName("JGitRepository.push(String)")
+        @Test
+        public void pushTest()
+            throws Exception {
+            Script script = Scenario.INITIAL_COMMIT.realize();
+
+            // also create two new empty repositories to use as remotes
+            Script remote1script = Scenario.FROM_SCRATCH.realize();
+            Script remote2script = Scenario.FROM_SCRATCH.realize();
+            script.addRemote(remote1script.getGitDirectory(), "origin");
+            script.addRemote(remote2script.getGitDirectory(), "custom");
+
+            Repository repository = JGitRepository.open(script.getWorkingDirectory());
+
+            // remotes still have no commits, so this must throw an exception
+            assertThrows(Exception.class, () -> remote1script.getLastCommit());
+            assertThrows(Exception.class, () -> remote2script.getLastCommit());
+
+            // make a first sync, just to have a starting commit in remotes as well
+            String pushedRemote = repository.push("custom");
+
+            // now the non-default remote 'custom' has the first commit
+            assertEquals("custom", pushedRemote);
+            assertThrows(Exception.class, () -> remote1script.getLastCommit());
+            assertDoesNotThrow(() -> remote2script.getLastCommit());
+
+            // add a commit into the local repo and make sure it's not into the others
+            script.andCommit("A commit message");
+            assertThrows(Exception.class, () -> remote1script.getLastCommit());
+            assertNotEquals(script.getLastCommit().getId().getName(), remote2script.getLastCommit().getId().getName());
+
+            // now push and see the changes reflected
+            pushedRemote = repository.push("custom");
+
+            // changes are reflected to 'custom' only
+            assertEquals("custom", pushedRemote);
+            assertThrows(Exception.class, () -> remote1script.getLastCommit());
+            assertEquals(script.getLastCommit().getId().getName(), remote2script.getLastCommit().getId().getName());
         }
 
         @DisplayName("JGitRepository.push(Collection<String>)")
@@ -428,7 +429,7 @@ public class JGitRepositoryTests {
             // make a first sync, just to have a starting commit in remotes as well
             Set<String> pushedRemotes = repository.push(List.<String>of("origin", "custom"));
 
-            // now the remotes have the fisrt commit
+            // now the remotes have the first commit
             assertTrue(pushedRemotes.contains("origin"));
             assertTrue(pushedRemotes.contains("custom"));
             assertEquals(2, pushedRemotes.size());
@@ -449,6 +450,152 @@ public class JGitRepositoryTests {
             assertEquals(2, pushedRemotes.size());
             assertEquals(script.getLastCommit().getId().getName(), remote1script.getLastCommit().getId().getName());
             assertEquals(script.getLastCommit().getId().getName(), remote2script.getLastCommit().getId().getName());
+        }
+    }
+
+    @Nested
+    @DisplayName("JGitRepository.tag")
+    class TagTests {
+        @DisplayName("JGitRepository.tag(String, String)")
+        @Test
+        public void tag1Test()
+            throws Exception {
+            Script script = Scenario.INITIAL_COMMIT.realize();
+            Repository repository = JGitRepository.open(script.getWorkingDirectory());
+
+            // make sure an exception is thrown when the tag name is null
+            assertThrows(GitException.class, () -> repository.tag(null));
+            
+            assertEquals(0, script.getTags().size());
+
+            Tag lTag = repository.tag("ltag");
+            assertEquals(repository.getLatestCommit(), lTag.getTarget());
+            assertEquals("ltag", lTag.getName());
+            assertEquals(1, script.getTags().size());
+            assertTrue(script.getTags().containsKey("ltag"));
+            assertEquals(repository.getLatestCommit(), script.getTags().get("ltag"));
+            assertEquals(script.getCommitByTag("ltag"), repository.getLatestCommit());
+
+            // make sure an exception is thrown when the tag name is duplicated
+            assertThrows(GitException.class, () -> repository.tag("ltag"));
+        }
+
+        @DisplayName("JGitRepository.tag(String, String)")
+        @Test
+        public void tag2Test()
+            throws Exception {
+            Script script = Scenario.INITIAL_COMMIT.realize();
+            Repository repository = JGitRepository.open(script.getWorkingDirectory());
+
+            // make sure an exception is thrown when the tag name is null
+            assertThrows(GitException.class, () -> repository.tag(null, null));
+            assertThrows(GitException.class, () -> repository.tag(null, "The tag message"));
+            
+            assertEquals(0, script.getTags().size());
+
+            Tag lTag = repository.tag("ltag", null);
+            assertEquals(repository.getLatestCommit(), lTag.getTarget());
+            assertEquals("ltag", lTag.getName());
+            assertEquals(1, script.getTags().size());
+            assertTrue(script.getTags().containsKey("ltag"));
+            assertEquals(repository.getLatestCommit(), script.getTags().get("ltag"));
+            assertEquals(script.getCommitByTag("ltag"), repository.getLatestCommit());
+
+            Tag aTag = repository.tag("atag", "The tag message");
+            assertEquals(repository.getLatestCommit(), aTag.getTarget());
+            assertEquals("atag", aTag.getName());
+            assertEquals(2, script.getTags().size());
+            assertTrue(script.getTags().containsKey("atag"));
+            assertEquals(repository.getLatestCommit(), script.getTags().get("atag"));
+            assertEquals(script.getCommitByTag("atag"), repository.getLatestCommit());
+
+            // make sure an exception is thrown when the tag name is duplicated
+            assertThrows(GitException.class, () -> repository.tag("ltag", null));
+            assertThrows(GitException.class, () -> repository.tag("atag", "The tag message"));
+        }
+
+        @DisplayName("JGitRepository.tag(String, String, Identity)")
+        @Test
+        public void tag3Test()
+            throws Exception {
+            Script script = Scenario.INITIAL_COMMIT.realize();
+            Repository repository = JGitRepository.open(script.getWorkingDirectory());
+
+            // make sure an exception is thrown when the tag name is null
+            assertThrows(GitException.class, () -> repository.tag(null, null, null));
+            assertThrows(GitException.class, () -> repository.tag(null, "The tag message", null));
+            
+            assertEquals(0, script.getTags().size());
+
+            Tag lTag = repository.tag("ltag", null, new Identity("John Doe", "jdoe@example.com"));
+            assertEquals(repository.getLatestCommit(), lTag.getTarget());
+            assertEquals("ltag", lTag.getName());
+            assertEquals(1, script.getTags().size());
+            assertTrue(script.getTags().containsKey("ltag"));
+            assertEquals(repository.getLatestCommit(), script.getTags().get("ltag"));
+            assertEquals(script.getCommitByTag("ltag"), repository.getLatestCommit());
+
+            Tag aTag = repository.tag("atag", "The tag message", new Identity("John Doe", "jdoe@example.com"));
+            assertEquals(repository.getLatestCommit(), aTag.getTarget());
+            assertEquals("atag", aTag.getName());
+            assertEquals(2, script.getTags().size());
+            assertTrue(script.getTags().containsKey("atag"));
+            assertEquals(repository.getLatestCommit(), script.getTags().get("atag"));
+            assertEquals(script.getCommitByTag("atag"), repository.getLatestCommit());
+
+            // make sure an exception is thrown when the tag name is duplicated
+            assertThrows(GitException.class, () -> repository.tag("ltag", null, null));
+            assertThrows(GitException.class, () -> repository.tag("atag", "The tag message", null));
+        }
+
+        @DisplayName("JGitRepository.tag(String, String, String, Identity)")
+        @Test
+        public void tag4Test()
+            throws Exception {
+            Script script = Scenario.INITIAL_COMMIT.realize();
+            Repository repository = JGitRepository.open(script.getWorkingDirectory());
+
+            // make sure an exception is thrown when the tag name is null
+            assertThrows(GitException.class, () -> repository.tag(repository.getLatestCommit(), null, null, null));
+            assertThrows(GitException.class, () -> repository.tag(repository.getLatestCommit(), null, "The tag message", null));
+            
+            assertEquals(0, script.getTags().size());
+
+            Tag lTag = repository.tag(repository.getLatestCommit(), "ltag", null, new Identity("John Doe", "jdoe@example.com"));
+            assertEquals(repository.getLatestCommit(), lTag.getTarget());
+            assertEquals("ltag", lTag.getName());
+            assertEquals(1, script.getTags().size());
+            assertTrue(script.getTags().containsKey("ltag"));
+            assertEquals(repository.getLatestCommit(), script.getTags().get("ltag"));
+            assertEquals(script.getCommitByTag("ltag"), repository.getLatestCommit());
+
+            lTag = repository.tag(null, "ltag2", null, new Identity("John Doe", "jdoe@example.com"));
+            assertEquals(repository.getLatestCommit(), lTag.getTarget());
+            assertEquals("ltag2", lTag.getName());
+            assertEquals(2, script.getTags().size());
+            assertTrue(script.getTags().containsKey("ltag2"));
+            assertEquals(repository.getLatestCommit(), script.getTags().get("ltag2"));
+            assertEquals(script.getCommitByTag("ltag2"), repository.getLatestCommit());
+
+            Tag aTag = repository.tag(repository.getLatestCommit(), "atag", "The tag message", new Identity("John Doe", "jdoe@example.com"));
+            assertEquals(repository.getLatestCommit(), aTag.getTarget());
+            assertEquals("atag", aTag.getName());
+            assertEquals(3, script.getTags().size());
+            assertTrue(script.getTags().containsKey("atag"));
+            assertEquals(repository.getLatestCommit(), script.getTags().get("atag"));
+            assertEquals(script.getCommitByTag("atag"), repository.getLatestCommit());
+
+            aTag = repository.tag(null, "atag2", "The tag message", new Identity("John Doe", "jdoe@example.com"));
+            assertEquals(repository.getLatestCommit(), aTag.getTarget());
+            assertEquals("atag2", aTag.getName());
+            assertEquals(4, script.getTags().size());
+            assertTrue(script.getTags().containsKey("atag2"));
+            assertEquals(repository.getLatestCommit(), script.getTags().get("atag2"));
+            assertEquals(script.getCommitByTag("atag2"), repository.getLatestCommit());
+
+            // make sure an exception is thrown when the tag name is duplicated
+            assertThrows(GitException.class, () -> repository.tag(repository.getLatestCommit(), "ltag", null, null));
+            assertThrows(GitException.class, () -> repository.tag(repository.getLatestCommit(), "atag", "The tag message", null));
         }
     }
 

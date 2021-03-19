@@ -116,7 +116,7 @@ public class Script extends Workbench {
      */
     public Script andAddFiles(int count)
         throws Exception {
-        addRandomTextFiles(count);
+        addRandomTextWorkbenchFiles(count);
         return this;
     }
 
@@ -129,7 +129,7 @@ public class Script extends Workbench {
      */
     public Script andUpdateFiles()
         throws Exception {
-        updateAllFiles();
+        updateAllWorkbenchFiles();
         return this;
     }
 

@@ -150,13 +150,14 @@ public class ObjectFactoryTests {
             Ref refTag1 = script.tag("t1", null);
             Tag tag1 = ObjectFactory.tagFrom(refTag1);
             assertEquals("t1", tag1.getName());
+            assertEquals(script.getLastCommit().getId().getName(), tag1.getTarget());
             assertFalse(tag1.isAnnotated());
 
             // test an annotated tag
             Ref refTag2 = script.tag("t2", "Tag message");
-
             Tag tag2 = ObjectFactory.tagFrom(script.peel(refTag2)); // the ref must be peeled first!
             assertEquals("t2", tag2.getName());
+            assertEquals(script.getLastCommit().getId().getName(), tag2.getTarget());
             assertTrue(tag2.isAnnotated());
         }
 

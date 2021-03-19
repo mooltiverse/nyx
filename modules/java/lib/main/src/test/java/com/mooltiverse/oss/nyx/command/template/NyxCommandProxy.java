@@ -57,7 +57,7 @@ class NyxCommandProxy implements CommandProxy {
      * {@inheritDoc}
      */
     @Override
-    public String getContextname() {
+    public String getContextName() {
         return "nyx";
     }
 
