@@ -23,7 +23,7 @@ allprojects {
       Project overall attributes
     ------------------------------------------------------------------------------*/
     group   = 'com.mooltiverse.oss.nyx'
-    version = 'v0.0.2-alpha.1'
+    version = 'v0.0.2-alpha.2'
 
     // The followings can be removed once we start using the Nyx plugin
     ext.isReleaseVersion = version.matches("^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\$")

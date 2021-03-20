@@ -523,3 +523,6 @@ tasks.publishToSonatype.dependsOn tasks.getStagingProfile
 // After successful publishing to the Staging Sonatype Nexus repository trigger the validation and release it to Maven Central
 // (it may take ~10-20 minutes) and so many retries
 tasks.publishToSonatype.finalizedBy tasks.closeAndReleaseRepository
+// make the overall publish task depend on the global publishToSonatype task
+// otherwise it only depends on its subtasks, ignoring closeAndReleaseRepository
+tasks.publish.dependsOn tasks.publishToSonatype
