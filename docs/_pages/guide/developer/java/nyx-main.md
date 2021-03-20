@@ -7,9 +7,6 @@ permalink: /guide/developer/java/nyx-main/
 
 [![Maven Central](https://img.shields.io/maven-central/v/com.mooltiverse.oss.nyx/main.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.mooltiverse.oss.nyx%22%20AND%20a:%22main%22) [![javadoc](https://javadoc.io/badge2/com.mooltiverse.oss.nyx/main/javadoc.svg)](https://javadoc.io/doc/com.mooltiverse.oss.nyx/main)
 
-TODO: check the links to external sites (Maven and Javadoc.io)
-{: .notice--warning}
-
 You can use the main Nyx library to embed it into your project and use all or some of its features. The `com.mooltiverse.oss.nyx` package brings the [`Nyx`](https://javadoc.io/doc/com.mooltiverse.oss.nyx/main/latest/com/mooltiverse/oss/nyx/Nyx.html){:target="_blank"} class that is the entry point for all the available commands and features.
 
 When using the library you may benefit from knowing some insights about the implementation available in [this]({{ site.baseurl }}{% link _pages/guide/user/07.in-depth/index.md %}) section.
@@ -89,4 +86,4 @@ This means that if you're using one of the SLF4J [supported frameworks](http://w
 
 This is why the [`verbosity`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#verbosity) configuration option is ignored by the Java implementation of Nyx.
 
-Log events are decorated with markers to let you categorize, colorize and filter them if you wish. The list of used markers is modelled in the [`Markers` class](https://github.com/mooltiverse/nyx/blob/master/modules/java/lib/main/src/main/java/com/mooltiverse/oss/nyx/log/Markers.java).
+Log events are decorated with markers to let you categorize, colorize and filter them if you wish. The list of used markers is modelled in the [`Markers` class](https://javadoc.io/doc/com.mooltiverse.oss.nyx/main/latest/com/mooltiverse/oss/nyx/log/Markers.html).
