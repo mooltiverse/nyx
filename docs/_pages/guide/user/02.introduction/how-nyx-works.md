@@ -26,7 +26,7 @@ Let's break down the actions taken:
 
 1. **release scope definition**: the Git commit history is browsed using Git natural order (from newest to older commits) starting from the current commit in the current branch (`HEAD`). Each commit is inspected along with its tags and the search stops at commit `C` where `C` is the first commit with a valid release tag applied (according to the [scheme]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#scheme)). The release tag becomes the [previous version]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#previous-version) and commit `C+1` (the commit after `C`, which was encountered before `C` when stepping backward) becomes the [initial commit]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#initial-commit).
 2. **scope analysis**: TODO: complete this bullet
-3. **generate version**: creates the current version identifier. If the above steps didn't find any [previous version]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#previous-version) then the [initial version]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#initial-version) is used, otherwise the previous version is bumped. Which identifier is bumped depends pn what was found during the scope analysis
+3. **generate version**: creates the current version identifier. If the above steps didn't find any [previous version]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#previous-version) then the [initial version]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#initial-version) is used, otherwise the previous version is bumped. Which identifier is bumped depends on what was found during the scope analysis
 
 TODO: summarize the INFER steps here
 {: .notice--warning}
@@ -43,8 +43,13 @@ TODO: write this section
 
 ## Mark
 
-TODO: write this section
-{: .notice--warning}
+This phase is where:
+
+1. new or changed release artifacts are **committed**, if any and if the [configuration](TODO: link the commit configuration option here) instructs the tool to do so
+2. a new release **tag** is created in the Git repository. The tag anatomy (i.e. whether it is [lightweight or annotated](https://git-scm.com/book/en/v2/Git-Basics-Tagging)) is driven by the [configuration](TODO: link the tag configuration option here)
+3. the new commit and tag are **pushed** to the [remote](https://git-scm.com/docs/git-remote) repositories, if required by the [configuration](TODO: link the push configuration option here)
+
+These steps are only taken if the [release scope]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/index.md %}) that has been [inferred](#infer) contains [significant changes]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/index.md %}#significant) that are worth a new release identified by a new [version]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#version), otherwise no action is taken.
 
 ## Publish
 

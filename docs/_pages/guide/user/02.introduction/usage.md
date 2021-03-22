@@ -40,6 +40,8 @@ This command has no dependencies.
 
 Scans the Git repository searching for significant information used to generate the new release. This command never applies any change as it just collects and computes all the required information to be used next.
 
+See [here]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer) for more.
+
 ### Make
 
 TODO: write this section
@@ -47,8 +49,9 @@ TODO: write this section
 
 ### Mark
 
-TODO: write this section
-{: .notice--warning}
+Commits the configured release artifacts (if any) and marks the latest commit with a release tag. If configured to do so it also pushes these changes to remote rrepositories.
+
+See [here]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#mark) for more.
 
 ### Publish
 
@@ -154,6 +157,19 @@ This task has no efferent dependecies but if the `clean` lifecycle task is defin
 Runs the [`infer`](#infer) command.
 
 This task depends on the [`nyxArrange`](#nyxarrange) task while [`nyxMake`](#nyxmake) depends on on this task.
+
+Since this is the task that actually makes available all the information required for a new release (including the [Gradle's `version` property](https://docs.gradle.org/current/userguide/writing_build_scripts.html#sec:standard_project_properties)), you should make all tasks that need that information [dependent](https://docs.gradle.org/current/userguide/more_about_tasks.html#sec:adding_dependencies_to_tasks) on this, directly or indirectly.
+
+For example:
+
+```groovy
+tasks.register('myTask')  {
+    dependsOn ':nyxInfer'
+    doLast {
+        ...
+    }
+}
+```
 
 #### `nyxMake`
 
