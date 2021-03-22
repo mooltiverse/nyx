@@ -97,7 +97,8 @@ plugins {
 }
 ```
 
-Now you need to [configure the plugin](#configure-the-plugin) before you can run any task.
+In Gradle [multi-project builds](https://docs.gradle.org/current/userguide/multi_project_builds.html) the Nyx plugin should be applied to the root project only.
+{: .notice--warning}
 
 ### Configure the plugin
 

@@ -53,6 +53,9 @@ public class NyxPlugin implements Plugin<Project> {
     public void apply(Project project) {
       project.getLogger().info("Applying Nyx plugin");
 
+      if (!Objects.isNull(project.getParent()))
+        project.getLogger().warn("Nyx plugin whould be applied to root project only!");
+
       // Create the project extension. This must be done first as tasks
       // need it to be already available when they are defined
       createExtensions(project);
