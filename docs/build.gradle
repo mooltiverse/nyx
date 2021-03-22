@@ -1,3 +1,14 @@
+/* This script doesn't actually build anything since the documentation microsite
+ * is rendered by GitHub off the 'docs' directory in the master branch. For more
+ * see: https://docs.github.com/en/github/working-with-github-pages/setting-up-a-github-pages-site-with-jekyll
+ * 
+ * To run the microsote locally during editing, cd into the 'docs' directory and
+ * run (with Jekyll installed locally):
+ *     $ bundle exec jekyll serve --watch
+ * 
+ * For more see: https://github.com/mooltiverse/nyx/blob/master/CONTRIBUTING.md#contributing-documentation
+ */
+
 /*------------------------------------------------------------------------------
   Plugins DSL block
   https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
