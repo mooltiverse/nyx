@@ -3,21 +3,7 @@ name: CI
 on: [push]
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Set up JDK 11
-      uses: actions/setup-java@v1
-      with:
-        java-version: 11
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-    - name: Test with Gradle
-      run: ./gradlew check
-
   build:
-    needs: test
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -27,8 +13,8 @@ jobs:
         java-version: 11
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
-    - name: Build with Gradle
-      run: ./gradlew build
+    - name: Test and build with Gradle
+      run: ./gradlew check build
 
   publish:
     needs: build
@@ -55,4 +41,3 @@ jobs:
           ORG_GRADLE_PROJECT_gitHubTestUserToken: ${{ secrets.TEST_GITHUB_USER_TOKEN }}   # The test user token to test Nyx GitHub features
           ORG_GRADLE_PROJECT_gitLabTestUserToken: ${{ secrets.TEST_GITLAB_USER_TOKEN }}   # The test user token to test Nyx GitLab features
         run: ./gradlew publish
-

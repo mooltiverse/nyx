@@ -515,9 +515,9 @@ task javadocPrivate(type: Javadoc) {
 tasks.build.dependsOn tasks.javadocPrivate
 
 // Publish artifacts to the Staging Sonatype Nexus
-// Before running publishToSonatype retrieve and print the stagingProfileId
-// using the getStagingProfile task provided by the 'io.codearte.nexus-staging'
-// plugin.
+//
+// Retrieve and print the stagingProfileId using the getStagingProfile task
+// provided by the 'io.codearte.nexus-staging' plugin.
 // When the browser has an authenticated session to Sonatype Nexus the Id is
 // also available at https://oss.sonatype.org/service/local/staging/profiles
 tasks.publishToSonatype.dependsOn tasks.getStagingProfile
@@ -525,8 +525,8 @@ tasks.publishToSonatype.dependsOn tasks.getStagingProfile
 // trigger the transition to the official Maven Central repository using the
 // closeAndReleaseRepository task from the 'io.codearte.nexus-staging' plugin.
 // This may take ~10-20 minutes and so many retries.
-tasks.closeAndReleaseRepository.dependsOn tasks.publishToSonatype
-// Make the overall publish task depend on the global closeAndReleaseRepository
+tasks.publishToSonatype.finalizedBy tasks.closeAndReleaseRepository
+// Make the overall publish task depend on the global publishToSonatype
 // task, which in turn has dependencies to the other tasks that are functional
 // to the publication.
-tasks.publish.dependsOn tasks.closeAndReleaseRepository
+tasks.publish.dependsOn tasks.publishToSonatype
