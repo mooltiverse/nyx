@@ -15,6 +15,8 @@
  */
 package com.mooltiverse.oss.nyx.gradle;
 
+import static org.junit.jupiter.params.provider.Arguments.arguments;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -198,5 +200,29 @@ public class TestData {
             arguments.add(Arguments.of(task.getKey(), task.getValue(), task.getValue().getSimpleName()));
         }
         return arguments.stream();
+    }
+
+    /**
+     * A stream that can be used in {@link MethodSource} that returns the standard lifecycle tasks
+     * and their dependencies on core tasks. This is used to test the behavior of our plugin and
+     * its tasks with respect to externally defined standard lifecycle tasks.
+     * 
+     * These standard lifecycle tasks are not created by our plugin but may be defined by other
+     * external plugins (i.e. the Gradle Base plugin).
+     * 
+     * Each returned argument has the fields:<br>
+     * - taskName: the name of the standard lifecycle task<br>
+     * - taskDependencies: a list of core task names the lifecycle task depends on<br>
+     *
+     * @return a stream of arguments representing standard lifecycle tasks and their dependencies
+     * 
+     * @see #coreTasks
+     */
+    static Stream<Arguments> standardLifecycleTasksDependencies() {
+        return Stream.of(
+            arguments("release", List.<String>of(PublishTask.NAME)),
+            arguments("clean", List.<String>of(CleanTask.NAME)),
+            arguments("assemble", List.<String>of(MakeTask.NAME))
+        );
     }
 }

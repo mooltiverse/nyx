@@ -158,7 +158,7 @@ This task depends on the [`nyxArrange`](#nyxarrange) task while [`nyxMake`](#nyx
 
 Runs the [`make`](#make) command.
 
-This task depends on the [`nyxInfer`](#nyxinfer) task while [`nyxMark`](#nyxmark) depends on on this task. Moreover, if lifecycle tasks like `assemble` and `build` are defined (like when using the [Base](https://docs.gradle.org/current/userguide/base_plugin.html) they are attached with a dependency on this task.
+This task depends on the [`nyxInfer`](#nyxinfer) task while [`nyxMark`](#nyxmark) depends on on this task. Moreover, if an `assemble` lifecycle tasks is defined (like when using the [Base](https://docs.gradle.org/current/userguide/base_plugin.html) plugin) it is attached with a dependency on this task.
 
 #### `nyxMark`
 

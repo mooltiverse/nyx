@@ -18,6 +18,7 @@ package com.mooltiverse.oss.nyx.gradle;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assumptions.*;
 
+import java.util.List;
 import java.util.Objects;
 
 import org.gradle.api.Project;
@@ -163,6 +164,27 @@ public abstract class AbstractTaskTests extends AbstractTests {
             Task task = project.getTasks().getByName(taskName);
             
             for (String dependency: TestData.allTaskEfferentDirectDependencies.get(taskName)) {
+                boolean dependencyFound = false;
+                for (Task taskDependency: task.getTaskDependencies().getDependencies(task)) {
+                    if (dependency.equals(taskDependency.getName()))
+                        dependencyFound = true;
+                }
+                assertTrue(dependencyFound);
+            }
+        }
+
+        @ParameterizedTest(name = "Task(''{0}'').getDependencies().contains(<all known direct efferent dependencies on core tasks>)")
+        @MethodSource("com.mooltiverse.oss.nyx.gradle.TestData#standardLifecycleTasksDependencies")
+        void getStandardLifecycleTaskDependency(String taskName, List<String> taskDependencies)
+            throws Exception {
+            Project project = newTestProject(null, false);
+
+            // the task is created on the fly to simulate it was there from other plugins
+            Task task = project.getTasks().create(taskName);
+            // apply the plugin
+            project.getPluginManager().apply(NyxPlugin.ID);
+            
+            for (String dependency: taskDependencies) {
                 boolean dependencyFound = false;
                 for (Task taskDependency: task.getTaskDependencies().getDependencies(task)) {
                     if (dependency.equals(taskDependency.getName()))
