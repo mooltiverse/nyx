@@ -149,8 +149,12 @@ $ ./gradlew [TASK]    # on Linux and Mac
 where the main tasks are:
 
 * `clean` to restore the entire project directory to its initial state
-* `build` to build the entire project
-* `test` to test the entire project
+* `assemble` to build the project artifacts
+* `test` to run unit tests
+* `check` to run all tests (unit, integration and functional)
+* `build` to build the entire project and run all tests
+* `publish` to publish project outcomes to distribution services
+* `release` to tag the current version and publish it as a release
 
 The `publish` and `release` tasks can only be executed on the CI/CD platform.
 

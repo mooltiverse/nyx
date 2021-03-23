@@ -57,12 +57,7 @@ nyx {
   bump = 'alpha'
 }
 
-task test() {
-  description 'Runs all tests'
-  group 'Verification'
-}
-
 /*------------------------------------------------------------------------------
   Additional task dependencies
 ------------------------------------------------------------------------------*/
-tasks.check.dependsOn tasks.test
+
