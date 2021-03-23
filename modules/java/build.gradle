@@ -274,12 +274,13 @@ subprojects.each {sub ->
         publications {
             "$sub.name"(MavenPublication) {
                 artifactId = sub.name
+                version = rootProject.version
                 from sub.components.java
 
                 pom {
                     name = sub.name
                     // sub.description fails to evaluate because it's not yet available when publications are defined
-                    description = "$sub.group:$sub.name:$sub.version $sub.description"
+                    description = "$sub.group:$sub.name:$rootProject.version $sub.description"
                     url = nyxHomeURL
                     licenses {
                         license {
@@ -313,6 +314,7 @@ publishing {
         // This is the publication for the umbrella project, basically providing all the java sources and javadocs
         allJava(MavenPublication) {
             artifactId = project.name
+            version = rootProject.version
             from project.components.java
 
             pom {
