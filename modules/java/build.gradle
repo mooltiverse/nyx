@@ -171,6 +171,9 @@ allprojects {
       Additional task dependencies
     ------------------------------------------------------------------------------*/
     tasks.build.dependsOn tasks.javadoc
+
+    // make sure the root project version is available since the early stages
+    tasks.compileJava.dependsOn rootProject.tasks.nyxInfer
 }
 
 /*------------------------------------------------------------------------------

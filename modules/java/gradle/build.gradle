@@ -37,6 +37,7 @@ gradlePlugin {
     plugins {
         nyxPlugin {
             id = rootProject.group
+            version = rootProject.version
             displayName = 'Nyx Gradle plugin'
             description = project.description
             implementationClass = 'com.mooltiverse.oss.nyx.gradle.NyxPlugin'
@@ -52,18 +53,18 @@ pluginBundle {
     /*plugins {
         nyxPlugin {
             id = rootProject.group
+            version = rootProject.version
             displayName = 'Nyx Gradle plugin'
             description = project.description
             tags = [ 'auto-versioning', 'changelog', 'continuous delivery', 'git', 'github', 'gitlab', 'release', 'semantic', 'semantic-release', 'semantic-version', 'semver', 'version', 'versioning' ]
-            version = rootProject.version
         }
     }*/
 
     mavenCoordinates {
         // Overriding the groupId requires manual approval
-        groupId = project.group
-        //artifactId = project.name
+        groupId = rootProject.group
         version = rootProject.version
+        //artifactId = project.name
     }
 }
 

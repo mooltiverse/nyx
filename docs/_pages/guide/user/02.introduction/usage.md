@@ -132,12 +132,26 @@ TODO: write this section
 
 #### Multi-project builds
 
-In Gradle [multi-project builds](https://docs.gradle.org/current/userguide/multi_project_builds.html) the Nyx plugin should be applied to the root project only. Moreover, to propagate the root project version to sub projects, you should add a `subprojects` block in the root project `build.gradle` to do so:
+In Gradle [multi-project builds](https://docs.gradle.org/current/userguide/multi_project_builds.html) the Nyx plugin should be applied to the root project only as it's supposed to be where the Git repository is located.
+
+Nyx makes no hard checks whether it's applied to the root project or a subproject so if you know what you're doing you can apply the plugin to one of the subprojects as well.
+{: .notice--warning}
+
+To use the project version from subprojects you should use the `rootProject.version` property instead of the simple `version` or `project.version` and in order to be sure it has been set before you use it, add a dependency from the task you read the `rootProject.version` to the [`nyxInfer`](#nyxinfer) task in the root project, like:
 
 ```groovy
-subprojects {
-  version = rootProject.version
+tasks.register('myTask')  {
+    dependsOn ':nyxInfer'
+    doLast {
+        println rootProject.version
+    }
 }
+```
+
+or
+
+```groovy
+tasks.myTask.dependsOn rootProject.tasks.nyxInfer
 ```
 
 ### Core tasks
@@ -176,6 +190,12 @@ tasks.register('myTask')  {
         ...
     }
 }
+```
+
+or
+
+```groovy
+tasks.myTask.dependsOn rootProject.tasks.nyxInfer
 ```
 
 #### `nyxMake`
