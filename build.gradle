@@ -8,6 +8,9 @@ plugins {
     // This plugin can be commented out and used only when needed.
     // See: https://github.com/dorongold/gradle-task-tree
     id "com.dorongold.task-tree" version "1.5"
+
+    // Use our own plugin for release management
+    id "com.mooltiverse.oss.nyx" version "0.0.2-alpha.4"
 }
 
 /*------------------------------------------------------------------------------
@@ -23,7 +26,6 @@ allprojects {
       Project overall attributes
     ------------------------------------------------------------------------------*/
     group   = 'com.mooltiverse.oss.nyx'
-    version = '0.0.2-alpha.4'
 
     // The followings can be removed once we start using the Nyx plugin
     ext.isReleaseVersion = version.matches("^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\$")
@@ -41,6 +43,18 @@ allprojects {
         }
       }
     }
+}
+
+/*------------------------------------------------------------------------------
+  Extension configurations
+------------------------------------------------------------------------------*/
+// Use our own plugin for release management
+nyx {
+  // Just bump the pre-release 'alpha' identifier until we have the commit
+  // message conventions implemented.
+  // This causes all new commits to bump the 'alpha' identifier, regardless
+  // how significant are the changes in the release scope.
+  bump = 'alpha'
 }
 
 task test() {
