@@ -100,9 +100,6 @@ plugins {
 }
 ```
 
-In Gradle [multi-project builds](https://docs.gradle.org/current/userguide/multi_project_builds.html) the Nyx plugin should be applied to the root project only.
-{: .notice--warning}
-
 ### Configure the plugin
 
 You have different means to configure the plugin and in these sections we'll introduce you to all of them. Whichever combination of configuration means you use, see the [configuration reference]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/index.md %}) for a detailed description of each option.
@@ -132,6 +129,16 @@ nyx {
 
 TODO: write this section
 {: .notice--warning}
+
+#### Multi-project builds
+
+In Gradle [multi-project builds](https://docs.gradle.org/current/userguide/multi_project_builds.html) the Nyx plugin should be applied to the root project only. Moreover, to propagate the root project version to sub projects, you should add a `subprojects` block in the root project `build.gradle` to do so:
+
+```groovy
+subprojects {
+  version = rootProject.version
+}
+```
 
 ### Core tasks
 

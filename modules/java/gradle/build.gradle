@@ -55,7 +55,7 @@ pluginBundle {
             displayName = 'Nyx Gradle plugin'
             description = project.description
             tags = [ 'auto-versioning', 'changelog', 'continuous delivery', 'git', 'github', 'gitlab', 'release', 'semantic', 'semantic-release', 'semantic-version', 'semver', 'version', 'versioning' ]
-            version = project.version
+            version = rootProject.version
         }
     }*/
 
@@ -63,7 +63,7 @@ pluginBundle {
         // Overriding the groupId requires manual approval
         groupId = project.group
         //artifactId = project.name
-        version = project.version
+        version = rootProject.version
     }
 }
 

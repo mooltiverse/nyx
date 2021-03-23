@@ -19,30 +19,35 @@ plugins {
 description = 'Nyx is a portable and flexible semantic release tool.'
 
 allprojects {
-    // See: https://docs.gradle.org/current/userguide/base_plugin.html
-    apply plugin: 'base'
+  // See: https://docs.gradle.org/current/userguide/base_plugin.html
+  apply plugin: 'base'
 
-    /*------------------------------------------------------------------------------
-      Project overall attributes
-    ------------------------------------------------------------------------------*/
-    group   = 'com.mooltiverse.oss.nyx'
+  /*------------------------------------------------------------------------------
+    Project overall attributes
+  ------------------------------------------------------------------------------*/
+  group   = 'com.mooltiverse.oss.nyx'
 
-    // The followings can be removed once we start using the Nyx plugin
-    ext.isReleaseVersion = version.matches("^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\$")
-    ext.isPrereleaseVersion = version.matches("^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))\$")
+  // The followings can be removed once we start using the Nyx plugin
+  ext.isReleaseVersion = version.matches("^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\$")
+  ext.isPrereleaseVersion = version.matches("^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))\$")
 
-    // This task is useful to see all the configurations for projects. Run this with 'gradle configurations'
-    task configurations() {
-      description 'Prints the project configurations'
-      group 'Help'
+  // This task is useful to see all the configurations for projects. Run this with 'gradle configurations'
+  task configurations() {
+    description 'Prints the project configurations'
+    group 'Help'
 
-      doLast() {
-        println "Project Name: $project.name configurations:"
-        configurations.each {
-          println "    $it.name"
-        }
+    doLast() {
+      println "Project Name: $project.name configurations:"
+      configurations.each {
+        println "    $it.name"
       }
     }
+  }
+}
+
+subprojects {
+  // Propagate the root project version to sub projects
+  version = rootProject.version
 }
 
 /*------------------------------------------------------------------------------
@@ -61,4 +66,8 @@ task test() {
   description 'Runs all tests'
   group 'Verification'
 }
+
+/*------------------------------------------------------------------------------
+  Additional task dependencies
+------------------------------------------------------------------------------*/
 tasks.check.dependsOn tasks.test
