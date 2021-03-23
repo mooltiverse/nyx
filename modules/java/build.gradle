@@ -274,7 +274,9 @@ subprojects.each {sub ->
         publications {
             "$sub.name"(MavenPublication) {
                 artifactId = sub.name
-                version = rootProject.version
+                afterEvaluate {
+                    version = rootProject.version
+                }
                 from sub.components.java
 
                 pom {
@@ -314,7 +316,9 @@ publishing {
         // This is the publication for the umbrella project, basically providing all the java sources and javadocs
         allJava(MavenPublication) {
             artifactId = project.name
-            version = rootProject.version
+            afterEvaluate {
+                version = rootProject.version
+            }
             from project.components.java
 
             pom {
