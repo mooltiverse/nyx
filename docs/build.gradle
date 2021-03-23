@@ -22,9 +22,9 @@ plugins {
 description = 'The Nyx documentation site'
 
 task updateSiteVariables() {
+    dependsOn     rootProject.tasks.nyxInfer
     description = 'Updates the site data file with the current version'
     group       = 'Build'
-    dependsOn   = ':nyxInfer'
 
     doLast {
         File file = project.file('_data/nyx.yml')
@@ -34,7 +34,7 @@ task updateSiteVariables() {
         file.append '\n'
         file.append '# Nyx Version\n'
         file.append '# This variable can be used as {{ site.data.nyx.version }} to parametrize the version of Nyx\n'
-        file.append 'version: "'+project.version+'"\n'
+        file.append 'version: "'+rootProject.version+'"\n'
     }
 }
 
