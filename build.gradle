@@ -45,11 +45,6 @@ allprojects {
   }
 }
 
-subprojects {
-  // Propagate the root project version to sub projects
-  version = rootProject.version
-}
-
 /*------------------------------------------------------------------------------
   Extension configurations
 ------------------------------------------------------------------------------*/
