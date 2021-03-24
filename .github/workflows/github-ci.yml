@@ -4,6 +4,9 @@ name: Continuous Integration
 #
 # The pipeline uses Gradle tasks for each job and in order to make it incremental the cache is used to store
 # the various 'build' directories between tasks (considering each job runs on a different fresh node).
+# The cache is scoped to the current pipeline so jobs in the pipeline can share it but new pipelines
+# always start fresh with an empty cache. This descision just revolves around the key used to store and
+# retrieve the cache for each job.
 
 on: [push]
 
@@ -24,9 +27,7 @@ jobs:
           ~/.gradle/wrapper
           build/
           **/build/
-        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-        restore-keys: |
-          ${{ runner.os }}-gradle-
+        key: ${{ runner.os }}-nyx-gradle-$GITHUB_RUN_ID-$GITHUB_RUN_NUMBER
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: List cache contents
@@ -53,9 +54,7 @@ jobs:
           ~/.gradle/wrapper
           build/
           **/build/
-        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-        restore-keys: |
-          ${{ runner.os }}-gradle-
+        key: ${{ runner.os }}-nyx-gradle-$GITHUB_RUN_ID-$GITHUB_RUN_NUMBER
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: List cache contents
@@ -82,9 +81,7 @@ jobs:
           ~/.gradle/wrapper
           build/
           **/build/
-        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-        restore-keys: |
-          ${{ runner.os }}-gradle-
+        key: ${{ runner.os }}-nyx-gradle-$GITHUB_RUN_ID-$GITHUB_RUN_NUMBER
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: List cache contents
@@ -115,9 +112,7 @@ jobs:
           ~/.gradle/wrapper
           build/
           **/build/
-        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-        restore-keys: |
-          ${{ runner.os }}-gradle-
+        key: ${{ runner.os }}-nyx-gradle-$GITHUB_RUN_ID-$GITHUB_RUN_NUMBER
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: List cache contents
@@ -144,9 +139,7 @@ jobs:
             ~/.gradle/wrapper
             build/
             **/build/
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
+          key: ${{ runner.os }}-nyx-gradle-$GITHUB_RUN_ID-$GITHUB_RUN_NUMBER
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: List cache contents
@@ -183,9 +176,7 @@ jobs:
             ~/.gradle/wrapper
             build/
             **/build/
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
+          key: ${{ runner.os }}-nyx-gradle-$GITHUB_RUN_ID-$GITHUB_RUN_NUMBER
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: List cache contents
