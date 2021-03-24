@@ -4,9 +4,16 @@ name: Continuous Integration
 #
 # The pipeline uses Gradle tasks for each job and in order to make it incremental the cache is used to store
 # the various 'build' directories between tasks (considering each job runs on a different fresh node).
-# The cache is scoped to the current pipeline so jobs in the pipeline can share it but new pipelines
-# always start fresh with an empty cache. This descision just revolves around the key used to store and
-# retrieve the cache for each job.
+#
+# CACHE
+# The cache is scoped to the current pipeline so every new pipeline starts with no cache, while each job
+# ends by caching its cached outputs so that next jobs can start from there.
+# If the cache action finds a stored cache with the given key it pulls when it's setting up but never updates
+# it in the post actions. The problem with this approach is that only the first job updates the cache but
+# next jobs always get the cache from the first job, not from next ones.
+# To work around this problem each job uses a 'restore-keys' with the key generated from the previous
+# job, while its own 'key' is specific (and can be used by next jobs). This prodices a chain of caches
+# but it's the only way to have the cache incremented at each job.
 
 on: [push]
 
@@ -27,7 +34,8 @@ jobs:
           ~/.gradle/wrapper
           build/
           **/build/
-        key: ${{ runner.os }}-nyx-gradle-${{ github.run_id }}-${{ github.run_number }}
+        key: ${{ runner.os }}-nyx-gradle-${{ github.run_id }}-${{ github.run_number }}-assemble
+        #restore-keys: not used here, start from scratch
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: List cache contents
@@ -54,7 +62,9 @@ jobs:
           ~/.gradle/wrapper
           build/
           **/build/
-        key: ${{ runner.os }}-nyx-gradle-${{ github.run_id }}-${{ github.run_number }}
+        key: ${{ runner.os }}-nyx-gradle-${{ github.run_id }}-${{ github.run_number }}-test
+        restore-keys: |
+          ${{ runner.os }}-nyx-gradle-${{ github.run_id }}-${{ github.run_number }}-assemble
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: List cache contents
@@ -81,7 +91,9 @@ jobs:
           ~/.gradle/wrapper
           build/
           **/build/
-        key: ${{ runner.os }}-nyx-gradle-${{ github.run_id }}-${{ github.run_number }}
+        key: ${{ runner.os }}-nyx-gradle-${{ github.run_id }}-${{ github.run_number }}-check
+        restore-keys: |
+          ${{ runner.os }}-nyx-gradle-${{ github.run_id }}-${{ github.run_number }}-test
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: List cache contents
@@ -112,7 +124,9 @@ jobs:
           ~/.gradle/wrapper
           build/
           **/build/
-        key: ${{ runner.os }}-nyx-gradle-${{ github.run_id }}-${{ github.run_number }}
+        key: ${{ runner.os }}-nyx-gradle-${{ github.run_id }}-${{ github.run_number }}-build
+        restore-keys: |
+          ${{ runner.os }}-nyx-gradle-${{ github.run_id }}-${{ github.run_number }}-check
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: List cache contents
@@ -139,7 +153,9 @@ jobs:
             ~/.gradle/wrapper
             build/
             **/build/
-          key: ${{ runner.os }}-nyx-gradle-${{ github.run_id }}-${{ github.run_number }}
+          key: ${{ runner.os }}-nyx-gradle-${{ github.run_id }}-${{ github.run_number }}-publish
+          restore-keys: |
+            ${{ runner.os }}-nyx-gradle-${{ github.run_id }}-${{ github.run_number }}-build
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: List cache contents
@@ -176,7 +192,9 @@ jobs:
             ~/.gradle/wrapper
             build/
             **/build/
-          key: ${{ runner.os }}-nyx-gradle-${{ github.run_id }}-${{ github.run_number }}
+          key: ${{ runner.os }}-nyx-gradle-${{ github.run_id }}-${{ github.run_number }}-release
+          restore-keys: |
+            ${{ runner.os }}-nyx-gradle-${{ github.run_id }}-${{ github.run_number }}-publish
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: List cache contents
