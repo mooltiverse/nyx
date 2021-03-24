@@ -596,7 +596,7 @@ public class NyxPluginFunctionalTests {
         void runNyxTask(GradleRunner gradleRunner, String target, Map<String,TaskOutcome> taskOutcomes, String gradleVersion, List<String> positiveFiles, List<String> negativeFiles)
             throws Exception {
             // GradleRunner.withDebug(boolean) enables debug output
-            BuildResult gradleResult = gradleRunner.withDebug(true).withArguments("--info", /*"--debug",*/ "--stacktrace", target).build();
+            BuildResult gradleResult = gradleRunner.withDebug(false).withArguments("--info", "--stacktrace", target).build();
             System.out.println("Executed task: "+target);System.out.flush();
 
             for (Map.Entry<String,TaskOutcome> taskOutcome: taskOutcomes.entrySet()) {

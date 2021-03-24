@@ -43,19 +43,6 @@ allprojects {
       }
     }
   }
-
-
-  task listBumpDirContents() {
-    doLast() {
-      println ">->->- "+project.name
-      def names = []
-      fileTree(project.buildDir).visit { FileVisitDetails details -> 
-          names << details.file.path
-          println "       "+details.file.path
-      }
-      println "<-<-<- "+project.name
-    }
-  }
 }
 
 /*------------------------------------------------------------------------------
