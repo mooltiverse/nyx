@@ -150,7 +150,7 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: List cache contents
-      run: ./gradlew listBumpDirContents
+        run: ./gradlew listBumpDirContents
       - name: Publish with Gradle
         env:
           # See the top level https://github.com/mooltiverse/nyx/blob/master/CONTRIBUTING.md#contributing-code file for details about passing these values when testing locally
@@ -164,7 +164,7 @@ jobs:
           ORG_GRADLE_PROJECT_gradlePublishSecret: ${{ secrets.GRADLE_PLUGIN_PUBLISH_SECRET }}
         run: ./gradlew publish --stacktrace
       - name: List cache contents
-      run: ./gradlew listBumpDirContents
+        run: ./gradlew listBumpDirContents
 
   release:
     needs: publish
@@ -189,7 +189,7 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: List cache contents
-      run: ./gradlew listBumpDirContents
+        run: ./gradlew listBumpDirContents
       - name: Release with Gradle
         env:
           # See the top level https://github.com/mooltiverse/nyx/blob/master/CONTRIBUTING.md#contributing-code file for details about passing these values when testing locally
@@ -197,4 +197,4 @@ jobs:
           ORG_GRADLE_PROJECT_gitHubToken: ${{ secrets.GITHUB_TOKEN }}
         run: ./gradlew release --stacktrace
       - name: List cache contents
-      run: ./gradlew listBumpDirContents
+        run: ./gradlew listBumpDirContents
