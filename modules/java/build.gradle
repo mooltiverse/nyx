@@ -170,8 +170,6 @@ allprojects {
     /*------------------------------------------------------------------------------
       Additional task dependencies
     ------------------------------------------------------------------------------*/
-    tasks.build.dependsOn tasks.javadoc
-
     // make sure the root project version is available since the early stages
     tasks.compileJava.dependsOn rootProject.tasks.nyxInfer
 }
@@ -266,23 +264,22 @@ tasks.check.finalizedBy tasks.testReport
 /*------------------------------------------------------------------------------
   Publications
 ------------------------------------------------------------------------------*/
-// Maven publications are configured here for all subprojects to grant more consistency when dealing with Sonatype
-// Nexus.
-// Here we create one Maven publication for each subproject.
-subprojects.each {sub ->
+// Maven publications are configured here for all java projects to grant more consistency when dealing with Sonatype Nexus.
+// Here we create one Maven publication for each project.
+allprojects.each {prj ->
     publishing {
         publications {
-            "$sub.name"(MavenPublication) {
-                artifactId = sub.name
+            "$prj.name"(MavenPublication) {
                 afterEvaluate {
+                    artifactId = prj.name
                     version = rootProject.version
+                    from prj.components.java
                 }
-                from sub.components.java
 
                 pom {
-                    name = sub.name
-                    // sub.description fails to evaluate because it's not yet available when publications are defined
-                    description = "$sub.group:$sub.name:$rootProject.version $sub.description"
+                    name = prj.name
+                    // prj.description fails to evaluate because it's not yet available when publications are defined
+                    description = "$prj.group:$prj.name:$rootProject.version $prj.description"
                     url = nyxHomeURL
                     licenses {
                         license {
@@ -311,44 +308,6 @@ subprojects.each {sub ->
 }
 
 publishing {
-    publications {
-        // The local project (all inclusive java library) publication
-        // This is the publication for the umbrella project, basically providing all the java sources and javadocs
-        allJava(MavenPublication) {
-            artifactId = project.name
-            afterEvaluate {
-                version = rootProject.version
-            }
-            from project.components.java
-
-            pom {
-                name = project.name
-                description = project.description
-                url = nyxHomeURL
-                licenses {
-                    license {
-                        name = nyxLicenseName
-                        url = nyxLicenseURL
-                    }
-                }
-                developers {
-                    developer {
-                        id = nyxID
-                        name = nyxTeamName
-                        email = nyxTeamEmail
-                        organization = nyxOrganizationName
-                        organizationUrl = nyxOrganizationURL
-                    }
-                }
-                scm {
-                    connection = nyxGitURL
-                    developerConnection = nyxGitURL
-                    url = nyxHomeURL
-                }
-            }
-        }
-    }
-
     repositories {
         // The GitHub Packages repository, visible at https://github.com/mooltiverse/nyx/packages
         maven {
@@ -504,24 +463,10 @@ nexusStaging {
 /*------------------------------------------------------------------------------
   Additional tasks
 ------------------------------------------------------------------------------*/
-// See: https://docs.gradle.org/current/javadoc/org/gradle/api/plugins/JavaPluginExtension.html#withJavadocJar--
-task javadocPrivate(type: Javadoc) {
-    group = 'Documentation'
-    description = 'Generates an additional global javadoc from all the modules with the private visibility (useful for development of this same project only)'
-    source subprojects.collect { it.sourceSets.main.allJava }
-    classpath = files(subprojects.collect { it.sourceSets.main.compileClasspath })
-    options.memberLevel = JavadocMemberLevel.PRIVATE
-    options.links 'https://docs.oracle.com/en/java/javase/13/docs/api/'
-    options.links 'https://download.eclipse.org/jgit/site/5.6.0.201912101111-r/apidocs/'
-    options.links 'https://docs.gradle.org/current/javadoc/'
-    options.links 'https://junit.org/junit5/docs/current/api/'
-    destinationDir = file("${project.docsDir}/javadoc-private")
-}
 
 /*------------------------------------------------------------------------------
   Additional task dependencies
 ------------------------------------------------------------------------------*/
-tasks.build.dependsOn tasks.javadocPrivate
 
 // Publish artifacts to the Staging Sonatype Nexus
 //
