@@ -75,13 +75,14 @@ plugins {
      */
     
     // 'maven-publish' is implicitly applied by 'de.marcphilipp.nexus-publish'
-    //id 'maven-publish'                                   // See: https://docs.gradle.org/current/userguide/publishing_maven.html
-    id 'signing'                                         // See: https://docs.gradle.org/current/userguide/signing_plugin.html
-    id 'de.marcphilipp.nexus-publish' version '0.4.0'    // See: https://github.com/marcphilipp/nexus-publish-plugin/
-    id 'io.codearte.nexus-staging' version '0.21.2'      // See: https://github.com/Codearte/gradle-nexus-staging-plugin/
+    //id 'maven-publish'                                          // See: https://docs.gradle.org/current/userguide/publishing_maven.html
+    id 'signing'                                                  // See: https://docs.gradle.org/current/userguide/signing_plugin.html
+    id 'de.marcphilipp.nexus-publish' version '0.4.0'             // See: https://github.com/marcphilipp/nexus-publish-plugin/
+    id 'io.codearte.nexus-staging' version '0.21.2'               // See: https://github.com/Codearte/gradle-nexus-staging-plugin/
     
-    // This plugin allows to have additional test sets, configured in a testSets block, like integrationTest and functionalTest
-    id 'org.unbroken-dome.test-sets' version '3.0.1'     // See: https://github.com/unbroken-dome/gradle-testsets-plugin
+    // This plugin allows to have additional test sets, configured in a testSets block, like integrationTest and functionalTest.
+    // This is applied to subprojects only.
+    id 'org.unbroken-dome.test-sets' version '3.0.1' apply false  // See: https://github.com/unbroken-dome/gradle-testsets-plugin
 }
 
 /*------------------------------------------------------------------------------
@@ -166,12 +167,6 @@ allprojects {
             links 'https://docs.oracle.com/en/java/javase/13/docs/api/'
         }
     }
-
-    /*------------------------------------------------------------------------------
-      Additional task dependencies
-    ------------------------------------------------------------------------------*/
-    // make sure the root project version is available since the early stages
-    tasks.compileJava.dependsOn rootProject.tasks.nyxInfer
 }
 
 /*------------------------------------------------------------------------------

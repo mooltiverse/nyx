@@ -22,7 +22,6 @@ plugins {
 description = 'The Nyx documentation site'
 
 task updateSiteVariables() {
-    dependsOn     rootProject.tasks.nyxInfer
     description = 'Updates the site data file with the current version'
     group       = 'Build'
 
