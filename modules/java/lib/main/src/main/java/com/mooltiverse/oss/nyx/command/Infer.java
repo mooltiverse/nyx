@@ -50,12 +50,38 @@ public class Infer extends AbstractCommand {
     private static final Logger logger = LoggerFactory.getLogger(Infer.class);
 
     /**
+     * The name used for the internal state attribute where we store the configured bump.
+     */
+    private static final String CONFIGURED_BUMP = Infer.class.getSimpleName().concat(".").concat("configured").concat(".").concat("bump");
+
+    /**
+     * The name used for the internal state attribute where we store the configured initial version.
+     */
+    private static final String CONFIGURED_INITIAL_VERSION = Infer.class.getSimpleName().concat(".").concat("configured").concat(".").concat("initialVersion");
+
+    /**
+     * The name used for the internal state attribute where we store the configured release lenient.
+     */
+    private static final String CONFIGURED_RELEASE_LENIENT = Infer.class.getSimpleName().concat(".").concat("configured").concat(".").concat("releaseLenient");
+
+    /**
+     * The name used for the internal state attribute where we store the configured release prefix.
+     */
+    private static final String CONFIGURED_RELEASE_PREFIX = Infer.class.getSimpleName().concat(".").concat("configured").concat(".").concat("releasePrefix");
+
+    /**
+     * The name used for the internal state attribute where we store the configured scheme.
+     */
+    private static final String CONFIGURED_SCHEME = Infer.class.getSimpleName().concat(".").concat("configured").concat(".").concat("scheme");
+
+    /**
+     * The name used for the internal state attribute where we store the configured version.
+     */
+    private static final String CONFIGURED_VERSION = Infer.class.getSimpleName().concat(".").concat("configured").concat(".").concat("version");
+
+    /**
      * The name used for the internal state attribute where we store the SHA-1 of the last
      * commit in the current branch by the time this command was last executed.
-     * 
-     * The name is prefixed with this class name to avoid clashes with other attributes.
-     * 
-     * @see State#getInternals()
      */
     private static final String INTERNAL_LAST_COMMIT = Infer.class.getSimpleName().concat(".").concat("last").concat(".").concat("commit");
 
@@ -78,10 +104,23 @@ public class Infer extends AbstractCommand {
     @Override
     public boolean isUpToDate()
         throws DataAccessException, IllegalPropertyException, GitException {
-        // This command is considered up to date only when the repository is clean and the latest
-        // commit (there must be at least one) didn't change.
-        // The State must already have a version set also.
-        return isRepositoryClean() && !Objects.isNull(state().getInternals().get(INTERNAL_LAST_COMMIT)) && state().getInternals().get(INTERNAL_LAST_COMMIT).equals(getLatestCommit()) && !Objects.isNull(state().getVersion());
+        // The command is never considered up to date when the repository is not clean
+        if (!isRepositoryClean())
+            return false;
+        // Never up to date if this command hasn't stored a version yet into the state
+        if (Objects.isNull(state().getVersion()))
+            return false;
+
+        // The command is never considered up to date when the repository last commit has changed
+        if (!isInternalAttributeUpToDate(INTERNAL_LAST_COMMIT, getLatestCommit()))
+            return false;
+        // Check if configuration parameters have changed
+        return isInternalAttributeUpToDate(CONFIGURED_VERSION, state().getConfiguration().getVersion()) &&
+            isInternalAttributeUpToDate(CONFIGURED_BUMP, state().getConfiguration().getBump()) &&
+            isInternalAttributeUpToDate(CONFIGURED_SCHEME, state().getConfiguration().getScheme()) &&
+            isInternalAttributeUpToDate(CONFIGURED_INITIAL_VERSION, state().getConfiguration().getInitialVersion()) &&
+            isInternalAttributeUpToDate(CONFIGURED_RELEASE_PREFIX, state().getConfiguration().getReleasePrefix()) &&
+            isInternalAttributeUpToDate(CONFIGURED_RELEASE_LENIENT, state().getConfiguration().getReleaseLenient());
     }
 
     /**
@@ -99,10 +138,13 @@ public class Infer extends AbstractCommand {
      */
     private void storeStatusInternalAttributes()
         throws DataAccessException, IllegalPropertyException, GitException {
-        // store the last commit SHA-1
-        String latestCommit = getLatestCommit();
-        if (!Objects.isNull(latestCommit))
-            state().getInternals().put(INTERNAL_LAST_COMMIT, latestCommit);
+        storeInternalAttribute(INTERNAL_LAST_COMMIT, getLatestCommit());
+        storeInternalAttribute(CONFIGURED_VERSION, state().getConfiguration().getVersion());
+        storeInternalAttribute(CONFIGURED_BUMP, state().getConfiguration().getBump());
+        storeInternalAttribute(CONFIGURED_SCHEME, state().getConfiguration().getScheme());
+        storeInternalAttribute(CONFIGURED_INITIAL_VERSION, state().getConfiguration().getInitialVersion());
+        storeInternalAttribute(CONFIGURED_RELEASE_PREFIX, state().getConfiguration().getReleasePrefix());
+        storeInternalAttribute(CONFIGURED_RELEASE_LENIENT, state().getConfiguration().getReleaseLenient());
     }
 
     /**

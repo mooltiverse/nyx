@@ -40,6 +40,8 @@ public interface Command {
      * This method uses the quickest method to verify whether the state is up to date or not. This method must not rely on
      * dependencies and it must always evaluate its own status independently.
      * 
+     * As a general rule this method checks if its inputs (i.e. from the configuration) have changed since the last run.
+     * 
      * @return {@code true} if this command is up to date
      * 
      * @throws DataAccessException in case the configuration can't be loaded for some reason.

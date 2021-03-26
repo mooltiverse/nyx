@@ -44,12 +44,23 @@ public class Mark extends AbstractCommand {
     /**
      * The name used for the internal state attribute where we store the SHA-1 of the last
      * commit in the current branch by the time this command was last executed.
-     * 
-     * The name is prefixed with this class name to avoid clashes with other attributes.
-     * 
-     * @see State#getInternals()
      */
     private static final String INTERNAL_LAST_COMMIT = Mark.class.getSimpleName().concat(".").concat("last").concat(".").concat("commit");
+
+    /**
+     * The name used for the internal state attribute where we store the initial commit.
+     */
+    private static final String STATE_INITIAL_COMMIT = Mark.class.getSimpleName().concat(".").concat("state").concat(".").concat("initialCommit");
+
+    /**
+     * The name used for the internal state attribute where we store the significant commits flag.
+     */
+    private static final String STATE_SIGNIFICANT = Mark.class.getSimpleName().concat(".").concat("state").concat(".").concat("significant");
+
+    /**
+     * The name used for the internal state attribute where we store the version.
+     */
+    private static final String STATE_VERSION = Mark.class.getSimpleName().concat(".").concat("state").concat(".").concat("version");
 
     /**
      * Standard constructor.
@@ -70,10 +81,20 @@ public class Mark extends AbstractCommand {
     @Override
     public boolean isUpToDate()
         throws DataAccessException, IllegalPropertyException, GitException {
-        // This command is considered up to date only when the repository is clean and the latest
-        // commit (there must be at least one) didn't change.
-        // The State must already have a version set also.
-        return isRepositoryClean() && !Objects.isNull(state().getInternals().get(INTERNAL_LAST_COMMIT)) && state().getInternals().get(INTERNAL_LAST_COMMIT).equals(getLatestCommit()) && !Objects.isNull(state().getVersion());
+        // The command is never considered up to date when the repository is not clean
+        if (!isRepositoryClean())
+            return false;
+        // Never up to date if this command hasn't stored a version yet into the state
+        if (Objects.isNull(state().getVersion()))
+            return false;
+
+        // The command is never considered up to date when the repository last commit has changed
+        if (!isInternalAttributeUpToDate(INTERNAL_LAST_COMMIT, getLatestCommit()))
+            return false;
+        // Check if configuration parameters have changed
+        return isInternalAttributeUpToDate(STATE_VERSION, state().getVersion()) &&
+            isInternalAttributeUpToDate(STATE_INITIAL_COMMIT, state().getReleaseScope().getInitialCommit()) &&
+            isInternalAttributeUpToDate(STATE_SIGNIFICANT, state().getReleaseScope().getSignificant());
     }
 
     /**
@@ -91,10 +112,12 @@ public class Mark extends AbstractCommand {
      */
     private void storeStatusInternalAttributes()
         throws DataAccessException, IllegalPropertyException, GitException {
-        // store the last commit SHA-1
-        String latestCommit = getLatestCommit();
-        if (!Objects.isNull(latestCommit))
-            state().getInternals().put(INTERNAL_LAST_COMMIT, latestCommit);
+        if (!state().getConfiguration().getDryRun()) {
+            storeInternalAttribute(INTERNAL_LAST_COMMIT, getLatestCommit());
+            storeInternalAttribute(STATE_VERSION, state().getVersion());
+            storeInternalAttribute(STATE_INITIAL_COMMIT, state().getReleaseScope().getInitialCommit());
+            storeInternalAttribute(STATE_SIGNIFICANT, state().getReleaseScope().getSignificant());
+        }
     }
 
     /**

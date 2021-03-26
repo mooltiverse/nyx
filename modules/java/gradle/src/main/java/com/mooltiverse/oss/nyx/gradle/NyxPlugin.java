@@ -15,6 +15,8 @@
  */
 package com.mooltiverse.oss.nyx.gradle;
 
+import static com.mooltiverse.oss.nyx.log.Markers.MAIN;
+
 import java.util.Objects;
 
 import org.gradle.api.Action;
@@ -83,30 +85,30 @@ public class NyxPlugin <T> implements Plugin<T> {
         Logger logger = Logging.getLogger(NyxPlugin.class);
 
         if (Project.class.isAssignableFrom(target.getClass())) {
-            logger.debug("Applying the Nyx plugin to the project");
+            logger.debug(MAIN, "Applying the Nyx plugin to the project");
 
             applyToProject(Project.class.cast(target));
 
-            logger.debug("The Nyx plugin has been applied to the project");
+            logger.debug(MAIN, "The Nyx plugin has been applied to the project");
         }
         else if (Settings.class.isAssignableFrom(target.getClass())) {
-            logger.debug("Applying the Nyx plugin to the settings");
+            logger.debug(MAIN, "Applying the Nyx plugin to the settings");
 
             // apply the plugin to the project as soon as it's available
             Settings.class.cast(target).getGradle().rootProject(project -> applyToProject(project));
 
-            logger.debug("The Nyx plugin has been applied to the settings");
+            logger.debug(MAIN, "The Nyx plugin has been applied to the settings");
         }
         else if (Gradle.class.isAssignableFrom(target.getClass())) {
-            logger.debug("Applying the Nyx plugin to the initialization");
+            logger.debug(MAIN, "Applying the Nyx plugin to the initialization");
 
             // apply the plugin to the project as soon as it's available
             Gradle.class.cast(target).rootProject(project -> applyToProject(project));
 
-            logger.debug("The Nyx plugin has been applied to the initialization");
+            logger.debug(MAIN, "The Nyx plugin has been applied to the initialization");
         }
         else {
-            logger.error("The Nyx plugin can't be applied to objects of type {}", target.getClass().getName());
+            logger.error(MAIN, "The Nyx plugin can't be applied to objects of type {}", target.getClass().getName());
         }
     }
 
@@ -117,7 +119,7 @@ public class NyxPlugin <T> implements Plugin<T> {
      */
     protected static void applyToProject(Project project) {
         if (!Objects.isNull(project.getParent()))
-            project.getLogger().warn("Nyx plugin should be applied to the root project only!");
+            project.getLogger().warn(MAIN, "Nyx plugin should be applied to the root project only!");
 
         // Create the project extension. This must be done first as tasks
         // need it to be already available when they are defined
@@ -136,11 +138,11 @@ public class NyxPlugin <T> implements Plugin<T> {
      * @param project the project to create the extension in
      */
     protected static void createExtensions(Project project) {
-        project.getLogger().debug("Creating Nyx extension with name: {}", NyxExtension.NAME);
+        project.getLogger().debug(MAIN, "Creating Nyx extension with name: {}", NyxExtension.NAME);
 
         NyxExtension.create(project);
 
-        project.getLogger().debug("Nyx extension created with name: {}", NyxExtension.NAME);
+        project.getLogger().debug(MAIN, "Nyx extension created with name: {}", NyxExtension.NAME);
     }
 
     /**
@@ -149,7 +151,7 @@ public class NyxPlugin <T> implements Plugin<T> {
      * @param project the project to define the tasks in
      */
     protected static void defineTasks(Project project) {
-        project.getLogger().debug("Defining Nyx tasks");
+        project.getLogger().debug(MAIN, "Defining Nyx tasks");
 
         // Define lifecycle tasks. These tasks are defined conditionally, only if they haven't been defined
         // elsewhere, i.e. by some other (core) plugin.
@@ -194,7 +196,7 @@ public class NyxPlugin <T> implements Plugin<T> {
             cleanLifecycleTask.dependsOn(CleanTask.NAME);
         }
 
-        project.getLogger().debug("Nyx tasks defined");
+        project.getLogger().debug(MAIN, "Nyx tasks defined");
     }
 
     /**
@@ -211,8 +213,8 @@ public class NyxPlugin <T> implements Plugin<T> {
             }
         }
         catch (Exception e) {
-            project.getLogger().error("Nyx failed to infer in the early project stage and some property like the project version will not be available until you succesfully run the nyxInfer task. Failure is due to: {}", e.getMessage());
-            project.getLogger().debug("Nyx failed to infer due to", e);
+            project.getLogger().error(MAIN, "Nyx failed to infer in the early project stage and some property like the project version will not be available until you succesfully run the nyxInfer task. Failure is due to: {}", e.getMessage());
+            project.getLogger().debug(MAIN, "Nyx failed to infer due to", e);
         }
     }
 }

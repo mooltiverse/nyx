@@ -120,4 +120,30 @@ public abstract class AbstractCommand implements Command {
             throw new GitException(ge);
         }
     }
+
+    /**
+     * Returns {@code true} if the internal attributes map contains an attribute with the given name and its value
+     * equals the given expected value. The comparison is always performed using the {@link Object#toString()} method
+     * of the expected value.
+     * 
+     * @param attributeName the name of the attribute to check. It can't be {@code null}
+     * @param expectedValue the expected value of the attribute. It may be {@code null}
+     * 
+     * @return {@code true} if the internal attributes map contains an attribute with the given name and its value
+     * equals the given expected value.
+     */
+    protected boolean isInternalAttributeUpToDate(String attributeName, Object expectedValue) {
+        return !Objects.isNull(state().getInternals().get(attributeName)) && state().getInternals().get(attributeName).equals(Objects.isNull(expectedValue) ? "null" : expectedValue.toString());
+    }
+
+    /**
+     * Stores the attribute with the given name to the internal attributes map. The stored value is always
+     * performed the {@link Object#toString()} of the given value.
+     * 
+     * @param attributeName the name of the attribute to store. It can't be {@code null}
+     * @param attributeValue the value of the attribute. It may be {@code null}
+     */
+    protected void storeInternalAttribute(String attributeName, Object attributeValue) {
+        state().getInternals().put(attributeName, Objects.isNull(attributeValue) ? "null" : attributeValue.toString());
+    }
 }
