@@ -198,7 +198,7 @@ public class MarkTestTemplates {
             assumeTrue(Objects.isNull(command.state().getVersion()));
 
             configurationMock.initialVersion = SemanticVersion.valueOf("12.13.14");
-            command.state().getConfiguration().withPluginConfiguration(configurationMock);
+            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
             command.run();
 
             assertNull(command.state().getBump());
@@ -236,7 +236,7 @@ public class MarkTestTemplates {
 
             assumeTrue(Objects.isNull(command.state().getVersion()));
 
-            command.state().getConfiguration().withPluginConfiguration(configurationMock);
+            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
             configurationMock.version = SemanticVersion.valueOf("1.2.3");
             command.run();
 
@@ -270,7 +270,7 @@ public class MarkTestTemplates {
             Map<String,String> previousTags = script.getTags();
             ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
 
-            command.state().getConfiguration().withPluginConfiguration(configurationMock);
+            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
             configurationMock.bump = "major";
             command.run();
 
@@ -308,7 +308,7 @@ public class MarkTestTemplates {
             Map<String,String> previousTags = script.getTags();
             ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
 
-            command.state().getConfiguration().withPluginConfiguration(configurationMock);
+            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
             configurationMock.bump = "minor";
             command.run();
 
@@ -346,7 +346,7 @@ public class MarkTestTemplates {
             Map<String,String> previousTags = script.getTags();
             ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
 
-            command.state().getConfiguration().withPluginConfiguration(configurationMock);
+            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
             configurationMock.bump = "patch";
             command.run();
 
@@ -384,7 +384,7 @@ public class MarkTestTemplates {
             Map<String,String> previousTags = script.getTags();
             ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
 
-            command.state().getConfiguration().withPluginConfiguration(configurationMock);
+            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
             configurationMock.bump = "alpha";
             command.run();
 
@@ -422,7 +422,7 @@ public class MarkTestTemplates {
             Map<String,String> previousTags = script.getTags();
             ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
 
-            command.state().getConfiguration().withPluginConfiguration(configurationMock);
+            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
             configurationMock.releaseLenient = Boolean.TRUE;
             script.andCommitWithTag("release-2.2.2");
             
@@ -462,7 +462,7 @@ public class MarkTestTemplates {
             Map<String,String> previousTags = script.getTags();
             ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
 
-            command.state().getConfiguration().withPluginConfiguration(configurationMock);
+            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
             configurationMock.releaseLenient = Boolean.FALSE;
             script.andCommitWithTag("release-2.2.2");
             
@@ -505,7 +505,7 @@ public class MarkTestTemplates {
             Map<String,String> previousTags = script.getTags();
             ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
 
-            command.state().getConfiguration().withPluginConfiguration(configurationMock);
+            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
             configurationMock.releaseLenient = Boolean.FALSE;
             configurationMock.releasePrefix = "release-";
             script.andCommitWithTag("release-2.2.2");
@@ -546,7 +546,7 @@ public class MarkTestTemplates {
             Map<String,String> previousTags = script.getTags();
             ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
 
-            command.state().getConfiguration().withPluginConfiguration(configurationMock);
+            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
             configurationMock.releaseLenient = Boolean.FALSE;
             configurationMock.releasePrefix = ""; // null doesn't override the default, the empty string does
             script.andCommitWithTag("release-2.2.2");
@@ -664,7 +664,7 @@ public class MarkTestTemplates {
             assumeTrue(Objects.isNull(command.state().getVersion()));
 
             configurationMock.initialVersion = SemanticVersion.valueOf("12.13.14");
-            command.state().getConfiguration().withPluginConfiguration(configurationMock);
+            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
             command.run();
 
             assertNull(command.state().getBump());
@@ -704,7 +704,7 @@ public class MarkTestTemplates {
 
             assumeTrue(Objects.isNull(command.state().getVersion()));
 
-            command.state().getConfiguration().withPluginConfiguration(configurationMock);
+            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
             configurationMock.version = SemanticVersion.valueOf("1.2.3");
             command.run();
 
@@ -738,7 +738,7 @@ public class MarkTestTemplates {
             Map<String,String> previousTags = script.getTags();
             ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
 
-            command.state().getConfiguration().withPluginConfiguration(configurationMock);
+            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
             configurationMock.bump = "major";
             command.run();
 
@@ -786,7 +786,7 @@ public class MarkTestTemplates {
             Map<String,String> previousTags = script.getTags();
             ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
 
-            command.state().getConfiguration().withPluginConfiguration(configurationMock);
+            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
             configurationMock.bump = "minor";
             command.run();
 
@@ -834,7 +834,7 @@ public class MarkTestTemplates {
             Map<String,String> previousTags = script.getTags();
             ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
 
-            command.state().getConfiguration().withPluginConfiguration(configurationMock);
+            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
             configurationMock.bump = "patch";
             command.run();
 
@@ -882,7 +882,7 @@ public class MarkTestTemplates {
             Map<String,String> previousTags = script.getTags();
             ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
 
-            command.state().getConfiguration().withPluginConfiguration(configurationMock);
+            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
             configurationMock.bump = "alpha";
             command.run();
 
@@ -930,7 +930,7 @@ public class MarkTestTemplates {
             Map<String,String> previousTags = script.getTags();
             ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
 
-            command.state().getConfiguration().withPluginConfiguration(configurationMock);
+            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
             configurationMock.releaseLenient = Boolean.TRUE;
             script.andCommitWithTag("release-2.2.2");
             
@@ -972,7 +972,7 @@ public class MarkTestTemplates {
             Map<String,String> previousTags = script.getTags();
             ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
 
-            command.state().getConfiguration().withPluginConfiguration(configurationMock);
+            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
             configurationMock.releaseLenient = Boolean.FALSE;
             script.andCommitWithTag("release-2.2.2");
             
@@ -1017,7 +1017,7 @@ public class MarkTestTemplates {
             Map<String,String> previousTags = script.getTags();
             ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
 
-            command.state().getConfiguration().withPluginConfiguration(configurationMock);
+            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
             configurationMock.releaseLenient = Boolean.FALSE;
             configurationMock.releasePrefix = "release-";
             script.andCommitWithTag("release-2.2.2");
@@ -1060,7 +1060,7 @@ public class MarkTestTemplates {
             Map<String,String> previousTags = script.getTags();
             ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
 
-            command.state().getConfiguration().withPluginConfiguration(configurationMock);
+            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
             configurationMock.releaseLenient = Boolean.FALSE;
             configurationMock.releasePrefix = ""; // null doesn't override the default, the empty string does
             script.andCommitWithTag("release-2.2.2");

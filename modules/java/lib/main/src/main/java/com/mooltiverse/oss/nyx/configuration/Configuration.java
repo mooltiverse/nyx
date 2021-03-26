@@ -88,6 +88,48 @@ public class Configuration implements Root {
     }
 
     /**
+     * Adds, replaces or removes the layer at the given priority level.
+     * 
+     * @param layer the configuration layer to set at the given priority level.
+     * If {@code null} any existing configuration layer at the same level is removed (if any).
+     * @param priority the priority level
+     * 
+     * @return a reference to this same object.
+     * 
+     * @throws DataAccessException in case data cannot be read or accessed.
+     * @throws IllegalPropertyException in case some option has been defined but has incorrect values or it can't be resolved.
+     */
+    private synchronized void setConfigurationLayer(ConfigurationLayer layer, LayerPriority priority) {
+        if (Objects.isNull(layer)) {
+            logger.debug(CONFIGURATION, "Removing the existing {} configuration layer, if any", priority);
+            if (layers.containsKey(priority))
+                layers.remove(priority);
+        }
+        else {
+            logger.debug(CONFIGURATION, "Adding or replacing the {} configuration layer", priority);
+            layers.put(priority, layer);
+        }
+    }
+
+    /**
+     * Adds, replaces or removes the layer at the {@link LayerPriority#COMMAND_LINE} level.
+     * 
+     * @param layer the configuration layer to set at the {@link LayerPriority#COMMAND_LINE} level.
+     * If {@code null} any existing configuration layer at the same level is removed (if any).
+     * 
+     * @return a reference to this same object.
+     * 
+     * @throws DataAccessException in case data cannot be read or accessed.
+     * @throws IllegalPropertyException in case some option has been defined but has incorrect values or it can't be resolved.
+     */
+    public Configuration withCommandLineConfiguration(ConfigurationLayer layer)
+        throws DataAccessException, IllegalPropertyException {
+        
+        setConfigurationLayer(layer, LayerPriority.COMMAND_LINE);
+        return this;
+    }
+
+    /**
      * Adds, replaces or removes the layer at the {@link LayerPriority#PLUGIN} level.
      * 
      * @param layer the configuration layer to set at the {@link LayerPriority#PLUGIN} level.
@@ -98,18 +140,10 @@ public class Configuration implements Root {
      * @throws DataAccessException in case data cannot be read or accessed.
      * @throws IllegalPropertyException in case some option has been defined but has incorrect values or it can't be resolved.
      */
-    public synchronized Configuration withPluginConfiguration(ConfigurationLayer layer)
+    public Configuration withPluginConfiguration(ConfigurationLayer layer)
         throws DataAccessException, IllegalPropertyException {
-        if (Objects.isNull(layer)) {
-            logger.debug(CONFIGURATION, "Removing the existing {} configuration layer, if any", LayerPriority.PLUGIN);
-            if (layers.containsKey(LayerPriority.PLUGIN))
-                layers.remove(LayerPriority.PLUGIN);
-        }
-        else {
-            logger.debug(CONFIGURATION, "Adding or replacing the {} configuration layer", LayerPriority.PLUGIN);
-            layers.put(LayerPriority.PLUGIN, layer);
-        }
-
+        
+        setConfigurationLayer(layer, LayerPriority.PLUGIN);
         return this;
     }
 

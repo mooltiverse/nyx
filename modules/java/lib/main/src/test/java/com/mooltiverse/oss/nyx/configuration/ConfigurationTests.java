@@ -108,6 +108,217 @@ public class ConfigurationTests {
     }
 
     /**
+     * Performs checks against the injection of a command line configuration
+     */
+    @Nested
+    @DisplayName("Configuration.withCommandLineConfiguration")
+    class withCommandLineConfigurationTests {
+        @Test
+        @DisplayName("Configuration.withCommandLineConfiguration(MOCK).getBump() == MOCK.getBump()")
+        void getBumpTest()
+            throws Exception {
+            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
+            Configuration configuration = new Configuration();
+            configurationMock.bump = "alpha";
+
+            // in order to make the test meaningful, make sure the default and mock values are different
+            assertNull(Defaults.BUMP);
+            assertNotNull(configurationMock.bump);
+
+            // make sure the initial values come from defaults, until we inject the command line configuration
+            assertNull(Defaults.BUMP);
+            assertNull(configuration.getBump());
+            
+            // inject the command line configuration and test the new value is returned from that
+            configuration.withCommandLineConfiguration(configurationMock);
+
+            assertEquals(configurationMock.bump, configuration.getBump());
+
+            // now remove the command line configuration and test that now default values are returned again
+            assertNull(configuration.withCommandLineConfiguration(null).getBump());
+        }
+
+        @Test
+        @DisplayName("Configuration.withCommandLineConfiguration(MOCK).getDirectory() == MOCK.getDirectory()")
+        void getDirectoryTest()
+            throws Exception {
+            Configuration.setDefaultDirectory(null); // clean the singleton from previous runs
+            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
+            Configuration configuration = new Configuration();
+            configurationMock.directory = new File(System.getProperty("java.io.tmpdir"), "this directory does not exists");
+
+            // in order to make the test meaningful, make sure the default and mock values are different
+            assertNotEquals(Defaults.DIRECTORY, configurationMock.directory);
+
+            // make sure the initial values come from defaults, until we inject the command line configuration
+            assertEquals(Defaults.DIRECTORY, configuration.getDirectory());
+            
+            // inject the command line configuration and test the new value is returned from that
+            configuration.withCommandLineConfiguration(configurationMock);
+            assertEquals(configurationMock.directory, configuration.getDirectory());
+
+            // now remove the command line configuration and test that now default values are returned again
+            assertEquals(Defaults.DIRECTORY, configuration.withCommandLineConfiguration(null).getDirectory());
+        }
+
+        @Test
+        @DisplayName("Configuration.withCommandLineConfiguration(MOCK).getDryRun() == MOCK.getDryRun()")
+        void getDryRunTest()
+            throws Exception {
+            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
+            Configuration configuration = new Configuration();
+            configurationMock.dryRun = Boolean.TRUE;
+
+            // in order to make the test meaningful, make sure the default and mock values are different
+            assertNotEquals(Defaults.DRY_RUN, configurationMock.dryRun);
+
+            // make sure the initial values come from defaults, until we inject the command line configuration
+            assertEquals(Defaults.DRY_RUN, configuration.getDryRun());
+            
+            // inject the command line configuration and test the new value is returned from that
+            configuration.withCommandLineConfiguration(configurationMock);
+            assertEquals(configurationMock.dryRun, configuration.getDryRun());
+
+            // now remove the command line configuration and test that now default values are returned again
+            assertEquals(Defaults.DRY_RUN, configuration.withCommandLineConfiguration(null).getDryRun());
+        }
+
+        @Test
+        @DisplayName("Configuration.withCommandLineConfiguration(MOCK).getInitialVersion() == MOCK.getInitialVersion()")
+        void getInitialVersionTest()
+            throws Exception {
+            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
+            Configuration configuration = new Configuration();
+            configurationMock.initialVersion = SemanticVersion.valueOf("9.9.9");
+
+            // in order to make the test meaningful, make sure the default and mock values are different
+            assertNotEquals(Defaults.INITIAL_VERSION, configurationMock.initialVersion);
+
+            // make sure the initial values come from defaults, until we inject the command line configuration
+            assertEquals(Defaults.INITIAL_VERSION, configuration.getInitialVersion());
+            
+            // inject the command line configuration and test the new value is returned from that
+            configuration.withCommandLineConfiguration(configurationMock);
+            assertEquals(configurationMock.initialVersion, configuration.getInitialVersion());
+
+            // now remove the command line configuration and test that now default values are returned again
+            assertEquals(Defaults.INITIAL_VERSION, configuration.withCommandLineConfiguration(null).getInitialVersion());
+        }
+
+        @Test
+        @DisplayName("Configuration.withCommandLineConfiguration(MOCK).getReleasePrefix() == MOCK.getReleasePrefix()")
+        void getReleasePrefixTest()
+            throws Exception {
+            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
+            Configuration configuration = new Configuration();
+            configurationMock.releasePrefix = "testprefix";
+
+            // in order to make the test meaningful, make sure the default and mock values are different
+            assertNotEquals(Defaults.RELEASE_PREFIX, configurationMock.releasePrefix);
+
+            // make sure the initial values come from defaults, until we inject the command line configuration
+            assertEquals(Defaults.RELEASE_PREFIX, configuration.getReleasePrefix());
+            
+            // inject the command line configuration and test the new value is returned from that
+            configuration.withCommandLineConfiguration(configurationMock);
+            assertEquals(configurationMock.releasePrefix, configuration.getReleasePrefix());
+
+            // now remove the command line configuration and test that now default values are returned again
+            assertEquals(Defaults.RELEASE_PREFIX, configuration.withCommandLineConfiguration(null).getReleasePrefix());
+        }
+
+        @Test
+        @DisplayName("Configuration.withCommandLineConfiguration(MOCK).getReleaseLenient() == MOCK.getReleaseLenient()")
+        void getReleaseLenientTest()
+            throws Exception {
+            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
+            Configuration configuration = new Configuration();
+            configurationMock.releaseLenient = Boolean.FALSE;
+
+            // in order to make the test meaningful, make sure the default and mock values are different
+            assertNotEquals(Defaults.RELEASE_LENIENT, configurationMock.releaseLenient);
+
+            // make sure the initial values come from defaults, until we inject the command line configuration
+            assertEquals(Defaults.RELEASE_LENIENT, configuration.getReleaseLenient());
+            
+            // inject the command line configuration and test the new value is returned from that
+            configuration.withCommandLineConfiguration(configurationMock);
+            assertEquals(configurationMock.releaseLenient, configuration.getReleaseLenient());
+
+            // now remove the command line configuration and test that now default values are returned again
+            assertEquals(Defaults.RELEASE_LENIENT, configuration.withCommandLineConfiguration(null).getReleaseLenient());
+        }
+
+        @Test
+        @DisplayName("Configuration.withCommandLineConfiguration(MOCK).getScheme() == MOCK.getScheme()")
+        void getSchemeTest()
+            throws Exception {
+            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
+            Configuration configuration = new Configuration();
+            configurationMock.scheme = Scheme.SEMVER;
+
+            // since there is only one scheme available, this assumption can't be assumed
+            //assertNotEquals(Defaults.SCHEME, configurationMock.scheme);
+
+            // make sure the initial values come from defaults, until we inject the command line configuration
+            assertEquals(Defaults.SCHEME, configuration.getScheme());
+            
+            // inject the command line configuration and test the new value is returned from that
+            configuration.withCommandLineConfiguration(configurationMock);
+            assertEquals(configurationMock.scheme, configuration.getScheme());
+
+            // now remove the command line configuration and test that now default values are returned again
+            assertEquals(Defaults.SCHEME, configuration.withCommandLineConfiguration(null).getScheme());
+        }
+
+        @Test
+        @DisplayName("Configuration.withCommandLineConfiguration(MOCK).getVerbosity() == MOCK.getVerbosity()")
+        void getVerbosityTest()
+            throws Exception {
+            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
+            Configuration configuration = new Configuration();
+            configurationMock.verbosity = Verbosity.TRACE;
+
+            // in order to make the test meaningful, make sure the default and mock values are different
+            assertNotEquals(Defaults.VERBOSITY, configurationMock.verbosity);
+
+            // make sure the initial values come from defaults, until we inject the command line configuration
+            assertEquals(Defaults.VERBOSITY, configuration.getVerbosity());
+            
+            // inject the command line configuration and test the new value is returned from that
+            configuration.withCommandLineConfiguration(configurationMock);
+            assertEquals(configurationMock.verbosity, configuration.getVerbosity());
+
+            // now remove the command line configuration and test that now default values are returned again
+            assertEquals(Defaults.VERBOSITY, configuration.withCommandLineConfiguration(null).getVerbosity());
+        }
+
+        @Test
+        @DisplayName("Configuration.withCommandLineConfiguration(MOCK).getVersion() == MOCK.getVersion()")
+        void getVersionTest()
+            throws Exception {
+            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
+            Configuration configuration = new Configuration();
+            configurationMock.version = SemanticVersion.valueOf("11.12.13");
+
+            // in order to make the test meaningful, make sure the default and mock values are different
+            assertNull(Defaults.VERSION);
+            assertNotNull(configurationMock.version);
+
+            // make sure the initial values come from defaults, until we inject the command line configuration
+            assertNull(Defaults.VERSION);
+            assertNull(configuration.getVersion());
+            
+            // inject the command line configuration and test the new value is returned from that
+            configuration.withCommandLineConfiguration(configurationMock);
+            assertEquals(configurationMock.version, configuration.getVersion());
+
+            // now remove the command line configuration and test that now default values are returned again
+            assertEquals(Defaults.VERSION, configuration.withCommandLineConfiguration(null).getVersion());
+        }
+    }
+
+    /**
      * Performs checks against the injection of a plugin configuration
      */
     @Nested

@@ -148,7 +148,7 @@ public class StateTests {
             throws Exception {
             Configuration configuration = new Configuration();
             ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-            configuration.withPluginConfiguration(configurationMock);
+            configuration.withCommandLineConfiguration(configurationMock);
             State state = new State(configuration);
 
             Version version = SemanticVersion.valueOf("1.2.3");
@@ -167,7 +167,7 @@ public class StateTests {
             throws Exception {
             Configuration configuration = new Configuration();
             ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-            configuration.withPluginConfiguration(configurationMock);
+            configuration.withCommandLineConfiguration(configurationMock);
             State state = new State(configuration);
 
             Version version = SemanticVersion.valueOf("1.2.3");

@@ -79,10 +79,10 @@ public class NyxTests {
             throws Exception {
             Nyx nyx = new Nyx();
 
-            // initialize a repository in a new directory and pass the directory to the configuration. We'll use the plugin configuration layer to pass the directory
+            // initialize a repository in a new directory and pass the directory to the configuration. We'll use the command line configuration layer to pass the directory
             ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
             configurationMock.directory = Scenario.FROM_SCRATCH.realize().getWorkingDirectory();
-            nyx.configuration().withPluginConfiguration(configurationMock);
+            nyx.configuration().withCommandLineConfiguration(configurationMock);
 
             Repository repository = nyx.repository();
 
