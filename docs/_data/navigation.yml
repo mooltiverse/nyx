@@ -57,6 +57,8 @@ nav-user-guide:
         url: /guide/user/introduction/how-nyx-works/
       - title: "Usage"
         url: /guide/user/introduction/usage/
+      - title: "CI/CD"
+        url: /guide/user/introduction/ci-cd/
       - title: "Configuration Methods"
         url: /guide/user/introduction/configuration-methods/
 #      - title: "Standard Configurations"
