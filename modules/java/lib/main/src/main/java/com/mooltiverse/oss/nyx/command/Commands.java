@@ -20,11 +20,6 @@ package com.mooltiverse.oss.nyx.command;
  */
 public enum Commands {
     /**
-     * The Arrange command.
-     */
-    ARRANGE,
-
-    /**
      * The Clean command.
      */
     CLEAN,

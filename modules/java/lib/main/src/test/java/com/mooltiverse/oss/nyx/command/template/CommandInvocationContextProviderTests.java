@@ -189,7 +189,7 @@ public class CommandInvocationContextProviderTests {
     public static class CommandInjectionTests1 {
         @TestTemplate
         @DisplayName("Command injection when the parameter is annotated with @CommandFactory and @Baseline")
-        void commandTest1(@CommandSelector(Commands.ARRANGE) @Baseline(Scenario.INITIAL_COMMIT) Command command)
+        void commandTest1(@CommandSelector(Commands.CLEAN) @Baseline(Scenario.INITIAL_COMMIT) Command command)
             throws Exception {
             assertNotNull(command);
         }
@@ -197,7 +197,7 @@ public class CommandInvocationContextProviderTests {
         @TestTemplate
         @DisplayName("Command injection when the method is annotated with @CommandFactory and @Baseline")
         @Baseline(Scenario.INITIAL_COMMIT)
-        void commandTest2(@CommandSelector(Commands.ARRANGE) CommandProxy command)
+        void commandTest2(@CommandSelector(Commands.CLEAN) CommandProxy command)
             throws Exception {
             assertNotNull(command);
         }
@@ -209,7 +209,7 @@ public class CommandInvocationContextProviderTests {
     public static class CommandProxyInjectionTests1 {
         @TestTemplate
         @DisplayName("CommandProxy injection when the parameter is annotated with @CommandFactory and @Baseline")
-        void commandProxyTest1(@CommandSelector(Commands.ARRANGE) @Baseline(Scenario.INITIAL_COMMIT) CommandProxy commandProxy)
+        void commandProxyTest1(@CommandSelector(Commands.CLEAN) @Baseline(Scenario.INITIAL_COMMIT) CommandProxy commandProxy)
             throws Exception {
             assertNotNull(commandProxy);
         }
@@ -217,7 +217,7 @@ public class CommandInvocationContextProviderTests {
         @TestTemplate
         @DisplayName("CommandProxy injection when the method is annotated with @CommandFactory and @Baseline")
         @Baseline(Scenario.INITIAL_COMMIT)
-        void commandProxyTest2(@CommandSelector(Commands.ARRANGE) CommandProxy commandProxy)
+        void commandProxyTest2(@CommandSelector(Commands.CLEAN) CommandProxy commandProxy)
             throws Exception {
             assertNotNull(commandProxy);
         }
@@ -229,7 +229,7 @@ public class CommandInvocationContextProviderTests {
         @TestTemplate
         @ExtendWith(CommandInvocationContextProvider.class)
         @DisplayName("Command injection when the parameter is annotated with @CommandFactory and @Baseline")
-        void commandTest1(@CommandSelector(Commands.ARRANGE) @Baseline(Scenario.INITIAL_COMMIT) Command command)
+        void commandTest1(@CommandSelector(Commands.CLEAN) @Baseline(Scenario.INITIAL_COMMIT) Command command)
             throws Exception {
             assertNotNull(command);
         }
@@ -238,7 +238,7 @@ public class CommandInvocationContextProviderTests {
         @ExtendWith(CommandInvocationContextProvider.class)
         @DisplayName("Command injection when the method is annotated with @CommandFactory and @Baseline")
         @Baseline(Scenario.INITIAL_COMMIT)
-        void commandTest2(@CommandSelector(Commands.ARRANGE) Command command)
+        void commandTest2(@CommandSelector(Commands.CLEAN) Command command)
             throws Exception {
             assertNotNull(command);
         }
@@ -250,7 +250,7 @@ public class CommandInvocationContextProviderTests {
         @TestTemplate
         @ExtendWith(CommandInvocationContextProvider.class)
         @DisplayName("CommandProxy injection when the parameter is annotated with @CommandFactory and @Baseline")
-        void commandProxyTest1(@CommandSelector(Commands.ARRANGE) @Baseline(Scenario.INITIAL_COMMIT) CommandProxy commandProxy)
+        void commandProxyTest1(@CommandSelector(Commands.CLEAN) @Baseline(Scenario.INITIAL_COMMIT) CommandProxy commandProxy)
             throws Exception {
             assertNotNull(commandProxy);
         }
@@ -259,7 +259,7 @@ public class CommandInvocationContextProviderTests {
         @ExtendWith(CommandInvocationContextProvider.class)
         @DisplayName("CommandProxy injection when the method is annotated with @CommandFactory and @Baseline")
         @Baseline(Scenario.INITIAL_COMMIT)
-        void commandProxyTest2(@CommandSelector(Commands.ARRANGE) CommandProxy commandProxy)
+        void commandProxyTest2(@CommandSelector(Commands.CLEAN) CommandProxy commandProxy)
             throws Exception {
             assertNotNull(commandProxy);
         }

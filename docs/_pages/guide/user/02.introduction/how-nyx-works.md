@@ -8,11 +8,6 @@ permalink: /guide/user/introduction/how-nyx-works/
 TODO: write the introductory section here
 {: .notice--warning}
 
-## Arrange
-
-TODO: write this section
-{: .notice--warning}
-
 ## Clean
 
 TODO: write this section

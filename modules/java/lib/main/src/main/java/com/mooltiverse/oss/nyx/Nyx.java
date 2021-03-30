@@ -26,7 +26,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mooltiverse.oss.nyx.command.AbstractCommand;
-import com.mooltiverse.oss.nyx.command.Arrange;
 import com.mooltiverse.oss.nyx.command.Clean;
 import com.mooltiverse.oss.nyx.command.Command;
 import com.mooltiverse.oss.nyx.command.Commands;
@@ -188,7 +187,6 @@ public class Nyx {
     private Command newCommandInstance(Commands command)
         throws DataAccessException, IllegalPropertyException, GitException {
         switch (command) {
-            case ARRANGE: return new Arrange(state(), repository());
             case CLEAN:   return new Clean(state(), repository());
             case INFER:   return new Infer(state(), repository());
             case MAKE:    return new Make(state(), repository());
@@ -276,7 +274,6 @@ public class Nyx {
      * @throws GitException in case of unexpected issues when accessing the Git repository.
      * @throws ReleaseException if the task is unable to complete for reasons due to the release process.
      * 
-     * @see #arrange()
      * @see #clean()
      * @see #infer()
      * @see #make()
@@ -289,7 +286,6 @@ public class Nyx {
         logger.debug(MAIN, "Nyx.run({})", command.toString());
         Objects.requireNonNull(command, "Command cannot be null");
         switch (command) {
-            case ARRANGE: arrange(); break;
             case CLEAN:   clean(); break;
             case INFER:   infer(); break;
             case MAKE:    make(); break;
@@ -297,29 +293,6 @@ public class Nyx {
             case PUBLISH: publish(); break;
             default:      throw new IllegalArgumentException(String.format("Unknown command %", command));
         }
-    }
-
-    /**
-     * Runs the {@link Arrange} command and returns the updated state.
-     * 
-     * @return the same state object reference returned by {@link #state()}, which might have been updated by this command
-     * 
-     * @throws DataAccessException in case the configuration can't be loaded for some reason.
-     * @throws IllegalPropertyException in case the configuration has some illegal options.
-     * @throws GitException in case of unexpected issues when accessing the Git repository.
-     * @throws ReleaseException if the task is unable to complete for reasons due to the release process.
-     * 
-     * @see Arrange
-     * @see #run(Commands)
-     */
-    public State arrange()
-        throws DataAccessException, IllegalPropertyException, GitException, ReleaseException {
-        logger.debug(MAIN, "Nyx.arrange()");
-
-        // this command has no dependencies
-
-        // run the command
-        return runCommand(Commands.ARRANGE);
     }
 
     /**
@@ -360,8 +333,7 @@ public class Nyx {
         throws DataAccessException, IllegalPropertyException, GitException, ReleaseException {
         logger.debug(MAIN, "Nyx.infer()");
 
-        // run dependent tasks first
-        arrange();
+        // this command has no dependencies
 
         // run the command
         return runCommand(Commands.INFER);

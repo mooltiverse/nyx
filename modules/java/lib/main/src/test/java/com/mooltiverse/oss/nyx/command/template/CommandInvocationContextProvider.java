@@ -33,7 +33,6 @@ import org.junit.platform.commons.support.AnnotationSupport;
 import com.mooltiverse.oss.nyx.Nyx;
 import com.mooltiverse.oss.nyx.command.Command;
 import com.mooltiverse.oss.nyx.command.Commands;
-import com.mooltiverse.oss.nyx.command.Arrange;
 import com.mooltiverse.oss.nyx.command.Clean;
 import com.mooltiverse.oss.nyx.command.Infer;
 import com.mooltiverse.oss.nyx.command.Make;
@@ -442,7 +441,6 @@ public class CommandInvocationContextProvider implements TestTemplateInvocationC
 
                 try {
                     switch (commandName) {
-                        case ARRANGE: return new StandaloneCommandProxy(new Arrange(new State(new Configuration()), Git.open(script.getWorkingDirectory())));
                         case CLEAN:   return new StandaloneCommandProxy(new Clean(new State(new Configuration()), Git.open(script.getWorkingDirectory())));
                         case INFER:   return new StandaloneCommandProxy(new Infer(new State(new Configuration()), Git.open(script.getWorkingDirectory())));
                         case MAKE:    return new StandaloneCommandProxy(new Make(new State(new Configuration()), Git.open(script.getWorkingDirectory())));

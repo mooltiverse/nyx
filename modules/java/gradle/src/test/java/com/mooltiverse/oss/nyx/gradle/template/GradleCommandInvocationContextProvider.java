@@ -39,7 +39,6 @@ import com.mooltiverse.oss.nyx.command.template.CommandInvocationContextProvider
 import com.mooltiverse.oss.nyx.command.template.CommandProxy;
 import com.mooltiverse.oss.nyx.git.Script;
 import com.mooltiverse.oss.nyx.git.Workbench;
-import com.mooltiverse.oss.nyx.gradle.ArrangeTask;
 import com.mooltiverse.oss.nyx.gradle.CleanTask;
 import com.mooltiverse.oss.nyx.gradle.InferTask;
 import com.mooltiverse.oss.nyx.gradle.MakeTask;
@@ -246,7 +245,6 @@ public class GradleCommandInvocationContextProvider extends CommandInvocationCon
                     Commands commandName = resolveCommandSelector(parameterContext, extensionContext);
                     String taskName = null;
                     switch (commandName) {
-                        case ARRANGE: taskName = ArrangeTask.NAME; break;
                         case CLEAN:   taskName = CleanTask.NAME; break;
                         case INFER:   taskName = InferTask.NAME; break;
                         case MAKE:    taskName = MakeTask.NAME; break;

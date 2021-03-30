@@ -43,7 +43,6 @@ public class TestData {
     static Map<String,Class<? extends CoreTask>> coreTasks = new HashMap<String,Class<? extends CoreTask>>(){
         private static final long serialVersionUID = 1L;
         {
-            put(ArrangeTask.NAME, ArrangeTask.class);
             put(CleanTask.NAME,   CleanTask.class);
             put(InferTask.NAME,   InferTask.class);
             put(MakeTask.NAME,    MakeTask.class);
@@ -80,8 +79,7 @@ public class TestData {
         private static final long serialVersionUID = 1L;
         {
             put(CleanTask.NAME,   List.<String>of());
-            put(ArrangeTask.NAME, List.<String>of());
-            put(InferTask.NAME,   List.<String>of(ArrangeTask.NAME));
+            put(InferTask.NAME,   List.<String>of());
             put(MakeTask.NAME,    List.<String>of(InferTask.NAME));
             put(MarkTask.NAME,    List.<String>of(MakeTask.NAME));
             put(PublishTask.NAME, List.<String>of(MarkTask.NAME));
@@ -116,7 +114,6 @@ public class TestData {
         private static final long serialVersionUID = 1L;
         {
             put(CleanTask.NAME,   List.<String>of());
-            put(ArrangeTask.NAME, List.<String>of(ReleaseTask.NAME, PublishTask.NAME, MarkTask.NAME, MakeTask.NAME, InferTask.NAME));
             put(InferTask.NAME,   List.<String>of(ReleaseTask.NAME, PublishTask.NAME, MarkTask.NAME, MakeTask.NAME));
             put(MakeTask.NAME,    List.<String>of(ReleaseTask.NAME, PublishTask.NAME, MarkTask.NAME));
             put(MarkTask.NAME,    List.<String>of(ReleaseTask.NAME, PublishTask.NAME));

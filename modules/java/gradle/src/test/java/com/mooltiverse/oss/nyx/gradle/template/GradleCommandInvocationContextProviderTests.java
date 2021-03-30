@@ -84,7 +84,7 @@ public class GradleCommandInvocationContextProviderTests {
     static class TaskInjectionTests1 {
         @TestTemplate
         @DisplayName("Task injection when the parameter is annotated with @CommandFactory and @Baseline")
-        void taskTest1(@CommandSelector(Commands.ARRANGE) @Baseline(Scenario.INITIAL_COMMIT) Task task)
+        void taskTest1(@CommandSelector(Commands.CLEAN) @Baseline(Scenario.INITIAL_COMMIT) Task task)
             throws Exception {
             assertNotNull(task);
         }
@@ -92,7 +92,7 @@ public class GradleCommandInvocationContextProviderTests {
         @TestTemplate
         @DisplayName("Task injection when the method is annotated with @CommandFactory and @Baseline")
         @Baseline(Scenario.INITIAL_COMMIT)
-        void taskTest2(@CommandSelector(Commands.ARRANGE) Task task)
+        void taskTest2(@CommandSelector(Commands.CLEAN) Task task)
             throws Exception {
             assertNotNull(task);
         }
@@ -104,7 +104,7 @@ public class GradleCommandInvocationContextProviderTests {
         @TestTemplate
         @ExtendWith(GradleCommandInvocationContextProvider.class)
         @DisplayName("Task injection when the parameter is annotated with @CommandFactory and @Baseline")
-        void taskTest1(@CommandSelector(Commands.ARRANGE) @Baseline(Scenario.INITIAL_COMMIT) Task task)
+        void taskTest1(@CommandSelector(Commands.CLEAN) @Baseline(Scenario.INITIAL_COMMIT) Task task)
             throws Exception {
             assertNotNull(task);
         }
@@ -113,7 +113,7 @@ public class GradleCommandInvocationContextProviderTests {
         @ExtendWith(GradleCommandInvocationContextProvider.class)
         @DisplayName("Task injection when the method is annotated with @CommandFactory and @Baseline")
         @Baseline(Scenario.INITIAL_COMMIT)
-        void taskTest2(@CommandSelector(Commands.ARRANGE) Task task)
+        void taskTest2(@CommandSelector(Commands.CLEAN) Task task)
             throws Exception {
             assertNotNull(task);
         }
@@ -125,7 +125,7 @@ public class GradleCommandInvocationContextProviderTests {
     static class ProjectInjectionTests1 {
         @TestTemplate
         @DisplayName("Project injection when the parameter is annotated with @CommandFactory and @Baseline")
-        void projectTest1(@CommandSelector(Commands.ARRANGE) @Baseline(Scenario.INITIAL_COMMIT) Project project)
+        void projectTest1(@CommandSelector(Commands.CLEAN) @Baseline(Scenario.INITIAL_COMMIT) Project project)
             throws Exception {
             assertNotNull(project);
         }
@@ -133,7 +133,7 @@ public class GradleCommandInvocationContextProviderTests {
         @TestTemplate
         @DisplayName("Project injection when the method is annotated with @CommandFactory and @Baseline")
         @Baseline(Scenario.INITIAL_COMMIT)
-        void projectTest2(@CommandSelector(Commands.ARRANGE) Project project)
+        void projectTest2(@CommandSelector(Commands.CLEAN) Project project)
             throws Exception {
             assertNotNull(project);
         }
@@ -145,7 +145,7 @@ public class GradleCommandInvocationContextProviderTests {
         @TestTemplate
         @ExtendWith(GradleCommandInvocationContextProvider.class)
         @DisplayName("Project injection when the parameter is annotated with @CommandFactory and @Baseline")
-        void projectTest1(@CommandSelector(Commands.ARRANGE) @Baseline(Scenario.INITIAL_COMMIT) Project project)
+        void projectTest1(@CommandSelector(Commands.CLEAN) @Baseline(Scenario.INITIAL_COMMIT) Project project)
             throws Exception {
             assertNotNull(project);
         }
@@ -154,7 +154,7 @@ public class GradleCommandInvocationContextProviderTests {
         @ExtendWith(GradleCommandInvocationContextProvider.class)
         @DisplayName("Project injection when the method is annotated with @CommandFactory and @Baseline")
         @Baseline(Scenario.INITIAL_COMMIT)
-        void projectTest2(@CommandSelector(Commands.ARRANGE) Project project)
+        void projectTest2(@CommandSelector(Commands.CLEAN) Project project)
             throws Exception {
             assertNotNull(project);
         }

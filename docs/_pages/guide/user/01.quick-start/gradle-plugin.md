@@ -47,7 +47,6 @@ $ gradle tasks
 
 Release tasks
 -------------
-nyxArrange - Integrates the local repository history with extra information from remotes
 nyxClean - Deletes local release artifacts and reverts the release process to its initial state
 nyxInfer - Collects informations from the local Git repository to generate the new version and plan the release actions
 nyxMake - Builds the configured local release artifacts
@@ -63,7 +62,7 @@ BUILD SUCCESSFUL in 280ms
 
 See [here]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#core-tasks) for the detailed description of each task.
 
-Please note that when using the *settings plugin* (applied in the `settings.gradle` file), using the `nyxArrange` and `nyxInfer` tasks is not needed (unless your Git repository changes throughout the build process) as they are executed during the project initialization phase.
+Please note that when using the *settings plugin* (applied in the `settings.gradle` file), using the `nyxInfer` task is not needed (unless your Git repository changes throughout the build process) as it is executed during the project initialization phase.
 
 TODO: complete this section with standard configuration options
 {: .notice--warning}

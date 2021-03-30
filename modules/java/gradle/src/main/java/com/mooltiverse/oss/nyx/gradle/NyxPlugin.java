@@ -125,7 +125,6 @@ public class NyxPlugin <T> implements Plugin<T> {
      */
     protected static void defineTasks(Project project, NyxExtension extension) {
         // Define core tasks
-        project.getTasks().register(ArrangeTask.NAME, ArrangeTask.class, extension);
         project.getTasks().register(CleanTask.NAME,   CleanTask.class, extension);
         project.getTasks().register(InferTask.NAME,   InferTask.class, extension);
         project.getTasks().register(MakeTask.NAME,    MakeTask.class, extension);

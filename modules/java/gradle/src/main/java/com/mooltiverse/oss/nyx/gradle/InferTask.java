@@ -48,9 +48,6 @@ public abstract class InferTask extends CoreTask {
     public InferTask(NyxExtension extension) {
         super(extension);
         setDescription(DESCRIPTION);
-
-        // Configure dependencies
-        dependsOn(ArrangeTask.NAME);
     }
 
     /**

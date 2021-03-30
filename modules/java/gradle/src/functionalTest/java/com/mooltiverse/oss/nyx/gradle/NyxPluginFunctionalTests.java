@@ -268,19 +268,6 @@ public class NyxPluginFunctionalTests {
                 private static final long serialVersionUID = 1L;
                 {
                     put(CleanTask.NAME, TaskOutcome.SUCCESS);
-                    put(ArrangeTask.NAME, null);
-                    put(InferTask.NAME, null);
-                    put(MakeTask.NAME, null);
-                    put(MarkTask.NAME, null);
-                    put(PublishTask.NAME, null);
-                    put(ReleaseTask.NAME, null);
-                }
-            });
-            put(ArrangeTask.NAME, new HashMap<String,TaskOutcome>(){
-                private static final long serialVersionUID = 1L;
-                {
-                    put(CleanTask.NAME, null);
-                    put(ArrangeTask.NAME, TaskOutcome.SUCCESS);
                     put(InferTask.NAME, null);
                     put(MakeTask.NAME, null);
                     put(MarkTask.NAME, null);
@@ -292,7 +279,6 @@ public class NyxPluginFunctionalTests {
                 private static final long serialVersionUID = 1L;
                 {
                     put(CleanTask.NAME, null);
-                    put(ArrangeTask.NAME, TaskOutcome.SUCCESS);
                     put(InferTask.NAME, TaskOutcome.SUCCESS);
                     put(MakeTask.NAME, null);
                     put(MarkTask.NAME, null);
@@ -304,7 +290,6 @@ public class NyxPluginFunctionalTests {
                 private static final long serialVersionUID = 1L;
                 {
                     put(CleanTask.NAME, null);
-                    put(ArrangeTask.NAME, TaskOutcome.SUCCESS);
                     put(InferTask.NAME, TaskOutcome.SUCCESS);
                     put(MakeTask.NAME, TaskOutcome.SUCCESS);
                     put(MarkTask.NAME, null);
@@ -316,7 +301,6 @@ public class NyxPluginFunctionalTests {
                 private static final long serialVersionUID = 1L;
                 {
                     put(CleanTask.NAME, null);
-                    put(ArrangeTask.NAME, TaskOutcome.SUCCESS);
                     put(InferTask.NAME, TaskOutcome.SUCCESS);
                     put(MakeTask.NAME, TaskOutcome.SUCCESS);
                     put(MarkTask.NAME, TaskOutcome.SUCCESS);
@@ -328,7 +312,6 @@ public class NyxPluginFunctionalTests {
                 private static final long serialVersionUID = 1L;
                 {
                     put(CleanTask.NAME, null);
-                    put(ArrangeTask.NAME, TaskOutcome.SUCCESS);
                     put(InferTask.NAME, TaskOutcome.SUCCESS);
                     put(MakeTask.NAME, TaskOutcome.SUCCESS);
                     put(MarkTask.NAME, TaskOutcome.SUCCESS);
@@ -340,7 +323,6 @@ public class NyxPluginFunctionalTests {
                 private static final long serialVersionUID = 1L;
                 {
                     put(CleanTask.NAME, null);
-                    put(ArrangeTask.NAME, TaskOutcome.SUCCESS);
                     put(InferTask.NAME, TaskOutcome.SUCCESS);
                     put(MakeTask.NAME, TaskOutcome.SUCCESS);
                     put(MarkTask.NAME, TaskOutcome.SUCCESS);
