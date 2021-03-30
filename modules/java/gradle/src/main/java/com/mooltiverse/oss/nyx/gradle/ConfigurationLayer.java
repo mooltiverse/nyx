@@ -22,8 +22,6 @@ import static com.mooltiverse.oss.nyx.gradle.Constants.GRADLE_VERSION_PROPERTY_N
 import java.io.File;
 import java.util.Objects;
 
-import org.gradle.api.file.DirectoryProperty;
-
 import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
 import com.mooltiverse.oss.nyx.data.Scheme;
 import com.mooltiverse.oss.nyx.data.Verbosity;
@@ -73,8 +71,7 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
      */
     @Override
     public File getDirectory() {
-        DirectoryProperty directoryProperty = extension.getDirectory();
-        return Objects.isNull(directoryProperty) ? null : directoryProperty.getAsFile().get();
+        return extension.getDirectory().getOrNull();
     }
 
     /**

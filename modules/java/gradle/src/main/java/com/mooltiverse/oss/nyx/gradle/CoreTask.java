@@ -17,8 +17,10 @@ package com.mooltiverse.oss.nyx.gradle;
 
 import static com.mooltiverse.oss.nyx.gradle.Constants.GRADLE_VERSION_PROPERTY_NAME;
 
-import org.gradle.api.Project;
+import java.util.Objects;
+
 import org.gradle.api.plugins.ExtensionContainer;
+import org.gradle.api.tasks.Internal;
 
 import com.mooltiverse.oss.nyx.Nyx;
 import com.mooltiverse.oss.nyx.data.DataAccessException;
@@ -40,34 +42,19 @@ public abstract class CoreTask extends AbstractTask {
     public static final String NYX_INSTANCE_PROPERTY = "nyxInstance";
 
     /**
-     * Default constructor.
+     * The private instance of the extension object.
      */
-    public CoreTask() {
+    private final NyxExtension extension;
+
+    /**
+     * Standard constructor.
+     * 
+     * @param extension the extension object. Cannot be {@code null}.
+     */
+    public CoreTask(NyxExtension extension) {
         super();
-    }
-
-    /**
-     * Configures the task by defining properties common to all core tasks. Also invokes the same method from superclass method.
-     * 
-     * Child classes should invoke this method during the configuration phase.
-     * 
-     * @param task the task to configure
-     * 
-     * @see AbstractTask#configure(AbstractTask)
-     */
-    protected static void configure(AbstractTask task) {
-        AbstractTask.configure(task);
-    }
-
-    /**
-     * Returns the instance of the extension for the given project.
-     * 
-     * @param project the project to return the extension for
-     * 
-     * @return the extension for the given project
-     */
-    protected static NyxExtension retrieveExtension(Project project) {
-        return project.getExtensions().getByType(NyxExtension.class);
+        Objects.requireNonNull(extension, "The task constructor requires a non null extension");
+        this.extension = extension;
     }
 
     /**
@@ -75,8 +62,9 @@ public abstract class CoreTask extends AbstractTask {
      * 
      * @return the extension for the task
      */
-    protected NyxExtension retrieveExtension() {
-        return retrieveExtension(getProject());
+    @Internal
+    protected NyxExtension getExtension() {
+        return extension;
     }
 
     /**
@@ -136,7 +124,7 @@ public abstract class CoreTask extends AbstractTask {
         else {
             Nyx instance = new Nyx(getProject().getProjectDir());
             // The 'version' is a standard Gradle project property (https://docs.gradle.org/current/userguide/writing_build_scripts.html#sec:standard_project_properties)
-            instance.configuration().withPluginConfiguration(new ConfigurationLayer(retrieveExtension(), getProject().findProperty(GRADLE_VERSION_PROPERTY_NAME)));
+            instance.configuration().withPluginConfiguration(new ConfigurationLayer(getExtension(), getProject().findProperty(GRADLE_VERSION_PROPERTY_NAME)));
             storeSharedProperty(NYX_INSTANCE_PROPERTY, instance);
             return Nyx.class.cast(retrieveSharedProperty(NYX_INSTANCE_PROPERTY));
         }

@@ -125,9 +125,6 @@ public class LifecycleTaskTests extends AbstractTaskTests {
             // now create a 'release' task by just its name
             project.task(taskName);
 
-            // now creating the task should return null as a task with the same name was already there
-            assertNull(ReleaseTask.conditionallyDefine(project));
-
             // make sure the project has no task with the ReleaseTask type
             // even if it has a task with the same name
             assertNotNull(project.getTasks().named(taskName));

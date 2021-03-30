@@ -17,10 +17,7 @@ package com.mooltiverse.oss.nyx.gradle;
 
 import javax.inject.Inject;
 
-import org.gradle.api.Action;
-import org.gradle.api.Project;
 import org.gradle.api.tasks.TaskAction;
-import org.gradle.api.tasks.TaskProvider;
 
 import com.mooltiverse.oss.nyx.Nyx;
 import com.mooltiverse.oss.nyx.NyxException;
@@ -40,46 +37,18 @@ public abstract class MarkTask extends CoreTask {
     public static final String NAME = "nyxMark";
 
     /**
-     * Default constructor
+     * Standard constructor.
+     * 
+     * @param extension the extension object. Cannot be {@code null}. This is injected by Gradle because it's passed
+     * as an optional constructor argument by the {@link NyxPlugin} definition method.
      */
     @Inject
-    public MarkTask() {
-        super();
-    }
-
-    /**
-     * Registers the task into the given project. The task is lazily registered, for deferred creation.
-     * 
-     * @param project the project to define the task for
-     * 
-     * @return the task provider used for the deferred task instantiation
-     * 
-     * @see #define(Project, String, Class, Action)
-     */
-    public static TaskProvider<MarkTask> define(Project project) {
-        return define(project, NAME, MarkTask.class, task -> configure(task));
-    }
-
-    /**
-     * Configures the task (group, description, dependencies, properties).
-     * 
-     * This method is lazily invoked by Gradle (only when actually needed) as its reference is passed as an {@link Action} during the
-     * {@link #define(Project, String, Class, Action)} phase.
-     * 
-     * @param task the task to configure
-     * 
-     * @see #define(Project)
-     */
-    protected static void configure(MarkTask task) {
-        task.getLogger().debug("Configuring task: {} - {}", task.getName(), MarkTask.NAME);
-
-        CoreTask.configure(task);
-        task.setDescription(DESCRIPTION);
+    public MarkTask(NyxExtension extension) {
+        super(extension);
+        setDescription(DESCRIPTION);
 
         // Configure dependencies
-        task.dependsOn(MakeTask.NAME);
-
-        task.getLogger().debug("Task: {} - {} configured", task.getName(), MarkTask.NAME);
+        dependsOn(MakeTask.NAME);
     }
 
     /**
@@ -93,9 +62,6 @@ public abstract class MarkTask extends CoreTask {
     @TaskAction
     public void mark()
         throws NyxException {
-        getLogger().info("Running MarkTask: {}", NAME);
-
-        // just a draft to test the wireframing between objects
         nyx().mark();
     }
 }

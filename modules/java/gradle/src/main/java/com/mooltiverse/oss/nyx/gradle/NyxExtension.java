@@ -15,12 +15,12 @@
  */
 package com.mooltiverse.oss.nyx.gradle;
 
+import java.io.File;
 import javax.inject.Inject;
 
 import org.gradle.api.NamedDomainObjectContainer;
 import org.gradle.api.Project;
-import org.gradle.api.file.DirectoryProperty;
-import org.gradle.api.file.ProjectLayout;
+import org.gradle.api.initialization.Settings;
 import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.provider.Property;
 import org.gradle.api.provider.Provider;
@@ -56,12 +56,17 @@ public abstract class NyxExtension {
 
     /**
      * The 'directory' property.
-     * Default is taken from the Gradle project directory.
+     * Default is taken from the Gradle project directory but the method to retrieve that is
+     * based on where this object is applied (see the {@link #create(Project)} and
+     * {@link #create(Settings)} methods).
      * 
      * This property uses the {@link Property#convention(Provider)} to define the default value so
      * when users are good with the default value they don't need to define it in the build script.
+     * 
+     * @see #create(Project)
+     * @see #create(Settings)
      */
-    private DirectoryProperty directory = getObjectfactory().directoryProperty().convention(getProjectLayout().getProjectDirectory());
+    private Property<File> directory = getObjectfactory().property(File.class);
 
     /**
      * The 'dryRun' property.
@@ -120,21 +125,6 @@ public abstract class NyxExtension {
     protected abstract ObjectFactory getObjectfactory();
 
     /**
-     * Returns a project layout instance.
-     * 
-     * The instance is injected by Gradle as soon as this getter method is invoked.
-     * 
-     * Using <a href="https://docs.gradle.org/current/userguide/custom_gradle_types.html#property_injection">property injection</a>
-     * instead of <a href="https://docs.gradle.org/current/userguide/custom_gradle_types.html#constructor_injection">constructor injection</a>
-     * has a few advantages: it allows Gradle to refer injecting the object until it's required and is safer for backward
-     * compatibility (older versions can be supported).
-     * 
-     * @return the project layout instance
-     */
-    @Inject
-    protected abstract ProjectLayout getProjectLayout();
-
-    /**
      * Creates the extension into the given project.
      * 
      * @param project the project to create the extension into
@@ -142,12 +132,21 @@ public abstract class NyxExtension {
      * @return the extension instance, within the given project
      */
     public static NyxExtension create(Project project) {
-        project.getLogger().debug("Creating Nyx extension with name: {}", NyxExtension.NAME);
-
         NyxExtension extension = project.getExtensions().create(NyxExtension.NAME, NyxExtension.class);
+        extension.directory.convention(project.getLayout().getProjectDirectory().getAsFile());
+        return extension;
+    }
 
-        project.getLogger().debug("Nyx extension created with name: {}", NyxExtension.NAME);
-
+    /**
+     * Creates the extension into the given settings.
+     * 
+     * @param settings the settings to create the extension into
+     * 
+     * @return the extension instance, within the given settings
+     */
+    public static NyxExtension create(Settings settings) {
+        NyxExtension extension = settings.getExtensions().create(NyxExtension.NAME, NyxExtension.class);
+        extension.directory.convention(settings.getRootDir());
         return extension;
     }
 
@@ -171,10 +170,8 @@ public abstract class NyxExtension {
      * safer for old Gradle versions we support.
      * 
      * @return the directory to use as the base repository location
-     * 
-     * TODO: add a link to constants from Nyx configuration classes
      */
-    public DirectoryProperty getDirectory() {
+    public Property<File> getDirectory() {
         return directory;
     }
 

@@ -34,8 +34,8 @@ import org.junit.jupiter.api.Test;
 @DisplayName("NyxPlugin")
 public class NyxPluginTests extends AbstractTests {
     @Nested
-    @DisplayName("NyxPlugin.apply")
-    class ApplyTests {
+    @DisplayName("NyxPlugin.apply [project plugin]")
+    class ApplyProjectPluginTests {
         @Test
         @DisplayName("NyxPlugin.apply()")
         void applyTest()
@@ -85,5 +85,11 @@ public class NyxPluginTests extends AbstractTests {
             assertEquals(NyxPlugin.class, project.getPlugins().getAt(NyxPlugin.ID).getClass());
             assertEquals(NyxPlugin.class, project.getPlugins().getAt(NyxPlugin.class).getClass());
         }
+    }
+
+    @Nested
+    @DisplayName("NyxPlugin.apply [settings plugin]")
+    class ApplySettingsPluginTests {
+        // Unfortunately Gradle doesn't give any means to instantiate a Settings object to use for unit tests
     }
 }

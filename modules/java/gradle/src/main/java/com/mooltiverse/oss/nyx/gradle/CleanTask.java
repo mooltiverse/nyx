@@ -17,10 +17,7 @@ package com.mooltiverse.oss.nyx.gradle;
 
 import javax.inject.Inject;
 
-import org.gradle.api.Action;
-import org.gradle.api.Project;
 import org.gradle.api.tasks.TaskAction;
-import org.gradle.api.tasks.TaskProvider;
 
 import com.mooltiverse.oss.nyx.Nyx;
 import com.mooltiverse.oss.nyx.NyxException;
@@ -40,45 +37,15 @@ public abstract class CleanTask extends CoreTask {
     public static final String NAME = "nyxClean";
 
     /**
-     * Default constructor
+     * Standard constructor.
+     * 
+     * @param extension the extension object. Cannot be {@code null}. This is injected by Gradle because it's passed
+     * as an optional constructor argument by the {@link NyxPlugin} definition method.
      */
     @Inject
-    public CleanTask() {
-        super();
-    }
-
-    /**
-     * Registers the task into the given project. The task is lazily registered, for deferred creation.
-     * 
-     * @param project the project to define the task for
-     * 
-     * @return the task provider used for the deferred task instantiation
-     * 
-     * @see #define(Project, String, Class, Action)
-     */
-    public static TaskProvider<CleanTask> define(Project project) {
-        return define(project, NAME, CleanTask.class, task -> configure(task));
-    }
-
-    /**
-     * Configures the task (group, description, dependencies, properties).
-     * 
-     * This method is lazily invoked by Gradle (only when actually needed) as its reference is passed as an {@link Action} during the
-     * {@link #define(Project, String, Class, Action)} phase.
-     * 
-     * @param task the task to configure
-     * 
-     * @see #define(Project)
-     */
-    protected static void configure(CleanTask task) {
-        task.getLogger().debug("Configuring task: {} - {}", task.getName(), CleanTask.NAME);
-
-        CoreTask.configure(task);
-        task.setDescription(DESCRIPTION);
-
-        // This task has no dependencies to configure
-
-        task.getLogger().debug("Task: {} - {} configured", task.getName(), CleanTask.NAME);
+    public CleanTask(NyxExtension extension) {
+        super(extension);
+        setDescription(DESCRIPTION);
     }
 
     /**
@@ -92,9 +59,6 @@ public abstract class CleanTask extends CoreTask {
     @TaskAction
     public void clean()
         throws NyxException {
-        getLogger().info("Running CleanTask: {}", NAME);
-
-        // just a draft to test the wireframing between objects
         nyx().clean();
     }
 }

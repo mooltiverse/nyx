@@ -24,22 +24,19 @@ import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
 import org.gradle.api.initialization.Settings;
-import org.gradle.api.invocation.Gradle;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 
 /**
- * The main plugin class. This plugin can be applied to {@link Project}, {@link Settings} or {@link Gradle} objects,
+ * The main plugin class. This plugin can be applied to {@link Project} or {@link Settings} objects,
  * which means the {@link #apply(Object)} method can receive any of these object types. The actual type of the object
  * passed to the {@link #apply(Object)} method is defined by Gradle based on how the plugin is used, or better,
  * where the plugin is <a href="https://docs.gradle.org/current/userguide/plugins.html">applied</a>.
  * <br>
  * If the plugin is applied the common way, using the plugin DSL in the {@code build.gradle} file, then a {@link Project}
  * object is passed. If the plugin is used as a settings plugin using the plugin DSL in the {@code settings.gradle}
- * then a {@link Settings} object is passed. If the plugin is used as an initialization plugin using an 
- * <a href="https://docs.gradle.org/current/userguide/init_scripts.html">Initialization Scripts</a> like {@code init.gradle}
- * then a {@link Gradle} object is passed.
- * See <a href="https://docs.gradle.org/current/userguide/custom_plugins.html#sec:writing_a_simple_plugin">Writing a simple plugin</a>
+ * then a {@link Settings} object is passed. See
+ * <a href="https://docs.gradle.org/current/userguide/custom_plugins.html#sec:writing_a_simple_plugin">Writing a simple plugin</a>
  * for more.
  * <br>
  * The main difference between the different options is that when the plugin is used as a regular project plugin
@@ -48,17 +45,16 @@ import org.gradle.api.logging.Logging;
  * are statically defined and evaluated before the Nyx inference has run, so they would likely get the {@code undefined}
  * default value when reading the {@code project.version} property. When the plugin is applied to the {@code settings.gradle}
  * instead, the inference happens before the project is evaluated and the {@code version} property, along with other values
- * coming from the inference, are available earlier. Last, applying the plugin to an {@code init.gradle} script has the
- * same effect as {@code settings.gradle}, but the use case may be different depending on users' needs.
+ * coming from the inference, are available earlier.
  * <br>
- * Please note that when applying the plugin in the {@code settings.gradle} or {@code init.gradle} file, the plugin is
+ * Please note that when applying the plugin in the {@code settings.gradle} the plugin is
  * also applied at the project level so that users don't need to apply it twice.
  * <br>
  * See <a href="https://docs.gradle.org/current/userguide/custom_plugins.html">Developing Custom Gradle Plugins</a> for an introduction
  * on custom Gradle plugin development.
  * 
  * @param <T> the type of object the plugin is applied to. The actual type is defined by Gradle and can be
- * {@link Project}, {@link Settings} or {@link Gradle} depending on how and where the plugin is applied.
+ * {@link Project} or {@link Settings} depending on how and where the plugin is applied.
  */
 public class NyxPlugin <T> implements Plugin<T> {
     /**
@@ -82,89 +78,59 @@ public class NyxPlugin <T> implements Plugin<T> {
      */
     @Override
     public void apply(T target) {
-        Logger logger = Logging.getLogger(NyxPlugin.class);
-
         if (Project.class.isAssignableFrom(target.getClass())) {
-            logger.debug(MAIN, "Applying the Nyx plugin to the project");
+            Project project = Project.class.cast(target);
+            project.getLogger().debug(MAIN, "Applying the Nyx plugin to the project");
 
-            applyToProject(Project.class.cast(target));
+            if (!Objects.isNull(project.getParent()))
+                project.getLogger().warn(MAIN, "Nyx plugin should be applied to the root project only!");
 
-            logger.debug(MAIN, "The Nyx plugin has been applied to the project");
+            // Create the project extension
+            NyxExtension nyxExtension = NyxExtension.create(project);
+
+            // Define the tasks
+            defineTasks(project, nyxExtension);
+
+            // if we want to trigger the inference as soon as the project is evaluated this can be uncommented (based on some conditional)
+            // the outcome isn't like applying the plugin at the settings level though as 'afterEvaluate' happens later
+            //project.afterEvaluate(p -> triggerInference(p));
+
+            project.getLogger().debug(MAIN, "The Nyx plugin has been applied to the project");
         }
         else if (Settings.class.isAssignableFrom(target.getClass())) {
+            Logger logger = Logging.getLogger(NyxPlugin.class);
+            Settings settings = Settings.class.cast(target);
             logger.debug(MAIN, "Applying the Nyx plugin to the settings");
 
-            // apply the plugin to the project as soon as it's available
-            Settings.class.cast(target).getGradle().rootProject(project -> applyToProject(project));
+            // Create the settings extension
+            NyxExtension nyxExtension = NyxExtension.create(settings);
+
+            // Define the tasks
+            settings.getGradle().rootProject(p -> defineTasks(p, nyxExtension));
+            // trigger the inference as soon as the project is evaluated
+            settings.getGradle().rootProject(p -> triggerInference(p));
 
             logger.debug(MAIN, "The Nyx plugin has been applied to the settings");
         }
-        else if (Gradle.class.isAssignableFrom(target.getClass())) {
-            logger.debug(MAIN, "Applying the Nyx plugin to the initialization");
-
-            // apply the plugin to the project as soon as it's available
-            Gradle.class.cast(target).rootProject(project -> applyToProject(project));
-
-            logger.debug(MAIN, "The Nyx plugin has been applied to the initialization");
-        }
         else {
-            logger.error(MAIN, "The Nyx plugin can't be applied to objects of type {}", target.getClass().getName());
+            Logging.getLogger(NyxPlugin.class).error(MAIN, "The Nyx plugin can't be applied to objects of type {}", target.getClass().getName());
         }
-    }
-
-    /**
-     * Applies the plugin to the given project.
-     * 
-     * @param project the project to apply the plugin to.
-     */
-    protected static void applyToProject(Project project) {
-        if (!Objects.isNull(project.getParent()))
-            project.getLogger().warn(MAIN, "Nyx plugin should be applied to the root project only!");
-
-        // Create the project extension. This must be done first as tasks
-        // need it to be already available when they are defined
-        createExtensions(project);
-
-        // Define the tasks
-        defineTasks(project);
-
-        // Trigger the ingerence to happen early. This may be turned on/off by a conditional if needed
-        triggerInference(project);
-    }
-
-    /**
-     * Creates the plugin extensions for the project.
-     * 
-     * @param project the project to create the extension in
-     */
-    protected static void createExtensions(Project project) {
-        project.getLogger().debug(MAIN, "Creating Nyx extension with name: {}", NyxExtension.NAME);
-
-        NyxExtension.create(project);
-
-        project.getLogger().debug(MAIN, "Nyx extension created with name: {}", NyxExtension.NAME);
     }
 
     /**
      * Sets up the tasks and dependencies to the project.
      * 
      * @param project the project to define the tasks in
+     * @param extension the extension to be passed to tasks
      */
-    protected static void defineTasks(Project project) {
-        project.getLogger().debug(MAIN, "Defining Nyx tasks");
-
-        // Define lifecycle tasks. These tasks are defined conditionally, only if they haven't been defined
-        // elsewhere, i.e. by some other (core) plugin.
-        // These tasks are define first to allow core tasks to set dependencies on lifecycle tasks, if they need so.
-        ReleaseTask.conditionallyDefine(project);
-
+    protected static void defineTasks(Project project, NyxExtension extension) {
         // Define core tasks
-        ArrangeTask.define(project);
-        CleanTask.define(project);
-        InferTask.define(project);
-        MakeTask.define(project);
-        MarkTask.define(project);
-        PublishTask.define(project);
+        project.getTasks().register(ArrangeTask.NAME, ArrangeTask.class, extension);
+        project.getTasks().register(CleanTask.NAME,   CleanTask.class, extension);
+        project.getTasks().register(InferTask.NAME,   InferTask.class, extension);
+        project.getTasks().register(MakeTask.NAME,    MakeTask.class, extension);
+        project.getTasks().register(MarkTask.NAME,    MarkTask.class, extension);
+        project.getTasks().register(PublishTask.NAME, PublishTask.class, extension);
 
         // Define lifecycle tasks dependencies
         // These dependencies can't be defined inside each task's configure() method as it may lead
@@ -174,9 +140,10 @@ public class NyxPlugin <T> implements Plugin<T> {
         // Make the 'release' task dependent on the Publish task. There must be one as we define it
         // within the plugin if not already defined elsewhere.
         Task releaseLifecycleTask = project.getTasks().findByName(ReleaseTask.NAME);
-        if (!Objects.isNull(releaseLifecycleTask)) {
-            releaseLifecycleTask.dependsOn(PublishTask.NAME);
+        if (Objects.isNull(releaseLifecycleTask)) {
+            releaseLifecycleTask = project.getTasks().create(ReleaseTask.NAME, ReleaseTask.class);
         }
+        releaseLifecycleTask.dependsOn(PublishTask.NAME);
 
         // If there is an 'assemble' task defined make it dependent on the MakeTask
         Task assembleLifecycleTask = project.getTasks().findByName("assemble");
@@ -195,15 +162,13 @@ public class NyxPlugin <T> implements Plugin<T> {
         if (!Objects.isNull(cleanLifecycleTask)) {
             cleanLifecycleTask.dependsOn(CleanTask.NAME);
         }
-
-        project.getLogger().debug(MAIN, "Nyx tasks defined");
     }
 
     /**
-     * Forces the execution of the {@link InferTask} as soon as the plugin has been applied so that the outcomes
-     * of the inference (like the {@code project.property}) are available as soon as possible.
+     * Runs the {@link InferTask} on the given project so that the outcomes of the inference
+     * (like the {@code project.property}) are available as soon as possible.
      * 
-     * @param project the project to trigger the inference for
+     * @param project the project to run the inference for
      */
     protected static void triggerInference(Project project) {
         try {

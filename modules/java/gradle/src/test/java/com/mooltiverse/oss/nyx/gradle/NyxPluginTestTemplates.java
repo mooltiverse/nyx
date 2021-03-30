@@ -36,9 +36,9 @@ import com.mooltiverse.oss.nyx.git.Scenario;
 @DisplayName("NyxPlugin")
 public class NyxPluginTestTemplates {
     @Nested
-    @DisplayName("NyxPlugin.apply")
+    @DisplayName("NyxPlugin.apply [project plugin]")
     @ExtendWith(GradleCommandInvocationContextProvider.class)
-    class ApplyTests {
+    class ApplyProjectPluginTests {
         @TestTemplate
         @DisplayName("NyxPlugin.apply()")
         @Baseline(Scenario.FROM_SCRATCH)
@@ -72,5 +72,12 @@ public class NyxPluginTestTemplates {
             assertEquals(NyxPlugin.class, project.getPlugins().getAt(NyxPlugin.ID).getClass());
             assertEquals(NyxPlugin.class, project.getPlugins().getAt(NyxPlugin.class).getClass());
         }
+    }
+
+    @Nested
+    @DisplayName("NyxPlugin.apply [settings plugin]")
+    @ExtendWith(GradleCommandInvocationContextProvider.class)
+    class ApplySettingsPluginTests {
+        // Unfortunately Gradle doesn't give any means to instantiate a Settings object to use for unit tests
     }
 }

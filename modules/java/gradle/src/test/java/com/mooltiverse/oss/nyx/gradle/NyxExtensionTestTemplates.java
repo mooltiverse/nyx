@@ -62,7 +62,7 @@ public class NyxExtensionTestTemplates {
 
             // the default must be the project directory
             assertTrue(extension.getDirectory().isPresent());
-            assertEquals(project.getProjectDir(), extension.getDirectory().get().getAsFile());
+            assertEquals(project.getProjectDir().getAbsolutePath(), extension.getDirectory().get().getAbsolutePath());
         }
 
         @TestTemplate

@@ -37,7 +37,6 @@ import org.junit.jupiter.params.provider.MethodSource;
  */
 @DisplayName("AbstractTask")
 public abstract class AbstractTaskTests extends AbstractTests {
-
     /**
      * Makes sure the task with the given name or class is not available using both eager and lazy methods.
      * 

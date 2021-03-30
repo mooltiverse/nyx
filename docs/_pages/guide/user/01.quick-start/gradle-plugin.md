@@ -11,7 +11,7 @@ We assume you already have a Gradle project in place and have base familiarity w
 
 ## Apply and configure the plugin
 
-First off, you need to apply the [plugin](https://plugins.gradle.org/plugin/com.mooltiverse.oss.nyx) (you're suggested to use the [plugin DSL](https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block)) and you do so by editing your `build.gradle` file to add the new plugin:
+First off, you need to apply the [plugin](https://plugins.gradle.org/plugin/com.mooltiverse.oss.nyx) (you're suggested to use the [plugin DSL](https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block)) and you do so by editing your `settings.gradle` file to add the new plugin:
 
 ```groovy
 plugins {
@@ -19,12 +19,17 @@ plugins {
 }
 ```
 
-Then you add the `nyx` configuration block to the same `build.gradle`, to make it look like:
+In this example we use the *settings plugin* as it's the suggested and safer way to use it. [Here]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#apply-the-plugin) you also have instructions to apply it as a regular *project plugin*.
+{: .notice--success}
+
+Then you add the `nyx` configuration block to the same `settings.gradle`, to make it look like:
 
 ```groovy
 plugins {
   id "com.mooltiverse.oss.nyx" version "{{ site.data.nyx.version }}"
 }
+
+// other definitions here like project name etc...
 
 nyx {
   // configuration options here...
@@ -57,6 +62,8 @@ BUILD SUCCESSFUL in 280ms
 ```
 
 See [here]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#core-tasks) for the detailed description of each task.
+
+Please note that when using the *settings plugin* (applied in the `settings.gradle` file), using the `nyxArrange` and `nyxInfer` tasks is not needed (unless your Git repository changes throughout the build process) as they are executed during the project initialization phase.
 
 TODO: complete this section with standard configuration options
 {: .notice--warning}
