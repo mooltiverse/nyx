@@ -23,11 +23,6 @@ allprojects {
     Project overall attributes
   ------------------------------------------------------------------------------*/
   group   = 'com.mooltiverse.oss.nyx'
-  version = '0.0.2-alpha.7'
-
-  // The followings can be removed once we start using the Nyx plugin
-  ext.isReleaseVersion = version.matches("^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\$")
-  ext.isPrereleaseVersion = version.matches("^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))\$")
 
   // This task is useful to see all the configurations for projects. Run this with 'gradle configurations'
   task configurations() {
@@ -50,4 +45,3 @@ allprojects {
 /*------------------------------------------------------------------------------
   Additional task dependencies
 ------------------------------------------------------------------------------*/
-

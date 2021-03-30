@@ -411,7 +411,7 @@ signing {
     useInMemoryPgpKeys(signingKey, signingPassword)
 
     // Sign only for release and prerelease versions
-    required { (isReleaseVersion || isPrereleaseVersion) && signingCredentialsAvailable && gradle.taskGraph.hasTask("publish") }
+    required { signingCredentialsAvailable && gradle.taskGraph.hasTask("publish") }
 
     //sign publishing.publications.mavenJava
     sign publishing.publications

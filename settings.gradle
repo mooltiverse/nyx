@@ -1,3 +1,15 @@
+/*------------------------------------------------------------------------------
+  Plugins DSL block
+  https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
+------------------------------------------------------------------------------*/
+plugins {
+  // use our own plugin
+  id "com.mooltiverse.oss.nyx" version "0.0.2-alpha.7"
+}
+
+/*------------------------------------------------------------------------------
+  Root project properties
+------------------------------------------------------------------------------*/
 rootProject.name = 'nyx'
 
 include 'docs'
@@ -9,3 +21,11 @@ include 'modules:java:lib:main'
 include 'modules:java:gradle'
 // re-enable the Docker module once we have something to build and publish
 //include 'modules:docker'
+
+/*------------------------------------------------------------------------------
+  Extension configurations
+------------------------------------------------------------------------------*/
+nyx {
+  bump          = 'alpha'   // for the time being just bump the 'alpha' pre-release identifier, until we can inspect commit messages
+  releasePrefix = ''        // use no release prefix
+}
