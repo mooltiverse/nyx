@@ -15,6 +15,8 @@
  */
 package com.mooltiverse.oss.nyx.version;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -42,7 +44,7 @@ public class VersionFactory {
         switch (scheme) {
             case SEMVER:  return SemanticVersion.valueOf(SemanticVersion.DEFAULT_INITIAL_VERSION);
             //MAVEN: not yet supported
-            default: throw new IllegalArgumentException(String.format("Illegal or unsupporte scheme %s", scheme));
+            default: throw new IllegalArgumentException(String.format("Illegal or unsupported scheme %s", scheme));
         }
     }
 
@@ -52,7 +54,7 @@ public class VersionFactory {
      * <br>
      * This method uses a strict criteria, without trying to sanitize the given string.
      * 
-     * @param scheme the scheme the check against.
+     * @param scheme the scheme to check against.
      * @param s the string version to check.
      * 
      * @return {@code true} if the given string represents a legal version sing the implementation selected
@@ -71,7 +73,7 @@ public class VersionFactory {
      * This method is different than {@link #isLegal(Scheme, String, String)} as it also sanitizes extra characters
      * in the body of the version identifier instead of just an optional prefix (when {@code sanitize} is {@code true}).
      * 
-     * @param scheme the scheme the check against.
+     * @param scheme the scheme to check against.
      * @param s the string version to check.
      * @param lenient when {@code true} prefixes and non critical extra characters are tolerated even if they are not
      * strictly legal from the version scheme specification perspective.
@@ -98,7 +100,7 @@ public class VersionFactory {
      * {@link #isLegal(Scheme, String, boolean)} is more lenient as it also sanitizes extra characters in the body
      * of the version identifier (when {@code sanitize} is {@code true}).
      * 
-     * @param scheme the scheme the check against.
+     * @param scheme the scheme to check against.
      * @param s the string version to check.
      * @param prefix the initial string that is used for the version prefix. This will be stripped off from the given
      * string representation of the version. It can be {@code null} or empty, in which case it's ignored. If not empty
@@ -114,6 +116,27 @@ public class VersionFactory {
         if (!Objects.isNull(prefix) && s.startsWith(prefix))
             s = s.replaceFirst(prefix, "");
         return isLegal(scheme, s);
+    }
+
+    /**
+     * Sorts the given list of identifiers by their relevance, according to the given scheme.
+     * The {@code null} values are not admitted.
+     * 
+     * @param scheme the scheme to sort the identifiers for
+     * @param identifiers the identifiers to sort
+     * 
+     * @see SemanticVersion#getIdentifierComparator()
+     * @see Collections#sort(List, Comparator)
+     */
+    public static void sortIdentifiers(Scheme scheme, List<String> identifiers) {
+        switch (scheme) {
+            case SEMVER: {
+                Collections.sort(identifiers, SemanticVersion.getIdentifierComparator());
+                return;
+            }
+            //MAVEN: not yet supported
+            default: throw new IllegalArgumentException(String.format("Illegal or unsupported scheme %s", scheme));
+        }
     }
 
     /**
@@ -158,7 +181,7 @@ public class VersionFactory {
         switch (scheme) {
             case SEMVER:  return SemanticVersion.valueOf(s, sanitize);
             //MAVEN: not yet supported
-            default: throw new IllegalArgumentException(String.format("Illegal or unsupporte scheme %s", scheme));
+            default: throw new IllegalArgumentException(String.format("Illegal or unsupported scheme %s", scheme));
         }
     }
 

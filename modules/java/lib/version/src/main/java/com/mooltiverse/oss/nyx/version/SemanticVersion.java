@@ -16,6 +16,8 @@
 package com.mooltiverse.oss.nyx.version;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
@@ -199,6 +201,43 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
             return false;
 
         return true;
+    }
+
+    /**
+     * Returns a comparator for identifier names. The returned comparator can be used to sort identifier names
+     * by their relevance, according to <a href="https://semver.org/#spec-item-11">Semantic Versioning 2.0.0</a>,
+     * provided that:<br>
+     * - core identifiers are always more relevant that any other identifier<br>
+     * - core identifiers are always sorted as {@code major}, {@code minor}, {@code patch}<br>
+     * - other identifiers are considered pre-release identifiers and are sorted by their natural order<br>
+     * <br>
+     * The comparator does not admit {@code null} values.
+     * 
+     * @return a comparator for identifier names. 
+     * 
+     * @see Collections#sort(List, Comparator)
+     */
+    static Comparator<String> getIdentifierComparator() {
+        return new Comparator<String>() {
+            @Override
+            public int compare(String i1, String i2) {
+                if (i1.equals(i2))
+                    return 0;
+                else if ("major".equals(i1))
+                    return -1;
+                else if ("major".equals(i2))
+                    return 1;
+                else if ("minor".equals(i1))
+                    return -1;
+                else if ("minor".equals(i2))
+                    return +1;
+                else if ("patch".equals(i1))
+                    return -1;
+                else if ("patch".equals(i2))
+                    return 1;
+                else return i1.compareTo(i2);
+            }
+        };
     }
 
     /**
