@@ -54,6 +54,22 @@ public class NyxExtensionTestTemplates {
         }
 
         @TestTemplate
+        @DisplayName("NyxExtension.getCommitMessageConventions() default value")
+        @Baseline(Scenario.FROM_SCRATCH)
+        void getCommitMessageConventionsDefaultTest(Project project)
+            throws Exception {
+            NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
+
+            assertNotNull(extension.getCommitMessageConventions());
+            assertTrue(extension.getCommitMessageConventions().getEnabled().isPresent());
+            assertNotNull(extension.getCommitMessageConventions().getEnabled().get());
+            assertTrue(extension.getCommitMessageConventions().getEnabled().get().isEmpty());
+            //assertTrue(extension.getCommitMessageConventions().getItems().isPresent());
+            //assertNotNull(extension.getCommitMessageConventions().getItems().get());
+            assertTrue(extension.getCommitMessageConventions().getItems().isEmpty());
+        }
+
+        @TestTemplate
         @DisplayName("NyxExtension.getDirectory() default value")
         @Baseline(Scenario.FROM_SCRATCH)
         void getDirectoryDefaultTest(Project project)

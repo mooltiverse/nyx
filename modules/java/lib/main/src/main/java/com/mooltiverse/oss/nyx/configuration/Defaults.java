@@ -16,7 +16,11 @@
 package com.mooltiverse.oss.nyx.configuration;
 
 import java.io.File;
+import java.util.List;
+import java.util.Map;
 
+import com.mooltiverse.oss.nyx.data.CommitMessageConvention;
+import com.mooltiverse.oss.nyx.data.CommitMessageConventions;
 import com.mooltiverse.oss.nyx.data.Scheme;
 import com.mooltiverse.oss.nyx.data.Verbosity;
 import com.mooltiverse.oss.nyx.version.Version;
@@ -30,6 +34,35 @@ public interface Defaults {
      * The default version identifier to bump. Value: {@code null}
      */
     public static final String BUMP = null;
+
+    /**
+     * The default commit message conventions block.
+     */
+    public static final CommitMessageConventions COMMIT_MESSAGE_CONVENTIONS = new CommitMessageConventions() {
+        /**
+         * The default enabled commit message conventions. Value: {@code null}
+         */
+        @Override
+        public List<String> getEnabled() {
+            return null;
+        }
+
+        /**
+         * The default commit message conventions. Value: {@code null}
+         */
+        @Override
+        public Map<String,CommitMessageConvention> getItems() {
+            return null;
+        }
+
+        /**
+         * The default commit message convention. Value: {@code null}
+         */
+        @Override
+        public CommitMessageConvention getItem(String name) {
+            return null;
+        }
+    };
 
     /**
      * The default working directory. Defaults to the current user directory returned by reading the

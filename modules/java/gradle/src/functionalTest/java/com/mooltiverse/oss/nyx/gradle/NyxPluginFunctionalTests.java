@@ -426,13 +426,20 @@ public class NyxPluginFunctionalTests {
         if (!Objects.isNull(bump))
             printWriter.println("  bump = '"+bump+"'");
         printWriter.println("  dryRun = true");
-        printWriter.println("  services {");
-        printWriter.println("     github {");
-        //printWriter.println("        provider = 'guesswhat'");
+        printWriter.println("  commitMessageConventions {");
+        printWriter.println("     enabled = ['conventionalCommits']");
+        printWriter.println("     items {");
+        printWriter.println("        conventionalCommits {");
+        printWriter.println("           expression = '(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\\\((?<scope>[a-z ]+)\\\\))?:( (?<title>.+))$(?s).*'");
+        printWriter.println("           bumpExpressions {");
+        printWriter.println("              major = '(?s)(?m)^[a-zA-Z0-9_]+(!|.*^(BREAKING( |-)CHANGE: )).*'");
+        printWriter.println("              minor = '(?s)(?m)^feat(?!!|.*^(BREAKING( |-)CHANGE: )).*'");
+        printWriter.println("              patch = '(?s)(?m)^fix(?!!|.*^(BREAKING( |-)CHANGE: )).*'");
+        printWriter.println("           }");
+        printWriter.println("        }");
         printWriter.println("     }");
         printWriter.println("  }");
         printWriter.println("}");
-
         return stringWriter.toString();
     }
 

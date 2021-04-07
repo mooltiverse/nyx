@@ -58,6 +58,23 @@ public class ConfigurationLayerTestTemplates {
         }
 
         @TestTemplate
+        @DisplayName("ConfigurationLayer.getCommitMessageConventions() default value")
+        @Baseline(Scenario.FROM_SCRATCH)
+        void getCommitMessageConventionsDefaultTest(Project project)
+            throws Exception {
+            NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
+            ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
+
+            assertNotNull(extension.getCommitMessageConventions());
+            assertNotNull(configurationLayer.getCommitMessageConventions());
+            assertTrue(extension.getCommitMessageConventions().getEnabled().isPresent());
+            assertNull(configurationLayer.getCommitMessageConventions().getEnabled());
+            assertTrue(extension.getCommitMessageConventions().getEnabled().get().isEmpty());
+            //assertTrue(extension.getCommitMessageConventions().getItems().isPresent());
+            assertNull(configurationLayer.getCommitMessageConventions().getItems());
+        }
+
+        @TestTemplate
         @DisplayName("ConfigurationLayer.getDirectory() default value")
         @Baseline(Scenario.FROM_SCRATCH)
         void getDirectoryDefaultTest(Project project)
@@ -178,6 +195,18 @@ public class ConfigurationLayerTestTemplates {
         @DisplayName("ConfigurationLayer.getBump().set() throws IllegalPropertyException with illegal value")
         @Baseline(Scenario.FROM_SCRATCH)
         void exceptionUsingGetBumpWithWrongValueTest(Project project)
+            throws Exception {
+            NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
+            ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
+
+            // no idea of how to test wrong values here
+        }*/
+
+        /* This test is commented because it has nothing to test
+        @TestTemplate
+        @DisplayName("ConfigurationLayer.getCommitMessageConventions().set() throws IllegalPropertyException with illegal value")
+        @Baseline(Scenario.FROM_SCRATCH)
+        void exceptionUsingGetCommitMessageConventionsWithWrongValueTest(Project project)
             throws Exception {
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
             ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);

@@ -18,6 +18,7 @@ package com.mooltiverse.oss.nyx.command;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assumptions.*;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -32,6 +33,7 @@ import com.mooltiverse.oss.nyx.command.template.CommandProxy;
 import com.mooltiverse.oss.nyx.command.template.CommandSelector;
 import com.mooltiverse.oss.nyx.configuration.Defaults;
 import com.mooltiverse.oss.nyx.configuration.mock.ConfigurationLayerMock;
+import com.mooltiverse.oss.nyx.data.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.git.GitException;
 import com.mooltiverse.oss.nyx.git.Scenario;
 import com.mooltiverse.oss.nyx.git.Script;
@@ -290,7 +292,7 @@ public class MarkTestTemplates {
                 assertEquals("v1.0.0", command.state().getVersion());
                 assertEquals("0.1.0", command.state().getReleaseScope().getPreviousVersion().toString());
                 assertEquals(script.getCommitByTag("0.1.0"), command.state().getReleaseScope().getPreviousVersionCommit());
-                assertEquals(Boolean.TRUE, command.state().getReleaseScope().getSignificant()); // this is valid just as long as we don't inspect commit messages, then it's expected to change to false because there are no other commits than the one tagged in the scenario
+                assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
             }
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
@@ -328,7 +330,7 @@ public class MarkTestTemplates {
                 assertEquals("v0.2.0", command.state().getVersion());
                 assertEquals("0.1.0", command.state().getReleaseScope().getPreviousVersion().toString());
                 assertEquals(script.getCommitByTag("0.1.0"), command.state().getReleaseScope().getPreviousVersionCommit());
-                assertEquals(Boolean.TRUE, command.state().getReleaseScope().getSignificant()); // this is valid just as long as we don't inspect commit messages, then it's expected to change to false because there are no other commits than the one tagged in the scenario
+                assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
             }
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
@@ -366,7 +368,7 @@ public class MarkTestTemplates {
                 assertEquals("v0.1.1", command.state().getVersion());
                 assertEquals("0.1.0", command.state().getReleaseScope().getPreviousVersion().toString());
                 assertEquals(script.getCommitByTag("0.1.0"), command.state().getReleaseScope().getPreviousVersionCommit());
-                assertEquals(Boolean.TRUE, command.state().getReleaseScope().getSignificant()); // this is valid just as long as we don't inspect commit messages, then it's expected to change to false because there are no other commits than the one tagged in the scenario
+                assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
             }
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
@@ -404,7 +406,7 @@ public class MarkTestTemplates {
                 assertEquals("v0.1.0-alpha.1", command.state().getVersion());
                 assertEquals("0.1.0", command.state().getReleaseScope().getPreviousVersion().toString());
                 assertEquals(script.getCommitByTag("0.1.0"), command.state().getReleaseScope().getPreviousVersionCommit());
-                assertEquals(Boolean.TRUE, command.state().getReleaseScope().getSignificant()); // this is valid just as long as we don't inspect commit messages, then it's expected to change to false because there are no other commits than the one tagged in the scenario
+                assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
             }
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
@@ -766,12 +768,10 @@ public class MarkTestTemplates {
                 assertEquals(script.getLastCommit().getId().getName(), command.state().getReleaseScope().getFinalCommit());
                 assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion().toString());
                 assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit());
-                assertEquals(Boolean.TRUE, command.state().getReleaseScope().getSignificant()); // this is valid just as long as we don't inspect commit messages, then it's expected to change to false because there are no other commits than the one tagged in the scenario
-                assertEquals(previousTags.size()+1, script.getTags().size());
-                assertTrue(script.getTags().containsKey("v1.0.0"));
-                assertEquals(script.getLastCommit().getId().getName(), script.getTags().get("v1.0.0"));
-                assertTrue(remoteScript.getCommits().containsAll(script.getCommits()));
-                assertTrue(remoteScript.getTags().keySet().containsAll(script.getTags().keySet()));
+                assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
+                assertEquals(previousTags.size(), script.getTags().size());
+                //assertFalse(remoteScript.getCommits().containsAll(script.getCommits()));
+                //assertFalse(remoteScript.getTags().keySet().containsAll(script.getTags().keySet()));
             }
             assertEquals(previousLastCommit, script.getLastCommit().getId().getName());
         }
@@ -814,12 +814,10 @@ public class MarkTestTemplates {
                 assertEquals(script.getLastCommit().getId().getName(), command.state().getReleaseScope().getFinalCommit());
                 assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion().toString());
                 assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit());
-                assertEquals(Boolean.TRUE, command.state().getReleaseScope().getSignificant()); // this is valid just as long as we don't inspect commit messages, then it's expected to change to false because there are no other commits than the one tagged in the scenario
-                assertEquals(previousTags.size()+1, script.getTags().size());
-                assertTrue(script.getTags().containsKey("v0.1.0"));
-                assertEquals(script.getLastCommit().getId().getName(), script.getTags().get("v0.1.0"));
-                assertTrue(remoteScript.getCommits().containsAll(script.getCommits()));
-                assertTrue(remoteScript.getTags().keySet().containsAll(script.getTags().keySet()));
+                assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
+                assertEquals(previousTags.size(), script.getTags().size());
+                //assertFalse(remoteScript.getCommits().containsAll(script.getCommits()));
+                //assertFalse(remoteScript.getTags().keySet().containsAll(script.getTags().keySet()));
             }
             assertEquals(previousLastCommit, script.getLastCommit().getId().getName());
         }
@@ -862,12 +860,10 @@ public class MarkTestTemplates {
                 assertEquals(script.getLastCommit().getId().getName(), command.state().getReleaseScope().getFinalCommit());
                 assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion().toString());
                 assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit());
-                assertEquals(Boolean.TRUE, command.state().getReleaseScope().getSignificant()); // this is valid just as long as we don't inspect commit messages, then it's expected to change to false because there are no other commits than the one tagged in the scenario
-                assertEquals(previousTags.size()+1, script.getTags().size());
-                assertTrue(script.getTags().containsKey("v0.0.5"));
-                assertEquals(script.getLastCommit().getId().getName(), script.getTags().get("v0.0.5"));
-                assertTrue(remoteScript.getCommits().containsAll(script.getCommits()));
-                assertTrue(remoteScript.getTags().keySet().containsAll(script.getTags().keySet()));
+                assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
+                assertEquals(previousTags.size(), script.getTags().size());
+                //assertFalse(remoteScript.getCommits().containsAll(script.getCommits()));
+                //assertFalse(remoteScript.getTags().keySet().containsAll(script.getTags().keySet()));
             }
             assertEquals(previousLastCommit, script.getLastCommit().getId().getName());
         }
@@ -910,12 +906,10 @@ public class MarkTestTemplates {
                 assertEquals(script.getLastCommit().getId().getName(), command.state().getReleaseScope().getFinalCommit());
                 assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion().toString());
                 assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit());
-                assertEquals(Boolean.TRUE, command.state().getReleaseScope().getSignificant()); // this is valid just as long as we don't inspect commit messages, then it's expected to change to false because there are no other commits than the one tagged in the scenario
-                assertEquals(previousTags.size()+1, script.getTags().size());
-                assertTrue(script.getTags().containsKey("v0.0.4-alpha.1"));
-                assertEquals(script.getLastCommit().getId().getName(), script.getTags().get("v0.0.4-alpha.1"));
-                assertTrue(remoteScript.getCommits().containsAll(script.getCommits()));
-                assertTrue(remoteScript.getTags().keySet().containsAll(script.getTags().keySet()));
+                assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
+                assertEquals(previousTags.size(), script.getTags().size());
+                //assertFalse(remoteScript.getCommits().containsAll(script.getCommits()));
+                //assertFalse(remoteScript.getTags().keySet().containsAll(script.getTags().keySet()));
             }
             assertEquals(previousLastCommit, script.getLastCommit().getId().getName());
         }
@@ -1091,6 +1085,50 @@ public class MarkTestTemplates {
             }
             assertNotEquals(previousLastCommit, script.getLastCommit().getId().getName());
             assertEquals(previousTags.size()+1, script.getTags().size());
+        }
+
+        @TestTemplate
+        @DisplayName("Mark.run() with a commit message convention that accepts all commits as significant")
+        @Baseline(Scenario.ONE_BRANCH_SHORT)
+        void runWithAllSignificantCommitsTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script, @Baseline(Scenario.FROM_SCRATCH) Script remoteScript)
+            throws Exception {
+            script.addRemote(remoteScript.getGitDirectory(), "origin");
+            String previousLastCommit = script.getLastCommit().getId().getName();
+            Map<String,String> previousTags = script.getTags();
+            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
+            // add a mock convention that accepts all non null messages and dumps the minor identifier for each
+            configurationMock.commitMessageConventions.items = Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("minor", ".*")));
+            configurationMock.commitMessageConventions.enabled = List.<String>of("testConvention");
+            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
+
+            command.run();
+
+            assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
+            // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
+            if (command.getContextName().equals("standalone")) {
+                assertNull(command.state().getBump());
+                assertNull(command.state().getVersionInternal());
+                assertNull(command.state().getVersion());
+                assertNull(command.state().getReleaseScope().getInitialCommit());
+                assertNull(command.state().getReleaseScope().getFinalCommit());
+                assertNull(command.state().getReleaseScope().getPreviousVersion());
+                assertNull(command.state().getReleaseScope().getPreviousVersionCommit());
+                assertNull(command.state().getReleaseScope().getSignificant());
+                assertEquals(previousLastCommit, script.getLastCommit().getId().getName());
+                assertEquals(previousTags.size(), script.getTags().size());
+            }
+            else {
+                assertEquals("minor", command.state().getBump());
+                assertEquals("0.1.0", command.state().getVersionInternal().toString());
+                assertEquals("v0.1.0", command.state().getVersion());
+                assertEquals(script.getWorkbenchCommits().get(script.getWorkbenchCommits().size()-2), command.state().getReleaseScope().getInitialCommit());
+                assertEquals(script.getWorkbenchCommits().get(script.getWorkbenchCommits().size()-1), command.state().getReleaseScope().getFinalCommit());
+                assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion().toString());
+                assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit());
+                assertEquals(Boolean.TRUE, command.state().getReleaseScope().getSignificant());
+                assertEquals(previousLastCommit, script.getLastCommit().getId().getName());
+                assertEquals(previousTags.size()+1, script.getTags().size());
+            }
         }
     }
 }

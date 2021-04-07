@@ -18,6 +18,8 @@ package com.mooltiverse.oss.nyx.command;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assumptions.*;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import org.junit.jupiter.api.DisplayName;
@@ -31,6 +33,7 @@ import com.mooltiverse.oss.nyx.command.template.CommandProxy;
 import com.mooltiverse.oss.nyx.command.template.CommandSelector;
 import com.mooltiverse.oss.nyx.configuration.Defaults;
 import com.mooltiverse.oss.nyx.configuration.mock.ConfigurationLayerMock;
+import com.mooltiverse.oss.nyx.data.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.git.GitException;
 import com.mooltiverse.oss.nyx.git.Scenario;
 import com.mooltiverse.oss.nyx.git.Script;
@@ -226,7 +229,7 @@ public class InferTestTemplates {
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("0.1.0", command.state().getReleaseScope().getPreviousVersion().toString());
             assertEquals(script.getCommitByTag("0.1.0"), command.state().getReleaseScope().getPreviousVersionCommit());
-            assertEquals(Boolean.TRUE, command.state().getReleaseScope().getSignificant()); // this is valid just as long as we don't inspect commit messages, then it's expected to change to false because there are no other commits than the one tagged in the scenario
+            assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
         }
 
         @TestTemplate
@@ -248,7 +251,7 @@ public class InferTestTemplates {
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("0.1.0", command.state().getReleaseScope().getPreviousVersion().toString());
             assertEquals(script.getCommitByTag("0.1.0"), command.state().getReleaseScope().getPreviousVersionCommit());
-            assertEquals(Boolean.TRUE, command.state().getReleaseScope().getSignificant()); // this is valid just as long as we don't inspect commit messages, then it's expected to change to false because there are no other commits than the one tagged in the scenario
+            assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
         }
 
         @TestTemplate
@@ -270,7 +273,7 @@ public class InferTestTemplates {
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("0.1.0", command.state().getReleaseScope().getPreviousVersion().toString());
             assertEquals(script.getCommitByTag("0.1.0"), command.state().getReleaseScope().getPreviousVersionCommit());
-            assertEquals(Boolean.TRUE, command.state().getReleaseScope().getSignificant()); // this is valid just as long as we don't inspect commit messages, then it's expected to change to false because there are no other commits than the one tagged in the scenario
+            assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
         }
 
         @TestTemplate
@@ -292,7 +295,7 @@ public class InferTestTemplates {
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("0.1.0", command.state().getReleaseScope().getPreviousVersion().toString());
             assertEquals(script.getCommitByTag("0.1.0"), command.state().getReleaseScope().getPreviousVersionCommit());
-            assertEquals(Boolean.TRUE, command.state().getReleaseScope().getSignificant()); // this is valid just as long as we don't inspect commit messages, then it's expected to change to false because there are no other commits than the one tagged in the scenario
+            assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
         }
 
         @TestTemplate
@@ -496,7 +499,7 @@ public class InferTestTemplates {
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion().toString());
             assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit());
-            assertEquals(Boolean.TRUE, command.state().getReleaseScope().getSignificant()); // this is valid just as long as we don't inspect commit messages, then it's expected to change to false because there are no other commits than the one tagged in the scenario
+            assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
         }
 
         @TestTemplate
@@ -518,7 +521,7 @@ public class InferTestTemplates {
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion().toString());
             assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit());
-            assertEquals(Boolean.TRUE, command.state().getReleaseScope().getSignificant()); // this is valid just as long as we don't inspect commit messages, then it's expected to change to false because there are no other commits than the one tagged in the scenario
+            assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
         }
 
         @TestTemplate
@@ -540,7 +543,7 @@ public class InferTestTemplates {
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion().toString());
             assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit());
-            assertEquals(Boolean.TRUE, command.state().getReleaseScope().getSignificant()); // this is valid just as long as we don't inspect commit messages, then it's expected to change to false because there are no other commits than the one tagged in the scenario
+            assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
         }
 
         @TestTemplate
@@ -562,7 +565,7 @@ public class InferTestTemplates {
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion().toString());
             assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit());
-            assertEquals(Boolean.TRUE, command.state().getReleaseScope().getSignificant()); // this is valid just as long as we don't inspect commit messages, then it's expected to change to false because there are no other commits than the one tagged in the scenario
+            assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
         }
 
         @TestTemplate
@@ -661,6 +664,30 @@ public class InferTestTemplates {
             assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion().toString());
             assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit());
             assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
+        }
+
+        @TestTemplate
+        @DisplayName("Infer.run() with a commit message convention that accepts all commits as significant")
+        @Baseline(Scenario.ONE_BRANCH_SHORT)
+        void runWithAllSignificantCommitsTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
+            throws Exception {
+            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
+            // add a mock convention that accepts all non null messages and dumps the minor identifier for each
+            configurationMock.commitMessageConventions.items = Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("minor", ".*")));
+            configurationMock.commitMessageConventions.enabled = List.<String>of("testConvention");
+            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
+
+            command.run();
+
+            assertEquals("minor", command.state().getBump());
+            assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
+            assertEquals("0.1.0", command.state().getVersionInternal().toString());
+            assertEquals("v0.1.0", command.state().getVersion());
+            assertEquals(script.getWorkbenchCommits().get(script.getWorkbenchCommits().size()-2), command.state().getReleaseScope().getInitialCommit());
+            assertNull(command.state().getReleaseScope().getFinalCommit());
+            assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion().toString());
+            assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(Boolean.TRUE, command.state().getReleaseScope().getSignificant());
         }
     }
 }

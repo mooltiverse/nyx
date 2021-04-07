@@ -18,10 +18,13 @@ package com.mooltiverse.oss.nyx.gradle;
 import java.io.File;
 import javax.inject.Inject;
 
+import org.gradle.api.Action;
 import org.gradle.api.NamedDomainObjectContainer;
 import org.gradle.api.Project;
 import org.gradle.api.initialization.Settings;
 import org.gradle.api.model.ObjectFactory;
+import org.gradle.api.provider.ListProperty;
+import org.gradle.api.provider.MapProperty;
 import org.gradle.api.provider.Property;
 import org.gradle.api.provider.Provider;
 
@@ -30,15 +33,63 @@ import com.mooltiverse.oss.nyx.configuration.Defaults;
 /**
  * The plugin configuration object. This object is responsible for reading the {@code nyx {...} } configuration block that users
  * define within the {@code build.gradle} script.
- * 
+ * <br>
  * See <a href="https://docs.gradle.org/current/userguide/implementing_gradle_plugins.html#modeling_dsl_like_apis">Modeling DSL-like APIs</a>
  * for more o developing extension.
- * 
+ * <br>
  * See <a href="https://docs.gradle.org/current/userguide/custom_gradle_types.html">Developing Custom Gradle Types</a>,
  * <a href="https://docs.gradle.org/current/userguide/custom_plugins.html">Developing Custom Gradle Plugins</a>,
  * <a href="https://docs.gradle.org/current/userguide/implementing_gradle_plugins.html">Implementing Gradle plugins</a> and 
  * <a href="https://docs.gradle.org/current/userguide/lazy_configuration.html">Lazy Configuration</a>
  * for an introduction on custom Gradle types development.
+ * <br><br>
+ * <b>NOTES ON NESTED OBJECTS</b>:<br>
+ * In order to support DSL (the curly braces syntax) for nested objects we also need to support one additional method for each nested object
+ * to accept and configure the closure. Take the {@code commitMessageConventions} for example. According to the API docs, defining the
+ * field and the getter method as as:<br><br>
+ * <pre>
+ *      private CommitMessageConventions commitMessageConventions = getObjectfactory().newInstance(CommitMessageConventions.class);
+ * 
+ *      public CommitMessageConventions getCommitMessageConventions() {
+ *          return commitMessageConventions;
+ *          }
+ * </pre>
+ * should be enough but it's not, in fact at runtime, when using the curly braces syntax to define that property like:<br><br>
+ * <pre>
+ * nyx {
+ *   commitMessageConventions {
+ *      enabled = ['conventionalCommits']
+ *   }
+ * }
+ * </pre>
+ * throws an exception like:<br><br>
+ * <pre>
+ * org.gradle.api.GradleScriptException: A problem occurred evaluating root project...
+ *      ...
+ *      Caused by: groovy.lang.MissingMethodException: No signature of method: build_araz4us455w31lfualzy83h1f.nyx() is applicable for argument types: (build_araz4us455w31lfualzy83h1f$_run_closure1) values: [build_araz4us455w31lfualzy83h1f$_run_closure1@22b6a7c8]
+ *      Possible solutions: any(), any(groovy.lang.Closure), run(), run(), sync(org.gradle.api.Action), uri(java.lang.Object)
+ *      ...
+ * </pre>
+ * So thanks to posts like <a href="https://stackoverflow.com/questions/33606861/nested-object-inside-custom-plugin-extension">this</a>
+ * (which points to this example <a href="https://github.com/Opalo/stackoverflow/blob/master/33606861/buildSrc/src/main/java/org/opal/LolExtension.java">here</a>),
+ * <a href="https://discuss.gradle.org/t/nested-extension-plugin-written-in-java/22264/10">this</a> and
+ * <a href="https://discuss.gradle.org/t/multi-level-dsl-for-plugin-extension/19029/13">this</a>
+ * it turns out there must be another method to accept the closure. I don't know Groovy so I'm not sure what it's needed for but the
+ * additional method can be in one of the two following variants (still using the {@code commitMessageConventions} example):<br><br>
+ * <pre>
+ *      public void commitMessageConventions(groovy.lang.Closure closure) {
+ *          closure.setResolveStrategy(groovy.lang.Closure.DELEGATE_FIRST);
+ *          closure.setDelegate(commitMessageConventions);
+ *          closure.call();
+ *      }
+ * </pre>
+ * or:<br>
+ * <pre>
+ *      public void commitMessageConventions(org.gradle.api.Action&lt;? super CommitMessageConventions&gt; configuration) {
+ *          configuration.execute(commitMessageConventions);
+ *      }
+ * </pre>
+ * I opted for the second one, as it's a little more comprehensible, although I don't know exactly what happens under the hood.
  * 
  * @see org.gradle.api.plugins.ExtensionAware
  * @see org.gradle.api.plugins.ExtensionContainer
@@ -52,7 +103,12 @@ public abstract class NyxExtension {
     /**
      * The 'bump' property.
      */
-    private Property<String> bump = getObjectfactory().property(String.class);
+    private final Property<String> bump = getObjectfactory().property(String.class);
+
+    /**
+     * The nested 'commitMessageConventions' block.
+     */
+    private final CommitMessageConventions commitMessageConventions = getObjectfactory().newInstance(CommitMessageConventions.class);
 
     /**
      * The 'directory' property.
@@ -66,32 +122,32 @@ public abstract class NyxExtension {
      * @see #create(Project)
      * @see #create(Settings)
      */
-    private Property<File> directory = getObjectfactory().property(File.class);
+    private final Property<File> directory = getObjectfactory().property(File.class);
 
     /**
      * The 'dryRun' property.
      */
-    private Property<Boolean> dryRun = getObjectfactory().property(Boolean.class);
+    private final Property<Boolean> dryRun = getObjectfactory().property(Boolean.class);
 
     /**
      * The 'initialVersion' property.
      */
-    private Property<String> initialVersion = getObjectfactory().property(String.class);
+    private final Property<String> initialVersion = getObjectfactory().property(String.class);
 
     /**
      * The 'releasePrefix' property.
      */
-    private Property<String> releasePrefix = getObjectfactory().property(String.class);
+    private final Property<String> releasePrefix = getObjectfactory().property(String.class);
 
     /**
      * The 'releaseLenient' property.
      */
-    private Property<Boolean> releaseLenient = getObjectfactory().property(Boolean.class);
+    private final Property<Boolean> releaseLenient = getObjectfactory().property(Boolean.class);
 
     /**
      * The 'scheme' property.
      */
-    private Property<String> scheme = getObjectfactory().property(String.class);
+    private final Property<String> scheme = getObjectfactory().property(String.class);
 
     /**
      * The 'verbosity' property.
@@ -99,15 +155,7 @@ public abstract class NyxExtension {
      * Please note that the verbosity option is actually ignored in this plugin implementation and the backing Nyx implementation
      * as it's controlled by Gradle.
      */
-    private Property<String> verbosity = getObjectfactory().property(String.class);
-
-    /**
-     * The nested 'services' block.
-     * Default is an empty list of Service objects.
-     * 
-     * @see Service
-     */
-    private NamedDomainObjectContainer<Service> services = getObjectfactory().domainObjectContainer(Service.class); // TODO: review this. Consider this just an example for when we'll have nested values
+    private final Property<String> verbosity = getObjectfactory().property(String.class);
 
     /**
      * Returns an object factory instance.
@@ -161,6 +209,29 @@ public abstract class NyxExtension {
      */
     public Property<String> getBump() {
         return bump;
+    }
+
+    /**
+     * Returns the object mapping the {@code commitMessageConventions} block.
+     * 
+     * We provide an implementation of this method instead of using the abstract definition as it's
+     * safer for old Gradle versions we support.
+     * 
+     * @return the object mapping the {@code commitMessageConventions} block
+     */
+    public CommitMessageConventions getCommitMessageConventions() {
+        return commitMessageConventions;
+    }
+
+    /**
+     * Accepts the DSL configuration for the {@code commitMessageConventions} block, needed for defining
+     * the block using the curly braces syntax in Gradle build scripts.
+     * See the documentation on top of this class for more.
+     * 
+     * @param configuration the configuration object for the {@code commitMessageConventions} block
+     */
+    public void commitMessageConventions(Action<? super CommitMessageConventions> configuration) {
+        configuration.execute(commitMessageConventions);
     }
 
     /**
@@ -264,49 +335,154 @@ public abstract class NyxExtension {
     }
 
     /**
-     * Returns the nested 'service' blocks.
-     * 
-     * We provide an implementation of this method instead of using the abstract definition as it's
-     * safer for old Gradle versions we support.
-     * 
-     * @return the nested 'service' blocks
-     * 
-     * TODO: add a link to constants from Nyx configuration classes
+     * The class to model the 'commitMessageConventions' block within the extension.
      */
-    public NamedDomainObjectContainer<Service> getServices() {
-        return services;
-    }
-
-    /**
-     * The class to model a single service item within the 'services' block within the extension.
-     */
-    public static class Service {
+    public abstract static class CommitMessageConventions {
         /**
-         * The service name.
+         * The list of enabled convention names.
          */
-        private final String name;
+        private final ListProperty<String> enabled = getObjectfactory().listProperty(String.class);
 
         /**
-         * Constructor.
+         * The nested 'items' block.
          * 
-         * This constructor is required as per the {@link NamedDomainObjectContainer} specification.
-         * 
-         * @param name the service name
+         * @see CommitMessageConvention
          */
-        public Service(String name) {
-            super();
-            this.name = name;
+        private NamedDomainObjectContainer<CommitMessageConvention> items = getObjectfactory().domainObjectContainer(CommitMessageConvention.class);
+
+        /**
+         * Returns an object factory instance.
+         * 
+         * The instance is injected by Gradle as soon as this getter method is invoked.
+         * 
+         * Using <a href="https://docs.gradle.org/current/userguide/custom_gradle_types.html#property_injection">property injection</a>
+         * instead of <a href="https://docs.gradle.org/current/userguide/custom_gradle_types.html#constructor_injection">constructor injection</a>
+         * has a few advantages: it allows Gradle to refer injecting the object until it's required and is safer for backward
+         * compatibility (older versions can be supported).
+         * 
+         * @return the object factory instance
+         */
+        @Inject
+        protected abstract ObjectFactory getObjectfactory();
+
+        /**
+         * Returns list of enabled convention names.
+         * 
+         * @return list of enabled convention names.
+         */
+        public ListProperty<String> getEnabled() {
+            return enabled;
         }
 
         /**
-         * Returns the name read-only mandatory property.
+         * Returns the map of commit message convention items.
          * 
-         * @return the name read-only mandatory property.
+         * @return the map of commit message convention items.
          */
-        public String getName() {
-            return name;
+        public NamedDomainObjectContainer<CommitMessageConvention> getItems() {
+            return items;
         }
 
-        // TODO: add the Services properties to this class
+        /**
+         * Accepts the DSL configuration for the {@code items} block, needed for defining
+         * the block using the curly braces syntax in Gradle build scripts.
+         * See the documentation on top of this class for more.
+         * 
+         * @param configuration the configuration object for the {@code items} block
+         */
+        public void items(Action<? super NamedDomainObjectContainer<CommitMessageConvention>> configuration) {
+            configuration.execute(items);
+        }
+
+        /**
+         * The class to model a single 'commitMessageConventions' item within the extension.
+         */
+        public abstract static class CommitMessageConvention {
+            /**
+             * The convention name.
+             */
+            private final String name;
+
+            /**
+             * The convention regular expression property.
+             */
+            private final Property<String> expression = getObjectfactory().property(String.class);
+
+            /**
+             * The nested 'bumpExpressions' block.
+             * 
+             * @see CommitMessageConvention
+             */
+            private final MapProperty<String,String> bumpExpressions = getObjectfactory().mapProperty(String.class, String.class);
+
+            /**
+             * Constructor.
+             * 
+             * This constructor is required as per the {@link NamedDomainObjectContainer} specification.
+             * 
+             * @param name the convention name
+             */
+            public CommitMessageConvention(String name) {
+                super();
+                this.name = name;
+            }
+
+            /**
+             * Returns an object factory instance.
+             * 
+             * The instance is injected by Gradle as soon as this getter method is invoked.
+             * 
+             * Using <a href="https://docs.gradle.org/current/userguide/custom_gradle_types.html#property_injection">property injection</a>
+             * instead of <a href="https://docs.gradle.org/current/userguide/custom_gradle_types.html#constructor_injection">constructor injection</a>
+             * has a few advantages: it allows Gradle to refer injecting the object until it's required and is safer for backward
+             * compatibility (older versions can be supported).
+             * 
+             * @return the object factory instance
+             */
+            @Inject
+            protected abstract ObjectFactory getObjectfactory();
+
+            /**
+             * Returns the name read-only mandatory property.
+             * 
+             * @return the name read-only mandatory property.
+             */
+            public String getName() {
+                return name;
+            }
+
+            /**
+             * Returns the name of the version identifier to bump. When this is set by the user it overrides
+             * the inference performed by Nyx.
+             * 
+             * We provide an implementation of this method instead of using the abstract definition as it's
+             * safer for old Gradle versions we support.
+             * 
+             * @return the name of the version identifier to bump
+             */
+            public Property<String> getExpression() {
+                return expression;
+            }
+
+            /**
+             * Returns the map of bump expression items.
+             * 
+             * @return the map of bump expression items.
+             */
+            public MapProperty<String,String> getBumpExpressions() {
+                return bumpExpressions;
+            }
+            
+            /**
+             * Accepts the DSL configuration for the {@code bumpExpressions} block, needed for defining
+             * the block using the curly braces syntax in Gradle build scripts.
+             * See the documentation on top of this class for more.
+             * 
+             * @param configuration the configuration object for the {@code bumpExpressions} block
+             */
+            public void bumpExpressions(Action<? super MapProperty<String,String>> configuration) {
+                configuration.execute(bumpExpressions);
+            }
+        }
     }
 }

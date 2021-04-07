@@ -17,14 +17,19 @@ package com.mooltiverse.oss.nyx.command;
 
 import static com.mooltiverse.oss.nyx.log.Markers.COMMAND;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mooltiverse.oss.nyx.ReleaseException;
+import com.mooltiverse.oss.nyx.data.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.data.DataAccessException;
 import com.mooltiverse.oss.nyx.data.Scheme;
 import com.mooltiverse.oss.nyx.data.Tag;
@@ -193,6 +198,10 @@ public class Infer extends AbstractCommand {
             final boolean releaseLenient = state().getConfiguration().getReleaseLenient().booleanValue();
             final String releasePrefix = state().getConfiguration().getReleasePrefix();
             final Scheme scheme = state().getScheme();
+            final Map<String,CommitMessageConvention> commitMessageConventions = state().getConfiguration().getCommitMessageConventions().getItems();
+
+            // this list contains the identifiers to bump, according to each single commit
+            final List<String> bumpComponents = new ArrayList<String>();
 
             // this map is used to work around the 'local variables referenced from a lambda expression must be final or effectively final'
             // that would be raised by compiler if we change simple non final values inside the lambda function
@@ -202,7 +211,6 @@ public class Infer extends AbstractCommand {
             final String PREVIOUS_VERSION = "previousVersion";
             final String PREVIOUS_VERSION_COMMIT = "previousVersionCommit";
             final String PREVIOUS_VERSION_COMMIT_PLUS_1 = "previousVersionCommitPlusOne";
-            final String SIGNIFICANT = "significant"; // simply defining this object means it's true
 
             if (!Objects.isNull(state().getConfiguration().getBump()))
                 findings.put(BUMP_COMPONENT, state().getConfiguration().getBump());
@@ -225,16 +233,30 @@ public class Infer extends AbstractCommand {
                     }
                 }
 
+                // if the 'bump' was not overridden by user, evaluate the commit message against the configured conventions to see which identifier must be dumped, if any
                 if (findings.containsKey(BUMP_COMPONENT)) {
-                    // TODO: only set the SIGNIFICANT attribute if the commit really contains significant contents.
-                    // Until we are not able to inspect the commit messages let's just assume that if the user forces the 'bump' we have significant commits.
-                    findings.put(SIGNIFICANT, Boolean.TRUE.toString());
+                    logger.debug(COMMAND, "Bump component overridden by user, skipping commit message convention evaluation");
                 }
                 else {
-                    // TODO: if 'bump' was not overridden by user config, inspect the commit message to figure out if we have to bump a specific version component based on that
-
-                    // each time we need to compare the 'bump' resulting from the previous commits with the one of the current commit and only store
-                    // the greatest in the findings map
+                    if (!Objects.isNull(commitMessageConventions)) {
+                        for (Map.Entry<String,CommitMessageConvention> cmcEntry: commitMessageConventions.entrySet()) {
+                            logger.debug(COMMAND, "Evaluating commit {} against message convention {}", c.getSHA(), cmcEntry.getKey());
+                            Matcher messageMatcher = Pattern.compile(cmcEntry.getValue().getExpression()).matcher(c.getMessage().getFullMessage());
+                            if (messageMatcher.matches()) {
+                                logger.debug(COMMAND, "Commit message convention {} matches commit {}", cmcEntry.getKey(), c.getSHA());
+                                for (Map.Entry<String,String> bumpExpression: cmcEntry.getValue().getBumpExpressions().entrySet()) {
+                                    logger.debug(COMMAND, "Matching commit {} against bump expression {} of message convention {}", c.getSHA(), bumpExpression.getKey(), cmcEntry.getKey());
+                                    Matcher bumpMatcher = Pattern.compile(bumpExpression.getValue()).matcher(c.getMessage().getFullMessage());
+                                    if (bumpMatcher.matches()) {
+                                        logger.debug(COMMAND, "Bump expression {} of message convention {} matches commit {}, meaning that the {} identifier has to be bumped, according to this commit", bumpExpression.getKey(), cmcEntry.getKey(), c.getSHA(), bumpExpression.getKey());
+                                        bumpComponents.add(bumpExpression.getKey());
+                                    }
+                                    else logger.debug(COMMAND, "Bump expression {} of message convention {} doesn't match commit {}", bumpExpression.getKey(), cmcEntry.getKey(), c.getSHA());
+                                }
+                            }
+                            else logger.debug(COMMAND, "Commit message convention {} doesn't match commit {}, skipping", cmcEntry.getKey(), c.getSHA());
+                        }
+                    }
                 }
 
                 // decide whether or not we need to keep walking to the next (previous) commit
@@ -278,6 +300,20 @@ public class Infer extends AbstractCommand {
                 state().getReleaseScope().setPreviousVersionCommit(null);
             }
 
+            // determine the bump component, if not overridden by user
+            if (!findings.containsKey(BUMP_COMPONENT)) {
+                if (bumpComponents.isEmpty()) {
+                    logger.debug(COMMAND, "Unable to infer the identifier to bump from the commits within the release scope. This may be due to the configured commit message conventions not matching any commit or because the release scope has no significant commits");
+                }
+                else {
+                    // the bump component is now the most significant among those detected on each commit within the scope
+                    VersionFactory.sortIdentifiers(scheme.getScheme(), bumpComponents);
+                    String bumpComponent = bumpComponents.get(0);
+                    logger.debug(COMMAND, "The version identifier to bump from the commits in the release scope, according to the configured commit message convenstions, is {}", bumpComponent);
+                    findings.put(BUMP_COMPONENT, bumpComponent);
+                }
+            }
+
             // finally compute the version
             // the previous version has been stored in the state above
             if (Objects.isNull(state().getReleaseScope().getPreviousVersion())) {
@@ -301,7 +337,7 @@ public class Infer extends AbstractCommand {
             // store values to the state object
             state().setVersionInternal(version);
             state().setBump(findings.containsKey(BUMP_COMPONENT) ? findings.get(BUMP_COMPONENT) : null);
-            state().getReleaseScope().setSignificant(Boolean.valueOf(findings.containsKey(SIGNIFICANT)));
+            state().getReleaseScope().setSignificant(Boolean.valueOf(!bumpComponents.isEmpty()));
         }
         else {
             // the version was overridden by user

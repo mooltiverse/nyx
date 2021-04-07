@@ -20,8 +20,13 @@ import static org.gradle.api.Project.DEFAULT_VERSION;
 import static com.mooltiverse.oss.nyx.gradle.Constants.GRADLE_VERSION_PROPERTY_NAME;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
+import com.mooltiverse.oss.nyx.data.CommitMessageConvention;
+import com.mooltiverse.oss.nyx.data.CommitMessageConventions;
 import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
 import com.mooltiverse.oss.nyx.data.Scheme;
 import com.mooltiverse.oss.nyx.data.Verbosity;
@@ -44,6 +49,11 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
     private final Object projectVersion;
 
     /**
+     * The private singleton instance of the commit message convention configuration block.
+     */
+    private CommitMessageConventionsBlock commitMessageConventionsBlock = null;
+
+    /**
      * Standard constructor.
      * 
      * @param extension the extension instance to be adapted to a configuration layer
@@ -64,6 +74,17 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
     @Override
     public String getBump() {
         return extension.getBump().getOrNull();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public CommitMessageConventions getCommitMessageConventions() {
+        if (Objects.isNull(commitMessageConventionsBlock)) {
+            commitMessageConventionsBlock = new CommitMessageConventionsBlock();
+        }
+        return commitMessageConventionsBlock;
     }
 
     /**
@@ -172,6 +193,62 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
             catch (IllegalArgumentException iae) {
                 throw new IllegalPropertyException(String.format("Illegal value '%s' provided for project property '%s'", projectVersion, GRADLE_VERSION_PROPERTY_NAME), iae);
             }
+        }
+    }
+
+    /**
+     * The class implementing the {@link CommitMessageConventions} confliguration block.
+     */
+    private class CommitMessageConventionsBlock implements CommitMessageConventions {
+        /**
+         * The local cache of resolved convention items.
+         */
+        private Map<String, CommitMessageConvention> items = null;
+
+        /**
+         * Default constructor is private on purpose.
+         */
+        private CommitMessageConventionsBlock() {
+            super();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public List<String> getEnabled() {
+            // the list property is always present and never null but is empty when the user doesn't define its contents
+            return extension.getCommitMessageConventions().getEnabled().isPresent() && !extension.getCommitMessageConventions().getEnabled().get().isEmpty() ? extension.getCommitMessageConventions().getEnabled().get() : null;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Map<String,CommitMessageConvention> getItems() {
+            // the map property is always present and never null but is empty when the user doesn't define its contents
+            if (extension.getCommitMessageConventions().getItems().isEmpty())
+                return null;
+            else {
+                if (Objects.isNull(items))
+                    items = new HashMap<String, CommitMessageConvention>(extension.getCommitMessageConventions().getItems().size());
+
+                for (NyxExtension.CommitMessageConventions.CommitMessageConvention convention: extension.getCommitMessageConventions().getItems()) {
+                    if (!items.containsKey(convention.getName()))
+                        items.put(convention.getName(), getItem(convention.getName()));
+                }
+
+                return items;
+            }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public CommitMessageConvention getItem(String name) {
+            NyxExtension.CommitMessageConventions.CommitMessageConvention convention = extension.getCommitMessageConventions().getItems().findByName(name);
+            return Objects.isNull(convention) ? null : new CommitMessageConvention(convention.getExpression().get(), convention.getBumpExpressions().isPresent() ? convention.getBumpExpressions().get() : Map.<String,String>of());
         }
     }
 }

@@ -19,12 +19,15 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import com.mooltiverse.oss.nyx.configuration.mock.ConfigurationLayerMock;
+import com.mooltiverse.oss.nyx.data.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.data.Scheme;
 import com.mooltiverse.oss.nyx.data.Verbosity;
 import com.mooltiverse.oss.nyx.version.SemanticVersion;
@@ -42,6 +45,14 @@ public class ConfigurationTests {
         void getBumpTest()
             throws Exception {
             assertEquals(Defaults.BUMP, new Configuration().getBump());
+        }
+
+        @Test
+        @DisplayName("Configuration.getCommitMessageConventions() == Defaults.COMMIT_MESSAGE_CONVENTIONS")
+        void getCommitMessageConventionsTest()
+            throws Exception {
+            assertEquals(Defaults.COMMIT_MESSAGE_CONVENTIONS.getEnabled(), new Configuration().getCommitMessageConventions().getEnabled());
+            assertEquals(Defaults.COMMIT_MESSAGE_CONVENTIONS.getItems(), new Configuration().getCommitMessageConventions().getItems());
         }
 
         @Test
@@ -136,6 +147,42 @@ public class ConfigurationTests {
 
             // now remove the command line configuration and test that now default values are returned again
             assertNull(configuration.withCommandLineConfiguration(null).getBump());
+        }
+
+        @Test
+        @DisplayName("Configuration.withCommandLineConfiguration(MOCK).getCommitMessageConventions() == MOCK.getCommitMessageConventions()")
+        void getCommitMessageConventionsTest()
+            throws Exception {
+            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
+            Configuration configuration = new Configuration();
+            configurationMock.commitMessageConventions.enabled = List.<String>of("convention1");
+            configurationMock.commitMessageConventions.items = Map.<String,CommitMessageConvention>of("convention1", new CommitMessageConvention("expr1", Map.<String,String>of()));
+
+            // in order to make the test meaningful, make sure the default and mock values are different
+            assertNotNull(Defaults.COMMIT_MESSAGE_CONVENTIONS);
+            assertNotNull(configurationMock.commitMessageConventions);
+            assertNotSame(configuration.getCommitMessageConventions(), configurationMock.commitMessageConventions);
+
+            // make sure the initial values come from defaults, until we inject the command line configuration
+            assertNull(Defaults.COMMIT_MESSAGE_CONVENTIONS.getEnabled());
+            assertNull(configuration.getCommitMessageConventions().getEnabled());
+            assertNull(Defaults.COMMIT_MESSAGE_CONVENTIONS.getItems());
+            assertNull(configuration.getCommitMessageConventions().getItems());
+            
+            // inject the command line configuration and test the new value is returned from that
+            configuration.withCommandLineConfiguration(configurationMock);
+
+            assertNotNull(configuration.getCommitMessageConventions().getEnabled());
+            assertNotNull(configuration.getCommitMessageConventions().getItems());
+            assertEquals(1, configuration.getCommitMessageConventions().getEnabled().size());
+            assertTrue(configuration.getCommitMessageConventions().getEnabled().contains("convention1"));
+            assertEquals(1, configuration.getCommitMessageConventions().getItems().size());
+            assertEquals("expr1", configuration.getCommitMessageConventions().getItem("convention1").getExpression());
+
+            // now remove the command line configuration and test that now default values are returned again
+            configuration.withCommandLineConfiguration(null);
+            assertNull(configuration.getCommitMessageConventions().getEnabled());
+            assertNull(configuration.getCommitMessageConventions().getItems());
         }
 
         @Test
@@ -350,6 +397,42 @@ public class ConfigurationTests {
         }
 
         @Test
+        @DisplayName("Configuration.withPluginConfiguration(MOCK).getCommitMessageConventions() == MOCK.getCommitMessageConventions()")
+        void getCommitMessageConventionsTest()
+            throws Exception {
+            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
+            Configuration configuration = new Configuration();
+            configurationMock.commitMessageConventions.enabled = List.<String>of("convention1");
+            configurationMock.commitMessageConventions.items = Map.<String,CommitMessageConvention>of("convention1", new CommitMessageConvention("expr1", Map.<String,String>of()));
+
+            // in order to make the test meaningful, make sure the default and mock values are different
+            assertNotNull(Defaults.COMMIT_MESSAGE_CONVENTIONS);
+            assertNotNull(configurationMock.commitMessageConventions);
+            assertNotSame(configuration.getCommitMessageConventions(), configurationMock.commitMessageConventions);
+
+            // make sure the initial values come from defaults, until we inject the command line configuration
+            assertNull(Defaults.COMMIT_MESSAGE_CONVENTIONS.getEnabled());
+            assertNull(configuration.getCommitMessageConventions().getEnabled());
+            assertNull(Defaults.COMMIT_MESSAGE_CONVENTIONS.getItems());
+            assertNull(configuration.getCommitMessageConventions().getItems());
+            
+            // inject the command line configuration and test the new value is returned from that
+            configuration.withPluginConfiguration(configurationMock);
+
+            assertNotNull(configuration.getCommitMessageConventions().getEnabled());
+            assertNotNull(configuration.getCommitMessageConventions().getItems());
+            assertEquals(1, configuration.getCommitMessageConventions().getEnabled().size());
+            assertTrue(configuration.getCommitMessageConventions().getEnabled().contains("convention1"));
+            assertEquals(1, configuration.getCommitMessageConventions().getItems().size());
+            assertEquals("expr1", configuration.getCommitMessageConventions().getItem("convention1").getExpression());
+
+            // now remove the command line configuration and test that now default values are returned again
+            configuration.withPluginConfiguration(null);
+            assertNull(configuration.getCommitMessageConventions().getEnabled());
+            assertNull(configuration.getCommitMessageConventions().getItems());
+        }
+
+        @Test
         @DisplayName("Configuration.withPluginConfiguration(MOCK).getDirectory() == MOCK.getDirectory()")
         void getDirectoryTest()
             throws Exception {
@@ -526,6 +609,183 @@ public class ConfigurationTests {
 
             // now remove the plugin configuration and test that now default values are returned again
             assertEquals(Defaults.VERSION, configuration.withPluginConfiguration(null).getVersion());
+        }
+    }
+
+    /**
+     * Performs checks against the injection of multiple configuration layers
+     */
+    @Nested
+    @DisplayName("Configuration.with multiple configuration layers")
+    class withMultipleConfigurationLayersTests {
+        @Test
+        @DisplayName("Configuration[multiple layers].getBump() == MOCK.getBump()")
+        void getBumpTest()
+            throws Exception {
+            ConfigurationLayerMock lowPriorityconfigurationMock = new ConfigurationLayerMock();
+            ConfigurationLayerMock highPriorityconfigurationMock = new ConfigurationLayerMock();
+            Configuration configuration = new Configuration();
+            lowPriorityconfigurationMock.bump = "alpha";
+            highPriorityconfigurationMock.bump = "beta";
+            
+            // inject the plugin configuration and test the new value is returned from that
+            configuration.withPluginConfiguration(lowPriorityconfigurationMock);
+            configuration.withCommandLineConfiguration(highPriorityconfigurationMock);
+
+            assertEquals(highPriorityconfigurationMock.bump, configuration.getBump());
+        }
+
+        @Test
+        @DisplayName("Configuration[multiple layers].getCommitMessageConventions() == MOCK.getCommitMessageConventions()")
+        void getCommitMessageConventionsTest()
+            throws Exception {
+            ConfigurationLayerMock lowPriorityconfigurationMock = new ConfigurationLayerMock();
+            ConfigurationLayerMock highPriorityconfigurationMock = new ConfigurationLayerMock();
+            Configuration configuration = new Configuration();
+            lowPriorityconfigurationMock.commitMessageConventions.enabled = List.<String>of("convention1");
+            lowPriorityconfigurationMock.commitMessageConventions.items = Map.<String,CommitMessageConvention>of("convention1", new CommitMessageConvention("expr1", Map.<String,String>of()));
+            highPriorityconfigurationMock.commitMessageConventions.enabled = List.<String>of("convention2");
+            highPriorityconfigurationMock.commitMessageConventions.items = Map.<String,CommitMessageConvention>of("convention2", new CommitMessageConvention("expr2", Map.<String,String>of()));
+            
+            // inject the command line configuration and test the new value is returned from that
+            configuration.withPluginConfiguration(lowPriorityconfigurationMock);
+            configuration.withCommandLineConfiguration(highPriorityconfigurationMock);
+
+            assertNotNull(configuration.getCommitMessageConventions().getEnabled());
+            assertNotNull(configuration.getCommitMessageConventions().getItems());
+            assertEquals(1, configuration.getCommitMessageConventions().getEnabled().size());
+            assertTrue(configuration.getCommitMessageConventions().getEnabled().contains("convention2"));
+            assertEquals(1, configuration.getCommitMessageConventions().getItems().size());
+            assertEquals("expr2", configuration.getCommitMessageConventions().getItem("convention2").getExpression());
+        }
+
+        @Test
+        @DisplayName("Configuration[multiple layers].getDirectory() == MOCK.getDirectory()")
+        void getDirectoryTest()
+            throws Exception {
+            Configuration.setDefaultDirectory(null); // clean the singleton from previous runs
+            ConfigurationLayerMock lowPriorityconfigurationMock = new ConfigurationLayerMock();
+            ConfigurationLayerMock highPriorityconfigurationMock = new ConfigurationLayerMock();
+            Configuration configuration = new Configuration();
+            lowPriorityconfigurationMock.directory = new File(System.getProperty("java.io.tmpdir"), "this directory does not exists");
+            highPriorityconfigurationMock.directory = new File(System.getProperty("java.io.tmpdir"), "another directory that does not exists");
+            
+            // inject the plugin configuration and test the new value is returned from that
+            configuration.withPluginConfiguration(lowPriorityconfigurationMock);
+            configuration.withCommandLineConfiguration(highPriorityconfigurationMock);
+            assertEquals(highPriorityconfigurationMock.directory, configuration.getDirectory());
+        }
+
+        @Test
+        @DisplayName("Configuration[multiple layers].getDryRun() == MOCK.getDryRun()")
+        void getDryRunTest()
+            throws Exception {
+            ConfigurationLayerMock lowPriorityconfigurationMock = new ConfigurationLayerMock();
+            ConfigurationLayerMock highPriorityconfigurationMock = new ConfigurationLayerMock();
+            Configuration configuration = new Configuration();
+            lowPriorityconfigurationMock.dryRun = Boolean.TRUE;
+            highPriorityconfigurationMock.dryRun = Boolean.FALSE;
+            
+            // inject the plugin configuration and test the new value is returned from that
+            configuration.withPluginConfiguration(lowPriorityconfigurationMock);
+            configuration.withCommandLineConfiguration(highPriorityconfigurationMock);
+            assertEquals(highPriorityconfigurationMock.dryRun, configuration.getDryRun());
+        }
+
+        @Test
+        @DisplayName("Configuration[multiple layers].getInitialVersion() == MOCK.getInitialVersion()")
+        void getInitialVersionTest()
+            throws Exception {
+            ConfigurationLayerMock lowPriorityconfigurationMock = new ConfigurationLayerMock();
+            ConfigurationLayerMock highPriorityconfigurationMock = new ConfigurationLayerMock();
+            Configuration configuration = new Configuration();
+            lowPriorityconfigurationMock.initialVersion = SemanticVersion.valueOf("9.9.9");
+            highPriorityconfigurationMock.initialVersion = SemanticVersion.valueOf("8.8.8");
+            
+            // inject the plugin configuration and test the new value is returned from that
+            configuration.withPluginConfiguration(lowPriorityconfigurationMock);
+            configuration.withCommandLineConfiguration(highPriorityconfigurationMock);
+            assertEquals(highPriorityconfigurationMock.initialVersion, configuration.getInitialVersion());
+        }
+
+        @Test
+        @DisplayName("Configuration[multiple layers].getReleasePrefix() == MOCK.getReleasePrefix()")
+        void getReleasePrefixTest()
+            throws Exception {
+            ConfigurationLayerMock lowPriorityconfigurationMock = new ConfigurationLayerMock();
+            ConfigurationLayerMock highPriorityconfigurationMock = new ConfigurationLayerMock();
+            Configuration configuration = new Configuration();
+            lowPriorityconfigurationMock.releasePrefix = "lpprefix";
+            highPriorityconfigurationMock.releasePrefix = "hpprefix";
+            
+            // inject the plugin configuration and test the new value is returned from that
+            configuration.withPluginConfiguration(lowPriorityconfigurationMock);
+            configuration.withCommandLineConfiguration(highPriorityconfigurationMock);
+            assertEquals(highPriorityconfigurationMock.releasePrefix, configuration.getReleasePrefix());
+        }
+
+        @Test
+        @DisplayName("Configuration[multiple layers].getReleaseLenient() == MOCK.getReleaseLenient()")
+        void getReleaseLenientTest()
+            throws Exception {
+            ConfigurationLayerMock lowPriorityconfigurationMock = new ConfigurationLayerMock();
+            ConfigurationLayerMock highPriorityconfigurationMock = new ConfigurationLayerMock();
+            Configuration configuration = new Configuration();
+            lowPriorityconfigurationMock.releaseLenient = Boolean.FALSE;
+            highPriorityconfigurationMock.releaseLenient = Boolean.TRUE;
+            
+            // inject the plugin configuration and test the new value is returned from that
+            configuration.withPluginConfiguration(lowPriorityconfigurationMock);
+            configuration.withCommandLineConfiguration(highPriorityconfigurationMock);
+            assertEquals(highPriorityconfigurationMock.releaseLenient, configuration.getReleaseLenient());
+        }
+
+        @Test
+        @DisplayName("Configuration[multiple layers].getScheme() == MOCK.getScheme()")
+        void getSchemeTest()
+            throws Exception {
+            ConfigurationLayerMock lowPriorityconfigurationMock = new ConfigurationLayerMock();
+            ConfigurationLayerMock highPriorityconfigurationMock = new ConfigurationLayerMock();
+            Configuration configuration = new Configuration();
+            lowPriorityconfigurationMock.scheme = Scheme.SEMVER;
+            highPriorityconfigurationMock.scheme = Scheme.SEMVER;
+            
+            // inject the plugin configuration and test the new value is returned from that
+            configuration.withPluginConfiguration(lowPriorityconfigurationMock);
+            configuration.withCommandLineConfiguration(highPriorityconfigurationMock);
+            assertEquals(highPriorityconfigurationMock.scheme, configuration.getScheme());
+        }
+
+        @Test
+        @DisplayName("Configuration[multiple layers].getVerbosity() == MOCK.getVerbosity()")
+        void getVerbosityTest()
+            throws Exception {
+            ConfigurationLayerMock lowPriorityconfigurationMock = new ConfigurationLayerMock();
+            ConfigurationLayerMock highPriorityconfigurationMock = new ConfigurationLayerMock();
+            Configuration configuration = new Configuration();
+            lowPriorityconfigurationMock.verbosity = Verbosity.TRACE;
+            highPriorityconfigurationMock.verbosity = Verbosity.INFO;
+            
+            // inject the plugin configuration and test the new value is returned from that
+            configuration.withPluginConfiguration(lowPriorityconfigurationMock);
+            configuration.withCommandLineConfiguration(highPriorityconfigurationMock);
+            assertEquals(highPriorityconfigurationMock.verbosity, configuration.getVerbosity());
+        }
+
+        @Test
+        @DisplayName("Configuration[multiple layers].getVersion() == MOCK.getVersion()")
+        void getVersionTest()
+            throws Exception {
+            ConfigurationLayerMock lowPriorityconfigurationMock = new ConfigurationLayerMock();
+            ConfigurationLayerMock highPriorityconfigurationMock = new ConfigurationLayerMock();
+            Configuration configuration = new Configuration();
+            lowPriorityconfigurationMock.version = SemanticVersion.valueOf("11.12.13");
+            highPriorityconfigurationMock.version = SemanticVersion.valueOf("21.22.23");
+            
+            // inject the plugin configuration and test the new value is returned from that
+            configuration.withPluginConfiguration(lowPriorityconfigurationMock);
+            configuration.withCommandLineConfiguration(highPriorityconfigurationMock);
+            assertEquals(highPriorityconfigurationMock.version, configuration.getVersion());
         }
     }
 }

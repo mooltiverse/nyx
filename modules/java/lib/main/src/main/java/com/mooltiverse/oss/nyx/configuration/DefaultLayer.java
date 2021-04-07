@@ -23,6 +23,7 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mooltiverse.oss.nyx.data.CommitMessageConventions;
 import com.mooltiverse.oss.nyx.data.DataAccessException;
 import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
 import com.mooltiverse.oss.nyx.data.Scheme;
@@ -83,6 +84,16 @@ class DefaultLayer implements ConfigurationLayer, Defaults {
      * {@inheritDoc}
      */
     @Override
+    public CommitMessageConventions getCommitMessageConventions()
+        throws DataAccessException, IllegalPropertyException {
+        logger.trace(DEFAULT, "Retrieving the default {} configuration option", "commitMessageConventions");
+        return COMMIT_MESSAGE_CONVENTIONS;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public File getDirectory()
         throws DataAccessException, IllegalPropertyException {
         logger.trace(DEFAULT, "Retrieving the default {} configuration option: {}", "directory", Objects.isNull(directory) ? DIRECTORY : directory);
@@ -95,6 +106,7 @@ class DefaultLayer implements ConfigurationLayer, Defaults {
      * @param directory the new default directory. If {@code null} then the standard default directory will be used.
      */
     public void setDirectory(File directory) {
+        logger.trace(DEFAULT, "Setting the default {} configuration option: {}", "directory", Objects.isNull(directory) ? "null" : directory.getAbsolutePath());
         this.directory = directory;
     }
 

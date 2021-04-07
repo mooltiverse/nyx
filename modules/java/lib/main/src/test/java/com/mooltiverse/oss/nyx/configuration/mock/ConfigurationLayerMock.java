@@ -16,8 +16,13 @@
 package com.mooltiverse.oss.nyx.configuration.mock;
 
 import java.io.File;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import com.mooltiverse.oss.nyx.configuration.ConfigurationLayer;
+import com.mooltiverse.oss.nyx.data.CommitMessageConvention;
+import com.mooltiverse.oss.nyx.data.CommitMessageConventions;
 import com.mooltiverse.oss.nyx.data.Scheme;
 import com.mooltiverse.oss.nyx.data.Verbosity;
 import com.mooltiverse.oss.nyx.version.Version;
@@ -30,6 +35,11 @@ public class ConfigurationLayerMock implements ConfigurationLayer {
      * The value returned by this mock object.
      */
     public String bump = null;
+
+    /**
+     * The value returned by this mock object.
+     */
+    public CommitMessageConventionsMock commitMessageConventions = new CommitMessageConventionsMock();
 
     /**
      * The value returned by this mock object. This is an abstract path and does not exists on the file system.
@@ -84,6 +94,14 @@ public class ConfigurationLayerMock implements ConfigurationLayer {
     @Override
     public String getBump() {
         return bump;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public CommitMessageConventions getCommitMessageConventions() {
+        return commitMessageConventions;
     }
 
     /**
@@ -148,5 +166,48 @@ public class ConfigurationLayerMock implements ConfigurationLayer {
     @Override
     public Version getVersion(){
         return version;
+    }
+
+    public class CommitMessageConventionsMock implements CommitMessageConventions {
+        /**
+         * The value returned by this mock object.
+         */
+        public List<String> enabled = null;
+
+        /**
+         * The value returned by this mock object.
+         */
+        public Map<String,CommitMessageConvention> items = null;
+
+        /**
+         * Default constructor
+         */
+        public CommitMessageConventionsMock() {
+            super();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public List<String> getEnabled() {
+            return enabled;
+        }
+    
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Map<String,CommitMessageConvention> getItems() {
+            return items;
+        }
+    
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public CommitMessageConvention getItem(String name) {
+            return Objects.isNull(items) ? null : items.get(name);
+        }
     }
 }

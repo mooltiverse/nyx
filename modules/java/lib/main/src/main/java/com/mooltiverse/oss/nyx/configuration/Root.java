@@ -18,6 +18,7 @@ package com.mooltiverse.oss.nyx.configuration;
 import java.io.File;
 
 import com.mooltiverse.oss.nyx.data.Block;
+import com.mooltiverse.oss.nyx.data.CommitMessageConventions;
 import com.mooltiverse.oss.nyx.data.DataAccessException;
 import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
 import com.mooltiverse.oss.nyx.data.Scheme;
@@ -38,6 +39,17 @@ public interface Root extends Block {
      * @throws IllegalPropertyException in case the option has been defined but has incorrect values or it can't be resolved.
      */
     public String getBump()
+        throws DataAccessException, IllegalPropertyException;
+    
+    /**
+     * Returns the commit message convention configuration block.
+     * 
+     * @return the commit message convention configuration block. Never {@code null}.
+     * 
+     * @throws DataAccessException in case the option cannot be read or accessed.
+     * @throws IllegalPropertyException in case the option has been defined but has incorrect values or it can't be resolved.
+     */
+    public CommitMessageConventions getCommitMessageConventions()
         throws DataAccessException, IllegalPropertyException;
 
     /**
