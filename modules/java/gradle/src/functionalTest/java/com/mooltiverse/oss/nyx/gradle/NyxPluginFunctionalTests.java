@@ -425,7 +425,6 @@ public class NyxPluginFunctionalTests {
         printWriter.println("nyx {");
         if (!Objects.isNull(bump))
             printWriter.println("  bump = '"+bump+"'");
-        printWriter.println("  dryRun = true");
         printWriter.println("  commitMessageConventions {");
         printWriter.println("     enabled = ['conventionalCommits']");
         printWriter.println("     items {");

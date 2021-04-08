@@ -82,8 +82,8 @@ nav-user-guide:
 #        url: /guide/user/configuration-reference/templates/
       - title: "Global Options"
         url: /guide/user/configuration-reference/global-options/
-#      - title: "Commit Message Conventions"
-#        url: /guide/user/configuration-reference/commit-message-conventions/
+      - title: "Commit Message Conventions"
+        url: /guide/user/configuration-reference/commit-message-conventions/
 #      - title: "Environments"
 #        url: /guide/user/configuration-reference/environments/
 #      - title: "Services"
