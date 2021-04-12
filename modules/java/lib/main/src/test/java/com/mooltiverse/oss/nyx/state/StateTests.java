@@ -174,7 +174,7 @@ public class StateTests {
             state.setVersionInternal(version);
             
             configurationMock.releasePrefix = null; // no effects, as the default is not null
-            assertEquals("v1.2.3", state.getVersion());
+            assertEquals("1.2.3", state.getVersion());
 
             configurationMock.releasePrefix = ""; // this has effect and uses no prefix
             assertEquals("1.2.3", state.getVersion());
@@ -190,7 +190,7 @@ public class StateTests {
             Version version = SemanticVersion.valueOf("1.2.3");
             state.setVersionInternal(version);
             assertEquals(version, state.getVersionInternal());
-            assertEquals(configuration.getReleasePrefix().concat(version.toString()), state.getVersion());
+            assertEquals(version.toString(), state.getVersion());
         }
 
         /*@Test

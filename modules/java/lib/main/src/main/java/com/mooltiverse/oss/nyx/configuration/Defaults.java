@@ -83,9 +83,9 @@ public interface Defaults {
     public static final Version INITIAL_VERSION = VersionFactory.defaultInitial(Scheme.SEMVER.getScheme());
 
     /**
-     * The default prefix to add at the beginning of a version identifier to generate the release identifier. Value: {@value}
+     * The default prefix to add at the beginning of a version identifier to generate the release identifier. Value: {@code null}
      */
-    public static final String RELEASE_PREFIX = "v";
+    public static final String RELEASE_PREFIX = null;
 
     /**
      * The flag that alows reading releases from the history tolerating arbitrary prefixes and extra non critical characters. Value: {@code true}

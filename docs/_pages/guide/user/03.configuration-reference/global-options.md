@@ -15,7 +15,7 @@ These are the top level options in the configuration:
 | [`dryRun`](#dry-run)                                      | boolean | `--dry-run`, `--dry-run=true|false`                       | `NYX_DRY_RUN=true|false`                                      | `false`  |
 | [`initialVersion`](#initial-version)                      | string  | `--initial-version=<VERSION>`                             | `NYX_INITIAL_VERSION=<VERSION>`                               |  Depends on the configured [version scheme](#scheme) |
 | [`releaseLenient`](#release-lenient)                      | boolean | `--release-lenient`, `--release-lenient=true|false`       | `NYX_RELEASE_LENIENT=true|false`                              | `true`   |
-| [`releasePrefix`](#release-prefix)                        | string  | `--release-prefix=<PREFIX>`                               | `NYX_RELEASE_PREFIX=<PREFIX>`                                 | `v`      |
+| [`releasePrefix`](#release-prefix)                        | string  | `--release-prefix=<PREFIX>`                               | `NYX_RELEASE_PREFIX=<PREFIX>`                                 | N/A      |
 | [`scheme`](#scheme)                                       | string  | `--scheme=<NAME>`                                         | `NYX_SCHEME=<NAME>`                                           | `semver` |
 | [`verbosity`](#verbosity)                                 | string  | `--verbosity=<LEVEL>`, `--fatal`, `--error`, `--warning`, `--info`, `--debug`, `--trace` | `NYX_VERBOSITY=<LEVEL>`        | `warning`|
 | [`version`](#version)                                     | string  | `-v <VERSION>`, `--version=<VERSION>`                     | `NYX_VERSION=<VERSION>`                                       | N/A      |
@@ -116,15 +116,13 @@ When used with no value on the command line (i.e. `--release-lenient` alone) `tr
 | ------------------------- | ---------------------------------------------------------------------------------------- |
 | Name                      | `releasePrefix`                                                                          |
 | Type                      | string                                                                                   |
-| Default                   | `v`                                                                                      |
+| Default                   | N/A                                                                                      |
 | Command Line Option       | `--release-prefix=<PREFIX>`                                                              |
 | Environment Variable      | `NYX_RELEASE_PREFIX=<PREFIX>`                                                            |
 | Configuration File Option | `releasePrefix`                                                                          |
 | Related state attributes  |                                                                                          |
 
 It's a common practice to add a leading string to version numbers to give releases a name. Common prefixes are `v` or `rel` but you might use anything, or no prefix at all.
-
-Nyx uses `v` as a default prefix so, provided versions like `x.y.x`, releases and tags are named `vx.y.x`. If you wish not to use any prefix set this option to an empty string (`null` would not elide the default prefix).
 
 When specifying a custom prefix, only use alphanumeric characters (no numbers or special characters).
 

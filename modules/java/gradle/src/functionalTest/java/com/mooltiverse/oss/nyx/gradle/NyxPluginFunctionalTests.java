@@ -711,7 +711,7 @@ public class NyxPluginFunctionalTests {
             // just run the nyxInfer Task, just the tasks that write the version to a file, which must be already available
             runTask(gradleRunner, gradleVersion, "nyxInfer", null);
             assertEquals("unspecified", fileContent(new File(directory, "diag-early-version.txt"))); // the beforeEvaluate version
-            assertEquals("v0.1.0", fileContent(new File(directory, "diag-late-version.txt"))); // the afterEvaluate version
+            assertEquals("0.1.0", fileContent(new File(directory, "diag-late-version.txt"))); // the afterEvaluate version
 
             tearDown(gradleRunner);
         }
@@ -738,13 +738,13 @@ public class NyxPluginFunctionalTests {
 
             // do not run any nyx Task, just the tasks that write the version to a file, which must be already available
             runTask(gradleRunner, gradleVersion, "dummy", null);
-            assertEquals("v0.1.0", fileContent(new File(directory, "diag-early-version.txt")));
-            assertEquals("v0.1.0", fileContent(new File(directory, "diag-late-version.txt")));
+            assertEquals("0.1.0", fileContent(new File(directory, "diag-early-version.txt")));
+            assertEquals("0.1.0", fileContent(new File(directory, "diag-late-version.txt")));
 
             // now run nyxInfer and make sure it makes no difference
             runTask(gradleRunner, gradleVersion, "nyxInfer", null);
-            assertEquals("v0.1.0", fileContent(new File(directory, "diag-early-version.txt")));
-            assertEquals("v0.1.0", fileContent(new File(directory, "diag-late-version.txt")));
+            assertEquals("0.1.0", fileContent(new File(directory, "diag-early-version.txt")));
+            assertEquals("0.1.0", fileContent(new File(directory, "diag-late-version.txt")));
 
             tearDown(gradleRunner);
         }

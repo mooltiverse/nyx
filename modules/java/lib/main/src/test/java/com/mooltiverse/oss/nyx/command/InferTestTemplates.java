@@ -154,7 +154,7 @@ public class InferTestTemplates {
             assertNull(command.state().getBump());
             assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
             assertEquals(Defaults.INITIAL_VERSION, command.state().getVersionInternal());
-            assertEquals(Defaults.RELEASE_PREFIX.concat(Defaults.INITIAL_VERSION.toString()), command.state().getVersion());
+            assertEquals(Defaults.INITIAL_VERSION.toString(), command.state().getVersion());
             assertEquals(script.getWorkbenchCommits().get(0), command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertNull(command.state().getReleaseScope().getPreviousVersion());
@@ -178,7 +178,7 @@ public class InferTestTemplates {
             assertNull(command.state().getBump());
             assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
             assertEquals(configurationMock.initialVersion, command.state().getVersionInternal());
-            assertEquals(Defaults.RELEASE_PREFIX.concat(configurationMock.initialVersion.toString()), command.state().getVersion());
+            assertEquals(configurationMock.initialVersion.toString(), command.state().getVersion());
             assertEquals(script.getWorkbenchCommits().get(0), command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertNull(command.state().getReleaseScope().getPreviousVersion());
@@ -202,7 +202,7 @@ public class InferTestTemplates {
             assertNull(command.state().getBump());
             assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
             assertEquals(configurationMock.version, command.state().getVersionInternal());
-            assertEquals(command.state().getConfiguration().getReleasePrefix().concat(configurationMock.version.toString()), command.state().getVersion());
+            assertEquals(configurationMock.version.toString(), command.state().getVersion());
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertNull(command.state().getReleaseScope().getPreviousVersion());
@@ -224,7 +224,7 @@ public class InferTestTemplates {
             assertEquals(configurationMock.bump, command.state().getBump());
             assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
             assertEquals("1.0.0", command.state().getVersionInternal().toString());
-            assertEquals("v1.0.0", command.state().getVersion());
+            assertEquals("1.0.0", command.state().getVersion());
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("0.1.0", command.state().getReleaseScope().getPreviousVersion().toString());
@@ -246,7 +246,7 @@ public class InferTestTemplates {
             assertEquals(configurationMock.bump, command.state().getBump());
             assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
             assertEquals("0.2.0", command.state().getVersionInternal().toString());
-            assertEquals("v0.2.0", command.state().getVersion());
+            assertEquals("0.2.0", command.state().getVersion());
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("0.1.0", command.state().getReleaseScope().getPreviousVersion().toString());
@@ -268,7 +268,7 @@ public class InferTestTemplates {
             assertEquals(configurationMock.bump, command.state().getBump());
             assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
             assertEquals("0.1.1", command.state().getVersionInternal().toString());
-            assertEquals("v0.1.1", command.state().getVersion());
+            assertEquals("0.1.1", command.state().getVersion());
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("0.1.0", command.state().getReleaseScope().getPreviousVersion().toString());
@@ -290,7 +290,7 @@ public class InferTestTemplates {
             assertEquals(configurationMock.bump, command.state().getBump());
             assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
             assertEquals("0.1.0-alpha.1", command.state().getVersionInternal().toString());
-            assertEquals("v0.1.0-alpha.1", command.state().getVersion());
+            assertEquals("0.1.0-alpha.1", command.state().getVersion());
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("0.1.0", command.state().getReleaseScope().getPreviousVersion().toString());
@@ -314,7 +314,7 @@ public class InferTestTemplates {
             assertEquals(configurationMock.bump, command.state().getBump());
             assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
             assertEquals("2.2.2", command.state().getVersionInternal().toString());
-            assertEquals("v2.2.2", command.state().getVersion());
+            assertEquals("2.2.2", command.state().getVersion());
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("2.2.2", command.state().getReleaseScope().getPreviousVersion().toString());
@@ -338,7 +338,7 @@ public class InferTestTemplates {
             assertEquals(configurationMock.bump, command.state().getBump());
             assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
             assertEquals("0.1.0", command.state().getVersionInternal().toString());
-            assertEquals("v0.1.0", command.state().getVersion());
+            assertEquals("0.1.0", command.state().getVersion());
             assertEquals(script.getCommitByTag("release-2.2.2"), command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("0.1.0", command.state().getReleaseScope().getPreviousVersion().toString());
@@ -406,7 +406,7 @@ public class InferTestTemplates {
             assertNull(command.state().getBump());
             assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
             assertEquals("0.0.4", command.state().getVersionInternal().toString());
-            assertEquals("v0.0.4", command.state().getVersion());
+            assertEquals("0.0.4", command.state().getVersion());
             assertEquals(script.getWorkbenchCommits().get(script.getWorkbenchCommits().size()-2), command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion().toString());
@@ -424,7 +424,7 @@ public class InferTestTemplates {
             assertNull(command.state().getBump());
             assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
             assertEquals("0.0.4", command.state().getVersionInternal().toString());
-            assertEquals("v0.0.4", command.state().getVersion());
+            assertEquals("0.0.4", command.state().getVersion());
             assertEquals(script.getWorkbenchCommits().get(script.getWorkbenchCommits().size()-2), command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion().toString());
@@ -448,7 +448,7 @@ public class InferTestTemplates {
             assertNull(command.state().getBump());
             assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
             assertEquals("0.0.4", command.state().getVersionInternal().toString());
-            assertEquals("v0.0.4", command.state().getVersion());
+            assertEquals("0.0.4", command.state().getVersion());
             assertEquals(script.getWorkbenchCommits().get(script.getWorkbenchCommits().size()-2), command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion().toString());
@@ -472,7 +472,7 @@ public class InferTestTemplates {
             assertNull(command.state().getBump());
             assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
             assertEquals(configurationMock.version, command.state().getVersionInternal());
-            assertEquals(command.state().getConfiguration().getReleasePrefix().concat(configurationMock.version.toString()), command.state().getVersion());
+            assertEquals(configurationMock.version.toString(), command.state().getVersion());
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertNull(command.state().getReleaseScope().getPreviousVersion());
@@ -494,7 +494,7 @@ public class InferTestTemplates {
             assertEquals(configurationMock.bump, command.state().getBump());
             assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
             assertEquals("1.0.0", command.state().getVersionInternal().toString());
-            assertEquals("v1.0.0", command.state().getVersion());
+            assertEquals("1.0.0", command.state().getVersion());
             assertEquals(script.getWorkbenchCommits().get(script.getWorkbenchCommits().size()-2), command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion().toString());
@@ -516,7 +516,7 @@ public class InferTestTemplates {
             assertEquals(configurationMock.bump, command.state().getBump());
             assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
             assertEquals("0.1.0", command.state().getVersionInternal().toString());
-            assertEquals("v0.1.0", command.state().getVersion());
+            assertEquals("0.1.0", command.state().getVersion());
             assertEquals(script.getWorkbenchCommits().get(script.getWorkbenchCommits().size()-2), command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion().toString());
@@ -538,7 +538,7 @@ public class InferTestTemplates {
             assertEquals(configurationMock.bump, command.state().getBump());
             assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
             assertEquals("0.0.5", command.state().getVersionInternal().toString());
-            assertEquals("v0.0.5", command.state().getVersion());
+            assertEquals("0.0.5", command.state().getVersion());
             assertEquals(script.getWorkbenchCommits().get(script.getWorkbenchCommits().size()-2), command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion().toString());
@@ -560,7 +560,7 @@ public class InferTestTemplates {
             assertEquals(configurationMock.bump, command.state().getBump());
             assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
             assertEquals("0.0.4-alpha.1", command.state().getVersionInternal().toString());
-            assertEquals("v0.0.4-alpha.1", command.state().getVersion());
+            assertEquals("0.0.4-alpha.1", command.state().getVersion());
             assertEquals(script.getWorkbenchCommits().get(script.getWorkbenchCommits().size()-2), command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion().toString());
@@ -584,7 +584,7 @@ public class InferTestTemplates {
             assertEquals(configurationMock.bump, command.state().getBump());
             assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
             assertEquals("2.2.2", command.state().getVersionInternal().toString());
-            assertEquals("v2.2.2", command.state().getVersion());
+            assertEquals("2.2.2", command.state().getVersion());
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("2.2.2", command.state().getReleaseScope().getPreviousVersion().toString());
@@ -608,7 +608,7 @@ public class InferTestTemplates {
             assertEquals(configurationMock.bump, command.state().getBump());
             assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
             assertEquals("0.0.4", command.state().getVersionInternal().toString());
-            assertEquals("v0.0.4", command.state().getVersion());
+            assertEquals("0.0.4", command.state().getVersion());
             assertEquals(script.getWorkbenchCommits().get(script.getWorkbenchCommits().size()-3), command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion().toString());
@@ -682,7 +682,7 @@ public class InferTestTemplates {
             assertEquals("minor", command.state().getBump());
             assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
             assertEquals("0.1.0", command.state().getVersionInternal().toString());
-            assertEquals("v0.1.0", command.state().getVersion());
+            assertEquals("0.1.0", command.state().getVersion());
             assertEquals(script.getWorkbenchCommits().get(script.getWorkbenchCommits().size()-2), command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion().toString());
