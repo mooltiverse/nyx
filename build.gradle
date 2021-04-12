@@ -15,6 +15,9 @@ plugins {
 ------------------------------------------------------------------------------*/
 description = 'Nyx is a portable and flexible semantic release tool.'
 
+/*------------------------------------------------------------------------------
+  This is the configuration for this project and all sub-projects
+------------------------------------------------------------------------------*/
 allprojects {
   // See: https://docs.gradle.org/current/userguide/base_plugin.html
   apply plugin: 'base'
@@ -36,6 +39,14 @@ allprojects {
       }
     }
   }
+}
+
+/*------------------------------------------------------------------------------
+  This is the configuration for this all sub-projects
+------------------------------------------------------------------------------*/
+subprojects {
+    // let all sub projects have the same version as the root project
+    version = rootProject.version
 }
 
 /*------------------------------------------------------------------------------
