@@ -234,3 +234,32 @@ The following additional [lifecycle tasks](https://docs.gradle.org/current/userg
 The `release` lifecycle task is created if there is no task with the same name already defined. This task provides no actions by itself but is just meant to let you run `gradle release` to run the entire release process.
 
 The newly created or existing `release` task is attached to depend on the [`nyxPublish`](#nyxpublish) task.
+
+### Accessing the Nyx State extra project property from build scripts
+
+Another nifty feature that may save you a bunch of coding is accessing the [Nyx State]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/index.md %}) from within a Gradle script.
+
+The entire State is bound to the project *extra properties* with the `nyxState` property name so, starting from that, you can read any property exported by Nyx.
+
+The `nyxState` property is only available after at least one [core task](#core-tasks) has executed. When using the [settings plugin](#apply-the-plugin) this is not an issue as the tasks run automatically in the early phases. Not all State properties are available at the same type (after the same task execution), please check out the [reference]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/index.md %}) for each property to know when it's available.
+{: .notice--info}
+
+This way you can have all the Nyx properties handy without even [storing the State file](TODO: link the configuration option to save the state to a local file). For example, to only run a task if the [release scope]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}) contains [significant changes]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#significant) you can check the `project.nyxState.releaseScope.significant` boolean property while to reuse the same timestamp used by Nyx you can read the [`project.nyxState.significant`]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#timestamp).
+
+Example:
+
+```groovy
+task dumpSomeDiagnostics() {
+    dependsOn nyxInfer
+    doLast {
+        println project.nyxState.bump
+        println project.nyxState.directory.getAbsolutePath()
+        println project.nyxState.scheme.toString()
+        println Long.valueOf(project.nyxState.timestamp).toString()
+        println project.nyxState.version
+        println Boolean.valueOf(projct.nyxState.releaseScope.significant).toString()
+    }
+}
+```
+
+In this example `dumpSomeDiagnostics` represents some arbitrary task that depends on [`nyxInfer`](#nyxinfer) just to make sure the `nyxState` is available and is used to print a few attributes from the state.

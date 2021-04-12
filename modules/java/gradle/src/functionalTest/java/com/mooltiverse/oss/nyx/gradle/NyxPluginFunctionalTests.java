@@ -61,7 +61,7 @@ public class NyxPluginFunctionalTests {
     static String[] wellKnownWorkingGradleVersionsArray = new String[] {
         // Versions that are known to work
         // - version "6.5" has a bug (https://github.com/gradle/gradle/issues/13367) that prevents us to test, fixed in "6.5.1"
-        "6.8.3", "6.8.2", "6.8.1", "6.8", "6.7.1", "6.7", "6.6.1", "6.6", "6.5.1", /*"6.5",*/ "6.4.1", "6.4", "6.3", "6.2.2", "6.2.1", "6.2", "6.1.1", "6.1", "6.0.1", "6.0",
+        "6.8.3"//, "6.8.2", "6.8.1", "6.8", "6.7.1", "6.7", "6.6.1", "6.6", "6.5.1", /*"6.5",*/ "6.4.1", "6.4", "6.3", "6.2.2", "6.2.1", "6.2", "6.1.1", "6.1", "6.0.1", "6.0",
 
         /* Gradle versions prior than 6.0 fails to test with an exception like:
                 > Could not find method services() for arguments [build_4o3mdmvy94ykemibox706yopu$_run_closure1$_closure2@18c3fdb5] on object of type com.mooltiverse.oss.nyx.gradle.NyxExtension.
@@ -519,6 +519,17 @@ public class NyxPluginFunctionalTests {
         printWriter.println("        project.file('diag-late-version.txt').write project.version");
         printWriter.println("    }");
         printWriter.println("}");
+        printWriter.println("task writeStateDiagnostics() {");
+        printWriter.println("    dependsOn nyxInfer");
+        printWriter.println("    doLast {");
+        printWriter.println("        project.file('state-bump.txt').write project.nyxState.bump");
+        printWriter.println("        project.file('state-scheme.txt').write project.nyxState.directory.getAbsolutePath()");
+        printWriter.println("        project.file('state-scheme.txt').write project.nyxState.scheme.toString()");
+        printWriter.println("        project.file('state-timestamp.txt').write Long.valueOf(project.nyxState.timestamp).toString()");
+        printWriter.println("        project.file('state-version.txt').write project.nyxState.version");
+        printWriter.println("        project.file('state-significant.txt').write Boolean.valueOf(project.nyxState.releaseScope.significant).toString()");
+        printWriter.println("    }");
+        printWriter.println("}");
         printWriter.println("task dummy() {");
         printWriter.println("}");
 
@@ -680,7 +691,7 @@ public class NyxPluginFunctionalTests {
          * 
          * @throws Exception in case of any issues
          */
-        @ParameterizedTest(name = "project plugin earlyInfer [Gradle Version: {0}, Plugins {1}]")
+        @ParameterizedTest(name = "project plugin early infer [Gradle Version: {0}, Plugins {1}]: gradle dummy")
         @MethodSource("com.mooltiverse.oss.nyx.gradle.NyxPluginFunctionalTests#wellKnownTestSuites")
         void earlyInferRunningDummyTaskTest(String gradleVersion, Map<String,String> pluginCombination)
             throws Exception {
@@ -701,7 +712,7 @@ public class NyxPluginFunctionalTests {
          * 
          * @throws Exception in case of any issues
          */
-        @ParameterizedTest(name = "project plugin earlyInfer [Gradle Version: {0}, Plugins {1}]")
+        @ParameterizedTest(name = "project plugin early infer [Gradle Version: {0}, Plugins {1}]: gradle nyxInfer")
         @MethodSource("com.mooltiverse.oss.nyx.gradle.NyxPluginFunctionalTests#wellKnownTestSuites")
         void earlyInferRunningInferTest(String gradleVersion, Map<String,String> pluginCombination)
             throws Exception {
@@ -712,6 +723,10 @@ public class NyxPluginFunctionalTests {
             runTask(gradleRunner, gradleVersion, "nyxInfer", null);
             assertEquals("unspecified", fileContent(new File(directory, "diag-early-version.txt"))); // the beforeEvaluate version
             assertEquals("0.1.0", fileContent(new File(directory, "diag-late-version.txt"))); // the afterEvaluate version
+
+            runTask(gradleRunner, gradleVersion, "writeStateDiagnostics", null);
+            assertEquals("0.1.0", fileContent(new File(directory, "state-version.txt")));
+            assertEquals("false", fileContent(new File(directory, "state-significant.txt")));
 
             tearDown(gradleRunner);
         }
@@ -729,7 +744,7 @@ public class NyxPluginFunctionalTests {
          * 
          * @throws Exception in case of any issues
          */
-        @ParameterizedTest(name = "project plugin earlyInfer [Gradle Version: {0}, Plugins {1}]")
+        @ParameterizedTest(name = "settings plugin early infer [Gradle Version: {0}, Plugins {1}]: gradle dummy, gradle nyxInfer")
         @MethodSource("com.mooltiverse.oss.nyx.gradle.NyxPluginFunctionalTests#wellKnownTestSuites")
         void earlyInferApplyingSettingsPluginTest(String gradleVersion, Map<String,String> pluginCombination)
             throws Exception {
@@ -741,10 +756,18 @@ public class NyxPluginFunctionalTests {
             assertEquals("0.1.0", fileContent(new File(directory, "diag-early-version.txt")));
             assertEquals("0.1.0", fileContent(new File(directory, "diag-late-version.txt")));
 
+            runTask(gradleRunner, gradleVersion, "writeStateDiagnostics", null);
+            assertEquals("0.1.0", fileContent(new File(directory, "state-version.txt")));
+            assertEquals("false", fileContent(new File(directory, "state-significant.txt")));
+
             // now run nyxInfer and make sure it makes no difference
             runTask(gradleRunner, gradleVersion, "nyxInfer", null);
             assertEquals("0.1.0", fileContent(new File(directory, "diag-early-version.txt")));
             assertEquals("0.1.0", fileContent(new File(directory, "diag-late-version.txt")));
+
+            runTask(gradleRunner, gradleVersion, "writeStateDiagnostics", null);
+            assertEquals("0.1.0", fileContent(new File(directory, "state-version.txt")));
+            assertEquals("false", fileContent(new File(directory, "state-significant.txt")));
 
             tearDown(gradleRunner);
         }

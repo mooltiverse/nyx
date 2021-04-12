@@ -32,6 +32,7 @@ import com.mooltiverse.oss.nyx.command.template.CommandSelector;
 import com.mooltiverse.oss.nyx.gradle.template.GradleCommandInvocationContextProvider;
 import com.mooltiverse.oss.nyx.git.Scenario;
 import com.mooltiverse.oss.nyx.git.Script;
+import com.mooltiverse.oss.nyx.state.State;
 
 /**
  * The purpose of this class is to just re-run the tests from inherited templates once more by running the Nyx commands
@@ -98,6 +99,19 @@ public class MarkTestTemplates {
         void noExceptionOnExecuteWithValidGitRepositoryInWorkingDirectoryTest(@CommandSelector(Commands.MARK) CommandProxy command)
             throws Exception {
             assertDoesNotThrow(() -> command.run());
+        }
+
+        @TestTemplate
+        @DisplayName("MarkTask.getActions().execute() feeds the nyxState extra property")
+        @Baseline(Scenario.INITIAL_COMMIT)
+        void nyxStateExtraProperty(Project project, @CommandSelector(Commands.MARK) CommandProxy command)
+            throws Exception {
+            assertNull(project.findProperty("nyxState"));
+
+            // after running the command the extra property must be available
+            command.run();
+            assertNotNull(project.findProperty("nyxState"));
+            assertTrue(State.class.isAssignableFrom(project.findProperty("nyxState").getClass()));
         }
     }
 }

@@ -42,6 +42,14 @@ public abstract class CoreTask extends AbstractTask {
     public static final String NYX_INSTANCE_PROPERTY = "nyxInstance";
 
     /**
+     * The name used to store and retrieve the extra property that holds the state of the backing Nyx
+     * instance that can be used by all tasks and also user scripts.
+     * 
+     * @see ExtensionContainer#getExtraProperties()
+     */
+    public static final String NYX_STATE_PROPERTY = "nyxState";
+
+    /**
      * The private instance of the extension object.
      */
     private final NyxExtension extension;
@@ -108,9 +116,10 @@ public abstract class CoreTask extends AbstractTask {
      * 
      * This method also stores the instance as a shared project property so that all subsequent calls can
      * retrieve the same instance to avoid creating multiple instances and saving configuration time.
+     * Moreover, the backing instance state object reference is stores as an extra property for use by
+     * user scripts.
      * 
-     * On the other hand, the instance is lazily created upon the first invocation so the Nyx instance
-     * is only created when needed.
+     * The instance is lazily created upon the first invocation so the Nyx instance is only created when needed.
      * 
      * @return a shared backing Nyx instance to be used by all tasks within the project.
      * 
@@ -126,6 +135,7 @@ public abstract class CoreTask extends AbstractTask {
             // The 'version' is a standard Gradle project property (https://docs.gradle.org/current/userguide/writing_build_scripts.html#sec:standard_project_properties)
             instance.configuration().withPluginConfiguration(new ConfigurationLayer(getExtension(), getProject().findProperty(GRADLE_VERSION_PROPERTY_NAME)));
             storeSharedProperty(NYX_INSTANCE_PROPERTY, instance);
+            storeSharedProperty(NYX_STATE_PROPERTY, instance.state());
             return Nyx.class.cast(retrieveSharedProperty(NYX_INSTANCE_PROPERTY));
         }
     }
