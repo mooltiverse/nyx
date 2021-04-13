@@ -150,6 +150,11 @@ public abstract class NyxExtension {
     private final Property<String> scheme = getObjectfactory().property(String.class);
 
     /**
+     * The 'stateFile' property.
+     */
+    private final Property<File> stateFile = getObjectfactory().property(File.class);
+
+    /**
      * The 'verbosity' property.
      * 
      * Please note that the verbosity option is actually ignored in this plugin implementation and the backing Nyx implementation
@@ -317,6 +322,18 @@ public abstract class NyxExtension {
      */
     public Property<String> getScheme() {
         return scheme;
+    }
+
+    /**
+     * Returns the optional path where to save the state file.
+     * 
+     * We provide an implementation of this method instead of using the abstract definition as it's
+     * safer for old Gradle versions we support.
+     * 
+     * @return the directory to use as the base repository location
+     */
+    public Property<File> getStateFile() {
+        return stateFile;
     }
 
     /**

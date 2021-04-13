@@ -25,7 +25,6 @@ import com.mooltiverse.oss.nyx.data.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.data.CommitMessageConventions;
 import com.mooltiverse.oss.nyx.data.Scheme;
 import com.mooltiverse.oss.nyx.data.Verbosity;
-import com.mooltiverse.oss.nyx.version.Version;
 
 /**
  * A fake configuration layer, with null or empty values to be set for specific purposes.
@@ -54,7 +53,7 @@ public class ConfigurationLayerMock implements ConfigurationLayer {
     /**
      * The value returned by this mock object.
      */
-    public Version initialVersion = null;
+    public String initialVersion = null;
 
     /**
      * The value returned by this mock object.
@@ -74,12 +73,17 @@ public class ConfigurationLayerMock implements ConfigurationLayer {
     /**
      * The value returned by this mock object.
      */
+    public String stateFile = null;
+
+    /**
+     * The value returned by this mock object.
+     */
     public Verbosity verbosity = null;
 
     /**
      * The value returned by this mock object.
      */
-    public Version version = null;
+    public String version = null;
 
     /**
      * Default constructor
@@ -124,7 +128,7 @@ public class ConfigurationLayerMock implements ConfigurationLayer {
      * {@inheritDoc}
      */
     @Override
-    public Version getInitialVersion(){
+    public String getInitialVersion(){
         return initialVersion;
     }
 
@@ -156,6 +160,14 @@ public class ConfigurationLayerMock implements ConfigurationLayer {
      * {@inheritDoc}
      */
     @Override
+    public String getStateFile() {
+        return stateFile;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Verbosity getVerbosity(){
         return verbosity;
     }
@@ -164,7 +176,7 @@ public class ConfigurationLayerMock implements ConfigurationLayer {
      * {@inheritDoc}
      */
     @Override
-    public Version getVersion(){
+    public String getVersion(){
         return version;
     }
 

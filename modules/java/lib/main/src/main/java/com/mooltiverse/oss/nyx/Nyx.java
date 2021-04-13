@@ -35,6 +35,7 @@ import com.mooltiverse.oss.nyx.command.Mark;
 import com.mooltiverse.oss.nyx.command.Publish;
 import com.mooltiverse.oss.nyx.configuration.Configuration;
 import com.mooltiverse.oss.nyx.data.DataAccessException;
+import com.mooltiverse.oss.nyx.data.FileMapper;
 import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
 import com.mooltiverse.oss.nyx.git.Git;
 import com.mooltiverse.oss.nyx.git.GitException;
@@ -219,29 +220,33 @@ public class Nyx {
     }
 
     /**
-     * Runs the given command through its {@link AbstractCommand#run()} and returns its result.
+     * Runs the given command through its {@link AbstractCommand#run()}.
      * 
-     * @param command the command
-     * 
-     * @return the return value of the {@link AbstractCommand#run()} method, invoked against the given command
+     * @param command the command to run
+     * @@param saveState a boolean that, when {@code true} saves the {@link State} to the configured state file
+     * ({@link Configuration#getStateFile()}), if not {@code null}
      * 
      * @throws DataAccessException in case the configuration can't be loaded for some reason.
      * @throws IllegalPropertyException in case the configuration has some illegal options.
      * @throws GitException in case of unexpected issues when accessing the Git repository.
      * @throws ReleaseException if the task is unable to complete for reasons due to the release process.
      */
-    private State runCommand(Commands command)
+    private void runCommand(Commands command, boolean saveState)
         throws DataAccessException, IllegalPropertyException, GitException, ReleaseException {
         Objects.requireNonNull(command, "Cannot instantiate the command from a null class");
 
         Command commandInstance = getCommandInstance(command);
         if (commandInstance.isUpToDate()) {
             logger.debug(MAIN, "Command {} is up to date, skipping.", command.toString());
-            return state();
         }
         else {
             logger.debug(MAIN, "Command {} is not up to date, running...", command.toString());
-            return commandInstance.run();
+            commandInstance.run();
+
+            // optionally save the state file
+            if (saveState && !Objects.isNull(configuration().getStateFile())) {
+                FileMapper.save(configuration().getStateFile(), state());
+            }
         }
     }
 
@@ -313,7 +318,7 @@ public class Nyx {
         // this command has no dependencies
 
         // run the command
-        runCommand(Commands.CLEAN);
+        runCommand(Commands.CLEAN, false);
     }
 
     /**
@@ -336,7 +341,9 @@ public class Nyx {
         // this command has no dependencies
 
         // run the command
-        return runCommand(Commands.INFER);
+        runCommand(Commands.INFER, true);
+
+        return state();
     }
 
     /**
@@ -360,7 +367,9 @@ public class Nyx {
         infer();
 
         // run the command
-        return runCommand(Commands.MAKE);
+        runCommand(Commands.MAKE, true);
+
+        return state();
     }
 
     /**
@@ -384,7 +393,9 @@ public class Nyx {
         make();
 
         // run the command
-        return runCommand(Commands.MARK);
+        runCommand(Commands.MARK, true);
+
+        return state();
     }
 
     /**
@@ -408,6 +419,8 @@ public class Nyx {
         mark();
 
         // run the command
-        return runCommand(Commands.PUBLISH);
+        runCommand(Commands.PUBLISH, true);
+
+        return state();
     }
 }

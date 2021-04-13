@@ -15,8 +15,6 @@
  */
 package com.mooltiverse.oss.nyx.data;
 
-import com.mooltiverse.oss.nyx.version.Version;
-
 /**
  * This is a value object that models the summary data about the scope of a release.
  */
@@ -39,7 +37,7 @@ public class ReleaseScope {
     /**
      * The version identifier of the most recent past release.
      */
-    private Version previousVersion = null;
+    private String previousVersion = null;
 
     /**
      * The flag telling if the release scope contains significant commits.
@@ -62,7 +60,7 @@ public class ReleaseScope {
      * @param finalCommit the SHA-1 identifier of the last commit within the scope. It may be {@code null}.
      * @param significant the flag telling if the release scope contains significant commits. It may be {@code null}.
      */
-    public ReleaseScope(Version previousVersion, String previousVersionCommit, String initialCommit, String finalCommit, Boolean significant) {
+    public ReleaseScope(String previousVersion, String previousVersionCommit, String initialCommit, String finalCommit, Boolean significant) {
         super();
         this.previousVersion = previousVersion;
         this.previousVersionCommit = previousVersionCommit;
@@ -76,7 +74,7 @@ public class ReleaseScope {
      * 
      * @return the version identifier of the most recent past release. It may be {@code null}.
      */
-    public Version getPreviousVersion() {
+    public String getPreviousVersion() {
         return previousVersion;
     }
 
@@ -85,7 +83,7 @@ public class ReleaseScope {
      * 
      * @param previousVersion the version identifier of the most recent past release. It may be {@code null}.
      */
-    public void setPreviousVersion(Version previousVersion) {
+    public void setPreviousVersion(String previousVersion) {
         this.previousVersion = previousVersion;
     }
 

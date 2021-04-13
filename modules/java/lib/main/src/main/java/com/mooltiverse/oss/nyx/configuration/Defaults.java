@@ -23,7 +23,6 @@ import com.mooltiverse.oss.nyx.data.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.data.CommitMessageConventions;
 import com.mooltiverse.oss.nyx.data.Scheme;
 import com.mooltiverse.oss.nyx.data.Verbosity;
-import com.mooltiverse.oss.nyx.version.Version;
 import com.mooltiverse.oss.nyx.version.VersionFactory;
 
 /**
@@ -80,7 +79,7 @@ public interface Defaults {
      * 
      * This strongly depends on the {@link #SCHEME} and as long as it's {@link Scheme#SEMVER}, we use that to select the initial version.
      */
-    public static final Version INITIAL_VERSION = VersionFactory.defaultInitial(Scheme.SEMVER.getScheme());
+    public static final String INITIAL_VERSION = VersionFactory.defaultInitial(Scheme.SEMVER.getScheme()).toString();
 
     /**
      * The default prefix to add at the beginning of a version identifier to generate the release identifier. Value: {@code null}
@@ -98,6 +97,11 @@ public interface Defaults {
     public static final Scheme SCHEME = Scheme.SEMVER;
 
     /**
+     * The path to the local state file. Value: {@code null}
+     */
+    public static final String STATE_FILE = null;
+
+    /**
      * The logging level. Value: {@link Verbosity#WARNING}.
      * 
      * Please note that the verbosity option is actually ignored in this library implementation as the event filtering based
@@ -109,5 +113,5 @@ public interface Defaults {
     /**
      * The release version. Value: {@code null}
      */
-    public static final Version VERSION = null;
+    public static final String VERSION = null;
 }

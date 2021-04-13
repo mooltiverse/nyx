@@ -10,8 +10,7 @@ TODO: write the introductory section here
 
 ## Clean
 
-TODO: write this section
-{: .notice--warning}
+In this phase, which must be invoked explicitly, the repository state is reverted to its initial state by removing all the files created during the other stages, if any.
 
 ## Infer
 

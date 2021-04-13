@@ -35,7 +35,6 @@ import com.mooltiverse.oss.nyx.data.DataAccessException;
 import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
 import com.mooltiverse.oss.nyx.data.Scheme;
 import com.mooltiverse.oss.nyx.data.Verbosity;
-import com.mooltiverse.oss.nyx.version.Version;
 
 /**
  * The Nyx configuration. The configuration is a live object that resolves each option lazily, only when required.
@@ -242,11 +241,11 @@ public class Configuration implements Root {
      * {@inheritDoc}
      */
     @Override
-    public Version getInitialVersion()
+    public String getInitialVersion()
         throws DataAccessException, IllegalPropertyException {
         logger.trace(CONFIGURATION, "Retrieving the {} configuration option", "initialVersion");
         for (ConfigurationLayer layer: layers.values()) {
-            Version initialVersion = layer.getInitialVersion();
+            String initialVersion = layer.getInitialVersion();
             if (!Objects.isNull(initialVersion)) {
                 logger.trace(CONFIGURATION, "The {} configuration option value is: {}", "initialVersion", initialVersion);
                 return initialVersion;
@@ -310,6 +309,23 @@ public class Configuration implements Root {
      * {@inheritDoc}
      */
     @Override
+    public String getStateFile()
+        throws DataAccessException, IllegalPropertyException {
+        logger.trace(CONFIGURATION, "Retrieving the {} configuration option", "stateFile");
+        for (ConfigurationLayer layer: layers.values()) {
+            String stateFile = layer.getStateFile();
+            if (!Objects.isNull(stateFile)) {
+                logger.trace(CONFIGURATION, "The {} configuration option value is: {}", "stateFile", stateFile);
+                return stateFile;
+            }
+        }
+        return DefaultLayer.getInstance().getStateFile();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Verbosity getVerbosity()
         throws DataAccessException, IllegalPropertyException {
         logger.trace(CONFIGURATION, "Retrieving the {} configuration option", "verbosity");
@@ -327,11 +343,11 @@ public class Configuration implements Root {
      * {@inheritDoc}
      */
     @Override
-    public Version getVersion()
+    public String getVersion()
         throws DataAccessException, IllegalPropertyException {
         logger.trace(CONFIGURATION, "Retrieving the {} configuration option", "version");
         for (ConfigurationLayer layer: layers.values()) {
-            Version version = layer.getVersion();
+            String version = layer.getVersion();
             if (!Objects.isNull(version)) {
                 logger.trace(CONFIGURATION, "The {} configuration option value is: {}", "version", version);
                 return version;

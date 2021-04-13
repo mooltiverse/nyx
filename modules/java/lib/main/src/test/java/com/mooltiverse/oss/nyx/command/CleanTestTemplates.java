@@ -17,6 +17,8 @@ package com.mooltiverse.oss.nyx.command;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.File;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.TestTemplate;
@@ -26,6 +28,7 @@ import com.mooltiverse.oss.nyx.command.template.Baseline;
 import com.mooltiverse.oss.nyx.command.template.CommandInvocationContextProvider;
 import com.mooltiverse.oss.nyx.command.template.CommandProxy;
 import com.mooltiverse.oss.nyx.command.template.CommandSelector;
+import com.mooltiverse.oss.nyx.configuration.mock.ConfigurationLayerMock;
 import com.mooltiverse.oss.nyx.git.Scenario;
 
 @DisplayName("Clean")
@@ -76,9 +79,40 @@ public class CleanTestTemplates {
         @Baseline(Scenario.INITIAL_COMMIT)
         void isUpToDateTest(@CommandSelector(Commands.CLEAN) CommandProxy command)
             throws Exception {
-            // simply test that running it twice returns false at the first run and true the second
-            assertFalse(command.isUpToDate());
+
+            // run once, to start
             command.run();
+
+            // always up to date unless we have generated artifacts
+            assertTrue(command.isUpToDate());
+        }
+
+        /**
+         * Check that the isUpToDate() returns {@code false} when there's a state file
+         */
+        @TestTemplate
+        @DisplayName("Clean.isUpToDate()")
+        @Baseline(Scenario.INITIAL_COMMIT)
+        void isUpToDateWithStateFileTest(@CommandSelector(Commands.CLEAN) CommandProxy command)
+            throws Exception {
+            String stateFilePath = "state-file.txt";
+            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
+            configurationMock.stateFile = stateFilePath;
+            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
+
+            // run once, to start
+            command.run();
+            assertTrue(command.isUpToDate());
+
+            File stateFile = new File(stateFilePath);
+            stateFile.createNewFile();
+
+            // now it's not up do date anymore
+            assertFalse(command.isUpToDate());
+
+            stateFile.delete();
+
+            // now it's not up do date again
             assertTrue(command.isUpToDate());
         }
     }
@@ -87,12 +121,26 @@ public class CleanTestTemplates {
     @DisplayName("Clean run")
     @ExtendWith(CommandInvocationContextProvider.class)
     public static class RunTests {
-        /*@TestTemplate
-        @DisplayName("Clean.run() throws exception with a valid but empty Git repository in working directory")
+        @TestTemplate
+        @DisplayName("Clean.run() deletes state file")
         @Baseline(Scenario.FROM_SCRATCH)
-        void stateTest(@CommandSelector(Commands.CLEAN) CommandProxy command)
+        void deleteStateFileTest(@CommandSelector(Commands.CLEAN) CommandProxy command)
             throws Exception {
-            assertThrows(GitException.class, () -> command.run());
-        }*/
+            String stateFilePath = "state-file.txt";
+            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
+            configurationMock.stateFile = stateFilePath;
+            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
+
+            // run once, to start
+            command.run();
+
+            File stateFile = new File(stateFilePath);
+            stateFile.createNewFile();
+            assertTrue(stateFile.exists());
+
+            // now running the clean must delete the file
+            command.run();
+            assertFalse(stateFile.exists());
+        }
     }
 }

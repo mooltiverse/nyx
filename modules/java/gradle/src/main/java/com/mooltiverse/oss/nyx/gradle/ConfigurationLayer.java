@@ -17,8 +17,6 @@ package com.mooltiverse.oss.nyx.gradle;
 
 import static org.gradle.api.Project.DEFAULT_VERSION;
 
-import static com.mooltiverse.oss.nyx.gradle.Constants.GRADLE_VERSION_PROPERTY_NAME;
-
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
@@ -30,8 +28,6 @@ import com.mooltiverse.oss.nyx.data.CommitMessageConventions;
 import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
 import com.mooltiverse.oss.nyx.data.Scheme;
 import com.mooltiverse.oss.nyx.data.Verbosity;
-import com.mooltiverse.oss.nyx.version.Version;
-import com.mooltiverse.oss.nyx.version.VersionFactory;
 
 /**
  * This class is an adapter to allow the extension to be used as a Nyx configuration layer.
@@ -107,9 +103,9 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
      * {@inheritDoc}
      */
     @Override
-    public Version getInitialVersion()
+    public String getInitialVersion()
         throws IllegalPropertyException {
-        return extension.getInitialVersion().isPresent() ? VersionFactory.valueOf(getScheme().getScheme(), extension.getInitialVersion().get(), getReleaseLenient()) : null;
+        return extension.getInitialVersion().getOrNull();
     }
 
     /**
@@ -149,6 +145,14 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
      * {@inheritDoc}
      */
     @Override
+    public String getStateFile() {
+        return extension.getStateFile().isPresent() ? extension.getStateFile().get().getAbsolutePath() : null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Verbosity getVerbosity()
         throws IllegalPropertyException {
         if (extension.getVerbosity().isPresent() && !Objects.isNull(extension.getVerbosity().getOrNull())) {
@@ -166,33 +170,14 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
      * {@inheritDoc}
      */
     @Override
-    public Version getVersion()
+    public String getVersion()
         throws IllegalPropertyException {
         // when to 'version' property is defined, Gradle does not return null but instead the 'unspecified' string which, to us,
         // means there is no version defined, just like it was null
         if (Objects.isNull(projectVersion) || DEFAULT_VERSION.equals(projectVersion))
             return null;
         else {
-            try {
-                // TODO: replace the hardcoded use of SEMVER with a resolved scheme
-                //
-                // This issue is common to all configuration layers when they need to resolve options using the entire configuration
-                // (not just their local values) because some options may be defined with higher priority in other layers.
-                // This example is significant for all layers because in order to resolve the Version option, the layer also needs
-                // to resolve the Scheme and ReleaseLenient options.
-                // One caveat is to prevent circular dependencies, as per https://github.com/mooltiverse/nyx/issues/37
-                //
-                // While using SEMVER as the scheme here is suitable for now as it's the only supported scheme, this must
-                // be resolved against all configuration layers. See also #37 (https://github.com/mooltiverse/nyx/issues/37).
-                //
-                // Moreover, we also need to consider if the getReleaseLenient option has been set and, if not, the getReleasePrefix
-                // to know if the parsing has to tolerate prefixes and, if so, if any prefix or just one.
-                // Again, we enable sanitization as it's suitable for now but this must be fixed as soon as possible
-                return VersionFactory.valueOf(Scheme.SEMVER.getScheme(), projectVersion.toString(), true);
-            }
-            catch (IllegalArgumentException iae) {
-                throw new IllegalPropertyException(String.format("Illegal value '%s' provided for project property '%s'", projectVersion, GRADLE_VERSION_PROPERTY_NAME), iae);
-            }
+            return projectVersion.toString();
         }
     }
 

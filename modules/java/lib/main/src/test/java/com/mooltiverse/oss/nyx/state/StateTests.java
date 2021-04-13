@@ -23,8 +23,6 @@ import org.junit.jupiter.api.Test;
 
 import com.mooltiverse.oss.nyx.configuration.Configuration;
 import com.mooltiverse.oss.nyx.configuration.mock.ConfigurationLayerMock;
-import com.mooltiverse.oss.nyx.version.Version;
-import com.mooltiverse.oss.nyx.version.SemanticVersion;
 
 @DisplayName("State")
 public class StateTests {
@@ -151,8 +149,7 @@ public class StateTests {
             configuration.withCommandLineConfiguration(configurationMock);
             State state = new State(configuration);
 
-            Version version = SemanticVersion.valueOf("1.2.3");
-            state.setVersionInternal(version);
+            state.setVersion("1.2.3");
             
             configurationMock.releasePrefix = "v";
             assertEquals("v1.2.3", state.getVersion());
@@ -170,8 +167,7 @@ public class StateTests {
             configuration.withCommandLineConfiguration(configurationMock);
             State state = new State(configuration);
 
-            Version version = SemanticVersion.valueOf("1.2.3");
-            state.setVersionInternal(version);
+            state.setVersion("1.2.3");
             
             configurationMock.releasePrefix = null; // no effects, as the default is not null
             assertEquals("1.2.3", state.getVersion());
@@ -187,10 +183,9 @@ public class StateTests {
             Configuration configuration = new Configuration();
             State state = new State(configuration);
 
-            Version version = SemanticVersion.valueOf("1.2.3");
-            state.setVersionInternal(version);
-            assertEquals(version, state.getVersionInternal());
-            assertEquals(version.toString(), state.getVersion());
+            String version = "1.2.3";
+            state.setVersion(version);
+            assertEquals(version, state.getVersion());
         }
 
         /*@Test

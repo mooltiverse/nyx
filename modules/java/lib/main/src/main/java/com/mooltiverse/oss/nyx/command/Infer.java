@@ -191,9 +191,7 @@ public class Infer extends AbstractCommand {
         throws DataAccessException, IllegalPropertyException, GitException, ReleaseException {
         logger.info(COMMAND, "Infer.run()");
 
-        Version version = state().getConfiguration().getVersion();
-
-        if (Objects.isNull(version)) {
+        if (Objects.isNull(state().getConfiguration().getVersion())) {
             // these objects are fetched in advance from the state because they may throw an exception that we can't handle in the lambda expression
             final boolean releaseLenient = state().getConfiguration().getReleaseLenient().booleanValue();
             final String releasePrefix = state().getConfiguration().getReleasePrefix();
@@ -286,7 +284,7 @@ public class Infer extends AbstractCommand {
             if (findings.containsKey(PREVIOUS_VERSION) && findings.containsKey(PREVIOUS_VERSION_COMMIT)) {
                 logger.debug(COMMAND, "Setting the previousVersion and previousVersionCommit state values to {} and {} respectively", findings.get(PREVIOUS_VERSION), findings.get(PREVIOUS_VERSION_COMMIT));
                 try {
-                    state().getReleaseScope().setPreviousVersion(releaseLenient ? VersionFactory.valueOf(scheme.getScheme(), findings.get(PREVIOUS_VERSION), releaseLenient) : VersionFactory.valueOf(scheme.getScheme(), findings.get(PREVIOUS_VERSION), releasePrefix));
+                    state().getReleaseScope().setPreviousVersion(releaseLenient ? VersionFactory.valueOf(scheme.getScheme(), findings.get(PREVIOUS_VERSION), releaseLenient).toString() : VersionFactory.valueOf(scheme.getScheme(), findings.get(PREVIOUS_VERSION), releasePrefix).toString());
                     state().getReleaseScope().setPreviousVersionCommit(findings.get(PREVIOUS_VERSION_COMMIT));
                 }
                 catch (IllegalArgumentException iae) {
@@ -316,12 +314,13 @@ public class Infer extends AbstractCommand {
 
             // finally compute the version
             // the previous version has been stored in the state above
+            Version version = null;
             if (Objects.isNull(state().getReleaseScope().getPreviousVersion())) {
-                version = state().getConfiguration().getInitialVersion();
+                version = releaseLenient ? VersionFactory.valueOf(scheme.getScheme(), state().getConfiguration().getInitialVersion(), releaseLenient) : VersionFactory.valueOf(scheme.getScheme(), state().getConfiguration().getInitialVersion(), releasePrefix);
                 logger.debug(COMMAND, "No previous version detected. Using the initial version {}", version.toString());
             }
             else {
-                Version previousVersion = state().getReleaseScope().getPreviousVersion();
+                Version previousVersion = releaseLenient ? VersionFactory.valueOf(scheme.getScheme(), state().getReleaseScope().getPreviousVersion(), releaseLenient) : VersionFactory.valueOf(scheme.getScheme(), state().getReleaseScope().getPreviousVersion(), releasePrefix);
                 if (findings.containsKey(BUMP_COMPONENT)) {
                     logger.debug(COMMAND, "Bumping component {} on version {}", findings.get(BUMP_COMPONENT), previousVersion.toString());
                     version = previousVersion.bump(findings.get(BUMP_COMPONENT));
@@ -335,14 +334,14 @@ public class Infer extends AbstractCommand {
             logger.info(COMMAND, "Inferred version is: {}", version.toString());
 
             // store values to the state object
-            state().setVersionInternal(version);
+            state().setVersion(version.toString());
             state().setBump(findings.containsKey(BUMP_COMPONENT) ? findings.get(BUMP_COMPONENT) : null);
             state().getReleaseScope().setSignificant(Boolean.valueOf(!bumpComponents.isEmpty()));
         }
         else {
             // the version was overridden by user
-            logger.info(COMMAND, "Version overridden by user: {}", version.toString());
-            state().setVersionInternal(version);
+            logger.info(COMMAND, "Version overridden by user: {}", state().getConfiguration().getVersion());
+            state().setVersion(state().getConfiguration().getVersion());
         }
 
         storeStatusInternalAttributes();

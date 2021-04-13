@@ -17,6 +17,7 @@ These are the top level options in the configuration:
 | [`releaseLenient`](#release-lenient)                      | boolean | `--release-lenient`, `--release-lenient=true|false`       | `NYX_RELEASE_LENIENT=true|false`                              | `true`   |
 | [`releasePrefix`](#release-prefix)                        | string  | `--release-prefix=<PREFIX>`                               | `NYX_RELEASE_PREFIX=<PREFIX>`                                 | N/A      |
 | [`scheme`](#scheme)                                       | string  | `--scheme=<NAME>`                                         | `NYX_SCHEME=<NAME>`                                           | `semver` |
+| [`stateFile`](#state-file)                                | string  | `--state-file=<PATH>`                                     | `NYX_STATE_FILE=<PATH>`                                       | N/A      |
 | [`verbosity`](#verbosity)                                 | string  | `--verbosity=<LEVEL>`, `--fatal`, `--error`, `--warning`, `--info`, `--debug`, `--trace` | `NYX_VERBOSITY=<LEVEL>`        | `warning`|
 | [`version`](#version)                                     | string  | `-v <VERSION>`, `--version=<VERSION>`                     | `NYX_VERSION=<VERSION>`                                       | N/A      |
 
@@ -143,6 +144,30 @@ This option only affects the way Nyx **generates** release names and tags, while
 | Related state attributes  | [bump]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#bump){: .btn .btn--info .btn--small} [scheme]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#scheme){: .btn .btn--info .btn--small} [version]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#version){: .btn .btn--info .btn--small} |
 
 Selects the [version scheme]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/version-schemes.md %}) to use. Defaults to [`semver`]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/version-schemes.md %}#semantic-versioning-semver).
+
+### State file
+
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `stateFile`                                                                              |
+| Type                      | string                                                                                   |
+| Default                   | N/A                                                                                      |
+| Command Line Option       | `--state-file=<PATH>`                                                                    |
+| Environment Variable      | `NYX_STATE_FILE=<PATH>`                                                                  |
+| Configuration File Option | `stateFile`                                                                              |
+| Related state attributes  |                                                                                          |
+
+Enables the creation of the [state file]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/index.md %}) where Nyx stores its findings and generated values.
+
+The value passed here can be:
+
+* a simple file name that will be interpred as local to the current working directory
+* a relative path that will be interpreted as relative to the current working directory
+* an absolute file name
+
+Nyx will infer the format of the file by the extension, where available ones are [`.yaml`](https://yaml.org/) (or `.yml`), [`.json`](https://www.json.org/). This way, if you need to read the file for your own purposes, you can have it in the format that is more accessible to you.
+
+The suggested name for the file, when used, is `.nyx-state.<EXT>` (so `.nyx-state.yaml`, `.nyx-state.yml` or `.nyx-state.json`). It's recommended to let Git [ignore](https://git-scm.com/docs/gitignore) this file.
+{: .notice--primary}
 
 ### Verbosity
 

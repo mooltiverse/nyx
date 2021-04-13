@@ -32,7 +32,6 @@ import com.mooltiverse.oss.nyx.data.DataAccessException;
 import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
 import com.mooltiverse.oss.nyx.data.ReleaseScope;
 import com.mooltiverse.oss.nyx.data.Scheme;
-import com.mooltiverse.oss.nyx.version.Version;
 
 /**
  * The State class holds a number of attributes resulting from the execution of one or more command and so represents
@@ -75,10 +74,9 @@ public class State implements Root {
     private Long timestamp = Long.valueOf(System.currentTimeMillis());
 
     /**
-     * The version that has been inferred. Please note that this is just the internal representation
-     * and does not contemplate the configured prefix, if any.
+     * The version that has been inferred.
      */
-    private Version version = null;
+    private String version = null;
     
     /**
      * Standard constructor.
@@ -174,8 +172,6 @@ public class State implements Root {
      * Returns the version inferred by Nyx, if any. If the version was overridden by configuration this will be the
      * same as {@link Configuration#getVersion()}. This value is only available after {@link Nyx#infer()} has run.
      * 
-     * This method returns the same as {@link #getVersionInternal()} but with the prefix, if configured.
-     * 
      * @return the current version inferred by Nyx. This is {@code null} until {@link Nyx#infer()} has run.
      * 
      * @throws DataAccessException in case the attribute cannot be read or accessed.
@@ -190,46 +186,15 @@ public class State implements Root {
         throws DataAccessException, IllegalPropertyException {
         if (Objects.isNull(version))
             return null;
-        else return Objects.isNull(getConfiguration().getReleasePrefix()) ? version.toString() : getConfiguration().getReleasePrefix().concat(version.toString());
+        else return Objects.isNull(getConfiguration().getReleasePrefix()) ? version : getConfiguration().getReleasePrefix().concat(version);
     }
 
     /**
-     * Gets the version attribute. This method returns the internal representation of the {@link Version}, which does not include the prefix.
-     * If you need the prefix as well use {@link #getVersion()} instead.
+     * Sets the version inferred by Nyx.
      * 
-     * @return the version attribute to set for this state.
-     * 
-     * @see #setVersionInternal(Version)
-     * @see #getVersion()
-     * 
-     * @throws DataAccessException in case the attribute cannot be read or accessed.
-     * @throws IllegalPropertyException in case the attribute has been defined but has incorrect values or it can't be resolved.
-     * 
-     * @see Version#getScheme()
-     * @see Configuration#getScheme()
+     * @param version the version inferred by Nyx.
      */
-    public Version getVersionInternal()
-        throws DataAccessException, IllegalPropertyException {
-        
-        return version;
-    }
-
-    /**
-     * Sets the version attribute. This is the internal representation and does not contemplate the configured prefix, if any.
-     * 
-     * @param version the version attribute to set for this state.
-     * 
-     * @see #getVersionInternal()
-     * 
-     * @throws DataAccessException in case the attribute cannot be read or accessed.
-     * @throws IllegalPropertyException in case the attribute has been defined but has incorrect values or it can't be resolved.
-     * 
-     * @see Version#getScheme()
-     * @see Configuration#getScheme()
-     */
-    public void setVersionInternal(Version version)
-        throws DataAccessException, IllegalPropertyException {
-        
+    public void setVersion(String version) {
         this.version = version;
     }
 

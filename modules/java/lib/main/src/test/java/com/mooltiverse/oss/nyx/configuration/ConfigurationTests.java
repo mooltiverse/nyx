@@ -30,7 +30,6 @@ import com.mooltiverse.oss.nyx.configuration.mock.ConfigurationLayerMock;
 import com.mooltiverse.oss.nyx.data.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.data.Scheme;
 import com.mooltiverse.oss.nyx.data.Verbosity;
-import com.mooltiverse.oss.nyx.version.SemanticVersion;
 
 @DisplayName("Configuration")
 public class ConfigurationTests {
@@ -236,7 +235,7 @@ public class ConfigurationTests {
             throws Exception {
             ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
             Configuration configuration = new Configuration();
-            configurationMock.initialVersion = SemanticVersion.valueOf("9.9.9");
+            configurationMock.initialVersion = "9.9.9";
 
             // in order to make the test meaningful, make sure the default and mock values are different
             assertNotEquals(Defaults.INITIAL_VERSION, configurationMock.initialVersion);
@@ -346,7 +345,7 @@ public class ConfigurationTests {
             throws Exception {
             ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
             Configuration configuration = new Configuration();
-            configurationMock.version = SemanticVersion.valueOf("11.12.13");
+            configurationMock.version = "11.12.13";
 
             // in order to make the test meaningful, make sure the default and mock values are different
             assertNull(Defaults.VERSION);
@@ -483,7 +482,7 @@ public class ConfigurationTests {
             throws Exception {
             ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
             Configuration configuration = new Configuration();
-            configurationMock.initialVersion = SemanticVersion.valueOf("9.9.9");
+            configurationMock.initialVersion = "9.9.9";
 
             // in order to make the test meaningful, make sure the default and mock values are different
             assertNotEquals(Defaults.INITIAL_VERSION, configurationMock.initialVersion);
@@ -593,7 +592,7 @@ public class ConfigurationTests {
             throws Exception {
             ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
             Configuration configuration = new Configuration();
-            configurationMock.version = SemanticVersion.valueOf("11.12.13");
+            configurationMock.version = "11.12.13";
 
             // in order to make the test meaningful, make sure the default and mock values are different
             assertNull(Defaults.VERSION);
@@ -699,8 +698,8 @@ public class ConfigurationTests {
             ConfigurationLayerMock lowPriorityconfigurationMock = new ConfigurationLayerMock();
             ConfigurationLayerMock highPriorityconfigurationMock = new ConfigurationLayerMock();
             Configuration configuration = new Configuration();
-            lowPriorityconfigurationMock.initialVersion = SemanticVersion.valueOf("9.9.9");
-            highPriorityconfigurationMock.initialVersion = SemanticVersion.valueOf("8.8.8");
+            lowPriorityconfigurationMock.initialVersion = "9.9.9";
+            highPriorityconfigurationMock.initialVersion = "8.8.8";
             
             // inject the plugin configuration and test the new value is returned from that
             configuration.withPluginConfiguration(lowPriorityconfigurationMock);
@@ -779,8 +778,8 @@ public class ConfigurationTests {
             ConfigurationLayerMock lowPriorityconfigurationMock = new ConfigurationLayerMock();
             ConfigurationLayerMock highPriorityconfigurationMock = new ConfigurationLayerMock();
             Configuration configuration = new Configuration();
-            lowPriorityconfigurationMock.version = SemanticVersion.valueOf("11.12.13");
-            highPriorityconfigurationMock.version = SemanticVersion.valueOf("21.22.23");
+            lowPriorityconfigurationMock.version = "11.12.13";
+            highPriorityconfigurationMock.version = "21.22.23";
             
             // inject the plugin configuration and test the new value is returned from that
             configuration.withPluginConfiguration(lowPriorityconfigurationMock);

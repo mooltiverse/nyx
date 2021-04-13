@@ -24,7 +24,6 @@ import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
 import com.mooltiverse.oss.nyx.data.Scheme;
 import com.mooltiverse.oss.nyx.data.Verbosity;
 import com.mooltiverse.oss.nyx.state.State;
-import com.mooltiverse.oss.nyx.version.Version;
 
 /**
  * This interface models the configuration root block, with global options.
@@ -73,7 +72,7 @@ public interface Root extends Block {
      * @throws DataAccessException in case the option cannot be read or accessed.
      * @throws IllegalPropertyException in case the option has been defined but has incorrect values or it can't be resolved.
      */
-    public Version getInitialVersion()
+    public String getInitialVersion()
         throws DataAccessException, IllegalPropertyException;
 
     /**
@@ -122,6 +121,17 @@ public interface Root extends Block {
         throws DataAccessException, IllegalPropertyException;
 
     /**
+     * Returns the path to the file where the Nyx {@link State} must be saved as it's defined by this configuration.
+     * 
+     * @return the configured value for this option or {@code null} if the value hasn't been defined.
+     * 
+     * @throws DataAccessException in case the option cannot be read or accessed.
+     * @throws IllegalPropertyException in case the option has been defined but has incorrect values or it can't be resolved.
+     */
+    public String getStateFile()
+        throws DataAccessException, IllegalPropertyException;
+
+    /**
      * Returns the logging verbosity level as it's defined by this configuration.
      * 
      * Please note that the verbosity option is actually ignored in this library implementation as the event filtering based
@@ -144,6 +154,6 @@ public interface Root extends Block {
      * @throws DataAccessException in case the option cannot be read or accessed.
      * @throws IllegalPropertyException in case the option has been defined but has incorrect values or it can't be resolved.
      */
-    public Version getVersion()
+    public String getVersion()
         throws DataAccessException, IllegalPropertyException;
 }

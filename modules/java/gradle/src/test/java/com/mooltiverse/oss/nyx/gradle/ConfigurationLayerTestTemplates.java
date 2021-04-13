@@ -302,19 +302,5 @@ public class ConfigurationLayerTestTemplates {
             extension.getVerbosity().set("illegalverbosity");
             assertThrows(IllegalPropertyException.class, () -> { configurationLayer.getVerbosity(); });
         }
-
-        @TestTemplate
-        @DisplayName("ConfigurationLayer.getVersion() throws IllegalPropertyException with illegal value")
-        @Baseline(Scenario.FROM_SCRATCH)
-        void exceptionUsingGetVersionWithWrongValueTest(Project project)
-            throws Exception {
-            NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
-
-            // set the property with an illegal value
-            // the 'version' property is a project standard property, not defined in the extension
-            // and is passed directly to the ConfigurationLayer constructor
-            ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, "notaversion");
-            assertThrows(IllegalPropertyException.class, () -> { configurationLayer.getVersion(); });
-        }
     }
 }
