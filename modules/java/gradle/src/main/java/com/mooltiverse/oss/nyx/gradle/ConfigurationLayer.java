@@ -128,6 +128,14 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
      * {@inheritDoc}
      */
     @Override
+    public Boolean getResume() {
+        return extension.getResume().getOrNull();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Scheme getScheme()
         throws IllegalPropertyException {
         if (extension.getScheme().isPresent() && !Objects.isNull(extension.getScheme().getOrNull())) {

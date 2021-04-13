@@ -153,6 +153,16 @@ class DefaultLayer implements ConfigurationLayer, Defaults {
      * {@inheritDoc}
      */
     @Override
+    public Boolean getResume()
+        throws DataAccessException, IllegalPropertyException {
+        logger.trace(DEFAULT, "Retrieving the default {} configuration option: {}", "resume", RESUME);
+        return RESUME;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Scheme getScheme()
         throws DataAccessException, IllegalPropertyException {
         logger.trace(DEFAULT, "Retrieving the default {} configuration option: {}", "scheme", SCHEME);

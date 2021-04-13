@@ -68,6 +68,11 @@ public class ConfigurationLayerMock implements ConfigurationLayer {
     /**
      * The value returned by this mock object.
      */
+    public Boolean resume = null;
+
+    /**
+     * The value returned by this mock object.
+     */
     public Scheme scheme = null;
 
     /**
@@ -146,6 +151,14 @@ public class ConfigurationLayerMock implements ConfigurationLayer {
     @Override
     public Boolean getReleaseLenient() {
         return releaseLenient;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Boolean getResume() {
+        return resume;
     }
 
     /**

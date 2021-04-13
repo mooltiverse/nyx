@@ -158,7 +158,7 @@ public class Nyx {
     }
 
     /**
-     * Returns the state.
+     * Returns the state. The state may be created from scratch or loaded from a previously saved file, if the configuration says so.
      * 
      * @return the state
      * 
@@ -168,8 +168,30 @@ public class Nyx {
     public State state()
         throws DataAccessException, IllegalPropertyException {
         if (Objects.isNull(state)) {
-            logger.debug(MAIN, "Instantiating the initial state");
-            state = new State(configuration());
+            if (configuration().getResume()) {
+                if (Objects.isNull(configuration().getStateFile())) {
+                    logger.warn(MAIN, "The resume flag has been set but no state file has been configured. The state file will not be resumed.");
+                }
+                else {
+                    File stateFile = new File(configuration().getStateFile());
+                    // if the file path is relative make it relative to the configured directory
+                    if (!stateFile.isAbsolute())
+                        stateFile = new File(configuration().getDirectory(), configuration().getStateFile());
+                    if (stateFile.exists()) {
+                        logger.debug(MAIN, "Resuming the state from file {}", configuration().getStateFile());
+                        state = State.resume(stateFile, configuration());
+                    }
+                    else {
+                        logger.warn(MAIN, "The resume flag has been set and the state file has been configured but no state file exists at the given location {}. The state file will not be resumed.", configuration().getStateFile());
+                    }
+                }
+            }
+
+            // if the state was not resumed from a file, instantiate a new one
+            if (Objects.isNull(state)) {
+                logger.debug(MAIN, "Instantiating the initial state");
+                state = new State(configuration());
+            }
         }
         return state;
     }

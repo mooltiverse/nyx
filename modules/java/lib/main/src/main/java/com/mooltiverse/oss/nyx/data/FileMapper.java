@@ -65,6 +65,30 @@ public class FileMapper {
     }
 
     /**
+     * Unmarshals the content of the given file to an object of the given type.
+     * 
+     * @param file the file to load from. The file path must end with one of the supported
+     * extensions: {@code json}, {@code yaml}, {@code properties}
+     * @param type the class representing the type of object to unmarshal.
+     * 
+     * @param <T> the type of object to unmarshal.
+     * 
+     * @return the object instance unmarshalled from the given file.
+     * 
+     * @throws DataAccessException in case of any exception due to data access
+     * @throws IllegalArgumentException if the given file path does not contain a supported extension
+     */
+    public static <T> T load(File file, Class<T> type)
+        throws DataAccessException {
+        try {
+            return getObjectMapper(file.getAbsolutePath()).readValue(file, type);
+        }
+        catch (IOException ioe) {
+            throw new DataAccessException(String.format("Unable to unmarshal content from file %s", file.getAbsolutePath()), ioe);
+        }
+    }
+
+    /**
      * Marshals the content of the given object to a file represented by the given path
      * 
      * @param filePath the path of the file to save to. If it's a relative path it will be

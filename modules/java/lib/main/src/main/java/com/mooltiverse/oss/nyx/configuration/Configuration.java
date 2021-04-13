@@ -292,6 +292,23 @@ public class Configuration implements Root {
      * {@inheritDoc}
      */
     @Override
+    public Boolean getResume()
+        throws DataAccessException, IllegalPropertyException {
+        logger.trace(CONFIGURATION, "Retrieving the {} configuration option", "resume");
+        for (ConfigurationLayer layer: layers.values()) {
+            Boolean resume = layer.getResume();
+            if (!Objects.isNull(resume)) {
+                logger.trace(CONFIGURATION, "The {} configuration option value is: {}", "resume", resume);
+                return resume;
+            }
+        }
+        return DefaultLayer.getInstance().getResume();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Scheme getScheme()
         throws DataAccessException, IllegalPropertyException {
         logger.trace(CONFIGURATION, "Retrieving the {} configuration option", "scheme");

@@ -29,6 +29,7 @@ import com.mooltiverse.oss.nyx.Nyx;
 import com.mooltiverse.oss.nyx.command.Infer;
 import com.mooltiverse.oss.nyx.configuration.Configuration;
 import com.mooltiverse.oss.nyx.data.DataAccessException;
+import com.mooltiverse.oss.nyx.data.FileMapper;
 import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
 import com.mooltiverse.oss.nyx.data.ReleaseScope;
 import com.mooltiverse.oss.nyx.data.Scheme;
@@ -56,17 +57,17 @@ public class State implements Root {
     /**
      * The private immutable instance of the configuration.
      */
-    private final Configuration configuration;
+    private Configuration configuration;
 
     /**
      * The map containing the internal attributes.
      */
-    private final Map<String, String> internals = new HashMap<String, String>();
+    private Map<String, String> internals = new HashMap<String, String>();
 
     /**
      * The private immutable instance of the release scope.
      */
-    private final ReleaseScope releaseScope = new ReleaseScope();
+    private ReleaseScope releaseScope = new ReleaseScope();
 
     /**
      * The latest timestamp that was taken.
@@ -77,6 +78,14 @@ public class State implements Root {
      * The version that has been inferred.
      */
     private String version = null;
+
+    /**
+     * Default constructor. <b>DO NOT USE THIS CONSTRUCTOR AS IT EXISTS ONLY FOR INTERNAL USE WHEN UNMARSHALLING</b>
+     */
+    @Deprecated
+    public State() {
+        super();
+    }
     
     /**
      * Standard constructor.
@@ -84,17 +93,41 @@ public class State implements Root {
      * @param configuration the configuration object held by this state
      * 
      * @throws NullPointerException if the given argument is {@code null}
+     * 
+     * @throws DataAccessException in case the state file is configured but cannot be read or accessed when resuming
+     * from a previously saved state.
+     * @throws IllegalPropertyException in case the state file is configured but has incorrect values or it can't be
+     * resolved when resuming from a previously saved state
      */
-    public State(Configuration configuration) {
+    public State(Configuration configuration)
+        throws DataAccessException, IllegalPropertyException {
         super();
         Objects.requireNonNull(configuration);
         this.configuration = configuration;
         logger.debug(STATE, "New state object");
 
-        // TODO: add the logic to load a previous state file, with special regard to the future 'resume' option (https://github.com/mooltiverse/nyx/issues/42)
-
-        // restoring from file gets the timestamp from previous runs, so we need to update it
+        // initialize the timestamp
         touchTimestamp();
+    }
+
+    /**
+     * Loads the state attributes from a previously saved state file. Note that not all attributes are loaded from the state file
+     * as many of them will still be retrieved live from the configuration.
+     * 
+     * @param stateFile the file to load the state from
+     * @param configuration the configuration object to read values from. This object will be set as the {@link #getConfiguration()}
+     * of the newly instantiated object too.
+     * 
+     * @return the new state object deserialized from the given state file
+     * 
+     * @throws DataAccessException in case the state file cannot be read or accessed.
+     * @throws IllegalPropertyException in case the state file has incorrect values.
+     */
+    public static State resume(File stateFile, Configuration configuration) 
+        throws DataAccessException, IllegalPropertyException {
+        State state = FileMapper.load(stateFile, State.class);
+        state.configuration = configuration;
+        return state;
     }
 
     /**
@@ -169,6 +202,15 @@ public class State implements Root {
     }
 
     /**
+     * Sets the state timestamp.
+     * 
+     * @param timestamp the state timestamp.
+     */
+    public void setTimestamp(Long timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    /**
      * Returns the version inferred by Nyx, if any. If the version was overridden by configuration this will be the
      * same as {@link Configuration#getVersion()}. This value is only available after {@link Nyx#infer()} has run.
      * 
@@ -184,9 +226,7 @@ public class State implements Root {
     @Override
     public String getVersion() 
         throws DataAccessException, IllegalPropertyException {
-        if (Objects.isNull(version))
-            return null;
-        else return Objects.isNull(getConfiguration().getReleasePrefix()) ? version : getConfiguration().getReleasePrefix().concat(version);
+        return version;
     }
 
     /**

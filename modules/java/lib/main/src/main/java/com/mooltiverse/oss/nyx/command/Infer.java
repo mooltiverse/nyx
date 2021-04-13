@@ -334,7 +334,7 @@ public class Infer extends AbstractCommand {
             logger.info(COMMAND, "Inferred version is: {}", version.toString());
 
             // store values to the state object
-            state().setVersion(version.toString());
+            state().setVersion(Objects.isNull(releasePrefix) ? version.toString() : releasePrefix.concat(version.toString()));
             state().setBump(findings.containsKey(BUMP_COMPONENT) ? findings.get(BUMP_COMPONENT) : null);
             state().getReleaseScope().setSignificant(Boolean.valueOf(!bumpComponents.isEmpty()));
         }

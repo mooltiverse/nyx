@@ -16,6 +16,7 @@ These are the top level options in the configuration:
 | [`initialVersion`](#initial-version)                      | string  | `--initial-version=<VERSION>`                             | `NYX_INITIAL_VERSION=<VERSION>`                               |  Depends on the configured [version scheme](#scheme) |
 | [`releaseLenient`](#release-lenient)                      | boolean | `--release-lenient`, `--release-lenient=true|false`       | `NYX_RELEASE_LENIENT=true|false`                              | `true`   |
 | [`releasePrefix`](#release-prefix)                        | string  | `--release-prefix=<PREFIX>`                               | `NYX_RELEASE_PREFIX=<PREFIX>`                                 | N/A      |
+| [`resume`](#resume)                                       | string  | `--resume`, `resume=true|false`                           | `NYX_RESUME=true|false`                                       | `false`  |
 | [`scheme`](#scheme)                                       | string  | `--scheme=<NAME>`                                         | `NYX_SCHEME=<NAME>`                                           | `semver` |
 | [`stateFile`](#state-file)                                | string  | `--state-file=<PATH>`                                     | `NYX_STATE_FILE=<PATH>`                                       | N/A      |
 | [`verbosity`](#verbosity)                                 | string  | `--verbosity=<LEVEL>`, `--fatal`, `--error`, `--warning`, `--info`, `--debug`, `--trace` | `NYX_VERBOSITY=<LEVEL>`        | `warning`|
@@ -132,6 +133,21 @@ Release names are not necessarily equal to versions. For example version `1.2.3`
 
 This option only affects the way Nyx **generates** release names and tags, while [`releaseLenient`](#release-lenient) controls how tolerant Nyx is when **reading** release tags from the Git repository.
 
+### Resume
+
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `resume`                                                                                 |
+| Type                      | boolean                                                                                  |
+| Default                   | `false`                                                                                  |
+| Command Line Option       | `--resume`, `--resume=true|false`                                                        |
+| Environment Variable      | `NYX_RESUME=true|false`                                                                  |
+| Configuration File Option | `resume`                                                                                 |
+| Related state attributes  |                                                                                          |
+
+When this flag is set to `true` Nyx tries to load an existing [state file](#state-file) and resume operations from where it left when the state file was saved. This can improve execution time when you need to run Nyx in separate steps (i.e. when you run [Infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer), then do other tasks external to Nyx and then finalize the release process by running [Infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#publish)).
+
+This option only makes sense when you also set a value for the [`stateFile`](#state-file). If no `stateFile` is defined this option just has no effect.
+
 ### Scheme
 
 | ------------------------- | ---------------------------------------------------------------------------------------- |
@@ -168,6 +184,8 @@ Nyx will infer the format of the file by the extension, where available ones are
 
 The suggested name for the file, when used, is `.nyx-state.<EXT>` (so `.nyx-state.yaml`, `.nyx-state.yml` or `.nyx-state.json`). It's recommended to let Git [ignore](https://git-scm.com/docs/gitignore) this file.
 {: .notice--primary}
+
+This option can also be used in conjunction with [`resume`](#resume) in case you wish to suspend the execution and resume from where you left at any other time.
 
 ### Verbosity
 

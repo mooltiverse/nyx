@@ -17,13 +17,16 @@ package com.mooltiverse.oss.nyx;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.File;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import com.mooltiverse.oss.nyx.configuration.Configuration;
-import com.mooltiverse.oss.nyx.data.DataAccessException;
 import com.mooltiverse.oss.nyx.configuration.mock.ConfigurationLayerMock;
+import com.mooltiverse.oss.nyx.data.DataAccessException;
+import com.mooltiverse.oss.nyx.data.FileMapper;
 import com.mooltiverse.oss.nyx.git.Repository;
 import com.mooltiverse.oss.nyx.git.Scenario;
 import com.mooltiverse.oss.nyx.state.State;
@@ -113,6 +116,49 @@ public class NyxTests {
             // test that multiple invocations return the same instance
             assertEquals(state.hashCode(), nyx.state().hashCode());
             assertEquals(state.hashCode(), nyx.state().hashCode());
+        }
+
+        @Test
+        @DisplayName("Nyx.state() resume")
+        void stateResumeTest()
+            throws Exception {
+            Configuration configuration = new Configuration();
+            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
+            configurationMock.resume = Boolean.TRUE;
+            configurationMock.stateFile = new File(System.getProperty("java.io.tmpdir"), "state"+this.hashCode()+".json").getAbsolutePath();
+            configuration.withCommandLineConfiguration(configurationMock);
+            State oldState = new State(configuration);
+
+            // set a few values to use later on for comparison
+            oldState.setBump("alpha");
+            oldState.setVersion("3.5.7");
+            oldState.getInternals().put("attr1", "value1");
+            oldState.getReleaseScope().setFinalCommit("final");
+            oldState.getReleaseScope().setInitialCommit("initial");
+            oldState.getReleaseScope().setPreviousVersion("previous");
+            oldState.getReleaseScope().setPreviousVersionCommit("previousCommit");
+            oldState.getReleaseScope().setSignificant(Boolean.TRUE);
+
+            // save the file
+            FileMapper.save(configurationMock.stateFile, oldState);
+            assertTrue(new File(configurationMock.stateFile).exists());
+
+            // now we are ready to resume the file
+            Nyx nyx = new Nyx();
+            nyx.configuration().withCommandLineConfiguration(configurationMock);
+
+            State resumedState = nyx.state();
+            assertEquals(oldState.getBump(), resumedState.getBump());
+            assertEquals(oldState.getInternals(), resumedState.getInternals());
+            assertTrue(resumedState.getInternals().containsKey("attr1"));
+            assertEquals("value1", resumedState.getInternals().get("attr1"));
+            assertEquals(oldState.getReleaseScope().getFinalCommit(), resumedState.getReleaseScope().getFinalCommit());
+            assertEquals(oldState.getReleaseScope().getInitialCommit(), resumedState.getReleaseScope().getInitialCommit());
+            assertEquals(oldState.getReleaseScope().getPreviousVersion(), resumedState.getReleaseScope().getPreviousVersion());
+            assertEquals(oldState.getReleaseScope().getPreviousVersionCommit(), resumedState.getReleaseScope().getPreviousVersionCommit());
+            assertEquals(oldState.getReleaseScope().getSignificant(), resumedState.getReleaseScope().getSignificant());
+            assertEquals(oldState.getTimestamp(), resumedState.getTimestamp());
+            assertEquals(oldState.getVersion(), resumedState.getVersion());
         }
     }
 }

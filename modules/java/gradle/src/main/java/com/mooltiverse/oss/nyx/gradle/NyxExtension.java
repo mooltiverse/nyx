@@ -145,6 +145,11 @@ public abstract class NyxExtension {
     private final Property<Boolean> releaseLenient = getObjectfactory().property(Boolean.class);
 
     /**
+     * The 'resume' property.
+     */
+    private final Property<Boolean> resume = getObjectfactory().property(Boolean.class);
+
+    /**
      * The 'scheme' property.
      */
     private final Property<String> scheme = getObjectfactory().property(String.class);
@@ -308,6 +313,22 @@ public abstract class NyxExtension {
      */
     public Property<Boolean> getReleaseLenient() {
         return releaseLenient;
+    }
+
+    /**
+     * Returns the flag that, when {@code true}, loads a previously saved state file (if any) to resume execution
+     * from there.
+     * 
+     * We provide an implementation of this method instead of using the abstract definition as it's
+     * safer for old Gradle versions we support.
+     * 
+     * @return the flag that, when {@code true}, prevents Nyx from applying any change to the repository or any
+     * other resource
+     * 
+     * @see Defaults#DRY_RUN
+     */
+    public Property<Boolean> getResume() {
+        return resume;
     }
 
     /**

@@ -96,10 +96,24 @@ public class ConfigurationTests {
         }
 
         @Test
+        @DisplayName("Configuration.getResume() == Defaults.RESUME")
+        void getResumeTest()
+            throws Exception {
+            assertEquals(Defaults.RESUME, new Configuration().getResume());
+        }
+
+        @Test
         @DisplayName("Configuration.getScheme() == Defaults.SCHEME")
         void getSchemeTest()
             throws Exception {
             assertEquals(Defaults.SCHEME, new Configuration().getScheme());
+        }
+
+        @Test
+        @DisplayName("Configuration.getStateFile() == Defaults.STATE_FILE")
+        void getStateFileTest()
+            throws Exception {
+            assertEquals(Defaults.STATE_FILE, new Configuration().getStateFile());
         }
 
         @Test
@@ -296,6 +310,28 @@ public class ConfigurationTests {
         }
 
         @Test
+        @DisplayName("Configuration.withCommandLineConfiguration(MOCK).getResume() == MOCK.getResume()")
+        void getResumeTest()
+            throws Exception {
+            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
+            Configuration configuration = new Configuration();
+            configurationMock.resume = Boolean.TRUE;
+
+            // in order to make the test meaningful, make sure the default and mock values are different
+            assertNotEquals(Defaults.RESUME, configurationMock.resume);
+
+            // make sure the initial values come from defaults, until we inject the command line configuration
+            assertEquals(Defaults.RESUME, configuration.getResume());
+            
+            // inject the command line configuration and test the new value is returned from that
+            configuration.withCommandLineConfiguration(configurationMock);
+            assertEquals(configurationMock.resume, configuration.getResume());
+
+            // now remove the command line configuration and test that now default values are returned again
+            assertEquals(Defaults.RESUME, configuration.withCommandLineConfiguration(null).getResume());
+        }
+
+        @Test
         @DisplayName("Configuration.withCommandLineConfiguration(MOCK).getScheme() == MOCK.getScheme()")
         void getSchemeTest()
             throws Exception {
@@ -315,6 +351,28 @@ public class ConfigurationTests {
 
             // now remove the command line configuration and test that now default values are returned again
             assertEquals(Defaults.SCHEME, configuration.withCommandLineConfiguration(null).getScheme());
+        }
+
+        @Test
+        @DisplayName("Configuration.withCommandLineConfiguration(MOCK).getStateFile() == MOCK.getStateFile()")
+        void getStateFileTest()
+            throws Exception {
+            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
+            Configuration configuration = new Configuration();
+            configurationMock.stateFile = "state-file.yml";
+
+            // in order to make the test meaningful, make sure the default and mock values are different
+            assertNotEquals(Defaults.STATE_FILE, configurationMock.stateFile);
+
+            // make sure the initial values come from defaults, until we inject the command line configuration
+            assertEquals(Defaults.STATE_FILE, configuration.getStateFile());
+            
+            // inject the command line configuration and test the new value is returned from that
+            configuration.withCommandLineConfiguration(configurationMock);
+            assertEquals(configurationMock.stateFile, configuration.getStateFile());
+
+            // now remove the command line configuration and test that now default values are returned again
+            assertEquals(Defaults.STATE_FILE, configuration.withCommandLineConfiguration(null).getStateFile());
         }
 
         @Test
@@ -543,6 +601,28 @@ public class ConfigurationTests {
         }
 
         @Test
+        @DisplayName("Configuration.withPluginConfiguration(MOCK).getResume() == MOCK.getResume()")
+        void getResumeTest()
+            throws Exception {
+            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
+            Configuration configuration = new Configuration();
+            configurationMock.resume = Boolean.TRUE;
+
+            // in order to make the test meaningful, make sure the default and mock values are different
+            assertNotEquals(Defaults.RESUME, configurationMock.resume);
+
+            // make sure the initial values come from defaults, until we inject the plugin configuration
+            assertEquals(Defaults.RESUME, configuration.getResume());
+            
+            // inject the plugin configuration and test the new value is returned from that
+            configuration.withPluginConfiguration(configurationMock);
+            assertEquals(configurationMock.resume, configuration.getResume());
+
+            // now remove the plugin configuration and test that now default values are returned again
+            assertEquals(Defaults.RESUME, configuration.withPluginConfiguration(null).getResume());
+        }
+
+        @Test
         @DisplayName("Configuration.withPluginConfiguration(MOCK).getScheme() == MOCK.getScheme()")
         void getSchemeTest()
             throws Exception {
@@ -562,6 +642,28 @@ public class ConfigurationTests {
 
             // now remove the plugin configuration and test that now default values are returned again
             assertEquals(Defaults.SCHEME, configuration.withPluginConfiguration(null).getScheme());
+        }
+
+        @Test
+        @DisplayName("Configuration.withPluginConfiguration(MOCK).getStateFile() == MOCK.getStateFile()")
+        void getStateFileTest()
+            throws Exception {
+            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
+            Configuration configuration = new Configuration();
+            configurationMock.stateFile = "state-file.yml";
+
+            // in order to make the test meaningful, make sure the default and mock values are different
+            assertNotEquals(Defaults.STATE_FILE, configurationMock.stateFile);
+
+            // make sure the initial values come from defaults, until we inject the command line configuration
+            assertEquals(Defaults.STATE_FILE, configuration.getStateFile());
+            
+            // inject the command line configuration and test the new value is returned from that
+            configuration.withPluginConfiguration(configurationMock);
+            assertEquals(configurationMock.stateFile, configuration.getStateFile());
+
+            // now remove the command line configuration and test that now default values are returned again
+            assertEquals(Defaults.STATE_FILE, configuration.withPluginConfiguration(null).getStateFile());
         }
 
         @Test
@@ -740,6 +842,22 @@ public class ConfigurationTests {
         }
 
         @Test
+        @DisplayName("Configuration[multiple layers].getResume() == MOCK.getResume()")
+        void getResumeTest()
+            throws Exception {
+            ConfigurationLayerMock lowPriorityconfigurationMock = new ConfigurationLayerMock();
+            ConfigurationLayerMock highPriorityconfigurationMock = new ConfigurationLayerMock();
+            Configuration configuration = new Configuration();
+            lowPriorityconfigurationMock.resume = Boolean.TRUE;
+            highPriorityconfigurationMock.resume = Boolean.FALSE;
+            
+            // inject the plugin configuration and test the new value is returned from that
+            configuration.withPluginConfiguration(lowPriorityconfigurationMock);
+            configuration.withCommandLineConfiguration(highPriorityconfigurationMock);
+            assertEquals(highPriorityconfigurationMock.resume, configuration.getResume());
+        }
+
+        @Test
         @DisplayName("Configuration[multiple layers].getScheme() == MOCK.getScheme()")
         void getSchemeTest()
             throws Exception {
@@ -753,6 +871,22 @@ public class ConfigurationTests {
             configuration.withPluginConfiguration(lowPriorityconfigurationMock);
             configuration.withCommandLineConfiguration(highPriorityconfigurationMock);
             assertEquals(highPriorityconfigurationMock.scheme, configuration.getScheme());
+        }
+
+        @Test
+        @DisplayName("Configuration[multiple layers].getStateFile() == MOCK.getStateFile()")
+        void getStateFileTest()
+            throws Exception {
+            ConfigurationLayerMock lowPriorityconfigurationMock = new ConfigurationLayerMock();
+            ConfigurationLayerMock highPriorityconfigurationMock = new ConfigurationLayerMock();
+            Configuration configuration = new Configuration();
+            lowPriorityconfigurationMock.stateFile = "file.yaml";
+            highPriorityconfigurationMock.stateFile = "file.json";
+            
+            // inject the plugin configuration and test the new value is returned from that
+            configuration.withPluginConfiguration(lowPriorityconfigurationMock);
+            configuration.withCommandLineConfiguration(highPriorityconfigurationMock);
+            assertEquals(highPriorityconfigurationMock.stateFile, configuration.getStateFile());
         }
 
         @Test

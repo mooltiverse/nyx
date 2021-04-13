@@ -17,17 +17,20 @@ package com.mooltiverse.oss.nyx.state;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.File;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import com.mooltiverse.oss.nyx.configuration.Configuration;
 import com.mooltiverse.oss.nyx.configuration.mock.ConfigurationLayerMock;
+import com.mooltiverse.oss.nyx.data.FileMapper;
 
 @DisplayName("State")
 public class StateTests {
     @Nested
-    @DisplayName("State")
+    @DisplayName("Constructor")
     class ConstructorTests {
         @Test
         @DisplayName("State()")
@@ -37,7 +40,10 @@ public class StateTests {
             assertThrows(NullPointerException.class, () -> { new State(null); });
             assertDoesNotThrow(() -> { new State(new Configuration()); });
         }
-
+    }
+    @Nested
+    @DisplayName("Attributes")
+    class AttributesTests {
         @Test
         @DisplayName("State.getBump()")
         void getBumpTest()
@@ -138,42 +144,12 @@ public class StateTests {
             // make sure the version is null in the beginning (it's set only after the Infer task has run)
             State state = new State(new Configuration());
             assertNull(state.getVersion());
-        }
-
-        @Test
-        @DisplayName("State.getVersion() with prefix")
-        void getVersionWithPrefixTest()
-            throws Exception {
-            Configuration configuration = new Configuration();
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-            configuration.withCommandLineConfiguration(configurationMock);
-            State state = new State(configuration);
 
             state.setVersion("1.2.3");
-            
-            configurationMock.releasePrefix = "v";
+            assertEquals("1.2.3", state.getVersion());
+
+            state.setVersion("v1.2.3");
             assertEquals("v1.2.3", state.getVersion());
-
-            configurationMock.releasePrefix = "prefix";
-            assertEquals("prefix1.2.3", state.getVersion());
-        }
-
-        @Test
-        @DisplayName("State.getVersion() without prefix")
-        void getVersionWithoutPrefixTest()
-            throws Exception {
-            Configuration configuration = new Configuration();
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-            configuration.withCommandLineConfiguration(configurationMock);
-            State state = new State(configuration);
-
-            state.setVersion("1.2.3");
-            
-            configurationMock.releasePrefix = null; // no effects, as the default is not null
-            assertEquals("1.2.3", state.getVersion());
-
-            configurationMock.releasePrefix = ""; // this has effect and uses no prefix
-            assertEquals("1.2.3", state.getVersion());
         }
 
         @Test
@@ -187,15 +163,49 @@ public class StateTests {
             state.setVersion(version);
             assertEquals(version, state.getVersion());
         }
+    }
 
-        /*@Test
-        @DisplayName("State.setVersion(Version) throws exception when using wrong scheme")
-        void setVersionWithWrongSchemeTest()
+    @Nested
+    @DisplayName("Resume")
+    class ResumeTests {
+        @Test
+        @DisplayName("State.resume()")
+        void resumeTest()
             throws Exception {
-            State state = new State(new Configuration());
+            Configuration configuration = new Configuration();
+            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
+            configurationMock.resume = Boolean.TRUE;
+            configurationMock.stateFile = new File(System.getProperty("java.io.tmpdir"), "state"+this.hashCode()+".json").getAbsolutePath();
+            configuration.withCommandLineConfiguration(configurationMock);
+            State oldState = new State(configuration);
 
-            // here we should try passing a version whose scheme doesn't match the configured scheme
-            // and make sure an exception is thrown
-        }*/
+            // set a few values to use later on for comparison
+            oldState.setBump("alpha");
+            oldState.setVersion("3.5.7");
+            oldState.getInternals().put("attr1", "value1");
+            oldState.getReleaseScope().setFinalCommit("final");
+            oldState.getReleaseScope().setInitialCommit("initial");
+            oldState.getReleaseScope().setPreviousVersion("previous");
+            oldState.getReleaseScope().setPreviousVersionCommit("previousCommit");
+            oldState.getReleaseScope().setSignificant(Boolean.TRUE);
+
+            // save the file
+            FileMapper.save(configurationMock.stateFile, oldState);
+            assertTrue(new File(configurationMock.stateFile).exists());
+
+            // now we are ready to resume the file
+            State resumedState = State.resume(new File(configurationMock.stateFile), configuration);
+            assertEquals(oldState.getBump(), resumedState.getBump());
+            assertEquals(oldState.getInternals(), resumedState.getInternals());
+            assertTrue(resumedState.getInternals().containsKey("attr1"));
+            assertEquals("value1", resumedState.getInternals().get("attr1"));
+            assertEquals(oldState.getReleaseScope().getFinalCommit(), resumedState.getReleaseScope().getFinalCommit());
+            assertEquals(oldState.getReleaseScope().getInitialCommit(), resumedState.getReleaseScope().getInitialCommit());
+            assertEquals(oldState.getReleaseScope().getPreviousVersion(), resumedState.getReleaseScope().getPreviousVersion());
+            assertEquals(oldState.getReleaseScope().getPreviousVersionCommit(), resumedState.getReleaseScope().getPreviousVersionCommit());
+            assertEquals(oldState.getReleaseScope().getSignificant(), resumedState.getReleaseScope().getSignificant());
+            assertEquals(oldState.getTimestamp(), resumedState.getTimestamp());
+            assertEquals(oldState.getVersion(), resumedState.getVersion());
+        }
     }
 }

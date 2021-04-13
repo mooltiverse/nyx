@@ -92,6 +92,11 @@ public interface Defaults {
     public static final Boolean RELEASE_LENIENT = Boolean.TRUE;
 
     /**
+     * The flag that enables loading a previously stored State file and resume operations from there. Value: {@code false}
+     */
+    public static final Boolean RESUME = Boolean.FALSE;
+
+    /**
      * The versioning scheme to use. Value: {@link Scheme#SEMVER}
      */
     public static final Scheme SCHEME = Scheme.SEMVER;
