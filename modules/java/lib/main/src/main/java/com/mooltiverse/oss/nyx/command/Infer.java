@@ -109,6 +109,7 @@ public class Infer extends AbstractCommand {
     @Override
     public boolean isUpToDate()
         throws DataAccessException, IllegalPropertyException, GitException {
+        logger.debug(COMMAND, "Checking whether the Infer command is up to date");
         // The command is never considered up to date when the repository is not clean
         if (!isRepositoryClean())
             return false;
@@ -143,6 +144,7 @@ public class Infer extends AbstractCommand {
      */
     private void storeStatusInternalAttributes()
         throws DataAccessException, IllegalPropertyException, GitException {
+        logger.debug(COMMAND, "Storing the Infer command internal attributes to the State");
         storeInternalAttribute(INTERNAL_LAST_COMMIT, getLatestCommit());
         storeInternalAttribute(CONFIGURED_VERSION, state().getConfiguration().getVersion());
         storeInternalAttribute(CONFIGURED_BUMP, state().getConfiguration().getBump());
@@ -189,7 +191,7 @@ public class Infer extends AbstractCommand {
     @Override
     public State run()
         throws DataAccessException, IllegalPropertyException, GitException, ReleaseException {
-        logger.info(COMMAND, "Infer.run()");
+        logger.debug(COMMAND, "Running the Infer command...");
 
         if (Objects.isNull(state().getConfiguration().getVersion())) {
             // these objects are fetched in advance from the state because they may throw an exception that we can't handle in the lambda expression
@@ -317,12 +319,12 @@ public class Infer extends AbstractCommand {
             Version version = null;
             if (Objects.isNull(state().getReleaseScope().getPreviousVersion())) {
                 version = releaseLenient ? VersionFactory.valueOf(scheme.getScheme(), state().getConfiguration().getInitialVersion(), releaseLenient) : VersionFactory.valueOf(scheme.getScheme(), state().getConfiguration().getInitialVersion(), releasePrefix);
-                logger.debug(COMMAND, "No previous version detected. Using the initial version {}", version.toString());
+                logger.info(COMMAND, "No previous version detected. Using the initial version {}", version.toString());
             }
             else {
                 Version previousVersion = releaseLenient ? VersionFactory.valueOf(scheme.getScheme(), state().getReleaseScope().getPreviousVersion(), releaseLenient) : VersionFactory.valueOf(scheme.getScheme(), state().getReleaseScope().getPreviousVersion(), releasePrefix);
                 if (findings.containsKey(BUMP_COMPONENT)) {
-                    logger.debug(COMMAND, "Bumping component {} on version {}", findings.get(BUMP_COMPONENT), previousVersion.toString());
+                    logger.info(COMMAND, "Bumping component {} on version {}", findings.get(BUMP_COMPONENT), previousVersion.toString());
                     version = previousVersion.bump(findings.get(BUMP_COMPONENT));
                 }
                 else {

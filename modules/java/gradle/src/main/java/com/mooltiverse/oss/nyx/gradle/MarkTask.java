@@ -15,6 +15,8 @@
  */
 package com.mooltiverse.oss.nyx.gradle;
 
+import static com.mooltiverse.oss.nyx.log.Markers.COMMAND;
+
 import javax.inject.Inject;
 
 import org.gradle.api.tasks.TaskAction;
@@ -62,6 +64,9 @@ public abstract class MarkTask extends CoreTask {
     @TaskAction
     public void mark()
         throws NyxException {
+        getLogger().debug(COMMAND, "Running Nyx mark...");
+        getLogger().quiet("Mark release: {}", nyx().state().getVersion());
         nyx().mark();
+        getLogger().debug(COMMAND, "Nyx mark complete");
     }
 }

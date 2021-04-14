@@ -16,6 +16,7 @@
 package com.mooltiverse.oss.nyx.gradle;
 
 import static com.mooltiverse.oss.nyx.gradle.Constants.GRADLE_VERSION_PROPERTY_NAME;
+import static com.mooltiverse.oss.nyx.log.Markers.COMMAND;
 
 import javax.inject.Inject;
 
@@ -61,9 +62,12 @@ public abstract class InferTask extends CoreTask {
     @TaskAction
     public void infer()
         throws NyxException {
+        getLogger().debug(COMMAND, "Running Nyx infer...");
         nyx().infer();
+        getLogger().debug(COMMAND, "Nyx infer complete");
 
         // reflect the version property in the Nyx state to the Gradle project
         getProject().setProperty(GRADLE_VERSION_PROPERTY_NAME, nyx().state().getVersion());
+        getLogger().quiet("Project version: {}", nyx().state().getVersion());
     }
 }

@@ -15,6 +15,8 @@
  */
 package com.mooltiverse.oss.nyx.gradle;
 
+import static com.mooltiverse.oss.nyx.log.Markers.COMMAND;
+
 import javax.inject.Inject;
 
 import org.gradle.api.tasks.TaskAction;
@@ -62,6 +64,8 @@ public abstract class MakeTask extends CoreTask {
     @TaskAction
     public void make()
         throws NyxException {
+        getLogger().debug(COMMAND, "Running Nyx make...");
         nyx().make();
+        getLogger().debug(COMMAND, "Nyx make complete");
     }
 }

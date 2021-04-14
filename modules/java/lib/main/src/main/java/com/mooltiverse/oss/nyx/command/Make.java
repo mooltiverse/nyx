@@ -69,6 +69,7 @@ public class Make extends AbstractCommand {
     @Override
     public boolean isUpToDate()
         throws DataAccessException, IllegalPropertyException, GitException {
+        logger.debug(COMMAND, "Checking whether the Make command is up to date");
         // TODO: implement the up-to-date checks here
         // for now let's just check if the task has executed by seeing if we have stored the last
         // execution time. Also see where the attribute is stored in the run() method
@@ -90,6 +91,7 @@ public class Make extends AbstractCommand {
      */
     private void storeStatusInternalAttributes()
         throws DataAccessException, IllegalPropertyException, GitException {
+        logger.debug(COMMAND, "Storing the Make command internal attributes to the State");
         // store the last execution time
         state().getInternals().put(INTERNAL_EXECUTED, Long.toString(System.currentTimeMillis()));
     }
@@ -102,7 +104,7 @@ public class Make extends AbstractCommand {
         throws DataAccessException, IllegalPropertyException, GitException, ReleaseException {
         // TODO: implement this method
         // the following are just temporary smoke detection outputs
-        logger.info(COMMAND, "Make.run()");
+        logger.debug(COMMAND, "Running the Make command...");
 
         storeStatusInternalAttributes();
         return state();

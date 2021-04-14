@@ -60,6 +60,8 @@ public class Clean extends AbstractCommand {
     @Override
     public boolean isUpToDate()
         throws DataAccessException, IllegalPropertyException, GitException {
+        logger.debug(COMMAND, "Checking whether the Clean command is up to date");
+
         // Check if there a State file
         String stateFilePath = state().getConfiguration().getStateFile();
 
@@ -79,7 +81,7 @@ public class Clean extends AbstractCommand {
     @Override
     public State run()
         throws DataAccessException, IllegalPropertyException, GitException, ReleaseException {
-        logger.info(COMMAND, "Clean.run()");
+        logger.debug(COMMAND, "Running the Clean command...");
 
         // Delete the state file, if any
         String stateFilePath = state().getConfiguration().getStateFile();

@@ -15,8 +15,13 @@
  */
 package com.mooltiverse.oss.nyx.data;
 
+import static com.mooltiverse.oss.nyx.log.Markers.DATA;
+
 import java.io.File;
 import java.io.IOException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,6 +33,11 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
  * This class is used to load and save data files like configuration or state files.
  */
 public class FileMapper {
+    /**
+     * The private logger instance
+     */
+    private static final Logger logger = LoggerFactory.getLogger(FileMapper.class);
+
     /**
      * Default constructor is private on purpose.
      */
@@ -46,6 +56,8 @@ public class FileMapper {
      */
     private static ObjectMapper getObjectMapper(String filePath) {
         ObjectMapper objectMapper = new ObjectMapper();
+
+        logger.trace(DATA, "Retrieving an object mapper instance for file {}", filePath);
 
         if (filePath.toLowerCase().endsWith(".json")) {
             objectMapper = new ObjectMapper(new JsonFactory());
@@ -80,6 +92,7 @@ public class FileMapper {
      */
     public static <T> T load(File file, Class<T> type)
         throws DataAccessException {
+        logger.trace(DATA, "Unmarshalling object from file {} to type {}", file.getAbsolutePath(), type.getName());
         try {
             return getObjectMapper(file.getAbsolutePath()).readValue(file, type);
         }
@@ -102,8 +115,11 @@ public class FileMapper {
      */
     public static void save(String filePath, Object content)
         throws DataAccessException {
+        logger.trace(DATA, "Marshalling object to file {} to type {}", filePath, content.getClass().getName());
         try {
-            getObjectMapper(filePath).writeValue(new File(filePath), content);
+            File file = new File(filePath);
+            file.mkdirs();
+            getObjectMapper(filePath).writeValue(file, content);
         }
         catch (IOException ioe) {
             throw new DataAccessException(String.format("Unable to marshal content to file %s", filePath), ioe);

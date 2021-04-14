@@ -16,6 +16,7 @@
 package com.mooltiverse.oss.nyx.gradle;
 
 import static com.mooltiverse.oss.nyx.gradle.Constants.GRADLE_VERSION_PROPERTY_NAME;
+import static com.mooltiverse.oss.nyx.log.Markers.COMMAND;
 
 import java.util.Objects;
 
@@ -94,6 +95,7 @@ public abstract class CoreTask extends AbstractTask {
      * @param value the value of the property to store
      */
     protected void storeSharedProperty(String name, Object value) {
+        getLogger().debug(COMMAND, "Storing shared extra property {}", name);
         getProject().getExtensions().getExtraProperties().set(name, value);
     }
 
@@ -107,6 +109,7 @@ public abstract class CoreTask extends AbstractTask {
      * with such name is available
      */
     protected Object retrieveSharedProperty(String name) {
+        getLogger().trace(COMMAND, "Retrieving shared extra property {}", name);
         return getProject().getExtensions().getExtraProperties().get(name);
     }
 
@@ -131,7 +134,9 @@ public abstract class CoreTask extends AbstractTask {
         if (hasSharedProperty(NYX_INSTANCE_PROPERTY))
             return Nyx.class.cast(retrieveSharedProperty(NYX_INSTANCE_PROPERTY));
         else {
+            getLogger().debug(COMMAND, "Creating a new Nyx backing instance...");
             Nyx instance = new Nyx(getProject().getProjectDir());
+            getLogger().debug(COMMAND, "Injecting the Nyx plugin configuration layer into the Nyx backing instance configuration...");
             // The 'version' is a standard Gradle project property (https://docs.gradle.org/current/userguide/writing_build_scripts.html#sec:standard_project_properties)
             instance.configuration().withPluginConfiguration(new ConfigurationLayer(getExtension(), getProject().findProperty(GRADLE_VERSION_PROPERTY_NAME)));
             storeSharedProperty(NYX_INSTANCE_PROPERTY, instance);
@@ -152,6 +157,7 @@ public abstract class CoreTask extends AbstractTask {
      */
     public State state()
         throws DataAccessException, IllegalPropertyException {
+        getLogger().trace(COMMAND, "Retrieving the Nyx state reference");
         return nyx().state();
     }
 }

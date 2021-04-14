@@ -80,7 +80,7 @@ public class NyxPlugin <T> implements Plugin<T> {
     public void apply(T target) {
         if (Project.class.isAssignableFrom(target.getClass())) {
             Project project = Project.class.cast(target);
-            project.getLogger().debug(MAIN, "Applying the Nyx plugin to the project");
+            project.getLogger().debug(MAIN, "Applying the Nyx plugin to the project...");
 
             if (!Objects.isNull(project.getParent()))
                 project.getLogger().warn(MAIN, "Nyx plugin should be applied to the root project only!");
@@ -100,7 +100,7 @@ public class NyxPlugin <T> implements Plugin<T> {
         else if (Settings.class.isAssignableFrom(target.getClass())) {
             Logger logger = Logging.getLogger(NyxPlugin.class);
             Settings settings = Settings.class.cast(target);
-            logger.debug(MAIN, "Applying the Nyx plugin to the settings");
+            logger.debug(MAIN, "Applying the Nyx plugin to the settings...");
 
             // Create the settings extension
             NyxExtension nyxExtension = NyxExtension.create(settings);
@@ -124,6 +124,8 @@ public class NyxPlugin <T> implements Plugin<T> {
      * @param extension the extension to be passed to tasks
      */
     protected static void defineTasks(Project project, NyxExtension extension) {
+        project.getLogger().debug(MAIN, "Registering Nyx core tasks for the project...");
+
         // Define core tasks
         project.getTasks().register(CleanTask.NAME,   CleanTask.class, extension);
         project.getTasks().register(InferTask.NAME,   InferTask.class, extension);
@@ -135,6 +137,8 @@ public class NyxPlugin <T> implements Plugin<T> {
         // These dependencies can't be defined inside each task's configure() method as it may lead
         // to unexpected behavior (see https://docs.gradle.org/current/userguide/task_configuration_avoidance.html#sec:task_configuration_avoidance_general, bullet #2).
         // The dependencies below make no difference whether the tasks are defined by this plugin or elsewhere.
+
+        project.getLogger().debug(MAIN, "Registering Nyx lifecycle tasks for the project...");
 
         // Make the 'release' task dependent on the Publish task. There must be one as we define it
         // within the plugin if not already defined elsewhere.
@@ -161,6 +165,7 @@ public class NyxPlugin <T> implements Plugin<T> {
         if (!Objects.isNull(cleanLifecycleTask)) {
             cleanLifecycleTask.dependsOn(CleanTask.NAME);
         }
+        project.getLogger().debug(MAIN, "Nyx tasks registered for the project");
     }
 
     /**
@@ -170,6 +175,7 @@ public class NyxPlugin <T> implements Plugin<T> {
      * @param project the project to run the inference for
      */
     protected static void triggerInference(Project project) {
+        project.getLogger().debug(MAIN, "Triggering Nyx inference for the project...");
         try {
             Task inferTask = project.getTasks().getByName(InferTask.NAME);
             for (Action<? super Task> action: inferTask.getActions()) {
@@ -180,5 +186,6 @@ public class NyxPlugin <T> implements Plugin<T> {
             project.getLogger().error(MAIN, "Nyx failed to infer in the early project stage and some property like the project version will not be available until you succesfully run the nyxInfer task. Failure is due to: {}", e.getMessage());
             project.getLogger().debug(MAIN, "Nyx failed to infer due to", e);
         }
+        project.getLogger().debug(MAIN, "Nyx inference complete");
     }
 }
