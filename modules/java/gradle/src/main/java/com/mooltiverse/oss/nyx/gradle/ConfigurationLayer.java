@@ -103,8 +103,7 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
      * {@inheritDoc}
      */
     @Override
-    public String getInitialVersion()
-        throws IllegalPropertyException {
+    public String getInitialVersion() {
         return extension.getInitialVersion().getOrNull();
     }
 

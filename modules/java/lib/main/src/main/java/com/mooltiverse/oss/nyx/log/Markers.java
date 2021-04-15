@@ -30,6 +30,11 @@ public class Markers {
     public static Marker COMMAND = MarkerFactory.getMarker("COMMAND");
 
     /**
+     * The {@code DATA} marker, used when logging events related to internal data.
+     */
+    public static Marker DATA = MarkerFactory.getMarker("DATA");
+
+    /**
      * The {@code CONFIGURATION} marker, used when logging configuration events.
      */
     public static Marker CONFIGURATION = MarkerFactory.getMarker("CONFIGURATION");

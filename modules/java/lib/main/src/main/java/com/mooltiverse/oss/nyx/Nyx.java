@@ -209,6 +209,7 @@ public class Nyx {
      */
     private Command newCommandInstance(Commands command)
         throws DataAccessException, IllegalPropertyException, GitException {
+        logger.debug(MAIN, "Creating new command instance {}", command);
         switch (command) {
             case CLEAN:   return new Clean(state(), repository());
             case INFER:   return new Infer(state(), repository());
@@ -233,6 +234,7 @@ public class Nyx {
      */
     private Command getCommandInstance(Commands command)
         throws DataAccessException, IllegalPropertyException, GitException {
+        logger.debug(MAIN, "Retrieving new command instance {}", command);
         if (commands.containsKey(command))
             return commands.get(command);
         
@@ -255,8 +257,9 @@ public class Nyx {
      */
     private void runCommand(Commands command, boolean saveState)
         throws DataAccessException, IllegalPropertyException, GitException, ReleaseException {
-        Objects.requireNonNull(command, "Cannot instantiate the command from a null class");
+        Objects.requireNonNull(command, "Cannot run a null command");
 
+        logger.debug(MAIN, "Running command {}", command);
         Command commandInstance = getCommandInstance(command);
         if (commandInstance.isUpToDate()) {
             logger.debug(MAIN, "Command {} is up to date, skipping.", command.toString());
@@ -267,6 +270,7 @@ public class Nyx {
 
             // optionally save the state file
             if (saveState && !Objects.isNull(configuration().getStateFile())) {
+                logger.debug(MAIN, "Storing the state to {}", configuration().getStateFile());
                 FileMapper.save(configuration().getStateFile(), state());
             }
         }
@@ -288,6 +292,7 @@ public class Nyx {
         logger.debug(MAIN, "Nyx.isUpTodate({})", command.toString());
         Objects.requireNonNull(command, "Command cannot be null");
 
+        logger.debug(MAIN, "Checking up-to-date status for command {}", command);
         return commands.containsKey(command) && commands.get(command).isUpToDate();
     }
 
@@ -310,8 +315,9 @@ public class Nyx {
      */
     public void run(Commands command)
         throws DataAccessException, IllegalPropertyException, GitException, ReleaseException {
-        logger.debug(MAIN, "Nyx.run({})", command.toString());
         Objects.requireNonNull(command, "Command cannot be null");
+        
+        logger.debug(MAIN, "Nyx.run({})", command.toString());
         switch (command) {
             case CLEAN:   clean(); break;
             case INFER:   infer(); break;

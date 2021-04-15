@@ -136,6 +136,7 @@ class JGitRepository implements Repository {
     @Override
     public void add(Collection<String> paths)
         throws GitException {
+        logger.debug(GIT, "Adding contents to repository staging area");
         try {
             AddCommand command = jGit.add();
             command.setUpdate(false); // match all files, not only those already in the index
@@ -164,6 +165,7 @@ class JGitRepository implements Repository {
     @Override
     public Commit commit(String message, Identity author, Identity committer)
         throws GitException {
+        logger.debug(GIT, "Committing changes to repository");
         try {
             CommitCommand command = jGit.commit();
             command.setMessage(message);
@@ -214,6 +216,7 @@ class JGitRepository implements Repository {
     @Override
     public String push(String remote)
         throws GitException {
+        logger.debug(GIT, "Pushing changes to remote repository {}", remote);
         try {
             // get the current branch name
             String currentBranchRef = jGit.getRepository().getFullBranch();
@@ -238,6 +241,7 @@ class JGitRepository implements Repository {
     @Override
     public Set<String> push(Collection<String> remotes)
         throws GitException {
+        logger.debug(GIT, "Pushing changes to {} remote repositories", remotes.size());
         Set<String> res = new HashSet<String>();
         for (String remote: remotes) {
             res.add(push(remote));
@@ -278,6 +282,7 @@ class JGitRepository implements Repository {
     @Override
     public Tag tag(String target, String name, String message, Identity tagger)
         throws GitException {
+        logger.debug(GIT, "Tagging as {}", name);
         try {
             TagCommand command = jGit.tag().setObjectId(parseCommit(Objects.isNull(target) ? getLatestCommit() : target));
             if (Objects.isNull(message))
@@ -315,6 +320,7 @@ class JGitRepository implements Repository {
         throws GitException {
         Objects.requireNonNull(id, "Cannot resolve null identifiers");
 
+        logger.trace(GIT, "Resolving {}", id);
         try {
             ObjectId res = jGit.getRepository().resolve(id);
             if (Objects.isNull(res))
@@ -358,6 +364,7 @@ class JGitRepository implements Repository {
         throws GitException {
         Objects.requireNonNull(id, "Cannot parse a commit from a null identifier");
 
+        logger.trace(GIT, "Parsing commit {}", id);
         try {
             return jGit.getRepository().parseCommit(resolve(id));
         }
@@ -420,6 +427,8 @@ class JGitRepository implements Repository {
     private RevCommit peekCommit(String startFrom, RevSort sort)
         throws GitException {
         Objects.requireNonNull(startFrom, "The starting revision object is required");
+
+        logger.trace(GIT, "Peeking commit");
         RevWalk rw = new RevWalk(jGit.getRepository());
         try {
             if (!Objects.isNull(sort))
@@ -466,6 +475,7 @@ class JGitRepository implements Repository {
     @Override
     public Set<Tag> getCommitTags(String commit)
         throws GitException {
+        logger.debug(GIT, "Retrieving tags for commit {}", commit);
         Set<Tag> res = new HashSet<Tag>();
         try {
             RefDatabase refDatabase = jGit.getRepository().getRefDatabase();
@@ -498,6 +508,7 @@ class JGitRepository implements Repository {
     @Override
     public boolean isClean()
         throws GitException {
+        logger.debug(GIT, "Checking repository clean status");
         try {
             return jGit.status().call().isClean();
         }

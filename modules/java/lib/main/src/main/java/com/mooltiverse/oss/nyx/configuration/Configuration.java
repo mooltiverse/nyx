@@ -100,8 +100,9 @@ public class Configuration implements Root {
      * Resets the cache of resolved options.
      */
     private synchronized void resetCache() {
+        logger.trace(CONFIGURATION, "Clearing the configuration cache");
         if (!Objects.isNull(commitMessageConventionsBlock))
-        commitMessageConventionsBlock.resolvedItems = null;
+            commitMessageConventionsBlock.resolvedItems = null;
     }
 
     /**
@@ -117,6 +118,7 @@ public class Configuration implements Root {
      * @throws IllegalPropertyException in case some option has been defined but has incorrect values or it can't be resolved.
      */
     private synchronized void setConfigurationLayer(ConfigurationLayer layer, LayerPriority priority) {
+        logger.debug(CONFIGURATION, "Setting configuration layer at {}", priority);
         if (Objects.isNull(layer)) {
             logger.debug(CONFIGURATION, "Removing the existing {} configuration layer, if any", priority);
             if (layers.containsKey(priority))
@@ -188,6 +190,7 @@ public class Configuration implements Root {
     @Override
     public CommitMessageConventions getCommitMessageConventions()
         throws DataAccessException, IllegalPropertyException {
+        logger.trace(CONFIGURATION, "Retrieving the commit message conventions");
         if (Objects.isNull(commitMessageConventionsBlock)) {
             commitMessageConventionsBlock = new CommitMessageConventionsBlock();
         }
@@ -217,6 +220,7 @@ public class Configuration implements Root {
      * @param directory the new default directory. If {@code null} then the standard default directory will be used.
      */
     public static void setDefaultDirectory(File directory) {
+        logger.trace(CONFIGURATION, "Setting the default directory {}", Objects.isNull(directory) ? "null" : directory.getAbsolutePath());
         DefaultLayer.getInstance().setDirectory(directory);
     }
 
@@ -476,6 +480,7 @@ public class Configuration implements Root {
         @Override
         public CommitMessageConvention getItem(String name)
             throws DataAccessException, IllegalPropertyException {
+            logger.trace(CONFIGURATION, "Retrieving the {}[{}] configuration option", "commitMessageConventions.items", name);
             return getResolvedItem(name);
         }
     }

@@ -15,6 +15,8 @@
  */
 package com.mooltiverse.oss.nyx.gradle;
 
+import static com.mooltiverse.oss.nyx.log.Markers.COMMAND;
+
 import javax.inject.Inject;
 
 import org.gradle.api.tasks.TaskAction;
@@ -59,6 +61,8 @@ public abstract class CleanTask extends CoreTask {
     @TaskAction
     public void clean()
         throws NyxException {
+        getLogger().debug(COMMAND, "Running Nyx clean...");
         nyx().clean();
+        getLogger().debug(COMMAND, "Nyx clean complete");
     }
 }

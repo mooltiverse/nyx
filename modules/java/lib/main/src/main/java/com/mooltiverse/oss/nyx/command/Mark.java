@@ -81,6 +81,7 @@ public class Mark extends AbstractCommand {
     @Override
     public boolean isUpToDate()
         throws DataAccessException, IllegalPropertyException, GitException {
+        logger.debug(COMMAND, "Checking whether the Mark command is up to date");
         // The command is never considered up to date when the repository is not clean
         if (!isRepositoryClean())
             return false;
@@ -112,6 +113,7 @@ public class Mark extends AbstractCommand {
      */
     private void storeStatusInternalAttributes()
         throws DataAccessException, IllegalPropertyException, GitException {
+        logger.debug(COMMAND, "Storing the Mark command internal attributes to the State");
         if (!state().getConfiguration().getDryRun()) {
             storeInternalAttribute(INTERNAL_LAST_COMMIT, getLatestCommit());
             storeInternalAttribute(STATE_VERSION, state().getVersion());
@@ -152,7 +154,7 @@ public class Mark extends AbstractCommand {
     @Override
     public State run()
         throws DataAccessException, IllegalPropertyException, GitException, ReleaseException {
-        logger.info(COMMAND, "Mark.run()");
+        logger.debug(COMMAND, "Running the Mark command...");
 
         if (Objects.isNull(state().getReleaseScope().getInitialCommit())) {
             logger.info(COMMAND, "Release scope is empty. Nothing to release.");
