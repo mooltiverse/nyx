@@ -176,16 +176,12 @@ public class NyxPlugin <T> implements Plugin<T> {
      */
     protected static void triggerInference(Project project) {
         project.getLogger().debug(MAIN, "Triggering Nyx inference for the project...");
-        try {
-            Task inferTask = project.getTasks().getByName(InferTask.NAME);
-            for (Action<? super Task> action: inferTask.getActions()) {
-                action.execute(inferTask);
-            }
+
+        Task inferTask = project.getTasks().getByName(InferTask.NAME);
+        for (Action<? super Task> action: inferTask.getActions()) {
+            action.execute(inferTask);
         }
-        catch (Exception e) {
-            project.getLogger().error(MAIN, "Nyx failed to infer in the early project stage and some property like the project version will not be available until you succesfully run the nyxInfer task. Failure is due to: {}", e.getMessage());
-            project.getLogger().debug(MAIN, "Nyx failed to infer due to", e);
-        }
+
         project.getLogger().debug(MAIN, "Nyx inference complete");
     }
 }
