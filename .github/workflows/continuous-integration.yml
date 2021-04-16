@@ -49,7 +49,7 @@ jobs:
     - name: Archive Nyx state file
       uses: actions/upload-artifact@v2
       with:
-        name: .nyx-state-assemble-${{ github.job }}.json
+        name: .nyx-state-${{ github.job }}.json
         path: build/.nyx-state.json
     - name: Archive Jar
       uses: actions/upload-artifact@v2
@@ -88,7 +88,7 @@ jobs:
     - name: Archive Nyx state file
       uses: actions/upload-artifact@v2
       with:
-        name: .nyx-state-assemble-${{ github.job }}.json
+        name: .nyx-state-${{ github.job }}.json
         path: build/.nyx-state.json
   
   check:
@@ -126,15 +126,15 @@ jobs:
     - name: Archive Nyx state file
       uses: actions/upload-artifact@v2
       with:
-        name: .nyx-state-assemble-${{ github.job }}.json
+        name: .nyx-state-${{ github.job }}.json
         path: build/.nyx-state.json
     - name: Archive Test Outputs
       uses: actions/upload-artifact@v2
       with:
         name: test-reports
         path: |
-          '**/build/reports/'
-          '**/build/test-results/'
+          **/build/reports/
+          **/build/test-results/
 
   build:
     needs: [assemble,check]
@@ -167,7 +167,7 @@ jobs:
     - name: Archive Nyx state file
       uses: actions/upload-artifact@v2
       with:
-        name: .nyx-state-assemble-${{ github.job }}.json
+        name: .nyx-state-${{ github.job }}.json
         path: build/.nyx-state.json
     - name: Archive Javadoc
       uses: actions/upload-artifact@v2
@@ -216,7 +216,7 @@ jobs:
       - name: Archive Nyx state file
         uses: actions/upload-artifact@v2
         with:
-          name: .nyx-state-assemble-${{ github.job }}.json
+          name: .nyx-state-${{ github.job }}.json
           path: build/.nyx-state.json
 
   release:
@@ -254,5 +254,5 @@ jobs:
       - name: Archive Nyx state file
         uses: actions/upload-artifact@v2
         with:
-          name: .nyx-state-assemble-${{ github.job }}.json
+          name: .nyx-state-${{ github.job }}.json
           path: build/.nyx-state.json
