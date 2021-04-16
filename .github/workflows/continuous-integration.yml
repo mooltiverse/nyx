@@ -46,6 +46,16 @@ jobs:
       run: chmod +x gradlew
     - name: Assemble with Gradle
       run: ./gradlew assemble --stacktrace
+    - name: Archive Nyx state file
+      uses: actions/upload-artifact@v2
+      with:
+        name: .nyx-state-assemble-${{ github.job }}.json
+        path: build/.nyx-state.json
+    - name: Archive Jar
+      uses: actions/upload-artifact@v2
+      with:
+        name: jar
+        path: '**/build/libs/'
 
   test:
     needs: assemble
@@ -75,6 +85,11 @@ jobs:
       run: chmod +x gradlew
     - name: Test with Gradle
       run: ./gradlew test --stacktrace
+    - name: Archive Nyx state file
+      uses: actions/upload-artifact@v2
+      with:
+        name: .nyx-state-assemble-${{ github.job }}.json
+        path: build/.nyx-state.json
   
   check:
     needs: test
@@ -108,6 +123,18 @@ jobs:
           ORG_GRADLE_PROJECT_gitHubTestUserToken: ${{ secrets.TEST_GITHUB_USER_TOKEN }}   # The test user token to test Nyx GitHub features
           ORG_GRADLE_PROJECT_gitLabTestUserToken: ${{ secrets.TEST_GITLAB_USER_TOKEN }}   # The test user token to test Nyx GitLab features
       run: ./gradlew check --stacktrace
+    - name: Archive Nyx state file
+      uses: actions/upload-artifact@v2
+      with:
+        name: .nyx-state-assemble-${{ github.job }}.json
+        path: build/.nyx-state.json
+    - name: Archive Test Outputs
+      uses: actions/upload-artifact@v2
+      with:
+        name: test-reports
+        path: |
+          '**/build/reports/'
+          '**/build/test-results/'
 
   build:
     needs: [assemble,check]
@@ -137,6 +164,16 @@ jobs:
       run: chmod +x gradlew
     - name: Build with Gradle
       run: ./gradlew build --stacktrace
+    - name: Archive Nyx state file
+      uses: actions/upload-artifact@v2
+      with:
+        name: .nyx-state-assemble-${{ github.job }}.json
+        path: build/.nyx-state.json
+    - name: Archive Javadoc
+      uses: actions/upload-artifact@v2
+      with:
+        name: javadoc
+        path: '**/build/docs/javadoc/'
 
   publish:
     needs: build
@@ -176,6 +213,11 @@ jobs:
           ORG_GRADLE_PROJECT_gradlePublishKey: ${{ secrets.GRADLE_PLUGIN_PUBLISH_KEY }}
           ORG_GRADLE_PROJECT_gradlePublishSecret: ${{ secrets.GRADLE_PLUGIN_PUBLISH_SECRET }}
         run: ./gradlew publish --stacktrace
+      - name: Archive Nyx state file
+        uses: actions/upload-artifact@v2
+        with:
+          name: .nyx-state-assemble-${{ github.job }}.json
+          path: build/.nyx-state.json
 
   release:
     needs: publish
@@ -209,3 +251,8 @@ jobs:
           ORG_GRADLE_PROJECT_gitHubUser: ${{ secrets.GITHUB_USERNAME }}
           ORG_GRADLE_PROJECT_gitHubToken: ${{ secrets.GITHUB_TOKEN }}
         run: ./gradlew release --debug --stacktrace
+      - name: Archive Nyx state file
+        uses: actions/upload-artifact@v2
+        with:
+          name: .nyx-state-assemble-${{ github.job }}.json
+          path: build/.nyx-state.json
