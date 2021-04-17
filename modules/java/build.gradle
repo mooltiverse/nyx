@@ -484,3 +484,5 @@ tasks.publishToSonatype.finalizedBy tasks.closeAndReleaseRepository
 // task, which in turn has dependencies to the other tasks that are functional
 // to the publication.
 tasks.publish.dependsOn tasks.publishToSonatype
+// Tag the release before publishing
+tasks.publishToSonatype.dependsOn rootProject.tasks.nyxMark
