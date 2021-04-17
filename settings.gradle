@@ -26,7 +26,7 @@ include 'modules:java:gradle'
   Extension configurations
 ------------------------------------------------------------------------------*/
 nyx {
-  bump          = 'alpha'   // for the time being just bump the 'alpha' pre-release identifier, until we can inspect commit messages
+  bump          = 'alpha' // for the time being just bump the 'alpha' pre-release identifier, until we can inspect commit messages
   stateFile     = file('build/.nyx-state.json')
   commitMessageConventions {
     enabled = ['conventionalCommits']
