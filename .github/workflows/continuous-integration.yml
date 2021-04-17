@@ -55,7 +55,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: jar
-        path: '**/build/libs/''
+        path: '**/build/libs/'
 
   test:
     needs: assemble
