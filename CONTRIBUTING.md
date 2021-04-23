@@ -162,7 +162,9 @@ The `publish` and `release` tasks can only be executed on the CI/CD platform.
 
 The documentation is under the `docs` directory and uses [GitHub Pages](https://help.github.com/en/github/working-with-github-pages/about-github-pages) for rendering. The documentation is a micro site written in [Markdown](https://en.wikipedia.org/wiki/Markdown) files and rendered using [Jekyll](https://jekyllrb.com/), the static web site generator supported by GitHub pages out of the box, along with the [Minimal Mistakes](https://mmistakes.github.io/minimal-mistakes/) theme. The site is available at [https://mooltiverse.github.io/nyx/](https://mooltiverse.github.io/nyx/).
 
-The regular content files are in the `docs/_pages` directory while the examples, f.a.q. and other post sources are in `docs/_posts`. The [navigation](https://mmistakes.github.io/minimal-mistakes/docs/navigation/) is modelled in the `docs/_data/navigation.yml` file and it defines the navigation items you see on top of the site and the [sidebar](https://mmistakes.github.io/minimal-mistakes/docs/layouts/#custom-sidebar-navigation-menu).
+The regular content files are in the `docs/_pages` directory while the examples, F.A.Qq. and other post sources are in `docs/_posts`. The [navigation](https://mmistakes.github.io/minimal-mistakes/docs/navigation/) is modelled in the `docs/_data/navigation.yml` file and it defines the navigation items you see on top of the site and the [sidebar](https://mmistakes.github.io/minimal-mistakes/docs/layouts/#custom-sidebar-navigation-menu).
+
+Images are in `docs/assets` and vector graphics (`.svg`) are preferred over other formats. Diagrams and charts have been edited with [Lucid tools](https://lucid.app/) (*Lucidspark* and *Lucidchart*).
 
 When authoring content make sure that:
 

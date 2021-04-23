@@ -240,7 +240,7 @@ These branches are to be treated differently as we already introduced with [*rel
 
 While the common practice is to have just one [*mainline*](#mainline) to store the primary, [*healthy*](https://martinfowler.com/articles/branching-patterns.html#healthy-branch) version of the project code, some others need multiple ones, like when using [*flavor branches*](#flavor-branches).
 
-This is an *edge* case and requires several customizations in the project organization and process also because it implies that official releases are issued from multiple branches, with implications in the coherence of version numbers and tags etc.
+This is an *edge* case and requires several customizations in the project organization and process also because it implies that official releases are issued from multiple branches, with implications in the coherence of version numbers and tags etc. See [this example]({{site.baseurl}}{% link _posts/2020-01-01-git-history-examples.md %}#regular-branches) for a taste of how easy is to incur into version conflicts with this strategy.
 
 For the sake of simplicity you should avoid having multiple *mainlines* and this can usually be achieved by using configuration flags, [feature toggles](https://en.wikipedia.org/wiki/Feature_toggle), build process ramifications, pre-processor conditionals etc. However, when you have no other chance, you probably should consider:
 
@@ -248,6 +248,7 @@ For the sake of simplicity you should avoid having multiple *mainlines* and this
 * use coherent names for your multiple mainline branches, like `master/X`, `master/Y` or `main-X`, `main-Y`
 * have a precise merge strategy that lets you merge the right code changes into the proper *mainlines*
 * avoid drifts among the mainlines as much as possible, for example by having one common *mainline* from which others merge down periodically and limit specific merges to single changes into the multiple *mainlines*
+* configure additional mainlines not to be released
 
 ## Your custom branching model
 
