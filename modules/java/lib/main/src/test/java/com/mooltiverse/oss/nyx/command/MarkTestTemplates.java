@@ -169,17 +169,18 @@ public class MarkTestTemplates {
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
             if (command.getContextName().equals("standalone")) {
                 assertNull(command.state().getVersion());
+                assertNull(command.state().getReleaseScope().getPreviousVersion());
                 assertNull(command.state().getReleaseScope().getInitialCommit());
                 assertNull(command.state().getReleaseScope().getFinalCommit());
                 assertNull(command.state().getReleaseScope().getSignificant());
             }
             else {
                 assertEquals(Defaults.INITIAL_VERSION.toString(), command.state().getVersion());
+                assertEquals(Defaults.INITIAL_VERSION, command.state().getReleaseScope().getPreviousVersion());
                 assertEquals(script.getWorkbenchCommits().get(0), command.state().getReleaseScope().getInitialCommit());
                 assertEquals(previousLastCommit, command.state().getReleaseScope().getFinalCommit());
                 assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
             }
-            assertNull(command.state().getReleaseScope().getPreviousVersion());
             assertNull(command.state().getReleaseScope().getPreviousVersionCommit());
             assertEquals(previousTags.size(), script.getTags().size());
         }
@@ -205,17 +206,18 @@ public class MarkTestTemplates {
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
             if (command.getContextName().equals("standalone")) {
                 assertNull(command.state().getVersion());
+                assertNull(command.state().getReleaseScope().getPreviousVersion());
                 assertNull(command.state().getReleaseScope().getInitialCommit());
                 assertNull(command.state().getReleaseScope().getFinalCommit());
                 assertNull(command.state().getReleaseScope().getSignificant());
             }
             else {
-                assertEquals(configurationMock.initialVersion.toString(), command.state().getVersion());
+                assertEquals(configurationMock.initialVersion, command.state().getVersion());
+                assertEquals(configurationMock.initialVersion, command.state().getReleaseScope().getPreviousVersion());
                 assertEquals(script.getWorkbenchCommits().get(0), command.state().getReleaseScope().getInitialCommit());
                 assertEquals(previousLastCommit, command.state().getReleaseScope().getFinalCommit());
                 assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
             }
-            assertNull(command.state().getReleaseScope().getPreviousVersion());
             assertNull(command.state().getReleaseScope().getPreviousVersionCommit());
             assertEquals(previousLastCommit, script.getLastCommit().getId().getName());
             assertEquals(previousTags.size(), script.getTags().size());
@@ -256,9 +258,161 @@ public class MarkTestTemplates {
         }
 
         @TestTemplate
-        @DisplayName("Mark.run() with bump=major override in a just initialized Git repository")
-        @Baseline(Scenario.INITIAL_VERSION)
+        @DisplayName("Mark.run() with bump=major override in a Git repository with just one initial version commit")
+        @Baseline(Scenario.INITIAL_COMMIT)
         void runWithBumpMajorOverriddenByUserInJustInitializedRepoTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script, @Baseline(Scenario.FROM_SCRATCH) Script remoteScript)
+            throws Exception {
+            script.addRemote(remoteScript.getGitDirectory(), "origin");
+            String previousLastCommit = script.getLastCommit().getId().getName();
+            Map<String,String> previousTags = script.getTags();
+            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
+
+            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
+            configurationMock.bump = "major";
+            command.run();
+
+            assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
+            // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
+            if (command.getContextName().equals("standalone")) {
+                assertNull(command.state().getBump());
+                assertNull(command.state().getVersion());
+                assertNull(command.state().getReleaseScope().getPreviousVersion());
+                assertNull(command.state().getReleaseScope().getPreviousVersionCommit());
+                assertNull(command.state().getReleaseScope().getInitialCommit());
+                assertNull(command.state().getReleaseScope().getFinalCommit());
+                assertNull(command.state().getReleaseScope().getSignificant());
+            }
+            else {
+                assertEquals(configurationMock.bump, command.state().getBump());
+                assertEquals("1.0.0", command.state().getVersion());
+                assertEquals(Defaults.INITIAL_VERSION, command.state().getReleaseScope().getPreviousVersion());
+                assertEquals(script.getCommitByTag("0.1.0"), command.state().getReleaseScope().getPreviousVersionCommit());
+                assertEquals(script.getLastCommit().getName(), command.state().getReleaseScope().getInitialCommit());
+                assertEquals(script.getLastCommit().getName(), command.state().getReleaseScope().getFinalCommit());
+                assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
+            }
+            assertEquals(previousLastCommit, script.getLastCommit().getId().getName());
+            assertEquals(previousTags.size(), script.getTags().size());
+        }
+
+        @TestTemplate
+        @DisplayName("Mark.run() with bump=minor override in a Git repository with just one initial version commit")
+        @Baseline(Scenario.INITIAL_COMMIT)
+        void runWithBumpMinorOverriddenByUserInJustInitializedRepoTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script, @Baseline(Scenario.FROM_SCRATCH) Script remoteScript)
+            throws Exception {
+            script.addRemote(remoteScript.getGitDirectory(), "origin");
+            String previousLastCommit = script.getLastCommit().getId().getName();
+            Map<String,String> previousTags = script.getTags();
+            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
+
+            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
+            configurationMock.bump = "minor";
+            command.run();
+
+            assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
+            // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
+            if (command.getContextName().equals("standalone")) {
+                assertNull(command.state().getBump());
+                assertNull(command.state().getVersion());
+                assertNull(command.state().getReleaseScope().getPreviousVersion());
+                assertNull(command.state().getReleaseScope().getPreviousVersionCommit());
+                assertNull(command.state().getReleaseScope().getInitialCommit());
+                assertNull(command.state().getReleaseScope().getFinalCommit());
+                assertNull(command.state().getReleaseScope().getSignificant());
+            }
+            else {
+                assertEquals(configurationMock.bump, command.state().getBump());
+                assertEquals("0.2.0", command.state().getVersion());
+                assertEquals(Defaults.INITIAL_VERSION, command.state().getReleaseScope().getPreviousVersion());
+                assertEquals(script.getCommitByTag("0.1.0"), command.state().getReleaseScope().getPreviousVersionCommit());
+                assertEquals(script.getLastCommit().getName(), command.state().getReleaseScope().getInitialCommit());
+                assertEquals(script.getLastCommit().getName(), command.state().getReleaseScope().getFinalCommit());
+                assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
+            }
+            assertEquals(previousLastCommit, script.getLastCommit().getId().getName());
+            assertEquals(previousTags.size(), script.getTags().size());
+        }
+
+        @TestTemplate
+        @DisplayName("Mark.run() with bump=patch override in a Git repository with just one initial version commit")
+        @Baseline(Scenario.INITIAL_COMMIT)
+        void runWithBumpPatchOverriddenByUserInJustInitializedRepoTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script, @Baseline(Scenario.FROM_SCRATCH) Script remoteScript)
+            throws Exception {
+            script.addRemote(remoteScript.getGitDirectory(), "origin");
+            String previousLastCommit = script.getLastCommit().getId().getName();
+            Map<String,String> previousTags = script.getTags();
+            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
+
+            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
+            configurationMock.bump = "patch";
+            command.run();
+
+            assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
+            // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
+            if (command.getContextName().equals("standalone")) {
+                assertNull(command.state().getBump());
+                assertNull(command.state().getVersion());
+                assertNull(command.state().getReleaseScope().getPreviousVersion());
+                assertNull(command.state().getReleaseScope().getPreviousVersionCommit());
+                assertNull(command.state().getReleaseScope().getInitialCommit());
+                assertNull(command.state().getReleaseScope().getFinalCommit());
+                assertNull(command.state().getReleaseScope().getSignificant());
+            }
+            else {
+                assertEquals(configurationMock.bump, command.state().getBump());
+                assertEquals("0.1.1", command.state().getVersion());
+                assertEquals(Defaults.INITIAL_VERSION, command.state().getReleaseScope().getPreviousVersion());
+                assertEquals(script.getCommitByTag("0.1.0"), command.state().getReleaseScope().getPreviousVersionCommit());
+                assertEquals(script.getLastCommit().getName(), command.state().getReleaseScope().getInitialCommit());
+                assertEquals(script.getLastCommit().getName(), command.state().getReleaseScope().getFinalCommit());
+                assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
+            }
+            assertEquals(previousLastCommit, script.getLastCommit().getId().getName());
+            assertEquals(previousTags.size(), script.getTags().size());
+        }
+
+        @TestTemplate
+        @DisplayName("Mark.run() with bump=alpha override in a Git repository with just one initial version commit")
+        @Baseline(Scenario.INITIAL_COMMIT)
+        void runWithBumpAlphaOverriddenByUserInJustInitializedRepoTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script, @Baseline(Scenario.FROM_SCRATCH) Script remoteScript)
+            throws Exception {
+            script.addRemote(remoteScript.getGitDirectory(), "origin");
+            String previousLastCommit = script.getLastCommit().getId().getName();
+            Map<String,String> previousTags = script.getTags();
+            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
+
+            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
+            configurationMock.bump = "alpha";
+            command.run();
+
+            assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
+            // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
+            if (command.getContextName().equals("standalone")) {
+                assertNull(command.state().getBump());
+                assertNull(command.state().getVersion());
+                assertNull(command.state().getReleaseScope().getPreviousVersion());
+                assertNull(command.state().getReleaseScope().getPreviousVersionCommit());
+                assertNull(command.state().getReleaseScope().getInitialCommit());
+                assertNull(command.state().getReleaseScope().getFinalCommit());
+                assertNull(command.state().getReleaseScope().getSignificant());
+            }
+            else {
+                assertEquals(configurationMock.bump, command.state().getBump());
+                assertEquals("0.1.0-alpha.1", command.state().getVersion());
+                assertEquals(Defaults.INITIAL_VERSION, command.state().getReleaseScope().getPreviousVersion());
+                assertEquals(script.getCommitByTag("0.1.0"), command.state().getReleaseScope().getPreviousVersionCommit());
+                assertEquals(script.getLastCommit().getName(), command.state().getReleaseScope().getInitialCommit());
+                assertEquals(script.getLastCommit().getName(), command.state().getReleaseScope().getFinalCommit());
+                assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
+            }
+            assertEquals(previousLastCommit, script.getLastCommit().getId().getName());
+            assertEquals(previousTags.size(), script.getTags().size());
+        }
+
+        @TestTemplate
+        @DisplayName("Mark.run() with bump=major override in a Git repository with just one initial version commit")
+        @Baseline(Scenario.INITIAL_VERSION)
+        void runWithBumpMajorOverriddenByUserInRepoWithJustOneInitialVersionCommitTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script, @Baseline(Scenario.FROM_SCRATCH) Script remoteScript)
             throws Exception {
             script.addRemote(remoteScript.getGitDirectory(), "origin");
             String previousLastCommit = script.getLastCommit().getId().getName();
@@ -281,7 +435,7 @@ public class MarkTestTemplates {
             else {
                 assertEquals(configurationMock.bump, command.state().getBump());
                 assertEquals("1.0.0", command.state().getVersion());
-                assertEquals("0.1.0", command.state().getReleaseScope().getPreviousVersion().toString());
+                assertEquals(Defaults.INITIAL_VERSION, command.state().getReleaseScope().getPreviousVersion());
                 assertEquals(script.getCommitByTag("0.1.0"), command.state().getReleaseScope().getPreviousVersionCommit());
                 assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
             }
@@ -292,9 +446,9 @@ public class MarkTestTemplates {
         }
 
         @TestTemplate
-        @DisplayName("Mark.run() with bump=minor override in a just initialized Git repository")
+        @DisplayName("Mark.run() with bump=minor override in a Git repository with just one initial version commit")
         @Baseline(Scenario.INITIAL_VERSION)
-        void runWithBumpMinorOverriddenByUserInJustInitializedRepoTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script, @Baseline(Scenario.FROM_SCRATCH) Script remoteScript)
+        void runWithBumpMinorOverriddenByUserInRepoWithJustOneInitialVersionCommitTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script, @Baseline(Scenario.FROM_SCRATCH) Script remoteScript)
             throws Exception {
             script.addRemote(remoteScript.getGitDirectory(), "origin");
             String previousLastCommit = script.getLastCommit().getId().getName();
@@ -317,7 +471,7 @@ public class MarkTestTemplates {
             else {
                 assertEquals(configurationMock.bump, command.state().getBump());
                 assertEquals("0.2.0", command.state().getVersion());
-                assertEquals("0.1.0", command.state().getReleaseScope().getPreviousVersion().toString());
+                assertEquals(Defaults.INITIAL_VERSION, command.state().getReleaseScope().getPreviousVersion());
                 assertEquals(script.getCommitByTag("0.1.0"), command.state().getReleaseScope().getPreviousVersionCommit());
                 assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
             }
@@ -328,9 +482,9 @@ public class MarkTestTemplates {
         }
 
         @TestTemplate
-        @DisplayName("Mark.run() with bump=patch override in a just initialized Git repository")
+        @DisplayName("Mark.run() with bump=patch override in a Git repository with just one initial version commit")
         @Baseline(Scenario.INITIAL_VERSION)
-        void runWithBumpPatchOverriddenByUserInJustInitializedRepoTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script, @Baseline(Scenario.FROM_SCRATCH) Script remoteScript)
+        void runWithBumpPatchOverriddenByUserInRepoWithJustOneInitialVersionCommitTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script, @Baseline(Scenario.FROM_SCRATCH) Script remoteScript)
             throws Exception {
             script.addRemote(remoteScript.getGitDirectory(), "origin");
             String previousLastCommit = script.getLastCommit().getId().getName();
@@ -353,7 +507,7 @@ public class MarkTestTemplates {
             else {
                 assertEquals(configurationMock.bump, command.state().getBump());
                 assertEquals("0.1.1", command.state().getVersion());
-                assertEquals("0.1.0", command.state().getReleaseScope().getPreviousVersion().toString());
+                assertEquals(Defaults.INITIAL_VERSION, command.state().getReleaseScope().getPreviousVersion());
                 assertEquals(script.getCommitByTag("0.1.0"), command.state().getReleaseScope().getPreviousVersionCommit());
                 assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
             }
@@ -364,9 +518,9 @@ public class MarkTestTemplates {
         }
 
         @TestTemplate
-        @DisplayName("Mark.run() with bump=alpha override in a just initialized Git repository")
+        @DisplayName("Mark.run() with bump=alpha override in a Git repository with just one initial version commit")
         @Baseline(Scenario.INITIAL_VERSION)
-        void runWithBumpAlphaOverriddenByUserInJustInitializedRepoTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script, @Baseline(Scenario.FROM_SCRATCH) Script remoteScript)
+        void runWithBumpAlphaOverriddenByUserInRepoWithJustOneInitialVersionCommitTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script, @Baseline(Scenario.FROM_SCRATCH) Script remoteScript)
             throws Exception {
             script.addRemote(remoteScript.getGitDirectory(), "origin");
             String previousLastCommit = script.getLastCommit().getId().getName();
@@ -389,7 +543,7 @@ public class MarkTestTemplates {
             else {
                 assertEquals(configurationMock.bump, command.state().getBump());
                 assertEquals("0.1.0-alpha.1", command.state().getVersion());
-                assertEquals("0.1.0", command.state().getReleaseScope().getPreviousVersion().toString());
+                assertEquals(Defaults.INITIAL_VERSION, command.state().getReleaseScope().getPreviousVersion());
                 assertEquals(script.getCommitByTag("0.1.0"), command.state().getReleaseScope().getPreviousVersionCommit());
                 assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
             }
@@ -400,9 +554,9 @@ public class MarkTestTemplates {
         }
 
         @TestTemplate
-        @DisplayName("Mark.run() with lenient release in a just initialized Git repository")
+        @DisplayName("Mark.run() with lenient release in a Git repository with just one initial version commit")
         @Baseline(Scenario.INITIAL_VERSION)
-        void runWithLenientReleaseInJustInitializedRepoTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script, @Baseline(Scenario.FROM_SCRATCH) Script remoteScript)
+        void runWithLenientReleaseInRepoWithJustOneInitialVersionCommitTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script, @Baseline(Scenario.FROM_SCRATCH) Script remoteScript)
             throws Exception {
             script.addRemote(remoteScript.getGitDirectory(), "origin");
             String previousLastCommit = script.getLastCommit().getId().getName();
@@ -427,7 +581,7 @@ public class MarkTestTemplates {
             else {
                 assertEquals(configurationMock.bump, command.state().getBump());
                 assertEquals("2.2.2", command.state().getVersion());
-                assertEquals("2.2.2", command.state().getReleaseScope().getPreviousVersion().toString());
+                assertEquals("2.2.2", command.state().getReleaseScope().getPreviousVersion());
                 assertEquals(script.getCommitByTag("release-2.2.2"), command.state().getReleaseScope().getPreviousVersionCommit());
                 assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
             }
@@ -438,9 +592,9 @@ public class MarkTestTemplates {
         }
 
         @TestTemplate
-        @DisplayName("Mark.run() without lenient release in a just initialized Git repository")
+        @DisplayName("Mark.run() without lenient release in a Git repository with just one initial version commit")
         @Baseline(Scenario.INITIAL_VERSION)
-        void runWithoutLenientReleaseInJustInitializedRepoTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script, @Baseline(Scenario.FROM_SCRATCH) Script remoteScript)
+        void runWithoutLenientReleaseInRepoWithJustOneInitialVersionCommitTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script, @Baseline(Scenario.FROM_SCRATCH) Script remoteScript)
             throws Exception {
             script.addRemote(remoteScript.getGitDirectory(), "origin");
             String previousLastCommit = script.getLastCommit().getId().getName();
@@ -458,19 +612,19 @@ public class MarkTestTemplates {
             if (command.getContextName().equals("standalone")) {
                 assertNull(command.state().getBump());
                 assertNull(command.state().getVersion());
+                assertNull(command.state().getReleaseScope().getPreviousVersion());
                 assertNull(command.state().getReleaseScope().getInitialCommit());
                 assertNull(command.state().getReleaseScope().getFinalCommit());
-                assertNull(command.state().getReleaseScope().getPreviousVersion());
                 assertNull(command.state().getReleaseScope().getPreviousVersionCommit());
                 assertNull(command.state().getReleaseScope().getSignificant());
             }
             else {
                 assertEquals(configurationMock.bump, command.state().getBump());
                 assertEquals("0.1.0", command.state().getVersion());
+                assertEquals(Defaults.INITIAL_VERSION, command.state().getReleaseScope().getPreviousVersion());
                 assertEquals(script.getCommitByTag("release-2.2.2"), command.state().getReleaseScope().getInitialCommit());
                 assertNotNull(command.state().getReleaseScope().getFinalCommit());
                 assertNotEquals(previousLastCommit, command.state().getReleaseScope().getFinalCommit());
-                assertEquals("0.1.0", command.state().getReleaseScope().getPreviousVersion().toString());
                 assertEquals(script.getCommitByTag("0.1.0"), command.state().getReleaseScope().getPreviousVersionCommit());
                 assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
             }
@@ -479,9 +633,9 @@ public class MarkTestTemplates {
         }
 
         @TestTemplate
-        @DisplayName("Mark.run() without lenient release and with release prefix in a just initialized Git repository")
+        @DisplayName("Mark.run() without lenient release and with release prefix in a Git repository with just one initial version commit")
         @Baseline(Scenario.INITIAL_VERSION)
-        void runWithoutLenientAndWithPrefixReleaseInJustInitializedRepoTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script, @Baseline(Scenario.FROM_SCRATCH) Script remoteScript)
+        void runWithoutLenientAndWithPrefixReleaseInRepoWithJustOneInitialVersionCommitTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script, @Baseline(Scenario.FROM_SCRATCH) Script remoteScript)
             throws Exception {
             script.addRemote(remoteScript.getGitDirectory(), "origin");
             String previousLastCommit = script.getLastCommit().getId().getName();
@@ -507,7 +661,7 @@ public class MarkTestTemplates {
             else {
                 assertEquals(configurationMock.bump, command.state().getBump());
                 assertEquals("release-2.2.2", command.state().getVersion());
-                assertEquals("2.2.2", command.state().getReleaseScope().getPreviousVersion().toString());
+                assertEquals("2.2.2", command.state().getReleaseScope().getPreviousVersion());
                 assertEquals(script.getCommitByTag("release-2.2.2"), command.state().getReleaseScope().getPreviousVersionCommit());
                 assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
             }
@@ -518,9 +672,9 @@ public class MarkTestTemplates {
         }
 
         @TestTemplate
-        @DisplayName("Mark.run() without lenient release and without release prefix in a just initialized Git repository")
+        @DisplayName("Mark.run() without lenient release and without release prefix in a Git repository with just one initial version commit")
         @Baseline(Scenario.INITIAL_VERSION)
-        void runWithoutLenientAndWithoutPrefixReleaseInJustInitializedRepoTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script, @Baseline(Scenario.FROM_SCRATCH) Script remoteScript)
+        void runWithoutLenientAndWithoutPrefixReleaseInRepoWithJustOneInitialVersionCommitTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script, @Baseline(Scenario.FROM_SCRATCH) Script remoteScript)
             throws Exception {
             script.addRemote(remoteScript.getGitDirectory(), "origin");
             String previousLastCommit = script.getLastCommit().getId().getName();
@@ -539,18 +693,18 @@ public class MarkTestTemplates {
             if (command.getContextName().equals("standalone")) {
                 assertNull(command.state().getBump());
                 assertNull(command.state().getVersion());
+                assertNull(command.state().getReleaseScope().getPreviousVersion());
                 assertNull(command.state().getReleaseScope().getInitialCommit());
                 assertNull(command.state().getReleaseScope().getFinalCommit());
-                assertNull(command.state().getReleaseScope().getPreviousVersion());
                 assertNull(command.state().getReleaseScope().getPreviousVersionCommit());
                 assertNull(command.state().getReleaseScope().getSignificant());
             }
             else {
                 assertEquals(configurationMock.bump, command.state().getBump());
                 assertEquals("0.1.0", command.state().getVersion());
+                assertEquals(Defaults.INITIAL_VERSION, command.state().getReleaseScope().getPreviousVersion());
                 assertEquals(script.getCommitByTag("release-2.2.2"), command.state().getReleaseScope().getInitialCommit());
                 assertNotNull(command.state().getReleaseScope().getFinalCommit());
-                assertEquals("0.1.0", command.state().getReleaseScope().getPreviousVersion().toString());
                 assertEquals(script.getCommitByTag("0.1.0"), command.state().getReleaseScope().getPreviousVersionCommit());
                 assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
             }
@@ -584,7 +738,7 @@ public class MarkTestTemplates {
                 assertEquals("0.0.4", command.state().getVersion());
                 assertEquals(script.getWorkbenchCommits().get(script.getWorkbenchCommits().size()-2), command.state().getReleaseScope().getInitialCommit());
                 assertEquals(previousLastCommit, command.state().getReleaseScope().getFinalCommit());
-                assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion().toString());
+                assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion());
                 assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit());
                 assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
             }
@@ -618,7 +772,7 @@ public class MarkTestTemplates {
                 assertEquals("0.0.4", command.state().getVersion());
                 assertEquals(script.getWorkbenchCommits().get(script.getWorkbenchCommits().size()-2), command.state().getReleaseScope().getInitialCommit());
                 assertEquals(previousLastCommit, command.state().getReleaseScope().getFinalCommit());
-                assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion().toString());
+                assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion());
                 assertEquals(script.getWorkbenchCommits().get(script.getWorkbenchCommits().size()-3), command.state().getReleaseScope().getPreviousVersionCommit());
                 assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
             }
@@ -657,7 +811,7 @@ public class MarkTestTemplates {
                 assertEquals("0.0.4", command.state().getVersion());
                 assertEquals(script.getWorkbenchCommits().get(script.getWorkbenchCommits().size()-2), command.state().getReleaseScope().getInitialCommit());
                 assertEquals(previousLastCommit, command.state().getReleaseScope().getFinalCommit());
-                assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion().toString());
+                assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion());
                 assertEquals(script.getWorkbenchCommits().get(script.getWorkbenchCommits().size()-3), command.state().getReleaseScope().getPreviousVersionCommit());
                 assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
             }
@@ -733,7 +887,7 @@ public class MarkTestTemplates {
                 assertEquals("1.0.0", command.state().getVersion());
                 assertEquals(script.getWorkbenchCommits().get(script.getWorkbenchCommits().size()-2), command.state().getReleaseScope().getInitialCommit());
                 assertEquals(script.getLastCommit().getId().getName(), command.state().getReleaseScope().getFinalCommit());
-                assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion().toString());
+                assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion());
                 assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit());
                 assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
                 assertEquals(previousTags.size(), script.getTags().size());
@@ -777,7 +931,7 @@ public class MarkTestTemplates {
                 assertEquals("0.1.0", command.state().getVersion());
                 assertEquals(script.getWorkbenchCommits().get(script.getWorkbenchCommits().size()-2), command.state().getReleaseScope().getInitialCommit());
                 assertEquals(script.getLastCommit().getId().getName(), command.state().getReleaseScope().getFinalCommit());
-                assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion().toString());
+                assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion());
                 assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit());
                 assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
                 assertEquals(previousTags.size(), script.getTags().size());
@@ -821,7 +975,7 @@ public class MarkTestTemplates {
                 assertEquals("0.0.5", command.state().getVersion());
                 assertEquals(script.getWorkbenchCommits().get(script.getWorkbenchCommits().size()-2), command.state().getReleaseScope().getInitialCommit());
                 assertEquals(script.getLastCommit().getId().getName(), command.state().getReleaseScope().getFinalCommit());
-                assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion().toString());
+                assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion());
                 assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit());
                 assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
                 assertEquals(previousTags.size(), script.getTags().size());
@@ -865,7 +1019,7 @@ public class MarkTestTemplates {
                 assertEquals("0.0.4-alpha.1", command.state().getVersion());
                 assertEquals(script.getWorkbenchCommits().get(script.getWorkbenchCommits().size()-2), command.state().getReleaseScope().getInitialCommit());
                 assertEquals(script.getLastCommit().getId().getName(), command.state().getReleaseScope().getFinalCommit());
-                assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion().toString());
+                assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion());
                 assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit());
                 assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
                 assertEquals(previousTags.size(), script.getTags().size());
@@ -903,7 +1057,7 @@ public class MarkTestTemplates {
             else {
                 assertEquals(configurationMock.bump, command.state().getBump());
                 assertEquals("2.2.2", command.state().getVersion());
-                assertEquals("2.2.2", command.state().getReleaseScope().getPreviousVersion().toString());
+                assertEquals("2.2.2", command.state().getReleaseScope().getPreviousVersion());
                 assertEquals(script.getCommitByTag("release-2.2.2"), command.state().getReleaseScope().getPreviousVersionCommit());
                 assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
             }
@@ -948,7 +1102,7 @@ public class MarkTestTemplates {
                 assertEquals(script.getWorkbenchCommits().get(script.getWorkbenchCommits().size()-3), command.state().getReleaseScope().getInitialCommit());
                 assertNotNull(command.state().getReleaseScope().getFinalCommit());
                 assertNotEquals(previousLastCommit, command.state().getReleaseScope().getFinalCommit());
-                assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion().toString());
+                assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion());
                 assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit());
                 assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
             }
@@ -987,7 +1141,7 @@ public class MarkTestTemplates {
             else {
                 assertEquals(configurationMock.bump, command.state().getBump());
                 assertEquals("release-2.2.2", command.state().getVersion());
-                assertEquals("2.2.2", command.state().getReleaseScope().getPreviousVersion().toString());
+                assertEquals("2.2.2", command.state().getReleaseScope().getPreviousVersion());
                 assertEquals(script.getCommitByTag("release-2.2.2"), command.state().getReleaseScope().getPreviousVersionCommit());
                 assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
             }
@@ -1032,7 +1186,7 @@ public class MarkTestTemplates {
                 assertEquals("0.0.4", command.state().getVersion());
                 assertEquals(script.getWorkbenchCommits().get(script.getWorkbenchCommits().size()-3), command.state().getReleaseScope().getInitialCommit());
                 assertNotNull(command.state().getReleaseScope().getFinalCommit());
-                assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion().toString());
+                assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion());
                 assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit());
                 assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
             }
@@ -1074,7 +1228,7 @@ public class MarkTestTemplates {
                 assertEquals("0.1.0", command.state().getVersion());
                 assertEquals(script.getWorkbenchCommits().get(script.getWorkbenchCommits().size()-2), command.state().getReleaseScope().getInitialCommit());
                 assertEquals(script.getWorkbenchCommits().get(script.getWorkbenchCommits().size()-1), command.state().getReleaseScope().getFinalCommit());
-                assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion().toString());
+                assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion());
                 assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit());
                 assertEquals(Boolean.TRUE, command.state().getReleaseScope().getSignificant());
                 assertEquals(previousLastCommit, script.getLastCommit().getId().getName());

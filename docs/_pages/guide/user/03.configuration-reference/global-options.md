@@ -92,7 +92,7 @@ The default version to use when no previous version can be [inferred]({{ site.ba
 
 This might be useful for project bootstrapping only (from Nyx's perspective) when the default initial version just doesn't fit your need. Remember that this value will be considered **just once** because after the first release (which *consumes* this option) there will be a previous version in the commit history.
 
-This value is ignored when the [version](#version) option is used.
+This value is ignored when the [version](#version) option is used. See [this example]({{ site.baseurl }}{% link _posts/2020-01-01-git-history-examples.md %}#custom-initial-version) to see how this option can be used.
 
 ### Release lenient
 

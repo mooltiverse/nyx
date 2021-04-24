@@ -159,6 +159,7 @@ public class Infer extends AbstractCommand {
      * <br>
      * Inputs to this task are:<br>
      * - the Git repository and the commit history;<br>
+     * - the configuration;<br>
      * <br>
      * Outputs from this task are all stored in the State object, with more detail:<br>
      * - {@code bump} is the version identifier that was bumped to get the new version; it's undefined if the user
@@ -294,9 +295,9 @@ public class Infer extends AbstractCommand {
                 }
             }
             else {
-                logger.debug(COMMAND, "The commit history had no information about the previousVersion and previousVersionCommit so they will be null");
-                // set them to null in the state to make sure previous runs didn't leave stale values
-                state().getReleaseScope().setPreviousVersion(null);
+                logger.debug(COMMAND, "The commit history had no information about the previousVersion and previousVersionCommit");
+                // use the configured initial version as the previous version
+                state().getReleaseScope().setPreviousVersion(state().getConfiguration().getInitialVersion());
                 state().getReleaseScope().setPreviousVersionCommit(null);
             }
 
@@ -314,23 +315,24 @@ public class Infer extends AbstractCommand {
                 }
             }
 
+            // the previous version has been stored in the state above, otherwise, if none was detected, set it to the default initial version
+            String previousVersionString = state().getReleaseScope().getPreviousVersion();
+            Version previousVersion = null;
+            if (Objects.isNull(previousVersionString)) {
+                previousVersion = releaseLenient ? VersionFactory.valueOf(scheme.getScheme(), state().getConfiguration().getInitialVersion(), releaseLenient) : VersionFactory.valueOf(scheme.getScheme(), state().getConfiguration().getInitialVersion(), releasePrefix);
+                logger.info(COMMAND, "No previous version detected. Using the initial version {}", previousVersion.toString());
+            }
+            else previousVersion = VersionFactory.valueOf(scheme.getScheme(), previousVersionString);
+
             // finally compute the version
-            // the previous version has been stored in the state above
             Version version = null;
-            if (Objects.isNull(state().getReleaseScope().getPreviousVersion())) {
-                version = releaseLenient ? VersionFactory.valueOf(scheme.getScheme(), state().getConfiguration().getInitialVersion(), releaseLenient) : VersionFactory.valueOf(scheme.getScheme(), state().getConfiguration().getInitialVersion(), releasePrefix);
-                logger.info(COMMAND, "No previous version detected. Using the initial version {}", version.toString());
+            if (findings.containsKey(BUMP_COMPONENT)) {
+                logger.info(COMMAND, "Bumping component {} on version {}", findings.get(BUMP_COMPONENT), previousVersion.toString());
+                version = previousVersion.bump(findings.get(BUMP_COMPONENT));
             }
             else {
-                Version previousVersion = releaseLenient ? VersionFactory.valueOf(scheme.getScheme(), state().getReleaseScope().getPreviousVersion(), releaseLenient) : VersionFactory.valueOf(scheme.getScheme(), state().getReleaseScope().getPreviousVersion(), releasePrefix);
-                if (findings.containsKey(BUMP_COMPONENT)) {
-                    logger.info(COMMAND, "Bumping component {} on version {}", findings.get(BUMP_COMPONENT), previousVersion.toString());
-                    version = previousVersion.bump(findings.get(BUMP_COMPONENT));
-                }
-                else {
-                    logger.info(COMMAND, "The release scope does not contain any significant commit, version remains unchanged: {}", previousVersion.toString());
-                    version = previousVersion;
-                }
+                logger.info(COMMAND, "The release scope does not contain any significant commit, version remains unchanged: {}", previousVersion.toString());
+                version = previousVersion;
             }
 
             logger.info(COMMAND, "Inferred version is: {}", version.toString());

@@ -20,7 +20,7 @@ The following attributes are children of the [`releaseScope`]({{ site.baseurl }}
 ### Final commit
 
 | ----------------------------- | ---------------------------------------------------------------------------------------- |
-| Name                          | `releaseScope/finalCommit`                                                             |
+| Name                          | `releaseScope/finalCommit`                                                               |
 | Type                          | string                                                                                   |
 | Related configuration options |                                                                                          |
 | Initialized by task           | [mark]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#mark){: .btn .btn--small} |
@@ -53,7 +53,7 @@ If no [`releaseScope/previousVersion`](#previous-version) is detected this value
 
 The version that was released before the one being created. This is the value of the version tag applied to the [`releaseScope/previousVersionCommit`](#previous-version-commit) and is found by browsing the commit history backward (in Git's natural order) until this tag is found. Upon merge commits only the [first parent]({{ site.baseurl }}{% link _posts/2020-01-01-how-does-nyx-deal-with-merge-commits-when-scanning-the-commit-history.md %}) is considered. The search stops at the first tag that is valid according to the version [`scheme`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#scheme), also considering prefixes, according to [`releaseLenient`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#release-lenient).
 
-This value remains undefined when no previous version can be found or [inference]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer) is skipped because the user overrides the [`version`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#version).
+This value remains undefined when [inference]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer) is skipped because the user overrides the [`version`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#version).
 
 ### Previous version commit
 
