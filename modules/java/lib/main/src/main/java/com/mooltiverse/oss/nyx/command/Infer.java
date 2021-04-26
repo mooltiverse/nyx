@@ -18,7 +18,6 @@ package com.mooltiverse.oss.nyx.command;
 import static com.mooltiverse.oss.nyx.log.Markers.COMMAND;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -85,6 +84,12 @@ public class Infer extends AbstractCommand {
     private static final String CONFIGURED_VERSION = Infer.class.getSimpleName().concat(".").concat("configured").concat(".").concat("version");
 
     /**
+     * The name used for the internal state attribute where we store the SHA-1 of the commit
+     * which MAY become the previous version commit if the parent has a valid version tag.
+     */
+    private static final String INTERIM_PREVIOUS_VERSION_COMMIT = Infer.class.getSimpleName().concat(".").concat("interim").concat(".").concat("previous").concat(".").concat("version").concat(".").concat("commit");
+
+    /**
      * The name used for the internal state attribute where we store the SHA-1 of the last
      * commit in the current branch by the time this command was last executed.
      */
@@ -145,13 +150,13 @@ public class Infer extends AbstractCommand {
     private void storeStatusInternalAttributes()
         throws DataAccessException, IllegalPropertyException, GitException {
         logger.debug(COMMAND, "Storing the Infer command internal attributes to the State");
-        storeInternalAttribute(INTERNAL_LAST_COMMIT, getLatestCommit());
-        storeInternalAttribute(CONFIGURED_VERSION, state().getConfiguration().getVersion());
-        storeInternalAttribute(CONFIGURED_BUMP, state().getConfiguration().getBump());
-        storeInternalAttribute(CONFIGURED_SCHEME, state().getConfiguration().getScheme());
-        storeInternalAttribute(CONFIGURED_INITIAL_VERSION, state().getConfiguration().getInitialVersion());
-        storeInternalAttribute(CONFIGURED_RELEASE_PREFIX, state().getConfiguration().getReleasePrefix());
-        storeInternalAttribute(CONFIGURED_RELEASE_LENIENT, state().getConfiguration().getReleaseLenient());
+        putInternalAttribute(INTERNAL_LAST_COMMIT, getLatestCommit());
+        putInternalAttribute(CONFIGURED_VERSION, state().getConfiguration().getVersion());
+        putInternalAttribute(CONFIGURED_BUMP, state().getConfiguration().getBump());
+        putInternalAttribute(CONFIGURED_SCHEME, state().getConfiguration().getScheme());
+        putInternalAttribute(CONFIGURED_INITIAL_VERSION, state().getConfiguration().getInitialVersion());
+        putInternalAttribute(CONFIGURED_RELEASE_PREFIX, state().getConfiguration().getReleasePrefix());
+        putInternalAttribute(CONFIGURED_RELEASE_LENIENT, state().getConfiguration().getReleaseLenient());
     }
 
     /**
@@ -204,17 +209,10 @@ public class Infer extends AbstractCommand {
             // this list contains the identifiers to bump, according to each single commit
             final List<String> bumpComponents = new ArrayList<String>();
 
-            // this map is used to work around the 'local variables referenced from a lambda expression must be final or effectively final'
-            // that would be raised by compiler if we change simple non final values inside the lambda function
-            final Map<String,String> findings = new HashMap<String,String>();
-            // and these are the attribute names we use in the map
-            final String BUMP_COMPONENT = "bumpComponent";
-            final String PREVIOUS_VERSION = "previousVersion";
-            final String PREVIOUS_VERSION_COMMIT = "previousVersionCommit";
-            final String PREVIOUS_VERSION_COMMIT_PLUS_1 = "previousVersionCommitPlusOne";
-
-            if (!Objects.isNull(state().getConfiguration().getBump()))
-                findings.put(BUMP_COMPONENT, state().getConfiguration().getBump());
+            if (!Objects.isNull(state().getConfiguration().getBump())) {
+                logger.debug(COMMAND, "Bump component overridden by user, skipping commit message convention evaluation");
+                state().setBump(state().getConfiguration().getBump());
+            }
 
             logger.debug(COMMAND, "Walking the commit history...");
             repository().walkHistory(null, null, c -> {
@@ -225,8 +223,8 @@ public class Infer extends AbstractCommand {
                 for (Tag tag: c.getTags()) {
                     if (releaseLenient ? VersionFactory.isLegal(scheme.getScheme(), tag.getName(), releaseLenient) : VersionFactory.isLegal(scheme.getScheme(), tag.getName(), releasePrefix)) {
                         logger.debug(COMMAND, "Tag {} is a valid {} version and is used as the previousVersion. Likewise, {} is used as the previousVersionCommit", tag.getName(), scheme.toString(), c.getSHA());
-                        findings.put(PREVIOUS_VERSION, tag.getName());
-                        findings.put(PREVIOUS_VERSION_COMMIT, c.getSHA());
+                        state().getReleaseScope().setPreviousVersion(tag.getName());
+                        state().getReleaseScope().setPreviousVersionCommit(c.getSHA());
                         break;
                     }
                     else {
@@ -235,10 +233,7 @@ public class Infer extends AbstractCommand {
                 }
 
                 // if the 'bump' was not overridden by user, evaluate the commit message against the configured conventions to see which identifier must be dumped, if any
-                if (findings.containsKey(BUMP_COMPONENT)) {
-                    logger.debug(COMMAND, "Bump component overridden by user, skipping commit message convention evaluation");
-                }
-                else {
+                if (!state().hasBump()) {
                     if (!Objects.isNull(commitMessageConventions)) {
                         for (Map.Entry<String,CommitMessageConvention> cmcEntry: commitMessageConventions.entrySet()) {
                             logger.debug(COMMAND, "Evaluating commit {} against message convention {}", c.getSHA(), cmcEntry.getKey());
@@ -261,21 +256,22 @@ public class Infer extends AbstractCommand {
                 }
 
                 // decide whether or not we need to keep walking to the next (previous) commit
-                // if we keep walking, store this curent commit as the previousVersionCommitPlusOne, which MAY become the initialCommit in the next loop
-                if (findings.containsKey(PREVIOUS_VERSION) && findings.containsKey(PREVIOUS_VERSION_COMMIT)) {
+                // if we keep walking, store this curent commit as the interim previous version,
+                // which MAY become the initialCommit in the next loop if the parent commit has a valid version tag
+                if (state().getReleaseScope().hasPreviousVersion() && state().getReleaseScope().hasPreviousVersionCommit()) {
                     return false;
                 }
                 else {
-                    findings.put(PREVIOUS_VERSION_COMMIT_PLUS_1, c.getSHA());
+                    putInternalAttribute(INTERIM_PREVIOUS_VERSION_COMMIT, c.getSHA());
                     return true;
                 }
             });
             logger.debug(COMMAND, "Walking the commit history finished.");
 
             // if we found the previous version commit the initial commit in the scope is the one next to it, otherwise the scope will start at the root commit
-            if (findings.containsKey(PREVIOUS_VERSION_COMMIT)) {
-                logger.debug(COMMAND, "Setting the initialCommit state value to {}", findings.get(PREVIOUS_VERSION_COMMIT_PLUS_1));
-                state().getReleaseScope().setInitialCommit(findings.get(PREVIOUS_VERSION_COMMIT_PLUS_1));
+            if (state().getReleaseScope().hasPreviousVersionCommit()) {
+                logger.debug(COMMAND, "Setting the initialCommit state value to {}", getInternalAttribute(INTERIM_PREVIOUS_VERSION_COMMIT));
+                state().getReleaseScope().setInitialCommit(getInternalAttribute(INTERIM_PREVIOUS_VERSION_COMMIT));
             }
             else {
                 String rootCommitSHA = repository().getRootCommit();
@@ -283,26 +279,18 @@ public class Infer extends AbstractCommand {
                 state().getReleaseScope().setInitialCommit(rootCommitSHA);
             }
 
-            // set the state attributes about the previous version and its related commit
-            if (findings.containsKey(PREVIOUS_VERSION) && findings.containsKey(PREVIOUS_VERSION_COMMIT)) {
-                logger.debug(COMMAND, "Setting the previousVersion and previousVersionCommit state values to {} and {} respectively", findings.get(PREVIOUS_VERSION), findings.get(PREVIOUS_VERSION_COMMIT));
-                try {
-                    state().getReleaseScope().setPreviousVersion(releaseLenient ? VersionFactory.valueOf(scheme.getScheme(), findings.get(PREVIOUS_VERSION), releaseLenient).toString() : VersionFactory.valueOf(scheme.getScheme(), findings.get(PREVIOUS_VERSION), releasePrefix).toString());
-                    state().getReleaseScope().setPreviousVersionCommit(findings.get(PREVIOUS_VERSION_COMMIT));
-                }
-                catch (IllegalArgumentException iae) {
-                    throw new ReleaseException(String.format("The previous version %s cannot be parsed as a valid version identifier", findings.get(PREVIOUS_VERSION)), iae);
-                }
-            }
-            else {
-                logger.debug(COMMAND, "The commit history had no information about the previousVersion and previousVersionCommit");
+            // if we couldn't infer the initial version and its commit, set the state attributes to the configured initial values
+            if (!state().getReleaseScope().hasPreviousVersion() || !state().getReleaseScope().hasPreviousVersionCommit()) {
+                logger.debug(COMMAND, "The commit history had no information about the previousVersion and previousVersionCommit, using default initial value {} for the previousVersion", state().getConfiguration().getInitialVersion());
                 // use the configured initial version as the previous version
                 state().getReleaseScope().setPreviousVersion(state().getConfiguration().getInitialVersion());
                 state().getReleaseScope().setPreviousVersionCommit(null);
             }
+            // parse the previous version now
+            Version previousVersion = releaseLenient ? VersionFactory.valueOf(scheme.getScheme(), state().getReleaseScope().getPreviousVersion(), releaseLenient) : VersionFactory.valueOf(scheme.getScheme(), state().getReleaseScope().getPreviousVersion(), releasePrefix);
 
             // determine the bump component, if not overridden by user
-            if (!findings.containsKey(BUMP_COMPONENT)) {
+            if (!state().hasBump()) {
                 if (bumpComponents.isEmpty()) {
                     logger.debug(COMMAND, "Unable to infer the identifier to bump from the commits within the release scope. This may be due to the configured commit message conventions not matching any commit or because the release scope has no significant commits");
                 }
@@ -311,24 +299,15 @@ public class Infer extends AbstractCommand {
                     VersionFactory.sortIdentifiers(scheme.getScheme(), bumpComponents);
                     String bumpComponent = bumpComponents.get(0);
                     logger.debug(COMMAND, "The version identifier to bump from the commits in the release scope, according to the configured commit message convenstions, is {}", bumpComponent);
-                    findings.put(BUMP_COMPONENT, bumpComponent);
+                    state().setBump(bumpComponent);
                 }
             }
 
-            // the previous version has been stored in the state above, otherwise, if none was detected, set it to the default initial version
-            String previousVersionString = state().getReleaseScope().getPreviousVersion();
-            Version previousVersion = null;
-            if (Objects.isNull(previousVersionString)) {
-                previousVersion = releaseLenient ? VersionFactory.valueOf(scheme.getScheme(), state().getConfiguration().getInitialVersion(), releaseLenient) : VersionFactory.valueOf(scheme.getScheme(), state().getConfiguration().getInitialVersion(), releasePrefix);
-                logger.info(COMMAND, "No previous version detected. Using the initial version {}", previousVersion.toString());
-            }
-            else previousVersion = VersionFactory.valueOf(scheme.getScheme(), previousVersionString);
-
             // finally compute the version
             Version version = null;
-            if (findings.containsKey(BUMP_COMPONENT)) {
-                logger.info(COMMAND, "Bumping component {} on version {}", findings.get(BUMP_COMPONENT), previousVersion.toString());
-                version = previousVersion.bump(findings.get(BUMP_COMPONENT));
+            if (state().hasBump()) {
+                logger.info(COMMAND, "Bumping component {} on version {}", state().getBump(), previousVersion.toString());
+                version = previousVersion.bump(state().getBump());
             }
             else {
                 logger.info(COMMAND, "The release scope does not contain any significant commit, version remains unchanged: {}", previousVersion.toString());
@@ -339,7 +318,6 @@ public class Infer extends AbstractCommand {
 
             // store values to the state object
             state().setVersion(Objects.isNull(releasePrefix) ? version.toString() : releasePrefix.concat(version.toString()));
-            state().setBump(findings.containsKey(BUMP_COMPONENT) ? findings.get(BUMP_COMPONENT) : null);
             state().getReleaseScope().setSignificant(Boolean.valueOf(!bumpComponents.isEmpty()));
         }
         else {

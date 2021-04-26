@@ -137,13 +137,25 @@ public abstract class AbstractCommand implements Command {
     }
 
     /**
+     * Retrieves the attribute with the given name from the internal attributes map. The returned value is always
+     * the {@link Object#toString()} representation of the stored value.
+     * 
+     * @param attributeName the name of the attribute to store. It can't be {@code null}
+     * 
+     * @return the value of the attribute, if available, otherwise {@code null}
+     */
+    protected String getInternalAttribute(String attributeName) {
+        return state().getInternals().get(attributeName);
+    }
+
+    /**
      * Stores the attribute with the given name to the internal attributes map. The stored value is always
      * performed the {@link Object#toString()} of the given value.
      * 
      * @param attributeName the name of the attribute to store. It can't be {@code null}
      * @param attributeValue the value of the attribute. It may be {@code null}
      */
-    protected void storeInternalAttribute(String attributeName, Object attributeValue) {
+    protected void putInternalAttribute(String attributeName, Object attributeValue) {
         state().getInternals().put(attributeName, Objects.isNull(attributeValue) ? "null" : attributeValue.toString());
     }
 }

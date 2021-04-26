@@ -115,10 +115,10 @@ public class Mark extends AbstractCommand {
         throws DataAccessException, IllegalPropertyException, GitException {
         logger.debug(COMMAND, "Storing the Mark command internal attributes to the State");
         if (!state().getConfiguration().getDryRun()) {
-            storeInternalAttribute(INTERNAL_LAST_COMMIT, getLatestCommit());
-            storeInternalAttribute(STATE_VERSION, state().getVersion());
-            storeInternalAttribute(STATE_INITIAL_COMMIT, state().getReleaseScope().getInitialCommit());
-            storeInternalAttribute(STATE_SIGNIFICANT, state().getReleaseScope().getSignificant());
+            putInternalAttribute(INTERNAL_LAST_COMMIT, getLatestCommit());
+            putInternalAttribute(STATE_VERSION, state().getVersion());
+            putInternalAttribute(STATE_INITIAL_COMMIT, state().getReleaseScope().getInitialCommit());
+            putInternalAttribute(STATE_SIGNIFICANT, state().getReleaseScope().getSignificant());
         }
     }
 

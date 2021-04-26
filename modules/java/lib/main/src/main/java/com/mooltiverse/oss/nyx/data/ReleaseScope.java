@@ -15,6 +15,8 @@
  */
 package com.mooltiverse.oss.nyx.data;
 
+import java.util.Objects;
+
 /**
  * This is a value object that models the summary data about the scope of a release.
  */
@@ -79,6 +81,15 @@ public class ReleaseScope {
     }
 
     /**
+     * Returns {@code true} if the scope has a non {@code null} version identifier of the most recent past release.
+     * 
+     * @return {@code true} if the scope has a non {@code null} version identifier of the most recent past release. It may be {@code null}.
+     */
+    public boolean hasPreviousVersion() {
+        return !Objects.isNull(previousVersion);
+    }
+
+    /**
      * Sets the version identifier of the most recent past release.
      * 
      * @param previousVersion the version identifier of the most recent past release. It may be {@code null}.
@@ -94,6 +105,15 @@ public class ReleaseScope {
      */
     public String getPreviousVersionCommit() {
         return previousVersionCommit;
+    }
+
+    /**
+     * Returns {@code true} if the scope has a non {@code null} SHA-1 identifier of the most recent past release commit.
+     * 
+     * @return {@code true} if the scope has a non {@code null} SHA-1 identifier of the most recent past release commit.
+     */
+    public boolean hasPreviousVersionCommit() {
+        return !Objects.isNull(previousVersionCommit);
     }
 
     /**
@@ -115,6 +135,15 @@ public class ReleaseScope {
     }
 
     /**
+     * Returns {@code true} if the scope has a non {@code null} SHA-1 identifier of the first commit within the scope.
+     * 
+     * @return {@code true} if the scope has a non {@code null} SHA-1 identifier of the first commit within the scope.
+     */
+    public boolean hasInitialCommit() {
+        return !Objects.isNull(initialCommit);
+    }
+
+    /**
      * Sets the SHA-1 identifier of the first commit within the scope.
      * 
      * @param initialCommit the SHA-1 identifier of the first commit within the scope. It may be {@code null}.
@@ -130,6 +159,15 @@ public class ReleaseScope {
      */
     public String getFinalCommit() {
         return finalCommit;
+    }
+
+    /**
+     * Returns {@code true} if the scope has a non {@code null} SHA-1 identifier of the last commit within the scope.
+     * 
+     * @return {@code true} if the scope has a non {@code null} SHA-1 identifier of the last commit within the scope. It may be {@code null}.
+     */
+    public boolean hasFinalCommit() {
+        return !Objects.isNull(finalCommit);
     }
 
     /**

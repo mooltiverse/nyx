@@ -392,7 +392,7 @@ public class InferTestTemplates {
             assertEquals("2.2.2", command.state().getVersion());
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
-            assertEquals("2.2.2", command.state().getReleaseScope().getPreviousVersion());
+            assertEquals("release-2.2.2", command.state().getReleaseScope().getPreviousVersion());
             assertEquals(script.getCommitByTag("release-2.2.2"), command.state().getReleaseScope().getPreviousVersionCommit());
             assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
         }
@@ -439,7 +439,7 @@ public class InferTestTemplates {
             assertEquals("release-2.2.2", command.state().getVersion());
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
-            assertEquals("2.2.2", command.state().getReleaseScope().getPreviousVersion());
+            assertEquals("release-2.2.2", command.state().getReleaseScope().getPreviousVersion());
             assertEquals(script.getCommitByTag("release-2.2.2"), command.state().getReleaseScope().getPreviousVersionCommit());
             assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
         }
@@ -650,7 +650,7 @@ public class InferTestTemplates {
             assertEquals("2.2.2", command.state().getVersion());
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
-            assertEquals("2.2.2", command.state().getReleaseScope().getPreviousVersion());
+            assertEquals("release-2.2.2", command.state().getReleaseScope().getPreviousVersion());
             assertEquals(script.getCommitByTag("release-2.2.2"), command.state().getReleaseScope().getPreviousVersionCommit());
             assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
         }
@@ -697,7 +697,7 @@ public class InferTestTemplates {
             assertEquals("release-2.2.2", command.state().getVersion());
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
-            assertEquals("2.2.2", command.state().getReleaseScope().getPreviousVersion());
+            assertEquals("release-2.2.2", command.state().getReleaseScope().getPreviousVersion());
             assertEquals(script.getCommitByTag("release-2.2.2"), command.state().getReleaseScope().getPreviousVersionCommit());
             assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
         }

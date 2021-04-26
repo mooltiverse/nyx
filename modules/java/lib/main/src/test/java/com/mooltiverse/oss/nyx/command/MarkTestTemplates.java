@@ -581,7 +581,7 @@ public class MarkTestTemplates {
             else {
                 assertEquals(configurationMock.bump, command.state().getBump());
                 assertEquals("2.2.2", command.state().getVersion());
-                assertEquals("2.2.2", command.state().getReleaseScope().getPreviousVersion());
+                assertEquals("release-2.2.2", command.state().getReleaseScope().getPreviousVersion());
                 assertEquals(script.getCommitByTag("release-2.2.2"), command.state().getReleaseScope().getPreviousVersionCommit());
                 assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
             }
@@ -661,7 +661,7 @@ public class MarkTestTemplates {
             else {
                 assertEquals(configurationMock.bump, command.state().getBump());
                 assertEquals("release-2.2.2", command.state().getVersion());
-                assertEquals("2.2.2", command.state().getReleaseScope().getPreviousVersion());
+                assertEquals("release-2.2.2", command.state().getReleaseScope().getPreviousVersion());
                 assertEquals(script.getCommitByTag("release-2.2.2"), command.state().getReleaseScope().getPreviousVersionCommit());
                 assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
             }
@@ -1057,7 +1057,7 @@ public class MarkTestTemplates {
             else {
                 assertEquals(configurationMock.bump, command.state().getBump());
                 assertEquals("2.2.2", command.state().getVersion());
-                assertEquals("2.2.2", command.state().getReleaseScope().getPreviousVersion());
+                assertEquals("release-2.2.2", command.state().getReleaseScope().getPreviousVersion());
                 assertEquals(script.getCommitByTag("release-2.2.2"), command.state().getReleaseScope().getPreviousVersionCommit());
                 assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
             }
@@ -1141,7 +1141,7 @@ public class MarkTestTemplates {
             else {
                 assertEquals(configurationMock.bump, command.state().getBump());
                 assertEquals("release-2.2.2", command.state().getVersion());
-                assertEquals("2.2.2", command.state().getReleaseScope().getPreviousVersion());
+                assertEquals("release-2.2.2", command.state().getReleaseScope().getPreviousVersion());
                 assertEquals(script.getCommitByTag("release-2.2.2"), command.state().getReleaseScope().getPreviousVersionCommit());
                 assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
             }

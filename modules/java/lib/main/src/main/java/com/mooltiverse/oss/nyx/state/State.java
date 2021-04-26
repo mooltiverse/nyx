@@ -140,6 +140,15 @@ public class State implements Root {
     }
 
     /**
+     * Returns {@code true} if the scope has a non {@code null} version identifier bumped on the previous release to produce the new release.
+     * 
+     * @return {@code true} if the scope has a non {@code null} version identifier bumped on the previous release to produce the new release.
+     */
+    public boolean hasBump() {
+        return !Objects.isNull(bump);
+    }
+
+    /**
      * Sets the version identifier bumped on the previous release to produce the new release, if any.
      * 
      * @param bump the version identifier bumped on the previous release to produce the new release, if any.
@@ -227,6 +236,15 @@ public class State implements Root {
     public String getVersion() 
         throws DataAccessException, IllegalPropertyException {
         return version;
+    }
+
+    /**
+     * Returns {@code true} if the scope has a non {@code null} version.
+     * 
+     * @return {@code true} if the scope has a non {@code null} version.
+     */
+    public boolean hasVersion() {
+        return !Objects.isNull(version);
     }
 
     /**
