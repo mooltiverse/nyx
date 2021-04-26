@@ -88,6 +88,45 @@ public interface Root extends Block {
     public Map<String, String> getInternals();
 
     /**
+     * Returns {@code true} if the version ({@link #getVersion()}) is different than the previous version
+     * ({@link #getReleaseScope()}{@link ReleaseScope#getPreviousVersion()}) and a new release has to be
+     * published on the new version.
+     * 
+     * @return {@code true} if the version is new and has to be released.
+     * 
+     * @throws DataAccessException in case the attribute cannot be read or accessed.
+     * @throws IllegalPropertyException in case the attribute has been defined but has incorrect values or it can't be resolved.
+     * 
+     * @see #getVersion()
+     * @see #getReleaseScope()
+     * @see ReleaseScope#getPreviousVersion()
+     * @see Configuration#getVersion()
+     * @see Nyx#infer()
+     * @see Infer
+     */
+    public boolean getNewRelease()
+        throws DataAccessException, IllegalPropertyException;
+
+    /**
+     * Returns {@code true} if the version ({@link #getVersion()}) is different than the previous version
+     * ({@link #getReleaseScope()}{@link ReleaseScope#getPreviousVersion()}).
+     * 
+     * @return {@code true} if the version is new.
+     * 
+     * @throws DataAccessException in case the attribute cannot be read or accessed.
+     * @throws IllegalPropertyException in case the attribute has been defined but has incorrect values or it can't be resolved.
+     * 
+     * @see #getVersion()
+     * @see #getReleaseScope()
+     * @see ReleaseScope#getPreviousVersion()
+     * @see Configuration#getVersion()
+     * @see Nyx#infer()
+     * @see Infer
+     */
+    public boolean getNewVersion()
+        throws DataAccessException, IllegalPropertyException;
+
+    /**
      * Returns the object modelling the attributes defining the scope of the release.
      * 
      * @return the current value for this attribute.
@@ -127,6 +166,8 @@ public interface Root extends Block {
      * @throws DataAccessException in case the attribute cannot be read or accessed.
      * @throws IllegalPropertyException in case the attribute has been defined but has incorrect values or it can't be resolved.
      * 
+     * @see #getNewRelease()
+     * @see #getNewVersion()
      * @see Configuration#getVersion()
      * @see Nyx#infer()
      * @see Infer

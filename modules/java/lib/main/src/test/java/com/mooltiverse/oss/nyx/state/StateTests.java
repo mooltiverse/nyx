@@ -93,6 +93,43 @@ public class StateTests {
         }
 
         @Test
+        @DisplayName("State.getNewRelease()")
+        void getNewReleaseTest()
+            throws Exception {
+            State state = new State(new Configuration());
+
+            state.setVersion("1.2.3");
+            state.getReleaseScope().setPreviousVersion("1.2.3");
+            state.getReleaseScope().setSignificant(Boolean.FALSE);
+            // TODO: dad the releaseType.publish attribute here as a variable to consider in the outcome
+            assertFalse(state.getNewRelease());
+
+            state.getReleaseScope().setSignificant(Boolean.TRUE);
+            assertFalse(state.getNewRelease());
+
+            state.getReleaseScope().setPreviousVersion("0.1.0");
+            assertTrue(state.getNewRelease());
+        }
+
+        @Test
+        @DisplayName("State.getNewVersion()")
+        void getNewVersionTest()
+            throws Exception {
+            State state = new State(new Configuration());
+
+            state.setVersion("1.2.3");
+            state.getReleaseScope().setPreviousVersion("1.2.3");
+            state.getReleaseScope().setSignificant(Boolean.FALSE);
+            assertFalse(state.getNewVersion());
+
+            state.getReleaseScope().setSignificant(Boolean.TRUE);
+            assertFalse(state.getNewVersion());
+
+            state.getReleaseScope().setPreviousVersion("0.1.0");
+            assertTrue(state.getNewVersion());
+        }
+
+        @Test
         @DisplayName("State.getReleaseScope()")
         void getReleaseScopeTest()
             throws Exception {

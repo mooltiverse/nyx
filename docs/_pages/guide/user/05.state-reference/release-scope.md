@@ -75,7 +75,7 @@ This value remains undefined when no previous version can be found or [inference
 | Related configuration options | [commitMessageConventions]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/commit-message-conventions.md %}){: .btn .btn--success .btn--small} [commitMessageConventions/ID/bumpExpressions]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/commit-message-conventions.md %}#bump-expressions){: .btn .btn--success .btn--small} |
 | Initialized by task           | [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#infer){: .btn .btn--small} |
 
-This boolean tells if the [`version`](#version) release scope contains significant commits to be released or not. When this is `true` then significant changes have been detected and they are worth a new release. When `false` the scope has no new commits at all or the commits that have been found do not yield to a new release.
+This boolean tells if the [`version`](#version) release scope contains significant commits to be released or not. When this is `true` then significant changes have been detected and they are worth a new version. When `false` the scope has no new commits at all or the commits that have been found do not yield to a new version.
 
 The release scope is assumed to contain significant changes when one or more commits are supposed to bump one or more version identifiers and this is determined by the [`commitMessageConventions/<ID>/bumpExpressions`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/commit-message-conventions.md %}#bump-expressions).
 

@@ -95,7 +95,7 @@ While conventions usually define a range of allowed values for `type` and `scope
 | Command Line Option       | `--commit-message-conventions-<NAME>-bumpExpressions=<MAP>`                              |
 | Environment Variable      | `NYX_COMMIT_MESSAGE_CONVENTIONS_<NAME>_BUMP_EXPRESSIONS=<MAP>`                           |
 | Configuration File Option | `commitMessageConventions/bumpExpressions`                                               |
-| Related state attributes  | [releaseScope/significant]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#significant){: .btn .btn--info .btn--small} [scheme]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#scheme){: .btn .btn--info .btn--small} [version]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#version){: .btn .btn--info .btn--small} |
+| Related state attributes  | [newVersion]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#new-version){: .btn .btn--info .btn--small} [releaseScope/significant]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#significant){: .btn .btn--info .btn--small} [scheme]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#scheme){: .btn .btn--info .btn--small} [version]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#version){: .btn .btn--info .btn--small} |
 
 The `bumpExpressions` map gives Nyx instructions about which version identifiers are expected to be bumped according to the commit message. This map can be empty for those conventions not addressing the version bumping.
 
