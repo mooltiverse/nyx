@@ -291,6 +291,8 @@ public class MarkTestTemplates {
                 assertNull(command.state().getReleaseScope().getInitialCommit());
                 assertNull(command.state().getReleaseScope().getFinalCommit());
                 assertNull(command.state().getReleaseScope().getSignificant());
+                assertEquals(previousLastCommit, script.getLastCommit().getId().getName());
+                assertEquals(previousTags.size(), script.getTags().size());
             }
             else {
                 assertEquals(configurationMock.bump, command.state().getBump());
@@ -299,12 +301,12 @@ public class MarkTestTemplates {
                 assertTrue(command.state().getNewRelease());
                 assertEquals(Defaults.INITIAL_VERSION, command.state().getReleaseScope().getPreviousVersion());
                 assertEquals(script.getCommitByTag("0.1.0"), command.state().getReleaseScope().getPreviousVersionCommit());
-                assertEquals(script.getLastCommit().getName(), command.state().getReleaseScope().getInitialCommit());
+                assertEquals(script.getRootCommit().getName(), command.state().getReleaseScope().getInitialCommit());
                 assertEquals(script.getLastCommit().getName(), command.state().getReleaseScope().getFinalCommit());
                 assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
+                assertNotEquals(previousLastCommit, script.getLastCommit().getId().getName());
+                assertEquals(previousTags.size()+1, script.getTags().size());
             }
-            assertEquals(previousLastCommit, script.getLastCommit().getId().getName());
-            assertEquals(previousTags.size(), script.getTags().size());
         }
 
         @TestTemplate
@@ -333,6 +335,8 @@ public class MarkTestTemplates {
                 assertNull(command.state().getReleaseScope().getInitialCommit());
                 assertNull(command.state().getReleaseScope().getFinalCommit());
                 assertNull(command.state().getReleaseScope().getSignificant());
+                assertEquals(previousLastCommit, script.getLastCommit().getId().getName());
+                assertEquals(previousTags.size(), script.getTags().size());
             }
             else {
                 assertEquals(configurationMock.bump, command.state().getBump());
@@ -341,12 +345,12 @@ public class MarkTestTemplates {
                 assertTrue(command.state().getNewRelease());
                 assertEquals(Defaults.INITIAL_VERSION, command.state().getReleaseScope().getPreviousVersion());
                 assertEquals(script.getCommitByTag("0.1.0"), command.state().getReleaseScope().getPreviousVersionCommit());
-                assertEquals(script.getLastCommit().getName(), command.state().getReleaseScope().getInitialCommit());
+                assertEquals(script.getRootCommit().getName(), command.state().getReleaseScope().getInitialCommit());
                 assertEquals(script.getLastCommit().getName(), command.state().getReleaseScope().getFinalCommit());
                 assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
+                assertNotEquals(previousLastCommit, script.getLastCommit().getId().getName());
+                assertEquals(previousTags.size()+1, script.getTags().size());
             }
-            assertEquals(previousLastCommit, script.getLastCommit().getId().getName());
-            assertEquals(previousTags.size(), script.getTags().size());
         }
 
         @TestTemplate
@@ -375,6 +379,8 @@ public class MarkTestTemplates {
                 assertNull(command.state().getReleaseScope().getInitialCommit());
                 assertNull(command.state().getReleaseScope().getFinalCommit());
                 assertNull(command.state().getReleaseScope().getSignificant());
+                assertEquals(previousLastCommit, script.getLastCommit().getId().getName());
+                assertEquals(previousTags.size(), script.getTags().size());
             }
             else {
                 assertEquals(configurationMock.bump, command.state().getBump());
@@ -383,12 +389,12 @@ public class MarkTestTemplates {
                 assertTrue(command.state().getNewRelease());
                 assertEquals(Defaults.INITIAL_VERSION, command.state().getReleaseScope().getPreviousVersion());
                 assertEquals(script.getCommitByTag("0.1.0"), command.state().getReleaseScope().getPreviousVersionCommit());
-                assertEquals(script.getLastCommit().getName(), command.state().getReleaseScope().getInitialCommit());
+                assertEquals(script.getRootCommit().getName(), command.state().getReleaseScope().getInitialCommit());
                 assertEquals(script.getLastCommit().getName(), command.state().getReleaseScope().getFinalCommit());
                 assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
+                assertNotEquals(previousLastCommit, script.getLastCommit().getId().getName());
+                assertEquals(previousTags.size()+1, script.getTags().size());
             }
-            assertEquals(previousLastCommit, script.getLastCommit().getId().getName());
-            assertEquals(previousTags.size(), script.getTags().size());
         }
 
         @TestTemplate
@@ -417,6 +423,8 @@ public class MarkTestTemplates {
                 assertNull(command.state().getReleaseScope().getInitialCommit());
                 assertNull(command.state().getReleaseScope().getFinalCommit());
                 assertNull(command.state().getReleaseScope().getSignificant());
+                assertEquals(previousLastCommit, script.getLastCommit().getId().getName());
+                assertEquals(previousTags.size(), script.getTags().size());
             }
             else {
                 assertEquals(configurationMock.bump, command.state().getBump());
@@ -425,12 +433,12 @@ public class MarkTestTemplates {
                 assertTrue(command.state().getNewRelease());
                 assertEquals(Defaults.INITIAL_VERSION, command.state().getReleaseScope().getPreviousVersion());
                 assertEquals(script.getCommitByTag("0.1.0"), command.state().getReleaseScope().getPreviousVersionCommit());
-                assertEquals(script.getLastCommit().getName(), command.state().getReleaseScope().getInitialCommit());
+                assertEquals(script.getRootCommit().getName(), command.state().getReleaseScope().getInitialCommit());
                 assertEquals(script.getLastCommit().getName(), command.state().getReleaseScope().getFinalCommit());
                 assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
+                assertNotEquals(previousLastCommit, script.getLastCommit().getId().getName());
+                assertEquals(previousTags.size()+1, script.getTags().size());
             }
-            assertEquals(previousLastCommit, script.getLastCommit().getId().getName());
-            assertEquals(previousTags.size(), script.getTags().size());
         }
 
         @TestTemplate
@@ -954,7 +962,7 @@ public class MarkTestTemplates {
                 assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion());
                 assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit());
                 assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
-                assertEquals(previousTags.size(), script.getTags().size());
+                assertEquals(previousTags.size()+1, script.getTags().size());
                 //assertFalse(remoteScript.getCommits().containsAll(script.getCommits()));
                 //assertFalse(remoteScript.getTags().keySet().containsAll(script.getTags().keySet()));
             }
@@ -1002,7 +1010,7 @@ public class MarkTestTemplates {
                 assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion());
                 assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit());
                 assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
-                assertEquals(previousTags.size(), script.getTags().size());
+                assertEquals(previousTags.size()+1, script.getTags().size());
                 //assertFalse(remoteScript.getCommits().containsAll(script.getCommits()));
                 //assertFalse(remoteScript.getTags().keySet().containsAll(script.getTags().keySet()));
             }
@@ -1050,7 +1058,7 @@ public class MarkTestTemplates {
                 assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion());
                 assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit());
                 assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
-                assertEquals(previousTags.size(), script.getTags().size());
+                assertEquals(previousTags.size()+1, script.getTags().size());
                 //assertFalse(remoteScript.getCommits().containsAll(script.getCommits()));
                 //assertFalse(remoteScript.getTags().keySet().containsAll(script.getTags().keySet()));
             }
@@ -1098,7 +1106,7 @@ public class MarkTestTemplates {
                 assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion());
                 assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit());
                 assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
-                assertEquals(previousTags.size(), script.getTags().size());
+                assertEquals(previousTags.size()+1, script.getTags().size());
                 //assertFalse(remoteScript.getCommits().containsAll(script.getCommits()));
                 //assertFalse(remoteScript.getTags().keySet().containsAll(script.getTags().keySet()));
             }

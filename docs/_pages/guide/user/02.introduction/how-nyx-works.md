@@ -42,7 +42,7 @@ This phase is where:
 2. a new release **tag** is created in the Git repository. The tag anatomy (i.e. whether it is [lightweight or annotated](https://git-scm.com/book/en/v2/Git-Basics-Tagging)) is driven by the [configuration](TODO: link the tag configuration option here)
 3. the new commit and tag are **pushed** to the [remote](https://git-scm.com/docs/git-remote) repositories, if required by the [configuration](TODO: link the push configuration option here)
 
-These steps are only taken if the [release scope]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/index.md %}) that has been [inferred](#infer) contains [significant changes]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/index.md %}#significant) that are worth a new release identified by a new [version]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#version), otherwise no action is taken.
+These steps are only taken if there is a [new version]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#new-version) resulting from the commit history after [inference](#infer), otherwise no action is taken.
 
 ## Publish
 

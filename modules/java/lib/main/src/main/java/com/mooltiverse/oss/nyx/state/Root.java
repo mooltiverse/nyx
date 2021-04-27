@@ -104,7 +104,7 @@ public interface Root extends Block {
      * @see Nyx#infer()
      * @see Infer
      */
-    public boolean getNewRelease()
+    public Boolean getNewRelease()
         throws DataAccessException, IllegalPropertyException;
 
     /**
@@ -123,7 +123,7 @@ public interface Root extends Block {
      * @see Nyx#infer()
      * @see Infer
      */
-    public boolean getNewVersion()
+    public Boolean getNewVersion()
         throws DataAccessException, IllegalPropertyException;
 
     /**

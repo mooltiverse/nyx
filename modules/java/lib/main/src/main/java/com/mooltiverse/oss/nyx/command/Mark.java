@@ -53,9 +53,9 @@ public class Mark extends AbstractCommand {
     private static final String STATE_INITIAL_COMMIT = Mark.class.getSimpleName().concat(".").concat("state").concat(".").concat("initialCommit");
 
     /**
-     * The name used for the internal state attribute where we store the significant commits flag.
+     * The flag telling if the current version is new.
      */
-    private static final String STATE_SIGNIFICANT = Mark.class.getSimpleName().concat(".").concat("state").concat(".").concat("significant");
+    private static final String STATE_NEW_VERSION = Mark.class.getSimpleName().concat(".").concat("state").concat(".").concat("newVersion");
 
     /**
      * The name used for the internal state attribute where we store the version.
@@ -95,7 +95,7 @@ public class Mark extends AbstractCommand {
         // Check if configuration parameters have changed
         return isInternalAttributeUpToDate(STATE_VERSION, state().getVersion()) &&
             isInternalAttributeUpToDate(STATE_INITIAL_COMMIT, state().getReleaseScope().getInitialCommit()) &&
-            isInternalAttributeUpToDate(STATE_SIGNIFICANT, state().getReleaseScope().getSignificant());
+            isInternalAttributeUpToDate(STATE_NEW_VERSION, state().getNewVersion());
     }
 
     /**
@@ -118,7 +118,7 @@ public class Mark extends AbstractCommand {
             putInternalAttribute(INTERNAL_LAST_COMMIT, getLatestCommit());
             putInternalAttribute(STATE_VERSION, state().getVersion());
             putInternalAttribute(STATE_INITIAL_COMMIT, state().getReleaseScope().getInitialCommit());
-            putInternalAttribute(STATE_SIGNIFICANT, state().getReleaseScope().getSignificant());
+            putInternalAttribute(STATE_NEW_VERSION, state().getNewVersion());
         }
     }
 
@@ -129,11 +129,7 @@ public class Mark extends AbstractCommand {
      * - the Git repository and the commit history;<br>
      * - the {@code releaseScope/initialCommit} with the SHA-1 of the initial commit in the release scope; if {@code null}
      *   this task just exits taking no act
-     * - {@code releaseScope/significant}, when {@code true} the release scope contains significant commits (commits
-     *   whose messages bring informations about new versions) and this task creates a new tag and, optionally,
-     *   a commit. When this is {@code false} and the {@code releaseScope/initialCommit} is {@code null}
-     *   this task just exits taking no actions; if this is {@code false} but {@code releaseScope/initialCommit} is
-     *   not {@code null} the {@code releaseScope/finalCommit} is set to the latest commit in the current branch
+     * - the {@code newVersion} {@link #state()} flag, that must be {@code true} for this task to run, otherwise it just skips
      * <br>
      * Outputs from this task are all stored in the State object, with more detail:<br>
      * - the {@code releaseScope/finalCommit} is defined with the SHA-1 of the last commit, which may be a new
@@ -156,38 +152,36 @@ public class Mark extends AbstractCommand {
         throws DataAccessException, IllegalPropertyException, GitException, ReleaseException {
         logger.debug(COMMAND, "Running the Mark command...");
 
-        if (Objects.isNull(state().getReleaseScope().getInitialCommit())) {
+        if (!state().getReleaseScope().hasInitialCommit()) {
             logger.info(COMMAND, "Release scope is empty. Nothing to release.");
         }
         else {
-            String finalCommit = repository().getLatestCommit();
+            logger.debug(COMMAND, "Setting the finalCommit state value to {}", repository().getLatestCommit());
+            state().getReleaseScope().setFinalCommit(repository().getLatestCommit());
 
-            if (Objects.isNull(state().getReleaseScope().getSignificant()) || Boolean.FALSE.equals(state().getReleaseScope().getSignificant())) {
-                logger.info(COMMAND, "Release scope does not contain significant changes. Nothing to release.");
-            }
-            else {
+            if (state().getNewVersion()) {
                 // COMMIT
                 // TODO: make the commit step conditional, depending on the configuration and the release type. Not all release types may have the commit enabled
                 if (repository().isClean()) {
-                    // TODO: customize the commit message
-                    finalCommit = repository().getLatestCommit();
-                    logger.debug(COMMAND, "Repository is clean, no commits need to be made. finalCommit updated to the latest commit {} in current branch", finalCommit);
+                    logger.debug(COMMAND, "Repository is clean, no commits need to be made");
                 }
                 else {
                     if (state().getConfiguration().getDryRun()) {
                         logger.info(COMMAND, "Git commit skipped due to dry run");
-
-                        finalCommit = repository().getLatestCommit();
-                        logger.debug(COMMAND, "Dry run prevents from committing. Updating the finalCommit at the latest commit in local branch: {}", finalCommit);
                     }
                     else {
                         logger.debug(COMMAND, "Committing local changes");
 
+                        // TODO: customize the commit message
+
                         // TODO: not all changes may need to be committed so replace "." here with the paths of the files to commit, in case only a subset has to be committed
                         // TODO: make the commit message customizeable. Now we use the version number also for the message
                         // TODO: use the other version of the commit() method that also accepts identities, to optionally set the Author and Committer. This could be used to add Nyx as the committer
-                        finalCommit = repository().commit(List.<String>of("."), state().getVersion()).getSHA();
+                        String finalCommit = repository().commit(List.<String>of("."), state().getVersion()).getSHA();
                         logger.debug(COMMAND, "Local changes committed at {}", finalCommit);
+
+                        logger.debug(COMMAND, "Setting the finalCommit state value to {}", finalCommit);
+                        state().getReleaseScope().setFinalCommit(finalCommit);
                     }
                 }
 
@@ -198,9 +192,9 @@ public class Mark extends AbstractCommand {
                 }
                 else {
                     // TODO: make the lightweight/annotated tag customizeable here and optionally add the Tagger Identity
-                    logger.debug(COMMAND, "Tagging latest commit {} with tag {}", finalCommit, state().getVersion());
+                    logger.debug(COMMAND, "Tagging latest commit {} with tag {}", repository().getLatestCommit(), state().getVersion());
                     repository().tag(state().getVersion());
-                    logger.debug(COMMAND, "Tag {} applied to commit {}", state().getVersion(), finalCommit);
+                    logger.debug(COMMAND, "Tag {} applied to commit {}", state().getVersion(), repository().getLatestCommit());
                 }
 
                 // PUSH
@@ -215,9 +209,9 @@ public class Mark extends AbstractCommand {
                     logger.debug(COMMAND, "Local changes pushed to remote {}", remote);
                 }
             }
-
-            logger.debug(COMMAND, "Setting the finalCommit state value to {}", finalCommit);
-            state().getReleaseScope().setFinalCommit(finalCommit);
+            else {
+                logger.info(COMMAND, "No version change detected. Nothing to release.");
+            }
         }
 
         storeStatusInternalAttributes();

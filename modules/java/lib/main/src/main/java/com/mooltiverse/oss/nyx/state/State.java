@@ -189,7 +189,7 @@ public class State implements Root {
      * {@inheritDoc}
      */
     @Override
-    public boolean getNewRelease()
+    public Boolean getNewRelease()
         throws DataAccessException, IllegalPropertyException {
         // TODO: Also check the releaseType attribute telling if the release has to be published
         // (when available), and include it into the AND here
@@ -200,7 +200,7 @@ public class State implements Root {
      * {@inheritDoc}
      */
     @Override
-    public boolean getNewVersion()
+    public Boolean getNewVersion()
         throws DataAccessException, IllegalPropertyException {
         return hasVersion() && !getVersion().equals(getReleaseScope().getPreviousVersion());
     }

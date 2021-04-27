@@ -400,6 +400,25 @@ public class Workbench {
     }
 
     /**
+     * Returns the root commit.
+     * 
+     * @return the root commit {@code null} if the repository has no commits yet
+     * 
+     * @throws Exception in case of any issue
+     */
+    public RevCommit getRootCommit()
+        throws Exception {
+        Iterator<RevCommit> iterator = git.log().add(git.getRepository().resolve(Constants.HEAD)).call().iterator();
+        RevCommit res = null;
+        while (iterator.hasNext()) {
+            res = iterator.next();
+            if (res.getParentCount() == 0)
+                return res;
+        }
+        return res;
+    }
+
+    /**
      * Commits the staged files with the given commit message.
      * 
      * @param message the commit message
