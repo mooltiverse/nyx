@@ -250,7 +250,7 @@ jobs:
           # See the top level https://github.com/mooltiverse/nyx/blob/master/CONTRIBUTING.md#contributing-code file for details about passing these values when testing locally
           ORG_GRADLE_PROJECT_gitHubUser: ${{ secrets.GITHUB_USERNAME }}
           ORG_GRADLE_PROJECT_gitHubToken: ${{ secrets.GITHUB_TOKEN }}
-        run: ./gradlew release --debug --stacktrace
+        run: ./gradlew release --stacktrace
       - name: Archive Nyx state file
         uses: actions/upload-artifact@v2
         with:
