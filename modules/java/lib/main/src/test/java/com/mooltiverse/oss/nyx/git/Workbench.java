@@ -40,7 +40,6 @@ import org.eclipse.jgit.lib.RefDatabase;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevObject;
-import org.eclipse.jgit.transport.RemoteConfig;
 import org.eclipse.jgit.transport.URIish;
 
 /**
@@ -107,10 +106,9 @@ public class Workbench {
     public Workbench(File directory, boolean bare, boolean initialize)
         throws Exception {
         super();
-        if (initialize) {
-            Git.init().setBare(bare).setDirectory(directory).call();
-        }
-        this.git = Git.open(directory);
+        if (initialize)
+            this.git = Git.init().setBare(bare).setDirectory(directory).call();
+        else this.git = Git.open(directory);
     }
 
     /**
@@ -133,6 +131,25 @@ public class Workbench {
     public Workbench()
         throws Exception {
         this(true);
+    }
+
+    /**
+     * Closes this repository and frees resources like file handles used by it.
+     * After calling this method this object is no longer usable.
+     * <br>
+     * If you encouner errors like:<br>
+     * <pre>
+     *      java.io.IOException: The process cannot access the file because another process has locked a portion of the file
+     * </pre>
+     * it means you are accessing the repository from multiple instances so you have to invoke this method on
+     * instances you're no longer using.
+     * 
+     * @throws Exception in case of any issue
+     */
+    public void close()
+        throws Exception {
+        git.getRepository().close();
+        git.close();
     }
 
     /**
@@ -560,13 +577,11 @@ public class Workbench {
      * @param gitDir the Git metadata directory of the repository to add as remote
      * @param name the name to use for the new remote repository in the local one
      * 
-     * @return
-     * 
      * @throws Exception in case of any issue
      */
-    public RemoteConfig addRemote(File gitDir, String name)
+    public void addRemote(File gitDir, String name)
         throws Exception {
-        return git.remoteAdd().setName(name).setUri(new URIish(gitDir.toURI().toURL())).call();
+        git.remoteAdd().setName(name).setUri(new URIish(gitDir.toURI().toURL())).call();
     }
 
     /**

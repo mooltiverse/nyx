@@ -43,6 +43,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import com.mooltiverse.oss.nyx.git.Scenario;
+import com.mooltiverse.oss.nyx.git.Script;
 
 /**
  * Functional tests for the Gradle plugin.<br>
@@ -538,6 +539,21 @@ public class NyxPluginFunctionalTests {
     }
 
     /**
+     * Returns a string with a valid content for the .gitignore file. The returned file ignores the .gradle dir to avoid errors due to file locks.
+     * 
+     * @return a string with a valid content for the .gitignore file
+     */
+    static String gitIgnore() {
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(stringWriter);
+
+        printWriter.println(".gradle");
+        printWriter.println();
+
+        return stringWriter.toString();
+    }
+
+    /**
      * Instantiates a new GradleRunner to use for tests, using the given Gradle version.
      * A new temporary directory is created for each test and used by the runner if none is given.
      * The settings.gradle is created with a standard content while the build.gradle file is created with the given content.
@@ -546,12 +562,13 @@ public class NyxPluginFunctionalTests {
      * @param gradleVersion the Gradle version to test against
      * @oaram gradleSettingsFileContent the content of the settings.gradle to create in the project directory
      * @oaram gradleBuildFileContent the content of the build.gradle to create in the project directory
+     * @oaram gitIgnoreFileContent the content of the .gitignore to create in the project directory
      * 
      * @return the runner to use for tests, already using the temporary directory
      * 
      * @throws Exception in case of any issue
      */
-    GradleRunner setUp(File directory, String gradleVersion, String gradleSettingsFileContent, String gradleBuildFileContent)
+    GradleRunner setUp(File directory, String gradleVersion, String gradleSettingsFileContent, String gradleBuildFileContent, String gitIgnoreFileContent)
         throws Exception {
         
         File tempProjectDir = Objects.isNull(directory) ? Files.createTempDirectory("nyx-gradle-"+gradleVersion+"-test").toFile() : directory;
@@ -569,6 +586,9 @@ public class NyxPluginFunctionalTests {
 
         // Create the build.gradle file
         write(new File(tempProjectDir, "build.gradle"), gradleBuildFileContent);
+
+        // Create the .gitignore file
+        write(new File(tempProjectDir, ".gitignore"), gitIgnoreFileContent);
 
         // withPluginClasspath() puts the Nyx plugin into the classpath
         return GradleRunner.create().withGradleVersion(gradleVersion).withProjectDir(tempProjectDir).withPluginClasspath().forwardOutput();
@@ -590,46 +610,46 @@ public class NyxPluginFunctionalTests {
     }
 
     /**
-         * Test running the given task with no exceptions using the given runner and Gradle version.
-         * This is a generic method to be invoked by actual tests.
-         * 
-         * @param gradleRunner the gradle runner
-         * @param gradleVersion the gradle version
-         * @param target the task to run
-         * @param taskOutcomes the map of outcomes to check, if {@code null} no outcomes are checked
-         * 
-         * @throws Exception in case of any issues
-         */
-        void runTask(GradleRunner gradleRunner, String gradleVersion, String target, Map<String,TaskOutcome> taskOutcomes)
-            throws Exception {
-            // GradleRunner.withDebug(boolean) enables debug output
-            // also run the 'writeDiagnostics' to print diagnostics to files
-            BuildResult gradleResult = gradleRunner.withDebug(false).withArguments("--info", "--stacktrace", target, "writeDiagnostics").build();
-            System.out.println("Executed tasks: "+target);System.out.flush();
+     * Test running the given task with no exceptions using the given runner and Gradle version.
+     * This is a generic method to be invoked by actual tests.
+     * 
+     * @param gradleRunner the gradle runner
+     * @param gradleVersion the gradle version
+     * @param target the task to run
+     * @param taskOutcomes the map of outcomes to check, if {@code null} no outcomes are checked
+     * 
+     * @throws Exception in case of any issues
+     */
+    void runTask(GradleRunner gradleRunner, String gradleVersion, String target, Map<String,TaskOutcome> taskOutcomes)
+        throws Exception {
+        // GradleRunner.withDebug(boolean) enables debug output
+        // also run the 'writeDiagnostics' to print diagnostics to files
+        BuildResult gradleResult = gradleRunner.withDebug(false).withArguments("--info", "--stacktrace", target, "writeDiagnostics").build();
+        System.out.println("Executed tasks: "+target);System.out.flush();
 
-            if (!Objects.isNull(taskOutcomes)) {
-                for (Map.Entry<String,TaskOutcome> taskOutcome: taskOutcomes.entrySet()) {
-                    boolean taskFound = false;
-                    System.out.println("  Testing outcome for task: "+taskOutcome.getKey());System.out.flush();
-                    for (BuildTask buildTask: gradleResult.getTasks()) {
-                        System.out.println("    Evaluating task: "+buildTask.getPath());System.out.flush();
-                        if (buildTask.getPath().endsWith(taskOutcome.getKey())) {
-                            taskFound = true;
-                            System.out.println("      Task "+taskOutcome.getKey()+" match found. Outcome is: "+buildTask.getOutcome()+", expected was "+taskOutcome.getValue());System.out.flush();
-                            assertEquals(taskOutcome.getValue(), buildTask.getOutcome(), "When running gradle "+target+" expected outcome for task "+buildTask.getPath()+" was "+taskOutcome.getValue()+" but actual value was "+buildTask.getOutcome());
-                        }
-                        else {
-                            System.out.println("      Skipping task "+taskOutcome.getKey());System.out.flush();
-                        }
+        if (!Objects.isNull(taskOutcomes)) {
+            for (Map.Entry<String,TaskOutcome> taskOutcome: taskOutcomes.entrySet()) {
+                boolean taskFound = false;
+                System.out.println("  Testing outcome for task: "+taskOutcome.getKey());System.out.flush();
+                for (BuildTask buildTask: gradleResult.getTasks()) {
+                    System.out.println("    Evaluating task: "+buildTask.getPath());System.out.flush();
+                    if (buildTask.getPath().endsWith(taskOutcome.getKey())) {
+                        taskFound = true;
+                        System.out.println("      Task "+taskOutcome.getKey()+" match found. Outcome is: "+buildTask.getOutcome()+", expected was "+taskOutcome.getValue());System.out.flush();
+                        assertEquals(taskOutcome.getValue(), buildTask.getOutcome(), "When running gradle "+target+" expected outcome for task "+buildTask.getPath()+" was "+taskOutcome.getValue()+" but actual value was "+buildTask.getOutcome());
                     }
-                    System.out.println("  Task "+taskOutcome.getKey()+"="+taskOutcome.getValue()+" found: "+taskFound);System.out.flush();
-                    if (Objects.isNull(taskOutcome.getValue())) {
-                        assertFalse(taskFound, "Task "+taskOutcome.getKey()+" was not expected to be part of the build but it was");
+                    else {
+                        System.out.println("      Skipping task "+taskOutcome.getKey());System.out.flush();
                     }
-                    else assertTrue(taskFound, "Task "+taskOutcome.getKey()+" was expected to be part of the build but it was not");
                 }
+                System.out.println("  Task "+taskOutcome.getKey()+"="+taskOutcome.getValue()+" found: "+taskFound);System.out.flush();
+                if (Objects.isNull(taskOutcome.getValue())) {
+                    assertFalse(taskFound, "Task "+taskOutcome.getKey()+" was not expected to be part of the build but it was");
+                }
+                else assertTrue(taskFound, "Task "+taskOutcome.getKey()+" was expected to be part of the build but it was not");
             }
         }
+    }
 
     /**
      * Test the plugin when applied to the project
@@ -646,7 +666,7 @@ public class NyxPluginFunctionalTests {
         @MethodSource("com.mooltiverse.oss.nyx.gradle.NyxPluginFunctionalTests#wellKnownTaskTestSuites")
         void exceptionRunningNyxTaskWithNoGitRepository(String target, String gradleVersion, Map<String,String> pluginCombination, Map<String,TaskOutcome> taskOutcomes)
             throws Exception {
-            GradleRunner gradleRunner = setUp(null, gradleVersion, gradleSettings(gradleVersion, false, null), gradleBuild(gradleVersion, true, pluginCombination, "minor"));
+            GradleRunner gradleRunner = setUp(null, gradleVersion, gradleSettings(gradleVersion, false, null), gradleBuild(gradleVersion, true, pluginCombination, "minor"), gitIgnore());
 
             // Gradle wraps these exception so let's not make assumptions on the type
             assertThrows(Exception.class, () -> runTask(gradleRunner, gradleVersion, target, taskOutcomes));
@@ -663,7 +683,9 @@ public class NyxPluginFunctionalTests {
         @MethodSource("com.mooltiverse.oss.nyx.gradle.NyxPluginFunctionalTests#wellKnownTaskTestSuites")
         void runNyxTaskWithEmptyScriptTest(String target, String gradleVersion, Map<String,String> pluginCombination, Map<String,TaskOutcome> taskOutcomes)
             throws Exception {
-            GradleRunner gradleRunner = setUp(Scenario.INITIAL_COMMIT.realize().getWorkingDirectory(), gradleVersion, gradleSettings(gradleVersion, false, null), gradleBuild(gradleVersion, true, pluginCombination, "minor"));
+            Script script = Scenario.INITIAL_COMMIT.realize();
+            script.addRemote(Scenario.FROM_SCRATCH.realize().getGitDirectory(), "origin");
+            GradleRunner gradleRunner = setUp(script.getWorkingDirectory(), gradleVersion, gradleSettings(gradleVersion, false, null), gradleBuild(gradleVersion, true, pluginCombination, "minor"), gitIgnore());
 
             runTask(gradleRunner, gradleVersion, target, taskOutcomes);
 
@@ -679,7 +701,9 @@ public class NyxPluginFunctionalTests {
         @MethodSource("com.mooltiverse.oss.nyx.gradle.NyxPluginFunctionalTests#wellKnownTaskTestSuites")
         void runNyxTaskWithSimpleScriptTest(String target, String gradleVersion, Map<String,String> pluginCombination, Map<String,TaskOutcome> taskOutcomes)
             throws Exception {
-            GradleRunner gradleRunner = setUp(Scenario.INITIAL_COMMIT.realize().getWorkingDirectory(), gradleVersion, gradleSettings(gradleVersion, false, null), gradleBuild(gradleVersion, true, pluginCombination, "minor"));
+            Script script = Scenario.INITIAL_COMMIT.realize();
+            script.addRemote(Scenario.FROM_SCRATCH.realize().getGitDirectory(), "origin");
+            GradleRunner gradleRunner = setUp(script.getWorkingDirectory(), gradleVersion, gradleSettings(gradleVersion, false, null), gradleBuild(gradleVersion, true, pluginCombination, "minor"), gitIgnore());
 
             runTask(gradleRunner, gradleVersion, target, taskOutcomes);
 
@@ -696,13 +720,14 @@ public class NyxPluginFunctionalTests {
         @MethodSource("com.mooltiverse.oss.nyx.gradle.NyxPluginFunctionalTests#wellKnownTestSuites")
         void earlyInferRunningDummyTaskTest(String gradleVersion, Map<String,String> pluginCombination)
             throws Exception {
-            File directory = Scenario.ONE_BRANCH_SHORT.realize().getWorkingDirectory();
-            GradleRunner gradleRunner = setUp(directory, gradleVersion, gradleSettings(gradleVersion, false, null), gradleBuild(gradleVersion, true, pluginCombination, "minor"));
+            Script script = Scenario.ONE_BRANCH_SHORT.realize();
+            script.addRemote(Scenario.FROM_SCRATCH.realize().getGitDirectory(), "origin");
+            GradleRunner gradleRunner = setUp(script.getWorkingDirectory(), gradleVersion, gradleSettings(gradleVersion, false, null), gradleBuild(gradleVersion, true, pluginCombination, "minor"), gitIgnore());
 
             // do not run any nyx Task, just the tasks that write the version to a file, which must be already available
             runTask(gradleRunner, gradleVersion, "dummy", null);
-            assertEquals("unspecified", fileContent(new File(directory, "diag-early-version.txt"))); // the beforeEvaluate version
-            assertEquals("unspecified", fileContent(new File(directory, "diag-late-version.txt"))); // the afterEvaluate version
+            assertEquals("unspecified", fileContent(new File(script.getWorkingDirectory(), "diag-early-version.txt"))); // the beforeEvaluate version
+            assertEquals("unspecified", fileContent(new File(script.getWorkingDirectory(), "diag-late-version.txt"))); // the afterEvaluate version
 
             tearDown(gradleRunner);
         }
@@ -717,17 +742,18 @@ public class NyxPluginFunctionalTests {
         @MethodSource("com.mooltiverse.oss.nyx.gradle.NyxPluginFunctionalTests#wellKnownTestSuites")
         void earlyInferRunningInferTest(String gradleVersion, Map<String,String> pluginCombination)
             throws Exception {
-            File directory = Scenario.ONE_BRANCH_SHORT.realize().getWorkingDirectory();
-            GradleRunner gradleRunner = setUp(directory, gradleVersion, gradleSettings(gradleVersion, false, null), gradleBuild(gradleVersion, true, pluginCombination, "minor"));
+            Script script = Scenario.ONE_BRANCH_SHORT.realize();
+            script.addRemote(Scenario.FROM_SCRATCH.realize().getGitDirectory(), "origin");
+            GradleRunner gradleRunner = setUp(script.getWorkingDirectory(), gradleVersion, gradleSettings(gradleVersion, false, null), gradleBuild(gradleVersion, true, pluginCombination, "minor"), gitIgnore());
 
             // just run the nyxInfer Task, just the tasks that write the version to a file, which must be already available
             runTask(gradleRunner, gradleVersion, "nyxInfer", null);
-            assertEquals("unspecified", fileContent(new File(directory, "diag-early-version.txt"))); // the beforeEvaluate version
-            assertEquals("0.1.0", fileContent(new File(directory, "diag-late-version.txt"))); // the afterEvaluate version
+            assertEquals("unspecified", fileContent(new File(script.getWorkingDirectory(), "diag-early-version.txt"))); // the beforeEvaluate version
+            assertEquals("0.1.0", fileContent(new File(script.getWorkingDirectory(), "diag-late-version.txt"))); // the afterEvaluate version
 
             runTask(gradleRunner, gradleVersion, "writeStateDiagnostics", null);
-            assertEquals("0.1.0", fileContent(new File(directory, "state-version.txt")));
-            assertEquals("false", fileContent(new File(directory, "state-significant.txt")));
+            assertEquals("0.1.0", fileContent(new File(script.getWorkingDirectory(), "state-version.txt")));
+            assertEquals("false", fileContent(new File(script.getWorkingDirectory(), "state-significant.txt")));
 
             tearDown(gradleRunner);
         }
@@ -749,26 +775,27 @@ public class NyxPluginFunctionalTests {
         @MethodSource("com.mooltiverse.oss.nyx.gradle.NyxPluginFunctionalTests#wellKnownTestSuites")
         void earlyInferApplyingSettingsPluginTest(String gradleVersion, Map<String,String> pluginCombination)
             throws Exception {
-            File directory = Scenario.ONE_BRANCH_SHORT.realize().getWorkingDirectory();
-            GradleRunner gradleRunner = setUp(directory, gradleVersion, gradleSettings(gradleVersion, true, "minor"), gradleBuild(gradleVersion, false, pluginCombination, null));
+            Script script = Scenario.ONE_BRANCH_SHORT.realize();
+            script.addRemote(Scenario.FROM_SCRATCH.realize().getGitDirectory(), "origin");
+            GradleRunner gradleRunner = setUp(script.getWorkingDirectory(), gradleVersion, gradleSettings(gradleVersion, true, "minor"), gradleBuild(gradleVersion, false, pluginCombination, null), gitIgnore());
 
             // do not run any nyx Task, just the tasks that write the version to a file, which must be already available
             runTask(gradleRunner, gradleVersion, "dummy", null);
-            assertEquals("0.1.0", fileContent(new File(directory, "diag-early-version.txt")));
-            assertEquals("0.1.0", fileContent(new File(directory, "diag-late-version.txt")));
+            assertEquals("0.1.0", fileContent(new File(script.getWorkingDirectory(), "diag-early-version.txt")));
+            assertEquals("0.1.0", fileContent(new File(script.getWorkingDirectory(), "diag-late-version.txt")));
 
             runTask(gradleRunner, gradleVersion, "writeStateDiagnostics", null);
-            assertEquals("0.1.0", fileContent(new File(directory, "state-version.txt")));
-            assertEquals("false", fileContent(new File(directory, "state-significant.txt")));
+            assertEquals("0.1.0", fileContent(new File(script.getWorkingDirectory(), "state-version.txt")));
+            assertEquals("false", fileContent(new File(script.getWorkingDirectory(), "state-significant.txt")));
 
             // now run nyxInfer and make sure it makes no difference
             runTask(gradleRunner, gradleVersion, "nyxInfer", null);
-            assertEquals("0.1.0", fileContent(new File(directory, "diag-early-version.txt")));
-            assertEquals("0.1.0", fileContent(new File(directory, "diag-late-version.txt")));
+            assertEquals("0.1.0", fileContent(new File(script.getWorkingDirectory(), "diag-early-version.txt")));
+            assertEquals("0.1.0", fileContent(new File(script.getWorkingDirectory(), "diag-late-version.txt")));
 
             runTask(gradleRunner, gradleVersion, "writeStateDiagnostics", null);
-            assertEquals("0.1.0", fileContent(new File(directory, "state-version.txt")));
-            assertEquals("false", fileContent(new File(directory, "state-significant.txt")));
+            assertEquals("0.1.0", fileContent(new File(script.getWorkingDirectory(), "state-version.txt")));
+            assertEquals("false", fileContent(new File(script.getWorkingDirectory(), "state-significant.txt")));
 
             tearDown(gradleRunner);
         }
