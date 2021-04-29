@@ -51,17 +51,10 @@ public class StateTests {
             // make sure the bump is null in the beginning (it's set only after the Infer task has run)
             State state = new State(new Configuration());
             assertNull(state.getBump());
-        }
-
-        @Test
-        @DisplayName("State.setBump(String)")
-        void setBumpTest()
-            throws Exception {
-            State state = new State(new Configuration());
-
-            String bump = "alpha";
-            state.setBump(bump);
-            assertEquals(bump, state.getBump());
+            state.getReleaseScope().getSignificantCommits().put("commit1", "alpha");
+            assertEquals("alpha", state.getBump());
+            state.getReleaseScope().getSignificantCommits().put("commit2", "major");
+            assertEquals("major", state.getBump());
         }
 
         @Test
@@ -209,7 +202,6 @@ public class StateTests {
             State oldState = new State(configuration);
 
             // set a few values to use later on for comparison
-            oldState.setBump("alpha");
             oldState.setVersion("3.5.7");
             oldState.getInternals().put("attr1", "value1");
             oldState.getReleaseScope().getCommits().add("final");
@@ -231,7 +223,6 @@ public class StateTests {
             assertEquals(oldState.getReleaseScope().getInitialCommit(), resumedState.getReleaseScope().getInitialCommit());
             assertEquals(oldState.getReleaseScope().getPreviousVersion(), resumedState.getReleaseScope().getPreviousVersion());
             assertEquals(oldState.getReleaseScope().getPreviousVersionCommit(), resumedState.getReleaseScope().getPreviousVersionCommit());
-            assertEquals(oldState.getReleaseScope().getSignificant(), resumedState.getReleaseScope().getSignificant());
             assertEquals(oldState.getTimestamp(), resumedState.getTimestamp());
             assertEquals(oldState.getVersion(), resumedState.getVersion());
         }

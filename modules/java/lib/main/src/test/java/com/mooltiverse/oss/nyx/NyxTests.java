@@ -130,13 +130,14 @@ public class NyxTests {
             State oldState = new State(configuration);
 
             // set a few values to use later on for comparison
-            oldState.setBump("alpha");
             oldState.setVersion("3.5.7");
             oldState.getInternals().put("attr1", "value1");
             oldState.getReleaseScope().getCommits().add("final");
             oldState.getReleaseScope().getCommits().add("initial");
             oldState.getReleaseScope().setPreviousVersion("previous");
             oldState.getReleaseScope().setPreviousVersionCommit("previousCommit");
+            oldState.getReleaseScope().getSignificantCommits().put("final", "major");
+            oldState.getReleaseScope().getSignificantCommits().put("initial", "minor");
 
             // save the file
             FileMapper.save(configurationMock.stateFile, oldState);
@@ -154,11 +155,16 @@ public class NyxTests {
             assertEquals("final", resumedState.getReleaseScope().getFinalCommit());
             assertEquals(oldState.getReleaseScope().getFinalCommit(), resumedState.getReleaseScope().getFinalCommit());
             assertEquals("initial", resumedState.getReleaseScope().getInitialCommit());
+            assertEquals(2, resumedState.getReleaseScope().getCommits().size());
             assertEquals(oldState.getReleaseScope().getInitialCommit(), resumedState.getReleaseScope().getInitialCommit());
             assertEquals(oldState.getReleaseScope().getPreviousVersion(), resumedState.getReleaseScope().getPreviousVersion());
             assertEquals(oldState.getReleaseScope().getPreviousVersionCommit(), resumedState.getReleaseScope().getPreviousVersionCommit());
-            assertTrue(resumedState.getReleaseScope().getSignificant());
-            assertEquals(oldState.getReleaseScope().getSignificant(), resumedState.getReleaseScope().getSignificant());
+            assertEquals(2, resumedState.getReleaseScope().getSignificantCommits().size());
+            assertTrue(resumedState.getReleaseScope().getSignificantCommits().containsKey("final"));
+            assertEquals("major", resumedState.getReleaseScope().getSignificantCommits().get("final"));
+            assertTrue(resumedState.getReleaseScope().getSignificantCommits().containsKey("initial"));
+            assertEquals("minor", resumedState.getReleaseScope().getSignificantCommits().get("initial"));
+
             assertEquals(oldState.getTimestamp(), resumedState.getTimestamp());
             assertEquals(oldState.getVersion(), resumedState.getVersion());
         }

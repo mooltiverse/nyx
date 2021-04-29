@@ -36,8 +36,8 @@ public class ReleaseScopeTests {
         assertNull(releaseScope.getInitialCommit());
         assertFalse(releaseScope.hasFinalCommit());
         assertNull(releaseScope.getFinalCommit());
-        assertFalse(releaseScope.getSignificant());
         assertTrue(releaseScope.getCommits().isEmpty());
+        assertTrue(releaseScope.getSignificantCommits().isEmpty());
     }
 
     @Test
@@ -152,13 +152,17 @@ public class ReleaseScopeTests {
     }
 
     @Test
-    @DisplayName("ReleaseScope.getSignificant()")
-    void getSignificantTest()
+    @DisplayName("ReleaseScope.getSignificantCommits()")
+    void getSignificantCommitsTest()
         throws Exception {
 
         ReleaseScope releaseScope = new ReleaseScope();
-        assertFalse(releaseScope.getSignificant());
-        releaseScope.getCommits().add("e7c4419c1a9635a264b1d6c573ac2af71e1eeea6");
-        assertTrue(releaseScope.getSignificant());
+        assertTrue(releaseScope.getSignificantCommits().isEmpty());
+        releaseScope.getSignificantCommits().put("e7c4419c1a9635a264b1d6c573ac2af71e1eeea6", "major");
+        assertEquals(1, releaseScope.getSignificantCommits().size());
+        releaseScope.getSignificantCommits().put("f9422bd6e5b0ac0ab0df2bffc280c3d4caa11b44", "minor");
+        assertEquals(2, releaseScope.getSignificantCommits().size());
+        releaseScope.getSignificantCommits().put("d0a19fc5776dc0c0b1a8d869c1117dac71065870", "patch");
+        assertEquals(3, releaseScope.getSignificantCommits().size());
     }
 }

@@ -244,7 +244,7 @@ The entire State is bound to the project *extra properties* with the `nyxState` 
 The `nyxState` property is only available after at least one [core task](#core-tasks) has executed. When using the [settings plugin](#apply-the-plugin) this is not an issue as the tasks run automatically in the early phases. Not all State properties are available at the same type (after the same task execution), please check out the [reference]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/index.md %}) for each property to know when it's available.
 {: .notice--info}
 
-This way you can have all the Nyx properties handy without even [storing the State file]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#state-file). For example, to only run a task if the [release scope]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}) contains [significant changes]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#significant) you can check the `project.nyxState.releaseScope.significant` boolean property while to reuse the same timestamp used by Nyx you can read the [`project.nyxState.significant`]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#timestamp).
+This way you can have all the Nyx properties handy without even [storing the State file]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#state-file). For example, to only run a task if the [release scope]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}) contains [significant changes]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#significant-commits) you can check the `project.nyxState.releaseScope.significantCommits` boolean property while to reuse the same timestamp used by Nyx you can read the [`project.nyxState.significant`]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#timestamp).
 
 Example:
 
@@ -257,7 +257,6 @@ task dumpSomeDiagnostics() {
         println project.nyxState.scheme.toString()
         println Long.valueOf(project.nyxState.timestamp).toString()
         println project.nyxState.version
-        println Boolean.valueOf(projct.nyxState.releaseScope.significant).toString()
     }
 }
 ```

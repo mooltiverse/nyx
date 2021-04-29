@@ -32,18 +32,20 @@ import com.mooltiverse.oss.nyx.data.Scheme;
  */
 public interface Root extends Block {
     /**
-     * Returns the version identifier bumped on the previous release to produce the new release, if any.
-     * This value is only available after {@link Nyx#infer()} has run.
+     * Returns the version identifier to bump or bumped on the previous release to produce the new release, if any.
+     * This value is only available after {@link Nyx#infer()} has run unless it's overridden by the configuration,
+     * in which case the configuration value is returned.
      * 
-     * @return the version identifier bumped on the previous release to produce the new release, if any.
+     * @return the version identifier to bump or bumped on the previous release to produce the new release, if any.
      * It may be {@code null} if no identifier has been bumped (i.e. because no significant changes have
-     * been detected in the release scope or because inference was inhibited by values overridden by user).
+     * been detected in the release scope or because inference was inhibited by values overridden by user) and the
+     * configuration does not override this value.
      * 
      * @throws DataAccessException in case the attribute cannot be read or accessed.
      * @throws IllegalPropertyException in case the attribute has been defined but has incorrect values or it can't be resolved.
      * 
      * @see #getReleaseScope()
-     * @see ReleaseScope#getSignificant()
+     * @see ReleaseScope#getSignificantCommits()
      */
     public String getBump()
         throws DataAccessException, IllegalPropertyException;

@@ -15,8 +15,9 @@
  */
 package com.mooltiverse.oss.nyx.version;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.Iterator;
 import java.util.Objects;
 
 /**
@@ -119,24 +120,39 @@ public class VersionFactory {
     }
 
     /**
-     * Sorts the given list of identifiers by their relevance, according to the given scheme.
-     * The {@code null} values are not admitted.
+     * Returns the most relevant identifier in the given collection, according to the given scheme ordering, or {@code null}
+     * if the given list is empty.
      * 
-     * @param scheme the scheme to sort the identifiers for
-     * @param identifiers the identifiers to sort
+     * @param scheme the scheme to peek the most relevand item from
+     * @param identifiers the identifiers to inspect
+     * 
+     * @return the most relevant identifier in the given collection, according to the given scheme ordering, or {@code null}
+     * if the given list is empty.
      * 
      * @see SemanticVersion#getIdentifierComparator()
-     * @see Collections#sort(List, Comparator)
      */
-    public static void sortIdentifiers(Scheme scheme, List<String> identifiers) {
+    public static String mostRelevantIdentifier(Scheme scheme, Collection<String> identifiers) {
+        if (identifiers.isEmpty())
+            return null;
+
+        Comparator<String> comparator = null;
         switch (scheme) {
             case SEMVER: {
-                Collections.sort(identifiers, SemanticVersion.getIdentifierComparator());
-                return;
+                comparator = SemanticVersion.getIdentifierComparator();
+                break;
             }
             //MAVEN: not yet supported
             default: throw new IllegalArgumentException(String.format("Illegal or unsupported scheme %s", scheme));
         }
+
+        Iterator<String> iterator = identifiers.iterator();
+        String candidate = iterator.next();
+        while (iterator.hasNext()) {
+            String next = iterator.next();
+            if (comparator.compare(next, candidate) < 0)
+                candidate = next;
+        }
+        return candidate;
     }
 
     /**

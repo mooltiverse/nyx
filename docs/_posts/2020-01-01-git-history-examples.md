@@ -15,7 +15,7 @@ In this page you can find some examples of Git histories. To the sake of simplic
 
 Here we have a brand new repository with an *Initial commit* and several others:
 
-The first *Initial commit* doesn't yield to any version number because it's not considered [*significant*]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#significant) as its message (*Initial commit*) doesn't match any message convention.
+The first *Initial commit* doesn't yield to any version number because it's not considered [*significant*]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#significant-commits) as its message (*Initial commit*) doesn't match any message convention.
 
 Commit `c1` instead produces a new version `0.1.1` and a new release because its commit message is matched as a *patch* commit. The version number `0.1.1` is produced by [bumping]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#bump) the `patch` identifier on the [previous version]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#previous-version), which in this case is the default [`initialVersion`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#initial-version) `0.1.0` since the repository history has no previous commits with valid version tags.
 

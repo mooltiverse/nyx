@@ -33,6 +33,7 @@ import com.mooltiverse.oss.nyx.data.FileMapper;
 import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
 import com.mooltiverse.oss.nyx.data.ReleaseScope;
 import com.mooltiverse.oss.nyx.data.Scheme;
+import com.mooltiverse.oss.nyx.version.VersionFactory;
 
 /**
  * The State class holds a number of attributes resulting from the execution of one or more command and so represents
@@ -48,11 +49,6 @@ public class State implements Root {
      * The private logger instance
      */
     private static final Logger logger = LoggerFactory.getLogger(State.class);
-
-    /**
-     * The version identifier bumped on the previous release to produce the new release, if any.
-     */
-    private String bump = null;
 
     /**
      * The private immutable instance of the configuration.
@@ -136,28 +132,23 @@ public class State implements Root {
     @Override
     public String getBump()
         throws DataAccessException, IllegalPropertyException {
-        return bump;
+        String bump = getConfiguration().getBump();
+        return Objects.isNull(bump) ? VersionFactory.mostRelevantIdentifier(getScheme().getScheme(), getReleaseScope().getSignificantCommits().values()) : bump;
     }
 
     /**
-     * Returns {@code true} if the scope has a non {@code null} version identifier bumped on the previous release to produce the new release.
+     * Returns {@code true} if the scope has a non {@code null} version identifier
+     * to bump or bumped on the previous release to produce the new release.
      * 
-     * @return {@code true} if the scope has a non {@code null} version identifier bumped on the previous release to produce the new release.
+     * @return {@code true} if the scope has a non {@code null} version identifier
+     * to bump or bumped on the previous release to produce the new release.
+     * 
+     * @throws DataAccessException in case the state file cannot be read or accessed.
+     * @throws IllegalPropertyException in case the state file has incorrect values.
      */
-    public boolean hasBump() {
-        return !Objects.isNull(bump);
-    }
-
-    /**
-     * Sets the version identifier bumped on the previous release to produce the new release, if any.
-     * 
-     * @param bump the version identifier bumped on the previous release to produce the new release, if any.
-     * It may be {@code null}.
-     * 
-     * @see #getBump()
-     */
-    public void setBump(String bump) {
-        this.bump = bump;
+    public boolean hasBump()
+        throws DataAccessException, IllegalPropertyException {
+        return !Objects.isNull(getBump());
     }
 
     /**

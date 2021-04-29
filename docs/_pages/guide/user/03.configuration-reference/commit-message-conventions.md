@@ -95,11 +95,11 @@ While conventions usually define a range of allowed values for `type` and `scope
 | Command Line Option       | `--commit-message-conventions-<NAME>-bumpExpressions=<MAP>`                              |
 | Environment Variable      | `NYX_COMMIT_MESSAGE_CONVENTIONS_<NAME>_BUMP_EXPRESSIONS=<MAP>`                           |
 | Configuration File Option | `commitMessageConventions/bumpExpressions`                                               |
-| Related state attributes  | [newVersion]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#new-version){: .btn .btn--info .btn--small} [releaseScope/significant]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#significant){: .btn .btn--info .btn--small} [scheme]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#scheme){: .btn .btn--info .btn--small} [version]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#version){: .btn .btn--info .btn--small} |
+| Related state attributes  | [newVersion]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#new-version){: .btn .btn--info .btn--small} [releaseScope/significantCommits]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#significant-commits){: .btn .btn--info .btn--small} [scheme]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#scheme){: .btn .btn--info .btn--small} [version]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#version){: .btn .btn--info .btn--small} |
 
 The `bumpExpressions` map gives Nyx instructions about which version identifiers are expected to be bumped according to the commit message. This map can be empty for those conventions not addressing the version bumping.
 
-When at least one commit in the release scope succesfully matches one of these expressions the release scope is considered to have [significant]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#significant) changes.
+Those commits in the release scope that succesfully match one of these expressions are available in the [`significantCommits`]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#significant-commits) map, which also brings the identifier to bump for each commit.
 
 Each entry in this map is made of two strings: the name of a version identifier and a regular expression that, when matching the commit message, instructs Nyx to bump the identifier in the name of the map entry.
 

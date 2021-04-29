@@ -176,36 +176,32 @@ public class VersionFactoryTests {
         @Test
         @DisplayName("VersionFactory.sortIdentifiers(Scheme.SEMVER, [...])")
         void sortIdentifiers() {
-            List<String> identifiers = new ArrayList<String>() {
-                private static final long serialVersionUID = 1L;
-                {
-                    add("alpha");
-                    add("beta");
-                    add("minor");
-                    add("patch");
-                    add("gamma");
-                    add("gamma");
-                    add("minor");
-                    add("major");
-                    add("theta");
-                    add("patch");
-                    add("major");
-                    add("epsylon");
-                }
-            };
-            VersionFactory.sortIdentifiers(Scheme.SEMVER, identifiers);
-            assertEquals("major",   identifiers.get(0));
-            assertEquals("major",   identifiers.get(1));
-            assertEquals("minor",   identifiers.get(2));
-            assertEquals("minor",   identifiers.get(3));
-            assertEquals("patch",   identifiers.get(4));
-            assertEquals("patch",   identifiers.get(5));
-            assertEquals("alpha",   identifiers.get(6));
-            assertEquals("beta",    identifiers.get(7));
-            assertEquals("epsylon", identifiers.get(8));
-            assertEquals("gamma",   identifiers.get(9));
-            assertEquals("gamma",   identifiers.get(10));
-            assertEquals("theta",   identifiers.get(11));
+            List<String> identifiers = new ArrayList<String>();
+            assertNull(VersionFactory.mostRelevantIdentifier(Scheme.SEMVER, identifiers));
+
+            identifiers.add("alpha");
+            assertEquals("alpha", VersionFactory.mostRelevantIdentifier(Scheme.SEMVER, identifiers));
+
+            identifiers.add("beta");
+            assertEquals("alpha", VersionFactory.mostRelevantIdentifier(Scheme.SEMVER, identifiers));
+
+            identifiers.add("patch");
+            assertEquals("patch", VersionFactory.mostRelevantIdentifier(Scheme.SEMVER, identifiers));
+
+            identifiers.add("minor");
+            assertEquals("minor", VersionFactory.mostRelevantIdentifier(Scheme.SEMVER, identifiers));
+
+            identifiers.add("major");
+            assertEquals("major", VersionFactory.mostRelevantIdentifier(Scheme.SEMVER, identifiers));
+
+            identifiers.add("gamma");
+            assertEquals("major", VersionFactory.mostRelevantIdentifier(Scheme.SEMVER, identifiers));
+
+            identifiers.add("theta");
+            assertEquals("major", VersionFactory.mostRelevantIdentifier(Scheme.SEMVER, identifiers));
+
+            identifiers.add("epsylon");
+            assertEquals("major", VersionFactory.mostRelevantIdentifier(Scheme.SEMVER, identifiers));
         }
     }
 }

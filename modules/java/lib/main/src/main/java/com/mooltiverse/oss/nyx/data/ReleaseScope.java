@@ -16,7 +16,9 @@
 package com.mooltiverse.oss.nyx.data;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -38,6 +40,13 @@ public class ReleaseScope {
      * The version identifier of the most recent past release.
      */
     private String previousVersion = null;
+
+    /**
+     * The internal map of significant commits (those commits causing the version number to be bumped).
+     * Keys are SHA-1 identifiers of significant commits in the scope, values are the version identifiers
+     * tha are supposed to be bumped. The order of these elements is not relevant.
+     */
+    private final Map<String, String> significantCommits = new HashMap<String, String>();
 
     /**
      * Default constructor.
@@ -147,11 +156,13 @@ public class ReleaseScope {
     }
 
     /**
-     * Returns the flag telling if the release scope contains significant commits.
+     * Returns the live map of significant commits (those commits causing the version number to be bumped).
+     * Keys are SHA-1 identifiers of significant commits in the scope, values are the version identifiers
+     * tha are supposed to be bumped. The order of these elements is not relevant.
      * 
-     * @return the flag telling if the release scope contains significant commits. It may be {@code null}.
+     * @return the live map of significant commits in the scope.
      */
-    public Boolean getSignificant() {
-        return !commits.isEmpty();
+    public Map<String, String> getSignificantCommits() {
+        return significantCommits;
     }
 }
