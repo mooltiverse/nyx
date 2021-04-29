@@ -174,7 +174,7 @@ public class CommandInvocationContextProvider implements TestTemplateInvocationC
          */
         @Override
         public String getDisplayName(int invocationIndex) {
-            return Objects.isNull(displayName) ? "[context: standalone] ".concat(Integer.toString(invocationIndex)) : "[context: standalone] ".concat(displayName);
+            return "[context: ".concat(StandaloneCommandProxy.CONTEXT_NAME).concat("] ").concat(Objects.isNull(displayName) ? Integer.toString(invocationIndex) : displayName);
         }
 
         /**
@@ -219,7 +219,7 @@ public class CommandInvocationContextProvider implements TestTemplateInvocationC
          */
         @Override
         public String getDisplayName(int invocationIndex) {
-            return Objects.isNull(displayName) ? "[context: nyx       ] ".concat(Integer.toString(invocationIndex)) : "[context: nyx       ] ".concat(displayName);
+            return "[context: ".concat(NyxCommandProxy.CONTEXT_NAME).concat("       ] ").concat(Objects.isNull(displayName) ? Integer.toString(invocationIndex) : displayName);
         }
 
         /**

@@ -26,11 +26,16 @@ import com.mooltiverse.oss.nyx.state.State;
  * This is a proxy implementation to be used in test templates and allows to run a command
  * standalone, so each method invocation is dispatched directly to the backing {@link Command} instance.
  */
-class StandaloneCommandProxy implements CommandProxy {
+public class StandaloneCommandProxy implements CommandProxy {
     /**
      * The backing command instance
      */
     private final Command command;
+
+    /**
+     * The context name returned by this proxy.
+     */
+    public static final String CONTEXT_NAME = "standalone";
 
     /**
      * Constructor.
@@ -50,7 +55,7 @@ class StandaloneCommandProxy implements CommandProxy {
      */
     @Override
     public String getContextName() {
-        return "standalone";
+        return CONTEXT_NAME;
     }
 
     /**

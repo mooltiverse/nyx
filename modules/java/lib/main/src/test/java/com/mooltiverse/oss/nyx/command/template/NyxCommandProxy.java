@@ -27,7 +27,7 @@ import com.mooltiverse.oss.nyx.state.State;
  * This is a proxy implementation to be used in test templates and allows to run a command
  * through the {@link Nyx} class business methods.
  */
-class NyxCommandProxy implements CommandProxy {
+public class NyxCommandProxy implements CommandProxy {
     /**
      * The Nyx class private instance.
      */
@@ -37,6 +37,11 @@ class NyxCommandProxy implements CommandProxy {
      * The command to be invoked by this class.
      */
     private final Commands command;
+
+    /**
+     * The context name returned by this proxy.
+     */
+    public static final String CONTEXT_NAME = "nyx";
 
     /**
      * Constructor.
@@ -58,7 +63,7 @@ class NyxCommandProxy implements CommandProxy {
      */
     @Override
     public String getContextName() {
-        return "nyx";
+        return CONTEXT_NAME;
     }
 
     /**

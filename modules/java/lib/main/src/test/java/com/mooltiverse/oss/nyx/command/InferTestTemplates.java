@@ -16,11 +16,9 @@
 package com.mooltiverse.oss.nyx.command;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assumptions.*;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -144,665 +142,571 @@ public class InferTestTemplates {
         }
 
         @TestTemplate
-        @DisplayName("Infer.run() with a valid but just initialized Git repository")
+        @DisplayName("Infer.run() on repository with the 'Initial commit' only, using defaults > yield to previous=initial version, no new version or release")
         @Baseline(Scenario.INITIAL_COMMIT)
-        void runWithJustInitializedRepositoryTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
+        void runWithInitialCommitOnlyTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
             command.run();
 
-            assertNull(command.state().getBump());
-            assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
-            assertEquals(Defaults.INITIAL_VERSION.toString(), command.state().getVersion());
-            assertFalse(command.state().getNewVersion());
-            assertFalse(command.state().getNewRelease());
-            assertEquals(script.getWorkbenchCommits().get(0), command.state().getReleaseScope().getInitialCommit());
+            assertEquals(Defaults.BUMP, command.state().getBump());
+            assertEquals(Defaults.SCHEME, command.state().getScheme());
+            assertEquals(script.getRootCommitID(), command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals(Defaults.INITIAL_VERSION, command.state().getReleaseScope().getPreviousVersion());
             assertNull(command.state().getReleaseScope().getPreviousVersionCommit());
-            assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
-        }
-
-        @TestTemplate
-        @DisplayName("Infer.run() with initial version override in a just initialized Git repository")
-        @Baseline(Scenario.INITIAL_COMMIT)
-        void runWithInitialVersionOverriddenByUserInJustInitializedRepoTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
-            throws Exception {
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-
-            assumeTrue(Objects.isNull(command.state().getVersion()));
-
-            configurationMock.initialVersion = "12.13.14";
-            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            command.run();
-
-            assertNull(command.state().getBump());
-            assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
-            assertEquals(configurationMock.initialVersion.toString(), command.state().getVersion());
+            assertFalse(command.state().getReleaseScope().getSignificant());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
-            assertEquals(script.getWorkbenchCommits().get(0), command.state().getReleaseScope().getInitialCommit());
-            assertNull(command.state().getReleaseScope().getFinalCommit());
-            assertEquals("12.13.14", command.state().getReleaseScope().getPreviousVersion());
-            assertNull(command.state().getReleaseScope().getPreviousVersionCommit());
-            assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
+            assertEquals(Defaults.INITIAL_VERSION.toString(), command.state().getVersion());
         }
 
         @TestTemplate
-        @DisplayName("Infer.run() with version override in a just initialized Git repository")
+        @DisplayName("Infer.run() on repository with the 'Initial commit' only, with initial version override > yield to previous=initial version, no new version or release")
         @Baseline(Scenario.INITIAL_COMMIT)
-        void runWithVersionOverriddenByUserInJustInitializedRepoTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
+        void runWithInitialCommitOnlyAndInitialVersionOverrideTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            final String CUSTOM_INITIAL_VERSION = "12.13.14";
             ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-
-            assumeTrue(Objects.isNull(command.state().getVersion()));
-
+            configurationMock.initialVersion = CUSTOM_INITIAL_VERSION;
             command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            configurationMock.version = "1.2.3";
             command.run();
 
-            assertNull(command.state().getBump());
-            assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
-            assertEquals(configurationMock.version.toString(), command.state().getVersion());
-            assertTrue(command.state().getNewVersion());
-            assertTrue(command.state().getNewRelease());
+            assertEquals(Defaults.BUMP, command.state().getBump());
+            assertEquals(Defaults.SCHEME, command.state().getScheme());
+            assertEquals(script.getRootCommitID(), command.state().getReleaseScope().getInitialCommit());
+            assertNull(command.state().getReleaseScope().getFinalCommit());
+            assertEquals(CUSTOM_INITIAL_VERSION, command.state().getReleaseScope().getPreviousVersion());
+            assertNull(command.state().getReleaseScope().getPreviousVersionCommit());
+            assertFalse(command.state().getReleaseScope().getSignificant());
+            assertFalse(command.state().getNewVersion());
+            assertFalse(command.state().getNewRelease());
+            assertEquals(CUSTOM_INITIAL_VERSION, command.state().getVersion());
+        }
+
+        @TestTemplate
+        @DisplayName("Infer.run() on repository with the 'Initial commit' only, with version override > yield to new version and release")
+        @Baseline(Scenario.INITIAL_COMMIT)
+        void runWithInitialCommitOnlyAndVersionOverrideTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
+            throws Exception {
+            final String CUSTOM_VERSION = "1.2.3";
+            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
+            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
+            configurationMock.version = CUSTOM_VERSION;
+            command.run();
+
+            assertEquals(Defaults.BUMP, command.state().getBump());
+            assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertNull(command.state().getReleaseScope().getPreviousVersion());
             assertNull(command.state().getReleaseScope().getPreviousVersionCommit());
             assertNull(command.state().getReleaseScope().getSignificant());
+            assertTrue(command.state().getNewVersion());
+            assertTrue(command.state().getNewRelease());
+            assertEquals(CUSTOM_VERSION, command.state().getVersion());
         }
 
         @TestTemplate
-        @DisplayName("Infer.run() with bump=major override in a just initialized Git repository")
+        @DisplayName("Infer.run() on repository with the 'Initial commit' only, with bump=major override > yield to new version and release")
         @Baseline(Scenario.INITIAL_COMMIT)
-        void runWithBumpMajorOverriddenByUserInJustInitializedRepoTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
+        void runWithInitialCommitOnlyAndBumpMajorOverrideTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            final String CUSTOM_BUMP = "major";
             ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-
             command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            configurationMock.bump = "major";
+            configurationMock.bump = CUSTOM_BUMP;
             command.run();
 
-            assertEquals(configurationMock.bump, command.state().getBump());
-            assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
+            assertEquals(CUSTOM_BUMP, command.state().getBump());
+            assertEquals(Defaults.SCHEME, command.state().getScheme());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getInitialCommit());
+            assertNull(command.state().getReleaseScope().getFinalCommit());
+            assertEquals(Defaults.INITIAL_VERSION, command.state().getReleaseScope().getPreviousVersion());
+            assertNull(command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
+            assertTrue(command.state().getNewVersion());
+            assertTrue(command.state().getNewRelease());
             assertEquals("1.0.0", command.state().getVersion());
-            assertTrue(command.state().getNewVersion());
-            assertTrue(command.state().getNewRelease());
-            assertEquals(script.getLastCommit().getName(), command.state().getReleaseScope().getInitialCommit());
+        }
+
+        @TestTemplate
+        @DisplayName("Infer.run() on repository with the 'Initial commit' only, with bump=minor override > yield to new version and release")
+        @Baseline(Scenario.INITIAL_COMMIT)
+        void runWithInitialCommitOnlyAndBumpMinorOverrideTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
+            throws Exception {
+            final String CUSTOM_BUMP = "minor";
+            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
+            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
+            configurationMock.bump = CUSTOM_BUMP;
+            command.run();
+
+            assertEquals(CUSTOM_BUMP, command.state().getBump());
+            assertEquals(Defaults.SCHEME, command.state().getScheme());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals(Defaults.INITIAL_VERSION, command.state().getReleaseScope().getPreviousVersion());
             assertNull(command.state().getReleaseScope().getPreviousVersionCommit());
             assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
-        }
-
-        @TestTemplate
-        @DisplayName("Infer.run() with bump=minor override in a just initialized Git repository")
-        @Baseline(Scenario.INITIAL_COMMIT)
-        void runWithBumpMinorOverriddenByUserInJustInitializedRepoTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
-            throws Exception {
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-
-            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            configurationMock.bump = "minor";
-            command.run();
-
-            assertEquals(configurationMock.bump, command.state().getBump());
-            assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
+            assertTrue(command.state().getNewVersion());
+            assertTrue(command.state().getNewRelease());
             assertEquals("0.2.0", command.state().getVersion());
-            assertTrue(command.state().getNewVersion());
-            assertTrue(command.state().getNewRelease());
-            assertEquals(script.getLastCommit().getName(), command.state().getReleaseScope().getInitialCommit());
+        }
+
+        @TestTemplate
+        @DisplayName("Infer.run() on repository with the 'Initial commit' only, with bump=patch override > yield to new version and release")
+        @Baseline(Scenario.INITIAL_COMMIT)
+        void runWithInitialCommitOnlyAndBumpPatchOverrideTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
+            throws Exception {
+            final String CUSTOM_BUMP = "patch";
+            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
+            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
+            configurationMock.bump = CUSTOM_BUMP;
+            command.run();
+
+            assertEquals(CUSTOM_BUMP, command.state().getBump());
+            assertEquals(Defaults.SCHEME, command.state().getScheme());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals(Defaults.INITIAL_VERSION, command.state().getReleaseScope().getPreviousVersion());
             assertNull(command.state().getReleaseScope().getPreviousVersionCommit());
             assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
-        }
-
-        @TestTemplate
-        @DisplayName("Infer.run() with bump=patch override in a just initialized Git repository")
-        @Baseline(Scenario.INITIAL_COMMIT)
-        void runWithBumpPatchOverriddenByUserInJustInitializedRepoTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
-            throws Exception {
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-
-            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            configurationMock.bump = "patch";
-            command.run();
-
-            assertEquals(configurationMock.bump, command.state().getBump());
-            assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
+            assertTrue(command.state().getNewVersion());
+            assertTrue(command.state().getNewRelease());
             assertEquals("0.1.1", command.state().getVersion());
-            assertTrue(command.state().getNewVersion());
-            assertTrue(command.state().getNewRelease());
-            assertEquals(script.getLastCommit().getName(), command.state().getReleaseScope().getInitialCommit());
-            assertNull(command.state().getReleaseScope().getFinalCommit());
-            assertEquals(Defaults.INITIAL_VERSION, command.state().getReleaseScope().getPreviousVersion());
-            assertNull(command.state().getReleaseScope().getPreviousVersionCommit());
-            assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
         }
 
         @TestTemplate
-        @DisplayName("Infer.run() with bump=alpha override in a just initialized Git repository")
+        @DisplayName("Infer.run() on repository with the 'Initial commit' only, with bump=alpha override > yield to new version and release")
         @Baseline(Scenario.INITIAL_COMMIT)
-        void runWithBumpAlphaOverriddenByUserInJustInitializedRepoTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
+        void runWithInitialCommitOnlyAndBumpAlphaOverrideTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            final String CUSTOM_BUMP = "alpha";
             ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-
             command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            configurationMock.bump = "alpha";
+            configurationMock.bump = CUSTOM_BUMP;
             command.run();
 
-            assertEquals(configurationMock.bump, command.state().getBump());
-            assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
-            assertEquals("0.1.0-alpha.1", command.state().getVersion());
-            assertTrue(command.state().getNewVersion());
-            assertTrue(command.state().getNewRelease());
-            assertEquals(script.getLastCommit().getName(), command.state().getReleaseScope().getInitialCommit());
+            assertEquals(CUSTOM_BUMP, command.state().getBump());
+            assertEquals(Defaults.SCHEME, command.state().getScheme());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals(Defaults.INITIAL_VERSION, command.state().getReleaseScope().getPreviousVersion());
             assertNull(command.state().getReleaseScope().getPreviousVersionCommit());
             assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
+            assertTrue(command.state().getNewVersion());
+            assertTrue(command.state().getNewRelease());
+            assertEquals("0.1.0-alpha.1", command.state().getVersion());
         }
 
         @TestTemplate
-        @DisplayName("Infer.run() with bump=major override in a Git repository with just one initial version commit")
+        @DisplayName("Infer.run() on repository with one versioned commit, with bump=major override > yield to new version and release")
         @Baseline(Scenario.INITIAL_VERSION)
         void runWithBumpMajorOverriddenByUserInRepoWithJustOneInitialVersionCommitTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            final String CUSTOM_BUMP = "major";
             ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-
             command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            configurationMock.bump = "major";
+            configurationMock.bump = CUSTOM_BUMP;
             command.run();
 
-            assertEquals(configurationMock.bump, command.state().getBump());
-            assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
-            assertEquals("1.0.0", command.state().getVersion());
-            assertTrue(command.state().getNewVersion());
-            assertTrue(command.state().getNewRelease());
+            assertEquals(CUSTOM_BUMP, command.state().getBump());
+            assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
-            assertEquals("0.1.0", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.1.0"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(Defaults.INITIAL_VERSION, command.state().getReleaseScope().getPreviousVersion());
+            assertEquals(script.getCommitByTag(Defaults.INITIAL_VERSION), command.state().getReleaseScope().getPreviousVersionCommit());
             assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
+            assertTrue(command.state().getNewVersion());
+            assertTrue(command.state().getNewRelease());
+            assertEquals("1.0.0", command.state().getVersion());
         }
 
         @TestTemplate
-        @DisplayName("Infer.run() with bump=minor override in a Git repository with just one initial version commit")
+        @DisplayName("Infer.run() on repository with one versioned commit, with bump=minor override > yield to new version and release")
         @Baseline(Scenario.INITIAL_VERSION)
         void runWithBumpMinorOverriddenByUserInRepoWithJustOneInitialVersionCommitTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            final String CUSTOM_BUMP = "minor";
             ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-
             command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            configurationMock.bump = "minor";
+            configurationMock.bump = CUSTOM_BUMP;
             command.run();
 
-            assertEquals(configurationMock.bump, command.state().getBump());
-            assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
-            assertEquals("0.2.0", command.state().getVersion());
-            assertTrue(command.state().getNewVersion());
-            assertTrue(command.state().getNewRelease());
+            assertEquals(CUSTOM_BUMP, command.state().getBump());
+            assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
-            assertEquals("0.1.0", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.1.0"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(Defaults.INITIAL_VERSION, command.state().getReleaseScope().getPreviousVersion());
+            assertEquals(script.getCommitByTag(Defaults.INITIAL_VERSION), command.state().getReleaseScope().getPreviousVersionCommit());
             assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
+            assertTrue(command.state().getNewVersion());
+            assertTrue(command.state().getNewRelease());
+            assertEquals("0.2.0", command.state().getVersion());
         }
 
         @TestTemplate
-        @DisplayName("Infer.run() with bump=patch override in a Git repository with just one initial version commit")
+        @DisplayName("Infer.run() on repository with one versioned commit, with bump=patch override > yield to new version and release")
         @Baseline(Scenario.INITIAL_VERSION)
         void runWithBumpPatchOverriddenByUserInRepoWithJustOneInitialVersionCommitTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            final String CUSTOM_BUMP = "patch";
             ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-
             command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            configurationMock.bump = "patch";
+            configurationMock.bump = CUSTOM_BUMP;
             command.run();
 
-            assertEquals(configurationMock.bump, command.state().getBump());
-            assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
-            assertEquals("0.1.1", command.state().getVersion());
-            assertTrue(command.state().getNewVersion());
-            assertTrue(command.state().getNewRelease());
+            assertEquals(CUSTOM_BUMP, command.state().getBump());
+            assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
-            assertEquals("0.1.0", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.1.0"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(Defaults.INITIAL_VERSION, command.state().getReleaseScope().getPreviousVersion());
+            assertEquals(script.getCommitByTag(Defaults.INITIAL_VERSION), command.state().getReleaseScope().getPreviousVersionCommit());
             assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
+            assertTrue(command.state().getNewVersion());
+            assertTrue(command.state().getNewRelease());
+            assertEquals("0.1.1", command.state().getVersion());
         }
 
         @TestTemplate
-        @DisplayName("Infer.run() with bump=alpha override in a Git repository with just one initial version commit")
+        @DisplayName("Infer.run() on repository with one versioned commit, with bump=alpha override > yield to new version and release")
         @Baseline(Scenario.INITIAL_VERSION)
         void runWithBumpAlphaOverriddenByUserInRepoWithJustOneInitialVersionCommitTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            final String CUSTOM_BUMP = "alpha";
             ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-
             command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            configurationMock.bump = "alpha";
+            configurationMock.bump = CUSTOM_BUMP;
             command.run();
 
-            assertEquals(configurationMock.bump, command.state().getBump());
-            assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
-            assertEquals("0.1.0-alpha.1", command.state().getVersion());
-            assertTrue(command.state().getNewVersion());
-            assertTrue(command.state().getNewRelease());
+            assertEquals(CUSTOM_BUMP, command.state().getBump());
+            assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
-            assertEquals("0.1.0", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.1.0"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(Defaults.INITIAL_VERSION, command.state().getReleaseScope().getPreviousVersion());
+            assertEquals(script.getCommitByTag(Defaults.INITIAL_VERSION), command.state().getReleaseScope().getPreviousVersionCommit());
             assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
+            assertTrue(command.state().getNewVersion());
+            assertTrue(command.state().getNewRelease());
+            assertEquals("0.1.0-alpha.1", command.state().getVersion());
         }
 
         @TestTemplate
-        @DisplayName("Infer.run() with lenient release in a Git repository with just one initial version commit")
+        @DisplayName("Infer.run() on repository with prefixed versioned commit, with release lenient, without prefix > yield to new version and release")
         @Baseline(Scenario.INITIAL_VERSION)
-        void runWithLenientReleaseInRepoWithJustOneInitialVersionCommitTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
+        void runWithReleaseLenientInRepoWithPrefixedVersionCommitTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
             ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-
             command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
             configurationMock.releaseLenient = Boolean.TRUE;
             script.andCommitWithTag("release-2.2.2");
-            
             command.run();
 
-            assertEquals(configurationMock.bump, command.state().getBump());
-            assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
-            assertEquals("2.2.2", command.state().getVersion());
-            assertTrue(command.state().getNewVersion());
-            assertTrue(command.state().getNewRelease());
+            assertEquals(Defaults.BUMP, command.state().getBump());
+            assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("release-2.2.2", command.state().getReleaseScope().getPreviousVersion());
             assertEquals(script.getCommitByTag("release-2.2.2"), command.state().getReleaseScope().getPreviousVersionCommit());
             assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
+            assertTrue(command.state().getNewVersion());
+            assertTrue(command.state().getNewRelease());
+            assertEquals("2.2.2", command.state().getVersion());
         }
 
         @TestTemplate
-        @DisplayName("Infer.run() without lenient release in a Git repository with just one initial version commit")
+        @DisplayName("Infer.run() on repository with prefixed versioned commit, without release lenient, without prefix > yield to no new version or release")
         @Baseline(Scenario.INITIAL_VERSION)
-        void runWithoutLenientReleaseInRepoWithJustOneInitialVersionCommitTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
+        void runWithoutReleaseLenientInRepoWithoutPrefixedVersionCommitTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
             ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-
             command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
             configurationMock.releaseLenient = Boolean.FALSE;
             script.andCommitWithTag("release-2.2.2");
-            
             command.run();
 
-            assertEquals(configurationMock.bump, command.state().getBump());
-            assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
-            assertEquals("0.1.0", command.state().getVersion());
+            assertEquals(Defaults.BUMP, command.state().getBump());
+            assertEquals(Defaults.SCHEME, command.state().getScheme());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getInitialCommit());
+            assertNull(command.state().getReleaseScope().getFinalCommit());
+            assertEquals(Defaults.INITIAL_VERSION, command.state().getReleaseScope().getPreviousVersion());
+            assertEquals(script.getCommitByTag(Defaults.INITIAL_VERSION), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
-            assertEquals(script.getCommitByTag("release-2.2.2"), command.state().getReleaseScope().getInitialCommit());
-            assertNull(command.state().getReleaseScope().getFinalCommit());
-            assertEquals("0.1.0", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.1.0"), command.state().getReleaseScope().getPreviousVersionCommit());
-            assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
+            assertEquals(Defaults.INITIAL_VERSION, command.state().getVersion());
         }
 
         @TestTemplate
-        @DisplayName("Infer.run() without lenient release and with release prefix in a Git repository with just one initial version commit")
+        @DisplayName("Infer.run() on repository with prefixed versioned commit, without release lenient, with prefix > yield to no new version or release")
         @Baseline(Scenario.INITIAL_VERSION)
         void runWithoutLenientAndWithPrefixReleaseInRepoWithJustOneInitialVersionCommitTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
             ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-
             command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
             configurationMock.releaseLenient = Boolean.FALSE;
             configurationMock.releasePrefix = "release-";
             script.andCommitWithTag("release-2.2.2");
-            
             command.run();
 
-            assertEquals(configurationMock.bump, command.state().getBump());
-            assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
-            assertEquals("release-2.2.2", command.state().getVersion());
-            assertFalse(command.state().getNewVersion());
-            assertFalse(command.state().getNewRelease());
+            assertEquals(Defaults.BUMP, command.state().getBump());
+            assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("release-2.2.2", command.state().getReleaseScope().getPreviousVersion());
             assertEquals(script.getCommitByTag("release-2.2.2"), command.state().getReleaseScope().getPreviousVersionCommit());
             assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
-        }
-
-        @TestTemplate
-        @DisplayName("Infer.run() without lenient release and without release prefix in a Git repository with just one initial version commit")
-        @Baseline(Scenario.INITIAL_VERSION)
-        void runWithoutLenientAndWithoutPrefixReleaseInRepoWithJustOneInitialVersionCommitTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
-            throws Exception {
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-
-            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            configurationMock.releaseLenient = Boolean.FALSE;
-            configurationMock.releasePrefix = ""; // null doesn't override the default, the empty string does
-            script.andCommitWithTag("release-2.2.2");
-
-            command.run();
-
-            assertEquals(configurationMock.bump, command.state().getBump());
-            assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
-            assertEquals("0.1.0", command.state().getVersion());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
-            assertEquals(script.getCommitByTag("release-2.2.2"), command.state().getReleaseScope().getInitialCommit());
-            assertNull(command.state().getReleaseScope().getFinalCommit());
-            assertEquals("0.1.0", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.1.0"), command.state().getReleaseScope().getPreviousVersionCommit());
-            assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
+            assertEquals("release-2.2.2", command.state().getVersion());
         }
 
         @TestTemplate
-        @DisplayName("Infer.run() with a simple linear commit history but no further significant commits")
+        @DisplayName("Infer.run() on repository with simple linear commit history and non significant commits > yield to no new version or release")
         @Baseline(Scenario.ONE_BRANCH_SHORT)
-        void runWithSimpleCommitHistoryButNoFurtherSignificantCommitsTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
+        void runInRepoWithSimpleLinearCommitHistoryAndNonSignificantCommitsTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
             command.run();
 
-            assertNull(command.state().getBump());
-            assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
-            assertEquals("0.0.4", command.state().getVersion());
-            assertFalse(command.state().getNewVersion());
-            assertFalse(command.state().getNewRelease());
-            assertEquals(script.getWorkbenchCommits().get(script.getWorkbenchCommits().size()-2), command.state().getReleaseScope().getInitialCommit());
+            assertEquals(Defaults.BUMP, command.state().getBump());
+            assertEquals(Defaults.SCHEME, command.state().getScheme());
+            assertEquals(script.getCommitIDs().get(1), command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion());
             assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit());
             assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
-        }
-
-        @TestTemplate
-        @DisplayName("Infer.run() with a simple linear commit history and further significant commits")
-        @Baseline(Scenario.ONE_BRANCH_SHORT)
-        void runWithSimpleCommitHistoryAndFurtherSignificantCommitsTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
-            throws Exception {
-            command.run();
-            
-            assertNull(command.state().getBump());
-            assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
-            assertEquals("0.0.4", command.state().getVersion());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
-            assertEquals(script.getWorkbenchCommits().get(script.getWorkbenchCommits().size()-2), command.state().getReleaseScope().getInitialCommit());
-            assertNull(command.state().getReleaseScope().getFinalCommit());
-            assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getWorkbenchCommits().get(script.getWorkbenchCommits().size()-3), command.state().getReleaseScope().getPreviousVersionCommit());
-            assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
+            assertEquals("0.0.4", command.state().getVersion());
         }
 
         @TestTemplate
-        @DisplayName("Infer.run() with initial version override with further non significant commits")
+        @DisplayName("Infer.run() on repository with simple linear commit history and non significant commits, with initial version override > yield to no new version or release")
         @Baseline(Scenario.ONE_BRANCH_SHORT)
-        void runWithInitialVersionOverriddenByUserInRepoWithFurtherNonSignificantCommitsTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
+        void runInRepoWithSimpleLinearCommitHistoryAndNonSignificantCommitsWithInitialVersionOverrideTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
             ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-
-            assumeTrue(Objects.isNull(command.state().getVersion()));
-
-            configurationMock.initialVersion = "12.13.14";
             command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
+            configurationMock.initialVersion = "12.13.14";
             command.run();
 
-            assertNull(command.state().getBump());
-            assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
-            assertEquals("0.0.4", command.state().getVersion());
-            assertFalse(command.state().getNewVersion());
-            assertFalse(command.state().getNewRelease());
-            assertEquals(script.getWorkbenchCommits().get(script.getWorkbenchCommits().size()-2), command.state().getReleaseScope().getInitialCommit());
+            assertEquals(Defaults.BUMP, command.state().getBump());
+            assertEquals(Defaults.SCHEME, command.state().getScheme());
+            assertEquals(script.getCommitIDs().get(1), command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getWorkbenchCommits().get(script.getWorkbenchCommits().size()-3), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit());
             assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
+            assertFalse(command.state().getNewVersion());
+            assertFalse(command.state().getNewRelease());
+            assertEquals("0.0.4", command.state().getVersion());
         }
 
         @TestTemplate
-        @DisplayName("Infer.run() with version override with further non significant commits")
+        @DisplayName("Infer.run() on repository with simple linear commit history and non significant commits, with version override > yield to new version and release")
         @Baseline(Scenario.ONE_BRANCH_SHORT)
         void runWithVersionOverriddenByUserInRepoWithFurtherNonSignificantCommitsTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
             ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-
-            assumeTrue(Objects.isNull(command.state().getVersion()));
-
             command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
             configurationMock.version = "1.2.3";
             command.run();
 
-            assertNull(command.state().getBump());
-            assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
-            assertEquals(configurationMock.version.toString(), command.state().getVersion());
-            assertTrue(command.state().getNewVersion());
-            assertTrue(command.state().getNewRelease());
+            assertEquals(Defaults.BUMP, command.state().getBump());
+            assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertNull(command.state().getReleaseScope().getPreviousVersion());
             assertNull(command.state().getReleaseScope().getPreviousVersionCommit());
             assertNull(command.state().getReleaseScope().getSignificant());
+            assertTrue(command.state().getNewVersion());
+            assertTrue(command.state().getNewRelease());
+            assertEquals("1.2.3", command.state().getVersion());
         }
 
         @TestTemplate
-        @DisplayName("Infer.run() with bump=major override with further non significant commits")
+        @DisplayName("Infer.run() on repository with simple linear commit history and non significant commits, with bump=major override > yield to new version and release")
         @Baseline(Scenario.ONE_BRANCH_SHORT)
-        void runWithBumpMajorOverriddenByUserInRepoWithFurtherNonSignificantCommitsTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
+        void runWithBumpMajorOverrideInRepoWithFurtherNonSignificantCommitsTestTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            final String CUSTOM_BUMP = "major";
             ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-
             command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            configurationMock.bump = "major";
+            configurationMock.bump = CUSTOM_BUMP;
             command.run();
 
-            assertEquals(configurationMock.bump, command.state().getBump());
-            assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
+            assertEquals(CUSTOM_BUMP, command.state().getBump());
+            assertEquals(Defaults.SCHEME, command.state().getScheme());
+            assertEquals(script.getCommitIDs().get(1), command.state().getReleaseScope().getInitialCommit());
+            assertNull(command.state().getReleaseScope().getFinalCommit());
+            assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion());
+            assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
+            assertTrue(command.state().getNewVersion());
+            assertTrue(command.state().getNewRelease());
             assertEquals("1.0.0", command.state().getVersion());
-            assertTrue(command.state().getNewVersion());
-            assertTrue(command.state().getNewRelease());
-            assertEquals(script.getWorkbenchCommits().get(script.getWorkbenchCommits().size()-2), command.state().getReleaseScope().getInitialCommit());
+        }
+
+        @TestTemplate
+        @DisplayName("Infer.run() on repository with simple linear commit history and non significant commits, with bump=minor override > yield to new version and release")
+        @Baseline(Scenario.ONE_BRANCH_SHORT)
+        void runWithBumpMinorOverrideInRepoWithFurtherNonSignificantCommitsTestTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
+            throws Exception {
+            final String CUSTOM_BUMP = "minor";
+            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
+            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
+            configurationMock.bump = CUSTOM_BUMP;
+            command.run();
+
+            assertEquals(CUSTOM_BUMP, command.state().getBump());
+            assertEquals(Defaults.SCHEME, command.state().getScheme());
+            assertEquals(script.getCommitIDs().get(1), command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion());
             assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit());
             assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
-        }
-
-        @TestTemplate
-        @DisplayName("Infer.run() with bump=minor override with further non significant commits")
-        @Baseline(Scenario.ONE_BRANCH_SHORT)
-        void runWithBumpMinorOverriddenByUserInRepoWithFurtherNonSignificantCommitsTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
-            throws Exception {
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-
-            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            configurationMock.bump = "minor";
-            command.run();
-
-            assertEquals(configurationMock.bump, command.state().getBump());
-            assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
+            assertTrue(command.state().getNewVersion());
+            assertTrue(command.state().getNewRelease());
             assertEquals("0.1.0", command.state().getVersion());
-            assertTrue(command.state().getNewVersion());
-            assertTrue(command.state().getNewRelease());
-            assertEquals(script.getWorkbenchCommits().get(script.getWorkbenchCommits().size()-2), command.state().getReleaseScope().getInitialCommit());
+        }
+
+        @TestTemplate
+        @DisplayName("Infer.run() on repository with simple linear commit history and non significant commits, with bump=patch override > yield to new version and release")
+        @Baseline(Scenario.ONE_BRANCH_SHORT)
+        void runWithBumpPatchOverrideInRepoWithFurtherNonSignificantCommitsTestTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
+            throws Exception {
+            final String CUSTOM_BUMP = "patch";
+            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
+            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
+            configurationMock.bump = CUSTOM_BUMP;
+            command.run();
+
+            assertEquals(CUSTOM_BUMP, command.state().getBump());
+            assertEquals(Defaults.SCHEME, command.state().getScheme());
+            assertEquals(script.getCommitIDs().get(1), command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion());
             assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit());
             assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
-        }
-
-        @TestTemplate
-        @DisplayName("Infer.run() with bump=patch override with further non significant commits")
-        @Baseline(Scenario.ONE_BRANCH_SHORT)
-        void runWithBumpPatchOverriddenByUserInRepoWithFurtherNonSignificantCommitsTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
-            throws Exception {
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-
-            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            configurationMock.bump = "patch";
-            command.run();
-
-            assertEquals(configurationMock.bump, command.state().getBump());
-            assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
+            assertTrue(command.state().getNewVersion());
+            assertTrue(command.state().getNewRelease());
             assertEquals("0.0.5", command.state().getVersion());
-            assertTrue(command.state().getNewVersion());
-            assertTrue(command.state().getNewRelease());
-            assertEquals(script.getWorkbenchCommits().get(script.getWorkbenchCommits().size()-2), command.state().getReleaseScope().getInitialCommit());
-            assertNull(command.state().getReleaseScope().getFinalCommit());
-            assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit());
-            assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
         }
 
         @TestTemplate
-        @DisplayName("Infer.run() with bump=alpha override with further non significant commits")
+        @DisplayName("Infer.run() on repository with simple linear commit history and non significant commits, with bump=alpha override > yield to new version and release")
         @Baseline(Scenario.ONE_BRANCH_SHORT)
-        void runWithBumpAlphaOverriddenByUserInRepoWithFurtherNonSignificantCommitsTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
+        void runWithBumpAlphaOverrideInRepoWithFurtherNonSignificantCommitsTestTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            final String CUSTOM_BUMP = "alpha";
             ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-
             command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            configurationMock.bump = "alpha";
+            configurationMock.bump = CUSTOM_BUMP;
             command.run();
 
-            assertEquals(configurationMock.bump, command.state().getBump());
-            assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
-            assertEquals("0.0.4-alpha.1", command.state().getVersion());
-            assertTrue(command.state().getNewVersion());
-            assertTrue(command.state().getNewRelease());
-            assertEquals(script.getWorkbenchCommits().get(script.getWorkbenchCommits().size()-2), command.state().getReleaseScope().getInitialCommit());
+            assertEquals(CUSTOM_BUMP, command.state().getBump());
+            assertEquals(Defaults.SCHEME, command.state().getScheme());
+            assertEquals(script.getCommitIDs().get(1), command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion());
             assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit());
             assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
+            assertTrue(command.state().getNewVersion());
+            assertTrue(command.state().getNewRelease());
+            assertEquals("0.0.4-alpha.1", command.state().getVersion());
         }
 
         @TestTemplate
-        @DisplayName("Infer.run() with lenient release with further non significant commits")
+        @DisplayName("Infer.run() on repository with simple linear commit history and non significant commits, with release lenient, without prefix > yield to new version and release")
         @Baseline(Scenario.ONE_BRANCH_SHORT)
-        void runWithLenientReleaseInRepoWithFurtherNonSignificantCommitsTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
+        void runWithReleaseLenientAndWithoutPrefixInRepoWithFurtherNonSignificantPrefixedCommitsTestTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
             ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-
             command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
             configurationMock.releaseLenient = Boolean.TRUE;
             script.andCommitWithTag("release-2.2.2");
-            
             command.run();
 
-            assertEquals(configurationMock.bump, command.state().getBump());
-            assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
-            assertEquals("2.2.2", command.state().getVersion());
-            assertTrue(command.state().getNewVersion());
-            assertTrue(command.state().getNewRelease());
+            assertEquals(Defaults.BUMP, command.state().getBump());
+            assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("release-2.2.2", command.state().getReleaseScope().getPreviousVersion());
             assertEquals(script.getCommitByTag("release-2.2.2"), command.state().getReleaseScope().getPreviousVersionCommit());
             assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
+            assertTrue(command.state().getNewVersion());
+            assertTrue(command.state().getNewRelease());
+            assertEquals("2.2.2", command.state().getVersion());
         }
 
         @TestTemplate
-        @DisplayName("Infer.run() without lenient release with further non significant commits")
+        @DisplayName("Infer.run() on repository with simple linear commit history and non significant commits, without release lenient, without prefix > yield to no new version or release")
         @Baseline(Scenario.ONE_BRANCH_SHORT)
-        void runWithoutLenientReleaseInRepoWithFurtherNonSignificantCommitsTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
+        void runWithoutReleaseLenientAndWithoutPrefixInRepoWithFurtherNonSignificantPrefixedCommitsTestTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
             ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-
             command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
             configurationMock.releaseLenient = Boolean.FALSE;
             script.andCommitWithTag("release-2.2.2");
-            
             command.run();
 
-            assertEquals(configurationMock.bump, command.state().getBump());
-            assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
-            assertEquals("0.0.4", command.state().getVersion());
-            assertFalse(command.state().getNewVersion());
-            assertFalse(command.state().getNewRelease());
-            assertEquals(script.getWorkbenchCommits().get(script.getWorkbenchCommits().size()-3), command.state().getReleaseScope().getInitialCommit());
+            assertEquals(Defaults.BUMP, command.state().getBump());
+            assertEquals(Defaults.SCHEME, command.state().getScheme());
+            assertEquals(script.getCommitIDs().get(2), command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion());
             assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit());
             assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
+            assertFalse(command.state().getNewVersion());
+            assertFalse(command.state().getNewRelease());
+            assertEquals("0.0.4", command.state().getVersion());
         }
 
         @TestTemplate
-        @DisplayName("Infer.run() without lenient release and with release prefix with further non significant commits")
+        @DisplayName("Infer.run() on repository with simple linear commit history and non significant commits, without release lenient, with prefix > yield to no new version or release")
         @Baseline(Scenario.ONE_BRANCH_SHORT)
-        void runWithoutLenientAndWithPrefixReleaseInRepoWithFurtherNonSignificantCommitsTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
+        void runWithoutReleaseLenientAndWithPrefixInRepoWithFurtherNonSignificantPrefixedCommitsTestTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
             ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-
             command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
             configurationMock.releaseLenient = Boolean.FALSE;
             configurationMock.releasePrefix = "release-";
             script.andCommitWithTag("release-2.2.2");
-            
             command.run();
 
-            assertEquals(configurationMock.bump, command.state().getBump());
-            assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
-            assertEquals("release-2.2.2", command.state().getVersion());
-            assertFalse(command.state().getNewVersion());
-            assertFalse(command.state().getNewRelease());
+            assertEquals(Defaults.BUMP, command.state().getBump());
+            assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("release-2.2.2", command.state().getReleaseScope().getPreviousVersion());
             assertEquals(script.getCommitByTag("release-2.2.2"), command.state().getReleaseScope().getPreviousVersionCommit());
             assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
-        }
-
-        @TestTemplate
-        @DisplayName("Infer.run() without lenient release and without release prefix with further non significant commits")
-        @Baseline(Scenario.ONE_BRANCH_SHORT)
-        void runWithoutLenientAndWithoutPrefixReleaseInRepoWithFurtherNonSignificantCommitsTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
-            throws Exception {
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-
-            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            configurationMock.releaseLenient = Boolean.FALSE;
-            configurationMock.releasePrefix = ""; // null doesn't override the default, the empty string does
-            script.andCommitWithTag("release-2.2.2");
-
-            command.run();
-
-            assertEquals(configurationMock.bump, command.state().getBump());
-            assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
-            assertEquals("0.0.4", command.state().getVersion());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
-            assertEquals(script.getWorkbenchCommits().get(script.getWorkbenchCommits().size()-3), command.state().getReleaseScope().getInitialCommit());
-            assertNull(command.state().getReleaseScope().getFinalCommit());
-            assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit());
-            assertEquals(Boolean.FALSE, command.state().getReleaseScope().getSignificant());
+            assertEquals("release-2.2.2", command.state().getVersion());
         }
 
         @TestTemplate
-        @DisplayName("Infer.run() with a commit message convention that accepts all commits as significant")
+        @DisplayName("Infer.run() on repository with simple linear commit history and non significant commits, with a commit message convention that accepts all commits as significant > yield to new version and release")
         @Baseline(Scenario.ONE_BRANCH_SHORT)
-        void runWithAllSignificantCommitsTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
+        void runWithAlwayspositiveCommitConventionInRepoWithFurtherNonSignificantPrefixedCommitsTestTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
             ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
             configurationMock.commitMessageConventions.items = Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("minor", ".*")));
             configurationMock.commitMessageConventions.enabled = List.<String>of("testConvention");
             command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-
             command.run();
 
             assertEquals("minor", command.state().getBump());
-            assertEquals(command.state().getConfiguration().getScheme(), command.state().getScheme());
-            assertEquals("0.1.0", command.state().getVersion());
-            assertTrue(command.state().getNewVersion());
-            assertTrue(command.state().getNewRelease());
-            assertEquals(script.getWorkbenchCommits().get(script.getWorkbenchCommits().size()-2), command.state().getReleaseScope().getInitialCommit());
+            assertEquals(Defaults.SCHEME, command.state().getScheme());
+            assertEquals(script.getCommitIDs().get(1), command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion());
             assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit());
             assertEquals(Boolean.TRUE, command.state().getReleaseScope().getSignificant());
+            assertTrue(command.state().getNewVersion());
+            assertTrue(command.state().getNewRelease());
+            assertEquals("0.1.0", command.state().getVersion());
         }
     }
 }

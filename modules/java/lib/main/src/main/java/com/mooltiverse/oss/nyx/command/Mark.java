@@ -152,66 +152,61 @@ public class Mark extends AbstractCommand {
         throws DataAccessException, IllegalPropertyException, GitException, ReleaseException {
         logger.debug(COMMAND, "Running the Mark command...");
 
-        if (!state().getReleaseScope().hasInitialCommit()) {
-            logger.info(COMMAND, "Release scope is empty. Nothing to release.");
-        }
-        else {
+        if (state().getNewVersion()) {
             logger.debug(COMMAND, "Setting the finalCommit state value to {}", repository().getLatestCommit());
             state().getReleaseScope().setFinalCommit(repository().getLatestCommit());
 
-            if (state().getNewVersion()) {
-                // COMMIT
-                // TODO: make the commit step conditional, depending on the configuration and the release type. Not all release types may have the commit enabled
-                if (repository().isClean()) {
-                    logger.debug(COMMAND, "Repository is clean, no commits need to be made");
-                }
-                else {
-                    if (state().getConfiguration().getDryRun()) {
-                        logger.info(COMMAND, "Git commit skipped due to dry run");
-                    }
-                    else {
-                        logger.debug(COMMAND, "Committing local changes");
-
-                        // TODO: customize the commit message
-
-                        // TODO: not all changes may need to be committed so replace "." here with the paths of the files to commit, in case only a subset has to be committed
-                        // TODO: make the commit message customizeable. Now we use the version number also for the message
-                        // TODO: use the other version of the commit() method that also accepts identities, to optionally set the Author and Committer. This could be used to add Nyx as the committer
-                        String finalCommit = repository().commit(List.<String>of("."), state().getVersion()).getSHA();
-                        logger.debug(COMMAND, "Local changes committed at {}", finalCommit);
-
-                        logger.debug(COMMAND, "Setting the finalCommit state value to {}", finalCommit);
-                        state().getReleaseScope().setFinalCommit(finalCommit);
-                    }
-                }
-
-                // TAG
-                // TODO: make the tag step conditional, depending on the configuration and the release type. Not all release types may have the tag enabled
-                if (state().getConfiguration().getDryRun()) {
-                    logger.info(COMMAND, "Git tag skipped due to dry run");
-                }
-                else {
-                    // TODO: make the lightweight/annotated tag customizeable here and optionally add the Tagger Identity
-                    logger.debug(COMMAND, "Tagging latest commit {} with tag {}", repository().getLatestCommit(), state().getVersion());
-                    repository().tag(state().getVersion());
-                    logger.debug(COMMAND, "Tag {} applied to commit {}", state().getVersion(), repository().getLatestCommit());
-                }
-
-                // PUSH
-                // TODO: make the push step conditional, depending on the configuration and the release type. Not all release types may have the push enabled
-                if (state().getConfiguration().getDryRun()) {
-                    logger.info(COMMAND, "Git push skipped due to dry run");
-                }
-                else {
-                    // TODO: here we push to the default remote only (origin). The remotes to push to should be customizeable
-                    logger.debug(COMMAND, "Pushing local changes to remotes");
-                    String remote = repository().push();
-                    logger.debug(COMMAND, "Local changes pushed to remote {}", remote);
-                }
+            // COMMIT
+            // TODO: make the commit step conditional, depending on the configuration and the release type. Not all release types may have the commit enabled
+            if (repository().isClean()) {
+                logger.debug(COMMAND, "Repository is clean, no commits need to be made");
             }
             else {
-                logger.info(COMMAND, "No version change detected. Nothing to release.");
+                if (state().getConfiguration().getDryRun()) {
+                    logger.info(COMMAND, "Git commit skipped due to dry run");
+                }
+                else {
+                    logger.debug(COMMAND, "Committing local changes");
+
+                    // TODO: customize the commit message
+
+                    // TODO: not all changes may need to be committed so replace "." here with the paths of the files to commit, in case only a subset has to be committed
+                    // TODO: make the commit message customizeable. Now we use the version number also for the message
+                    // TODO: use the other version of the commit() method that also accepts identities, to optionally set the Author and Committer. This could be used to add Nyx as the committer
+                    String finalCommit = repository().commit(List.<String>of("."), state().getVersion()).getSHA();
+                    logger.debug(COMMAND, "Local changes committed at {}", finalCommit);
+
+                    logger.debug(COMMAND, "Setting the finalCommit state value to {}", finalCommit);
+                    state().getReleaseScope().setFinalCommit(finalCommit);
+                }
             }
+
+            // TAG
+            // TODO: make the tag step conditional, depending on the configuration and the release type. Not all release types may have the tag enabled
+            if (state().getConfiguration().getDryRun()) {
+                logger.info(COMMAND, "Git tag skipped due to dry run");
+            }
+            else {
+                // TODO: make the lightweight/annotated tag customizeable here and optionally add the Tagger Identity
+                logger.debug(COMMAND, "Tagging latest commit {} with tag {}", repository().getLatestCommit(), state().getVersion());
+                repository().tag(state().getVersion());
+                logger.debug(COMMAND, "Tag {} applied to commit {}", state().getVersion(), repository().getLatestCommit());
+            }
+
+            // PUSH
+            // TODO: make the push step conditional, depending on the configuration and the release type. Not all release types may have the push enabled
+            if (state().getConfiguration().getDryRun()) {
+                logger.info(COMMAND, "Git push skipped due to dry run");
+            }
+            else {
+                // TODO: here we push to the default remote only (origin). The remotes to push to should be customizeable
+                logger.debug(COMMAND, "Pushing local changes to remotes");
+                String remote = repository().push();
+                logger.debug(COMMAND, "Local changes pushed to remote {}", remote);
+            }
+        }
+        else {
+            logger.info(COMMAND, "No version change detected. Nothing to release.");
         }
 
         storeStatusInternalAttributes();

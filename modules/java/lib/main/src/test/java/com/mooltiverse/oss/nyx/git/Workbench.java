@@ -353,19 +353,37 @@ public class Workbench {
     }
 
     /**
-     * Returns the list of all commit SHAs queried onto the repository.
+     * Returns the list of all commit SHAs by querying the repository starting from HEAD.
      * 
-     * @return the list of all commit SHAs queried onto the repository.
+     * @return the list of all commit SHAs by querying the repository starting from HEAD.
      * 
      * @throws Exception in case of any issue
      */
-    public List<String> getCommits()
+    public List<String> getCommitIDs()
         throws Exception {
         List<String> res = new ArrayList<String>();
         
-        Iterator<RevCommit> commitIterator = git.log().all().call().iterator();
+        Iterator<RevCommit> commitIterator = git.log().add(git.getRepository().resolve(Constants.HEAD)).call().iterator();
         while (commitIterator.hasNext())
             res.add(commitIterator.next().getId().getName());
+
+        return res;
+    }
+
+    /**
+     * Returns the list of all commits by querying the repository starting from HEAD.
+     * 
+     * @return the list of all commits by querying the repository starting from HEAD.
+     * 
+     * @throws Exception in case of any issue
+     */
+    public List<RevCommit> getCommits()
+        throws Exception {
+        List<RevCommit> res = new ArrayList<RevCommit>();
+        
+        Iterator<RevCommit> commitIterator = git.log().add(git.getRepository().resolve(Constants.HEAD)).call().iterator();
+        while (commitIterator.hasNext())
+            res.add(commitIterator.next());
 
         return res;
     }
@@ -417,6 +435,18 @@ public class Workbench {
     }
 
     /**
+     * Returns the SHA-1 ID of the last commit in the current branch.
+     * 
+     * @return the SHA-1 ID of the last commit in the current branch or {@code null} if the repository has no commits yet
+     * 
+     * @throws Exception in case of any issue
+     */
+    public String getLastCommitID()
+        throws Exception {
+        return getLastCommit().getId().getName();
+    }
+
+    /**
      * Returns the root commit.
      * 
      * @return the root commit {@code null} if the repository has no commits yet
@@ -433,6 +463,18 @@ public class Workbench {
                 return res;
         }
         return res;
+    }
+
+    /**
+     * Returns the SHA-1 ID of the root commit.
+     * 
+     * @return the SHA-1 ID of the root commit {@code null} if the repository has no commits yet
+     * 
+     * @throws Exception in case of any issue
+     */
+    public String getRootCommitID()
+        throws Exception {
+            return getRootCommit().getId().getName();
     }
 
     /**

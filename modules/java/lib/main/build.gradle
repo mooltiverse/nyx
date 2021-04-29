@@ -34,6 +34,10 @@ dependencies {
   implementation         'com.fasterxml.jackson.core:jackson-databind:2.12.2'                       // Jackson JSON library (https://github.com/FasterXML/jackson)
   implementation         'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.12.2'          // Jackson YAML library (https://github.com/FasterXML/jackson-dataformats-text/tree/master/yaml)
 
+  // The SLF4J framework that prints all test output to System err
+  // See http://www.slf4j.org/apidocs/org/slf4j/impl/SimpleLogger.html for the system properties available to change verbosity levels
+  testImplementation     'org.slf4j:slf4j-simple:1.7.30'
+
   // See the 'testExport' about this
   testExport             sourceSets.test.output
 }

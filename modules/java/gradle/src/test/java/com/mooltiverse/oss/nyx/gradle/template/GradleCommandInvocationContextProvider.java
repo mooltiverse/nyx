@@ -163,7 +163,7 @@ public class GradleCommandInvocationContextProvider extends CommandInvocationCon
          */
         @Override
         public String getDisplayName(int invocationIndex) {
-            return Objects.isNull(displayName) ? "[context: gradle    ] ".concat(Integer.toString(invocationIndex)) : "[context: gradle    ] ".concat(displayName);
+            return "[context: ".concat(GradleTaskCommand.CONTEXT_NAME).concat("    ] ").concat(Objects.isNull(displayName) ? Integer.toString(invocationIndex) : displayName);
         }
 
         /**

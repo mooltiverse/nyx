@@ -84,12 +84,6 @@ public class Infer extends AbstractCommand {
     private static final String CONFIGURED_VERSION = Infer.class.getSimpleName().concat(".").concat("configured").concat(".").concat("version");
 
     /**
-     * The name used for the internal state attribute where we store the SHA-1 of the commit
-     * which MAY become the previous version commit if the parent has a valid version tag.
-     */
-    private static final String INTERIM_PREVIOUS_VERSION_COMMIT = Infer.class.getSimpleName().concat(".").concat("interim").concat(".").concat("previous").concat(".").concat("version").concat(".").concat("commit");
-
-    /**
      * The name used for the internal state attribute where we store the SHA-1 of the last
      * commit in the current branch by the time this command was last executed.
      */
@@ -232,6 +226,11 @@ public class Infer extends AbstractCommand {
                     }
                 }
 
+                if (!state().getReleaseScope().hasPreviousVersion() || !state().getReleaseScope().hasPreviousVersionCommit()) {
+                    logger.debug(COMMAND, "Commit {} has no valid version tags so it's added to the release scope", c.getSHA());
+                    state().getReleaseScope().setInitialCommit(c.getSHA());
+                }
+
                 // if the 'bump' was not overridden by user, evaluate the commit message against the configured conventions to see which identifier must be dumped, if any
                 if (!state().hasBump()) {
                     if (!Objects.isNull(commitMessageConventions)) {
@@ -255,29 +254,10 @@ public class Infer extends AbstractCommand {
                     }
                 }
 
-                // decide whether or not we need to keep walking to the next (previous) commit
-                // if we keep walking, store this curent commit as the interim previous version,
-                // which MAY become the initialCommit in the next loop if the parent commit has a valid version tag
-                if (state().getReleaseScope().hasPreviousVersion() && state().getReleaseScope().hasPreviousVersionCommit()) {
-                    return false;
-                }
-                else {
-                    putInternalAttribute(INTERIM_PREVIOUS_VERSION_COMMIT, c.getSHA());
-                    return true;
-                }
+                // stop walking the commit history if we already have the previous version (and its commit), otherwise keep walking
+                return !(state().getReleaseScope().hasPreviousVersion() && state().getReleaseScope().hasPreviousVersionCommit());
             });
             logger.debug(COMMAND, "Walking the commit history finished.");
-
-            // if we found the previous version commit the initial commit in the scope is the one next to it, otherwise the scope will start at the root commit
-            if (state().getReleaseScope().hasPreviousVersionCommit()) {
-                logger.debug(COMMAND, "Setting the initialCommit state value to {}", getInternalAttribute(INTERIM_PREVIOUS_VERSION_COMMIT));
-                state().getReleaseScope().setInitialCommit(getInternalAttribute(INTERIM_PREVIOUS_VERSION_COMMIT));
-            }
-            else {
-                String rootCommitSHA = repository().getRootCommit();
-                logger.debug(COMMAND, "The commit history had no information about the previousVersion and previousVersionCommit so the initialCommit is the repository root commit {}", rootCommitSHA);
-                state().getReleaseScope().setInitialCommit(rootCommitSHA);
-            }
 
             // if we couldn't infer the initial version and its commit, set the state attributes to the configured initial values
             if (!state().getReleaseScope().hasPreviousVersion() || !state().getReleaseScope().hasPreviousVersionCommit()) {

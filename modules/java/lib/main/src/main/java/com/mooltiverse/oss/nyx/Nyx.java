@@ -234,7 +234,7 @@ public class Nyx {
      */
     private Command getCommandInstance(Commands command)
         throws DataAccessException, IllegalPropertyException, GitException {
-        logger.debug(MAIN, "Retrieving new command instance {}", command);
+        logger.debug(MAIN, "Looking up command instance {} from cache", command);
         if (commands.containsKey(command))
             return commands.get(command);
         

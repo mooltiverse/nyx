@@ -30,11 +30,16 @@ import com.mooltiverse.oss.nyx.state.State;
  * This is a proxy implementation to be used in test templates and allows to run a command
  * as a Gradle {@link Task}.
  */
-class GradleTaskCommand implements CommandProxy {
+public class GradleTaskCommand implements CommandProxy {
     /**
      * The Gradle task private instance.
      */
     private final CoreTask task;
+
+    /**
+     * The context name returned by this proxy.
+     */
+    public static final String CONTEXT_NAME = "gradle";
 
     /**
      * Constructor.
@@ -53,7 +58,7 @@ class GradleTaskCommand implements CommandProxy {
      */
     @Override
     public String getContextName() {
-        return "gradle";
+        return CONTEXT_NAME;
     }
 
     /**

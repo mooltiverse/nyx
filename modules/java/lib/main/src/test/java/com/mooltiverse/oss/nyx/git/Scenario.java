@@ -57,7 +57,8 @@ public enum Scenario {
      * </pre>
      */
     INITIAL_VERSION( f -> Script.fromScratch(f).andAddFiles()
-        .andCommit("Initial commit").andCommitWithTag("Initial version", "0.1.0", null)
+        .andCommit("Initial commit")
+        .andCommitWithTag("Initial version", "0.1.0", null)
     ),
 
     /**
