@@ -100,11 +100,7 @@ public class StateTests {
 
             state.setVersion("1.2.3");
             state.getReleaseScope().setPreviousVersion("1.2.3");
-            state.getReleaseScope().setSignificant(Boolean.FALSE);
-            // TODO: dad the releaseType.publish attribute here as a variable to consider in the outcome
-            assertFalse(state.getNewRelease());
-
-            state.getReleaseScope().setSignificant(Boolean.TRUE);
+            // TODO: use the releaseType.publish attribute here as a variable to consider in the outcome
             assertFalse(state.getNewRelease());
 
             state.getReleaseScope().setPreviousVersion("0.1.0");
@@ -119,10 +115,6 @@ public class StateTests {
 
             state.setVersion("1.2.3");
             state.getReleaseScope().setPreviousVersion("1.2.3");
-            state.getReleaseScope().setSignificant(Boolean.FALSE);
-            assertFalse(state.getNewVersion());
-
-            state.getReleaseScope().setSignificant(Boolean.TRUE);
             assertFalse(state.getNewVersion());
 
             state.getReleaseScope().setPreviousVersion("0.1.0");
@@ -220,11 +212,10 @@ public class StateTests {
             oldState.setBump("alpha");
             oldState.setVersion("3.5.7");
             oldState.getInternals().put("attr1", "value1");
-            oldState.getReleaseScope().setFinalCommit("final");
-            oldState.getReleaseScope().setInitialCommit("initial");
+            oldState.getReleaseScope().getCommits().add("final");
+            oldState.getReleaseScope().getCommits().add("initial");
             oldState.getReleaseScope().setPreviousVersion("previous");
             oldState.getReleaseScope().setPreviousVersionCommit("previousCommit");
-            oldState.getReleaseScope().setSignificant(Boolean.TRUE);
 
             // save the file
             FileMapper.save(configurationMock.stateFile, oldState);

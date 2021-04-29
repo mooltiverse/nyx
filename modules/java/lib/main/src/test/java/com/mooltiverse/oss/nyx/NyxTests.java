@@ -133,11 +133,10 @@ public class NyxTests {
             oldState.setBump("alpha");
             oldState.setVersion("3.5.7");
             oldState.getInternals().put("attr1", "value1");
-            oldState.getReleaseScope().setFinalCommit("final");
-            oldState.getReleaseScope().setInitialCommit("initial");
+            oldState.getReleaseScope().getCommits().add("final");
+            oldState.getReleaseScope().getCommits().add("initial");
             oldState.getReleaseScope().setPreviousVersion("previous");
             oldState.getReleaseScope().setPreviousVersionCommit("previousCommit");
-            oldState.getReleaseScope().setSignificant(Boolean.TRUE);
 
             // save the file
             FileMapper.save(configurationMock.stateFile, oldState);
@@ -152,10 +151,13 @@ public class NyxTests {
             assertEquals(oldState.getInternals(), resumedState.getInternals());
             assertTrue(resumedState.getInternals().containsKey("attr1"));
             assertEquals("value1", resumedState.getInternals().get("attr1"));
+            assertEquals("final", resumedState.getReleaseScope().getFinalCommit());
             assertEquals(oldState.getReleaseScope().getFinalCommit(), resumedState.getReleaseScope().getFinalCommit());
+            assertEquals("initial", resumedState.getReleaseScope().getInitialCommit());
             assertEquals(oldState.getReleaseScope().getInitialCommit(), resumedState.getReleaseScope().getInitialCommit());
             assertEquals(oldState.getReleaseScope().getPreviousVersion(), resumedState.getReleaseScope().getPreviousVersion());
             assertEquals(oldState.getReleaseScope().getPreviousVersionCommit(), resumedState.getReleaseScope().getPreviousVersionCommit());
+            assertTrue(resumedState.getReleaseScope().getSignificant());
             assertEquals(oldState.getReleaseScope().getSignificant(), resumedState.getReleaseScope().getSignificant());
             assertEquals(oldState.getTimestamp(), resumedState.getTimestamp());
             assertEquals(oldState.getVersion(), resumedState.getVersion());

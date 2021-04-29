@@ -153,9 +153,6 @@ public class Mark extends AbstractCommand {
         logger.debug(COMMAND, "Running the Mark command...");
 
         if (state().getNewVersion()) {
-            logger.debug(COMMAND, "Setting the finalCommit state value to {}", repository().getLatestCommit());
-            state().getReleaseScope().setFinalCommit(repository().getLatestCommit());
-
             // COMMIT
             // TODO: make the commit step conditional, depending on the configuration and the release type. Not all release types may have the commit enabled
             if (repository().isClean()) {
@@ -176,8 +173,8 @@ public class Mark extends AbstractCommand {
                     String finalCommit = repository().commit(List.<String>of("."), state().getVersion()).getSHA();
                     logger.debug(COMMAND, "Local changes committed at {}", finalCommit);
 
-                    logger.debug(COMMAND, "Setting the finalCommit state value to {}", finalCommit);
-                    state().getReleaseScope().setFinalCommit(finalCommit);
+                    logger.debug(COMMAND, "Adding commit {} to the release scope", finalCommit);
+                    state().getReleaseScope().getCommits().add(0, finalCommit);
                 }
             }
 

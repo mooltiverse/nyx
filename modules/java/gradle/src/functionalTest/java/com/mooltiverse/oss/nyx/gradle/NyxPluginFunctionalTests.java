@@ -529,7 +529,6 @@ public class NyxPluginFunctionalTests {
         printWriter.println("        project.file('state-scheme.txt').write project.nyxState.scheme.toString()");
         printWriter.println("        project.file('state-timestamp.txt').write Long.valueOf(project.nyxState.timestamp).toString()");
         printWriter.println("        project.file('state-version.txt').write project.nyxState.version");
-        printWriter.println("        project.file('state-significant.txt').write Boolean.valueOf(project.nyxState.releaseScope.significant).toString()");
         printWriter.println("    }");
         printWriter.println("}");
         printWriter.println("task dummy() {");
@@ -753,7 +752,6 @@ public class NyxPluginFunctionalTests {
 
             runTask(gradleRunner, gradleVersion, "writeStateDiagnostics", null);
             assertEquals("0.1.0", fileContent(new File(script.getWorkingDirectory(), "state-version.txt")));
-            assertEquals("false", fileContent(new File(script.getWorkingDirectory(), "state-significant.txt")));
 
             tearDown(gradleRunner);
         }
@@ -786,7 +784,6 @@ public class NyxPluginFunctionalTests {
 
             runTask(gradleRunner, gradleVersion, "writeStateDiagnostics", null);
             assertEquals("0.1.0", fileContent(new File(script.getWorkingDirectory(), "state-version.txt")));
-            assertEquals("false", fileContent(new File(script.getWorkingDirectory(), "state-significant.txt")));
 
             // now run nyxInfer and make sure it makes no difference
             runTask(gradleRunner, gradleVersion, "nyxInfer", null);
@@ -795,7 +792,6 @@ public class NyxPluginFunctionalTests {
 
             runTask(gradleRunner, gradleVersion, "writeStateDiagnostics", null);
             assertEquals("0.1.0", fileContent(new File(script.getWorkingDirectory(), "state-version.txt")));
-            assertEquals("false", fileContent(new File(script.getWorkingDirectory(), "state-significant.txt")));
 
             tearDown(gradleRunner);
         }

@@ -228,7 +228,7 @@ public class Infer extends AbstractCommand {
 
                 if (!state().getReleaseScope().hasPreviousVersion() || !state().getReleaseScope().hasPreviousVersionCommit()) {
                     logger.debug(COMMAND, "Commit {} has no valid version tags so it's added to the release scope", c.getSHA());
-                    state().getReleaseScope().setInitialCommit(c.getSHA());
+                    state().getReleaseScope().getCommits().add(c.getSHA());
                 }
 
                 // if the 'bump' was not overridden by user, evaluate the commit message against the configured conventions to see which identifier must be dumped, if any
@@ -298,7 +298,6 @@ public class Infer extends AbstractCommand {
 
             // store values to the state object
             state().setVersion(Objects.isNull(releasePrefix) ? version.toString() : releasePrefix.concat(version.toString()));
-            state().getReleaseScope().setSignificant(Boolean.valueOf(!bumpComponents.isEmpty()));
         }
         else {
             // the version was overridden by user

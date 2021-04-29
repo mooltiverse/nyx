@@ -15,6 +15,8 @@
  */
 package com.mooltiverse.oss.nyx.data;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -22,14 +24,10 @@ import java.util.Objects;
  */
 public class ReleaseScope {
     /**
-     * The SHA-1 identifier of the first commit within the scope.
+     * The internal list of SHA-1 identifiers of all commits in the scope. The items are in reverse
+     * order so the newest commit is at position 0 and the oldest is in the final position.
      */
-    private String initialCommit = null;
-
-    /**
-     * The SHA-1 identifier of the last commit within the scope.
-     */
-    private String finalCommit = null;
+    private final List<String> commits = new ArrayList<String>();
 
     /**
      * The SHA-1 identifier of the most recent past release commit.
@@ -42,11 +40,6 @@ public class ReleaseScope {
     private String previousVersion = null;
 
     /**
-     * The flag telling if the release scope contains significant commits.
-     */
-    private Boolean significant = null;
-
-    /**
      * Default constructor.
      */
     public ReleaseScope() {
@@ -54,21 +47,13 @@ public class ReleaseScope {
     }
 
     /**
-     * Constructor.
+     * Returns the live list of SHA-1 identifiers of all commits in the scope. The items are in reverse
+     * order so the newest commit is at position 0 and the oldest is in the final position.
      * 
-     * @param previousVersion the version identifier of the most recent past release. It may be {@code null}.
-     * @param previousVersionCommit the SHA-1 identifier of the most recent past release commit. It may be {@code null}.
-     * @param initialCommit the SHA-1 identifier of the first commit within the scope. It may be {@code null}.
-     * @param finalCommit the SHA-1 identifier of the last commit within the scope. It may be {@code null}.
-     * @param significant the flag telling if the release scope contains significant commits. It may be {@code null}.
+     * @return the live list of SHA-1 identifiers of all commits in the scope.
      */
-    public ReleaseScope(String previousVersion, String previousVersionCommit, String initialCommit, String finalCommit, Boolean significant) {
-        super();
-        this.previousVersion = previousVersion;
-        this.previousVersionCommit = previousVersionCommit;
-        this.initialCommit = initialCommit;
-        this.finalCommit = finalCommit;
-        this.significant = significant;
+    public List<String> getCommits() {
+        return commits;
     }
 
     /**
@@ -131,7 +116,7 @@ public class ReleaseScope {
      * @return the SHA-1 identifier of the first commit within the scope. It may be {@code null}.
      */
     public String getInitialCommit() {
-        return initialCommit;
+        return commits.isEmpty() ? null : commits.get(commits.size()-1);
     }
 
     /**
@@ -140,16 +125,7 @@ public class ReleaseScope {
      * @return {@code true} if the scope has a non {@code null} SHA-1 identifier of the first commit within the scope.
      */
     public boolean hasInitialCommit() {
-        return !Objects.isNull(initialCommit);
-    }
-
-    /**
-     * Sets the SHA-1 identifier of the first commit within the scope.
-     * 
-     * @param initialCommit the SHA-1 identifier of the first commit within the scope. It may be {@code null}.
-     */
-    public void setInitialCommit(String initialCommit) {
-        this.initialCommit = initialCommit;
+        return !commits.isEmpty();
     }
 
     /**
@@ -158,7 +134,7 @@ public class ReleaseScope {
      * @return the SHA-1 identifier of the last commit within the scope. It may be {@code null}.
      */
     public String getFinalCommit() {
-        return finalCommit;
+        return commits.isEmpty() ? null : commits.get(0);
     }
 
     /**
@@ -167,16 +143,7 @@ public class ReleaseScope {
      * @return {@code true} if the scope has a non {@code null} SHA-1 identifier of the last commit within the scope. It may be {@code null}.
      */
     public boolean hasFinalCommit() {
-        return !Objects.isNull(finalCommit);
-    }
-
-    /**
-     * Sets the SHA-1 identifier of the last commit within the scope.
-     * 
-     * @param finalCommit the SHA-1 identifier of the last commit within the scope. It may be {@code null}.
-     */
-    public void setFinalCommit(String finalCommit) {
-        this.finalCommit = finalCommit;
+        return !commits.isEmpty();
     }
 
     /**
@@ -185,15 +152,6 @@ public class ReleaseScope {
      * @return the flag telling if the release scope contains significant commits. It may be {@code null}.
      */
     public Boolean getSignificant() {
-        return significant;
-    }
-
-    /**
-     * Sets the flag telling if the release scope contains significant commits.
-     * 
-     * @param significant the flag telling if the release scope contains significant commits. It may be {@code null}.
-     */
-    public void setSignificant(Boolean significant) {
-        this.significant = significant;
+        return !commits.isEmpty();
     }
 }

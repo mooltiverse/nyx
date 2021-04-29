@@ -11,11 +11,26 @@ The following attributes are children of the [`releaseScope`]({{ site.baseurl }}
 
 | Name                                                                | Type    | Values                                              |
 | ------------------------------------------------------------------- | ------- | --------------------------------------------------- |
+| [`releaseScope/commits`](#commits)                                  | list    | The SHA-1 of the commits in the release scope       |
 | [`releaseScope/finalCommit`](#final-commit)                         | string  | The SHA-1 of the last commit in the release scope   |
 | [`releaseScope/initialCommit`](#initial-commit)                     | string  | The SHA-1 of the first commit in the release scope  |
 | [`releaseScope/previousVersion`](#previous-version)                 | string  | The previous version                                |
 | [`releaseScope/previousVersionCommit`](#previous-version-commit)    | string  | The SHA-1 of the previous version commit            |
 | [`releaseScope/significant`](#significant)                          | boolean | Whether or not the scope brings significant changes |
+
+### Commits
+
+| ----------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                          | `releaseScope/commits`                                                                   |
+| Type                          | list                                                                                     |
+| Related configuration options |                                                                                          |
+| Initialized by task           | [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#infer){: .btn .btn--small} [mark]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#mark){: .btn .btn--small} |
+
+The ordered list of SHA-1 identifiers of all commits in the release scope. The list is reverse ordered, so the [newest commit](#final-commit) appears as the first element in the list, while the [oldest](#initial-commit) is the last in the list.
+
+This value may remain undefined when [inference]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer) is skipped because the user overrides the [`version`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#version).
+
+Furthermore this attribute may be changed by the [mark]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#mark) task in case a new commit is added (i.e. to include generated release artifacts).
 
 ### Final commit
 
@@ -23,11 +38,13 @@ The following attributes are children of the [`releaseScope`]({{ site.baseurl }}
 | Name                          | `releaseScope/finalCommit`                                                               |
 | Type                          | string                                                                                   |
 | Related configuration options |                                                                                          |
-| Initialized by task           | [mark]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#mark){: .btn .btn--small} |
+| Initialized by task           | [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#infer){: .btn .btn--small} [mark]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#mark){: .btn .btn--small} |
 
-The SHA-1 of the last commit in the release scope, which is to say the commit to be tagged upon release, the latest commit in the current branch (`HEAD`).
+The SHA-1 of the last commit in the release scope, which is to say the commit to be tagged upon release, the latest commit in the current branch (`HEAD`). This is the first element of the [`commits`](#commits) list.
 
-Please note that this attribute is undefined until the [mark]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#mark) task runs as some extra commits may need to be included (i.e. for new release artifacts).
+This value may remain undefined when [inference]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer) is skipped because the user overrides the [`version`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#version) or if there is no further commits after the [previous version](#previous-version-commit).
+
+Furthermore this attribute may be changed by the [mark]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#mark) task in case a new commit is added (i.e. to include generated release artifacts).
 
 ### Initial commit
 
@@ -35,9 +52,9 @@ Please note that this attribute is undefined until the [mark]({{ site.baseurl }}
 | Name                          | `releaseScope/initialCommit`                                                             |
 | Type                          | string                                                                                   |
 | Related configuration options | [releaseLenient]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#release-lenient){: .btn .btn--success .btn--small} [releasePrefix]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#release-prefix){: .btn .btn--success .btn--small} [scheme]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#scheme){: .btn .btn--success .btn--small} |
-| Initialized by task           | [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#infer){: .btn .btn--small} |
+| Initialized by task           | [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#infer){: .btn .btn--small} [mark]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#mark){: .btn .btn--small} |
 
-The SHA-1 of the commit that became right after the [`releaseScope/previousVersionCommit`](#previous-version-commit), so the first commit in the range of commits belonging to the release being prepared.
+The SHA-1 of the commit that became right after the [`releaseScope/previousVersionCommit`](#previous-version-commit), so the first commit in the range of commits belonging to the release being prepared. This is the last element of the [`commits`](#commits) list.
 
 This value may remain undefined when [inference]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer) is skipped because the user overrides the [`version`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#version) or if there is no further commits after the [previous version](#previous-version-commit).
 
