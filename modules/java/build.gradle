@@ -103,14 +103,19 @@ allprojects {
 
     // The Eclipse plugin is also used for VSCode.
     // This plugin generates .project and .classpath files used by Eclipse and/or VSCode based on the Gradle configurations.
-    // Without this the IDE overwrites those files with its own (wrong) versions that are missing a bunch of classpath items
+    // There's still an issue caused by Buildship that always overwrites the generated .classpath with its own but at least
+    // it does so by taking into account also the values defined here.
     // To clean and generate new .project and .classpath files run ./gradlew cleanEclipse eclipse
     eclipse {
         // control how the .project files are generated
         //project {}
         // control how the .classpath files are generated
         classpath {
-            defaultOutputDir = file('build/classes')    // the default output directory for java .class files
+            // the default output directory for java .class files
+            defaultOutputDir = file('build/classes')
+            // this is supposed to prevent Buildship to overwrite the .classpath file, according to
+            // https://stackoverflow.com/questions/49068870/buildship-keeps-overwriting-classpath
+            containers 'org.eclipse.buildship.core.gradleclasspathcontainer'
         }
     }
 
