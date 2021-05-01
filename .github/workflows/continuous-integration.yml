@@ -1,10 +1,21 @@
-name: Continuous Integration
-
 # The Nyx CI pipeline running on GitHub Actions
 #
 # The pipeline uses Gradle tasks for each job and in order to make it incremental the cache is used to store
 # the various 'build' directories between tasks (considering each job runs on a different fresh node).
 # See https://docs.gradle.org/current/userguide/build_cache.html for more on the Gradle Build Cache.
+#
+# CACHE
+# The cache is scoped to the current pipeline so every new pipeline starts with no cache, while each job
+# ends by caching its cached outputs so that next jobs can start from there.
+# If the cache action finds a stored cache with the given key it pulls when it's setting up but never updates
+# it in the post actions. You can see this behavior at the end of a job when it says:
+#     Cache hit occurred on the primary key Linux-nyx-gradle-XYZ, not saving cache.
+# The problem with this approach if using the same cache key in all jobs is that only the first job updates
+# the cache but next jobs always get the cache from the first job, not from next ones.
+# To work around this problem each job uses a 'restore-keys' with the key generated from the previous
+# job, while its own 'key' is specific (and can be used by next jobs). This produces a chain of caches
+# but it's the only way to have the cache incremented at each job.
+# To make sure the cache is used take a look at the logs and see the Gradle tasks status (UP-TO-DATE).
 
 on: [push]
 
@@ -20,6 +31,7 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 11
+    # Start with a new empty cache (no restore-keys) and save the job output cache as -assemble
     - name: Set up the pipeline cache
       uses: actions/cache@v2
       with:
@@ -28,7 +40,7 @@ jobs:
           ~/.gradle/wrapper
           build/
           **/build/
-        key: ${{ runner.os }}-nyx-gradle-${{ github.run_id }}
+        key: ${{ runner.os }}-nyx-gradle-${{ github.run_id }}-assemble
         #restore-keys: not used here, start from scratch
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
@@ -57,6 +69,7 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 11
+    # Start from the -assemble cache and save the job output cache as -test
     - name: Set up the pipeline cache
       uses: actions/cache@v2
       with:
@@ -65,9 +78,9 @@ jobs:
           ~/.gradle/wrapper
           build/
           **/build/
-        key: ${{ runner.os }}-nyx-gradle-${{ github.run_id }}
+        key: ${{ runner.os }}-nyx-gradle-${{ github.run_id }}-test
         restore-keys: |
-          ${{ runner.os }}-nyx-gradle-${{ github.run_id }}
+          ${{ runner.os }}-nyx-gradle-${{ github.run_id }}-assemble
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Test with Gradle
@@ -90,6 +103,7 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 11
+    # Start from the -test cache and save the job output cache as -check
     - name: Set up the pipeline cache
       uses: actions/cache@v2
       with:
@@ -98,9 +112,9 @@ jobs:
           ~/.gradle/wrapper
           build/
           **/build/
-        key: ${{ runner.os }}-nyx-gradle-${{ github.run_id }}
+        key: ${{ runner.os }}-nyx-gradle-${{ github.run_id }}-check
         restore-keys: |
-          ${{ runner.os }}-nyx-gradle-${{ github.run_id }}
+          ${{ runner.os }}-nyx-gradle-${{ github.run_id }}-test
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Check with Gradle
@@ -134,6 +148,7 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 11
+    # Start from the -check cache and save the job output cache as -build
     - name: Set up the pipeline cache
       uses: actions/cache@v2
       with:
@@ -142,9 +157,9 @@ jobs:
           ~/.gradle/wrapper
           build/
           **/build/
-        key: ${{ runner.os }}-nyx-gradle-${{ github.run_id }}
+        key: ${{ runner.os }}-nyx-gradle-${{ github.run_id }}-build
         restore-keys: |
-          ${{ runner.os }}-nyx-gradle-${{ github.run_id }}
+          ${{ runner.os }}-nyx-gradle-${{ github.run_id }}-check
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Build with Gradle
@@ -172,6 +187,7 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
+      # Start from the -build cache and save the job output cache as -publish
       - name: Set up the pipeline cache
         uses: actions/cache@v2
         with:
@@ -180,9 +196,9 @@ jobs:
             ~/.gradle/wrapper
             build/
             **/build/
-          key: ${{ runner.os }}-nyx-gradle-${{ github.run_id }}
+          key: ${{ runner.os }}-nyx-gradle-${{ github.run_id }}-publish
           restore-keys: |
-            ${{ runner.os }}-nyx-gradle-${{ github.run_id }}
+            ${{ runner.os }}-nyx-gradle-${{ github.run_id }}-build
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Publish with Gradle
@@ -215,6 +231,7 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
+      # Start from the -publish cache and save the job output cache as -release
       - name: Set up the pipeline cache
         uses: actions/cache@v2
         with:
@@ -223,9 +240,9 @@ jobs:
             ~/.gradle/wrapper
             build/
             **/build/
-          key: ${{ runner.os }}-nyx-gradle-${{ github.run_id }}
+          key: ${{ runner.os }}-nyx-gradle-${{ github.run_id }}-release
           restore-keys: |
-            ${{ runner.os }}-nyx-gradle-${{ github.run_id }}
+            ${{ runner.os }}-nyx-gradle-${{ github.run_id }}-publish
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Release with Gradle
