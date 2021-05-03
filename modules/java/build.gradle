@@ -311,11 +311,6 @@ allprojects.each {prj ->
 publishing {
     repositories {
         // The GitHub Packages repository, visible at https://github.com/mooltiverse/nyx/packages
-        /* 
-            GitHub Packages publishing is suspended due to a bug that always prevents publishing with an error like:
-                Could not PUT 'https://maven.pkg.github.com/mooltiverse/nyx/com/mooltiverse/oss/nyx/gradle/0.0.2-alpha.9/gradle-0.0.2-alpha.9.pom.sha1'. Received status code 409 from server: Conflict
-            Issue opened at https://github.com/mooltiverse/nyx/issues/62
-            TODO: uncomment this repository to re-enable GitHub Packages publishing upon resolution of issue https://github.com/mooltiverse/nyx/issues/62*/
         maven {
             name = "GitHubPackages"
             url = uri("https://maven.pkg.github.com/"+nyxOrganizationID+"/"+nyxID)
