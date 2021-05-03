@@ -41,3 +41,8 @@ dependencies {
   // See the 'testExport' about this
   testExport             sourceSets.test.output
 }
+
+/*------------------------------------------------------------------------------
+  Additional task dependencies
+------------------------------------------------------------------------------*/
+

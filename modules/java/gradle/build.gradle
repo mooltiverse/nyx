@@ -97,3 +97,6 @@ task publish() {
   Additional task dependencies
 ------------------------------------------------------------------------------*/
 tasks.publishPlugins.dependsOn tasks.setupPublishPluginCredentials
+
+// to enforce the fail-fast principle, make sure the main library tests are executed first
+tasks.test.dependsOn project(':modules:java:lib:main').tasks.test

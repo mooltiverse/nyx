@@ -45,7 +45,7 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Assemble with Gradle
-      run: ./gradlew assemble --build-cache --info --stacktrace
+      run: ./gradlew assemble --build-cache --stacktrace
     - name: Archive Nyx state file
       uses: actions/upload-artifact@v2
       with:
@@ -84,7 +84,7 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Test with Gradle
-      run: ./gradlew test --build-cache --info --stacktrace
+      run: ./gradlew test --build-cache --stacktrace
     - name: Archive Nyx state file
       uses: actions/upload-artifact@v2
       with:
@@ -122,7 +122,7 @@ jobs:
           # See the top level https://github.com/mooltiverse/nyx/blob/master/CONTRIBUTING.md#contributing-code file for details about passing these values when testing locally
           ORG_GRADLE_PROJECT_gitHubTestUserToken: ${{ secrets.TEST_GITHUB_USER_TOKEN }}   # The test user token to test Nyx GitHub features
           ORG_GRADLE_PROJECT_gitLabTestUserToken: ${{ secrets.TEST_GITLAB_USER_TOKEN }}   # The test user token to test Nyx GitLab features
-      run: ./gradlew check --build-cache --info --stacktrace
+      run: ./gradlew check --build-cache --stacktrace
     - name: Archive Nyx state file
       uses: actions/upload-artifact@v2
       with:
@@ -163,7 +163,7 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Build with Gradle
-      run: ./gradlew build --build-cache --info --stacktrace
+      run: ./gradlew build --build-cache --stacktrace
     - name: Archive Nyx state file
       uses: actions/upload-artifact@v2
       with:
@@ -212,7 +212,7 @@ jobs:
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.GPC_PASSPHRASE }}
           ORG_GRADLE_PROJECT_gradlePublishKey: ${{ secrets.GRADLE_PLUGIN_PUBLISH_KEY }}
           ORG_GRADLE_PROJECT_gradlePublishSecret: ${{ secrets.GRADLE_PLUGIN_PUBLISH_SECRET }}
-        run: ./gradlew publish --build-cache --info --stacktrace
+        run: ./gradlew publish --build-cache --stacktrace
       - name: Archive Nyx state file
         uses: actions/upload-artifact@v2
         with:
