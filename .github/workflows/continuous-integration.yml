@@ -56,43 +56,9 @@ jobs:
       with:
         name: jar
         path: '**/build/libs/'
-
-  test:
-    needs: assemble
-    runs-on: ubuntu-latest
-    steps:
-    - name: Git checkout
-      uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-    - name: Set up JDK 11
-      uses: actions/setup-java@v1
-      with:
-        java-version: 11
-    # Start from the -assemble cache and save the job output cache as -test
-    - name: Set up the pipeline cache
-      uses: actions/cache@v2
-      with:
-        path: |
-          ~/.gradle/caches
-          ~/.gradle/wrapper
-          build/
-          **/build/
-        key: ${{ runner.os }}-nyx-gradle-${{ github.run_id }}-test
-        restore-keys: |
-          ${{ runner.os }}-nyx-gradle-${{ github.run_id }}-assemble
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-    - name: Test with Gradle
-      run: ./gradlew test --build-cache --stacktrace
-    - name: Archive Nyx state file
-      uses: actions/upload-artifact@v2
-      with:
-        name: .nyx-state-${{ github.job }}.json
-        path: build/.nyx-state.json
   
   check:
-    needs: test
+    needs: assemble
     runs-on: ubuntu-latest
     steps:
     - name: Git checkout
@@ -114,10 +80,16 @@ jobs:
           **/build/
         key: ${{ runner.os }}-nyx-gradle-${{ github.run_id }}-check
         restore-keys: |
-          ${{ runner.os }}-nyx-gradle-${{ github.run_id }}-test
+          ${{ runner.os }}-nyx-gradle-${{ github.run_id }}-assemble
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
-    - name: Check with Gradle
+    - name: Run Unit Tests with Gradle
+      run: ./gradlew test --build-cache --stacktrace
+    - name: Run Integration Tests with Gradle
+      run: ./gradlew integrationTest --build-cache --stacktrace
+    - name: Run Functional Tests with Gradle
+      run: ./gradlew functionalTest --build-cache --stacktrace
+    - name: Finalize Tests with Gradle
       env:
           # See the top level https://github.com/mooltiverse/nyx/blob/master/CONTRIBUTING.md#contributing-code file for details about passing these values when testing locally
           ORG_GRADLE_PROJECT_gitHubTestUserToken: ${{ secrets.TEST_GITHUB_USER_TOKEN }}   # The test user token to test Nyx GitHub features
