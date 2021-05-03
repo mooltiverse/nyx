@@ -23,11 +23,11 @@ import java.util.Objects;
 /**
  * The utility class used to create version instances.
  */
-public class VersionFactory {
+public class Versions {
     /**
      * Default constructor is private on purpose
      */
-    private VersionFactory() {
+    private Versions() {
         super();
     }
 

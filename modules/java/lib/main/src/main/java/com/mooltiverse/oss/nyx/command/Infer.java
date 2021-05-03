@@ -35,7 +35,7 @@ import com.mooltiverse.oss.nyx.git.GitException;
 import com.mooltiverse.oss.nyx.git.Repository;
 import com.mooltiverse.oss.nyx.state.State;
 import com.mooltiverse.oss.nyx.version.Version;
-import com.mooltiverse.oss.nyx.version.VersionFactory;
+import com.mooltiverse.oss.nyx.version.Versions;
 
 /**
  * The Infer command takes care of inferring and computing informations in order to make a new release.
@@ -207,7 +207,7 @@ public class Infer extends AbstractCommand {
                 // previousVersion and previousVersionCommit are set and this commit closes the release scope
                 // (without being part of it), otherwise this is just another commit that belongs to the scope
                 for (Tag tag: c.getTags()) {
-                    if (releaseLenient ? VersionFactory.isLegal(scheme.getScheme(), tag.getName(), releaseLenient) : VersionFactory.isLegal(scheme.getScheme(), tag.getName(), releasePrefix)) {
+                    if (releaseLenient ? Versions.isLegal(scheme.getScheme(), tag.getName(), releaseLenient) : Versions.isLegal(scheme.getScheme(), tag.getName(), releasePrefix)) {
                         logger.debug(COMMAND, "Tag {} is a valid {} version and is used as the previousVersion. Likewise, {} is used as the previousVersionCommit", tag.getName(), scheme.toString(), c.getSHA());
                         state().getReleaseScope().setPreviousVersion(tag.getName());
                         state().getReleaseScope().setPreviousVersionCommit(c.getSHA());
@@ -260,7 +260,7 @@ public class Infer extends AbstractCommand {
                 state().getReleaseScope().setPreviousVersionCommit(null);
             }
             // parse the previous version now
-            Version previousVersion = releaseLenient ? VersionFactory.valueOf(scheme.getScheme(), state().getReleaseScope().getPreviousVersion(), releaseLenient) : VersionFactory.valueOf(scheme.getScheme(), state().getReleaseScope().getPreviousVersion(), releasePrefix);
+            Version previousVersion = releaseLenient ? Versions.valueOf(scheme.getScheme(), state().getReleaseScope().getPreviousVersion(), releaseLenient) : Versions.valueOf(scheme.getScheme(), state().getReleaseScope().getPreviousVersion(), releasePrefix);
 
             // finally compute the version
             Version version = null;

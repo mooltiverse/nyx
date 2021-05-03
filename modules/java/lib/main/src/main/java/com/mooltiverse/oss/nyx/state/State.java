@@ -33,7 +33,7 @@ import com.mooltiverse.oss.nyx.data.FileMapper;
 import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
 import com.mooltiverse.oss.nyx.data.ReleaseScope;
 import com.mooltiverse.oss.nyx.data.Scheme;
-import com.mooltiverse.oss.nyx.version.VersionFactory;
+import com.mooltiverse.oss.nyx.version.Versions;
 
 /**
  * The State class holds a number of attributes resulting from the execution of one or more command and so represents
@@ -133,7 +133,7 @@ public class State implements Root {
     public String getBump()
         throws DataAccessException, IllegalPropertyException {
         String bump = getConfiguration().getBump();
-        return Objects.isNull(bump) ? VersionFactory.mostRelevantIdentifier(getScheme().getScheme(), getReleaseScope().getSignificantCommits().values()) : bump;
+        return Objects.isNull(bump) ? Versions.mostRelevantIdentifier(getScheme().getScheme(), getReleaseScope().getSignificantCommits().values()) : bump;
     }
 
     /**

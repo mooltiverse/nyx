@@ -41,6 +41,7 @@ public class StateTests {
             assertDoesNotThrow(() -> { new State(new Configuration()); });
         }
     }
+    
     @Nested
     @DisplayName("Attributes")
     class AttributesTests {

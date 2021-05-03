@@ -23,7 +23,7 @@ import com.mooltiverse.oss.nyx.data.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.data.CommitMessageConventions;
 import com.mooltiverse.oss.nyx.data.Scheme;
 import com.mooltiverse.oss.nyx.data.Verbosity;
-import com.mooltiverse.oss.nyx.version.VersionFactory;
+import com.mooltiverse.oss.nyx.version.Versions;
 
 /**
  * A utility interface that collects default configuration values.
@@ -79,7 +79,7 @@ public interface Defaults {
      * 
      * This strongly depends on the {@link #SCHEME} and as long as it's {@link Scheme#SEMVER}, we use that to select the initial version.
      */
-    public static final String INITIAL_VERSION = VersionFactory.defaultInitial(Scheme.SEMVER.getScheme()).toString();
+    public static final String INITIAL_VERSION = Versions.defaultInitial(Scheme.SEMVER.getScheme()).toString();
 
     /**
      * The default prefix to add at the beginning of a version identifier to generate the release identifier. Value: {@code null}
