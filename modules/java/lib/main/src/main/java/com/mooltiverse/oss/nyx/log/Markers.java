@@ -45,6 +45,11 @@ public class Markers {
     public static Marker DEFAULT = MarkerFactory.getMarker("DEFAULT");
 
     /**
+     * The {@code TEMPLATE} marker, used when logging events about templates and their rendering.
+     */
+    public static Marker TEMPLATE = MarkerFactory.getMarker("TEMPLATE");
+
+    /**
      * The {@code MAIN} marker, used when logging events from the main classes.
      */
     public static Marker MAIN = MarkerFactory.getMarker("MAIN");

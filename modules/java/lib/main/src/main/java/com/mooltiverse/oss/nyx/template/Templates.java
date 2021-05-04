@@ -5,6 +5,8 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.Mustache;
@@ -49,6 +51,7 @@ public class Templates {
 
     /**
      * Renders the given template using the given scope to fetch the values.
+     * Standard functions are available in the rendering engine.
      * 
      * @param template the template
      * @param scope the object representing the value to use in rendering
@@ -66,6 +69,7 @@ public class Templates {
 
     /**
      * Renders the given template using the given scope to fetch the values.
+     * Standard functions are available in the rendering engine.
      * 
      * @param template the template
      * @param scope the object representing the value to use in rendering
@@ -83,6 +87,7 @@ public class Templates {
 
     /**
      * Renders the given template using the given scope to fetch the values and writing the output to the given writer.
+     * Standard functions are available in the rendering engine.
      * 
      * @param template the template
      * @param scope the object representing the value to use in rendering
@@ -94,6 +99,11 @@ public class Templates {
         throws IOException {
         MustacheFactory mf = new DefaultMustacheFactory();
         Mustache mustache = mf.compile(template, "template");
-        mustache.execute(writer, scope).flush();
+
+        // prepare the scopes with the object passed by the used plust the map of all standard functions
+        List<Object> scopes = new ArrayList<Object>(2);
+        scopes.add(scope);
+        scopes.add(Functions.FUNCTIONS);
+        mustache.execute(writer, scopes).flush();
     }
 }
