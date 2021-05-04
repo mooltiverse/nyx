@@ -63,8 +63,8 @@ nav-user-guide:
         url: /guide/user/introduction/configuration-methods/
 #      - title: "Standard Configurations"
 #        url: /guide/user/introduction/standard-configurations/
-#      - title: "Dynamic Configurations"
-#        url: /guide/user/introduction/dynamic-configurations/
+      - title: "Dynamic Configurations"
+        url: /guide/user/introduction/dynamic-configurations/
       - title: "Version Schemes"
         url: /guide/user/introduction/version-schemes/
 #      - title: "Release Strategy"
@@ -76,10 +76,6 @@ nav-user-guide:
   - title: Configuration Reference
     url: /guide/user/configuration-reference/
     children:
-#      - title: "Expressions"
-#        url: /guide/user/configuration-reference/expressions/
-#      - title: "Templates"
-#        url: /guide/user/configuration-reference/templates/
       - title: "Global Options"
         url: /guide/user/configuration-reference/global-options/
       - title: "Commit Message Conventions"
@@ -94,6 +90,10 @@ nav-user-guide:
 #        url: /guide/user/configuration-reference/release-types/
 #      - title: "Artifacts"
 #        url: /guide/user/configuration-reference/artifacts/
+#      - title: "Expressions"
+#        url: /guide/user/configuration-reference/expressions/
+      - title: "Templates"
+        url: /guide/user/configuration-reference/templates/
 #      - title: "Configuration Examples"
 #        url: /guide/user/configuration-reference/configuration-examples/
 #  - title: Configuration Presets
