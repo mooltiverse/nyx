@@ -33,6 +33,7 @@ dependencies {
   implementation         'org.eclipse.jgit:org.eclipse.jgit:5.10.0.202012080955-r'                  // JGit (https://www.eclipse.org/jgit/)
   implementation         'com.fasterxml.jackson.core:jackson-databind:2.12.2'                       // Jackson JSON library (https://github.com/FasterXML/jackson)
   implementation         'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.12.2'          // Jackson YAML library (https://github.com/FasterXML/jackson-dataformats-text/tree/master/yaml)
+  implementation         'com.github.spullara.mustache.java:compiler:0.9.7'                         // Mustache library (https://github.com/spullara/mustache.java)
 
   // The SLF4J framework that prints all test output to System err
   // See http://www.slf4j.org/apidocs/org/slf4j/impl/SimpleLogger.html for the system properties available to change verbosity levels
