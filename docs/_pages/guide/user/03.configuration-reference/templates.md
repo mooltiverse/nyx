@@ -5,9 +5,9 @@ toc: true
 permalink: /guide/user/configuration-reference/templates/
 ---
 
-Templates are used in several places to make configuration options dynamic or parametrize text outputs, be them strings, messages or even whole text files.
+Templates can be used in several places to make configuration dynamic or parametrize text outputs, be them strings, messages or even whole text files.
 
-Nyx uses [Mustache](https://mustache.github.io/) templates passing the engine the [internal state]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/index.md %}) for the template scope (the template input value) so it's easy to figure out which values are available. Moreover a few functions ([lambdas](#using-lambdas)) are available for common needs.
+Nyx uses [Mustache](https://mustache.github.io/) templates passing the engine the [internal state]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/index.md %}) for the template scope (the template input value) so it's easy to figure out which values are available. Moreover a few [functions](#functions) (lambdas) are available for common needs.
 
 Tip: when writing templates you may find useful to [serialize the state to a file]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#state-file) for reference or troubleshooting.
 {: .notice--info}
@@ -52,9 +52,20 @@ Alternatively you can simply use the dotted notation, like:
 option = "{% raw %}{{ section.attribute }}{% endraw %}"
 ```
 
-### Using lambdas
+### Type conversions
 
-You can also use functions to produce outputs or transform an input value. These functions are provided by lambdas and the syntax is like the one we've seen for nested values, like in this example:
+All templates return text values but ofter times the template output needs to be converted to other types. This may happen for configuration options, for example, when a dynamically computed value needs a boolean or a number. You can always tell if some conversion is to be performed by the *type* of the option.
+
+This table gives you the overall rules used to convert text values to types other than strings:
+
+| Expected type    | Translation criteria                                                                                          |
+| -----------------| ------------------------------------------------------------------------------------------------------------- | 
+| boolean          | If the expression returns an empty or blank string translates to `false`, otherwise `true` in all other cases |
+| number           | Translates to the number representation of the string when it contains a valid number, `0` in all other cases, including when the string does not contain a valid number. Different numeric types (i.e. integers and floats) require specific constraints to be met in order for the conversion to succeed, as per the standard number representation rules |
+
+## Functions
+
+Wherever templates are allowed you can also use functions to produce outputs or transform an input value. These functions are provided by lambdas and the syntax is like the one we've seen for nested values, like in this example:
 
 ```
 option = "{% raw %}{{ #upper }}{{ attribute }}{{ /upper }}{% endraw %}"
@@ -62,9 +73,9 @@ option = "{% raw %}{{ #upper }}{{ attribute }}{{ /upper }}{% endraw %}"
 
 Here `upper` is a function accepting one parameter (`attribute`) and returning the same output, with upper case. Below you can find the list of available lambdas.
 
-#### The functions library
+### The functions library
 
-##### `lower`
+#### `lower`
 
 Transforms the input characters to lower case. Example:
 
@@ -81,7 +92,7 @@ Example inputs and corresponding outputs:
 | `FEATURE`                  | `feature`                  |
 | `feature/XX-12345`         | `feature/xx-12345`         |
 
-##### `upper`
+#### `upper`
 
 Transforms the input characters to upper case. Example:
 
@@ -98,7 +109,7 @@ Example inputs and corresponding outputs:
 | `FEATURE`                  | `FEATURE`                  |
 | `feature/XX-12345`         | `FEATURE/XX-12345`         |
 
-##### `trim`
+#### `trim`
 
 Removes the leading and trailing spaces from the input. Example:
 
@@ -115,7 +126,7 @@ Example inputs and corresponding outputs:
 | ` FEATURE `                | `FEATURE`                  |
 | ` feature/XX-12345 `       | `feature/XX-12345`         |
 
-##### `first`
+#### `first`
 
 Discards everything from the first occurrence of a character other than letters and positive digits. Example:
 
@@ -131,7 +142,7 @@ Example inputs and corresponding outputs:
 | `12345`                    | `12345`                    |
 | `feature/XX-12345`         | `feature`                  |
 
-##### `firstLower`
+#### `firstLower`
 
 Discards everything from the first occurrence of a character other than letters and positive digits and transforms the remaining characters to lower case. Example:
 
@@ -148,7 +159,7 @@ Example inputs and corresponding outputs:
 | `feature/XX-12345`         | `feature`                  |
 | `FEATURE/XX-12345`         | `feature`                  |
 
-##### `firstUpper`
+#### `firstUpper`
 
 Discards everything from the first occurrence of a character other than letters and positive digits and transforms the remaining characters to upper case. Example:
 
@@ -165,7 +176,7 @@ Example inputs and corresponding outputs:
 | `feature/XX-12345`         | `FEATURE`                  |
 | `FEATURE/XX-12345`         | `FEATURE`                  |
 
-##### `last`
+#### `last`
 
 Discards everything before the last occurrence of a character other than letters and positive digits. Example:
 
@@ -181,7 +192,7 @@ Example inputs and corresponding outputs:
 | `12345`                    | `12345`                    |
 | `feature/XX-12345`         | `12345`                    |
 
-##### `lastLower`
+#### `lastLower`
 
 Discards everything before the last occurrence of a character other than letters and positive digits and transforms the remaining characters to lower case. Example:
 
@@ -198,7 +209,7 @@ Example inputs and corresponding outputs:
 | `12345`                    | `12345`                    |
 | `feature/XX-12345`         | `12345`                    |
 
-##### `lastUpper`
+#### `lastUpper`
 
 Discards everything before the last occurrence of a character other than letters and positive digits and transforms the remaining characters to upper case. Example:
 
@@ -215,7 +226,7 @@ Example inputs and corresponding outputs:
 | `12345`                    | `12345`                    |
 | `feature/XX-12345`         | `12345`                    |
 
-##### `sanitize`
+#### `sanitize`
 
 Removes all characters other than letters and positive digits from the input string, leaving all other characters untouched. Example:
 
@@ -231,7 +242,7 @@ Example inputs and corresponding outputs:
 | `12345`                    | `12345`                    |
 | `feature/XX-12345`         | `featureXX12345`           |
 
-##### `sanitizeLower`
+#### `sanitizeLower`
 
 Removes all characters other than letters and positive digits from the input string, and transforms all others to lower case. Example:
 
@@ -247,7 +258,7 @@ Example inputs and corresponding outputs:
 | `12345`                    | `12345`                    |
 | `feature/XX-12345`         | `featurexx12345`           |
 
-##### `sanitizeUpper`
+#### `sanitizeUpper`
 
 Removes all characters other than letters and positive digits from the input string, and transforms all others to upper case. Example:
 
@@ -263,7 +274,7 @@ Example inputs and corresponding outputs:
 | `12345`                    | `12345`                    |
 | `feature/XX-12345`         | `FEATUREXX12345`           |
 
-##### `short5`
+#### `short5`
 
 Returns only the first 5 characters of the input. If the input is shorter than 5 characters it's returned untouched. This is often useful to shorten SHAs. Example:
 
@@ -279,7 +290,7 @@ Example inputs and corresponding outputs:
 | `7b9da`                                    | `7b9da`    |
 | `7b`                                       | `7b`       |
 
-##### `short6`
+#### `short6`
 
 Returns only the first 6 characters of the input. If the input is shorter than 5 characters it's returned untouched. This is often useful to shorten SHAs. Example:
 
@@ -295,7 +306,7 @@ Example inputs and corresponding outputs:
 | `7b9da5`                                   | `7b9da5`   |
 | `7b`                                       | `7b`       |
 
-##### `short7`
+#### `short7`
 
 Returns only the first 7 characters of the input. If the input is shorter than 5 characters it's returned untouched. This is often useful to shorten SHAs. Example:
 
@@ -311,7 +322,7 @@ Example inputs and corresponding outputs:
 | `7b9da52`                                  | `7b9da52`  |
 | `7b`                                       | `7b`       |
 
-##### `timestampISO8601`
+#### `timestampISO8601`
 
 Provided a timestamp in the [unix format](https://www.unixtimestamp.com/) returns it formatted as [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601). If the input is not a Unix timestamp returns an empty string. Example:
 
@@ -326,7 +337,7 @@ Example inputs and corresponding outputs:
 | `1608210396 `              | `2020-12-17T13:06:36`      |
 
 
-##### `timestampYYYYMMDDHHMMSS`
+#### `timestampYYYYMMDDHHMMSS`
 
 Provided a timestamp in the [unix format](https://www.unixtimestamp.com/) returns it formatted as `YYYYMMDDHHMMSS`. If the input is not a Unix timestamp returns an empty string. Example:
 
@@ -340,6 +351,58 @@ Example inputs and corresponding outputs:
 | -------------------------- | -------------------------- |
 | `1608210396 `              | `20201217130636`           |
 
+#### `environment.user`
+
+Returns the current system user name. Example:
+
+```
+user = "{% raw %}{{environment.user}}{% endraw %}"
+```
+
+or, if you prefer the open/close tags:
+
+```
+user = "{% raw %}{{#environment.user}}{{/environment.user}}{% endraw %}"
+```
+
+In case you pass a value to this function it is ignored.
+
+#### `environment.variable`
+
+Returns the value of the environment variable used as parameter, if any. Example:
+
+```
+os = "{% raw %}{{#environment.variable}}OS{{/environment.variable}}{% endraw %}"
+```
+
+returns the value of the `OS` environment variable, if present, or an empty string.
+
+#### `file.content`
+
+Returns content of the given file, if it exists, or an empty string. Example:
+
+```
+filecontent = "{% raw %}{{#file.content}}example.txt{{/file.content}}{% endraw %}"
+```
+
+returns returns the **entire** content of the `example.txt` file (if it exists).
+
+The file name can be a relative or an absolute path. Please note that when a relative path is used, it's always resolved to the current working directory and other configured directories are ignored.
+
+Be careful with the file content type, which must be text, and its size.
+
+#### `file.exists`
+
+Returns the string representation of a boolean, depending on whether the the given file exists. Example:
+
+```
+fileexists = "{% raw %}{{#file.exists}}example.txt{{/file.exists}}{% endraw %}"
+```
+
+returns `true` if the `example.txt` file exists, `false` otherwise.
+
+The file name can be a relative or an absolute path. Please note that when a relative path is used, it's always resolved to the current working directory and other configured directories are ignored.
+
 ## Example
 
 Here is a more complex example where we combine several state attributes to produce a multi-line text content. This example is only useful to show the use of templates and is not meant to be used anywhere.
@@ -350,6 +413,8 @@ Consider this template:
 {% raw %}Version: {{version}} (bumping '{{ bump }}' on {{ configuration.initialVersion }} using lenient ({{ configuration.releaseLenient }}))
 Scheme: {{ scheme }}
 Timestamp: {{ timestamp }}
+OS: {{#environment.variable}}OS{{/environment.variable}}
+User: {{environment.user}}
 Previous Version: {{releaseScope.previousVersion}} at {{#short5}}{{releaseScope.previousVersionCommit}}{{/short5}}
 
 Commits:
@@ -364,6 +429,8 @@ When rendered, it yields to an output like:
 Version: 9.8.6 (bumping 'theta' on 1.2.3 using lenient (true))
 Scheme: SEMVER
 Timestamp: 9223372036854775807
+OS: Linux
+Users: jdoe
 Previous Version: 4.5.6 at 05cbf
 
 Commits:
@@ -376,6 +443,8 @@ Commits:
 As you can see there are state attributes like `version`, `bump`, `scheme` and `timestamp` used in the template and their usage should already be clear.
 
 But since the resolved configuration is also available as a [nested state object]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#configuration), a couple of attributes are fetched from there, as you can see by `configuration.initialVersion` and `configuration.releaseLenient`.
+
+Some values are retrieved from the current environment: the `OS` environment variable is fetched by the `{% raw %}{{#environment.variable}}OS{{/environment.variable}}{% endraw %}` block (where the function parameter `OS` is the name of the variable to retrieve) and also the system user name is retrieved by `{% raw %}{{{environment.user}}{% endraw %}`.
 
 Moreover, the [release scope]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}) is also used to get the `releaseScope.previousVersion` and `releaseScope.previousVersionCommit`. By pay attention here: the `previousVersionCommit` is not used as is but only the shortened SHA-1 is used, thanks to the [`short5`](#short5) function.
 

@@ -2,6 +2,9 @@ package com.mooltiverse.oss.nyx.template;
 
 import static com.mooltiverse.oss.nyx.log.Markers.TEMPLATE;
 
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -46,6 +49,12 @@ class Functions {
             put(Short7.NAME,                  new Short7());
             put(TimestampISO8601.NAME,        new TimestampISO8601());
             put(TimestampYYYYMMDDHHMMSS.NAME, new TimestampYYYYMMDDHHMMSS());
+
+            put(Environment.User.NAME,        new Environment.User());
+            put(Environment.Variable.NAME,    new Environment.Variable());
+
+            put(File.Content.NAME,            new File.Content());
+            put(File.Exists.NAME,             new File.Exists());
         }
     };
 
@@ -523,6 +532,138 @@ class Functions {
             catch (NumberFormatException nfe) {
                 logger.error(TEMPLATE, "String {} does not represent a valid Long timestamp", input);
                 return "";
+            }
+        }
+    }
+
+    /**
+     * The class enclosing environment related functions.
+     */
+    public static class Environment {
+        /**
+         * The prefix to use for functions within this class.
+         */
+        public static final String NAME = "environment";
+
+        /**
+         * This function returns the value of the environment variable with the given name, if any.
+         */
+        public static class Variable implements Function<String,String> {
+            /**
+             * The name to use for this function.
+             */
+            public static final String NAME = Environment.NAME.concat(".").concat("variable");
+
+            /**
+             * This method returns the value of the environment variable with the given name, if any.
+             * 
+             * @param name the name of the requested variable. If {@code null} an empty string is returned.
+             * 
+             * @return the value of the environment variable with the given name, if any.
+             */ 
+            public String apply(String name) {
+                if (Objects.isNull(name))
+                    return "";
+
+                String res = System.getenv(name);
+                return Objects.isNull(res) ? "" : res;
+            }
+        }
+
+        /**
+         * This function returns the current user name. The input parameter is ignored.
+         */
+        public static class User implements Function<String,String> {
+            /**
+             * The name to use for this function.
+             */
+            public static final String NAME = Environment.NAME.concat(".").concat("user");
+
+            /**
+             * This method returns the current user name.
+             * 
+             * @param name ignored.
+             * 
+             * @return the current user name.
+             */ 
+            public String apply(String name) {
+                return System.getProperty("user.name");
+            }
+        }
+    }
+
+    /**
+     * The class enclosing file related functions.
+     */
+    public static class File {
+        /**
+         * The prefix to use for functions within this class.
+         */
+        public static final String NAME = "file";
+
+        /**
+         * This function returns the content of the given file, if any.
+         */
+        public static class Content implements Function<String,String> {
+            /**
+             * The name to use for this function.
+             */
+            public static final String NAME = File.NAME.concat(".").concat("content");
+
+            /**
+             * This method returns the content of the given file, if any.
+             * 
+             * @param path the path of file to get the content from. When a relative path is used it's resolved
+             * against the system current directory (configured directories are ignored here).
+             * 
+             * @return the content of the given file, if any.
+             */ 
+            public String apply(String path) {
+                if (Objects.isNull(path))
+                    return "";
+                
+                try {
+                    java.io.File f = new java.io.File(path);
+                    logger.trace(TEMPLATE, "Trying to read contents from file {} ({})", path, f.getAbsolutePath());
+                    FileReader reader = new FileReader(f);
+                    StringWriter writer = new StringWriter();
+                    reader.transferTo(writer);
+                    reader.close();
+                    writer.flush();
+                    return writer.toString();
+                }
+                catch (IOException ioe) {
+                    logger.error(TEMPLATE, "Unable to read from file {}: {}", path, ioe.getMessage());
+                    logger.trace(TEMPLATE, "Unable to read from file", ioe);
+                    return "";
+                }
+            }
+        }
+
+        /**
+         * This function returns {@code true} if the file with the given name exists, {@code false} otherwise.
+         */
+        public static class Exists implements Function<String,String> {
+            /**
+             * The name to use for this function.
+             */
+            public static final String NAME = File.NAME.concat(".").concat("exists");
+
+            /**
+             * This method returns {@code true} if the file with the given name exists, {@code false} otherwise.
+             * 
+             * @param path the path of file to check. When a relative path is used it's resolved against the system
+             * current directory (configured directories are ignored here).
+             * 
+             * @return {@code true} if the file with the given name exists, {@code false} otherwise.
+             */ 
+            public String apply(String path) {
+                if (Objects.isNull(path))
+                    return Boolean.FALSE.toString();
+
+                java.io.File f = new java.io.File(path);
+                logger.trace(TEMPLATE, "Checking whether file {} ({}) exists", path, f.getAbsolutePath());
+                return Boolean.toString(f.exists() && f.isFile());
             }
         }
     }

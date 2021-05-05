@@ -80,6 +80,46 @@ public class TemplatesTests {
     }
 
     @Nested
+    @DisplayName("Templates.toBoolean")
+    class ToBooleanTests {
+        @Test
+        @DisplayName("Templates.toBoolean(String)")
+        void toBooleanTest()
+            throws Exception {
+            assertFalse(Templates.toBoolean(null));
+            assertFalse(Templates.toBoolean(""));
+            assertFalse(Templates.toBoolean("    "));
+            
+            assertTrue(Templates.toBoolean("1"));
+            assertTrue(Templates.toBoolean("a"));
+            assertTrue(Templates.toBoolean("!"));
+            assertTrue(Templates.toBoolean("lkjhewm,òlkàòld wq dsedewdwedw"));
+        }
+    }
+
+    @Nested
+    @DisplayName("Templates.toInteger")
+    class ToIntegerTests {
+        @Test
+        @DisplayName("Templates.toInteger(String)")
+        void toIntegerTest()
+            throws Exception {
+            assertEquals(0, Templates.toInteger(null));
+            assertEquals(0, Templates.toInteger(""));
+            assertEquals(0, Templates.toInteger("    "));
+            assertEquals(0, Templates.toInteger("a"));
+            assertEquals(0, Templates.toInteger("!"));
+            assertEquals(0, Templates.toInteger("lkjhewm,òlkàòld wq dsedewdwedw"));
+            assertEquals(0, Templates.toInteger("1.0"));
+            assertEquals(0, Templates.toInteger("1,0"));
+
+            assertEquals(1, Templates.toInteger("1"));
+            assertEquals(100, Templates.toInteger("100"));
+            assertEquals(9999999, Templates.toInteger("9999999"));
+        }
+    }
+
+    @Nested
     @DisplayName("Templates.render with mock")
     class RenderWithMockTests {
         /**
@@ -130,9 +170,11 @@ public class TemplatesTests {
         public static final String TEMPLATE_OUTPUT = "Version: 9.8.7 (bumping 'theta' on 1.2.3 using lenient (true))\nScheme: SEMVER\nTimestamp: 9223372036854775807\nPrevious Version: 4.5.6 at 05cbf\n\nCommits:\n  d40fcded9e516158a2901f5657794931528af106\n  9bed70fac8a27a4b14b6b12307d034bc59da85c3\n  ef6a6481adb2df26bc7eebfde465e5c2f3e93539\n";
 
         /**
-         * Returns a State instance to be used as the scope for template rendering
-         * @return
-         * @throws Exception
+         * Returns a State instance to be used as the scope for template rendering.
+         * 
+         * @return the scope for rendering
+         * 
+         * @throws Exception in case of any issue
          */
         private State getStateScope()
             throws Exception {
@@ -147,8 +189,6 @@ public class TemplatesTests {
 
             state.setVersion("9.8.7");
             state.setTimestamp(Long.MAX_VALUE);
-            state.getInternals().put("attribute1", "value1");
-            state.getInternals().put("attribute2", "value2");
 
             state.getReleaseScope().setPreviousVersion("4.5.6");
             state.getReleaseScope().setPreviousVersionCommit("05cbfd58fadbec3d96b220a0054d96875aa37011");

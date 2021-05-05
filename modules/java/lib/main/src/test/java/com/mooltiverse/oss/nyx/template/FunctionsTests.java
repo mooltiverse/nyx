@@ -2,6 +2,9 @@ package com.mooltiverse.oss.nyx.template;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.File;
+import java.io.FileWriter;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -403,6 +406,87 @@ public class FunctionsTests {
             assertEquals("", Functions.FUNCTIONS.get("timestampYYYYMMDDHHMMSS").apply(null));
             assertEquals("19700101010000", Functions.FUNCTIONS.get("timestampYYYYMMDDHHMMSS").apply("0"));
             assertEquals("20200101120000", Functions.FUNCTIONS.get("timestampYYYYMMDDHHMMSS").apply("1577876400000"));
+        }
+    }
+
+    @Nested
+    @DisplayName("Functions.environment.variable")
+    class EnvironmentVariableTests {
+        @Test
+        @DisplayName("Functions.environment.variable.apply()")
+        void applyTest()
+            throws Exception {
+            assertEquals("", new Functions.Environment.Variable().apply(null));
+            assertEquals(System.getenv("OS"), new Functions.Environment.Variable().apply("OS"));
+
+            // also run the same tests by selecting the function by name, as the template engine does
+            assertEquals("", Functions.FUNCTIONS.get("environment.variable").apply(null));
+            assertEquals(System.getenv("OS"), Functions.FUNCTIONS.get("environment.variable").apply("OS"));
+        }
+    }
+
+    @Nested
+    @DisplayName("Functions.environment.user")
+    class EnvironmentUserTests {
+        @Test
+        @DisplayName("Functions.environment.user.apply()")
+        void applyTest()
+            throws Exception {
+            // the input value is ignored by this function, it always returns the system user name
+            assertEquals(System.getProperty("user.name"), new Functions.Environment.User().apply(null));
+            assertEquals(System.getProperty("user.name"), new Functions.Environment.User().apply("any"));
+
+            // also run the same tests by selecting the function by name, as the template engine does
+            assertEquals(System.getProperty("user.name"), Functions.FUNCTIONS.get("environment.user").apply(null));
+            assertEquals(System.getProperty("user.name"), Functions.FUNCTIONS.get("environment.user").apply("any"));
+        }
+    }
+
+    @Nested
+    @DisplayName("Functions.file.content")
+    class FileContentTests {
+        @Test
+        @DisplayName("Functions.file.content.apply()")
+        void applyTest()
+            throws Exception {
+            final String FILE_CONTENT = "file content to test";
+
+            File f = File.createTempFile("filecontenttest", "file", new File(System.getProperty("java.io.tmpdir")));
+            f.deleteOnExit();
+            FileWriter w = new FileWriter(f);
+            w.write(FILE_CONTENT);
+            w.flush();
+            w.close();
+
+            assertEquals("", new Functions.File.Content().apply(null));
+            assertEquals("", new Functions.File.Content().apply("afilethatdoesnotexists"));
+            assertEquals(FILE_CONTENT, new Functions.File.Content().apply(f.getAbsolutePath()));
+
+            // also run the same tests by selecting the function by name, as the template engine does
+            assertEquals("", Functions.FUNCTIONS.get("file.content").apply(null));
+            assertEquals("", Functions.FUNCTIONS.get("file.content").apply("afilethatdoesnotexists"));
+            assertEquals(FILE_CONTENT, Functions.FUNCTIONS.get("file.content").apply(f.getAbsolutePath()));
+        }
+    }
+
+    @Nested
+    @DisplayName("Functions.file.exists")
+    class FileExistsTests {
+        @Test
+        @DisplayName("Functions.file.exists.apply()")
+        void applyTest()
+            throws Exception {
+            File f = File.createTempFile("fileexiststest", "file", new File(System.getProperty("java.io.tmpdir")));
+            f.deleteOnExit();
+
+            assertEquals("false", new Functions.File.Exists().apply(null));
+            assertEquals("false", new Functions.File.Exists().apply("afilethatdoesnotexists"));
+            assertEquals("true", new Functions.File.Exists().apply(f.getAbsolutePath()));
+
+            // also run the same tests by selecting the function by name, as the template engine does
+            assertEquals("false", Functions.FUNCTIONS.get("file.exists").apply(null));
+            assertEquals("false", Functions.FUNCTIONS.get("file.exists").apply("afilethatdoesnotexists"));
+            assertEquals("true", Functions.FUNCTIONS.get("file.exists").apply(f.getAbsolutePath()));
         }
     }
 }

@@ -7,6 +7,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.Mustache;
@@ -105,5 +106,33 @@ public class Templates {
         scopes.add(scope);
         scopes.add(Functions.FUNCTIONS);
         mustache.execute(writer, scopes).flush();
+    }
+
+    /**
+     * Converts the given value to a boolean.
+     * 
+     * @param value the text to convert
+     * 
+     * @return {@code true} if the given value is not {@code null} and not blank, {@code false} in all other cases.
+     */
+    public static Boolean toBoolean(String value) {
+        return Objects.isNull(value) || value.isBlank() ? Boolean.FALSE : Boolean.TRUE;
+    }
+
+    /**
+     * Converts the given value to an integer.
+     * 
+     * @param value the text to convert
+     * 
+     * @return the integer representation of the given string, when the given string contains a valid integer
+     * representation, or 0 otherwise.
+     */
+    public static Integer toInteger(String value) {
+        try {
+            return Integer.valueOf(value);
+        }
+        catch (NumberFormatException nfe) {
+            return Integer.valueOf(0);
+        }
     }
 }
