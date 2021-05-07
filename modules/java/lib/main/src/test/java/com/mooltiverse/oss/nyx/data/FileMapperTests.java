@@ -18,6 +18,7 @@ package com.mooltiverse.oss.nyx.data;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
+import java.net.URL;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -47,6 +48,21 @@ public class FileMapperTests {
         }
 
         @Test
+        @DisplayName("FileMapper[state file with no extension] JSON by default")
+        void stateFileNoExtensionTest()
+            throws Exception {
+            File savedFile = new File(System.getProperty("java.io.tmpdir"), "state"+this.hashCode());
+            savedFile.deleteOnExit();
+
+            assertFalse(savedFile.exists());
+
+            State state = new State(new Configuration());
+            FileMapper.save(savedFile.getAbsolutePath(), state);
+
+            assertTrue(savedFile.exists());
+        }
+
+        @Test
         @DisplayName("FileMapper[state file] YAML")
         void stateFileYAMLTest()
             throws Exception {
@@ -59,6 +75,41 @@ public class FileMapperTests {
             FileMapper.save(savedFile.getAbsolutePath(), state);
 
             assertTrue(savedFile.exists());
+        }
+    }
+
+    @Nested
+    @DisplayName("Load from URL")
+    public static class LoadFromURL {
+        /**
+         * A dummy class used to test the output from the <a href="https://www.jsontest.com/">JSON Test</a> service.
+         */
+        public static class JSONTestIPOutput {
+
+            public String ip = null;
+
+            public JSONTestIPOutput() {
+                super();
+            }
+        }
+
+        /**
+         * In this test we just try to load a JSON file from the internet.
+         * For this we use the <a href="https://www.jsontest.com/">JSON Test</a> service, which just returns a value like:
+         * <pre>
+         *      {"ip": "8.8.8.8"}
+         * </pre>
+         * 
+         * @throws Exception
+         */
+        @Test
+        @DisplayName("FileMapper.load(URL, ?)")
+        void loadFromURLTest()
+            throws Exception {
+            URL url = new URL("http://ip.jsontest.com/");
+
+            JSONTestIPOutput testOutput = FileMapper.load(url, JSONTestIPOutput.class);
+            assertNotNull(testOutput.ip);
         }
     }
 }

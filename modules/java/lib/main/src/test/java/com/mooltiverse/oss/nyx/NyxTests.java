@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import com.mooltiverse.oss.nyx.configuration.Configuration;
-import com.mooltiverse.oss.nyx.configuration.mock.ConfigurationLayerMock;
+import com.mooltiverse.oss.nyx.configuration.SimpleConfigurationLayer;
 import com.mooltiverse.oss.nyx.data.DataAccessException;
 import com.mooltiverse.oss.nyx.data.FileMapper;
 import com.mooltiverse.oss.nyx.git.Repository;
@@ -83,9 +83,9 @@ public class NyxTests {
             Nyx nyx = new Nyx();
 
             // initialize a repository in a new directory and pass the directory to the configuration. We'll use the command line configuration layer to pass the directory
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-            configurationMock.directory = Scenario.FROM_SCRATCH.realize().getWorkingDirectory();
-            nyx.configuration().withCommandLineConfiguration(configurationMock);
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            configurationLayerMock.setDirectory(Scenario.FROM_SCRATCH.realize().getWorkingDirectory().getAbsolutePath());
+            nyx.configuration().withCommandLineConfiguration(configurationLayerMock);
 
             Repository repository = nyx.repository();
 
@@ -123,10 +123,10 @@ public class NyxTests {
         void stateResumeTest()
             throws Exception {
             Configuration configuration = new Configuration();
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-            configurationMock.resume = Boolean.TRUE;
-            configurationMock.stateFile = new File(System.getProperty("java.io.tmpdir"), "state"+this.hashCode()+".json").getAbsolutePath();
-            configuration.withCommandLineConfiguration(configurationMock);
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            configurationLayerMock.setResume(Boolean.TRUE);
+            configurationLayerMock.setStateFile(new File(System.getProperty("java.io.tmpdir"), "state"+this.hashCode()+".json").getAbsolutePath());
+            configuration.withCommandLineConfiguration(configurationLayerMock);
             State oldState = new State(configuration);
 
             // set a few values to use later on for comparison
@@ -140,12 +140,12 @@ public class NyxTests {
             oldState.getReleaseScope().getSignificantCommits().put("initial", "minor");
 
             // save the file
-            FileMapper.save(configurationMock.stateFile, oldState);
-            assertTrue(new File(configurationMock.stateFile).exists());
+            FileMapper.save(configurationLayerMock.getStateFile(), oldState);
+            assertTrue(new File(configurationLayerMock.getStateFile()).exists());
 
             // now we are ready to resume the file
             Nyx nyx = new Nyx();
-            nyx.configuration().withCommandLineConfiguration(configurationMock);
+            nyx.configuration().withCommandLineConfiguration(configurationLayerMock);
 
             State resumedState = nyx.state();
             assertEquals(oldState.getBump(), resumedState.getBump());

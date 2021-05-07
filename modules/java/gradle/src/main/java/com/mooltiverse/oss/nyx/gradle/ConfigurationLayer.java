@@ -17,7 +17,6 @@ package com.mooltiverse.oss.nyx.gradle;
 
 import static org.gradle.api.Project.DEFAULT_VERSION;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -87,8 +86,16 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
      * {@inheritDoc}
      */
     @Override
-    public File getDirectory() {
-        return extension.getDirectory().getOrNull();
+    public String getConfigurationFile() {
+        return extension.getConfigurationFile().getOrNull();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getDirectory() {
+        return extension.getDirectory().isPresent() ? extension.getDirectory().get().getAbsolutePath() : null;
     }
 
     /**
@@ -105,6 +112,14 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
     @Override
     public String getInitialVersion() {
         return extension.getInitialVersion().getOrNull();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getPreset() {
+        return extension.getPreset().getOrNull();
     }
 
     /**
@@ -146,6 +161,14 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
             }
         }
         else return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getSharedConfigurationFile() {
+        return extension.getSharedConfigurationFile().getOrNull();
     }
 
     /**

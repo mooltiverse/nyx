@@ -75,6 +75,18 @@ public class ConfigurationLayerTestTemplates {
         }
 
         @TestTemplate
+        @DisplayName("ConfigurationLayer.getConfigurationFile() default value")
+        @Baseline(Scenario.FROM_SCRATCH)
+        void getConfigurationFileDefaultTest(Project project)
+            throws Exception {
+            NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
+            ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
+
+            assertFalse(extension.getConfigurationFile().isPresent());
+            assertNull(configurationLayer.getConfigurationFile());
+        }
+
+        @TestTemplate
         @DisplayName("ConfigurationLayer.getDirectory() default value")
         @Baseline(Scenario.FROM_SCRATCH)
         void getDirectoryDefaultTest(Project project)
@@ -84,7 +96,7 @@ public class ConfigurationLayerTestTemplates {
 
             // the default must be the project directory
             assertTrue(extension.getDirectory().isPresent());
-            assertEquals(project.getProjectDir().getAbsolutePath(), configurationLayer.getDirectory().getAbsolutePath());
+            assertEquals(project.getProjectDir().getAbsolutePath(), configurationLayer.getDirectory());
         }
 
         @TestTemplate
@@ -109,6 +121,18 @@ public class ConfigurationLayerTestTemplates {
 
             assertFalse(extension.getInitialVersion().isPresent());
             assertNull(configurationLayer.getInitialVersion());
+        }
+
+        @TestTemplate
+        @DisplayName("ConfigurationLayer.getPreset() default value")
+        @Baseline(Scenario.FROM_SCRATCH)
+        void getPresetDefaultTest(Project project)
+            throws Exception {
+            NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
+            ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
+
+            assertFalse(extension.getPreset().isPresent());
+            assertNull(configurationLayer.getPreset());
         }
 
         @TestTemplate
@@ -145,6 +169,18 @@ public class ConfigurationLayerTestTemplates {
 
             assertFalse(extension.getScheme().isPresent());
             assertNull(configurationLayer.getScheme());
+        }
+
+        @TestTemplate
+        @DisplayName("ConfigurationLayer.getSharedConfigurationFile() default value")
+        @Baseline(Scenario.FROM_SCRATCH)
+        void getSharedConfigurationFileDefaultTest(Project project)
+            throws Exception {
+            NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
+            ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
+
+            assertFalse(extension.getSharedConfigurationFile().isPresent());
+            assertNull(configurationLayer.getSharedConfigurationFile());
         }
 
         @TestTemplate

@@ -16,7 +16,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import com.mooltiverse.oss.nyx.configuration.Configuration;
-import com.mooltiverse.oss.nyx.configuration.mock.ConfigurationLayerMock;
+import com.mooltiverse.oss.nyx.configuration.SimpleConfigurationLayer;
 import com.mooltiverse.oss.nyx.template.mock.TestScope;
 import com.mooltiverse.oss.nyx.state.State;
 
@@ -179,10 +179,10 @@ public class TemplatesTests {
         private State getStateScope()
             throws Exception {
             Configuration configuration = new Configuration();
-            ConfigurationLayerMock configurationLayerMock = new ConfigurationLayerMock();
-            configurationLayerMock.bump = "theta";
-            configurationLayerMock.releaseLenient = Boolean.TRUE;
-            configurationLayerMock.initialVersion = "1.2.3";
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            configurationLayerMock.setBump("theta");
+            configurationLayerMock.setReleaseLenient(Boolean.TRUE);
+            configurationLayerMock.setInitialVersion("1.2.3");
 
             configuration.withCommandLineConfiguration(configurationLayerMock);
             State state = new State(configuration);

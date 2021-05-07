@@ -17,7 +17,6 @@ package com.mooltiverse.oss.nyx.configuration;
 
 import static com.mooltiverse.oss.nyx.log.Markers.DEFAULT;
 
-import java.io.File;
 import java.util.Objects;
 
 import org.slf4j.Logger;
@@ -49,7 +48,7 @@ class DefaultLayer implements ConfigurationLayer, Defaults {
     /**
      * The directory returned by this layer.
      */
-    private File directory = null;
+    private String directory = null;
 
     /**
      * Default constructor is private on purpose.
@@ -93,7 +92,17 @@ class DefaultLayer implements ConfigurationLayer, Defaults {
      * {@inheritDoc}
      */
     @Override
-    public File getDirectory()
+    public String getConfigurationFile()
+        throws DataAccessException, IllegalPropertyException {
+        logger.trace(DEFAULT, "Retrieving the default {} configuration option", "configurationFile");
+        return CONFIGURATION_FILE;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getDirectory()
         throws DataAccessException, IllegalPropertyException {
         logger.trace(DEFAULT, "Retrieving the default {} configuration option: {}", "directory", Objects.isNull(directory) ? DIRECTORY : directory);
         return Objects.isNull(directory) ? DIRECTORY : directory;
@@ -104,8 +113,8 @@ class DefaultLayer implements ConfigurationLayer, Defaults {
      * 
      * @param directory the new default directory. If {@code null} then the standard default directory will be used.
      */
-    public void setDirectory(File directory) {
-        logger.trace(DEFAULT, "Setting the default {} configuration option: {}", "directory", Objects.isNull(directory) ? "null" : directory.getAbsolutePath());
+    public void setDirectory(String directory) {
+        logger.trace(DEFAULT, "Setting the default {} configuration option: {}", "directory", Objects.isNull(directory) ? "null" : directory);
         this.directory = directory;
     }
 
@@ -127,6 +136,16 @@ class DefaultLayer implements ConfigurationLayer, Defaults {
         throws DataAccessException, IllegalPropertyException {
         logger.trace(DEFAULT, "Retrieving the default {} configuration option: {}", "initialVersion", INITIAL_VERSION);
         return INITIAL_VERSION;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getPreset()
+        throws DataAccessException, IllegalPropertyException {
+        logger.trace(DEFAULT, "Retrieving the default {} configuration option: {}", "preset", PRESET);
+        return PRESET;
     }
 
     /**
@@ -167,6 +186,16 @@ class DefaultLayer implements ConfigurationLayer, Defaults {
         throws DataAccessException, IllegalPropertyException {
         logger.trace(DEFAULT, "Retrieving the default {} configuration option: {}", "scheme", SCHEME);
         return SCHEME;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getSharedConfigurationFile()
+        throws DataAccessException, IllegalPropertyException {
+        logger.trace(DEFAULT, "Retrieving the default {} configuration option", "sharedConfigurationFile");
+        return SHARED_CONFIGURATION_FILE;
     }
 
     /**

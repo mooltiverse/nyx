@@ -26,8 +26,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import com.mooltiverse.oss.nyx.configuration.mock.ConfigurationLayerMock;
+import com.mooltiverse.oss.nyx.configuration.examples.SimplestConfigurationExample;
 import com.mooltiverse.oss.nyx.data.CommitMessageConvention;
+import com.mooltiverse.oss.nyx.data.FileMapper;
 import com.mooltiverse.oss.nyx.data.Scheme;
 import com.mooltiverse.oss.nyx.data.Verbosity;
 
@@ -51,7 +52,7 @@ public class ConfigurationTests {
         void getCommitMessageConventionsTest()
             throws Exception {
             assertEquals(Defaults.COMMIT_MESSAGE_CONVENTIONS.getEnabled(), new Configuration().getCommitMessageConventions().getEnabled());
-            assertEquals(Defaults.COMMIT_MESSAGE_CONVENTIONS.getItems(), new Configuration().getCommitMessageConventions().getItems());
+            assertTrue(new Configuration().getCommitMessageConventions().getItems().isEmpty());
         }
 
         @Test
@@ -69,9 +70,16 @@ public class ConfigurationTests {
             File directory = Files.createTempDirectory(null).toFile();
             Configuration.setDefaultDirectory(directory);
             
-            assertEquals(directory, new Configuration().getDirectory());
+            assertEquals(directory.getAbsolutePath(), new File(new Configuration().getDirectory()).getAbsolutePath());
 
             Configuration.setDefaultDirectory(null); // clean up
+        }
+
+        @Test
+        @DisplayName("Configuration.getConfigurationFile() == Defaults.CONFIGURATION_FILE")
+        void getConfigurationFileTest()
+            throws Exception {
+            assertEquals(Defaults.CONFIGURATION_FILE, new Configuration().getConfigurationFile());
         }
 
         @Test
@@ -79,6 +87,13 @@ public class ConfigurationTests {
         void getDryRunTest()
             throws Exception {
             assertEquals(Defaults.DRY_RUN, new Configuration().getDryRun());
+        }
+
+        @Test
+        @DisplayName("Configuration.getPreset() == Defaults.PRESET")
+        void getPresetTest()
+            throws Exception {
+            assertEquals(Defaults.PRESET, new Configuration().getPreset());
         }
 
         @Test
@@ -107,6 +122,13 @@ public class ConfigurationTests {
         void getSchemeTest()
             throws Exception {
             assertEquals(Defaults.SCHEME, new Configuration().getScheme());
+        }
+
+        @Test
+        @DisplayName("Configuration.getSharedConfigurationFile() == Defaults.SHARED_CONFIGURATION_FILE")
+        void getSharedConfigurationFileTest()
+            throws Exception {
+            assertEquals(Defaults.SHARED_CONFIGURATION_FILE, new Configuration().getSharedConfigurationFile());
         }
 
         @Test
@@ -141,22 +163,22 @@ public class ConfigurationTests {
         @DisplayName("Configuration.withCommandLineConfiguration(MOCK).getBump() == MOCK.getBump()")
         void getBumpTest()
             throws Exception {
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
-            configurationMock.bump = "alpha";
+            configurationLayerMock.setBump("alpha");
 
             // in order to make the test meaningful, make sure the default and mock values are different
             assertNull(Defaults.BUMP);
-            assertNotNull(configurationMock.bump);
+            assertNotNull(configurationLayerMock.getBump());
 
             // make sure the initial values come from defaults, until we inject the command line configuration
             assertNull(Defaults.BUMP);
             assertNull(configuration.getBump());
             
             // inject the command line configuration and test the new value is returned from that
-            configuration.withCommandLineConfiguration(configurationMock);
+            configuration.withCommandLineConfiguration(configurationLayerMock);
 
-            assertEquals(configurationMock.bump, configuration.getBump());
+            assertEquals(configurationLayerMock.getBump(), configuration.getBump());
 
             // now remove the command line configuration and test that now default values are returned again
             assertNull(configuration.withCommandLineConfiguration(null).getBump());
@@ -166,24 +188,24 @@ public class ConfigurationTests {
         @DisplayName("Configuration.withCommandLineConfiguration(MOCK).getCommitMessageConventions() == MOCK.getCommitMessageConventions()")
         void getCommitMessageConventionsTest()
             throws Exception {
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
-            configurationMock.commitMessageConventions.enabled = List.<String>of("convention1");
-            configurationMock.commitMessageConventions.items = Map.<String,CommitMessageConvention>of("convention1", new CommitMessageConvention("expr1", Map.<String,String>of()));
+            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("convention1"));
+            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("convention1", new CommitMessageConvention("expr1", Map.<String,String>of())));
 
             // in order to make the test meaningful, make sure the default and mock values are different
             assertNotNull(Defaults.COMMIT_MESSAGE_CONVENTIONS);
-            assertNotNull(configurationMock.commitMessageConventions);
-            assertNotSame(configuration.getCommitMessageConventions(), configurationMock.commitMessageConventions);
+            assertNotNull(configurationLayerMock.getCommitMessageConventions());
+            assertNotSame(configuration.getCommitMessageConventions(), configurationLayerMock.getCommitMessageConventions());
 
             // make sure the initial values come from defaults, until we inject the command line configuration
             assertNull(Defaults.COMMIT_MESSAGE_CONVENTIONS.getEnabled());
             assertNull(configuration.getCommitMessageConventions().getEnabled());
-            assertNull(Defaults.COMMIT_MESSAGE_CONVENTIONS.getItems());
-            assertNull(configuration.getCommitMessageConventions().getItems());
+            assertTrue(Defaults.COMMIT_MESSAGE_CONVENTIONS.getItems().isEmpty());
+            assertTrue(configuration.getCommitMessageConventions().getItems().isEmpty());
             
             // inject the command line configuration and test the new value is returned from that
-            configuration.withCommandLineConfiguration(configurationMock);
+            configuration.withCommandLineConfiguration(configurationLayerMock);
 
             assertNotNull(configuration.getCommitMessageConventions().getEnabled());
             assertNotNull(configuration.getCommitMessageConventions().getItems());
@@ -195,7 +217,33 @@ public class ConfigurationTests {
             // now remove the command line configuration and test that now default values are returned again
             configuration.withCommandLineConfiguration(null);
             assertNull(configuration.getCommitMessageConventions().getEnabled());
-            assertNull(configuration.getCommitMessageConventions().getItems());
+            assertTrue(configuration.getCommitMessageConventions().getItems().isEmpty());
+        }
+
+        @Test
+        @DisplayName("Configuration.withCommandLineConfiguration(MOCK).getConfigurationFile() == MOCK.getConfigurationFile()")
+        void getConfigurationFileTest()
+            throws Exception {
+            File savedFile = new File(System.getProperty("java.io.tmpdir"), "extended"+this.hashCode()+".json");
+            savedFile.deleteOnExit();
+            FileMapper.save(savedFile.getAbsolutePath(), new SimplestConfigurationExample());
+
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            Configuration configuration = new Configuration();
+            configurationLayerMock.setConfigurationFile(savedFile.getAbsolutePath());
+
+            // in order to make the test meaningful, make sure the default and mock values are different
+            assertNotEquals(Defaults.CONFIGURATION_FILE, configurationLayerMock.getConfigurationFile());
+
+            // make sure the initial values come from defaults, until we inject the command line configuration
+            assertEquals(Defaults.CONFIGURATION_FILE, configuration.getConfigurationFile());
+            
+            // inject the command line configuration and test the new value is returned from that
+            configuration.withCommandLineConfiguration(configurationLayerMock);
+            assertEquals(configurationLayerMock.getConfigurationFile(), configuration.getConfigurationFile());
+
+            // now remove the command line configuration and test that now default values are returned again
+            assertEquals(Defaults.CONFIGURATION_FILE, configuration.withCommandLineConfiguration(null).getConfigurationFile());
         }
 
         @Test
@@ -203,19 +251,19 @@ public class ConfigurationTests {
         void getDirectoryTest()
             throws Exception {
             Configuration.setDefaultDirectory(null); // clean the singleton from previous runs
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
-            configurationMock.directory = new File(System.getProperty("java.io.tmpdir"), "this directory does not exists");
+            configurationLayerMock.setDirectory("some/directory");
 
             // in order to make the test meaningful, make sure the default and mock values are different
-            assertNotEquals(Defaults.DIRECTORY, configurationMock.directory);
+            assertNotEquals(Defaults.DIRECTORY, configurationLayerMock.getDirectory());
 
             // make sure the initial values come from defaults, until we inject the command line configuration
             assertEquals(Defaults.DIRECTORY, configuration.getDirectory());
             
             // inject the command line configuration and test the new value is returned from that
-            configuration.withCommandLineConfiguration(configurationMock);
-            assertEquals(configurationMock.directory, configuration.getDirectory());
+            configuration.withCommandLineConfiguration(configurationLayerMock);
+            assertEquals(configurationLayerMock.getDirectory(), configuration.getDirectory());
 
             // now remove the command line configuration and test that now default values are returned again
             assertEquals(Defaults.DIRECTORY, configuration.withCommandLineConfiguration(null).getDirectory());
@@ -225,19 +273,19 @@ public class ConfigurationTests {
         @DisplayName("Configuration.withCommandLineConfiguration(MOCK).getDryRun() == MOCK.getDryRun()")
         void getDryRunTest()
             throws Exception {
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
-            configurationMock.dryRun = Boolean.TRUE;
+            configurationLayerMock.setDryRun(Boolean.TRUE);
 
             // in order to make the test meaningful, make sure the default and mock values are different
-            assertNotEquals(Defaults.DRY_RUN, configurationMock.dryRun);
+            assertNotEquals(Defaults.DRY_RUN, configurationLayerMock.getDryRun());
 
             // make sure the initial values come from defaults, until we inject the command line configuration
             assertEquals(Defaults.DRY_RUN, configuration.getDryRun());
             
             // inject the command line configuration and test the new value is returned from that
-            configuration.withCommandLineConfiguration(configurationMock);
-            assertEquals(configurationMock.dryRun, configuration.getDryRun());
+            configuration.withCommandLineConfiguration(configurationLayerMock);
+            assertEquals(configurationLayerMock.getDryRun(), configuration.getDryRun());
 
             // now remove the command line configuration and test that now default values are returned again
             assertEquals(Defaults.DRY_RUN, configuration.withCommandLineConfiguration(null).getDryRun());
@@ -247,41 +295,63 @@ public class ConfigurationTests {
         @DisplayName("Configuration.withCommandLineConfiguration(MOCK).getInitialVersion() == MOCK.getInitialVersion()")
         void getInitialVersionTest()
             throws Exception {
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
-            configurationMock.initialVersion = "9.9.9";
+            configurationLayerMock.setInitialVersion("9.9.9");
 
             // in order to make the test meaningful, make sure the default and mock values are different
-            assertNotEquals(Defaults.INITIAL_VERSION, configurationMock.initialVersion);
+            assertNotEquals(Defaults.INITIAL_VERSION, configurationLayerMock.getInitialVersion());
 
             // make sure the initial values come from defaults, until we inject the command line configuration
             assertEquals(Defaults.INITIAL_VERSION, configuration.getInitialVersion());
             
             // inject the command line configuration and test the new value is returned from that
-            configuration.withCommandLineConfiguration(configurationMock);
-            assertEquals(configurationMock.initialVersion, configuration.getInitialVersion());
+            configuration.withCommandLineConfiguration(configurationLayerMock);
+            assertEquals(configurationLayerMock.getInitialVersion(), configuration.getInitialVersion());
 
             // now remove the command line configuration and test that now default values are returned again
             assertEquals(Defaults.INITIAL_VERSION, configuration.withCommandLineConfiguration(null).getInitialVersion());
         }
 
         @Test
+        @DisplayName("Configuration.withCommandLineConfiguration(MOCK).getPreset() == MOCK.getPreset()")
+        void getPresetTest()
+            throws Exception {
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            Configuration configuration = new Configuration();
+            configurationLayerMock.setPreset("simple");
+
+            // in order to make the test meaningful, make sure the default and mock values are different
+            assertNotEquals(Defaults.PRESET, configurationLayerMock.getPreset());
+
+            // make sure the initial values come from defaults, until we inject the command line configuration
+            assertEquals(Defaults.PRESET, configuration.getPreset());
+            
+            // inject the command line configuration and test the new value is returned from that
+            configuration.withCommandLineConfiguration(configurationLayerMock);
+            assertEquals(configurationLayerMock.getPreset(), configuration.getPreset());
+
+            // now remove the command line configuration and test that now default values are returned again
+            assertEquals(Defaults.PRESET, configuration.withCommandLineConfiguration(null).getPreset());
+        }
+
+        @Test
         @DisplayName("Configuration.withCommandLineConfiguration(MOCK).getReleasePrefix() == MOCK.getReleasePrefix()")
         void getReleasePrefixTest()
             throws Exception {
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
-            configurationMock.releasePrefix = "testprefix";
+            configurationLayerMock.setReleasePrefix("testprefix");
 
             // in order to make the test meaningful, make sure the default and mock values are different
-            assertNotEquals(Defaults.RELEASE_PREFIX, configurationMock.releasePrefix);
+            assertNotEquals(Defaults.RELEASE_PREFIX, configurationLayerMock.getReleasePrefix());
 
             // make sure the initial values come from defaults, until we inject the command line configuration
             assertEquals(Defaults.RELEASE_PREFIX, configuration.getReleasePrefix());
             
             // inject the command line configuration and test the new value is returned from that
-            configuration.withCommandLineConfiguration(configurationMock);
-            assertEquals(configurationMock.releasePrefix, configuration.getReleasePrefix());
+            configuration.withCommandLineConfiguration(configurationLayerMock);
+            assertEquals(configurationLayerMock.getReleasePrefix(), configuration.getReleasePrefix());
 
             // now remove the command line configuration and test that now default values are returned again
             assertEquals(Defaults.RELEASE_PREFIX, configuration.withCommandLineConfiguration(null).getReleasePrefix());
@@ -291,19 +361,19 @@ public class ConfigurationTests {
         @DisplayName("Configuration.withCommandLineConfiguration(MOCK).getReleaseLenient() == MOCK.getReleaseLenient()")
         void getReleaseLenientTest()
             throws Exception {
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
-            configurationMock.releaseLenient = Boolean.FALSE;
+            configurationLayerMock.setReleaseLenient(Boolean.FALSE);
 
             // in order to make the test meaningful, make sure the default and mock values are different
-            assertNotEquals(Defaults.RELEASE_LENIENT, configurationMock.releaseLenient);
+            assertNotEquals(Defaults.RELEASE_LENIENT, configurationLayerMock.getReleaseLenient());
 
             // make sure the initial values come from defaults, until we inject the command line configuration
             assertEquals(Defaults.RELEASE_LENIENT, configuration.getReleaseLenient());
             
             // inject the command line configuration and test the new value is returned from that
-            configuration.withCommandLineConfiguration(configurationMock);
-            assertEquals(configurationMock.releaseLenient, configuration.getReleaseLenient());
+            configuration.withCommandLineConfiguration(configurationLayerMock);
+            assertEquals(configurationLayerMock.getReleaseLenient(), configuration.getReleaseLenient());
 
             // now remove the command line configuration and test that now default values are returned again
             assertEquals(Defaults.RELEASE_LENIENT, configuration.withCommandLineConfiguration(null).getReleaseLenient());
@@ -313,19 +383,19 @@ public class ConfigurationTests {
         @DisplayName("Configuration.withCommandLineConfiguration(MOCK).getResume() == MOCK.getResume()")
         void getResumeTest()
             throws Exception {
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
-            configurationMock.resume = Boolean.TRUE;
+            configurationLayerMock.setResume(Boolean.TRUE);
 
             // in order to make the test meaningful, make sure the default and mock values are different
-            assertNotEquals(Defaults.RESUME, configurationMock.resume);
+            assertNotEquals(Defaults.RESUME, configurationLayerMock.getResume());
 
             // make sure the initial values come from defaults, until we inject the command line configuration
             assertEquals(Defaults.RESUME, configuration.getResume());
             
             // inject the command line configuration and test the new value is returned from that
-            configuration.withCommandLineConfiguration(configurationMock);
-            assertEquals(configurationMock.resume, configuration.getResume());
+            configuration.withCommandLineConfiguration(configurationLayerMock);
+            assertEquals(configurationLayerMock.getResume(), configuration.getResume());
 
             // now remove the command line configuration and test that now default values are returned again
             assertEquals(Defaults.RESUME, configuration.withCommandLineConfiguration(null).getResume());
@@ -335,41 +405,67 @@ public class ConfigurationTests {
         @DisplayName("Configuration.withCommandLineConfiguration(MOCK).getScheme() == MOCK.getScheme()")
         void getSchemeTest()
             throws Exception {
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
-            configurationMock.scheme = Scheme.SEMVER;
+            configurationLayerMock.setScheme(Scheme.SEMVER);
 
             // since there is only one scheme available, this assumption can't be assumed
-            //assertNotEquals(Defaults.SCHEME, configurationMock.scheme);
+            //assertNotEquals(Defaults.SCHEME, configurationLayerMock.scheme);
 
             // make sure the initial values come from defaults, until we inject the command line configuration
             assertEquals(Defaults.SCHEME, configuration.getScheme());
             
             // inject the command line configuration and test the new value is returned from that
-            configuration.withCommandLineConfiguration(configurationMock);
-            assertEquals(configurationMock.scheme, configuration.getScheme());
+            configuration.withCommandLineConfiguration(configurationLayerMock);
+            assertEquals(configurationLayerMock.getScheme(), configuration.getScheme());
 
             // now remove the command line configuration and test that now default values are returned again
             assertEquals(Defaults.SCHEME, configuration.withCommandLineConfiguration(null).getScheme());
         }
 
         @Test
+        @DisplayName("Configuration.withCommandLineConfiguration(MOCK).getSharedConfigurationFile() == MOCK.getSharedConfigurationFile()")
+        void getSharedConfigurationFileTest()
+            throws Exception {
+            File savedFile = new File(System.getProperty("java.io.tmpdir"), "extended"+this.hashCode()+".json");
+            savedFile.deleteOnExit();
+            FileMapper.save(savedFile.getAbsolutePath(), new SimplestConfigurationExample());
+
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            Configuration configuration = new Configuration();
+            configurationLayerMock.setSharedConfigurationFile(savedFile.getAbsolutePath());
+
+            // in order to make the test meaningful, make sure the default and mock values are different
+            assertNotEquals(Defaults.SHARED_CONFIGURATION_FILE, configurationLayerMock.getSharedConfigurationFile());
+
+            // make sure the initial values come from defaults, until we inject the command line configuration
+            assertEquals(Defaults.SHARED_CONFIGURATION_FILE, configuration.getSharedConfigurationFile());
+            
+            // inject the command line configuration and test the new value is returned from that
+            configuration.withCommandLineConfiguration(configurationLayerMock);
+            assertEquals(configurationLayerMock.getSharedConfigurationFile(), configuration.getSharedConfigurationFile());
+
+            // now remove the command line configuration and test that now default values are returned again
+            assertEquals(Defaults.SHARED_CONFIGURATION_FILE, configuration.withCommandLineConfiguration(null).getSharedConfigurationFile());
+        }
+
+        @Test
         @DisplayName("Configuration.withCommandLineConfiguration(MOCK).getStateFile() == MOCK.getStateFile()")
         void getStateFileTest()
             throws Exception {
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
-            configurationMock.stateFile = "state-file.yml";
+            configurationLayerMock.setStateFile("state-file.yml");
 
             // in order to make the test meaningful, make sure the default and mock values are different
-            assertNotEquals(Defaults.STATE_FILE, configurationMock.stateFile);
+            assertNotEquals(Defaults.STATE_FILE, configurationLayerMock.getStateFile());
 
             // make sure the initial values come from defaults, until we inject the command line configuration
             assertEquals(Defaults.STATE_FILE, configuration.getStateFile());
             
             // inject the command line configuration and test the new value is returned from that
-            configuration.withCommandLineConfiguration(configurationMock);
-            assertEquals(configurationMock.stateFile, configuration.getStateFile());
+            configuration.withCommandLineConfiguration(configurationLayerMock);
+            assertEquals(configurationLayerMock.getStateFile(), configuration.getStateFile());
 
             // now remove the command line configuration and test that now default values are returned again
             assertEquals(Defaults.STATE_FILE, configuration.withCommandLineConfiguration(null).getStateFile());
@@ -379,19 +475,19 @@ public class ConfigurationTests {
         @DisplayName("Configuration.withCommandLineConfiguration(MOCK).getVerbosity() == MOCK.getVerbosity()")
         void getVerbosityTest()
             throws Exception {
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
-            configurationMock.verbosity = Verbosity.TRACE;
+            configurationLayerMock.setVerbosity(Verbosity.TRACE);
 
             // in order to make the test meaningful, make sure the default and mock values are different
-            assertNotEquals(Defaults.VERBOSITY, configurationMock.verbosity);
+            assertNotEquals(Defaults.VERBOSITY, configurationLayerMock.getVerbosity());
 
             // make sure the initial values come from defaults, until we inject the command line configuration
             assertEquals(Defaults.VERBOSITY, configuration.getVerbosity());
             
             // inject the command line configuration and test the new value is returned from that
-            configuration.withCommandLineConfiguration(configurationMock);
-            assertEquals(configurationMock.verbosity, configuration.getVerbosity());
+            configuration.withCommandLineConfiguration(configurationLayerMock);
+            assertEquals(configurationLayerMock.getVerbosity(), configuration.getVerbosity());
 
             // now remove the command line configuration and test that now default values are returned again
             assertEquals(Defaults.VERBOSITY, configuration.withCommandLineConfiguration(null).getVerbosity());
@@ -401,21 +497,21 @@ public class ConfigurationTests {
         @DisplayName("Configuration.withCommandLineConfiguration(MOCK).getVersion() == MOCK.getVersion()")
         void getVersionTest()
             throws Exception {
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
-            configurationMock.version = "11.12.13";
+            configurationLayerMock.setVersion("11.12.13");
 
             // in order to make the test meaningful, make sure the default and mock values are different
             assertNull(Defaults.VERSION);
-            assertNotNull(configurationMock.version);
+            assertNotNull(configurationLayerMock.getVersion());
 
             // make sure the initial values come from defaults, until we inject the command line configuration
             assertNull(Defaults.VERSION);
             assertNull(configuration.getVersion());
             
             // inject the command line configuration and test the new value is returned from that
-            configuration.withCommandLineConfiguration(configurationMock);
-            assertEquals(configurationMock.version, configuration.getVersion());
+            configuration.withCommandLineConfiguration(configurationLayerMock);
+            assertEquals(configurationLayerMock.getVersion(), configuration.getVersion());
 
             // now remove the command line configuration and test that now default values are returned again
             assertEquals(Defaults.VERSION, configuration.withCommandLineConfiguration(null).getVersion());
@@ -432,22 +528,22 @@ public class ConfigurationTests {
         @DisplayName("Configuration.withPluginConfiguration(MOCK).getBump() == MOCK.getBump()")
         void getBumpTest()
             throws Exception {
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
-            configurationMock.bump = "alpha";
+            configurationLayerMock.setBump("alpha");
 
             // in order to make the test meaningful, make sure the default and mock values are different
             assertNull(Defaults.BUMP);
-            assertNotNull(configurationMock.bump);
+            assertNotNull(configurationLayerMock.getBump());
 
             // make sure the initial values come from defaults, until we inject the plugin configuration
             assertNull(Defaults.BUMP);
             assertNull(configuration.getBump());
             
             // inject the plugin configuration and test the new value is returned from that
-            configuration.withPluginConfiguration(configurationMock);
+            configuration.withPluginConfiguration(configurationLayerMock);
 
-            assertEquals(configurationMock.bump, configuration.getBump());
+            assertEquals(configurationLayerMock.getBump(), configuration.getBump());
 
             // now remove the plugin configuration and test that now default values are returned again
             assertNull(configuration.withPluginConfiguration(null).getBump());
@@ -457,24 +553,24 @@ public class ConfigurationTests {
         @DisplayName("Configuration.withPluginConfiguration(MOCK).getCommitMessageConventions() == MOCK.getCommitMessageConventions()")
         void getCommitMessageConventionsTest()
             throws Exception {
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
-            configurationMock.commitMessageConventions.enabled = List.<String>of("convention1");
-            configurationMock.commitMessageConventions.items = Map.<String,CommitMessageConvention>of("convention1", new CommitMessageConvention("expr1", Map.<String,String>of()));
+            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("convention1"));
+            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("convention1", new CommitMessageConvention("expr1", Map.<String,String>of())));
 
             // in order to make the test meaningful, make sure the default and mock values are different
             assertNotNull(Defaults.COMMIT_MESSAGE_CONVENTIONS);
-            assertNotNull(configurationMock.commitMessageConventions);
-            assertNotSame(configuration.getCommitMessageConventions(), configurationMock.commitMessageConventions);
+            assertNotNull(configurationLayerMock.getCommitMessageConventions());
+            assertNotSame(configuration.getCommitMessageConventions(), configurationLayerMock.getCommitMessageConventions());
 
             // make sure the initial values come from defaults, until we inject the command line configuration
             assertNull(Defaults.COMMIT_MESSAGE_CONVENTIONS.getEnabled());
             assertNull(configuration.getCommitMessageConventions().getEnabled());
-            assertNull(Defaults.COMMIT_MESSAGE_CONVENTIONS.getItems());
-            assertNull(configuration.getCommitMessageConventions().getItems());
+            assertTrue(Defaults.COMMIT_MESSAGE_CONVENTIONS.getItems().isEmpty());
+            assertTrue(configuration.getCommitMessageConventions().getItems().isEmpty());
             
             // inject the command line configuration and test the new value is returned from that
-            configuration.withPluginConfiguration(configurationMock);
+            configuration.withPluginConfiguration(configurationLayerMock);
 
             assertNotNull(configuration.getCommitMessageConventions().getEnabled());
             assertNotNull(configuration.getCommitMessageConventions().getItems());
@@ -486,7 +582,33 @@ public class ConfigurationTests {
             // now remove the command line configuration and test that now default values are returned again
             configuration.withPluginConfiguration(null);
             assertNull(configuration.getCommitMessageConventions().getEnabled());
-            assertNull(configuration.getCommitMessageConventions().getItems());
+            assertTrue(configuration.getCommitMessageConventions().getItems().isEmpty());
+        }
+
+        @Test
+        @DisplayName("Configuration.withPluginConfiguration(MOCK).getConfigurationFile() == MOCK.getConfigurationFile()")
+        void getConfigurationFileTest()
+            throws Exception {
+            File savedFile = new File(System.getProperty("java.io.tmpdir"), "extended"+this.hashCode()+".json");
+            savedFile.deleteOnExit();
+            FileMapper.save(savedFile.getAbsolutePath(), new SimplestConfigurationExample());
+
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            Configuration configuration = new Configuration();
+            configurationLayerMock.setConfigurationFile(savedFile.getAbsolutePath());
+
+            // in order to make the test meaningful, make sure the default and mock values are different
+            assertNotEquals(Defaults.CONFIGURATION_FILE, configurationLayerMock.getConfigurationFile());
+
+            // make sure the initial values come from defaults, until we inject the plugin configuration
+            assertEquals(Defaults.CONFIGURATION_FILE, configuration.getConfigurationFile());
+            
+            // inject the plugin configuration and test the new value is returned from that
+            configuration.withPluginConfiguration(configurationLayerMock);
+            assertEquals(configurationLayerMock.getConfigurationFile(), configuration.getConfigurationFile());
+
+            // now remove the plugin configuration and test that now default values are returned again
+            assertEquals(Defaults.CONFIGURATION_FILE, configuration.withPluginConfiguration(null).getConfigurationFile());
         }
 
         @Test
@@ -494,19 +616,19 @@ public class ConfigurationTests {
         void getDirectoryTest()
             throws Exception {
             Configuration.setDefaultDirectory(null); // clean the singleton from previous runs
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
-            configurationMock.directory = new File(System.getProperty("java.io.tmpdir"), "this directory does not exists");
+            configurationLayerMock.setDirectory("some/directory");
 
             // in order to make the test meaningful, make sure the default and mock values are different
-            assertNotEquals(Defaults.DIRECTORY, configurationMock.directory);
+            assertNotEquals(Defaults.DIRECTORY, configurationLayerMock.getDirectory());
 
             // make sure the initial values come from defaults, until we inject the plugin configuration
             assertEquals(Defaults.DIRECTORY, configuration.getDirectory());
             
             // inject the plugin configuration and test the new value is returned from that
-            configuration.withPluginConfiguration(configurationMock);
-            assertEquals(configurationMock.directory, configuration.getDirectory());
+            configuration.withPluginConfiguration(configurationLayerMock);
+            assertEquals(configurationLayerMock.getDirectory(), configuration.getDirectory());
 
             // now remove the plugin configuration and test that now default values are returned again
             assertEquals(Defaults.DIRECTORY, configuration.withPluginConfiguration(null).getDirectory());
@@ -516,19 +638,19 @@ public class ConfigurationTests {
         @DisplayName("Configuration.withPluginConfiguration(MOCK).getDryRun() == MOCK.getDryRun()")
         void getDryRunTest()
             throws Exception {
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
-            configurationMock.dryRun = Boolean.TRUE;
+            configurationLayerMock.setDryRun(Boolean.TRUE);
 
             // in order to make the test meaningful, make sure the default and mock values are different
-            assertNotEquals(Defaults.DRY_RUN, configurationMock.dryRun);
+            assertNotEquals(Defaults.DRY_RUN, configurationLayerMock.getDryRun());
 
             // make sure the initial values come from defaults, until we inject the plugin configuration
             assertEquals(Defaults.DRY_RUN, configuration.getDryRun());
             
             // inject the plugin configuration and test the new value is returned from that
-            configuration.withPluginConfiguration(configurationMock);
-            assertEquals(configurationMock.dryRun, configuration.getDryRun());
+            configuration.withPluginConfiguration(configurationLayerMock);
+            assertEquals(configurationLayerMock.getDryRun(), configuration.getDryRun());
 
             // now remove the plugin configuration and test that now default values are returned again
             assertEquals(Defaults.DRY_RUN, configuration.withPluginConfiguration(null).getDryRun());
@@ -538,41 +660,63 @@ public class ConfigurationTests {
         @DisplayName("Configuration.withPluginConfiguration(MOCK).getInitialVersion() == MOCK.getInitialVersion()")
         void getInitialVersionTest()
             throws Exception {
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
-            configurationMock.initialVersion = "9.9.9";
+            configurationLayerMock.setInitialVersion("9.9.9");
 
             // in order to make the test meaningful, make sure the default and mock values are different
-            assertNotEquals(Defaults.INITIAL_VERSION, configurationMock.initialVersion);
+            assertNotEquals(Defaults.INITIAL_VERSION, configurationLayerMock.getInitialVersion());
 
             // make sure the initial values come from defaults, until we inject the plugin configuration
             assertEquals(Defaults.INITIAL_VERSION, configuration.getInitialVersion());
             
             // inject the plugin configuration and test the new value is returned from that
-            configuration.withPluginConfiguration(configurationMock);
-            assertEquals(configurationMock.initialVersion, configuration.getInitialVersion());
+            configuration.withPluginConfiguration(configurationLayerMock);
+            assertEquals(configurationLayerMock.getInitialVersion(), configuration.getInitialVersion());
 
             // now remove the plugin configuration and test that now default values are returned again
             assertEquals(Defaults.INITIAL_VERSION, configuration.withPluginConfiguration(null).getInitialVersion());
         }
 
         @Test
+        @DisplayName("Configuration.withPluginConfiguration(MOCK).getPreset() == MOCK.getPreset()")
+        void getPresetTest()
+            throws Exception {
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            Configuration configuration = new Configuration();
+            configurationLayerMock.setPreset("simple");
+
+            // in order to make the test meaningful, make sure the default and mock values are different
+            assertNotEquals(Defaults.PRESET, configurationLayerMock.getPreset());
+
+            // make sure the initial values come from defaults, until we inject the plugin configuration
+            assertEquals(Defaults.PRESET, configuration.getPreset());
+            
+            // inject the plugin configuration and test the new value is returned from that
+            configuration.withPluginConfiguration(configurationLayerMock);
+            assertEquals(configurationLayerMock.getPreset(), configuration.getPreset());
+
+            // now remove the plugin configuration and test that now default values are returned again
+            assertEquals(Defaults.PRESET, configuration.withPluginConfiguration(null).getPreset());
+        }
+
+        @Test
         @DisplayName("Configuration.withPluginConfiguration(MOCK).getReleasePrefix() == MOCK.getReleasePrefix()")
         void getReleasePrefixTest()
             throws Exception {
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
-            configurationMock.releasePrefix = "testprefix";
+            configurationLayerMock.setReleasePrefix("testprefix");
 
             // in order to make the test meaningful, make sure the default and mock values are different
-            assertNotEquals(Defaults.RELEASE_PREFIX, configurationMock.releasePrefix);
+            assertNotEquals(Defaults.RELEASE_PREFIX, configurationLayerMock.getReleasePrefix());
 
             // make sure the initial values come from defaults, until we inject the plugin configuration
             assertEquals(Defaults.RELEASE_PREFIX, configuration.getReleasePrefix());
             
             // inject the plugin configuration and test the new value is returned from that
-            configuration.withPluginConfiguration(configurationMock);
-            assertEquals(configurationMock.releasePrefix, configuration.getReleasePrefix());
+            configuration.withPluginConfiguration(configurationLayerMock);
+            assertEquals(configurationLayerMock.getReleasePrefix(), configuration.getReleasePrefix());
 
             // now remove the plugin configuration and test that now default values are returned again
             assertEquals(Defaults.RELEASE_PREFIX, configuration.withPluginConfiguration(null).getReleasePrefix());
@@ -582,19 +726,19 @@ public class ConfigurationTests {
         @DisplayName("Configuration.withPluginConfiguration(MOCK).getReleaseLenient() == MOCK.getReleaseLenient()")
         void getReleaseLenientTest()
             throws Exception {
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
-            configurationMock.releaseLenient = Boolean.FALSE;
+            configurationLayerMock.setReleaseLenient(Boolean.FALSE);
 
             // in order to make the test meaningful, make sure the default and mock values are different
-            assertNotEquals(Defaults.RELEASE_LENIENT, configurationMock.releaseLenient);
+            assertNotEquals(Defaults.RELEASE_LENIENT, configurationLayerMock.getReleaseLenient());
 
             // make sure the initial values come from defaults, until we inject the plugin configuration
             assertEquals(Defaults.RELEASE_LENIENT, configuration.getReleaseLenient());
             
             // inject the plugin configuration and test the new value is returned from that
-            configuration.withPluginConfiguration(configurationMock);
-            assertEquals(configurationMock.releaseLenient, configuration.getReleaseLenient());
+            configuration.withPluginConfiguration(configurationLayerMock);
+            assertEquals(configurationLayerMock.getReleaseLenient(), configuration.getReleaseLenient());
 
             // now remove the plugin configuration and test that now default values are returned again
             assertEquals(Defaults.RELEASE_LENIENT, configuration.withPluginConfiguration(null).getReleaseLenient());
@@ -604,19 +748,19 @@ public class ConfigurationTests {
         @DisplayName("Configuration.withPluginConfiguration(MOCK).getResume() == MOCK.getResume()")
         void getResumeTest()
             throws Exception {
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
-            configurationMock.resume = Boolean.TRUE;
+            configurationLayerMock.setResume(Boolean.TRUE);
 
             // in order to make the test meaningful, make sure the default and mock values are different
-            assertNotEquals(Defaults.RESUME, configurationMock.resume);
+            assertNotEquals(Defaults.RESUME, configurationLayerMock.getResume());
 
             // make sure the initial values come from defaults, until we inject the plugin configuration
             assertEquals(Defaults.RESUME, configuration.getResume());
             
             // inject the plugin configuration and test the new value is returned from that
-            configuration.withPluginConfiguration(configurationMock);
-            assertEquals(configurationMock.resume, configuration.getResume());
+            configuration.withPluginConfiguration(configurationLayerMock);
+            assertEquals(configurationLayerMock.getResume(), configuration.getResume());
 
             // now remove the plugin configuration and test that now default values are returned again
             assertEquals(Defaults.RESUME, configuration.withPluginConfiguration(null).getResume());
@@ -626,41 +770,67 @@ public class ConfigurationTests {
         @DisplayName("Configuration.withPluginConfiguration(MOCK).getScheme() == MOCK.getScheme()")
         void getSchemeTest()
             throws Exception {
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
-            configurationMock.scheme = Scheme.SEMVER;
+            configurationLayerMock.setScheme(Scheme.SEMVER);
 
             // since there is only one scheme available, this assumption can't be assumed
-            //assertNotEquals(Defaults.SCHEME, configurationMock.scheme);
+            //assertNotEquals(Defaults.SCHEME, configurationLayerMock.scheme);
 
             // make sure the initial values come from defaults, until we inject the plugin configuration
             assertEquals(Defaults.SCHEME, configuration.getScheme());
             
             // inject the plugin configuration and test the new value is returned from that
-            configuration.withPluginConfiguration(configurationMock);
-            assertEquals(configurationMock.scheme, configuration.getScheme());
+            configuration.withPluginConfiguration(configurationLayerMock);
+            assertEquals(configurationLayerMock.getScheme(), configuration.getScheme());
 
             // now remove the plugin configuration and test that now default values are returned again
             assertEquals(Defaults.SCHEME, configuration.withPluginConfiguration(null).getScheme());
         }
 
         @Test
+        @DisplayName("Configuration.withPluginConfiguration(MOCK).getSharedConfigurationFile() == MOCK.getSharedConfigurationFile()")
+        void getSharedConfigurationFileTest()
+            throws Exception {
+            File savedFile = new File(System.getProperty("java.io.tmpdir"), "extended"+this.hashCode()+".json");
+            savedFile.deleteOnExit();
+            FileMapper.save(savedFile.getAbsolutePath(), new SimplestConfigurationExample());
+
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            Configuration configuration = new Configuration();
+            configurationLayerMock.setSharedConfigurationFile(savedFile.getAbsolutePath());
+
+            // in order to make the test meaningful, make sure the default and mock values are different
+            assertNotEquals(Defaults.SHARED_CONFIGURATION_FILE, configurationLayerMock.getSharedConfigurationFile());
+
+            // make sure the initial values come from defaults, until we inject the plugin configuration
+            assertEquals(Defaults.SHARED_CONFIGURATION_FILE, configuration.getSharedConfigurationFile());
+            
+            // inject the plugin configuration and test the new value is returned from that
+            configuration.withPluginConfiguration(configurationLayerMock);
+            assertEquals(configurationLayerMock.getSharedConfigurationFile(), configuration.getSharedConfigurationFile());
+
+            // now remove the plugin configuration and test that now default values are returned again
+            assertEquals(Defaults.SHARED_CONFIGURATION_FILE, configuration.withPluginConfiguration(null).getSharedConfigurationFile());
+        }
+
+        @Test
         @DisplayName("Configuration.withPluginConfiguration(MOCK).getStateFile() == MOCK.getStateFile()")
         void getStateFileTest()
             throws Exception {
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
-            configurationMock.stateFile = "state-file.yml";
+            configurationLayerMock.setStateFile("state-file.yml");
 
             // in order to make the test meaningful, make sure the default and mock values are different
-            assertNotEquals(Defaults.STATE_FILE, configurationMock.stateFile);
+            assertNotEquals(Defaults.STATE_FILE, configurationLayerMock.getStateFile());
 
             // make sure the initial values come from defaults, until we inject the command line configuration
             assertEquals(Defaults.STATE_FILE, configuration.getStateFile());
             
             // inject the command line configuration and test the new value is returned from that
-            configuration.withPluginConfiguration(configurationMock);
-            assertEquals(configurationMock.stateFile, configuration.getStateFile());
+            configuration.withPluginConfiguration(configurationLayerMock);
+            assertEquals(configurationLayerMock.getStateFile(), configuration.getStateFile());
 
             // now remove the command line configuration and test that now default values are returned again
             assertEquals(Defaults.STATE_FILE, configuration.withPluginConfiguration(null).getStateFile());
@@ -670,19 +840,19 @@ public class ConfigurationTests {
         @DisplayName("Configuration.withPluginConfiguration(MOCK).getVerbosity() == MOCK.getVerbosity()")
         void getVerbosityTest()
             throws Exception {
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
-            configurationMock.verbosity = Verbosity.TRACE;
+            configurationLayerMock.setVerbosity(Verbosity.TRACE);
 
             // in order to make the test meaningful, make sure the default and mock values are different
-            assertNotEquals(Defaults.VERBOSITY, configurationMock.verbosity);
+            assertNotEquals(Defaults.VERBOSITY, configurationLayerMock.getVerbosity());
 
             // make sure the initial values come from defaults, until we inject the plugin configuration
             assertEquals(Defaults.VERBOSITY, configuration.getVerbosity());
             
             // inject the plugin configuration and test the new value is returned from that
-            configuration.withPluginConfiguration(configurationMock);
-            assertEquals(configurationMock.verbosity, configuration.getVerbosity());
+            configuration.withPluginConfiguration(configurationLayerMock);
+            assertEquals(configurationLayerMock.getVerbosity(), configuration.getVerbosity());
 
             // now remove the plugin configuration and test that now default values are returned again
             assertEquals(Defaults.VERBOSITY, configuration.withPluginConfiguration(null).getVerbosity());
@@ -692,21 +862,21 @@ public class ConfigurationTests {
         @DisplayName("Configuration.withPluginConfiguration(MOCK).getVersion() == MOCK.getVersion()")
         void getVersionTest()
             throws Exception {
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
-            configurationMock.version = "11.12.13";
+            configurationLayerMock.setVersion("11.12.13");
 
             // in order to make the test meaningful, make sure the default and mock values are different
             assertNull(Defaults.VERSION);
-            assertNotNull(configurationMock.version);
+            assertNotNull(configurationLayerMock.getVersion());
 
             // make sure the initial values come from defaults, until we inject the plugin configuration
             assertNull(Defaults.VERSION);
             assertNull(configuration.getVersion());
             
             // inject the plugin configuration and test the new value is returned from that
-            configuration.withPluginConfiguration(configurationMock);
-            assertEquals(configurationMock.version, configuration.getVersion());
+            configuration.withPluginConfiguration(configurationLayerMock);
+            assertEquals(configurationLayerMock.getVersion(), configuration.getVersion());
 
             // now remove the plugin configuration and test that now default values are returned again
             assertEquals(Defaults.VERSION, configuration.withPluginConfiguration(null).getVersion());
@@ -723,34 +893,34 @@ public class ConfigurationTests {
         @DisplayName("Configuration[multiple layers].getBump() == MOCK.getBump()")
         void getBumpTest()
             throws Exception {
-            ConfigurationLayerMock lowPriorityconfigurationMock = new ConfigurationLayerMock();
-            ConfigurationLayerMock highPriorityconfigurationMock = new ConfigurationLayerMock();
+            SimpleConfigurationLayer lowPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
+            SimpleConfigurationLayer highPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
-            lowPriorityconfigurationMock.bump = "alpha";
-            highPriorityconfigurationMock.bump = "beta";
+            lowPriorityConfigurationLayerMock.setBump("alpha");
+            highPriorityConfigurationLayerMock.setBump("beta");
             
             // inject the plugin configuration and test the new value is returned from that
-            configuration.withPluginConfiguration(lowPriorityconfigurationMock);
-            configuration.withCommandLineConfiguration(highPriorityconfigurationMock);
+            configuration.withPluginConfiguration(lowPriorityConfigurationLayerMock);
+            configuration.withCommandLineConfiguration(highPriorityConfigurationLayerMock);
 
-            assertEquals(highPriorityconfigurationMock.bump, configuration.getBump());
+            assertEquals(highPriorityConfigurationLayerMock.getBump(), configuration.getBump());
         }
 
         @Test
         @DisplayName("Configuration[multiple layers].getCommitMessageConventions() == MOCK.getCommitMessageConventions()")
         void getCommitMessageConventionsTest()
             throws Exception {
-            ConfigurationLayerMock lowPriorityconfigurationMock = new ConfigurationLayerMock();
-            ConfigurationLayerMock highPriorityconfigurationMock = new ConfigurationLayerMock();
+            SimpleConfigurationLayer lowPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
+            SimpleConfigurationLayer highPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
-            lowPriorityconfigurationMock.commitMessageConventions.enabled = List.<String>of("convention1");
-            lowPriorityconfigurationMock.commitMessageConventions.items = Map.<String,CommitMessageConvention>of("convention1", new CommitMessageConvention("expr1", Map.<String,String>of()));
-            highPriorityconfigurationMock.commitMessageConventions.enabled = List.<String>of("convention2");
-            highPriorityconfigurationMock.commitMessageConventions.items = Map.<String,CommitMessageConvention>of("convention2", new CommitMessageConvention("expr2", Map.<String,String>of()));
+            lowPriorityConfigurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("convention1"));
+            lowPriorityConfigurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("convention1", new CommitMessageConvention("expr1", Map.<String,String>of())));
+            highPriorityConfigurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("convention2"));
+            highPriorityConfigurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("convention2", new CommitMessageConvention("expr2", Map.<String,String>of())));
             
             // inject the command line configuration and test the new value is returned from that
-            configuration.withPluginConfiguration(lowPriorityconfigurationMock);
-            configuration.withCommandLineConfiguration(highPriorityconfigurationMock);
+            configuration.withPluginConfiguration(lowPriorityConfigurationLayerMock);
+            configuration.withCommandLineConfiguration(highPriorityConfigurationLayerMock);
 
             assertNotNull(configuration.getCommitMessageConventions().getEnabled());
             assertNotNull(configuration.getCommitMessageConventions().getItems());
@@ -761,164 +931,371 @@ public class ConfigurationTests {
         }
 
         @Test
+        @DisplayName("Configuration[multiple layers].getConfigurationFile() == MOCK.getConfigurationFile()")
+        void getConfigurationFileTest()
+            throws Exception {
+            File savedFileLow = new File(System.getProperty("java.io.tmpdir"), "extendedLow"+this.hashCode()+".json");
+            savedFileLow.deleteOnExit();
+            FileMapper.save(savedFileLow.getAbsolutePath(), new SimplestConfigurationExample());
+            File savedFileHigh = new File(System.getProperty("java.io.tmpdir"), "extendedHigh"+this.hashCode()+".json");
+            savedFileHigh.deleteOnExit();
+            FileMapper.save(savedFileHigh.getAbsolutePath(), new SimplestConfigurationExample());
+
+            SimpleConfigurationLayer lowPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
+            SimpleConfigurationLayer highPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
+            Configuration configuration = new Configuration();
+            lowPriorityConfigurationLayerMock.setConfigurationFile(savedFileLow.getAbsolutePath());
+            highPriorityConfigurationLayerMock.setConfigurationFile(savedFileHigh.getAbsolutePath());
+            
+            // inject the plugin configuration and test the new value is returned from that
+            configuration.withPluginConfiguration(lowPriorityConfigurationLayerMock);
+            configuration.withCommandLineConfiguration(highPriorityConfigurationLayerMock);
+            assertEquals(highPriorityConfigurationLayerMock.getConfigurationFile(), configuration.getConfigurationFile());
+        }
+
+        @Test
         @DisplayName("Configuration[multiple layers].getDirectory() == MOCK.getDirectory()")
         void getDirectoryTest()
             throws Exception {
             Configuration.setDefaultDirectory(null); // clean the singleton from previous runs
-            ConfigurationLayerMock lowPriorityconfigurationMock = new ConfigurationLayerMock();
-            ConfigurationLayerMock highPriorityconfigurationMock = new ConfigurationLayerMock();
+            SimpleConfigurationLayer lowPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
+            SimpleConfigurationLayer highPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
-            lowPriorityconfigurationMock.directory = new File(System.getProperty("java.io.tmpdir"), "this directory does not exists");
-            highPriorityconfigurationMock.directory = new File(System.getProperty("java.io.tmpdir"), "another directory that does not exists");
+            lowPriorityConfigurationLayerMock.setDirectory("some/directory");
+            highPriorityConfigurationLayerMock.setDirectory("some/other/directory");
             
             // inject the plugin configuration and test the new value is returned from that
-            configuration.withPluginConfiguration(lowPriorityconfigurationMock);
-            configuration.withCommandLineConfiguration(highPriorityconfigurationMock);
-            assertEquals(highPriorityconfigurationMock.directory, configuration.getDirectory());
+            configuration.withPluginConfiguration(lowPriorityConfigurationLayerMock);
+            configuration.withCommandLineConfiguration(highPriorityConfigurationLayerMock);
+            assertEquals(highPriorityConfigurationLayerMock.getDirectory(), configuration.getDirectory());
         }
 
         @Test
         @DisplayName("Configuration[multiple layers].getDryRun() == MOCK.getDryRun()")
         void getDryRunTest()
             throws Exception {
-            ConfigurationLayerMock lowPriorityconfigurationMock = new ConfigurationLayerMock();
-            ConfigurationLayerMock highPriorityconfigurationMock = new ConfigurationLayerMock();
+            SimpleConfigurationLayer lowPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
+            SimpleConfigurationLayer highPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
-            lowPriorityconfigurationMock.dryRun = Boolean.TRUE;
-            highPriorityconfigurationMock.dryRun = Boolean.FALSE;
+            lowPriorityConfigurationLayerMock.setDryRun(Boolean.TRUE);
+            highPriorityConfigurationLayerMock.setDryRun(Boolean.FALSE);
             
             // inject the plugin configuration and test the new value is returned from that
-            configuration.withPluginConfiguration(lowPriorityconfigurationMock);
-            configuration.withCommandLineConfiguration(highPriorityconfigurationMock);
-            assertEquals(highPriorityconfigurationMock.dryRun, configuration.getDryRun());
+            configuration.withPluginConfiguration(lowPriorityConfigurationLayerMock);
+            configuration.withCommandLineConfiguration(highPriorityConfigurationLayerMock);
+            assertEquals(highPriorityConfigurationLayerMock.getDryRun(), configuration.getDryRun());
         }
 
         @Test
         @DisplayName("Configuration[multiple layers].getInitialVersion() == MOCK.getInitialVersion()")
         void getInitialVersionTest()
             throws Exception {
-            ConfigurationLayerMock lowPriorityconfigurationMock = new ConfigurationLayerMock();
-            ConfigurationLayerMock highPriorityconfigurationMock = new ConfigurationLayerMock();
+            SimpleConfigurationLayer lowPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
+            SimpleConfigurationLayer highPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
-            lowPriorityconfigurationMock.initialVersion = "9.9.9";
-            highPriorityconfigurationMock.initialVersion = "8.8.8";
+            lowPriorityConfigurationLayerMock.setInitialVersion("9.9.9");
+            highPriorityConfigurationLayerMock.setInitialVersion("8.8.8");
             
             // inject the plugin configuration and test the new value is returned from that
-            configuration.withPluginConfiguration(lowPriorityconfigurationMock);
-            configuration.withCommandLineConfiguration(highPriorityconfigurationMock);
-            assertEquals(highPriorityconfigurationMock.initialVersion, configuration.getInitialVersion());
+            configuration.withPluginConfiguration(lowPriorityConfigurationLayerMock);
+            configuration.withCommandLineConfiguration(highPriorityConfigurationLayerMock);
+            assertEquals(highPriorityConfigurationLayerMock.getInitialVersion(), configuration.getInitialVersion());
+        }
+
+        @Test
+        @DisplayName("Configuration[multiple layers].getPreset() == MOCK.getPreset()")
+        void getPresetTest()
+            throws Exception {
+            SimpleConfigurationLayer lowPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
+            SimpleConfigurationLayer highPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
+            Configuration configuration = new Configuration();
+            lowPriorityConfigurationLayerMock.setPreset("low");
+            highPriorityConfigurationLayerMock.setPreset("high");
+            
+            // inject the plugin configuration and test the new value is returned from that
+            configuration.withPluginConfiguration(lowPriorityConfigurationLayerMock);
+            configuration.withCommandLineConfiguration(highPriorityConfigurationLayerMock);
+            assertEquals(highPriorityConfigurationLayerMock.getPreset(), configuration.getPreset());
         }
 
         @Test
         @DisplayName("Configuration[multiple layers].getReleasePrefix() == MOCK.getReleasePrefix()")
         void getReleasePrefixTest()
             throws Exception {
-            ConfigurationLayerMock lowPriorityconfigurationMock = new ConfigurationLayerMock();
-            ConfigurationLayerMock highPriorityconfigurationMock = new ConfigurationLayerMock();
+            SimpleConfigurationLayer lowPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
+            SimpleConfigurationLayer highPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
-            lowPriorityconfigurationMock.releasePrefix = "lpprefix";
-            highPriorityconfigurationMock.releasePrefix = "hpprefix";
+            lowPriorityConfigurationLayerMock.setReleasePrefix("lpprefix");
+            highPriorityConfigurationLayerMock.setReleasePrefix("hpprefix");
             
             // inject the plugin configuration and test the new value is returned from that
-            configuration.withPluginConfiguration(lowPriorityconfigurationMock);
-            configuration.withCommandLineConfiguration(highPriorityconfigurationMock);
-            assertEquals(highPriorityconfigurationMock.releasePrefix, configuration.getReleasePrefix());
+            configuration.withPluginConfiguration(lowPriorityConfigurationLayerMock);
+            configuration.withCommandLineConfiguration(highPriorityConfigurationLayerMock);
+            assertEquals(highPriorityConfigurationLayerMock.getReleasePrefix(), configuration.getReleasePrefix());
         }
 
         @Test
         @DisplayName("Configuration[multiple layers].getReleaseLenient() == MOCK.getReleaseLenient()")
         void getReleaseLenientTest()
             throws Exception {
-            ConfigurationLayerMock lowPriorityconfigurationMock = new ConfigurationLayerMock();
-            ConfigurationLayerMock highPriorityconfigurationMock = new ConfigurationLayerMock();
+            SimpleConfigurationLayer lowPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
+            SimpleConfigurationLayer highPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
-            lowPriorityconfigurationMock.releaseLenient = Boolean.FALSE;
-            highPriorityconfigurationMock.releaseLenient = Boolean.TRUE;
+            lowPriorityConfigurationLayerMock.setReleaseLenient(Boolean.FALSE);
+            highPriorityConfigurationLayerMock.setReleaseLenient(Boolean.TRUE);
             
             // inject the plugin configuration and test the new value is returned from that
-            configuration.withPluginConfiguration(lowPriorityconfigurationMock);
-            configuration.withCommandLineConfiguration(highPriorityconfigurationMock);
-            assertEquals(highPriorityconfigurationMock.releaseLenient, configuration.getReleaseLenient());
+            configuration.withPluginConfiguration(lowPriorityConfigurationLayerMock);
+            configuration.withCommandLineConfiguration(highPriorityConfigurationLayerMock);
+            assertEquals(highPriorityConfigurationLayerMock.getReleaseLenient(), configuration.getReleaseLenient());
         }
 
         @Test
         @DisplayName("Configuration[multiple layers].getResume() == MOCK.getResume()")
         void getResumeTest()
             throws Exception {
-            ConfigurationLayerMock lowPriorityconfigurationMock = new ConfigurationLayerMock();
-            ConfigurationLayerMock highPriorityconfigurationMock = new ConfigurationLayerMock();
+            SimpleConfigurationLayer lowPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
+            SimpleConfigurationLayer highPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
-            lowPriorityconfigurationMock.resume = Boolean.TRUE;
-            highPriorityconfigurationMock.resume = Boolean.FALSE;
+            lowPriorityConfigurationLayerMock.setResume(Boolean.TRUE);
+            highPriorityConfigurationLayerMock.setResume(Boolean.FALSE);
             
             // inject the plugin configuration and test the new value is returned from that
-            configuration.withPluginConfiguration(lowPriorityconfigurationMock);
-            configuration.withCommandLineConfiguration(highPriorityconfigurationMock);
-            assertEquals(highPriorityconfigurationMock.resume, configuration.getResume());
+            configuration.withPluginConfiguration(lowPriorityConfigurationLayerMock);
+            configuration.withCommandLineConfiguration(highPriorityConfigurationLayerMock);
+            assertEquals(highPriorityConfigurationLayerMock.getResume(), configuration.getResume());
         }
 
         @Test
         @DisplayName("Configuration[multiple layers].getScheme() == MOCK.getScheme()")
         void getSchemeTest()
             throws Exception {
-            ConfigurationLayerMock lowPriorityconfigurationMock = new ConfigurationLayerMock();
-            ConfigurationLayerMock highPriorityconfigurationMock = new ConfigurationLayerMock();
+            SimpleConfigurationLayer lowPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
+            SimpleConfigurationLayer highPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
-            lowPriorityconfigurationMock.scheme = Scheme.SEMVER;
-            highPriorityconfigurationMock.scheme = Scheme.SEMVER;
+            lowPriorityConfigurationLayerMock.setScheme(Scheme.SEMVER);
+            highPriorityConfigurationLayerMock.setScheme(Scheme.SEMVER);
             
             // inject the plugin configuration and test the new value is returned from that
-            configuration.withPluginConfiguration(lowPriorityconfigurationMock);
-            configuration.withCommandLineConfiguration(highPriorityconfigurationMock);
-            assertEquals(highPriorityconfigurationMock.scheme, configuration.getScheme());
+            configuration.withPluginConfiguration(lowPriorityConfigurationLayerMock);
+            configuration.withCommandLineConfiguration(highPriorityConfigurationLayerMock);
+            assertEquals(highPriorityConfigurationLayerMock.getScheme(), configuration.getScheme());
+        }
+
+        @Test
+        @DisplayName("Configuration[multiple layers].getSharedConfigurationFile() == MOCK.getSharedConfigurationFile()")
+        void getSharedConfigurationFileTest()
+            throws Exception {
+            File savedFileLow = new File(System.getProperty("java.io.tmpdir"), "extendedLow"+this.hashCode()+".json");
+            savedFileLow.deleteOnExit();
+            FileMapper.save(savedFileLow.getAbsolutePath(), new SimplestConfigurationExample());
+            File savedFileHigh = new File(System.getProperty("java.io.tmpdir"), "extendedHigh"+this.hashCode()+".json");
+            savedFileHigh.deleteOnExit();
+            FileMapper.save(savedFileHigh.getAbsolutePath(), new SimplestConfigurationExample());
+
+            SimpleConfigurationLayer lowPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
+            SimpleConfigurationLayer highPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
+            Configuration configuration = new Configuration();
+            lowPriorityConfigurationLayerMock.setSharedConfigurationFile(savedFileLow.getAbsolutePath());
+            highPriorityConfigurationLayerMock.setSharedConfigurationFile(savedFileHigh.getAbsolutePath());
+            
+            // inject the plugin configuration and test the new value is returned from that
+            configuration.withPluginConfiguration(lowPriorityConfigurationLayerMock);
+            configuration.withCommandLineConfiguration(highPriorityConfigurationLayerMock);
+            assertEquals(highPriorityConfigurationLayerMock.getSharedConfigurationFile(), configuration.getSharedConfigurationFile());
         }
 
         @Test
         @DisplayName("Configuration[multiple layers].getStateFile() == MOCK.getStateFile()")
         void getStateFileTest()
             throws Exception {
-            ConfigurationLayerMock lowPriorityconfigurationMock = new ConfigurationLayerMock();
-            ConfigurationLayerMock highPriorityconfigurationMock = new ConfigurationLayerMock();
+            SimpleConfigurationLayer lowPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
+            SimpleConfigurationLayer highPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
-            lowPriorityconfigurationMock.stateFile = "file.yaml";
-            highPriorityconfigurationMock.stateFile = "file.json";
+            lowPriorityConfigurationLayerMock.setStateFile("file.yaml");
+            highPriorityConfigurationLayerMock.setStateFile("file.json");
             
             // inject the plugin configuration and test the new value is returned from that
-            configuration.withPluginConfiguration(lowPriorityconfigurationMock);
-            configuration.withCommandLineConfiguration(highPriorityconfigurationMock);
-            assertEquals(highPriorityconfigurationMock.stateFile, configuration.getStateFile());
+            configuration.withPluginConfiguration(lowPriorityConfigurationLayerMock);
+            configuration.withCommandLineConfiguration(highPriorityConfigurationLayerMock);
+            assertEquals(highPriorityConfigurationLayerMock.getStateFile(), configuration.getStateFile());
         }
 
         @Test
         @DisplayName("Configuration[multiple layers].getVerbosity() == MOCK.getVerbosity()")
         void getVerbosityTest()
             throws Exception {
-            ConfigurationLayerMock lowPriorityconfigurationMock = new ConfigurationLayerMock();
-            ConfigurationLayerMock highPriorityconfigurationMock = new ConfigurationLayerMock();
+            SimpleConfigurationLayer lowPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
+            SimpleConfigurationLayer highPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
-            lowPriorityconfigurationMock.verbosity = Verbosity.TRACE;
-            highPriorityconfigurationMock.verbosity = Verbosity.INFO;
+            lowPriorityConfigurationLayerMock.setVerbosity(Verbosity.TRACE);
+            highPriorityConfigurationLayerMock.setVerbosity(Verbosity.INFO);
             
             // inject the plugin configuration and test the new value is returned from that
-            configuration.withPluginConfiguration(lowPriorityconfigurationMock);
-            configuration.withCommandLineConfiguration(highPriorityconfigurationMock);
-            assertEquals(highPriorityconfigurationMock.verbosity, configuration.getVerbosity());
+            configuration.withPluginConfiguration(lowPriorityConfigurationLayerMock);
+            configuration.withCommandLineConfiguration(highPriorityConfigurationLayerMock);
+            assertEquals(highPriorityConfigurationLayerMock.getVerbosity(), configuration.getVerbosity());
         }
 
         @Test
         @DisplayName("Configuration[multiple layers].getVersion() == MOCK.getVersion()")
         void getVersionTest()
             throws Exception {
-            ConfigurationLayerMock lowPriorityconfigurationMock = new ConfigurationLayerMock();
-            ConfigurationLayerMock highPriorityconfigurationMock = new ConfigurationLayerMock();
+            SimpleConfigurationLayer lowPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
+            SimpleConfigurationLayer highPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
-            lowPriorityconfigurationMock.version = "11.12.13";
-            highPriorityconfigurationMock.version = "21.22.23";
+            lowPriorityConfigurationLayerMock.setVersion("11.12.13");
+            highPriorityConfigurationLayerMock.setVersion("21.22.23");
             
             // inject the plugin configuration and test the new value is returned from that
-            configuration.withPluginConfiguration(lowPriorityconfigurationMock);
-            configuration.withCommandLineConfiguration(highPriorityconfigurationMock);
-            assertEquals(highPriorityconfigurationMock.version, configuration.getVersion());
+            configuration.withPluginConfiguration(lowPriorityConfigurationLayerMock);
+            configuration.withCommandLineConfiguration(highPriorityConfigurationLayerMock);
+            assertEquals(highPriorityConfigurationLayerMock.getVersion(), configuration.getVersion());
+        }
+    }
+
+    /**
+     * Performs checks against the injection of a combination of configuration layers
+     */
+    @Nested
+    @DisplayName("Configuration.with combined configuration layers")
+    class withCombinedConfigurationLayersTests {
+        @Test
+        @DisplayName("Configuration[combined layers with standard files]")
+        void combinedConfigurationWithStandardFilesTest()
+            throws Exception {
+            File tempDir = Files.createTempDirectory(String.valueOf(this.hashCode())).toFile();
+            Configuration.setDefaultDirectory(tempDir);
+
+            // create 4 different config files with the bump field different for each
+            SimpleConfigurationLayer standardSharedConfiguration = new SimpleConfigurationLayer();
+            standardSharedConfiguration.setBump("standard-shared");
+            standardSharedConfiguration.setReleasePrefix("sharedPrefix");
+            SimpleConfigurationLayer standardLocalConfiguration = new SimpleConfigurationLayer();
+            standardLocalConfiguration.setBump("standard-local");
+
+            // save the standard files to standard locations
+            File standardSharedConfigurationFile = new File(tempDir, ".nyx-shared.json");
+            standardSharedConfigurationFile.deleteOnExit();
+            FileMapper.save(standardSharedConfigurationFile.getAbsolutePath(), standardSharedConfiguration);
+            File standardLocalConfigurationFile = new File(tempDir, ".nyx.json");
+            standardLocalConfigurationFile.deleteOnExit();
+            FileMapper.save(standardLocalConfigurationFile.getAbsolutePath(), standardLocalConfiguration);
+
+            Configuration configuration = new Configuration();
+
+            // first test against the standard files, which must have been loaded by default
+            assertEquals("sharedPrefix", configuration.getReleasePrefix()); // this is configured only on the standard shared file
+            assertEquals("standard-local", configuration.getBump()); // this is the value configured in the standard local file and has higher priority over the standard shared
+        }
+
+        @Test
+        @DisplayName("Configuration[combined layers with standard and custom files]")
+        void combinedConfigurationWithStandardAndCustomFilesTest()
+            throws Exception {
+            File tempDir = Files.createTempDirectory(String.valueOf(this.hashCode())).toFile();
+            Configuration.setDefaultDirectory(tempDir);
+
+            // create 4 different config files with the bump field different for each
+            // here the standard local file adds the custom configuration file, which in turn adds the shared custom file
+            // so we can test all the chain
+            SimpleConfigurationLayer standardSharedConfiguration = new SimpleConfigurationLayer();
+            standardSharedConfiguration.setBump("standard-shared");
+            standardSharedConfiguration.setReleasePrefix("sharedPrefix");
+            SimpleConfigurationLayer standardLocalConfiguration = new SimpleConfigurationLayer();
+            standardLocalConfiguration.setBump("standard-local");
+            standardLocalConfiguration.setConfigurationFile("custom-local.json");
+            SimpleConfigurationLayer customSharedConfiguration = new SimpleConfigurationLayer();
+            customSharedConfiguration.setBump("custom-shared");
+            SimpleConfigurationLayer customLocalConfiguration = new SimpleConfigurationLayer();
+            customLocalConfiguration.setBump("custom-local");
+            customLocalConfiguration.setSharedConfigurationFile("custom-shared.json");
+
+            // save the standard files to standard locations
+            File standardSharedConfigurationFile = new File(tempDir, ".nyx-shared.json");
+            standardSharedConfigurationFile.deleteOnExit();
+            FileMapper.save(standardSharedConfigurationFile.getAbsolutePath(), standardSharedConfiguration);
+            File standardLocalConfigurationFile = new File(tempDir, ".nyx.json");
+            standardLocalConfigurationFile.deleteOnExit();
+            FileMapper.save(standardLocalConfigurationFile.getAbsolutePath(), standardLocalConfiguration);
+
+            // save custom files to custom file names in the same directory
+            File customSharedConfigurationFile = new File(tempDir, "custom-shared.json");
+            customSharedConfigurationFile.deleteOnExit();
+            FileMapper.save(customSharedConfigurationFile.getAbsolutePath(), customSharedConfiguration);
+            File customLocalConfigurationFile = new File(tempDir, "custom-local.json");
+            customLocalConfigurationFile.deleteOnExit();
+            FileMapper.save(customLocalConfigurationFile.getAbsolutePath(), customLocalConfiguration);
+
+            Configuration configuration = new Configuration();
+
+            // first test against the standard files, which must have been loaded by default
+            assertEquals("sharedPrefix", configuration.getReleasePrefix()); // this is configured only on the standard shared file
+            assertEquals("custom-local", configuration.getBump()); // this is the value configured in the custom local file and has higher priority over the standard shared
+        }
+
+        @Test
+        @DisplayName("Configuration[combined layers with standard, custom files and command line]")
+        void combinedConfigurationWithStandardCustomFilesAndCommandLineTest()
+            throws Exception {
+            File tempDir = Files.createTempDirectory(String.valueOf(this.hashCode())).toFile();
+            Configuration.setDefaultDirectory(tempDir);
+
+            // create 4 different config files with the bump field different for each
+            // here the standard local file adds the custom configuration file, which in turn adds the shared custom file
+            // so we can test all the chain
+            SimpleConfigurationLayer standardSharedConfiguration = new SimpleConfigurationLayer();
+            standardSharedConfiguration.setBump("standard-shared");
+            standardSharedConfiguration.setReleasePrefix("sharedPrefix");
+            SimpleConfigurationLayer standardLocalConfiguration = new SimpleConfigurationLayer();
+            standardLocalConfiguration.setBump("standard-local");
+            standardLocalConfiguration.setConfigurationFile("custom-local.json");
+            SimpleConfigurationLayer customSharedConfiguration = new SimpleConfigurationLayer();
+            customSharedConfiguration.setBump("custom-shared");
+            SimpleConfigurationLayer customLocalConfiguration = new SimpleConfigurationLayer();
+            customLocalConfiguration.setBump("custom-local");
+            customLocalConfiguration.setSharedConfigurationFile("custom-shared.json");
+            SimpleConfigurationLayer customCmdlineConfigurationFile = new SimpleConfigurationLayer();
+            customCmdlineConfigurationFile.setReleasePrefix("cmdlinePrefix");
+
+            // also create the command line layer, which defines a different custom local file
+            SimpleConfigurationLayer commandLineConfiguration = new SimpleConfigurationLayer();
+            commandLineConfiguration.setBump("cmdline");
+            commandLineConfiguration.setConfigurationFile("custom-cmdline.json");
+
+            // save the standard files to standard locations
+            File standardSharedConfigurationFile = new File(tempDir, ".nyx-shared.json");
+            standardSharedConfigurationFile.deleteOnExit();
+            FileMapper.save(standardSharedConfigurationFile.getAbsolutePath(), standardSharedConfiguration);
+            File standardLocalConfigurationFile = new File(tempDir, ".nyx.json");
+            standardLocalConfigurationFile.deleteOnExit();
+            FileMapper.save(standardLocalConfigurationFile.getAbsolutePath(), standardLocalConfiguration);
+
+            // save custom files to custom file names in the same directory
+            File customSharedConfigurationFile = new File(tempDir, "custom-shared.json");
+            customSharedConfigurationFile.deleteOnExit();
+            FileMapper.save(customSharedConfigurationFile.getAbsolutePath(), customSharedConfiguration);
+            File customLocalConfigurationFile = new File(tempDir, "custom-local.json");
+            customLocalConfigurationFile.deleteOnExit();
+            FileMapper.save(customLocalConfigurationFile.getAbsolutePath(), customLocalConfiguration);
+            File customCmdlineConfigurationFileFile = new File(tempDir, "custom-cmdline.json");
+            customCmdlineConfigurationFileFile.deleteOnExit();
+            FileMapper.save(customCmdlineConfigurationFileFile.getAbsolutePath(), customCmdlineConfigurationFile);
+
+            Configuration configuration = new Configuration();
+            // first test against the standard files, which must have been loaded by default
+            assertEquals("sharedPrefix", configuration.getReleasePrefix()); // this is configured only on the standard shared file
+            assertEquals("custom-local", configuration.getBump()); // this is the value configured in the custom local file
+
+            // inject the plugin configuration and test the new value is returned from that
+            // what happens now is that the bump is taked directly from the command line layer,
+            // but the release prefix must be read from the configuration that the command line defines
+            // overwriting the previous configuration file
+            configuration.withCommandLineConfiguration(commandLineConfiguration);
+
+            // first test against the standard files, which must have been loaded by default
+            assertEquals("cmdlinePrefix", configuration.getReleasePrefix()); // this must come from the custom configuration file defined by the command line config
+            assertEquals("cmdline", configuration.getBump()); // this is the value configured in the command line and has higher priority over all others
         }
     }
 }

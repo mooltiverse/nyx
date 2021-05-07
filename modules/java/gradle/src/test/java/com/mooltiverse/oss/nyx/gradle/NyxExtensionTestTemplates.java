@@ -70,6 +70,17 @@ public class NyxExtensionTestTemplates {
         }
 
         @TestTemplate
+        @DisplayName("NyxExtension.getConfigurationFile() default value")
+        @Baseline(Scenario.FROM_SCRATCH)
+        void getConfigurationFileDefaultTest(Project project)
+            throws Exception {
+            NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
+
+            assertFalse(extension.getConfigurationFile().isPresent());
+            assertNull(extension.getConfigurationFile().getOrNull());
+        }
+
+        @TestTemplate
         @DisplayName("NyxExtension.getDirectory() default value")
         @Baseline(Scenario.FROM_SCRATCH)
         void getDirectoryDefaultTest(Project project)
@@ -104,6 +115,17 @@ public class NyxExtensionTestTemplates {
         }
 
         @TestTemplate
+        @DisplayName("NyxExtension.getPreset() default value")
+        @Baseline(Scenario.FROM_SCRATCH)
+        void getPresetDefaultTest(Project project)
+            throws Exception {
+            NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
+
+            assertFalse(extension.getPreset().isPresent());
+            assertNull(extension.getPreset().getOrNull());
+        }
+
+        @TestTemplate
         @DisplayName("NyxExtension.getReleaseLenient() default value")
         @Baseline(Scenario.FROM_SCRATCH)
         void getReleaseLenientDefaultTest(Project project)
@@ -134,6 +156,17 @@ public class NyxExtensionTestTemplates {
 
             assertFalse(extension.getScheme().isPresent());
             assertNull(extension.getScheme().getOrNull());
+        }
+
+        @TestTemplate
+        @DisplayName("NyxExtension.getSharedConfigurationFile() default value")
+        @Baseline(Scenario.FROM_SCRATCH)
+        void getSharedConfigurationFileDefaultTest(Project project)
+            throws Exception {
+            NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
+
+            assertFalse(extension.getSharedConfigurationFile().isPresent());
+            assertNull(extension.getSharedConfigurationFile().getOrNull());
         }
 
         @TestTemplate

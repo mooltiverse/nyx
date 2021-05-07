@@ -111,6 +111,11 @@ public abstract class NyxExtension {
     private final CommitMessageConventions commitMessageConventions = getObjectfactory().newInstance(CommitMessageConventions.class);
 
     /**
+     * The 'configurationFile' property.
+     */
+    private final Property<String> configurationFile = getObjectfactory().property(String.class);
+
+    /**
      * The 'directory' property.
      * Default is taken from the Gradle project directory but the method to retrieve that is
      * based on where this object is applied (see the {@link #create(Project)} and
@@ -135,6 +140,11 @@ public abstract class NyxExtension {
     private final Property<String> initialVersion = getObjectfactory().property(String.class);
 
     /**
+     * The 'preset' property.
+     */
+    private final Property<String> preset = getObjectfactory().property(String.class);
+
+    /**
      * The 'releasePrefix' property.
      */
     private final Property<String> releasePrefix = getObjectfactory().property(String.class);
@@ -153,6 +163,11 @@ public abstract class NyxExtension {
      * The 'scheme' property.
      */
     private final Property<String> scheme = getObjectfactory().property(String.class);
+
+    /**
+     * The 'sharedConfigurationFile' property.
+     */
+    private final Property<String> sharedConfigurationFile = getObjectfactory().property(String.class);
 
     /**
      * The 'stateFile' property.
@@ -245,6 +260,20 @@ public abstract class NyxExtension {
     }
 
     /**
+     * Returns the custom configuration file scheme to use.
+     * 
+     * We provide an implementation of this method instead of using the abstract definition as it's
+     * safer for old Gradle versions we support.
+     * 
+     * @return the custom configuration file to use
+     * 
+     * @see Defaults#SHARED_CONFIGURATION_FILE
+     */
+    public Property<String> getConfigurationFile() {
+        return configurationFile;
+    }
+
+    /**
      * Returns the directory to use as the base repository location.
      * 
      * We provide an implementation of this method instead of using the abstract definition as it's
@@ -285,6 +314,20 @@ public abstract class NyxExtension {
      */
     public Property<String> getInitialVersion() {
         return initialVersion;
+    }
+
+    /**
+     * Returns the selected preset configuration name.
+     * 
+     * We provide an implementation of this method instead of using the abstract definition as it's
+     * safer for old Gradle versions we support.
+     * 
+     * @return the selected preset configuration name.
+     * 
+     * @see Defaults#PRESET
+     */
+    public Property<String> getPreset() {
+        return preset;
     }
 
     /**
@@ -343,6 +386,20 @@ public abstract class NyxExtension {
      */
     public Property<String> getScheme() {
         return scheme;
+    }
+
+    /**
+     * Returns the custom shared configuration file scheme to use.
+     * 
+     * We provide an implementation of this method instead of using the abstract definition as it's
+     * safer for old Gradle versions we support.
+     * 
+     * @return the custom shared configuration file to use
+     * 
+     * @see Defaults#SHARED_CONFIGURATION_FILE
+     */
+    public Property<String> getSharedConfigurationFile() {
+        return sharedConfigurationFile;
     }
 
     /**

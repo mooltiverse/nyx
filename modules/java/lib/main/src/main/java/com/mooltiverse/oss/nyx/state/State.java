@@ -165,7 +165,7 @@ public class State implements Root {
     @Override
     public File getDirectory()
         throws DataAccessException, IllegalPropertyException {
-        return getConfiguration().getDirectory();
+        return new File(getConfiguration().getDirectory());
     }
 
     /**

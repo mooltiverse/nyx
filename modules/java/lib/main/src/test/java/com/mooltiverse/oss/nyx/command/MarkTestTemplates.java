@@ -31,7 +31,7 @@ import com.mooltiverse.oss.nyx.command.template.CommandProxy;
 import com.mooltiverse.oss.nyx.command.template.CommandSelector;
 import com.mooltiverse.oss.nyx.command.template.StandaloneCommandProxy;
 import com.mooltiverse.oss.nyx.configuration.Defaults;
-import com.mooltiverse.oss.nyx.configuration.mock.ConfigurationLayerMock;
+import com.mooltiverse.oss.nyx.configuration.SimpleConfigurationLayer;
 import com.mooltiverse.oss.nyx.data.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.git.GitException;
 import com.mooltiverse.oss.nyx.git.Scenario;
@@ -190,9 +190,9 @@ public class MarkTestTemplates {
             String previousLastCommit = script.getLastCommitID();
             List<String> previousCommits = script.getCommitIDs();
             Map<String,String> previousTags = script.getTags();
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-            configurationMock.initialVersion = CUSTOM_INITIAL_VERSION;
-            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            configurationLayerMock.setInitialVersion(CUSTOM_INITIAL_VERSION);
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             command.run();
 
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
@@ -224,9 +224,9 @@ public class MarkTestTemplates {
             String previousLastCommit = script.getLastCommitID();
             List<String> previousCommits = script.getCommitIDs();
             Map<String,String> previousTags = script.getTags();
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            configurationMock.version = CUSTOM_VERSION;
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            configurationLayerMock.setVersion(CUSTOM_VERSION);
             command.run();
 
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
@@ -258,9 +258,9 @@ public class MarkTestTemplates {
             String previousLastCommit = script.getLastCommitID();
             List<String> previousCommits = script.getCommitIDs();
             Map<String,String> previousTags = script.getTags();
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            configurationMock.bump = CUSTOM_BUMP;
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            configurationLayerMock.setBump(CUSTOM_BUMP);
             command.run();
 
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
@@ -292,9 +292,9 @@ public class MarkTestTemplates {
             String previousLastCommit = script.getLastCommitID();
             List<String> previousCommits = script.getCommitIDs();
             Map<String,String> previousTags = script.getTags();
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            configurationMock.bump = CUSTOM_BUMP;
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            configurationLayerMock.setBump(CUSTOM_BUMP);
             command.run();
 
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
@@ -326,9 +326,9 @@ public class MarkTestTemplates {
             String previousLastCommit = script.getLastCommitID();
             List<String> previousCommits = script.getCommitIDs();
             Map<String,String> previousTags = script.getTags();
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            configurationMock.bump = CUSTOM_BUMP;
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            configurationLayerMock.setBump(CUSTOM_BUMP);
             command.run();
 
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
@@ -360,9 +360,9 @@ public class MarkTestTemplates {
             String previousLastCommit = script.getLastCommitID();
             List<String> previousCommits = script.getCommitIDs();
             Map<String,String> previousTags = script.getTags();
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            configurationMock.bump = CUSTOM_BUMP;
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            configurationLayerMock.setBump(CUSTOM_BUMP);
             command.run();
 
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
@@ -394,9 +394,9 @@ public class MarkTestTemplates {
             String previousLastCommit = script.getLastCommitID();
             List<String> previousCommits = script.getCommitIDs();
             Map<String,String> previousTags = script.getTags();
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            configurationMock.bump = CUSTOM_BUMP;
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            configurationLayerMock.setBump(CUSTOM_BUMP);
             command.run();
 
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
@@ -428,9 +428,9 @@ public class MarkTestTemplates {
             String previousLastCommit = script.getLastCommitID();
             List<String> previousCommits = script.getCommitIDs();
             Map<String,String> previousTags = script.getTags();
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            configurationMock.bump = CUSTOM_BUMP;
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            configurationLayerMock.setBump(CUSTOM_BUMP);
             command.run();
 
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
@@ -462,9 +462,9 @@ public class MarkTestTemplates {
             String previousLastCommit = script.getLastCommitID();
             List<String> previousCommits = script.getCommitIDs();
             Map<String,String> previousTags = script.getTags();
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            configurationMock.bump = CUSTOM_BUMP;
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            configurationLayerMock.setBump(CUSTOM_BUMP);
             command.run();
 
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
@@ -496,9 +496,9 @@ public class MarkTestTemplates {
             String previousLastCommit = script.getLastCommitID();
             List<String> previousCommits = script.getCommitIDs();
             Map<String,String> previousTags = script.getTags();
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            configurationMock.bump = CUSTOM_BUMP;
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            configurationLayerMock.setBump(CUSTOM_BUMP);
             command.run();
 
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
@@ -530,9 +530,9 @@ public class MarkTestTemplates {
             String previousLastCommit = script.getLastCommitID();
             List<String> previousCommits = script.getCommitIDs();
             Map<String,String> previousTags = script.getTags();
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            configurationMock.releaseLenient = Boolean.TRUE;
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            configurationLayerMock.setReleaseLenient(Boolean.TRUE);
             command.run();
 
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
@@ -564,9 +564,9 @@ public class MarkTestTemplates {
             String previousLastCommit = script.getLastCommitID();
             List<String> previousCommits = script.getCommitIDs();
             Map<String,String> previousTags = script.getTags();
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            configurationMock.releaseLenient = Boolean.FALSE;
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            configurationLayerMock.setReleaseLenient(Boolean.FALSE);
             command.run();
 
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
@@ -598,10 +598,10 @@ public class MarkTestTemplates {
             String previousLastCommit = script.getLastCommitID();
             List<String> previousCommits = script.getCommitIDs();
             Map<String,String> previousTags = script.getTags();
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            configurationMock.releaseLenient = Boolean.FALSE;
-            configurationMock.releasePrefix = "release-";
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            configurationLayerMock.setReleaseLenient(Boolean.FALSE);
+            configurationLayerMock.setReleasePrefix("release-");
             command.run();
 
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
@@ -662,9 +662,9 @@ public class MarkTestTemplates {
             String previousLastCommit = script.getLastCommitID();
             List<String> previousCommits = script.getCommitIDs();
             Map<String,String> previousTags = script.getTags();
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            configurationMock.initialVersion = "12.13.14";
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            configurationLayerMock.setInitialVersion("12.13.14");
             command.run();
 
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
@@ -695,9 +695,9 @@ public class MarkTestTemplates {
             String previousLastCommit = script.getLastCommitID();
             List<String> previousCommits = script.getCommitIDs();
             Map<String,String> previousTags = script.getTags();
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            configurationMock.version = "1.2.3";
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            configurationLayerMock.setVersion("1.2.3");
             command.run();
 
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
@@ -729,9 +729,9 @@ public class MarkTestTemplates {
             String previousLastCommit = script.getLastCommitID();
             List<String> previousCommits = script.getCommitIDs();
             Map<String,String> previousTags = script.getTags();
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            configurationMock.bump = CUSTOM_BUMP;
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            configurationLayerMock.setBump(CUSTOM_BUMP);
             command.run();
 
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
@@ -763,9 +763,9 @@ public class MarkTestTemplates {
             String previousLastCommit = script.getLastCommitID();
             List<String> previousCommits = script.getCommitIDs();
             Map<String,String> previousTags = script.getTags();
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            configurationMock.bump = CUSTOM_BUMP;
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            configurationLayerMock.setBump(CUSTOM_BUMP);
             command.run();
 
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
@@ -797,9 +797,9 @@ public class MarkTestTemplates {
             String previousLastCommit = script.getLastCommitID();
             List<String> previousCommits = script.getCommitIDs();
             Map<String,String> previousTags = script.getTags();
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            configurationMock.bump = CUSTOM_BUMP;
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            configurationLayerMock.setBump(CUSTOM_BUMP);
             command.run();
 
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
@@ -831,9 +831,9 @@ public class MarkTestTemplates {
             String previousLastCommit = script.getLastCommitID();
             List<String> previousCommits = script.getCommitIDs();
             Map<String,String> previousTags = script.getTags();
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            configurationMock.bump = CUSTOM_BUMP;
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            configurationLayerMock.setBump(CUSTOM_BUMP);
             command.run();
 
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
@@ -865,9 +865,9 @@ public class MarkTestTemplates {
             String previousLastCommit = script.getLastCommitID();
             List<String> previousCommits = script.getCommitIDs();
             Map<String,String> previousTags = script.getTags();
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            configurationMock.releaseLenient = Boolean.TRUE;
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            configurationLayerMock.setReleaseLenient(Boolean.TRUE);
             command.run();
 
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
@@ -899,9 +899,9 @@ public class MarkTestTemplates {
             String previousLastCommit = script.getLastCommitID();
             List<String> previousCommits = script.getCommitIDs();
             Map<String,String> previousTags = script.getTags();
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            configurationMock.releaseLenient = Boolean.FALSE;
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            configurationLayerMock.setReleaseLenient(Boolean.FALSE);
             command.run();
 
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
@@ -933,10 +933,10 @@ public class MarkTestTemplates {
             String previousLastCommit = script.getLastCommitID();
             List<String> previousCommits = script.getCommitIDs();
             Map<String,String> previousTags = script.getTags();
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            configurationMock.releaseLenient = Boolean.FALSE;
-            configurationMock.releasePrefix = "release-";
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            configurationLayerMock.setReleaseLenient(Boolean.FALSE);
+            configurationLayerMock.setReleasePrefix("release-");
             command.run();
 
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
@@ -967,11 +967,11 @@ public class MarkTestTemplates {
             String previousLastCommit = script.getLastCommitID();
             List<String> previousCommits = script.getCommitIDs();
             Map<String,String> previousTags = script.getTags();
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
-            configurationMock.commitMessageConventions.items = Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("minor", ".*")));
-            configurationMock.commitMessageConventions.enabled = List.<String>of("testConvention");
-            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
+            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("minor", ".*"))));
+            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             command.run();
 
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined

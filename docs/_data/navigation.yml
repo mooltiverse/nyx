@@ -96,8 +96,8 @@ nav-user-guide:
         url: /guide/user/configuration-reference/templates/
 #      - title: "Configuration Examples"
 #        url: /guide/user/configuration-reference/configuration-examples/
-#  - title: Configuration Presets
-#    url: /guide/user/configuration-presets/
+  - title: Configuration Presets
+    url: /guide/user/configuration-presets/
 #    children:
 #      - title: "Simple"
 #        url: /guide/user/configuration-presets/simple/

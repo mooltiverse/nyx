@@ -19,6 +19,7 @@ import static com.mooltiverse.oss.nyx.log.Markers.DATA;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.Objects;
 
 import org.slf4j.Logger;
@@ -49,7 +50,8 @@ public class FileMapper {
     /**
      * Returns an object mapper instance, with the required custom features set.
      * 
-     * @param filePath the target file path, used to infer the file format
+     * @param filePath the target file path, used to infer the file format. If it doesn't have a recognized
+     * extension JSON is used by default.
      * 
      * @return the object mapper instance.
      * 
@@ -66,7 +68,10 @@ public class FileMapper {
         else if (filePath.toLowerCase().endsWith(".yaml") || filePath.toLowerCase().endsWith(".yml")) {
             objectMapper = new ObjectMapper(new YAMLFactory());
         }
-        else throw new IllegalArgumentException(String.format("Unsupported extension in file %s. Supported extensions are .json, .yaml, .yml, .properties", filePath));
+        else {
+            logger.debug(DATA, "Unable to infer the extension from file {}, using JSON by default", filePath);
+            objectMapper = new ObjectMapper(new JsonFactory());
+        }
 
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
         objectMapper.enable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
@@ -81,7 +86,7 @@ public class FileMapper {
      * Unmarshals the content of the given file to an object of the given type.
      * 
      * @param file the file to load from. The file path must end with one of the supported
-     * extensions: {@code json}, {@code yaml}, {@code properties}
+     * extensions: {@code json}, {@code yaml}, {@code yml} (or JSON is used by default).
      * @param type the class representing the type of object to unmarshal.
      * 
      * @param <T> the type of object to unmarshal.
@@ -103,11 +108,36 @@ public class FileMapper {
     }
 
     /**
-     * Marshals the content of the given object to a file represented by the given path
+     * Unmarshals the content of the given URL to an object of the given type.
+     * 
+     * @param url the URL to load from. The file path must end with one of the supported
+     * extensions: {@code json}, {@code yaml}, {@code yml} (or JSON is used by default).
+     * @param type the class representing the type of object to unmarshal.
+     * 
+     * @param <T> the type of object to unmarshal.
+     * 
+     * @return the object instance unmarshalled from the given URL.
+     * 
+     * @throws DataAccessException in case of any exception due to data access
+     * @throws IllegalArgumentException if the given file path does not contain a supported extension
+     */
+    public static <T> T load(URL url, Class<T> type)
+        throws DataAccessException {
+        logger.trace(DATA, "Unmarshalling object from URL {} to type {}", url.toString(), type.getName());
+        try {
+            return getObjectMapper(url.getFile()).readValue(url, type);
+        }
+        catch (IOException ioe) {
+            throw new DataAccessException(String.format("Unable to unmarshal content from URL %s", url.toString()), ioe);
+        }
+    }
+
+    /**
+     * Marshals the content of the given object to a file represented by the given path.
      * 
      * @param filePath the path of the file to save to. If it's a relative path it will be
      * considered relative to the current working directory. The file path must end with one of the supported
-     * extensions: {@code json}, {@code yaml}, {@code properties}
+     * extensions: {@code json}, {@code yaml}, {@code yml} (or JSON is used by default).
      * @param content the object to marshal.
      * 
      * @throws DataAccessException in case of any exception due to data access

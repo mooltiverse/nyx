@@ -15,8 +15,6 @@
  */
 package com.mooltiverse.oss.nyx.configuration;
 
-import java.io.File;
-
 import com.mooltiverse.oss.nyx.data.Block;
 import com.mooltiverse.oss.nyx.data.CommitMessageConventions;
 import com.mooltiverse.oss.nyx.data.DataAccessException;
@@ -52,6 +50,17 @@ public interface Root extends Block {
         throws DataAccessException, IllegalPropertyException;
 
     /**
+     * Returns the path to a custom configuration file as it's defined by this configuration.
+     * 
+     * @return the configured value for this option or {@code null} if the value hasn't been defined.
+     * 
+     * @throws DataAccessException in case the option cannot be read or accessed.
+     * @throws IllegalPropertyException in case the option has been defined but has incorrect values or it can't be resolved.
+     */
+    public String getConfigurationFile()
+        throws DataAccessException, IllegalPropertyException;
+
+    /**
      * Returns the directory to use as the working directory as it's defined by this configuration.
      * 
      * @return the configured value for this option or {@code null} if the value hasn't been defined.
@@ -61,7 +70,18 @@ public interface Root extends Block {
      * 
      * @see State#getDirectory()
      */
-    public File getDirectory()
+    public String getDirectory()
+        throws DataAccessException, IllegalPropertyException;
+
+    /**
+     * Returns the value of the dry run flag as it's defined by this configuration.
+     * 
+     * @return the configured value for this option or {@code null} if the value hasn't been defined.
+     * 
+     * @throws DataAccessException in case the option cannot be read or accessed.
+     * @throws IllegalPropertyException in case the option has been defined but has incorrect values or it can't be resolved.
+     */
+    public Boolean getDryRun()
         throws DataAccessException, IllegalPropertyException;
 
     /**
@@ -76,14 +96,14 @@ public interface Root extends Block {
         throws DataAccessException, IllegalPropertyException;
 
     /**
-     * Returns the value of the dry run flag as it's defined by this configuration.
+     * Returns selected preset configuration as it's defined by this configuration.
      * 
      * @return the configured value for this option or {@code null} if the value hasn't been defined.
      * 
      * @throws DataAccessException in case the option cannot be read or accessed.
      * @throws IllegalPropertyException in case the option has been defined but has incorrect values or it can't be resolved.
      */
-    public Boolean getDryRun()
+    public String getPreset()
         throws DataAccessException, IllegalPropertyException;
 
     /**
@@ -129,6 +149,17 @@ public interface Root extends Block {
      * @throws IllegalPropertyException in case the option has been defined but has incorrect values or it can't be resolved.
      */
     public Scheme getScheme()
+        throws DataAccessException, IllegalPropertyException;
+
+    /**
+     * Returns the path to a custom shared configuration file as it's defined by this configuration.
+     * 
+     * @return the configured value for this option or {@code null} if the value hasn't been defined.
+     * 
+     * @throws DataAccessException in case the option cannot be read or accessed.
+     * @throws IllegalPropertyException in case the option has been defined but has incorrect values or it can't be resolved.
+     */
+    public String getSharedConfigurationFile()
         throws DataAccessException, IllegalPropertyException;
 
     /**

@@ -28,7 +28,7 @@ import com.mooltiverse.oss.nyx.command.template.Baseline;
 import com.mooltiverse.oss.nyx.command.template.CommandInvocationContextProvider;
 import com.mooltiverse.oss.nyx.command.template.CommandProxy;
 import com.mooltiverse.oss.nyx.command.template.CommandSelector;
-import com.mooltiverse.oss.nyx.configuration.mock.ConfigurationLayerMock;
+import com.mooltiverse.oss.nyx.configuration.SimpleConfigurationLayer;
 import com.mooltiverse.oss.nyx.git.Scenario;
 
 @DisplayName("Clean")
@@ -96,9 +96,9 @@ public class CleanTestTemplates {
         void isUpToDateWithStateFileTest(@CommandSelector(Commands.CLEAN) CommandProxy command)
             throws Exception {
             String stateFilePath = "state-file.txt";
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-            configurationMock.stateFile = stateFilePath;
-            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            configurationLayerMock.setStateFile(stateFilePath);
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             // run once, to start
             command.run();
@@ -127,9 +127,9 @@ public class CleanTestTemplates {
         void deleteStateFileTest(@CommandSelector(Commands.CLEAN) CommandProxy command)
             throws Exception {
             String stateFilePath = "state-file.txt";
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-            configurationMock.stateFile = stateFilePath;
-            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            configurationLayerMock.setStateFile(stateFilePath);
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             // run once, to start
             command.run();

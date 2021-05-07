@@ -28,11 +28,6 @@ public class CommitMessageConventionTests {
     @DisplayName("CommitMessageConvention()")
     void constructorTest()
         throws Exception {
-        // test with null values
-        assertThrows(NullPointerException.class, () -> new CommitMessageConvention(null, null));
-        assertThrows(NullPointerException.class, () -> new CommitMessageConvention("", null));
-        assertThrows(NullPointerException.class, () -> new CommitMessageConvention(null, Map.<String,String>of()));
-
         assertEquals("regex1", new CommitMessageConvention("regex1", Map.<String,String>of("k1", "v1")).getExpression());
         assertTrue(new CommitMessageConvention("regex1", Map.<String,String>of("k1", "v1")).getBumpExpressions().containsKey("k1"));
         assertEquals("v1", new CommitMessageConvention("regex1", Map.<String,String>of("k1", "v1")).getBumpExpressions().get("k1"));

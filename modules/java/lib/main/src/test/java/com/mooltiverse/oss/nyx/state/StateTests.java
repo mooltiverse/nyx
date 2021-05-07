@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import com.mooltiverse.oss.nyx.configuration.Configuration;
-import com.mooltiverse.oss.nyx.configuration.mock.ConfigurationLayerMock;
+import com.mooltiverse.oss.nyx.configuration.SimpleConfigurationLayer;
 import com.mooltiverse.oss.nyx.data.FileMapper;
 
 @DisplayName("State")
@@ -72,7 +72,7 @@ public class StateTests {
             throws Exception {
             Configuration configuration = new Configuration();
             // make sure the state directory is the same from the configuration
-            assertEquals(configuration.getDirectory(), new State(configuration).getDirectory());
+            assertEquals(new File(configuration.getDirectory()).getAbsolutePath(), new State(configuration).getDirectory().getAbsolutePath());
         }
 
         @Test
@@ -196,10 +196,10 @@ public class StateTests {
         void resumeTest()
             throws Exception {
             Configuration configuration = new Configuration();
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-            configurationMock.resume = Boolean.TRUE;
-            configurationMock.stateFile = new File(System.getProperty("java.io.tmpdir"), "state"+this.hashCode()+".json").getAbsolutePath();
-            configuration.withCommandLineConfiguration(configurationMock);
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            configurationLayerMock.setResume(Boolean.TRUE);
+            configurationLayerMock.setStateFile(new File(System.getProperty("java.io.tmpdir"), "state"+this.hashCode()+".json").getAbsolutePath());
+            configuration.withCommandLineConfiguration(configurationLayerMock);
             State oldState = new State(configuration);
 
             // set a few values to use later on for comparison
@@ -211,11 +211,11 @@ public class StateTests {
             oldState.getReleaseScope().setPreviousVersionCommit("previousCommit");
 
             // save the file
-            FileMapper.save(configurationMock.stateFile, oldState);
-            assertTrue(new File(configurationMock.stateFile).exists());
+            FileMapper.save(configurationLayerMock.getStateFile(), oldState);
+            assertTrue(new File(configurationLayerMock.getStateFile()).exists());
 
             // now we are ready to resume the file
-            State resumedState = State.resume(new File(configurationMock.stateFile), configuration);
+            State resumedState = State.resume(new File(configurationLayerMock.getStateFile()), configuration);
             assertEquals(oldState.getBump(), resumedState.getBump());
             assertEquals(oldState.getInternals(), resumedState.getInternals());
             assertTrue(resumedState.getInternals().containsKey("attr1"));

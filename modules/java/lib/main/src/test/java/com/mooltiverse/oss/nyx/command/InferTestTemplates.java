@@ -30,7 +30,7 @@ import com.mooltiverse.oss.nyx.command.template.CommandInvocationContextProvider
 import com.mooltiverse.oss.nyx.command.template.CommandProxy;
 import com.mooltiverse.oss.nyx.command.template.CommandSelector;
 import com.mooltiverse.oss.nyx.configuration.Defaults;
-import com.mooltiverse.oss.nyx.configuration.mock.ConfigurationLayerMock;
+import com.mooltiverse.oss.nyx.configuration.SimpleConfigurationLayer;
 import com.mooltiverse.oss.nyx.data.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.git.GitException;
 import com.mooltiverse.oss.nyx.git.Scenario;
@@ -167,9 +167,9 @@ public class InferTestTemplates {
         void runWithInitialCommitOnlyAndInitialVersionOverrideTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
             final String CUSTOM_INITIAL_VERSION = "12.13.14";
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-            configurationMock.initialVersion = CUSTOM_INITIAL_VERSION;
-            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            configurationLayerMock.setInitialVersion(CUSTOM_INITIAL_VERSION);
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             command.run();
 
             assertEquals(Defaults.BUMP, command.state().getBump());
@@ -191,9 +191,9 @@ public class InferTestTemplates {
         void runWithInitialCommitOnlyAndVersionOverrideTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
             final String CUSTOM_VERSION = "1.2.3";
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            configurationMock.version = CUSTOM_VERSION;
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            configurationLayerMock.setVersion(CUSTOM_VERSION);
             command.run();
 
             assertEquals(Defaults.BUMP, command.state().getBump());
@@ -215,9 +215,9 @@ public class InferTestTemplates {
         void runWithInitialCommitOnlyAndBumpMajorOverrideTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
             final String CUSTOM_BUMP = "major";
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            configurationMock.bump = CUSTOM_BUMP;
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            configurationLayerMock.setBump(CUSTOM_BUMP);
             command.run();
 
             assertEquals(CUSTOM_BUMP, command.state().getBump());
@@ -239,9 +239,9 @@ public class InferTestTemplates {
         void runWithInitialCommitOnlyAndBumpMinorOverrideTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
             final String CUSTOM_BUMP = "minor";
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            configurationMock.bump = CUSTOM_BUMP;
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            configurationLayerMock.setBump(CUSTOM_BUMP);
             command.run();
 
             assertEquals(CUSTOM_BUMP, command.state().getBump());
@@ -263,9 +263,9 @@ public class InferTestTemplates {
         void runWithInitialCommitOnlyAndBumpPatchOverrideTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
             final String CUSTOM_BUMP = "patch";
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            configurationMock.bump = CUSTOM_BUMP;
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            configurationLayerMock.setBump(CUSTOM_BUMP);
             command.run();
 
             assertEquals(CUSTOM_BUMP, command.state().getBump());
@@ -287,9 +287,9 @@ public class InferTestTemplates {
         void runWithInitialCommitOnlyAndBumpAlphaOverrideTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
             final String CUSTOM_BUMP = "alpha";
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            configurationMock.bump = CUSTOM_BUMP;
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            configurationLayerMock.setBump(CUSTOM_BUMP);
             command.run();
 
             assertEquals(CUSTOM_BUMP, command.state().getBump());
@@ -311,9 +311,9 @@ public class InferTestTemplates {
         void runWithBumpMajorOverriddenByUserInRepoWithJustOneInitialVersionCommitTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
             final String CUSTOM_BUMP = "major";
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            configurationMock.bump = CUSTOM_BUMP;
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            configurationLayerMock.setBump(CUSTOM_BUMP);
             command.run();
 
             assertEquals(CUSTOM_BUMP, command.state().getBump());
@@ -335,9 +335,9 @@ public class InferTestTemplates {
         void runWithBumpMinorOverriddenByUserInRepoWithJustOneInitialVersionCommitTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
             final String CUSTOM_BUMP = "minor";
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            configurationMock.bump = CUSTOM_BUMP;
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            configurationLayerMock.setBump(CUSTOM_BUMP);
             command.run();
 
             assertEquals(CUSTOM_BUMP, command.state().getBump());
@@ -359,9 +359,9 @@ public class InferTestTemplates {
         void runWithBumpPatchOverriddenByUserInRepoWithJustOneInitialVersionCommitTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
             final String CUSTOM_BUMP = "patch";
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            configurationMock.bump = CUSTOM_BUMP;
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            configurationLayerMock.setBump(CUSTOM_BUMP);
             command.run();
 
             assertEquals(CUSTOM_BUMP, command.state().getBump());
@@ -383,9 +383,9 @@ public class InferTestTemplates {
         void runWithBumpAlphaOverriddenByUserInRepoWithJustOneInitialVersionCommitTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
             final String CUSTOM_BUMP = "alpha";
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            configurationMock.bump = CUSTOM_BUMP;
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            configurationLayerMock.setBump(CUSTOM_BUMP);
             command.run();
 
             assertEquals(CUSTOM_BUMP, command.state().getBump());
@@ -406,9 +406,9 @@ public class InferTestTemplates {
         @Baseline(Scenario.INITIAL_VERSION)
         void runWithReleaseLenientInRepoWithPrefixedVersionCommitTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            configurationMock.releaseLenient = Boolean.TRUE;
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            configurationLayerMock.setReleaseLenient(Boolean.TRUE);
             script.andCommitWithTag("release-2.2.2");
             command.run();
 
@@ -430,9 +430,9 @@ public class InferTestTemplates {
         @Baseline(Scenario.INITIAL_VERSION)
         void runWithoutReleaseLenientInRepoWithoutPrefixedVersionCommitTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            configurationMock.releaseLenient = Boolean.FALSE;
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            configurationLayerMock.setReleaseLenient(Boolean.FALSE);
             script.andCommitWithTag("release-2.2.2");
             command.run();
 
@@ -454,10 +454,10 @@ public class InferTestTemplates {
         @Baseline(Scenario.INITIAL_VERSION)
         void runWithoutLenientAndWithPrefixReleaseInRepoWithJustOneInitialVersionCommitTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            configurationMock.releaseLenient = Boolean.FALSE;
-            configurationMock.releasePrefix = "release-";
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            configurationLayerMock.setReleaseLenient(Boolean.FALSE);
+            configurationLayerMock.setReleasePrefix("release-");
             script.andCommitWithTag("release-2.2.2");
             command.run();
 
@@ -499,9 +499,9 @@ public class InferTestTemplates {
         @Baseline(Scenario.ONE_BRANCH_SHORT)
         void runInRepoWithSimpleLinearCommitHistoryAndNonSignificantCommitsWithInitialVersionOverrideTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            configurationMock.initialVersion = "12.13.14";
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            configurationLayerMock.setInitialVersion("12.13.14");
             command.run();
 
             assertEquals(Defaults.BUMP, command.state().getBump());
@@ -522,9 +522,9 @@ public class InferTestTemplates {
         @Baseline(Scenario.ONE_BRANCH_SHORT)
         void runWithVersionOverriddenByUserInRepoWithFurtherNonSignificantCommitsTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            configurationMock.version = "1.2.3";
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            configurationLayerMock.setVersion("1.2.3");
             command.run();
 
             assertEquals(Defaults.BUMP, command.state().getBump());
@@ -546,9 +546,9 @@ public class InferTestTemplates {
         void runWithBumpMajorOverrideInRepoWithFurtherNonSignificantCommitsTestTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
             final String CUSTOM_BUMP = "major";
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            configurationMock.bump = CUSTOM_BUMP;
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            configurationLayerMock.setBump(CUSTOM_BUMP);
             command.run();
 
             assertEquals(CUSTOM_BUMP, command.state().getBump());
@@ -570,9 +570,9 @@ public class InferTestTemplates {
         void runWithBumpMinorOverrideInRepoWithFurtherNonSignificantCommitsTestTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
             final String CUSTOM_BUMP = "minor";
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            configurationMock.bump = CUSTOM_BUMP;
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            configurationLayerMock.setBump(CUSTOM_BUMP);
             command.run();
 
             assertEquals(CUSTOM_BUMP, command.state().getBump());
@@ -594,9 +594,9 @@ public class InferTestTemplates {
         void runWithBumpPatchOverrideInRepoWithFurtherNonSignificantCommitsTestTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
             final String CUSTOM_BUMP = "patch";
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            configurationMock.bump = CUSTOM_BUMP;
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            configurationLayerMock.setBump(CUSTOM_BUMP);
             command.run();
 
             assertEquals(CUSTOM_BUMP, command.state().getBump());
@@ -618,9 +618,9 @@ public class InferTestTemplates {
         void runWithBumpAlphaOverrideInRepoWithFurtherNonSignificantCommitsTestTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
             final String CUSTOM_BUMP = "alpha";
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            configurationMock.bump = CUSTOM_BUMP;
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            configurationLayerMock.setBump(CUSTOM_BUMP);
             command.run();
 
             assertEquals(CUSTOM_BUMP, command.state().getBump());
@@ -641,9 +641,9 @@ public class InferTestTemplates {
         @Baseline(Scenario.ONE_BRANCH_SHORT)
         void runWithReleaseLenientAndWithoutPrefixInRepoWithFurtherNonSignificantPrefixedCommitsTestTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            configurationMock.releaseLenient = Boolean.TRUE;
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            configurationLayerMock.setReleaseLenient(Boolean.TRUE);
             script.andCommitWithTag("release-2.2.2");
             command.run();
 
@@ -665,9 +665,9 @@ public class InferTestTemplates {
         @Baseline(Scenario.ONE_BRANCH_SHORT)
         void runWithoutReleaseLenientAndWithoutPrefixInRepoWithFurtherNonSignificantPrefixedCommitsTestTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            configurationMock.releaseLenient = Boolean.FALSE;
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            configurationLayerMock.setReleaseLenient(Boolean.FALSE);
             script.andCommitWithTag("release-2.2.2");
             command.run();
 
@@ -689,10 +689,10 @@ public class InferTestTemplates {
         @Baseline(Scenario.ONE_BRANCH_SHORT)
         void runWithoutReleaseLenientAndWithPrefixInRepoWithFurtherNonSignificantPrefixedCommitsTestTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
-            configurationMock.releaseLenient = Boolean.FALSE;
-            configurationMock.releasePrefix = "release-";
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            configurationLayerMock.setReleaseLenient(Boolean.FALSE);
+            configurationLayerMock.setReleasePrefix("release-");
             script.andCommitWithTag("release-2.2.2");
             command.run();
 
@@ -714,11 +714,11 @@ public class InferTestTemplates {
         @Baseline(Scenario.ONE_BRANCH_SHORT)
         void runWithAlwayspositiveCommitConventionInRepoWithFurtherNonSignificantPrefixedCommitsTestTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
-            ConfigurationLayerMock configurationMock = new ConfigurationLayerMock();
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
-            configurationMock.commitMessageConventions.items = Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("minor", ".*")));
-            configurationMock.commitMessageConventions.enabled = List.<String>of("testConvention");
-            command.state().getConfiguration().withCommandLineConfiguration(configurationMock);
+            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("minor", ".*"))));
+            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             command.run();
 
             assertEquals("minor", command.state().getBump());

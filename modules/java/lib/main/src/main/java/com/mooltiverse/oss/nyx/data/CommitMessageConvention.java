@@ -15,6 +15,7 @@
  */
 package com.mooltiverse.oss.nyx.data;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -37,40 +38,55 @@ public class CommitMessageConvention {
     /**
      * The regular expression used to parse informations from a commit message.
      */
-    private final String expression;
+    private String expression;
 
     /**
      * The map where each key is a version identifier to bump and the value is a regular expression to be evaluated
      * against the commit message. When the expression matches the commit message the version identifier
      * in the key is to be bumped.
      */
-    private final Map<String,String> bumpExpressions;
+    private final Map<String,String> bumpExpressions = new HashMap<String,String>();
+
+    /**
+     * Default constructor.
+     */
+    public CommitMessageConvention() {
+        super();
+    }
 
     /**
      * Standard constructor.
      * 
      * @param expression the regular expression used to parse informations from a commit message.
-     * It can't be {@code null} and it must comply with the requirements define on top of this class documentation.
+     * It must comply with the requirements define on top of this class documentation.
      * @param bumpExpressions the map where each key is a version identifier to bump and the value is a regular
      * expression to be evaluated against the commit message. When the expression matches the commit message
-     * the version identifier in the key is to be bumped. It can't be {@code null} but it may be empty
-     * and it must comply with the requirements define on top of this class documentation.
+     * the version identifier in the key is to be bumped. It must comply with the requirements define on top
+     * of this class documentation.
      */
     public CommitMessageConvention(String expression, Map<String,String> bumpExpressions) {
         super();
-        Objects.requireNonNull(expression, "The commit message convention needs a non null regular expression");
-        Objects.requireNonNull(bumpExpressions, "The commit message convention needs a non null bump expressions map");
         this.expression = expression;
-        this.bumpExpressions = bumpExpressions;
+        if (!Objects.isNull(bumpExpressions))
+            this.bumpExpressions.putAll(bumpExpressions);
     }
 
     /**
      * Returns the regular expression used to parse informations from a commit message.
      * 
-     * @return the regular expression used to parse informations from a commit message. Never {@code null}.
+     * @return the regular expression used to parse informations from a commit message.
      */
     public String getExpression() {
         return expression;
+    }
+
+    /**
+     * Sets the regular expression used to parse informations from a commit message.
+     * 
+     * @param expression the regular expression used to parse informations from a commit message.
+     */
+    public void setExpression(String expression) {
+        this.expression = expression;
     }
 
     /**

@@ -32,7 +32,7 @@ public class DefaultsTests {
     @DisplayName("Defaults.DIRECTORY == System.getProperty('user.dir')")
     void directoryTest()
         throws Exception {
-        assertEquals(new File(System.getProperty("user.dir")), Defaults.DIRECTORY);
+        assertEquals(new File(System.getProperty("user.dir")).getAbsolutePath(), new File(Defaults.DIRECTORY).getAbsolutePath());
     }
 
     @Test

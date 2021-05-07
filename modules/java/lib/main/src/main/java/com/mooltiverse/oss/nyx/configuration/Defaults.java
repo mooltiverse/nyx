@@ -15,7 +15,6 @@
  */
 package com.mooltiverse.oss.nyx.configuration;
 
-import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -47,11 +46,11 @@ public interface Defaults {
         }
 
         /**
-         * The default commit message conventions. Value: {@code null}
+         * The default commit message conventions. Value: is an empty map.
          */
         @Override
         public Map<String,CommitMessageConvention> getItems() {
-            return null;
+            return Map.<String,CommitMessageConvention>of();
         }
 
         /**
@@ -64,10 +63,15 @@ public interface Defaults {
     };
 
     /**
+     * The default custom configuration file path. Value: {@code null}
+     */
+    public static final String CONFIGURATION_FILE = null;
+
+    /**
      * The default working directory. Defaults to the current user directory returned by reading the
      * {@code user.dir} from {@link System#getProperty(String)}
      */
-    public static final File DIRECTORY = new File(System.getProperty("user.dir"));
+    public static final String DIRECTORY = System.getProperty("user.dir");
 
     /**
      * The flag that prevents to alter any repository state and instead just log the actions that would be taken. Value: {@code false}
@@ -80,6 +84,11 @@ public interface Defaults {
      * This strongly depends on the {@link #SCHEME} and as long as it's {@link Scheme#SEMVER}, we use that to select the initial version.
      */
     public static final String INITIAL_VERSION = Versions.defaultInitial(Scheme.SEMVER.getScheme()).toString();
+
+    /**
+     * The default preset configuration. Value: {@code null}
+     */
+    public static final String PRESET = null;
 
     /**
      * The default prefix to add at the beginning of a version identifier to generate the release identifier. Value: {@code null}
@@ -100,6 +109,11 @@ public interface Defaults {
      * The versioning scheme to use. Value: {@link Scheme#SEMVER}
      */
     public static final Scheme SCHEME = Scheme.SEMVER;
+
+    /**
+     * The default shared custom configuration file path. Value: {@code null}
+     */
+    public static final String SHARED_CONFIGURATION_FILE = null;
 
     /**
      * The path to the local state file. Value: {@code null}

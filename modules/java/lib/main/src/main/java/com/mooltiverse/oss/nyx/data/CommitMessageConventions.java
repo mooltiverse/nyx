@@ -38,7 +38,7 @@ public interface CommitMessageConventions extends Block {
      * and values are actual convention objects.
      * 
      * @return the map of the commit message conventions configured in this block, where keys are convention names
-     * and values are actual convention objects. It may be {@code null} if not configured.
+     * and values are actual convention objects. It may be empty but not {@code null} if not configured.
      * 
      * @throws DataAccessException in case the option cannot be read or accessed.
      * @throws IllegalPropertyException in case the option has been defined but has incorrect values or it can't be resolved.

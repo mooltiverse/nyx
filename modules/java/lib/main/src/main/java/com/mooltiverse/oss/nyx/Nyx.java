@@ -145,7 +145,7 @@ public class Nyx {
     public Repository repository()
         throws DataAccessException, IllegalPropertyException, GitException {
         if (Objects.isNull(repository)) {
-            File repoDir = configuration().getDirectory();
+            File repoDir = new File(configuration().getDirectory());
             logger.debug(MAIN, "Instantiating the Git repository in {}", repoDir);
             try {
                 repository = Git.open(repoDir);

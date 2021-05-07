@@ -32,6 +32,7 @@ import com.mooltiverse.oss.nyx.Nyx;
 import com.mooltiverse.oss.nyx.data.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.data.CommitMessageConventions;
 import com.mooltiverse.oss.nyx.data.DataAccessException;
+import com.mooltiverse.oss.nyx.data.FileMapper;
 import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
 import com.mooltiverse.oss.nyx.data.Scheme;
 import com.mooltiverse.oss.nyx.data.Verbosity;
@@ -93,7 +94,26 @@ public class Configuration implements Root {
         throws DataAccessException, IllegalPropertyException {
         super();
         logger.debug(CONFIGURATION, "New configuration object");
-        // TODO: add the code to load standard local (see LayerPriority#CUSTOM_LOCAL_FILE) and shared (see LayerPriority#STANDARD_SHARED_FILE) configuration files, if found
+        loadStandardConfigurationFileLayers();
+    }
+
+    /**
+     * Returns a file built on the given path if it's already an absolute file path, otherwise make it absolute by resolving it with the
+     * configured (or default) directory.
+     * 
+     * @param path the file to make absolute
+     * 
+     * @return the absolute representation of the file
+     * 
+     * @see #getDirectory()
+     * 
+     * @throws DataAccessException in case data cannot be read or accessed.
+     * @throws IllegalPropertyException in case some option has been defined but has incorrect values or it can't be resolved.
+     */
+    private File getAbsoluteFilePath(String path)
+        throws DataAccessException, IllegalPropertyException {
+        File res = new File(path);
+        return res.isAbsolute() ? res : new File(new File(getDirectory()), path);
     }
 
     /**
@@ -102,33 +122,107 @@ public class Configuration implements Root {
     private synchronized void resetCache() {
         logger.trace(CONFIGURATION, "Clearing the configuration cache");
         if (!Objects.isNull(commitMessageConventionsBlock))
-            commitMessageConventionsBlock.resolvedItems = null;
+            commitMessageConventionsBlock.resetCache();
     }
 
     /**
-     * Adds, replaces or removes the layer at the given priority level.
+     * Makes sure that the configuration layers that can in turn be configured (custom configuration file, custom shared
+     * configuration file, preset) are added or removed into the internal layers representation, according to the actual
+     * configuration parameters.
      * 
-     * @param layer the configuration layer to set at the given priority level.
-     * If {@code null} any existing configuration layer at the same level is removed (if any).
-     * @param priority the priority level
-     * 
-     * @return a reference to this same object.
+     * This method should be invoked after any core layer (not among the configured ones) changes, or after a batch of
+     * those changes.
      * 
      * @throws DataAccessException in case data cannot be read or accessed.
      * @throws IllegalPropertyException in case some option has been defined but has incorrect values or it can't be resolved.
      */
-    private synchronized void setConfigurationLayer(ConfigurationLayer layer, LayerPriority priority) {
-        logger.debug(CONFIGURATION, "Setting configuration layer at {}", priority);
-        if (Objects.isNull(layer)) {
-            logger.debug(CONFIGURATION, "Removing the existing {} configuration layer, if any", priority);
-            if (layers.containsKey(priority))
-                layers.remove(priority);
+    private synchronized void updateConfiguredConfigurationLayers()
+        throws DataAccessException, IllegalPropertyException {
+        
+        // follow the evaluation order from top to bottom to make sure that any change applied here does not
+        // require further changes to the layers that we already checked
+
+        // start with the local custom configuration file
+        if (Objects.isNull(getConfigurationFile())) {
+            logger.debug(CONFIGURATION, "Clearing the custom local configuration file, if any");
+            layers.remove(LayerPriority.CUSTOM_LOCAL_FILE);
+        }
+        else if (getConfigurationFile().isBlank()) {
+            logger.error(CONFIGURATION, "An empty path has been defined for the local custom configuration file and it will be ignored");
+            layers.remove(LayerPriority.CUSTOM_LOCAL_FILE);
         }
         else {
-            logger.debug(CONFIGURATION, "Adding or replacing the {} configuration layer", priority);
-            layers.put(priority, layer);
+            File customLocalConfigurationFile = getAbsoluteFilePath(getConfigurationFile());
+            logger.debug(CONFIGURATION, "Loading custom local configuration file at {}", customLocalConfigurationFile.getAbsolutePath());
+            layers.put(LayerPriority.CUSTOM_LOCAL_FILE, FileMapper.load(customLocalConfigurationFile, SimpleConfigurationLayer.class));
+            logger.debug(CONFIGURATION, "Custom local configuration file {} loaded", customLocalConfigurationFile.getAbsolutePath());
         }
-        resetCache();
+
+        // now the local shared configuration file
+        if (Objects.isNull(getSharedConfigurationFile())) {
+            logger.debug(CONFIGURATION, "Clearing the custom shared configuration file, if any");
+            layers.remove(LayerPriority.CUSTOM_SHARED_FILE);
+        }
+        else if (getSharedConfigurationFile().isBlank()) {
+            logger.error(CONFIGURATION, "An empty path has been defined for the local shared configuration file and it will be ignored");
+            layers.remove(LayerPriority.CUSTOM_SHARED_FILE);
+        }
+        else {
+            File customSharedConfigurationFile = getAbsoluteFilePath(getSharedConfigurationFile());
+            logger.debug(CONFIGURATION, "Loading custom shared configuration file at {}", customSharedConfigurationFile.getAbsolutePath());
+            layers.put(LayerPriority.CUSTOM_SHARED_FILE, FileMapper.load(customSharedConfigurationFile, SimpleConfigurationLayer.class));
+            logger.debug(CONFIGURATION, "Custom shared configuration file {} loaded", customSharedConfigurationFile.getAbsolutePath());
+        }
+
+        // now the preset
+        if (Objects.isNull(getPreset())) {
+            logger.debug(CONFIGURATION, "Clearing the preset configuration, if any");
+            layers.remove(LayerPriority.PRESET);
+        }
+        else if (getPreset().isBlank()) {
+            logger.error(CONFIGURATION, "An empty name has been defined for the preset configuration and it will be ignored");
+            layers.remove(LayerPriority.PRESET);
+        }
+        else {
+            logger.debug(CONFIGURATION, "Loading preset configuration {}", getPreset());
+            //layers.put(LayerPriority.PRESET, /* TODO: load the preset class here */null);
+            logger.debug(CONFIGURATION, "Preset configuration {} loaded", getPreset());
+        }
+    }
+
+    /**
+     * Loads the various standard configuration file layers, if found, searched at their default locations.
+     * 
+     * @throws DataAccessException in case data cannot be read or accessed.
+     * @throws IllegalPropertyException in case some option has been defined but has incorrect values or it can't be resolved.
+     */
+    private void loadStandardConfigurationFileLayers()
+        throws DataAccessException, IllegalPropertyException {
+        logger.debug(CONFIGURATION, "Searching for standard configuration files...");
+        // load standard local configuration files first, if any
+        for (String fileName: List.<String>of(".nyx.json", ".nyx.yaml", ".nyx.yml")) {
+            File file = getAbsoluteFilePath(fileName);
+            if (file.exists() && file.isFile()) {
+                logger.debug(CONFIGURATION, "Standard local configuration file found at {}. Loading...", file.getAbsolutePath());
+                layers.put(LayerPriority.STANDARD_LOCAL_FILE, FileMapper.load(file, SimpleConfigurationLayer.class));
+                logger.debug(CONFIGURATION, "Standard local configuration file {} loaded", file.getAbsolutePath());
+                break;
+            }
+            else logger.debug(CONFIGURATION, "Standard local configuration file {} not found.", file.getAbsolutePath());
+        }
+        // then load standard shared configuration files, if any
+        for (String fileName: List.<String>of(".nyx-shared.json", ".nyx-shared.yaml", ".nyx-shared.yml")) {
+            File file = getAbsoluteFilePath(fileName);
+            if (file.exists() && file.isFile()) {
+                logger.debug(CONFIGURATION, "Standard shared configuration file found at {}. Loading...", file.getAbsolutePath());
+                layers.put(LayerPriority.STANDARD_SHARED_FILE, FileMapper.load(file, SimpleConfigurationLayer.class));
+                logger.debug(CONFIGURATION, "Standard shared configuration file {} loaded", file.getAbsolutePath());
+                break;
+            }
+            else logger.debug(CONFIGURATION, "Standard shared configuration file {} not found.", file.getAbsolutePath());
+        }
+        if (layers.containsKey(LayerPriority.STANDARD_LOCAL_FILE) || layers.containsKey(LayerPriority.STANDARD_SHARED_FILE))
+            updateConfiguredConfigurationLayers();
     }
 
     /**
@@ -144,8 +238,16 @@ public class Configuration implements Root {
      */
     public Configuration withCommandLineConfiguration(ConfigurationLayer layer)
         throws DataAccessException, IllegalPropertyException {
-        
-        setConfigurationLayer(layer, LayerPriority.COMMAND_LINE);
+        if (Objects.isNull(layer)) {
+            logger.debug(CONFIGURATION, "Removing the existing {} configuration layer, if any", LayerPriority.COMMAND_LINE);
+            layers.remove(LayerPriority.COMMAND_LINE);
+        }
+        else {
+            logger.debug(CONFIGURATION, "Adding or replacing the {} configuration layer", LayerPriority.COMMAND_LINE);
+            layers.put(LayerPriority.COMMAND_LINE, layer);
+        }
+        updateConfiguredConfigurationLayers();
+        resetCache();
         return this;
     }
 
@@ -162,8 +264,16 @@ public class Configuration implements Root {
      */
     public Configuration withPluginConfiguration(ConfigurationLayer layer)
         throws DataAccessException, IllegalPropertyException {
-        
-        setConfigurationLayer(layer, LayerPriority.PLUGIN);
+        if (Objects.isNull(layer)) {
+            logger.debug(CONFIGURATION, "Removing the existing {} configuration layer, if any", LayerPriority.PLUGIN);
+            layers.remove(LayerPriority.PLUGIN);
+        }
+        else {
+            logger.debug(CONFIGURATION, "Adding or replacing the {} configuration layer", LayerPriority.PLUGIN);
+            layers.put(LayerPriority.PLUGIN, layer);
+        }
+        updateConfiguredConfigurationLayers();
+        resetCache();
         return this;
     }
 
@@ -201,13 +311,33 @@ public class Configuration implements Root {
      * {@inheritDoc}
      */
     @Override
-    public File getDirectory()
+    public String getConfigurationFile()
+        throws DataAccessException, IllegalPropertyException {
+        logger.trace(CONFIGURATION, "Retrieving the {} configuration option", "configurationFile");
+        for (Map.Entry<LayerPriority, ConfigurationLayer> layerEntry: layers.entrySet()) {
+            // custom configuration file configuration is ignored on custom configuration file layers to avoid chaining
+            if (!LayerPriority.CUSTOM_LOCAL_FILE.equals(layerEntry.getKey())) {
+                String configurationFile = layerEntry.getValue().getConfigurationFile();
+                if (!Objects.isNull(configurationFile)) {
+                    logger.trace(CONFIGURATION, "The {} configuration option value is: {}", "configurationFile", configurationFile);
+                    return configurationFile;
+                }
+            }
+        }
+        return DefaultLayer.getInstance().getConfigurationFile();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getDirectory()
         throws DataAccessException, IllegalPropertyException {
         logger.trace(CONFIGURATION, "Retrieving the {} configuration option", "directory");
         for (ConfigurationLayer layer: layers.values()) {
-            File directory = layer.getDirectory();
+            String directory = layer.getDirectory();
             if (!Objects.isNull(directory)) {
-                logger.trace(CONFIGURATION, "The {} configuration option value is: {}", "directory", directory.getAbsolutePath());
+                logger.trace(CONFIGURATION, "The {} configuration option value is: {}", "directory", directory);
                 return directory;
             }
         }
@@ -216,12 +346,13 @@ public class Configuration implements Root {
 
     /**
      * This method allows to override the default directory that will be returned by {@link #getDirectory()}.
+     * This method must be invoked before instances of {@link Nyx} or other classes are created or the given value may be ignored.
      * 
      * @param directory the new default directory. If {@code null} then the standard default directory will be used.
      */
     public static void setDefaultDirectory(File directory) {
         logger.trace(CONFIGURATION, "Setting the default directory {}", Objects.isNull(directory) ? "null" : directory.getAbsolutePath());
-        DefaultLayer.getInstance().setDirectory(directory);
+        DefaultLayer.getInstance().setDirectory(Objects.isNull(directory) ? null : directory.getAbsolutePath());
     }
 
     /**
@@ -256,6 +387,26 @@ public class Configuration implements Root {
             }
         }
         return DefaultLayer.getInstance().getInitialVersion();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getPreset()
+        throws DataAccessException, IllegalPropertyException {
+        logger.trace(CONFIGURATION, "Retrieving the {} configuration option", "preset");
+        for (Map.Entry<LayerPriority, ConfigurationLayer> layerEntry: layers.entrySet()) {
+            // preset configuration is ignored on preset layers to avoid chaining
+            if (!LayerPriority.PRESET.equals(layerEntry.getKey())) {
+                String preset = layerEntry.getValue().getPreset();
+                if (!Objects.isNull(preset)) {
+                    logger.trace(CONFIGURATION, "The {} configuration option value is: {}", "preset", preset);
+                    return preset;
+                }
+            }
+        }
+        return DefaultLayer.getInstance().getPreset();
     }
 
     /**
@@ -330,6 +481,26 @@ public class Configuration implements Root {
      * {@inheritDoc}
      */
     @Override
+    public String getSharedConfigurationFile()
+        throws DataAccessException, IllegalPropertyException {
+        logger.trace(CONFIGURATION, "Retrieving the {} configuration option", "sharedConfigurationFile");
+        for (Map.Entry<LayerPriority, ConfigurationLayer> layerEntry: layers.entrySet()) {
+            // custom shared configuration file configuration is ignored on custom shared configuration file layers to avoid chaining
+            if (!LayerPriority.CUSTOM_SHARED_FILE.equals(layerEntry.getKey())) {
+                String sharedConfigurationFile = layerEntry.getValue().getSharedConfigurationFile();
+                if (!Objects.isNull(sharedConfigurationFile)) {
+                    logger.trace(CONFIGURATION, "The {} configuration option value is: {}", "sharedConfigurationFile", sharedConfigurationFile);
+                    return sharedConfigurationFile;
+                }
+            }
+        }
+        return DefaultLayer.getInstance().getSharedConfigurationFile();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String getStateFile()
         throws DataAccessException, IllegalPropertyException {
         logger.trace(CONFIGURATION, "Retrieving the {} configuration option", "stateFile");
@@ -384,13 +555,26 @@ public class Configuration implements Root {
         /**
          * The private map of the items resolved among the layers.
          */
-        private Map<String,CommitMessageConvention> resolvedItems = null;
+        private final Map<String,CommitMessageConvention> resolvedItems = new HashMap<String,CommitMessageConvention>();
+
+        /**
+         * The flag telling if the items have been already initialized.
+         */
+        private boolean itemsInitialized = false;
 
         /**
          * Default constructor is private on purpose.
          */
         private CommitMessageConventionsBlock() {
             super();
+        }
+
+        /**
+         * Resets the resolved items and clears the cache.
+         */
+        private void resetCache() {
+            resolvedItems.clear();
+            itemsInitialized = false;
         }
 
         /**
@@ -414,23 +598,22 @@ public class Configuration implements Root {
          * Returns the map of resolved items, resolving them over all the layers. Each field of each item needs to be 
          * resolved independently as it may be overridden in some layer.
          * 
-         * @return the map of resolved items, resolving them over all the layers. {@code null} of no items are enabled.
+         * @return the map of resolved items, resolving them over all the layers. Empty if no items are enabled.
          * 
          * @throws DataAccessException in case the option cannot be read or accessed.
          * @throws IllegalPropertyException in case the option has been defined but has incorrect values or it can't be resolved.
          */
         private Map<String,CommitMessageConvention> getResolvedItems()
             throws DataAccessException, IllegalPropertyException {
-            if (Objects.isNull(resolvedItems)) {
-                logger.trace(CONFIGURATION, "Resolving the {} configuration option", "commitMessageConventions.items");
+            logger.trace(CONFIGURATION, "Resolving the {} configuration option", "commitMessageConventions.items");
+            if (!itemsInitialized) {
                 List<String> enabled = getEnabled();
                 if (Objects.isNull(enabled)) {
                     logger.trace(CONFIGURATION, "No enabled {} to resolve", "commitMessageConventions.items");
-                    return null;
                 }
                 else {
                     logger.trace(CONFIGURATION, "Resolving {} {}: ", enabled.size(), "commitMessageConventions.items", String.join(", ", enabled));
-                    resolvedItems = new HashMap<String,CommitMessageConvention>(enabled.size());
+                    resolvedItems.clear();
                     for (String enabledItem: enabled) {
                         resolvedItems.put(enabledItem, getResolvedItem(enabledItem));
                     }

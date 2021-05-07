@@ -11,13 +11,16 @@ These are the top level options in the configuration:
 | --------------------------------------------------------- | ------- | --------------------------------------------------------- | ------------------------------------------------------------- | -------- |
 | [`bump`](#bump)                                           | string  | `-b <NAME>`, `--bump=<NAME>`                              | `NYX_BUMP=<NAME>`                                             | N/A      |
 | [`commitMessageConventions`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/commit-message-conventions.md %}) | object  | See [Commit Message Conventions]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/commit-message-conventions.md %}) | See [Commit Message Conventions]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/commit-message-conventions.md %}) | N/A      |
+| [`configurationFile`](#configuration-file)                | string  | `-c <PATH>`, `--configuration-file=<PATH>`                | `NYX_CONFIGURATION_FILE=<PATH>`                               | N/A      |
 | [`directory`](#directory)                                 | string  | `-d <PATH>`, `--directory=<PATH>`                         | `NYX_DIRECTORY=<PATH>`                                        | Current working directory |
 | [`dryRun`](#dry-run)                                      | boolean | `--dry-run`, `--dry-run=true|false`                       | `NYX_DRY_RUN=true|false`                                      | `false`  |
 | [`initialVersion`](#initial-version)                      | string  | `--initial-version=<VERSION>`                             | `NYX_INITIAL_VERSION=<VERSION>`                               |  Depends on the configured [version scheme](#scheme) |
+| [`preset`](#preset)                                       | string  | `--preset=<NAME>`                                         | `NYX_PRESET=<NAME>`                                           | N/A      |
 | [`releaseLenient`](#release-lenient)                      | boolean | `--release-lenient`, `--release-lenient=true|false`       | `NYX_RELEASE_LENIENT=true|false`                              | `true`   |
 | [`releasePrefix`](#release-prefix)                        | string  | `--release-prefix=<PREFIX>`                               | `NYX_RELEASE_PREFIX=<PREFIX>`                                 | N/A      |
 | [`resume`](#resume)                                       | string  | `--resume`, `resume=true|false`                           | `NYX_RESUME=true|false`                                       | `false`  |
 | [`scheme`](#scheme)                                       | string  | `--scheme=<NAME>`                                         | `NYX_SCHEME=<NAME>`                                           | `semver` |
+| [`sharedConfigurationFile`](#shared-configuration-file)   | string  | `--shared-configuration-file=<PATH>`                      | `NYX_SHARED_CONFIGURATION_FILE=<PATH>`                        | N/A      |
 | [`stateFile`](#state-file)                                | string  | `--state-file=<PATH>`                                     | `NYX_STATE_FILE=<PATH>`                                       | N/A      |
 | [`verbosity`](#verbosity)                                 | string  | `--verbosity=<LEVEL>`, `--fatal`, `--error`, `--warning`, `--info`, `--debug`, `--trace` | `NYX_VERBOSITY=<LEVEL>`        | `warning`|
 | [`version`](#version)                                     | string  | `-v <VERSION>`, `--version=<VERSION>`                     | `NYX_VERSION=<VERSION>`                                       | N/A      |
@@ -42,6 +45,27 @@ Valid values for this options are the identifier names for the current version [
 Using [Semver]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/version-schemes.md %}#semantic-versioning-semver) they are `core`, `major`, `minor`. Names other than these are interpreted as pre-release identifier names so, for example, if the past version is `1.2.3` and you set this option to `alpha`, the new [`version`](#version) will be `1.2.3-alpha.1` at the first run, `1.2.3-alpha.2` the second and so on.
 
 This option has no effect if [`version`](#version) is also used.
+
+### Configuration file
+
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `configurationFile`                                                                      |
+| Type                      | string                                                                                   |
+| Default                   | N/A                                                                                      |
+| Command Line Option       | `-c <PATH>`, `--configuration-file=<PATH>`                                               |
+| Environment Variable      | `NYX_CONFIGURATION_FILE=<PATH>`                                                          |
+| Configuration File Option | `configurationFile`                                                                      |
+| Related state attributes  | [directory]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#directory){: .btn .btn--info .btn--small} |
+
+This option allows you to load a configuration file from a location other than default ones. This can be a relative or absolute path to a local file or an URL to load a remote file. This configuration file can override other options, as per the [evaluation order]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}#evaluation-order), and can be authored as `.yaml` (or `.yml`) or `.json` (the format is inferred by the file extension or JSON is used by default) just like the default configuration files.
+
+Configuration files have higher priority over [shared configuration files](#shared-configuration-file) so they can override specific options inherited from them.
+
+Consider using a [standard path for configuration files]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}#evaluation-order) before using a custom one, so you don't even need to use this option.
+{: .notice--info}
+
+In order to avoid chaining this option is ignored when defined in custom configuration files loaded by means of this same option.
+{: .notice--info}
 
 ### Directory
 
@@ -94,6 +118,21 @@ This might be useful for project bootstrapping only (from Nyx's perspective) whe
 
 This value is ignored when the [version](#version) option is used. See [this example]({{ site.baseurl }}{% link _posts/2020-01-01-git-history-examples.md %}#custom-initial-version) to see how this option can be used.
 
+### Preset
+
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `preset`                                                                                 |
+| Type                      | string                                                                                   |
+| Default                   | N/A                                                                                      |
+| Command Line Option       | `--preset=<NAME>`                                                                        |
+| Environment Variable      | `NYX_PRESET=<NAME>`                                                                      |
+| Configuration File Option | `preset`                                                                                 |
+| Related state attributes  |                                                                                          |
+
+This option allows you to import one [preset configuration]({{ site.baseurl }}{% link _pages/guide/user/04.configuration-presets/index.md %}) into your configuration to save configuration time and effort.
+
+Presets have low priority in the [evaluation order]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}#evaluation-order) so you can override their values by several means if you need to. On the other hand they are an effective way to get started in minutes using well known and tested streamlined configurations.
+
 ### Release lenient
 
 | ------------------------- | ---------------------------------------------------------------------------------------- |
@@ -132,6 +171,28 @@ Release names are not necessarily equal to versions. For example version `1.2.3`
 {: .notice--info}
 
 This option only affects the way Nyx **generates** release names and tags, while [`releaseLenient`](#release-lenient) controls how tolerant Nyx is when **reading** release tags from the Git repository.
+
+### Shared configuration file
+
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `sharedConfigurationFile`                                                                |
+| Type                      | string                                                                                   |
+| Default                   | N/A                                                                                      |
+| Command Line Option       | `--shared-configuration-file=<PATH>`                                                     |
+| Environment Variable      | `NYX_SHARED_CONFIGURATION_FILE=<PATH>`                                                   |
+| Configuration File Option | `sharedConfigurationFile`                                                                |
+| Related state attributes  |                                                                                          |
+
+This option allows you to load a **shared** configuration file from a location other than [default ones]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}#evaluation-order). This can be a relative or absolute path to a local file or an URL to load a remote file. This configuration file can be authored as `.yaml` (or `.yml`), `.json` (the format is inferred by the file extension or JSON is used by default) just like the default configuration files.
+
+Shared configuration files are meant to share a common set of configuration options among projects and they have lower priority over [regular configuration files](#configuration-file) which, in turn, can be used to override specific options inherited from shared files.
+
+Consider using a [standard path for configuration files]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}#evaluation-order) before using a custom one, so you don't even need to use this option.
+{: .notice--info}
+
+In order to avoid chaining this option is ignored when defined in custom configuration files loaded by means of this same option.
+{: .notice--info}
+
 
 ### Resume
 
@@ -180,7 +241,7 @@ The value passed here can be:
 * a relative path that will be interpreted as relative to the current working directory
 * an absolute file name
 
-Nyx will infer the format of the file by the extension, where available ones are [`.yaml`](https://yaml.org/) (or `.yml`), [`.json`](https://www.json.org/). This way, if you need to read the file for your own purposes, you can have it in the format that is more accessible to you.
+Nyx will infer the format of the file by the extension, where available ones are [`.yaml`](https://yaml.org/) (or `.yml`), [`.json`](https://www.json.org/). When unable to infer the format by the extension JSON is assumed by default. This way, if you need to read the file for your own purposes, you can have it in the format that is more accessible to you.
 
 The suggested name for the file, when used, is `.nyx-state.<EXT>` (so `.nyx-state.yaml`, `.nyx-state.yml` or `.nyx-state.json`). It's recommended to let Git [ignore](https://git-scm.com/docs/gitignore) this file.
 {: .notice--primary}
