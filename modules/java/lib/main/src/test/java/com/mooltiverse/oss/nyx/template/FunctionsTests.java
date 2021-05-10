@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.util.Objects;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -381,13 +382,13 @@ public class FunctionsTests {
         void applyTest()
             throws Exception {
             assertEquals("", new Functions.TimestampISO8601().apply(null));
-            assertEquals("1970-01-01T01:00:00", new Functions.TimestampISO8601().apply("0"));
-            assertEquals("2020-01-01T12:00:00", new Functions.TimestampISO8601().apply("1577876400000"));
+            assertEquals("1970-01-01T00:00:00", new Functions.TimestampISO8601().apply("0"));
+            assertEquals("2020-01-01T12:00:00", new Functions.TimestampISO8601().apply("1577880000000"));
 
             // also run the same tests by selecting the function by name, as the template engine does
             assertEquals("", Functions.FUNCTIONS.get("timestampISO8601").apply(null));
-            assertEquals("1970-01-01T01:00:00", Functions.FUNCTIONS.get("timestampISO8601").apply("0"));
-            assertEquals("2020-01-01T12:00:00", Functions.FUNCTIONS.get("timestampISO8601").apply("1577876400000"));
+            assertEquals("1970-01-01T00:00:00", Functions.FUNCTIONS.get("timestampISO8601").apply("0"));
+            assertEquals("2020-01-01T12:00:00", Functions.FUNCTIONS.get("timestampISO8601").apply("1577880000000"));
         }
     }
 
@@ -399,13 +400,13 @@ public class FunctionsTests {
         void applyTest()
             throws Exception {
             assertEquals("", new Functions.TimestampISO8601().apply(null));
-            assertEquals("19700101010000", new Functions.TimestampYYYYMMDDHHMMSS().apply("0"));
-            assertEquals("20200101120000", new Functions.TimestampYYYYMMDDHHMMSS().apply("1577876400000"));
+            assertEquals("19700101000000", new Functions.TimestampYYYYMMDDHHMMSS().apply("0"));
+            assertEquals("20200101120000", new Functions.TimestampYYYYMMDDHHMMSS().apply("1577880000000"));
 
             // also run the same tests by selecting the function by name, as the template engine does
             assertEquals("", Functions.FUNCTIONS.get("timestampYYYYMMDDHHMMSS").apply(null));
-            assertEquals("19700101010000", Functions.FUNCTIONS.get("timestampYYYYMMDDHHMMSS").apply("0"));
-            assertEquals("20200101120000", Functions.FUNCTIONS.get("timestampYYYYMMDDHHMMSS").apply("1577876400000"));
+            assertEquals("19700101000000", Functions.FUNCTIONS.get("timestampYYYYMMDDHHMMSS").apply("0"));
+            assertEquals("20200101120000", Functions.FUNCTIONS.get("timestampYYYYMMDDHHMMSS").apply("1577880000000"));
         }
     }
 
@@ -416,12 +417,23 @@ public class FunctionsTests {
         @DisplayName("Functions.environment.variable.apply()")
         void applyTest()
             throws Exception {
-            assertEquals("", new Functions.Environment.Variable().apply(null));
-            assertEquals(System.getenv("OS"), new Functions.Environment.Variable().apply("OS"));
+            // on CI platforms the OS variable may not be defined, causing this test to fail, so let's make it conditional
+            if (Objects.isNull(System.getenv("OS"))) {
+                assertEquals("", new Functions.Environment.Variable().apply(null));
+                assertEquals("", new Functions.Environment.Variable().apply("OS"));
 
-            // also run the same tests by selecting the function by name, as the template engine does
-            assertEquals("", Functions.FUNCTIONS.get("environment.variable").apply(null));
-            assertEquals(System.getenv("OS"), Functions.FUNCTIONS.get("environment.variable").apply("OS"));
+                // also run the same tests by selecting the function by name, as the template engine does
+                assertEquals("", Functions.FUNCTIONS.get("environment.variable").apply(null));
+                assertEquals("", Functions.FUNCTIONS.get("environment.variable").apply("OS"));
+            }
+            else {
+                assertEquals("", new Functions.Environment.Variable().apply(null));
+                assertEquals(System.getenv("OS"), new Functions.Environment.Variable().apply("OS"));
+
+                // also run the same tests by selecting the function by name, as the template engine does
+                assertEquals("", Functions.FUNCTIONS.get("environment.variable").apply(null));
+                assertEquals(System.getenv("OS"), Functions.FUNCTIONS.get("environment.variable").apply("OS"));
+            }
         }
     }
 

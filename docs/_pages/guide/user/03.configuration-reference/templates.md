@@ -324,7 +324,7 @@ Example inputs and corresponding outputs:
 
 #### `timestampISO8601`
 
-Provided a timestamp in the [unix format](https://www.unixtimestamp.com/) returns it formatted as [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601). If the input is not a Unix timestamp returns an empty string. Example:
+Provided a timestamp in the [unix format](https://www.unixtimestamp.com/) returns it formatted as [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) UTC. If the input is not a Unix timestamp returns an empty string. Example:
 
 ```
 output = "{% raw %}{{ #timestampISO8601 }}{{ timestamp }}{{ /timestampISO8601 }}{% endraw %}"
@@ -339,7 +339,7 @@ Example inputs and corresponding outputs:
 
 #### `timestampYYYYMMDDHHMMSS`
 
-Provided a timestamp in the [unix format](https://www.unixtimestamp.com/) returns it formatted as `YYYYMMDDHHMMSS`. If the input is not a Unix timestamp returns an empty string. Example:
+Provided a timestamp in the [unix format](https://www.unixtimestamp.com/) returns it formatted as `YYYYMMDDHHMMSS` UTC. If the input is not a Unix timestamp returns an empty string. Example:
 
 ```
 output = "{% raw %}{{ #timestampYYYYMMDDHHMMSS }}{{ timestamp }}{{ /timestampYYYYMMDDHHMMSS }}{% endraw %}"

@@ -6,11 +6,13 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
+import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -463,7 +465,7 @@ class Functions {
     /**
      * This function parses the input string as a {@link Long} representing a timestamp in the
      * <a href="https://www.unixtimestamp.com/">unix format</a> and returns it formatted as
-     * <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO 8601</a> timestamp.
+     * <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO 8601</a> UTC timestamp.
      */
     public static class TimestampISO8601 implements Function<String,String> {
         /**
@@ -474,7 +476,7 @@ class Functions {
         /**
          * This method parses the input string as a {@link Long} representing a timestamp in the
          * <a href="https://www.unixtimestamp.com/">unix format</a> and returns it formatted as
-         * <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO 8601</a> timestamp.
+         * <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO 8601</a> UTC timestamp.
          * If the input value fails to parse for whatever reason then the emty string is returned
          * (and an error is logged).
          * 
@@ -489,7 +491,9 @@ class Functions {
             
             try {
                 Date date = new Date(Long.valueOf(input).longValue());
-                return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(date);
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+                dateFormat.setTimeZone(TimeZone.getTimeZone(ZoneOffset.UTC));
+                return dateFormat.format(date);
             }
             catch (NumberFormatException nfe) {
                 logger.error(TEMPLATE, "String {} does not represent a valid Long timestamp", input);
@@ -501,7 +505,7 @@ class Functions {
     /**
      * This function parses the input string as a {@link Long} representing a timestamp in the
      * <a href="https://www.unixtimestamp.com/">unix format</a> and returns it formatted as
-     * {@code YYYYMMDDHHMMSS}.
+     * {@code YYYYMMDDHHMMSS} UTC.
      */
     public static class TimestampYYYYMMDDHHMMSS implements Function<String,String> {
         /**
@@ -512,7 +516,7 @@ class Functions {
         /**
          * This method parses the input string as a {@link Long} representing a timestamp in the
          * <a href="https://www.unixtimestamp.com/">unix format</a> and returns it formatted as
-         * {@code YYYYMMDDHHMMSS}.
+         * {@code YYYYMMDDHHMMSS} UTC.
          * If the input value fails to parse for whatever reason then the emty string is returned
          * (and an error is logged).
          * 
@@ -527,7 +531,9 @@ class Functions {
             
             try {
                 Date date = new Date(Long.valueOf(input).longValue());
-                return new SimpleDateFormat("yyyyMMddHHmmss").format(date);
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+                dateFormat.setTimeZone(TimeZone.getTimeZone(ZoneOffset.UTC));
+                return dateFormat.format(date);
             }
             catch (NumberFormatException nfe) {
                 logger.error(TEMPLATE, "String {} does not represent a valid Long timestamp", input);
