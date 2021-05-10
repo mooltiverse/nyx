@@ -27,6 +27,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import com.mooltiverse.oss.nyx.configuration.examples.SimplestConfigurationExample;
+import com.mooltiverse.oss.nyx.configuration.presets.Extended;
+import com.mooltiverse.oss.nyx.configuration.presets.Simple;
 import com.mooltiverse.oss.nyx.data.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.data.FileMapper;
 import com.mooltiverse.oss.nyx.data.Scheme;
@@ -1009,8 +1011,8 @@ public class ConfigurationTests {
             SimpleConfigurationLayer lowPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             SimpleConfigurationLayer highPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
-            lowPriorityConfigurationLayerMock.setPreset("low");
-            highPriorityConfigurationLayerMock.setPreset("high");
+            lowPriorityConfigurationLayerMock.setPreset(Simple.NAME);
+            highPriorityConfigurationLayerMock.setPreset(Extended.NAME);
             
             // inject the plugin configuration and test the new value is returned from that
             configuration.withPluginConfiguration(lowPriorityConfigurationLayerMock);

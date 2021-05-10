@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mooltiverse.oss.nyx.configuration;
+package com.mooltiverse.oss.nyx.configuration.presets;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
@@ -30,59 +30,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-@DisplayName("CommitMessageConvention")
-public class CommitMessageConventionTests {
-    /**
-     * The regular expression that can be used to match headline fields in commit messages. The regex defines 4 named groups:<br>
-     * - 'type' is the commit type<br>
-     * - 'breaking' is the optional exlamation mark after the type<br>
-     * - 'scope' is the commit scope (optional)<br>
-     * - 'title' is the commit short description<br>
-     * <br>
-     * This expression only considers the first line while others are ignored.
-     * <br>
-     * IMPLEMENTATION NOTE:<br>
-     * If Java regex supported duplicated named group|pattern names we could transform this expression into:
-     *      ^(?<type>[a-zA-Z0-9_]+)(?<breaking>!)?(\((?<scope>[a-z ]+)\))?:(\s(?<title>.+))?(^(?<breaking>BREAKING(\s|-)CHANGE:\s.+)|\X)*
-     * so we could have just one expression, avoiding using also {@link #BREAKING_CHANGE_REGEX}. But this uses the 'breaking' named group
-     * twice, which indeed is not supported by Java.
-     * If we could do this the single 'breaking' group could match the exclamation mark after the {@code type} AND the BREAKING CHANGE
-     * footers, making the regex a little more complicated, but the code lighter.
-     * Conclusion is: in order to cope with Conventional Commit breaking changes, we must have and evaluate 2 expressions.
-     */
-    private static final String CONVENTIONAL_COMMITS_REGEX = "(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))$(?s).*";
-
-    /**
-     * The map of regular expressions used to determine which version identifier to bump, if any.
-     * Each map entry key is the name of the version identifier if the expression (the entry value) matches the expression.
-     */
-    private static final Map<String,String> CONVENTIONAL_COMMITS_BUMP_REGEXES = Map.<String,String>of(
-        "major", "(?s)(?m)^[a-zA-Z0-9_]+(!|.*^(BREAKING( |-)CHANGE: )).*",
-        "minor", "(?s)(?m)^feat(?!!|.*^(BREAKING( |-)CHANGE: )).*",
-        "patch", "(?s)(?m)^fix(?!!|.*^(BREAKING( |-)CHANGE: )).*"
-    );
-
-    /**
-     * The regular expression that can be used to match Gitmojis in any message.
-     * <br>
-     * This expression defines two named groups that can be used to retrieve fields:<br>
-     * - 'type': the emoji identifier (without the leading and trailing colons)
-     * - 'title': the message title (the content of the first line, without the leading emoji)
-     */
-    private static final String GITMOJI_REGEX = "(?m)^(:(?<type>[a-zA-Z0-9_]+):)( (?<title>.+))?$(?s).*";
-
-    /**
-     * The map of regular expressions used to determine which version identifier to bump, if any.
-     * Each map entry key is the name of the version identifier if the expression (the entry value) matches the expression.
-     * 
-     * These entries are taken from <a href="https://github.com/carloscuesta/gitmoji/blob/master/src/data/gitmojis.json"/>.
-     */
-    private static final Map<String,String> GITMOJI_BUMP_REGEXES = Map.<String,String>of(
-        "major", "(?m)^:boom:(?s).*",
-        "minor", "(?m)^:sparkles:(?s).*",
-        "patch", "(?m)^:(zap|bug|ambulance|lipstick|lock|arrow_down|arrow_up|pushpin|chart_with_upwards_trend|heavy_plus_sign|heavy_minus_sign|wrench|globe_with_meridians|pencil2|rewind|package|alien|bento|wheelchair|speech_balloon|card_file_box|children_crossing|iphone|egg|alembic|mag|label|triangular_flag_on_post|goal_net|dizzy|wastebasket|passport_control|adhesive_bandage):(?s).*"
-    );
-
+@DisplayName("CommitMessageConventions")
+public class CommitMessageConventionsTests {
     /**
      * A {@link MethodSource} method that returns valid structured data to test commit messages using Conventional Commits.
      * Each returned argument has the fields:<br>
@@ -172,16 +121,16 @@ public class CommitMessageConventionTests {
         @DisplayName("ConventionalCommits positive match")
         class MatchTests {
             @ParameterizedTest(name = "Conventional commits convention regex matches")
-            @MethodSource("com.mooltiverse.oss.nyx.configuration.CommitMessageConventionTests#wellKnownValidConventionalCommitsMessages")
+            @MethodSource("com.mooltiverse.oss.nyx.configuration.presets.CommitMessageConventionsTests#wellKnownValidConventionalCommitsMessages")
             void positiveMatch(String message, String type, String scope, String title, String bump) {
-                Matcher m = Pattern.compile(CONVENTIONAL_COMMITS_REGEX).matcher(message);
+                Matcher m = Pattern.compile(CommitMessageConventions.CONVENTIONAL_COMMITS.getExpression()).matcher(message);
                 assertTrue(m.matches());
             }
 
             @ParameterizedTest(name = "Conventional commits convention regex does not match")
-            @MethodSource("com.mooltiverse.oss.nyx.configuration.CommitMessageConventionTests#wellKnownInvalidConventionalCommitsMessages")
+            @MethodSource("com.mooltiverse.oss.nyx.configuration.presets.CommitMessageConventionsTests#wellKnownInvalidConventionalCommitsMessages")
             void negativeMatch(String message) {
-                Matcher m = Pattern.compile(CONVENTIONAL_COMMITS_REGEX).matcher(message);
+                Matcher m = Pattern.compile(CommitMessageConventions.CONVENTIONAL_COMMITS.getExpression()).matcher(message);
                 assertFalse(m.matches());
             }
         }
@@ -190,9 +139,9 @@ public class CommitMessageConventionTests {
         @DisplayName("ConventionalCommits commit type")
         class CommitTypeTests {
             @ParameterizedTest(name = "Conventional commits convention regex type == ''{1}''")
-            @MethodSource("com.mooltiverse.oss.nyx.configuration.CommitMessageConventionTests#wellKnownValidConventionalCommitsMessages")
+            @MethodSource("com.mooltiverse.oss.nyx.configuration.presets.CommitMessageConventionsTests#wellKnownValidConventionalCommitsMessages")
             void getCommitType(String message, String type, String scope, String title, String bump) {
-                Matcher m = Pattern.compile(CONVENTIONAL_COMMITS_REGEX).matcher(message);
+                Matcher m = Pattern.compile(CommitMessageConventions.CONVENTIONAL_COMMITS.getExpression()).matcher(message);
                 m.find();
                 if (!Objects.isNull(type))
                     assertEquals(type, m.group("type"));
@@ -203,9 +152,9 @@ public class CommitMessageConventionTests {
         @DisplayName("ConventionalCommits commit scope")
         class CommitScopeTests {
             @ParameterizedTest(name = "Conventional commits convention regex scope == ''{2}''")
-            @MethodSource("com.mooltiverse.oss.nyx.configuration.CommitMessageConventionTests#wellKnownValidConventionalCommitsMessages")
+            @MethodSource("com.mooltiverse.oss.nyx.configuration.presets.CommitMessageConventionsTests#wellKnownValidConventionalCommitsMessages")
             void getCommitScope(String message, String type, String scope, String title, String bump) {
-                Matcher m = Pattern.compile(CONVENTIONAL_COMMITS_REGEX).matcher(message);
+                Matcher m = Pattern.compile(CommitMessageConventions.CONVENTIONAL_COMMITS.getExpression()).matcher(message);
                 m.find();
                 if (!Objects.isNull(scope))
                     assertEquals(scope, m.group("scope"));
@@ -216,9 +165,9 @@ public class CommitMessageConventionTests {
         @DisplayName("ConventionalCommits commit title")
         class CommitTitleTests {
             @ParameterizedTest(name = "Conventional commits convention regex title == ''{3}''")
-            @MethodSource("com.mooltiverse.oss.nyx.configuration.CommitMessageConventionTests#wellKnownValidConventionalCommitsMessages")
+            @MethodSource("com.mooltiverse.oss.nyx.configuration.presets.CommitMessageConventionsTests#wellKnownValidConventionalCommitsMessages")
             void getCommitTitle(String message, String type, String scope, String title, String bump) {
-                Matcher m = Pattern.compile(CONVENTIONAL_COMMITS_REGEX).matcher(message);
+                Matcher m = Pattern.compile(CommitMessageConventions.CONVENTIONAL_COMMITS.getExpression()).matcher(message);
                 m.find();
                 if (!Objects.isNull(title))
                     assertEquals(title, m.group("title"));
@@ -229,10 +178,10 @@ public class CommitMessageConventionTests {
         @DisplayName("ConventionalCommits bump component")
         class BumpComponentTests {
             @ParameterizedTest(name = "Conventional commits convention regex bump component == ''{4}''")
-            @MethodSource("com.mooltiverse.oss.nyx.configuration.CommitMessageConventionTests#wellKnownValidConventionalCommitsMessages")
+            @MethodSource("com.mooltiverse.oss.nyx.configuration.presets.CommitMessageConventionsTests#wellKnownValidConventionalCommitsMessages")
             void getBumpComponent(String message, String type, String scope, String title, String bump) {
                 if (!Objects.isNull(bump)) {
-                    for (Map.Entry<String,String> entry: CONVENTIONAL_COMMITS_BUMP_REGEXES.entrySet()) {
+                    for (Map.Entry<String,String> entry: CommitMessageConventions.CONVENTIONAL_COMMITS.getBumpExpressions().entrySet()) {
                         Matcher m = Pattern.compile(entry.getValue()).matcher(message);
                         if (bump.equals(entry.getKey()))
                             assertTrue(m.matches());
@@ -250,16 +199,16 @@ public class CommitMessageConventionTests {
         @DisplayName("Gitmoji positive match")
         class MatchTests {
             @ParameterizedTest(name = "Gitmoji convention regex matches")
-            @MethodSource("com.mooltiverse.oss.nyx.configuration.CommitMessageConventionTests#wellKnownValidGitMojiMessages")
+            @MethodSource("com.mooltiverse.oss.nyx.configuration.presets.CommitMessageConventionsTests#wellKnownValidGitMojiMessages")
             void positiveMatch(String message, String type, String scope, String title, String bump) {
-                Matcher m = Pattern.compile(GITMOJI_REGEX).matcher(message);
+                Matcher m = Pattern.compile(CommitMessageConventions.GITMOJI.getExpression()).matcher(message);
                 assertTrue(m.matches());
             }
 
             @ParameterizedTest(name = "Gitmoji convention regex does not match")
-            @MethodSource("com.mooltiverse.oss.nyx.configuration.CommitMessageConventionTests#wellKnownInvalidGitMojiMessages")
+            @MethodSource("com.mooltiverse.oss.nyx.configuration.presets.CommitMessageConventionsTests#wellKnownInvalidGitMojiMessages")
             void negativeMatch(String message) {
-                Matcher m = Pattern.compile(GITMOJI_REGEX).matcher(message);
+                Matcher m = Pattern.compile(CommitMessageConventions.GITMOJI.getExpression()).matcher(message);
                 assertFalse(m.matches());
             }
         }
@@ -268,9 +217,9 @@ public class CommitMessageConventionTests {
         @DisplayName("Gitmoji commit type")
         class CommitTypeTests {
             @ParameterizedTest(name = "Gitmoji convention regex type == ''{1}''")
-            @MethodSource("com.mooltiverse.oss.nyx.configuration.CommitMessageConventionTests#wellKnownValidGitMojiMessages")
+            @MethodSource("com.mooltiverse.oss.nyx.configuration.presets.CommitMessageConventionsTests#wellKnownValidGitMojiMessages")
             void getCommitType(String message, String type, String scope, String title, String bump) {
-                Matcher m = Pattern.compile(GITMOJI_REGEX).matcher(message);
+                Matcher m = Pattern.compile(CommitMessageConventions.GITMOJI.getExpression()).matcher(message);
                 m.find();
                 if (!Objects.isNull(type))
                     assertEquals(type, m.group("type"));
@@ -281,9 +230,9 @@ public class CommitMessageConventionTests {
         @DisplayName("Gitmoji commit scope")
         class CommitScopeTests {
             @ParameterizedTest(name = "Gitmoji convention regex scope == ''{2}''")
-            @MethodSource("com.mooltiverse.oss.nyx.configuration.CommitMessageConventionTests#wellKnownValidGitMojiMessages")
+            @MethodSource("com.mooltiverse.oss.nyx.configuration.presets.CommitMessageConventionsTests#wellKnownValidGitMojiMessages")
             void getCommitScope(String message, String type, String scope, String title, String bump) {
-                Matcher m = Pattern.compile(GITMOJI_REGEX).matcher(message);
+                Matcher m = Pattern.compile(CommitMessageConventions.GITMOJI.getExpression()).matcher(message);
                 m.find();
                 if (!Objects.isNull(scope))
                     assertEquals(scope, m.group("scope"));
@@ -294,9 +243,9 @@ public class CommitMessageConventionTests {
         @DisplayName("Gitmoji commit title")
         class CommitTitleTests {
             @ParameterizedTest(name = "Gitmoji convention regex title == ''{3}''")
-            @MethodSource("com.mooltiverse.oss.nyx.configuration.CommitMessageConventionTests#wellKnownValidGitMojiMessages")
+            @MethodSource("com.mooltiverse.oss.nyx.configuration.presets.CommitMessageConventionsTests#wellKnownValidGitMojiMessages")
             void getCommitTitle(String message, String type, String scope, String title, String bump) {
-                Matcher m = Pattern.compile(GITMOJI_REGEX).matcher(message);
+                Matcher m = Pattern.compile(CommitMessageConventions.GITMOJI.getExpression()).matcher(message);
                 m.find();
                 if (!Objects.isNull(title))
                     assertEquals(title, m.group("title"));
@@ -307,10 +256,10 @@ public class CommitMessageConventionTests {
         @DisplayName("Gitmoji bump component")
         class BumpComponentTests {
             @ParameterizedTest(name = "Gitmoji convention regex bump component == ''{4}''")
-            @MethodSource("com.mooltiverse.oss.nyx.configuration.CommitMessageConventionTests#wellKnownValidGitMojiMessages")
+            @MethodSource("com.mooltiverse.oss.nyx.configuration.presets.CommitMessageConventionsTests#wellKnownValidGitMojiMessages")
             void getBumpComponent(String message, String type, String scope, String title, String bump) {
                 if (!Objects.isNull(bump)) {
-                    for (Map.Entry<String,String> entry: GITMOJI_BUMP_REGEXES.entrySet()) {
+                    for (Map.Entry<String,String> entry: CommitMessageConventions.GITMOJI.getBumpExpressions().entrySet()) {
                         Matcher m = Pattern.compile(entry.getValue()).matcher(message);
                         if (bump.equals(entry.getKey()))
                             assertTrue(m.matches());

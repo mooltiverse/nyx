@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mooltiverse.oss.nyx.Nyx;
+import com.mooltiverse.oss.nyx.configuration.presets.Presets;
 import com.mooltiverse.oss.nyx.data.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.data.CommitMessageConventions;
 import com.mooltiverse.oss.nyx.data.DataAccessException;
@@ -185,7 +186,7 @@ public class Configuration implements Root {
         }
         else {
             logger.debug(CONFIGURATION, "Loading preset configuration {}", getPreset());
-            //layers.put(LayerPriority.PRESET, /* TODO: load the preset class here */null);
+            layers.put(LayerPriority.PRESET, Presets.byName(getPreset()));
             logger.debug(CONFIGURATION, "Preset configuration {} loaded", getPreset());
         }
     }
