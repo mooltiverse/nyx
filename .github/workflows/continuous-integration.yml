@@ -45,7 +45,7 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Assemble with Gradle
-      run: ./gradlew assemble --build-cache --stacktrace --debug
+      run: ./gradlew assemble --build-cache --stacktrace
     - name: Archive Nyx state file
       uses: actions/upload-artifact@v2
       if: ${{ always() }}
@@ -85,7 +85,7 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Run Unit Tests with Gradle
-      run: ./gradlew test --build-cache --stacktrace --debug
+      run: ./gradlew test --build-cache --stacktrace
     - name: Run Integration Tests with Gradle
       run: ./gradlew integrationTest --build-cache --stacktrace
     - name: Run Functional Tests with Gradle

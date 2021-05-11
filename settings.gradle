@@ -4,7 +4,7 @@
 ------------------------------------------------------------------------------*/
 plugins {
   // use our own plugin
-  id "com.mooltiverse.oss.nyx" version "0.1.0-alpha.27"
+  id "com.mooltiverse.oss.nyx" version "0.1.0-alpha.29"
 }
 
 /*------------------------------------------------------------------------------
@@ -27,18 +27,6 @@ include 'modules:java:gradle'
 ------------------------------------------------------------------------------*/
 nyx {
   bump          = 'alpha' // for the time being just bump the 'alpha' pre-release identifier, until we have release types implemented
+  preset        = 'simple'
   stateFile     = file('build/.nyx-state.json')
-  commitMessageConventions {
-    enabled = ['conventionalCommits']
-    items {
-      conventionalCommits {
-        expression = '(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))$(?s).*'
-        bumpExpressions {
-          major = '(?s)(?m)^[a-zA-Z0-9_]+(!|.*^(BREAKING( |-)CHANGE: )).*'
-          minor = '(?s)(?m)^feat(?!!|.*^(BREAKING( |-)CHANGE: )).*'
-          patch = '(?s)(?m)^fix(?!!|.*^(BREAKING( |-)CHANGE: )).*'
-        }
-      }
-    }
-  }
 }
