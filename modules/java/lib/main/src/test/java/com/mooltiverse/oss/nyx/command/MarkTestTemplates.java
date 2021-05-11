@@ -722,7 +722,7 @@ public class MarkTestTemplates {
         @TestTemplate
         @DisplayName("Mark.run() on repository with simple linear commit history and non significant commits, with bump=major override > yield to new tag but no new commit")
         @Baseline(Scenario.ONE_BRANCH_SHORT)
-        void runWithBumpMajorOverrideInRepoWithFurtherNonSignificantCommitsTestTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script, @Baseline(Scenario.FROM_SCRATCH) Script remoteScript)
+        void runWithBumpMajorOverrideInRepoWithFurtherNonSignificantCommitsTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script, @Baseline(Scenario.FROM_SCRATCH) Script remoteScript)
             throws Exception {
             final String CUSTOM_BUMP = "major";
             script.addRemote(remoteScript.getGitDirectory(), "origin");
@@ -756,7 +756,7 @@ public class MarkTestTemplates {
         @TestTemplate
         @DisplayName("Mark.run() on repository with simple linear commit history and non significant commits, with bump=minor override > yield to new tag but no new commit")
         @Baseline(Scenario.ONE_BRANCH_SHORT)
-        void runWithBumpMinorOverrideInRepoWithFurtherNonSignificantCommitsTestTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script, @Baseline(Scenario.FROM_SCRATCH) Script remoteScript)
+        void runWithBumpMinorOverrideInRepoWithFurtherNonSignificantCommitsTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script, @Baseline(Scenario.FROM_SCRATCH) Script remoteScript)
             throws Exception {
             final String CUSTOM_BUMP = "minor";
             script.addRemote(remoteScript.getGitDirectory(), "origin");
@@ -790,7 +790,7 @@ public class MarkTestTemplates {
         @TestTemplate
         @DisplayName("Mark.run() on repository with simple linear commit history and non significant commits, with bump=patch override > yield to new tag but no new commit")
         @Baseline(Scenario.ONE_BRANCH_SHORT)
-        void runWithBumpPatchOverrideInRepoWithFurtherNonSignificantCommitsTestTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script, @Baseline(Scenario.FROM_SCRATCH) Script remoteScript)
+        void runWithBumpPatchOverrideInRepoWithFurtherNonSignificantCommitsTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script, @Baseline(Scenario.FROM_SCRATCH) Script remoteScript)
             throws Exception {
             final String CUSTOM_BUMP = "patch";
             script.addRemote(remoteScript.getGitDirectory(), "origin");
@@ -824,7 +824,7 @@ public class MarkTestTemplates {
         @TestTemplate
         @DisplayName("Mark.run() on repository with simple linear commit history and non significant commits, with bump=alpha override > yield to new tag but no new commit")
         @Baseline(Scenario.ONE_BRANCH_SHORT)
-        void runWithBumpAlphaOverrideInRepoWithFurtherNonSignificantCommitsTestTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script, @Baseline(Scenario.FROM_SCRATCH) Script remoteScript)
+        void runWithBumpAlphaOverrideInRepoWithFurtherNonSignificantCommitsTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script, @Baseline(Scenario.FROM_SCRATCH) Script remoteScript)
             throws Exception {
             final String CUSTOM_BUMP = "alpha";
             script.addRemote(remoteScript.getGitDirectory(), "origin");
@@ -858,7 +858,7 @@ public class MarkTestTemplates {
         @TestTemplate
         @DisplayName("Mark.run() on repository with simple linear commit history and non significant commits, with release lenient, without prefix > yield to new tag but no new commit")
         @Baseline(Scenario.INITIAL_VERSION)
-        void runWithReleaseLenientAndWithoutPrefixInRepoWithFurtherNonSignificantPrefixedCommitsTestTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script, @Baseline(Scenario.FROM_SCRATCH) Script remoteScript)
+        void runWithReleaseLenientAndWithoutPrefixInRepoWithFurtherNonSignificantPrefixedCommitsTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script, @Baseline(Scenario.FROM_SCRATCH) Script remoteScript)
             throws Exception {
             script.addRemote(remoteScript.getGitDirectory(), "origin");
             script.andCommitWithTag("release-2.2.2");
@@ -892,7 +892,7 @@ public class MarkTestTemplates {
         @TestTemplate
         @DisplayName("Mark.run() on repository with simple linear commit history and non significant commits, without release lenient, without prefix > yield to no new tag or commit")
         @Baseline(Scenario.ONE_BRANCH_SHORT)
-        void runWithoutReleaseLenientAndWithoutPrefixInRepoWithFurtherNonSignificantPrefixedCommitsTestTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script, @Baseline(Scenario.FROM_SCRATCH) Script remoteScript)
+        void runWithoutReleaseLenientAndWithoutPrefixInRepoWithFurtherNonSignificantPrefixedCommitsTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script, @Baseline(Scenario.FROM_SCRATCH) Script remoteScript)
             throws Exception {
             script.addRemote(remoteScript.getGitDirectory(), "origin");
             script.andCommitWithTag("release-2.2.2");

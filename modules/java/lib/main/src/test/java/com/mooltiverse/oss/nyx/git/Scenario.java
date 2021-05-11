@@ -62,8 +62,9 @@ public enum Scenario {
     ),
 
     /**
-     * The scenario where the Git repository has been created with just one commit after the initial commit.
-     * The latest commit is tagged as {@code 0.1.0}.
+     * The scenario where the Git repository has been created with a few tagged commits plus a couple of trailing
+     * untagged commits.
+     * The latest commit is tagged as {@code 0.4.0}.
      * This yields to a repository like:
      * 
      * <pre>
@@ -88,7 +89,34 @@ public enum Scenario {
 
     /**
      * The scenario where the Git repository has been created with just one commit after the initial commit.
-     * The latest commit is tagged as {@code 0.1.0}.
+     * The latest tagged commit has overlapping tags, applied in reverse order, and is useful to test which
+     * one is selected for bumping.
+     * This yields to a repository like:
+     * 
+     * <pre>
+     *   * b875514 (HEAD -> master) Untagged commit #2
+     *   * 7c88def Untagged commit #1
+     *   * 7d410cf (tag: 0.0.6, tag: 0.0.5, tag: 0.0.4) Commit smm
+     *   * c99087c (tag: 0.0.3) Commit vkh
+     *   * 7a24383 (tag: 0.0.2) Commit liu
+     *   * 5b53015 (tag: 0.0.1) Commit tjk
+     *   * 6018fc3 Initial commit
+     * </pre>
+     */
+    ONE_BRANCH_WITH_OVERLAPPING_TAGS( f -> Script.fromScratch(f).andAddFiles()
+        .andCommit("Initial commit")
+        .andCommitWithTag("0.0.1")
+        .andCommitWithTag("0.0.2", "Annotated tag to commit 0.0.2")
+        .andCommitWithTag("0.0.3")
+        .andCommitWithTag("0.0.6", "Annotated tag to commit 0.0.6")
+        .andTag("0.0.5", null)
+        .andTag("0.0.4", null)
+        .andCommit("Untagged commit #1")
+        .andCommit("Untagged commit #2")
+    ),
+
+    /**
+     * The scenario where the Git repository has been created with two unmerged branches.
      * This yields to a repository like:
      * 
      * <pre>
@@ -129,8 +157,7 @@ public enum Scenario {
     ),
 
     /**
-     * The scenario where the Git repository has been created with just one commit after the initial commit.
-     * The latest commit is tagged as {@code 0.1.0}.
+     * The scenario where the Git repository has been created with two merged branches.
      * This yields to a repository like:
      * 
      * <pre>

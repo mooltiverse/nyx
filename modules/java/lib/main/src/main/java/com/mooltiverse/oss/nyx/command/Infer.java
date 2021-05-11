@@ -206,12 +206,15 @@ public class Infer extends AbstractCommand {
                 // If this commit has tags that make it the 'previous version commit' then the release scope
                 // previousVersion and previousVersionCommit are set and this commit closes the release scope
                 // (without being part of it), otherwise this is just another commit that belongs to the scope
+                // If the commit has multiple valid version tags they are all evaluated and compared to select the greatest
                 for (Tag tag: c.getTags()) {
                     if (releaseLenient ? Versions.isLegal(scheme.getScheme(), tag.getName(), releaseLenient) : Versions.isLegal(scheme.getScheme(), tag.getName(), releasePrefix)) {
-                        logger.debug(COMMAND, "Tag {} is a valid {} version and is used as the previousVersion. Likewise, {} is used as the previousVersionCommit", tag.getName(), scheme.toString(), c.getSHA());
-                        state().getReleaseScope().setPreviousVersion(tag.getName());
-                        state().getReleaseScope().setPreviousVersionCommit(c.getSHA());
-                        break;
+                        final int comparison = releaseLenient ? Versions.compare(scheme.getScheme(), tag.getName(), state().getReleaseScope().getPreviousVersion(), releaseLenient) : Versions.compare(scheme.getScheme(), tag.getName(), state().getReleaseScope().getPreviousVersion(), releasePrefix);
+                        if (comparison > 0) {
+                            logger.debug(COMMAND, "Tag {} is a valid {} version and is greater than any previously selected version so is used as the previousVersion. Likewise, {} is used as the previousVersionCommit", tag.getName(), scheme.toString(), c.getSHA());
+                            state().getReleaseScope().setPreviousVersion(tag.getName());
+                            state().getReleaseScope().setPreviousVersionCommit(c.getSHA());
+                        }
                     }
                     else {
                         logger.debug(COMMAND, "Tag {} is not a valid {} version", tag.getName(), scheme.toString());

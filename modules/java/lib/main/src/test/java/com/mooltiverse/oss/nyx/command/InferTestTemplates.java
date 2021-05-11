@@ -543,7 +543,7 @@ public class InferTestTemplates {
         @TestTemplate
         @DisplayName("Infer.run() on repository with simple linear commit history and non significant commits, with bump=major override > yield to new version and release")
         @Baseline(Scenario.ONE_BRANCH_SHORT)
-        void runWithBumpMajorOverrideInRepoWithFurtherNonSignificantCommitsTestTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
+        void runWithBumpMajorOverrideInRepoWithFurtherNonSignificantCommitsTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
             final String CUSTOM_BUMP = "major";
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
@@ -567,7 +567,7 @@ public class InferTestTemplates {
         @TestTemplate
         @DisplayName("Infer.run() on repository with simple linear commit history and non significant commits, with bump=minor override > yield to new version and release")
         @Baseline(Scenario.ONE_BRANCH_SHORT)
-        void runWithBumpMinorOverrideInRepoWithFurtherNonSignificantCommitsTestTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
+        void runWithBumpMinorOverrideInRepoWithFurtherNonSignificantCommitsTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
             final String CUSTOM_BUMP = "minor";
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
@@ -591,7 +591,7 @@ public class InferTestTemplates {
         @TestTemplate
         @DisplayName("Infer.run() on repository with simple linear commit history and non significant commits, with bump=patch override > yield to new version and release")
         @Baseline(Scenario.ONE_BRANCH_SHORT)
-        void runWithBumpPatchOverrideInRepoWithFurtherNonSignificantCommitsTestTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
+        void runWithBumpPatchOverrideInRepoWithFurtherNonSignificantCommitsTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
             final String CUSTOM_BUMP = "patch";
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
@@ -615,7 +615,7 @@ public class InferTestTemplates {
         @TestTemplate
         @DisplayName("Infer.run() on repository with simple linear commit history and non significant commits, with bump=alpha override > yield to new version and release")
         @Baseline(Scenario.ONE_BRANCH_SHORT)
-        void runWithBumpAlphaOverrideInRepoWithFurtherNonSignificantCommitsTestTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
+        void runWithBumpAlphaOverrideInRepoWithFurtherNonSignificantCommitsTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
             final String CUSTOM_BUMP = "alpha";
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
@@ -639,7 +639,7 @@ public class InferTestTemplates {
         @TestTemplate
         @DisplayName("Infer.run() on repository with simple linear commit history and non significant commits, with release lenient, without prefix > yield to new version and release")
         @Baseline(Scenario.ONE_BRANCH_SHORT)
-        void runWithReleaseLenientAndWithoutPrefixInRepoWithFurtherNonSignificantPrefixedCommitsTestTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
+        void runWithReleaseLenientAndWithoutPrefixInRepoWithFurtherNonSignificantPrefixedCommitsTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
@@ -663,7 +663,7 @@ public class InferTestTemplates {
         @TestTemplate
         @DisplayName("Infer.run() on repository with simple linear commit history and non significant commits, without release lenient, without prefix > yield to no new version or release")
         @Baseline(Scenario.ONE_BRANCH_SHORT)
-        void runWithoutReleaseLenientAndWithoutPrefixInRepoWithFurtherNonSignificantPrefixedCommitsTestTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
+        void runWithoutReleaseLenientAndWithoutPrefixInRepoWithFurtherNonSignificantPrefixedCommitsTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
@@ -687,7 +687,7 @@ public class InferTestTemplates {
         @TestTemplate
         @DisplayName("Infer.run() on repository with simple linear commit history and non significant commits, without release lenient, with prefix > yield to no new version or release")
         @Baseline(Scenario.ONE_BRANCH_SHORT)
-        void runWithoutReleaseLenientAndWithPrefixInRepoWithFurtherNonSignificantPrefixedCommitsTestTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
+        void runWithoutReleaseLenientAndWithPrefixInRepoWithFurtherNonSignificantPrefixedCommitsTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
@@ -712,7 +712,7 @@ public class InferTestTemplates {
         @TestTemplate
         @DisplayName("Infer.run() on repository with simple linear commit history and non significant commits, with a commit message convention that accepts all commits as significant > yield to new version and release")
         @Baseline(Scenario.ONE_BRANCH_SHORT)
-        void runWithAlwayspositiveCommitConventionInRepoWithFurtherNonSignificantPrefixedCommitsTestTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
+        void runWithAlwaysPositiveCommitConventionInRepoWithFurtherNonSignificantPrefixedCommitsTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
@@ -734,6 +734,30 @@ public class InferTestTemplates {
             assertTrue(command.state().getNewVersion());
             assertTrue(command.state().getNewRelease());
             assertEquals("0.1.0", command.state().getVersion());
+        }
+
+        @TestTemplate
+        @DisplayName("Infer.run() on repository with simple linear commit history and a commit with overlapping valid tags > yield to new version and release")
+        @Baseline(Scenario.ONE_BRANCH_WITH_OVERLAPPING_TAGS)
+        void runInRepoWithOverlappingTagsCommitTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
+            throws Exception {
+            final String CUSTOM_BUMP = "patch";
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            configurationLayerMock.setBump(CUSTOM_BUMP);
+            command.run();
+
+            assertEquals("patch", command.state().getBump());
+            assertEquals(Defaults.SCHEME, command.state().getScheme());
+            assertEquals(2, command.state().getReleaseScope().getCommits().size());
+            assertEquals(script.getCommitIDs().get(1), command.state().getReleaseScope().getInitialCommit());
+            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getFinalCommit());
+            assertEquals("0.0.6", command.state().getReleaseScope().getPreviousVersion());
+            assertEquals(script.getCommitByTag("0.0.6"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
+            assertTrue(command.state().getNewVersion());
+            assertTrue(command.state().getNewRelease());
+            assertEquals("0.0.7", command.state().getVersion());
         }
     }
 }
