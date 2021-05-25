@@ -164,6 +164,7 @@ public class MarkTestTemplates {
 
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
             if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
+                assertEquals("master", command.state().getBranch());
                 assertEquals(Defaults.BUMP, command.state().getBump());
                 assertEquals(Defaults.SCHEME, command.state().getScheme());
                 assertEquals(1, command.state().getReleaseScope().getCommits().size());
@@ -197,6 +198,7 @@ public class MarkTestTemplates {
 
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
             if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
+                assertEquals("master", command.state().getBranch());
                 assertEquals(Defaults.BUMP, command.state().getBump());
                 assertEquals(Defaults.SCHEME, command.state().getScheme());
                 assertEquals(1, command.state().getReleaseScope().getCommits().size());
@@ -231,6 +233,7 @@ public class MarkTestTemplates {
 
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
             if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
+                assertNull(command.state().getBranch());
                 assertEquals(Defaults.BUMP, command.state().getBump());
                 assertEquals(Defaults.SCHEME, command.state().getScheme());
                 assertEquals(1, command.state().getReleaseScope().getCommits().size());
@@ -265,6 +268,7 @@ public class MarkTestTemplates {
 
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
             if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
+                assertEquals("master", command.state().getBranch());
                 assertEquals(CUSTOM_BUMP, command.state().getBump());
                 assertEquals(Defaults.SCHEME, command.state().getScheme());
                 assertEquals(2, command.state().getReleaseScope().getCommits().size());
@@ -299,6 +303,7 @@ public class MarkTestTemplates {
 
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
             if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
+                assertEquals("master", command.state().getBranch());
                 assertEquals(CUSTOM_BUMP, command.state().getBump());
                 assertEquals(Defaults.SCHEME, command.state().getScheme());
                 assertEquals(2, command.state().getReleaseScope().getCommits().size());
@@ -333,6 +338,7 @@ public class MarkTestTemplates {
 
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
             if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
+                assertEquals("master", command.state().getBranch());
                 assertEquals(CUSTOM_BUMP, command.state().getBump());
                 assertEquals(Defaults.SCHEME, command.state().getScheme());
                 assertEquals(2, command.state().getReleaseScope().getCommits().size());
@@ -367,6 +373,7 @@ public class MarkTestTemplates {
 
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
             if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
+                assertEquals("master", command.state().getBranch());
                 assertEquals(CUSTOM_BUMP, command.state().getBump());
                 assertEquals(Defaults.SCHEME, command.state().getScheme());
                 assertEquals(2, command.state().getReleaseScope().getCommits().size());
@@ -401,6 +408,7 @@ public class MarkTestTemplates {
 
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
             if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
+                assertEquals("master", command.state().getBranch());
                 assertEquals(CUSTOM_BUMP, command.state().getBump());
                 assertEquals(Defaults.SCHEME, command.state().getScheme());
                 assertEquals(0, command.state().getReleaseScope().getCommits().size());
@@ -435,6 +443,7 @@ public class MarkTestTemplates {
 
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
             if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
+                assertEquals("master", command.state().getBranch());
                 assertEquals(CUSTOM_BUMP, command.state().getBump());
                 assertEquals(Defaults.SCHEME, command.state().getScheme());
                 assertEquals(0, command.state().getReleaseScope().getCommits().size());
@@ -469,6 +478,7 @@ public class MarkTestTemplates {
 
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
             if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
+                assertEquals("master", command.state().getBranch());
                 assertEquals(CUSTOM_BUMP, command.state().getBump());
                 assertEquals(Defaults.SCHEME, command.state().getScheme());
                 assertEquals(0, command.state().getReleaseScope().getCommits().size());
@@ -503,6 +513,7 @@ public class MarkTestTemplates {
 
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
             if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
+                assertEquals("master", command.state().getBranch());
                 assertEquals(CUSTOM_BUMP, command.state().getBump());
                 assertEquals(Defaults.SCHEME, command.state().getScheme());
                 assertEquals(0, command.state().getReleaseScope().getCommits().size());
@@ -537,6 +548,7 @@ public class MarkTestTemplates {
 
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
             if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
+                assertEquals("master", command.state().getBranch());
                 assertEquals(Defaults.BUMP, command.state().getBump());
                 assertEquals(Defaults.SCHEME, command.state().getScheme());
                 assertEquals(0, command.state().getReleaseScope().getCommits().size());
@@ -571,6 +583,7 @@ public class MarkTestTemplates {
 
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
             if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
+                assertEquals("master", command.state().getBranch());
                 assertEquals(Defaults.BUMP, command.state().getBump());
                 assertEquals(Defaults.SCHEME, command.state().getScheme());
                 assertEquals(1, command.state().getReleaseScope().getCommits().size());
@@ -606,6 +619,7 @@ public class MarkTestTemplates {
 
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
             if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
+                assertEquals("master", command.state().getBranch());
                 assertEquals(Defaults.BUMP, command.state().getBump());
                 assertEquals(Defaults.SCHEME, command.state().getScheme());
                 assertEquals(0, command.state().getReleaseScope().getCommits().size());
@@ -636,6 +650,7 @@ public class MarkTestTemplates {
 
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
             if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
+                assertEquals("master", command.state().getBranch());
                 assertEquals(Defaults.BUMP, command.state().getBump());
                 assertEquals(Defaults.SCHEME, command.state().getScheme());
                 assertEquals(2, command.state().getReleaseScope().getCommits().size());
@@ -669,6 +684,7 @@ public class MarkTestTemplates {
 
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
             if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
+                assertEquals("master", command.state().getBranch());
                 assertEquals(Defaults.BUMP, command.state().getBump());
                 assertEquals(Defaults.SCHEME, command.state().getScheme());
                 assertEquals(2, command.state().getReleaseScope().getCommits().size());
@@ -702,6 +718,7 @@ public class MarkTestTemplates {
 
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
             if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
+                assertNull(command.state().getBranch());
                 assertEquals(Defaults.BUMP, command.state().getBump());
                 assertEquals(Defaults.SCHEME, command.state().getScheme());
                 assertEquals(0, command.state().getReleaseScope().getCommits().size());
@@ -736,6 +753,7 @@ public class MarkTestTemplates {
 
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
             if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
+                assertEquals("master", command.state().getBranch());
                 assertEquals(CUSTOM_BUMP, command.state().getBump());
                 assertEquals(Defaults.SCHEME, command.state().getScheme());
                 assertEquals(2, command.state().getReleaseScope().getCommits().size());
@@ -770,6 +788,7 @@ public class MarkTestTemplates {
 
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
             if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
+                assertEquals("master", command.state().getBranch());
                 assertEquals(CUSTOM_BUMP, command.state().getBump());
                 assertEquals(Defaults.SCHEME, command.state().getScheme());
                 assertEquals(2, command.state().getReleaseScope().getCommits().size());
@@ -804,6 +823,7 @@ public class MarkTestTemplates {
 
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
             if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
+                assertEquals("master", command.state().getBranch());
                 assertEquals(CUSTOM_BUMP, command.state().getBump());
                 assertEquals(Defaults.SCHEME, command.state().getScheme());
                 assertEquals(2, command.state().getReleaseScope().getCommits().size());
@@ -838,6 +858,7 @@ public class MarkTestTemplates {
 
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
             if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
+                assertEquals("master", command.state().getBranch());
                 assertEquals(CUSTOM_BUMP, command.state().getBump());
                 assertEquals(Defaults.SCHEME, command.state().getScheme());
                 assertEquals(2, command.state().getReleaseScope().getCommits().size());
@@ -872,6 +893,7 @@ public class MarkTestTemplates {
 
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
             if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
+                assertEquals("master", command.state().getBranch());
                 assertEquals(Defaults.BUMP, command.state().getBump());
                 assertEquals(Defaults.SCHEME, command.state().getScheme());
                 assertEquals(0, command.state().getReleaseScope().getCommits().size());
@@ -906,6 +928,7 @@ public class MarkTestTemplates {
 
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
             if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
+                assertEquals("master", command.state().getBranch());
                 assertEquals(Defaults.BUMP, command.state().getBump());
                 assertEquals(Defaults.SCHEME, command.state().getScheme());
                 assertEquals(3, command.state().getReleaseScope().getCommits().size());
@@ -941,6 +964,7 @@ public class MarkTestTemplates {
 
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
             if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
+                assertEquals("master", command.state().getBranch());
                 assertEquals(Defaults.BUMP, command.state().getBump());
                 assertEquals(Defaults.SCHEME, command.state().getScheme());
                 assertEquals(0, command.state().getReleaseScope().getCommits().size());
@@ -976,6 +1000,7 @@ public class MarkTestTemplates {
 
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
             if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
+                assertEquals("master", command.state().getBranch());
                 assertEquals("minor", command.state().getBump());
                 assertEquals(Defaults.SCHEME, command.state().getScheme());
                 assertEquals(2, command.state().getReleaseScope().getCommits().size());

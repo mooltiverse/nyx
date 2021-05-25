@@ -32,6 +32,23 @@ import com.mooltiverse.oss.nyx.data.Scheme;
  */
 public interface Root extends Block {
     /**
+     * Returns the current Git branch name.
+     * 
+     * @return the current Git branch name. This is {@code null} until {@link Nyx#infer()} has run.
+     * 
+     * @throws DataAccessException in case the attribute cannot be read or accessed.
+     * @throws IllegalPropertyException in case the attribute has been defined but has incorrect values or it can't be resolved.
+     * 
+     * @see #getNewRelease()
+     * @see #getNewVersion()
+     * @see Configuration#getVersion()
+     * @see Nyx#infer()
+     * @see Infer
+     */
+    public String getBranch()
+        throws DataAccessException, IllegalPropertyException;
+
+    /**
      * Returns the version identifier to bump or bumped on the previous release to produce the new release, if any.
      * This value is only available after {@link Nyx#infer()} has run unless it's overridden by the configuration,
      * in which case the configuration value is returned.

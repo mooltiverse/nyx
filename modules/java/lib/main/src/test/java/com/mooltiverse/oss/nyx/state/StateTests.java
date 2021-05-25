@@ -46,6 +46,33 @@ public class StateTests {
     @DisplayName("Attributes")
     class AttributesTests {
         @Test
+        @DisplayName("State.getBranch()")
+        void getBranchTest()
+            throws Exception {
+            // make sure the branch is null in the beginning (it's set only after the Infer task has run)
+            State state = new State(new Configuration());
+            assertNull(state.getBranch());
+
+            state.setBranch("abranch");
+            assertEquals("abranch", state.getBranch());
+
+            state.setBranch("anotherbranch");
+            assertEquals("anotherbranch", state.getBranch());
+        }
+
+        @Test
+        @DisplayName("State.setBranch(String)")
+        void setBranchTest()
+            throws Exception {
+            Configuration configuration = new Configuration();
+            State state = new State(configuration);
+
+            String branch = "abranch";
+            state.setBranch(branch);
+            assertEquals(branch, state.getBranch());
+        }
+
+        @Test
         @DisplayName("State.getBump()")
         void getBumpTest()
             throws Exception {

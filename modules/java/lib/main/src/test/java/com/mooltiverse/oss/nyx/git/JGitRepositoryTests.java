@@ -600,6 +600,28 @@ public class JGitRepositoryTests {
     }
 
     @Nested
+    @DisplayName("JGitRepository.getCurrentBranch")
+    class GetCurrentBranchTests {
+        @DisplayName("JGitRepository.getCurrentBranch()")
+        @Test
+        public void getCurrentBranchTest()
+            throws Exception {
+            Script script = Scenario.FROM_SCRATCH.realize();
+            Repository repository = JGitRepository.open(script.getWorkingDirectory());
+
+            assertEquals("master", repository.getCurrentBranch());
+            
+            // add and stage some files
+            script.andAddFiles().andStage().commit("A commit");
+
+            assertEquals("master", repository.getCurrentBranch());
+
+            script.inBranch("testbranch");
+            assertEquals("testbranch", repository.getCurrentBranch());
+        }
+    }
+
+    @Nested
     @DisplayName("JGitRepository.getLatestCommit")
     class GetLatestCommitTests {
         @DisplayName("JGitRepository.getLatestCommit() throws GitException without commits")

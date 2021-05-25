@@ -11,6 +11,7 @@ The following attributes are at the top of the hierarchy:
 
 | Name                                      | Type    | Values                                      |
 | ----------------------------------------- | ------- | ------------------------------------------- |
+| [`branch`](#branch)                       | string  | The current Git branch                      |
 | [`bump`](#bump)                           | string  | The bumped version identifier               |
 | [`configuration`](#configuration)         | object  | The resolved configuration                  |
 | [`directory`](#directory)                 | string  | Directory path                              |
@@ -21,6 +22,20 @@ The following attributes are at the top of the hierarchy:
 | [`scheme`](#scheme)                       | string  | `semver`                                    |
 | [`timestamp`](#timestamp)                 | integer | A positive integer                          |
 | [`version`](#version)                     | string  | The current version                         |
+
+### Branch
+
+| ----------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                          | `branch`                                                                                 |
+| Type                          | string                                                                                   |
+| Related configuration options |                                                                                          |
+| Initialized by task           | [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#infer){: .btn .btn--small} |
+
+This string contains the current Git branch name.
+
+This attribute is not initialized if the [`version`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#version) configuration option was passed to override inference.
+
+This attribute is not available until [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer) has run.
 
 ### Bump
 

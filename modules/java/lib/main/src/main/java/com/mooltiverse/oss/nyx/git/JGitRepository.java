@@ -451,6 +451,20 @@ class JGitRepository implements Repository {
      * {@inheritDoc}
      */
     @Override
+    public String getCurrentBranch()
+        throws GitException {
+        try {
+            return jGit.getRepository().getBranch();
+        }
+        catch (IOException ioe) {
+            throw new GitException("Unable to retrieve the current branch name", ioe);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String getLatestCommit()
         throws GitException {
         String commitSHA = peekCommit(Constants.HEAD, null).getName();

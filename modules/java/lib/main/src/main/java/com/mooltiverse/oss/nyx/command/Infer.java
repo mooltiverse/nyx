@@ -197,6 +197,9 @@ public class Infer extends AbstractCommand {
             final Scheme scheme = state().getScheme();
             final Map<String,CommitMessageConvention> commitMessageConventions = state().getConfiguration().getCommitMessageConventions().getItems();
 
+            logger.debug(COMMAND, "Current Git branch is {}", repository().getCurrentBranch());
+            state().setBranch(repository().getCurrentBranch());
+
             logger.debug(COMMAND, "Walking the commit history...");
             repository().walkHistory(null, null, c -> {
                 logger.debug(COMMAND, "Stepping by commit {}", c.getSHA());

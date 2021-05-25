@@ -51,6 +51,11 @@ public class State implements Root {
     private static final Logger logger = LoggerFactory.getLogger(State.class);
 
     /**
+     * The current Git branch name.
+     */
+    private String branch = null;
+
+    /**
      * The private immutable instance of the configuration.
      */
     private Configuration configuration;
@@ -124,6 +129,33 @@ public class State implements Root {
         State state = FileMapper.load(stateFile, State.class);
         state.configuration = configuration;
         return state;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getBranch()
+        throws DataAccessException, IllegalPropertyException {
+        return branch;
+    }
+
+    /**
+     * Returns {@code true} if the scope has a non {@code null} branch name.
+     * 
+     * @return {@code true} if the scope has a non {@code null} branch name.
+     */
+    public boolean hasBranch() {
+        return !Objects.isNull(branch);
+    }
+
+    /**
+     * Sets the current Git branch name
+     * 
+     * @param branch the current Git branch name
+     */
+    public void setBranch(String branch) {
+        this.branch = branch;
     }
 
     /**

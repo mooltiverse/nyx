@@ -148,6 +148,7 @@ public class InferTestTemplates {
             throws Exception {
             command.run();
 
+            assertEquals("master", command.state().getBranch());
             assertEquals(Defaults.BUMP, command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(1, command.state().getReleaseScope().getCommits().size());
@@ -172,6 +173,7 @@ public class InferTestTemplates {
             command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             command.run();
 
+            assertEquals("master", command.state().getBranch());
             assertEquals(Defaults.BUMP, command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(1, command.state().getReleaseScope().getCommits().size());
@@ -196,6 +198,7 @@ public class InferTestTemplates {
             configurationLayerMock.setVersion(CUSTOM_VERSION);
             command.run();
 
+            assertNull(command.state().getBranch());
             assertEquals(Defaults.BUMP, command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(0, command.state().getReleaseScope().getCommits().size());
@@ -220,6 +223,7 @@ public class InferTestTemplates {
             configurationLayerMock.setBump(CUSTOM_BUMP);
             command.run();
 
+            assertEquals("master", command.state().getBranch());
             assertEquals(CUSTOM_BUMP, command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(1, command.state().getReleaseScope().getCommits().size());
@@ -244,6 +248,7 @@ public class InferTestTemplates {
             configurationLayerMock.setBump(CUSTOM_BUMP);
             command.run();
 
+            assertEquals("master", command.state().getBranch());
             assertEquals(CUSTOM_BUMP, command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(1, command.state().getReleaseScope().getCommits().size());
@@ -268,6 +273,7 @@ public class InferTestTemplates {
             configurationLayerMock.setBump(CUSTOM_BUMP);
             command.run();
 
+            assertEquals("master", command.state().getBranch());
             assertEquals(CUSTOM_BUMP, command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(1, command.state().getReleaseScope().getCommits().size());
@@ -292,6 +298,7 @@ public class InferTestTemplates {
             configurationLayerMock.setBump(CUSTOM_BUMP);
             command.run();
 
+            assertEquals("master", command.state().getBranch());
             assertEquals(CUSTOM_BUMP, command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(1, command.state().getReleaseScope().getCommits().size());
@@ -316,6 +323,7 @@ public class InferTestTemplates {
             configurationLayerMock.setBump(CUSTOM_BUMP);
             command.run();
 
+            assertEquals("master", command.state().getBranch());
             assertEquals(CUSTOM_BUMP, command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(0, command.state().getReleaseScope().getCommits().size());
@@ -340,6 +348,7 @@ public class InferTestTemplates {
             configurationLayerMock.setBump(CUSTOM_BUMP);
             command.run();
 
+            assertEquals("master", command.state().getBranch());
             assertEquals(CUSTOM_BUMP, command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(0, command.state().getReleaseScope().getCommits().size());
@@ -364,6 +373,7 @@ public class InferTestTemplates {
             configurationLayerMock.setBump(CUSTOM_BUMP);
             command.run();
 
+            assertEquals("master", command.state().getBranch());
             assertEquals(CUSTOM_BUMP, command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(0, command.state().getReleaseScope().getCommits().size());
@@ -388,6 +398,7 @@ public class InferTestTemplates {
             configurationLayerMock.setBump(CUSTOM_BUMP);
             command.run();
 
+            assertEquals("master", command.state().getBranch());
             assertEquals(CUSTOM_BUMP, command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(0, command.state().getReleaseScope().getCommits().size());
@@ -412,6 +423,7 @@ public class InferTestTemplates {
             script.andCommitWithTag("release-2.2.2");
             command.run();
 
+            assertEquals("master", command.state().getBranch());
             assertEquals(Defaults.BUMP, command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(0, command.state().getReleaseScope().getCommits().size());
@@ -436,6 +448,7 @@ public class InferTestTemplates {
             script.andCommitWithTag("release-2.2.2");
             command.run();
 
+            assertEquals("master", command.state().getBranch());
             assertEquals(Defaults.BUMP, command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(1, command.state().getReleaseScope().getCommits().size());
@@ -461,6 +474,7 @@ public class InferTestTemplates {
             script.andCommitWithTag("release-2.2.2");
             command.run();
 
+            assertEquals("master", command.state().getBranch());
             assertEquals(Defaults.BUMP, command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(0, command.state().getReleaseScope().getCommits().size());
@@ -481,6 +495,7 @@ public class InferTestTemplates {
             throws Exception {
             command.run();
 
+            assertEquals("master", command.state().getBranch());
             assertEquals(Defaults.BUMP, command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(2, command.state().getReleaseScope().getCommits().size());
@@ -504,6 +519,7 @@ public class InferTestTemplates {
             configurationLayerMock.setInitialVersion("12.13.14");
             command.run();
 
+            assertEquals("master", command.state().getBranch());
             assertEquals(Defaults.BUMP, command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(2, command.state().getReleaseScope().getCommits().size());
@@ -527,6 +543,7 @@ public class InferTestTemplates {
             configurationLayerMock.setVersion("1.2.3");
             command.run();
 
+            assertNull(command.state().getBranch());
             assertEquals(Defaults.BUMP, command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(0, command.state().getReleaseScope().getCommits().size());
@@ -551,6 +568,7 @@ public class InferTestTemplates {
             configurationLayerMock.setBump(CUSTOM_BUMP);
             command.run();
 
+            assertEquals("master", command.state().getBranch());
             assertEquals(CUSTOM_BUMP, command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(2, command.state().getReleaseScope().getCommits().size());
@@ -575,6 +593,7 @@ public class InferTestTemplates {
             configurationLayerMock.setBump(CUSTOM_BUMP);
             command.run();
 
+            assertEquals("master", command.state().getBranch());
             assertEquals(CUSTOM_BUMP, command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(2, command.state().getReleaseScope().getCommits().size());
@@ -599,6 +618,7 @@ public class InferTestTemplates {
             configurationLayerMock.setBump(CUSTOM_BUMP);
             command.run();
 
+            assertEquals("master", command.state().getBranch());
             assertEquals(CUSTOM_BUMP, command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(2, command.state().getReleaseScope().getCommits().size());
@@ -623,6 +643,7 @@ public class InferTestTemplates {
             configurationLayerMock.setBump(CUSTOM_BUMP);
             command.run();
 
+            assertEquals("master", command.state().getBranch());
             assertEquals(CUSTOM_BUMP, command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(2, command.state().getReleaseScope().getCommits().size());
@@ -647,6 +668,7 @@ public class InferTestTemplates {
             script.andCommitWithTag("release-2.2.2");
             command.run();
 
+            assertEquals("master", command.state().getBranch());
             assertEquals(Defaults.BUMP, command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(0, command.state().getReleaseScope().getCommits().size());
@@ -671,6 +693,7 @@ public class InferTestTemplates {
             script.andCommitWithTag("release-2.2.2");
             command.run();
 
+            assertEquals("master", command.state().getBranch());
             assertEquals(Defaults.BUMP, command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(3, command.state().getReleaseScope().getCommits().size());
@@ -696,6 +719,7 @@ public class InferTestTemplates {
             script.andCommitWithTag("release-2.2.2");
             command.run();
 
+            assertEquals("master", command.state().getBranch());
             assertEquals(Defaults.BUMP, command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(0, command.state().getReleaseScope().getCommits().size());
@@ -721,6 +745,7 @@ public class InferTestTemplates {
             command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             command.run();
 
+            assertEquals("master", command.state().getBranch());
             assertEquals("minor", command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(2, command.state().getReleaseScope().getCommits().size());
@@ -747,6 +772,7 @@ public class InferTestTemplates {
             configurationLayerMock.setBump(CUSTOM_BUMP);
             command.run();
 
+            assertEquals("master", command.state().getBranch());
             assertEquals("patch", command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(2, command.state().getReleaseScope().getCommits().size());

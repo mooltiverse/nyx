@@ -230,6 +230,17 @@ public interface Repository {
         throws GitException;
 
     /**
+     * Returns the name of the current branch or a commit SHA-1 if the repository is in the detached head state.
+     * 
+     * @return the name of the current branch or a commit SHA-1 if the repository is in the detached head state.
+     * 
+     * @throws GitException in case some problem is encountered with the underlying Git repository, including when
+     * the repository has no commits yet or is in the 'detached HEAD' state.
+     */
+    public String getCurrentBranch()
+        throws GitException;
+
+    /**
      * Returns the SHA-1 identifier of the last commit in the current branch.
      * 
      * @return the SHA-1 identifier of the last commit in the current branch.
