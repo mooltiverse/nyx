@@ -16,7 +16,7 @@
 package com.mooltiverse.oss.nyx.data;
 
 /**
- * Models the commit message conventions configuration block.
+ * Models the releaseTypes configuration block.
  */
-public interface CommitMessageConventions extends MapConfigurationBlock<CommitMessageConvention> {
+public interface ReleaseTypes extends MapConfigurationBlock<ReleaseType> {
 }

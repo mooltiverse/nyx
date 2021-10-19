@@ -363,7 +363,10 @@ public class Workbench {
         throws Exception {
         List<String> res = new ArrayList<String>();
         
-        Iterator<RevCommit> commitIterator = git.log().add(git.getRepository().resolve(Constants.HEAD)).call().iterator();
+        ObjectId resolvedHead = git.getRepository().resolve(Constants.HEAD);
+        if (Objects.isNull(resolvedHead))
+            return res;
+        Iterator<RevCommit> commitIterator = git.log().add(resolvedHead).call().iterator();
         while (commitIterator.hasNext())
             res.add(commitIterator.next().getId().getName());
 
@@ -381,7 +384,10 @@ public class Workbench {
         throws Exception {
         List<RevCommit> res = new ArrayList<RevCommit>();
         
-        Iterator<RevCommit> commitIterator = git.log().add(git.getRepository().resolve(Constants.HEAD)).call().iterator();
+        ObjectId resolvedHead = git.getRepository().resolve(Constants.HEAD);
+        if (Objects.isNull(resolvedHead))
+            return res;
+        Iterator<RevCommit> commitIterator = git.log().add(resolvedHead).call().iterator();
         while (commitIterator.hasNext())
             res.add(commitIterator.next());
 
@@ -428,7 +434,10 @@ public class Workbench {
      */
     public RevCommit getLastCommit()
         throws Exception {
-        Iterator<RevCommit> iterator = git.log().add(git.getRepository().resolve(Constants.HEAD)).setMaxCount(1).call().iterator();
+        ObjectId resolvedHead = git.getRepository().resolve(Constants.HEAD);
+        if (Objects.isNull(resolvedHead))
+            return null;
+        Iterator<RevCommit> iterator = git.log().add(resolvedHead).setMaxCount(1).call().iterator();
         if (iterator.hasNext())
             return iterator.next();
         else return null;
@@ -443,7 +452,8 @@ public class Workbench {
      */
     public String getLastCommitID()
         throws Exception {
-        return getLastCommit().getId().getName();
+        RevCommit lastCommit = getLastCommit();
+        return Objects.isNull(lastCommit) ? null : lastCommit.getId().getName();
     }
 
     /**
@@ -455,7 +465,10 @@ public class Workbench {
      */
     public RevCommit getRootCommit()
         throws Exception {
-        Iterator<RevCommit> iterator = git.log().add(git.getRepository().resolve(Constants.HEAD)).call().iterator();
+        ObjectId resolvedHead = git.getRepository().resolve(Constants.HEAD);
+        if (Objects.isNull(resolvedHead))
+            return null;
+        Iterator<RevCommit> iterator = git.log().add(resolvedHead).call().iterator();
         RevCommit res = null;
         while (iterator.hasNext()) {
             res = iterator.next();

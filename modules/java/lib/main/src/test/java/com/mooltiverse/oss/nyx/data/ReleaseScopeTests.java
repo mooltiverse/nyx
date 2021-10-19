@@ -32,6 +32,8 @@ public class ReleaseScopeTests {
         ReleaseScope releaseScope = new ReleaseScope();
         assertNull(releaseScope.getPreviousVersion());
         assertNull(releaseScope.getPreviousVersionCommit());
+        assertNull(releaseScope.getPrimeVersion());
+        assertNull(releaseScope.getPrimeVersionCommit());
         assertFalse(releaseScope.hasInitialCommit());
         assertNull(releaseScope.getInitialCommit());
         assertFalse(releaseScope.hasFinalCommit());
@@ -97,6 +99,50 @@ public class ReleaseScopeTests {
         assertNull(releaseScope.getPreviousVersionCommit());
         releaseScope.setPreviousVersionCommit("f9422bd6e5b0ac0ab0df2bffc280c3d4caa11b44");
         assertEquals("f9422bd6e5b0ac0ab0df2bffc280c3d4caa11b44", releaseScope.getPreviousVersionCommit());
+    }
+    
+    @Test
+    @DisplayName("ReleaseScope.hasPrimeVersion()")
+    void hasPrimeVersionTest()
+        throws Exception {
+
+        ReleaseScope releaseScope = new ReleaseScope();
+        assertFalse(releaseScope.hasPrimeVersion());
+        releaseScope.setPrimeVersion(SemanticVersion.valueOf(SemanticVersion.DEFAULT_INITIAL_VERSION).toString());
+        assertTrue(releaseScope.hasPrimeVersion());
+    }
+
+    @Test
+    @DisplayName("ReleaseScope.getPrimeVersion()")
+    void getPrimeVersionTest()
+        throws Exception {
+
+        ReleaseScope releaseScope = new ReleaseScope();
+        assertNull(releaseScope.getPrimeVersion());
+        releaseScope.setPrimeVersion(SemanticVersion.valueOf(SemanticVersion.DEFAULT_INITIAL_VERSION).toString());
+        assertEquals(SemanticVersion.DEFAULT_INITIAL_VERSION, releaseScope.getPrimeVersion());
+    }
+
+    @Test
+    @DisplayName("ReleaseScope.hasPrimeVersionCommit()")
+    void hasPrimeVersionCommitTest()
+        throws Exception {
+
+        ReleaseScope releaseScope = new ReleaseScope();
+        assertFalse(releaseScope.hasPrimeVersionCommit());
+        releaseScope.setPrimeVersionCommit("f9422bd6e5b0ac0ab0df2bffc280c3d4caa11b44");
+        assertTrue(releaseScope.hasPrimeVersionCommit());
+    }
+
+    @Test
+    @DisplayName("ReleaseScope.getPrimeVersionCommit()")
+    void getPrimeVersionCommitTest()
+        throws Exception {
+
+        ReleaseScope releaseScope = new ReleaseScope();
+        assertNull(releaseScope.getPrimeVersionCommit());
+        releaseScope.setPrimeVersionCommit("f9422bd6e5b0ac0ab0df2bffc280c3d4caa11b44");
+        assertEquals("f9422bd6e5b0ac0ab0df2bffc280c3d4caa11b44", releaseScope.getPrimeVersionCommit());
     }
 
     @Test

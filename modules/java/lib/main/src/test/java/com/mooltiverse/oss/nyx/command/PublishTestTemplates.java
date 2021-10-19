@@ -26,6 +26,7 @@ import com.mooltiverse.oss.nyx.command.template.Baseline;
 import com.mooltiverse.oss.nyx.command.template.CommandInvocationContextProvider;
 import com.mooltiverse.oss.nyx.command.template.CommandProxy;
 import com.mooltiverse.oss.nyx.command.template.CommandSelector;
+import com.mooltiverse.oss.nyx.command.template.StandaloneCommandProxy;
 import com.mooltiverse.oss.nyx.git.Scenario;
 
 @DisplayName("Publish")
@@ -79,7 +80,11 @@ public class PublishTestTemplates {
             // simply test that running it twice returns false at the first run and true the second
             assertFalse(command.isUpToDate());
             command.run();
-            assertTrue(command.isUpToDate());
+
+            // when the command is executed standalone, Infer is not executed so isUpToDate() will always return false
+            if (command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME))
+                assertFalse(command.isUpToDate());
+            else assertTrue(command.isUpToDate()); 
         }
     }
 

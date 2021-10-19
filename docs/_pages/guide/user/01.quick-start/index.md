@@ -5,5 +5,6 @@ toc: false
 permalink: /guide/user/quick-start/
 ---
 
-TODO: write this section
-{: .notice--warning}
+This section give you a quick reference to get started with Nyx in minutes.
+
+Jump right to the use case that better suits your use case in the sub sections you see on the menu.

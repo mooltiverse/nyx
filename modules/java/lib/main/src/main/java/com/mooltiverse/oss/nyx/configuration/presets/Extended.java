@@ -38,5 +38,16 @@ public class Extended extends SimpleConfigurationLayer {
         getCommitMessageConventions().setEnabled(List.<String>of("conventionalCommits", "gitmoji"));
         getCommitMessageConventions().getItems().put("conventionalCommits", CommitMessageConventions.CONVENTIONAL_COMMITS);
         getCommitMessageConventions().getItems().put("gitmoji", CommitMessageConventions.GITMOJI);
+
+        // add the 'mainline' and 'internal' release types
+        getReleaseTypes().setEnabled(List.<String>of("mainline", "integration", "maturity", "feature", "hotfix", "release", "maintenance", "internal"));
+        getReleaseTypes().getItems().put("mainline", ReleaseTypes.MAINLINE);
+        getReleaseTypes().getItems().put("integration", ReleaseTypes.INTEGRATION);
+        getReleaseTypes().getItems().put("maturity", ReleaseTypes.MATURITY);
+        getReleaseTypes().getItems().put("feature", ReleaseTypes.FEATURE);
+        getReleaseTypes().getItems().put("hotfix", ReleaseTypes.HOTFIX);
+        getReleaseTypes().getItems().put("release", ReleaseTypes.RELEASE);
+        getReleaseTypes().getItems().put("maintenance", ReleaseTypes.MAINTENANCE);
+        getReleaseTypes().getItems().put("internal", ReleaseTypes.INTERNAL);
     }
 }

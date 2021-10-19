@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mooltiverse.oss.nyx.ReleaseException;
+import com.mooltiverse.oss.nyx.configuration.Defaults;
 import com.mooltiverse.oss.nyx.data.DataAccessException;
 import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
 import com.mooltiverse.oss.nyx.git.GitException;
@@ -40,6 +41,26 @@ public class Mark extends AbstractCommand {
      * The private logger instance
      */
     private static final Logger logger = LoggerFactory.getLogger(Mark.class);
+
+    /**
+     * The name used for the internal state attribute where we store current branch name.
+     */
+    private static final String INTERNAL_BRANCH = Mark.class.getSimpleName().concat(".").concat("repository").concat(".").concat("current").concat(".").concat("branch");
+
+    /**
+     * The name used for the internal state attribute where we store the commit flag.
+     */
+    private static final String INTERNAL_GIT_COMMIT = Mark.class.getSimpleName().concat(".").concat("git").concat(".").concat("commit");
+
+    /**
+     * The name used for the internal state attribute where we store the push flag.
+     */
+    private static final String INTERNAL_GIT_PUSH = Mark.class.getSimpleName().concat(".").concat("git").concat(".").concat("push");
+
+    /**
+     * The name used for the internal state attribute where we store the tag flag.
+     */
+    private static final String INTERNAL_GIT_TAG = Mark.class.getSimpleName().concat(".").concat("git").concat(".").concat("tag");
 
     /**
      * The name used for the internal state attribute where we store the SHA-1 of the last
@@ -89,8 +110,11 @@ public class Mark extends AbstractCommand {
         if (Objects.isNull(state().getVersion()))
             return false;
 
-        // The command is never considered up to date when the repository last commit has changed
-        if (!isInternalAttributeUpToDate(INTERNAL_LAST_COMMIT, getLatestCommit()))
+        // The command is never considered up to date when the repository branch or last commit has changed
+        if ((!isInternalAttributeUpToDate(INTERNAL_BRANCH, getCurrentBranch())) || (!isInternalAttributeUpToDate(INTERNAL_LAST_COMMIT, getLatestCommit())))
+            return false;
+        // The command is never considered up to date when the commit, tag or push configurantion flags have changed
+        if ((!isInternalAttributeUpToDate(INTERNAL_GIT_COMMIT, state().getReleaseType().getGitCommit())) || (!isInternalAttributeUpToDate(INTERNAL_GIT_PUSH, state().getReleaseType().getGitPush())) || (!isInternalAttributeUpToDate(INTERNAL_GIT_TAG, state().getReleaseType().getGitTag())))
             return false;
         // Check if configuration parameters have changed
         return isInternalAttributeUpToDate(STATE_VERSION, state().getVersion()) &&
@@ -115,6 +139,10 @@ public class Mark extends AbstractCommand {
         throws DataAccessException, IllegalPropertyException, GitException {
         logger.debug(COMMAND, "Storing the Mark command internal attributes to the State");
         if (!state().getConfiguration().getDryRun()) {
+            putInternalAttribute(INTERNAL_BRANCH, getCurrentBranch());
+            putInternalAttribute(INTERNAL_GIT_COMMIT, Objects.isNull(state().getReleaseType()) ? null : state().getReleaseType().getGitCommit());
+            putInternalAttribute(INTERNAL_GIT_PUSH, Objects.isNull(state().getReleaseType()) ? null : state().getReleaseType().getGitPush());
+            putInternalAttribute(INTERNAL_GIT_TAG, Objects.isNull(state().getReleaseType()) ? null : state().getReleaseType().getGitTag());
             putInternalAttribute(INTERNAL_LAST_COMMIT, getLatestCommit());
             putInternalAttribute(STATE_VERSION, state().getVersion());
             putInternalAttribute(STATE_INITIAL_COMMIT, state().getReleaseScope().getInitialCommit());
@@ -154,53 +182,66 @@ public class Mark extends AbstractCommand {
 
         if (state().getNewVersion()) {
             // COMMIT
-            // TODO: make the commit step conditional, depending on the configuration and the release type. Not all release types may have the commit enabled
-            if (repository().isClean()) {
-                logger.debug(COMMAND, "Repository is clean, no commits need to be made");
-            }
-            else {
-                if (state().getConfiguration().getDryRun()) {
-                    logger.info(COMMAND, "Git commit skipped due to dry run");
+            if (renderTemplateAsBoolean(state().getReleaseType().getGitCommit())) {
+                logger.debug(COMMAND, "The release type has the git commit flag enabled");
+                if (repository().isClean()) {
+                    logger.debug(COMMAND, "Repository is clean, no commits need to be made");
                 }
                 else {
-                    logger.debug(COMMAND, "Committing local changes");
+                    if (state().getConfiguration().getDryRun()) {
+                        logger.info(COMMAND, "Git commit skipped due to dry run");
+                    }
+                    else {
+                        logger.debug(COMMAND, "Committing local changes");
 
-                    // TODO: customize the commit message
+                        String commitMessage = renderTemplate(state().getReleaseType().getGitCommitMessage());
+                        if (Objects.isNull(commitMessage) || commitMessage.isBlank()) {
+                            logger.debug(COMMAND, "The configured commit message template yields to an empty commit message. Using default template '{}'", Defaults.ReleaseType.GIT_COMMIT_MESSAGE);
+                            commitMessage = renderTemplate(Defaults.ReleaseType.GIT_COMMIT_MESSAGE);
+                        }
 
-                    // TODO: not all changes may need to be committed so replace "." here with the paths of the files to commit, in case only a subset has to be committed
-                    // TODO: make the commit message customizeable. Now we use the version number also for the message
-                    // TODO: use the other version of the commit() method that also accepts identities, to optionally set the Author and Committer. This could be used to add Nyx as the committer
-                    String finalCommit = repository().commit(List.<String>of("."), state().getVersion()).getSHA();
-                    logger.debug(COMMAND, "Local changes committed at {}", finalCommit);
+                        // Here we commit all uncommitted files (of course if they're not ignored by .gitignore). Should we pick a specific subset instead? Maybe among the artifacts produced by Nyx?
+                        // Here we can also specify the Author and Committer Identity as per https://github.com/mooltiverse/nyx/issues/65
+                        String finalCommit = repository().commit(List.<String>of("."), commitMessage).getSHA();
+                        logger.debug(COMMAND, "Local changes committed at {}", finalCommit);
 
-                    logger.debug(COMMAND, "Adding commit {} to the release scope", finalCommit);
-                    state().getReleaseScope().getCommits().add(0, finalCommit);
+                        logger.debug(COMMAND, "Adding commit {} to the release scope", finalCommit);
+                        state().getReleaseScope().getCommits().add(0, finalCommit);
+                    }
                 }
             }
+            else logger.debug(COMMAND, "The release type has the git commit flag disabled");
 
             // TAG
-            // TODO: make the tag step conditional, depending on the configuration and the release type. Not all release types may have the tag enabled
-            if (state().getConfiguration().getDryRun()) {
-                logger.info(COMMAND, "Git tag skipped due to dry run");
+            if (renderTemplateAsBoolean(state().getReleaseType().getGitTag())) {
+                logger.debug(COMMAND, "The release type has the git tag flag enabled");
+                if (state().getConfiguration().getDryRun()) {
+                    logger.info(COMMAND, "Git tag skipped due to dry run");
+                }
+                else {
+                    String tagMessage = renderTemplate(state().getReleaseType().getGitTagMessage());
+                    logger.debug(COMMAND, "Tagging latest commit {} with tag {}", repository().getLatestCommit(), state().getVersion());
+                    // Here we can also specify the Tagger Identity as per https://github.com/mooltiverse/nyx/issues/65
+                    repository().tag(state().getVersion(), Objects.isNull(tagMessage) || tagMessage.isBlank() ? null : tagMessage);
+                    logger.debug(COMMAND, "Tag {} applied to commit {}", state().getVersion(), repository().getLatestCommit());
+                }
             }
-            else {
-                // TODO: make the lightweight/annotated tag customizeable here and optionally add the Tagger Identity
-                logger.debug(COMMAND, "Tagging latest commit {} with tag {}", repository().getLatestCommit(), state().getVersion());
-                repository().tag(state().getVersion());
-                logger.debug(COMMAND, "Tag {} applied to commit {}", state().getVersion(), repository().getLatestCommit());
-            }
+            else logger.debug(COMMAND, "The release type has the git tag flag disabled");
 
             // PUSH
-            // TODO: make the push step conditional, depending on the configuration and the release type. Not all release types may have the push enabled
-            if (state().getConfiguration().getDryRun()) {
-                logger.info(COMMAND, "Git push skipped due to dry run");
+            if (renderTemplateAsBoolean(state().getReleaseType().getGitPush())) {
+                logger.debug(COMMAND, "The release type has the git push flag enabled");
+                if (state().getConfiguration().getDryRun()) {
+                    logger.info(COMMAND, "Git push skipped due to dry run");
+                }
+                else {
+                    // Here we should make the Git remote repositories configurable as per https://github.com/mooltiverse/nyx/issues/66
+                    logger.debug(COMMAND, "Pushing local changes to remotes");
+                    String remote = repository().push();
+                    logger.debug(COMMAND, "Local changes pushed to remote {}", remote);
+                }
             }
-            else {
-                // TODO: here we push to the default remote only (origin). The remotes to push to should be customizeable
-                logger.debug(COMMAND, "Pushing local changes to remotes");
-                String remote = repository().push();
-                logger.debug(COMMAND, "Local changes pushed to remote {}", remote);
-            }
+            else logger.debug(COMMAND, "The release type has the git push flag disabled");
         }
         else {
             logger.info(COMMAND, "No version change detected. Nothing to release.");

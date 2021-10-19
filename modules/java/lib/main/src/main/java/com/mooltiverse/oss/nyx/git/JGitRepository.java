@@ -224,7 +224,7 @@ class JGitRepository implements Repository {
             RefSpec refSpec = new RefSpec(currentBranchRef.concat(":").concat(currentBranchRef));
 
             PushCommand pushCommand = jGit.push().setRefSpecs(refSpec);
-            if (!Objects.isNull(remote) && !remote.isEmpty())
+            if (!Objects.isNull(remote) && !remote.isBlank())
                 pushCommand.setRemote(remote);
             pushCommand.setPushTags();
             pushCommand.call();
@@ -560,8 +560,18 @@ class JGitRepository implements Repository {
                 RevCommit commit = commitIterator.next();
                 logger.trace(GIT, "Visiting commit {}", commit.getId().getName());
                 boolean visitorContinues = visitor.visit(ObjectFactory.commitFrom(commit, getCommitTags(commit.getId().getName())));
-                if (!visitorContinues || (!Objects.isNull(end) && commit.getId().getName().startsWith(end)))
+                
+                if (!visitorContinues) {
+                    logger.debug(GIT, "Commit history walk interrupted by visitor");
                     break;
+                }
+                else if (!Objects.isNull(end) && commit.getId().getName().startsWith(end)) {
+                    logger.debug(GIT, "Commit history walk reached the end boundary {}", end);
+                    break;
+                }
+                else if (!commitIterator.hasNext()) {
+                    logger.debug(GIT, "Commit history walk reached the end");
+                }
             }
         }
         catch (RevWalkException rwe) {

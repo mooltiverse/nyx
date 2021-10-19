@@ -25,8 +25,9 @@ import org.slf4j.LoggerFactory;
 import com.mooltiverse.oss.nyx.data.CommitMessageConventions;
 import com.mooltiverse.oss.nyx.data.DataAccessException;
 import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
-import com.mooltiverse.oss.nyx.data.Scheme;
+import com.mooltiverse.oss.nyx.data.ReleaseTypes;
 import com.mooltiverse.oss.nyx.data.Verbosity;
+import com.mooltiverse.oss.nyx.version.Scheme;
 
 /**
  * The default configuration layer. This is a singleton class so instances are to be retrieved via the static {@link #getInstance()} method.
@@ -166,6 +167,16 @@ class DefaultLayer implements ConfigurationLayer, Defaults {
         throws DataAccessException, IllegalPropertyException {
         logger.trace(DEFAULT, "Retrieving the default {} configuration option: {}", "releaseLenient", RELEASE_LENIENT);
         return RELEASE_LENIENT;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ReleaseTypes getReleaseTypes()
+        throws DataAccessException, IllegalPropertyException {
+        logger.trace(DEFAULT, "Retrieving the default {} release type", "releaseTypes");
+        return RELEASE_TYPES;
     }
 
     /**

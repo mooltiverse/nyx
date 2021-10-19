@@ -166,7 +166,7 @@ allprojects {
         options {
             // Link generated javadocs to external docs
             links 'https://download.eclipse.org/jgit/site/5.8.1.202007141445-r/apidocs/'
-            links 'https://www.slf4j.org/apidocs/'
+            links 'http://www.slf4j.org/apidocs/'   // TODO: make this URL use HTTPS again. It was disabled as the target site had invalid certificates, breaking the javadoc build
             links 'https://docs.gradle.org/current/javadoc/'
             links 'https://junit.org/junit5/docs/current/api/'
             links 'https://docs.oracle.com/en/java/javase/13/docs/api/'

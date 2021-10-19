@@ -25,6 +25,7 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -72,6 +73,10 @@ public class FileMapper {
             logger.debug(DATA, "Unable to infer the extension from file {}, using JSON by default", filePath);
             objectMapper = new ObjectMapper(new JsonFactory());
         }
+
+        // Only serialize objects and attributes with non null values. Here we set it at the global level.
+        // If this turns out to be an issue the same attribute can be set at a class or attribute level.
+        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
         objectMapper.enable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);

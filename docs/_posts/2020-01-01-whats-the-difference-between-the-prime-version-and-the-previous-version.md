@@ -8,7 +8,7 @@ tags: git version
 
 The *previous version* is, broadly speaking, the version that came before the current one (*current* the one Nyx is in the process of releasing).
 
-The *prime version* is a concept introduced by Nyx for [*collapsed*](TODO: add the link to the collapsed versioning configuration option) versioning (also see [this F.A.Q.]({{ site.baseurl }}{% link _posts/2020-01-01-how-does-collapsed-versioning-work.md %})), where the *previous version* alone is not enough in order to generate a new version number. The *prime version* is only used for this kind of versioning and you can see an example [here]({{ site.baseurl }}{% link _posts/2020-01-01-git-history-examples.md %}#pre-release-branch) with a broad explanation.
+The *prime version* is a concept introduced by Nyx for [*collapsed*]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#collapse-versions) versioning (also see [this F.A.Q.]({{ site.baseurl }}{% link _posts/2020-01-01-how-does-collapsed-versioning-work.md %})), where the *previous version* alone is not enough in order to generate a new version number. The *prime version* is only used for this kind of versioning and you can see an example [here]({{ site.baseurl }}{% link _posts/2020-01-01-git-history-examples.md %}#pre-release-branch) with a broad explanation.
 
 The distinction between *previous* and *prime* version is specific to Nyx and does not apply out of this scope.
 {: .notice--info}

@@ -21,8 +21,10 @@ import java.util.Map;
 
 import com.mooltiverse.oss.nyx.data.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.data.CommitMessageConventions;
-import com.mooltiverse.oss.nyx.data.Scheme;
+import com.mooltiverse.oss.nyx.data.ReleaseType;
+import com.mooltiverse.oss.nyx.data.ReleaseTypes;
 import com.mooltiverse.oss.nyx.data.Verbosity;
+import com.mooltiverse.oss.nyx.version.Scheme;
 
 /**
  * A simple configuration layer, acting as a value holder for configuration options.
@@ -72,6 +74,11 @@ public class SimpleConfigurationLayer implements ConfigurationLayer {
      * The value held by this object.
      */
     private Boolean releaseLenient = null;
+
+    /**
+     * The value held by this object.
+     */
+    private final SimpleReleaseTypes releaseTypes = new SimpleReleaseTypes();
 
     /**
      * The value held by this object.
@@ -258,6 +265,14 @@ public class SimpleConfigurationLayer implements ConfigurationLayer {
      * {@inheritDoc}
      */
     @Override
+    public SimpleReleaseTypes getReleaseTypes() {
+        return releaseTypes;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Boolean getResume() {
         return resume;
     }
@@ -357,7 +372,7 @@ public class SimpleConfigurationLayer implements ConfigurationLayer {
     }
 
     /**
-     * The value holder for commit message convenstions.
+     * The value holder for commit message conventions.
      */
     public static class SimpleCommitMessageConventions implements CommitMessageConventions {
         /**
@@ -407,6 +422,61 @@ public class SimpleConfigurationLayer implements ConfigurationLayer {
          */
         @Override
         public CommitMessageConvention getItem(String name) {
+            return items.get(name);
+        }
+    }
+
+    /**
+     * The value holder for commit message conventions.
+     */
+    public static class SimpleReleaseTypes implements ReleaseTypes {
+        /**
+         * The value held by this object.
+         */
+        public List<String> enabled = null;
+
+        /**
+         * The value held by this object.
+         */
+        public final Map<String,ReleaseType> items = new HashMap<String,ReleaseType>();
+
+        /**
+         * Default constructor.
+         */
+        public SimpleReleaseTypes() {
+            super();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public List<String> getEnabled() {
+            return enabled;
+        }
+
+        /**
+         * Sets the value for this option.
+         * 
+         * @param enabled the value for this option.
+         */
+        public void setEnabled(List<String> enabled) {
+            this.enabled = enabled;
+        }
+    
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Map<String,ReleaseType> getItems() {
+            return items;
+        }
+    
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public ReleaseType getItem(String name) {
             return items.get(name);
         }
     }

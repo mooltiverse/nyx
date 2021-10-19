@@ -342,9 +342,9 @@ public class JGitRepositoryTests {
 
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
 
-            // remotes still have no commits, so this must throw an exception
-            assertThrows(Exception.class, () -> remote1script.getLastCommit());
-            assertThrows(Exception.class, () -> remote2script.getLastCommit());
+            // remotes still have no commits
+            assertNull(remote1script.getLastCommit());
+            assertNull(remote2script.getLastCommit());
 
             // make a first sync, just to have a starting commit in remotes as well
             String pushedRemote = repository.push();
@@ -352,12 +352,12 @@ public class JGitRepositoryTests {
             // now the default remote 'origin' has the first commit
             assertEquals("origin", pushedRemote);
             assertDoesNotThrow(() -> remote1script.getLastCommit());
-            assertThrows(Exception.class, () -> remote2script.getLastCommit());
+            assertNull(remote2script.getLastCommit());
 
             // add a commit into the local repo and make sure it's not into the others
             script.andCommit("A commit message");
             assertNotEquals(script.getLastCommit().getId().getName(), remote1script.getLastCommit().getId().getName());
-            assertThrows(Exception.class, () -> remote2script.getLastCommit());
+            assertNull(remote2script.getLastCommit());
 
             // now push (to the default 'origin') and see the changes reflected
             pushedRemote = repository.push();
@@ -365,7 +365,7 @@ public class JGitRepositoryTests {
             // changes are reflected to 'origin' only
             assertEquals("origin", pushedRemote);
             assertEquals(script.getLastCommit().getId().getName(), remote1script.getLastCommit().getId().getName());
-            assertThrows(Exception.class, () -> remote2script.getLastCommit());
+            assertNull(remote2script.getLastCommit());
         }
         
         @DisplayName("JGitRepository.push(String)")
@@ -382,21 +382,21 @@ public class JGitRepositoryTests {
 
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
 
-            // remotes still have no commits, so this must throw an exception
-            assertThrows(Exception.class, () -> remote1script.getLastCommit());
-            assertThrows(Exception.class, () -> remote2script.getLastCommit());
+            // remotes still have no commits
+            assertNull(remote1script.getLastCommit());
+            assertNull(remote2script.getLastCommit());
 
             // make a first sync, just to have a starting commit in remotes as well
             String pushedRemote = repository.push("custom");
 
             // now the non-default remote 'custom' has the first commit
             assertEquals("custom", pushedRemote);
-            assertThrows(Exception.class, () -> remote1script.getLastCommit());
+            assertNull(remote1script.getLastCommit());
             assertDoesNotThrow(() -> remote2script.getLastCommit());
 
             // add a commit into the local repo and make sure it's not into the others
             script.andCommit("A commit message");
-            assertThrows(Exception.class, () -> remote1script.getLastCommit());
+            assertNull(remote1script.getLastCommit());
             assertNotEquals(script.getLastCommit().getId().getName(), remote2script.getLastCommit().getId().getName());
 
             // now push and see the changes reflected
@@ -404,7 +404,7 @@ public class JGitRepositoryTests {
 
             // changes are reflected to 'custom' only
             assertEquals("custom", pushedRemote);
-            assertThrows(Exception.class, () -> remote1script.getLastCommit());
+            assertNull(remote1script.getLastCommit());
             assertEquals(script.getLastCommit().getId().getName(), remote2script.getLastCommit().getId().getName());
         }
 
@@ -422,9 +422,9 @@ public class JGitRepositoryTests {
 
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
 
-            // remotes still have no commits, so this must throw an exception
-            assertThrows(Exception.class, () -> remote1script.getLastCommit());
-            assertThrows(Exception.class, () -> remote2script.getLastCommit());
+            // remotes still have no commits
+            assertNull(remote1script.getLastCommit());
+            assertNull(remote2script.getLastCommit());
 
             // make a first sync, just to have a starting commit in remotes as well
             Set<String> pushedRemotes = repository.push(List.<String>of("origin", "custom"));

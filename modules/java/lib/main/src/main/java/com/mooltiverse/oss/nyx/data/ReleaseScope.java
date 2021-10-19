@@ -32,14 +32,24 @@ public class ReleaseScope {
     private final List<String> commits = new ArrayList<String>();
 
     /**
+     * The version identifier of the most recent past release.
+     */
+    private String previousVersion = null;
+
+    /**
      * The SHA-1 identifier of the most recent past release commit.
      */
     private String previousVersionCommit = null;
 
     /**
-     * The version identifier of the most recent past release.
+     * The version identifier of the most recent past release with only core identifiers.
      */
-    private String previousVersion = null;
+    private String primeVersion = null;
+
+    /**
+     * The SHA-1 identifier of the most recent past release commit with only core identifiers.
+     */
+    private String primeVersionCommit = null;
 
     /**
      * The internal map of significant commits (those commits causing the version number to be bumped).
@@ -120,6 +130,68 @@ public class ReleaseScope {
     }
 
     /**
+     * Returns the version identifier of the most recent past release with only core identifiers.
+     * 
+     * @return the version identifier of the most recent past release with only core identifiers.
+     * It may be {@code null}.
+     */
+    public String getPrimeVersion() {
+        return primeVersion;
+    }
+
+    /**
+     * Returns {@code true} if the scope has a non {@code null} version identifier of the most recent past release
+     * with only core identifiers.
+     * 
+     * @return {@code true} if the scope has a non {@code null} version identifier of the most recent past release
+     * with only core identifiers. It may be {@code null}.
+     */
+    public boolean hasPrimeVersion() {
+        return !Objects.isNull(primeVersion);
+    }
+
+    /**
+     * Sets the version identifier of the most recent past release with only core identifiers.
+     * 
+     * @param primeVersion the version identifier of the most recent past release with only core identifiers.
+     * It may be {@code null}.
+     */
+    public void setPrimeVersion(String primeVersion) {
+        this.primeVersion = primeVersion;
+    }
+
+    /**
+     * Returns the SHA-1 identifier of the most recent past release commit with only core identifiers.
+     * 
+     * @return the SHA-1 identifier of the most recent past release commit with only core identifiers.
+     * It may be {@code null}.
+     */
+    public String getPrimeVersionCommit() {
+        return primeVersionCommit;
+    }
+
+    /**
+     * Returns {@code true} if the scope has a non {@code null} SHA-1 identifier of the most recent past release commit
+     * with only core identifiers.
+     * 
+     * @return {@code true} if the scope has a non {@code null} SHA-1 identifier of the most recent past release commit
+     * with only core identifiers.
+     */
+    public boolean hasPrimeVersionCommit() {
+        return !Objects.isNull(primeVersionCommit);
+    }
+
+    /**
+     * Sets the SHA-1 identifier of the most recent past release commit with only core identifiers.
+     * 
+     * @param primeVersionCommit the SHA-1 identifier of the most recent past release commit with only core identifiers.
+     * It may be {@code null}.
+     */
+    public void setPrimeVersionCommit(String primeVersionCommit) {
+        this.primeVersionCommit = primeVersionCommit;
+    }
+
+    /**
      * Returns the SHA-1 identifier of the first commit within the scope.
      * 
      * @return the SHA-1 identifier of the first commit within the scope. It may be {@code null}.
@@ -149,7 +221,8 @@ public class ReleaseScope {
     /**
      * Returns {@code true} if the scope has a non {@code null} SHA-1 identifier of the last commit within the scope.
      * 
-     * @return {@code true} if the scope has a non {@code null} SHA-1 identifier of the last commit within the scope. It may be {@code null}.
+     * @return {@code true} if the scope has a non {@code null} SHA-1 identifier of the last commit within the scope.
+     * It may be {@code null}.
      */
     public boolean hasFinalCommit() {
         return !commits.isEmpty();

@@ -86,8 +86,8 @@ nav-user-guide:
 #        url: /guide/user/configuration-reference/services/
 #      - title: "Extra Identifiers"
 #        url: /guide/user/configuration-reference/extra-identifiers/
-#      - title: "Release Types"
-#        url: /guide/user/configuration-reference/release-types/
+      - title: "Release Types"
+        url: /guide/user/configuration-reference/release-types/
 #      - title: "Artifacts"
 #        url: /guide/user/configuration-reference/artifacts/
 #      - title: "Expressions"

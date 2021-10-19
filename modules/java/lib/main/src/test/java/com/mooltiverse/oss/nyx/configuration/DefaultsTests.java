@@ -23,7 +23,7 @@ import java.io.File;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.mooltiverse.oss.nyx.data.Scheme;
+import com.mooltiverse.oss.nyx.version.Scheme;
 import com.mooltiverse.oss.nyx.version.SemanticVersion;
 
 @DisplayName("Defaults")

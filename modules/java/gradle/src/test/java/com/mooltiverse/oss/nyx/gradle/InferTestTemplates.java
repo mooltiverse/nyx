@@ -67,6 +67,21 @@ public class InferTestTemplates {
     static class UpToDateTests extends com.mooltiverse.oss.nyx.command.InferTestTemplates.UpToDateTests {}
 
     @Nested
+    @DisplayName("Infer match release type")
+    @ExtendWith(GradleCommandInvocationContextProvider.class)
+    static class ReleaseTypeMatchTests extends com.mooltiverse.oss.nyx.command.InferTestTemplates.ReleaseTypeMatchTests {}
+
+    @Nested
+    @DisplayName("Infer version with extra identifiers")
+    @ExtendWith(GradleCommandInvocationContextProvider.class)
+    static class ExtraIdentifiersTests extends com.mooltiverse.oss.nyx.command.InferTestTemplates.ExtraIdentifiersTests {}
+
+    @Nested
+    @DisplayName("Infer version with range check")
+    @ExtendWith(GradleCommandInvocationContextProvider.class)
+    static class VersionRangeCheckTests extends com.mooltiverse.oss.nyx.command.InferTestTemplates.VersionRangeCheckTests {}
+
+    @Nested
     @DisplayName("Infer run")
     @ExtendWith(GradleCommandInvocationContextProvider.class)
     static class RunTests extends com.mooltiverse.oss.nyx.command.InferTestTemplates.RunTests {}

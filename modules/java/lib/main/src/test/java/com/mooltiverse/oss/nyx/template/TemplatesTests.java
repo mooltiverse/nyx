@@ -89,11 +89,16 @@ public class TemplatesTests {
             assertFalse(Templates.toBoolean(null));
             assertFalse(Templates.toBoolean(""));
             assertFalse(Templates.toBoolean("    "));
+            assertFalse(Templates.toBoolean("false"));
+            assertFalse(Templates.toBoolean("FALSE"));
             
-            assertTrue(Templates.toBoolean("1"));
-            assertTrue(Templates.toBoolean("a"));
-            assertTrue(Templates.toBoolean("!"));
-            assertTrue(Templates.toBoolean("lkjhewm,òlkàòld wq dsedewdwedw"));
+            assertFalse(Templates.toBoolean("1"));
+            assertFalse(Templates.toBoolean("a"));
+            assertFalse(Templates.toBoolean("!"));
+            assertFalse(Templates.toBoolean("lkjhewm,òlkàòld wq dsedewdwedw"));
+
+            assertTrue(Templates.toBoolean("true"));
+            assertTrue(Templates.toBoolean("TRUE"));
         }
     }
 
@@ -116,6 +121,43 @@ public class TemplatesTests {
             assertEquals(1, Templates.toInteger("1"));
             assertEquals(100, Templates.toInteger("100"));
             assertEquals(9999999, Templates.toInteger("9999999"));
+        }
+    }
+
+    @Nested
+    @DisplayName("Templates.render with null scope")
+    class RenderWithNullScopeTests {
+        /**
+         * A test template
+         */
+        public static final String TEMPLATE = "{{#items}}\nName: {{name}}\n\nPrice: {{price}}\n  {{#features}}\n  Feature: {{description}}\n  {{/features}}\n{{/items}}";
+
+        /**
+         * The expected output for the template
+         */
+        public static final String TEMPLATE_OUTPUT = "";
+
+        @Test
+        @DisplayName("Templates.render(String, null)")
+        void renderWithNullScopeTest1()
+            throws Exception {
+            assertEquals(TEMPLATE_OUTPUT, Templates.render(TEMPLATE, null));
+        }
+
+        @Test
+        @DisplayName("Templates.render(Reader, null)")
+        void renderWithNullScopeTest2()
+            throws Exception {
+            assertEquals(TEMPLATE_OUTPUT, Templates.render(new StringReader(TEMPLATE), null));
+        }
+
+        @Test
+        @DisplayName("Templates.render(Reader, null, Writer)")
+        void renderWithNullScopeTest3()
+            throws Exception {
+            StringWriter output = new StringWriter();
+            Templates.render(new StringReader(TEMPLATE), null, output);
+            assertEquals(TEMPLATE_OUTPUT, output.toString());
         }
     }
 
@@ -190,6 +232,8 @@ public class TemplatesTests {
             state.setVersion("9.8.7");
             state.setTimestamp(Long.MAX_VALUE);
 
+            state.getReleaseScope().setPreviousVersion("4.5.6");
+            state.getReleaseScope().setPreviousVersionCommit("05cbfd58fadbec3d96b220a0054d96875aa37011");
             state.getReleaseScope().setPreviousVersion("4.5.6");
             state.getReleaseScope().setPreviousVersionCommit("05cbfd58fadbec3d96b220a0054d96875aa37011");
             state.getReleaseScope().getCommits().add("d40fcded9e516158a2901f5657794931528af106");

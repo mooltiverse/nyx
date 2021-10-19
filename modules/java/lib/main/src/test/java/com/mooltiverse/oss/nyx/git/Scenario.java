@@ -197,6 +197,219 @@ public enum Scenario {
         .andCommitWithTagInBranch("alpha", "0.0.9-alpha.2")
         .andCommitWithTagInBranch("master", "0.0.8")
         .andMergeIntoWithTag("master", "alpha", "Merge alpha > master", "0.0.9", null)
+    ),
+
+    /**
+     * The scenario where the Git repository has been created with several branches
+     * (all those contemplated in the {@link com.mooltiverse.oss.nyx.configuration.presets.Extended} preset).
+     * <br>
+     * Branches are:
+     * 
+     * <pre>
+     * - master: a mainline branch with a few tagged commits
+     * - main: a mainline branch with a a few non tagged commits
+     * - integration: an integration branch with a few tagged commits
+     * - development: an integration branch with a few non tagged commits
+     * - alpha: a maturity branch with a few tagged commits
+     * - beta: a maturity branch with a few tagged commits
+     * - gamma: a maturity branch with a few non tagged commits
+     * - v0.x: a maintenance branch with a few tagged commits
+     * - v1.x: a maintenance branch with a few non tagged commits
+     * - rel/0.x: a release branch with a few tagged commits
+     * - rel/1.x: a release branch with a few non tagged commits
+     * - feature/SSO: a feature branch with a few tagged commits
+     * - feature/IN-12345: a feature branch with a few non tagged commits
+     * - fix-98765: an hotfix branch with a few tagged commits
+     * - somebranch: a generic branch for 'internal' contributions with a few tagged commits
+     * - someotherbranch: a generic branch for 'internal' contributions with a few non tagged commits
+     * </pre>
+     * <br>
+     * This yields to a repository like:
+     * 
+     * <pre>
+     *   * 8f3dd93 (beta) Untagged commit #1 in branch beta
+     *   * a297e00 (tag: 0.0.6-beta.2) Commit xde
+     *   * d6b24a8 (tag: 0.0.6-beta.1) Commit xjl
+     *   * 46ec855 (alpha) Untagged commit in branch alpha
+     *   * c162a55 (tag: 0.0.6-alpha.2) Commit lxy
+     *   * abbb668 (tag: 0.0.6-alpha.1) Commit djf
+     *   | * e6781ca (gamma) Untagged commit #3 in branch gamma
+     *   | * c2c5458 Untagged commit #2 in branch gamma
+     *   | * 53ab7c1 Untagged commit #1 in branch gamma
+     *   |/  
+     *   | * 3c1bd3e (HEAD -> internal) Untagged commit #1 in branch internal
+     *   | * 1180b5e (tag: 0.0.6-internal.1+timestamp.003) Commit gqe
+     *   | * 5363e1c (tag: 0.0.6-internal.1+timestamp.002) Commit vfi
+     *   | * c753c3c (tag: 0.0.6-internal.1+timestamp.001) Commit mto
+     *   |/  
+     *   | * af9a14c (tag: tag3, somebranch) Commit fho
+     *   | * 5c5a667 (tag: tag2) Commit yyo
+     *   | * 1560350 (tag: tag1) Commit ehw
+     *   |/  
+     *   | * 5abba0a (someotherbranch) Untagged commit #3 in branch someotherbranch
+     *   | * a04254a Untagged commit #2 in branch someotherbranch
+     *   | * 0a10479 Untagged commit #1 in branch someotherbranch
+     *   | | * 5245a52 (feature/IN-12345) Untagged commit #3 in branch feature/IN-12345
+     *   | | * 4d5a3c2 Untagged commit #2 in branch feature/IN-12345
+     *   | | * c0ec7d2 Untagged commit #1 in branch feature/IN-12345
+     *   | |/  
+     *   |/|   
+     *   | | * f14c4c5 (feature/SSO) Untagged commit in branch feature/SSO
+     *   | | * fd313d1 (tag: 0.0.6-featuresso.2) Commit swa
+     *   | | * 0c93cdc (tag: 0.0.6-featuresso.1) Commit nxl
+     *   | |/  
+     *   |/|   
+     *   * | c0cface (integration) Untagged commit in branch integration
+     *   * | db26bd2 (tag: 0.0.6-integration.2) Commit xkk
+     *   |/  
+     *   * 8673f95 (tag: 0.0.6-integration.1, master) Commit jad
+     *   | * fe6db90 (fix-98765) Untagged commit in branch fix-98765
+     *   | * f352f79 (tag: 0.0.8-fix98765.2) Commit fee
+     *   | * 4b5687a (tag: 0.0.8-fix98765.1) Commit ogx
+     *   | * 890e188 (v0.x) Untagged commit in branch v0.x
+     *   | * d69e85b (tag: 0.0.7-v0x.1) Commit vvv
+     *   | * 47aa910 (tag: 0.0.7) Commit uie
+     *   | * 5b54a35 (tag: 0.0.6-v0x.3) Commit azr
+     *   | * 39e3879 (tag: 0.0.6-v0x.2) Commit hdl
+     *   | * 40c12cf (tag: 0.0.6-v0x.1) Commit aqi
+     *   |/  
+     *   | * 7505531 (rel/1.x) Untagged commit #3 in branch rel/1.x
+     *   | * 82eab49 Untagged commit #2 in branch rel/1.x
+     *   | * fb6fa06 Untagged commit #1 in branch rel/1.x
+     *   |/  
+     *   | * c55f82d (development) Untagged commit #3 in branch development
+     *   | * dd47ac7 Untagged commit #2 in branch development
+     *   | * 913e54e Untagged commit #1 in branch development
+     *   | | * bc81e17 (rel/0.x) Untagged commit in branch rel/0.x
+     *   | | * 636dff5 (tag: 0.0.6-rel.2) Commit kos
+     *   | | * 99ae8fd (tag: 0.0.6-rel.1) Commit ecs
+     *   | |/  
+     *   |/|   
+     *   | | * 290ef69 (v1.x) Untagged commit #3 in branch v1.x
+     *   | | * b0e518b Untagged commit #2 in branch v1.x
+     *   | | * b558e3d Untagged commit #1 in branch v1.x
+     *   | |/  
+     *   |/|   
+     *   * | b282b60 Untagged commit in branch master
+     *   * | 1a775e1 (tag: 0.0.5) Commit uap
+     *   * | a7e5922 (tag: 0.0.4) Commit iqy
+     *   * | 0861112 (tag: 0.0.3) Commit els
+     *   * | 4d725fd (tag: 0.0.2) Commit wrj
+     *   * | 330768c (tag: 0.0.1) Commit zwj
+     *   |/  
+     *   | * 341ce36 (main) Untagged commit #3 in branch main
+     *   | * 51fac9e Untagged commit #2 in branch main
+     *   | * a985699 Untagged commit #1 in branch main
+     *   |/  
+     *   * eaaa818 Initial commit
+     * </pre>
+     */
+    EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED( f -> Script.fromScratch(f).andAddFiles()
+        .andCommit("Initial commit")
+        .inBranch("master")
+        // feed the MAINLINE branch: main
+        .inBranch("main")
+        .andAddFiles().andStage().andCommit("Untagged commit #1 in branch main")
+        .andAddFiles().andStage().andCommit("Untagged commit #2 in branch main")
+        .andAddFiles().andStage().andCommit("Untagged commit #3 in branch main")
+        // feed the INTEGRATION branch: development (forking from master)
+        .inBranch("master")
+        .inBranch("development")
+        .andAddFiles().andStage().andCommit("Untagged commit #1 in branch development")
+        .andAddFiles().andStage().andCommit("Untagged commit #2 in branch development")
+        .andAddFiles().andStage().andCommit("Untagged commit #3 in branch development")
+        // feed the MAINLINE branch: master
+        .inBranch("master")
+        .andCommitWithTagInBranch("master", "0.0.1")
+        .andCommitWithTagInBranch("master", "0.0.2", "Annotated tag to commit 0.0.2")
+        .andCommitWithTagInBranch("master", "0.0.3")
+        .andCommitWithTagInBranch("master", "0.0.4", "Annotated tag to commit 0.0.4")
+        .andCommitWithTagInBranch("master", "0.0.5")
+        .andAddFiles().andStage().andCommit("Untagged commit in branch master")
+        // feed the MAINTENANCE branch: v0.x (forking from master)
+        .inBranch("master")
+        .andCommitWithTagInBranch("v0.x", "0.0.6-v0x.1", "Annotated tag to commit 0.0.6-v0x.1")
+        .andCommitWithTagInBranch("v0.x", "0.0.6-v0x.2", "Annotated tag to commit 0.0.6-v0x.2")
+        .andCommitWithTagInBranch("v0.x", "0.0.6-v0x.3")
+        .andCommitWithTagInBranch("v0.x", "0.0.7", "Annotated tag to commit 0.0.7")
+        .andCommitWithTagInBranch("v0.x", "0.0.7-v0x.1", "Annotated tag to commit 0.0.7-v0x.1")
+        .andAddFiles().andStage().andCommit("Untagged commit in branch v0.x")
+        // feed the MAINTENANCE branch: v1.x (forking from master)
+        .inBranch("master")
+        .inBranch("v1.x")
+        .andAddFiles().andStage().andCommit("Untagged commit #1 in branch v1.x")
+        .andAddFiles().andStage().andCommit("Untagged commit #2 in branch v1.x")
+        .andAddFiles().andStage().andCommit("Untagged commit #3 in branch v1.x")
+        // feed the RELEASE branch: rel/0.x (forking from master)
+        .inBranch("master")
+        .andCommitWithTagInBranch("rel/0.x", "0.0.6-rel.1", "Annotated tag to commit 0.0.6-rel.1")
+        .andCommitWithTagInBranch("rel/0.x", "0.0.6-rel.2")
+        .andAddFiles().andStage().andCommit("Untagged commit in branch rel/0.x")
+        // feed the RELEASE branch: rel/1.x (forking from master)
+        .inBranch("master")
+        .inBranch("rel/1.x")
+        .andAddFiles().andStage().andCommit("Untagged commit #1 in branch rel/1.x")
+        .andAddFiles().andStage().andCommit("Untagged commit #2 in branch rel/1.x")
+        .andAddFiles().andStage().andCommit("Untagged commit #3 in branch rel/1.x")
+        // feed the INTEGRATION branch: integration (forking from master)
+        .inBranch("master")
+        .andCommitWithTagInBranch("integration", "0.0.6-integration.1", "Annotated tag to commit 0.0.6-integration.1")
+        .andMergeInto("master")
+        .inBranch("integration")
+        .andCommitWithTagInBranch("integration", "0.0.6-integration.2")
+        .andAddFiles().andStage().andCommit("Untagged commit in branch integration")
+        // feed the FEATURE branch: feature/SSO (forking from integration)
+        .inBranch("integration")
+        .andCommitWithTagInBranch("feature/SSO", "0.0.6-featuresso.1", "Annotated tag to commit 0.0.6-featuresso.1")
+        .andCommitWithTagInBranch("feature/SSO", "0.0.6-featuresso.2")
+        .andAddFiles().andStage().andCommit("Untagged commit in branch feature/SSO")
+        // feed the FEATURE branch: feature/IN-12345 (forking from integration)
+        .inBranch("integration")
+        .inBranch("feature/IN-12345")
+        .andAddFiles().andStage().andCommit("Untagged commit #1 in branch feature/IN-12345")
+        .andAddFiles().andStage().andCommit("Untagged commit #2 in branch feature/IN-12345")
+        .andAddFiles().andStage().andCommit("Untagged commit #3 in branch feature/IN-12345")
+        // feed the HOTFIX branch: fix-98765 (forking from v0.x)
+        .inBranch("v0.x")
+        .andCommitWithTagInBranch("fix-98765", "0.0.8-fix98765.1", "Annotated tag to commit 0.0.8-fix98765.1")
+        .andCommitWithTagInBranch("fix-98765", "0.0.8-fix98765.2")
+        .andAddFiles().andStage().andCommit("Untagged commit in branch fix-98765")
+        // feed the MATURITY branch: alpha (forking from integration)
+        .inBranch("integration")
+        .andCommitWithTagInBranch("alpha", "0.0.6-alpha.1", "Annotated tag to commit 0.0.6-alpha.1")
+        .andCommitWithTagInBranch("alpha", "0.0.6-alpha.2")
+        .andAddFiles().andStage().andCommit("Untagged commit in branch alpha")
+        // feed the MATURITY branch: beta (forking from alpha)
+        .inBranch("alpha")
+        .andCommitWithTagInBranch("beta", "0.0.6-beta.1", "Annotated tag to commit 0.0.6-beta.1")
+        .andCommitWithTagInBranch("beta", "0.0.6-beta.2")
+        .andAddFiles().andStage().andCommit("Untagged commit #1 in branch beta")
+        // feed the MATURITY branch: gamma (forking from integration)
+        .inBranch("integration")
+        .inBranch("gamma")
+        .andAddFiles().andStage().andCommit("Untagged commit #1 in branch gamma")
+        .andAddFiles().andStage().andCommit("Untagged commit #2 in branch gamma")
+        .andAddFiles().andStage().andCommit("Untagged commit #3 in branch gamma")
+        // feed the INTERNAL branch: internal
+        .inBranch("integration")
+        .inBranch("internal")
+        .andCommitWithTagInBranch("internal", "0.0.6-internal.1+timestamp.001")
+        .andCommitWithTagInBranch("internal", "0.0.6-internal.1+timestamp.002")
+        .andCommitWithTagInBranch("internal", "0.0.6-internal.1+timestamp.003")
+        .andAddFiles().andStage().andCommit("Untagged commit #1 in branch internal")
+        // feed the INTERNAL branch: somebranch
+        .inBranch("integration")
+        .inBranch("somebranch")
+        .andCommitWithTagInBranch("somebranch", "tag1")
+        .andCommitWithTagInBranch("somebranch", "tag2")
+        .andCommitWithTagInBranch("somebranch", "tag3")
+        // feed the INTERNAL branch: someotherbranch
+        .inBranch("master")
+        .inBranch("someotherbranch")
+        .andAddFiles().andStage().andCommit("Untagged commit #1 in branch someotherbranch")
+        .andAddFiles().andStage().andCommit("Untagged commit #2 in branch someotherbranch")
+        .andAddFiles().andStage().andCommit("Untagged commit #3 in branch someotherbranch")
+        .inBranch("master")
     );
 
     /**

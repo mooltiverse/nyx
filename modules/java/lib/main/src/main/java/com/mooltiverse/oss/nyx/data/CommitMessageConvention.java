@@ -19,6 +19,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import com.mooltiverse.oss.nyx.version.Scheme;
+
 /**
  * This object models the fields used to configure a generic commit message convention.
  * <br>

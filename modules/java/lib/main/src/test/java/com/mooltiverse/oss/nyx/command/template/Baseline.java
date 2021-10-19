@@ -28,7 +28,7 @@ import com.mooltiverse.oss.nyx.git.Workbench;
 /**
  * This annotation can be used to define a well known Git baseline to be realized in a Git repository when
  * a test runs. Available baselines are defined as {@link Scenario}s, which indeed is the value that must be
- * declared by this annotation. Baselines are realized in anew temporary directory each time.
+ * declared by this annotation. Baselines are realized in a new temporary directory each time.
  * <br>
  * The baseline being realized may be directly represented by a parameter that is injected into a test method
  * (when the injected parameter is of type {@link Script}, {@link Workbench}) or used by other objects

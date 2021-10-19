@@ -131,11 +131,14 @@ public class NyxTests {
 
             // set a few values to use later on for comparison
             oldState.setVersion("3.5.7");
+            oldState.setVersionRange(".*");
             oldState.getInternals().put("attr1", "value1");
             oldState.getReleaseScope().getCommits().add("final");
             oldState.getReleaseScope().getCommits().add("initial");
             oldState.getReleaseScope().setPreviousVersion("previous");
             oldState.getReleaseScope().setPreviousVersionCommit("previousCommit");
+            oldState.getReleaseScope().setPrimeVersion("prime");
+            oldState.getReleaseScope().setPrimeVersionCommit("primeCommit");
             oldState.getReleaseScope().getSignificantCommits().put("final", "major");
             oldState.getReleaseScope().getSignificantCommits().put("initial", "minor");
 
@@ -159,6 +162,8 @@ public class NyxTests {
             assertEquals(oldState.getReleaseScope().getInitialCommit(), resumedState.getReleaseScope().getInitialCommit());
             assertEquals(oldState.getReleaseScope().getPreviousVersion(), resumedState.getReleaseScope().getPreviousVersion());
             assertEquals(oldState.getReleaseScope().getPreviousVersionCommit(), resumedState.getReleaseScope().getPreviousVersionCommit());
+            assertEquals(oldState.getReleaseScope().getPrimeVersion(), resumedState.getReleaseScope().getPrimeVersion());
+            assertEquals(oldState.getReleaseScope().getPrimeVersionCommit(), resumedState.getReleaseScope().getPrimeVersionCommit());
             assertEquals(2, resumedState.getReleaseScope().getSignificantCommits().size());
             assertTrue(resumedState.getReleaseScope().getSignificantCommits().containsKey("final"));
             assertEquals("major", resumedState.getReleaseScope().getSignificantCommits().get("final"));
@@ -167,6 +172,7 @@ public class NyxTests {
 
             assertEquals(oldState.getTimestamp(), resumedState.getTimestamp());
             assertEquals(oldState.getVersion(), resumedState.getVersion());
+            assertEquals(oldState.getVersionRange(), resumedState.getVersionRange());
         }
     }
 }

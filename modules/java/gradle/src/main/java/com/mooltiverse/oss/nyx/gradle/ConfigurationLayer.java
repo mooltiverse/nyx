@@ -24,9 +24,15 @@ import java.util.Objects;
 
 import com.mooltiverse.oss.nyx.data.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.data.CommitMessageConventions;
+import com.mooltiverse.oss.nyx.data.Identifier;
+import com.mooltiverse.oss.nyx.data.Identifiers;
+import com.mooltiverse.oss.nyx.data.IdentifierPosition;
 import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
-import com.mooltiverse.oss.nyx.data.Scheme;
+import com.mooltiverse.oss.nyx.data.ReleaseType;
+import com.mooltiverse.oss.nyx.data.ReleaseTypes;
 import com.mooltiverse.oss.nyx.data.Verbosity;
+import com.mooltiverse.oss.nyx.data.WorkspaceStatus;
+import com.mooltiverse.oss.nyx.version.Scheme;
 
 /**
  * This class is an adapter to allow the extension to be used as a Nyx configuration layer.
@@ -47,6 +53,11 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
      * The private singleton instance of the commit message convention configuration block.
      */
     private CommitMessageConventionsBlock commitMessageConventionsBlock = null;
+
+    /**
+     * The private singleton instance of the release types configuration block.
+     */
+    private ReleaseTypesBlock releaseTypesBlock = null;
 
     /**
      * Standard constructor.
@@ -142,6 +153,17 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
      * {@inheritDoc}
      */
     @Override
+    public ReleaseTypes getReleaseTypes() {
+        if (Objects.isNull(releaseTypesBlock)) {
+            releaseTypesBlock = new ReleaseTypesBlock();
+        }
+        return releaseTypesBlock;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Boolean getResume() {
         return extension.getResume().getOrNull();
     }
@@ -154,7 +176,7 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
         throws IllegalPropertyException {
         if (extension.getScheme().isPresent() && !Objects.isNull(extension.getScheme().getOrNull())) {
             try {
-                return Scheme.from(extension.getScheme().get());
+                return Scheme.valueOf(extension.getScheme().get());
             }
             catch (IllegalArgumentException iae) {
                 throw new IllegalPropertyException(String.format("Illegal value '%s' provided for configuration option '%s'", extension.getScheme().get(), "scheme"), iae);
@@ -176,7 +198,7 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
      */
     @Override
     public String getStateFile() {
-        return extension.getStateFile().isPresent() ? extension.getStateFile().get().getAbsolutePath() : null;
+        return extension.getStateFile().isPresent() ? extension.getStateFile().get() : null;
     }
 
     /**
@@ -187,7 +209,7 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
         throws IllegalPropertyException {
         if (extension.getVerbosity().isPresent() && !Objects.isNull(extension.getVerbosity().getOrNull())) {
             try {
-                return Verbosity.from(extension.getVerbosity().get());
+                return Verbosity.valueOf(extension.getVerbosity().get());
             }
             catch (IllegalArgumentException iae) {
                 throw new IllegalPropertyException(String.format("Illegal value '%s' provided for configuration option '%s'", extension.getVerbosity().get(), "verbosity"), iae);
@@ -212,7 +234,7 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
     }
 
     /**
-     * The class implementing the {@link CommitMessageConventions} confliguration block.
+     * The class implementing the {@link CommitMessageConventions} configuration block.
      */
     private class CommitMessageConventionsBlock implements CommitMessageConventions {
         /**
@@ -264,6 +286,79 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
         public CommitMessageConvention getItem(String name) {
             NyxExtension.CommitMessageConventions.CommitMessageConvention convention = extension.getCommitMessageConventions().getItems().findByName(name);
             return Objects.isNull(convention) ? null : new CommitMessageConvention(convention.getExpression().get(), convention.getBumpExpressions().isPresent() ? convention.getBumpExpressions().get() : Map.<String,String>of());
+        }
+    }
+
+    /**
+     * The class implementing the {@link ReleaseTypes} configuration block.
+     */
+    private class ReleaseTypesBlock implements ReleaseTypes {
+        /**
+         * The local cache of resolved release type items.
+         */
+        private Map<String, ReleaseType> items = null;
+
+        /**
+         * Default constructor is private on purpose.
+         */
+        private ReleaseTypesBlock() {
+            super();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public List<String> getEnabled() {
+            // the list property is always present and never null but is empty when the user doesn't define its contents
+            return extension.getReleaseTypes().getEnabled().isPresent() && !extension.getReleaseTypes().getEnabled().get().isEmpty() ? extension.getReleaseTypes().getEnabled().get() : null;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Map<String,ReleaseType> getItems() {
+            // the map property is always present and never null but is empty when the user doesn't define its contents
+            if (extension.getReleaseTypes().getItems().isEmpty())
+                return null;
+            else {
+                if (Objects.isNull(items))
+                    items = new HashMap<String, ReleaseType>(extension.getReleaseTypes().getItems().size());
+
+                for (NyxExtension.ReleaseTypes.ReleaseType type: extension.getReleaseTypes().getItems()) {
+                    if (!items.containsKey(type.getName()))
+                        items.put(type.getName(), getItem(type.getName()));
+                }
+
+                return items;
+            }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public ReleaseType getItem(String name) {
+            NyxExtension.ReleaseTypes.ReleaseType type = extension.getReleaseTypes().getItems().findByName(name);
+
+            if (Objects.isNull(type))
+                return null;
+            else {
+                Identifiers identifiers = null;
+                if (!Objects.isNull(type.getIdentifiers())) {
+                    Map<String,Identifier> items = null;
+                    if (!type.getIdentifiers().getItems().isEmpty()) {
+                        items = new HashMap<String,Identifier>(type.getIdentifiers().getItems().size());
+                        for (NyxExtension.ReleaseTypes.ReleaseType.Identifiers.Identifier identifier: type.getIdentifiers().getItems()) {
+                            if (!items.containsKey(identifier.getName()))
+                                items.put(identifier.getName(), new Identifier(identifier.getQualifier().isPresent() ? identifier.getQualifier().get() : null, identifier.getValue().isPresent() ? identifier.getValue().get() : null, identifier.getPosition().isPresent() ? IdentifierPosition.valueOf(identifier.getPosition().get()) : null));
+                        }
+                    }
+                    identifiers = new Identifiers(type.getIdentifiers().getEnabled().isPresent() ? type.getIdentifiers().getEnabled().get() : null, items);
+                }
+                return new ReleaseType(type.getCollapseVersions().isPresent() ? type.getCollapseVersions().get() : null, type.getCollapsedVersionQualifier().isPresent() ? type.getCollapsedVersionQualifier().get() : null, type.getFilterTags().isPresent() ? type.getFilterTags().get() : null, type.getGitCommit().isPresent() ? type.getGitCommit().get() : null, type.getGitCommitMessage().isPresent() ? type.getGitCommitMessage().get() : null, type.getGitPush().isPresent() ? type.getGitPush().get() : null, type.getGitTag().isPresent() ? type.getGitTag().get() : null, type.getGitTagMessage().isPresent() ? type.getGitTagMessage().get() : null, identifiers, type.getMatchBranches().isPresent() ? type.getMatchBranches().get() : null, type.getMatchEnvironmentVariables().isPresent() ? type.getMatchEnvironmentVariables().get() : null, type.getMatchWorkspaceStatus().isPresent() ? WorkspaceStatus.valueOf(type.getMatchWorkspaceStatus().get()) : null, type.getPublish().isPresent() ? type.getPublish().get() : null, type.getVersionRange().isPresent() ? type.getVersionRange().get() : null, type.getVersionRangeFromBranchName().isPresent() ? type.getVersionRangeFromBranchName().get() : null);
+            }
         }
     }
 }

@@ -18,6 +18,7 @@ package com.mooltiverse.oss.nyx.state;
 import static com.mooltiverse.oss.nyx.log.Markers.STATE;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -26,13 +27,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mooltiverse.oss.nyx.Nyx;
-import com.mooltiverse.oss.nyx.command.Infer;
 import com.mooltiverse.oss.nyx.configuration.Configuration;
 import com.mooltiverse.oss.nyx.data.DataAccessException;
 import com.mooltiverse.oss.nyx.data.FileMapper;
 import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
 import com.mooltiverse.oss.nyx.data.ReleaseScope;
-import com.mooltiverse.oss.nyx.data.Scheme;
+import com.mooltiverse.oss.nyx.data.ReleaseType;
+import com.mooltiverse.oss.nyx.template.Templates;
+import com.mooltiverse.oss.nyx.version.Scheme;
 import com.mooltiverse.oss.nyx.version.Versions;
 
 /**
@@ -63,12 +65,17 @@ public class State implements Root {
     /**
      * The map containing the internal attributes.
      */
-    private Map<String, String> internals = new HashMap<String, String>();
+    private  Map<String, String> internals = new HashMap<String, String>();
 
     /**
      * The private immutable instance of the release scope.
      */
     private ReleaseScope releaseScope = new ReleaseScope();
+
+    /**
+     * The private instance of the release type.
+     */
+    private ReleaseType releaseType = null;
 
     /**
      * The latest timestamp that was taken.
@@ -79,6 +86,11 @@ public class State implements Root {
      * The version that has been inferred.
      */
     private String version = null;
+
+    /**
+     * The regular expression used to check the version against a range constraint.
+     */
+    private String versionRange = null;
 
     /**
      * Default constructor. <b>DO NOT USE THIS CONSTRUCTOR AS IT EXISTS ONLY FOR INTERNAL USE WHEN UNMARSHALLING</b>
@@ -165,7 +177,7 @@ public class State implements Root {
     public String getBump()
         throws DataAccessException, IllegalPropertyException {
         String bump = getConfiguration().getBump();
-        return Objects.isNull(bump) ? Versions.mostRelevantIdentifier(getScheme().getScheme(), getReleaseScope().getSignificantCommits().values()) : bump;
+        return Objects.isNull(bump) ? Versions.mostRelevantIdentifier(getScheme(), getReleaseScope().getSignificantCommits().values()) : bump;
     }
 
     /**
@@ -214,9 +226,14 @@ public class State implements Root {
     @Override
     public Boolean getNewRelease()
         throws DataAccessException, IllegalPropertyException {
-        // TODO: Also check the releaseType attribute telling if the release has to be published
-        // (when available), and include it into the AND here
-        return getNewVersion();
+        if (Objects.isNull(releaseType))
+            return Boolean.FALSE;
+        try {
+            return Boolean.valueOf(getNewVersion() && Templates.toBoolean(Templates.render(releaseType.getPublish(), this)));
+        }
+        catch (IOException ioe) {
+            throw new IllegalPropertyException(String.format("Unable to render the template %s specified for the publish option in the release type", releaseType.getPublish()), ioe);
+        }
     }
 
     /**
@@ -234,6 +251,23 @@ public class State implements Root {
     @Override
     public ReleaseScope getReleaseScope() {
         return releaseScope;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ReleaseType getReleaseType() {
+        return releaseType;
+    }
+
+    /**
+     * Sets the selected release type.
+     * 
+     * @param releaseType the selected release type.
+     */
+    public void setReleaseType(ReleaseType releaseType) {
+        this.releaseType = releaseType;
     }
 
     /**
@@ -263,17 +297,7 @@ public class State implements Root {
     }
 
     /**
-     * Returns the version inferred by Nyx, if any. If the version was overridden by configuration this will be the
-     * same as {@link Configuration#getVersion()}. This value is only available after {@link Nyx#infer()} has run.
-     * 
-     * @return the current version inferred by Nyx. This is {@code null} until {@link Nyx#infer()} has run.
-     * 
-     * @throws DataAccessException in case the attribute cannot be read or accessed.
-     * @throws IllegalPropertyException in case the attribute has been defined but has incorrect values or it can't be resolved.
-     * 
-     * @see Configuration#getVersion()
-     * @see Nyx#infer()
-     * @see Infer
+     * {@inheritDoc}
      */
     @Override
     public String getVersion() 
@@ -297,6 +321,33 @@ public class State implements Root {
      */
     public void setVersion(String version) {
         this.version = version;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getVersionRange()
+        throws DataAccessException, IllegalPropertyException {
+        return versionRange;
+    }
+
+    /**
+     * Returns {@code true} if the scope has a non {@code null} version range.
+     * 
+     * @return {@code true} if the scope has a non {@code null} version range.
+     */
+    public boolean hasVersionRange() {
+        return !Objects.isNull(versionRange);
+    }
+
+    /**
+     * Sets the regular expression used to check the version against a range constraint.
+     * 
+     * @param versionRange the regular expression used to check the version against a range constraint.
+     */
+    public void setVersionRange(String versionRange) {
+        this.versionRange = versionRange;
     }
 
     /**

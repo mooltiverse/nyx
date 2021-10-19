@@ -19,9 +19,11 @@ The following attributes are at the top of the hierarchy:
 | [`newRelease`](#new-release)              | boolean | `true` if a new release has to be issued    |
 | [`newVersion`](#new-version)              | boolean | `true` if a new version has been generated  |
 | [`releaseScope`](#release-scope)          | object  | The release scope attributes                |
-| [`scheme`](#scheme)                       | string  | `semver`                                    |
+| [`releaseType`](#release-type)            | string  | The selected release type                   |
+| [`scheme`](#scheme)                       | string  | `SEMVER`                                    |
 | [`timestamp`](#timestamp)                 | integer | A positive integer                          |
 | [`version`](#version)                     | string  | The current version                         |
+| [`versionRange`](#version-range)          | string  | The version range regular expression        |
 
 ### Branch
 
@@ -45,7 +47,7 @@ This attribute is not available until [infer]({{ site.baseurl }}{% link _pages/g
 | Related configuration options | [bump]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#bump){: .btn .btn--success .btn--small} [initialVersion]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#initial-version){: .btn .btn--success .btn--small} [scheme]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#scheme){: .btn .btn--success .btn--small} [version]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#version){: .btn .btn--success .btn--small} |
 | Initialized by task           | [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#infer){: .btn .btn--small} |
 
-This string contains the name of the identifier that has been dumped to make the new [`version`](#version) starting from the [previous one]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#previous-version). Version identifiers depend on the selected version [scheme](#scheme).
+This string contains the name of the identifier that has been bumped to make the new [`version`](#version) starting from the [previous one]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#previous-version). Version identifiers depend on the selected version [scheme](#scheme).
 
 This attribute is not initialized if the [`version`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#version) configuration option was passed to override inference or the [release scope]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}) does not contain [significant changes]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#significant-commits) to be released.
 
@@ -90,12 +92,12 @@ Using the attributes in this section is not supported. You should never rely on 
 | ----------------------------- | ---------------------------------------------------------------------------------------- |
 | Name                          | `newRelease`                                                                             |
 | Type                          | boolean                                                                                  |
-| Related configuration options | [bump]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#bump){: .btn .btn--success .btn--small} [initialVersion]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#initial-version){: .btn .btn--success .btn--small} [releasePrefix]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#release-prefix){: .btn .btn--success .btn--small} [scheme]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#scheme){: .btn .btn--success .btn--small} [version]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#version){: .btn .btn--success .btn--small} |
+| Related configuration options | [bump]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#bump){: .btn .btn--success .btn--small} [initialVersion]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#initial-version){: .btn .btn--success .btn--small} [releasePrefix]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#release-prefix){: .btn .btn--success .btn--small} [releaseTypes/ID/publish]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#publish){: .btn .btn--success .btn--small} [scheme]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#scheme){: .btn .btn--success .btn--small} [version]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#version){: .btn .btn--success .btn--small} |
 | Initialized by task           | [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#infer){: .btn .btn--small} |
 
-This value is `true` when the [`newVersion`](#version) is `true` and a new release with the current [`version`](#version) has to be [issued](TODO: link to the releaseType state attribute telling if the release type is configured to publish new releases).
+This value is `true` when the [`newVersion`](#version) is `true` and a new release with the current [`version`](#version) has to be [issued]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#publish).
 
-This is basically a shorthand to testing if [`version`](#version) is different than the [`releaseScope/previousVersion`]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#previous-version) and [publishing](TODO: link to the releaseType state attribute telling if the release type is configured to publish new releases) is enabled for the current [release type](TODO: link to the releaseType state block here).
+This is basically a shorthand to testing if [`version`](#version) is different than the [`releaseScope/previousVersion`]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#previous-version) and [publishing]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#publish) is enabled for the current [release type](#release-type).
 
 This attribute is not available until [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer) has run.
 
@@ -120,6 +122,18 @@ This attribute is not available until [infer]({{ site.baseurl }}{% link _pages/g
 | Initialized by task           | See the [details]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}) |
 
 This object collects several attributes defining the release scope, documented [here]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}).
+
+### Release type
+
+| ----------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                          | `releaseType`                                                                            |
+| Type                          | object                                                                                   |
+| Related configuration options | [releaseType]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#release-type-definition){: .btn .btn--success .btn--small} |
+| Initialized by task           | [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#infer){: .btn .btn--small} |
+
+This object references the release type that has been selected among the [enabled ones]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#enabled) by [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer).
+
+The referenced object has all the attributes modelled as configuration options of a [`releaseType`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#release-type-definition) and all templates are evaluated.
 
 ### Scheme
 
@@ -158,5 +172,19 @@ If this is not used as the sole timestamp you may see a skew due to when the sys
 The version that was [inferred]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer), unless the [`version`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#version) configuration option was passed to override inference. When the version is not overridden or inferred the [`initialVersion`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#initial-version) is used.
 
 Please note that this version might be the same as the [`releaseScope/previousVersion`]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#previous-version) found in the Git commit history (or the [`initialVersion`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#initial-version) if the commit history does not contain any previous version) if the [release scope]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}) has no [significant changes]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#significant-commits). To know whether this is a new version or not you should check [`newVersion`](#new-version).
+
+This attribute is not available until [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer) has run.
+
+### Version range
+
+| ----------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                          | `versionRange`                                                                           |
+| Type                          | string                                                                                   |
+| Related configuration options | [versionRange]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#version-range){: .btn .btn--success .btn--small} [versionRangeFromBranchName]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#version-range-from-branch-name){: .btn .btn--success .btn--small} |
+| Initialized by task           | [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#infer){: .btn .btn--small} |
+
+The regular expression matched against the [`version`](#version) to make sure it's within a specific range.
+
+This constraint is optional and depends on the [`versionRange`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#version-range) and [`versionRangeFromBranchName`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}) configuration options. When the check is not enabled by this option this reference attribute remains undefined, otherwise it's populated with a regular expression that is dynamically generated to match the current [`version`](#version). To be more specific, when [`versionRange`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#version-range) is configured this value has the same value configured in [`versionRange`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#version-range) after the template has been evaluated, otherwise if [`versionRangeFromBranchName`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}) is enabled this value has the dynamically generated regular expression as it's inferred by the branch name.
 
 This attribute is not available until [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer) has run.

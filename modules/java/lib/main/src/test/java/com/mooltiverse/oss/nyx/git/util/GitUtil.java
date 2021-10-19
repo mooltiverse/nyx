@@ -86,9 +86,13 @@ public class GitUtil {
         printRepositoryCommitHistory(directory, out);
         printSeparator(ps, "REPOSITORY COMMIT HISTORY", false);
 
-        printSeparator(ps, "REPOSITORY COMMIT GRAPH", true);
-        printRepositoryCommitGraph(directory, out);
-        printSeparator(ps, "REPOSITORY COMMIT GRAPH", false);
+        printSeparator(ps, "REPOSITORY COMMIT GRAPH BY DATE", true);
+        printRepositoryCommitGraphByDate(directory, out);
+        printSeparator(ps, "REPOSITORY COMMIT GRAPH BY DATE", false);
+
+        printSeparator(ps, "REPOSITORY COMMIT GRAPH BY TOPOLOGY", true);
+        printRepositoryCommitGraphByTopology(directory, out);
+        printSeparator(ps, "REPOSITORY COMMIT GRAPH BY TOPOLOGY", false);
 
         printSeparator(ps, marker, false);
         ps.flush();
@@ -139,14 +143,24 @@ public class GitUtil {
     }
 
     /**
-     * Dumps the list of repository commits with a graph.
+     * Dumps the list of repository commits with a graph sorted by date.
      * 
      * @param directory the repository to dump the informations about
      * @param out the stream to write to
      */
-    public static void printRepositoryCommitGraph(File directory, OutputStream out)
+    public static void printRepositoryCommitGraphByDate(File directory, OutputStream out)
         throws Exception {
         RuntimeUtil.runCommand(new String[]{"git", "log", "--all", "--decorate", "--oneline", "--graph", "--date-order"}, null, directory, out);
-        
+    }
+
+    /**
+     * Dumps the list of repository commits with a graph sorted by topology.
+     * 
+     * @param directory the repository to dump the informations about
+     * @param out the stream to write to
+     */
+    public static void printRepositoryCommitGraphByTopology(File directory, OutputStream out)
+        throws Exception {
+        RuntimeUtil.runCommand(new String[]{"git", "log", "--all", "--decorate", "--oneline", "--graph", "--topo-order"}, null, directory, out);
     }
 }

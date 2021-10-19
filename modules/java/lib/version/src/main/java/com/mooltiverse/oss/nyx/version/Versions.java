@@ -50,6 +50,82 @@ public class Versions {
     }
 
     /**
+     * Returns {@code true} if the given string is a legal version and it only contains core identifiers
+     * according to the given scheme.
+     * <br>
+     * This method uses a strict criteria, without trying to sanitize the given string.
+     * 
+     * @param scheme the scheme to check against.
+     * @param s the string version to check.
+     * 
+     * @return {@code true} if the given string is a legal version and it only contains core identifiers
+     * according to the given scheme, {@code false} otherwise.
+     * 
+     * @see #isLegal(Scheme, String)
+     */
+    public static boolean isCore(Scheme scheme, String s) {
+        return isCore(scheme, s, false);
+    }
+
+    /**
+     * Returns {@code true} if the given string is a legal version and it only contains core identifiers
+     * according to the given scheme.
+     * <br>
+     * This method is different than {@link #isCore(Scheme, String, String)} as it also sanitizes extra characters
+     * in the body of the version identifier instead of just an optional prefix (when {@code sanitize} is {@code true}).
+     * 
+     * @param scheme the scheme to check against.
+     * @param s the string version to check.
+     * @param lenient when {@code true} prefixes and non critical extra characters are tolerated even if they are not
+     * strictly legal from the version scheme specification perspective.
+     * 
+     * @return {@code true} if the given string is a legal version and it only contains core identifiers
+     * according to the given scheme, {@code false} otherwise.
+     * 
+     * @see #isLegal(Scheme, String, boolean)
+     */
+    public static boolean isCore(Scheme scheme, String s, boolean lenient) {
+        Objects.requireNonNull(s, "Can't parse a null string");
+        switch (scheme) {
+            case SEMVER: {
+                    if (!SemanticVersion.isLegal(s, lenient))
+                        return false;
+                    
+                    SemanticVersion v = SemanticVersion.valueOf(s, lenient);
+                    return Objects.isNull(v.getPrerelease()) && Objects.isNull(v.getBuild());
+                }
+            //MAVEN: not yet supported
+            default: throw new IllegalArgumentException(String.format("Illegal or unsupported scheme %s", scheme));
+        }
+    }
+
+    /**
+     * Returns {@code true} if the given string is a legal version and it only contains core identifiers
+     * according to the given scheme.
+     * <br>
+     * This method is different than {@link #isCore(Scheme, String, boolean)} as it only tolerates a prefix, while
+     * {@link #isCore(Scheme, String, boolean)} is more lenient as it also sanitizes extra characters in the body
+     * of the version identifier (when {@code sanitize} is {@code true}).
+     * 
+     * @param scheme the scheme to check against.
+     * @param s the string version to check.
+     * @param prefix the initial string that is used for the version prefix. This will be stripped off from the given
+     * string representation of the version. It can be {@code null} or empty, in which case it's ignored. If not empty
+     * and the given version string doesn't start with this prefix, this prefix is ignored.
+     * 
+     * @return {@code true} if the given string is a legal version and it only contains core identifiers
+     * according to the given scheme, {@code false} otherwise.
+     * 
+     * @see #isLegal(Scheme, String, boolean)
+     */
+    public static boolean isCore(Scheme scheme, String s, String prefix) {
+        Objects.requireNonNull(s, "Can't parse a null string");
+        if (!Objects.isNull(prefix) && s.startsWith(prefix))
+            s = s.replaceFirst(prefix, "");
+        return isCore(scheme, s);
+    }
+
+    /**
      * Returns {@code true} if the given string is a legal version which, for example, can be parsed using
      * {@link #valueOf(Scheme, String)} without exceptions using the implementation selected by the given scheme.
      * <br>

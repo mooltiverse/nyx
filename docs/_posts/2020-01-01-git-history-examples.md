@@ -118,7 +118,7 @@ Keep this in mind if you use long running pre-release branches that you merge to
 
 These branches are often defined in those branching strategies using [release branches]({{ site.baseurl }}{% link _pages/guide/user/06.best-practice/branching-models.md %}#release-branches), [maintenance branches]({{ site.baseurl }}{% link _pages/guide/user/06.best-practice/branching-models.md %}#maintenance-branches) or [release and maintenance]({{ site.baseurl }}{% link _pages/guide/user/06.best-practice/branching-models.md %}#release-and-maintenance-branches).
 
-What they basically do is make sure that versions issued by these branches comply with a certain range, preventing releases outside the range to be issued. This is done by [configuring](TODO: add the link to the version constraint configuration options here) the branch with static or dynamic rules.
+What they basically do is make sure that versions issued by these branches comply with a certain range, preventing releases outside the range to be issued. This is done by configuring the branch with static rules (like [`versionRange`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#version-range)) or dynamic rules (like [`versionRangeFromBranchName`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#version-range-from-branch-name)).
 
 In this example we use a branch named `0.x` (might as well be `v0.x`) that only allows version with the *major* identifier to be `0`, so the range is between `0.0.0` and `0.N.M`, with `N` and `M` set to be any positive integer.
 

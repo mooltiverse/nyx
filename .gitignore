@@ -19,3 +19,6 @@ build/
 #   ./gradlew cleanEclipse
 .project
 .classpath
+# BuildShip keeps creating compiled output in the 'bin'
+# directory so let's ignore it
+bin/

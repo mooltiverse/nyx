@@ -19,9 +19,10 @@ import com.mooltiverse.oss.nyx.data.Block;
 import com.mooltiverse.oss.nyx.data.CommitMessageConventions;
 import com.mooltiverse.oss.nyx.data.DataAccessException;
 import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
-import com.mooltiverse.oss.nyx.data.Scheme;
+import com.mooltiverse.oss.nyx.data.ReleaseTypes;
 import com.mooltiverse.oss.nyx.data.Verbosity;
 import com.mooltiverse.oss.nyx.state.State;
+import com.mooltiverse.oss.nyx.version.Scheme;
 
 /**
  * This interface models the configuration root block, with global options.
@@ -127,6 +128,17 @@ public interface Root extends Block {
      * @throws IllegalPropertyException in case the option has been defined but has incorrect values or it can't be resolved.
      */
     public Boolean getReleaseLenient()
+        throws DataAccessException, IllegalPropertyException;
+
+    /**
+     * Returns the release types configuration block.
+     * 
+     * @return the release types configuration block. Never {@code null}.
+     * 
+     * @throws DataAccessException in case the option cannot be read or accessed.
+     * @throws IllegalPropertyException in case the option has been defined but has incorrect values or it can't be resolved.
+     */
+    public ReleaseTypes getReleaseTypes()
         throws DataAccessException, IllegalPropertyException;
 
     /**

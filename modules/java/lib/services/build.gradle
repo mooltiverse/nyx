@@ -23,7 +23,7 @@ configurations {
 */
 dependencies {
   implementation         'org.slf4j:slf4j-api:1.7.30'                                               // SLF4J API (http://www.slf4j.org/)
-  implementation         'com.fasterxml.jackson.core:jackson-databind:2.12.2'                       // Jackson JSON library (https://github.com/FasterXML/jackson)
+  implementation         'com.fasterxml.jackson.core:jackson-databind:2.12.4'                       // Jackson JSON library (https://github.com/FasterXML/jackson)
 }
 
 test {

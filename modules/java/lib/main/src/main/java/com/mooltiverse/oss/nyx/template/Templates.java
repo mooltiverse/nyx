@@ -55,7 +55,7 @@ public class Templates {
      * Standard functions are available in the rendering engine.
      * 
      * @param template the template
-     * @param scope the object representing the value to use in rendering
+     * @param scope the object representing the value to use in rendering. If {@code null} it won't be used.
      * 
      * @return a string with the rendered output
      * 
@@ -73,7 +73,7 @@ public class Templates {
      * Standard functions are available in the rendering engine.
      * 
      * @param template the template
-     * @param scope the object representing the value to use in rendering
+     * @param scope the object representing the value to use in rendering. If {@code null} it won't be used.
      * 
      * @return a string with the rendered output
      * 
@@ -91,7 +91,7 @@ public class Templates {
      * Standard functions are available in the rendering engine.
      * 
      * @param template the template
-     * @param scope the object representing the value to use in rendering
+     * @param scope the object representing the value to use in rendering. If {@code null} it won't be used.
      * @param writer the object to write the output to
      * 
      * @throws IOException in case of I/O issues
@@ -103,7 +103,8 @@ public class Templates {
 
         // prepare the scopes with the object passed by the used plust the map of all standard functions
         List<Object> scopes = new ArrayList<Object>(2);
-        scopes.add(scope);
+        if (!Objects.isNull(scope))
+            scopes.add(scope);
         scopes.add(Functions.FUNCTIONS);
         mustache.execute(writer, scopes).flush();
     }
@@ -113,10 +114,11 @@ public class Templates {
      * 
      * @param value the text to convert
      * 
-     * @return {@code true} if the given value is not {@code null} and not blank, {@code false} in all other cases.
+     * @return {@code true} if the given value is not {@code null} and not blank and it is a string representation of a {@code true},
+     * {@code false} in all other cases.
      */
     public static Boolean toBoolean(String value) {
-        return Objects.isNull(value) || value.isBlank() ? Boolean.FALSE : Boolean.TRUE;
+        return Boolean.valueOf(value);
     }
 
     /**

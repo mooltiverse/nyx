@@ -43,6 +43,34 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 public class SemanticVersionTests {
     /**
      * A {@link MethodSource} method that returns valid structured data to test semantic versions.
+     * Each item is core, so it doesn't have pre-release and/or build identifiers.
+     * Each returned argument has the fields:<br>
+     * - version: the entire string representation of the version<br>
+     * - major: the major number<br>
+     * - minor: the minor number<br>
+     * - patch: the patch number<br>
+     * - prerelease: null<br>
+     * - build: null<br>
+     *
+     * @return a stream of arguments representing correct versions
+     */
+    static Stream<Arguments> wellKnownValidCoreVersions() {
+        return Stream.of(
+            // This list is taken from https://regex101.com/r/vkijKf/1/, linked from https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
+            arguments("0.0.4", 0, 0, 4, null, null),
+            arguments("1.2.3", 1, 2, 3, null, null),
+            arguments("10.20.30", 10, 20, 30, null, null),
+            arguments("1.0.0", 1, 0, 0, null, null),
+            arguments("2.0.0", 2, 0, 0, null, null),
+            arguments("1.1.7", 1, 1, 7, null, null),
+            //Let's use just the biggest int here. just make it -1 to support bumps
+            arguments(String.valueOf(Integer.MAX_VALUE-1)+"."+String.valueOf(Integer.MAX_VALUE-1)+"."+String.valueOf(Integer.MAX_VALUE-1), Integer.MAX_VALUE-1, Integer.MAX_VALUE-1, Integer.MAX_VALUE-1, null, null)
+        );
+    }
+
+    /**
+     * A {@link MethodSource} method that returns valid structured data to test semantic versions.
+     * Each item is not core, so it has pre-release and/or build identifiers.
      * Each returned argument has the fields:<br>
      * - version: the entire string representation of the version<br>
      * - major: the major number<br>
@@ -53,12 +81,9 @@ public class SemanticVersionTests {
      *
      * @return a stream of arguments representing correct versions
      */
-    static Stream<Arguments> wellKnownValidVersions() {
+    static Stream<Arguments> wellKnownValidNonCoreVersions() {
         return Stream.of(
             // This list is taken from https://regex101.com/r/vkijKf/1/, linked from https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
-            arguments("0.0.4", 0, 0, 4, null, null),
-            arguments("1.2.3", 1, 2, 3, null, null),
-            arguments("10.20.30", 10, 20, 30, null, null),
             arguments("1.1.2-prerelease+meta", 1, 1, 2, Arrays.asList("prerelease"), Arrays.asList("meta")),
             arguments("1.1.2+meta", 1, 1, 2, null, Arrays.asList("meta")),
             arguments("1.1.2+meta-valid", 1, 1, 2, null, Arrays.asList("meta-valid")),
@@ -75,9 +100,6 @@ public class SemanticVersionTests {
             arguments("1.2.3-beta", 1, 2, 3, Arrays.asList("beta"), null),
             arguments("10.2.3-DEV-SNAPSHOT", 10, 2, 3, Arrays.asList("DEV-SNAPSHOT"), null),
             arguments("1.2.3-SNAPSHOT-123", 1, 2, 3, Arrays.asList("SNAPSHOT-123"), null),
-            arguments("1.0.0", 1, 0, 0, null, null),
-            arguments("2.0.0", 2, 0, 0, null, null),
-            arguments("1.1.7", 1, 1, 7, null, null),
             arguments("2.0.0+build.1848", 2, 0, 0, null, Arrays.asList("build", "1848")),
             arguments("2.0.1-alpha.1227", 2, 0, 1, Arrays.asList("alpha", "1227"), null),
             arguments("1.0.0-alpha+beta", 1, 0, 0, Arrays.asList("alpha"), Arrays.asList("beta")),
@@ -85,10 +107,24 @@ public class SemanticVersionTests {
             arguments("1.2.3----R-S.12.9.1--.12+meta", 1, 2, 3, Arrays.asList("---R-S", "12", "9", "1--", "12"), Arrays.asList("meta")),
             arguments("1.2.3----RC-SNAPSHOT.12.9.1--.12", 1, 2, 3, Arrays.asList("---RC-SNAPSHOT", "12", "9", "1--", "12"), null),
             arguments("1.0.0+0.build.1-rc.10000aaa-kk-0.1", 1, 0, 0, null, Arrays.asList("0", "build", "1-rc", "10000aaa-kk-0", "1")),
-            //Let's use just the biggest int here. just make it -1 to support bumps
-            arguments(String.valueOf(Integer.MAX_VALUE-1)+"."+String.valueOf(Integer.MAX_VALUE-1)+"."+String.valueOf(Integer.MAX_VALUE-1), Integer.MAX_VALUE-1, Integer.MAX_VALUE-1, Integer.MAX_VALUE-1, null, null),
             arguments("1.0.0-0A.is.legal", 1, 0, 0, Arrays.asList("0A", "is", "legal"), null)
         );
+    }
+
+    /**
+     * A {@link MethodSource} method that returns valid structured data to test semantic versions.
+     * Each returned argument has the fields:<br>
+     * - version: the entire string representation of the version<br>
+     * - major: the major number<br>
+     * - minor: the minor number<br>
+     * - patch: the patch number<br>
+     * - prerelease: an (optional) List of strings, each representing one identifier in the prerelease part<br>
+     * - build: an (optional) List of strings, each representing one identifier in the build part<br>
+     *
+     * @return a stream of arguments representing correct versions
+     */
+    static Stream<Arguments> wellKnownValidVersions() {
+        return Stream.concat(wellKnownValidCoreVersions(), wellKnownValidNonCoreVersions());
     }
 
     /**
@@ -149,6 +185,87 @@ public class SemanticVersionTests {
 
     /**
      * A {@link MethodSource} method that returns structured data to test semantic versions.
+     * Each item has spurious charachers but can be sanitized to a core version.
+     * Each returned argument has the fields:<br>
+     * - version: the entire string representation of the sanitizeable original version<br>
+     * - prefix: if the original version has a prefix, it's the expected outcome of the invocation of the getPrefix() method, otherwise null means that the version has no prefix and getPrefix() is expected to return null<br>
+     * - sanitizedOutcome: the expected outcome of the entire sanitization over the original string<br>
+     * - sanitizedPrefixOutcome: the expected outcome of sanitizePrefix() over the original string<br>
+     * - sanitizedNumberOutcome: the expected outcome of sanitizeNumbers() over the original string<br>
+     *
+     * @return a stream of arguments representing incorrect versions that can be sanitized
+     */
+    static Stream<Arguments> wellKnownSanitizableCoreVersions() {
+        return Stream.of(
+            // common prefixes
+            arguments("v1.2.3", "v", "1.2.3", "1.2.3", "v1.2.3"),
+            arguments("ver1.2.3", "ver", "1.2.3", "1.2.3", "ver1.2.3"),
+            arguments("version1.2.3", "version", "1.2.3", "1.2.3", "version1.2.3"),
+            arguments("r1.2.3", "r", "1.2.3", "1.2.3", "r1.2.3"),
+            arguments("rel1.2.3", "rel", "1.2.3", "1.2.3", "rel1.2.3"),
+            arguments("release1.2.3", "release", "1.2.3", "1.2.3", "release1.2.3"),
+            // spurious prefixes
+            arguments("-1.2.3", "-", "1.2.3", "1.2.3", "-1.2.3"),
+            arguments("!1.2.3", "!", "1.2.3", "1.2.3", "!1.2.3"),
+            arguments("+1.2.3", "+", "1.2.3", "1.2.3", "+1.2.3"),
+            arguments("!(trash)v1.2.3", "!(trash)v", "1.2.3", "1.2.3", "!(trash)v1.2.3"),
+            // leading zeroes
+            arguments("01.02.03", null, "1.2.3", "01.02.03", "1.2.3"),
+            arguments("000001.000002.000003", null, "1.2.3", "000001.000002.000003", "1.2.3"),
+            // These are taken from https://regex101.com/r/vkijKf/1/, linked from https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
+            // they are actually illegal numbers, bu they can be sanitized to legal ones
+            arguments("01.1.1", null, "1.1.1", "01.1.1", "1.1.1"),
+            arguments("1.01.1", null, "1.1.1", "1.01.1", "1.1.1"),
+            arguments("1.1.01", null, "1.1.1", "1.1.01", "1.1.1")
+        );
+    }
+
+    /**
+     * A {@link MethodSource} method that returns structured data to test semantic versions.
+     * Each item has spurious charachers but can be sanitized to a non core version.
+     * Each returned argument has the fields:<br>
+     * - version: the entire string representation of the sanitizeable original version<br>
+     * - prefix: if the original version has a prefix, it's the expected outcome of the invocation of the getPrefix() method, otherwise null means that the version has no prefix and getPrefix() is expected to return null<br>
+     * - sanitizedOutcome: the expected outcome of the entire sanitization over the original string<br>
+     * - sanitizedPrefixOutcome: the expected outcome of sanitizePrefix() over the original string<br>
+     * - sanitizedNumberOutcome: the expected outcome of sanitizeNumbers() over the original string<br>
+     *
+     * @return a stream of arguments representing incorrect versions that can be sanitized
+     */
+    static Stream<Arguments> wellKnownSanitizableNonCoreVersions() {
+        return Stream.of(
+            // common prefixes
+            arguments("v1.2.3-alpha.1", "v", "1.2.3-alpha.1", "1.2.3-alpha.1", "v1.2.3-alpha.1"),
+            arguments("v1.2.3-alpha.1+build.2", "v", "1.2.3-alpha.1+build.2", "1.2.3-alpha.1+build.2", "v1.2.3-alpha.1+build.2"),
+            arguments("v1.2.3-alpha.1.delta-q.whatever+build.2.20200101", "v", "1.2.3-alpha.1.delta-q.whatever+build.2.20200101", "1.2.3-alpha.1.delta-q.whatever+build.2.20200101", "v1.2.3-alpha.1.delta-q.whatever+build.2.20200101"),
+            arguments("ver-1.2.3", "ver-", "1.2.3", "1.2.3", "ver-1.2.3"),
+            arguments("ver.1.2.3", "ver.", "1.2.3", "1.2.3", "ver.1.2.3"),
+            arguments("version-1.2.3", "version-", "1.2.3", "1.2.3", "version-1.2.3"),
+            arguments("version.1.2.3", "version.", "1.2.3", "1.2.3", "version.1.2.3"),
+            arguments("rel-1.2.3", "rel-", "1.2.3", "1.2.3", "rel-1.2.3"),
+            arguments("rel.1.2.3", "rel.", "1.2.3", "1.2.3", "rel.1.2.3"),
+            arguments("release-1.2.3", "release-", "1.2.3", "1.2.3", "release-1.2.3"),
+            arguments("release.1.2.3", "release.", "1.2.3", "1.2.3", "release.1.2.3"),
+            // leading zeroes
+            arguments("01.02.03-alpha", null, "1.2.3-alpha", "01.02.03-alpha", "1.2.3-alpha"),
+            arguments("01.02.03-alpha.0", null, "1.2.3-alpha.0", "01.02.03-alpha.0", "1.2.3-alpha.0"),
+            arguments("01.02.03-alpha+beta", null, "1.2.3-alpha+beta", "01.02.03-alpha+beta", "1.2.3-alpha+beta"),
+            arguments("01.02.03-alpha+beta.0", null, "1.2.3-alpha+beta.0", "01.02.03-alpha+beta.0", "1.2.3-alpha+beta.0"),
+            arguments("01.02.03+beta", null, "1.2.3+beta", "01.02.03+beta", "1.2.3+beta"),
+            arguments("01.02.03+beta.0", null, "1.2.3+beta.0", "01.02.03+beta.0", "1.2.3+beta.0"),
+            arguments("01.02.03-alpha.0+beta.0", null, "1.2.3-alpha.0+beta.0", "01.02.03-alpha.0+beta.0", "1.2.3-alpha.0+beta.0"),
+            arguments("01.02.03-alpha.01+beta.02", null, "1.2.3-alpha.1+beta.02", "01.02.03-alpha.01+beta.02", "1.2.3-alpha.1+beta.02"),
+            arguments("000001.000002.000003-alpha.00345+beta-00678", null, "1.2.3-alpha.345+beta-00678", "000001.000002.000003-alpha.00345+beta-00678", "1.2.3-alpha.345+beta-00678"),
+            // These are taken from https://regex101.com/r/vkijKf/1/, linked from https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
+            // they are actually illegal numbers, bu they can be sanitized to legal ones
+            arguments("1.2.3-0123", null, "1.2.3-123", "1.2.3-0123", "1.2.3-123"),
+            arguments("1.2.3-0123.0123", null, "1.2.3-123.123", "1.2.3-0123.0123", "1.2.3-123.123"),
+            arguments("-1.0.3-gamma+b7718", "-", "1.0.3-gamma+b7718", "1.0.3-gamma+b7718", "-1.0.3-gamma+b7718")
+        );
+    }
+
+    /**
+     * A {@link MethodSource} method that returns structured data to test semantic versions.
      * Each returned argument has the fields:<br>
      * - version: the entire string representation of the sanitizeable original version<br>
      * - prefix: if the original version has a prefix, it's the expected outcome of the invocation of the getPrefix() method, otherwise null means that the version has no prefix and getPrefix() is expected to return null<br>
@@ -159,51 +276,7 @@ public class SemanticVersionTests {
      * @return a stream of arguments representing incorrect versions that can be sanitized
      */
     static Stream<Arguments> wellKnownSanitizableVersions() {
-        return Stream.of(
-            // common prefixes
-            arguments("v1.2.3", "v", "1.2.3", "1.2.3", "v1.2.3"),
-            arguments("v1.2.3-alpha.1", "v", "1.2.3-alpha.1", "1.2.3-alpha.1", "v1.2.3-alpha.1"),
-            arguments("v1.2.3-alpha.1+build.2", "v", "1.2.3-alpha.1+build.2", "1.2.3-alpha.1+build.2", "v1.2.3-alpha.1+build.2"),
-            arguments("v1.2.3-alpha.1.delta-q.whatever+build.2.20200101", "v", "1.2.3-alpha.1.delta-q.whatever+build.2.20200101", "1.2.3-alpha.1.delta-q.whatever+build.2.20200101", "v1.2.3-alpha.1.delta-q.whatever+build.2.20200101"),
-            arguments("ver1.2.3", "ver", "1.2.3", "1.2.3", "ver1.2.3"),
-            arguments("ver-1.2.3", "ver-", "1.2.3", "1.2.3", "ver-1.2.3"),
-            arguments("ver.1.2.3", "ver.", "1.2.3", "1.2.3", "ver.1.2.3"),
-            arguments("version1.2.3", "version", "1.2.3", "1.2.3", "version1.2.3"),
-            arguments("version-1.2.3", "version-", "1.2.3", "1.2.3", "version-1.2.3"),
-            arguments("version.1.2.3", "version.", "1.2.3", "1.2.3", "version.1.2.3"),
-            arguments("r1.2.3", "r", "1.2.3", "1.2.3", "r1.2.3"),
-            arguments("rel1.2.3", "rel", "1.2.3", "1.2.3", "rel1.2.3"),
-            arguments("rel-1.2.3", "rel-", "1.2.3", "1.2.3", "rel-1.2.3"),
-            arguments("rel.1.2.3", "rel.", "1.2.3", "1.2.3", "rel.1.2.3"),
-            arguments("release1.2.3", "release", "1.2.3", "1.2.3", "release1.2.3"),
-            arguments("release-1.2.3", "release-", "1.2.3", "1.2.3", "release-1.2.3"),
-            arguments("release.1.2.3", "release.", "1.2.3", "1.2.3", "release.1.2.3"),
-            // spurious prefixes
-            arguments("-1.2.3", "-", "1.2.3", "1.2.3", "-1.2.3"),
-            arguments("!1.2.3", "!", "1.2.3", "1.2.3", "!1.2.3"),
-            arguments("+1.2.3", "+", "1.2.3", "1.2.3", "+1.2.3"),
-            arguments("!(trash)v1.2.3", "!(trash)v", "1.2.3", "1.2.3", "!(trash)v1.2.3"),
-            // leading zeroes
-            arguments("01.02.03", null, "1.2.3", "01.02.03", "1.2.3"),
-            arguments("01.02.03-alpha", null, "1.2.3-alpha", "01.02.03-alpha", "1.2.3-alpha"),
-            arguments("01.02.03-alpha.0", null, "1.2.3-alpha.0", "01.02.03-alpha.0", "1.2.3-alpha.0"),
-            arguments("01.02.03-alpha+beta", null, "1.2.3-alpha+beta", "01.02.03-alpha+beta", "1.2.3-alpha+beta"),
-            arguments("01.02.03-alpha+beta.0", null, "1.2.3-alpha+beta.0", "01.02.03-alpha+beta.0", "1.2.3-alpha+beta.0"),
-            arguments("01.02.03+beta", null, "1.2.3+beta", "01.02.03+beta", "1.2.3+beta"),
-            arguments("01.02.03+beta.0", null, "1.2.3+beta.0", "01.02.03+beta.0", "1.2.3+beta.0"),
-            arguments("01.02.03-alpha.0+beta.0", null, "1.2.3-alpha.0+beta.0", "01.02.03-alpha.0+beta.0", "1.2.3-alpha.0+beta.0"),
-            arguments("01.02.03-alpha.01+beta.02", null, "1.2.3-alpha.1+beta.02", "01.02.03-alpha.01+beta.02", "1.2.3-alpha.1+beta.02"),
-            arguments("000001.000002.000003", null, "1.2.3", "000001.000002.000003", "1.2.3"),
-            arguments("000001.000002.000003-alpha.00345+beta-00678", null, "1.2.3-alpha.345+beta-00678", "000001.000002.000003-alpha.00345+beta-00678", "1.2.3-alpha.345+beta-00678"),
-            // These are taken from https://regex101.com/r/vkijKf/1/, linked from https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
-            // they are actually illegal numbers, bu they can be sanitized to legal ones
-            arguments("1.2.3-0123", null, "1.2.3-123", "1.2.3-0123", "1.2.3-123"),
-            arguments("1.2.3-0123.0123", null, "1.2.3-123.123", "1.2.3-0123.0123", "1.2.3-123.123"),
-            arguments("01.1.1", null, "1.1.1", "01.1.1", "1.1.1"),
-            arguments("1.01.1", null, "1.1.1", "1.01.1", "1.1.1"),
-            arguments("1.1.01", null, "1.1.1", "1.1.01", "1.1.1"),
-            arguments("-1.0.3-gamma+b7718", "-", "1.0.3-gamma+b7718", "1.0.3-gamma+b7718", "-1.0.3-gamma+b7718")
-        );
+        return Stream.concat(wellKnownSanitizableCoreVersions(), wellKnownSanitizableNonCoreVersions());
     }
 
     /**

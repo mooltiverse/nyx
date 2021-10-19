@@ -20,7 +20,6 @@ import static com.mooltiverse.oss.nyx.log.Markers.CONFIGURATION;
 import java.io.File;
 
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -35,8 +34,11 @@ import com.mooltiverse.oss.nyx.data.CommitMessageConventions;
 import com.mooltiverse.oss.nyx.data.DataAccessException;
 import com.mooltiverse.oss.nyx.data.FileMapper;
 import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
-import com.mooltiverse.oss.nyx.data.Scheme;
+import com.mooltiverse.oss.nyx.data.LayeredMapConfigurationBlock;
+import com.mooltiverse.oss.nyx.data.ReleaseType;
+import com.mooltiverse.oss.nyx.data.ReleaseTypes;
 import com.mooltiverse.oss.nyx.data.Verbosity;
+import com.mooltiverse.oss.nyx.version.Scheme;
 
 /**
  * The Nyx configuration. The configuration is a live object that resolves each option lazily, only when required.
@@ -59,9 +61,14 @@ public class Configuration implements Root {
     private static final Logger logger = LoggerFactory.getLogger(Configuration.class);
 
     /**
-     * The private singleton instance of the commit message convention configuration block.
+     * The private instance of the commit message convention configuration block.
      */
     private CommitMessageConventionsBlock commitMessageConventionsBlock = null;
+
+    /**
+     * The private instance of the release types configuration block.
+     */
+    private ReleaseTypesBlock releaseTypesBlock = null;
 
     /**
      * The internal representation of the configuration layers and their priorities.
@@ -124,6 +131,8 @@ public class Configuration implements Root {
         logger.trace(CONFIGURATION, "Clearing the configuration cache");
         if (!Objects.isNull(commitMessageConventionsBlock))
             commitMessageConventionsBlock.resetCache();
+        if (!Objects.isNull(releaseTypesBlock))
+            releaseTypesBlock.resetCache();
     }
 
     /**
@@ -448,6 +457,20 @@ public class Configuration implements Root {
      * {@inheritDoc}
      */
     @Override
+    public ReleaseTypes getReleaseTypes()
+        throws DataAccessException, IllegalPropertyException {
+        logger.trace(CONFIGURATION, "Retrieving the release types");
+
+        if (Objects.isNull(releaseTypesBlock)) {
+            releaseTypesBlock = new ReleaseTypesBlock();
+        }
+        return releaseTypesBlock;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Boolean getResume()
         throws DataAccessException, IllegalPropertyException {
         logger.trace(CONFIGURATION, "Retrieving the {} configuration option", "resume");
@@ -550,32 +573,14 @@ public class Configuration implements Root {
     }
 
     /**
-     * The class implementing the {@link CommitMessageConventions} confliguration block.
+     * The class implementing the {@link CommitMessageConventions} configuration block.
      */
-    private class CommitMessageConventionsBlock implements CommitMessageConventions {
-        /**
-         * The private map of the items resolved among the layers.
-         */
-        private final Map<String,CommitMessageConvention> resolvedItems = new HashMap<String,CommitMessageConvention>();
-
-        /**
-         * The flag telling if the items have been already initialized.
-         */
-        private boolean itemsInitialized = false;
-
+    private class CommitMessageConventionsBlock extends LayeredMapConfigurationBlock<CommitMessageConvention> implements CommitMessageConventions {
         /**
          * Default constructor is private on purpose.
          */
         private CommitMessageConventionsBlock() {
-            super();
-        }
-
-        /**
-         * Resets the resolved items and clears the cache.
-         */
-        private void resetCache() {
-            resolvedItems.clear();
-            itemsInitialized = false;
+            super("commitMessageConventions");
         }
 
         /**
@@ -584,11 +589,11 @@ public class Configuration implements Root {
         @Override
         public List<String> getEnabled()
             throws DataAccessException, IllegalPropertyException {
-            logger.trace(CONFIGURATION, "Retrieving the {} configuration option", "commitMessageConventions.enabled");
+            logger.trace(CONFIGURATION, "Retrieving the {}.{} configuration option", configurationBlockName, "enabled");
             for (ConfigurationLayer layer: layers.values()) {
                 List<String> enabled = layer.getCommitMessageConventions().getEnabled();
                 if (!Objects.isNull(enabled)) {
-                    logger.trace(CONFIGURATION, "The {} configuration option value is: {}", "commitMessageConventions.enabled", String.join(", ", enabled));
+                    logger.trace(CONFIGURATION, "The {}.{} configuration option value is: {}", configurationBlockName, "enabled", String.join(", ", enabled));
                     return enabled;
                 }
             }
@@ -596,76 +601,68 @@ public class Configuration implements Root {
         }
 
         /**
-         * Returns the map of resolved items, resolving them over all the layers. Each field of each item needs to be 
-         * resolved independently as it may be overridden in some layer.
-         * 
-         * @return the map of resolved items, resolving them over all the layers. Empty if no items are enabled.
-         * 
-         * @throws DataAccessException in case the option cannot be read or accessed.
-         * @throws IllegalPropertyException in case the option has been defined but has incorrect values or it can't be resolved.
+         * {@inheritDoc}
          */
-        private Map<String,CommitMessageConvention> getResolvedItems()
+        @Override
+        protected CommitMessageConvention getResolvedItem(String name)
             throws DataAccessException, IllegalPropertyException {
-            logger.trace(CONFIGURATION, "Resolving the {} configuration option", "commitMessageConventions.items");
-            if (!itemsInitialized) {
-                List<String> enabled = getEnabled();
-                if (Objects.isNull(enabled)) {
-                    logger.trace(CONFIGURATION, "No enabled {} to resolve", "commitMessageConventions.items");
-                }
-                else {
-                    logger.trace(CONFIGURATION, "Resolving {} {}: ", enabled.size(), "commitMessageConventions.items", String.join(", ", enabled));
-                    resolvedItems.clear();
-                    for (String enabledItem: enabled) {
-                        resolvedItems.put(enabledItem, getResolvedItem(enabledItem));
-                    }
-                }
-            }
-            return resolvedItems;
-        }
-
-        /**
-         * Returns the resolved item with the given name, resolving it over all the layers. Each field needs to be 
-         * resolved independently as it may be overridden in some layer.
-         * 
-         * @param name the name of the item to retrieve. Cannot be {@code null}.
-         * 
-         * @return the resolved item, if any. {@code null} of no item with such name is available.
-         * 
-         * @throws DataAccessException in case the option cannot be read or accessed.
-         * @throws IllegalPropertyException in case the option has been defined but has incorrect values or it can't be resolved.
-         */
-        private CommitMessageConvention getResolvedItem(String name)
-            throws DataAccessException, IllegalPropertyException {
-            logger.trace(CONFIGURATION, "Resolving the {}[{}] configuration option", "commitMessageConventions.items", name);
+            logger.trace(CONFIGURATION, "Resolving the {}.{}[{}] configuration option", configurationBlockName, "items", name);
             for (ConfigurationLayer layer: layers.values()) {
                 CommitMessageConvention item = layer.getCommitMessageConventions().getItem(name);
                 if (!Objects.isNull(item)) {
-                    logger.trace(CONFIGURATION, "The {}[{}] configuration option has been resolved", "commitMessageConventions.items", name);
+                    logger.trace(CONFIGURATION, "The {}.{}[{}] configuration option has been resolved", configurationBlockName, "items", name);
                     return item;
                 }
             }
-            logger.error(CONFIGURATION, "Unable to resolve the {}[{}] configuration option", "commitMessageConventions.items", name);
-            throw new IllegalPropertyException(String.format("Unable to resolve the {}[{}] configuration option", "commitMessageConventions.items", name));
+            logger.error(CONFIGURATION, "Unable to resolve the {}.{}[{}] configuration option", configurationBlockName, "items", name);
+            throw new IllegalPropertyException(String.format("Unable to resolve the %s.%s[%s] configuration option", configurationBlockName, "items", name));
+        }
+    }
+
+    /**
+     * The class implementing the {@link ReleaseTypes} configuration block.
+     */
+    private class ReleaseTypesBlock extends LayeredMapConfigurationBlock<ReleaseType> implements ReleaseTypes {
+        /**
+         * Default constructor is private on purpose.
+         */
+        private ReleaseTypesBlock() {
+            super("releaseTypes");
         }
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public Map<String,CommitMessageConvention> getItems()
+        public List<String> getEnabled()
             throws DataAccessException, IllegalPropertyException {
-            logger.trace(CONFIGURATION, "Retrieving the {} configuration option", "commitMessageConventions.items");
-            return getResolvedItems();
+            logger.trace(CONFIGURATION, "Retrieving the {}.{} configuration option", configurationBlockName, "enabled");
+            for (ConfigurationLayer layer: layers.values()) {
+                List<String> enabled = layer.getReleaseTypes().getEnabled();
+                if (!Objects.isNull(enabled)) {
+                    logger.trace(CONFIGURATION, "The {}.{} configuration option value is: {}", configurationBlockName, "enabled", String.join(", ", enabled));
+                    return enabled;
+                }
+            }
+            return DefaultLayer.getInstance().getReleaseTypes().getEnabled();
         }
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public CommitMessageConvention getItem(String name)
+        protected ReleaseType getResolvedItem(String name)
             throws DataAccessException, IllegalPropertyException {
-            logger.trace(CONFIGURATION, "Retrieving the {}[{}] configuration option", "commitMessageConventions.items", name);
-            return getResolvedItem(name);
+            logger.trace(CONFIGURATION, "Resolving the {}.{}[{}] configuration option", configurationBlockName, "items", name);
+            for (ConfigurationLayer layer: layers.values()) {
+                ReleaseType item = layer.getReleaseTypes().getItem(name);
+                if (!Objects.isNull(item)) {
+                    logger.trace(CONFIGURATION, "The {}.{}[{}] configuration option has been resolved", configurationBlockName, "items", name);
+                    return item;
+                }
+            }
+            logger.error(CONFIGURATION, "Unable to resolve the {}.{}[{}] configuration option", configurationBlockName, "items", name);
+            throw new IllegalPropertyException(String.format("Unable to resolve the %s.%s[%s] configuration option", configurationBlockName, "items", name));
         }
     }
 }

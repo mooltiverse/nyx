@@ -18,11 +18,12 @@ These are the top level options in the configuration:
 | [`preset`](#preset)                                       | string  | `--preset=<NAME>`                                         | `NYX_PRESET=<NAME>`                                           | N/A      |
 | [`releaseLenient`](#release-lenient)                      | boolean | `--release-lenient`, `--release-lenient=true|false`       | `NYX_RELEASE_LENIENT=true|false`                              | `true`   |
 | [`releasePrefix`](#release-prefix)                        | string  | `--release-prefix=<PREFIX>`                               | `NYX_RELEASE_PREFIX=<PREFIX>`                                 | N/A      |
+| [`releaseTypes`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}) | object  | See [Release Types]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}) | See [Release Types]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}) | N/A      |
 | [`resume`](#resume)                                       | string  | `--resume`, `resume=true|false`                           | `NYX_RESUME=true|false`                                       | `false`  |
-| [`scheme`](#scheme)                                       | string  | `--scheme=<NAME>`                                         | `NYX_SCHEME=<NAME>`                                           | `semver` |
+| [`scheme`](#scheme)                                       | string  | `--scheme=<NAME>`                                         | `NYX_SCHEME=<NAME>`                                           | `SEMVER` |
 | [`sharedConfigurationFile`](#shared-configuration-file)   | string  | `--shared-configuration-file=<PATH>`                      | `NYX_SHARED_CONFIGURATION_FILE=<PATH>`                        | N/A      |
 | [`stateFile`](#state-file)                                | string  | `--state-file=<PATH>`                                     | `NYX_STATE_FILE=<PATH>`                                       | N/A      |
-| [`verbosity`](#verbosity)                                 | string  | `--verbosity=<LEVEL>`, `--fatal`, `--error`, `--warning`, `--info`, `--debug`, `--trace` | `NYX_VERBOSITY=<LEVEL>`        | `warning`|
+| [`verbosity`](#verbosity)                                 | string  | `--verbosity=<LEVEL>`, `--fatal`, `--error`, `--warning`, `--info`, `--debug`, `--trace` | `NYX_VERBOSITY=<LEVEL>`        | `WARNING`|
 | [`version`](#version)                                     | string  | `-v <VERSION>`, `--version=<VERSION>`                     | `NYX_VERSION=<VERSION>`                                       | N/A      |
 
 ### Bump
@@ -66,6 +67,10 @@ Consider using a [standard path for configuration files]({{ site.baseurl }}{% li
 
 In order to avoid chaining this option is ignored when defined in custom configuration files loaded by means of this same option.
 {: .notice--info}
+
+### Commit message conventions
+
+See [Commit Message Conventions]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/commit-message-conventions.md %}).
 
 ### Directory
 
@@ -172,6 +177,10 @@ Release names are not necessarily equal to versions. For example version `1.2.3`
 
 This option only affects the way Nyx **generates** release names and tags, while [`releaseLenient`](#release-lenient) controls how tolerant Nyx is when **reading** release tags from the Git repository.
 
+### Release types
+
+See [Release Types]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}).
+
 ### Shared configuration file
 
 | ------------------------- | ---------------------------------------------------------------------------------------- |
@@ -214,13 +223,13 @@ This option only makes sense when you also set a value for the [`stateFile`](#st
 | ------------------------- | ---------------------------------------------------------------------------------------- |
 | Name                      | `scheme`                                                                                 |
 | Type                      | string                                                                                   |
-| Default                   | `semver`                                                                                 |
+| Default                   | `SEMVER`                                                                                 |
 | Command Line Option       | `--scheme=<NAME>`                                                                        |
 | Environment Variable      | `NYX_SCHEME=<NAME>`                                                                      |
 | Configuration File Option | `scheme`                                                                                 |
 | Related state attributes  | [bump]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#bump){: .btn .btn--info .btn--small} [newVersion]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#new-version){: .btn .btn--info .btn--small} [scheme]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#scheme){: .btn .btn--info .btn--small} [version]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#version){: .btn .btn--info .btn--small} |
 
-Selects the [version scheme]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/version-schemes.md %}) to use. Defaults to [`semver`]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/version-schemes.md %}#semantic-versioning-semver).
+Selects the [version scheme]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/version-schemes.md %}) to use. Defaults to [`SEMVER`]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/version-schemes.md %}#semantic-versioning-semver).
 
 ### State file
 
@@ -253,7 +262,7 @@ This option can also be used in conjunction with [`resume`](#resume) in case you
 | ------------------------- | ---------------------------------------------------------------------------------------- |
 | Name                      | `verbosity`                                                                              |
 | Type                      | string                                                                                   |
-| Default                   | `warning`                                                                                |
+| Default                   | `WARNING`                                                                                |
 | Command Line Option       | `--verbosity=<LEVEL>`, `--fatal`, `--error`, `--warning`, `--info`, `--debug`, `--trace` |
 | Environment Variable      | `NYX_VERBOSITY=<LEVEL>`                                                                  |
 | Configuration File Option | `verbosity`                                                                              |
@@ -261,12 +270,12 @@ This option can also be used in conjunction with [`resume`](#resume) in case you
 
 Controls the amount of output emitted by Nyx, where values are:
 
-* `fatal`: only prints critical errors that prevent Nyx to complete. No output is printed when no fatal error is encountered
-* `error`: only prints errors along with some essential informations
-* `warning`: only prints errors and warnings along with some essential informations (like the generated version number)
-* `info` : prints high level informations about the internal action that Nyx runs
-* `debug`: prints informations obout internals that can be useful to debug Nyx in case of anomalies
-* `trace`: this is the most verbose option that prints lots of informations, including internals
+* `FATAL`: only prints critical errors that prevent Nyx to complete. No output is printed when no fatal error is encountered
+* `ERROR`: only prints errors along with some essential informations
+* `WARNING`: only prints errors and warnings along with some essential informations (like the generated version number)
+* `INFO` : prints high level informations about the internal action that Nyx runs
+* `DEBUG`: prints informations obout internals that can be useful to debug Nyx in case of anomalies
+* `TRACE`: this is the most verbose option that prints lots of informations, including internals
 
 The [**command line**]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#using-the-command-line) supports a shorthand option for each verbosity level so you can also use `--fatal`, `--error`, `--warning`, `--info`, `--debug`, `--trace` instead of `--verbosity=<LEVEL>`. When multiple verbosity levels are given, the most verbose one is used.
 

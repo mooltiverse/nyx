@@ -37,5 +37,10 @@ public class Simple extends SimpleConfigurationLayer {
         // add the 'conventionalCommits' convention
         getCommitMessageConventions().setEnabled(List.<String>of("conventionalCommits"));
         getCommitMessageConventions().getItems().put("conventionalCommits", CommitMessageConventions.CONVENTIONAL_COMMITS);
+
+        // add the 'mainline' and 'internal' release types
+        getReleaseTypes().setEnabled(List.<String>of("mainline", "internal"));
+        getReleaseTypes().getItems().put("mainline", ReleaseTypes.MAINLINE);
+        getReleaseTypes().getItems().put("internal", ReleaseTypes.INTERNAL);
     }
 }

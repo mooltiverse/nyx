@@ -25,8 +25,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.mooltiverse.oss.nyx.data.CommitMessageConvention;
-import com.mooltiverse.oss.nyx.data.Scheme;
+import com.mooltiverse.oss.nyx.data.ReleaseType;
 import com.mooltiverse.oss.nyx.data.Verbosity;
+import com.mooltiverse.oss.nyx.version.Scheme;
 
 @DisplayName("SimpleConfigurationLayer")
 public class SimpleConfigurationLayerTests {
@@ -126,6 +127,26 @@ public class SimpleConfigurationLayerTests {
 
         simpleConfigurationLayer.setReleasePrefix("prefix");
         assertEquals("prefix", simpleConfigurationLayer.getReleasePrefix());
+    }
+
+    @Test
+    @DisplayName("SimpleConfigurationLayer.getReleaseTypes()")
+    void getReleaseTypesTest()
+        throws Exception {
+        SimpleConfigurationLayer simpleConfigurationLayer = new SimpleConfigurationLayer();
+        assertNotNull(simpleConfigurationLayer.getReleaseTypes());
+        assertNull(simpleConfigurationLayer.getReleaseTypes().getEnabled());
+        assertNotNull(simpleConfigurationLayer.getReleaseTypes().getItems());
+        assertTrue(simpleConfigurationLayer.getReleaseTypes().getItems().isEmpty());
+
+        simpleConfigurationLayer.getReleaseTypes().setEnabled(List.<String>of("one", "two"));
+        simpleConfigurationLayer.getReleaseTypes().getItems().put("one", new ReleaseType());
+        simpleConfigurationLayer.getReleaseTypes().getItems().put("two", new ReleaseType());
+        assertEquals(2, simpleConfigurationLayer.getReleaseTypes().getEnabled().size());
+        assertTrue(simpleConfigurationLayer.getReleaseTypes().getEnabled().containsAll(List.<String>of("one", "two")));
+        assertEquals(2, simpleConfigurationLayer.getReleaseTypes().getItems().size());
+        assertNotNull(simpleConfigurationLayer.getReleaseTypes().getItem("one"));
+        assertNotNull(simpleConfigurationLayer.getReleaseTypes().getItem("two"));
     }
 
     @Test

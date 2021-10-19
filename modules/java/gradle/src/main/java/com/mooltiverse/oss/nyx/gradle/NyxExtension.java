@@ -155,6 +155,11 @@ public abstract class NyxExtension {
     private final Property<Boolean> releaseLenient = getObjectfactory().property(Boolean.class);
 
     /**
+     * The nested 'releaseTypes' block.
+     */
+    private final ReleaseTypes releaseTypes = getObjectfactory().newInstance(ReleaseTypes.class);
+
+    /**
      * The 'resume' property.
      */
     private final Property<Boolean> resume = getObjectfactory().property(Boolean.class);
@@ -172,7 +177,7 @@ public abstract class NyxExtension {
     /**
      * The 'stateFile' property.
      */
-    private final Property<File> stateFile = getObjectfactory().property(File.class);
+    private final Property<String> stateFile = getObjectfactory().property(String.class);
 
     /**
      * The 'verbosity' property.
@@ -260,7 +265,7 @@ public abstract class NyxExtension {
     }
 
     /**
-     * Returns the custom configuration file scheme to use.
+     * Returns the custom configuration file to use.
      * 
      * We provide an implementation of this method instead of using the abstract definition as it's
      * safer for old Gradle versions we support.
@@ -359,6 +364,29 @@ public abstract class NyxExtension {
     }
 
     /**
+     * Returns the object mapping the {@code releaseTypes} block.
+     * 
+     * We provide an implementation of this method instead of using the abstract definition as it's
+     * safer for old Gradle versions we support.
+     * 
+     * @return the object mapping the {@code releaseTypes} block
+     */
+    public ReleaseTypes getReleaseTypes() {
+        return releaseTypes;
+    }
+
+    /**
+     * Accepts the DSL configuration for the {@code releaseTypes} block, needed for defining
+     * the block using the curly braces syntax in Gradle build scripts.
+     * See the documentation on top of this class for more.
+     * 
+     * @param configuration the configuration object for the {@code releaseTypes} block
+     */
+    public void releaseTypes(Action<? super ReleaseTypes> configuration) {
+        configuration.execute(releaseTypes);
+    }
+
+    /**
      * Returns the flag that, when {@code true}, loads a previously saved state file (if any) to resume execution
      * from there.
      * 
@@ -389,7 +417,7 @@ public abstract class NyxExtension {
     }
 
     /**
-     * Returns the custom shared configuration file scheme to use.
+     * Returns the custom shared configuration file to use.
      * 
      * We provide an implementation of this method instead of using the abstract definition as it's
      * safer for old Gradle versions we support.
@@ -410,7 +438,7 @@ public abstract class NyxExtension {
      * 
      * @return the directory to use as the base repository location
      */
-    public Property<File> getStateFile() {
+    public Property<String> getStateFile() {
         return stateFile;
     }
 
@@ -511,18 +539,6 @@ public abstract class NyxExtension {
             private final MapProperty<String,String> bumpExpressions = getObjectfactory().mapProperty(String.class, String.class);
 
             /**
-             * Constructor.
-             * 
-             * This constructor is required as per the {@link NamedDomainObjectContainer} specification.
-             * 
-             * @param name the convention name
-             */
-            public CommitMessageConvention(String name) {
-                super();
-                this.name = name;
-            }
-
-            /**
              * Returns an object factory instance.
              * 
              * The instance is injected by Gradle as soon as this getter method is invoked.
@@ -536,6 +552,18 @@ public abstract class NyxExtension {
              */
             @Inject
             protected abstract ObjectFactory getObjectfactory();
+
+            /**
+             * Constructor.
+             * 
+             * This constructor is required as per the {@link NamedDomainObjectContainer} specification.
+             * 
+             * @param name the convention name
+             */
+            public CommitMessageConvention(String name) {
+                super();
+                this.name = name;
+            }
 
             /**
              * Returns the name read-only mandatory property.
@@ -579,5 +607,563 @@ public abstract class NyxExtension {
                 configuration.execute(bumpExpressions);
             }
         }
+    }
+
+    /**
+     * The class to model the 'releaseTypes' block within the extension.
+     */
+    public abstract static class ReleaseTypes {
+        /**
+         * The list of enabled release type names.
+         */
+        private final ListProperty<String> enabled = getObjectfactory().listProperty(String.class);
+
+        /**
+         * The nested 'items' block.
+         * 
+         * @see ReleaseType
+         */
+        private NamedDomainObjectContainer<ReleaseType> items = getObjectfactory().domainObjectContainer(ReleaseType.class);
+
+        /**
+         * Returns an object factory instance.
+         * 
+         * The instance is injected by Gradle as soon as this getter method is invoked.
+         * 
+         * Using <a href="https://docs.gradle.org/current/userguide/custom_gradle_types.html#property_injection">property injection</a>
+         * instead of <a href="https://docs.gradle.org/current/userguide/custom_gradle_types.html#constructor_injection">constructor injection</a>
+         * has a few advantages: it allows Gradle to refer injecting the object until it's required and is safer for backward
+         * compatibility (older versions can be supported).
+         * 
+         * @return the object factory instance
+         */
+        @Inject
+        protected abstract ObjectFactory getObjectfactory();
+
+        /**
+         * Returns list of enabled convention names.
+         * 
+         * @return list of enabled convention names.
+         */
+        public ListProperty<String> getEnabled() {
+            return enabled;
+        }
+
+        /**
+         * Returns the map of release type items.
+         * 
+         * @return the map of release type items.
+         */
+        public NamedDomainObjectContainer<ReleaseType> getItems() {
+            return items;
+        }
+
+        /**
+         * Accepts the DSL configuration for the {@code items} block, needed for defining
+         * the block using the curly braces syntax in Gradle build scripts.
+         * See the documentation on top of this class for more.
+         * 
+         * @param configuration the configuration object for the {@code items} block
+         */
+        public void items(Action<? super NamedDomainObjectContainer<ReleaseType>> configuration) {
+            configuration.execute(items);
+        }
+
+        /**
+         * The class to model a single 'releaseTypes' item within the extension.
+         */
+        public abstract static class ReleaseType {
+            /**
+             * The release type name.
+             */
+            private final String name;
+
+            /**
+             * The flag indicating whether or not the 'collapsed' versioning (pre-release style) must be used.
+             */
+            private final Property<Boolean> collapseVersions = getObjectfactory().property(Boolean.class);
+
+            /**
+             * The optional qualifier or the template to render the qualifier to use for the pre-release identifier when versions are collapsed.
+             */
+            private final Property<String> collapsedVersionQualifier = getObjectfactory().property(String.class);
+
+            /**
+             * The optional template to render as a regular expression used to match tags from the commit history.
+             */
+            private final Property<String> filterTags = getObjectfactory().property(String.class);
+
+            /**
+             * The optional flag or the template to render indicating whether or not a new commit must be generated in case new artifacts are generated.
+             */
+            private final Property<String> gitCommit = getObjectfactory().property(String.class);
+
+            /**
+             * The optional string or the template to render to use as the commit message if a commit has to be made.
+             */
+            private final Property<String> gitCommitMessage = getObjectfactory().property(String.class);
+
+            /**
+             * The optional flag or the template to render indicating whether or not a new commit must be generated and pushed in case new artifacts are generated.
+             */
+            private final Property<String> gitPush = getObjectfactory().property(String.class);
+
+            /**
+             * The optional flag or the template to render indicating whether or not a new tag must be generated.
+             */
+            private final Property<String> gitTag = getObjectfactory().property(String.class);
+
+            /**
+             * The optional string or the template to render to use as the tag message if a tag has to be made.
+             */
+            private final Property<String> gitTagMessage = getObjectfactory().property(String.class);
+
+            /**
+             * The nested 'identifiers' block.
+             */
+            private final Identifiers identifiers = getObjectfactory().newInstance(Identifiers.class);
+
+            /**
+             * The optional template to render as a regular expression used to match branch names.
+             */
+            private final Property<String> matchBranches = getObjectfactory().property(String.class);
+
+            /**
+             * The identifier of a specific workspace status to be matched.
+             */
+            private final Property<String> matchWorkspaceStatus = getObjectfactory().property(String.class);
+
+            /**
+             * The optional flag or the template to render indicating whether or not releases must be published.
+             */
+            private final Property<String> publish = getObjectfactory().property(String.class);
+
+            /**
+             * The optional template to render as a regular expression used to constrain versions issued by this release type.
+             */
+            private final Property<String> versionRange = getObjectfactory().property(String.class);
+
+            /**
+             * The optional flag telling if the version range must be inferred from the branch name.
+             */
+            private final Property<Boolean> versionRangeFromBranchName = getObjectfactory().property(Boolean.class);
+
+            /**
+             * The nested 'matchEnvironmentVariables' block.
+             */
+            private final MapProperty<String,String> matchEnvironmentVariables = getObjectfactory().mapProperty(String.class, String.class);
+
+            /**
+             * Returns an object factory instance.
+             * 
+             * The instance is injected by Gradle as soon as this getter method is invoked.
+             * 
+             * Using <a href="https://docs.gradle.org/current/userguide/custom_gradle_types.html#property_injection">property injection</a>
+             * instead of <a href="https://docs.gradle.org/current/userguide/custom_gradle_types.html#constructor_injection">constructor injection</a>
+             * has a few advantages: it allows Gradle to refer injecting the object until it's required and is safer for backward
+             * compatibility (older versions can be supported).
+             * 
+             * @return the object factory instance
+             */
+            @Inject
+            protected abstract ObjectFactory getObjectfactory();
+
+            /**
+             * Constructor.
+             * 
+             * This constructor is required as per the {@link NamedDomainObjectContainer} specification.
+             * 
+             * @param name the release type name
+             */
+            public ReleaseType(String name) {
+                super();
+                this.name = name;
+            }
+
+            /**
+             * Returns the name read-only mandatory property.
+             * 
+             * @return the name read-only mandatory property.
+             */
+            public String getName() {
+                return name;
+            }
+
+            /**
+             * Returns the flag indicating whether or not the 'collapsed' versioning (pre-release style) must be used.
+             * When this is set by the user it overrides the inference performed by Nyx.
+             * 
+             * We provide an implementation of this method instead of using the abstract definition as it's
+             * safer for old Gradle versions we support.
+             * 
+             * @return the flag indicating whether or not the 'collapsed' versioning (pre-release style) must be used.
+             */
+            public Property<Boolean> getCollapseVersions() {
+                return collapseVersions;
+            }
+
+            /**
+             * Returns the optional qualifier or the template to render the qualifier to use for the pre-release
+             * identifier when versions are collapsed. When this is set by the user it overrides
+             * the inference performed by Nyx.
+             * 
+             * We provide an implementation of this method instead of using the abstract definition as it's
+             * safer for old Gradle versions we support.
+             * 
+             * @return the optional qualifier or the template to render the qualifier to use for the pre-release
+             * identifier when versions are collapsed
+             */
+            public Property<String> getCollapsedVersionQualifier() {
+                return collapsedVersionQualifier;
+            }
+
+            /**
+             * Returns the optional template to render as a regular expression used to match tags
+             * from the commit history. When this is set by the user it overrides
+             * the inference performed by Nyx.
+             * 
+             * We provide an implementation of this method instead of using the abstract definition as it's
+             * safer for old Gradle versions we support.
+             * 
+             * @return the optional template to render as a regular expression used to match tags
+             * from the commit history.
+             */
+            public Property<String> getFilterTags() {
+                return filterTags;
+            }
+
+            /**
+             * Returns the optional flag or the template to render indicating whether or not a new commit must be generated in case new artifacts are generated.
+             * 
+             * We provide an implementation of this method instead of using the abstract definition as it's
+             * safer for old Gradle versions we support.
+             * 
+             * @return the optional flag or the template to render indicating whether or not a new commit must be generated in case new artifacts are generated.
+             */
+            public Property<String> getGitCommit() {
+                return gitCommit;
+            }
+
+            /**
+             * Returns the optional string or the template to render to use as the commit message if a commit has to be made.
+             * When this is set by the user it overrides the inference performed by Nyx.
+             * 
+             * We provide an implementation of this method instead of using the abstract definition as it's
+             * safer for old Gradle versions we support.
+             * 
+             * @return the optional string or the template to render to use as the commit message if a commit has to be made.
+             */
+            public Property<String> getGitCommitMessage() {
+                return gitCommitMessage;
+            }
+
+            /**
+             * Returns the optional flag or the template to render indicating whether or not a new commit must be generated and pushed in case new artifacts are generated.
+             * When this is set by the user it overrides the inference performed by Nyx.
+             * 
+             * We provide an implementation of this method instead of using the abstract definition as it's
+             * safer for old Gradle versions we support.
+             * 
+             * @return the optional flag or the template to render indicating whether or not a new commit must be generated and pushed in case new artifacts are generated.
+             */
+            public Property<String> getGitPush() {
+                return gitPush;
+            }
+
+            /**
+             * Returns the optional flag or the template to render indicating whether or not a new tag must be generated.
+             * When this is set by the user it overrides the inference performed by Nyx.
+             * 
+             * We provide an implementation of this method instead of using the abstract definition as it's
+             * safer for old Gradle versions we support.
+             * 
+             * @return the optional flag or the template to render indicating whether or not a new tag must be generated.
+             */
+            public Property<String> getGitTag() {
+                return gitTag;
+            }
+
+            /**
+             * Returns the optional string or the template to render to use as the tag message if a tag has to be made.
+             * When this is set by the user it overrides the inference performed by Nyx.
+             * 
+             * We provide an implementation of this method instead of using the abstract definition as it's
+             * safer for old Gradle versions we support.
+             * 
+             * @return the optional string or the template to render to use as the tag message if a tag has to be made.
+             */
+            public Property<String> getGitTagMessage() {
+                return gitTagMessage;
+            }
+
+            /**
+             * Returns the object mapping the {@code identifiers} block.
+             * 
+             * We provide an implementation of this method instead of using the abstract definition as it's
+             * safer for old Gradle versions we support.
+             * 
+             * @return the object mapping the {@code identifiers} block
+             */
+            public Identifiers getIdentifiers() {
+                return identifiers;
+            }
+
+            /**
+             * Accepts the DSL configuration for the {@code identifiers} block, needed for defining
+             * the block using the curly braces syntax in Gradle build scripts.
+             * See the documentation on top of this class for more.
+             * 
+             * @param configuration the configuration object for the {@code identifiers} block
+             */
+            public void identifiers(Action<? super Identifiers> configuration) {
+                configuration.execute(identifiers);
+            }
+
+            /**
+             * Returns the optional template to render as a regular expression used to match branch names.
+             * When this is set by the user it overrides the inference performed by Nyx.
+             * 
+             * We provide an implementation of this method instead of using the abstract definition as it's
+             * safer for old Gradle versions we support.
+             * 
+             * @return the optional template to render as a regular expression used to match branch names.
+             */
+            public Property<String> getMatchBranches() {
+                return matchBranches;
+            }
+
+            /**
+             * Returns the map of match environment variables names and regular expressions items.
+             * 
+             * @return the map of match environment variables names and regular expressions items.
+             */
+            public MapProperty<String,String> getMatchEnvironmentVariables() {
+                return matchEnvironmentVariables;
+            }
+            
+            /**
+             * Accepts the DSL configuration for the {@code matchEnvironmentVariables} block, needed for defining
+             * the block using the curly braces syntax in Gradle build scripts.
+             * See the documentation on top of this class for more.
+             * 
+             * @param configuration the configuration object for the {@code matchEnvironmentVariables} block
+             */
+            public void matchEnvironmentVariables(Action<? super MapProperty<String,String>> configuration) {
+                configuration.execute(matchEnvironmentVariables);
+            }
+
+            /**
+             * Returns the identifier of a specific workspace status to be matched.
+             * When this is set by the user it overrides the inference performed by Nyx.
+             * 
+             * We provide an implementation of this method instead of using the abstract definition as it's
+             * safer for old Gradle versions we support.
+             * 
+             * @return the identifier of a specific workspace status to be matched.
+             */
+            public Property<String> getMatchWorkspaceStatus() {
+                return matchWorkspaceStatus;
+            }
+
+            /**
+             * Returns the optional flag or the template to render indicating whether or not releases must be published.
+             * When this is set by the user it overrides the inference performed by Nyx.
+             * 
+             * We provide an implementation of this method instead of using the abstract definition as it's
+             * safer for old Gradle versions we support.
+             * 
+             * @return the optional flag or the template to render indicating whether or not releases must be published.
+             */
+            public Property<String> getPublish() {
+                return publish;
+            }
+
+            /**
+             * Returns the optional template to render as a regular expression used to constrain versions issued by this release type.
+             * When this is set by the user it overrides the inference performed by Nyx.
+             * 
+             * We provide an implementation of this method instead of using the abstract definition as it's
+             * safer for old Gradle versions we support.
+             * 
+             * @return the optional template to render as a regular expression used to constrain versions issued by this release type.
+             */
+            public Property<String> getVersionRange() {
+                return versionRange;
+            }
+
+            /**
+             * Returns the optional flag telling if the version range must be inferred from the branch name.
+             * When this is set by the user it overrides the inference performed by Nyx.
+             * 
+             * We provide an implementation of this method instead of using the abstract definition as it's
+             * safer for old Gradle versions we support.
+             * 
+             * @return the optional flag telling if the version range must be inferred from the branch name.
+             */
+            public Property<Boolean> getVersionRangeFromBranchName() {
+                return versionRangeFromBranchName;
+            }
+
+            /**
+             * The class to model the 'identifiers' block within the extension.
+             */
+            public abstract static class Identifiers {
+                /**
+                 * The list of enabled identifier names.
+                 */
+                private final ListProperty<String> enabled = getObjectfactory().listProperty(String.class);
+
+                /**
+                 * The nested 'items' block.
+                 * 
+                 * @see Identifier
+                 */
+                private NamedDomainObjectContainer<Identifier> items = getObjectfactory().domainObjectContainer(Identifier.class);
+
+                /**
+                 * Returns an object factory instance.
+                 * 
+                 * The instance is injected by Gradle as soon as this getter method is invoked.
+                 * 
+                 * Using <a href="https://docs.gradle.org/current/userguide/custom_gradle_types.html#property_injection">property injection</a>
+                 * instead of <a href="https://docs.gradle.org/current/userguide/custom_gradle_types.html#constructor_injection">constructor injection</a>
+                 * has a few advantages: it allows Gradle to refer injecting the object until it's required and is safer for backward
+                 * compatibility (older versions can be supported).
+                 * 
+                 * @return the object factory instance
+                 */
+                @Inject
+                protected abstract ObjectFactory getObjectfactory();
+
+                /**
+                 * Returns list of enabled identifier names.
+                 * 
+                 * @return list of enabled identifier names.
+                 */
+                public ListProperty<String> getEnabled() {
+                    return enabled;
+                }
+
+                /**
+                 * Returns the map of identifier items.
+                 * 
+                 * @return the map of identifier items.
+                 */
+                public NamedDomainObjectContainer<Identifier> getItems() {
+                    return items;
+                }
+
+                /**
+                 * Accepts the DSL configuration for the {@code items} block, needed for defining
+                 * the block using the curly braces syntax in Gradle build scripts.
+                 * See the documentation on top of this class for more.
+                 * 
+                 * @param configuration the configuration object for the {@code items} block
+                 */
+                public void items(Action<? super NamedDomainObjectContainer<Identifier>> configuration) {
+                    configuration.execute(items);
+                }
+
+                /**
+                 * The class to model a single 'identifiers' item within the extension.
+                 */
+                public abstract static class Identifier {
+                    /**
+                     * The identifier name.
+                     */
+                    private final String name;
+
+                    /**
+                     * The identifier qualifier.
+                     */
+                    private final Property<String> qualifier = getObjectfactory().property(String.class);
+
+                    /**
+                     * The identifier value.
+                     */
+                    private final Property<String> value = getObjectfactory().property(String.class);
+
+                    /**
+                     * The identifier position.
+                     */
+                    private final Property<String> position = getObjectfactory().property(String.class);
+
+                    /**
+                     * Returns an object factory instance.
+                     * 
+                     * The instance is injected by Gradle as soon as this getter method is invoked.
+                     * 
+                     * Using <a href="https://docs.gradle.org/current/userguide/custom_gradle_types.html#property_injection">property injection</a>
+                     * instead of <a href="https://docs.gradle.org/current/userguide/custom_gradle_types.html#constructor_injection">constructor injection</a>
+                     * has a few advantages: it allows Gradle to refer injecting the object until it's required and is safer for backward
+                     * compatibility (older versions can be supported).
+                     * 
+                     * @return the object factory instance
+                     */
+                    @Inject
+                    protected abstract ObjectFactory getObjectfactory();
+
+                    /**
+                     * Constructor.
+                     * 
+                     * This constructor is required as per the {@link NamedDomainObjectContainer} specification.
+                     * 
+                     * @param name the release type name
+                     */
+                    public Identifier(String name) {
+                        super();
+                        this.name = name;
+                    }
+
+                    /**
+                     * Returns the name read-only mandatory property.
+                     * 
+                     * @return the name read-only mandatory property.
+                     */
+                    public String getName() {
+                        return name;
+                    }
+
+                    /**
+                     * Returns the identifier qualifier.
+                     * When this is set by the user it overrides the inference performed by Nyx.
+                     * 
+                     * We provide an implementation of this method instead of using the abstract definition as it's
+                     * safer for old Gradle versions we support.
+                     * 
+                     * @return the identifier qualifier.
+                     */
+                    public Property<String> getQualifier() {
+                        return qualifier;
+                    }
+
+                    /**
+                     * Returns the identifier value.
+                     * When this is set by the user it overrides the inference performed by Nyx.
+                     * 
+                     * We provide an implementation of this method instead of using the abstract definition as it's
+                     * safer for old Gradle versions we support.
+                     * 
+                     * @return the identifier value.
+                     */
+                    public Property<String> getValue() {
+                        return value;
+                    }
+
+                    /**
+                     * Returns the identifier qualifier.
+                     * When this is set by the user it overrides the inference performed by Nyx.
+                     * 
+                     * We provide an implementation of this method instead of using the abstract definition as it's
+                     * safer for old Gradle versions we support.
+                     * 
+                     * @return the identifier qualifier.
+                     */
+                    public Property<String> getPosition() {
+                        return position;
+                    }
+                }
+            }
+        }        
     }
 }

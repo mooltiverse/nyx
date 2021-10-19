@@ -41,14 +41,10 @@ public class Publish extends AbstractCommand {
     private static final Logger logger = LoggerFactory.getLogger(Publish.class);
 
     /**
-     * The name used for the internal state attribute where we store the timestamp
-     * of the last execution of this command.
-     * 
-     * The name is prefixed with this class name to avoid clashes with other attributes.
-     * 
-     * @see State#getInternals()
+     * The name used for the internal state attribute where we store the last version
+     * that was published by this command.
      */
-    private static final String INTERNAL_EXECUTED = Publish.class.getSimpleName().concat(".").concat("last").concat(".").concat("executed");
+    private static final String INTERNAL_LAST_PUBLISHED_VERSION = Mark.class.getSimpleName().concat(".").concat("last").concat(".").concat("published").concat(".").concat("version");
 
     /**
      * Standard constructor.
@@ -70,10 +66,12 @@ public class Publish extends AbstractCommand {
     public boolean isUpToDate()
         throws DataAccessException, IllegalPropertyException, GitException {
         logger.debug(COMMAND, "Checking whether the Publish command is up to date");
-        // TODO: implement the up-to-date checks here
-        // for now let's just check if the task has executed by seeing if we have stored the last
-        // execution time. Also see where the attribute is stored in the run() method
-        return !Objects.isNull(state().getInternals().get(INTERNAL_EXECUTED));
+
+        // Never up to date if this command hasn't stored a version yet into the state
+        if (Objects.isNull(state().getVersion()))
+            return false;
+        
+        return isInternalAttributeUpToDate(INTERNAL_LAST_PUBLISHED_VERSION, state().getVersion());
     }
 
     /**
@@ -92,8 +90,9 @@ public class Publish extends AbstractCommand {
     private void storeStatusInternalAttributes()
         throws DataAccessException, IllegalPropertyException, GitException {
         logger.debug(COMMAND, "Storing the Publish command internal attributes to the State");
-        // store the last execution time
-        state().getInternals().put(INTERNAL_EXECUTED, Long.toString(System.currentTimeMillis()));
+        if (!state().getConfiguration().getDryRun()) {
+            putInternalAttribute(INTERNAL_LAST_PUBLISHED_VERSION, state().getVersion());
+        }
     }
 
     /**
@@ -102,9 +101,25 @@ public class Publish extends AbstractCommand {
     @Override
     public State run()
         throws DataAccessException, IllegalPropertyException, GitException, ReleaseException {
-        // TODO: implement this method
-        // the following are just temporary smoke detection outputs
         logger.debug(COMMAND, "Running the Publish command...");
+
+        if (state().getNewVersion()) {
+            if (renderTemplateAsBoolean(state().getReleaseType().getPublish())) {
+                logger.debug(COMMAND, "The release type has the publish flag enabled");
+                if (state().getConfiguration().getDryRun()) {
+                    logger.info(COMMAND, "Publish skipped due to dry run");
+                }
+                else {
+                    logger.debug(COMMAND, "Publishing version {}");
+                    
+                    // TODO: actually do the publish using the configured services
+                }
+            }
+            else logger.debug(COMMAND, "The release type has the publish flag disabled");
+        }
+        else {
+            logger.info(COMMAND, "No version change detected. Nothing to publish.");
+        }
 
         storeStatusInternalAttributes();
         return state();

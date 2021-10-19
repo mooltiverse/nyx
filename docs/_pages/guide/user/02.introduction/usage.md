@@ -72,7 +72,7 @@ TODO: write this section
 TODO: write this section
 {: .notice--warning}
 
-All the examples in this page assume you're using tha plain `gradle` command. If you're using the (recommended) [wrapper](https://docs.gradle.org/current/userguide/gradle_wrapper.html) just change instances of the `gradle` command with `./gradlew`.
+All the examples in this page assume you're using the plain `gradle` command. If you're using the (recommended) [wrapper](https://docs.gradle.org/current/userguide/gradle_wrapper.html) just change instances of the `gradle` command with `./gradlew`.
 {: .notice--info}
 
 You can find more on the Gradle Plugin internals [here]({{ site.baseurl }}{% link _pages/guide/user/07.in-depth/gradle-plugin.md %}).

@@ -33,42 +33,42 @@ public enum Verbosity {
      * 
      * @see Level#ERROR
      */
-    FATAL(Level.ERROR, "fatal"),
+    FATAL(Level.ERROR),
 
     /**
      * The error log level.
      * 
      * @see Level#ERROR
      */
-    ERROR(Level.ERROR, "error"),
+    ERROR(Level.ERROR),
 
     /**
      * The warning log level.
      * 
      * @see Level#WARN
      */
-    WARNING(Level.WARN, "warning"),
+    WARNING(Level.WARN),
 
     /**
      * The info log level.
      * 
      * @see Level#INFO
      */
-    INFO(Level.INFO, "info"),
+    INFO(Level.INFO),
 
     /**
      * The debug log level.
      * 
      * @see Level#DEBUG
      */
-    DEBUG(Level.DEBUG, "debug"),
+    DEBUG(Level.DEBUG),
 
     /**
      * The trace log level.
      * 
      * @see Level#TRACE
      */
-    TRACE(Level.TRACE, "trace");
+    TRACE(Level.TRACE);
 
     /**
      * The SLF4J corresponding logging level.
@@ -76,19 +76,12 @@ public enum Verbosity {
     private final Level level;
 
     /**
-     * The verbosity level value, also used in configuration and state.
-     */
-    private final String value;
-
-    /**
      * Builds the enumeration item.
      * 
      * @param level the SLF4J corresponding logging level
-     * @param value the verbosity level value, also used in configuration and state
      */
-    private Verbosity(Level level, String value) {
+    private Verbosity(Level level) {
         this.level = level;
-        this.value = value;
     }
 
     /**
@@ -98,16 +91,6 @@ public enum Verbosity {
      */
     public Level getLevel() {
         return level;
-    }
-
-    /**
-     * Returns the string representation of this verbosity level. This string is also used in configuration options
-     * and state attributes.
-     * 
-     * @return the string representation of this verbosity level
-     */
-    public String getValue() {
-        return value;
     }
 
     /**
@@ -132,32 +115,6 @@ public enum Verbosity {
             case WARN:  return Verbosity.WARNING;
             case ERROR: return Verbosity.ERROR;
             default: throw new IllegalArgumentException(level.toString());
-        }
-    }
-
-    /**
-     * Returns the proper verbosity level mapped from the given value.
-     * 
-     * @param value string value level to parse and return the verbosity for
-     * 
-     * @return the proper verbosity level mapped from the given value.
-     * 
-     * @throws IllegalArgumentException if the given value cannot be mapped to any existing verbosity level
-     * @throws NullPointerException if the given value is {@code null}
-     */
-    public static Verbosity from(String value)
-        throws IllegalArgumentException, NullPointerException {
-        if (Objects.isNull(value))
-            throw new NullPointerException();
-
-        switch (value) {
-            case "trace":   return Verbosity.TRACE;
-            case "debug":   return Verbosity.DEBUG;
-            case "info":    return Verbosity.INFO;
-            case "warning": return Verbosity.WARNING;
-            case "error":   return Verbosity.ERROR;
-            case "fatal":   return Verbosity.FATAL;
-            default: throw new IllegalArgumentException(value);
         }
     }
 }

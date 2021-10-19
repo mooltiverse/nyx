@@ -160,6 +160,23 @@ public class ConfigurationLayerTestTemplates {
         }
 
         @TestTemplate
+        @DisplayName("ConfigurationLayer.getReleaseTypes() default value")
+        @Baseline(Scenario.FROM_SCRATCH)
+        void getReleaseTypesDefaultTest(Project project)
+            throws Exception {
+            NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
+            ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
+
+            assertNotNull(extension.getReleaseTypes());
+            assertNotNull(configurationLayer.getReleaseTypes());
+            assertTrue(extension.getReleaseTypes().getEnabled().isPresent());
+            assertNull(configurationLayer.getReleaseTypes().getEnabled());
+            assertTrue(extension.getReleaseTypes().getEnabled().get().isEmpty());
+            //assertTrue(extension.getReleaseTypes().getItems().isPresent());
+            assertNull(configurationLayer.getReleaseTypes().getItems());
+        }
+
+        @TestTemplate
         @DisplayName("ConfigurationLayer.getScheme() default value")
         @Baseline(Scenario.FROM_SCRATCH)
         void getSchemeDefaultTest(Project project)
@@ -311,6 +328,18 @@ public class ConfigurationLayerTestTemplates {
 
             // no idea of how to test wrong values here
             // since the property is already modelled as a boolean, Gradle provides the validation for this
+        }*/
+
+        /* This test is commented because it has nothing to test
+        @TestTemplate
+        @DisplayName("ConfigurationLayer.getReleaseTypes().set() throws IllegalPropertyException with illegal value")
+        @Baseline(Scenario.FROM_SCRATCH)
+        void exceptionUsingGetReleaseTypesWithWrongValueTest(Project project)
+            throws Exception {
+            NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
+            ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
+
+            // no idea of how to test wrong values here
         }*/
 
         @TestTemplate

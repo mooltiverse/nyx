@@ -48,6 +48,70 @@ public class VersionsTests {
     }
 
     @Nested
+    @DisplayName("VersionFactory.isCore")
+    class IsCoreTests {
+        @ParameterizedTest(name = "VersionFactory.isCore(Scheme.SEMVER, ''{0}'') == false")
+        @EmptySource
+        void isCoreWithEmptyString(String version) {
+            assertFalse(Versions.isCore(Scheme.SEMVER, version));
+        }
+
+        @ParameterizedTest(name = "VersionFactory.isCore(Scheme.SEMVER, ''{0}'') throws NullPointerException")
+        @NullSource
+        void exceptionUsingIsCoreWithNullString(String version) {
+            assertThrows(NullPointerException.class, () -> Versions.isCore(Scheme.SEMVER, version));
+        }
+
+        @ParameterizedTest(name = "VersionFactory.isCore(Scheme.SEMVER, ''{0}'') == false")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownInvalidVersions")
+        void isCoreWithInvalidVersion(String version, Class<? extends Exception> expectedException) {
+            assertFalse(Versions.isCore(Scheme.SEMVER, version));
+        }
+
+        @ParameterizedTest(name = "VersionFactory.isCore(Scheme.SEMVER, ''{0}'') == true")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidCoreVersions")
+        void isCoreValidString(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
+            assertTrue(Versions.isCore(Scheme.SEMVER, version));
+        }
+
+        @ParameterizedTest(name = "VersionFactory.isCore(Scheme.SEMVER, ''{0}'') == false")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidNonCoreVersions")
+        void isNotCoreValidString(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
+            assertFalse(Versions.isCore(Scheme.SEMVER, version));
+        }
+
+        @ParameterizedTest(name = "VersionFactory.isCore(Scheme.SEMVER, ''{0}'') == true")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidCoreVersions")
+        void isCoreValidStringWithPrefix(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
+            assertTrue(Versions.isCore(Scheme.SEMVER, "".concat(version), null));
+            assertTrue(Versions.isCore(Scheme.SEMVER, "".concat(version), ""));
+            assertTrue(Versions.isCore(Scheme.SEMVER, "v".concat(version), "v"));
+            assertTrue(Versions.isCore(Scheme.SEMVER, "prefix".concat(version), "prefix"));
+
+            assertFalse(Versions.isCore(Scheme.SEMVER, "v".concat(version), null));
+            assertFalse(Versions.isCore(Scheme.SEMVER, "v".concat(version), ""));
+            assertFalse(Versions.isCore(Scheme.SEMVER, "prefix".concat(version), null));
+            assertFalse(Versions.isCore(Scheme.SEMVER, "prefix".concat(version), ""));
+        }
+
+        @ParameterizedTest(name = "VersionFactory.isCore(Scheme.SEMVER, ''{0}'', true) == true")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidCoreVersions")
+        void isCoreSanitizedString(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
+            // test invoking isCore with prefix tolerance
+            assertTrue(Versions.isCore(Scheme.SEMVER, version, true));
+        }
+
+        @ParameterizedTest(name = "VersionFactory.isCore(Scheme.SEMVER, ''{0}'', true) == true")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownSanitizableCoreVersions")
+        void isCoreSanitizableString(String version) {
+            // the method must fail without toleration and succeed when using toleration
+            assertFalse(Versions.isCore(Scheme.SEMVER, version));
+            assertFalse(Versions.isCore(Scheme.SEMVER, version, false));
+            assertTrue(Versions.isCore(Scheme.SEMVER, version, true));
+        }
+    }
+
+    @Nested
     @DisplayName("VersionFactory.isLegal")
     class IsLegalTests {
         @ParameterizedTest(name = "VersionFactory.isLegal(Scheme.SEMVER, ''{0}'') == false")

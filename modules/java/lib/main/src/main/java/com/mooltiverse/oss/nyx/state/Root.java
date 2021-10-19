@@ -25,7 +25,8 @@ import com.mooltiverse.oss.nyx.data.DataAccessException;
 import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
 import com.mooltiverse.oss.nyx.data.Block;
 import com.mooltiverse.oss.nyx.data.ReleaseScope;
-import com.mooltiverse.oss.nyx.data.Scheme;
+import com.mooltiverse.oss.nyx.data.ReleaseType;
+import com.mooltiverse.oss.nyx.version.Scheme;
 
 /**
  * This interface models the state root block, with global attributes.
@@ -157,6 +158,17 @@ public interface Root extends Block {
         throws DataAccessException, IllegalPropertyException;
 
     /**
+     * Returns the object modelling the attributes defining the type of the release.
+     * 
+     * @return the current value for this attribute.
+     * 
+     * @throws DataAccessException in case the attribute cannot be read or accessed.
+     * @throws IllegalPropertyException in case the attribute has been defined but has incorrect values or it can't be resolved.
+     */
+    public ReleaseType getReleaseType()
+        throws DataAccessException, IllegalPropertyException;
+
+    /**
      * Returns the versioning scheme used as it's defined by the configuration.
      * 
      * @return the current value for this attribute.
@@ -192,5 +204,27 @@ public interface Root extends Block {
      * @see Infer
      */
     public String getVersion()
+        throws DataAccessException, IllegalPropertyException;
+
+    /**
+     * Returns the regular expression that is used to check whether or not the {@link #getVersion() version} is within a certain
+     * range. This value is only available after {@link Nyx#infer()} has run.
+     * <br>
+     * This attribute has a value only if {@link ReleaseType#getVersionRange() version range} or
+     * {@link ReleaseType#getVersionRangeFromBranchName() version range from branch name} are enabled. If
+     * {@link ReleaseType#getVersionRange() version range} has a value then this attribute has the same value, otherwise if
+     * {@link ReleaseType#getVersionRangeFromBranchName() version range from branch name} is {@code true} this value has the dynamically
+     * generated regular expression inferred from the branch name.
+     * 
+     * @return the regular expression that is used to check whether or not the {@link #getVersion() version} is within a certain
+     * range. This is {@code null} until {@link Nyx#infer()} has run.
+     * 
+     * @throws DataAccessException in case the attribute cannot be read or accessed.
+     * @throws IllegalPropertyException in case the attribute has been defined but has incorrect values or it can't be resolved.
+     * 
+     * @see ReleaseType#getVersionRange()
+     * @see ReleaseType#getVersionRangeFromBranchName()
+     */
+    public String getVersionRange()
         throws DataAccessException, IllegalPropertyException;
 }

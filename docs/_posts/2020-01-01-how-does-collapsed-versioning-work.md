@@ -24,8 +24,8 @@ First off, the need a new concept to be introduced, and that is the [prime versi
 
 With that in hand, each commit is versioned with the greatest between the two version numbers computed as:
 
-* the *prime version* bumped with the single instance of most significant identifier bumped in all the commits between the *prime version* commit and the commit before the current one
-* the *previous version* bumped with the pre-release identifier
+* the [*prime version*]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#prime-version) bumped with the single instance of most significant identifier bumped in all the commits between the *prime version* commit and the commit before the current one, eventually bumped with the pre-release identifier
+* the [*previous version*]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#previous-version) bumped with the pre-release identifier
 
 Let's take commit `c8` as an example.
 

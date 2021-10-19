@@ -16,7 +16,16 @@
 package com.mooltiverse.oss.nyx.data;
 
 /**
- * Models the commit message conventions configuration block.
+ * This class maps allowed values for a Git workspace status.
  */
-public interface CommitMessageConventions extends MapConfigurationBlock<CommitMessageConvention> {
+public enum WorkspaceStatus {
+    /**
+     * The workspace has no uncommitted changes.
+     */
+    CLEAN(),
+
+    /**
+     * The workspace has uncommitted changes.
+     */
+    DIRTY();
 }

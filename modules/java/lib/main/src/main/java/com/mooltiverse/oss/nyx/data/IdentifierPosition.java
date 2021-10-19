@@ -16,7 +16,16 @@
 package com.mooltiverse.oss.nyx.data;
 
 /**
- * Models the commit message conventions configuration block.
+ * This class maps allowed values for a custom identifier position (where the identifier has to be placed in version names).
  */
-public interface CommitMessageConventions extends MapConfigurationBlock<CommitMessageConvention> {
+public enum IdentifierPosition {
+    /**
+     * The identifier has to be placed in the pre-release part of the version (when using <a href="https://semver.org/">Semantic Versioning</a>).
+     */
+    PRE_RELEASE(),
+
+    /**
+     * The identifier has to be placed in the build part of the version (when using <a href="https://semver.org/">Semantic Versioning</a>).
+     */
+    BUILD();
 }

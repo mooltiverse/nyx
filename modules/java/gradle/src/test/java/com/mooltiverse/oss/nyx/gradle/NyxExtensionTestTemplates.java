@@ -148,6 +148,22 @@ public class NyxExtensionTestTemplates {
         }
 
         @TestTemplate
+        @DisplayName("NyxExtension.getReleaseTypes() default value")
+        @Baseline(Scenario.FROM_SCRATCH)
+        void getReleaseTypesDefaultTest(Project project)
+            throws Exception {
+            NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
+
+            assertNotNull(extension.getReleaseTypes());
+            assertTrue(extension.getReleaseTypes().getEnabled().isPresent());
+            assertNotNull(extension.getReleaseTypes().getEnabled().get());
+            assertTrue(extension.getReleaseTypes().getEnabled().get().isEmpty());
+            //assertTrue(extension.getReleaseTypes().getItems().isPresent());
+            //assertNotNull(extension.getReleaseTypes().getItems().get());
+            assertTrue(extension.getReleaseTypes().getItems().isEmpty());
+        }
+
+        @TestTemplate
         @DisplayName("NyxExtension.getScheme() default value")
         @Baseline(Scenario.FROM_SCRATCH)
         void getSchemeDefaultTest(Project project)

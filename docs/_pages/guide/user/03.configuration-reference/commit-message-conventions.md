@@ -9,7 +9,7 @@ Commit message conventions are patterns used for Git commit messages widely used
 
 Conventions are configured within the `commitMessageConventions` *section*. The section allows one sub-section for each convention and some overall options.
 
-You can have as many conventions as you want. You can use [presets](TODO: link the preset conventions here) that come bundled with Nyx, override them or define your own from scratch.
+You can have as many conventions as you want. You can use [presets]({{ site.baseurl }}{% link _pages/guide/user/04.configuration-presets/index.md %}) that come bundled with Nyx, override them or define your own from scratch.
 
 ### Commit message conventions overall options
 
@@ -30,7 +30,7 @@ You can have as many conventions as you want. You can use [presets](TODO: link t
 
 The comma separated list of commit message convention names that are enabled for the project. Here you can enable or disable the various conventions, either custom or default.
 
-Each item in the list must correspond to a convention `name` attribute. Each named convention must exist, but not all defined convention must be enabled here. Convention not listed here will just be ignored by Nyx as if they were not even defined.
+Each item in the list must correspond to a convention [`name`](#name) attribute. Each named convention must exist, but not all defined convention must be enabled here. Convention not listed here will just be ignored by Nyx as if they were not even defined.
 
 The order in which convention are listed matters. The conventions listed first are evaluated first, so when evaluating a commit message, the first convention that matches is used.
 {: .notice--info}
@@ -59,7 +59,7 @@ Each convention has the following attributes:
 | Default                   | N/A                                                                                      |
 | Command Line Option       | `--commit-message-conventions-<NAME>-expression=<REGEX>`                                 |
 | Environment Variable      | `NYX_COMMIT_MESSAGE_CONVENTIONS_<NAME>_EXPRESSION=<REGEX>`                               |
-| Configuration File Option | `commitMessageConventions/<NAME>/expression`                                             |
+| Configuration File Option | `commitMessageConventions/items/<NAME>/expression`                                       |
 | Related state attributes  |                                                                                          |
 
 The `expression` in a commit message convention is a regular expression that:
@@ -94,7 +94,7 @@ While conventions usually define a range of allowed values for `type` and `scope
 | Default                   | N/A                                                                                      |
 | Command Line Option       | `--commit-message-conventions-<NAME>-bumpExpressions=<MAP>`                              |
 | Environment Variable      | `NYX_COMMIT_MESSAGE_CONVENTIONS_<NAME>_BUMP_EXPRESSIONS=<MAP>`                           |
-| Configuration File Option | `commitMessageConventions/<NAME>/bumpExpressions`                                        |
+| Configuration File Option | `commitMessageConventions/items/<NAME>/bumpExpressions`                                  |
 | Related state attributes  | [newVersion]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#new-version){: .btn .btn--info .btn--small} [releaseScope/significantCommits]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#significant-commits){: .btn .btn--info .btn--small} [scheme]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#scheme){: .btn .btn--info .btn--small} [version]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#version){: .btn .btn--info .btn--small} |
 
 The `bumpExpressions` map gives Nyx instructions about which version identifiers are expected to be bumped according to the commit message. This map can be empty for those conventions not addressing the version bumping.
@@ -116,3 +116,18 @@ Bear in mind that:
 * the identifier names must comply with the configured version [`scheme`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#scheme) (the above example is using [Semantic Versioning]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/version-schemes.md %}#semantic-versioning-semver))
 * each expression must match exactly one bump type and not others or the identifier that is dumped might be unpredictable
 * capturing groups are ignored (named or not) and these expressions are just used to match or not a commit message
+
+#### Name
+
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `commitMessageConventions/<NAME>`                                                        |
+| Type                      | string                                                                                   |
+| Default                   | N/A                                                                                      |
+| Command Line Option       | `--commit-message-conventions-<NAME>=<NAME>`                                             |
+| Environment Variable      | `NYX_COMMIT_MESSAGE_CONVENTIONS_<NAME>=<NAME>`                                           |
+| Configuration File Option | `commitMessageConventions/items/<NAME>`                                                  |
+| Related state attributes  |                                                                                          |
+
+The short name that identifies this convention. This is also the value you can use in the [enabled](#enabled) conventions. This is actually not a field to be set within a convention section but instead the key of the map element.
+
+This option is **mandatory**.

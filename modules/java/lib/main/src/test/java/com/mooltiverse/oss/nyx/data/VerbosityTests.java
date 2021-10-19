@@ -38,19 +38,6 @@ public class VerbosityTests {
     }
 
     @Test
-    @DisplayName("Verbosity.VALUE.getValue()")
-    void getValueTest()
-        throws Exception {
-
-        assertEquals("trace", Verbosity.TRACE.getValue());
-        assertEquals("debug", Verbosity.DEBUG.getValue());
-        assertEquals("info", Verbosity.INFO.getValue());
-        assertEquals("warning", Verbosity.WARNING.getValue());
-        assertEquals("error", Verbosity.ERROR.getValue());
-        assertEquals("fatal", Verbosity.FATAL.getValue()); // FATAL is not available in SLF4J
-    }
-
-    @Test
     @DisplayName("Verbosity.from(Level)")
     void fromLevelTest()
         throws Exception {
@@ -63,22 +50,5 @@ public class VerbosityTests {
         // FATAL is not available in SLF4J
 
         assertThrows(NullPointerException.class, () -> { Verbosity.from((Level)null); });
-    }
-
-    @Test
-    @DisplayName("Verbosity.from(String)")
-    void fromStringTest()
-        throws Exception {
-
-        assertEquals(Verbosity.TRACE, Verbosity.from("trace"));
-        assertEquals(Verbosity.DEBUG, Verbosity.from("debug"));
-        assertEquals(Verbosity.INFO, Verbosity.from("info"));
-        assertEquals(Verbosity.WARNING, Verbosity.from("warning"));
-        assertEquals(Verbosity.ERROR, Verbosity.from("error"));
-        assertEquals(Verbosity.FATAL, Verbosity.from("fatal"));
-
-        assertThrows(NullPointerException.class, () -> { Verbosity.from((String)null); });
-        assertThrows(IllegalArgumentException.class, () -> { Verbosity.from(""); });
-        assertThrows(IllegalArgumentException.class, () -> { Verbosity.from("someotherstring"); });
     }
 }
