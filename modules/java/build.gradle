@@ -78,11 +78,11 @@ plugins {
     //id 'maven-publish'                                          // See: https://docs.gradle.org/current/userguide/publishing_maven.html
     id 'signing'                                                  // See: https://docs.gradle.org/current/userguide/signing_plugin.html
     id 'de.marcphilipp.nexus-publish' version '0.4.0'             // See: https://github.com/marcphilipp/nexus-publish-plugin/
-    id 'io.codearte.nexus-staging' version '0.21.2'               // See: https://github.com/Codearte/gradle-nexus-staging-plugin/
+    id 'io.codearte.nexus-staging' version '0.30.0'               // See: https://github.com/Codearte/gradle-nexus-staging-plugin/
     
     // This plugin allows to have additional test sets, configured in a testSets block, like integrationTest and functionalTest.
     // This is applied to subprojects only.
-    id 'org.unbroken-dome.test-sets' version '3.0.1' apply false  // See: https://github.com/unbroken-dome/gradle-testsets-plugin
+    id 'org.unbroken-dome.test-sets' version '4.0.0' apply false  // See: https://github.com/unbroken-dome/gradle-testsets-plugin
 }
 
 /*------------------------------------------------------------------------------
@@ -132,12 +132,12 @@ allprojects {
         }
     }
     dependencies {
-        testImplementation 'org.junit.jupiter:junit-jupiter:5.6.0'
+        testImplementation 'org.junit.jupiter:junit-jupiter:5.8.1'
         testRuntimeOnly    'org.junit.jupiter:junit-jupiter-engine'
 
         // plug the Logback SLF4J implementation when testing so we can get log messages logged to the standard output
-        testRuntimeOnly    'ch.qos.logback:logback-core:1.2.3'
-        testRuntimeOnly    'ch.qos.logback:logback-classic:1.2.3'
+        testRuntimeOnly    'ch.qos.logback:logback-core:1.2.6'
+        testRuntimeOnly    'ch.qos.logback:logback-classic:1.2.6'
     }
 
     /*------------------------------------------------------------------------------

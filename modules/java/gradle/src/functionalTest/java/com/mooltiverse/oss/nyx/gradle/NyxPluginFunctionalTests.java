@@ -61,8 +61,10 @@ public class NyxPluginFunctionalTests {
      */
     static String[] wellKnownWorkingGradleVersionsArray = new String[] {
         // Versions that are known to work
+        "7.2", "7.1.1", "7.1", "7.0.2", "7.0.1", "7.0",
+
         // - version "6.5" has a bug (https://github.com/gradle/gradle/issues/13367) that prevents us to test, fixed in "6.5.1"
-        "6.8.3"//, "6.8.2", "6.8.1", "6.8", "6.7.1", "6.7", "6.6.1", "6.6", "6.5.1", /*"6.5",*/ "6.4.1", "6.4", "6.3", "6.2.2", "6.2.1", "6.2", "6.1.1", "6.1", "6.0.1", "6.0",
+        "6.9.1", "6.9", "6.8.3", "6.8.2", "6.8.1", "6.8", "6.7.1", "6.7", "6.6.1", "6.6", "6.5.1", /*"6.5",*/ "6.4.1", "6.4", "6.3", "6.2.2", "6.2.1", "6.2", "6.1.1", "6.1", "6.0.1", "6.0",
 
         /* Gradle versions prior than 6.0 fails to test with an exception like:
                 > Could not find method services() for arguments [build_4o3mdmvy94ykemibox706yopu$_run_closure1$_closure2@18c3fdb5] on object of type com.mooltiverse.oss.nyx.gradle.NyxExtension.
@@ -208,9 +210,6 @@ public class NyxPluginFunctionalTests {
                 put("ivy-publish", "");
             }});*/
             /*add(new HashMap<String,String>(){   private static final long serialVersionUID = 1L; {
-                put("maven", "");
-            }});*/
-            /*add(new HashMap<String,String>(){   private static final long serialVersionUID = 1L; {
                 put("distribution", "");   }
             });*/
             /*add(new HashMap<String,String>(){   private static final long serialVersionUID = 1L; {
@@ -252,7 +251,7 @@ public class NyxPluginFunctionalTests {
                 put("java", "");
                 put("antlr", "");
                 put("application", "");
-                put("maven", "");
+                put("maven-publish", "");
             }});
         }
     };
@@ -524,9 +523,9 @@ public class NyxPluginFunctionalTests {
             printWriter.println("  resume = true");
             printWriter.println("  scheme = 'SEMVER'");
             //printWriter.println("  sharedConfigurationFile = 'shared.config.json'");
-            printWriter.println("  stateFile = '.nyx-state.yml'");
-            printWriter.println("  verbosity = 'INFO'");    // this is ignored with Gradle
-            //printWriter.println("  version = '1.8.12'");  // let Nyx infer the version
+            //printWriter.println("  stateFile = '.nyx-state.yml'");    // do not output the file to avoid polluting the working directory
+            printWriter.println("  verbosity = 'INFO'");                // this is ignored with Gradle
+            //printWriter.println("  version = '1.8.12'");              // let Nyx infer the version
         }
         else printWriter.println("  preset = '"+preset+"'");
         printWriter.println("}");
@@ -801,7 +800,7 @@ public class NyxPluginFunctionalTests {
          */
         @ParameterizedTest(name = "gradle {0} [Gradle Version: {1}, Plugins {2}, Script: simple] ==> {3}")
         @MethodSource("com.mooltiverse.oss.nyx.gradle.NyxPluginFunctionalTests#wellKnownTaskTestSuites")
-        void runNyxTaskWithSimpleScriptithPresetTest(String target, String gradleVersion, Map<String,String> pluginCombination, Map<String,TaskOutcome> taskOutcomes)
+        void runNyxTaskWithSimpleScriptWithPresetTest(String target, String gradleVersion, Map<String,String> pluginCombination, Map<String,TaskOutcome> taskOutcomes)
             throws Exception {
             Script script = Scenario.INITIAL_COMMIT.realize();
             script.addRemote(Scenario.FROM_SCRATCH.realize().getGitDirectory(), "origin");

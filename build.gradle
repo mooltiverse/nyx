@@ -7,7 +7,7 @@ plugins {
     // (at times it doesn't work when using the ./gradlew wrapper).
     // This plugin can be commented out and used only when needed.
     // See: https://github.com/dorongold/gradle-task-tree
-    id "com.dorongold.task-tree" version "1.5"
+    id "com.dorongold.task-tree" version "2.1.0"
 }
 
 /*------------------------------------------------------------------------------
