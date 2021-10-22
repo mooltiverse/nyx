@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import com.mooltiverse.oss.nyx.configuration.Defaults;
 import com.mooltiverse.oss.nyx.data.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.data.CommitMessageConventions;
 import com.mooltiverse.oss.nyx.data.Identifier;
@@ -352,12 +353,35 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
                         items = new HashMap<String,Identifier>(type.getIdentifiers().getItems().size());
                         for (NyxExtension.ReleaseTypes.ReleaseType.Identifiers.Identifier identifier: type.getIdentifiers().getItems()) {
                             if (!items.containsKey(identifier.getName()))
-                                items.put(identifier.getName(), new Identifier(identifier.getQualifier().isPresent() ? identifier.getQualifier().get() : null, identifier.getValue().isPresent() ? identifier.getValue().get() : null, identifier.getPosition().isPresent() ? IdentifierPosition.valueOf(identifier.getPosition().get()) : null));
+                                items.put(identifier.getName(),
+                                    new Identifier(
+                                        identifier.getQualifier().isPresent() ? identifier.getQualifier().get() : null,
+                                        identifier.getValue().isPresent() ? identifier.getValue().get() : null,
+                                        identifier.getPosition().isPresent() ? IdentifierPosition.valueOf(identifier.getPosition().get()) : null)
+                                );
                         }
                     }
-                    identifiers = new Identifiers(type.getIdentifiers().getEnabled().isPresent() ? type.getIdentifiers().getEnabled().get() : null, items);
+                    identifiers = new Identifiers(
+                        type.getIdentifiers().getEnabled().isPresent() ? type.getIdentifiers().getEnabled().get() : null, items
+                    );
                 }
-                return new ReleaseType(type.getCollapseVersions().isPresent() ? type.getCollapseVersions().get() : null, type.getCollapsedVersionQualifier().isPresent() ? type.getCollapsedVersionQualifier().get() : null, type.getFilterTags().isPresent() ? type.getFilterTags().get() : null, type.getGitCommit().isPresent() ? type.getGitCommit().get() : null, type.getGitCommitMessage().isPresent() ? type.getGitCommitMessage().get() : null, type.getGitPush().isPresent() ? type.getGitPush().get() : null, type.getGitTag().isPresent() ? type.getGitTag().get() : null, type.getGitTagMessage().isPresent() ? type.getGitTagMessage().get() : null, identifiers, type.getMatchBranches().isPresent() ? type.getMatchBranches().get() : null, type.getMatchEnvironmentVariables().isPresent() ? type.getMatchEnvironmentVariables().get() : null, type.getMatchWorkspaceStatus().isPresent() ? WorkspaceStatus.valueOf(type.getMatchWorkspaceStatus().get()) : null, type.getPublish().isPresent() ? type.getPublish().get() : null, type.getVersionRange().isPresent() ? type.getVersionRange().get() : null, type.getVersionRangeFromBranchName().isPresent() ? type.getVersionRangeFromBranchName().get() : null);
+                return new ReleaseType(
+                    type.getCollapseVersions().isPresent() ? type.getCollapseVersions().get() : Defaults.ReleaseType.COLLAPSE_VERSIONS,
+                    type.getCollapsedVersionQualifier().isPresent() ? type.getCollapsedVersionQualifier().get() : Defaults.ReleaseType.COLLAPSED_VERSION_QUALIFIER,
+                    type.getFilterTags().isPresent() ? type.getFilterTags().get() : Defaults.ReleaseType.FILTER_TAGS,
+                    type.getGitCommit().isPresent() ? type.getGitCommit().get() : Defaults.ReleaseType.GIT_COMMIT,
+                    type.getGitCommitMessage().isPresent() ? type.getGitCommitMessage().get() : Defaults.ReleaseType.GIT_COMMIT_MESSAGE,
+                    type.getGitPush().isPresent() ? type.getGitPush().get() : Defaults.ReleaseType.GIT_PUSH,
+                    type.getGitTag().isPresent() ? type.getGitTag().get() : Defaults.ReleaseType.GIT_TAG,
+                    type.getGitTagMessage().isPresent() ? type.getGitTagMessage().get() : Defaults.ReleaseType.GIT_TAG_MESSAGE,
+                    identifiers,
+                    type.getMatchBranches().isPresent() ? type.getMatchBranches().get() : Defaults.ReleaseType.MATCH_BRANCHES,
+                    type.getMatchEnvironmentVariables().isPresent() ? type.getMatchEnvironmentVariables().get() : Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES,
+                    type.getMatchWorkspaceStatus().isPresent() ? WorkspaceStatus.valueOf(type.getMatchWorkspaceStatus().get()) : Defaults.ReleaseType.MATCH_WORKSPACE_STATUS,
+                    type.getPublish().isPresent() ? type.getPublish().get() : Defaults.ReleaseType.PUBLISH,
+                    type.getVersionRange().isPresent() ? type.getVersionRange().get() : Defaults.ReleaseType.VERSION_RANGE,
+                    type.getVersionRangeFromBranchName().isPresent() ? type.getVersionRangeFromBranchName().get() : Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME
+                );
             }
         }
     }
