@@ -26,7 +26,239 @@ include 'modules:java:gradle'
   Extension configurations
 ------------------------------------------------------------------------------*/
 nyx {
-  bump          = 'alpha' // for the time being just bump the 'alpha' pre-release identifier, until we have release types implemented
+  // starting from the 'simple' preset gives us:
+  // - the Conventional Commits convention
+  // - the 'mainline' and 'internal' release types (that we override here)
   preset        = 'simple'
   stateFile     = 'build/.nyx-state.json'
+  releaseTypes  {
+    enabled       = [ 'mainline', 'mainlinelocal', 'maturity', 'maturitylocal', 'integration', 'integrationlocal', 'hotfix', 'hotfixlocal', 'feature', 'featurelocal', 'release', 'releaselocal', 'maintenance', 'maintenancelocal', 'internal' ]
+    items {
+      // 'mainline' overrides the release type with the same name from the preset
+      mainline {
+        filterTags = '^({{configuration.releasePrefix}})?([0-9]\\\\d*)\\\\.([0-9]\\\\d*)\\\\.([0-9]\\\\d*)$'
+        gitPush = 'true'
+        gitTag = 'true'
+        matchBranches = '^(master|main)$'
+        matchEnvironmentVariables {
+          // tie this release type to GitHub CI servers. See https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables
+          CI = '^true$'
+          GITHUB_ACTIONS = '^true$'
+        }
+        matchWorkspaceStatus = 'CLEAN'
+        publish = 'true'
+
+        //TODO: remove this unnecessary attribute once https://github.com/mooltiverse/nyx/issues/68 is fixed//TODO: figure out why without this value we get a NullPointerException
+        collapseVersions = false
+      }
+      maturity {
+        collapseVersions = true
+        collapsedVersionQualifier = '{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}'
+        filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$'
+        gitPush = 'true'
+        gitTag = 'true'
+        matchBranches = '^(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)$'
+        matchEnvironmentVariables {
+          // tie this release type to GitHub CI servers. See https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables
+          CI = '^true$'
+          GITHUB_ACTIONS = '^true$'
+        }
+        matchWorkspaceStatus = 'CLEAN'
+        publish = 'false'
+      }
+      integration {
+        collapseVersions = true
+        collapsedVersionQualifier = '{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}'
+        filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(develop|development|integration|latest)(\\.([0-9]\\d*))?)$'
+        gitPush = 'true'
+        gitTag = 'true'
+        matchBranches = '^(develop|development|integration|latest)$'
+        matchEnvironmentVariables {
+          // tie this release type to GitHub CI servers. See https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables
+          CI = '^true$'
+          GITHUB_ACTIONS = '^true$'
+        }
+        matchWorkspaceStatus = 'CLEAN'
+        publish = 'false'
+      }
+      hotfix {
+        collapseVersions = true
+        collapsedVersionQualifier = '{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}'
+        filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(fix|hotfix)(([0-9a-zA-Z]*)(\\.([0-9]\\d*))?)?)$'
+        gitPush = 'true'
+        gitTag = 'true'
+        matchBranches = '^(fix|hotfix)((-|\\/)[0-9a-zA-Z-_]+)?$'
+        matchEnvironmentVariables {
+          // tie this release type to GitHub CI servers. See https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables
+          CI = '^true$'
+          GITHUB_ACTIONS = '^true$'
+        }
+        matchWorkspaceStatus = 'CLEAN'
+        publish = 'true'
+      }
+      feature {
+        collapseVersions = true
+        collapsedVersionQualifier = '{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}'
+        filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(feat|feature)(([0-9a-zA-Z]*)(\\.([0-9]\\d*))?)?)$'
+        gitPush = 'true'
+        gitTag = 'true'
+        matchBranches = '^(feat|feature)((-|\\/)[0-9a-zA-Z-_]+)?$'
+        matchEnvironmentVariables {
+          // tie this release type to GitHub CI servers. See https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables
+          CI = '^true$'
+          GITHUB_ACTIONS = '^true$'
+        }
+        matchWorkspaceStatus = 'CLEAN'
+        publish = 'false'
+      }
+      release {
+        collapseVersions = true
+        collapsedVersionQualifier = '{{#firstLower}}{{branch}}{{/firstLower}}'
+        filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(rel|release)((\\.([0-9]\\d*))?)?)$'
+        gitPush = 'true'
+        gitTag = 'true'
+        matchBranches = '^(rel|release)(-|\\/)({{configuration.releasePrefix}})?([0-9|x]\\d*)(\\.([0-9|x]\\d*)(\\.([0-9|x]\\d*))?)?$'
+        matchEnvironmentVariables {
+          // tie this release type to GitHub CI servers. See https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables
+          CI = '^true$'
+          GITHUB_ACTIONS = '^true$'
+        }
+        matchWorkspaceStatus = 'CLEAN'
+        publish = 'false'
+        versionRangeFromBranchName = true
+      }
+      maintenance {
+        filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$'
+        gitPush = 'true'
+        gitTag = 'true'
+        matchBranches = '^[a-zA-Z]*([0-9|x]\\d*)(\\.([0-9|x]\\d*)(\\.([0-9|x]\\d*))?)?$'
+        matchEnvironmentVariables {
+          // tie this release type to GitHub CI servers. See https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables
+          CI = '^true$'
+          GITHUB_ACTIONS = '^true$'
+        }
+        matchWorkspaceStatus = 'CLEAN'
+        publish = 'true'
+        versionRangeFromBranchName = true
+
+        //TODO: remove this unnecessary attribute once https://github.com/mooltiverse/nyx/issues/68 is fixed//TODO: figure out why without this value we get a NullPointerException
+        collapseVersions = false
+      }
+      // 'internal' overrides the release type with the same name from the preset adding some qualifiers and is the global fallback for all release types
+      internal {
+        collapseVersions = true
+        collapsedVersionQualifier = 'internal'
+        gitPush = 'false'
+        gitTag = 'false'
+        identifiers {
+          enabled = [ 'branch', 'commit', 'user', 'timestamp' ]
+          items {
+            branch {
+              qualifier = 'branch'
+              value = '{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}'
+              position = 'BUILD'
+            }
+            commit {
+              qualifier = 'commit'
+              value = '{{#short7}}{{releaseScope.finalCommit}}{{/short7}}'
+              position = 'BUILD'
+            }
+            user {
+              qualifier = 'user'
+              value = '{{#sanitizeLower}}{{environment.user}}{{/sanitizeLower}}'
+              position = 'BUILD'
+            }
+            timestamp {
+              qualifier = 'timestamp'
+              value = '{{#timestampYYYYMMDDHHMMSS}}{{timestamp}}{{/timestampYYYYMMDDHHMMSS}}'
+              position = 'BUILD'
+            }
+          }
+        }
+        publish = 'false'
+
+        //TODO: remove this unnecessary attribute once https://github.com/mooltiverse/nyx/issues/68 is fixed
+        versionRangeFromBranchName = false
+      }
+
+      // TODO: remove the following '*local' release types once the plugin has been tested in production
+      // The following release types are replicas of the main ones above and we just use them to test in production
+      // so that when builds are executed locally no push or publish is performed and an extra identifier is added.
+      // These have the environment variable constraints removed.
+      mainlinelocal {
+        filterTags = '^({{configuration.releasePrefix}})?([0-9]\\\\d*)\\\\.([0-9]\\\\d*)\\\\.([0-9]\\\\d*)$'
+        gitPush = 'false'
+        gitTag = 'false'
+        matchBranches = '^(master|main)$'
+        matchWorkspaceStatus = 'CLEAN'
+        publish = 'false'
+
+        //TODO: remove this unnecessary attribute once https://github.com/mooltiverse/nyx/issues/68 is fixed//TODO: figure out why without this value we get a NullPointerException
+        collapseVersions = false
+      }
+      maturitylocal {
+        collapseVersions = true
+        collapsedVersionQualifier = '{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}'
+        filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$'
+        gitPush = 'false'
+        gitTag = 'false'
+        matchBranches = '^(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)$'
+        matchWorkspaceStatus = 'CLEAN'
+        publish = 'false'
+      }
+      integrationlocal {
+        collapseVersions = true
+        collapsedVersionQualifier = '{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}'
+        filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(develop|development|integration|latest)(\\.([0-9]\\d*))?)$'
+        gitPush = 'false'
+        gitTag = 'false'
+        matchBranches = '^(develop|development|integration|latest)$'
+        matchWorkspaceStatus = 'CLEAN'
+        publish = 'false'
+      }
+      hotfixlocal {
+        collapseVersions = true
+        collapsedVersionQualifier = '{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}'
+        filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(fix|hotfix)(([0-9a-zA-Z]*)(\\.([0-9]\\d*))?)?)$'
+        gitPush = 'false'
+        gitTag = 'false'
+        matchBranches = '^(fix|hotfix)((-|\\/)[0-9a-zA-Z-_]+)?$'
+        matchWorkspaceStatus = 'CLEAN'
+        publish = 'false'
+      }
+      featurelocal {
+        collapseVersions = true
+        collapsedVersionQualifier = '{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}'
+        filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(feat|feature)(([0-9a-zA-Z]*)(\\.([0-9]\\d*))?)?)$'
+        gitPush = 'false'
+        gitTag = 'false'
+        matchBranches = '^(feat|feature)((-|\\/)[0-9a-zA-Z-_]+)?$'
+        matchWorkspaceStatus = 'CLEAN'
+        publish = 'false'
+      }
+      releaselocal {
+        collapseVersions = true
+        collapsedVersionQualifier = '{{#firstLower}}{{branch}}{{/firstLower}}'
+        filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(rel|release)((\\.([0-9]\\d*))?)?)$'
+        gitPush = 'false'
+        gitTag = 'false'
+        matchBranches = '^(rel|release)(-|\\/)({{configuration.releasePrefix}})?([0-9|x]\\d*)(\\.([0-9|x]\\d*)(\\.([0-9|x]\\d*))?)?$'
+        matchWorkspaceStatus = 'CLEAN'
+        publish = 'false'
+        versionRangeFromBranchName = true
+      }
+      maintenancelocal {
+        filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$'
+        gitPush = 'false'
+        gitTag = 'false'
+        matchBranches = '^[a-zA-Z]*([0-9|x]\\d*)(\\.([0-9|x]\\d*)(\\.([0-9|x]\\d*))?)?$'
+        matchWorkspaceStatus = 'CLEAN'
+        publish = 'false'
+        versionRangeFromBranchName = true
+
+        //TODO: remove this unnecessary attribute once https://github.com/mooltiverse/nyx/issues/68 is fixed//TODO: figure out why without this value we get a NullPointerException
+        collapseVersions = false
+      }
+    }
+  }
 }

@@ -486,5 +486,7 @@ tasks.publishToSonatype.finalizedBy tasks.closeAndReleaseRepository
 // to the publication.
 tasks.publish.dependsOn tasks.publishToSonatype
 
-tasks.publishToSonatype.onlyIf { rootProject.nyxState.newVersion }
-tasks.closeAndReleaseRepository.onlyIf { rootProject.nyxState.newVersion }
+// Only perform publishing if the Nyx release type enables publishing
+tasks.publishToSonatype.onlyIf { rootProject.nyxState.newRelease }
+tasks.closeAndReleaseRepository.onlyIf { rootProject.nyxState.newRelease }
+tasks.publish.onlyIf { rootProject.nyxState.newRelease }
