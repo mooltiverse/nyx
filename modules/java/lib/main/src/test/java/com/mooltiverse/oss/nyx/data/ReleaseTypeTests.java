@@ -29,7 +29,7 @@ public class ReleaseTypeTests {
     @DisplayName("ReleaseType()")
     void constructorTest()
         throws Exception {
-        assertNotNull(new ReleaseType(true, "{{ branch }}", "^({{ configuration.releasePrefix }})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{ version }}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{ version }}", new Identifiers(List.<String>of("build"),  Map.<String,Identifier>of("build", new Identifier("build", "12", IdentifierPosition.BUILD))), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), "", Boolean.FALSE));
+        assertNotNull(new ReleaseType(true, "{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}", "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{version}}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{version}}", new Identifiers(List.<String>of("build"),  Map.<String,Identifier>of("build", new Identifier("build", "12", IdentifierPosition.BUILD))), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), "", Boolean.FALSE));
         assertNull(new ReleaseType().getMatchEnvironmentVariables());
     }
 }

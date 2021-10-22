@@ -34,8 +34,8 @@ public class ReleaseTypes {
     public static final ReleaseType FEATURE = new ReleaseType() {
         {
             setCollapseVersions(Boolean.TRUE);
-            setCollapsedVersionQualifier("{{#sanitizeLower}}{{ branch }}{{/sanitizeLower}}");
-            setFilterTags("^({{ configuration.releasePrefix }})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(feat|feature)(([0-9a-zA-Z]*)(\\.([0-9]\\d*))?)?)$");
+            setCollapsedVersionQualifier("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}");
+            setFilterTags("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(feat|feature)(([0-9a-zA-Z]*)(\\.([0-9]\\d*))?)?)$");
             setGitCommit(Boolean.FALSE.toString());
             setGitCommitMessage(null);
             setGitPush(Boolean.FALSE.toString());
@@ -57,8 +57,8 @@ public class ReleaseTypes {
     public static final ReleaseType HOTFIX = new ReleaseType() {
         {
             setCollapseVersions(Boolean.TRUE);
-            setCollapsedVersionQualifier("{{#sanitizeLower}}{{ branch }}{{/sanitizeLower}}");
-            setFilterTags("^({{ configuration.releasePrefix }})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(fix|hotfix)(([0-9a-zA-Z]*)(\\.([0-9]\\d*))?)?)$");
+            setCollapsedVersionQualifier("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}");
+            setFilterTags("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(fix|hotfix)(([0-9a-zA-Z]*)(\\.([0-9]\\d*))?)?)$");
             setGitCommit(Boolean.FALSE.toString());
             setGitCommitMessage(null);
             setGitPush(Boolean.TRUE.toString());
@@ -80,8 +80,8 @@ public class ReleaseTypes {
     public static final ReleaseType INTEGRATION = new ReleaseType() {
         {
             setCollapseVersions(Boolean.TRUE);
-            setCollapsedVersionQualifier("{{#sanitizeLower}}{{ branch }}{{/sanitizeLower}}");
-            setFilterTags("^({{ configuration.releasePrefix }})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(develop|development|integration|latest)(\\.([0-9]\\d*))?)$");
+            setCollapsedVersionQualifier("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}");
+            setFilterTags("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(develop|development|integration|latest)(\\.([0-9]\\d*))?)$");
             setGitCommit(Boolean.FALSE.toString());
             setGitCommitMessage(null);
             setGitPush(Boolean.TRUE.toString());
@@ -110,7 +110,7 @@ public class ReleaseTypes {
             setGitPush(Boolean.FALSE.toString());
             setGitTag(Boolean.FALSE.toString());
             setGitTagMessage(null);
-            setIdentifiers(new Identifiers(List.<String>of("timestamp"), Map.<String,Identifier>of("timestamp", new Identifier("timestamp", "{{#timestampYYYYMMDDHHMMSS}}{{ timestamp }}{{/timestampYYYYMMDDHHMMSS}}", IdentifierPosition.BUILD))));
+            setIdentifiers(new Identifiers(List.<String>of("timestamp"), Map.<String,Identifier>of("timestamp", new Identifier("timestamp", "{{#timestampYYYYMMDDHHMMSS}}{{timestamp}}{{/timestampYYYYMMDDHHMMSS}}", IdentifierPosition.BUILD))));
             setMatchBranches(null);
             setMatchEnvironmentVariables(null);
             setMatchWorkspaceStatus(null);
@@ -127,7 +127,7 @@ public class ReleaseTypes {
         {
             setCollapseVersions(Boolean.FALSE);
             setCollapsedVersionQualifier(null);
-            setFilterTags("^({{ configuration.releasePrefix }})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$");
+            setFilterTags("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$");
             setGitCommit(Boolean.FALSE.toString());
             setGitCommitMessage(null);
             setGitPush(Boolean.TRUE.toString());
@@ -150,7 +150,7 @@ public class ReleaseTypes {
         {
             setCollapseVersions(Boolean.FALSE);
             setCollapsedVersionQualifier(null);
-            setFilterTags("^({{ configuration.releasePrefix }})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$");
+            setFilterTags("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$");
             setGitCommit(Boolean.FALSE.toString());
             setGitCommitMessage(null);
             setGitPush(Boolean.TRUE.toString());
@@ -172,8 +172,8 @@ public class ReleaseTypes {
     public static final ReleaseType MATURITY = new ReleaseType() {
         {
             setCollapseVersions(Boolean.TRUE);
-            setCollapsedVersionQualifier("{{#sanitizeLower}}{{ branch }}{{/sanitizeLower}}");
-            setFilterTags("^({{ configuration.releasePrefix }})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$");
+            setCollapsedVersionQualifier("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}");
+            setFilterTags("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$");
             setGitCommit(Boolean.FALSE.toString());
             setGitCommitMessage(null);
             setGitPush(Boolean.TRUE.toString());
@@ -195,15 +195,15 @@ public class ReleaseTypes {
     public static final ReleaseType RELEASE = new ReleaseType() {
         {
             setCollapseVersions(Boolean.TRUE);
-            setCollapsedVersionQualifier("{{#firstLower}}{{ branch }}{{/firstLower}}");
-            setFilterTags("^({{ configuration.releasePrefix }})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(rel|release)((\\.([0-9]\\d*))?)?)$");
+            setCollapsedVersionQualifier("{{#firstLower}}{{branch}}{{/firstLower}}");
+            setFilterTags("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(rel|release)((\\.([0-9]\\d*))?)?)$");
             setGitCommit(Boolean.FALSE.toString());
             setGitCommitMessage(null);
             setGitPush(Boolean.TRUE.toString());
             setGitTag(Boolean.TRUE.toString());
             setGitTagMessage(null);
             setIdentifiers(null);
-            setMatchBranches("^(rel|release)(-|\\/)({{ configuration.releasePrefix }})?([0-9|x]\\d*)(\\.([0-9|x]\\d*)(\\.([0-9|x]\\d*))?)?$");
+            setMatchBranches("^(rel|release)(-|\\/)({{configuration.releasePrefix}})?([0-9|x]\\d*)(\\.([0-9|x]\\d*)(\\.([0-9|x]\\d*))?)?$");
             setMatchEnvironmentVariables(null);
             setMatchWorkspaceStatus(WorkspaceStatus.CLEAN);
             setPublish(Boolean.FALSE.toString());

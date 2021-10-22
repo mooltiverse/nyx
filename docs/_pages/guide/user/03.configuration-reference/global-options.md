@@ -181,28 +181,6 @@ This option only affects the way Nyx **generates** release names and tags, while
 
 See [Release Types]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}).
 
-### Shared configuration file
-
-| ------------------------- | ---------------------------------------------------------------------------------------- |
-| Name                      | `sharedConfigurationFile`                                                                |
-| Type                      | string                                                                                   |
-| Default                   | N/A                                                                                      |
-| Command Line Option       | `--shared-configuration-file=<PATH>`                                                     |
-| Environment Variable      | `NYX_SHARED_CONFIGURATION_FILE=<PATH>`                                                   |
-| Configuration File Option | `sharedConfigurationFile`                                                                |
-| Related state attributes  |                                                                                          |
-
-This option allows you to load a **shared** configuration file from a location other than [default ones]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}#evaluation-order). This can be a relative or absolute path to a local file or an URL to load a remote file. This configuration file can be authored as `.yaml` (or `.yml`), `.json` (the format is inferred by the file extension or JSON is used by default) just like the default configuration files.
-
-Shared configuration files are meant to share a common set of configuration options among projects and they have lower priority over [regular configuration files](#configuration-file) which, in turn, can be used to override specific options inherited from shared files.
-
-Consider using a [standard path for configuration files]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}#evaluation-order) before using a custom one, so you don't even need to use this option.
-{: .notice--info}
-
-In order to avoid chaining this option is ignored when defined in custom configuration files loaded by means of this same option.
-{: .notice--info}
-
-
 ### Resume
 
 | ------------------------- | ---------------------------------------------------------------------------------------- |
@@ -230,6 +208,27 @@ This option only makes sense when you also set a value for the [`stateFile`](#st
 | Related state attributes  | [bump]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#bump){: .btn .btn--info .btn--small} [newVersion]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#new-version){: .btn .btn--info .btn--small} [scheme]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#scheme){: .btn .btn--info .btn--small} [version]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#version){: .btn .btn--info .btn--small} |
 
 Selects the [version scheme]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/version-schemes.md %}) to use. Defaults to [`SEMVER`]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/version-schemes.md %}#semantic-versioning-semver).
+
+### Shared configuration file
+
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `sharedConfigurationFile`                                                                |
+| Type                      | string                                                                                   |
+| Default                   | N/A                                                                                      |
+| Command Line Option       | `--shared-configuration-file=<PATH>`                                                     |
+| Environment Variable      | `NYX_SHARED_CONFIGURATION_FILE=<PATH>`                                                   |
+| Configuration File Option | `sharedConfigurationFile`                                                                |
+| Related state attributes  |                                                                                          |
+
+This option allows you to load a **shared** configuration file from a location other than [default ones]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}#evaluation-order). This can be a relative or absolute path to a local file or an URL to load a remote file. This configuration file can be authored as `.yaml` (or `.yml`), `.json` (the format is inferred by the file extension or JSON is used by default) just like the default configuration files.
+
+Shared configuration files are meant to share a common set of configuration options among projects and they have lower priority over [regular configuration files](#configuration-file) which, in turn, can be used to override specific options inherited from shared files.
+
+Consider using a [standard path for configuration files]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}#evaluation-order) before using a custom one, so you don't even need to use this option.
+{: .notice--info}
+
+In order to avoid chaining this option is ignored when defined in custom configuration files loaded by means of this same option.
+{: .notice--info}
 
 ### State file
 

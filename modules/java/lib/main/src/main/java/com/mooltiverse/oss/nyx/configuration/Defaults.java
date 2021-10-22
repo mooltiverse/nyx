@@ -128,9 +128,9 @@ public interface Defaults {
         public static final String GIT_COMMIT = Boolean.FALSE.toString();
 
         /**
-         * The optional string or the template to render to use as the commit message if a commit has to be made. Value: {@code Release version {{ version }}}
+         * The optional string or the template to render to use as the commit message if a commit has to be made. Value: {@code Release version {{version}}}
          */
-        public static final String GIT_COMMIT_MESSAGE = "Release version {{ version }}";
+        public static final String GIT_COMMIT_MESSAGE = "Release version {{version}}";
 
         /**
          * The name of the default release type.

@@ -204,7 +204,7 @@ public class TemplatesTests {
         /**
          * A test template
          */
-        public static final String TEMPLATE = "Version: {{version}} (bumping '{{ bump }}' on {{ configuration.initialVersion }} using lenient ({{ configuration.releaseLenient }}))\nScheme: {{ scheme }}\nTimestamp: {{ timestamp }}\nPrevious Version: {{releaseScope.previousVersion}} at {{#short5}}{{releaseScope.previousVersionCommit}}{{/short5}}\n\nCommits:\n{{#releaseScope.commits}}\n  {{.}}\n{{/releaseScope.commits}}\n";
+        public static final String TEMPLATE = "Version: {{version}} (bumping '{{bump}}' on {{configuration.initialVersion}} using lenient ({{configuration.releaseLenient}}))\nScheme: {{scheme}}\nTimestamp: {{timestamp}}\nPrevious Version: {{releaseScope.previousVersion}} at {{#short5}}{{releaseScope.previousVersionCommit}}{{/short5}}\n\nCommits:\n{{#releaseScope.commits}}\n  {{.}}\n{{/releaseScope.commits}}\n";
 
         /**
          * The expected output for the template

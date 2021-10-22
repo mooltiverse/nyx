@@ -30,26 +30,26 @@ option = "Hello World"
 
 Often times you just need to use a simple value from the [Nyx state]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/index.md %}) to be the result of the template.
 
-This is fairly simple as you just need to wrap the name of the [state]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/index.md %}) attribute with double curly braces, like `{% raw %}{{ attribute }}{% endraw %}`. This is the simplest form of a [Mustache tag](https://mustache.github.io/mustache.5.html) (and yes, the double curly brances are the *mustaches*).
+This is fairly simple as you just need to wrap the name of the [state]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/index.md %}) attribute with double curly braces, like `{% raw %}{{attribute}}{% endraw %}`. This is the simplest form of a [Mustache tag](https://mustache.github.io/mustache.5.html) (and yes, the double curly brances are the *mustaches*).
 
 So if we want to set our configuration `option` to the current value of the `version` attribute from the [state]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/index.md %}) our definition will look like:
 
 ```
-option = "{% raw %}{{ version }}{% endraw %}"
+option = "{% raw %}{{version}}{% endraw %}"
 ```
 
 When the value you need to render is nested into another (i.e. `section/attribute` or `section.attribute`, depending on the notation), the template looks like:
 
 ```
-option = "{% raw %}{{ #section }}{{ attribute }}{{ /section }}{% endraw %}"
+option = "{% raw %}{{#section}}{{attribute}}{{/section}}{% endraw %}"
 ```
 
-As you can see this is a little cumbersome for a simple value but you will soon understand how powerful it can be. What is important to note here is that the `{% raw %}{{ attribute }}{% endraw %}` expression is now enclosed between a `{% raw %}{{ #section }}{% endraw %}` opening tag and a `{% raw %}{{ /section }}{% endraw %}` closing tag (denoted by the `#` and `/` characters).
+As you can see this is a little cumbersome for a simple value but you will soon understand how powerful it can be. What is important to note here is that the `{% raw %}{{attribute}}{% endraw %}` expression is now enclosed between a `{% raw %}{{#section}}{% endraw %}` opening tag and a `{% raw %}{{/section}}{% endraw %}` closing tag (denoted by the `#` and `/` characters).
 
 Alternatively you can simply use the dotted notation, like:
 
 ```
-option = "{% raw %}{{ section.attribute }}{% endraw %}"
+option = "{% raw %}{{section.attribute}}{% endraw %}"
 ```
 
 ### Type conversions
@@ -83,7 +83,7 @@ Function expressions are sensitive to whitespaces, in the sense that Mustache do
 Transforms the input characters to lower case. Example:
 
 ```
-output = "{% raw %}{{#lower}}{{ input }}{{/lower}}{% endraw %}"
+output = "{% raw %}{{#lower}}{{input}}{{/lower}}{% endraw %}"
 ```
 
 Example inputs and corresponding outputs:
@@ -100,7 +100,7 @@ Example inputs and corresponding outputs:
 Transforms the input characters to upper case. Example:
 
 ```
-output = "{% raw %}{{#upper}}{{ input }}{{/upper}}{% endraw %}"
+output = "{% raw %}{{#upper}}{{input}}{{/upper}}{% endraw %}"
 ```
 
 Example inputs and corresponding outputs:
@@ -117,7 +117,7 @@ Example inputs and corresponding outputs:
 Removes the leading and trailing spaces from the input. Example:
 
 ```
-output = "{% raw %}{{#trim}}{{ input }}{{/trim}}{% endraw %}"
+output = "{% raw %}{{#trim}}{{input}}{{/trim}}{% endraw %}"
 ```
 
 Example inputs and corresponding outputs:
@@ -134,7 +134,7 @@ Example inputs and corresponding outputs:
 Discards everything from the first occurrence of a character other than letters and positive digits. Example:
 
 ```
-output = "{% raw %}{{#first}}{{ input }}{{/first}}{% endraw %}"
+output = "{% raw %}{{#first}}{{input}}{{/first}}{% endraw %}"
 ```
 
 Example inputs and corresponding outputs:
@@ -150,7 +150,7 @@ Example inputs and corresponding outputs:
 Discards everything from the first occurrence of a character other than letters and positive digits and transforms the remaining characters to lower case. Example:
 
 ```
-output = "{% raw %}{{#firstLower}}{{ input }}{{/firstLower}}{% endraw %}"
+output = "{% raw %}{{#firstLower}}{{input}}{{/firstLower}}{% endraw %}"
 ```
 
 Example inputs and corresponding outputs:
@@ -167,7 +167,7 @@ Example inputs and corresponding outputs:
 Discards everything from the first occurrence of a character other than letters and positive digits and transforms the remaining characters to upper case. Example:
 
 ```
-output = "{% raw %}{{#firstUpper}}{{ input }}{{/firstUpper}}{% endraw %}"
+output = "{% raw %}{{#firstUpper}}{{input}}{{/firstUpper}}{% endraw %}"
 ```
 
 Example inputs and corresponding outputs:
@@ -184,7 +184,7 @@ Example inputs and corresponding outputs:
 Discards everything before the last occurrence of a character other than letters and positive digits. Example:
 
 ```
-output = "{% raw %}{{#last}}{{ input }}{{/last}}{% endraw %}"
+output = "{% raw %}{{#last}}{{input}}{{/last}}{% endraw %}"
 ```
 
 Example inputs and corresponding outputs:
@@ -200,7 +200,7 @@ Example inputs and corresponding outputs:
 Discards everything before the last occurrence of a character other than letters and positive digits and transforms the remaining characters to lower case. Example:
 
 ```
-output = "{% raw %}{{#lastLower}}{{ input }}{{/lastLower}}{% endraw %}"
+output = "{% raw %}{{#lastLower}}{{input}}{{/lastLower}}{% endraw %}"
 ```
 
 Example inputs and corresponding outputs:
@@ -217,7 +217,7 @@ Example inputs and corresponding outputs:
 Discards everything before the last occurrence of a character other than letters and positive digits and transforms the remaining characters to upper case. Example:
 
 ```
-output = "{% raw %}{{#lastUpper}}{{ input }}{{/lastUpper}}{% endraw %}"
+output = "{% raw %}{{#lastUpper}}{{input}}{{/lastUpper}}{% endraw %}"
 ```
 
 Example inputs and corresponding outputs:
@@ -234,7 +234,7 @@ Example inputs and corresponding outputs:
 Removes all characters other than letters and positive digits from the input string, leaving all other characters untouched. Example:
 
 ```
-output = "{% raw %}{{#sanitize}}{{ input }}{{/sanitize}}{% endraw %}"
+output = "{% raw %}{{#sanitize}}{{input}}{{/sanitize}}{% endraw %}"
 ```
 
 Example inputs and corresponding outputs:
@@ -250,7 +250,7 @@ Example inputs and corresponding outputs:
 Removes all characters other than letters and positive digits from the input string, and transforms all others to lower case. Example:
 
 ```
-output = "{% raw %}{{#sanitizeLower}}{{ input }}{{/sanitizeLower}}{% endraw %}"
+output = "{% raw %}{{#sanitizeLower}}{{input}}{{/sanitizeLower}}{% endraw %}"
 ```
 
 Example inputs and corresponding outputs:
@@ -266,7 +266,7 @@ Example inputs and corresponding outputs:
 Removes all characters other than letters and positive digits from the input string, and transforms all others to upper case. Example:
 
 ```
-output = "{% raw %}{{#sanitizeUpper}}{{ input }}{{/sanitizeUpper}}{% endraw %}"
+output = "{% raw %}{{#sanitizeUpper}}{{input}}{{/sanitizeUpper}}{% endraw %}"
 ```
 
 Example inputs and corresponding outputs:
@@ -282,7 +282,7 @@ Example inputs and corresponding outputs:
 Returns only the first 5 characters of the input. If the input is shorter than 5 characters it's returned untouched. This is often useful to shorten SHAs. Example:
 
 ```
-output = "{% raw %}{{#short5}}{{ input }}{{/short5}}{% endraw %}"
+output = "{% raw %}{{#short5}}{{input}}{{/short5}}{% endraw %}"
 ```
 
 Example inputs and corresponding outputs:
@@ -298,7 +298,7 @@ Example inputs and corresponding outputs:
 Returns only the first 6 characters of the input. If the input is shorter than 5 characters it's returned untouched. This is often useful to shorten SHAs. Example:
 
 ```
-output = "{% raw %}{{#short6}}{{ input }}{{/short6}}{% endraw %}"
+output = "{% raw %}{{#short6}}{{input}}{{/short6}}{% endraw %}"
 ```
 
 Example inputs and corresponding outputs:
@@ -314,7 +314,7 @@ Example inputs and corresponding outputs:
 Returns only the first 7 characters of the input. If the input is shorter than 5 characters it's returned untouched. This is often useful to shorten SHAs. Example:
 
 ```
-output = "{% raw %}{{#short7}}{{ input }}{{/short7}}{% endraw %}"
+output = "{% raw %}{{#short7}}{{input}}{{/short7}}{% endraw %}"
 ```
 
 Example inputs and corresponding outputs:
@@ -330,7 +330,7 @@ Example inputs and corresponding outputs:
 Provided a timestamp in the [unix format](https://www.unixtimestamp.com/) returns it formatted as [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) UTC. If the input is not a Unix timestamp returns an empty string. Example:
 
 ```
-output = "{% raw %}{{#timestampISO8601}}{{ timestamp }}{{/timestampISO8601}}{% endraw %}"
+output = "{% raw %}{{#timestampISO8601}}{{timestamp}}{{/timestampISO8601}}{% endraw %}"
 ```
 
 Example inputs and corresponding outputs:
@@ -345,7 +345,7 @@ Example inputs and corresponding outputs:
 Provided a timestamp in the [unix format](https://www.unixtimestamp.com/) returns it formatted as `YYYYMMDDHHMMSS` UTC. If the input is not a Unix timestamp returns an empty string. Example:
 
 ```
-output = "{% raw %}{{#timestampYYYYMMDDHHMMSS}}{{ timestamp }}{{/timestampYYYYMMDDHHMMSS}}{% endraw %}"
+output = "{% raw %}{{#timestampYYYYMMDDHHMMSS}}{{timestamp}}{{/timestampYYYYMMDDHHMMSS}}{% endraw %}"
 ```
 
 Example inputs and corresponding outputs:
@@ -413,9 +413,9 @@ Here is a more complex example where we combine several state attributes to prod
 Consider this template:
 
 ```
-{% raw %}Version: {{version}} (bumping '{{ bump }}' on {{ configuration.initialVersion }} using lenient ({{ configuration.releaseLenient }}))
-Scheme: {{ scheme }}
-Timestamp: {{ timestamp }}
+{% raw %}Version: {{version}} (bumping '{{bump}}' on {{configuration.initialVersion}} using lenient ({{configuration.releaseLenient}}))
+Scheme: {{scheme}}
+Timestamp: {{timestamp}}
 OS: {{#environment.variable}}OS{{/environment.variable}}
 User: {{environment.user}}
 Previous Version: {{releaseScope.previousVersion}} at {{#short5}}{{releaseScope.previousVersionCommit}}{{/short5}}

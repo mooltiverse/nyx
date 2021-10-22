@@ -60,7 +60,7 @@ Each release type has the following attributes:
 | [`releaseTypes/<NAME>/collapsedVersionQualifier`](#collapsed-version-qualifier)            | string  | `--release-types-<NAME>-collapsed-version-qualifier=<TEMPLATE>`       | `NYX_RELEASE_TYPES_<NAME>_COLLAPSED_VERSION_QUALIFIER=<TEMPLATE>`       | Empty                                                |
 | [`releaseTypes/<NAME>/filterTags`](#filter-tags)                                           | string  | `--release-types-<NAME>-filter-tags`                                  | `NYX_RELEASE_TYPES_<NAME>_FILTER_TAGS=<TEMPLATE>`                       | Empty                                                |
 | [`releaseTypes/<NAME>/gitCommit`](#git-commit)                                             | boolean | `--release-types-<NAME>-git-commit=<TEMPLATE>`                        | `NYX_RELEASE_TYPES_<NAME>_GIT_COMMIT=<TEMPLATE>`                        | `false`                                              |
-| [`releaseTypes/<NAME>/gitCommitMessage`](#git-commit-message)                              | string  | `--release-types-<NAME>-git-commit-message=<TEMPLATE>`                | `NYX_RELEASE_TYPES_<NAME>_GIT_COMMIT_MESSAGE=<TEMPLATE>`                | `{% raw %}Release version {{ version }}{% endraw %}` |
+| [`releaseTypes/<NAME>/gitCommitMessage`](#git-commit-message)                              | string  | `--release-types-<NAME>-git-commit-message=<TEMPLATE>`                | `NYX_RELEASE_TYPES_<NAME>_GIT_COMMIT_MESSAGE=<TEMPLATE>`                | `{% raw %}Release version {{version}}{% endraw %}` |
 | [`releaseTypes/<NAME>/gitPush`](#git-push)                                                 | boolean | `--release-types-<NAME>-git-push=<TEMPLATE>`                          | `NYX_RELEASE_TYPES_<NAME>_GIT_PUSH=<TEMPLATE>`                          | `false`                                              |
 | [`releaseTypes/<NAME>/gitTag`](#git-tag)                                                   | boolean | `--release-types-<NAME>-git-tag=<TEMPLATE>`                           | `NYX_RELEASE_TYPES_<NAME>_GIT_TAG=<TEMPLATE>`                           | `false`                                              |
 | [`releaseTypes/<NAME>/gitTagMessage`](#git-tag-message)                                    | string  | `--release-types-<NAME>-git-tag-message=<TEMPLATE>`                   | `NYX_RELEASE_TYPES_<NAME>_GIT_TAG_MESSAGE=<TEMPLATE>`                   | Empty                                                |
@@ -127,7 +127,7 @@ This option can be defined as a [template]({{ site.baseurl }}{% link _pages/guid
 
 Examples (assuming [`collapseVersions`](#collapse-versions) is `true`):
 
-| Generated version with no collapsed version qualifier | Generated version with collapsed version qualifier = `{% raw %}{{ branch }}{% endraw %}` |
+| Generated version with no collapsed version qualifier | Generated version with collapsed version qualifier = `{% raw %}{{branch}}{% endraw %}` |
 | ----------------------------------------------------- | ------------------------------------------------------------------------- |
 | 1.2.3-1                                               | 1.2.3-alpha.1                                                             |
 | 1.2.3-2                                               | 1.2.3-alpha.2                                                             |
@@ -151,13 +151,15 @@ This option is **mandatory** when [`collapseVersions`](#collapse-versions) is `t
 
 A [template]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}) that, once rendered, produces a regular expression that filter tags in the commit history so that the [*prime* and *previous* version]({{ site.baseurl }}{% link _posts/2020-01-01-whats-the-difference-between-the-prime-version-and-the-previous-version.md %}) can be correctly inferred, ignoring non relevant tags that may be found.
 
-Please note that this string value is rendered as a template in the first place and then the outcome is used as a regular expression. For example, `{% raw %}"^({{ configuration.releasePrefix }})?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)$"{% endraw %}` is first rendered to `{% raw %}"^(v)?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)$"{% endraw %}` (assuming the [`releasePrefix`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#release-prefix) is set to `"v"`), then this regular expression is used to match actual values.
+By default this is empty so all tags are matched.
+
+Please note that this string value is rendered as a template in the first place and then the outcome is used as a regular expression. For example, `{% raw %}"^({{configuration.releasePrefix}})?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)$"{% endraw %}` is first rendered to `{% raw %}"^(v)?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)$"{% endraw %}` (assuming the [`releasePrefix`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#release-prefix) is set to `"v"`), then this regular expression is used to match actual values.
 {: .notice--info}
 
 A few examples:
 
-* `{% raw %}"^({{ configuration.releasePrefix }})?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)$"{% endraw %}`: matches all the tags representing a [valid SemVer identifier](https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string) (with *core* identifiers only), tolerating the optional  [`releasePrefix`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#release-prefix) when configured
-* `{% raw %}"^({{ configuration.releasePrefix }})?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)(-(develop|development|integration|latest)(\.([0-9]\d*))?)?$"{% endraw %}`: matches a [valid SemVer identifier](https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string) (with *core* identifiers only), tolerating the optional  [`releasePrefix`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#release-prefix) when configured that may optionally have an extra identifier in the *pre-release* part, like `1.2.3`, `1.2.3-develop`, `1.2.3-develop.2` etc
+* `{% raw %}"^({{configuration.releasePrefix}})?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)$"{% endraw %}`: matches all the tags representing a [valid SemVer identifier](https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string) (with *core* identifiers only), tolerating the optional  [`releasePrefix`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#release-prefix) when configured
+* `{% raw %}"^({{configuration.releasePrefix}})?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)(-(develop|development|integration|latest)(\.([0-9]\d*))?)?$"{% endraw %}`: matches a [valid SemVer identifier](https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string) (with *core* identifiers only), tolerating the optional  [`releasePrefix`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#release-prefix) when configured that may optionally have an extra identifier in the *pre-release* part, like `1.2.3`, `1.2.3-develop`, `1.2.3-develop.2` etc
 
 You can use tools like [https://regex101.com/](https://regex101.com/) to write and test your regular expressions.
 
@@ -184,7 +186,7 @@ Here you can define a [template]({{ site.baseurl }}{% link _pages/guide/user/03.
 | ------------------------- | ---------------------------------------------------------------------------------------- |
 | Name                      | `releaseTypes/<NAME>/gitCommitMessage`                                                   |
 | Type                      | string                                                                                   |
-| Default                   | `{% raw %}Release version {{ version }}{% endraw %}`                                     |
+| Default                   | `{% raw %}Release version {{version}}{% endraw %}`                                       |
 | Command Line Option       | `--release-types-<NAME>-git-commit-message=<TEMPLATE>`                                   |
 | Environment Variable      | `NYX_RELEASE_TYPES_<NAME>_GIT_COMMIT_MESSAGE=<TEMPLATE>`                                 |
 | Configuration File Option | `releaseTypes/items/<NAME>/gitCommitMessage`                                             |
@@ -391,7 +393,9 @@ When using the [SemVer]({{ site.baseurl }}{% link _pages/guide/user/02.introduct
 
 A [template]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}) that, once rendered, produces a regular expression that evaluates `true` when it *matches* the [current Git branch](https://git-scm.com/docs/git-branch).
 
-Please note that this string value is rendered as a template in the first place and then the outcome is used as a regular expression. For example, `{% raw %}"^({{ configuration.releasePrefix }})?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)$"{% endraw %}` is first rendered to `{% raw %}"^(v)?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)$"{% endraw %}` (assuming the [`releasePrefix`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#release-prefix) is set to `"v"`), then this regular expression is used to match actual values.
+By default this is empty so any branch is matched.
+
+Please note that this string value is rendered as a template in the first place and then the outcome is used as a regular expression. For example, `{% raw %}"^({{configuration.releasePrefix}})?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)$"{% endraw %}` is first rendered to `{% raw %}"^(v)?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)$"{% endraw %}` (assuming the [`releasePrefix`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#release-prefix) is set to `"v"`), then this regular expression is used to match actual values.
 {: .notice--info}
 
 A few examples:
@@ -487,7 +491,7 @@ TODO: Check this statement and the link when Services are implemented: Please no
 
 This option allows to define a constraint on the versions issued by this release type. When defined it is a [template]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}) that, once rendered, produces a regular expression which is evaluated against the generated version number. If the version being issued matches the regular expression the release process can proceed, otherwise it's interrupted by an error.
 
-Please note that this string value is rendered as a template in the first place and then the outcome is used as a regular expression. For example, `{% raw %}"^({{ configuration.releasePrefix }})?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)$"{% endraw %}` is first rendered to `{% raw %}"^(v)?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)$"{% endraw %}` (assuming the [`releasePrefix`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#release-prefix) is set to `"v"`), then this regular expression is used to match actual values.
+Please note that this string value is rendered as a template in the first place and then the outcome is used as a regular expression. For example, `{% raw %}"^({{configuration.releasePrefix}})?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)$"{% endraw %}` is first rendered to `{% raw %}"^(v)?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)$"{% endraw %}` (assuming the [`releasePrefix`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#release-prefix) is set to `"v"`), then this regular expression is used to match actual values.
 {: .notice--info}
 
 A typical case where these constraints are used is for [post-release]({{ site.baseurl }}{% link _pages/guide/user/06.best-practice/branching-models.md %}) ([*maintenance*]({{ site.baseurl }}{% link _pages/guide/user/06.best-practice/branching-models.md %}#maintenance-branches) or [*release*]({{ site.baseurl }}{% link _pages/guide/user/06.best-practice/branching-models.md %}#release-branches)) release types, when you need to put boundaries to issued releases to avoid conflicts. See [this example]({{ site.baseurl }}{% link _posts/2020-01-01-git-history-examples.md %}#version-constrained-branch) for more on this.

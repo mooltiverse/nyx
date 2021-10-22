@@ -2829,7 +2829,7 @@ public class MarkTestTemplates {
             configurationLayerMock.getReleaseTypes().getItems().put("testReleaseType", new ReleaseType() {
                 {
                     setCollapseVersions(true);
-                    setCollapsedVersionQualifier("{{ branch }}");
+                    setCollapsedVersionQualifier("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}");
                     setGitCommit(Boolean.TRUE.toString());
                     setGitPush(Boolean.TRUE.toString());
                     setGitTag(Boolean.TRUE.toString());
@@ -2865,7 +2865,7 @@ public class MarkTestTemplates {
                 assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPrimeVersionCommit());
                 assertEquals(8, command.state().getReleaseScope().getSignificantCommits().size());
                 assertTrue(command.state().getReleaseType().getCollapseVersions());
-                assertEquals("{{ branch }}", command.state().getReleaseType().getCollapsedVersionQualifier());
+                assertEquals("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}", command.state().getReleaseType().getCollapsedVersionQualifier());
                 assertNull(command.state().getReleaseType().getFilterTags());
                 assertEquals(Boolean.TRUE.toString(), command.state().getReleaseType().getGitCommit());
                 assertEquals(Defaults.ReleaseType.GIT_COMMIT_MESSAGE, command.state().getReleaseType().getGitCommitMessage());
