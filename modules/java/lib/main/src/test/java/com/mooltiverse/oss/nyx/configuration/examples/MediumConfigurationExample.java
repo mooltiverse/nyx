@@ -39,18 +39,66 @@ public class MediumConfigurationExample extends SimpleConfigurationLayer {
         super();
 
         setConfigurationFile("example.config.json");
-        setDirectory("project/directory");
-        setInitialVersion("1.0.0");
-        setReleasePrefix("v");
-        setReleaseLenient(Boolean.TRUE);
-        setScheme(Scheme.SEMVER);
-        setStateFile(".nyx-state.yml");
-        setVerbosity(Verbosity.INFO);
 
         getCommitMessageConventions().setEnabled(List.<String>of("conventionalCommits"));
         getCommitMessageConventions().getItems().put("conventionalCommits", new CommitMessageConvention("(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))$(?s).*", Map.<String,String>of("major", "(?s)(?m)^[a-zA-Z0-9_]+(!|.*^(BREAKING( |-)CHANGE: )).*", "minor", "(?s)(?m)^feat(?!!|.*^(BREAKING( |-)CHANGE: )).*", "patch", "(?s)(?m)^fix(?!!|.*^(BREAKING( |-)CHANGE: )).*")));
 
-        getReleaseTypes().setEnabled(List.<String>of("type1"));
-        getReleaseTypes().getItems().put("type1", new ReleaseType(true, "{{ branch }}", "^({{ configuration.releasePrefix }})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{ version }}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{ version }}", new Identifiers(List.<String>of("build"),  Map.<String,Identifier>of("build", new Identifier("build", "12", IdentifierPosition.BUILD))), "^(release[-\\/](0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)|feature[-\\/][[:alnum:]]+)$", Map.<String,String>of("PATH",".*"), WorkspaceStatus.CLEAN, Boolean.TRUE.toString(), "^1\\.2\\.(0|[1-9]\\d*)?$", Boolean.FALSE));
+        setInitialVersion("1.0.0");
+        setReleaseLenient(Boolean.TRUE);
+        setReleasePrefix("v");
+
+        getReleaseTypes().setEnabled(List.<String>of("mainline", "internal"));
+        getReleaseTypes().getItems().put(
+            "mainline",
+            new ReleaseType(
+                false,
+                null,
+                "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$",
+                Boolean.TRUE.toString(),
+                "Release version {{version}}",
+                Boolean.TRUE.toString(),
+                Boolean.TRUE.toString(),
+                "Tag release {{version}}",
+                null,
+                "^(master|main)$",
+                Map.<String,String>of("CI","^true$"),
+                WorkspaceStatus.CLEAN,
+                Boolean.TRUE.toString(),
+                null,
+                Boolean.FALSE
+            )
+        );
+        getReleaseTypes().getItems().put(
+            "internal",
+            new ReleaseType(
+                false,
+                "internal",
+                "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$",
+                Boolean.FALSE.toString(),
+                null,
+                Boolean.FALSE.toString(),
+                Boolean.FALSE.toString(),
+                null,
+                new Identifiers(
+                    List.<String>of("branch", "commit", "user", "timestamp"),
+                    Map.<String,Identifier>of(
+                        "branch",    new Identifier("branch", "{{#sanitize}}{{branch}}{{/sanitize}}", IdentifierPosition.BUILD),
+                        "commit",    new Identifier("commit", "{{#short7}}{{releaseScope.finalCommit}}{{/short7}}", IdentifierPosition.BUILD),
+                        "user",      new Identifier("user", "{{#sanitizeLower}}{{environment.user}}{{/sanitizeLower}}", IdentifierPosition.BUILD),
+                        "timestamp", new Identifier("timestamp", "{{#timestampYYYYMMDDHHMMSS}}{{timestamp}}{{/timestampYYYYMMDDHHMMSS}}", IdentifierPosition.BUILD)
+                    )
+                ),
+                null,
+                null,
+                null,
+                Boolean.FALSE.toString(),
+                null,
+                Boolean.FALSE
+            )
+        );
+
+        setScheme(Scheme.SEMVER);
+        setStateFile(".nyx-state.yml");
+        setVerbosity(Verbosity.INFO);
     }
 }

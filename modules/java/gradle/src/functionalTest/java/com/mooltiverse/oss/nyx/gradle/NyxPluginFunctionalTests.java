@@ -143,8 +143,8 @@ public class NyxPluginFunctionalTests {
             // note that we never had any issue due to plugins so most of them are commented out to not spend hourse in useless test repetitions
 
             // ----- no plugins
-            add(new HashMap<String,String>(){   private static final long serialVersionUID = 1L; {
-            }});
+            /*add(new HashMap<String,String>(){   private static final long serialVersionUID = 1L; {
+            }});*/
 
             // ----- single plugins
             /*add(new HashMap<String,String>(){   private static final long serialVersionUID = 1L; {
@@ -427,6 +427,7 @@ public class NyxPluginFunctionalTests {
         if (!Objects.isNull(bump))
             printWriter.println("  bump = '"+bump+"'");
         if (Objects.isNull(preset)) {
+            //printWriter.println("  configurationFile = '.nyx.json'");
             printWriter.println("  commitMessageConventions {");
             printWriter.println("      enabled = [ 'conventionalCommits' ]");
             printWriter.println("      items {");
@@ -440,83 +441,124 @@ public class NyxPluginFunctionalTests {
             printWriter.println("        }");
             printWriter.println("      }");
             printWriter.println("    }");
-            //printWriter.println("  configurationFile = '.nyx.json'");
             //printWriter.println("  directory = file('project/directory')");
             printWriter.println("  dryRun = false");
             printWriter.println("  initialVersion = '0.1.0'");
-            //printWriter.println("  preset = 'extended'");
-            printWriter.println("  releasePrefix = ''");
             printWriter.println("  releaseLenient = true");
+            printWriter.println("  releasePrefix = ''");
             printWriter.println("  releaseTypes {");
-            printWriter.println("    enabled = [ 'main', 'prerelease', 'internal' ]");
+            printWriter.println("    enabled = [ 'mainline', 'maturity', 'integration', 'hotfix', 'feature', 'release', 'maintenance', 'internal' ]");
             printWriter.println("    items {");
-            printWriter.println("      main {");
-            printWriter.println("        collapseVersions = false");
-            printWriter.println("        filterTags = '^({{ configuration.releasePrefix }})?([0-9]\\\\d*)\\\\.([0-9]\\\\d*)\\\\.([0-9]\\\\d*)$'");
+            printWriter.println("      mainline {");
+            printWriter.println("        filterTags = '^({{configuration.releasePrefix}})?([0-9]\\\\d*)\\\\.([0-9]\\\\d*)\\\\.([0-9]\\\\d*)$'");
             printWriter.println("        gitCommit = 'true'");
-            printWriter.println("        gitCommitMessage = 'This commit is for {{ version }}'");
+            printWriter.println("        gitCommitMessage = 'Release version {{version}}'");
             printWriter.println("        gitPush = 'true'");
             printWriter.println("        gitTag = 'true'");
-            printWriter.println("        gitTagMessage = 'Tagging release {{ version }}'");
+            printWriter.println("        gitTagMessage = 'Tag release {{version}}'");
             printWriter.println("        matchBranches = '^(master|main)$'");
-            /*printWriter.println("        matchEnvironmentVariables {");
-            printWriter.println("          USER = '.*'");
-            printWriter.println("        }");*/
             printWriter.println("        matchWorkspaceStatus = 'CLEAN'");
             printWriter.println("        publish = 'true'");
-            printWriter.println("        versionRange = ''");
-            printWriter.println("        versionRangeFromBranchName = false");
             printWriter.println("      }");
-            printWriter.println("      prerelease {");
+            printWriter.println("      maturity {");
             printWriter.println("        collapseVersions = true");
-            printWriter.println("        collapsedVersionQualifier = '{{ branch }}'");
-            printWriter.println("        filterTags = '^({{ configuration.releasePrefix }})?([0-9]\\\\d*)\\\\.([0-9]\\\\d*)\\\\.([0-9]\\\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\\\.([0-9]\\\\d*))?)?$'");
-            printWriter.println("        gitCommit = 'true'");
-            printWriter.println("        gitCommitMessage = 'Committing pre-release {{ version }}'");
+            printWriter.println("        collapsedVersionQualifier = '{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}'");
+            printWriter.println("        filterTags = '^({{configuration.releasePrefix}})?([0-9]\\\\d*)\\\\.([0-9]\\\\d*)\\\\.([0-9]\\\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\\\.([0-9]\\\\d*))?)?$'");
             printWriter.println("        gitPush = 'true'");
             printWriter.println("        gitTag = 'true'");
-            printWriter.println("        gitTagMessage = 'Tagging pre-release {{ version }}'");
-            printWriter.println("        matchBranches = '^(?!(master|main)).*$'");
-            printWriter.println("        identifiers {");
-            printWriter.println("          enabled = [ 'build' ]");
-            printWriter.println("          items {");
-            printWriter.println("            build {");
-            printWriter.println("              qualifier = 'build'");
-            printWriter.println("              value = '12'");    // let's hardcode a build number here
-            printWriter.println("              position = 'BUILD'");
-            printWriter.println("            }");
-            printWriter.println("          }");
-            printWriter.println("        }");
-            printWriter.println("        matchBranches = '.*'"); // match any branch
+            printWriter.println("        matchBranches = '^(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)$'");
             printWriter.println("        matchEnvironmentVariables {");
-            printWriter.println("          USER = '.*'");
-            printWriter.println("          PATH = '.*'"); // the PATH environment variable must be defined with any value
+            printWriter.println("          CI = '^true$'");
             printWriter.println("        }");
             printWriter.println("        matchWorkspaceStatus = 'CLEAN'");
-            printWriter.println("        publish = 'false'");
-            printWriter.println("        versionRange = ''");
-            printWriter.println("        versionRangeFromBranchName = false");
+            printWriter.println("      }");
+            printWriter.println("      hotfix {");
+            printWriter.println("        collapseVersions = true");
+            printWriter.println("        collapsedVersionQualifier = '{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}'");
+            printWriter.println("        filterTags = '^({{configuration.releasePrefix}})?([0-9]\\\\d*)\\\\.([0-9]\\\\d*)\\\\.([0-9]\\\\d*)(-(fix|hotfix)(([0-9a-zA-Z]*)(\\\\.([0-9]\\\\d*))?)?)$'");
+            printWriter.println("        gitPush = 'true'");
+            printWriter.println("        gitTag = 'true'");
+            printWriter.println("        matchBranches = '^(fix|hotfix)((-|\\\\/)[0-9a-zA-Z-_]+)?$'");
+            printWriter.println("        matchEnvironmentVariables {");
+            printWriter.println("          CI = '^true$'");
+            printWriter.println("        }");
+            printWriter.println("        matchWorkspaceStatus = 'CLEAN'");
+            printWriter.println("        publish = 'true'");
+            printWriter.println("      }");
+            printWriter.println("      feature {");
+            printWriter.println("        collapseVersions = true");
+            printWriter.println("        collapsedVersionQualifier = '{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}'");
+            printWriter.println("        filterTags = '^({{configuration.releasePrefix}})?([0-9]\\\\d*)\\\\.([0-9]\\\\d*)\\\\.([0-9]\\\\d*)(-(feat|feature)(([0-9a-zA-Z]*)(\\\\.([0-9]\\\\d*))?)?)$'");
+            printWriter.println("        matchBranches = '^(feat|feature)((-|\\\\/)[0-9a-zA-Z-_]+)?$'");
+            printWriter.println("        matchEnvironmentVariables {");
+            printWriter.println("          CI = '^true$'");
+            printWriter.println("        }");
+            printWriter.println("        matchWorkspaceStatus = 'CLEAN'");
+            printWriter.println("      }");
+            printWriter.println("      integration {");
+            printWriter.println("        collapseVersions = true");
+            printWriter.println("        collapsedVersionQualifier = '{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}'");
+            printWriter.println("        filterTags = '^({{configuration.releasePrefix}})?([0-9]\\\\d*)\\\\.([0-9]\\\\d*)\\\\.([0-9]\\\\d*)(-(develop|development|integration|latest)(\\\\.([0-9]\\\\d*))?)$'");
+            printWriter.println("        gitPush = 'true'");
+            printWriter.println("        gitTag = 'true'");
+            printWriter.println("        matchBranches = '^(develop|development|integration|latest)$'");
+            printWriter.println("        matchEnvironmentVariables {");
+            printWriter.println("          CI = '^true$'");
+            printWriter.println("        }");
+            printWriter.println("        matchWorkspaceStatus = 'CLEAN'");
+            printWriter.println("      }");
+            printWriter.println("      release {");
+            printWriter.println("        collapseVersions = true");
+            printWriter.println("        collapsedVersionQualifier = '{{#firstLower}}{{branch}}{{/firstLower}}'");
+            printWriter.println("        filterTags = '^({{configuration.releasePrefix}})?([0-9]\\\\d*)\\\\.([0-9]\\\\d*)\\\\.([0-9]\\\\d*)(-(rel|release)((\\\\.([0-9]\\\\d*))?)?)$'");
+            printWriter.println("        gitPush = 'true'");
+            printWriter.println("        gitTag = 'true'");
+            printWriter.println("        matchBranches = '^(rel|release)(-|\\\\/)({{configuration.releasePrefix}})?([0-9|x]\\\\d*)(\\\\.([0-9|x]\\\\d*)(\\\\.([0-9|x]\\\\d*))?)?$'");
+            printWriter.println("        matchEnvironmentVariables {");
+            printWriter.println("          CI = '^true$'");
+            printWriter.println("        }");
+            printWriter.println("        matchWorkspaceStatus = 'CLEAN'");
+            printWriter.println("        versionRangeFromBranchName = true");
+            printWriter.println("      }");
+            printWriter.println("      maintenance {");
+            printWriter.println("        filterTags = '^({{configuration.releasePrefix}})?([0-9]\\\\d*)\\\\.([0-9]\\\\d*)\\\\.([0-9]\\\\d*)$'");
+            printWriter.println("        gitPush = 'true'");
+            printWriter.println("        gitTag = 'true'");
+            printWriter.println("        matchBranches = '^[a-zA-Z]*([0-9|x]\\\\d*)(\\\\.([0-9|x]\\\\d*)(\\\\.([0-9|x]\\\\d*))?)?$'");
+            printWriter.println("        matchEnvironmentVariables {");
+            printWriter.println("          CI = '^true$'");
+            printWriter.println("        }");
+            printWriter.println("        matchWorkspaceStatus = 'CLEAN'");
+            printWriter.println("        publish = 'true'");
             printWriter.println("      }");
             printWriter.println("      internal {");
             printWriter.println("        collapseVersions = true");
-            printWriter.println("        collapsedVersionQualifier = '{{ branch }}'");
-            printWriter.println("        gitCommit = 'false'");
-            printWriter.println("        matchBranches = '^(?!(master|main)).*$'");
+            printWriter.println("        collapsedVersionQualifier = 'internal'");
             printWriter.println("        identifiers {");
-            printWriter.println("          enabled = [ 'internal', 'user' ]");
-            printWriter.println("          items {");
-            printWriter.println("            internal {");
-            printWriter.println("              qualifier = 'internal'");
-            printWriter.println("              position = 'BUILD'");
-            printWriter.println("            }");
-            printWriter.println("            user {");
-            printWriter.println("              qualifier = 'user'");
-            printWriter.println("              value = '{{ environment.user }}'");    // take the user name from the environment variable
-            printWriter.println("              position = 'BUILD'");
+            printWriter.println("            enabled = [ 'branch', 'commit', 'user', 'timestamp' ]");
+            printWriter.println("            items {");
+            printWriter.println("              branch {");
+            printWriter.println("                qualifier = 'branch'");
+            printWriter.println("                value = '{{#sanitize}}{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}{{/sanitize}}'");
+            printWriter.println("                position = 'BUILD'");
+            printWriter.println("              }");
+            printWriter.println("              commit {");
+            printWriter.println("                qualifier = 'commit'");
+            printWriter.println("                value = '{{#short7}}{{releaseScope.finalCommit}}{{/short7}}'");
+            printWriter.println("                position = 'BUILD'");
+            printWriter.println("              }");
+            printWriter.println("              user {");
+            printWriter.println("                qualifier = 'user'");
+            printWriter.println("                value = '{{#sanitizeLower}}{{environment.user}}{{/sanitizeLower}}'");
+            printWriter.println("                position = 'BUILD'");
+            printWriter.println("              }");
+            printWriter.println("              timestamp {");
+            printWriter.println("                qualifier = 'timestamp'");
+            printWriter.println("                value = '{{#timestampYYYYMMDDHHMMSS}}{{timestamp}}{{/timestampYYYYMMDDHHMMSS}}'");
+            printWriter.println("                position = 'BUILD'");
+            printWriter.println("              }");
             printWriter.println("            }");
             printWriter.println("          }");
-            printWriter.println("        }");
-            printWriter.println("        publish = 'false'");
             printWriter.println("      }");
             printWriter.println("    }");
             printWriter.println("  }");
