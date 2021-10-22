@@ -4,7 +4,7 @@
 ------------------------------------------------------------------------------*/
 plugins {
   // use our own plugin
-  id "com.mooltiverse.oss.nyx" version "0.1.0-alpha.31"
+  id "com.mooltiverse.oss.nyx" version "0.1.0-alpha.32"
 }
 
 /*------------------------------------------------------------------------------
@@ -25,12 +25,6 @@ include 'modules:java:gradle'
 /*------------------------------------------------------------------------------
   Extension configurations
 ------------------------------------------------------------------------------*/
-nyx {
-  bump          = 'alpha' // for the time being just bump the 'alpha' pre-release identifier, until we have release types implemented
-  preset        = 'extended'
-  stateFile     = 'build/.nyx-state.json'
-}
-/*
 nyx {
   // starting from the 'simple' preset gives us:
   // - the Conventional Commits convention
@@ -53,9 +47,6 @@ nyx {
         }
         matchWorkspaceStatus = 'CLEAN'
         publish = 'true'
-
-        //TODO: remove this unnecessary attribute once https://github.com/mooltiverse/nyx/issues/68 is fixed//TODO: figure out why without this value we get a NullPointerException
-        collapseVersions = false
       }
       maturity {
         collapseVersions = true
@@ -146,9 +137,6 @@ nyx {
         matchWorkspaceStatus = 'CLEAN'
         publish = 'true'
         versionRangeFromBranchName = true
-
-        //TODO: remove this unnecessary attribute once https://github.com/mooltiverse/nyx/issues/68 is fixed//TODO: figure out why without this value we get a NullPointerException
-        collapseVersions = false
       }
       // 'internal' overrides the release type with the same name from the preset adding some qualifiers and is the global fallback for all release types
       internal {
@@ -182,9 +170,6 @@ nyx {
           }
         }
         publish = 'false'
-
-        //TODO: remove this unnecessary attribute once https://github.com/mooltiverse/nyx/issues/68 is fixed
-        versionRangeFromBranchName = false
       }
 
       // TODO: remove the following '*local' release types once the plugin has been tested in production
@@ -196,11 +181,8 @@ nyx {
         gitPush = 'false'
         gitTag = 'false'
         matchBranches = '^(master|main)$'
-        matchWorkspaceStatus = 'CLEAN'
+        //matchWorkspaceStatus = 'CLEAN'
         publish = 'false'
-
-        //TODO: remove this unnecessary attribute once https://github.com/mooltiverse/nyx/issues/68 is fixed//TODO: figure out why without this value we get a NullPointerException
-        collapseVersions = false
       }
       maturitylocal {
         collapseVersions = true
@@ -209,7 +191,7 @@ nyx {
         gitPush = 'false'
         gitTag = 'false'
         matchBranches = '^(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)$'
-        matchWorkspaceStatus = 'CLEAN'
+        //matchWorkspaceStatus = 'CLEAN'
         publish = 'false'
       }
       integrationlocal {
@@ -219,7 +201,7 @@ nyx {
         gitPush = 'false'
         gitTag = 'false'
         matchBranches = '^(develop|development|integration|latest)$'
-        matchWorkspaceStatus = 'CLEAN'
+        //matchWorkspaceStatus = 'CLEAN'
         publish = 'false'
       }
       hotfixlocal {
@@ -229,7 +211,7 @@ nyx {
         gitPush = 'false'
         gitTag = 'false'
         matchBranches = '^(fix|hotfix)((-|\\/)[0-9a-zA-Z-_]+)?$'
-        matchWorkspaceStatus = 'CLEAN'
+        //matchWorkspaceStatus = 'CLEAN'
         publish = 'false'
       }
       featurelocal {
@@ -239,7 +221,7 @@ nyx {
         gitPush = 'false'
         gitTag = 'false'
         matchBranches = '^(feat|feature)((-|\\/)[0-9a-zA-Z-_]+)?$'
-        matchWorkspaceStatus = 'CLEAN'
+        //matchWorkspaceStatus = 'CLEAN'
         publish = 'false'
       }
       releaselocal {
@@ -249,7 +231,7 @@ nyx {
         gitPush = 'false'
         gitTag = 'false'
         matchBranches = '^(rel|release)(-|\\/)({{configuration.releasePrefix}})?([0-9|x]\\d*)(\\.([0-9|x]\\d*)(\\.([0-9|x]\\d*))?)?$'
-        matchWorkspaceStatus = 'CLEAN'
+        //matchWorkspaceStatus = 'CLEAN'
         publish = 'false'
         versionRangeFromBranchName = true
       }
@@ -258,14 +240,10 @@ nyx {
         gitPush = 'false'
         gitTag = 'false'
         matchBranches = '^[a-zA-Z]*([0-9|x]\\d*)(\\.([0-9|x]\\d*)(\\.([0-9|x]\\d*))?)?$'
-        matchWorkspaceStatus = 'CLEAN'
+        //matchWorkspaceStatus = 'CLEAN'
         publish = 'false'
         versionRangeFromBranchName = true
-
-        //TODO: remove this unnecessary attribute once https://github.com/mooltiverse/nyx/issues/68 is fixed//TODO: figure out why without this value we get a NullPointerException
-        collapseVersions = false
       }
     }
   }
 }
-*/
