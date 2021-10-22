@@ -27,7 +27,7 @@ include 'modules:java:gradle'
 ------------------------------------------------------------------------------*/
 nyx {
   bump          = 'alpha' // for the time being just bump the 'alpha' pre-release identifier, until we have release types implemented
-  preset        = 'simple'
+  preset        = 'extended'
   stateFile     = 'build/.nyx-state.json'
 }
 /*
