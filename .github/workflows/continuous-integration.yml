@@ -100,7 +100,7 @@ jobs:
       uses: actions/upload-artifact@v2
       if: ${{ always() }}
       with:
-        name: test-reports
+        name: unit-test-reports
         path: |
           **/build/reports/
           **/build/test-results/
@@ -154,7 +154,7 @@ jobs:
     #  uses: actions/upload-artifact@v2
     #  if: ${{ always() }}
     #  with:
-    #    name: test-reports
+    #    name: integration-test-reports
     #    path: |
     #      **/build/reports/
     #      **/build/test-results/
@@ -206,7 +206,7 @@ jobs:
       uses: actions/upload-artifact@v2
       if: ${{ always() }}
       with:
-        name: test-reports
+        name: functional-test-reports
         path: |
           **/build/reports/
           **/build/test-results/
