@@ -205,10 +205,10 @@ subprojects {
     }
 
     configurations {
-        // make integrations tests extend unit tests
-        integrationTestImplementation.extendsFrom testImplementation
-        // make functional tests extend integration (and unit) tests
-        functionalTestImplementation.extendsFrom integrationTestImplementation
+        // make integrations tests extend other tests
+        //integrationTestImplementation.extendsFrom testImplementation
+        // make integrations tests extend other tests
+        //functionalTestImplementation.extendsFrom testImplementation
     }
 
     // This includes all test sets like regular unit tests, integration and functional tests
@@ -232,12 +232,6 @@ subprojects {
     /*------------------------------------------------------------------------------
       Additional task dependencies
     ------------------------------------------------------------------------------*/
-    tasks.check.dependsOn tasks.integrationTest
-    tasks.check.dependsOn tasks.functionalTest
-    tasks.integrationTest.dependsOn tasks.test
-    tasks.functionalTest.dependsOn tasks.test
-    tasks.functionalTest.dependsOn tasks.integrationTest
-
     tasks.check.finalizedBy tasks.jacocoTestReport
 }
 
@@ -258,7 +252,7 @@ sourcesJar.from(subprojects.collect { it.sourceSets.main.allJava })
 task testReport(type: TestReport) {
     destinationDir = file("$buildDir/reports/tests/all")
     // Include the results from the "test" task in all subprojects
-    reportOn subprojects*.test, subprojects*.integrationTest, subprojects*.functionalTest
+    reportOn subprojects*.test//, subprojects*.integrationTest, subprojects*.functionalTest
 }
 tasks.check.finalizedBy tasks.testReport
 

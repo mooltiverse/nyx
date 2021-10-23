@@ -143,8 +143,8 @@ public class NyxPluginFunctionalTests {
             // note that we never had any issue due to plugins so most of them are commented out to not spend hourse in useless test repetitions
 
             // ----- no plugins
-            /*add(new HashMap<String,String>(){   private static final long serialVersionUID = 1L; {
-            }});*/
+            add(new HashMap<String,String>(){   private static final long serialVersionUID = 1L; {
+            }});
 
             // ----- single plugins
             /*add(new HashMap<String,String>(){   private static final long serialVersionUID = 1L; {
