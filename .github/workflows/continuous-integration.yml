@@ -147,14 +147,17 @@ jobs:
       with:
         name: .nyx-state-${{ github.job }}.json
         path: build/.nyx-state.json
-    - name: Archive Test Outputs
-      uses: actions/upload-artifact@v2
-      if: ${{ always() }}
-      with:
-        name: test-reports
-        path: |
-          **/build/reports/
-          **/build/test-results/
+    # These tests  are still empty so there is no reports to archive and the build produces a warning.
+    # Uncomment the following lines when these tests have some output reports to archive.
+    #
+    #- name: Archive Test Outputs
+    #  uses: actions/upload-artifact@v2
+    #  if: ${{ always() }}
+    #  with:
+    #    name: test-reports
+    #    path: |
+    #      **/build/reports/
+    #      **/build/test-results/
   
   # These teets may take a very long time to complete and their cache may easily go over the 5GB
   # limit defined by GitHub Actions. This is why they are in a separate job and the output cache
