@@ -181,71 +181,68 @@ public class Mark extends AbstractCommand {
         logger.debug(COMMAND, "Running the Mark command...");
 
         if (state().getNewVersion()) {
-            // COMMIT
-            if (renderTemplateAsBoolean(state().getReleaseType().getGitCommit())) {
-                logger.debug(COMMAND, "The release type has the git commit flag enabled");
-                if (repository().isClean()) {
-                    logger.debug(COMMAND, "Repository is clean, no commits need to be made");
-                }
-                else {
-                    if (state().getConfiguration().getDryRun()) {
-                        logger.info(COMMAND, "Git commit skipped due to dry run");
-                    }
+            if (state().hasReleaseType()) {
+                // COMMIT
+                if (renderTemplateAsBoolean(state().getReleaseType().getGitCommit())) {
+                    logger.debug(COMMAND, "The release type has the git commit flag enabled");
+                    if (repository().isClean())
+                        logger.debug(COMMAND, "Repository is clean, no commits need to be made");
                     else {
-                        logger.debug(COMMAND, "Committing local changes");
+                        if (state().getConfiguration().getDryRun())
+                            logger.info(COMMAND, "Git commit skipped due to dry run");
+                        else {
+                            logger.debug(COMMAND, "Committing local changes");
 
-                        String commitMessage = renderTemplate(state().getReleaseType().getGitCommitMessage());
-                        if (Objects.isNull(commitMessage) || commitMessage.isBlank()) {
-                            logger.debug(COMMAND, "The configured commit message template yields to an empty commit message. Using default template '{}'", Defaults.ReleaseType.GIT_COMMIT_MESSAGE);
-                            commitMessage = renderTemplate(Defaults.ReleaseType.GIT_COMMIT_MESSAGE);
+                            String commitMessage = renderTemplate(state().getReleaseType().getGitCommitMessage());
+                            if (Objects.isNull(commitMessage) || commitMessage.isBlank()) {
+                                logger.debug(COMMAND, "The configured commit message template yields to an empty commit message. Using default template '{}'", Defaults.ReleaseType.GIT_COMMIT_MESSAGE);
+                                commitMessage = renderTemplate(Defaults.ReleaseType.GIT_COMMIT_MESSAGE);
+                            }
+
+                            // Here we commit all uncommitted files (of course if they're not ignored by .gitignore). Should we pick a specific subset instead? Maybe among the artifacts produced by Nyx?
+                            // Here we can also specify the Author and Committer Identity as per https://github.com/mooltiverse/nyx/issues/65
+                            String finalCommit = repository().commit(List.<String>of("."), commitMessage).getSHA();
+                            logger.debug(COMMAND, "Local changes committed at {}", finalCommit);
+
+                            logger.debug(COMMAND, "Adding commit {} to the release scope", finalCommit);
+                            state().getReleaseScope().getCommits().add(0, finalCommit);
                         }
-
-                        // Here we commit all uncommitted files (of course if they're not ignored by .gitignore). Should we pick a specific subset instead? Maybe among the artifacts produced by Nyx?
-                        // Here we can also specify the Author and Committer Identity as per https://github.com/mooltiverse/nyx/issues/65
-                        String finalCommit = repository().commit(List.<String>of("."), commitMessage).getSHA();
-                        logger.debug(COMMAND, "Local changes committed at {}", finalCommit);
-
-                        logger.debug(COMMAND, "Adding commit {} to the release scope", finalCommit);
-                        state().getReleaseScope().getCommits().add(0, finalCommit);
                     }
                 }
-            }
-            else logger.debug(COMMAND, "The release type has the git commit flag disabled");
+                else logger.debug(COMMAND, "The release type has the git commit flag disabled");
 
-            // TAG
-            if (renderTemplateAsBoolean(state().getReleaseType().getGitTag())) {
-                logger.debug(COMMAND, "The release type has the git tag flag enabled");
-                if (state().getConfiguration().getDryRun()) {
-                    logger.info(COMMAND, "Git tag skipped due to dry run");
+                // TAG
+                if (renderTemplateAsBoolean(state().getReleaseType().getGitTag())) {
+                    logger.debug(COMMAND, "The release type has the git tag flag enabled");
+                    if (state().getConfiguration().getDryRun())
+                        logger.info(COMMAND, "Git tag skipped due to dry run");
+                    else {
+                        String tagMessage = renderTemplate(state().getReleaseType().getGitTagMessage());
+                        logger.debug(COMMAND, "Tagging latest commit {} with tag {}", repository().getLatestCommit(), state().getVersion());
+                        // Here we can also specify the Tagger Identity as per https://github.com/mooltiverse/nyx/issues/65
+                        repository().tag(state().getVersion(), Objects.isNull(tagMessage) || tagMessage.isBlank() ? null : tagMessage);
+                        logger.debug(COMMAND, "Tag {} applied to commit {}", state().getVersion(), repository().getLatestCommit());
+                    }
                 }
-                else {
-                    String tagMessage = renderTemplate(state().getReleaseType().getGitTagMessage());
-                    logger.debug(COMMAND, "Tagging latest commit {} with tag {}", repository().getLatestCommit(), state().getVersion());
-                    // Here we can also specify the Tagger Identity as per https://github.com/mooltiverse/nyx/issues/65
-                    repository().tag(state().getVersion(), Objects.isNull(tagMessage) || tagMessage.isBlank() ? null : tagMessage);
-                    logger.debug(COMMAND, "Tag {} applied to commit {}", state().getVersion(), repository().getLatestCommit());
-                }
-            }
-            else logger.debug(COMMAND, "The release type has the git tag flag disabled");
+                else logger.debug(COMMAND, "The release type has the git tag flag disabled");
 
-            // PUSH
-            if (renderTemplateAsBoolean(state().getReleaseType().getGitPush())) {
-                logger.debug(COMMAND, "The release type has the git push flag enabled");
-                if (state().getConfiguration().getDryRun()) {
-                    logger.info(COMMAND, "Git push skipped due to dry run");
+                // PUSH
+                if (renderTemplateAsBoolean(state().getReleaseType().getGitPush())) {
+                    logger.debug(COMMAND, "The release type has the git push flag enabled");
+                    if (state().getConfiguration().getDryRun())
+                        logger.info(COMMAND, "Git push skipped due to dry run");
+                    else {
+                        // Here we should make the Git remote repositories configurable as per https://github.com/mooltiverse/nyx/issues/66
+                        logger.debug(COMMAND, "Pushing local changes to remotes");
+                        String remote = repository().push();
+                        logger.debug(COMMAND, "Local changes pushed to remote {}", remote);
+                    }
                 }
-                else {
-                    // Here we should make the Git remote repositories configurable as per https://github.com/mooltiverse/nyx/issues/66
-                    logger.debug(COMMAND, "Pushing local changes to remotes");
-                    String remote = repository().push();
-                    logger.debug(COMMAND, "Local changes pushed to remote {}", remote);
-                }
+                else logger.debug(COMMAND, "The release type has the git push flag disabled");
             }
-            else logger.debug(COMMAND, "The release type has the git push flag disabled");
+            else logger.warn(COMMAND, "No release type available. Nothing to release.");
         }
-        else {
-            logger.info(COMMAND, "No version change detected. Nothing to release.");
-        }
+        else logger.info(COMMAND, "No version change detected. Nothing to release.");
 
         storeStatusInternalAttributes();
         return state();

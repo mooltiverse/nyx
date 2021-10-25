@@ -267,6 +267,19 @@ public class StateTests {
         }
 
         @Test
+        @DisplayName("State.getVersion() overridden by configuration")
+        void getVersionOverrideByConfigurationTest()
+            throws Exception {
+            Configuration configuration = new Configuration();
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            configurationLayerMock.setVersion("1.2.3");
+            configuration.withCommandLineConfiguration(configurationLayerMock);
+            State state = new State(configuration);
+
+            assertEquals("1.2.3", state.getVersion());
+        }
+
+        @Test
         @DisplayName("State.setVersion(String)")
         void setVersionTest()
             throws Exception {
@@ -276,6 +289,19 @@ public class StateTests {
             String version = "1.2.3";
             state.setVersion(version);
             assertEquals(version, state.getVersion());
+        }
+
+        @Test
+        @DisplayName("State.setVersion() overridden by configuration")
+        void setVersionOverrideByConfigurationTest()
+            throws Exception {
+            Configuration configuration = new Configuration();
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            configurationLayerMock.setVersion("1.2.3");
+            configuration.withCommandLineConfiguration(configurationLayerMock);
+            State state = new State(configuration);
+            assertEquals("1.2.3", state.getVersion());
+            assertThrows(IllegalStateException.class, () -> state.setVersion("2.3.4"));
         }
 
         @Test

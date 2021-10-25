@@ -268,7 +268,20 @@ public class State implements Root {
     @Override
     public Boolean getNewVersion()
         throws DataAccessException, IllegalPropertyException {
-        return hasVersion() && !getVersion().equals(getReleaseScope().getPreviousVersion());
+        if (hasVersion()) {
+            if (getVersion().equals(getReleaseScope().getPreviousVersion()))
+                return false;
+            else {
+                if (hasReleaseType() && getReleaseType().getCollapseVersions()) {
+                    if (getVersion().equals(getReleaseScope().getPrimeVersion())) {
+                        return false;
+                    }
+                    else return true;
+                }
+                else return true;
+            }
+        }
+        else return false;
     }
 
     /**
@@ -285,6 +298,19 @@ public class State implements Root {
     @Override
     public ReleaseType getReleaseType() {
         return releaseType;
+    }
+
+    /**
+     * Returns {@code true} if the scope has a non {@code null} release type set.
+     * 
+     * @return {@code true} if the scope has a non {@code null} release type set.
+     * 
+     * @throws DataAccessException in case the state file cannot be read or accessed.
+     * @throws IllegalPropertyException in case the state file has incorrect values.
+     */
+    public boolean hasReleaseType()
+        throws DataAccessException, IllegalPropertyException {
+        return !Objects.isNull(getReleaseType());
     }
 
     /**
@@ -328,25 +354,43 @@ public class State implements Root {
     @Override
     public String getVersion() 
         throws DataAccessException, IllegalPropertyException {
-        return version;
+        return Objects.isNull(getConfiguration().getVersion()) ? version : getConfiguration().getVersion();
     }
 
     /**
      * Returns {@code true} if the scope has a non {@code null} version.
      * 
      * @return {@code true} if the scope has a non {@code null} version.
+     * 
+     * @throws DataAccessException in case the state file cannot be read or accessed.
+     * @throws IllegalPropertyException in case the state file has incorrect values.
      */
-    public boolean hasVersion() {
-        return !Objects.isNull(version);
+    public boolean hasVersion()
+        throws DataAccessException, IllegalPropertyException {
+        return !Objects.isNull(getVersion());
     }
 
     /**
      * Sets the version inferred by Nyx.
+     * <br>
+     * Since this option can be overridden by configuration this method can only be invoked when the
+     * {@link #getConfiguration() configuration} doesn't already have a {@link Configuration#getVersion() version}
+     * attribute otherwise an {@link IllegalStateException} is thrown.
      * 
      * @param version the version inferred by Nyx.
+     * 
+     * @throws DataAccessException in case the state file cannot be read or accessed.
+     * @throws IllegalPropertyException in case the state file has incorrect values.
+     * @throws IllegalStateException if the {@link #getConfiguration() configuration} has a value for the
+     * {@link Configuration#getVersion() version} attribute.
+     * 
+     * @see Configuration#getVersion()
      */
-    public void setVersion(String version) {
-        this.version = version;
+    public void setVersion(String version)
+        throws DataAccessException, IllegalPropertyException, IllegalStateException {
+        if (Objects.isNull(getConfiguration().getVersion()))
+            this.version = version;
+        else throw new IllegalStateException(String.format("The state version attribute can't be set when it's ovverridden by the configuration. Configuration version attribute is %s", getConfiguration().getVersion()));
     }
 
     /**

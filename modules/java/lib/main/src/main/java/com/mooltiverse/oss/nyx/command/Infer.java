@@ -229,7 +229,9 @@ public class Infer extends AbstractCommand {
 
         state().setReleaseType(resolveReleaseType());
 
-        if (Objects.isNull(state().getConfiguration().getVersion())) {
+        if (state().hasVersion() && !Objects.isNull(state().getConfiguration().getVersion()))
+            logger.info(COMMAND, "Version overridden by user: {}", state().getConfiguration().getVersion());
+        else {
             // some state attributes must be set first as they're also used for template rendering afterwards
             logger.debug(COMMAND, "Current Git branch is {}", repository().getCurrentBranch());
             state().setBranch(repository().getCurrentBranch());
@@ -502,11 +504,6 @@ public class Infer extends AbstractCommand {
 
             // store values to the state object
             state().setVersion(Objects.isNull(releasePrefix) ? version.toString() : releasePrefix.concat(version.toString()));
-        }
-        else {
-            // the version was overridden by user
-            logger.info(COMMAND, "Version overridden by user: {}", state().getConfiguration().getVersion());
-            state().setVersion(state().getConfiguration().getVersion());
         }
 
         storeStatusInternalAttributes();
