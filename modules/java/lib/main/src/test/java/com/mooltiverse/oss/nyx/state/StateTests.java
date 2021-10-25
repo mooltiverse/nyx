@@ -87,10 +87,44 @@ public class StateTests {
             // make sure the bump is null in the beginning (it's set only after the Infer task has run)
             State state = new State(new Configuration());
             assertNull(state.getBump());
-            state.getReleaseScope().getSignificantCommits().put("commit1", "alpha");
+            state.setBump("alpha");
             assertEquals("alpha", state.getBump());
-            state.getReleaseScope().getSignificantCommits().put("commit2", "major");
-            assertEquals("major", state.getBump());
+        }
+
+        @Test
+        @DisplayName("State.getBump() overridden by configuration")
+        void getBumpOverrideByConfigurationTest()
+            throws Exception {
+            Configuration configuration = new Configuration();
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            configurationLayerMock.setBump("gamma");
+            configuration.withCommandLineConfiguration(configurationLayerMock);
+            State state = new State(configuration);
+            assertEquals("gamma", state.getBump());
+        }
+
+        @Test
+        @DisplayName("State.setBump()")
+        void setBumpTest()
+            throws Exception {
+            // make sure the bump is null in the beginning (it's set only after the Infer task has run)
+            State state = new State(new Configuration());
+            assertNull(state.getBump());
+            state.setBump("alpha");
+            assertEquals("alpha", state.getBump());
+        }
+
+        @Test
+        @DisplayName("State.setBump() overridden by configuration")
+        void setBumpOverrideByConfigurationTest()
+            throws Exception {
+            Configuration configuration = new Configuration();
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            configurationLayerMock.setBump("gamma");
+            configuration.withCommandLineConfiguration(configurationLayerMock);
+            State state = new State(configuration);
+            assertEquals("gamma", state.getBump());
+            assertThrows(IllegalStateException.class, () -> state.setBump("any value"));
         }
 
         @Test

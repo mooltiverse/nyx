@@ -17,8 +17,10 @@ package com.mooltiverse.oss.nyx.command;
 
 import static com.mooltiverse.oss.nyx.log.Markers.COMMAND;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -233,7 +235,7 @@ public class Infer extends AbstractCommand {
             state().setBranch(repository().getCurrentBranch());
 
             // these objects are fetched in advance from the state because they may throw an exception that we can't handle in the lambda expression
-            final String bump = state().getConfiguration().getBump();
+            final Set<String> bumpIdentifiers = Objects.isNull(state().getConfiguration().getBump()) ? new HashSet<String>() : null; // this must be used only if the bump was not overridden by configuration
             final Map<String,CommitMessageConvention> commitMessageConventions = state().getConfiguration().getCommitMessageConventions().getItems();
             final boolean releaseLenient = state().getConfiguration().getReleaseLenient().booleanValue();
             final String releasePrefix = state().getConfiguration().getReleasePrefix();
@@ -318,34 +320,37 @@ public class Infer extends AbstractCommand {
                     state().getReleaseScope().getCommits().add(c.getSHA());
                 }
 
-                // if the 'bump' was not overridden by user, evaluate the commit message against the
-                // configured conventions to see which identifier must be dumped, if any
-                if (Objects.isNull(bump) && !Objects.isNull(commitMessageConventions)) {
-                    // Let's find the identifier to bump (unless the bump was overridden by user).
-                    // We need to consider all commits within the scope and, when using collapsed versioning,
-                    // also those between the primeVersionCommit and the finalCommit (but only if there are
-                    // significant commmits since the previousVersion, otherwise we don't have to dump anything).
-                    if ((!(state().getReleaseScope().hasPreviousVersion() && state().getReleaseScope().hasPreviousVersionCommit())) ||
-                        (releaseTypeCollapseVersions && (!(state().getReleaseScope().hasPrimeVersion() && state().getReleaseScope().hasPrimeVersionCommit())))) {
-                    
-                        for (Map.Entry<String,CommitMessageConvention> cmcEntry: commitMessageConventions.entrySet()) {
-                            logger.debug(COMMAND, "Evaluating commit {} against message convention {}", c.getSHA(), cmcEntry.getKey());                                
-                            Matcher messageMatcher = Pattern.compile(cmcEntry.getValue().getExpression()).matcher(c.getMessage().getFullMessage());
-                            if (messageMatcher.matches()) {
-                                logger.debug(COMMAND, "Commit message convention {} matches commit {}", cmcEntry.getKey(), c.getSHA());
-                                for (Map.Entry<String,String> bumpExpression: cmcEntry.getValue().getBumpExpressions().entrySet()) {
-                                    logger.debug(COMMAND, "Matching commit {} against bump expression {} of message convention {}", c.getSHA(), bumpExpression.getKey(), cmcEntry.getKey());
-                                    Matcher bumpMatcher = Pattern.compile(bumpExpression.getValue()).matcher(c.getMessage().getFullMessage());
-                                    if (bumpMatcher.matches()) {
-                                        logger.debug(COMMAND, "Bump expression {} of message convention {} matches commit {}, meaning that the {} identifier has to be bumped, according to this commit", bumpExpression.getKey(), cmcEntry.getKey(), c.getSHA(), bumpExpression.getKey());
-                                        state().getReleaseScope().getSignificantCommits().put(c.getSHA(), bumpExpression.getKey());
+                // if the 'bump' was not overridden by user (so the bumpIdentifiers is null), evaluate the commit message against the configured conventions to see which identifier must be dumped, if any
+                if (!Objects.isNull(bumpIdentifiers)) {
+                    if (!Objects.isNull(commitMessageConventions)) {
+                        // Let's find the identifier to bump (unless the bump was overridden by user).
+                        // We need to consider all commits within the scope and, when using collapsed versioning,
+                        // also those between the primeVersionCommit and the finalCommit (but only if there are
+                        // significant commmits since the previousVersion, otherwise we don't have to dump anything).
+                        if ((!(state().getReleaseScope().hasPreviousVersion() && state().getReleaseScope().hasPreviousVersionCommit())) ||
+                            (releaseTypeCollapseVersions && (!(state().getReleaseScope().hasPrimeVersion() && state().getReleaseScope().hasPrimeVersionCommit())))) {
+                            logger.debug(COMMAND, "Trying to infer the identifier to bump based on the commit message of commit {}", c.getSHA());
+                            for (Map.Entry<String,CommitMessageConvention> cmcEntry: commitMessageConventions.entrySet()) {
+                                logger.debug(COMMAND, "Evaluating commit {} against message convention {}", c.getSHA(), cmcEntry.getKey());                                
+                                Matcher messageMatcher = Pattern.compile(cmcEntry.getValue().getExpression()).matcher(c.getMessage().getFullMessage());
+                                if (messageMatcher.matches()) {
+                                    logger.debug(COMMAND, "Commit message convention {} matches commit {}", cmcEntry.getKey(), c.getSHA());
+                                    for (Map.Entry<String,String> bumpExpression: cmcEntry.getValue().getBumpExpressions().entrySet()) {
+                                        logger.debug(COMMAND, "Matching commit {} against bump expression {} of message convention {}", c.getSHA(), bumpExpression.getKey(), cmcEntry.getKey());
+                                        Matcher bumpMatcher = Pattern.compile(bumpExpression.getValue()).matcher(c.getMessage().getFullMessage());
+                                        if (bumpMatcher.matches()) {
+                                            logger.debug(COMMAND, "Bump expression {} of message convention {} matches commit {}, meaning that the {} identifier has to be bumped, according to this commit", bumpExpression.getKey(), cmcEntry.getKey(), c.getSHA(), bumpExpression.getKey());
+                                            bumpIdentifiers.add(bumpExpression.getKey());
+                                            state().getReleaseScope().getSignificantCommits().put(c.getSHA(), bumpExpression.getKey());
+                                        }
+                                        else logger.debug(COMMAND, "Bump expression {} of message convention {} doesn't match commit {}", bumpExpression.getKey(), cmcEntry.getKey(), c.getSHA());
                                     }
-                                    else logger.debug(COMMAND, "Bump expression {} of message convention {} doesn't match commit {}", bumpExpression.getKey(), cmcEntry.getKey(), c.getSHA());
                                 }
+                                else logger.debug(COMMAND, "Commit message convention {} doesn't match commit {}, skipping", cmcEntry.getKey(), c.getSHA());
                             }
-                            else logger.debug(COMMAND, "Commit message convention {} doesn't match commit {}, skipping", cmcEntry.getKey(), c.getSHA());
                         }
                     }
+                    else logger.debug(COMMAND, "No commit message convention has been configured, skipping inference of the identifier to bump based on commit messages");
                 }
 
                 // stop walking the commit history if we already have the previous and prime versions (and their commits), otherwise keep walking
@@ -376,8 +381,16 @@ public class Infer extends AbstractCommand {
                     state().getReleaseScope().setPrimeVersionCommit(state().getReleaseScope().getPreviousVersionCommit());
                 }
             }
-            // now parse the prime version
-            Version primeVersion = releaseLenient ? Versions.valueOf(scheme, state().getReleaseScope().getPrimeVersion(), releaseLenient) : Versions.valueOf(scheme, state().getReleaseScope().getPrimeVersion(), releasePrefix);
+
+            // if the state has no bump yet and we were able to collect the bump identifiers from the commit history,
+            // use the most relevant one among them
+            if ((!state().hasBump()) && !Objects.isNull(bumpIdentifiers)) {
+                state().setBump(Versions.mostRelevantIdentifier(scheme, bumpIdentifiers));
+                logger.debug(COMMAND, "The most relevant identifier to bump inferred among significant commits is {}", state().hasBump() ? state().getBump() : "null");
+            }
+
+            // now parse the previous version
+            Version previousVersion = releaseLenient ? Versions.valueOf(scheme, state().getReleaseScope().getPreviousVersion(), releaseLenient) : Versions.valueOf(scheme, state().getReleaseScope().getPreviousVersion(), releasePrefix);
 
             // finally compute the version
             Version version = null;
@@ -395,14 +408,14 @@ public class Infer extends AbstractCommand {
                     if (Objects.isNull(collapsedVersionQualifier) || collapsedVersionQualifier.isBlank())
                         throw new ReleaseException(String.format("The releaseType.collapsedVersionQualifier must have a value when using collapsed versioning. The template '%s' has been configured but it yields to '%s' after evaluation", releaseType.getCollapsedVersionQualifier(), Objects.isNull(collapsedVersionQualifier) ? "null" : collapsedVersionQualifier));
 
-                    Version primeVersionBumped = releaseLenient ? Versions.valueOf(scheme, state().getReleaseScope().getPrimeVersion(), releaseLenient) : Versions.valueOf(scheme, state().getReleaseScope().getPrimeVersion(), releasePrefix);
-                    primeVersionBumped = primeVersionBumped.bump(bumpIdentifier).bump(collapsedVersionQualifier);
-    
+                    // parse the prime version
+                    Version primeVersion = releaseLenient ? Versions.valueOf(scheme, state().getReleaseScope().getPrimeVersion(), releaseLenient) : Versions.valueOf(scheme, state().getReleaseScope().getPrimeVersion(), releasePrefix);
+
+                    // bump the two identifiers on the prime version
+                    Version primeVersionBumped = primeVersion.bump(bumpIdentifier).bump(collapsedVersionQualifier);
                     logger.debug(COMMAND, "Bumping qualifiers {} and {} on prime version {} yields to {}", bumpIdentifier, collapsedVersionQualifier, state().getReleaseScope().getPrimeVersion(), primeVersionBumped.toString());
                     
-                    Version previousVersionBumped = releaseLenient ? Versions.valueOf(scheme, state().getReleaseScope().getPreviousVersion(), releaseLenient) : Versions.valueOf(scheme, state().getReleaseScope().getPreviousVersion(), releasePrefix);
-                    previousVersionBumped = previousVersionBumped.bump(collapsedVersionQualifier);
-
+                    Version previousVersionBumped = previousVersion.bump(collapsedVersionQualifier);
                     logger.debug(COMMAND, "Bumping qualifier {} on previous version {} yields to {}", collapsedVersionQualifier, state().getReleaseScope().getPreviousVersion(), previousVersionBumped.toString());
 
                     int comparison = releaseLenient ? Versions.compare(scheme, primeVersionBumped.toString(), previousVersionBumped.toString(), releaseLenient) : Versions.compare(scheme, primeVersionBumped.toString(), previousVersionBumped.toString(), releasePrefix);
@@ -413,13 +426,14 @@ public class Infer extends AbstractCommand {
                     logger.debug(COMMAND, "The greatest version between {} and {} is {}, which is the new (collapsed) version", primeVersionBumped, previousVersionBumped, version);
                 }
                 else {
-                    logger.debug(COMMAND, "Bumping component {} on version {}", bumpIdentifier, primeVersion.toString());
-                    version = primeVersion.bump(bumpIdentifier);
+                    logger.debug(COMMAND, "Bumping component {} on version {}", bumpIdentifier, previousVersion.toString());
+                    version = previousVersion.bump(bumpIdentifier);
                 }
 
                 // apply extra identifiers, if any has been configured for the release type
-                if (Objects.isNull(releaseType.getIdentifiers()) || Objects.isNull(releaseType.getIdentifiers().getEnabled()) || releaseType.getIdentifiers().getEnabled().isEmpty())
+                if (Objects.isNull(releaseType.getIdentifiers()) || Objects.isNull(releaseType.getIdentifiers().getEnabled()) || releaseType.getIdentifiers().getEnabled().isEmpty()) {
                     logger.debug(COMMAND, "The release type does not define any (enabled) extra identifiers so none is applied");
+                }
                 else if (Objects.isNull(releaseType.getIdentifiers().getItems()) || releaseType.getIdentifiers().getItems().isEmpty())
                     throw new IllegalPropertyException(String.format("The release type has %d enabled extra identifiers (%s) but none is defined", releaseType.getIdentifiers().getEnabled().size(), String.join(", ", releaseType.getIdentifiers().getEnabled())));
                 else {
@@ -475,8 +489,8 @@ public class Infer extends AbstractCommand {
                 }
             }
             else {
-                logger.info(COMMAND, "The release scope does not contain any significant commit, version remains unchanged: {}", primeVersion.toString());
-                version = primeVersion;
+                logger.info(COMMAND, "The release scope does not contain any significant commit, version remains unchanged: {}", previousVersion.toString());
+                version = previousVersion;
             }
             
             // check if the version complies with version constraints, if any

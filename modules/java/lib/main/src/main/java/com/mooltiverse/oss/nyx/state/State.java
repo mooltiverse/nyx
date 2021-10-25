@@ -35,7 +35,6 @@ import com.mooltiverse.oss.nyx.data.ReleaseScope;
 import com.mooltiverse.oss.nyx.data.ReleaseType;
 import com.mooltiverse.oss.nyx.template.Templates;
 import com.mooltiverse.oss.nyx.version.Scheme;
-import com.mooltiverse.oss.nyx.version.Versions;
 
 /**
  * The State class holds a number of attributes resulting from the execution of one or more command and so represents
@@ -56,6 +55,11 @@ public class State implements Root {
      * The current Git branch name.
      */
     private String branch = null;
+
+    /**
+     * The identifier to bump.
+     */
+    private String bump = null;
 
     /**
      * The private immutable instance of the configuration.
@@ -176,8 +180,7 @@ public class State implements Root {
     @Override
     public String getBump()
         throws DataAccessException, IllegalPropertyException {
-        String bump = getConfiguration().getBump();
-        return Objects.isNull(bump) ? Versions.mostRelevantIdentifier(getScheme(), getReleaseScope().getSignificantCommits().values()) : bump;
+        return Objects.isNull(getConfiguration().getBump()) ? bump : getConfiguration().getBump();
     }
 
     /**
@@ -193,6 +196,29 @@ public class State implements Root {
     public boolean hasBump()
         throws DataAccessException, IllegalPropertyException {
         return !Objects.isNull(getBump());
+    }
+
+    /**
+     * Sets the identifier to bump.
+     * <br>
+     * Since this option can be overridden by configuration this method can only be invoked when the
+     * {@link #getConfiguration() configuration} doesn't already have a {@link Configuration#getBump() bump}
+     * attribute otherwise an {@link IllegalStateException} is thrown.
+     * 
+     * @param bump the identifier to bump
+     * 
+     * @throws DataAccessException in case the state file cannot be read or accessed.
+     * @throws IllegalPropertyException in case the state file has incorrect values.
+     * @throws IllegalStateException if the {@link #getConfiguration() configuration} has a value for the
+     * {@link Configuration#getBump() bump} attribute.
+     * 
+     * @see Configuration#getBump()
+     */
+    public void setBump(String bump)
+        throws DataAccessException, IllegalPropertyException, IllegalStateException {
+        if (Objects.isNull(getConfiguration().getBump()))
+            this.bump = bump;
+        else throw new IllegalStateException(String.format("The state bump attribute can't be set when it's ovverridden by the configuration. Configuration bump attribute is %s", getConfiguration().getBump()));
     }
 
     /**
