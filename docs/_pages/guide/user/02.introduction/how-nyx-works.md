@@ -5,8 +5,9 @@ toc: true
 permalink: /guide/user/introduction/how-nyx-works/
 ---
 
-TODO: write the introductory section here
-{: .notice--warning}
+In this page you can find the overall principles of the various Nyx commands and how they work in order to take full advantage.
+
+As you will see you can control the tool in a very granular way not just by configuring detailed aspects but also running specific commands separately so you can run other custom actions in between and also gain access to some internals thanks to the accessible [state]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/index.md %}).
 
 ## Clean
 
@@ -38,9 +39,9 @@ TODO: write this section
 
 This phase is where:
 
-1. new or changed release artifacts are **committed**, if any and if the [configuration](TODO: link the commit configuration option here) instructs the tool to do so
-2. a new release **tag** is created in the Git repository. The tag anatomy (i.e. whether it is [lightweight or annotated](https://git-scm.com/book/en/v2/Git-Basics-Tagging)) is driven by the [configuration](TODO: link the tag configuration option here)
-3. the new commit and tag are **pushed** to the [remote](https://git-scm.com/docs/git-remote) repositories, if required by the [configuration](TODO: link the push configuration option here)
+1. new or changed release artifacts are **committed**, if any and if the [configured release type]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#git-commit) instructs the tool to do so
+2. a new release **tag** is created in the Git repository. The tag anatomy (i.e. whether it is [lightweight or annotated](https://git-scm.com/book/en/v2/Git-Basics-Tagging)) is driven by the [release type configuration]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#git-tag-message)
+3. the new commit and tag are **pushed** to the [remote](https://git-scm.com/docs/git-remote) repositories, if required by the [release type configuration]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#git-push)
 
 These steps are only taken if there is a [new version]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#new-version) resulting from the commit history after [inference](#infer), otherwise no action is taken.
 

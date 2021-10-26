@@ -61,22 +61,57 @@ Thanks to [javadoc.io](https://javadoc.io/) you can browse the Javadoc API at [t
 
 ## Using the library
 
-Using the library is simple. Start from the [`Nyx`](https://javadoc.io/doc/com.mooltiverse.oss.nyx/main/latest/com/mooltiverse/oss/nyx/Nyx.html){:target="_blank"} class as an entry point, optionally add your custom configuration and use it as in the following example.
+Using the library is simple. You just need to create a [`Nyx`](https://javadoc.io/doc/com.mooltiverse.oss.nyx/main/latest/com/mooltiverse/oss/nyx/Nyx.html){:target="_blank"} instance and run the `publish` command. It takes just one line of code, like:
 
 ```java
 import com.mooltiverse.oss.nyx.Nyx;
 
 public class Test {
-    static void main(String[] args){
-        // TODO: add a code example here
+    static void main(String[] args)
+        throws Exception {
+        new Nyx().publish(); // This is it!
     }
 }
 ```
 
-### Configuration
+In this example Nyx loads the configuration from the files it optionally finds at their [default locations]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}#evaluation-order) and runs the `publish` command, which also implies `infer`, `mark` and `make`.
 
-TODO: write this section
-{: .notice--warning}
+You can get more control on the behavior by injecting some configuration programmatically and running tasks one by one. You can also start Nyx in a specific directory, get access to the internal Git [repository](https://javadoc.io/doc/com.mooltiverse.oss.nyx/main/latest/com/mooltiverse/oss/nyx/git/Repository.html){:target="_blank"} object and even the internal [state](https://javadoc.io/doc/com.mooltiverse.oss.nyx/main/latest/com/mooltiverse/oss/nyx/state/State.html){:target="_blank"}, like in this example:
+
+```java
+import com.mooltiverse.oss.nyx.Nyx;
+import com.mooltiverse.oss.nyx.configuration.SimpleConfigurationLayer;
+
+public class Test {
+    static void main(String[] args)
+        throws Exception {
+        File customDirectory = new File("~/project"); 
+        Nyx nyx = new Nyx(customDirectory); // Nyx now runs on the '~/project' directory
+
+        // Create a new configuration layer, set some options, and add it on top
+        // of other layers at the 'command line' layer level
+        SimpleConfigurationLayer configurationLayer = new SimpleConfigurationLayer();
+        configurationLayer.setDryRun​(Boolean.TRUE); // make it run dry
+        configurationLayer.setReleasePrefix​("rel"); // make it use 'rel' as the prefix for generated versions
+        nyx.configuration().withCommandLineConfiguration(configurationLayer); // inject the configuration
+
+        nyx.infer(); // let Nyx infer values from the Git repository
+
+        // now we have plenty of values in the State, let's read some...
+        System.out.println(nyx.state().getBranch());
+        System.out.println(nyx.state().getVersion());
+
+        // it might be a good place to run some custom tasks of yours, i.e. using the Git Repository
+        // let's say you create a RELEASE_NOTES.md file and want to commit it
+        nyx.repository().commit​("Adding RELEASE_NOTES.md");
+
+        // then run the remaining tasks one by one
+        nyx.make();
+        nyx.mark();
+        nyx.publish();
+    }
+}
+```
 
 ### Logging
 

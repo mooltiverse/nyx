@@ -69,8 +69,7 @@ TODO: write this section
 
 ## Using the Gradle plugin
 
-TODO: write this section
-{: .notice--warning}
+When using Gradle, the native Nyx plugin is the easiest and most effective way of using Nyx.
 
 All the examples in this page assume you're using the plain `gradle` command. If you're using the (recommended) [wrapper](https://docs.gradle.org/current/userguide/gradle_wrapper.html) just change instances of the `gradle` command with `./gradlew`.
 {: .notice--info}
@@ -105,8 +104,9 @@ You have different means to configure the plugin and in these sections we'll int
 The [`version`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#version) configuration option is not handled like other options because it would overlap [Gradle's standard `version` project property](https://docs.gradle.org/current/userguide/writing_build_scripts.html#sec:standard_project_properties). The plugin reads and writes the standard Gradle option to provide a consistent behavior and reduce impact on existing build scripts. See [here]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#the-version-in-gradle-scripts) for more.
 {: .notice--warning}
 
-TODO: insert links here to the various configuration means and a short description on how to use a hybrid configuration approach, mixing different means.
-{: .notice--warning}
+You can also mix different configuration means according to the [configuration evaluation order]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}#evaluation-order) in order to use what better suits your needs. Mixed configurations are often used to reuse some parts or entire configurations across projects and organizations or to override some inherited values on a project basis.
+
+Examples of different configuration files are available [here]({{ site.baseurl }}/examples/).
 
 #### Using the extension
 
@@ -118,15 +118,15 @@ plugins {
 }
 
 nyx {
-  // configuration options here...
-  // TODO: add the bare minimum options here
+  // configuration block
 }
 ```
 
+The *configuration block* shown above is where you can place configuration options defined in the [configuration reference]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/index.md %}) using the [Gradle]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}#gradle) syntax.
+
 #### Using configuration files
 
-TODO: write this section
-{: .notice--warning}
+If you rather prefer to configure Nyx by means of configuration files you can use one of the [default configuration files]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}#evaluation-order) that are looked up automatically or set the [`configurationFile`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#configuration-file) global option to look for a file in a custom location.
 
 #### Multi-project builds
 

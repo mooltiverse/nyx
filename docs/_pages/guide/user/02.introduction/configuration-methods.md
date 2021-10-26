@@ -14,6 +14,8 @@ Nyx offers a wide range of configuration options, including:
 
 All configuration options are available for any of the above methods to let you pick what best suits your needs.
 
+[Examples]({{ site.baseurl }}/examples/) are available for any option and file grammar.
+
 ## Evaluation order
 
 Options are evaluated in the following order:
