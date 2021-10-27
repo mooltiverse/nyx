@@ -16,6 +16,7 @@
 package com.mooltiverse.oss.nyx.gradle;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assumptions.*;
 
 import java.io.File;
 import java.io.FileReader;
@@ -54,6 +55,30 @@ import com.mooltiverse.oss.nyx.git.Script;
  */
 @DisplayName("NyxPlugin.Functional")
 public class NyxPluginFunctionalTests {
+    /**
+     * The name of the system property used to pass the path of the
+     * extended Groovy configuration file example to tests.
+     */
+    public static final String EXTENDED_GROOVY_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY = "extendedGROOVYExampleConfigurationFile";
+
+    /**
+     * The name of the system property used to pass the path of the
+     * medium Groovy configuration file example to tests.
+     */
+    public static final String MEDIUM_GROOVY_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY = "mediumGROOVYExampleConfigurationFile";
+
+    /**
+     * The name of the system property used to pass the path of the
+     * simple Groovy configuration file example to tests.
+     */
+    public static final String SIMPLE_GROOVY_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY = "simpleGROOVYExampleConfigurationFile";
+    
+    /**
+     * The name of the system property used to pass the path of the
+     * simplest Groovy configuration file example to tests.
+     */
+    public static final String SIMPLEST_GROOVY_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY = "simplestGROOVYExampleConfigurationFile";
+
     /**
      * An array of Gradle versions to succesfully test against.
      * 
@@ -412,182 +437,19 @@ public class NyxPluginFunctionalTests {
     }
 
     /**
-     * Returns a string with a valid content for plugin extension.
-     * 
-     * @param bump the value to set for the {@code bump} option in the extension. If {@code null} no value is set.
-     * @param preset the value to set for the {@code preset} option in the extension. If {@code null} a custom configuration is created.
-     * 
-     * @return a string with a valid content for plugin extension
-     */
-    static String gradleExtension(String bump, String preset) {
-        StringWriter stringWriter = new StringWriter();
-        PrintWriter printWriter = new PrintWriter(stringWriter);
-
-        printWriter.println("nyx {");
-        if (!Objects.isNull(bump))
-            printWriter.println("  bump = '"+bump+"'");
-        if (Objects.isNull(preset)) {
-            //printWriter.println("  configurationFile = '.nyx.json'");
-            printWriter.println("  commitMessageConventions {");
-            printWriter.println("      enabled = [ 'conventionalCommits' ]");
-            printWriter.println("      items {");
-            printWriter.println("        conventionalCommits {");
-            printWriter.println("          expression = '(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\\\((?<scope>[a-z ]+)\\\\))?:( (?<title>.+))$(?s).*'");
-            printWriter.println("          bumpExpressions {");
-            printWriter.println("            patch = '(?s)(?m)^fix(?!!|.*^(BREAKING( |-)CHANGE: )).*'");
-            printWriter.println("            minor = '(?s)(?m)^feat(?!!|.*^(BREAKING( |-)CHANGE: )).*'");
-            printWriter.println("            major = '(?s)(?m)^[a-zA-Z0-9_]+(!|.*^(BREAKING( |-)CHANGE: )).*'");
-            printWriter.println("          }");
-            printWriter.println("        }");
-            printWriter.println("      }");
-            printWriter.println("    }");
-            //printWriter.println("  directory = file('project/directory')");
-            printWriter.println("  dryRun = false");
-            printWriter.println("  initialVersion = '0.1.0'");
-            printWriter.println("  releaseLenient = true");
-            printWriter.println("  releasePrefix = ''");
-            printWriter.println("  releaseTypes {");
-            printWriter.println("    enabled = [ 'mainline', 'maturity', 'integration', 'hotfix', 'feature', 'release', 'maintenance', 'internal' ]");
-            printWriter.println("    items {");
-            printWriter.println("      mainline {");
-            printWriter.println("        filterTags = '^({{configuration.releasePrefix}})?([0-9]\\\\d*)\\\\.([0-9]\\\\d*)\\\\.([0-9]\\\\d*)$'");
-            printWriter.println("        gitCommit = 'true'");
-            printWriter.println("        gitCommitMessage = 'Release version {{version}}'");
-            printWriter.println("        gitPush = 'true'");
-            printWriter.println("        gitTag = 'true'");
-            printWriter.println("        gitTagMessage = 'Tag release {{version}}'");
-            printWriter.println("        matchBranches = '^(master|main)$'");
-            printWriter.println("        matchWorkspaceStatus = 'CLEAN'");
-            printWriter.println("        publish = 'true'");
-            printWriter.println("      }");
-            printWriter.println("      maturity {");
-            printWriter.println("        collapseVersions = true");
-            printWriter.println("        collapsedVersionQualifier = '{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}'");
-            printWriter.println("        filterTags = '^({{configuration.releasePrefix}})?([0-9]\\\\d*)\\\\.([0-9]\\\\d*)\\\\.([0-9]\\\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\\\.([0-9]\\\\d*))?)?$'");
-            printWriter.println("        gitPush = 'true'");
-            printWriter.println("        gitTag = 'true'");
-            printWriter.println("        matchBranches = '^(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)$'");
-            printWriter.println("        matchEnvironmentVariables {");
-            printWriter.println("          CI = '^true$'");
-            printWriter.println("        }");
-            printWriter.println("        matchWorkspaceStatus = 'CLEAN'");
-            printWriter.println("      }");
-            printWriter.println("      hotfix {");
-            printWriter.println("        collapseVersions = true");
-            printWriter.println("        collapsedVersionQualifier = '{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}'");
-            printWriter.println("        filterTags = '^({{configuration.releasePrefix}})?([0-9]\\\\d*)\\\\.([0-9]\\\\d*)\\\\.([0-9]\\\\d*)(-(fix|hotfix)(([0-9a-zA-Z]*)(\\\\.([0-9]\\\\d*))?)?)$'");
-            printWriter.println("        gitPush = 'true'");
-            printWriter.println("        gitTag = 'true'");
-            printWriter.println("        matchBranches = '^(fix|hotfix)((-|\\\\/)[0-9a-zA-Z-_]+)?$'");
-            printWriter.println("        matchEnvironmentVariables {");
-            printWriter.println("          CI = '^true$'");
-            printWriter.println("        }");
-            printWriter.println("        matchWorkspaceStatus = 'CLEAN'");
-            printWriter.println("        publish = 'true'");
-            printWriter.println("      }");
-            printWriter.println("      feature {");
-            printWriter.println("        collapseVersions = true");
-            printWriter.println("        collapsedVersionQualifier = '{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}'");
-            printWriter.println("        filterTags = '^({{configuration.releasePrefix}})?([0-9]\\\\d*)\\\\.([0-9]\\\\d*)\\\\.([0-9]\\\\d*)(-(feat|feature)(([0-9a-zA-Z]*)(\\\\.([0-9]\\\\d*))?)?)$'");
-            printWriter.println("        matchBranches = '^(feat|feature)((-|\\\\/)[0-9a-zA-Z-_]+)?$'");
-            printWriter.println("        matchEnvironmentVariables {");
-            printWriter.println("          CI = '^true$'");
-            printWriter.println("        }");
-            printWriter.println("        matchWorkspaceStatus = 'CLEAN'");
-            printWriter.println("      }");
-            printWriter.println("      integration {");
-            printWriter.println("        collapseVersions = true");
-            printWriter.println("        collapsedVersionQualifier = '{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}'");
-            printWriter.println("        filterTags = '^({{configuration.releasePrefix}})?([0-9]\\\\d*)\\\\.([0-9]\\\\d*)\\\\.([0-9]\\\\d*)(-(develop|development|integration|latest)(\\\\.([0-9]\\\\d*))?)$'");
-            printWriter.println("        gitPush = 'true'");
-            printWriter.println("        gitTag = 'true'");
-            printWriter.println("        matchBranches = '^(develop|development|integration|latest)$'");
-            printWriter.println("        matchEnvironmentVariables {");
-            printWriter.println("          CI = '^true$'");
-            printWriter.println("        }");
-            printWriter.println("        matchWorkspaceStatus = 'CLEAN'");
-            printWriter.println("      }");
-            printWriter.println("      release {");
-            printWriter.println("        collapseVersions = true");
-            printWriter.println("        collapsedVersionQualifier = '{{#firstLower}}{{branch}}{{/firstLower}}'");
-            printWriter.println("        filterTags = '^({{configuration.releasePrefix}})?([0-9]\\\\d*)\\\\.([0-9]\\\\d*)\\\\.([0-9]\\\\d*)(-(rel|release)((\\\\.([0-9]\\\\d*))?)?)$'");
-            printWriter.println("        gitPush = 'true'");
-            printWriter.println("        gitTag = 'true'");
-            printWriter.println("        matchBranches = '^(rel|release)(-|\\\\/)({{configuration.releasePrefix}})?([0-9|x]\\\\d*)(\\\\.([0-9|x]\\\\d*)(\\\\.([0-9|x]\\\\d*))?)?$'");
-            printWriter.println("        matchEnvironmentVariables {");
-            printWriter.println("          CI = '^true$'");
-            printWriter.println("        }");
-            printWriter.println("        matchWorkspaceStatus = 'CLEAN'");
-            printWriter.println("        versionRangeFromBranchName = true");
-            printWriter.println("      }");
-            printWriter.println("      maintenance {");
-            printWriter.println("        filterTags = '^({{configuration.releasePrefix}})?([0-9]\\\\d*)\\\\.([0-9]\\\\d*)\\\\.([0-9]\\\\d*)$'");
-            printWriter.println("        gitPush = 'true'");
-            printWriter.println("        gitTag = 'true'");
-            printWriter.println("        matchBranches = '^[a-zA-Z]*([0-9|x]\\\\d*)(\\\\.([0-9|x]\\\\d*)(\\\\.([0-9|x]\\\\d*))?)?$'");
-            printWriter.println("        matchEnvironmentVariables {");
-            printWriter.println("          CI = '^true$'");
-            printWriter.println("        }");
-            printWriter.println("        matchWorkspaceStatus = 'CLEAN'");
-            printWriter.println("        publish = 'true'");
-            printWriter.println("      }");
-            printWriter.println("      internal {");
-            printWriter.println("        collapseVersions = true");
-            printWriter.println("        collapsedVersionQualifier = 'internal'");
-            printWriter.println("        identifiers {");
-            printWriter.println("            enabled = [ 'branch', 'commit', 'user', 'timestamp' ]");
-            printWriter.println("            items {");
-            printWriter.println("              branch {");
-            printWriter.println("                qualifier = 'branch'");
-            printWriter.println("                value = '{{#sanitize}}{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}{{/sanitize}}'");
-            printWriter.println("                position = 'BUILD'");
-            printWriter.println("              }");
-            printWriter.println("              commit {");
-            printWriter.println("                qualifier = 'commit'");
-            printWriter.println("                value = '{{#short7}}{{releaseScope.finalCommit}}{{/short7}}'");
-            printWriter.println("                position = 'BUILD'");
-            printWriter.println("              }");
-            printWriter.println("              user {");
-            printWriter.println("                qualifier = 'user'");
-            printWriter.println("                value = '{{#sanitizeLower}}{{environment.user}}{{/sanitizeLower}}'");
-            printWriter.println("                position = 'BUILD'");
-            printWriter.println("              }");
-            printWriter.println("              timestamp {");
-            printWriter.println("                qualifier = 'timestamp'");
-            printWriter.println("                value = '{{#timestampYYYYMMDDHHMMSS}}{{timestamp}}{{/timestampYYYYMMDDHHMMSS}}'");
-            printWriter.println("                position = 'BUILD'");
-            printWriter.println("              }");
-            printWriter.println("            }");
-            printWriter.println("          }");
-            printWriter.println("      }");
-            printWriter.println("    }");
-            printWriter.println("  }");
-            printWriter.println("  resume = true");
-            printWriter.println("  scheme = 'SEMVER'");
-            //printWriter.println("  sharedConfigurationFile = 'shared.config.json'");
-            //printWriter.println("  stateFile = '.nyx-state.yml'");    // do not output the file to avoid polluting the working directory
-            printWriter.println("  verbosity = 'INFO'");                // this is ignored with Gradle
-            //printWriter.println("  version = '1.8.12'");              // let Nyx infer the version
-        }
-        else printWriter.println("  preset = '"+preset+"'");
-        printWriter.println("}");
-        return stringWriter.toString();
-    }
-
-    /**
      * Returns a string with a valid content for the gradle.settings file.
      * 
      * @param gradleVersion the Gradle version to use for the file
      * @param applyPlugin when {@code true} the Nyx plugin is applied in the settings (as a settings plugin),
      * otherwise the settings file just contains a plain definition of the project (and the Nyx plugin will need to be applied in the build file)
-     * @param bump the value to set for the {@code bump} option in the extension. If {@code null} no value is set.
-     * If {@code applyPlugin} is {@code false} this parameter is ignored.
-     * @param preset the value to set for the {@code preset} option in the extension. If {@code null} a custom configuration is created.
-     * Ignored when {@code applyPlugin} is {@code false}.
+     * @param pluginSettingsConfigurationFile the path to a local file containing a valid
+     * extension configuration. Ignored when {@code applyPlugin} is {@code false}, otherwise it can't be {@code null}
+     * and it must contain the path to a valid file
      * 
      * @return a string with a valid content for the gradle.settings file
      */
-    static String gradleSettings(String gradleVersion, boolean applyPlugin, String bump, String preset) {
+    static String gradleSettings(String gradleVersion, boolean applyPlugin, String pluginSettingsConfigurationFile)
+        throws Exception {
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
 
@@ -602,7 +464,7 @@ public class NyxPluginFunctionalTests {
 
         if (applyPlugin) {
             // configure the settings extension
-            printWriter.println(gradleExtension(bump, preset));
+            printWriter.println(fileContent(new File(pluginSettingsConfigurationFile)));
         }
 
         return stringWriter.toString();
@@ -616,14 +478,14 @@ public class NyxPluginFunctionalTests {
      * otherwise the settings file just contains a plain definition of the build (and the Nyx plugin will need to be applied in the settings file)
      * @param plugins an optional map of plugins to apply, where names are plugin IDs and values are their versions. The version may be {@code null}
      * or empty for core plugins. If the entire map is {@code null} no plugins are applied. The Nyc plugin is added by default and doesn't need to be added.
-     * @param bump the value to set for the {@code bump} option in the extension. If {@code null} no value is set.
-     * If {@code applyPlugin} is {@code false} this parameter is ignored.
-     * @param preset the value to set for the {@code preset} option in the extension. If {@code null} a custom configuration is created.
-     * Ignored when {@code applyPlugin} is {@code false}.
+     * @param pluginSettingsConfigurationFile the path to a local file containing a valid
+     * extension configuration. Ignored when {@code applyPlugin} is {@code false}, otherwise it can't be {@code null}
+     * and it must contain the path to a valid file
      * 
      * @return a string with a valid content for the build.gradle file
      */
-    static String gradleBuild(String gradleVersion, boolean applyPlugin, Map<String, String> plugins, String bump, String preset) {
+    static String gradleBuild(String gradleVersion, boolean applyPlugin, Map<String, String> plugins, String pluginSettingsConfigurationFile)
+        throws Exception {
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
 
@@ -645,7 +507,7 @@ public class NyxPluginFunctionalTests {
 
         if (applyPlugin) {
             // configure the project extension
-            printWriter.println(gradleExtension(bump, preset));
+            printWriter.println(fileContent(new File(pluginSettingsConfigurationFile)));
         }
 
         // add custom tasks used for debug and diagnostics
@@ -658,8 +520,8 @@ public class NyxPluginFunctionalTests {
         printWriter.println("task writeStateDiagnostics() {");
         printWriter.println("    dependsOn nyxInfer");
         printWriter.println("    doLast {");
-        printWriter.println("        project.file('state-bump.txt').write project.nyxState.bump");
-        printWriter.println("        project.file('state-scheme.txt').write project.nyxState.directory.getAbsolutePath()");
+        printWriter.println("        project.file('state-bump.txt').write project.nyxState.bump.toString()");
+        printWriter.println("        project.file('state-directory.txt').write project.nyxState.directory.getAbsolutePath()");
         printWriter.println("        project.file('state-scheme.txt').write project.nyxState.scheme.toString()");
         printWriter.println("        project.file('state-timestamp.txt').write Long.valueOf(project.nyxState.timestamp).toString()");
         printWriter.println("        project.file('state-version.txt').write project.nyxState.version");
@@ -807,7 +669,8 @@ public class NyxPluginFunctionalTests {
         @MethodSource("com.mooltiverse.oss.nyx.gradle.NyxPluginFunctionalTests#wellKnownTaskTestSuites")
         void exceptionRunningNyxTaskWithNoGitRepository(String target, String gradleVersion, Map<String,String> pluginCombination, Map<String,TaskOutcome> taskOutcomes)
             throws Exception {
-            GradleRunner gradleRunner = setUp(null, gradleVersion, gradleSettings(gradleVersion, false, null, null), gradleBuild(gradleVersion, true, pluginCombination, "minor", "extended"), gitIgnore());
+            assumeFalse(Objects.isNull(System.getProperty(MEDIUM_GROOVY_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY)), "A configuration file path must be passed to this test as a system property but it was not set");
+            GradleRunner gradleRunner = setUp(null, gradleVersion, gradleSettings(gradleVersion, false, null), gradleBuild(gradleVersion, true, pluginCombination, System.getProperty(MEDIUM_GROOVY_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY)), gitIgnore());
 
             // Gradle wraps these exception so let's not make assumptions on the type
             assertThrows(Exception.class, () -> runTask(gradleRunner, gradleVersion, target, taskOutcomes));
@@ -824,9 +687,10 @@ public class NyxPluginFunctionalTests {
         @MethodSource("com.mooltiverse.oss.nyx.gradle.NyxPluginFunctionalTests#wellKnownTaskTestSuites")
         void runNyxTaskWithEmptyScriptTest(String target, String gradleVersion, Map<String,String> pluginCombination, Map<String,TaskOutcome> taskOutcomes)
             throws Exception {
+            assumeFalse(Objects.isNull(System.getProperty(MEDIUM_GROOVY_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY)), "A configuration file path must be passed to this test as a system property but it was not set");
             Script script = Scenario.INITIAL_COMMIT.realize();
             script.addRemote(Scenario.FROM_SCRATCH.realize().getGitDirectory(), "origin");
-            GradleRunner gradleRunner = setUp(script.getWorkingDirectory(), gradleVersion, gradleSettings(gradleVersion, false, null, null), gradleBuild(gradleVersion, true, pluginCombination, "minor", "extended"), gitIgnore());
+            GradleRunner gradleRunner = setUp(script.getWorkingDirectory(), gradleVersion, gradleSettings(gradleVersion, false, null), gradleBuild(gradleVersion, true, pluginCombination, System.getProperty(MEDIUM_GROOVY_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY)), gitIgnore());
 
             runTask(gradleRunner, gradleVersion, target, taskOutcomes);
 
@@ -844,9 +708,10 @@ public class NyxPluginFunctionalTests {
         @MethodSource("com.mooltiverse.oss.nyx.gradle.NyxPluginFunctionalTests#wellKnownTaskTestSuites")
         void runNyxTaskWithSimpleScriptWithPresetTest(String target, String gradleVersion, Map<String,String> pluginCombination, Map<String,TaskOutcome> taskOutcomes)
             throws Exception {
+            assumeFalse(Objects.isNull(System.getProperty(MEDIUM_GROOVY_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY)), "A configuration file path must be passed to this test as a system property but it was not set");
             Script script = Scenario.INITIAL_COMMIT.realize();
             script.addRemote(Scenario.FROM_SCRATCH.realize().getGitDirectory(), "origin");
-            GradleRunner gradleRunner = setUp(script.getWorkingDirectory(), gradleVersion, gradleSettings(gradleVersion, false, null, null), gradleBuild(gradleVersion, true, pluginCombination, "minor", "extended"), gitIgnore());
+            GradleRunner gradleRunner = setUp(script.getWorkingDirectory(), gradleVersion, gradleSettings(gradleVersion, false, null), gradleBuild(gradleVersion, true, pluginCombination, System.getProperty(MEDIUM_GROOVY_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY)), gitIgnore());
 
             runTask(gradleRunner, gradleVersion, target, taskOutcomes);
 
@@ -865,9 +730,10 @@ public class NyxPluginFunctionalTests {
         @MethodSource("com.mooltiverse.oss.nyx.gradle.NyxPluginFunctionalTests#wellKnownTestSuites")
         void earlyInferRunningDummyTaskWithPresetTest(String gradleVersion, Map<String,String> pluginCombination)
             throws Exception {
+            assumeFalse(Objects.isNull(System.getProperty(MEDIUM_GROOVY_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY)), "A configuration file path must be passed to this test as a system property but it was not set");
             Script script = Scenario.ONE_BRANCH_SHORT.realize();
             script.addRemote(Scenario.FROM_SCRATCH.realize().getGitDirectory(), "origin");
-            GradleRunner gradleRunner = setUp(script.getWorkingDirectory(), gradleVersion, gradleSettings(gradleVersion, false, null, null), gradleBuild(gradleVersion, true, pluginCombination, "minor", "extended"), gitIgnore());
+            GradleRunner gradleRunner = setUp(script.getWorkingDirectory(), gradleVersion, gradleSettings(gradleVersion, false, null), gradleBuild(gradleVersion, true, pluginCombination, System.getProperty(MEDIUM_GROOVY_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY)), gitIgnore());
 
             // do not run any nyx Task, just the tasks that write the version to a file, which must be already available
             runTask(gradleRunner, gradleVersion, "dummy", null);
@@ -889,17 +755,18 @@ public class NyxPluginFunctionalTests {
         @MethodSource("com.mooltiverse.oss.nyx.gradle.NyxPluginFunctionalTests#wellKnownTestSuites")
         void earlyInferRunningInferWithPresetTest(String gradleVersion, Map<String,String> pluginCombination)
             throws Exception {
+            assumeFalse(Objects.isNull(System.getProperty(MEDIUM_GROOVY_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY)), "A configuration file path must be passed to this test as a system property but it was not set");
             Script script = Scenario.ONE_BRANCH_SHORT.realize();
             script.addRemote(Scenario.FROM_SCRATCH.realize().getGitDirectory(), "origin");
-            GradleRunner gradleRunner = setUp(script.getWorkingDirectory(), gradleVersion, gradleSettings(gradleVersion, false, null, null), gradleBuild(gradleVersion, true, pluginCombination, "minor", "extended"), gitIgnore());
+            GradleRunner gradleRunner = setUp(script.getWorkingDirectory(), gradleVersion, gradleSettings(gradleVersion, false, null), gradleBuild(gradleVersion, true, pluginCombination, System.getProperty(MEDIUM_GROOVY_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY)), gitIgnore());
 
             // just run the nyxInfer Task, just the tasks that write the version to a file, which must be already available
             runTask(gradleRunner, gradleVersion, "nyxInfer", null);
             assertEquals("unspecified", fileContent(new File(script.getWorkingDirectory(), "diag-early-version.txt"))); // the beforeEvaluate version
-            assertEquals("0.1.0", fileContent(new File(script.getWorkingDirectory(), "diag-late-version.txt"))); // the afterEvaluate version
+            assertEquals("v0.0.4", fileContent(new File(script.getWorkingDirectory(), "diag-late-version.txt"))); // the afterEvaluate version
 
             runTask(gradleRunner, gradleVersion, "writeStateDiagnostics", null);
-            assertEquals("0.1.0", fileContent(new File(script.getWorkingDirectory(), "state-version.txt")));
+            assertEquals("v0.0.4", fileContent(new File(script.getWorkingDirectory(), "state-version.txt")));
 
             tearDown(gradleRunner);
         }
@@ -916,17 +783,18 @@ public class NyxPluginFunctionalTests {
         @MethodSource("com.mooltiverse.oss.nyx.gradle.NyxPluginFunctionalTests#wellKnownTestSuites")
         void earlyInferRunningInferWithCustomConfigurationTest(String gradleVersion, Map<String,String> pluginCombination)
             throws Exception {
+            assumeFalse(Objects.isNull(System.getProperty(SIMPLE_GROOVY_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY)), "A configuration file path must be passed to this test as a system property but it was not set");
             Script script = Scenario.ONE_BRANCH_SHORT.realize();
             script.addRemote(Scenario.FROM_SCRATCH.realize().getGitDirectory(), "origin");
-            GradleRunner gradleRunner = setUp(script.getWorkingDirectory(), gradleVersion, gradleSettings(gradleVersion, false, null, null), gradleBuild(gradleVersion, true, pluginCombination, "minor", null), gitIgnore());
+            GradleRunner gradleRunner = setUp(script.getWorkingDirectory(), gradleVersion, gradleSettings(gradleVersion, false, null), gradleBuild(gradleVersion, true, pluginCombination, System.getProperty(SIMPLE_GROOVY_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY)), gitIgnore());
 
             // just run the nyxInfer Task, just the tasks that write the version to a file, which must be already available
             runTask(gradleRunner, gradleVersion, "nyxInfer", null);
             assertEquals("unspecified", fileContent(new File(script.getWorkingDirectory(), "diag-early-version.txt"))); // the beforeEvaluate version
-            assertEquals("0.1.0", fileContent(new File(script.getWorkingDirectory(), "diag-late-version.txt"))); // the afterEvaluate version
+            assertEquals("v0.0.4", fileContent(new File(script.getWorkingDirectory(), "diag-late-version.txt"))); // the afterEvaluate version
 
             runTask(gradleRunner, gradleVersion, "writeStateDiagnostics", null);
-            assertEquals("0.1.0", fileContent(new File(script.getWorkingDirectory(), "state-version.txt")));
+            assertEquals("v0.0.4", fileContent(new File(script.getWorkingDirectory(), "state-version.txt")));
 
             tearDown(gradleRunner);
         }
@@ -950,25 +818,26 @@ public class NyxPluginFunctionalTests {
         @MethodSource("com.mooltiverse.oss.nyx.gradle.NyxPluginFunctionalTests#wellKnownTestSuites")
         void earlyInferApplyingSettingsPluginWithPresetTest(String gradleVersion, Map<String,String> pluginCombination)
             throws Exception {
+            assumeFalse(Objects.isNull(System.getProperty(MEDIUM_GROOVY_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY)), "A configuration file path must be passed to this test as a system property but it was not set");
             Script script = Scenario.ONE_BRANCH_SHORT.realize();
             script.addRemote(Scenario.FROM_SCRATCH.realize().getGitDirectory(), "origin");
-            GradleRunner gradleRunner = setUp(script.getWorkingDirectory(), gradleVersion, gradleSettings(gradleVersion, true, "minor", "extended"), gradleBuild(gradleVersion, false, pluginCombination, null, null), gitIgnore());
+            GradleRunner gradleRunner = setUp(script.getWorkingDirectory(), gradleVersion, gradleSettings(gradleVersion, true, System.getProperty(MEDIUM_GROOVY_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY)), gradleBuild(gradleVersion, false, pluginCombination, null), gitIgnore());
 
             // do not run any nyx Task, just the tasks that write the version to a file, which must be already available
             runTask(gradleRunner, gradleVersion, "dummy", null);
-            assertEquals("0.1.0", fileContent(new File(script.getWorkingDirectory(), "diag-early-version.txt")));
-            assertEquals("0.1.0", fileContent(new File(script.getWorkingDirectory(), "diag-late-version.txt")));
+            assertEquals("v0.0.4", fileContent(new File(script.getWorkingDirectory(), "diag-early-version.txt")));
+            assertEquals("v0.0.4", fileContent(new File(script.getWorkingDirectory(), "diag-late-version.txt")));
 
             runTask(gradleRunner, gradleVersion, "writeStateDiagnostics", null);
-            assertEquals("0.1.0", fileContent(new File(script.getWorkingDirectory(), "state-version.txt")));
+            assertEquals("v0.0.4", fileContent(new File(script.getWorkingDirectory(), "state-version.txt")));
 
             // now run nyxInfer and make sure it makes no difference
             runTask(gradleRunner, gradleVersion, "nyxInfer", null);
-            assertEquals("0.1.0", fileContent(new File(script.getWorkingDirectory(), "diag-early-version.txt")));
-            assertEquals("0.1.0", fileContent(new File(script.getWorkingDirectory(), "diag-late-version.txt")));
+            assertEquals("v0.0.4", fileContent(new File(script.getWorkingDirectory(), "diag-early-version.txt")));
+            assertEquals("v0.0.4", fileContent(new File(script.getWorkingDirectory(), "diag-late-version.txt")));
 
             runTask(gradleRunner, gradleVersion, "writeStateDiagnostics", null);
-            assertEquals("0.1.0", fileContent(new File(script.getWorkingDirectory(), "state-version.txt")));
+            assertEquals("v0.0.4", fileContent(new File(script.getWorkingDirectory(), "state-version.txt")));
 
             tearDown(gradleRunner);
         }
@@ -985,25 +854,26 @@ public class NyxPluginFunctionalTests {
         @MethodSource("com.mooltiverse.oss.nyx.gradle.NyxPluginFunctionalTests#wellKnownTestSuites")
         void earlyInferApplyingSettingsPluginWithCustomConfigurationTest(String gradleVersion, Map<String,String> pluginCombination)
             throws Exception {
+            assumeFalse(Objects.isNull(System.getProperty(SIMPLE_GROOVY_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY)), "A configuration file path must be passed to this test as a system property but it was not set");
             Script script = Scenario.ONE_BRANCH_SHORT.realize();
             script.addRemote(Scenario.FROM_SCRATCH.realize().getGitDirectory(), "origin");
-            GradleRunner gradleRunner = setUp(script.getWorkingDirectory(), gradleVersion, gradleSettings(gradleVersion, true, "minor", null), gradleBuild(gradleVersion, false, pluginCombination, null, null), gitIgnore());
+            GradleRunner gradleRunner = setUp(script.getWorkingDirectory(), gradleVersion, gradleSettings(gradleVersion, true, System.getProperty(SIMPLE_GROOVY_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY)), gradleBuild(gradleVersion, false, pluginCombination, null), gitIgnore());
 
             // do not run any nyx Task, just the tasks that write the version to a file, which must be already available
             runTask(gradleRunner, gradleVersion, "dummy", null);
-            assertEquals("0.1.0", fileContent(new File(script.getWorkingDirectory(), "diag-early-version.txt")));
-            assertEquals("0.1.0", fileContent(new File(script.getWorkingDirectory(), "diag-late-version.txt")));
+            assertEquals("v0.0.4", fileContent(new File(script.getWorkingDirectory(), "diag-early-version.txt")));
+            assertEquals("v0.0.4", fileContent(new File(script.getWorkingDirectory(), "diag-late-version.txt")));
 
             runTask(gradleRunner, gradleVersion, "writeStateDiagnostics", null);
-            assertEquals("0.1.0", fileContent(new File(script.getWorkingDirectory(), "state-version.txt")));
+            assertEquals("v0.0.4", fileContent(new File(script.getWorkingDirectory(), "state-version.txt")));
 
             // now run nyxInfer and make sure it makes no difference
             runTask(gradleRunner, gradleVersion, "nyxInfer", null);
-            assertEquals("0.1.0", fileContent(new File(script.getWorkingDirectory(), "diag-early-version.txt")));
-            assertEquals("0.1.0", fileContent(new File(script.getWorkingDirectory(), "diag-late-version.txt")));
+            assertEquals("v0.0.4", fileContent(new File(script.getWorkingDirectory(), "diag-early-version.txt")));
+            assertEquals("v0.0.4", fileContent(new File(script.getWorkingDirectory(), "diag-late-version.txt")));
 
             runTask(gradleRunner, gradleVersion, "writeStateDiagnostics", null);
-            assertEquals("0.1.0", fileContent(new File(script.getWorkingDirectory(), "state-version.txt")));
+            assertEquals("v0.0.4", fileContent(new File(script.getWorkingDirectory(), "state-version.txt")));
 
             tearDown(gradleRunner);
         }

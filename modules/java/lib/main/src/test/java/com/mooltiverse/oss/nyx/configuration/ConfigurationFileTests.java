@@ -17,6 +17,9 @@ package com.mooltiverse.oss.nyx.configuration;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import static com.mooltiverse.oss.nyx.configuration.ConfigurationExamples.EXTENDED_JSON_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY;
+import static com.mooltiverse.oss.nyx.configuration.ConfigurationExamples.EXTENDED_YAML_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY;
+
 import java.io.File;
 import java.util.Objects;
 import java.util.Map.Entry;
@@ -26,7 +29,6 @@ import org.junit.jupiter.api.Test;
 
 import com.mooltiverse.oss.nyx.data.FileMapper;
 import com.mooltiverse.oss.nyx.data.Identifier;
-import com.mooltiverse.oss.nyx.configuration.examples.ExtendedConfigurationExample;
 
 /**
  * Tests the saving and loading of configuration layers as files.
@@ -44,13 +46,16 @@ public class ConfigurationFileTests {
     @DisplayName("Load YAML configuration")
     void loadYAML()
         throws Exception {
-        // use an example configuration and store it as a file
-        SimpleConfigurationLayer source = new ExtendedConfigurationExample(); // use the example with the most fields used
-        File savedFile = new File(System.getProperty("java.io.tmpdir"), "extended"+this.hashCode()+".yaml");
+        // load an example configuration file
+        assertNotNull(System.getProperty(EXTENDED_YAML_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY), "A configuration file path must be passed to this test as a system property but it was not set");
+        SimpleConfigurationLayer source = FileMapper.load(new File(System.getProperty(EXTENDED_YAML_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY)), SimpleConfigurationLayer.class);
+
+        // now save it to another file
+        File savedFile = new File(System.getProperty("java.io.tmpdir"), "extended"+this.hashCode()+".json");
         savedFile.deleteOnExit();
         FileMapper.save(savedFile.getAbsolutePath(), source);
 
-        // now load the file into another object and then compare their fields
+        // now load the second file into another object and then compare their fields
         SimpleConfigurationLayer target = FileMapper.load(savedFile, SimpleConfigurationLayer.class);
 
         // all the following tests must consider that a value that was not defined in the source configuration gets its default value when unmarshalling
@@ -134,13 +139,16 @@ public class ConfigurationFileTests {
     @DisplayName("Load JSON configuration")
     void loadJSON()
         throws Exception {
-        // use an example configuration and store it as a file
-        SimpleConfigurationLayer source = new ExtendedConfigurationExample(); // use the example with the most fields used
+        // load an example configuration file
+        assertNotNull(System.getProperty(EXTENDED_JSON_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY), "A configuration file path must be passed to this test as a system property but it was not set");
+        SimpleConfigurationLayer source = FileMapper.load(new File(System.getProperty(EXTENDED_JSON_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY)), SimpleConfigurationLayer.class);
+
+        // now save it to another file
         File savedFile = new File(System.getProperty("java.io.tmpdir"), "extended"+this.hashCode()+".json");
         savedFile.deleteOnExit();
         FileMapper.save(savedFile.getAbsolutePath(), source);
 
-        // now load the file into another object and then compare their fields
+        // now load the second file into another object and then compare their fields
         SimpleConfigurationLayer target = FileMapper.load(savedFile, SimpleConfigurationLayer.class);
 
         // all the following tests must consider that a value that was not defined in the source configuration gets its default value when unmarshalling

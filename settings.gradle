@@ -4,7 +4,7 @@
 ------------------------------------------------------------------------------*/
 plugins {
   // use our own plugin
-  id "com.mooltiverse.oss.nyx" version "0.2.0-alpha.3"
+  id "com.mooltiverse.oss.nyx" version "0.2.0-alpha.4"
 }
 
 /*------------------------------------------------------------------------------
@@ -31,8 +31,8 @@ nyx {
   // - the 'mainline' and 'internal' release types (that we override here)
   preset        = 'simple'
   stateFile     = 'build/.nyx-state.json'
-  releaseTypes  {
-    enabled       = [ 'mainline', 'mainlinelocal', 'maturity', 'maturitylocal', 'integration', 'integrationlocal', 'hotfix', 'hotfixlocal', 'feature', 'featurelocal', 'release', 'releaselocal', 'maintenance', 'maintenancelocal', 'internal' ]
+  releaseTypes {
+    enabled = [ 'mainline', 'mainlinelocal', 'maturity', 'maturitylocal', 'integration', 'integrationlocal', 'hotfix', 'hotfixlocal', 'feature', 'featurelocal', 'release', 'releaselocal', 'maintenance', 'maintenancelocal', 'internal' ]
     items {
       // 'mainline' overrides the release type with the same name from the preset
       mainline {
@@ -180,6 +180,15 @@ nyx {
         filterTags = '^({{configuration.releasePrefix}})?([0-9]\\\\d*)\\\\.([0-9]\\\\d*)\\\\.([0-9]\\\\d*)$'
         gitPush = 'false'
         gitTag = 'false'
+        identifiers {
+          enabled = [ 'local' ]
+          items {
+            local {
+              qualifier = 'local'
+              position = 'BUILD'
+            }
+          }
+        }
         matchBranches = '^(master|main)$'
         //matchWorkspaceStatus = 'CLEAN'
         publish = 'false'
@@ -190,6 +199,15 @@ nyx {
         filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$'
         gitPush = 'false'
         gitTag = 'false'
+        identifiers {
+          enabled = [ 'local' ]
+          items {
+            local {
+              qualifier = 'local'
+              position = 'BUILD'
+            }
+          }
+        }
         matchBranches = '^(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)$'
         //matchWorkspaceStatus = 'CLEAN'
         publish = 'false'
@@ -200,6 +218,15 @@ nyx {
         filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(develop|development|integration|latest)(\\.([0-9]\\d*))?)$'
         gitPush = 'false'
         gitTag = 'false'
+        identifiers {
+          enabled = [ 'local' ]
+          items {
+            local {
+              qualifier = 'local'
+              position = 'BUILD'
+            }
+          }
+        }
         matchBranches = '^(develop|development|integration|latest)$'
         //matchWorkspaceStatus = 'CLEAN'
         publish = 'false'
@@ -210,6 +237,15 @@ nyx {
         filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(fix|hotfix)(([0-9a-zA-Z]*)(\\.([0-9]\\d*))?)?)$'
         gitPush = 'false'
         gitTag = 'false'
+        identifiers {
+          enabled = [ 'local' ]
+          items {
+            local {
+              qualifier = 'local'
+              position = 'BUILD'
+            }
+          }
+        }
         matchBranches = '^(fix|hotfix)((-|\\/)[0-9a-zA-Z-_]+)?$'
         //matchWorkspaceStatus = 'CLEAN'
         publish = 'false'
@@ -220,6 +256,15 @@ nyx {
         filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(feat|feature)(([0-9a-zA-Z]*)(\\.([0-9]\\d*))?)?)$'
         gitPush = 'false'
         gitTag = 'false'
+        identifiers {
+          enabled = [ 'local' ]
+          items {
+            local {
+              qualifier = 'local'
+              position = 'BUILD'
+            }
+          }
+        }
         matchBranches = '^(feat|feature)((-|\\/)[0-9a-zA-Z-_]+)?$'
         //matchWorkspaceStatus = 'CLEAN'
         publish = 'false'
@@ -230,6 +275,15 @@ nyx {
         filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(rel|release)((\\.([0-9]\\d*))?)?)$'
         gitPush = 'false'
         gitTag = 'false'
+        identifiers {
+          enabled = [ 'local' ]
+          items {
+            local {
+              qualifier = 'local'
+              position = 'BUILD'
+            }
+          }
+        }
         matchBranches = '^(rel|release)(-|\\/)({{configuration.releasePrefix}})?([0-9|x]\\d*)(\\.([0-9|x]\\d*)(\\.([0-9|x]\\d*))?)?$'
         //matchWorkspaceStatus = 'CLEAN'
         publish = 'false'
@@ -239,6 +293,15 @@ nyx {
         filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$'
         gitPush = 'false'
         gitTag = 'false'
+        identifiers {
+          enabled = [ 'local' ]
+          items {
+            local {
+              qualifier = 'local'
+              position = 'BUILD'
+            }
+          }
+        }
         matchBranches = '^[a-zA-Z]*([0-9|x]\\d*)(\\.([0-9|x]\\d*)(\\.([0-9|x]\\d*))?)?$'
         //matchWorkspaceStatus = 'CLEAN'
         publish = 'false'

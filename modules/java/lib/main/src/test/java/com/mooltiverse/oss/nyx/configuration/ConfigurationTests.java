@@ -17,6 +17,9 @@ package com.mooltiverse.oss.nyx.configuration;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import static com.mooltiverse.oss.nyx.configuration.ConfigurationExamples.SIMPLEST_JSON_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY;
+import static com.mooltiverse.oss.nyx.configuration.ConfigurationExamples.SIMPLEST_YAML_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY;
+
 import java.io.File;
 import java.nio.file.Files;
 import java.util.List;
@@ -26,7 +29,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import com.mooltiverse.oss.nyx.configuration.examples.SimplestConfigurationExample;
 import com.mooltiverse.oss.nyx.configuration.presets.Extended;
 import com.mooltiverse.oss.nyx.configuration.presets.Simple;
 import com.mooltiverse.oss.nyx.data.CommitMessageConvention;
@@ -238,13 +240,10 @@ public class ConfigurationTests {
         @DisplayName("Configuration.withCommandLineConfiguration(MOCK).getConfigurationFile() == MOCK.getConfigurationFile()")
         void getConfigurationFileTest()
             throws Exception {
-            File savedFile = new File(System.getProperty("java.io.tmpdir"), "extended"+this.hashCode()+".json");
-            savedFile.deleteOnExit();
-            FileMapper.save(savedFile.getAbsolutePath(), new SimplestConfigurationExample());
-
+            assertNotNull(System.getProperty(SIMPLEST_JSON_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY), "A configuration file path must be passed to this test as a system property but it was not set");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
-            configurationLayerMock.setConfigurationFile(savedFile.getAbsolutePath());
+            configurationLayerMock.setConfigurationFile(System.getProperty(SIMPLEST_JSON_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY));
 
             // in order to make the test meaningful, make sure the default and mock values are different
             assertNotEquals(Defaults.CONFIGURATION_FILE, configurationLayerMock.getConfigurationFile());
@@ -494,13 +493,10 @@ public class ConfigurationTests {
         @DisplayName("Configuration.withCommandLineConfiguration(MOCK).getSharedConfigurationFile() == MOCK.getSharedConfigurationFile()")
         void getSharedConfigurationFileTest()
             throws Exception {
-            File savedFile = new File(System.getProperty("java.io.tmpdir"), "extended"+this.hashCode()+".json");
-            savedFile.deleteOnExit();
-            FileMapper.save(savedFile.getAbsolutePath(), new SimplestConfigurationExample());
-
+            assertNotNull(System.getProperty(SIMPLEST_JSON_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY), "A configuration file path must be passed to this test as a system property but it was not set");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
-            configurationLayerMock.setSharedConfigurationFile(savedFile.getAbsolutePath());
+            configurationLayerMock.setSharedConfigurationFile(System.getProperty(SIMPLEST_JSON_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY));
 
             // in order to make the test meaningful, make sure the default and mock values are different
             assertNotEquals(Defaults.SHARED_CONFIGURATION_FILE, configurationLayerMock.getSharedConfigurationFile());
@@ -656,13 +652,10 @@ public class ConfigurationTests {
         @DisplayName("Configuration.withPluginConfiguration(MOCK).getConfigurationFile() == MOCK.getConfigurationFile()")
         void getConfigurationFileTest()
             throws Exception {
-            File savedFile = new File(System.getProperty("java.io.tmpdir"), "extended"+this.hashCode()+".json");
-            savedFile.deleteOnExit();
-            FileMapper.save(savedFile.getAbsolutePath(), new SimplestConfigurationExample());
-
+            assertNotNull(System.getProperty(SIMPLEST_JSON_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY), "A configuration file path must be passed to this test as a system property but it was not set");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
-            configurationLayerMock.setConfigurationFile(savedFile.getAbsolutePath());
+            configurationLayerMock.setConfigurationFile(System.getProperty(SIMPLEST_JSON_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY));
 
             // in order to make the test meaningful, make sure the default and mock values are different
             assertNotEquals(Defaults.CONFIGURATION_FILE, configurationLayerMock.getConfigurationFile());
@@ -912,13 +905,10 @@ public class ConfigurationTests {
         @DisplayName("Configuration.withPluginConfiguration(MOCK).getSharedConfigurationFile() == MOCK.getSharedConfigurationFile()")
         void getSharedConfigurationFileTest()
             throws Exception {
-            File savedFile = new File(System.getProperty("java.io.tmpdir"), "extended"+this.hashCode()+".json");
-            savedFile.deleteOnExit();
-            FileMapper.save(savedFile.getAbsolutePath(), new SimplestConfigurationExample());
-
+            assertNotNull(System.getProperty(SIMPLEST_JSON_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY), "A configuration file path must be passed to this test as a system property but it was not set");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
-            configurationLayerMock.setSharedConfigurationFile(savedFile.getAbsolutePath());
+            configurationLayerMock.setSharedConfigurationFile(System.getProperty(SIMPLEST_JSON_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY));
 
             // in order to make the test meaningful, make sure the default and mock values are different
             assertNotEquals(Defaults.SHARED_CONFIGURATION_FILE, configurationLayerMock.getSharedConfigurationFile());
@@ -1054,18 +1044,13 @@ public class ConfigurationTests {
         @DisplayName("Configuration[multiple layers].getConfigurationFile() == MOCK.getConfigurationFile()")
         void getConfigurationFileTest()
             throws Exception {
-            File savedFileLow = new File(System.getProperty("java.io.tmpdir"), "extendedLow"+this.hashCode()+".json");
-            savedFileLow.deleteOnExit();
-            FileMapper.save(savedFileLow.getAbsolutePath(), new SimplestConfigurationExample());
-            File savedFileHigh = new File(System.getProperty("java.io.tmpdir"), "extendedHigh"+this.hashCode()+".json");
-            savedFileHigh.deleteOnExit();
-            FileMapper.save(savedFileHigh.getAbsolutePath(), new SimplestConfigurationExample());
-
+            assertNotNull(System.getProperty(SIMPLEST_JSON_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY), "A configuration file path must be passed to this test as a system property but it was not set");
+            assertNotNull(System.getProperty(SIMPLEST_YAML_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY), "A configuration file path must be passed to this test as a system property but it was not set");
             SimpleConfigurationLayer lowPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             SimpleConfigurationLayer highPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
-            lowPriorityConfigurationLayerMock.setConfigurationFile(savedFileLow.getAbsolutePath());
-            highPriorityConfigurationLayerMock.setConfigurationFile(savedFileHigh.getAbsolutePath());
+            lowPriorityConfigurationLayerMock.setConfigurationFile(System.getProperty(SIMPLEST_JSON_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY));
+            highPriorityConfigurationLayerMock.setConfigurationFile(System.getProperty(SIMPLEST_YAML_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY));
             
             // inject the plugin configuration and test the new value is returned from that
             configuration.withPluginConfiguration(lowPriorityConfigurationLayerMock);
@@ -1247,18 +1232,13 @@ public class ConfigurationTests {
         @DisplayName("Configuration[multiple layers].getSharedConfigurationFile() == MOCK.getSharedConfigurationFile()")
         void getSharedConfigurationFileTest()
             throws Exception {
-            File savedFileLow = new File(System.getProperty("java.io.tmpdir"), "extendedLow"+this.hashCode()+".json");
-            savedFileLow.deleteOnExit();
-            FileMapper.save(savedFileLow.getAbsolutePath(), new SimplestConfigurationExample());
-            File savedFileHigh = new File(System.getProperty("java.io.tmpdir"), "extendedHigh"+this.hashCode()+".json");
-            savedFileHigh.deleteOnExit();
-            FileMapper.save(savedFileHigh.getAbsolutePath(), new SimplestConfigurationExample());
-
+            assertNotNull(System.getProperty(SIMPLEST_JSON_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY), "A configuration file path must be passed to this test as a system property but it was not set");
+            assertNotNull(System.getProperty(SIMPLEST_YAML_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY), "A configuration file path must be passed to this test as a system property but it was not set");
             SimpleConfigurationLayer lowPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             SimpleConfigurationLayer highPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
-            lowPriorityConfigurationLayerMock.setSharedConfigurationFile(savedFileLow.getAbsolutePath());
-            highPriorityConfigurationLayerMock.setSharedConfigurationFile(savedFileHigh.getAbsolutePath());
+            lowPriorityConfigurationLayerMock.setConfigurationFile(System.getProperty(SIMPLEST_JSON_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY));
+            highPriorityConfigurationLayerMock.setConfigurationFile(System.getProperty(SIMPLEST_YAML_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY));
             
             // inject the plugin configuration and test the new value is returned from that
             configuration.withPluginConfiguration(lowPriorityConfigurationLayerMock);

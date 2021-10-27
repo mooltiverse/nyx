@@ -15,6 +15,8 @@
  */
 package com.mooltiverse.oss.nyx.configuration;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.StringWriter;
@@ -23,16 +25,60 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.mooltiverse.oss.nyx.data.FileMapper;
-import com.mooltiverse.oss.nyx.configuration.examples.ExtendedConfigurationExample;
-import com.mooltiverse.oss.nyx.configuration.examples.MediumConfigurationExample;
-import com.mooltiverse.oss.nyx.configuration.examples.SimpleConfigurationExample;
-import com.mooltiverse.oss.nyx.configuration.examples.SimplestConfigurationExample;
 
 /**
  * These are not actual tests but rather examples printed to the standard output for a few configuration files.
  */
 @DisplayName("ConfigurationExamples")
 public class ConfigurationExamples {
+    /**
+     * The name of the system property used to pass the path of the
+     * extended JSON configuration file example to tests.
+     */
+    public static final String EXTENDED_JSON_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY = "extendedJSONExampleConfigurationFile";
+
+    /**
+     * The name of the system property used to pass the path of the
+     * medium JSON configuration file example to tests.
+     */
+    public static final String MEDIUM_JSON_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY = "mediumJSONExampleConfigurationFile";
+
+    /**
+     * The name of the system property used to pass the path of the
+     * simple JSON configuration file example to tests.
+     */
+    public static final String SIMPLE_JSON_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY = "simpleJSONExampleConfigurationFile";
+    
+    /**
+     * The name of the system property used to pass the path of the
+     * simplest JSON configuration file example to tests.
+     */
+    public static final String SIMPLEST_JSON_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY = "simplestJSONExampleConfigurationFile";
+
+    /**
+     * The name of the system property used to pass the path of the
+     * extended YAML configuration file example to tests.
+     */
+    public static final String EXTENDED_YAML_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY = "extendedYAMLExampleConfigurationFile";
+
+    /**
+     * The name of the system property used to pass the path of the
+     * medium YAML configuration file example to tests.
+     */
+    public static final String MEDIUM_YAML_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY = "mediumYAMLExampleConfigurationFile";
+
+    /**
+     * The name of the system property used to pass the path of the
+     * simple YAML configuration file example to tests.
+     */
+    public static final String SIMPLE_YAML_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY = "simpleYAMLExampleConfigurationFile";
+
+    /**
+     * The name of the system property used to pass the path of the
+     * simplest YAML configuration file example to tests.
+     */
+    public static final String SIMPLEST_YAML_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY = "simplestYAMLExampleConfigurationFile";
+
     /**
      * Reads the contents of the given file and returns its content as a string.
      * 
@@ -55,12 +101,19 @@ public class ConfigurationExamples {
     @DisplayName("Simplest YAML configuration")
     void simplestYAMLExample()
         throws Exception {
+        assertNotNull(System.getProperty(SIMPLEST_YAML_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY), "A configuration file path must be passed to this test as a system property but it was not set");
+        File exampleFile = new File(System.getProperty(SIMPLEST_YAML_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY));
         File savedFile = new File(System.getProperty("java.io.tmpdir"), "simplest"+this.hashCode()+".yaml");
-        savedFile.deleteOnExit();
-        FileMapper.save(savedFile.getAbsolutePath(), new SimplestConfigurationExample());
+        FileMapper.save(savedFile.getAbsolutePath(), FileMapper.load(exampleFile, SimpleConfigurationLayer.class));
 
         // print the file to standard output for inspection purpose
         System.out.println("------ Simplest YAML configuration ------");
+        System.out.println("Loading from: "+exampleFile.getAbsolutePath());
+        System.out.println("-----------------------------------------");
+        System.out.println(readFile(exampleFile));
+        System.out.println("-----------------------------------------");
+        System.out.println("Saving to: "+savedFile.getAbsolutePath());
+        System.out.println("-----------------------------------------");
         System.out.println(readFile(savedFile));
         System.out.println("-----------------------------------------");
         System.out.flush();
@@ -70,12 +123,20 @@ public class ConfigurationExamples {
     @DisplayName("Simple YAML configuration")
     void simpleYAMLExample()
         throws Exception {
+        assertNotNull(System.getProperty(SIMPLE_YAML_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY), "A configuration file path must be passed to this test as a system property but it was not set");
+        File exampleFile = new File(System.getProperty(SIMPLE_YAML_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY));
         File savedFile = new File(System.getProperty("java.io.tmpdir"), "simple"+this.hashCode()+".yaml");
         savedFile.deleteOnExit();
-        FileMapper.save(savedFile.getAbsolutePath(), new SimpleConfigurationExample());
+        FileMapper.save(savedFile.getAbsolutePath(), FileMapper.load(exampleFile, SimpleConfigurationLayer.class));
 
         // print the file to standard output for inspection purpose
         System.out.println("------  Simple YAML configuration  ------");
+        System.out.println("Loading from: "+exampleFile.getAbsolutePath());
+        System.out.println("-----------------------------------------");
+        System.out.println(readFile(exampleFile));
+        System.out.println("-----------------------------------------");
+        System.out.println("Saving to: "+savedFile.getAbsolutePath());
+        System.out.println("-----------------------------------------");
         System.out.println(readFile(savedFile));
         System.out.println("-----------------------------------------");
         System.out.flush();
@@ -85,12 +146,20 @@ public class ConfigurationExamples {
     @DisplayName("Medium YAML configuration")
     void mediumYAMLExample()
         throws Exception {
+        assertNotNull(System.getProperty(MEDIUM_YAML_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY), "A configuration file path must be passed to this test as a system property but it was not set");
+        File exampleFile = new File(System.getProperty(MEDIUM_YAML_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY));
         File savedFile = new File(System.getProperty("java.io.tmpdir"), "medium"+this.hashCode()+".yaml");
         savedFile.deleteOnExit();
-        FileMapper.save(savedFile.getAbsolutePath(), new MediumConfigurationExample());
+        FileMapper.save(savedFile.getAbsolutePath(), FileMapper.load(exampleFile, SimpleConfigurationLayer.class));
 
         // print the file to standard output for inspection purpose
         System.out.println("------  Medium YAML configuration  ------");
+        System.out.println("Loading from: "+exampleFile.getAbsolutePath());
+        System.out.println("-----------------------------------------");
+        System.out.println(readFile(exampleFile));
+        System.out.println("-----------------------------------------");
+        System.out.println("Saving to: "+savedFile.getAbsolutePath());
+        System.out.println("-----------------------------------------");
         System.out.println(readFile(savedFile));
         System.out.println("-----------------------------------------");
         System.out.flush();
@@ -100,12 +169,20 @@ public class ConfigurationExamples {
     @DisplayName("Extended YAML configuration")
     void extendedYAMLExample()
         throws Exception {
+        assertNotNull(System.getProperty(EXTENDED_YAML_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY), "A configuration file path must be passed to this test as a system property but it was not set");
+        File exampleFile = new File(System.getProperty(EXTENDED_YAML_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY));
         File savedFile = new File(System.getProperty("java.io.tmpdir"), "extended"+this.hashCode()+".yaml");
         savedFile.deleteOnExit();
-        FileMapper.save(savedFile.getAbsolutePath(), new ExtendedConfigurationExample());
+        FileMapper.save(savedFile.getAbsolutePath(), FileMapper.load(exampleFile, SimpleConfigurationLayer.class));
 
         // print the file to standard output for inspection purpose
         System.out.println("------ Extended YAML configuration ------");
+        System.out.println("Loading from: "+exampleFile.getAbsolutePath());
+        System.out.println("-----------------------------------------");
+        System.out.println(readFile(exampleFile));
+        System.out.println("-----------------------------------------");
+        System.out.println("Saving to: "+savedFile.getAbsolutePath());
+        System.out.println("-----------------------------------------");
         System.out.println(readFile(savedFile));
         System.out.println("-----------------------------------------");
         System.out.flush();
@@ -115,12 +192,20 @@ public class ConfigurationExamples {
     @DisplayName("Simplest JSON configuration")
     void simplestJSONExample()
         throws Exception {
+        assertNotNull(System.getProperty(SIMPLEST_JSON_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY), "A configuration file path must be passed to this test as a system property but it was not set");
+        File exampleFile = new File(System.getProperty(SIMPLEST_JSON_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY));
         File savedFile = new File(System.getProperty("java.io.tmpdir"), "simplest"+this.hashCode()+".json");
         savedFile.deleteOnExit();
-        FileMapper.save(savedFile.getAbsolutePath(), new SimplestConfigurationExample());
+        FileMapper.save(savedFile.getAbsolutePath(), FileMapper.load(exampleFile, SimpleConfigurationLayer.class));
 
         // print the file to standard output for inspection purpose
         System.out.println("------ Simplest JSON configuration ------");
+        System.out.println("Loading from: "+exampleFile.getAbsolutePath());
+        System.out.println("-----------------------------------------");
+        System.out.println(readFile(exampleFile));
+        System.out.println("-----------------------------------------");
+        System.out.println("Saving to: "+savedFile.getAbsolutePath());
+        System.out.println("-----------------------------------------");
         System.out.println(readFile(savedFile));
         System.out.println("-----------------------------------------");
         System.out.flush();
@@ -130,12 +215,19 @@ public class ConfigurationExamples {
     @DisplayName("Simple JSON configuration")
     void simpleJSONExample()
         throws Exception {
+        assertNotNull(System.getProperty(SIMPLE_JSON_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY), "A configuration file path must be passed to this test as a system property but it was not set");
+        File exampleFile = new File(System.getProperty(SIMPLE_JSON_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY));
         File savedFile = new File(System.getProperty("java.io.tmpdir"), "simple"+this.hashCode()+".json");
         savedFile.deleteOnExit();
-        FileMapper.save(savedFile.getAbsolutePath(), new SimpleConfigurationExample());
+        FileMapper.save(savedFile.getAbsolutePath(), FileMapper.load(exampleFile, SimpleConfigurationLayer.class));
 
         // print the file to standard output for inspection purpose
         System.out.println("------  Simple JSON configuration  ------");
+        System.out.println("-----------------------------------------");
+        System.out.println(readFile(exampleFile));
+        System.out.println("-----------------------------------------");
+        System.out.println("Saving to: "+savedFile.getAbsolutePath());
+        System.out.println("-----------------------------------------");
         System.out.println(readFile(savedFile));
         System.out.println("-----------------------------------------");
         System.out.flush();
@@ -145,12 +237,20 @@ public class ConfigurationExamples {
     @DisplayName("Medium JSON configuration")
     void mediumJSONExample()
         throws Exception {
+        assertNotNull(System.getProperty(MEDIUM_JSON_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY), "A configuration file path must be passed to this test as a system property but it was not set");
+        File exampleFile = new File(System.getProperty(MEDIUM_JSON_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY));
         File savedFile = new File(System.getProperty("java.io.tmpdir"), "medium"+this.hashCode()+".json");
         savedFile.deleteOnExit();
-        FileMapper.save(savedFile.getAbsolutePath(), new MediumConfigurationExample());
+        FileMapper.save(savedFile.getAbsolutePath(), FileMapper.load(exampleFile, SimpleConfigurationLayer.class));
 
         // print the file to standard output for inspection purpose
         System.out.println("------  Medium JSON configuration  ------");
+        System.out.println("Loading from: "+exampleFile.getAbsolutePath());
+        System.out.println("-----------------------------------------");
+        System.out.println(readFile(exampleFile));
+        System.out.println("-----------------------------------------");
+        System.out.println("Saving to: "+savedFile.getAbsolutePath());
+        System.out.println("-----------------------------------------");
         System.out.println(readFile(savedFile));
         System.out.println("-----------------------------------------");
         System.out.flush();
@@ -160,12 +260,20 @@ public class ConfigurationExamples {
     @DisplayName("Extended JSON configuration")
     void extendedJSONExample()
         throws Exception {
+        assertNotNull(System.getProperty(EXTENDED_JSON_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY), "A configuration file path must be passed to this test as a system property but it was not set");
+        File exampleFile = new File(System.getProperty(EXTENDED_JSON_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY));
         File savedFile = new File(System.getProperty("java.io.tmpdir"), "extended"+this.hashCode()+".json");
         savedFile.deleteOnExit();
-        FileMapper.save(savedFile.getAbsolutePath(), new ExtendedConfigurationExample());
+        FileMapper.save(savedFile.getAbsolutePath(), FileMapper.load(exampleFile, SimpleConfigurationLayer.class));
 
         // print the file to standard output for inspection purpose
         System.out.println("------ Extended JSON configuration ------");
+        System.out.println("Loading from: "+exampleFile.getAbsolutePath());
+        System.out.println("-----------------------------------------");
+        System.out.println(readFile(exampleFile));
+        System.out.println("-----------------------------------------");
+        System.out.println("Saving to: "+savedFile.getAbsolutePath());
+        System.out.println("-----------------------------------------");
         System.out.println(readFile(savedFile));
         System.out.println("-----------------------------------------");
         System.out.flush();

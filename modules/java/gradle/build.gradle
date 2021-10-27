@@ -30,6 +30,15 @@ dependencies {
   testImplementation project(path: ':modules:java:lib:main', configuration: 'testExport')
 }
 
+functionalTest {
+  // Pass the name of the configuration file examples to tests.
+  // We use the same files used for the documentation here.
+  systemProperty 'extendedGROOVYExampleConfigurationFile', file("$rootDir/docs/_includes/.nyx-extended.groovy").absolutePath
+  systemProperty 'mediumGROOVYExampleConfigurationFile', file("$rootDir/docs/_includes/.nyx-medium.groovy").absolutePath
+  systemProperty 'simpleGROOVYExampleConfigurationFile', file("$rootDir/docs/_includes/.nyx-simple.groovy").absolutePath
+  systemProperty 'simplestGROOVYExampleConfigurationFile', file("$rootDir/docs/_includes/.nyx-simplest.groovy").absolutePath
+}
+
 /*------------------------------------------------------------------------------
   Extension configurations
 ------------------------------------------------------------------------------*/

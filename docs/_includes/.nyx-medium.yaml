@@ -9,6 +9,7 @@ commitMessageConventions:
         major: "(?s)(?m)^[a-zA-Z0-9_]+(!|.*^(BREAKING( |-)CHANGE: )).*"
         minor: "(?s)(?m)^feat(?!!|.*^(BREAKING( |-)CHANGE: )).*"
         patch: "(?s)(?m)^fix(?!!|.*^(BREAKING( |-)CHANGE: )).*"
+dryRun: false
 initialVersion: "0.1.0"
 releaseLenient: true
 releasePrefix: v
@@ -64,5 +65,4 @@ releaseTypes:
       publish: "false"
       versionRangeFromBranchName: false
 scheme: "SEMVER"
-stateFile: ".nyx-state.yml"
 verbosity: "INFO"

@@ -12,8 +12,8 @@ nyx {
       }
     }
   }
+  dryRun = false
   initialVersion = '0.1.0'
-  stateFile = '.nyx-state.yml'
   releaseLenient = true
   releasePrefix = 'v'
   releaseTypes {
@@ -73,6 +73,5 @@ nyx {
     }
   }
   scheme = 'SEMVER'
-  stateFile = '.nyx-state.yml'
   verbosity = 'INFO'
 }
