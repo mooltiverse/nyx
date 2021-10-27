@@ -232,6 +232,37 @@ public class Versions {
     }
 
     /**
+     * Returns the most relevant identifier between the given arguments, according to the given scheme ordering, or {@code null}
+     * if both arguments are {@code null}.
+     * 
+     * @param scheme the scheme to peek the most relevand item from
+     * @param identifier1 the first identifier to inspect
+     * @param identifier2 the secondt identifier to inspect
+     * 
+     * @return the most relevant identifier between the given arguments, according to the given scheme ordering, or {@code null}
+     * if both arguments are {@code null}.
+     * 
+     * @see SemanticVersion#getIdentifierComparator()
+     */
+    public static String mostRelevantIdentifier(Scheme scheme, String identifier1, String identifier2) {
+        if (Objects.isNull(identifier1))
+            return identifier2;
+        else if (Objects.isNull(identifier2))
+        return identifier1;
+
+        Comparator<String> comparator = null;
+        switch (scheme) {
+            case SEMVER: {
+                comparator = SemanticVersion.getIdentifierComparator();
+                break;
+            }
+            //MAVEN: not yet supported
+            default: throw new IllegalArgumentException(String.format("Illegal or unsupported scheme %s", scheme));
+        }
+        return (comparator.compare(identifier1, identifier2) < 0) ? identifier1 : identifier2;
+    }
+
+    /**
      * Returns a Version instance representing the specified String value. No sanitization attempt is done.
      *
      * @param scheme the scheme the version belongs to
