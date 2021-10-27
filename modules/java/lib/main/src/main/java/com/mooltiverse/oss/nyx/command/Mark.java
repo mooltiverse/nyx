@@ -155,11 +155,16 @@ public class Mark extends AbstractCommand {
      * <br>
      * Inputs to this task are:<br>
      * - the Git repository and the commit history;<br>
+     * - the {@code releaseType} {@link #state()} attribute group, bringing flags for operations (commit, tag, push)
+     *   to be performed or not. More specifically these attributes are {@code releaseType/gitCommit}, {@code releaseType/gitTag},
+     *   and {@code releaseType/gitPush}, plus {@code releaseType/gitCommitMessage} and {@code releaseType/gitTagMessage}
+     *   telling the format of messages
      * - the {@code releaseScope/initialCommit} with the SHA-1 of the initial commit in the release scope; if {@code null}
      *   this task just exits taking no act
      * - the {@code newVersion} {@link #state()} flag, that must be {@code true} for this task to run, otherwise it just skips
      * <br>
-     * Outputs from this task are all stored in the State object, with more detail:<br>
+     * Outputs from this task are operations executed on the Git repository plus some attributes stored in the State object
+     * with more detail:<br>
      * - the {@code releaseScope/finalCommit} is defined with the SHA-1 of the last commit, which may be a new
      *   commit created by this task (if pending changes are found and if configured to do so) or the most recent
      *   commit that in the current branch; if the user overrides the version by configuration
