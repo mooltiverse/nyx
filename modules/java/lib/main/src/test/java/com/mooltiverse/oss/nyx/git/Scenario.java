@@ -200,6 +200,139 @@ public enum Scenario {
     ),
 
     /**
+     * The scenario where the Git repository has been created with five unmerged branches
+     * and commit messages bring the identifier to bump.
+     * This yields to a repository like:
+     * 
+     * <pre>
+     *   * 4138eb0 (tag: 0.3.3, taggedwithbump) patch 3
+     *   * ea77e30 (tag: 0.3.2) minor 2
+     *   * 0a5a452 (tag: 0.3.1) patch 1
+     *   | * 58f0450 (tag: 0.2.3, taggedwithoutbump) Commit cxl
+     *   | * 5a25593 (tag: 0.2.2) Commit ale
+     *   | * 125a5f4 (tag: 0.2.1) Commit its
+     *   |/  
+     *   | * fe94837 (untaggedwithbump) patch 6
+     *   | * f6819f5 minor 5
+     *   | * 79977b5 patch 4
+     *   |/  
+     *   | * 387677a (untaggedwithoutbump) Commit kyh
+     *   | * 095690e Commit gdq
+     *   | * 5484622 Commit fhy
+     *   |/  
+     *   * cd259bc (HEAD -> gamma, tag: 0.0.1, master) 
+     *   * 48f4b7f Initial commit
+     * </pre>
+     */
+    FIVE_BRANCH_UNMERGED_BUMPING( f -> Script.fromScratch(f).andAddFiles()
+        .andCommit("Initial commit")
+        .inBranch("master")              .andAddFiles().andCommit("").andTag("0.0.1", null)
+        .inBranch("master")
+        .inBranch("taggedwithoutbump")   .andAddFiles().andCommit(null).andTag("0.2.1", null)
+        .inBranch("taggedwithoutbump")   .andAddFiles().andCommit(null).andTag("0.2.2", null)
+        .inBranch("taggedwithoutbump")   .andAddFiles().andCommit(null).andTag("0.2.3", null)
+        .inBranch("master")
+        .inBranch("taggedwithbump")      .andAddFiles().andCommit("patch 1").andTag("0.3.1", null)
+        .inBranch("taggedwithbump")      .andAddFiles().andCommit("minor 2").andTag("0.3.2", null)
+        .inBranch("taggedwithbump")      .andAddFiles().andCommit("patch 3").andTag("0.3.3", null)
+        .inBranch("master")
+        .inBranch("untaggedwithoutbump") .andAddFiles().andCommit(null)
+        .inBranch("untaggedwithoutbump") .andAddFiles().andCommit(null)
+        .inBranch("untaggedwithoutbump") .andAddFiles().andCommit(null)
+        .inBranch("master")
+        .inBranch("untaggedwithbump")    .andAddFiles().andCommit("patch 4")
+        .inBranch("untaggedwithbump")    .andAddFiles().andCommit("minor 5")
+        .inBranch("untaggedwithbump")    .andAddFiles().andCommit("patch 6")
+        .inBranch("master")
+    ),
+
+    /**
+     * The scenario where the Git repository has been created with five unmerged branches
+     * and commit messages bring the identifier to bump. The repository is assumed to use
+     * collapsed versioning.
+     * This yields to a repository like:
+     * 
+     * <pre>
+     *   * a9ee0e0 (eta) Commit glq
+     *   * 519c3e8 (tag: 1.0.0-eta.3) patch 12
+     *   * ba9df35 (tag: 1.0.0-eta.2) minor 11
+     *   * d8602a5 (tag: 1.0.0-eta.1) patch 10
+     *   | * b172638 (theta) patch 15
+     *   | * 51f98e1 minor 14
+     *   | * df952e6 patch 13
+     *   |/  
+     *   | * 3a4ea57 (tag: 1.0.0-alpha.3, alpha) Commit blo
+     *   | * 34db654 (tag: 1.0.0-alpha.2) Commit ubp
+     *   | * bf0ac9e (tag: 1.0.0-alpha.1) Commit mms
+     *   |/  
+     *   | * 98a699c (tag: 1.0.0-beta.3, beta) patch 3
+     *   | * a18393b (tag: 1.0.0-beta.2) minor 2
+     *   | * d6f23df (tag: 1.0.0-beta.1) patch 1
+     *   |/  
+     *   | * f146e94 (HEAD -> delta) patch 6
+     *   | * 3516d03 minor 5
+     *   | * 70c1691 patch 4
+     *   |/  
+     *   | * 0e8d6c2 (epsilon) Commit syw
+     *   | * 4dd91b8 (tag: 1.0.0-epsilon.3) Commit zdr
+     *   | * ff60ee7 (tag: 1.0.0-epsilon.2) Commit sbq
+     *   | * e8e2e83 (tag: 1.0.0-epsilon.1) Commit umm
+     *   |/  
+     *   | * 025a281 (gamma) Commit nrj
+     *   | * e61fd7a Commit bmq
+     *   | * 0cf681d Commit fsv
+     *   |/  
+     *   | * 12dd283 (tag: 1.0.0-zeta.4, zeta) Commit dyf
+     *   | * 3093108 (tag: 1.0.0-zeta.3) patch 9
+     *   | * 2700ace (tag: 1.0.0-zeta.2) minor 8
+     *   | * 6e37362 (tag: 1.0.0-zeta.1) patch 7
+     *   |/  
+     *   * eb38e63 (tag: 0.0.1, master) 
+     *   * c853750 Initial commit
+     * </pre>
+     */
+    FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED( f -> Script.fromScratch(f).andAddFiles()
+        .andCommit("Initial commit")
+        .inBranch("master")  .andAddFiles().andCommit("").andTag("0.0.1", null)
+        .inBranch("master")
+        .inBranch("alpha")   .andAddFiles().andCommit(null).andTag("1.0.0-alpha.1", null)
+        .inBranch("alpha")   .andAddFiles().andCommit(null).andTag("1.0.0-alpha.2", null)
+        .inBranch("alpha")   .andAddFiles().andCommit(null).andTag("1.0.0-alpha.3", null)
+        .inBranch("master")
+        .inBranch("beta")    .andAddFiles().andCommit("patch 1").andTag("1.0.0-beta.1", null)
+        .inBranch("beta")    .andAddFiles().andCommit("minor 2").andTag("1.0.0-beta.2", null)
+        .inBranch("beta")    .andAddFiles().andCommit("patch 3").andTag("1.0.0-beta.3", null)
+        .inBranch("master")
+        .inBranch("gamma")   .andAddFiles().andCommit(null)
+        .inBranch("gamma")   .andAddFiles().andCommit(null)
+        .inBranch("gamma")   .andAddFiles().andCommit(null)
+        .inBranch("master")
+        .inBranch("delta")   .andAddFiles().andCommit("patch 4")
+        .inBranch("delta")   .andAddFiles().andCommit("minor 5")
+        .inBranch("delta")   .andAddFiles().andCommit("patch 6")
+        .inBranch("master")
+        .inBranch("epsilon") .andAddFiles().andCommit(null).andTag("1.0.0-epsilon.1", null)
+        .inBranch("epsilon") .andAddFiles().andCommit(null).andTag("1.0.0-epsilon.2", null)
+        .inBranch("epsilon") .andAddFiles().andCommit(null).andTag("1.0.0-epsilon.3", null)
+        .inBranch("epsilon") .andAddFiles().andCommit(null)
+        .inBranch("master")
+        .inBranch("zeta")    .andAddFiles().andCommit("patch 7").andTag("1.0.0-zeta.1", null)
+        .inBranch("zeta")    .andAddFiles().andCommit("minor 8").andTag("1.0.0-zeta.2", null)
+        .inBranch("zeta")    .andAddFiles().andCommit("patch 9").andTag("1.0.0-zeta.3", null)
+        .inBranch("zeta")    .andAddFiles().andCommit(null).andTag("1.0.0-zeta.4", null)
+        .inBranch("master")
+        .inBranch("eta")     .andAddFiles().andCommit("patch 10").andTag("1.0.0-eta.1", null)
+        .inBranch("eta")     .andAddFiles().andCommit("minor 11").andTag("1.0.0-eta.2", null)
+        .inBranch("eta")     .andAddFiles().andCommit("patch 12").andTag("1.0.0-eta.3", null)
+        .inBranch("eta")     .andAddFiles().andCommit(null)
+        .inBranch("master")
+        .inBranch("theta")   .andAddFiles().andCommit("patch 13")
+        .inBranch("theta")   .andAddFiles().andCommit("minor 14")
+        .inBranch("theta")   .andAddFiles().andCommit("patch 15")
+        .inBranch("master")
+    ),
+
+    /**
      * The scenario where the Git repository has been created with several branches
      * (all those contemplated in the {@link com.mooltiverse.oss.nyx.configuration.presets.Extended} preset).
      * <br>

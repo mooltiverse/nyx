@@ -2732,7 +2732,7 @@ public class InferTestTemplates {
             assertEquals(script.getCommitByTag("0.0.6-integration.2"), command.state().getReleaseScope().getPreviousVersionCommit());
             assertEquals("0.0.5", command.state().getReleaseScope().getPrimeVersion());
             assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPrimeVersionCommit());
-            assertEquals(4, command.state().getReleaseScope().getSignificantCommits().size());
+            assertEquals(1, command.state().getReleaseScope().getSignificantCommits().size());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
@@ -2960,7 +2960,7 @@ public class InferTestTemplates {
             assertEquals(script.getCommitByTag("0.0.6-alpha.2"), command.state().getReleaseScope().getPreviousVersionCommit());
             assertEquals("0.0.5", command.state().getReleaseScope().getPrimeVersion());
             assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPrimeVersionCommit());
-            assertEquals(7, command.state().getReleaseScope().getSignificantCommits().size());
+            assertEquals(1, command.state().getReleaseScope().getSignificantCommits().size());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
@@ -3074,7 +3074,7 @@ public class InferTestTemplates {
             assertEquals(script.getCommitByTag("0.0.6-beta.2"), command.state().getReleaseScope().getPreviousVersionCommit());
             assertEquals("0.0.5", command.state().getReleaseScope().getPrimeVersion());
             assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPrimeVersionCommit());
-            assertEquals(10, command.state().getReleaseScope().getSignificantCommits().size());
+            assertEquals(1, command.state().getReleaseScope().getSignificantCommits().size());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
@@ -3436,7 +3436,7 @@ public class InferTestTemplates {
             assertEquals(script.getCommitByTag("0.0.6-rel.2"), command.state().getReleaseScope().getPreviousVersionCommit());
             assertEquals("0.0.5", command.state().getReleaseScope().getPrimeVersion());
             assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPrimeVersionCommit());
-            assertEquals(4, command.state().getReleaseScope().getSignificantCommits().size());
+            assertEquals(1, command.state().getReleaseScope().getSignificantCommits().size());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
@@ -3570,7 +3570,7 @@ public class InferTestTemplates {
             assertEquals(script.getCommitByTag("0.0.6-featuresso.2"), command.state().getReleaseScope().getPreviousVersionCommit());
             assertEquals("0.0.5", command.state().getReleaseScope().getPrimeVersion());
             assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPrimeVersionCommit());
-            assertEquals(7, command.state().getReleaseScope().getSignificantCommits().size());
+            assertEquals(1, command.state().getReleaseScope().getSignificantCommits().size());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
@@ -3798,7 +3798,7 @@ public class InferTestTemplates {
             assertEquals(script.getCommitByTag("0.0.8-fix98765.2"), command.state().getReleaseScope().getPreviousVersionCommit());
             assertEquals("0.0.7", command.state().getReleaseScope().getPrimeVersion());
             assertEquals(script.getCommitByTag("0.0.7"), command.state().getReleaseScope().getPrimeVersionCommit());
-            assertEquals(5, command.state().getReleaseScope().getSignificantCommits().size());
+            assertEquals(1, command.state().getReleaseScope().getSignificantCommits().size());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
@@ -3912,7 +3912,7 @@ public class InferTestTemplates {
             assertEquals(script.getCommitByTag("0.0.6-internal.1+timestamp.003"), command.state().getReleaseScope().getPreviousVersionCommit());
             assertEquals("0.0.5", command.state().getReleaseScope().getPrimeVersion());
             assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPrimeVersionCommit());
-            assertEquals(8, command.state().getReleaseScope().getSignificantCommits().size());
+            assertEquals(1, command.state().getReleaseScope().getSignificantCommits().size());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
@@ -4276,7 +4276,7 @@ public class InferTestTemplates {
             assertEquals(script.getCommitByTag("0.0.6-internal.1+timestamp.003"), command.state().getReleaseScope().getPreviousVersionCommit());
             assertEquals("0.0.5", command.state().getReleaseScope().getPrimeVersion());
             assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPrimeVersionCommit());
-            assertEquals(8, command.state().getReleaseScope().getSignificantCommits().size());
+            assertEquals(1, command.state().getReleaseScope().getSignificantCommits().size());
             assertTrue(command.state().getReleaseType().getCollapseVersions());
             assertEquals("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}", command.state().getReleaseType().getCollapsedVersionQualifier());
             assertNull(command.state().getReleaseType().getFilterTags());
@@ -4367,6 +4367,808 @@ public class InferTestTemplates {
             assertFalse(command.state().getNewRelease());
             assertEquals("0.0.6-internal.1+timestamp.003", command.state().getVersion());
             assertNull(command.state().getVersionRange());
+        }
+
+        @TestTemplate
+        @DisplayName("Infer.run() inferring a custom flat release type on repository with several branches and commits, with a commit message convention that infers bump identifier from commit messages, in master branch > yield to no new version or release")
+        @Baseline(Scenario.FIVE_BRANCH_UNMERGED_BUMPING)
+        void runUsingCustomFlatReleaseTypeWithInferringCommitConventionInMasterBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
+            throws Exception {
+            script.checkout("master");
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            // add a custom release type that matches any branch
+            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeMain", new ReleaseType() {
+                {
+                    setMatchBranches(".*");
+                }}
+            );
+            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("testReleaseTypeMain"));
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            // add a mock convention that takes the commit message as the identifier to bump, if any
+            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*"))));
+            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+
+            command.run();
+
+            assertEquals("master", command.state().getBranch());
+            assertNull(command.state().getBump());
+            assertEquals(Defaults.SCHEME, command.state().getScheme());
+            assertEquals(0, command.state().getReleaseScope().getCommits().size());
+            assertNull(command.state().getReleaseScope().getInitialCommit());
+            assertNull(command.state().getReleaseScope().getFinalCommit());
+            assertEquals("0.0.1", command.state().getReleaseScope().getPreviousVersion());
+            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals("0.0.1", command.state().getReleaseScope().getPrimeVersion());
+            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
+            assertFalse(command.state().getReleaseType().getCollapseVersions());
+            assertNull(command.state().getReleaseType().getCollapsedVersionQualifier());
+            assertNull(command.state().getReleaseType().getFilterTags());
+            assertEquals(Defaults.ReleaseType.GIT_COMMIT, command.state().getReleaseType().getGitCommit());
+            assertEquals(Defaults.ReleaseType.GIT_COMMIT_MESSAGE, command.state().getReleaseType().getGitCommitMessage());
+            assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
+            assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
+            assertEquals(".*", command.state().getReleaseType().getMatchBranches());
+            assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
+            assertEquals(Defaults.ReleaseType.MATCH_WORKSPACE_STATUS, command.state().getReleaseType().getMatchWorkspaceStatus());
+            assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
+            assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
+            assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertFalse(command.state().getNewVersion());
+            assertFalse(command.state().getNewRelease());
+            assertEquals("0.0.1", command.state().getVersion());
+        }
+
+        @TestTemplate
+        @DisplayName("Infer.run() inferring a custom flat release type on repository with several branches and commits, with a commit message convention that infers bump identifier from commit messages, in taggedwithoutbump branch > yield to no new version or release")
+        @Baseline(Scenario.FIVE_BRANCH_UNMERGED_BUMPING)
+        void runUsingCustomFlatReleaseTypeWithInferringCommitConventionInTaggedwithoutbumpBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
+            throws Exception {
+            script.checkout("taggedwithoutbump");
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            // add a custom release type that matches any branch
+            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeMain", new ReleaseType() {
+                {
+                    setMatchBranches(".*");
+                }}
+            );
+            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("testReleaseTypeMain"));
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            // add a mock convention that takes the commit message as the identifier to bump, if any
+            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*"))));
+            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+
+            command.run();
+
+            assertEquals("taggedwithoutbump", command.state().getBranch());
+            assertNull(command.state().getBump());
+            assertEquals(Defaults.SCHEME, command.state().getScheme());
+            assertEquals(0, command.state().getReleaseScope().getCommits().size());
+            assertNull(command.state().getReleaseScope().getInitialCommit());
+            assertNull(command.state().getReleaseScope().getFinalCommit());
+            assertEquals("0.2.3", command.state().getReleaseScope().getPreviousVersion());
+            assertEquals(script.getCommitByTag("0.2.3"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals("0.2.3", command.state().getReleaseScope().getPrimeVersion());
+            assertEquals(script.getCommitByTag("0.2.3"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
+            assertFalse(command.state().getReleaseType().getCollapseVersions());
+            assertNull(command.state().getReleaseType().getCollapsedVersionQualifier());
+            assertNull(command.state().getReleaseType().getFilterTags());
+            assertEquals(Defaults.ReleaseType.GIT_COMMIT, command.state().getReleaseType().getGitCommit());
+            assertEquals(Defaults.ReleaseType.GIT_COMMIT_MESSAGE, command.state().getReleaseType().getGitCommitMessage());
+            assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
+            assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
+            assertEquals(".*", command.state().getReleaseType().getMatchBranches());
+            assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
+            assertEquals(Defaults.ReleaseType.MATCH_WORKSPACE_STATUS, command.state().getReleaseType().getMatchWorkspaceStatus());
+            assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
+            assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
+            assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertFalse(command.state().getNewVersion());
+            assertFalse(command.state().getNewRelease());
+            assertEquals("0.2.3", command.state().getVersion());
+        }
+
+        @TestTemplate
+        @DisplayName("Infer.run() inferring a custom flat release type on repository with several branches and commits, with a commit message convention that infers bump identifier from commit messages, in taggedwithbump branch > yield to no new version or release")
+        @Baseline(Scenario.FIVE_BRANCH_UNMERGED_BUMPING)
+        void runUsingCustomFlatReleaseTypeWithInferringCommitConventionInTaggedwithbumpBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
+            throws Exception {
+            script.checkout("taggedwithbump");
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            // add a custom release type that matches any branch
+            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeMain", new ReleaseType() {
+                {
+                    setMatchBranches(".*");
+                }}
+            );
+            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("testReleaseTypeMain"));
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            // add a mock convention that takes the commit message as the identifier to bump, if any
+            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*"))));
+            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+
+            command.run();
+
+            assertEquals("taggedwithbump", command.state().getBranch());
+            assertNull(command.state().getBump());
+            assertEquals(Defaults.SCHEME, command.state().getScheme());
+            assertEquals(0, command.state().getReleaseScope().getCommits().size());
+            assertNull(command.state().getReleaseScope().getInitialCommit());
+            assertNull(command.state().getReleaseScope().getFinalCommit());
+            assertEquals("0.3.3", command.state().getReleaseScope().getPreviousVersion());
+            assertEquals(script.getCommitByTag("0.3.3"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals("0.3.3", command.state().getReleaseScope().getPrimeVersion());
+            assertEquals(script.getCommitByTag("0.3.3"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
+            assertFalse(command.state().getReleaseType().getCollapseVersions());
+            assertNull(command.state().getReleaseType().getCollapsedVersionQualifier());
+            assertNull(command.state().getReleaseType().getFilterTags());
+            assertEquals(Defaults.ReleaseType.GIT_COMMIT, command.state().getReleaseType().getGitCommit());
+            assertEquals(Defaults.ReleaseType.GIT_COMMIT_MESSAGE, command.state().getReleaseType().getGitCommitMessage());
+            assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
+            assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
+            assertEquals(".*", command.state().getReleaseType().getMatchBranches());
+            assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
+            assertEquals(Defaults.ReleaseType.MATCH_WORKSPACE_STATUS, command.state().getReleaseType().getMatchWorkspaceStatus());
+            assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
+            assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
+            assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertFalse(command.state().getNewVersion());
+            assertFalse(command.state().getNewRelease());
+            assertEquals("0.3.3", command.state().getVersion());
+        }
+
+        @TestTemplate
+        @DisplayName("Infer.run() inferring a custom flat release type on repository with several branches and commits, with a commit message convention that infers bump identifier from commit messages, in untaggedwithoutbump branch > yield to no new version or release")
+        @Baseline(Scenario.FIVE_BRANCH_UNMERGED_BUMPING)
+        void runUsingCustomFlatReleaseTypeWithInferringCommitConventionInUntaggedwithoutbumpBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
+            throws Exception {
+            script.checkout("untaggedwithoutbump");
+
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            // add a custom release type that matches any branch
+            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeMain", new ReleaseType() {
+                {
+                    setMatchBranches(".*");
+                }}
+            );
+            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("testReleaseTypeMain"));
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            // add a mock convention that takes the commit message as the identifier to bump, if any
+            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*"))));
+            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+
+            command.run();
+
+            assertEquals("untaggedwithoutbump", command.state().getBranch());
+            assertNull(command.state().getBump());
+            assertEquals(Defaults.SCHEME, command.state().getScheme());
+            assertEquals(3, command.state().getReleaseScope().getCommits().size());
+            assertEquals(script.getCommitIDs().get(2), command.state().getReleaseScope().getInitialCommit());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals("0.0.1", command.state().getReleaseScope().getPreviousVersion());
+            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals("0.0.1", command.state().getReleaseScope().getPrimeVersion());
+            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
+            assertFalse(command.state().getReleaseType().getCollapseVersions());
+            assertNull(command.state().getReleaseType().getCollapsedVersionQualifier());
+            assertNull(command.state().getReleaseType().getFilterTags());
+            assertEquals(Defaults.ReleaseType.GIT_COMMIT, command.state().getReleaseType().getGitCommit());
+            assertEquals(Defaults.ReleaseType.GIT_COMMIT_MESSAGE, command.state().getReleaseType().getGitCommitMessage());
+            assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
+            assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
+            assertEquals(".*", command.state().getReleaseType().getMatchBranches());
+            assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
+            assertEquals(Defaults.ReleaseType.MATCH_WORKSPACE_STATUS, command.state().getReleaseType().getMatchWorkspaceStatus());
+            assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
+            assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
+            assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertFalse(command.state().getNewVersion());
+            assertFalse(command.state().getNewRelease());
+            assertEquals("0.0.1", command.state().getVersion());
+        }
+
+        @TestTemplate
+        @DisplayName("Infer.run() inferring a custom flat release type on repository with several branches and commits, with a commit message convention that infers bump identifier from commit messages, in untaggedwithbump branch > yield to no new version or release")
+        @Baseline(Scenario.FIVE_BRANCH_UNMERGED_BUMPING)
+        void runUsingCustomFlatReleaseTypeWithInferringCommitConventionInUntaggedwithbumpBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
+            throws Exception {
+            script.checkout("untaggedwithbump");
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            // add a custom release type that matches any branch
+            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeMain", new ReleaseType() {
+                {
+                    setMatchBranches(".*");
+                }}
+            );
+            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("testReleaseTypeMain"));
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            // add a mock convention that takes the commit message as the identifier to bump, if any
+            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*"))));
+            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+
+            command.run();
+
+            assertEquals("untaggedwithbump", command.state().getBranch());
+            assertEquals("minor", command.state().getBump());
+            assertEquals(Defaults.SCHEME, command.state().getScheme());
+            assertEquals(3, command.state().getReleaseScope().getCommits().size());
+            assertEquals(script.getCommitIDs().get(2), command.state().getReleaseScope().getInitialCommit());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals("0.0.1", command.state().getReleaseScope().getPreviousVersion());
+            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals("0.0.1", command.state().getReleaseScope().getPrimeVersion());
+            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(3, command.state().getReleaseScope().getSignificantCommits().size());
+            assertFalse(command.state().getReleaseType().getCollapseVersions());
+            assertNull(command.state().getReleaseType().getCollapsedVersionQualifier());
+            assertNull(command.state().getReleaseType().getFilterTags());
+            assertEquals(Defaults.ReleaseType.GIT_COMMIT, command.state().getReleaseType().getGitCommit());
+            assertEquals(Defaults.ReleaseType.GIT_COMMIT_MESSAGE, command.state().getReleaseType().getGitCommitMessage());
+            assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
+            assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
+            assertEquals(".*", command.state().getReleaseType().getMatchBranches());
+            assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
+            assertEquals(Defaults.ReleaseType.MATCH_WORKSPACE_STATUS, command.state().getReleaseType().getMatchWorkspaceStatus());
+            assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
+            assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
+            assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertTrue(command.state().getNewVersion());
+            assertFalse(command.state().getNewRelease());
+            assertEquals("0.1.0", command.state().getVersion());
+        }
+
+        @TestTemplate
+        @DisplayName("Infer.run() inferring a custom collapsed release type on repository with several branches and commits, with a commit message convention that infers bump identifier from commit messages, in master branch > yield to no new version or release")
+        @Baseline(Scenario.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED)
+        void runUsingCustomCollapsedReleaseTypeWithInferringCommitConventionInMasterBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
+            throws Exception {
+            script.checkout("master");
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            // add a custom release type that matches any branch
+            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeMain", new ReleaseType() {
+                {
+                    setMatchBranches("^(master|main)$");    // match main and master
+                }}
+            );
+            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeCollapsed", new ReleaseType() {
+                {
+                    setCollapseVersions(Boolean.TRUE);
+                    setCollapsedVersionQualifier("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}");
+                    setFilterTags("^([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$");
+                    setMatchBranches(".*");  // match any branch (this is the fallback release type)
+                }}
+            );
+            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("testReleaseTypeMain", "testReleaseTypeCollapsed"));
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            // add a mock convention that takes the commit message as the identifier to bump, if any
+            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*"))));
+            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+
+            command.run();
+
+            assertEquals("master", command.state().getBranch());
+            assertNull(command.state().getBump());
+            assertEquals(Defaults.SCHEME, command.state().getScheme());
+            assertEquals(0, command.state().getReleaseScope().getCommits().size());
+            assertNull(command.state().getReleaseScope().getInitialCommit());
+            assertNull(command.state().getReleaseScope().getFinalCommit());
+            assertEquals("0.0.1", command.state().getReleaseScope().getPreviousVersion());
+            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals("0.0.1", command.state().getReleaseScope().getPrimeVersion());
+            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
+            assertFalse(command.state().getReleaseType().getCollapseVersions());
+            assertNull(command.state().getReleaseType().getCollapsedVersionQualifier());
+            assertNull(command.state().getReleaseType().getFilterTags());
+            assertEquals(Defaults.ReleaseType.GIT_COMMIT, command.state().getReleaseType().getGitCommit());
+            assertEquals(Defaults.ReleaseType.GIT_COMMIT_MESSAGE, command.state().getReleaseType().getGitCommitMessage());
+            assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
+            assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
+            assertEquals("^(master|main)$", command.state().getReleaseType().getMatchBranches());
+            assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
+            assertEquals(Defaults.ReleaseType.MATCH_WORKSPACE_STATUS, command.state().getReleaseType().getMatchWorkspaceStatus());
+            assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
+            assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
+            assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertFalse(command.state().getNewVersion());
+            assertFalse(command.state().getNewRelease());
+            assertEquals("0.0.1", command.state().getVersion());
+        }
+
+        @TestTemplate
+        @DisplayName("Infer.run() inferring a custom collapsed release type on repository with several branches and commits, with a commit message convention that infers bump identifier from commit messages, in alpha branch > yield to no new version or release")
+        @Baseline(Scenario.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED)
+        void runUsingCustomCollapsedReleaseTypeWithInferringCommitConventionInAlphaBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
+            throws Exception {
+            script.checkout("alpha");
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            // add a custom release type that matches any branch
+            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeMain", new ReleaseType() {
+                {
+                    setMatchBranches("^(master|main)$");    // match main and master
+                }}
+            );
+            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeCollapsed", new ReleaseType() {
+                {
+                    setCollapseVersions(Boolean.TRUE);
+                    setCollapsedVersionQualifier("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}");
+                    setFilterTags("^([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$");
+                    setMatchBranches(".*");  // match any branch (this is the fallback release type)
+                }}
+            );
+            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("testReleaseTypeMain", "testReleaseTypeCollapsed"));
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            // add a mock convention that takes the commit message as the identifier to bump, if any
+            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*"))));
+            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+
+            command.run();
+
+            assertEquals("alpha", command.state().getBranch());
+            assertNull(command.state().getBump());
+            assertEquals(Defaults.SCHEME, command.state().getScheme());
+            assertEquals(0, command.state().getReleaseScope().getCommits().size());
+            assertNull(command.state().getReleaseScope().getInitialCommit());
+            assertNull(command.state().getReleaseScope().getFinalCommit());
+            assertEquals("1.0.0-alpha.3", command.state().getReleaseScope().getPreviousVersion());
+            assertEquals(script.getCommitByTag("1.0.0-alpha.3"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals("0.0.1", command.state().getReleaseScope().getPrimeVersion());
+            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
+            assertTrue(command.state().getReleaseType().getCollapseVersions());
+            assertEquals("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}", command.state().getReleaseType().getCollapsedVersionQualifier());
+            assertEquals("^([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$", command.state().getReleaseType().getFilterTags());
+            assertEquals(Defaults.ReleaseType.GIT_COMMIT, command.state().getReleaseType().getGitCommit());
+            assertEquals(Defaults.ReleaseType.GIT_COMMIT_MESSAGE, command.state().getReleaseType().getGitCommitMessage());
+            assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
+            assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
+            assertEquals(".*", command.state().getReleaseType().getMatchBranches());
+            assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
+            assertEquals(Defaults.ReleaseType.MATCH_WORKSPACE_STATUS, command.state().getReleaseType().getMatchWorkspaceStatus());
+            assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
+            assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
+            assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertFalse(command.state().getNewVersion());
+            assertFalse(command.state().getNewRelease());
+            assertEquals("1.0.0-alpha.3", command.state().getVersion());
+        }
+
+        @TestTemplate
+        @DisplayName("Infer.run() inferring a custom collapsed release type on repository with several branches and commits, with a commit message convention that infers bump identifier from commit messages, in beta branch > yield to no new version or release")
+        @Baseline(Scenario.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED)
+        void runUsingCustomCollapsedReleaseTypeWithInferringCommitConventionInBetaBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
+            throws Exception {
+            script.checkout("beta");
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            // add a custom release type that matches any branch
+            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeMain", new ReleaseType() {
+                {
+                    setMatchBranches("^(master|main)$");    // match main and master
+                }}
+            );
+            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeCollapsed", new ReleaseType() {
+                {
+                    setCollapseVersions(Boolean.TRUE);
+                    setCollapsedVersionQualifier("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}");
+                    setFilterTags("^([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$");
+                    setMatchBranches(".*");  // match any branch (this is the fallback release type)
+                }}
+            );
+            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("testReleaseTypeMain", "testReleaseTypeCollapsed"));
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            // add a mock convention that takes the commit message as the identifier to bump, if any
+            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*"))));
+            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+
+            command.run();
+
+            assertEquals("beta", command.state().getBranch());
+            assertNull(command.state().getBump());
+            assertEquals(Defaults.SCHEME, command.state().getScheme());
+            assertEquals(0, command.state().getReleaseScope().getCommits().size());
+            assertNull(command.state().getReleaseScope().getInitialCommit());
+            assertNull(command.state().getReleaseScope().getFinalCommit());
+            assertEquals("1.0.0-beta.3", command.state().getReleaseScope().getPreviousVersion());
+            assertEquals(script.getCommitByTag("1.0.0-beta.3"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals("0.0.1", command.state().getReleaseScope().getPrimeVersion());
+            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
+            assertTrue(command.state().getReleaseType().getCollapseVersions());
+            assertEquals("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}", command.state().getReleaseType().getCollapsedVersionQualifier());
+            assertEquals("^([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$", command.state().getReleaseType().getFilterTags());
+            assertEquals(Defaults.ReleaseType.GIT_COMMIT, command.state().getReleaseType().getGitCommit());
+            assertEquals(Defaults.ReleaseType.GIT_COMMIT_MESSAGE, command.state().getReleaseType().getGitCommitMessage());
+            assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
+            assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
+            assertEquals(".*", command.state().getReleaseType().getMatchBranches());
+            assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
+            assertEquals(Defaults.ReleaseType.MATCH_WORKSPACE_STATUS, command.state().getReleaseType().getMatchWorkspaceStatus());
+            assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
+            assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
+            assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertFalse(command.state().getNewVersion());
+            assertFalse(command.state().getNewRelease());
+            assertEquals("1.0.0-beta.3", command.state().getVersion());
+        }
+
+        @TestTemplate
+        @DisplayName("Infer.run() inferring a custom collapsed release type on repository with several branches and commits, with a commit message convention that infers bump identifier from commit messages, in gamma branch > yield to no new version or release")
+        @Baseline(Scenario.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED)
+        void runUsingCustomCollapsedReleaseTypeWithInferringCommitConventionInGammaBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
+            throws Exception {
+            script.checkout("gamma");
+
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            // add a custom release type that matches any branch
+            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeMain", new ReleaseType() {
+                {
+                    setMatchBranches("^(master|main)$");    // match main and master
+                }}
+            );
+            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeCollapsed", new ReleaseType() {
+                {
+                    setCollapseVersions(Boolean.TRUE);
+                    setCollapsedVersionQualifier("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}");
+                    setFilterTags("^([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$");
+                    setMatchBranches(".*");  // match any branch (this is the fallback release type)
+                }}
+            );
+            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("testReleaseTypeMain", "testReleaseTypeCollapsed"));
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            // add a mock convention that takes the commit message as the identifier to bump, if any
+            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*"))));
+            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+
+            command.run();
+
+            assertEquals("gamma", command.state().getBranch());
+            assertNull(command.state().getBump());
+            assertEquals(Defaults.SCHEME, command.state().getScheme());
+            assertEquals(3, command.state().getReleaseScope().getCommits().size());
+            assertEquals(script.getCommitIDs().get(2), command.state().getReleaseScope().getInitialCommit());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals("0.0.1", command.state().getReleaseScope().getPreviousVersion());
+            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals("0.0.1", command.state().getReleaseScope().getPrimeVersion());
+            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
+            assertTrue(command.state().getReleaseType().getCollapseVersions());
+            assertEquals("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}", command.state().getReleaseType().getCollapsedVersionQualifier());
+            assertEquals("^([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$", command.state().getReleaseType().getFilterTags());
+            assertEquals(Defaults.ReleaseType.GIT_COMMIT, command.state().getReleaseType().getGitCommit());
+            assertEquals(Defaults.ReleaseType.GIT_COMMIT_MESSAGE, command.state().getReleaseType().getGitCommitMessage());
+            assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
+            assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
+            assertEquals(".*", command.state().getReleaseType().getMatchBranches());
+            assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
+            assertEquals(Defaults.ReleaseType.MATCH_WORKSPACE_STATUS, command.state().getReleaseType().getMatchWorkspaceStatus());
+            assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
+            assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
+            assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertFalse(command.state().getNewVersion());
+            assertFalse(command.state().getNewRelease());
+            assertEquals("0.0.1", command.state().getVersion());
+        }
+
+        @TestTemplate
+        @DisplayName("Infer.run() inferring a custom collapsed release type on repository with several branches and commits, with a commit message convention that infers bump identifier from commit messages, in delta branch > yield to no new version or release")
+        @Baseline(Scenario.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED)
+        void runUsingCustomCollapsedReleaseTypeWithInferringCommitConventionInDeltaBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
+            throws Exception {
+            script.checkout("delta");
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            // add a custom release type that matches any branch
+            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeMain", new ReleaseType() {
+                {
+                    setMatchBranches("^(master|main)$");    // match main and master
+                }}
+            );
+            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeCollapsed", new ReleaseType() {
+                {
+                    setCollapseVersions(Boolean.TRUE);
+                    setCollapsedVersionQualifier("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}");
+                    setFilterTags("^([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$");
+                    setMatchBranches(".*");  // match any branch (this is the fallback release type)
+                }}
+            );
+            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("testReleaseTypeMain", "testReleaseTypeCollapsed"));
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            // add a mock convention that takes the commit message as the identifier to bump, if any
+            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*"))));
+            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+
+            command.run();
+
+            assertEquals("delta", command.state().getBranch());
+            assertEquals("minor", command.state().getBump());
+            assertEquals(Defaults.SCHEME, command.state().getScheme());
+            assertEquals(3, command.state().getReleaseScope().getCommits().size());
+            assertEquals(script.getCommitIDs().get(2), command.state().getReleaseScope().getInitialCommit());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals("0.0.1", command.state().getReleaseScope().getPreviousVersion());
+            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals("0.0.1", command.state().getReleaseScope().getPrimeVersion());
+            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(3, command.state().getReleaseScope().getSignificantCommits().size());
+            assertTrue(command.state().getReleaseType().getCollapseVersions());
+            assertEquals("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}", command.state().getReleaseType().getCollapsedVersionQualifier());
+            assertEquals("^([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$", command.state().getReleaseType().getFilterTags());
+            assertEquals(Defaults.ReleaseType.GIT_COMMIT, command.state().getReleaseType().getGitCommit());
+            assertEquals(Defaults.ReleaseType.GIT_COMMIT_MESSAGE, command.state().getReleaseType().getGitCommitMessage());
+            assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
+            assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
+            assertEquals(".*", command.state().getReleaseType().getMatchBranches());
+            assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
+            assertEquals(Defaults.ReleaseType.MATCH_WORKSPACE_STATUS, command.state().getReleaseType().getMatchWorkspaceStatus());
+            assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
+            assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
+            assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertTrue(command.state().getNewVersion());
+            assertFalse(command.state().getNewRelease());
+            assertEquals("0.1.0-delta.1", command.state().getVersion());
+        }
+
+        @TestTemplate
+        @DisplayName("Infer.run() inferring a custom collapsed release type on repository with several branches and commits, with a commit message convention that infers bump identifier from commit messages, in epsilon branch > yield to no new version or release")
+        @Baseline(Scenario.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED)
+        void runUsingCustomCollapsedReleaseTypeWithInferringCommitConventionInEpsilonBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
+            throws Exception {
+            script.checkout("epsilon");
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            // add a custom release type that matches any branch
+            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeMain", new ReleaseType() {
+                {
+                    setMatchBranches("^(master|main)$");    // match main and master
+                }}
+            );
+            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeCollapsed", new ReleaseType() {
+                {
+                    setCollapseVersions(Boolean.TRUE);
+                    setCollapsedVersionQualifier("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}");
+                    setFilterTags("^([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$");
+                    setMatchBranches(".*");  // match any branch (this is the fallback release type)
+                }}
+            );
+            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("testReleaseTypeMain", "testReleaseTypeCollapsed"));
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            // add a mock convention that takes the commit message as the identifier to bump, if any
+            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*"))));
+            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+
+            command.run();
+
+            assertEquals("epsilon", command.state().getBranch());
+            assertNull(command.state().getBump());
+            assertEquals(Defaults.SCHEME, command.state().getScheme());
+            assertEquals(1, command.state().getReleaseScope().getCommits().size());
+            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getInitialCommit());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals("1.0.0-epsilon.3", command.state().getReleaseScope().getPreviousVersion());
+            assertEquals(script.getCommitByTag("1.0.0-epsilon.3"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals("0.0.1", command.state().getReleaseScope().getPrimeVersion());
+            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
+            assertTrue(command.state().getReleaseType().getCollapseVersions());
+            assertEquals("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}", command.state().getReleaseType().getCollapsedVersionQualifier());
+            assertEquals("^([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$", command.state().getReleaseType().getFilterTags());
+            assertEquals(Defaults.ReleaseType.GIT_COMMIT, command.state().getReleaseType().getGitCommit());
+            assertEquals(Defaults.ReleaseType.GIT_COMMIT_MESSAGE, command.state().getReleaseType().getGitCommitMessage());
+            assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
+            assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
+            assertEquals(".*", command.state().getReleaseType().getMatchBranches());
+            assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
+            assertEquals(Defaults.ReleaseType.MATCH_WORKSPACE_STATUS, command.state().getReleaseType().getMatchWorkspaceStatus());
+            assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
+            assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
+            assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertFalse(command.state().getNewVersion());
+            assertFalse(command.state().getNewRelease());
+            assertEquals("1.0.0-epsilon.3", command.state().getVersion());
+        }
+
+        @TestTemplate
+        @DisplayName("Infer.run() inferring a custom collapsed release type on repository with several branches and commits, with a commit message convention that infers bump identifier from commit messages, in zeta branch > yield to no new version or release")
+        @Baseline(Scenario.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED)
+        void runUsingCustomCollapsedReleaseTypeWithInferringCommitConventionInZetaBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
+            throws Exception {
+            script.checkout("zeta");
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            // add a custom release type that matches any branch
+            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeMain", new ReleaseType() {
+                {
+                    setMatchBranches("^(master|main)$");    // match main and master
+                }}
+            );
+            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeCollapsed", new ReleaseType() {
+                {
+                    setCollapseVersions(Boolean.TRUE);
+                    setCollapsedVersionQualifier("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}");
+                    setFilterTags("^([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$");
+                    setMatchBranches(".*");  // match any branch (this is the fallback release type)
+                }}
+            );
+            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("testReleaseTypeMain", "testReleaseTypeCollapsed"));
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            // add a mock convention that takes the commit message as the identifier to bump, if any
+            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*"))));
+            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+
+            command.run();
+
+            assertEquals("zeta", command.state().getBranch());
+            assertNull(command.state().getBump());
+            assertEquals(Defaults.SCHEME, command.state().getScheme());
+            assertEquals(0, command.state().getReleaseScope().getCommits().size());
+            assertNull(command.state().getReleaseScope().getInitialCommit());
+            assertNull(command.state().getReleaseScope().getFinalCommit());
+            assertEquals("1.0.0-zeta.4", command.state().getReleaseScope().getPreviousVersion());
+            assertEquals(script.getCommitByTag("1.0.0-zeta.4"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals("0.0.1", command.state().getReleaseScope().getPrimeVersion());
+            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
+            assertTrue(command.state().getReleaseType().getCollapseVersions());
+            assertEquals("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}", command.state().getReleaseType().getCollapsedVersionQualifier());
+            assertEquals("^([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$", command.state().getReleaseType().getFilterTags());
+            assertEquals(Defaults.ReleaseType.GIT_COMMIT, command.state().getReleaseType().getGitCommit());
+            assertEquals(Defaults.ReleaseType.GIT_COMMIT_MESSAGE, command.state().getReleaseType().getGitCommitMessage());
+            assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
+            assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
+            assertEquals(".*", command.state().getReleaseType().getMatchBranches());
+            assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
+            assertEquals(Defaults.ReleaseType.MATCH_WORKSPACE_STATUS, command.state().getReleaseType().getMatchWorkspaceStatus());
+            assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
+            assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
+            assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertFalse(command.state().getNewVersion());
+            assertFalse(command.state().getNewRelease());
+            assertEquals("1.0.0-zeta.4", command.state().getVersion());
+        }
+
+        @TestTemplate
+        @DisplayName("Infer.run() inferring a custom collapsed release type on repository with several branches and commits, with a commit message convention that infers bump identifier from commit messages, in eta branch > yield to no new version or release")
+        @Baseline(Scenario.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED)
+        void runUsingCustomCollapsedReleaseTypeWithInferringCommitConventionInEtaBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
+            throws Exception {
+            script.checkout("eta");
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            // add a custom release type that matches any branch
+            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeMain", new ReleaseType() {
+                {
+                    setMatchBranches("^(master|main)$");    // match main and master
+                }}
+            );
+            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeCollapsed", new ReleaseType() {
+                {
+                    setCollapseVersions(Boolean.TRUE);
+                    setCollapsedVersionQualifier("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}");
+                    setFilterTags("^([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$");
+                    setMatchBranches(".*");  // match any branch (this is the fallback release type)
+                }}
+            );
+            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("testReleaseTypeMain", "testReleaseTypeCollapsed"));
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            // add a mock convention that takes the commit message as the identifier to bump, if any
+            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*"))));
+            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+
+            command.run();
+
+            assertEquals("eta", command.state().getBranch());
+            assertNull(command.state().getBump());
+            assertEquals(Defaults.SCHEME, command.state().getScheme());
+            assertEquals(1, command.state().getReleaseScope().getCommits().size());
+            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getInitialCommit());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals("1.0.0-eta.3", command.state().getReleaseScope().getPreviousVersion());
+            assertEquals(script.getCommitByTag("1.0.0-eta.3"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals("0.0.1", command.state().getReleaseScope().getPrimeVersion());
+            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
+            assertTrue(command.state().getReleaseType().getCollapseVersions());
+            assertEquals("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}", command.state().getReleaseType().getCollapsedVersionQualifier());
+            assertEquals("^([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$", command.state().getReleaseType().getFilterTags());
+            assertEquals(Defaults.ReleaseType.GIT_COMMIT, command.state().getReleaseType().getGitCommit());
+            assertEquals(Defaults.ReleaseType.GIT_COMMIT_MESSAGE, command.state().getReleaseType().getGitCommitMessage());
+            assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
+            assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
+            assertEquals(".*", command.state().getReleaseType().getMatchBranches());
+            assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
+            assertEquals(Defaults.ReleaseType.MATCH_WORKSPACE_STATUS, command.state().getReleaseType().getMatchWorkspaceStatus());
+            assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
+            assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
+            assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertFalse(command.state().getNewVersion());
+            assertFalse(command.state().getNewRelease());
+            assertEquals("1.0.0-eta.3", command.state().getVersion());
+        }
+
+        @TestTemplate
+        @DisplayName("Infer.run() inferring a custom collapsed release type on repository with several branches and commits, with a commit message convention that infers bump identifier from commit messages, in theta branch > yield to no new version or release")
+        @Baseline(Scenario.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED)
+        void runUsingCustomCollapsedReleaseTypeWithInferringCommitConventionInThetaBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
+            throws Exception {
+            script.checkout("theta");
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            // add a custom release type that matches any branch
+            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeMain", new ReleaseType() {
+                {
+                    setMatchBranches("^(master|main)$");    // match main and master
+                }}
+            );
+            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeCollapsed", new ReleaseType() {
+                {
+                    setCollapseVersions(Boolean.TRUE);
+                    setCollapsedVersionQualifier("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}");
+                    setFilterTags("^([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$");
+                    setMatchBranches(".*");  // match any branch (this is the fallback release type)
+                }}
+            );
+            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("testReleaseTypeMain", "testReleaseTypeCollapsed"));
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            // add a mock convention that takes the commit message as the identifier to bump, if any
+            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*"))));
+            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+
+            command.run();
+
+            assertEquals("theta", command.state().getBranch());
+            assertEquals("minor", command.state().getBump());
+            assertEquals(Defaults.SCHEME, command.state().getScheme());
+            assertEquals(3, command.state().getReleaseScope().getCommits().size());
+            assertEquals(script.getCommitIDs().get(2), command.state().getReleaseScope().getInitialCommit());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals("0.0.1", command.state().getReleaseScope().getPreviousVersion());
+            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals("0.0.1", command.state().getReleaseScope().getPrimeVersion());
+            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(3, command.state().getReleaseScope().getSignificantCommits().size());
+            assertTrue(command.state().getReleaseType().getCollapseVersions());
+            assertEquals("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}", command.state().getReleaseType().getCollapsedVersionQualifier());
+            assertEquals("^([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$", command.state().getReleaseType().getFilterTags());
+            assertEquals(Defaults.ReleaseType.GIT_COMMIT, command.state().getReleaseType().getGitCommit());
+            assertEquals(Defaults.ReleaseType.GIT_COMMIT_MESSAGE, command.state().getReleaseType().getGitCommitMessage());
+            assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
+            assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
+            assertEquals(".*", command.state().getReleaseType().getMatchBranches());
+            assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
+            assertEquals(Defaults.ReleaseType.MATCH_WORKSPACE_STATUS, command.state().getReleaseType().getMatchWorkspaceStatus());
+            assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
+            assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
+            assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertTrue(command.state().getNewVersion());
+            assertFalse(command.state().getNewRelease());
+            assertEquals("0.1.0-theta.1", command.state().getVersion());
         }
     }
 }

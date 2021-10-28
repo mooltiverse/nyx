@@ -100,12 +100,12 @@ This value remains undefined when no previous version can be found or [inference
 
 The version that is used as the baseline when bumping version numbers when the release type uses [collapsed versioning]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#collapse-versions) (the *pre-release* versioning).
 
-When not using collapsed versioning this value is the same as the [previous version](#previous-version), otherwise it's the first version that is encountered browing the commit history backwards that only has *core* identifiers. It is also the value of the version tag applied to the [`releaseScope/primeVersionCommit`](#prime-version-commit). Upon merge commits only the [first parent]({{ site.baseurl }}{% link _posts/2020-01-01-how-does-nyx-deal-with-merge-commits-when-scanning-the-commit-history.md %}) is considered. The search stops at the first tag that is valid according to:
+This is the first version tag that is encountered browsing the commit history backwards that only has *core* identifiers. It is also the value of the version tag applied to the [`releaseScope/primeVersionCommit`](#prime-version-commit). Upon merge commits only the [first parent]({{ site.baseurl }}{% link _posts/2020-01-01-how-does-nyx-deal-with-merge-commits-when-scanning-the-commit-history.md %}) is considered. The search stops at the first tag that is valid according to:
 
 * the version [`scheme`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#scheme)
 * optional prefixes, according to [`releaseLenient`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#release-lenient)
 
-This value remains undefined when [inference]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer) is skipped because the user overrides the [`version`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#version).
+This value remains undefined when [inference]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer) is skipped because the user overrides the [`version`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#version). It also remains undefined when not using collapsed versioning.
 
 Also see [this F.A.Q.]({{ site.baseurl }}{% link _posts/2020-01-01-how-does-collapsed-versioning-work.md %}) and [this post]({{ site.baseurl }}{% link _posts/2020-01-01-whats-the-difference-between-the-prime-version-and-the-previous-version.md %}) for more on the *previous* and *prime* versions.
 
@@ -119,7 +119,7 @@ Also see [this F.A.Q.]({{ site.baseurl }}{% link _posts/2020-01-01-how-does-coll
 
 The SHA-1 of the commit that the [`primeVersion`](#prime-version) tag points to.
 
-This value remains undefined when no previous or prime version can be found or [inference]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer) is skipped because the user overrides the [`version`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#version).
+This value remains undefined when no previous or prime version can be found or [inference]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer) is skipped because the user overrides the [`version`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#version). It also remains undefined when not using collapsed versioning.
 
 ### Significant commits
 
