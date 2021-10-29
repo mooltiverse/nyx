@@ -377,6 +377,15 @@ public class Infer extends AbstractCommand {
             });
             logger.debug(COMMAND, "Walking the commit history finished. The release scope contains {} commits.", state().getReleaseScope().getCommits().size());
 
+            if (collapseVersions) {
+                logger.debug(COMMAND, "After scanning the commit history the previousVersion is '{}' and the primeVersion is '{}'", Objects.isNull(state().getReleaseScope().getPreviousVersion()) ? "null" : state().getReleaseScope().getPreviousVersion(), Objects.isNull(state().getReleaseScope().getPrimeVersion()) ? "null" : state().getReleaseScope().getPrimeVersion());
+                logger.debug(COMMAND, "Significant commits (bumping identifiers) since the previousVersion are '{}', while those since the primeVersion are '{}'", Objects.isNull(previousBumpIdentifiers) ? "0" : previousBumpIdentifiers.size(), Objects.isNull(primeBumpIdentifiers) ? "0" : primeBumpIdentifiers.size());
+            }
+            else {
+                logger.debug(COMMAND, "After scanning the commit history the previousVersion is '{}'", Objects.isNull(state().getReleaseScope().getPreviousVersion()) ? "null" : state().getReleaseScope().getPreviousVersion());
+                logger.debug(COMMAND, "Significant commits (bumping identifiers) since the previousVersion are '{}'", Objects.isNull(previousBumpIdentifiers) ? "0" : previousBumpIdentifiers.size());
+            }
+
             // if we couldn't infer the initial version and its commit, set the state attributes to the configured initial values or the prime version (if available)
             if (!state().getReleaseScope().hasPreviousVersion() || !state().getReleaseScope().hasPreviousVersionCommit()) {
                 logger.debug(COMMAND, "The commit history had no information about the previousVersion and previousVersionCommit, using default initial value '{}' for the previousVersion", state().getConfiguration().getInitialVersion());
@@ -400,25 +409,6 @@ public class Infer extends AbstractCommand {
                 }
             }
 
-            if (collapseVersions)
-                logger.debug(COMMAND, "After scanning the commit history the previousVersion is '{}' and the primeVersion is '{}'", Objects.isNull(state().getReleaseScope().getPreviousVersion()) ? "null" : state().getReleaseScope().getPreviousVersion(), Objects.isNull(state().getReleaseScope().getPrimeVersion()) ? "null" : state().getReleaseScope().getPrimeVersion());
-            else logger.debug(COMMAND, "After scanning the commit history the previousVersion is '{}'", Objects.isNull(state().getReleaseScope().getPreviousVersion()) ? "null" : state().getReleaseScope().getPreviousVersion());
-
-            // if the user hasn't overridden the bump identifier let's find out which identifier is supposed to be bumped
-            // in the previous version scope and in the prime version scope (if used collapsed versioning)
-            // for each scope, the identifier to bump is the most significant one among the collected ones
-            String previousVersionBumpIdentifier = null;
-            String primeVersionBumpIdentifier = null;
-            if (!bumpOverride) {
-                previousVersionBumpIdentifier = Versions.mostRelevantIdentifier(scheme, previousBumpIdentifiers);
-                logger.debug(COMMAND, "The most relevant identifier to bump on the previous version inferred among significant commits is '{}'", Objects.isNull(previousVersionBumpIdentifier) ? "null" : previousVersionBumpIdentifier);
-                
-                if (collapseVersions) {
-                    primeVersionBumpIdentifier = Versions.mostRelevantIdentifier(scheme, primeBumpIdentifiers);
-                    logger.debug(COMMAND, "The most relevant identifier to bump on the prime version inferred among significant commits is '{}'", Objects.isNull(primeVersionBumpIdentifier) ? "null" : primeVersionBumpIdentifier);
-                }
-            }
-
             // parse the previous version
             Version previousVersion = releaseLenient ? Versions.valueOf(scheme, state().getReleaseScope().getPreviousVersion(), releaseLenient) : Versions.valueOf(scheme, state().getReleaseScope().getPreviousVersion(), releasePrefix);
 
@@ -429,7 +419,23 @@ public class Infer extends AbstractCommand {
                 logger.debug(COMMAND, "Bumping component '{}' on version '{}'", state().getBump(), previousVersion.toString());
                 version = previousVersion.bump(state().getBump());
             }
+            else if (state().getReleaseScope().getCommits().isEmpty()) {
+                // there are no new commits in the release scope
+                logger.info(COMMAND, "The release scope does not contain any commit since the previous version, version remains unchanged: '{}'", previousVersion);
+                version = previousVersion;
+            }
             else {
+                // let's find out which identifier is supposed to be bumped in the previous version scope and
+                // in the prime version scope (if used collapsed versioning)
+                // for each scope, the identifier to bump is the most significant one among the collected ones
+                String previousVersionBumpIdentifier = Versions.mostRelevantIdentifier(scheme, previousBumpIdentifiers);
+                logger.debug(COMMAND, "The most relevant identifier to bump on the previous version inferred among significant commits is '{}'", Objects.isNull(previousVersionBumpIdentifier) ? "null" : previousVersionBumpIdentifier);
+                String primeVersionBumpIdentifier = null;
+                if (collapseVersions) {
+                    primeVersionBumpIdentifier = Versions.mostRelevantIdentifier(scheme, primeBumpIdentifiers);
+                    logger.debug(COMMAND, "The most relevant identifier to bump on the prime version inferred among significant commits is '{}'", Objects.isNull(primeVersionBumpIdentifier) ? "null" : primeVersionBumpIdentifier);
+                }
+
                 // when using collapsed versioning we need to return greatest between:
                 // - the primeVersion bumped with the core identifier among all those from significant commits since the primeVersion
                 //   (only if we have significant commits since the primeVersion), then bumped with the pre-release identifier
@@ -502,66 +508,66 @@ public class Infer extends AbstractCommand {
                         state().getReleaseScope().getSignificantCommits().putAll(previousSignificantCommits);
                     }
                 }
-            }
 
-            // apply extra identifiers if there are significant commits
-            if ((!Objects.isNull(previousVersionBumpIdentifier) && !previousVersionBumpIdentifier.isEmpty()) ||
-                (collapseVersions && !Objects.isNull(primeVersionBumpIdentifier) && !primeVersionBumpIdentifier.isEmpty())) {
-                // apply extra identifiers, if any has been configured for the release type
-                if (Objects.isNull(releaseType.getIdentifiers()) || Objects.isNull(releaseType.getIdentifiers().getEnabled()) || releaseType.getIdentifiers().getEnabled().isEmpty()) {
-                    logger.debug(COMMAND, "The release type does not define any (enabled) extra identifiers so none is applied");
-                }
-                else if (Objects.isNull(releaseType.getIdentifiers().getItems()) || releaseType.getIdentifiers().getItems().isEmpty())
-                    throw new IllegalPropertyException(String.format("The release type has '%d' enabled extra identifiers ('%s') but none is defined", releaseType.getIdentifiers().getEnabled().size(), String.join(", ", releaseType.getIdentifiers().getEnabled())));
-                else {
-                    logger.debug(COMMAND, "Applying '{}' extra identifiers defined by the release type to version '{}'", releaseType.getIdentifiers().getItems().size(), version.toString());
+                // apply extra identifiers if there are significant commits
+                if ((!Objects.isNull(previousVersionBumpIdentifier) && !previousVersionBumpIdentifier.isEmpty()) ||
+                    (collapseVersions && !Objects.isNull(primeVersionBumpIdentifier) && !primeVersionBumpIdentifier.isEmpty())) {
+                    // apply extra identifiers, if any has been configured for the release type
+                    if (Objects.isNull(releaseType.getIdentifiers()) || Objects.isNull(releaseType.getIdentifiers().getEnabled()) || releaseType.getIdentifiers().getEnabled().isEmpty()) {
+                        logger.debug(COMMAND, "The release type does not define any (enabled) extra identifiers so none is applied");
+                    }
+                    else if (Objects.isNull(releaseType.getIdentifiers().getItems()) || releaseType.getIdentifiers().getItems().isEmpty())
+                        throw new IllegalPropertyException(String.format("The release type has '%d' enabled extra identifiers ('%s') but none is defined", releaseType.getIdentifiers().getEnabled().size(), String.join(", ", releaseType.getIdentifiers().getEnabled())));
+                    else {
+                        logger.debug(COMMAND, "Applying '{}' extra identifiers defined by the release type to version '{}'", releaseType.getIdentifiers().getItems().size(), version.toString());
 
-                    for (String identifierName: releaseType.getIdentifiers().getEnabled()) {
-                        Identifier identifier = releaseType.getIdentifiers().getItem(identifierName);
-                        if (Objects.isNull(identifier))
-                            throw new IllegalPropertyException(String.format("The identifier '%s' is enabled but not defined", identifierName));
+                        for (String identifierName: releaseType.getIdentifiers().getEnabled()) {
+                            Identifier identifier = releaseType.getIdentifiers().getItem(identifierName);
+                            if (Objects.isNull(identifier))
+                                throw new IllegalPropertyException(String.format("The identifier '%s' is enabled but not defined", identifierName));
 
-                        logger.debug(COMMAND, "Applying the '{}' extra identifier to version '{}'", identifierName, version.toString());
-                        if (Objects.isNull(identifier.getQualifier()) || identifier.getQualifier().isBlank())
-                            throw new IllegalPropertyException(String.format("The identifier '%s' must define a non blank qualifier", identifierName));
-                        
-                        String identifierQualifier = renderTemplate(identifier.getQualifier());
-                        if (Objects.isNull(identifierQualifier) || identifierQualifier.isBlank())
-                            throw new IllegalPropertyException(String.format("The identifier '%s' must evaluate to a non empty string. Configured value is '%s', rendered string is '%s'", identifierName, identifier.getQualifier(), identifierQualifier));
-                        
-                        String identifierValue = renderTemplate(identifier.getValue());
-                        logger.debug(COMMAND, "The '{}' extra identifier is defined by qualifier='{}' and value='{}', which are resolved to qualifier='{}' and value='{}'", identifierName, identifier.getQualifier(), identifier.getValue(), identifierQualifier, identifierValue);
+                            logger.debug(COMMAND, "Applying the '{}' extra identifier to version '{}'", identifierName, version.toString());
+                            if (Objects.isNull(identifier.getQualifier()) || identifier.getQualifier().isBlank())
+                                throw new IllegalPropertyException(String.format("The identifier '%s' must define a non blank qualifier", identifierName));
+                            
+                            String identifierQualifier = renderTemplate(identifier.getQualifier());
+                            if (Objects.isNull(identifierQualifier) || identifierQualifier.isBlank())
+                                throw new IllegalPropertyException(String.format("The identifier '%s' must evaluate to a non empty string. Configured value is '%s', rendered string is '%s'", identifierName, identifier.getQualifier(), identifierQualifier));
+                            
+                            String identifierValue = renderTemplate(identifier.getValue());
+                            logger.debug(COMMAND, "The '{}' extra identifier is defined by qualifier='{}' and value='{}', which are resolved to qualifier='{}' and value='{}'", identifierName, identifier.getQualifier(), identifier.getValue(), identifierQualifier, identifierValue);
 
-                        // Semver is the only supported scheme so far...
-                        if (Scheme.SEMVER.equals(scheme)) {
-                            SemanticVersion semanticVersion = SemanticVersion.valueOf(version.toString()); // faster and safer than casting...
+                            // Semver is the only supported scheme so far...
+                            if (Scheme.SEMVER.equals(scheme)) {
+                                SemanticVersion semanticVersion = SemanticVersion.valueOf(version.toString()); // faster and safer than casting...
 
-                            if (IdentifierPosition.PRE_RELEASE.equals(identifier.getPosition())) {
-                                // the value must be converted to an Integer when using SemVer and the pre-release part
-                                Integer identifierValueAsInteger = null;
+                                if (IdentifierPosition.PRE_RELEASE.equals(identifier.getPosition())) {
+                                    // the value must be converted to an Integer when using SemVer and the pre-release part
+                                    Integer identifierValueAsInteger = null;
 
-                                if (!(Objects.isNull(identifierValue) || identifierValue.isBlank())) {
-                                    try {
-                                        identifierValueAsInteger = Integer.valueOf(identifierValue);
+                                    if (!(Objects.isNull(identifierValue) || identifierValue.isBlank())) {
+                                        try {
+                                            identifierValueAsInteger = Integer.valueOf(identifierValue);
+                                        }
+                                        catch (NumberFormatException nfe) {
+                                            throw new IllegalPropertyException(String.format("Invalid integer value '%s' for Identifier '%s'. Semantic versioning requires integer numbers as values for identifiers in the pre release part.", identifierValue, identifierName), nfe);
+                                        }
                                     }
-                                    catch (NumberFormatException nfe) {
-                                        throw new IllegalPropertyException(String.format("Invalid integer value '%s' for Identifier '%s'. Semantic versioning requires integer numbers as values for identifiers in the pre release part.", identifierValue, identifierName), nfe);
-                                    }
+
+                                    semanticVersion = semanticVersion.setPrereleaseAttribute(identifierQualifier, Objects.isNull(identifierValueAsInteger) ? null : identifierValueAsInteger);
                                 }
+                                else if (IdentifierPosition.BUILD.equals(identifier.getPosition()) || Objects.isNull(identifier.getPosition())) {
+                                    // BUILD is the default if no position is set
+                                    semanticVersion = semanticVersion.setBuildAttribute(identifierQualifier, (Objects.isNull(identifierValue) || identifierValue.isBlank()) ? null : identifierValue);
+                                }
+                                else throw new IllegalPropertyException(String.format("Illegal identifier position '%s' for identifier '%s'", identifier.getPosition(), identifierName));
 
-                                semanticVersion = semanticVersion.setPrereleaseAttribute(identifierQualifier, Objects.isNull(identifierValueAsInteger) ? null : identifierValueAsInteger);
+                                version = semanticVersion;
+
+                                logger.debug(COMMAND, "The version after applying the '{}' extra identifier is '{}'", identifierName, version.toString());
                             }
-                            else if (IdentifierPosition.BUILD.equals(identifier.getPosition()) || Objects.isNull(identifier.getPosition())) {
-                                // BUILD is the default if no position is set
-                                semanticVersion = semanticVersion.setBuildAttribute(identifierQualifier, (Objects.isNull(identifierValue) || identifierValue.isBlank()) ? null : identifierValue);
-                            }
-                            else throw new IllegalPropertyException(String.format("Illegal identifier position '%s' for identifier '%s'", identifier.getPosition(), identifierName));
-
-                            version = semanticVersion;
-
-                            logger.debug(COMMAND, "The version after applying the '{}' extra identifier is '{}'", identifierName, version.toString());
+                            else throw new IllegalPropertyException(String.format("Extra identifiers are supported for '%s' scheme only", Scheme.SEMVER));
                         }
-                        else throw new IllegalPropertyException(String.format("Extra identifiers are supported for '%s' scheme only", Scheme.SEMVER));
                     }
                 }
             }
