@@ -111,4 +111,8 @@ tasks.publishPlugins.dependsOn tasks.setupPublishPluginCredentials
 tasks.test.dependsOn project(':modules:java:lib:main').tasks.test
 
 // Only perform publishing if the Nyx release type enables publishing
+tasks.publish.onlyIf { rootProject.nyxState.newRelease }
 tasks.publishPlugins.onlyIf { rootProject.nyxState.newRelease }
+//tasks.publishPluginJar.onlyIf { rootProject.nyxState.newRelease }
+//tasks.publishPluginJavaDocsJar.onlyIf { rootProject.nyxState.newRelease }
+//tasks.setupPublishPluginCredentials.onlyIf { rootProject.nyxState.newRelease }

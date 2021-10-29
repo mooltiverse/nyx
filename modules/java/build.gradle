@@ -300,6 +300,13 @@ allprojects.each {prj ->
             }
         }
     }
+
+    afterEvaluate {
+        // Only perform publishing if the Nyx release type enables publishing
+        // Here we disable all the automatically generated tasks, one for each target publication
+        tasks.findByName("publish"+prj.name.capitalize()+"PublicationToGitHubPackagesRepository").onlyIf { rootProject.nyxState.newRelease }
+        tasks.findByName("publish"+prj.name.capitalize()+"PublicationToSonatypeRepository").onlyIf { rootProject.nyxState.newRelease }
+    }
 }
 
 publishing {
@@ -481,6 +488,8 @@ tasks.publishToSonatype.finalizedBy tasks.closeAndReleaseRepository
 tasks.publish.dependsOn tasks.publishToSonatype
 
 // Only perform publishing if the Nyx release type enables publishing
+tasks.publish.onlyIf { rootProject.nyxState.newRelease }
+tasks.getStagingProfile.onlyIf { rootProject.nyxState.newRelease }
 tasks.publishToSonatype.onlyIf { rootProject.nyxState.newRelease }
 tasks.closeAndReleaseRepository.onlyIf { rootProject.nyxState.newRelease }
-tasks.publish.onlyIf { rootProject.nyxState.newRelease }
+tasks.initializeSonatypeStagingRepository.onlyIf { rootProject.nyxState.newRelease }
