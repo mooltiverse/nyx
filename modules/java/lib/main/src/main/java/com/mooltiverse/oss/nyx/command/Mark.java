@@ -207,9 +207,9 @@ public class Mark extends AbstractCommand {
                             // Here we commit all uncommitted files (of course if they're not ignored by .gitignore). Should we pick a specific subset instead? Maybe among the artifacts produced by Nyx?
                             // Here we can also specify the Author and Committer Identity as per https://github.com/mooltiverse/nyx/issues/65
                             String finalCommit = repository().commit(List.<String>of("."), commitMessage).getSHA();
-                            logger.debug(COMMAND, "Local changes committed at {}", finalCommit);
+                            logger.debug(COMMAND, "Local changes committed at '{}'", finalCommit);
 
-                            logger.debug(COMMAND, "Adding commit {} to the release scope", finalCommit);
+                            logger.debug(COMMAND, "Adding commit '{}' to the release scope", finalCommit);
                             state().getReleaseScope().getCommits().add(0, finalCommit);
                         }
                     }
@@ -223,10 +223,10 @@ public class Mark extends AbstractCommand {
                         logger.info(COMMAND, "Git tag skipped due to dry run");
                     else {
                         String tagMessage = renderTemplate(state().getReleaseType().getGitTagMessage());
-                        logger.debug(COMMAND, "Tagging latest commit {} with tag {}", repository().getLatestCommit(), state().getVersion());
+                        logger.debug(COMMAND, "Tagging latest commit '{}' with tag '{}'", repository().getLatestCommit(), state().getVersion());
                         // Here we can also specify the Tagger Identity as per https://github.com/mooltiverse/nyx/issues/65
                         repository().tag(state().getVersion(), Objects.isNull(tagMessage) || tagMessage.isBlank() ? null : tagMessage);
-                        logger.debug(COMMAND, "Tag {} applied to commit {}", state().getVersion(), repository().getLatestCommit());
+                        logger.debug(COMMAND, "Tag '{}' applied to commit '{}'", state().getVersion(), repository().getLatestCommit());
                     }
                 }
                 else logger.debug(COMMAND, "The release type has the git tag flag disabled");
@@ -240,7 +240,7 @@ public class Mark extends AbstractCommand {
                         // Here we should make the Git remote repositories configurable as per https://github.com/mooltiverse/nyx/issues/66
                         logger.debug(COMMAND, "Pushing local changes to remotes");
                         String remote = repository().push();
-                        logger.debug(COMMAND, "Local changes pushed to remote {}", remote);
+                        logger.debug(COMMAND, "Local changes pushed to remote '{}'", remote);
                     }
                 }
                 else logger.debug(COMMAND, "The release type has the git push flag disabled");

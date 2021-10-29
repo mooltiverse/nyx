@@ -86,7 +86,7 @@ public class Clean extends AbstractCommand {
         // Delete the state file, if any
         String stateFilePath = state().getConfiguration().getStateFile();
         if (!Objects.isNull(stateFilePath) && !stateFilePath.isBlank()) {
-            logger.debug(COMMAND, "Deleting state file {}, if present", stateFilePath);
+            logger.debug(COMMAND, "Deleting state file '{}', if present", stateFilePath);
             File stateFile = new File(stateFilePath);
             if (stateFile.exists()) {
                 stateFile.delete();

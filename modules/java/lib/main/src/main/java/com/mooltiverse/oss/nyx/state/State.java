@@ -218,7 +218,7 @@ public class State implements Root {
         throws DataAccessException, IllegalPropertyException, IllegalStateException {
         if (Objects.isNull(getConfiguration().getBump()))
             this.bump = bump;
-        else throw new IllegalStateException(String.format("The state bump attribute can't be set when it's ovverridden by the configuration. Configuration bump attribute is %s", getConfiguration().getBump()));
+        else throw new IllegalStateException(String.format("The state bump attribute can't be set when it's ovverridden by the configuration. Configuration bump attribute is '%s'", getConfiguration().getBump()));
     }
 
     /**
@@ -258,7 +258,7 @@ public class State implements Root {
             return Boolean.valueOf(getNewVersion() && Templates.toBoolean(Templates.render(releaseType.getPublish(), this)));
         }
         catch (IOException ioe) {
-            throw new IllegalPropertyException(String.format("Unable to render the template %s specified for the publish option in the release type", releaseType.getPublish()), ioe);
+            throw new IllegalPropertyException(String.format("Unable to render the template '%s' specified for the publish option in the release type", releaseType.getPublish()), ioe);
         }
     }
 
@@ -390,7 +390,7 @@ public class State implements Root {
         throws DataAccessException, IllegalPropertyException, IllegalStateException {
         if (Objects.isNull(getConfiguration().getVersion()))
             this.version = version;
-        else throw new IllegalStateException(String.format("The state version attribute can't be set when it's ovverridden by the configuration. Configuration version attribute is %s", getConfiguration().getVersion()));
+        else throw new IllegalStateException(String.format("The state version attribute can't be set when it's ovverridden by the configuration. Configuration version attribute is '%s'", getConfiguration().getVersion()));
     }
 
     /**

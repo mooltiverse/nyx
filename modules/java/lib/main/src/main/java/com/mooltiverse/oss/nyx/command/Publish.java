@@ -110,7 +110,7 @@ public class Publish extends AbstractCommand {
                     logger.info(COMMAND, "Publish skipped due to dry run");
                 }
                 else {
-                    logger.debug(COMMAND, "Publishing version {}");
+                    logger.debug(COMMAND, "Publishing version '{}'");
                     
                     // TODO: actually do the publish using the configured services
                 }

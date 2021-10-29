@@ -43,7 +43,7 @@ public class Presets {
         switch (name) {
             case Extended.NAME: return new Extended();
             case Simple.NAME:   return new Simple();
-            default: throw new IllegalPropertyException(String.format("Preset %s does not exists", name));
+            default: throw new IllegalPropertyException(String.format("Preset '%s' does not exists", name));
         }
     }
 }

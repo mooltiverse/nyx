@@ -61,7 +61,7 @@ final class Parser {
             throw new IllegalArgumentException("Identifier value cannot be empty");
 
         if (!value.matches(ALLOWED_ALPHANUMERIC_CHARACTERS_REGEXP_PATTERN))
-            throw new IllegalArgumentException(String.format("Illegal value %s for string identifier. Illegal characters have been found. Allowed characters are limited to "+ALLOWED_ALPHANUMERIC_CHARACTERS+".", value));
+            throw new IllegalArgumentException(String.format("Illegal value '%s' for string identifier. Illegal characters have been found. Allowed characters are limited to "+ALLOWED_ALPHANUMERIC_CHARACTERS+".", value));
         return value;
     }
 
@@ -81,7 +81,7 @@ final class Parser {
     static Integer validateIntegerIdentifier(Integer value, boolean allowNegative) {
         Objects.requireNonNull(value, "Identifier value cannot be null");
         if (!allowNegative && (value.intValue() < 0))
-            throw new IllegalArgumentException(String.format("Illegal value %d for integer identifier. Value cannot be negative.", value));
+            throw new IllegalArgumentException(String.format("Illegal value '%d' for integer identifier. Value cannot be negative.", value));
 
         return value;
     }
@@ -116,13 +116,13 @@ final class Parser {
             intValue = Integer.valueOf(value);
         }
         catch (NumberFormatException nfe) {
-            throw new IllegalArgumentException(String.format("Illegal value %s for integer identifier. Not a valid Integer.", value), nfe);
+            throw new IllegalArgumentException(String.format("Illegal value '%s' for integer identifier. Not a valid Integer.", value), nfe);
         }
 
         // Check that the string representation of the parsed value is the same as the input value
         // they may differ if the input value had leading zeroes or signs
         if (!value.equals(intValue.toString()))
-            throw new IllegalArgumentException(String.format("Illegal value %s for integer identifier. Value should be %d. Consider sanitizing the string before parsing.", value, intValue));
+            throw new IllegalArgumentException(String.format("Illegal value '%s' for integer identifier. Value should be '%d'. Consider sanitizing the string before parsing.", value, intValue));
 
         // Let the other overloaded version of the validate() method check if it's positive
         return validateIntegerIdentifier(intValue, allowNegative);
@@ -165,7 +165,7 @@ final class Parser {
         if (s.isBlank())
             throw new IllegalArgumentException("Can't split an empty string");
         //if (s.startsWith(Character.toString(separator)) || s.endsWith(Character.toString(separator)))
-        //    throw new IllegalArgumentException(String.format("String %s has separator occurrences at the beginning or the end", s, Character.toString(separator)));
+        //    throw new IllegalArgumentException(String.format("String '%s' has separator occurrences at the beginning or the end", s, Character.toString(separator)));
         return s.split("["+separator+"]");
     }
 

@@ -154,7 +154,7 @@ class SemanticVersionPreReleaseIdentifier extends CompositeObjectIdentifier {
         if (id.isBlank())
             throw new IllegalArgumentException("Can't bump an empty identifier");
         if (defaultNumber < 0)
-            throw new IllegalArgumentException(String.format("Can't use a negative number for the default number to bump. %d was passed", defaultNumber));
+            throw new IllegalArgumentException(String.format("Can't use a negative number for the default number to bump. '%d' was passed", defaultNumber));
 
         List<Object> newValues = new ArrayList<Object>();
         boolean bumped = false;

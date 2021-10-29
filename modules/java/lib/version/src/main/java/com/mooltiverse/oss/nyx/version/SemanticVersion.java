@@ -508,7 +508,7 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
 
             return new SemanticVersion(coreIdentifier, preReleaseIdentifier, buildIdentifier);
         }
-        else throw new IllegalArgumentException(String.format("The string %s does not contain a valid semantic number", s));
+        else throw new IllegalArgumentException(String.format("The string '%s' does not contain a valid semantic number", s));
     }
 
     /**
@@ -602,21 +602,21 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
                 // to remove leading zeroes, just transform the numbers to Integers and back to strings
                 Integer integer = Integer.valueOf(m.group(1));
                 if (integer.intValue()<0)
-                    throw new IllegalArgumentException(String.format("Can't sanitize negative number %d in %s", integer, s));
+                    throw new IllegalArgumentException(String.format("Can't sanitize negative number '%d' in '%s'", integer, s));
                 result.append(integer.toString());
                 result.append(CompositeIdentifier.DEFAULT_SEPARATOR);
                 integer = Integer.valueOf(m.group(2));
                 if (integer.intValue()<0)
-                    throw new IllegalArgumentException(String.format("Can't sanitize negative number %d in %s", integer, s));
+                    throw new IllegalArgumentException(String.format("Can't sanitize negative number '%d' in '%s'", integer, s));
                 result.append(integer.toString());
                 result.append(CompositeIdentifier.DEFAULT_SEPARATOR);
                 integer = Integer.valueOf(m.group(3));
                 if (integer.intValue()<0)
-                    throw new IllegalArgumentException(String.format("Can't sanitize negative number %d in %s", integer, s));
+                    throw new IllegalArgumentException(String.format("Can't sanitize negative number '%d' in '%s'", integer, s));
                 result.append(integer.toString());
             }
             catch (NumberFormatException nfe) {
-                throw new IllegalArgumentException(String.format("Numeric identifiers in string %s can't be converted to valid Integers", s), nfe);
+                throw new IllegalArgumentException(String.format("Numeric identifiers in string '%s' can't be converted to valid Integers", s), nfe);
             }
 
             // Go through all identifiers in the prerelease part. If they can convert to an integer just do it and
@@ -647,7 +647,7 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
                 result.append(m.group(5));
             }
         }
-        else throw new IllegalArgumentException(String.format("The string %s does not contain a valid semantic number", s));
+        else throw new IllegalArgumentException(String.format("The string '%s' does not contain a valid semantic number", s));
 
         return result.toString();
     }
@@ -681,7 +681,7 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
             // group 0 is the entire version string
             return m.group(0);
         }
-        else throw new IllegalArgumentException(String.format("The string %s does not contain a valid semantic number", s));
+        else throw new IllegalArgumentException(String.format("The string '%s' does not contain a valid semantic number", s));
     }
 
     /**
@@ -712,7 +712,7 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
                 return null;
             else return s.substring(0, s.length()-m.group(0).length());
         }
-        else throw new IllegalArgumentException(String.format("The string %s does not contain a valid semantic number", s));
+        else throw new IllegalArgumentException(String.format("The string '%s' does not contain a valid semantic number", s));
     }
 
     /**
@@ -1238,7 +1238,7 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
         try {
             Integer.valueOf(id);
             // it's a number and can't be bumped
-            throw new IllegalArgumentException(String.format("The value %s is numeric ant can't be used as a string identifier in the prerelease", id));
+            throw new IllegalArgumentException(String.format("The value '%s' is numeric ant can't be used as a string identifier in the prerelease", id));
         }
         catch (NumberFormatException nfe) {
             // ok, not a number. Proceed

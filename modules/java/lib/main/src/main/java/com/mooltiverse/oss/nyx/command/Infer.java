@@ -231,10 +231,10 @@ public class Infer extends AbstractCommand {
         state().setReleaseType(resolveReleaseType());
 
         if (state().hasVersion() && !Objects.isNull(state().getConfiguration().getVersion()))
-            logger.info(COMMAND, "Version overridden by user: {}", state().getConfiguration().getVersion());
+            logger.info(COMMAND, "Version overridden by user: '{}'", state().getConfiguration().getVersion());
         else {
             // some state attributes must be set first as they're also used for template rendering afterwards
-            logger.debug(COMMAND, "Current Git branch is {}", repository().getCurrentBranch());
+            logger.debug(COMMAND, "Current Git branch is '{}'", repository().getCurrentBranch());
             state().setBranch(repository().getCurrentBranch());
 
             // these objects are fetched in advance from the state because they may throw an exception
@@ -264,8 +264,8 @@ public class Infer extends AbstractCommand {
 
             logger.debug(COMMAND, "Walking the commit history...");
             repository().walkHistory(null, null, c -> {
-                logger.debug(COMMAND, "Stepping by commit {}", c.getSHA());
-                logger.debug(COMMAND, "Commit {} has {} tags: {}", c.getSHA(), c.getTags().size(), c.getTags());
+                logger.debug(COMMAND, "Stepping by commit '{}'", c.getSHA());
+                logger.debug(COMMAND, "Commit '{}' has '{}' tags: '{}'", c.getSHA(), c.getTags().size(), c.getTags());
 
                 // Inspect the tags in order to determine what kind of commit this is.
                 // If this commit has tags that make it the 'previous version commit' then the release scope
@@ -277,58 +277,58 @@ public class Infer extends AbstractCommand {
                 // If the commit has multiple valid version tags they are all evaluated and compared to select the greatest
                 for (Tag tag: c.getTags()) {
                     if (releaseLenient ? Versions.isLegal(scheme, tag.getName(), releaseLenient) : Versions.isLegal(scheme, tag.getName(), releasePrefix)) {
-                        logger.debug(COMMAND, "Evaluating tag {}: tag is a valid version according to the {} scheme and will be passed to the next evaluation steps. The tag is applied to commit {}", tag.getName(), scheme.toString(), c.getSHA());
+                        logger.debug(COMMAND, "Evaluating tag '{}': tag is a valid version according to the '{}' scheme and will be passed to the next evaluation steps. The tag is applied to commit '{}'", tag.getName(), scheme.toString(), c.getSHA());
 
                         final int previousVersionComparison = releaseLenient ? Versions.compare(scheme, tag.getName(), state().getReleaseScope().getPreviousVersion(), releaseLenient) : Versions.compare(scheme, tag.getName(), state().getReleaseScope().getPreviousVersion(), releasePrefix);
                         if (previousVersionComparison > 0) {
-                            logger.debug(COMMAND, "Evaluating tag {}: tag is greater than previously selected previousVersion tag {} and will be passed to the next evaluation steps. The tag is applied to commit {}", tag.getName(), Objects.isNull(state().getReleaseScope().getPreviousVersion()) ? "<none>" : state().getReleaseScope().getPreviousVersion(), c.getSHA());
+                            logger.debug(COMMAND, "Evaluating tag '{}': tag is greater than previously selected previousVersion tag '{}' and will be passed to the next evaluation steps. The tag is applied to commit '{}'", tag.getName(), Objects.isNull(state().getReleaseScope().getPreviousVersion()) ? "<none>" : state().getReleaseScope().getPreviousVersion(), c.getSHA());
 
                             if (Objects.isNull(filterTagsExpression) || filterTagsExpression.isBlank() || Pattern.matches(filterTagsExpression, tag.getName())) {
                                 if (Objects.isNull(filterTagsExpression) || filterTagsExpression.isBlank()) {
-                                    logger.debug(COMMAND, "Evaluating tag {}: the selected release type does not specify any additional filter for tags (or the tags filter template yields to an empty regular expression after evaluation) so the tag will be used as the previousVersion and the commit {} is used as the previousVersionCommit", tag.getName(), c.getSHA());
+                                    logger.debug(COMMAND, "Evaluating tag '{}': the selected release type does not specify any additional filter for tags (or the tags filter template yields to an empty regular expression after evaluation) so the tag will be used as the previousVersion and the commit '{}' is used as the previousVersionCommit", tag.getName(), c.getSHA());
                                 }
                                 else if (Pattern.matches(filterTagsExpression, tag.getName())) {
-                                    logger.debug(COMMAND, "Evaluating tag {}: the selected release type specifies an additional filter '{}' (after template evaluation) for tags and the tag succesfully matches so the tag will be used as the previousVersion and the commit {} is used as the previousVersionCommit", tag.getName(), filterTagsExpression, c.getSHA());
+                                    logger.debug(COMMAND, "Evaluating tag '{}': the selected release type specifies an additional filter '{}' (after template evaluation) for tags and the tag succesfully matches so the tag will be used as the previousVersion and the commit '{}' is used as the previousVersionCommit", tag.getName(), filterTagsExpression, c.getSHA());
                                 }
 
                                 state().getReleaseScope().setPreviousVersion(tag.getName());
                                 state().getReleaseScope().setPreviousVersionCommit(c.getSHA());
                             }
-                            else logger.debug(COMMAND, "Evaluating tag {}: the selected release type specifies an additional filter '{}' (after template evaluation) for tags but the tag doesn't match it so it will be ignored. The tag is applied to commit {}", tag.getName(), filterTagsExpression, c.getSHA());
+                            else logger.debug(COMMAND, "Evaluating tag '{}': the selected release type specifies an additional filter '{}' (after template evaluation) for tags but the tag doesn't match it so it will be ignored. The tag is applied to commit '{}'", tag.getName(), filterTagsExpression, c.getSHA());
                         }
-                        else logger.debug(COMMAND, "Evaluating tag {}: tag is less than previously selected previousVersion tag {} so it will be ignored. The tag is applied to commit {}", tag.getName(), Objects.isNull(state().getReleaseScope().getPreviousVersion()) ? "<none>" : state().getReleaseScope().getPreviousVersion(), c.getSHA());
+                        else logger.debug(COMMAND, "Evaluating tag '{}': tag is less than previously selected previousVersion tag '{}' so it will be ignored. The tag is applied to commit '{}'", tag.getName(), Objects.isNull(state().getReleaseScope().getPreviousVersion()) ? "<none>" : state().getReleaseScope().getPreviousVersion(), c.getSHA());
 
                         if (collapseVersions) {
-                            logger.debug(COMMAND, "Evaluating tag {}: the selected release type uses collapsed versioning so the tag will be passed to the next evaluation steps to check if it's a valid primeVersion. The tag is applied to commit {}", tag.getName(), c.getSHA());
+                            logger.debug(COMMAND, "Evaluating tag '{}': the selected release type uses collapsed versioning so the tag will be passed to the next evaluation steps to check if it's a valid primeVersion. The tag is applied to commit '{}'", tag.getName(), c.getSHA());
 
                             if (releaseLenient ? Versions.isCore(scheme, tag.getName(), releaseLenient) : Versions.isCore(scheme, tag.getName(), releasePrefix)) {
-                                logger.debug(COMMAND, "Evaluating tag {}: tag is a valid core version according to the {} scheme and the selected release type uses collapsed versioning so the tag will be passed to the next evaluation steps to check if it's a valid primeVersion. The tag is applied to commit {}", tag.getName(), scheme.toString(), c.getSHA());
+                                logger.debug(COMMAND, "Evaluating tag '{}': tag is a valid core version according to the '{}' scheme and the selected release type uses collapsed versioning so the tag will be passed to the next evaluation steps to check if it's a valid primeVersion. The tag is applied to commit '{}'", tag.getName(), scheme.toString(), c.getSHA());
                             
                                 final int primeVersionComparison = releaseLenient ? Versions.compare(scheme, tag.getName(), state().getReleaseScope().getPrimeVersion(), releaseLenient) : Versions.compare(scheme, tag.getName(), state().getReleaseScope().getPrimeVersion(), releasePrefix);
                                 if (primeVersionComparison > 0) {
-                                    logger.debug(COMMAND, "Evaluating tag {}: tag is greater than previously selected primeVersion tag {} so it will be used as the primeVersion and the commit {} is used as the primeVersionCommit", tag.getName(), Objects.isNull(state().getReleaseScope().getPrimeVersion()) ? "<none>" : state().getReleaseScope().getPrimeVersion(), c.getSHA());
+                                    logger.debug(COMMAND, "Evaluating tag '{}': tag is greater than previously selected primeVersion tag '{}' so it will be used as the primeVersion and the commit '{}' is used as the primeVersionCommit", tag.getName(), Objects.isNull(state().getReleaseScope().getPrimeVersion()) ? "<none>" : state().getReleaseScope().getPrimeVersion(), c.getSHA());
 
                                     state().getReleaseScope().setPrimeVersion(tag.getName());
                                     state().getReleaseScope().setPrimeVersionCommit(c.getSHA());
 
                                     if (!state().getReleaseScope().hasPreviousVersion()) {
-                                        logger.debug(COMMAND, "Evaluating tag {}: a primeVersion has been encountered before any valid previousVersion so this tag will also be used as the previousVersion the commit {} as the prreviousVersionCommit", tag.getName(), c.getSHA());
+                                        logger.debug(COMMAND, "Evaluating tag '{}': a primeVersion has been encountered before any valid previousVersion so this tag will also be used as the previousVersion the commit '{}' as the prreviousVersionCommit", tag.getName(), c.getSHA());
 
                                         state().getReleaseScope().setPreviousVersion(tag.getName());
                                         state().getReleaseScope().setPreviousVersionCommit(c.getSHA());
                                     }
                                 }
-                                else logger.debug(COMMAND, "Evaluating tag {}: tag is less than previously selected primeVersion tag {} so it will be ignored for the primeVersion", tag.getName(), Objects.isNull(state().getReleaseScope().getPrimeVersion()) ? "<none>" : state().getReleaseScope().getPrimeVersion());
+                                else logger.debug(COMMAND, "Evaluating tag '{}': tag is less than previously selected primeVersion tag '{}' so it will be ignored for the primeVersion", tag.getName(), Objects.isNull(state().getReleaseScope().getPrimeVersion()) ? "<none>" : state().getReleaseScope().getPrimeVersion());
                             }
-                            else logger.debug(COMMAND, "Evaluating tag {}: tag is not a valid core version according to the {} scheme so the tag will be ignored for the primeVersion. The tag is applied to commit {}", tag.getName(), scheme.toString(), c.getSHA());
+                            else logger.debug(COMMAND, "Evaluating tag '{}': tag is not a valid core version according to the '{}' scheme so the tag will be ignored for the primeVersion. The tag is applied to commit '{}'", tag.getName(), scheme.toString(), c.getSHA());
                         }
                     }
-                    else logger.debug(COMMAND, "Evaluating tag {}: tag is not a valid version according to the {} scheme and will be ignored. The tag is applied to commit {}", tag.getName(), scheme.toString(), c.getSHA());
+                    else logger.debug(COMMAND, "Evaluating tag '{}': tag is not a valid version according to the '{}' scheme and will be ignored. The tag is applied to commit '{}'", tag.getName(), scheme.toString(), c.getSHA());
                 }
 
                 // If this is a commit within the scope let's add it to the scope and inspect it
                 if (!(state().getReleaseScope().hasPreviousVersion() && state().getReleaseScope().hasPreviousVersionCommit())) {
-                    logger.debug(COMMAND, "Commit {} has no valid version tags so it's added to the release scope", c.getSHA());
+                    logger.debug(COMMAND, "Commit '{}' has no valid version tags so it's added to the release scope", c.getSHA());
                     state().getReleaseScope().getCommits().add(c.getSHA());
                 }
 
@@ -340,17 +340,17 @@ public class Infer extends AbstractCommand {
                         // also those between the primeVersionCommit and the finalCommit
                         if ((!(state().getReleaseScope().hasPreviousVersion() && state().getReleaseScope().hasPreviousVersionCommit())) ||
                             (collapseVersions && (!(state().getReleaseScope().hasPrimeVersion() && state().getReleaseScope().hasPrimeVersionCommit())))) {
-                            logger.debug(COMMAND, "Trying to infer the identifier to bump based on the commit message of commit {}", c.getSHA());
+                            logger.debug(COMMAND, "Trying to infer the identifier to bump based on the commit message of commit '{}'", c.getSHA());
                             for (Map.Entry<String,CommitMessageConvention> cmcEntry: commitMessageConventions.entrySet()) {
-                                logger.debug(COMMAND, "Evaluating commit {} against message convention {}", c.getSHA(), cmcEntry.getKey());                                
+                                logger.debug(COMMAND, "Evaluating commit '{}' against message convention '{}'", c.getSHA(), cmcEntry.getKey());                                
                                 Matcher messageMatcher = Pattern.compile(cmcEntry.getValue().getExpression()).matcher(c.getMessage().getFullMessage());
                                 if (messageMatcher.matches()) {
-                                    logger.debug(COMMAND, "Commit message convention {} matches commit {}", cmcEntry.getKey(), c.getSHA());
+                                    logger.debug(COMMAND, "Commit message convention '{}' matches commit '{}'", cmcEntry.getKey(), c.getSHA());
                                     for (Map.Entry<String,String> bumpExpression: cmcEntry.getValue().getBumpExpressions().entrySet()) {
-                                        logger.debug(COMMAND, "Matching commit {} ('{}') against bump expression {} ('{}') of message convention {}", c.getSHA(), c.getMessage().getFullMessage(), bumpExpression.getKey(), bumpExpression.getValue(), cmcEntry.getKey());
+                                        logger.debug(COMMAND, "Matching commit '{}' ('{}') against bump expression '{}' ('{}') of message convention '{}'", c.getSHA(), c.getMessage().getFullMessage(), bumpExpression.getKey(), bumpExpression.getValue(), cmcEntry.getKey());
                                         Matcher bumpMatcher = Pattern.compile(bumpExpression.getValue()).matcher(c.getMessage().getFullMessage());
                                         if (bumpMatcher.matches()) {
-                                            logger.debug(COMMAND, "Bump expression {} ('{}') of message convention {} matches commit {} ('{}'), meaning that the {} identifier has to be bumped, according to this commit", bumpExpression.getKey(), bumpExpression.getValue(), cmcEntry.getKey(), c.getSHA(), c.getMessage().getFullMessage(), bumpExpression.getKey());
+                                            logger.debug(COMMAND, "Bump expression '{}' of message convention '{}' matches commit '{}', meaning that the '{}' identifier has to be bumped, according to this commit", bumpExpression.getKey(), cmcEntry.getKey(), c.getSHA(), bumpExpression.getKey());
                                             // if we reached this point this is also in the 'prime commit' scope
                                             primeBumpIdentifiers.add(bumpExpression.getKey());
                                             primeSignificantCommits.put(c.getSHA(), bumpExpression.getKey());
@@ -361,10 +361,10 @@ public class Infer extends AbstractCommand {
                                                 previousSignificantCommits.put(c.getSHA(), bumpExpression.getKey());
                                             }
                                         }
-                                        else logger.debug(COMMAND, "Bump expression {} ('{}') of message convention {} doesn't match commit {} ('{}')", bumpExpression.getKey(), bumpExpression.getValue(), cmcEntry.getKey(), c.getSHA(), c.getMessage().getFullMessage());
+                                        else logger.debug(COMMAND, "Bump expression '{}' of message convention '{}' doesn't match commit '{}'", bumpExpression.getKey(), cmcEntry.getKey(), c.getSHA());
                                     }
                                 }
-                                else logger.debug(COMMAND, "Commit message convention {} doesn't match commit {}, skipping", cmcEntry.getKey(), c.getSHA());
+                                else logger.debug(COMMAND, "Commit message convention '{}' doesn't match commit '{}', skipping", cmcEntry.getKey(), c.getSHA());
                             }
                         }
                     }
@@ -375,11 +375,11 @@ public class Infer extends AbstractCommand {
                 return !(state().getReleaseScope().hasPreviousVersion() && state().getReleaseScope().hasPreviousVersionCommit() &&
                          state().getReleaseScope().hasPrimeVersion() && state().getReleaseScope().hasPrimeVersionCommit());
             });
-            logger.debug(COMMAND, "Walking the commit history finished.");
+            logger.debug(COMMAND, "Walking the commit history finished. The release scope contains {} commits.", state().getReleaseScope().getCommits().size());
 
             // if we couldn't infer the initial version and its commit, set the state attributes to the configured initial values or the prime version (if available)
             if (!state().getReleaseScope().hasPreviousVersion() || !state().getReleaseScope().hasPreviousVersionCommit()) {
-                logger.debug(COMMAND, "The commit history had no information about the previousVersion and previousVersionCommit, using default initial value {} for the previousVersion", state().getConfiguration().getInitialVersion());
+                logger.debug(COMMAND, "The commit history had no information about the previousVersion and previousVersionCommit, using default initial value '{}' for the previousVersion", state().getConfiguration().getInitialVersion());
                 // use the configured initial version as the previous version
                 state().getReleaseScope().setPreviousVersion(state().getConfiguration().getInitialVersion());
                 state().getReleaseScope().setPreviousVersionCommit(null);
@@ -387,7 +387,7 @@ public class Infer extends AbstractCommand {
             // if we couldn't infer the prime version and its commit, set the state attributes to the configured initial values
             if (!state().getReleaseScope().hasPrimeVersion() || !state().getReleaseScope().hasPrimeVersionCommit()) {
                 if (collapseVersions) {
-                    logger.debug(COMMAND, "The commit history had no information about the primeVersion and primeVersionCommit and the release type uses collapsed versioning, using default initial value {} for the primeVersion", state().getConfiguration().getInitialVersion());
+                    logger.debug(COMMAND, "The commit history had no information about the primeVersion and primeVersionCommit and the release type uses collapsed versioning, using default initial value '{}' for the primeVersion", state().getConfiguration().getInitialVersion());
                     // use the configured initial version as the prime version
                     state().getReleaseScope().setPrimeVersion(state().getConfiguration().getInitialVersion());
                     state().getReleaseScope().setPrimeVersionCommit(null);
@@ -400,6 +400,10 @@ public class Infer extends AbstractCommand {
                 }
             }
 
+            if (collapseVersions)
+                logger.debug(COMMAND, "After scanning the commit history the previousVersion is '{}' and the primeVersion is '{}'", Objects.isNull(state().getReleaseScope().getPreviousVersion()) ? "null" : state().getReleaseScope().getPreviousVersion(), Objects.isNull(state().getReleaseScope().getPrimeVersion()) ? "null" : state().getReleaseScope().getPrimeVersion());
+            else logger.debug(COMMAND, "After scanning the commit history the previousVersion is '{}'", Objects.isNull(state().getReleaseScope().getPreviousVersion()) ? "null" : state().getReleaseScope().getPreviousVersion());
+
             // if the user hasn't overridden the bump identifier let's find out which identifier is supposed to be bumped
             // in the previous version scope and in the prime version scope (if used collapsed versioning)
             // for each scope, the identifier to bump is the most significant one among the collected ones
@@ -407,11 +411,11 @@ public class Infer extends AbstractCommand {
             String primeVersionBumpIdentifier = null;
             if (!bumpOverride) {
                 previousVersionBumpIdentifier = Versions.mostRelevantIdentifier(scheme, previousBumpIdentifiers);
-                logger.debug(COMMAND, "The most relevant identifier to bump on the previous version inferred among significant commits is {}", Objects.isNull(previousVersionBumpIdentifier) ? "null" : previousVersionBumpIdentifier);
+                logger.debug(COMMAND, "The most relevant identifier to bump on the previous version inferred among significant commits is '{}'", Objects.isNull(previousVersionBumpIdentifier) ? "null" : previousVersionBumpIdentifier);
                 
                 if (collapseVersions) {
                     primeVersionBumpIdentifier = Versions.mostRelevantIdentifier(scheme, primeBumpIdentifiers);
-                    logger.debug(COMMAND, "The most relevant identifier to bump on the prime version inferred among significant commits is {}", Objects.isNull(primeVersionBumpIdentifier) ? "null" : primeVersionBumpIdentifier);
+                    logger.debug(COMMAND, "The most relevant identifier to bump on the prime version inferred among significant commits is '{}'", Objects.isNull(primeVersionBumpIdentifier) ? "null" : primeVersionBumpIdentifier);
                 }
             }
 
@@ -422,7 +426,7 @@ public class Infer extends AbstractCommand {
             Version version = null;
             if (state().hasBump()) {
                 // the bump identifier has been detected by previous runs or overridden by the user
-                logger.debug(COMMAND, "Bumping component {} on version {}", state().getBump(), previousVersion.toString());
+                logger.debug(COMMAND, "Bumping component '{}' on version '{}'", state().getBump(), previousVersion.toString());
                 version = previousVersion.bump(state().getBump());
             }
             else {
@@ -446,29 +450,29 @@ public class Infer extends AbstractCommand {
                     Version primeVersionBumped = null;
                     if (Objects.isNull(primeVersionBumpIdentifier) || primeVersionBumpIdentifier.isBlank()) {
                         // bump only the collapsed identifier on the prime version
-                        logger.info(COMMAND, "The release scope does not contain any significant commit since the prime version, only collapsed identifier {} is bumped while core identifiers are not bumped on prime version: {}", collapsedVersionQualifier, primeVersion.toString());
+                        logger.info(COMMAND, "The release scope does not contain any significant commit since the prime version, only collapsed identifier '{}' is bumped while core identifiers are not bumped on prime version: '{}'", collapsedVersionQualifier, primeVersion.toString());
                         primeVersionBumped = primeVersion.bump(collapsedVersionQualifier);
-                        logger.debug(COMMAND, "Bumping qualifier {} on prime version {} yields to {}", collapsedVersionQualifier, primeVersion.toString(), primeVersionBumped.toString());
+                        logger.debug(COMMAND, "Bumping qualifier '{}' on prime version '{}' yields to '{}'", collapsedVersionQualifier, primeVersion.toString(), primeVersionBumped.toString());
                     }
                     else {
                         // bump the two identifiers on the prime version
-                        logger.info(COMMAND, "The release scope contains significant commits since the prime version, core identifier {} and collapsed identifier {} are bumped on prime version: {}", primeVersionBumpIdentifier, collapsedVersionQualifier, primeVersion.toString());
+                        logger.info(COMMAND, "The release scope contains significant commits since the prime version, core identifier '{}' and collapsed identifier '{}' are bumped on prime version: '{}'", primeVersionBumpIdentifier, collapsedVersionQualifier, primeVersion.toString());
                         primeVersionBumped = primeVersion.bump(primeVersionBumpIdentifier).bump(collapsedVersionQualifier);
-                        logger.debug(COMMAND, "Bumping qualifiers {} and {} on prime version {} yields to {}", primeVersionBumpIdentifier, collapsedVersionQualifier, primeVersion.toString(), primeVersionBumped.toString());
+                        logger.debug(COMMAND, "Bumping qualifiers '{}' and '{}' on prime version '{}' yields to '{}'", primeVersionBumpIdentifier, collapsedVersionQualifier, primeVersion.toString(), primeVersionBumped.toString());
                     }
 
                     // compute the previous version
                     Version previousVersionBumped = null;
                     if (Objects.isNull(previousVersionBumpIdentifier) || previousVersionBumpIdentifier.isBlank()) {
                         // do not bump anything on the previous version
-                        logger.info(COMMAND, "The release scope does not contain any significant commit since the previous version, identifiers are not bumped on previous version: {}", previousVersion.toString());
+                        logger.info(COMMAND, "The release scope does not contain any significant commit since the previous version, identifiers are not bumped on previous version: '{}'", previousVersion.toString());
                         previousVersionBumped = previousVersion;
                     }
                     else {
                         // bump only the collapsed identifier on the previous version
-                        logger.info(COMMAND, "The release scope contains significant commits since the previous version, collapsed identifier {} is bumped on previous version: {}", collapsedVersionQualifier, previousVersion.toString());
+                        logger.info(COMMAND, "The release scope contains significant commits since the previous version, collapsed identifier '{}' is bumped on previous version: '{}'", collapsedVersionQualifier, previousVersion.toString());
                         previousVersionBumped = previousVersion.bump(collapsedVersionQualifier);
-                        logger.debug(COMMAND, "Bumping qualifier {} on previous version {} yields to {}", collapsedVersionQualifier, previousVersion.toString(), previousVersionBumped.toString());
+                        logger.debug(COMMAND, "Bumping qualifier '{}' on previous version '{}' yields to '{}'", collapsedVersionQualifier, previousVersion.toString(), previousVersionBumped.toString());
 
                     }
 
@@ -484,15 +488,15 @@ public class Infer extends AbstractCommand {
                         state().setBump(primeVersionBumpIdentifier);
                         state().getReleaseScope().getSignificantCommits().putAll(primeSignificantCommits);
                     }
-                    logger.debug(COMMAND, "The greatest version between {} and {} is {}, which is the new (collapsed) version", primeVersionBumped, previousVersionBumped, version);
+                    logger.debug(COMMAND, "The greatest version between '{}' and '{}' is '{}', which is the new (collapsed) version", primeVersionBumped, previousVersionBumped, version);
                 }
                 else {
                     if (Objects.isNull(previousVersionBumpIdentifier) || previousVersionBumpIdentifier.isBlank()) {
-                        logger.info(COMMAND, "The release scope does not contain any significant commit since the previous version, version remains unchanged: {}", previousVersion.toString());
+                        logger.info(COMMAND, "The release scope does not contain any significant commit since the previous version, version remains unchanged: '{}'", previousVersion.toString());
                         version = previousVersion;
                     }
                     else {
-                        logger.debug(COMMAND, "Bumping component {} on version {}", previousVersionBumpIdentifier, previousVersion.toString());
+                        logger.debug(COMMAND, "Bumping component '{}' on version '{}'", previousVersionBumpIdentifier, previousVersion.toString());
                         version = previousVersion.bump(previousVersionBumpIdentifier);
                         state().setBump(previousVersionBumpIdentifier);
                         state().getReleaseScope().getSignificantCommits().putAll(previousSignificantCommits);
@@ -508,25 +512,25 @@ public class Infer extends AbstractCommand {
                     logger.debug(COMMAND, "The release type does not define any (enabled) extra identifiers so none is applied");
                 }
                 else if (Objects.isNull(releaseType.getIdentifiers().getItems()) || releaseType.getIdentifiers().getItems().isEmpty())
-                    throw new IllegalPropertyException(String.format("The release type has %d enabled extra identifiers (%s) but none is defined", releaseType.getIdentifiers().getEnabled().size(), String.join(", ", releaseType.getIdentifiers().getEnabled())));
+                    throw new IllegalPropertyException(String.format("The release type has '%d' enabled extra identifiers ('%s') but none is defined", releaseType.getIdentifiers().getEnabled().size(), String.join(", ", releaseType.getIdentifiers().getEnabled())));
                 else {
-                    logger.debug(COMMAND, "Applying {} extra identifiers defined by the release type to version {}", releaseType.getIdentifiers().getItems().size(), version.toString());
+                    logger.debug(COMMAND, "Applying '{}' extra identifiers defined by the release type to version '{}'", releaseType.getIdentifiers().getItems().size(), version.toString());
 
                     for (String identifierName: releaseType.getIdentifiers().getEnabled()) {
                         Identifier identifier = releaseType.getIdentifiers().getItem(identifierName);
                         if (Objects.isNull(identifier))
-                            throw new IllegalPropertyException(String.format("The identifier %s is enabled but not defined", identifierName));
+                            throw new IllegalPropertyException(String.format("The identifier '%s' is enabled but not defined", identifierName));
 
-                        logger.debug(COMMAND, "Applying the {} extra identifier to version {}", identifierName, version.toString());
+                        logger.debug(COMMAND, "Applying the '{}' extra identifier to version '{}'", identifierName, version.toString());
                         if (Objects.isNull(identifier.getQualifier()) || identifier.getQualifier().isBlank())
-                            throw new IllegalPropertyException(String.format("The identifier %s must define a non blank qualifier", identifierName));
+                            throw new IllegalPropertyException(String.format("The identifier '%s' must define a non blank qualifier", identifierName));
                         
                         String identifierQualifier = renderTemplate(identifier.getQualifier());
                         if (Objects.isNull(identifierQualifier) || identifierQualifier.isBlank())
-                            throw new IllegalPropertyException(String.format("The identifier %s must evaluate to a non empty string. Configured value is '%s', rendered string is '%s'", identifierName, identifier.getQualifier(), identifierQualifier));
+                            throw new IllegalPropertyException(String.format("The identifier '%s' must evaluate to a non empty string. Configured value is '%s', rendered string is '%s'", identifierName, identifier.getQualifier(), identifierQualifier));
                         
                         String identifierValue = renderTemplate(identifier.getValue());
-                        logger.debug(COMMAND, "The {} extra identifier is defined by qualifier='{}' and value='{}', which are resolved to qualifier='{}' and value='{}'", identifierName, identifier.getQualifier(), identifier.getValue(), identifierQualifier, identifierValue);
+                        logger.debug(COMMAND, "The '{}' extra identifier is defined by qualifier='{}' and value='{}', which are resolved to qualifier='{}' and value='{}'", identifierName, identifier.getQualifier(), identifier.getValue(), identifierQualifier, identifierValue);
 
                         // Semver is the only supported scheme so far...
                         if (Scheme.SEMVER.equals(scheme)) {
@@ -541,7 +545,7 @@ public class Infer extends AbstractCommand {
                                         identifierValueAsInteger = Integer.valueOf(identifierValue);
                                     }
                                     catch (NumberFormatException nfe) {
-                                        throw new IllegalPropertyException(String.format("Invalid integer value %s for Identifier %s. Semantic versioning requires integer numbers as values for identifiers in the pre release part.", identifierValue, identifierName), nfe);
+                                        throw new IllegalPropertyException(String.format("Invalid integer value '%s' for Identifier '%s'. Semantic versioning requires integer numbers as values for identifiers in the pre release part.", identifierValue, identifierName), nfe);
                                     }
                                 }
 
@@ -551,23 +555,23 @@ public class Infer extends AbstractCommand {
                                 // BUILD is the default if no position is set
                                 semanticVersion = semanticVersion.setBuildAttribute(identifierQualifier, (Objects.isNull(identifierValue) || identifierValue.isBlank()) ? null : identifierValue);
                             }
-                            else throw new IllegalPropertyException(String.format("Illegal identifier position %s for identifier %s", identifier.getPosition(), identifierName));
+                            else throw new IllegalPropertyException(String.format("Illegal identifier position '%s' for identifier '%s'", identifier.getPosition(), identifierName));
 
                             version = semanticVersion;
 
-                            logger.debug(COMMAND, "The version after applying the {} extra identifier is {}", identifierName, version.toString());
+                            logger.debug(COMMAND, "The version after applying the '{}' extra identifier is '{}'", identifierName, version.toString());
                         }
-                        else throw new IllegalPropertyException(String.format("Extra identifiers are supported for %s scheme only", Scheme.SEMVER));
+                        else throw new IllegalPropertyException(String.format("Extra identifiers are supported for '%s' scheme only", Scheme.SEMVER));
                     }
                 }
             }
 
             // check if the version complies with version constraints, if any
             if (checkVersionRange(scheme, version, (Objects.isNull(releaseType.getVersionRange()) || releaseType.getVersionRange().isBlank()) ? null : releaseType.getVersionRange(), releaseType.getVersionRangeFromBranchName() ? repository().getCurrentBranch() : null))
-                logger.debug(COMMAND, "Version {} succesfully passed range checks", version.toString());
-            else logger.debug(COMMAND, "Version {} did not require version range checks", version.toString());
+                logger.debug(COMMAND, "Version '{}' succesfully passed range checks", version.toString());
+            else logger.debug(COMMAND, "Version '{}' did not require version range checks", version.toString());
 
-            logger.info(COMMAND, "Inferred version is: {}", version.toString());
+            logger.info(COMMAND, "Inferred version is: '{}'", version.toString());
 
             // store values to the state object
             state().setVersion(Objects.isNull(releasePrefix) ? version.toString() : releasePrefix.concat(version.toString()));
@@ -643,7 +647,7 @@ public class Infer extends AbstractCommand {
 
                 // Semver is the only supported scheme so far...
                 if (Scheme.SEMVER.equals(scheme)) {
-                    logger.debug(COMMAND, "Scanning the branch name {} searching for a version range pattern", branch);
+                    logger.debug(COMMAND, "Scanning the branch name '{}' searching for a version range pattern", branch);
 
                     Matcher m = Pattern.compile(SEMVER_DYNAMIC_VERSION_RANGE_FROM_BRANCH_NAME_REGEX).matcher(branch);
                     String major = null;
@@ -659,7 +663,7 @@ public class Infer extends AbstractCommand {
                         throw new ReleaseException(String.format("Branch name '%s' doesn't seem to contain a parseable version range", branch));
                     }
 
-                    logger.debug(COMMAND, "Building the dynamic version range regular expression with constraints inferred by {}", branch);
+                    logger.debug(COMMAND, "Building the dynamic version range regular expression with constraints inferred by '{}'", branch);
 
                     StringBuilder dynamicVersionRangeExpression = new StringBuilder("^");
 
@@ -683,11 +687,11 @@ public class Infer extends AbstractCommand {
                     // that accepts anything after a '-' or '+'
                     dynamicVersionRangeExpression.append("(?:(?:-|\\+).*)?$");
 
-                    logger.debug(COMMAND, "The dynamic version range regular expression that was built from {} is '{}'", branch, dynamicVersionRangeExpression.toString());
+                    logger.debug(COMMAND, "The dynamic version range regular expression that was built from '{}' is '{}'", branch, dynamicVersionRangeExpression.toString());
                     // now we have the dynamically built regular expression
                     state().setVersionRange(dynamicVersionRangeExpression.toString());
                 }
-                else throw new IllegalPropertyException(String.format("Version range check is supported for %s scheme only", Scheme.SEMVER));                
+                else throw new IllegalPropertyException(String.format("Version range check is supported for '%s' scheme only", Scheme.SEMVER));                
             }
         }
         else {
@@ -701,18 +705,18 @@ public class Infer extends AbstractCommand {
         }
 
         if (state().hasVersionRange()) {
-            logger.debug(COMMAND, "Performing version range check against version {} using the expression '{}'", version.toString(), state().getVersionRange());
+            logger.debug(COMMAND, "Performing version range check against version '{}' using the expression '{}'", version.toString(), state().getVersionRange());
             try {
                 if (Pattern.matches(state().getVersionRange(), version.toString())) {
-                    logger.debug(COMMAND, "Version {} succesfully matches version range pattern {}", version.toString(), state().getVersionRange());
+                    logger.debug(COMMAND, "Version '{}' succesfully matches version range pattern '{}'", version.toString(), state().getVersionRange());
                     return true;
                 }
                 else {
-                    throw new ReleaseException(String.format("Version %s doesn't match version range pattern %s", version.toString(), state().getVersionRange()));
+                    throw new ReleaseException(String.format("Version '%s' doesn't match version range pattern '%s'", version.toString(), state().getVersionRange()));
                 }
             }
             catch (PatternSyntaxException pse) {
-                throw new IllegalPropertyException(String.format("Cannot compile regular expression '%s' (evaluated by template %s) ", state().getVersionRange(), staticVersionRangeExpressionTemplate), pse);
+                throw new IllegalPropertyException(String.format("Cannot compile regular expression '%s' (evaluated by template '%s') ", state().getVersionRange(), staticVersionRangeExpressionTemplate), pse);
             }
         }
         else {

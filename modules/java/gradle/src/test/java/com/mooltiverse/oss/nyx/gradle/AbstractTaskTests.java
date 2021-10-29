@@ -152,7 +152,7 @@ public abstract class AbstractTaskTests extends AbstractTests {
             Project project = newTestProject(null, true);
             Task task = project.getTasks().getByName(taskName);
 
-            assertEquals(task.getTaskDependencies().getDependencies(task).size(), TestData.allTaskEfferentDirectDependencies.get(taskName).size(), String.format("Task %s is expected to have %d dependencies but has %d", taskName, TestData.allTaskEfferentDirectDependencies.get(taskName).size(), task.getTaskDependencies().getDependencies(task).size()));
+            assertEquals(task.getTaskDependencies().getDependencies(task).size(), TestData.allTaskEfferentDirectDependencies.get(taskName).size(), String.format("Task '%s' is expected to have '%d' dependencies but has '%d'", taskName, TestData.allTaskEfferentDirectDependencies.get(taskName).size(), task.getTaskDependencies().getDependencies(task).size()));
         }
 
         @ParameterizedTest(name = "{2}.getDependencies().contains(<all known direct efferent dependencies>)")

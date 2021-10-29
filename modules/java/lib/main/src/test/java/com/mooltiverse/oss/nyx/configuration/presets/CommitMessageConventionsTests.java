@@ -185,7 +185,7 @@ public class CommitMessageConventionsTests {
                         Matcher m = Pattern.compile(entry.getValue()).matcher(message);
                         if (bump.equals(entry.getKey()))
                             assertTrue(m.matches());
-                        else assertFalse(m.matches(), String.format("expression %s (%s) was not expected to match but it did", entry.getKey(), entry.getValue()));
+                        else assertFalse(m.matches(), String.format("expression '%s' ('%s') was not expected to match but it did", entry.getKey(), entry.getValue()));
                     }
                 }
             }
@@ -263,7 +263,7 @@ public class CommitMessageConventionsTests {
                         Matcher m = Pattern.compile(entry.getValue()).matcher(message);
                         if (bump.equals(entry.getKey()))
                             assertTrue(m.matches());
-                        else assertFalse(m.matches(), String.format("expression %s (%s) was not expected to match but it did", entry.getKey(), entry.getValue()));
+                        else assertFalse(m.matches(), String.format("expression '%s' ('%s') was not expected to match but it did", entry.getKey(), entry.getValue()));
                     }
                 }
             }

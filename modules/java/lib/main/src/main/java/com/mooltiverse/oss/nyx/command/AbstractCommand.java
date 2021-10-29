@@ -207,7 +207,7 @@ public abstract class AbstractCommand implements Command {
             return Templates.render(template, state());
         }
         catch (IOException ioe) {
-            throw new IllegalPropertyException(String.format("Template %s cannot be rendered using the current state", template));
+            throw new IllegalPropertyException(String.format("Template '%s' cannot be rendered using the current state", template));
         }
     }
 
@@ -257,49 +257,49 @@ public abstract class AbstractCommand implements Command {
         if (Objects.isNull(state().getConfiguration().getReleaseTypes()) || Objects.isNull(state().getConfiguration().getReleaseTypes().getEnabled()) || state().getConfiguration().getReleaseTypes().getEnabled().isEmpty())
             throw new ReleaseException("No release types have been configured. Please configure them using the releaseTypes option.");
 
-        logger.debug(COMMAND, "Resolving the release type among enabled ones: {}", String.join(", ", state().getConfiguration().getReleaseTypes().getEnabled()));
+        logger.debug(COMMAND, "Resolving the release type among enabled ones: '{}'", String.join(", ", state().getConfiguration().getReleaseTypes().getEnabled()));
         for (String releaseTypeName: state().getConfiguration().getReleaseTypes().getEnabled()) {
-            logger.debug(COMMAND, "Evaluating release type: {}", releaseTypeName);
+            logger.debug(COMMAND, "Evaluating release type: '{}'", releaseTypeName);
             ReleaseType releaseType = state().getConfiguration().getReleaseTypes().getItem(releaseTypeName);
 
             if (Objects.isNull(releaseType))
-                throw new ReleaseException(String.format("Release type %s is configured among enabled ones but is not configured", releaseTypeName));
+                throw new ReleaseException(String.format("Release type '%s' is configured among enabled ones but is not configured", releaseTypeName));
             
             // evaluate the matching criteria: branch name
             if (Objects.isNull(releaseType.getMatchBranches()) || releaseType.getMatchBranches().isBlank())
-                logger.debug(COMMAND, "Release type {} does not specify any branch name requirement", releaseTypeName);
+                logger.debug(COMMAND, "Release type '{}' does not specify any branch name requirement", releaseTypeName);
             else {
                 String matchBranchesRendered = renderTemplate(releaseType.getMatchBranches());
                 if (Objects.isNull(matchBranchesRendered) || matchBranchesRendered.isBlank())
-                    logger.debug(COMMAND, "Release type {} specifies a match branches template {} that evaluates to an empty regular expression", releaseTypeName, releaseType.getMatchBranches());
+                    logger.debug(COMMAND, "Release type '{}' specifies a match branches template '{}' that evaluates to an empty regular expression", releaseTypeName, releaseType.getMatchBranches());
                 else {
-                    logger.debug(COMMAND, "Release type {} specifies a match branches template {} that evaluates to regular expression: {}", releaseTypeName, releaseType.getMatchBranches(), matchBranchesRendered);
+                    logger.debug(COMMAND, "Release type '{}' specifies a match branches template '{}' that evaluates to regular expression: '{}'", releaseTypeName, releaseType.getMatchBranches(), matchBranchesRendered);
                     try {
                         if (Pattern.matches(matchBranchesRendered, getCurrentBranch()))
-                            logger.debug(COMMAND, "Current branch {} succesfully matched by release type {} matchBranches regular expression {}", getCurrentBranch(), releaseTypeName, matchBranchesRendered);
+                            logger.debug(COMMAND, "Current branch '{}' succesfully matched by release type '{}' matchBranches regular expression '{}'", getCurrentBranch(), releaseTypeName, matchBranchesRendered);
                         else {
-                            logger.debug(COMMAND, "Current branch {} not matched by release type {} matchBranches regular expression {}. Skipping release type {}", getCurrentBranch(), releaseTypeName, matchBranchesRendered, releaseTypeName);
+                            logger.debug(COMMAND, "Current branch '{}' not matched by release type '{}' matchBranches regular expression '{}'. Skipping release type '{}'", getCurrentBranch(), releaseTypeName, matchBranchesRendered, releaseTypeName);
                             continue;
                         }
                     }
                     catch (PatternSyntaxException pse) {
-                        throw new IllegalPropertyException(String.format("Release type %s has a malformed matchBranches regular expression: %s (was %s before rendering the template rendering)", releaseTypeName, matchBranchesRendered, releaseType.getMatchBranches()), pse);
+                        throw new IllegalPropertyException(String.format("Release type '%s' has a malformed matchBranches regular expression: '%s' (was '%s' before rendering the template rendering)", releaseTypeName, matchBranchesRendered, releaseType.getMatchBranches()), pse);
                     }
                 }
             }
 
             // evaluate the matching criteria: environment variables
             if (Objects.isNull(releaseType.getMatchEnvironmentVariables()) || releaseType.getMatchEnvironmentVariables().isEmpty())
-                logger.debug(COMMAND, "Release type {} does not specify any environment variable requirement", releaseTypeName);
+                logger.debug(COMMAND, "Release type '{}' does not specify any environment variable requirement", releaseTypeName);
             else {
                 boolean mismatch = false;
                 for (String varName: releaseType.getMatchEnvironmentVariables().keySet()) {
-                    logger.debug(COMMAND, "Evaluating environment variable {} as required by release type {}", varName, releaseTypeName);
+                    logger.debug(COMMAND, "Evaluating environment variable '{}' as required by release type '{}'", varName, releaseTypeName);
 
                     String varValue = System.getenv(varName);
 
                     if (Objects.isNull(varValue)) {
-                        logger.debug(COMMAND, "Environment variable {} is required by release type {} but is not defined in the current environment. Skipping release type {}", varName, releaseTypeName, releaseTypeName);
+                        logger.debug(COMMAND, "Environment variable '{}' is required by release type '{}' but is not defined in the current environment. Skipping release type '{}'", varName, releaseTypeName, releaseTypeName);
                         mismatch = true;
                         continue;
                     }
@@ -307,38 +307,38 @@ public abstract class AbstractCommand implements Command {
                     String varVarueRegExp = releaseType.getMatchEnvironmentVariables().get(varName);
                     try {
                         if (Objects.isNull(varVarueRegExp) || varVarueRegExp.isBlank() || Pattern.matches(varVarueRegExp, varValue))
-                            logger.debug(COMMAND, "Environment variable {} value succesfully matched by release type {} regular expression {}", varName, releaseTypeName, varVarueRegExp);
+                            logger.debug(COMMAND, "Environment variable '{}' value succesfully matched by release type '{}' regular expression '{}'", varName, releaseTypeName, varVarueRegExp);
                         else {
-                            logger.debug(COMMAND, "Environment variable {} value not matched by release type {} regular expression {}", varName, releaseTypeName, varVarueRegExp);
+                            logger.debug(COMMAND, "Environment variable '{}' value not matched by release type '{}' regular expression '{}'", varName, releaseTypeName, varVarueRegExp);
                             mismatch = true;
                             continue;
                         }
                     }
                     catch (PatternSyntaxException pse) {
-                        throw new IllegalPropertyException(String.format("Release type %s has a malformed environment variable regular expression %s to match for environment variable %s", releaseTypeName, varVarueRegExp, varName), pse);
+                        throw new IllegalPropertyException(String.format("Release type '%s' has a malformed environment variable regular expression '%s' to match for environment variable '%s'", releaseTypeName, varVarueRegExp, varName), pse);
                     }
                 }
 
                 if (mismatch) {
-                    logger.debug(COMMAND, "Environment variables not matched by release type {}", releaseTypeName);
+                    logger.debug(COMMAND, "Environment variables not matched by release type '{}'", releaseTypeName);
                     continue;
                 }
             }
 
             // evaluate the matching criteria: workspace status
             if (Objects.isNull(releaseType.getMatchWorkspaceStatus()))
-                logger.debug(COMMAND, "Release type {} does not specify any workspace status requirement", releaseTypeName);
+                logger.debug(COMMAND, "Release type '{}' does not specify any workspace status requirement", releaseTypeName);
             else {
                 if ((WorkspaceStatus.CLEAN.equals(releaseType.getMatchWorkspaceStatus()) && isRepositoryClean()) || (WorkspaceStatus.DIRTY.equals(releaseType.getMatchWorkspaceStatus()) && (!isRepositoryClean())))
-                    logger.debug(COMMAND, "Current repository status {} succesfully matched by release type {} matchWorkspaceStatus filter {}", isRepositoryClean() ? "CLEAN" : "DIRTY", releaseTypeName, releaseType.getMatchWorkspaceStatus().toString());
+                    logger.debug(COMMAND, "Current repository status '{}' succesfully matched by release type '{}' matchWorkspaceStatus filter '{}'", isRepositoryClean() ? "CLEAN" : "DIRTY", releaseTypeName, releaseType.getMatchWorkspaceStatus().toString());
                 else {
-                    logger.debug(COMMAND, "Current repository status {} not matched by release type {} matchWorkspaceStatus filter {}. Skipping release type {}", isRepositoryClean() ? "CLEAN" : "DIRTY", releaseTypeName, releaseType.getMatchWorkspaceStatus().toString(), releaseTypeName);
+                    logger.debug(COMMAND, "Current repository status '{}' not matched by release type '{}' matchWorkspaceStatus filter '{}'. Skipping release type '{}'", isRepositoryClean() ? "CLEAN" : "DIRTY", releaseTypeName, releaseType.getMatchWorkspaceStatus().toString(), releaseTypeName);
                     continue;
                 }
             }
             
             // if we reached this point the release type matches all of the filters so it can be returned
-            logger.debug(COMMAND, "Release type {} has been selected", releaseTypeName);
+            logger.debug(COMMAND, "Release type '{}' has been selected", releaseTypeName);
             return releaseType;
         }
         throw new IllegalPropertyException("No suitable release types have been configured or none of the configured release types matches the current environment");

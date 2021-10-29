@@ -163,9 +163,9 @@ public class Configuration implements Root {
         }
         else {
             File customLocalConfigurationFile = getAbsoluteFilePath(getConfigurationFile());
-            logger.debug(CONFIGURATION, "Loading custom local configuration file at {}", customLocalConfigurationFile.getAbsolutePath());
+            logger.debug(CONFIGURATION, "Loading custom local configuration file at '{}'", customLocalConfigurationFile.getAbsolutePath());
             layers.put(LayerPriority.CUSTOM_LOCAL_FILE, FileMapper.load(customLocalConfigurationFile, SimpleConfigurationLayer.class));
-            logger.debug(CONFIGURATION, "Custom local configuration file {} loaded", customLocalConfigurationFile.getAbsolutePath());
+            logger.debug(CONFIGURATION, "Custom local configuration file '{}' loaded", customLocalConfigurationFile.getAbsolutePath());
         }
 
         // now the local shared configuration file
@@ -179,9 +179,9 @@ public class Configuration implements Root {
         }
         else {
             File customSharedConfigurationFile = getAbsoluteFilePath(getSharedConfigurationFile());
-            logger.debug(CONFIGURATION, "Loading custom shared configuration file at {}", customSharedConfigurationFile.getAbsolutePath());
+            logger.debug(CONFIGURATION, "Loading custom shared configuration file at '{}'", customSharedConfigurationFile.getAbsolutePath());
             layers.put(LayerPriority.CUSTOM_SHARED_FILE, FileMapper.load(customSharedConfigurationFile, SimpleConfigurationLayer.class));
-            logger.debug(CONFIGURATION, "Custom shared configuration file {} loaded", customSharedConfigurationFile.getAbsolutePath());
+            logger.debug(CONFIGURATION, "Custom shared configuration file '{}' loaded", customSharedConfigurationFile.getAbsolutePath());
         }
 
         // now the preset
@@ -194,9 +194,9 @@ public class Configuration implements Root {
             layers.remove(LayerPriority.PRESET);
         }
         else {
-            logger.debug(CONFIGURATION, "Loading preset configuration {}", getPreset());
+            logger.debug(CONFIGURATION, "Loading preset configuration '{}'", getPreset());
             layers.put(LayerPriority.PRESET, Presets.byName(getPreset()));
-            logger.debug(CONFIGURATION, "Preset configuration {} loaded", getPreset());
+            logger.debug(CONFIGURATION, "Preset configuration '{}' loaded", getPreset());
         }
     }
 
@@ -213,23 +213,23 @@ public class Configuration implements Root {
         for (String fileName: List.<String>of(".nyx.json", ".nyx.yaml", ".nyx.yml")) {
             File file = getAbsoluteFilePath(fileName);
             if (file.exists() && file.isFile()) {
-                logger.debug(CONFIGURATION, "Standard local configuration file found at {}. Loading...", file.getAbsolutePath());
+                logger.debug(CONFIGURATION, "Standard local configuration file found at '{}'. Loading...", file.getAbsolutePath());
                 layers.put(LayerPriority.STANDARD_LOCAL_FILE, FileMapper.load(file, SimpleConfigurationLayer.class));
-                logger.debug(CONFIGURATION, "Standard local configuration file {} loaded", file.getAbsolutePath());
+                logger.debug(CONFIGURATION, "Standard local configuration file '{}' loaded", file.getAbsolutePath());
                 break;
             }
-            else logger.debug(CONFIGURATION, "Standard local configuration file {} not found.", file.getAbsolutePath());
+            else logger.debug(CONFIGURATION, "Standard local configuration file '{}' not found.", file.getAbsolutePath());
         }
         // then load standard shared configuration files, if any
         for (String fileName: List.<String>of(".nyx-shared.json", ".nyx-shared.yaml", ".nyx-shared.yml")) {
             File file = getAbsoluteFilePath(fileName);
             if (file.exists() && file.isFile()) {
-                logger.debug(CONFIGURATION, "Standard shared configuration file found at {}. Loading...", file.getAbsolutePath());
+                logger.debug(CONFIGURATION, "Standard shared configuration file found at '{}'. Loading...", file.getAbsolutePath());
                 layers.put(LayerPriority.STANDARD_SHARED_FILE, FileMapper.load(file, SimpleConfigurationLayer.class));
-                logger.debug(CONFIGURATION, "Standard shared configuration file {} loaded", file.getAbsolutePath());
+                logger.debug(CONFIGURATION, "Standard shared configuration file '{}' loaded", file.getAbsolutePath());
                 break;
             }
-            else logger.debug(CONFIGURATION, "Standard shared configuration file {} not found.", file.getAbsolutePath());
+            else logger.debug(CONFIGURATION, "Standard shared configuration file '{}' not found.", file.getAbsolutePath());
         }
         if (layers.containsKey(LayerPriority.STANDARD_LOCAL_FILE) || layers.containsKey(LayerPriority.STANDARD_SHARED_FILE))
             updateConfiguredConfigurationLayers();
@@ -249,11 +249,11 @@ public class Configuration implements Root {
     public Configuration withCommandLineConfiguration(ConfigurationLayer layer)
         throws DataAccessException, IllegalPropertyException {
         if (Objects.isNull(layer)) {
-            logger.debug(CONFIGURATION, "Removing the existing {} configuration layer, if any", LayerPriority.COMMAND_LINE);
+            logger.debug(CONFIGURATION, "Removing the existing '{}' configuration layer, if any", LayerPriority.COMMAND_LINE);
             layers.remove(LayerPriority.COMMAND_LINE);
         }
         else {
-            logger.debug(CONFIGURATION, "Adding or replacing the {} configuration layer", LayerPriority.COMMAND_LINE);
+            logger.debug(CONFIGURATION, "Adding or replacing the '{}' configuration layer", LayerPriority.COMMAND_LINE);
             layers.put(LayerPriority.COMMAND_LINE, layer);
         }
         updateConfiguredConfigurationLayers();
@@ -275,11 +275,11 @@ public class Configuration implements Root {
     public Configuration withPluginConfiguration(ConfigurationLayer layer)
         throws DataAccessException, IllegalPropertyException {
         if (Objects.isNull(layer)) {
-            logger.debug(CONFIGURATION, "Removing the existing {} configuration layer, if any", LayerPriority.PLUGIN);
+            logger.debug(CONFIGURATION, "Removing the existing '{}' configuration layer, if any", LayerPriority.PLUGIN);
             layers.remove(LayerPriority.PLUGIN);
         }
         else {
-            logger.debug(CONFIGURATION, "Adding or replacing the {} configuration layer", LayerPriority.PLUGIN);
+            logger.debug(CONFIGURATION, "Adding or replacing the '{}' configuration layer", LayerPriority.PLUGIN);
             layers.put(LayerPriority.PLUGIN, layer);
         }
         updateConfiguredConfigurationLayers();
@@ -293,11 +293,11 @@ public class Configuration implements Root {
     @Override
     public String getBump()
         throws DataAccessException, IllegalPropertyException {
-        logger.trace(CONFIGURATION, "Retrieving the {} configuration option", "bump");
+        logger.trace(CONFIGURATION, "Retrieving the '{}' configuration option", "bump");
         for (ConfigurationLayer layer: layers.values()) {
             String bump = layer.getBump();
             if (!Objects.isNull(bump)) {
-                logger.trace(CONFIGURATION, "The {} configuration option value is: {}", "bump", bump);
+                logger.trace(CONFIGURATION, "The '{}' configuration option value is: '{}'", "bump", bump);
                 return bump;
             }
         }
@@ -323,13 +323,13 @@ public class Configuration implements Root {
     @Override
     public String getConfigurationFile()
         throws DataAccessException, IllegalPropertyException {
-        logger.trace(CONFIGURATION, "Retrieving the {} configuration option", "configurationFile");
+        logger.trace(CONFIGURATION, "Retrieving the '{}' configuration option", "configurationFile");
         for (Map.Entry<LayerPriority, ConfigurationLayer> layerEntry: layers.entrySet()) {
             // custom configuration file configuration is ignored on custom configuration file layers to avoid chaining
             if (!LayerPriority.CUSTOM_LOCAL_FILE.equals(layerEntry.getKey())) {
                 String configurationFile = layerEntry.getValue().getConfigurationFile();
                 if (!Objects.isNull(configurationFile)) {
-                    logger.trace(CONFIGURATION, "The {} configuration option value is: {}", "configurationFile", configurationFile);
+                    logger.trace(CONFIGURATION, "The '{}' configuration option value is: '{}'", "configurationFile", configurationFile);
                     return configurationFile;
                 }
             }
@@ -343,11 +343,11 @@ public class Configuration implements Root {
     @Override
     public String getDirectory()
         throws DataAccessException, IllegalPropertyException {
-        logger.trace(CONFIGURATION, "Retrieving the {} configuration option", "directory");
+        logger.trace(CONFIGURATION, "Retrieving the '{}' configuration option", "directory");
         for (ConfigurationLayer layer: layers.values()) {
             String directory = layer.getDirectory();
             if (!Objects.isNull(directory)) {
-                logger.trace(CONFIGURATION, "The {} configuration option value is: {}", "directory", directory);
+                logger.trace(CONFIGURATION, "The '{}' configuration option value is: '{}'", "directory", directory);
                 return directory;
             }
         }
@@ -361,7 +361,7 @@ public class Configuration implements Root {
      * @param directory the new default directory. If {@code null} then the standard default directory will be used.
      */
     public static void setDefaultDirectory(File directory) {
-        logger.trace(CONFIGURATION, "Setting the default directory {}", Objects.isNull(directory) ? "null" : directory.getAbsolutePath());
+        logger.trace(CONFIGURATION, "Setting the default directory '{}'", Objects.isNull(directory) ? "null" : directory.getAbsolutePath());
         DefaultLayer.getInstance().setDirectory(Objects.isNull(directory) ? null : directory.getAbsolutePath());
     }
 
@@ -371,11 +371,11 @@ public class Configuration implements Root {
     @Override
     public Boolean getDryRun()
         throws DataAccessException, IllegalPropertyException {
-        logger.trace(CONFIGURATION, "Retrieving the {} configuration option", "dryRun");
+        logger.trace(CONFIGURATION, "Retrieving the '{}' configuration option", "dryRun");
         for (ConfigurationLayer layer: layers.values()) {
             Boolean dryRun = layer.getDryRun();
             if (!Objects.isNull(dryRun)) {
-                logger.trace(CONFIGURATION, "The {} configuration option value is: {}", "dryRun", dryRun);
+                logger.trace(CONFIGURATION, "The '{}' configuration option value is: '{}'", "dryRun", dryRun);
                 return dryRun;
             }
         }
@@ -388,11 +388,11 @@ public class Configuration implements Root {
     @Override
     public String getInitialVersion()
         throws DataAccessException, IllegalPropertyException {
-        logger.trace(CONFIGURATION, "Retrieving the {} configuration option", "initialVersion");
+        logger.trace(CONFIGURATION, "Retrieving the '{}' configuration option", "initialVersion");
         for (ConfigurationLayer layer: layers.values()) {
             String initialVersion = layer.getInitialVersion();
             if (!Objects.isNull(initialVersion)) {
-                logger.trace(CONFIGURATION, "The {} configuration option value is: {}", "initialVersion", initialVersion);
+                logger.trace(CONFIGURATION, "The '{}' configuration option value is: '{}'", "initialVersion", initialVersion);
                 return initialVersion;
             }
         }
@@ -405,13 +405,13 @@ public class Configuration implements Root {
     @Override
     public String getPreset()
         throws DataAccessException, IllegalPropertyException {
-        logger.trace(CONFIGURATION, "Retrieving the {} configuration option", "preset");
+        logger.trace(CONFIGURATION, "Retrieving the '{}' configuration option", "preset");
         for (Map.Entry<LayerPriority, ConfigurationLayer> layerEntry: layers.entrySet()) {
             // preset configuration is ignored on preset layers to avoid chaining
             if (!LayerPriority.PRESET.equals(layerEntry.getKey())) {
                 String preset = layerEntry.getValue().getPreset();
                 if (!Objects.isNull(preset)) {
-                    logger.trace(CONFIGURATION, "The {} configuration option value is: {}", "preset", preset);
+                    logger.trace(CONFIGURATION, "The '{}' configuration option value is: '{}'", "preset", preset);
                     return preset;
                 }
             }
@@ -425,11 +425,11 @@ public class Configuration implements Root {
     @Override
     public String getReleasePrefix()
         throws DataAccessException, IllegalPropertyException {
-        logger.trace(CONFIGURATION, "Retrieving the {} configuration option", "releasePrefix");
+        logger.trace(CONFIGURATION, "Retrieving the '{}' configuration option", "releasePrefix");
         for (ConfigurationLayer layer: layers.values()) {
             String releasePrefix = layer.getReleasePrefix();
             if (!Objects.isNull(releasePrefix)) {
-                logger.trace(CONFIGURATION, "The {} configuration option value is: {}", "releasePrefix", releasePrefix);
+                logger.trace(CONFIGURATION, "The '{}' configuration option value is: '{}'", "releasePrefix", releasePrefix);
                 return releasePrefix;
             }
         }
@@ -442,11 +442,11 @@ public class Configuration implements Root {
     @Override
     public Boolean getReleaseLenient()
         throws DataAccessException, IllegalPropertyException {
-        logger.trace(CONFIGURATION, "Retrieving the {} configuration option", "releaseLenient");
+        logger.trace(CONFIGURATION, "Retrieving the '{}' configuration option", "releaseLenient");
         for (ConfigurationLayer layer: layers.values()) {
             Boolean releaseLenient = layer.getReleaseLenient();
             if (!Objects.isNull(releaseLenient)) {
-                logger.trace(CONFIGURATION, "The {} configuration option value is: {}", "releaseLenient", releaseLenient);
+                logger.trace(CONFIGURATION, "The '{}' configuration option value is: '{}'", "releaseLenient", releaseLenient);
                 return releaseLenient;
             }
         }
@@ -473,11 +473,11 @@ public class Configuration implements Root {
     @Override
     public Boolean getResume()
         throws DataAccessException, IllegalPropertyException {
-        logger.trace(CONFIGURATION, "Retrieving the {} configuration option", "resume");
+        logger.trace(CONFIGURATION, "Retrieving the '{}' configuration option", "resume");
         for (ConfigurationLayer layer: layers.values()) {
             Boolean resume = layer.getResume();
             if (!Objects.isNull(resume)) {
-                logger.trace(CONFIGURATION, "The {} configuration option value is: {}", "resume", resume);
+                logger.trace(CONFIGURATION, "The '{}' configuration option value is: '{}'", "resume", resume);
                 return resume;
             }
         }
@@ -490,11 +490,11 @@ public class Configuration implements Root {
     @Override
     public Scheme getScheme()
         throws DataAccessException, IllegalPropertyException {
-        logger.trace(CONFIGURATION, "Retrieving the {} configuration option", "scheme");
+        logger.trace(CONFIGURATION, "Retrieving the '{}' configuration option", "scheme");
         for (ConfigurationLayer layer: layers.values()) {
             Scheme scheme = layer.getScheme();
             if (!Objects.isNull(scheme)) {
-                logger.trace(CONFIGURATION, "The {} configuration option value is: {}", "scheme", scheme);
+                logger.trace(CONFIGURATION, "The '{}' configuration option value is: '{}'", "scheme", scheme);
                 return scheme;
             }
         }
@@ -507,13 +507,13 @@ public class Configuration implements Root {
     @Override
     public String getSharedConfigurationFile()
         throws DataAccessException, IllegalPropertyException {
-        logger.trace(CONFIGURATION, "Retrieving the {} configuration option", "sharedConfigurationFile");
+        logger.trace(CONFIGURATION, "Retrieving the '{}' configuration option", "sharedConfigurationFile");
         for (Map.Entry<LayerPriority, ConfigurationLayer> layerEntry: layers.entrySet()) {
             // custom shared configuration file configuration is ignored on custom shared configuration file layers to avoid chaining
             if (!LayerPriority.CUSTOM_SHARED_FILE.equals(layerEntry.getKey())) {
                 String sharedConfigurationFile = layerEntry.getValue().getSharedConfigurationFile();
                 if (!Objects.isNull(sharedConfigurationFile)) {
-                    logger.trace(CONFIGURATION, "The {} configuration option value is: {}", "sharedConfigurationFile", sharedConfigurationFile);
+                    logger.trace(CONFIGURATION, "The '{}' configuration option value is: '{}'", "sharedConfigurationFile", sharedConfigurationFile);
                     return sharedConfigurationFile;
                 }
             }
@@ -527,11 +527,11 @@ public class Configuration implements Root {
     @Override
     public String getStateFile()
         throws DataAccessException, IllegalPropertyException {
-        logger.trace(CONFIGURATION, "Retrieving the {} configuration option", "stateFile");
+        logger.trace(CONFIGURATION, "Retrieving the '{}' configuration option", "stateFile");
         for (ConfigurationLayer layer: layers.values()) {
             String stateFile = layer.getStateFile();
             if (!Objects.isNull(stateFile)) {
-                logger.trace(CONFIGURATION, "The {} configuration option value is: {}", "stateFile", stateFile);
+                logger.trace(CONFIGURATION, "The '{}' configuration option value is: '{}'", "stateFile", stateFile);
                 return stateFile;
             }
         }
@@ -544,11 +544,11 @@ public class Configuration implements Root {
     @Override
     public Verbosity getVerbosity()
         throws DataAccessException, IllegalPropertyException {
-        logger.trace(CONFIGURATION, "Retrieving the {} configuration option", "verbosity");
+        logger.trace(CONFIGURATION, "Retrieving the '{}' configuration option", "verbosity");
         for (ConfigurationLayer layer: layers.values()) {
             Verbosity verbosity = layer.getVerbosity();
             if (!Objects.isNull(verbosity)) {
-                logger.trace(CONFIGURATION, "The {} configuration option value is: {}", "verbosity", verbosity);
+                logger.trace(CONFIGURATION, "The '{}' configuration option value is: '{}'", "verbosity", verbosity);
                 return verbosity;
             }
         }
@@ -561,11 +561,11 @@ public class Configuration implements Root {
     @Override
     public String getVersion()
         throws DataAccessException, IllegalPropertyException {
-        logger.trace(CONFIGURATION, "Retrieving the {} configuration option", "version");
+        logger.trace(CONFIGURATION, "Retrieving the '{}' configuration option", "version");
         for (ConfigurationLayer layer: layers.values()) {
             String version = layer.getVersion();
             if (!Objects.isNull(version)) {
-                logger.trace(CONFIGURATION, "The {} configuration option value is: {}", "version", version);
+                logger.trace(CONFIGURATION, "The '{}' configuration option value is: '{}'", "version", version);
                 return version;
             }
         }
@@ -589,11 +589,11 @@ public class Configuration implements Root {
         @Override
         public List<String> getEnabled()
             throws DataAccessException, IllegalPropertyException {
-            logger.trace(CONFIGURATION, "Retrieving the {}.{} configuration option", configurationBlockName, "enabled");
+            logger.trace(CONFIGURATION, "Retrieving the '{}.{}' configuration option", configurationBlockName, "enabled");
             for (ConfigurationLayer layer: layers.values()) {
                 List<String> enabled = layer.getCommitMessageConventions().getEnabled();
                 if (!Objects.isNull(enabled)) {
-                    logger.trace(CONFIGURATION, "The {}.{} configuration option value is: {}", configurationBlockName, "enabled", String.join(", ", enabled));
+                    logger.trace(CONFIGURATION, "The '{}.{}' configuration option value is: '{}'", configurationBlockName, "enabled", String.join(", ", enabled));
                     return enabled;
                 }
             }
@@ -606,16 +606,16 @@ public class Configuration implements Root {
         @Override
         protected CommitMessageConvention getResolvedItem(String name)
             throws DataAccessException, IllegalPropertyException {
-            logger.trace(CONFIGURATION, "Resolving the {}.{}[{}] configuration option", configurationBlockName, "items", name);
+            logger.trace(CONFIGURATION, "Resolving the '{}.{}[{}]' configuration option", configurationBlockName, "items", name);
             for (ConfigurationLayer layer: layers.values()) {
                 CommitMessageConvention item = layer.getCommitMessageConventions().getItem(name);
                 if (!Objects.isNull(item)) {
-                    logger.trace(CONFIGURATION, "The {}.{}[{}] configuration option has been resolved", configurationBlockName, "items", name);
+                    logger.trace(CONFIGURATION, "The '{}.{}[{}]' configuration option has been resolved", configurationBlockName, "items", name);
                     return item;
                 }
             }
-            logger.error(CONFIGURATION, "Unable to resolve the {}.{}[{}] configuration option", configurationBlockName, "items", name);
-            throw new IllegalPropertyException(String.format("Unable to resolve the %s.%s[%s] configuration option", configurationBlockName, "items", name));
+            logger.error(CONFIGURATION, "Unable to resolve the '{}.{}[{}]' configuration option", configurationBlockName, "items", name);
+            throw new IllegalPropertyException(String.format("Unable to resolve the '%s.%s[%s]' configuration option", configurationBlockName, "items", name));
         }
     }
 
@@ -636,11 +636,11 @@ public class Configuration implements Root {
         @Override
         public List<String> getEnabled()
             throws DataAccessException, IllegalPropertyException {
-            logger.trace(CONFIGURATION, "Retrieving the {}.{} configuration option", configurationBlockName, "enabled");
+            logger.trace(CONFIGURATION, "Retrieving the '{}.{}' configuration option", configurationBlockName, "enabled");
             for (ConfigurationLayer layer: layers.values()) {
                 List<String> enabled = layer.getReleaseTypes().getEnabled();
                 if (!Objects.isNull(enabled)) {
-                    logger.trace(CONFIGURATION, "The {}.{} configuration option value is: {}", configurationBlockName, "enabled", String.join(", ", enabled));
+                    logger.trace(CONFIGURATION, "The '{}.{}' configuration option value is: '{}'", configurationBlockName, "enabled", String.join(", ", enabled));
                     return enabled;
                 }
             }
@@ -653,16 +653,16 @@ public class Configuration implements Root {
         @Override
         protected ReleaseType getResolvedItem(String name)
             throws DataAccessException, IllegalPropertyException {
-            logger.trace(CONFIGURATION, "Resolving the {}.{}[{}] configuration option", configurationBlockName, "items", name);
+            logger.trace(CONFIGURATION, "Resolving the '{}.{}[{}]' configuration option", configurationBlockName, "items", name);
             for (ConfigurationLayer layer: layers.values()) {
                 ReleaseType item = layer.getReleaseTypes().getItem(name);
                 if (!Objects.isNull(item)) {
-                    logger.trace(CONFIGURATION, "The {}.{}[{}] configuration option has been resolved", configurationBlockName, "items", name);
+                    logger.trace(CONFIGURATION, "The '{}.{}[{}]' configuration option has been resolved", configurationBlockName, "items", name);
                     return item;
                 }
             }
-            logger.error(CONFIGURATION, "Unable to resolve the {}.{}[{}] configuration option", configurationBlockName, "items", name);
-            throw new IllegalPropertyException(String.format("Unable to resolve the %s.%s[%s] configuration option", configurationBlockName, "items", name));
+            logger.error(CONFIGURATION, "Unable to resolve the '{}.{}[{}]' configuration option", configurationBlockName, "items", name);
+            throw new IllegalPropertyException(String.format("Unable to resolve the '%s.%s[%s]' configuration option", configurationBlockName, "items", name));
         }
     }
 }

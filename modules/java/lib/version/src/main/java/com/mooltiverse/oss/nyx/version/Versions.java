@@ -45,7 +45,7 @@ public class Versions {
         switch (scheme) {
             case SEMVER: return SemanticVersion.valueOf(SemanticVersion.DEFAULT_INITIAL_VERSION);
             //MAVEN: not yet supported
-            default: throw new IllegalArgumentException(String.format("Illegal or unsupported scheme %s", scheme));
+            default: throw new IllegalArgumentException(String.format("Illegal or unsupported scheme '%s'", scheme));
         }
     }
 
@@ -95,7 +95,7 @@ public class Versions {
                     return Objects.isNull(v.getPrerelease()) && Objects.isNull(v.getBuild());
                 }
             //MAVEN: not yet supported
-            default: throw new IllegalArgumentException(String.format("Illegal or unsupported scheme %s", scheme));
+            default: throw new IllegalArgumentException(String.format("Illegal or unsupported scheme '%s'", scheme));
         }
     }
 
@@ -165,7 +165,7 @@ public class Versions {
         switch (scheme) {
             case SEMVER: return SemanticVersion.isLegal(s, lenient);
             //MAVEN: not yet supported
-            default: throw new IllegalArgumentException(String.format("Illegal or unsupported scheme %s", scheme));
+            default: throw new IllegalArgumentException(String.format("Illegal or unsupported scheme '%s'", scheme));
         }
     }
 
@@ -218,7 +218,7 @@ public class Versions {
                 break;
             }
             //MAVEN: not yet supported
-            default: throw new IllegalArgumentException(String.format("Illegal or unsupported scheme %s", scheme));
+            default: throw new IllegalArgumentException(String.format("Illegal or unsupported scheme '%s'", scheme));
         }
 
         Iterator<String> iterator = identifiers.iterator();
@@ -257,7 +257,7 @@ public class Versions {
                 break;
             }
             //MAVEN: not yet supported
-            default: throw new IllegalArgumentException(String.format("Illegal or unsupported scheme %s", scheme));
+            default: throw new IllegalArgumentException(String.format("Illegal or unsupported scheme '%s'", scheme));
         }
         return (comparator.compare(identifier1, identifier2) < 0) ? identifier1 : identifier2;
     }
@@ -304,7 +304,7 @@ public class Versions {
         switch (scheme) {
             case SEMVER: return SemanticVersion.valueOf(s, sanitize);
             //MAVEN: not yet supported
-            default: throw new IllegalArgumentException(String.format("Illegal or unsupported scheme %s", scheme));
+            default: throw new IllegalArgumentException(String.format("Illegal or unsupported scheme '%s'", scheme));
         }
     }
 
@@ -415,7 +415,7 @@ public class Versions {
                 else return sv1.compareTo(sv2);
             }
             //MAVEN: not yet supported
-            default: throw new IllegalArgumentException(String.format("Illegal or unsupported scheme %s", scheme));
+            default: throw new IllegalArgumentException(String.format("Illegal or unsupported scheme '%s'", scheme));
         }
     }
 }

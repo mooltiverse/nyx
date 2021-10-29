@@ -80,14 +80,14 @@ public abstract class LayeredMapConfigurationBlock<T> implements MapConfiguratio
      */
     private Map<String,T> getResolvedItems()
         throws DataAccessException, IllegalPropertyException {
-        logger.trace(CONFIGURATION, "Resolving the {}.{} configuration option", configurationBlockName, "items");
+        logger.trace(CONFIGURATION, "Resolving the '{}.{}' configuration option", configurationBlockName, "items");
         if (!itemsInitialized) {
             List<String> enabled = getEnabled();
             if (Objects.isNull(enabled)) {
-                logger.trace(CONFIGURATION, "No enabled {}.{} to resolve", configurationBlockName, "items");
+                logger.trace(CONFIGURATION, "No enabled '{}.{}' to resolve", configurationBlockName, "items");
             }
             else {
-                logger.trace(CONFIGURATION, "Resolving {}.{} {}: ", enabled.size(), configurationBlockName, "items", String.join(", ", enabled));
+                logger.trace(CONFIGURATION, "Resolving '{}.{}[{}]': ", enabled.size(), configurationBlockName, "items", String.join(", ", enabled));
                 resolvedItems.clear();
                 for (String enabledItem: enabled) {
                     resolvedItems.put(enabledItem, getResolvedItem(enabledItem));
@@ -117,7 +117,7 @@ public abstract class LayeredMapConfigurationBlock<T> implements MapConfiguratio
     @Override
     public Map<String,T> getItems()
         throws DataAccessException, IllegalPropertyException {
-        logger.trace(CONFIGURATION, "Retrieving the {}.{} configuration option", configurationBlockName, "items");
+        logger.trace(CONFIGURATION, "Retrieving the '{}.{}' configuration option", configurationBlockName, "items");
         return getResolvedItems();
     }
 
@@ -127,7 +127,7 @@ public abstract class LayeredMapConfigurationBlock<T> implements MapConfiguratio
     @Override
     public T getItem(String name)
         throws DataAccessException, IllegalPropertyException {
-        logger.trace(CONFIGURATION, "Retrieving the {}.{}[{}] configuration option", configurationBlockName, "items", name);
+        logger.trace(CONFIGURATION, "Retrieving the '{}.{}[{}]' configuration option", configurationBlockName, "items", name);
         return getResolvedItem(name);
     }
 }

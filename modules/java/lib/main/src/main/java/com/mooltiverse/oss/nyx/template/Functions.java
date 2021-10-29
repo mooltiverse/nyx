@@ -496,7 +496,7 @@ class Functions {
                 return dateFormat.format(date);
             }
             catch (NumberFormatException nfe) {
-                logger.error(TEMPLATE, "String {} does not represent a valid Long timestamp", input);
+                logger.error(TEMPLATE, "String '{}' does not represent a valid Long timestamp", input);
                 return "";
             }
         }
@@ -536,7 +536,7 @@ class Functions {
                 return dateFormat.format(date);
             }
             catch (NumberFormatException nfe) {
-                logger.error(TEMPLATE, "String {} does not represent a valid Long timestamp", input);
+                logger.error(TEMPLATE, "String '{}' does not represent a valid Long timestamp", input);
                 return "";
             }
         }
@@ -630,7 +630,7 @@ class Functions {
                 
                 try {
                     java.io.File f = new java.io.File(path);
-                    logger.trace(TEMPLATE, "Trying to read contents from file {} ({})", path, f.getAbsolutePath());
+                    logger.trace(TEMPLATE, "Trying to read contents from file '{}' ('{}')", path, f.getAbsolutePath());
                     FileReader reader = new FileReader(f);
                     StringWriter writer = new StringWriter();
                     reader.transferTo(writer);
@@ -639,7 +639,7 @@ class Functions {
                     return writer.toString();
                 }
                 catch (IOException ioe) {
-                    logger.error(TEMPLATE, "Unable to read from file {}: {}", path, ioe.getMessage());
+                    logger.error(TEMPLATE, "Unable to read from file '{}': '{}'", path, ioe.getMessage());
                     logger.trace(TEMPLATE, "Unable to read from file", ioe);
                     return "";
                 }
@@ -668,7 +668,7 @@ class Functions {
                     return Boolean.FALSE.toString();
 
                 java.io.File f = new java.io.File(path);
-                logger.trace(TEMPLATE, "Checking whether file {} ({}) exists", path, f.getAbsolutePath());
+                logger.trace(TEMPLATE, "Checking whether file '{}' ('{}') exists", path, f.getAbsolutePath());
                 return Boolean.toString(f.exists() && f.isFile());
             }
         }

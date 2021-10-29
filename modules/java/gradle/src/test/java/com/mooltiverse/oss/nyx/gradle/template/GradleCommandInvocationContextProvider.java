@@ -218,7 +218,7 @@ public class GradleCommandInvocationContextProvider extends CommandInvocationCon
                 return project;
             }
             catch (Exception e) {
-                throw new ParameterResolutionException(String.format("Cannot resolve parameter %s in %s", parameterContext.getParameter().getName(), parameterContext.getParameter().getDeclaringExecutable().getName()), e);
+                throw new ParameterResolutionException(String.format("Cannot resolve parameter '%s' in '%s'", parameterContext.getParameter().getName(), parameterContext.getParameter().getDeclaringExecutable().getName()), e);
             }
         }
 
@@ -250,7 +250,7 @@ public class GradleCommandInvocationContextProvider extends CommandInvocationCon
                         case MAKE:    taskName = MakeTask.NAME; break;
                         case MARK:    taskName = MarkTask.NAME; break;
                         case PUBLISH: taskName = PublishTask.NAME; break;
-                        default:      throw new ParameterResolutionException(String.format("Cannot resolve parameter %s in %s because the command % is unknown", parameterContext.getParameter().getName(), parameterContext.getParameter().getDeclaringExecutable().getName(), commandName.toString()));
+                        default:      throw new ParameterResolutionException(String.format("Cannot resolve parameter '%s' in '%s' because the command % is unknown", parameterContext.getParameter().getName(), parameterContext.getParameter().getDeclaringExecutable().getName(), commandName.toString()));
                     }
                     task = project.getTasks().getByName(taskName);
                     store.put("task", task);
@@ -258,7 +258,7 @@ public class GradleCommandInvocationContextProvider extends CommandInvocationCon
                 return task;
             }
             catch (Exception e) {
-                throw new ParameterResolutionException(String.format("Cannot resolve parameter %s in %s", parameterContext.getParameter().getName(), parameterContext.getParameter().getDeclaringExecutable().getName()), e);
+                throw new ParameterResolutionException(String.format("Cannot resolve parameter '%s' in '%s'", parameterContext.getParameter().getName(), parameterContext.getParameter().getDeclaringExecutable().getName()), e);
             }
         }
     }
@@ -290,7 +290,7 @@ public class GradleCommandInvocationContextProvider extends CommandInvocationCon
             if (parameterContext.getParameter().getType().isAssignableFrom(Project.class)) {
                 return resolveSharedProject(parameterContext, extensionContext, parameterContext.getDeclaringExecutable());
             }
-            else throw new ParameterResolutionException(String.format("Cannot resolve parameter %s in %s because its type %s is not supported by this resolver", parameterContext.getParameter().getName(), parameterContext.getParameter().getDeclaringExecutable().getName(), parameterContext.getParameter().getType().getName()));
+            else throw new ParameterResolutionException(String.format("Cannot resolve parameter '%s' in '%s' because its type '%s' is not supported by this resolver", parameterContext.getParameter().getName(), parameterContext.getParameter().getDeclaringExecutable().getName(), parameterContext.getParameter().getType().getName()));
         }
     }
 
@@ -322,7 +322,7 @@ public class GradleCommandInvocationContextProvider extends CommandInvocationCon
             if (parameterContext.getParameter().getType().isAssignableFrom(Task.class)) {
                 return resolveSharedTask(parameterContext, extensionContext, parameterContext.getDeclaringExecutable());
             }
-            else throw new ParameterResolutionException(String.format("Cannot resolve parameter %s in %s because its type %s is not supported by this resolver", parameterContext.getParameter().getName(), parameterContext.getParameter().getDeclaringExecutable().getName(), parameterContext.getParameter().getType().getName()));
+            else throw new ParameterResolutionException(String.format("Cannot resolve parameter '%s' in '%s' because its type '%s' is not supported by this resolver", parameterContext.getParameter().getName(), parameterContext.getParameter().getDeclaringExecutable().getName(), parameterContext.getParameter().getType().getName()));
         }
     }
 
@@ -354,7 +354,7 @@ public class GradleCommandInvocationContextProvider extends CommandInvocationCon
             if (parameterContext.getParameter().getType().isAssignableFrom(CommandProxy.class)) {
                 return new GradleTaskCommand(CoreTask.class.cast(resolveSharedTask(parameterContext, extensionContext, parameterContext.getDeclaringExecutable())));
             }
-            else throw new ParameterResolutionException(String.format("Cannot resolve parameter %s in %s because its type %s is not supported by this resolver", parameterContext.getParameter().getName(), parameterContext.getParameter().getDeclaringExecutable().getName(), parameterContext.getParameter().getType().getName()));
+            else throw new ParameterResolutionException(String.format("Cannot resolve parameter '%s' in '%s' because its type '%s' is not supported by this resolver", parameterContext.getParameter().getName(), parameterContext.getParameter().getDeclaringExecutable().getName(), parameterContext.getParameter().getType().getName()));
         }
     }
 }

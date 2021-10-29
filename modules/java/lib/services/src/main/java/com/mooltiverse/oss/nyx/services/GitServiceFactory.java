@@ -51,7 +51,7 @@ public class GitServiceFactory {
         {
             case GITHUB: return GitHub.instance();
             case GITLAB: return GitLab.instance();
-            default:     throw new IllegalArgumentException(String.format("Illegal provider: %s", provider));
+            default:     throw new IllegalArgumentException(String.format("Illegal provider: '%s'", provider));
         }
     }
 
@@ -75,7 +75,7 @@ public class GitServiceFactory {
         {
             case GITHUB: return GitHub.instance(apiURI);
             case GITLAB: return GitLab.instance(apiURI);
-            default:     throw new IllegalArgumentException(String.format("Illegal provider: %s", provider));
+            default:     throw new IllegalArgumentException(String.format("Illegal provider: '%s'", provider));
         }
     }
 
@@ -99,7 +99,7 @@ public class GitServiceFactory {
         {
             case GITHUB: return GitHub.instance(apiURI);
             case GITLAB: return GitLab.instance(apiURI);
-            default:     throw new IllegalArgumentException(String.format("Illegal provider: %s", provider));
+            default:     throw new IllegalArgumentException(String.format("Illegal provider: '%s'", provider));
         }
     }
 }

@@ -61,7 +61,7 @@ public class FileMapper {
     private static ObjectMapper getObjectMapper(String filePath) {
         ObjectMapper objectMapper = new ObjectMapper();
 
-        logger.trace(DATA, "Retrieving an object mapper instance for file {}", filePath);
+        logger.trace(DATA, "Retrieving an object mapper instance for file '{}'", filePath);
 
         if (filePath.toLowerCase().endsWith(".json")) {
             objectMapper = new ObjectMapper(new JsonFactory());
@@ -70,7 +70,7 @@ public class FileMapper {
             objectMapper = new ObjectMapper(new YAMLFactory());
         }
         else {
-            logger.debug(DATA, "Unable to infer the extension from file {}, using JSON by default", filePath);
+            logger.debug(DATA, "Unable to infer the extension from file '{}', using JSON by default", filePath);
             objectMapper = new ObjectMapper(new JsonFactory());
         }
 
@@ -103,12 +103,12 @@ public class FileMapper {
      */
     public static <T> T load(File file, Class<T> type)
         throws DataAccessException {
-        logger.trace(DATA, "Unmarshalling object from file {} to type {}", file.getAbsolutePath(), type.getName());
+        logger.trace(DATA, "Unmarshalling object from file '{}' to type '{}'", file.getAbsolutePath(), type.getName());
         try {
             return getObjectMapper(file.getAbsolutePath()).readValue(file, type);
         }
         catch (IOException ioe) {
-            throw new DataAccessException(String.format("Unable to unmarshal content from file %s", file.getAbsolutePath()), ioe);
+            throw new DataAccessException(String.format("Unable to unmarshal content from file '%s'", file.getAbsolutePath()), ioe);
         }
     }
 
@@ -128,12 +128,12 @@ public class FileMapper {
      */
     public static <T> T load(URL url, Class<T> type)
         throws DataAccessException {
-        logger.trace(DATA, "Unmarshalling object from URL {} to type {}", url.toString(), type.getName());
+        logger.trace(DATA, "Unmarshalling object from URL '{}' to type '{}'", url.toString(), type.getName());
         try {
             return getObjectMapper(url.getFile()).readValue(url, type);
         }
         catch (IOException ioe) {
-            throw new DataAccessException(String.format("Unable to unmarshal content from URL %s", url.toString()), ioe);
+            throw new DataAccessException(String.format("Unable to unmarshal content from URL '%s'", url.toString()), ioe);
         }
     }
 
@@ -151,7 +151,7 @@ public class FileMapper {
      */
     public static void save(String filePath, Object content)
         throws DataAccessException {
-        logger.trace(DATA, "Marshalling object to file {} to type {}", filePath, content.getClass().getName());
+        logger.trace(DATA, "Marshalling object to file '{}' to type '{}'", filePath, content.getClass().getName());
         try {
             File file = new File(filePath);
             // create parent directories, if any and if needed
@@ -162,7 +162,7 @@ public class FileMapper {
             getObjectMapper(filePath).writeValue(file, content);
         }
         catch (IOException ioe) {
-            throw new DataAccessException(String.format("Unable to marshal content to file %s", filePath), ioe);
+            throw new DataAccessException(String.format("Unable to marshal content to file '%s'", filePath), ioe);
         }
     }
 }

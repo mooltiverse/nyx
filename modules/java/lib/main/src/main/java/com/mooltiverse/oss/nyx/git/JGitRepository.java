@@ -105,7 +105,7 @@ class JGitRepository implements Repository {
         throws IOException {
         Objects.requireNonNull(directory, "Can't create a repository instance with a null directory");
 
-        logger.debug(GIT, "Opening repository in directory {}", directory.getAbsolutePath());
+        logger.debug(GIT, "Opening repository in directory '{}'", directory.getAbsolutePath());
 
         return new JGitRepository(Git.open(directory));
     }
@@ -216,7 +216,7 @@ class JGitRepository implements Repository {
     @Override
     public String push(String remote)
         throws GitException {
-        logger.debug(GIT, "Pushing changes to remote repository {}", remote);
+        logger.debug(GIT, "Pushing changes to remote repository '{}'", remote);
         try {
             // get the current branch name
             String currentBranchRef = jGit.getRepository().getFullBranch();
@@ -241,7 +241,7 @@ class JGitRepository implements Repository {
     @Override
     public Set<String> push(Collection<String> remotes)
         throws GitException {
-        logger.debug(GIT, "Pushing changes to {} remote repositories", remotes.size());
+        logger.debug(GIT, "Pushing changes to '{}' remote repositories", remotes.size());
         Set<String> res = new HashSet<String>();
         for (String remote: remotes) {
             res.add(push(remote));
@@ -282,7 +282,7 @@ class JGitRepository implements Repository {
     @Override
     public Tag tag(String target, String name, String message, Identity tagger)
         throws GitException {
-        logger.debug(GIT, "Tagging as {}", name);
+        logger.debug(GIT, "Tagging as '{}'", name);
         try {
             TagCommand command = jGit.tag().setObjectId(parseCommit(Objects.isNull(target) ? getLatestCommit() : target));
             if (Objects.isNull(message))
@@ -320,25 +320,25 @@ class JGitRepository implements Repository {
         throws GitException {
         Objects.requireNonNull(id, "Cannot resolve null identifiers");
 
-        logger.trace(GIT, "Resolving {}", id);
+        logger.trace(GIT, "Resolving '{}'", id);
         try {
             ObjectId res = jGit.getRepository().resolve(id);
             if (Objects.isNull(res))
             {
                 if (Constants.HEAD.equals(id))
-                    logger.warn(GIT, "Repository identifier {} cannot be resolved. This means that the repository has just been initialized and has no commits yet or the repository is in a 'detached HEAD' state. See the documentation to fix this.", Constants.HEAD);
-                throw new GitException(String.format("Identifier %s cannot be resolved", id));
+                    logger.warn(GIT, "Repository identifier '{}' cannot be resolved. This means that the repository has just been initialized and has no commits yet or the repository is in a 'detached HEAD' state. See the documentation to fix this.", Constants.HEAD);
+                throw new GitException(String.format("Identifier '%s' cannot be resolved", id));
             }
             else return res;
         }
         catch (AmbiguousObjectException aoe) {
-            throw new GitException(String.format("The %s identifier cannot be resolved uniquely as it resolves to multiple objects in the repository. If this is a shortened SHA identifier try using more charachers to disambiguate.", id), aoe);
+            throw new GitException(String.format("The '%s' identifier cannot be resolved uniquely as it resolves to multiple objects in the repository. If this is a shortened SHA identifier try using more charachers to disambiguate.", id), aoe);
         }
         catch (RevisionSyntaxException rse) {
-            throw new GitException(String.format("The %s identifier cannot be resolved as the expression is not supported by this implementation.", id), rse);
+            throw new GitException(String.format("The '%s' identifier cannot be resolved as the expression is not supported by this implementation.", id), rse);
         }
         catch (IOException ioe) {
-            throw new GitException(String.format("The %s identifier cannot be resolved", id), ioe);
+            throw new GitException(String.format("The '%s' identifier cannot be resolved", id), ioe);
         }
     }
 
@@ -364,15 +364,15 @@ class JGitRepository implements Repository {
         throws GitException {
         Objects.requireNonNull(id, "Cannot parse a commit from a null identifier");
 
-        logger.trace(GIT, "Parsing commit {}", id);
+        logger.trace(GIT, "Parsing commit '{}'", id);
         try {
             return jGit.getRepository().parseCommit(resolve(id));
         }
         catch (MissingObjectException moe) {
-            throw new GitException(String.format("The %s commit identifier cannot be resolved as there is no such commit.", id), moe);
+            throw new GitException(String.format("The '%s' commit identifier cannot be resolved as there is no such commit.", id), moe);
         }
         catch (IOException ioe) {
-            throw new GitException(String.format("The %s commit identifier cannot be resolved to a valid commit", id), ioe);
+            throw new GitException(String.format("The '%s' commit identifier cannot be resolved to a valid commit", id), ioe);
         }
     }
 
@@ -403,10 +403,10 @@ class JGitRepository implements Repository {
             return rw.parseCommit(resolve(id));
         }
         catch (MissingObjectException moe) {
-            throw new GitException(String.format("The %s commit identifier cannot be resolved as there is no such commit.", id), moe);
+            throw new GitException(String.format("The '%s' commit identifier cannot be resolved as there is no such commit.", id), moe);
         }
         catch (IOException ioe) {
-            throw new GitException(String.format("The %s commit identifier cannot be resolved to a valid commit", id), ioe);
+            throw new GitException(String.format("The '%s' commit identifier cannot be resolved to a valid commit", id), ioe);
         }
     }
 
@@ -437,10 +437,10 @@ class JGitRepository implements Repository {
             return rw.next();
         }
         catch (MissingObjectException moe) {
-            throw new GitException(String.format("Cannot peek the %s commit likely because of a broken link in the object database.", startFrom), moe);
+            throw new GitException(String.format("Cannot peek the '%s' commit likely because of a broken link in the object database.", startFrom), moe);
         }
         catch (RevisionSyntaxException | JGitInternalException | IOException e) {
-            throw new GitException(String.format("Cannot peek the %s commit.", startFrom), e);
+            throw new GitException(String.format("Cannot peek the '%s' commit.", startFrom), e);
         }
         finally {
             rw.close();
@@ -468,7 +468,7 @@ class JGitRepository implements Repository {
     public String getLatestCommit()
         throws GitException {
         String commitSHA = peekCommit(Constants.HEAD, null).getName();
-        logger.debug(GIT, "Repository latest commit in HEAD branch is {}", commitSHA);
+        logger.debug(GIT, "Repository latest commit in HEAD branch is '{}'", commitSHA);
         return commitSHA;
     }
 
@@ -479,7 +479,7 @@ class JGitRepository implements Repository {
     public String getRootCommit()
         throws GitException {
         String commitSHA = peekCommit(Constants.HEAD, RevSort.REVERSE).getName();
-        logger.debug(GIT, "Repository root commit is {}", commitSHA);
+        logger.debug(GIT, "Repository root commit is '{}'", commitSHA);
         return commitSHA;
     }
 
@@ -489,7 +489,7 @@ class JGitRepository implements Repository {
     @Override
     public Set<Tag> getCommitTags(String commit)
         throws GitException {
-        logger.debug(GIT, "Retrieving tags for commit {}", commit);
+        logger.debug(GIT, "Retrieving tags for commit '{}'", commit);
         Set<Tag> res = new HashSet<Tag>();
         try {
             RefDatabase refDatabase = jGit.getRepository().getRefDatabase();
@@ -539,7 +539,7 @@ class JGitRepository implements Repository {
         throws GitException {
         if (Objects.isNull(visitor))
             return;
-        logger.debug(GIT, "Walking commit history. Start commit boundary is {}. End commit boundary is {}", Objects.isNull(start) ? "not defined" : start, Objects.isNull(end) ? "not defined" : end);
+        logger.debug(GIT, "Walking commit history. Start commit boundary is '{}'. End commit boundary is '{}'", Objects.isNull(start) ? "not defined" : start, Objects.isNull(end) ? "not defined" : end);
 
         RevWalk rw = new RevWalk(jGit.getRepository());
         try {
@@ -548,17 +548,17 @@ class JGitRepository implements Repository {
             logger.debug(GIT, "Upon merge commits only the first parent is considered.");
 
             RevCommit startCommit = parseCommit(rw, Objects.isNull(start) ? Constants.HEAD : start);
-            logger.trace(GIT, "Start boundary resolved to commit {}", startCommit.getId().getName());
+            logger.trace(GIT, "Start boundary resolved to commit '{}'", startCommit.getId().getName());
             rw.markStart(startCommit);
 
             // make sure the end commit can be resolved, if not null, or throw an exception
             RevCommit endCommit = Objects.isNull(end) ? null : parseCommit(rw, end);
-            logger.trace(GIT, "End boundary resolved to commit {}", Objects.isNull(endCommit) ? "not defined" : endCommit.getId().getName());
+            logger.trace(GIT, "End boundary resolved to commit '{}'", Objects.isNull(endCommit) ? "not defined" : endCommit.getId().getName());
 
             Iterator<RevCommit> commitIterator = rw.iterator();
             while (commitIterator.hasNext()) {
                 RevCommit commit = commitIterator.next();
-                logger.trace(GIT, "Visiting commit {}", commit.getId().getName());
+                logger.trace(GIT, "Visiting commit '{}'", commit.getId().getName());
                 boolean visitorContinues = visitor.visit(ObjectFactory.commitFrom(commit, getCommitTags(commit.getId().getName())));
                 
                 if (!visitorContinues) {
@@ -566,7 +566,7 @@ class JGitRepository implements Repository {
                     break;
                 }
                 else if (!Objects.isNull(end) && commit.getId().getName().startsWith(end)) {
-                    logger.debug(GIT, "Commit history walk reached the end boundary {}", end);
+                    logger.debug(GIT, "Commit history walk reached the end boundary '{}'", end);
                     break;
                 }
                 else if (!commitIterator.hasNext()) {

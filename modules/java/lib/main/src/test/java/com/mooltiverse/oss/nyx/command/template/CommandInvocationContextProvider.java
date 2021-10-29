@@ -297,7 +297,7 @@ public class CommandInvocationContextProvider implements TestTemplateInvocationC
                 return value;
             }
             catch (Exception e) {
-                throw new ParameterResolutionException(String.format("Cannot resolve parameter %s in %s", parameterContext.getParameter().getName(), parameterContext.getParameter().getDeclaringExecutable().getName()), e);
+                throw new ParameterResolutionException(String.format("Cannot resolve parameter '%s' in '%s'", parameterContext.getParameter().getName(), parameterContext.getParameter().getDeclaringExecutable().getName()), e);
             }
         }
 
@@ -326,7 +326,7 @@ public class CommandInvocationContextProvider implements TestTemplateInvocationC
                     return parameterContext.findAnnotation(Baseline.class).get().value().realize();
                 }
                 catch (Exception e) {
-                    throw new ParameterResolutionException(String.format("Cannot resolve parameter %s in %s", parameterContext.getParameter().getName(), parameterContext.getParameter().getDeclaringExecutable().getName()), e);
+                    throw new ParameterResolutionException(String.format("Cannot resolve parameter '%s' in '%s'", parameterContext.getParameter().getName(), parameterContext.getParameter().getDeclaringExecutable().getName()), e);
                 }
             }
             else if (AnnotationSupport.isAnnotated(parameterContext.getDeclaringExecutable(), Baseline.class)) {
@@ -339,7 +339,7 @@ public class CommandInvocationContextProvider implements TestTemplateInvocationC
                 // when storing use the name of the declaring class as the namespace, from proper isolation
                 return resolveSharedBaseline(parameterContext, extensionContext, parameterContext.getDeclaringExecutable().getDeclaringClass(), parameterContext.getDeclaringExecutable().getDeclaringClass().toGenericString());
             }
-            else throw new ParameterResolutionException(String.format("Cannot resolve parameter %s in %s because no %s annotation is present", parameterContext.getParameter().getName(), parameterContext.getParameter().getDeclaringExecutable().getName(), Baseline.class.getName()));
+            else throw new ParameterResolutionException(String.format("Cannot resolve parameter '%s' in '%s' because no '%s' annotation is present", parameterContext.getParameter().getName(), parameterContext.getParameter().getDeclaringExecutable().getName(), Baseline.class.getName()));
         }
 
         /**
@@ -363,7 +363,7 @@ public class CommandInvocationContextProvider implements TestTemplateInvocationC
             else if (AnnotationSupport.isAnnotated(parameterContext.getDeclaringExecutable(), CommandSelector.class)) {
                 return AnnotationSupport.findAnnotation(parameterContext.getDeclaringExecutable(), CommandSelector.class).get().value();
             }
-            else throw new ParameterResolutionException(String.format("Cannot resolve parameter %s in %s because it does not have a % annotation", parameterContext.getParameter().getName(), parameterContext.getParameter().getDeclaringExecutable().getName(), CommandSelector.class.getName()));
+            else throw new ParameterResolutionException(String.format("Cannot resolve parameter '%s' in '%s' because it does not have a % annotation", parameterContext.getParameter().getName(), parameterContext.getParameter().getDeclaringExecutable().getName(), CommandSelector.class.getName()));
         }
     }
 
@@ -397,7 +397,7 @@ public class CommandInvocationContextProvider implements TestTemplateInvocationC
             if (parameterContext.getParameter().getType().isAssignableFrom(Script.class)) {
                 return resolveBaseline(parameterContext, extensionContext);
             }
-            else throw new ParameterResolutionException(String.format("Cannot resolve parameter %s in %s because its type %s is not supported by this resolver", parameterContext.getParameter().getName(), parameterContext.getParameter().getDeclaringExecutable().getName(), parameterContext.getParameter().getType().getName()));
+            else throw new ParameterResolutionException(String.format("Cannot resolve parameter '%s' in '%s' because its type '%s' is not supported by this resolver", parameterContext.getParameter().getName(), parameterContext.getParameter().getDeclaringExecutable().getName(), parameterContext.getParameter().getType().getName()));
         }
     }
 
@@ -436,7 +436,7 @@ public class CommandInvocationContextProvider implements TestTemplateInvocationC
                     script = resolveBaseline(parameterContext, extensionContext);
                 }
                 catch (ParameterResolutionException pre) {
-                    throw new ParameterResolutionException(String.format("Cannot resolve parameter %s in %s because no annotation %s could be found or resolved to get the Git Script baseline", parameterContext.getParameter().getName(), parameterContext.getParameter().getDeclaringExecutable().getName(), Baseline.class.getName()), pre);
+                    throw new ParameterResolutionException(String.format("Cannot resolve parameter '%s' in '%s' because no annotation '%s' could be found or resolved to get the Git Script baseline", parameterContext.getParameter().getName(), parameterContext.getParameter().getDeclaringExecutable().getName(), Baseline.class.getName()), pre);
                 }
 
                 try {
@@ -451,11 +451,11 @@ public class CommandInvocationContextProvider implements TestTemplateInvocationC
                 }
                 catch (Exception e)
                 {
-                    throw new ParameterResolutionException(String.format("Cannot resolve parameter %s in %s because the command could not be instantiated", parameterContext.getParameter().getName(), parameterContext.getParameter().getDeclaringExecutable().getName()));
+                    throw new ParameterResolutionException(String.format("Cannot resolve parameter '%s' in '%s' because the command could not be instantiated", parameterContext.getParameter().getName(), parameterContext.getParameter().getDeclaringExecutable().getName()));
                 }
 
             }
-            else throw new ParameterResolutionException(String.format("Cannot resolve parameter %s in %s because its type %s is not supported by this resolver", parameterContext.getParameter().getName(), parameterContext.getParameter().getDeclaringExecutable().getName(), parameterContext.getParameter().getType().getName()));
+            else throw new ParameterResolutionException(String.format("Cannot resolve parameter '%s' in '%s' because its type '%s' is not supported by this resolver", parameterContext.getParameter().getName(), parameterContext.getParameter().getDeclaringExecutable().getName(), parameterContext.getParameter().getType().getName()));
         }
     }
 
@@ -494,7 +494,7 @@ public class CommandInvocationContextProvider implements TestTemplateInvocationC
                     script = resolveBaseline(parameterContext, extensionContext);
                 }
                 catch (ParameterResolutionException pre) {
-                    throw new ParameterResolutionException(String.format("Cannot resolve parameter %s in %s because no annotation %s could be found or resolved to get the Git Script baseline", parameterContext.getParameter().getName(), parameterContext.getParameter().getDeclaringExecutable().getName(), Baseline.class.getName()), pre);
+                    throw new ParameterResolutionException(String.format("Cannot resolve parameter '%s' in '%s' because no annotation '%s' could be found or resolved to get the Git Script baseline", parameterContext.getParameter().getName(), parameterContext.getParameter().getDeclaringExecutable().getName(), Baseline.class.getName()), pre);
                 }
 
                 try {
@@ -502,11 +502,11 @@ public class CommandInvocationContextProvider implements TestTemplateInvocationC
                 }
                 catch (Exception e)
                 {
-                    throw new ParameterResolutionException(String.format("Cannot resolve parameter %s in %s because the command could not be instantiated", parameterContext.getParameter().getName(), parameterContext.getParameter().getDeclaringExecutable().getName()));
+                    throw new ParameterResolutionException(String.format("Cannot resolve parameter '%s' in '%s' because the command could not be instantiated", parameterContext.getParameter().getName(), parameterContext.getParameter().getDeclaringExecutable().getName()));
                 }
 
             }
-            else throw new ParameterResolutionException(String.format("Cannot resolve parameter %s in %s because its type %s is not supported by this resolver", parameterContext.getParameter().getName(), parameterContext.getParameter().getDeclaringExecutable().getName(), parameterContext.getParameter().getType().getName()));
+            else throw new ParameterResolutionException(String.format("Cannot resolve parameter '%s' in '%s' because its type '%s' is not supported by this resolver", parameterContext.getParameter().getName(), parameterContext.getParameter().getDeclaringExecutable().getName(), parameterContext.getParameter().getType().getName()));
         }
     }
 }

@@ -114,7 +114,7 @@ public class GitLabUser extends GitLabEntity implements GitUser {
         URI uri = userID == null ? session.getService().newRequestURI("/user") : session.getService().newRequestURI("/users/"+userID);
         Logger logger = LoggerFactory.getLogger(GitLabUser.class);
 
-        logger.debug(String.format("HTTP request %s %s", "GET", uri));
+        logger.debug(String.format("HTTP request '%s' '%s'", "GET", uri));
 
         HttpResponse<String> response = null;
         try {
@@ -124,12 +124,12 @@ public class GitLabUser extends GitLabEntity implements GitUser {
             throw new GitTransportException(e);
         }
 
-        logger.debug(String.format("Request to %s returned a response code %d", uri, response.statusCode()));
+        logger.debug(String.format("Request to '%s' returned a response code '%d'", uri, response.statusCode()));
         logger.trace(response.body());
 
         if (response.statusCode() != 200) {
-            logger.error(String.format("Request failed with result code %d", response.statusCode()));
-            throw new GitTransportException(String.format("Request returned a status code %d", response.statusCode()));
+            logger.error(String.format("Request failed with result code '%d'", response.statusCode()));
+            throw new GitTransportException(String.format("Request returned a status code '%d'", response.statusCode()));
         }
 
         try {

@@ -111,7 +111,7 @@ public class Nyx {
      */
     public Nyx(File directory) {
         super();
-        logger.trace(MAIN, "New Nyx instance in directory {}", Objects.isNull(directory) ? "null" : directory.getAbsolutePath());
+        logger.trace(MAIN, "New Nyx instance in directory '{}'", Objects.isNull(directory) ? "null" : directory.getAbsolutePath());
         // just override the default directory right away in the singleton default layer
         Configuration.setDefaultDirectory(directory);
     }
@@ -146,12 +146,12 @@ public class Nyx {
         throws DataAccessException, IllegalPropertyException, GitException {
         if (Objects.isNull(repository)) {
             File repoDir = new File(configuration().getDirectory());
-            logger.debug(MAIN, "Instantiating the Git repository in {}", repoDir);
+            logger.debug(MAIN, "Instantiating the Git repository in '{}'", repoDir);
             try {
                 repository = Git.open(repoDir);
             }
             catch (IOException ioe) {
-                throw new DataAccessException(String.format("The directory %s is not accessible or does not contain a valid Git repository", repoDir.getAbsolutePath()), ioe);
+                throw new DataAccessException(String.format("The directory '%s' is not accessible or does not contain a valid Git repository", repoDir.getAbsolutePath()), ioe);
             }
         }
         return repository;
@@ -178,7 +178,7 @@ public class Nyx {
                     if (!stateFile.isAbsolute())
                         stateFile = new File(configuration().getDirectory(), configuration().getStateFile());
                     if (stateFile.exists()) {
-                        logger.debug(MAIN, "Resuming the state from file {}", configuration().getStateFile());
+                        logger.debug(MAIN, "Resuming the state from file '{}'", configuration().getStateFile());
                         state = State.resume(stateFile, configuration());
                     }
                     else {
@@ -209,14 +209,14 @@ public class Nyx {
      */
     private Command newCommandInstance(Commands command)
         throws DataAccessException, IllegalPropertyException, GitException {
-        logger.debug(MAIN, "Creating new command instance {}", command);
+        logger.debug(MAIN, "Creating new command instance '{}'", command);
         switch (command) {
             case CLEAN:   return new Clean(state(), repository());
             case INFER:   return new Infer(state(), repository());
             case MAKE:    return new Make(state(), repository());
             case MARK:    return new Mark(state(), repository());
             case PUBLISH: return new Publish(state(), repository());
-            default:      throw new IllegalArgumentException(String.format("Unknown command", command.toString()));
+            default:      throw new IllegalArgumentException(String.format("Unknown command '%s'", command.toString()));
         }
     }
 
@@ -234,7 +234,7 @@ public class Nyx {
      */
     private Command getCommandInstance(Commands command)
         throws DataAccessException, IllegalPropertyException, GitException {
-        logger.debug(MAIN, "Looking up command instance {} from cache", command);
+        logger.debug(MAIN, "Looking up command instance '{}' from cache", command);
         if (commands.containsKey(command))
             return commands.get(command);
         
@@ -259,18 +259,18 @@ public class Nyx {
         throws DataAccessException, IllegalPropertyException, GitException, ReleaseException {
         Objects.requireNonNull(command, "Cannot run a null command");
 
-        logger.debug(MAIN, "Running command {}", command);
+        logger.debug(MAIN, "Running command '{}'", command);
         Command commandInstance = getCommandInstance(command);
         if (commandInstance.isUpToDate()) {
-            logger.debug(MAIN, "Command {} is up to date, skipping.", command.toString());
+            logger.debug(MAIN, "Command '{}' is up to date, skipping.", command.toString());
         }
         else {
-            logger.debug(MAIN, "Command {} is not up to date, running...", command.toString());
+            logger.debug(MAIN, "Command '{}' is not up to date, running...", command.toString());
             commandInstance.run();
 
             // optionally save the state file
             if (saveState && !Objects.isNull(configuration().getStateFile())) {
-                logger.debug(MAIN, "Storing the state to {}", configuration().getStateFile());
+                logger.debug(MAIN, "Storing the state to '{}'", configuration().getStateFile());
                 FileMapper.save(configuration().getStateFile(), state());
             }
         }
@@ -292,7 +292,7 @@ public class Nyx {
         logger.debug(MAIN, "Nyx.isUpTodate({})", command.toString());
         Objects.requireNonNull(command, "Command cannot be null");
 
-        logger.debug(MAIN, "Checking up-to-date status for command {}", command);
+        logger.debug(MAIN, "Checking up-to-date status for command '{}'", command);
         return commands.containsKey(command) && commands.get(command).isUpToDate();
     }
 

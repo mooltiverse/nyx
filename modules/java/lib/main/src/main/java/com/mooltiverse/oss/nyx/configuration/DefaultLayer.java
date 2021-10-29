@@ -75,7 +75,7 @@ class DefaultLayer implements ConfigurationLayer, Defaults {
     @Override
     public String getBump()
         throws DataAccessException, IllegalPropertyException {
-        logger.trace(DEFAULT, "Retrieving the default {} configuration option: {}", "bump", BUMP);
+        logger.trace(DEFAULT, "Retrieving the default '{}' configuration option: '{}'", "bump", BUMP);
         return BUMP;
     }
 
@@ -85,7 +85,7 @@ class DefaultLayer implements ConfigurationLayer, Defaults {
     @Override
     public CommitMessageConventions getCommitMessageConventions()
         throws DataAccessException, IllegalPropertyException {
-        logger.trace(DEFAULT, "Retrieving the default {} configuration option", "commitMessageConventions");
+        logger.trace(DEFAULT, "Retrieving the default '{}' configuration option", "commitMessageConventions");
         return COMMIT_MESSAGE_CONVENTIONS;
     }
 
@@ -95,7 +95,7 @@ class DefaultLayer implements ConfigurationLayer, Defaults {
     @Override
     public String getConfigurationFile()
         throws DataAccessException, IllegalPropertyException {
-        logger.trace(DEFAULT, "Retrieving the default {} configuration option", "configurationFile");
+        logger.trace(DEFAULT, "Retrieving the default '{}' configuration option", "configurationFile");
         return CONFIGURATION_FILE;
     }
 
@@ -105,7 +105,7 @@ class DefaultLayer implements ConfigurationLayer, Defaults {
     @Override
     public String getDirectory()
         throws DataAccessException, IllegalPropertyException {
-        logger.trace(DEFAULT, "Retrieving the default {} configuration option: {}", "directory", Objects.isNull(directory) ? DIRECTORY : directory);
+        logger.trace(DEFAULT, "Retrieving the default '{}' configuration option: '{}'", "directory", Objects.isNull(directory) ? DIRECTORY : directory);
         return Objects.isNull(directory) ? DIRECTORY : directory;
     }
 
@@ -115,7 +115,7 @@ class DefaultLayer implements ConfigurationLayer, Defaults {
      * @param directory the new default directory. If {@code null} then the standard default directory will be used.
      */
     public void setDirectory(String directory) {
-        logger.trace(DEFAULT, "Setting the default {} configuration option: {}", "directory", Objects.isNull(directory) ? "null" : directory);
+        logger.trace(DEFAULT, "Setting the default '{}' configuration option: '{}'", "directory", Objects.isNull(directory) ? "null" : directory);
         this.directory = directory;
     }
 
@@ -125,7 +125,7 @@ class DefaultLayer implements ConfigurationLayer, Defaults {
     @Override
     public Boolean getDryRun()
         throws DataAccessException, IllegalPropertyException {
-        logger.trace(DEFAULT, "Retrieving the default {} configuration option: {}", "dryRun", DRY_RUN);
+        logger.trace(DEFAULT, "Retrieving the default '{}' configuration option: '{}'", "dryRun", DRY_RUN);
         return DRY_RUN;
     }
 
@@ -135,7 +135,7 @@ class DefaultLayer implements ConfigurationLayer, Defaults {
     @Override
     public String getInitialVersion()
         throws DataAccessException, IllegalPropertyException {
-        logger.trace(DEFAULT, "Retrieving the default {} configuration option: {}", "initialVersion", INITIAL_VERSION);
+        logger.trace(DEFAULT, "Retrieving the default '{}' configuration option: '{}'", "initialVersion", INITIAL_VERSION);
         return INITIAL_VERSION;
     }
 
@@ -145,7 +145,7 @@ class DefaultLayer implements ConfigurationLayer, Defaults {
     @Override
     public String getPreset()
         throws DataAccessException, IllegalPropertyException {
-        logger.trace(DEFAULT, "Retrieving the default {} configuration option: {}", "preset", PRESET);
+        logger.trace(DEFAULT, "Retrieving the default '{}' configuration option: '{}'", "preset", PRESET);
         return PRESET;
     }
 
@@ -155,7 +155,7 @@ class DefaultLayer implements ConfigurationLayer, Defaults {
     @Override
     public String getReleasePrefix()
         throws DataAccessException, IllegalPropertyException {
-        logger.trace(DEFAULT, "Retrieving the default {} configuration option: {}", "releasePrefix", RELEASE_PREFIX);
+        logger.trace(DEFAULT, "Retrieving the default '{}' configuration option: '{}'", "releasePrefix", RELEASE_PREFIX);
         return RELEASE_PREFIX;
     }
 
@@ -165,7 +165,7 @@ class DefaultLayer implements ConfigurationLayer, Defaults {
     @Override
     public Boolean getReleaseLenient()
         throws DataAccessException, IllegalPropertyException {
-        logger.trace(DEFAULT, "Retrieving the default {} configuration option: {}", "releaseLenient", RELEASE_LENIENT);
+        logger.trace(DEFAULT, "Retrieving the default '{}' configuration option: '{}'", "releaseLenient", RELEASE_LENIENT);
         return RELEASE_LENIENT;
     }
 
@@ -175,7 +175,7 @@ class DefaultLayer implements ConfigurationLayer, Defaults {
     @Override
     public ReleaseTypes getReleaseTypes()
         throws DataAccessException, IllegalPropertyException {
-        logger.trace(DEFAULT, "Retrieving the default {} release type", "releaseTypes");
+        logger.trace(DEFAULT, "Retrieving the default '{}' release type", "releaseTypes");
         return RELEASE_TYPES;
     }
 
@@ -185,7 +185,7 @@ class DefaultLayer implements ConfigurationLayer, Defaults {
     @Override
     public Boolean getResume()
         throws DataAccessException, IllegalPropertyException {
-        logger.trace(DEFAULT, "Retrieving the default {} configuration option: {}", "resume", RESUME);
+        logger.trace(DEFAULT, "Retrieving the default '{}' configuration option: '{}'", "resume", RESUME);
         return RESUME;
     }
 
@@ -195,7 +195,7 @@ class DefaultLayer implements ConfigurationLayer, Defaults {
     @Override
     public Scheme getScheme()
         throws DataAccessException, IllegalPropertyException {
-        logger.trace(DEFAULT, "Retrieving the default {} configuration option: {}", "scheme", SCHEME);
+        logger.trace(DEFAULT, "Retrieving the default '{}' configuration option: '{}'", "scheme", SCHEME);
         return SCHEME;
     }
 
@@ -205,7 +205,7 @@ class DefaultLayer implements ConfigurationLayer, Defaults {
     @Override
     public String getSharedConfigurationFile()
         throws DataAccessException, IllegalPropertyException {
-        logger.trace(DEFAULT, "Retrieving the default {} configuration option", "sharedConfigurationFile");
+        logger.trace(DEFAULT, "Retrieving the default '{}' configuration option", "sharedConfigurationFile");
         return SHARED_CONFIGURATION_FILE;
     }
 
@@ -215,7 +215,7 @@ class DefaultLayer implements ConfigurationLayer, Defaults {
     @Override
     public String getStateFile()
         throws DataAccessException, IllegalPropertyException {
-        logger.trace(DEFAULT, "Retrieving the default {} configuration option: {}", "stateFile", STATE_FILE);
+        logger.trace(DEFAULT, "Retrieving the default '{}' configuration option: '{}'", "stateFile", STATE_FILE);
         return STATE_FILE;
     }
 
@@ -225,7 +225,7 @@ class DefaultLayer implements ConfigurationLayer, Defaults {
     @Override
     public Verbosity getVerbosity()
         throws DataAccessException, IllegalPropertyException {
-        logger.trace(DEFAULT, "Retrieving the default {} configuration option: {}", "verbosity", VERBOSITY);
+        logger.trace(DEFAULT, "Retrieving the default '{}' configuration option: '{}'", "verbosity", VERBOSITY);
         return VERBOSITY;
     }
 
@@ -235,7 +235,7 @@ class DefaultLayer implements ConfigurationLayer, Defaults {
     @Override
     public String getVersion()
         throws DataAccessException, IllegalPropertyException {
-        logger.trace(DEFAULT, "Retrieving the default {} configuration option: {}", "version", VERSION);
+        logger.trace(DEFAULT, "Retrieving the default '{}' configuration option: '{}'", "version", VERSION);
         return VERSION;
     }
 }

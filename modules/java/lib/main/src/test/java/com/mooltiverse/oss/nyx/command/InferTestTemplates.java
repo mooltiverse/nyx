@@ -3939,7 +3939,7 @@ public class InferTestTemplates {
             assertTrue(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             // the version contains the timestamp which is variable so let's test the start string and the overall length
-            assertTrue(command.state().getVersion().startsWith("0.0.6-internal.2+timestamp."), String.format("Version %s was expected to start with %s", command.state().getVersion(), "0.0.6-internal.2+timestamp."));
+            assertTrue(command.state().getVersion().startsWith("0.0.6-internal.2+timestamp."), String.format("Version '%s' was expected to start with '%s'", command.state().getVersion(), "0.0.6-internal.2+timestamp."));
             assertEquals("0.0.6-internal.2+timestamp.".length()+14, command.state().getVersion().length()); // the timestamp is 14 characters long
             assertNull(command.state().getVersionRange());
         }
@@ -4055,7 +4055,7 @@ public class InferTestTemplates {
             assertTrue(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             // the version contains the timestamp which is variable so let's test the start string and the overall length
-            assertTrue(command.state().getVersion().startsWith("0.0.6-internal.1+timestamp."), String.format("Version %s was expected to start with %s", command.state().getVersion(), "0.0.6-internal.1+timestamp."));
+            assertTrue(command.state().getVersion().startsWith("0.0.6-internal.1+timestamp."), String.format("Version '%s' was expected to start with '%s'", command.state().getVersion(), "0.0.6-internal.1+timestamp."));
             assertEquals("0.0.6-internal.1+timestamp.".length()+14, command.state().getVersion().length()); // the timestamp is 14 characters long
             assertNull(command.state().getVersionRange());
         }
@@ -4171,7 +4171,7 @@ public class InferTestTemplates {
             assertTrue(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             // the version contains the timestamp which is variable so let's test the start string and the overall length
-            assertTrue(command.state().getVersion().startsWith("0.0.6-internal.1+timestamp."), String.format("Version %s was expected to start with %s", command.state().getVersion(), "0.0.6-internal.1+timestamp."));
+            assertTrue(command.state().getVersion().startsWith("0.0.6-internal.1+timestamp."), String.format("Version '%s' was expected to start with '%s'", command.state().getVersion(), "0.0.6-internal.1+timestamp."));
             assertEquals("0.0.6-internal.1+timestamp.".length()+14, command.state().getVersion().length()); // the timestamp is 14 characters long
             assertNull(command.state().getVersionRange());
         }

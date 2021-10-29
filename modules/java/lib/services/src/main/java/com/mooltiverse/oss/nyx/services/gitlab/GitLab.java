@@ -94,7 +94,7 @@ public class GitLab implements GitService {
 
         // Since ping requests are not authenticated they may incur into errors due to rate limits so we need to avoid it here
         //if (!ping())
-        //    throw new IOException(String.format("Ping failed using the given URI %s", uri));
+        //    throw new IOException(String.format("Ping failed using the given URI '%s'", uri));
     }
 
     /**
@@ -127,7 +127,7 @@ public class GitLab implements GitService {
             return new GitLab(new URI(apiURI));
         }
         catch (URISyntaxException use) {
-            throw new IllegalArgumentException(String.format("The given URI %s is not a valid URI", apiURI), use);
+            throw new IllegalArgumentException(String.format("The given URI '%s' is not a valid URI", apiURI), use);
         }
     }
 
@@ -168,22 +168,22 @@ public class GitLab implements GitService {
         // GitLab does not expose any URL to be invoked without authentication so it will always return an
         // error message. Let's just check if the error message is what we expect
         URI uri = getBaseURI();
-        logger.debug(String.format("HTTP request %s %s", "GET", uri));
+        logger.debug(String.format("HTTP request '%s' '%s'", "GET", uri));
         try {
             HttpResponse<String> response = newClient().send(getRequestBuilder().uri(uri).GET().build(), BodyHandlers.ofString());
 
-            logger.debug(String.format("Request to %s returned a response code %d", uri, response.statusCode()));
+            logger.debug(String.format("Request to '%s' returned a response code '%d'", uri, response.statusCode()));
             logger.trace(response.body());
 
             // Expected response is 404 but in case future releases answer with a 200 let's foresee that
             // This is quite a lose check but let's hope GitLab gives an health check path in the future
             if (!((response.statusCode() >= 200) && (response.statusCode() < 300)) && !((response.statusCode() >= 400) && (response.statusCode() < 500))) {
-                logger.error(String.format("Ping failed with result code %d", response.statusCode()));
+                logger.error(String.format("Ping failed with result code '%d'", response.statusCode()));
                 return false;
             }
         }
         catch (IOException | InterruptedException | IllegalArgumentException | SecurityException e) {
-            logger.error(String.format("HTTP request %s %s has thrown an exception", "GET", uri), e);
+            logger.error(String.format("HTTP request '%s' '%s' has thrown an exception", "GET", uri), e);
             return false;
         }
 
