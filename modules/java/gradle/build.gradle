@@ -109,3 +109,6 @@ tasks.publishPlugins.dependsOn tasks.setupPublishPluginCredentials
 
 // to enforce the fail-fast principle, make sure the main library tests are executed first
 tasks.test.dependsOn project(':modules:java:lib:main').tasks.test
+
+// Only perform publishing if the Nyx release type enables publishing
+tasks.publishPlugins.onlyIf { rootProject.nyxState.newRelease }
