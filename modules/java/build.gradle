@@ -303,7 +303,10 @@ allprojects.each {prj ->
 
     afterEvaluate {
         // Only perform publishing if the Nyx release type enables publishing
+        // Remember that setting the 'onlyIf' on a task does not prevent its dependencies
+        // to run so the tasks of the entire tree must be disabled
         // Here we disable all the automatically generated tasks, one for each target publication
+        // In case the publication repositories change, these taska must be updated
         tasks.findByName("publish"+prj.name.capitalize()+"PublicationToGitHubPackagesRepository").onlyIf { rootProject.nyxState.newRelease }
         tasks.findByName("publish"+prj.name.capitalize()+"PublicationToSonatypeRepository").onlyIf { rootProject.nyxState.newRelease }
     }
@@ -488,8 +491,12 @@ tasks.publishToSonatype.finalizedBy tasks.closeAndReleaseRepository
 tasks.publish.dependsOn tasks.publishToSonatype
 
 // Only perform publishing if the Nyx release type enables publishing
+// Remember that setting the 'onlyIf' on a task does not prevent its dependencies
+// to run so the tasks of the entire tree must be disabled
 tasks.publish.onlyIf { rootProject.nyxState.newRelease }
 tasks.getStagingProfile.onlyIf { rootProject.nyxState.newRelease }
 tasks.publishToSonatype.onlyIf { rootProject.nyxState.newRelease }
+tasks.closeRepository.onlyIf { rootProject.nyxState.newRelease }
+tasks.releaseRepository.onlyIf { rootProject.nyxState.newRelease }
 tasks.closeAndReleaseRepository.onlyIf { rootProject.nyxState.newRelease }
 tasks.initializeSonatypeStagingRepository.onlyIf { rootProject.nyxState.newRelease }

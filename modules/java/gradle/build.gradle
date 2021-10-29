@@ -111,6 +111,8 @@ tasks.publishPlugins.dependsOn tasks.setupPublishPluginCredentials
 tasks.test.dependsOn project(':modules:java:lib:main').tasks.test
 
 // Only perform publishing if the Nyx release type enables publishing
+// Remember that setting the 'onlyIf' on a task does not prevent its dependencies
+// to run so the tasks of the entire tree must be disabled
 tasks.publish.onlyIf { rootProject.nyxState.newRelease }
 tasks.publishPlugins.onlyIf { rootProject.nyxState.newRelease }
 //tasks.publishPluginJar.onlyIf { rootProject.nyxState.newRelease }
