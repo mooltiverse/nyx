@@ -379,11 +379,11 @@ public class Infer extends AbstractCommand {
 
             if (collapseVersions) {
                 logger.debug(COMMAND, "After scanning the commit history the previousVersion is '{}' and the primeVersion is '{}'", Objects.isNull(state().getReleaseScope().getPreviousVersion()) ? "null" : state().getReleaseScope().getPreviousVersion(), Objects.isNull(state().getReleaseScope().getPrimeVersion()) ? "null" : state().getReleaseScope().getPrimeVersion());
-                logger.debug(COMMAND, "Significant commits (bumping identifiers) since the previousVersion are '{}', while those since the primeVersion are '{}'", Objects.isNull(previousBumpIdentifiers) ? "0" : previousBumpIdentifiers.size(), Objects.isNull(primeBumpIdentifiers) ? "0" : primeBumpIdentifiers.size());
+                logger.debug(COMMAND, "Significant commits (bumping identifiers) since the previousVersion are '{}', while those since the primeVersion are '{}'", Objects.isNull(previousSignificantCommits) ? "0" : previousSignificantCommits.size(), Objects.isNull(primeSignificantCommits) ? "0" : primeSignificantCommits.size());
             }
             else {
                 logger.debug(COMMAND, "After scanning the commit history the previousVersion is '{}'", Objects.isNull(state().getReleaseScope().getPreviousVersion()) ? "null" : state().getReleaseScope().getPreviousVersion());
-                logger.debug(COMMAND, "Significant commits (bumping identifiers) since the previousVersion are '{}'", Objects.isNull(previousBumpIdentifiers) ? "0" : previousBumpIdentifiers.size());
+                logger.debug(COMMAND, "Significant commits (bumping identifiers) since the previousVersion are '{}'", Objects.isNull(previousSignificantCommits) ? "0" : previousSignificantCommits.size());
             }
 
             // if we couldn't infer the initial version and its commit, set the state attributes to the configured initial values or the prime version (if available)
