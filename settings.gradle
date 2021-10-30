@@ -61,7 +61,7 @@ nyx {
           GITHUB_ACTIONS = '^true$'
         }
         matchWorkspaceStatus = 'CLEAN'
-        publish = 'false'
+        publish = 'true'
       }
       integration {
         collapseVersions = true
