@@ -172,6 +172,7 @@ nyx {
         publish = 'false'
       }
 
+
       // TODO: remove the following '*local' release types once the plugin has been tested in production
       // The following release types are replicas of the main ones above and we just use them to test in production
       // so that when builds are executed locally no push or publish is performed and an extra identifier is added.
