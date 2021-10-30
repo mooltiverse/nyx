@@ -27,6 +27,18 @@ allprojects {
   ------------------------------------------------------------------------------*/
   group   = 'com.mooltiverse.oss.nyx'
 
+  // This task is useful to run all verification tasks (check, test but also functionalTest and integrationTest)
+  
+  task verify() {
+    description 'Runs all tests and verification tasks'
+    group 'Verification'
+
+    dependsOn project.tasks.matching {
+        // skip this task itself to avoid circular dependencies
+        it.group.equals('verification') && !it.name.equals('verify')
+    }
+  }
+
   // This task is useful to see all the configurations for projects. Run this with 'gradle configurations'
   task configurations() {
     description 'Prints the project configurations'

@@ -305,10 +305,12 @@ allprojects.each {prj ->
         // Only perform publishing if the Nyx release type enables publishing
         // Remember that setting the 'onlyIf' on a task does not prevent its dependencies
         // to run so the tasks of the entire tree must be disabled
-        // Here we disable all the automatically generated tasks, one for each target publication
-        // In case the publication repositories change, these taska must be updated
-        tasks.findByName("publish"+prj.name.capitalize()+"PublicationToGitHubPackagesRepository").onlyIf { rootProject.nyxState.newRelease }
-        tasks.findByName("publish"+prj.name.capitalize()+"PublicationToSonatypeRepository").onlyIf { rootProject.nyxState.newRelease }
+        // This is why we set the onlyIf to all tasks in the Publish group
+        tasks.matching {
+            it.group.equals('publish')
+        }.all {
+            it.onlyIf { rootProject.nyxState.newRelease }
+        }
     }
 }
 
