@@ -110,12 +110,14 @@ tasks.publishPlugins.dependsOn tasks.setupPublishPluginCredentials
 // to enforce the fail-fast principle, make sure the main library tests are executed first
 tasks.test.dependsOn project(':modules:java:lib:main').tasks.test
 
-// Only perform publishing if the Nyx release type enables publishing
-// Remember that setting the 'onlyIf' on a task does not prevent its dependencies
-// to run so the tasks of the entire tree must be disabled
-// This is why we set the onlyIf to all tasks in the Publish group
-tasks.matching {
-    it.group.equals('publish')
-}.all {
-    it.onlyIf { rootProject.nyxState.newRelease }
+afterEvaluate {
+    // Only perform publishing if the Nyx release type enables publishing
+    // Remember that setting the 'onlyIf' on a task does not prevent its dependencies
+    // to run so the tasks of the entire tree must be disabled
+    // This is why we set the onlyIf to all tasks in the Publish group
+    tasks.matching {
+        it.group.equals('publish')
+    }.all {
+        it.onlyIf { rootProject.nyxState.newRelease }
+    }
 }
