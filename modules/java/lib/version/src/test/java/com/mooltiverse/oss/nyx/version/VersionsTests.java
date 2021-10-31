@@ -301,7 +301,7 @@ public class VersionsTests {
     class CompareTests {
         @Test
         @DisplayName("Versions.compare(Scheme.SEMVER, [...])")
-        void compareCoreVersions() {
+        void compareVersions() {
             assertEquals(0, Versions.compare(Scheme.SEMVER, null, null));
             assertEquals(0, Versions.compare(Scheme.SEMVER, null, null, null));
             assertEquals(0, Versions.compare(Scheme.SEMVER, null, null, false));
@@ -324,6 +324,7 @@ public class VersionsTests {
             assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0-alpha.2", "1.0.0-alpha.1") > 0);
             assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0-alpha.2", "1.0.0-alpha.1", null) > 0);
             assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0-alpha.2", "1.0.0-alpha.1", false) > 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0-alpha.10", "1.0.0-alpha.9", false) > 0);
 
             assertTrue(Versions.compare(Scheme.SEMVER, null, "1.0.0") < 0);
             assertTrue(Versions.compare(Scheme.SEMVER, null, "1.0.0", null) < 0);
@@ -337,11 +338,12 @@ public class VersionsTests {
             assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0-alpha.1", "1.0.0-alpha.2") < 0);
             assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0-alpha.1", "1.0.0-alpha.2", null) < 0);
             assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0-alpha.1", "1.0.0-alpha.2", false) < 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0-alpha.9", "1.0.0-alpha.10", false) < 0);
         }
 
         @Test
         @DisplayName("Versions.compare(Scheme.SEMVER, [...])")
-        void compareAndSanitizeCoreVersions() {
+        void compareAndSanitizeVersions() {
             assertEquals(0, Versions.compare(Scheme.SEMVER, null, null, true));
             assertEquals(0, Versions.compare(Scheme.SEMVER, "1.00.0", "01.0.0", true));
             assertEquals(0, Versions.compare(Scheme.SEMVER, "01.2.3-alpha.1", "1.2.3-alpha.1", true));
@@ -350,16 +352,18 @@ public class VersionsTests {
             assertTrue(Versions.compare(Scheme.SEMVER, "01.0.0", "0.1.00", true) > 0);
             assertTrue(Versions.compare(Scheme.SEMVER, "01.0.0", "1.0.00-alpha.1", true) > 0);
             assertTrue(Versions.compare(Scheme.SEMVER, "1.0.00-alpha.2", "1.0.00-alpha.1", true) > 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.00-alpha.010", "1.0.00-alpha.9", true) > 0);
 
             assertTrue(Versions.compare(Scheme.SEMVER, null, "01.0.0", true) < 0);
             assertTrue(Versions.compare(Scheme.SEMVER, "0.1.00", "01.0.000", true) < 0);
             assertTrue(Versions.compare(Scheme.SEMVER, "1.00.0-alpha.1", "01.0.0", true) < 0);
             assertTrue(Versions.compare(Scheme.SEMVER, "01.0.0-alpha.1", "1.0.00-alpha.2", true) < 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, "01.0.0-alpha.9", "1.0.00-alpha.010", true) < 0);
         }
 
         @Test
         @DisplayName("Versions.compare(Scheme.SEMVER, [...])")
-        void compareCoreVersionsWithPrefix() {
+        void compareVersionsWithPrefix() {
             assertEquals(0, Versions.compare(Scheme.SEMVER, null, null, "rel-"));
             assertEquals(0, Versions.compare(Scheme.SEMVER, "1.0.0", "1.0.0", "rel-"));
             assertEquals(0, Versions.compare(Scheme.SEMVER, "rel-1.0.0", "1.0.0", "rel-"));
@@ -379,6 +383,7 @@ public class VersionsTests {
             assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0-alpha.2", "1.0.0-alpha.1", "rel-") > 0);
             assertTrue(Versions.compare(Scheme.SEMVER, "rel-1.0.0-alpha.2", "1.0.0-alpha.1", "rel-") > 0);
             assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0-alpha.2", "rel-1.0.0-alpha.1", "rel-") > 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0-alpha.10", "rel-1.0.0-alpha.9", "rel-") > 0);
 
             assertTrue(Versions.compare(Scheme.SEMVER, null, "1.0.0", "rel-") < 0);
             assertTrue(Versions.compare(Scheme.SEMVER, null, "rel-1.0.0", "rel-") < 0);
@@ -391,6 +396,7 @@ public class VersionsTests {
             assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0-alpha.1", "1.0.0-alpha.2", "rel-") < 0);
             assertTrue(Versions.compare(Scheme.SEMVER, "rel-1.0.0-alpha.1", "1.0.0-alpha.2", "rel-") < 0);
             assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0-alpha.1", "rel-1.0.0-alpha.2", "rel-") < 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0-alpha.9", "rel-1.0.0-alpha.10", "rel-") < 0);
         }
     }
 }

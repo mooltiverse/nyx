@@ -320,8 +320,8 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
 
             while (thisIterator.hasNext()) {
                 if (otherIterator.hasNext()) {
-                    Object thisItem = thisIterator.next();
-                    Object otherItem = otherIterator.next();
+                    Object thisItem = thisIterator.next().getValue();
+                    Object otherItem = otherIterator.next().getValue();
 
                     // Identifiers consisting of only digits are compared numerically and identifiers with letters or
                     // hyphens are compared lexically in ASCII sort order. Numeric identifiers always have lower
