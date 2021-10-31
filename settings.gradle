@@ -26,7 +26,6 @@ include 'modules:java:gradle'
   Extension configurations
 ------------------------------------------------------------------------------*/
 nyx {
-  bump = 'minor' // force a minor publication just once to publish a version that has no #74 bug
   // starting from the 'simple' preset gives us:
   // - the Conventional Commits convention
   // - the 'mainline' and 'internal' release types (that we override here)
