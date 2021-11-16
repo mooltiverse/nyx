@@ -589,7 +589,7 @@ public enum Scenario {
      */
     public Script realize()
         throws Exception {
-        return function.apply(FileSystemUtil.newTempDirectory(null, "scenario"));
+        return function.apply(FileSystemUtil.newTempDirectory(null, "nyx-test-scenario-"));
     }
 
     /**

@@ -15,10 +15,8 @@
  */
 package com.mooltiverse.oss.nyx.configuration;
 
-import com.mooltiverse.oss.nyx.data.Block;
-
 /**
  * This interface models the configuration block that defines the configured services.
  */
-public interface Services extends Block {
+public interface Services {
 }

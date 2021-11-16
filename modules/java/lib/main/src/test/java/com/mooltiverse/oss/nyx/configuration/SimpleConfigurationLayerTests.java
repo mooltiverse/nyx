@@ -18,15 +18,19 @@ package com.mooltiverse.oss.nyx.configuration;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
+
 import java.nio.file.Files;
+
 import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.mooltiverse.oss.nyx.data.CommitMessageConvention;
-import com.mooltiverse.oss.nyx.data.ReleaseType;
-import com.mooltiverse.oss.nyx.data.Verbosity;
+import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
+import com.mooltiverse.oss.nyx.entities.EnabledItemsMap;
+import com.mooltiverse.oss.nyx.entities.ReleaseType;
+import com.mooltiverse.oss.nyx.entities.Verbosity;
 import com.mooltiverse.oss.nyx.version.Scheme;
 
 @DisplayName("SimpleConfigurationLayer")
@@ -48,18 +52,32 @@ public class SimpleConfigurationLayerTests {
         throws Exception {
         SimpleConfigurationLayer simpleConfigurationLayer = new SimpleConfigurationLayer();
         assertNotNull(simpleConfigurationLayer.getCommitMessageConventions());
-        assertNull(simpleConfigurationLayer.getCommitMessageConventions().getEnabled());
-        assertNotNull(simpleConfigurationLayer.getCommitMessageConventions().getItems());
+        assertTrue(simpleConfigurationLayer.getCommitMessageConventions().getEnabled().isEmpty());
         assertTrue(simpleConfigurationLayer.getCommitMessageConventions().getItems().isEmpty());
 
-        simpleConfigurationLayer.getCommitMessageConventions().setEnabled(List.<String>of("one", "two"));
-        simpleConfigurationLayer.getCommitMessageConventions().getItems().put("one", new CommitMessageConvention());
-        simpleConfigurationLayer.getCommitMessageConventions().getItems().put("two", new CommitMessageConvention());
+        simpleConfigurationLayer.setCommitMessageConventions(
+            new EnabledItemsMap<CommitMessageConvention>(
+                List.<String>of("one", "two"),
+                Map.<String,CommitMessageConvention>of("one", new CommitMessageConvention(), "two", new CommitMessageConvention())
+            )
+        );
+
         assertEquals(2, simpleConfigurationLayer.getCommitMessageConventions().getEnabled().size());
         assertTrue(simpleConfigurationLayer.getCommitMessageConventions().getEnabled().containsAll(List.<String>of("one", "two")));
         assertEquals(2, simpleConfigurationLayer.getCommitMessageConventions().getItems().size());
-        assertNotNull(simpleConfigurationLayer.getCommitMessageConventions().getItem("one"));
-        assertNotNull(simpleConfigurationLayer.getCommitMessageConventions().getItem("two"));
+        assertNotNull(simpleConfigurationLayer.getCommitMessageConventions().getItems().get("one"));
+        assertNotNull(simpleConfigurationLayer.getCommitMessageConventions().getItems().get("two"));
+    }
+
+    @Test
+    @DisplayName("SimpleConfigurationLayer.getConfigurationFile()")
+    void getConfigurationFileTest()
+        throws Exception {
+        SimpleConfigurationLayer simpleConfigurationLayer = new SimpleConfigurationLayer();
+        assertNull(simpleConfigurationLayer.getConfigurationFile());
+
+        simpleConfigurationLayer.setConfigurationFile("config.yml");
+        assertEquals("config.yml", simpleConfigurationLayer.getConfigurationFile());
     }
 
     @Test
@@ -75,17 +93,6 @@ public class SimpleConfigurationLayerTests {
     }
 
     @Test
-    @DisplayName("SimpleConfigurationLayer.getConfigurationFile()")
-    void getConfigurationFileTest()
-        throws Exception {
-        SimpleConfigurationLayer simpleConfigurationLayer = new SimpleConfigurationLayer();
-        assertNull(simpleConfigurationLayer.getConfigurationFile());
-
-        simpleConfigurationLayer.setConfigurationFile("config.yml");
-        assertEquals("config.yml", simpleConfigurationLayer.getConfigurationFile());
-    }
-
-    @Test
     @DisplayName("SimpleConfigurationLayer.getDryRun()")
     void getDryRunTest()
         throws Exception {
@@ -94,6 +101,17 @@ public class SimpleConfigurationLayerTests {
 
         simpleConfigurationLayer.setDryRun(Boolean.TRUE);
         assertEquals(Boolean.TRUE, simpleConfigurationLayer.getDryRun());
+    }
+
+    @Test
+    @DisplayName("SimpleConfigurationLayer.getInitialVersion()")
+    void getInitialVersionTest()
+        throws Exception {
+        SimpleConfigurationLayer simpleConfigurationLayer = new SimpleConfigurationLayer();
+        assertNull(simpleConfigurationLayer.getInitialVersion());
+
+        simpleConfigurationLayer.setInitialVersion("0.3.5");
+        assertEquals("0.3.5", simpleConfigurationLayer.getInitialVersion());
     }
 
     @Test
@@ -135,18 +153,22 @@ public class SimpleConfigurationLayerTests {
         throws Exception {
         SimpleConfigurationLayer simpleConfigurationLayer = new SimpleConfigurationLayer();
         assertNotNull(simpleConfigurationLayer.getReleaseTypes());
-        assertNull(simpleConfigurationLayer.getReleaseTypes().getEnabled());
+        assertTrue(simpleConfigurationLayer.getReleaseTypes().getEnabled().isEmpty());
         assertNotNull(simpleConfigurationLayer.getReleaseTypes().getItems());
         assertTrue(simpleConfigurationLayer.getReleaseTypes().getItems().isEmpty());
 
-        simpleConfigurationLayer.getReleaseTypes().setEnabled(List.<String>of("one", "two"));
-        simpleConfigurationLayer.getReleaseTypes().getItems().put("one", new ReleaseType());
-        simpleConfigurationLayer.getReleaseTypes().getItems().put("two", new ReleaseType());
+        simpleConfigurationLayer.setReleaseTypes(
+            new EnabledItemsMap<ReleaseType>(
+                List.<String>of("one", "two"),
+                Map.<String,ReleaseType>of("one", new ReleaseType(), "two", new ReleaseType())
+            )
+        );
+
         assertEquals(2, simpleConfigurationLayer.getReleaseTypes().getEnabled().size());
         assertTrue(simpleConfigurationLayer.getReleaseTypes().getEnabled().containsAll(List.<String>of("one", "two")));
         assertEquals(2, simpleConfigurationLayer.getReleaseTypes().getItems().size());
-        assertNotNull(simpleConfigurationLayer.getReleaseTypes().getItem("one"));
-        assertNotNull(simpleConfigurationLayer.getReleaseTypes().getItem("two"));
+        assertNotNull(simpleConfigurationLayer.getReleaseTypes().getItems().get("one"));
+        assertNotNull(simpleConfigurationLayer.getReleaseTypes().getItems().get("two"));
     }
 
     @Test

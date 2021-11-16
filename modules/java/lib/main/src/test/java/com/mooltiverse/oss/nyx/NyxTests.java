@@ -18,6 +18,9 @@ package com.mooltiverse.oss.nyx;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -25,10 +28,15 @@ import org.junit.jupiter.api.Test;
 
 import com.mooltiverse.oss.nyx.configuration.Configuration;
 import com.mooltiverse.oss.nyx.configuration.SimpleConfigurationLayer;
-import com.mooltiverse.oss.nyx.data.DataAccessException;
-import com.mooltiverse.oss.nyx.data.FileMapper;
+import com.mooltiverse.oss.nyx.entities.git.Action;
+import com.mooltiverse.oss.nyx.entities.git.Commit;
+import com.mooltiverse.oss.nyx.entities.git.Identity;
+import com.mooltiverse.oss.nyx.entities.git.Message;
+import com.mooltiverse.oss.nyx.entities.git.Tag;
 import com.mooltiverse.oss.nyx.git.Repository;
 import com.mooltiverse.oss.nyx.git.Scenario;
+import com.mooltiverse.oss.nyx.io.DataAccessException;
+import com.mooltiverse.oss.nyx.io.FileMapper;
 import com.mooltiverse.oss.nyx.state.State;
 
 @DisplayName("Nyx")
@@ -129,18 +137,21 @@ public class NyxTests {
             configuration.withCommandLineConfiguration(configurationLayerMock);
             State oldState = new State(configuration);
 
+            Commit initialCommit = new Commit("initial", 0, List.<String>of(), new Action(new Identity("Jim", null), null), new Action(new Identity("Sam", null), null), new Message("full", "short", Map.<String,String>of()), Set.<Tag>of());
+            Commit finalCommit = new Commit("final", 0, List.<String>of(), new Action(new Identity("Jim", null), null), new Action(new Identity("Sam", null), null), new Message("full", "short", Map.<String,String>of()), Set.<Tag>of());
+
             // set a few values to use later on for comparison
             oldState.setVersion("3.5.7");
             oldState.setVersionRange(".*");
             oldState.getInternals().put("attr1", "value1");
-            oldState.getReleaseScope().getCommits().add("final");
-            oldState.getReleaseScope().getCommits().add("initial");
-            oldState.getReleaseScope().setPreviousVersion("previous");
-            oldState.getReleaseScope().setPreviousVersionCommit("previousCommit");
-            oldState.getReleaseScope().setPrimeVersion("prime");
-            oldState.getReleaseScope().setPrimeVersionCommit("primeCommit");
-            oldState.getReleaseScope().getSignificantCommits().put("final", "major");
-            oldState.getReleaseScope().getSignificantCommits().put("initial", "minor");
+            oldState.getReleaseScope().getCommits().add(finalCommit);
+            oldState.getReleaseScope().getCommits().add(initialCommit);
+            oldState.getReleaseScope().setPreviousVersion("4.5.6");
+            oldState.getReleaseScope().setPreviousVersionCommit(new Commit("05cbfd58fadbec3d96b220a0054d96875aa37011", 0, List.<String>of(), new Action(new Identity("Jim", null), null), new Action(new Identity("Sam", null), null), new Message("full", "short", Map.<String,String>of()), Set.<Tag>of(new Tag("4.5.6", "05cbfd58fadbec3d96b220a0054d96875aa37011", false))));
+            oldState.getReleaseScope().setPrimeVersion("1.0.0");
+            oldState.getReleaseScope().setPrimeVersionCommit(new Commit("e8fa442504d91a0187865c74093a5a4212a805f9", 0, List.<String>of(), new Action(new Identity("Jim", null), null), new Action(new Identity("Sam", null), null), new Message("full", "short", Map.<String,String>of()), Set.<Tag>of(new Tag("1.0.0", "e8fa442504d91a0187865c74093a5a4212a805f9", false))));
+            oldState.getReleaseScope().getSignificantCommits().add(finalCommit);
+            oldState.getReleaseScope().getSignificantCommits().add(initialCommit);
 
             // save the file
             FileMapper.save(configurationLayerMock.getStateFile(), oldState);
@@ -155,9 +166,9 @@ public class NyxTests {
             assertEquals(oldState.getInternals(), resumedState.getInternals());
             assertTrue(resumedState.getInternals().containsKey("attr1"));
             assertEquals("value1", resumedState.getInternals().get("attr1"));
-            assertEquals("final", resumedState.getReleaseScope().getFinalCommit());
+            assertEquals("final", resumedState.getReleaseScope().getFinalCommit().getSHA());
             assertEquals(oldState.getReleaseScope().getFinalCommit(), resumedState.getReleaseScope().getFinalCommit());
-            assertEquals("initial", resumedState.getReleaseScope().getInitialCommit());
+            assertEquals("initial", resumedState.getReleaseScope().getInitialCommit().getSHA());
             assertEquals(2, resumedState.getReleaseScope().getCommits().size());
             assertEquals(oldState.getReleaseScope().getInitialCommit(), resumedState.getReleaseScope().getInitialCommit());
             assertEquals(oldState.getReleaseScope().getPreviousVersion(), resumedState.getReleaseScope().getPreviousVersion());
@@ -165,10 +176,8 @@ public class NyxTests {
             assertEquals(oldState.getReleaseScope().getPrimeVersion(), resumedState.getReleaseScope().getPrimeVersion());
             assertEquals(oldState.getReleaseScope().getPrimeVersionCommit(), resumedState.getReleaseScope().getPrimeVersionCommit());
             assertEquals(2, resumedState.getReleaseScope().getSignificantCommits().size());
-            assertTrue(resumedState.getReleaseScope().getSignificantCommits().containsKey("final"));
-            assertEquals("major", resumedState.getReleaseScope().getSignificantCommits().get("final"));
-            assertTrue(resumedState.getReleaseScope().getSignificantCommits().containsKey("initial"));
-            assertEquals("minor", resumedState.getReleaseScope().getSignificantCommits().get("initial"));
+            assertTrue(resumedState.getReleaseScope().getSignificantCommits().contains(finalCommit));
+            assertTrue(resumedState.getReleaseScope().getSignificantCommits().contains(initialCommit));
 
             assertEquals(oldState.getTimestamp(), resumedState.getTimestamp());
             assertEquals(oldState.getVersion(), resumedState.getVersion());

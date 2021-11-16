@@ -48,7 +48,7 @@ Within the `releaseTypes` block you can define as many types as you want, each i
 
 Configuring release types gives Nyx informations about:
 
-* how to assume which type to select given a certain set of facts that are automatically inferred or overridden by user. The rules defining how to match a release type are [`matchBranches`](#match-branches), [`matchEnvironmentVariables`](#match-environment-variables) and [`matchWorkspaceStatus`](#match-workspace-status) and they are evaluated by an `AND` logic so **they must all evaluate `true` to make a succesful match**
+* how to assume which type to select given a certain set of facts that are automatically inferred or overridden by user. The rules defining how to match a release type are [`matchBranches`](#match-branches), [`matchEnvironmentVariables`](#match-environment-variables) and [`matchWorkspaceStatus`](#match-workspace-status) and they are evaluated by an `AND` logic so **they must all evaluate `true` to make a successful match**
 * which tags in the Git history must be considered for the release type so that the commit history can be consistently parsed. The match is done using the regular expression configured as the [`filterTags`](#filter-tags)
 * the actions to take for each release type
 
@@ -59,17 +59,17 @@ Each release type has the following attributes:
 | [`releaseTypes/<NAME>/collapseVersions`](#collapse-versions)                               | boolean | `--release-types-<NAME>-collapse-versions=true|false`                 | `NYX_RELEASE_TYPES_<NAME>_COLLAPSE_VERSIONS=true|false`                 | `false`                                              |
 | [`releaseTypes/<NAME>/collapsedVersionQualifier`](#collapsed-version-qualifier)            | string  | `--release-types-<NAME>-collapsed-version-qualifier=<TEMPLATE>`       | `NYX_RELEASE_TYPES_<NAME>_COLLAPSED_VERSION_QUALIFIER=<TEMPLATE>`       | Empty                                                |
 | [`releaseTypes/<NAME>/filterTags`](#filter-tags)                                           | string  | `--release-types-<NAME>-filter-tags`                                  | `NYX_RELEASE_TYPES_<NAME>_FILTER_TAGS=<TEMPLATE>`                       | Empty                                                |
-| [`releaseTypes/<NAME>/gitCommit`](#git-commit)                                             | boolean | `--release-types-<NAME>-git-commit=<TEMPLATE>`                        | `NYX_RELEASE_TYPES_<NAME>_GIT_COMMIT=<TEMPLATE>`                        | `false`                                              |
+| [`releaseTypes/<NAME>/gitCommit`](#git-commit)                                             | string  | `--release-types-<NAME>-git-commit=<TEMPLATE>`                        | `NYX_RELEASE_TYPES_<NAME>_GIT_COMMIT=<TEMPLATE>`                        | `false`                                              |
 | [`releaseTypes/<NAME>/gitCommitMessage`](#git-commit-message)                              | string  | `--release-types-<NAME>-git-commit-message=<TEMPLATE>`                | `NYX_RELEASE_TYPES_<NAME>_GIT_COMMIT_MESSAGE=<TEMPLATE>`                | `{% raw %}Release version {{version}}{% endraw %}` |
-| [`releaseTypes/<NAME>/gitPush`](#git-push)                                                 | boolean | `--release-types-<NAME>-git-push=<TEMPLATE>`                          | `NYX_RELEASE_TYPES_<NAME>_GIT_PUSH=<TEMPLATE>`                          | `false`                                              |
-| [`releaseTypes/<NAME>/gitTag`](#git-tag)                                                   | boolean | `--release-types-<NAME>-git-tag=<TEMPLATE>`                           | `NYX_RELEASE_TYPES_<NAME>_GIT_TAG=<TEMPLATE>`                           | `false`                                              |
+| [`releaseTypes/<NAME>/gitPush`](#git-push)                                                 | string  | `--release-types-<NAME>-git-push=<TEMPLATE>`                          | `NYX_RELEASE_TYPES_<NAME>_GIT_PUSH=<TEMPLATE>`                          | `false`                                              |
+| [`releaseTypes/<NAME>/gitTag`](#git-tag)                                                   | string  | `--release-types-<NAME>-git-tag=<TEMPLATE>`                           | `NYX_RELEASE_TYPES_<NAME>_GIT_TAG=<TEMPLATE>`                           | `false`                                              |
 | [`releaseTypes/<NAME>/gitTagMessage`](#git-tag-message)                                    | string  | `--release-types-<NAME>-git-tag-message=<TEMPLATE>`                   | `NYX_RELEASE_TYPES_<NAME>_GIT_TAG_MESSAGE=<TEMPLATE>`                   | Empty                                                |
-| [`releaseTypes/<NAME>/identifiers`](#identifiers)                                          | map     | `--release-types-<NAME>-identifiers=<MAP>`                            | `NYX_RELEASE_TYPES_<NAME>_IDENTIFIERS=<MAP>`                            | Empty                                                |
+| [`releaseTypes/<NAME>/identifiers`](#identifiers)                                          | list    | `--release-types-<NAME>-identifiers=<LIST>`                           | `NYX_RELEASE_TYPES_<NAME>_IDENTIFIERS=<LIST>`                           | Empty                                                |
 | [`releaseTypes/<NAME>/matchBranches`](#match-branches)                                     | string  | `--release-types-<NAME>-match-branches=<TEMPLATE>`                    | `NYX_RELEASE_TYPES_<NAME>_MATCH_BRANCHES=<TEMPLATE>`                    | Empty                                                |
 | [`releaseTypes/<NAME>/matchEnvironmentVariables`](#match-environment-variables)            | map     | `--release-types-<NAME>-match-environment-variables=<MAP>`            | `NYX_RELEASE_TYPES_<NAME>_MATCH_ENVIRONMENT_VARIABLES=<MAP>`            | Empty                                                |
 | [`releaseTypes/<NAME>/matchWorkspaceStatus`](#match-workspace-status)                      | string  | `--release-types-<NAME>-match-workspace-status`                       | `NYX_RELEASE_TYPES_<NAME>_MATCH_WORKSPACE_STATUS=<STATUS>`              | Empty                                                |
 | [`releaseTypes/<NAME>/name`](#name)                                                        | string  | `--release-types-<NAME>-name=<NAME>`                                  | `NYX_RELEASE_TYPES_<NAME>_NAME=<NAME>`                                  | N/A                                                  |
-| [`releaseTypes/<NAME>/publish`](#publish)                                                  | boolean | `--release-types-<NAME>-publish=<TEMPLATE>`                           | `NYX_RELEASE_TYPES_<NAME>_PUBLISH=<TEMPLATE>`                           | `false`                                              |
+| [`releaseTypes/<NAME>/publish`](#publish)                                                  | string  | `--release-types-<NAME>-publish=<TEMPLATE>`                           | `NYX_RELEASE_TYPES_<NAME>_PUBLISH=<TEMPLATE>`                           | `false`                                              |
 | [`releaseTypes/<NAME>/versionRange`](#version-range)                                       | string  | `--release-types-<NAME>-version-range=<TEMPLATE>`                     | `NYX_RELEASE_TYPES_<NAME>_VERSION_RANGE=<TEMPLATE>`                     | Empty (no constrained range)                         |
 | [`releaseTypes/<NAME>/versionRangeFromBranchName`](#version-range-from-branch-name)        | boolean | `--release-types-<NAME>-version-range-from-branch-name=true|false`    | `NYX_RELEASE_TYPES_<NAME>_VERSION_RANGE_FROM_BRANCH_NAME=true|false`    | `false`                                              |
 
@@ -247,7 +247,7 @@ This option is ignored when [`gitTag`](#git-tag) is `false`.
 
 | ------------------------- | ---------------------------------------------------------------------------------------- |
 | Name                      | `releaseTypes/<NAME>/identifiers`                                                        |
-| Type                      | map                                                                                      |
+| Type                      | list                                                                                     |
 | Default                   | Empty (no custom identifiers)                                                            |
 | Command Line Option       | `--release-types-<NAME>-identifiers=<LIST>`                                              |
 | Environment Variable      | `NYX_RELEASE_TYPES_<NAME>_IDENTIFIERS=<LIST>`                                            |
@@ -268,6 +268,14 @@ Do not confuse the identifier *name* and its *qualifier*. The *name* is used int
 
 This nested configuration block allows one element for each extra identifier. You can have as many extra identifiers as you want.
 
+The order in which identifiers are listed matters. The identifiers listed first are evaluated and applied first, according to the configured [position](#identifier-position). The identifier [position](#identifier-position) has higher priority over the *enabled* list.
+{: .notice--info}
+
+When configuring this map using command line options or environment variables you need to pass flattened values as documented [here]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}#collections-of-objects). In this case you can pass each identifier as a set of command line options like `--release-types-<NAME>-identifiers-<ORDINAL>-position=PRE_RELEASE|BUILD`, `--release-types-<NAME>-identifiers-<ORDINAL>-qualifier=<TEMPLATE>`, `--release-types-<NAME>-identifiers-<ORDINAL>-value=<TEMPLATE>` or as a set of environment variables like `NYX_RELEASE_TYPES_<NAME>_IDENTIFIERS_<ORDINAL>_POSITION=PRE_RELEASE|BUILD`, `NYX_RELEASE_TYPES_<NAME>_IDENTIFIERS_<ORDINAL>_QUALIFIER=<TEMPLATE>`, `NYX_RELEASE_TYPES_<NAME>_IDENTIFIERS_<ORDINAL>_VALUE=<TEMPLATE>`.
+{: .notice--info}
+
+When applying extra identifiers to a [previous]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#previous-version) or [prime]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#prime-version) version that already has extra identifiers, existing identifiers are left in their position and the new ones are appended at the end. You never notice this difference when previous versions have been generated by Nyx using the same configuration but in case the commit history contains existing version tags where extra identifiers have a different order than the one configured here, you need to know this.
+
 When using [collapsed versions](#collapse-versions) an extra identifier is also added to disambiguate versions with the same *core* values. This identifier is not affected by the configuration in this block, regardless of whether or not the [collapsed version qualifier](#collapsed-version-qualifier) is also configured.
 {: .notice--info}
 
@@ -275,64 +283,19 @@ When extra identifiers are used and [tagging](#git-tag) is enabled the [regular 
 {: .notice--info}
 
 Each item in the `identifiers` block is made of a `qualifier`, a `value` and a `position`, as follows.
-
-##### Identifiers overall options
-
-| Name                                                              | Type   | Command Line Option                                       | Environment Variable                                   | Configuration File Option                      | Default                                |
-| ----------------------------------------------------------------- | -------| --------------------------------------------------------- | ------------------------------------------------------ | ----------------------------------------------- | -------------------------------------- |
-| [`releaseTypes/<NAME>/identifiers/enabled`](#enabled-identifiers) | list   | `--release-types-<NAME>-identifiers-enabled=<NAMES>`      | `NYX_RELEASE_TYPES_<NAME>_IDENTIFIERS_ENABLED=<NAMES>` | `releaseTypes/items/<NAME>/identifiers/enabled` | Empty                                  |
-
-###### Enabled (identifiers)
-
-| ------------------------- | ---------------------------------------------------------------------------------------- |
-| Name                      | `releaseTypes/<NAME>/identifiers/enabled`                                                |
-| Type                      | list                                                                                     |
-| Default                   | Empty (no qualifier)                                                                     |
-| Command Line Option       | `--release-types-<NAME>-identifiers-enabled=<NAMES>`                                     |
-| Environment Variable      | `NYX_RELEASE_TYPES_<NAME>_IDENTIFIERS_ENABLED=<NAMES>`                                   |
-| Configuration File Option | `releaseTypes/items/<NAME>/identifiers/enabled`                                          |
-| Related state attributes  | [`releaseType`]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#release-type) |
-
-The comma separated list of identifier names that are enabled for the release type. Here you can enable or disable the various identifiers.
-
-Each item in the list must correspond to an identifier [`name`](#identifier-name) attribute. Each named identifier must exist, but not all defined identifiers must be enabled here. Identifiers not listed here will just be ignored by Nyx as if they were not even defined.
-
-The order in which identifiers are listed matters. The identifiers listed first are evaluated and applied first, according to the configured [position](#identifier-position). The identifier [position](#identifier-position) has higher priority over the *enabled* list.
-{: .notice--info}
-
-When applying extra identifiers to a [previous]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#previous-version) or [prime]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#prime-version) version that already has extra identifiers, existing identifiers are left in their position and the new ones are appended at the end. You never notice this difference when previous versions have been generated by Nyx using the same configuration but in case the commit history contains existing version tags where extra identifiers have a different order than the one configured here, you need to know this.
-
-While this list is somehow redundant as it contains names that are already defined as the keys in the nested identifiers map, it's also required to grant the right order of identifiers when applied.
-{: .notice--info}
-
 ##### Identifier definition
 
-Within the `releaseTypes/<NAME>/identifiers` block you can define as many identifiers as you want, each in its own separate block. The `name` identifies the identifier (and is also the value to use for the [enabled](#enabled-identifiers) list) so to define a brand new identifier make sure you give it a `name` that was not already in use. Depending on the [configuration method]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}) you use the `name` property might be defined inside or outside the block that configures a single identifier.
-
-###### Identifier name
-
-| ------------------------- | ---------------------------------------------------------------------------------------- |
-| Name                      | `releaseTypes/<NAME>/identifiers/<NAME>`                                                 |
-| Type                      | string                                                                                   |
-| Default                   | N/A                                                                                      |
-| Command Line Option       | `--release-types-<NAME>-identifiers-<NAME>`                                              |
-| Environment Variable      | `NYX_RELEASE_TYPES_<NAME>_IDENTIFIERS_<NAME>=<NAME>`                                     |
-| Configuration File Option | `releaseTypes/items/<NAME>/identifiers/items/<NAME>`                                     |
-| Related state attributes  |                                                                                          |
-
-The short name that identifies this identifier. This is also the value you can use in the [enabled](#enabled-identifiers) identifiers. This is actually not a field to be set within an identifier section but instead the key of the map element.
-
-This option is **mandatory**.
+Within the `releaseTypes/<NAME>/identifiers` block you can define as many identifiers as you want, each in its own separate block.
 
 ###### Identifier position
 
 | ------------------------- | ---------------------------------------------------------------------------------------- |
-| Name                      | `releaseTypes/<NAME>/identifiers/<NAME>/position`                                        |
+| Name                      | `releaseTypes/<NAME>/identifiers/<#>/position`                                           |
 | Type                      | string                                                                                   |
 | Default                   | `build`                                                                                  |
-| Command Line Option       | `--release-types-<NAME>-identifiers-<NAME>-position=PRE_RELEASE|BUILD`                   |
-| Environment Variable      | `NYX_RELEASE_TYPES_<NAME>_IDENTIFIERS_<NAME>_POSITION=PRE_RELEASE|BUILD`                 |
-| Configuration File Option | `releaseTypes/items/<NAME>/identifiers/items/<NAME>/position`                            |
+| Command Line Option       | `--release-types-<NAME>-identifiers-<#>-position=PRE_RELEASE|BUILD`                      |
+| Environment Variable      | `NYX_RELEASE_TYPES_<NAME>_IDENTIFIERS_<#>_POSITION=PRE_RELEASE|BUILD`                    |
+| Configuration File Option | `releaseTypes/items/<NAME>/identifiers/items/<#>/position`                               |
 | Related state attributes  |                                                                                          |
 
 This is only used with the [SemVer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/version-schemes.md %}#semantic-versioning-semver) version [scheme]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#scheme). Available values are:
@@ -348,12 +311,12 @@ The position has higher priority than the order in which identifiers are listed 
 ###### Identifier qualifier
 
 | ------------------------- | ---------------------------------------------------------------------------------------- |
-| Name                      | `releaseTypes/<NAME>/identifiers/<NAME>/qualifier`                                       |
+| Name                      | `releaseTypes/<NAME>/identifiers/<#>/qualifier`                                          |
 | Type                      | string                                                                                   |
 | Default                   | Empty (no qualifier)                                                                     |
-| Command Line Option       | `--release-types-<NAME>-identifiers-<NAME>-qualifier=<TEMPLATE>`                         |
-| Environment Variable      | `NYX_RELEASE_TYPES_<NAME>_IDENTIFIERS_<NAME>_QUALIFIER=<TEMPLATE>`                       |
-| Configuration File Option | `releaseTypes/items/<NAME>/identifiers/items/<NAME>/qualifier`                           |
+| Command Line Option       | `--release-types-<NAME>-identifiers-<#>-qualifier=<TEMPLATE>`                            |
+| Environment Variable      | `NYX_RELEASE_TYPES_<NAME>_IDENTIFIERS_<#>_QUALIFIER=<TEMPLATE>`                          |
+| Configuration File Option | `releaseTypes/items/<NAME>/identifiers/items/<#>/qualifier`                              |
 | Related state attributes  |                                                                                          |
 
 This is a short [template]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}) that, once rendered, is used as the leftmost part of the extra qualifier. This string is mandatory and must evaluate to non empty and will be used for the leftmost part of the identifier in the version and if the value is non empty, the two will be separated by a dot.
@@ -363,12 +326,12 @@ Defaults to the empty string (no qualifier).
 ###### Identifier value
 
 | ------------------------- | ---------------------------------------------------------------------------------------- |
-| Name                      | `releaseTypes/<NAME>/identifiers/<NAME>/value`                                           |
+| Name                      | `releaseTypes/<NAME>/identifiers/<#>/value`                                              |
 | Type                      | string                                                                                   |
 | Default                   | Empty (no value)                                                                         |
-| Command Line Option       | `--release-types-<NAME>-identifiers-<NAME>-value=<TEMPLATE>`                             |
-| Environment Variable      | `NYX_RELEASE_TYPES_<NAME>_IDENTIFIERS_<NAME>_VALUE=<TEMPLATE>`                           |
-| Configuration File Option | `releaseTypes/items/<NAME>/identifiers/items/<NAME>/value`                               |
+| Command Line Option       | `--release-types-<NAME>-identifiers-<#>-value=<TEMPLATE>`                                |
+| Environment Variable      | `NYX_RELEASE_TYPES_<NAME>_IDENTIFIERS_<#>_VALUE=<TEMPLATE>`                              |
+| Configuration File Option | `releaseTypes/items/<NAME>/identifiers/items/<#>/value`                                  |
 | Related state attributes  |                                                                                          |
 
 This is a short optional [template]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}) that, once rendered, is used as the rightmost part of the extra qualifier. If empty the version will only show the identifier [qualifier](#identifier-qualifier). If not empty the result of the template evaluation will be used for the rightmost part (after the [qualifier](#identifier-qualifier) and the dot) of the identifier in the version.
@@ -429,6 +392,9 @@ You can use tools like [https://regex101.com/](https://regex101.com/) to write a
 This option can be used to enable or disable a release type based on the environment. For example you may want to limit issuing official releases on authoritative CI servers only (where some specific environment variable is defined) and disable it on all other environments (like developer workstations).
 
 The default is the empty map, which matches any environment, making the release type independent from the environment.
+
+When configuring this map using command line options or environment variables you need to pass flattened values as documented [here]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}#collections-of-objects). In this case you can pass each environment variable to be matched as a command line option like `--release-types-<NAME>-match-environment-variables-<VARIABLE_NAME>=<REGEX>` or as an environment variable like `NYX_RELEASE_TYPES_<NAME>_MATCH_ENVIRONMENT_VARIABLES_<VARIABLE_NAME>=<REGEX>`.
+{: .notice--info}
 
 #### Match workspace status
 

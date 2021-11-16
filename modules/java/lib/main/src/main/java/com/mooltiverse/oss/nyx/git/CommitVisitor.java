@@ -15,7 +15,7 @@
  */
 package com.mooltiverse.oss.nyx.git;
 
-import com.mooltiverse.oss.nyx.data.Commit;
+import com.mooltiverse.oss.nyx.entities.git.Commit;
 
 /**
  * This functional interface is used when browsing Git commits and lets consumers receive summary

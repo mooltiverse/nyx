@@ -40,13 +40,12 @@ import com.mooltiverse.oss.nyx.command.template.StandaloneCommandProxy;
 import com.mooltiverse.oss.nyx.configuration.Defaults;
 import com.mooltiverse.oss.nyx.configuration.SimpleConfigurationLayer;
 import com.mooltiverse.oss.nyx.configuration.presets.Extended;
-import com.mooltiverse.oss.nyx.data.CommitMessageConvention;
-import com.mooltiverse.oss.nyx.data.Identifier;
-import com.mooltiverse.oss.nyx.data.Identifiers;
-import com.mooltiverse.oss.nyx.data.IdentifierPosition;
-import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
-import com.mooltiverse.oss.nyx.data.WorkspaceStatus;
-import com.mooltiverse.oss.nyx.data.ReleaseType;
+import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
+import com.mooltiverse.oss.nyx.entities.EnabledItemsMap;
+import com.mooltiverse.oss.nyx.entities.Identifier;
+import com.mooltiverse.oss.nyx.entities.IllegalPropertyException;
+import com.mooltiverse.oss.nyx.entities.ReleaseType;
+import com.mooltiverse.oss.nyx.entities.WorkspaceStatus;
 import com.mooltiverse.oss.nyx.git.GitException;
 import com.mooltiverse.oss.nyx.git.Scenario;
 import com.mooltiverse.oss.nyx.git.Script;
@@ -472,14 +471,19 @@ public class InferTestTemplates {
             throws Exception {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add some fictional release types
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("nonexisting", "matched"));
-            configurationLayerMock.getReleaseTypes().getItems().put("matched", new ReleaseType() {
-                {
-                    setGitCommitMessage("MATCHED");         // use this value to see if the release type has been matched
-                    setMatchBranches("^(master|main)$");    // match main and master
-                    setMatchEnvironmentVariables(null);
-                    setMatchWorkspaceStatus(null);
-                }}
+            configurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("nonexisting", "matched"),
+                    Map.<String,ReleaseType>of(
+                        "matched", new ReleaseType() {
+                        {
+                            setGitCommitMessage("MATCHED");         // use this value to see if the release type has been matched
+                            setMatchBranches("^(master|main)$");    // match main and master
+                            setMatchEnvironmentVariables(null);
+                            setMatchWorkspaceStatus(null);
+                        }}
+                    )
+                )
             );
             command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
@@ -495,30 +499,33 @@ public class InferTestTemplates {
             throws Exception {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add some fictional release types
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("unmatched", "matched", "fallback"));
-            configurationLayerMock.getReleaseTypes().getItems().put("unmatched", new ReleaseType() {
-                {
-                    setGitCommitMessage("UNMATCHED");       // use this value to see if the release type has been matched
-                    setMatchBranches("^nonexistendbranch$");// match only a branch name that doesn't exist
-                    setMatchEnvironmentVariables(null);
-                    setMatchWorkspaceStatus(null);
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().getItems().put("matched", new ReleaseType() {
-                {
-                    setGitCommitMessage("MATCHED");         // use this value to see if the release type has been matched
-                    setMatchBranches("^(master|main)$");    // match main and master
-                    setMatchEnvironmentVariables(null);
-                    setMatchWorkspaceStatus(null);
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().getItems().put("fallback", new ReleaseType() {
-                {
-                    setGitCommitMessage("FALLBACK");        // use this value to see if the release type has been matched
-                    setMatchBranches(null);                 // match any branch name
-                    setMatchEnvironmentVariables(null);
-                    setMatchWorkspaceStatus(null);
-                }}
+            configurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("unmatched", "matched", "fallback"),
+                    Map.<String,ReleaseType>of(
+                        "unmatched", new ReleaseType() {
+                        {
+                            setGitCommitMessage("UNMATCHED");       // use this value to see if the release type has been matched
+                            setMatchBranches("^nonexistendbranch$");// match only a branch name that doesn't exist
+                            setMatchEnvironmentVariables(null);
+                            setMatchWorkspaceStatus(null);
+                        }},
+                        "matched", new ReleaseType() {
+                        {
+                            setGitCommitMessage("MATCHED");         // use this value to see if the release type has been matched
+                            setMatchBranches("^(master|main)$");    // match main and master
+                            setMatchEnvironmentVariables(null);
+                            setMatchWorkspaceStatus(null);
+                        }},
+                        "fallback", new ReleaseType() {
+                        {
+                            setGitCommitMessage("FALLBACK");        // use this value to see if the release type has been matched
+                            setMatchBranches(null);                 // match any branch name
+                            setMatchEnvironmentVariables(null);
+                            setMatchWorkspaceStatus(null);
+                        }}
+                    )
+                )
             );
             command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
@@ -547,31 +554,33 @@ public class InferTestTemplates {
             // since we can't set environment variables here we just use the PATH variable, which is always present
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add some fictional release types
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("unmatched", "matchedpath", "fallback"));
-            configurationLayerMock.getReleaseTypes().getItems().put("unmatched", new ReleaseType() {
-                {
-                    setGitCommitMessage("UNMATCHED");       // use this value to see if the release type has been matched
-                    setMatchBranches(null);                 // match any branch name
-                    setMatchEnvironmentVariables(Map.<String,String>of("PATH","^nonexistingvalue$")); // require the PATH variable to be present, with a non existing value
-                    setMatchWorkspaceStatus(null);
-                }}
-            );
-
-            configurationLayerMock.getReleaseTypes().getItems().put("matchedpath", new ReleaseType() {
-                {
-                    setGitCommitMessage("MATCHED PATH");    // use this value to see if the release type has been matched
-                    setMatchBranches(null);                 // match any branch name
-                    setMatchEnvironmentVariables(Map.<String,String>of("PATH",".*")); // require the PATH variable to be present, with any value
-                    setMatchWorkspaceStatus(null);
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().getItems().put("fallback", new ReleaseType() {
-                {
-                    setGitCommitMessage("FALLBACK");        // use this value to see if the release type has been matched
-                    setMatchBranches(null);                 // match any branch name
-                    setMatchEnvironmentVariables(null);
-                    setMatchWorkspaceStatus(null);
-                }}
+            configurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("unmatched", "matchedpath", "fallback"),
+                    Map.<String,ReleaseType>of(
+                        "unmatched", new ReleaseType() {
+                        {
+                            setGitCommitMessage("UNMATCHED");       // use this value to see if the release type has been matched
+                            setMatchBranches(null);                 // match any branch name
+                            setMatchEnvironmentVariables(Map.<String,String>of("PATH","^nonexistingvalue$")); // require the PATH variable to be present, with a non existing value
+                            setMatchWorkspaceStatus(null);
+                        }},
+                        "matchedpath", new ReleaseType() {
+                        {
+                            setGitCommitMessage("MATCHED PATH");    // use this value to see if the release type has been matched
+                            setMatchBranches(null);                 // match any branch name
+                            setMatchEnvironmentVariables(Map.<String,String>of("PATH",".*")); // require the PATH variable to be present, with any value
+                            setMatchWorkspaceStatus(null);
+                        }},
+                        "fallback", new ReleaseType() {
+                        {
+                            setGitCommitMessage("FALLBACK");        // use this value to see if the release type has been matched
+                            setMatchBranches(null);                 // match any branch name
+                            setMatchEnvironmentVariables(null);
+                            setMatchWorkspaceStatus(null);
+                        }}
+                    )
+                )
             );
             command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
@@ -590,39 +599,40 @@ public class InferTestTemplates {
             throws Exception {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add some fictional release types
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("unmatched", "matchedclean", "matcheddirty", "fallback"));
-            configurationLayerMock.getReleaseTypes().getItems().put("unmatched", new ReleaseType() {
-                {
-                    setGitCommitMessage("UNMATCHED");       // use this value to see if the release type has been matched
-                    setMatchBranches("^nonexistendbranch$");// match only a branch name that doesn't exist
-                    setMatchEnvironmentVariables(null);
-                    setMatchWorkspaceStatus(null);
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().getItems().put("matchedclean", new ReleaseType() {
-                {
-                    setGitCommitMessage("MATCHED CLEAN");   // use this value to see if the release type has been matched
-                    setMatchBranches(null);                 // match any branch name
-                    setMatchEnvironmentVariables(null);
-                    setMatchWorkspaceStatus(WorkspaceStatus.CLEAN);  // the workspace must be clean to match
-                }}
-            );
-
-            configurationLayerMock.getReleaseTypes().getItems().put("matcheddirty", new ReleaseType() {
-                {
-                    setGitCommitMessage("MATCHED DIRTY");   // use this value to see if the release type has been matched
-                    setMatchBranches(null);                 // match any branch name
-                    setMatchEnvironmentVariables(null);
-                    setMatchWorkspaceStatus(WorkspaceStatus.DIRTY);  // the workspace must be dirty to match
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().getItems().put("fallback", new ReleaseType() {
-                {
-                    setGitCommitMessage("FALLBACK");        // use this value to see if the release type has been matched
-                    setMatchBranches(null);                 // match any branch name
-                    setMatchEnvironmentVariables(null);
-                    setMatchWorkspaceStatus(null);
-                }}
+            configurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("unmatched", "matchedclean", "matcheddirty", "fallback"),
+                    Map.<String,ReleaseType>of(
+                        "unmatched", new ReleaseType() {
+                        {
+                            setGitCommitMessage("UNMATCHED");       // use this value to see if the release type has been matched
+                            setMatchBranches("^nonexistendbranch$");// match only a branch name that doesn't exist
+                            setMatchEnvironmentVariables(null);
+                            setMatchWorkspaceStatus(null);
+                        }},
+                        "matchedclean", new ReleaseType() {
+                        {
+                            setGitCommitMessage("MATCHED CLEAN");   // use this value to see if the release type has been matched
+                            setMatchBranches(null);                 // match any branch name
+                            setMatchEnvironmentVariables(null);
+                            setMatchWorkspaceStatus(WorkspaceStatus.CLEAN);  // the workspace must be clean to match
+                        }},
+                        "matcheddirty", new ReleaseType() {
+                        {
+                            setGitCommitMessage("MATCHED DIRTY");   // use this value to see if the release type has been matched
+                            setMatchBranches(null);                 // match any branch name
+                            setMatchEnvironmentVariables(null);
+                            setMatchWorkspaceStatus(WorkspaceStatus.DIRTY);  // the workspace must be dirty to match
+                        }},
+                        "fallback", new ReleaseType() {
+                        {
+                            setGitCommitMessage("FALLBACK");        // use this value to see if the release type has been matched
+                            setMatchBranches(null);                 // match any branch name
+                            setMatchEnvironmentVariables(null);
+                            setMatchWorkspaceStatus(null);
+                        }}
+                    )
+                )
             );
             command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
@@ -653,59 +663,54 @@ public class InferTestTemplates {
             // since we can't set environment variables here we just use the PATH variable, which is always present
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add some fictional release types
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("unmatched", "unmatchedbybranch", "unmatchedbyenvironmentvariables", "unmatchedbyworkspacestatus", "matched", "fallback"));
-            configurationLayerMock.getReleaseTypes().getItems().put("unmatched", new ReleaseType() {
-                {
-                    setGitCommitMessage("UNMATCHED");                   // use this value to see if the release type has been matched
-                    setMatchBranches("^nonexistendbranch$");            // match only a branch name that doesn't exist
-                    setMatchEnvironmentVariables(Map.<String,String>of("PATH","^nonexistingvalue$")); // require the PATH variable to be present, with a non existing value
-                    setMatchWorkspaceStatus(null);
-                }}
-            );
-
-            configurationLayerMock.getReleaseTypes().getItems().put("unmatchedbybranch", new ReleaseType() {
-                {
-                    setGitCommitMessage("UNMATCHED BY BRANCH");         // use this value to see if the release type has been matched
-                    setMatchBranches("^nonexistendbranch$");            // match only a branch name that doesn't exist
-                    setMatchEnvironmentVariables(Map.<String,String>of("PATH",".*")); // require the PATH variable to be present, with any value
-                    setMatchWorkspaceStatus(WorkspaceStatus.CLEAN);     // the workspace must be clean to match
-                }}
-            );
-
-            configurationLayerMock.getReleaseTypes().getItems().put("unmatchedbyenvironmentvariables", new ReleaseType() {
-                {
-                    setGitCommitMessage("UNMATCHED BY ENVIRONMENT VARIABLES");         // use this value to see if the release type has been matched
-                    setMatchBranches("^(master|main)$");                // match main and master
-                    setMatchEnvironmentVariables(Map.<String,String>of("PATH","^nonexistingvalue$")); // require the PATH variable to be present, with a non existing value
-                    setMatchWorkspaceStatus(WorkspaceStatus.CLEAN);     // the workspace must be clean to match
-                }}
-            );
-
-            configurationLayerMock.getReleaseTypes().getItems().put("unmatchedbyworkspacestatus", new ReleaseType() {
-                {
-                    setGitCommitMessage("UNMATCHED BY WORKSPACE STATUS");         // use this value to see if the release type has been matched
-                    setMatchBranches("^(master|main)$");                // match main and master
-                    setMatchEnvironmentVariables(Map.<String,String>of("PATH",".*")); // require the PATH variable to be present, with any value
-                    setMatchWorkspaceStatus(WorkspaceStatus.DIRTY);     // the workspace must be dirty to match
-                }}
-            );
-
-            configurationLayerMock.getReleaseTypes().getItems().put("matched", new ReleaseType() {
-                {
-                    setGitCommitMessage("MATCHED");                     // use this value to see if the release type has been matched
-                    setMatchBranches("^(master|main)$");                // match main and master
-                    setMatchEnvironmentVariables(Map.<String,String>of("PATH",".*")); // require the PATH variable to be present, with any value
-                    setMatchWorkspaceStatus(WorkspaceStatus.CLEAN);     // the workspace must be clean to match
-                }}
-            );
-
-            configurationLayerMock.getReleaseTypes().getItems().put("fallback", new ReleaseType() {
-                {
-                    setGitCommitMessage("FALLBACK");                    // use this value to see if the release type has been matched
-                    setMatchBranches(null);                             // match any branch name
-                    setMatchEnvironmentVariables(null);
-                    setMatchWorkspaceStatus(null);
-                }}
+            configurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("unmatched", "unmatchedbybranch", "unmatchedbyenvironmentvariables", "unmatchedbyworkspacestatus", "matched", "fallback"),
+                    Map.<String,ReleaseType>of(
+                        "unmatched", new ReleaseType() {
+                        {
+                            setGitCommitMessage("UNMATCHED");                   // use this value to see if the release type has been matched
+                            setMatchBranches("^nonexistendbranch$");            // match only a branch name that doesn't exist
+                            setMatchEnvironmentVariables(Map.<String,String>of("PATH","^nonexistingvalue$")); // require the PATH variable to be present, with a non existing value
+                            setMatchWorkspaceStatus(null);
+                        }},
+                        "unmatchedbybranch", new ReleaseType() {
+                        {
+                            setGitCommitMessage("UNMATCHED BY BRANCH");         // use this value to see if the release type has been matched
+                            setMatchBranches("^nonexistendbranch$");            // match only a branch name that doesn't exist
+                            setMatchEnvironmentVariables(Map.<String,String>of("PATH",".*")); // require the PATH variable to be present, with any value
+                            setMatchWorkspaceStatus(WorkspaceStatus.CLEAN);     // the workspace must be clean to match
+                        }},
+                        "unmatchedbyenvironmentvariables", new ReleaseType() {
+                        {
+                            setGitCommitMessage("UNMATCHED BY ENVIRONMENT VARIABLES");         // use this value to see if the release type has been matched
+                            setMatchBranches("^(master|main)$");                // match main and master
+                            setMatchEnvironmentVariables(Map.<String,String>of("PATH","^nonexistingvalue$")); // require the PATH variable to be present, with a non existing value
+                            setMatchWorkspaceStatus(WorkspaceStatus.CLEAN);     // the workspace must be clean to match
+                        }},
+                        "unmatchedbyworkspacestatus", new ReleaseType() {
+                        {
+                            setGitCommitMessage("UNMATCHED BY WORKSPACE STATUS");         // use this value to see if the release type has been matched
+                            setMatchBranches("^(master|main)$");                // match main and master
+                            setMatchEnvironmentVariables(Map.<String,String>of("PATH",".*")); // require the PATH variable to be present, with any value
+                            setMatchWorkspaceStatus(WorkspaceStatus.DIRTY);     // the workspace must be dirty to match
+                        }},
+                        "matched", new ReleaseType() {
+                        {
+                            setGitCommitMessage("MATCHED");                     // use this value to see if the release type has been matched
+                            setMatchBranches("^(master|main)$");                // match main and master
+                            setMatchEnvironmentVariables(Map.<String,String>of("PATH",".*")); // require the PATH variable to be present, with any value
+                            setMatchWorkspaceStatus(WorkspaceStatus.CLEAN);     // the workspace must be clean to match
+                        }},
+                        "fallback", new ReleaseType() {
+                        {
+                            setGitCommitMessage("FALLBACK");                    // use this value to see if the release type has been matched
+                            setMatchBranches(null);                             // match any branch name
+                            setMatchEnvironmentVariables(null);
+                            setMatchWorkspaceStatus(null);
+                        }}
+                    )
+                )
             );
             command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
@@ -729,69 +734,29 @@ public class InferTestTemplates {
             throws Exception {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*")))
+                )
+            );
             // add some fictional release types
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("matched"));
-            configurationLayerMock.getReleaseTypes().getItems().put("matched", new ReleaseType() {
-                {
-                    setIdentifiers(new Identifiers(List.<String>of("nonint"), Map.<String,Identifier>of("nonint", new Identifier("nonint", "abc", IdentifierPosition.PRE_RELEASE))));
-                }}
+            configurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("matched"),
+                    Map.<String,ReleaseType>of(
+                        "matched", new ReleaseType() {
+                        {
+                            setIdentifiers(List.<Identifier>of(new Identifier("nonint", "abc", Identifier.Position.PRE_RELEASE)));
+                        }}
+                    )
+                )
             );
             command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             if (command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME))
                 assertThrows(IllegalPropertyException.class, () -> command.run());
             else assertThrows(Exception.class, () -> command.run());
-        }
-
-        @TestTemplate
-        @DisplayName("Infer.run() throws exception when an enabled identifier is not defined")
-        @Baseline(Scenario.ONE_BRANCH_SHORT)
-        void extraNonDefinedEnabledIdentifierThrowsExceptionTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
-            throws Exception {
-            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            // add a mock convention that accepts all non null messages and dumps the minor identifier for each
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
-            // add some fictional release types
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("matched"));
-            configurationLayerMock.getReleaseTypes().getItems().put("matched", new ReleaseType() {
-                {
-                    // the identifier is listed among the enabled ones but then it's not defined
-                    setIdentifiers(new Identifiers(List.<String>of("undefined"), Map.<String,Identifier>of()));
-                }}
-            );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
-
-            if (command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME))
-                assertThrows(IllegalPropertyException.class, () -> command.run());
-            else assertThrows(Exception.class, () -> command.run());
-        }
-
-        @TestTemplate
-        @DisplayName("Infer.run() with a non enabled identifier")
-        @Baseline(Scenario.ONE_BRANCH_SHORT)
-        void extraNonEnabledIdentifierTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
-            throws Exception {
-            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            // add a mock convention that accepts all non null messages and dumps the minor identifier for each
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
-            // add some fictional release types
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("matched"));
-            configurationLayerMock.getReleaseTypes().getItems().put("matched", new ReleaseType() {
-                {
-                    // the identifier is defined but does not appear among the enabled ones
-                    setIdentifiers(new Identifiers(List.<String>of(), Map.<String,Identifier>of("identifier1", new Identifier("identifier1", "123", IdentifierPosition.PRE_RELEASE))));
-                }}
-            );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
-
-            command.run();
-
-            // the identifier just doesn't appear
-            assertEquals("0.0.5", command.state().getVersion());
         }
 
         @TestTemplate
@@ -801,14 +766,23 @@ public class InferTestTemplates {
             throws Exception {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*")))
+                )
+            );
             // add some fictional release types
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("matched"));
-            configurationLayerMock.getReleaseTypes().getItems().put("matched", new ReleaseType() {
-                {
-                    setIdentifiers(new Identifiers(List.<String>of("identifier1"), Map.<String,Identifier>of("identifier1", new Identifier("identifier1", "123", IdentifierPosition.PRE_RELEASE))));
-                }}
+            configurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("matched"),
+                    Map.<String,ReleaseType>of(
+                        "matched", new ReleaseType() {
+                        {
+                            setIdentifiers(List.<Identifier>of(new Identifier("identifier1", "123", Identifier.Position.PRE_RELEASE)));
+                        }}
+                    )
+                )
             );
             command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
@@ -824,14 +798,23 @@ public class InferTestTemplates {
             throws Exception {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*")))
+                )
+            );
             // add some fictional release types
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("matched"));
-            configurationLayerMock.getReleaseTypes().getItems().put("matched", new ReleaseType() {
-                {
-                    setIdentifiers(new Identifiers(List.<String>of("identifier1"), Map.<String,Identifier>of("identifier1", new Identifier("identifier1", "123", IdentifierPosition.PRE_RELEASE))));
-                }}
+            configurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("matched"),
+                    Map.<String,ReleaseType>of(
+                        "matched", new ReleaseType() {
+                        {
+                            setIdentifiers(List.<Identifier>of(new Identifier("identifier1", "123", Identifier.Position.PRE_RELEASE)));
+                        }}
+                    )
+                )
             );
             command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
@@ -851,14 +834,23 @@ public class InferTestTemplates {
             throws Exception {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*")))
+                )
+            );
             // add some fictional release types
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("matched"));
-            configurationLayerMock.getReleaseTypes().getItems().put("matched", new ReleaseType() {
-                {
-                    setIdentifiers(new Identifiers(List.<String>of("identifier1"), Map.<String,Identifier>of("identifier1", new Identifier("identifier1", "abc", IdentifierPosition.BUILD))));
-                }}
+            configurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("matched"),
+                    Map.<String,ReleaseType>of(
+                        "matched", new ReleaseType() {
+                        {
+                            setIdentifiers(List.<Identifier>of(new Identifier("identifier1", "abc", Identifier.Position.BUILD)));
+                        }}
+                    )
+                )
             );
             command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
@@ -874,14 +866,23 @@ public class InferTestTemplates {
             throws Exception {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*")))
+                )
+            );
             // add some fictional release types
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("matched"));
-            configurationLayerMock.getReleaseTypes().getItems().put("matched", new ReleaseType() {
-                {
-                    setIdentifiers(new Identifiers(List.<String>of("identifier1"), Map.<String,Identifier>of("identifier1", new Identifier("identifier1", "abc", IdentifierPosition.BUILD))));
-                }}
+            configurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("matched"),
+                    Map.<String,ReleaseType>of(
+                        "matched", new ReleaseType() {
+                        {
+                            setIdentifiers(List.<Identifier>of(new Identifier("identifier1", "abc", Identifier.Position.BUILD)));
+                        }}
+                    )
+                )
             );
             command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
@@ -901,21 +902,30 @@ public class InferTestTemplates {
             throws Exception {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*")))
+                )
+            );
             // add some fictional release types
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("matched"));
-            configurationLayerMock.getReleaseTypes().getItems().put("matched", new ReleaseType() {
-                {
-                    setIdentifiers(new Identifiers(List.<String>of("p1", "p2", "p3", "b1", "b2", "b3"), Map.<String,Identifier>of(
-                        "p1", new Identifier("p1", "123", IdentifierPosition.PRE_RELEASE),
-                        "p2", new Identifier("p2", null, IdentifierPosition.PRE_RELEASE),
-                        "p3", new Identifier("p3", "456", IdentifierPosition.PRE_RELEASE),
-                        "b1", new Identifier("b1", "abc", IdentifierPosition.BUILD),
-                        "b2", new Identifier("b2", null, null), // BUILD is the default position
-                        "b3", new Identifier("b3", "def", IdentifierPosition.BUILD)
-                    )));
-                }}
+            configurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("matched"),
+                    Map.<String,ReleaseType>of(
+                        "matched", new ReleaseType() {
+                        {
+                            setIdentifiers(List.<Identifier>of(
+                                new Identifier("p1", "123", Identifier.Position.PRE_RELEASE),
+                                new Identifier("p2", null, Identifier.Position.PRE_RELEASE),
+                                new Identifier("p3", "456", Identifier.Position.PRE_RELEASE),
+                                new Identifier("b1", "abc", Identifier.Position.BUILD),
+                                new Identifier("b2", null, null), // BUILD is the default position
+                                new Identifier("b3", "def", Identifier.Position.BUILD)
+                            ));
+                        }}
+                    )
+                )
             );
             command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
@@ -931,21 +941,30 @@ public class InferTestTemplates {
             throws Exception {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*")))
+                )
+            );
             // add some fictional release types
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("matched"));
-            configurationLayerMock.getReleaseTypes().getItems().put("matched", new ReleaseType() {
-                {
-                    setIdentifiers(new Identifiers(List.<String>of("p1", "p2", "p3", "b1", "b2", "b3"), Map.<String,Identifier>of(
-                        "p1", new Identifier("p1", "123", IdentifierPosition.PRE_RELEASE),
-                        "p2", new Identifier("p2", null, IdentifierPosition.PRE_RELEASE),
-                        "p3", new Identifier("p3", "456", IdentifierPosition.PRE_RELEASE),
-                        "b1", new Identifier("b1", "abc", IdentifierPosition.BUILD),
-                        "b2", new Identifier("b2", null, null), // BUILD is the default position
-                        "b3", new Identifier("b3", "def", IdentifierPosition.BUILD)
-                    )));
-                }}
+            configurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("matched"),
+                    Map.<String,ReleaseType>of(
+                        "matched", new ReleaseType() {
+                        {
+                            setIdentifiers(List.<Identifier>of(
+                                new Identifier("p1", "123", Identifier.Position.PRE_RELEASE),
+                                new Identifier("p2", null, Identifier.Position.PRE_RELEASE),
+                                new Identifier("p3", "456", Identifier.Position.PRE_RELEASE),
+                                new Identifier("b1", "abc", Identifier.Position.BUILD),
+                                new Identifier("b2", null, null), // BUILD is the default position
+                                new Identifier("b3", "def", Identifier.Position.BUILD)
+                            ));
+                        }}
+                    )
+                )
             );
             command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
@@ -974,14 +993,23 @@ public class InferTestTemplates {
             throws Exception {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*")))
+                )
+            );
             // add some fictional release types
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("matched"));
-            configurationLayerMock.getReleaseTypes().getItems().put("matched", new ReleaseType() {
-                {
-                    setVersionRange("^0\\.0\\.([0-9]*)$");
-                }}
+            configurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("matched"),
+                    Map.<String,ReleaseType>of(
+                        "matched", new ReleaseType() {
+                        {
+                            setVersionRange("^0\\.0\\.([0-9]*)$");
+                        }}
+                    )
+                )
             );
             command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
@@ -998,14 +1026,23 @@ public class InferTestTemplates {
             throws Exception {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*")))
+                )
+            );
             // add some fictional release types
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("matched"));
-            configurationLayerMock.getReleaseTypes().getItems().put("matched", new ReleaseType() {
-                {
-                    setVersionRange("^1\\.2\\.([0-9]*)$");
-                }}
+            configurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("matched"),
+                    Map.<String,ReleaseType>of(
+                        "matched", new ReleaseType() {
+                        {
+                            setVersionRange("^1\\.2\\.([0-9]*)$");
+                        }}
+                    )
+                )
             );
             command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
@@ -1024,14 +1061,23 @@ public class InferTestTemplates {
             throws Exception {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*")))
+                )
+            );
             // add some fictional release types
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("matched"));
-            configurationLayerMock.getReleaseTypes().getItems().put("matched", new ReleaseType() {
-                {
-                    setVersionRange("^1\\.2\\.((((((([0-9]*)$");
-                }}
+            configurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("matched"),
+                    Map.<String,ReleaseType>of(
+                        "matched", new ReleaseType() {
+                        {
+                            setVersionRange("^1\\.2\\.((((((([0-9]*)$");
+                        }}
+                    )
+                )
             );
             command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
@@ -1053,14 +1099,23 @@ public class InferTestTemplates {
             throws Exception {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*")))
+                )
+            );
             // add some fictional release types
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("matched"));
-            configurationLayerMock.getReleaseTypes().getItems().put("matched", new ReleaseType() {
-                {
-                    setVersionRangeFromBranchName(Boolean.TRUE);
-                }}
+            configurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("matched"),
+                    Map.<String,ReleaseType>of(
+                        "matched", new ReleaseType() {
+                        {
+                            setVersionRangeFromBranchName(Boolean.TRUE);
+                        }}
+                    )
+                )
             );
             command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
@@ -1091,14 +1146,23 @@ public class InferTestTemplates {
             throws Exception {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*")))
+                )
+            );
             // add some fictional release types
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("matched"));
-            configurationLayerMock.getReleaseTypes().getItems().put("matched", new ReleaseType() {
-                {
-                    setVersionRangeFromBranchName(Boolean.TRUE);
-                }}
+            configurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("matched"),
+                    Map.<String,ReleaseType>of(
+                        "matched", new ReleaseType() {
+                        {
+                            setVersionRangeFromBranchName(Boolean.TRUE);
+                        }}
+                    )
+                )
             );
             command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
@@ -1141,8 +1205,8 @@ public class InferTestTemplates {
             assertEquals(Defaults.BUMP, command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(1, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getRootCommitID(), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getRootCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getRootCommitID(), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getRootCommitID(), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals(Defaults.INITIAL_VERSION, command.state().getReleaseScope().getPreviousVersion());
             assertNull(command.state().getReleaseScope().getPreviousVersionCommit());
             assertEquals(Defaults.INITIAL_VERSION, command.state().getReleaseScope().getPrimeVersion());
@@ -1160,10 +1224,12 @@ public class InferTestTemplates {
                 assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(Defaults.ReleaseType.IDENTIFIERS.getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(Defaults.ReleaseType.IDENTIFIERS.getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(Defaults.ReleaseType.IDENTIFIERS.getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(Defaults.ReleaseType.IDENTIFIERS.getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                assertTrue(Defaults.ReleaseType.IDENTIFIERS.containsAll(command.state().getReleaseType().getIdentifiers()));
+                for (int i=0; i<Defaults.ReleaseType.IDENTIFIERS.size(); i++) {
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
             assertEquals(Defaults.ReleaseType.MATCH_BRANCHES, command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -1192,8 +1258,8 @@ public class InferTestTemplates {
             assertEquals(Defaults.BUMP, command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(1, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getRootCommitID(), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getRootCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getRootCommitID(), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getRootCommitID(), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals(CUSTOM_INITIAL_VERSION, command.state().getReleaseScope().getPreviousVersion());
             assertNull(command.state().getReleaseScope().getPreviousVersionCommit());
             assertEquals(CUSTOM_INITIAL_VERSION, command.state().getReleaseScope().getPrimeVersion());
@@ -1210,10 +1276,12 @@ public class InferTestTemplates {
                 assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(Defaults.ReleaseType.IDENTIFIERS.getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(Defaults.ReleaseType.IDENTIFIERS.getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(Defaults.ReleaseType.IDENTIFIERS.getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(Defaults.ReleaseType.IDENTIFIERS.getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                assertTrue(Defaults.ReleaseType.IDENTIFIERS.containsAll(command.state().getReleaseType().getIdentifiers()));
+                for (int i=0; i<Defaults.ReleaseType.IDENTIFIERS.size(); i++) {
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
             assertEquals(Defaults.ReleaseType.MATCH_BRANCHES, command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -1260,10 +1328,12 @@ public class InferTestTemplates {
                 assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(Defaults.ReleaseType.IDENTIFIERS.getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(Defaults.ReleaseType.IDENTIFIERS.getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(Defaults.ReleaseType.IDENTIFIERS.getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(Defaults.ReleaseType.IDENTIFIERS.getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                assertTrue(Defaults.ReleaseType.IDENTIFIERS.containsAll(command.state().getReleaseType().getIdentifiers()));
+                for (int i=0; i<Defaults.ReleaseType.IDENTIFIERS.size(); i++) {
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
             assertEquals(Defaults.ReleaseType.MATCH_BRANCHES, command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -1292,8 +1362,8 @@ public class InferTestTemplates {
             assertEquals(CUSTOM_BUMP, command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(1, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getRootCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getRootCommitID(), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals(Defaults.INITIAL_VERSION, command.state().getReleaseScope().getPreviousVersion());
             assertNull(command.state().getReleaseScope().getPreviousVersionCommit());
             assertEquals(Defaults.INITIAL_VERSION, command.state().getReleaseScope().getPrimeVersion());
@@ -1310,10 +1380,12 @@ public class InferTestTemplates {
                 assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(Defaults.ReleaseType.IDENTIFIERS.getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(Defaults.ReleaseType.IDENTIFIERS.getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(Defaults.ReleaseType.IDENTIFIERS.getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(Defaults.ReleaseType.IDENTIFIERS.getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                assertTrue(Defaults.ReleaseType.IDENTIFIERS.containsAll(command.state().getReleaseType().getIdentifiers()));
+                for (int i=0; i<Defaults.ReleaseType.IDENTIFIERS.size(); i++) {
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
             assertEquals(Defaults.ReleaseType.MATCH_BRANCHES, command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -1342,8 +1414,8 @@ public class InferTestTemplates {
             assertEquals(CUSTOM_BUMP, command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(1, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getRootCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getRootCommitID(), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals(Defaults.INITIAL_VERSION, command.state().getReleaseScope().getPreviousVersion());
             assertNull(command.state().getReleaseScope().getPreviousVersionCommit());
             assertEquals(Defaults.INITIAL_VERSION, command.state().getReleaseScope().getPrimeVersion());
@@ -1360,10 +1432,12 @@ public class InferTestTemplates {
                 assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(Defaults.ReleaseType.IDENTIFIERS.getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(Defaults.ReleaseType.IDENTIFIERS.getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(Defaults.ReleaseType.IDENTIFIERS.getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(Defaults.ReleaseType.IDENTIFIERS.getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                assertTrue(Defaults.ReleaseType.IDENTIFIERS.containsAll(command.state().getReleaseType().getIdentifiers()));
+                for (int i=0; i<Defaults.ReleaseType.IDENTIFIERS.size(); i++) {
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
             assertEquals(Defaults.ReleaseType.MATCH_BRANCHES, command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -1392,8 +1466,8 @@ public class InferTestTemplates {
             assertEquals(CUSTOM_BUMP, command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(1, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getRootCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getRootCommitID(), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals(Defaults.INITIAL_VERSION, command.state().getReleaseScope().getPreviousVersion());
             assertNull(command.state().getReleaseScope().getPreviousVersionCommit());
             assertEquals(Defaults.INITIAL_VERSION, command.state().getReleaseScope().getPrimeVersion());
@@ -1410,10 +1484,12 @@ public class InferTestTemplates {
                 assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(Defaults.ReleaseType.IDENTIFIERS.getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(Defaults.ReleaseType.IDENTIFIERS.getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(Defaults.ReleaseType.IDENTIFIERS.getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(Defaults.ReleaseType.IDENTIFIERS.getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                assertTrue(Defaults.ReleaseType.IDENTIFIERS.containsAll(command.state().getReleaseType().getIdentifiers()));
+                for (int i=0; i<Defaults.ReleaseType.IDENTIFIERS.size(); i++) {
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
             assertEquals(Defaults.ReleaseType.MATCH_BRANCHES, command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -1442,8 +1518,8 @@ public class InferTestTemplates {
             assertEquals(CUSTOM_BUMP, command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(1, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getRootCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getRootCommitID(), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals(Defaults.INITIAL_VERSION, command.state().getReleaseScope().getPreviousVersion());
             assertNull(command.state().getReleaseScope().getPreviousVersionCommit());
             assertEquals(Defaults.INITIAL_VERSION, command.state().getReleaseScope().getPrimeVersion());
@@ -1460,10 +1536,12 @@ public class InferTestTemplates {
                 assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(Defaults.ReleaseType.IDENTIFIERS.getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(Defaults.ReleaseType.IDENTIFIERS.getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(Defaults.ReleaseType.IDENTIFIERS.getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(Defaults.ReleaseType.IDENTIFIERS.getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                assertTrue(Defaults.ReleaseType.IDENTIFIERS.containsAll(command.state().getReleaseType().getIdentifiers()));
+                for (int i=0; i<Defaults.ReleaseType.IDENTIFIERS.size(); i++) {
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
             assertEquals(Defaults.ReleaseType.MATCH_BRANCHES, command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -1495,9 +1573,9 @@ public class InferTestTemplates {
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals(Defaults.INITIAL_VERSION, command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag(Defaults.INITIAL_VERSION), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag(Defaults.INITIAL_VERSION), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals(Defaults.INITIAL_VERSION, command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag(Defaults.INITIAL_VERSION), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag(Defaults.INITIAL_VERSION), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
             assertEquals(Defaults.ReleaseType.COLLAPSE_VERSIONS, command.state().getReleaseType().getCollapseVersions());
             assertEquals(Defaults.ReleaseType.COLLAPSED_VERSION_QUALIFIER, command.state().getReleaseType().getCollapsedVersionQualifier());
@@ -1510,10 +1588,12 @@ public class InferTestTemplates {
                 assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(Defaults.ReleaseType.IDENTIFIERS.getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(Defaults.ReleaseType.IDENTIFIERS.getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(Defaults.ReleaseType.IDENTIFIERS.getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(Defaults.ReleaseType.IDENTIFIERS.getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                assertTrue(Defaults.ReleaseType.IDENTIFIERS.containsAll(command.state().getReleaseType().getIdentifiers()));
+                for (int i=0; i<Defaults.ReleaseType.IDENTIFIERS.size(); i++) {
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
             assertEquals(Defaults.ReleaseType.MATCH_BRANCHES, command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -1545,9 +1625,9 @@ public class InferTestTemplates {
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals(Defaults.INITIAL_VERSION, command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag(Defaults.INITIAL_VERSION), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag(Defaults.INITIAL_VERSION), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals(Defaults.INITIAL_VERSION, command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag(Defaults.INITIAL_VERSION), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag(Defaults.INITIAL_VERSION), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
             assertEquals(Defaults.ReleaseType.COLLAPSE_VERSIONS, command.state().getReleaseType().getCollapseVersions());
             assertEquals(Defaults.ReleaseType.COLLAPSED_VERSION_QUALIFIER, command.state().getReleaseType().getCollapsedVersionQualifier());
@@ -1560,10 +1640,12 @@ public class InferTestTemplates {
                 assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(Defaults.ReleaseType.IDENTIFIERS.getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(Defaults.ReleaseType.IDENTIFIERS.getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(Defaults.ReleaseType.IDENTIFIERS.getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(Defaults.ReleaseType.IDENTIFIERS.getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                assertTrue(Defaults.ReleaseType.IDENTIFIERS.containsAll(command.state().getReleaseType().getIdentifiers()));
+                for (int i=0; i<Defaults.ReleaseType.IDENTIFIERS.size(); i++) {
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
             assertEquals(Defaults.ReleaseType.MATCH_BRANCHES, command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -1595,9 +1677,9 @@ public class InferTestTemplates {
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals(Defaults.INITIAL_VERSION, command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag(Defaults.INITIAL_VERSION), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag(Defaults.INITIAL_VERSION), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals(Defaults.INITIAL_VERSION, command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag(Defaults.INITIAL_VERSION), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag(Defaults.INITIAL_VERSION), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
             assertEquals(Defaults.ReleaseType.COLLAPSE_VERSIONS, command.state().getReleaseType().getCollapseVersions());
             assertEquals(Defaults.ReleaseType.COLLAPSED_VERSION_QUALIFIER, command.state().getReleaseType().getCollapsedVersionQualifier());
@@ -1610,10 +1692,12 @@ public class InferTestTemplates {
                 assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(Defaults.ReleaseType.IDENTIFIERS.getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(Defaults.ReleaseType.IDENTIFIERS.getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(Defaults.ReleaseType.IDENTIFIERS.getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(Defaults.ReleaseType.IDENTIFIERS.getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                assertTrue(Defaults.ReleaseType.IDENTIFIERS.containsAll(command.state().getReleaseType().getIdentifiers()));
+                for (int i=0; i<Defaults.ReleaseType.IDENTIFIERS.size(); i++) {
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
             assertEquals(Defaults.ReleaseType.MATCH_BRANCHES, command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -1645,9 +1729,9 @@ public class InferTestTemplates {
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals(Defaults.INITIAL_VERSION, command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag(Defaults.INITIAL_VERSION), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag(Defaults.INITIAL_VERSION), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals(Defaults.INITIAL_VERSION, command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag(Defaults.INITIAL_VERSION), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag(Defaults.INITIAL_VERSION), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
             assertEquals(Defaults.ReleaseType.COLLAPSE_VERSIONS, command.state().getReleaseType().getCollapseVersions());
             assertEquals(Defaults.ReleaseType.COLLAPSED_VERSION_QUALIFIER, command.state().getReleaseType().getCollapsedVersionQualifier());
@@ -1660,10 +1744,12 @@ public class InferTestTemplates {
                 assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(Defaults.ReleaseType.IDENTIFIERS.getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(Defaults.ReleaseType.IDENTIFIERS.getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(Defaults.ReleaseType.IDENTIFIERS.getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(Defaults.ReleaseType.IDENTIFIERS.getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                assertTrue(Defaults.ReleaseType.IDENTIFIERS.containsAll(command.state().getReleaseType().getIdentifiers()));
+                for (int i=0; i<Defaults.ReleaseType.IDENTIFIERS.size(); i++) {
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
             assertEquals(Defaults.ReleaseType.MATCH_BRANCHES, command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -1695,9 +1781,9 @@ public class InferTestTemplates {
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("release-2.2.2", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("release-2.2.2"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("release-2.2.2"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("release-2.2.2", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("release-2.2.2"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("release-2.2.2"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
             assertEquals(Defaults.ReleaseType.COLLAPSE_VERSIONS, command.state().getReleaseType().getCollapseVersions());
             assertEquals(Defaults.ReleaseType.COLLAPSED_VERSION_QUALIFIER, command.state().getReleaseType().getCollapsedVersionQualifier());
@@ -1710,10 +1796,12 @@ public class InferTestTemplates {
                 assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(Defaults.ReleaseType.IDENTIFIERS.getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(Defaults.ReleaseType.IDENTIFIERS.getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(Defaults.ReleaseType.IDENTIFIERS.getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(Defaults.ReleaseType.IDENTIFIERS.getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                assertTrue(Defaults.ReleaseType.IDENTIFIERS.containsAll(command.state().getReleaseType().getIdentifiers()));
+                for (int i=0; i<Defaults.ReleaseType.IDENTIFIERS.size(); i++) {
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
             assertEquals(Defaults.ReleaseType.MATCH_BRANCHES, command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -1742,12 +1830,12 @@ public class InferTestTemplates {
             assertEquals(Defaults.BUMP, command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(1, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals(Defaults.INITIAL_VERSION, command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag(Defaults.INITIAL_VERSION), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag(Defaults.INITIAL_VERSION), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals(Defaults.INITIAL_VERSION, command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag(Defaults.INITIAL_VERSION), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag(Defaults.INITIAL_VERSION), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
             assertEquals(Defaults.ReleaseType.COLLAPSE_VERSIONS, command.state().getReleaseType().getCollapseVersions());
             assertEquals(Defaults.ReleaseType.COLLAPSED_VERSION_QUALIFIER, command.state().getReleaseType().getCollapsedVersionQualifier());
@@ -1760,10 +1848,12 @@ public class InferTestTemplates {
                 assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(Defaults.ReleaseType.IDENTIFIERS.getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(Defaults.ReleaseType.IDENTIFIERS.getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(Defaults.ReleaseType.IDENTIFIERS.getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(Defaults.ReleaseType.IDENTIFIERS.getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                assertTrue(Defaults.ReleaseType.IDENTIFIERS.containsAll(command.state().getReleaseType().getIdentifiers()));
+                for (int i=0; i<Defaults.ReleaseType.IDENTIFIERS.size(); i++) {
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
             assertEquals(Defaults.ReleaseType.MATCH_BRANCHES, command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -1796,9 +1886,9 @@ public class InferTestTemplates {
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("release-2.2.2", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("release-2.2.2"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("release-2.2.2"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("release-2.2.2", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("release-2.2.2"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("release-2.2.2"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
             assertEquals(Defaults.ReleaseType.COLLAPSE_VERSIONS, command.state().getReleaseType().getCollapseVersions());
             assertEquals(Defaults.ReleaseType.COLLAPSED_VERSION_QUALIFIER, command.state().getReleaseType().getCollapsedVersionQualifier());
@@ -1811,10 +1901,12 @@ public class InferTestTemplates {
                 assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(Defaults.ReleaseType.IDENTIFIERS.getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(Defaults.ReleaseType.IDENTIFIERS.getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(Defaults.ReleaseType.IDENTIFIERS.getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(Defaults.ReleaseType.IDENTIFIERS.getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                assertTrue(Defaults.ReleaseType.IDENTIFIERS.containsAll(command.state().getReleaseType().getIdentifiers()));
+                for (int i=0; i<Defaults.ReleaseType.IDENTIFIERS.size(); i++) {
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
             assertEquals(Defaults.ReleaseType.MATCH_BRANCHES, command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -1839,12 +1931,12 @@ public class InferTestTemplates {
             assertEquals(Defaults.BUMP, command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(2, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getCommitIDs().get(1), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getCommitIDs().get(1), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.4", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
             assertEquals(Defaults.ReleaseType.COLLAPSE_VERSIONS, command.state().getReleaseType().getCollapseVersions());
             assertEquals(Defaults.ReleaseType.COLLAPSED_VERSION_QUALIFIER, command.state().getReleaseType().getCollapsedVersionQualifier());
@@ -1857,10 +1949,12 @@ public class InferTestTemplates {
                 assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(Defaults.ReleaseType.IDENTIFIERS.getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(Defaults.ReleaseType.IDENTIFIERS.getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(Defaults.ReleaseType.IDENTIFIERS.getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(Defaults.ReleaseType.IDENTIFIERS.getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                assertTrue(Defaults.ReleaseType.IDENTIFIERS.containsAll(command.state().getReleaseType().getIdentifiers()));
+                for (int i=0; i<Defaults.ReleaseType.IDENTIFIERS.size(); i++) {
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
             assertEquals(Defaults.ReleaseType.MATCH_BRANCHES, command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -1888,12 +1982,12 @@ public class InferTestTemplates {
             assertEquals(Defaults.BUMP, command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(2, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getCommitIDs().get(1), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getCommitIDs().get(1), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.4", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
             assertEquals(Defaults.ReleaseType.COLLAPSE_VERSIONS, command.state().getReleaseType().getCollapseVersions());
             assertEquals(Defaults.ReleaseType.COLLAPSED_VERSION_QUALIFIER, command.state().getReleaseType().getCollapsedVersionQualifier());
@@ -1906,10 +2000,12 @@ public class InferTestTemplates {
                 assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(Defaults.ReleaseType.IDENTIFIERS.getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(Defaults.ReleaseType.IDENTIFIERS.getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(Defaults.ReleaseType.IDENTIFIERS.getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(Defaults.ReleaseType.IDENTIFIERS.getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                assertTrue(Defaults.ReleaseType.IDENTIFIERS.containsAll(command.state().getReleaseType().getIdentifiers()));
+                for (int i=0; i<Defaults.ReleaseType.IDENTIFIERS.size(); i++) {
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
             assertEquals(Defaults.ReleaseType.MATCH_BRANCHES, command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -1955,10 +2051,12 @@ public class InferTestTemplates {
                 assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(Defaults.ReleaseType.IDENTIFIERS.getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(Defaults.ReleaseType.IDENTIFIERS.getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(Defaults.ReleaseType.IDENTIFIERS.getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(Defaults.ReleaseType.IDENTIFIERS.getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                assertTrue(Defaults.ReleaseType.IDENTIFIERS.containsAll(command.state().getReleaseType().getIdentifiers()));
+                for (int i=0; i<Defaults.ReleaseType.IDENTIFIERS.size(); i++) {
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
             assertEquals(Defaults.ReleaseType.MATCH_BRANCHES, command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -1987,12 +2085,12 @@ public class InferTestTemplates {
             assertEquals(CUSTOM_BUMP, command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(2, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getCommitIDs().get(1), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getCommitIDs().get(1), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.4", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
             assertEquals(Defaults.ReleaseType.COLLAPSE_VERSIONS, command.state().getReleaseType().getCollapseVersions());
             assertEquals(Defaults.ReleaseType.COLLAPSED_VERSION_QUALIFIER, command.state().getReleaseType().getCollapsedVersionQualifier());
@@ -2005,10 +2103,12 @@ public class InferTestTemplates {
                 assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(Defaults.ReleaseType.IDENTIFIERS.getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(Defaults.ReleaseType.IDENTIFIERS.getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(Defaults.ReleaseType.IDENTIFIERS.getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(Defaults.ReleaseType.IDENTIFIERS.getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                assertTrue(Defaults.ReleaseType.IDENTIFIERS.containsAll(command.state().getReleaseType().getIdentifiers()));
+                for (int i=0; i<Defaults.ReleaseType.IDENTIFIERS.size(); i++) {
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
             assertEquals(Defaults.ReleaseType.MATCH_BRANCHES, command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -2037,12 +2137,12 @@ public class InferTestTemplates {
             assertEquals(CUSTOM_BUMP, command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(2, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getCommitIDs().get(1), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getCommitIDs().get(1), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.4", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
             assertEquals(Defaults.ReleaseType.COLLAPSE_VERSIONS, command.state().getReleaseType().getCollapseVersions());
             assertEquals(Defaults.ReleaseType.COLLAPSED_VERSION_QUALIFIER, command.state().getReleaseType().getCollapsedVersionQualifier());
@@ -2055,10 +2155,12 @@ public class InferTestTemplates {
                 assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(Defaults.ReleaseType.IDENTIFIERS.getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(Defaults.ReleaseType.IDENTIFIERS.getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(Defaults.ReleaseType.IDENTIFIERS.getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(Defaults.ReleaseType.IDENTIFIERS.getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                assertTrue(Defaults.ReleaseType.IDENTIFIERS.containsAll(command.state().getReleaseType().getIdentifiers()));
+                for (int i=0; i<Defaults.ReleaseType.IDENTIFIERS.size(); i++) {
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
             assertEquals(Defaults.ReleaseType.MATCH_BRANCHES, command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -2087,12 +2189,12 @@ public class InferTestTemplates {
             assertEquals(CUSTOM_BUMP, command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(2, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getCommitIDs().get(1), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getCommitIDs().get(1), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.4", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
             assertEquals(Defaults.ReleaseType.COLLAPSE_VERSIONS, command.state().getReleaseType().getCollapseVersions());
             assertEquals(Defaults.ReleaseType.COLLAPSED_VERSION_QUALIFIER, command.state().getReleaseType().getCollapsedVersionQualifier());
@@ -2105,10 +2207,12 @@ public class InferTestTemplates {
                 assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(Defaults.ReleaseType.IDENTIFIERS.getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(Defaults.ReleaseType.IDENTIFIERS.getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(Defaults.ReleaseType.IDENTIFIERS.getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(Defaults.ReleaseType.IDENTIFIERS.getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                assertTrue(Defaults.ReleaseType.IDENTIFIERS.containsAll(command.state().getReleaseType().getIdentifiers()));
+                for (int i=0; i<Defaults.ReleaseType.IDENTIFIERS.size(); i++) {
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
             assertEquals(Defaults.ReleaseType.MATCH_BRANCHES, command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -2137,12 +2241,12 @@ public class InferTestTemplates {
             assertEquals(CUSTOM_BUMP, command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(2, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getCommitIDs().get(1), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getCommitIDs().get(1), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.4", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
             assertEquals(Defaults.ReleaseType.COLLAPSE_VERSIONS, command.state().getReleaseType().getCollapseVersions());
             assertEquals(Defaults.ReleaseType.COLLAPSED_VERSION_QUALIFIER, command.state().getReleaseType().getCollapsedVersionQualifier());
@@ -2155,10 +2259,12 @@ public class InferTestTemplates {
                 assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(Defaults.ReleaseType.IDENTIFIERS.getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(Defaults.ReleaseType.IDENTIFIERS.getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(Defaults.ReleaseType.IDENTIFIERS.getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(Defaults.ReleaseType.IDENTIFIERS.getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                assertTrue(Defaults.ReleaseType.IDENTIFIERS.containsAll(command.state().getReleaseType().getIdentifiers()));
+                for (int i=0; i<Defaults.ReleaseType.IDENTIFIERS.size(); i++) {
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
             assertEquals(Defaults.ReleaseType.MATCH_BRANCHES, command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -2190,9 +2296,9 @@ public class InferTestTemplates {
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("release-2.2.2", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("release-2.2.2"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("release-2.2.2"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("release-2.2.2", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("release-2.2.2"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("release-2.2.2"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
             assertEquals(Defaults.ReleaseType.COLLAPSE_VERSIONS, command.state().getReleaseType().getCollapseVersions());
             assertEquals(Defaults.ReleaseType.COLLAPSED_VERSION_QUALIFIER, command.state().getReleaseType().getCollapsedVersionQualifier());
@@ -2205,10 +2311,12 @@ public class InferTestTemplates {
                 assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(Defaults.ReleaseType.IDENTIFIERS.getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(Defaults.ReleaseType.IDENTIFIERS.getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(Defaults.ReleaseType.IDENTIFIERS.getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(Defaults.ReleaseType.IDENTIFIERS.getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                assertTrue(Defaults.ReleaseType.IDENTIFIERS.containsAll(command.state().getReleaseType().getIdentifiers()));
+                for (int i=0; i<Defaults.ReleaseType.IDENTIFIERS.size(); i++) {
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
             assertEquals(Defaults.ReleaseType.MATCH_BRANCHES, command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -2237,12 +2345,12 @@ public class InferTestTemplates {
             assertEquals(Defaults.BUMP, command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(3, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getCommitIDs().get(2), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getCommitIDs().get(2), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.4", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
             assertEquals(Defaults.ReleaseType.COLLAPSE_VERSIONS, command.state().getReleaseType().getCollapseVersions());
             assertEquals(Defaults.ReleaseType.COLLAPSED_VERSION_QUALIFIER, command.state().getReleaseType().getCollapsedVersionQualifier());
@@ -2255,10 +2363,12 @@ public class InferTestTemplates {
                 assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(Defaults.ReleaseType.IDENTIFIERS.getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(Defaults.ReleaseType.IDENTIFIERS.getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(Defaults.ReleaseType.IDENTIFIERS.getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(Defaults.ReleaseType.IDENTIFIERS.getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                assertTrue(Defaults.ReleaseType.IDENTIFIERS.containsAll(command.state().getReleaseType().getIdentifiers()));
+                for (int i=0; i<Defaults.ReleaseType.IDENTIFIERS.size(); i++) {
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
             assertEquals(Defaults.ReleaseType.MATCH_BRANCHES, command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -2291,9 +2401,9 @@ public class InferTestTemplates {
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("release-2.2.2", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("release-2.2.2"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("release-2.2.2"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("release-2.2.2", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("release-2.2.2"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("release-2.2.2"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
             assertEquals(Defaults.ReleaseType.COLLAPSE_VERSIONS, command.state().getReleaseType().getCollapseVersions());
             assertEquals(Defaults.ReleaseType.COLLAPSED_VERSION_QUALIFIER, command.state().getReleaseType().getCollapsedVersionQualifier());
@@ -2306,10 +2416,12 @@ public class InferTestTemplates {
                 assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(Defaults.ReleaseType.IDENTIFIERS.getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(Defaults.ReleaseType.IDENTIFIERS.getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(Defaults.ReleaseType.IDENTIFIERS.getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(Defaults.ReleaseType.IDENTIFIERS.getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                assertTrue(Defaults.ReleaseType.IDENTIFIERS.containsAll(command.state().getReleaseType().getIdentifiers()));
+                for (int i=0; i<Defaults.ReleaseType.IDENTIFIERS.size(); i++) {
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
             assertEquals(Defaults.ReleaseType.MATCH_BRANCHES, command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -2338,12 +2450,12 @@ public class InferTestTemplates {
             assertEquals("patch", command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(2, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getCommitIDs().get(1), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getCommitIDs().get(1), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals("0.0.6", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.6"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.6"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.6", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.6"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.6"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
             assertEquals(Defaults.ReleaseType.COLLAPSE_VERSIONS, command.state().getReleaseType().getCollapseVersions());
             assertEquals(Defaults.ReleaseType.COLLAPSED_VERSION_QUALIFIER, command.state().getReleaseType().getCollapsedVersionQualifier());
@@ -2356,10 +2468,12 @@ public class InferTestTemplates {
                 assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(Defaults.ReleaseType.IDENTIFIERS.getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(Defaults.ReleaseType.IDENTIFIERS.getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(Defaults.ReleaseType.IDENTIFIERS.getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(Defaults.ReleaseType.IDENTIFIERS.getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                assertTrue(Defaults.ReleaseType.IDENTIFIERS.containsAll(command.state().getReleaseType().getIdentifiers()));
+                for (int i=0; i<Defaults.ReleaseType.IDENTIFIERS.size(); i++) {
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
             assertEquals(Defaults.ReleaseType.MATCH_BRANCHES, command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -2380,8 +2494,12 @@ public class InferTestTemplates {
             throws Exception {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("minor", ".*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("minor", ".*")))
+                )
+            );
             command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             command.run();
 
@@ -2389,15 +2507,15 @@ public class InferTestTemplates {
             assertEquals("minor", command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(2, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getCommitIDs().get(1), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getCommitIDs().get(1), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.4", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(2, command.state().getReleaseScope().getSignificantCommits().size());
-            assertTrue(command.state().getReleaseScope().getSignificantCommits().containsKey(script.getCommitIDs().get(0)));
-            assertTrue(command.state().getReleaseScope().getSignificantCommits().containsKey(script.getCommitIDs().get(1)));
+            assertTrue(command.state().getReleaseScope().getSignificantCommits().get(0).getSHA().equals(script.getCommitIDs().get(0)));
+            assertTrue(command.state().getReleaseScope().getSignificantCommits().get(1).getSHA().equals(script.getCommitIDs().get(1)));
             assertEquals(Defaults.ReleaseType.COLLAPSE_VERSIONS, command.state().getReleaseType().getCollapseVersions());
             assertEquals(Defaults.ReleaseType.COLLAPSED_VERSION_QUALIFIER, command.state().getReleaseType().getCollapsedVersionQualifier());
             assertEquals(Defaults.ReleaseType.GIT_COMMIT, command.state().getReleaseType().getGitCommit());
@@ -2409,10 +2527,12 @@ public class InferTestTemplates {
                 assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(Defaults.ReleaseType.IDENTIFIERS.getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(Defaults.ReleaseType.IDENTIFIERS.getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(Defaults.ReleaseType.IDENTIFIERS.getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(Defaults.ReleaseType.IDENTIFIERS.getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                assertTrue(Defaults.ReleaseType.IDENTIFIERS.containsAll(command.state().getReleaseType().getIdentifiers()));
+                for (int i=0; i<Defaults.ReleaseType.IDENTIFIERS.size(); i++) {
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
             assertEquals(Defaults.ReleaseType.MATCH_BRANCHES, command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -2433,8 +2553,12 @@ public class InferTestTemplates {
             throws Exception {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of())));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of()))
+                )
+            );
             command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             command.run();
 
@@ -2442,12 +2566,12 @@ public class InferTestTemplates {
             assertNull(command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(2, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getCommitIDs().get(1), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getCommitIDs().get(1), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.4", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
             assertEquals(Defaults.ReleaseType.COLLAPSE_VERSIONS, command.state().getReleaseType().getCollapseVersions());
             assertEquals(Defaults.ReleaseType.COLLAPSED_VERSION_QUALIFIER, command.state().getReleaseType().getCollapsedVersionQualifier());
@@ -2460,10 +2584,12 @@ public class InferTestTemplates {
                 assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(Defaults.ReleaseType.IDENTIFIERS.getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(Defaults.ReleaseType.IDENTIFIERS.getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(Defaults.ReleaseType.IDENTIFIERS.getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(Defaults.ReleaseType.IDENTIFIERS.getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                assertTrue(Defaults.ReleaseType.IDENTIFIERS.containsAll(command.state().getReleaseType().getIdentifiers()));
+                for (int i=0; i<Defaults.ReleaseType.IDENTIFIERS.size(); i++) {
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
             assertEquals(Defaults.ReleaseType.MATCH_BRANCHES, command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -2487,10 +2613,14 @@ public class InferTestTemplates {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add the 'extended' preset, which comes with standard release types
             configurationLayerMock.setPreset(Extended.NAME);
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*")))
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -2498,36 +2628,38 @@ public class InferTestTemplates {
             assertEquals("patch", command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(2, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getCommitIDs().get(1), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getCommitIDs().get(1), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals("0.0.5", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.5", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(2, command.state().getReleaseScope().getSignificantCommits().size());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
-            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().containsAll(command.state().getReleaseType().getIdentifiers()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
             assertTrue(command.state().getNewVersion());
             assertTrue(command.state().getNewRelease());
             assertEquals("0.0.6", command.state().getVersion());
@@ -2544,10 +2676,14 @@ public class InferTestTemplates {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add the 'extended' preset, which comes with standard release types
             configurationLayerMock.setPreset(Extended.NAME);
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of())));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of()))
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -2555,36 +2691,38 @@ public class InferTestTemplates {
             assertNull(command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(2, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getCommitIDs().get(1), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getCommitIDs().get(1), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals("0.0.5", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.5", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
-            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().containsAll(command.state().getReleaseType().getIdentifiers()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.0.5", command.state().getVersion());
@@ -2601,10 +2739,14 @@ public class InferTestTemplates {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add the 'extended' preset, which comes with standard release types
             configurationLayerMock.setPreset(Extended.NAME);
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*")))
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -2612,36 +2754,38 @@ public class InferTestTemplates {
             assertEquals("patch", command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(4, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getCommitIDs().get(3), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getCommitIDs().get(3), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals("0.1.0", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.1.0"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertNull(command.state().getReleaseScope().getPreviousVersionCommit());
             assertEquals("0.1.0", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.1.0"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertNull(command.state().getReleaseScope().getPrimeVersionCommit());
             assertEquals(4, command.state().getReleaseScope().getSignificantCommits().size());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
-            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().containsAll(command.state().getReleaseType().getIdentifiers()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
             assertTrue(command.state().getNewVersion());
             assertTrue(command.state().getNewRelease());
             assertEquals("0.1.1", command.state().getVersion());
@@ -2658,10 +2802,14 @@ public class InferTestTemplates {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add the 'extended' preset, which comes with standard release types
             configurationLayerMock.setPreset(Extended.NAME);
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of())));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of()))
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -2669,36 +2817,38 @@ public class InferTestTemplates {
             assertNull(command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(4, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getCommitIDs().get(3), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getCommitIDs().get(3), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals("0.1.0", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.1.0"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertNull(command.state().getReleaseScope().getPreviousVersionCommit());
             assertEquals("0.1.0", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.1.0"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertNull(command.state().getReleaseScope().getPrimeVersionCommit());
             assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
-            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().containsAll(command.state().getReleaseType().getIdentifiers()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.1.0", command.state().getVersion());
@@ -2715,10 +2865,14 @@ public class InferTestTemplates {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add the 'extended' preset, which comes with standard release types
             configurationLayerMock.setPreset(Extended.NAME);
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*")))
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -2726,36 +2880,38 @@ public class InferTestTemplates {
             assertEquals("patch", command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(1, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals("0.0.6-integration.2", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.6-integration.2"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.6-integration.2"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.5", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(1, command.state().getReleaseScope().getSignificantCommits().size());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
-            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().containsAll(command.state().getReleaseType().getIdentifiers()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
             assertTrue(command.state().getNewVersion());
             assertTrue(command.state().getNewRelease());
             assertEquals("0.0.6-integration.3", command.state().getVersion());
@@ -2772,10 +2928,14 @@ public class InferTestTemplates {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add the 'extended' preset, which comes with standard release types
             configurationLayerMock.setPreset(Extended.NAME);
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of())));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of()))
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -2783,36 +2943,38 @@ public class InferTestTemplates {
             assertNull(command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(1, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals("0.0.6-integration.2", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.6-integration.2"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.6-integration.2"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.5", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
-            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().containsAll(command.state().getReleaseType().getIdentifiers()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.0.6-integration.2", command.state().getVersion());
@@ -2829,10 +2991,14 @@ public class InferTestTemplates {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add the 'extended' preset, which comes with standard release types
             configurationLayerMock.setPreset(Extended.NAME);
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*")))
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -2840,36 +3006,38 @@ public class InferTestTemplates {
             assertEquals("patch", command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(4, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getCommitIDs().get(3), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getCommitIDs().get(3), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals("0.1.0", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.1.0"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertNull(command.state().getReleaseScope().getPreviousVersionCommit());
             assertEquals("0.1.0", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.1.0"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertNull(command.state().getReleaseScope().getPrimeVersionCommit());
             assertEquals(4, command.state().getReleaseScope().getSignificantCommits().size());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
-            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().containsAll(command.state().getReleaseType().getIdentifiers()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
             assertTrue(command.state().getNewVersion());
             assertTrue(command.state().getNewRelease());
             assertEquals("0.1.1-development.1", command.state().getVersion());
@@ -2886,10 +3054,14 @@ public class InferTestTemplates {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add the 'extended' preset, which comes with standard release types
             configurationLayerMock.setPreset(Extended.NAME);
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of())));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of()))
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -2897,36 +3069,38 @@ public class InferTestTemplates {
             assertNull(command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(4, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getCommitIDs().get(3), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getCommitIDs().get(3), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals("0.1.0", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.1.0"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertNull(command.state().getReleaseScope().getPreviousVersionCommit());
             assertEquals("0.1.0", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.1.0"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertNull(command.state().getReleaseScope().getPrimeVersionCommit());
             assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
-            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().containsAll(command.state().getReleaseType().getIdentifiers()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.1.0", command.state().getVersion());
@@ -2943,10 +3117,14 @@ public class InferTestTemplates {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add the 'extended' preset, which comes with standard release types
             configurationLayerMock.setPreset(Extended.NAME);
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*")))
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -2954,36 +3132,38 @@ public class InferTestTemplates {
             assertEquals("patch", command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(1, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals("0.0.6-alpha.2", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.6-alpha.2"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.6-alpha.2"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.5", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(1, command.state().getReleaseScope().getSignificantCommits().size());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
-            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().containsAll(command.state().getReleaseType().getIdentifiers()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
             assertTrue(command.state().getNewVersion());
             assertTrue(command.state().getNewRelease());
             assertEquals("0.0.6-alpha.3", command.state().getVersion());
@@ -3000,10 +3180,14 @@ public class InferTestTemplates {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add the 'extended' preset, which comes with standard release types
             configurationLayerMock.setPreset(Extended.NAME);
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of())));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of()))
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -3011,36 +3195,38 @@ public class InferTestTemplates {
             assertNull(command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(1, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals("0.0.6-alpha.2", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.6-alpha.2"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.6-alpha.2"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.5", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
-            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().containsAll(command.state().getReleaseType().getIdentifiers()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.0.6-alpha.2", command.state().getVersion());
@@ -3057,10 +3243,14 @@ public class InferTestTemplates {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add the 'extended' preset, which comes with standard release types
             configurationLayerMock.setPreset(Extended.NAME);
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*")))
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -3068,36 +3258,38 @@ public class InferTestTemplates {
             assertEquals("patch", command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(1, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals("0.0.6-beta.2", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.6-beta.2"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.6-beta.2"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.5", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(1, command.state().getReleaseScope().getSignificantCommits().size());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
-            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().containsAll(command.state().getReleaseType().getIdentifiers()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
             assertTrue(command.state().getNewVersion());
             assertTrue(command.state().getNewRelease());
             assertEquals("0.0.6-beta.3", command.state().getVersion());
@@ -3114,10 +3306,14 @@ public class InferTestTemplates {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add the 'extended' preset, which comes with standard release types
             configurationLayerMock.setPreset(Extended.NAME);
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of())));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of()))
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -3125,36 +3321,38 @@ public class InferTestTemplates {
             assertNull(command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(1, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals("0.0.6-beta.2", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.6-beta.2"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.6-beta.2"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.5", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
-            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().containsAll(command.state().getReleaseType().getIdentifiers()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.0.6-beta.2", command.state().getVersion());
@@ -3171,10 +3369,14 @@ public class InferTestTemplates {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add the 'extended' preset, which comes with standard release types
             configurationLayerMock.setPreset(Extended.NAME);
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*")))
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -3182,36 +3384,38 @@ public class InferTestTemplates {
             assertEquals("patch", command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(7, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getCommitIDs().get(6), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getCommitIDs().get(6), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals("0.0.5", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.5", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(7, command.state().getReleaseScope().getSignificantCommits().size());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
-            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().containsAll(command.state().getReleaseType().getIdentifiers()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
             assertTrue(command.state().getNewVersion());
             assertTrue(command.state().getNewRelease());
             assertEquals("0.0.6-gamma.1", command.state().getVersion());
@@ -3228,10 +3432,14 @@ public class InferTestTemplates {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add the 'extended' preset, which comes with standard release types
             configurationLayerMock.setPreset(Extended.NAME);
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of())));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of()))
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -3239,36 +3447,38 @@ public class InferTestTemplates {
             assertNull(command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(7, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getCommitIDs().get(6), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getCommitIDs().get(6), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals("0.0.5", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.5", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
-            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().containsAll(command.state().getReleaseType().getIdentifiers()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.0.5", command.state().getVersion());
@@ -3285,10 +3495,14 @@ public class InferTestTemplates {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add the 'extended' preset, which comes with standard release types
             configurationLayerMock.setPreset(Extended.NAME);
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*")))
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -3296,36 +3510,38 @@ public class InferTestTemplates {
             assertEquals("patch", command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(2, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getCommitIDs().get(1), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getCommitIDs().get(1), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals("0.0.7", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.7"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.7"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.7", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.7"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.7"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(2, command.state().getReleaseScope().getSignificantCommits().size());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
-            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().containsAll(command.state().getReleaseType().getIdentifiers()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
             assertTrue(command.state().getNewVersion());
             assertTrue(command.state().getNewRelease());
             assertEquals("0.0.8", command.state().getVersion());
@@ -3342,10 +3558,14 @@ public class InferTestTemplates {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add the 'extended' preset, which comes with standard release types
             configurationLayerMock.setPreset(Extended.NAME);
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of())));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of()))
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -3353,36 +3573,38 @@ public class InferTestTemplates {
             assertNull(command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(2, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getCommitIDs().get(1), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getCommitIDs().get(1), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals("0.0.7", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.7"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.7"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.7", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.7"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.7"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
-            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().containsAll(command.state().getReleaseType().getIdentifiers()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.0.7", command.state().getVersion());
@@ -3398,10 +3620,14 @@ public class InferTestTemplates {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add the 'extended' preset, which comes with standard release types
             configurationLayerMock.setPreset(Extended.NAME);
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*")))
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             // the generated version does not comply with the version range so it raises an exception
             if (command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME))
@@ -3419,10 +3645,14 @@ public class InferTestTemplates {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add the 'extended' preset, which comes with standard release types
             configurationLayerMock.setPreset(Extended.NAME);
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*")))
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -3430,36 +3660,38 @@ public class InferTestTemplates {
             assertEquals("patch", command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(1, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals("0.0.6-rel.2", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.6-rel.2"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.6-rel.2"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.5", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(1, command.state().getReleaseScope().getSignificantCommits().size());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
-            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().containsAll(command.state().getReleaseType().getIdentifiers()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
             assertTrue(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.0.6-rel.3", command.state().getVersion());
@@ -3476,10 +3708,14 @@ public class InferTestTemplates {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add the 'extended' preset, which comes with standard release types
             configurationLayerMock.setPreset(Extended.NAME);
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of())));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of()))
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -3487,36 +3723,38 @@ public class InferTestTemplates {
             assertNull(command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(1, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals("0.0.6-rel.2", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.6-rel.2"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.6-rel.2"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.5", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
-            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().containsAll(command.state().getReleaseType().getIdentifiers()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.0.6-rel.2", command.state().getVersion());
@@ -3532,10 +3770,14 @@ public class InferTestTemplates {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add the 'extended' preset, which comes with standard release types
             configurationLayerMock.setPreset(Extended.NAME);
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*")))
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             // the generated version does not comply with the version range so it raises an exception
             if (command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME))
@@ -3553,10 +3795,14 @@ public class InferTestTemplates {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add the 'extended' preset, which comes with standard release types
             configurationLayerMock.setPreset(Extended.NAME);
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*")))
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -3564,36 +3810,38 @@ public class InferTestTemplates {
             assertEquals("patch", command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(1, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals("0.0.6-featuresso.2", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.6-featuresso.2"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.6-featuresso.2"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.5", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(1, command.state().getReleaseScope().getSignificantCommits().size());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
-            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().containsAll(command.state().getReleaseType().getIdentifiers()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
             assertTrue(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.0.6-featuresso.3", command.state().getVersion());
@@ -3610,10 +3858,14 @@ public class InferTestTemplates {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add the 'extended' preset, which comes with standard release types
             configurationLayerMock.setPreset(Extended.NAME);
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of())));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of()))
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -3621,36 +3873,38 @@ public class InferTestTemplates {
             assertNull(command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(1, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals("0.0.6-featuresso.2", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.6-featuresso.2"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.6-featuresso.2"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.5", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
-            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().containsAll(command.state().getReleaseType().getIdentifiers()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.0.6-featuresso.2", command.state().getVersion());
@@ -3667,10 +3921,14 @@ public class InferTestTemplates {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add the 'extended' preset, which comes with standard release types
             configurationLayerMock.setPreset(Extended.NAME);
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*")))
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -3678,36 +3936,38 @@ public class InferTestTemplates {
             assertEquals("patch", command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(7, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getCommitIDs().get(6), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getCommitIDs().get(6), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals("0.0.5", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.5", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(7, command.state().getReleaseScope().getSignificantCommits().size());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
-            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().containsAll(command.state().getReleaseType().getIdentifiers()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
             assertTrue(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.0.6-featurein12345.1", command.state().getVersion());
@@ -3724,10 +3984,14 @@ public class InferTestTemplates {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add the 'extended' preset, which comes with standard release types
             configurationLayerMock.setPreset(Extended.NAME);
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of())));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of()))
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -3735,36 +3999,38 @@ public class InferTestTemplates {
             assertNull(command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(7, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getCommitIDs().get(6), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getCommitIDs().get(6), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals("0.0.5", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.5", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
-            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().containsAll(command.state().getReleaseType().getIdentifiers()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.0.5", command.state().getVersion());
@@ -3781,10 +4047,14 @@ public class InferTestTemplates {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add the 'extended' preset, which comes with standard release types
             configurationLayerMock.setPreset(Extended.NAME);
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*")))
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -3792,36 +4062,38 @@ public class InferTestTemplates {
             assertEquals("patch", command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(1, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals("0.0.8-fix98765.2", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.8-fix98765.2"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.8-fix98765.2"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.7", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.7"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.7"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(1, command.state().getReleaseScope().getSignificantCommits().size());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
-            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().containsAll(command.state().getReleaseType().getIdentifiers()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
             assertTrue(command.state().getNewVersion());
             assertTrue(command.state().getNewRelease());
             assertEquals("0.0.8-fix98765.3", command.state().getVersion());
@@ -3838,10 +4110,14 @@ public class InferTestTemplates {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add the 'extended' preset, which comes with standard release types
             configurationLayerMock.setPreset(Extended.NAME);
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of())));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of()))
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -3849,36 +4125,38 @@ public class InferTestTemplates {
             assertNull(command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(1, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals("0.0.8-fix98765.2", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.8-fix98765.2"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.8-fix98765.2"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.7", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.7"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.7"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
-            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().containsAll(command.state().getReleaseType().getIdentifiers()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.0.8-fix98765.2", command.state().getVersion());
@@ -3895,10 +4173,14 @@ public class InferTestTemplates {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add the 'extended' preset, which comes with standard release types
             configurationLayerMock.setPreset(Extended.NAME);
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*")))
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -3906,36 +4188,38 @@ public class InferTestTemplates {
             assertEquals("patch", command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(1, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals("0.0.6-internal.1+timestamp.003", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.6-internal.1+timestamp.003"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.6-internal.1+timestamp.003"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.5", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(1, command.state().getReleaseScope().getSignificantCommits().size());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
-            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().containsAll(command.state().getReleaseType().getIdentifiers()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
             assertTrue(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             // the version contains the timestamp which is variable so let's test the start string and the overall length
@@ -3954,10 +4238,14 @@ public class InferTestTemplates {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add the 'extended' preset, which comes with standard release types
             configurationLayerMock.setPreset(Extended.NAME);
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of())));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of()))
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -3965,36 +4253,38 @@ public class InferTestTemplates {
             assertNull(command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(1, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals("0.0.6-internal.1+timestamp.003", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.6-internal.1+timestamp.003"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.6-internal.1+timestamp.003"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.5", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
-            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().containsAll(command.state().getReleaseType().getIdentifiers()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.0.6-internal.1+timestamp.003", command.state().getVersion());
@@ -4011,10 +4301,14 @@ public class InferTestTemplates {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add the 'extended' preset, which comes with standard release types
             configurationLayerMock.setPreset(Extended.NAME);
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*")))
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -4022,36 +4316,38 @@ public class InferTestTemplates {
             assertEquals("patch", command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(4, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getCommitIDs().get(3), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getCommitIDs().get(3), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals("0.0.6-integration.2", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.6-integration.2"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.6-integration.2"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.5", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(7, command.state().getReleaseScope().getSignificantCommits().size());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
-            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().containsAll(command.state().getReleaseType().getIdentifiers()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
             assertTrue(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             // the version contains the timestamp which is variable so let's test the start string and the overall length
@@ -4070,10 +4366,14 @@ public class InferTestTemplates {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add the 'extended' preset, which comes with standard release types
             configurationLayerMock.setPreset(Extended.NAME);
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of())));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of()))
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -4081,36 +4381,38 @@ public class InferTestTemplates {
             assertNull(command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(4, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getCommitIDs().get(3), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getCommitIDs().get(3), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals("0.0.6-integration.2", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.6-integration.2"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.6-integration.2"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.5", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
-            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().containsAll(command.state().getReleaseType().getIdentifiers()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.0.6-integration.2", command.state().getVersion());
@@ -4127,10 +4429,14 @@ public class InferTestTemplates {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add the 'extended' preset, which comes with standard release types
             configurationLayerMock.setPreset(Extended.NAME);
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*")))
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -4138,36 +4444,38 @@ public class InferTestTemplates {
             assertEquals("patch", command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(3, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getCommitIDs().get(2), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getCommitIDs().get(2), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals("0.0.6-integration.1", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.6-integration.1"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.6-integration.1"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.5", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(5, command.state().getReleaseScope().getSignificantCommits().size());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
-            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().containsAll(command.state().getReleaseType().getIdentifiers()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
             assertTrue(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             // the version contains the timestamp which is variable so let's test the start string and the overall length
@@ -4186,10 +4494,14 @@ public class InferTestTemplates {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add the 'extended' preset, which comes with standard release types
             configurationLayerMock.setPreset(Extended.NAME);
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of())));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of()))
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -4197,36 +4509,38 @@ public class InferTestTemplates {
             assertNull(command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(3, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getCommitIDs().get(2), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getCommitIDs().get(2), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals("0.0.6-integration.1", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.6-integration.1"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.6-integration.1"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.5", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
-            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapseVersions(), command.state().getReleaseType().getCollapseVersions());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getCollapsedVersionQualifier(), command.state().getReleaseType().getCollapsedVersionQualifier());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getFilterTags(), command.state().getReleaseType().getFilterTags());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommit(), command.state().getReleaseType().getGitCommit());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitCommitMessage(), command.state().getReleaseType().getGitCommitMessage());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().containsAll(command.state().getReleaseType().getIdentifiers()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers().get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
-            assertEquals(command.state().getConfiguration().getReleaseTypes().getItem(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchBranches(), command.state().getReleaseType().getMatchBranches());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchEnvironmentVariables(), command.state().getReleaseType().getMatchEnvironmentVariables());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getMatchWorkspaceStatus(), command.state().getReleaseType().getMatchWorkspaceStatus());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
+            assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.0.6-integration.1", command.state().getVersion());
@@ -4240,28 +4554,32 @@ public class InferTestTemplates {
             throws Exception {
             script.checkout("internal");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            // add a custom release type that always enables committing, tagging and pushing
-            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseType", new ReleaseType() {
-                {
-                    setCollapseVersions(true);
-                    setCollapsedVersionQualifier("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}");
-                    setGitCommit(Boolean.TRUE.toString());
-                    setGitPush(Boolean.TRUE.toString());
-                    setGitTag(Boolean.TRUE.toString());
-                    setIdentifiers(new Identifiers() {
-                        {
-                            setEnabled(List.<String>of("customId"));
-                            setItem("customId", new Identifier("customId", "999", IdentifierPosition.PRE_RELEASE));
-                        }}
-                    );
-                    setPublish(Boolean.TRUE.toString());
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("testReleaseType"));
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*")))
+                )
+            );
+            // add a custom release type that always enables committing, tagging and pushing
+            configurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("testReleaseType"),
+                    Map.<String,ReleaseType>of(
+                        "testReleaseType", new ReleaseType() {
+                        {
+                            setCollapseVersions(true);
+                            setCollapsedVersionQualifier("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}");
+                            setGitCommit(Boolean.TRUE.toString());
+                            setGitPush(Boolean.TRUE.toString());
+                            setGitTag(Boolean.TRUE.toString());
+                            setIdentifiers(List.<Identifier>of(new Identifier("customId", "999", Identifier.Position.PRE_RELEASE)));
+                            setPublish(Boolean.TRUE.toString());
+                        }}
+                    )
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             script.andAddFiles(); // add some uncommitted changes to be committed by the Mark command
             command.run();
@@ -4270,12 +4588,12 @@ public class InferTestTemplates {
             assertEquals("patch", command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(1, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals("0.0.6-internal.1+timestamp.003", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.6-internal.1+timestamp.003"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.6-internal.1+timestamp.003"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.5", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(1, command.state().getReleaseScope().getSignificantCommits().size());
             assertTrue(command.state().getReleaseType().getCollapseVersions());
             assertEquals("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}", command.state().getReleaseType().getCollapsedVersionQualifier());
@@ -4285,10 +4603,10 @@ public class InferTestTemplates {
             assertEquals(Boolean.TRUE.toString(), command.state().getReleaseType().getGitPush());
             assertEquals(Boolean.TRUE.toString(), command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
-            assertEquals(1, command.state().getReleaseType().getIdentifiers().getEnabled().size());
-            assertTrue(command.state().getReleaseType().getIdentifiers().getEnabled().contains("customId"));
-            assertEquals(1, command.state().getReleaseType().getIdentifiers().getItems().size());
-            assertTrue(command.state().getReleaseType().getIdentifiers().getItems().containsKey("customId"));
+            assertEquals(1, command.state().getReleaseType().getIdentifiers().size());
+            assertEquals("customId", command.state().getReleaseType().getIdentifiers().get(0).getQualifier());
+            assertEquals("999", command.state().getReleaseType().getIdentifiers().get(0).getValue());
+            assertEquals(Identifier.Position.PRE_RELEASE, command.state().getReleaseType().getIdentifiers().get(0).getPosition());
             assertNull(command.state().getReleaseType().getMatchBranches());
             assertNull(command.state().getReleaseType().getMatchEnvironmentVariables());
             assertNull(command.state().getReleaseType().getMatchWorkspaceStatus());
@@ -4308,28 +4626,32 @@ public class InferTestTemplates {
             throws Exception {
             script.checkout("internal");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            // add a custom release type that always enables committing, tagging and pushing
-            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseType", new ReleaseType() {
-                {
-                    setCollapseVersions(true);
-                    setCollapsedVersionQualifier("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}");
-                    setGitCommit(Boolean.TRUE.toString());
-                    setGitPush(Boolean.TRUE.toString());
-                    setGitTag(Boolean.TRUE.toString());
-                    setIdentifiers(new Identifiers() {
-                        {
-                            setEnabled(List.<String>of("customId"));
-                            setItem("customId", new Identifier("customId", "999", IdentifierPosition.PRE_RELEASE));
-                        }}
-                    );
-                    setPublish(Boolean.TRUE.toString());
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("testReleaseType"));
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of())));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of()))
+                )
+            );
+            // add a custom release type that always enables committing, tagging and pushing
+            configurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("testReleaseType"),
+                    Map.<String,ReleaseType>of(
+                        "testReleaseType", new ReleaseType() {
+                        {
+                            setCollapseVersions(true);
+                            setCollapsedVersionQualifier("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}");
+                            setGitCommit(Boolean.TRUE.toString());
+                            setGitPush(Boolean.TRUE.toString());
+                            setGitTag(Boolean.TRUE.toString());
+                            setIdentifiers(List.<Identifier>of(new Identifier("customId", "999", Identifier.Position.PRE_RELEASE)));
+                            setPublish(Boolean.TRUE.toString());
+                        }}
+                    )
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             script.andAddFiles(); // add some uncommitted changes to be committed by the Mark command
             command.run();
@@ -4338,12 +4660,12 @@ public class InferTestTemplates {
             assertNull(command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(1, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals("0.0.6-internal.1+timestamp.003", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.6-internal.1+timestamp.003"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.6-internal.1+timestamp.003"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.5", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.5"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
             assertTrue(command.state().getReleaseType().getCollapseVersions());
             assertEquals("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}", command.state().getReleaseType().getCollapsedVersionQualifier());
@@ -4353,10 +4675,10 @@ public class InferTestTemplates {
             assertEquals(Boolean.TRUE.toString(), command.state().getReleaseType().getGitPush());
             assertEquals(Boolean.TRUE.toString(), command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
-            assertEquals(1, command.state().getReleaseType().getIdentifiers().getEnabled().size());
-            assertTrue(command.state().getReleaseType().getIdentifiers().getEnabled().contains("customId"));
-            assertEquals(1, command.state().getReleaseType().getIdentifiers().getItems().size());
-            assertTrue(command.state().getReleaseType().getIdentifiers().getItems().containsKey("customId"));
+            assertEquals(1, command.state().getReleaseType().getIdentifiers().size());
+            assertEquals("customId", command.state().getReleaseType().getIdentifiers().get(0).getQualifier());
+            assertEquals("999", command.state().getReleaseType().getIdentifiers().get(0).getValue());
+            assertEquals(Identifier.Position.PRE_RELEASE, command.state().getReleaseType().getIdentifiers().get(0).getPosition());
             assertNull(command.state().getReleaseType().getMatchBranches());
             assertNull(command.state().getReleaseType().getMatchEnvironmentVariables());
             assertNull(command.state().getReleaseType().getMatchWorkspaceStatus());
@@ -4376,17 +4698,26 @@ public class InferTestTemplates {
             throws Exception {
             script.checkout("master");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            // add a custom release type that matches any branch
-            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeMain", new ReleaseType() {
-                {
-                    setMatchBranches(".*");
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("testReleaseTypeMain"));
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that takes the commit message as the identifier to bump, if any
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*")))
+                )
+            );
+            // add a custom release type that matches any branch
+            configurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("testReleaseTypeMain"),
+                    Map.<String,ReleaseType>of(
+                        "testReleaseTypeMain", new ReleaseType() {
+                        {
+                            setMatchBranches(".*");
+                        }}
+                    )
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -4397,9 +4728,9 @@ public class InferTestTemplates {
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("0.0.1", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.1", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
             assertFalse(command.state().getReleaseType().getCollapseVersions());
             assertNull(command.state().getReleaseType().getCollapsedVersionQualifier());
@@ -4428,17 +4759,26 @@ public class InferTestTemplates {
             throws Exception {
             script.checkout("taggedwithoutbump");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            // add a custom release type that matches any branch
-            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeMain", new ReleaseType() {
-                {
-                    setMatchBranches(".*");
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("testReleaseTypeMain"));
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that takes the commit message as the identifier to bump, if any
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*")))
+                )
+            );
+            // add a custom release type that matches any branch
+            configurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("testReleaseTypeMain"),
+                    Map.<String,ReleaseType>of(
+                        "testReleaseTypeMain", new ReleaseType() {
+                        {
+                            setMatchBranches(".*");
+                        }}
+                    )
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -4449,9 +4789,9 @@ public class InferTestTemplates {
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("0.2.3", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.2.3"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("0.2.3"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.2.3", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.2.3"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.2.3"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
             assertFalse(command.state().getReleaseType().getCollapseVersions());
             assertNull(command.state().getReleaseType().getCollapsedVersionQualifier());
@@ -4480,17 +4820,26 @@ public class InferTestTemplates {
             throws Exception {
             script.checkout("taggedwithbump");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            // add a custom release type that matches any branch
-            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeMain", new ReleaseType() {
-                {
-                    setMatchBranches(".*");
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("testReleaseTypeMain"));
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that takes the commit message as the identifier to bump, if any
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*")))
+                )
+            );
+            // add a custom release type that matches any branch
+            configurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("testReleaseTypeMain"),
+                    Map.<String,ReleaseType>of(
+                        "testReleaseTypeMain", new ReleaseType() {
+                        {
+                            setMatchBranches(".*");
+                        }}
+                    )
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -4501,9 +4850,9 @@ public class InferTestTemplates {
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("0.3.3", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.3.3"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("0.3.3"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.3.3", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.3.3"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.3.3"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
             assertFalse(command.state().getReleaseType().getCollapseVersions());
             assertNull(command.state().getReleaseType().getCollapsedVersionQualifier());
@@ -4531,19 +4880,27 @@ public class InferTestTemplates {
         void runUsingCustomFlatReleaseTypeWithInferringCommitConventionInUntaggedwithoutbumpBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
             script.checkout("untaggedwithoutbump");
-
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            // add a custom release type that matches any branch
-            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeMain", new ReleaseType() {
-                {
-                    setMatchBranches(".*");
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("testReleaseTypeMain"));
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that takes the commit message as the identifier to bump, if any
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*")))
+                )
+            );
+            // add a custom release type that matches any branch
+            configurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("testReleaseTypeMain"),
+                    Map.<String,ReleaseType>of(
+                        "testReleaseTypeMain", new ReleaseType() {
+                        {
+                            setMatchBranches(".*");
+                        }}
+                    )
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -4551,12 +4908,12 @@ public class InferTestTemplates {
             assertNull(command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(3, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getCommitIDs().get(2), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getCommitIDs().get(2), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals("0.0.1", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.1", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
             assertFalse(command.state().getReleaseType().getCollapseVersions());
             assertNull(command.state().getReleaseType().getCollapsedVersionQualifier());
@@ -4585,17 +4942,26 @@ public class InferTestTemplates {
             throws Exception {
             script.checkout("untaggedwithbump");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            // add a custom release type that matches any branch
-            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeMain", new ReleaseType() {
-                {
-                    setMatchBranches(".*");
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("testReleaseTypeMain"));
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that takes the commit message as the identifier to bump, if any
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*")))
+                )
+            );
+            // add a custom release type that matches any branch
+            configurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("testReleaseTypeMain"),
+                    Map.<String,ReleaseType>of(
+                        "testReleaseTypeMain", new ReleaseType() {
+                        {
+                            setMatchBranches(".*");
+                        }}
+                    )
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -4603,12 +4969,12 @@ public class InferTestTemplates {
             assertEquals("minor", command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(3, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getCommitIDs().get(2), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getCommitIDs().get(2), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals("0.0.1", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.1", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(3, command.state().getReleaseScope().getSignificantCommits().size());
             assertFalse(command.state().getReleaseType().getCollapseVersions());
             assertNull(command.state().getReleaseType().getCollapsedVersionQualifier());
@@ -4637,25 +5003,33 @@ public class InferTestTemplates {
             throws Exception {
             script.checkout("master");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            // add a custom release type that matches any branch
-            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeMain", new ReleaseType() {
-                {
-                    setMatchBranches("^(master|main)$");    // match main and master
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeCollapsed", new ReleaseType() {
-                {
-                    setCollapseVersions(Boolean.TRUE);
-                    setCollapsedVersionQualifier("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}");
-                    setFilterTags("^([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$");
-                    setMatchBranches(".*");  // match any branch (this is the fallback release type)
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("testReleaseTypeMain", "testReleaseTypeCollapsed"));
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that takes the commit message as the identifier to bump, if any
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*")))
+                )
+            );
+            // add a custom release type that matches any branch
+            configurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("testReleaseTypeMain", "testReleaseTypeCollapsed"),
+                    Map.<String,ReleaseType>of(
+                        "testReleaseTypeMain", new ReleaseType() {
+                        {
+                            setMatchBranches("^(master|main)$");    // match main and master
+                        }},
+                        "testReleaseTypeCollapsed", new ReleaseType() {
+                        {
+                            setCollapseVersions(Boolean.TRUE);
+                            setCollapsedVersionQualifier("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}");
+                            setFilterTags("^([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$");
+                            setMatchBranches(".*");  // match any branch (this is the fallback release type)
+                        }}
+                    )
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -4666,9 +5040,9 @@ public class InferTestTemplates {
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("0.0.1", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.1", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
             assertFalse(command.state().getReleaseType().getCollapseVersions());
             assertNull(command.state().getReleaseType().getCollapsedVersionQualifier());
@@ -4697,25 +5071,33 @@ public class InferTestTemplates {
             throws Exception {
             script.checkout("alpha");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            // add a custom release type that matches any branch
-            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeMain", new ReleaseType() {
-                {
-                    setMatchBranches("^(master|main)$");    // match main and master
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeCollapsed", new ReleaseType() {
-                {
-                    setCollapseVersions(Boolean.TRUE);
-                    setCollapsedVersionQualifier("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}");
-                    setFilterTags("^([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$");
-                    setMatchBranches(".*");  // match any branch (this is the fallback release type)
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("testReleaseTypeMain", "testReleaseTypeCollapsed"));
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that takes the commit message as the identifier to bump, if any
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*")))
+                )
+            );
+            // add a custom release type that matches any branch
+            configurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("testReleaseTypeMain", "testReleaseTypeCollapsed"),
+                    Map.<String,ReleaseType>of(
+                        "testReleaseTypeMain", new ReleaseType() {
+                        {
+                            setMatchBranches("^(master|main)$");    // match main and master
+                        }},
+                        "testReleaseTypeCollapsed", new ReleaseType() {
+                        {
+                            setCollapseVersions(Boolean.TRUE);
+                            setCollapsedVersionQualifier("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}");
+                            setFilterTags("^([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$");
+                            setMatchBranches(".*");  // match any branch (this is the fallback release type)
+                        }}
+                    )
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -4726,9 +5108,9 @@ public class InferTestTemplates {
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("1.0.0-alpha.3", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("1.0.0-alpha.3"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("1.0.0-alpha.3"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.1", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
             assertTrue(command.state().getReleaseType().getCollapseVersions());
             assertEquals("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}", command.state().getReleaseType().getCollapsedVersionQualifier());
@@ -4757,25 +5139,33 @@ public class InferTestTemplates {
             throws Exception {
             script.checkout("beta");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            // add a custom release type that matches any branch
-            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeMain", new ReleaseType() {
-                {
-                    setMatchBranches("^(master|main)$");    // match main and master
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeCollapsed", new ReleaseType() {
-                {
-                    setCollapseVersions(Boolean.TRUE);
-                    setCollapsedVersionQualifier("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}");
-                    setFilterTags("^([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$");
-                    setMatchBranches(".*");  // match any branch (this is the fallback release type)
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("testReleaseTypeMain", "testReleaseTypeCollapsed"));
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that takes the commit message as the identifier to bump, if any
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*")))
+                )
+            );
+            // add a custom release type that matches any branch
+            configurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("testReleaseTypeMain", "testReleaseTypeCollapsed"),
+                    Map.<String,ReleaseType>of(
+                        "testReleaseTypeMain", new ReleaseType() {
+                        {
+                            setMatchBranches("^(master|main)$");    // match main and master
+                        }},
+                        "testReleaseTypeCollapsed", new ReleaseType() {
+                        {
+                            setCollapseVersions(Boolean.TRUE);
+                            setCollapsedVersionQualifier("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}");
+                            setFilterTags("^([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$");
+                            setMatchBranches(".*");  // match any branch (this is the fallback release type)
+                        }}
+                    )
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -4786,9 +5176,9 @@ public class InferTestTemplates {
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("1.0.0-beta.3", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("1.0.0-beta.3"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("1.0.0-beta.3"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.1", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
             assertTrue(command.state().getReleaseType().getCollapseVersions());
             assertEquals("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}", command.state().getReleaseType().getCollapsedVersionQualifier());
@@ -4816,27 +5206,34 @@ public class InferTestTemplates {
         void runUsingCustomCollapsedReleaseTypeWithInferringCommitConventionInGammaBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
             script.checkout("gamma");
-
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            // add a custom release type that matches any branch
-            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeMain", new ReleaseType() {
-                {
-                    setMatchBranches("^(master|main)$");    // match main and master
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeCollapsed", new ReleaseType() {
-                {
-                    setCollapseVersions(Boolean.TRUE);
-                    setCollapsedVersionQualifier("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}");
-                    setFilterTags("^([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$");
-                    setMatchBranches(".*");  // match any branch (this is the fallback release type)
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("testReleaseTypeMain", "testReleaseTypeCollapsed"));
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that takes the commit message as the identifier to bump, if any
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*")))
+                )
+            );
+            // add a custom release type that matches any branch
+            configurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("testReleaseTypeMain", "testReleaseTypeCollapsed"),
+                    Map.<String,ReleaseType>of(
+                        "testReleaseTypeMain", new ReleaseType() {
+                        {
+                            setMatchBranches("^(master|main)$");    // match main and master
+                        }},
+                        "testReleaseTypeCollapsed", new ReleaseType() {
+                        {
+                            setCollapseVersions(Boolean.TRUE);
+                            setCollapsedVersionQualifier("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}");
+                            setFilterTags("^([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$");
+                            setMatchBranches(".*");  // match any branch (this is the fallback release type)
+                        }}
+                    )
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -4844,12 +5241,12 @@ public class InferTestTemplates {
             assertNull(command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(3, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getCommitIDs().get(2), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getCommitIDs().get(2), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals("0.0.1", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.1", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
             assertTrue(command.state().getReleaseType().getCollapseVersions());
             assertEquals("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}", command.state().getReleaseType().getCollapsedVersionQualifier());
@@ -4878,25 +5275,33 @@ public class InferTestTemplates {
             throws Exception {
             script.checkout("delta");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            // add a custom release type that matches any branch
-            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeMain", new ReleaseType() {
-                {
-                    setMatchBranches("^(master|main)$");    // match main and master
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeCollapsed", new ReleaseType() {
-                {
-                    setCollapseVersions(Boolean.TRUE);
-                    setCollapsedVersionQualifier("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}");
-                    setFilterTags("^([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$");
-                    setMatchBranches(".*");  // match any branch (this is the fallback release type)
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("testReleaseTypeMain", "testReleaseTypeCollapsed"));
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that takes the commit message as the identifier to bump, if any
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*")))
+                )
+            );
+            // add a custom release type that matches any branch
+            configurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("testReleaseTypeMain", "testReleaseTypeCollapsed"),
+                    Map.<String,ReleaseType>of(
+                        "testReleaseTypeMain", new ReleaseType() {
+                        {
+                            setMatchBranches("^(master|main)$");    // match main and master
+                        }},
+                        "testReleaseTypeCollapsed", new ReleaseType() {
+                        {
+                            setCollapseVersions(Boolean.TRUE);
+                            setCollapsedVersionQualifier("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}");
+                            setFilterTags("^([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$");
+                            setMatchBranches(".*");  // match any branch (this is the fallback release type)
+                        }}
+                    )
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -4904,12 +5309,12 @@ public class InferTestTemplates {
             assertEquals("minor", command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(3, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getCommitIDs().get(2), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getCommitIDs().get(2), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals("0.0.1", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.1", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(3, command.state().getReleaseScope().getSignificantCommits().size());
             assertTrue(command.state().getReleaseType().getCollapseVersions());
             assertEquals("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}", command.state().getReleaseType().getCollapsedVersionQualifier());
@@ -4938,25 +5343,33 @@ public class InferTestTemplates {
             throws Exception {
             script.checkout("epsilon");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            // add a custom release type that matches any branch
-            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeMain", new ReleaseType() {
-                {
-                    setMatchBranches("^(master|main)$");    // match main and master
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeCollapsed", new ReleaseType() {
-                {
-                    setCollapseVersions(Boolean.TRUE);
-                    setCollapsedVersionQualifier("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}");
-                    setFilterTags("^([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$");
-                    setMatchBranches(".*");  // match any branch (this is the fallback release type)
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("testReleaseTypeMain", "testReleaseTypeCollapsed"));
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that takes the commit message as the identifier to bump, if any
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*")))
+                )
+            );
+            // add a custom release type that matches any branch
+            configurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("testReleaseTypeMain", "testReleaseTypeCollapsed"),
+                    Map.<String,ReleaseType>of(
+                        "testReleaseTypeMain", new ReleaseType() {
+                        {
+                            setMatchBranches("^(master|main)$");    // match main and master
+                        }},
+                        "testReleaseTypeCollapsed", new ReleaseType() {
+                        {
+                            setCollapseVersions(Boolean.TRUE);
+                            setCollapsedVersionQualifier("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}");
+                            setFilterTags("^([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$");
+                            setMatchBranches(".*");  // match any branch (this is the fallback release type)
+                        }}
+                    )
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -4964,12 +5377,12 @@ public class InferTestTemplates {
             assertNull(command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(1, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals("1.0.0-epsilon.3", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("1.0.0-epsilon.3"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("1.0.0-epsilon.3"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.1", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
             assertTrue(command.state().getReleaseType().getCollapseVersions());
             assertEquals("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}", command.state().getReleaseType().getCollapsedVersionQualifier());
@@ -4998,25 +5411,33 @@ public class InferTestTemplates {
             throws Exception {
             script.checkout("zeta");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            // add a custom release type that matches any branch
-            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeMain", new ReleaseType() {
-                {
-                    setMatchBranches("^(master|main)$");    // match main and master
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeCollapsed", new ReleaseType() {
-                {
-                    setCollapseVersions(Boolean.TRUE);
-                    setCollapsedVersionQualifier("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}");
-                    setFilterTags("^([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$");
-                    setMatchBranches(".*");  // match any branch (this is the fallback release type)
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("testReleaseTypeMain", "testReleaseTypeCollapsed"));
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that takes the commit message as the identifier to bump, if any
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*")))
+                )
+            );
+            // add a custom release type that matches any branch
+            configurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("testReleaseTypeMain", "testReleaseTypeCollapsed"),
+                    Map.<String,ReleaseType>of(
+                        "testReleaseTypeMain", new ReleaseType() {
+                        {
+                            setMatchBranches("^(master|main)$");    // match main and master
+                        }},
+                        "testReleaseTypeCollapsed", new ReleaseType() {
+                        {
+                            setCollapseVersions(Boolean.TRUE);
+                            setCollapsedVersionQualifier("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}");
+                            setFilterTags("^([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$");
+                            setMatchBranches(".*");  // match any branch (this is the fallback release type)
+                        }}
+                    )
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -5027,9 +5448,9 @@ public class InferTestTemplates {
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("1.0.0-zeta.4", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("1.0.0-zeta.4"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("1.0.0-zeta.4"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.1", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
             assertTrue(command.state().getReleaseType().getCollapseVersions());
             assertEquals("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}", command.state().getReleaseType().getCollapsedVersionQualifier());
@@ -5058,25 +5479,33 @@ public class InferTestTemplates {
             throws Exception {
             script.checkout("eta");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            // add a custom release type that matches any branch
-            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeMain", new ReleaseType() {
-                {
-                    setMatchBranches("^(master|main)$");    // match main and master
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeCollapsed", new ReleaseType() {
-                {
-                    setCollapseVersions(Boolean.TRUE);
-                    setCollapsedVersionQualifier("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}");
-                    setFilterTags("^([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$");
-                    setMatchBranches(".*");  // match any branch (this is the fallback release type)
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("testReleaseTypeMain", "testReleaseTypeCollapsed"));
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that takes the commit message as the identifier to bump, if any
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*")))
+                )
+            );
+            // add a custom release type that matches any branch
+            configurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("testReleaseTypeMain", "testReleaseTypeCollapsed"),
+                    Map.<String,ReleaseType>of(
+                        "testReleaseTypeMain", new ReleaseType() {
+                        {
+                            setMatchBranches("^(master|main)$");    // match main and master
+                        }},
+                        "testReleaseTypeCollapsed", new ReleaseType() {
+                        {
+                            setCollapseVersions(Boolean.TRUE);
+                            setCollapsedVersionQualifier("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}");
+                            setFilterTags("^([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$");
+                            setMatchBranches(".*");  // match any branch (this is the fallback release type)
+                        }}
+                    )
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -5084,12 +5513,12 @@ public class InferTestTemplates {
             assertNull(command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(1, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals("1.0.0-eta.3", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("1.0.0-eta.3"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("1.0.0-eta.3"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.1", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
             assertTrue(command.state().getReleaseType().getCollapseVersions());
             assertEquals("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}", command.state().getReleaseType().getCollapsedVersionQualifier());
@@ -5118,25 +5547,33 @@ public class InferTestTemplates {
             throws Exception {
             script.checkout("theta");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            // add a custom release type that matches any branch
-            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeMain", new ReleaseType() {
-                {
-                    setMatchBranches("^(master|main)$");    // match main and master
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeCollapsed", new ReleaseType() {
-                {
-                    setCollapseVersions(Boolean.TRUE);
-                    setCollapsedVersionQualifier("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}");
-                    setFilterTags("^([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$");
-                    setMatchBranches(".*");  // match any branch (this is the fallback release type)
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("testReleaseTypeMain", "testReleaseTypeCollapsed"));
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that takes the commit message as the identifier to bump, if any
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*")))
+                )
+            );
+            // add a custom release type that matches any branch
+            configurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("testReleaseTypeMain", "testReleaseTypeCollapsed"),
+                    Map.<String,ReleaseType>of(
+                        "testReleaseTypeMain", new ReleaseType() {
+                        {
+                            setMatchBranches("^(master|main)$");    // match main and master
+                        }},
+                        "testReleaseTypeCollapsed", new ReleaseType() {
+                        {
+                            setCollapseVersions(Boolean.TRUE);
+                            setCollapsedVersionQualifier("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}");
+                            setFilterTags("^([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$");
+                            setMatchBranches(".*");  // match any branch (this is the fallback release type)
+                        }}
+                    )
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -5144,12 +5581,12 @@ public class InferTestTemplates {
             assertEquals("minor", command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(3, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getCommitIDs().get(2), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getCommitIDs().get(2), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals("0.0.1", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.1", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(3, command.state().getReleaseScope().getSignificantCommits().size());
             assertTrue(command.state().getReleaseType().getCollapseVersions());
             assertEquals("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}", command.state().getReleaseType().getCollapsedVersionQualifier());
@@ -5178,18 +5615,27 @@ public class InferTestTemplates {
             throws Exception {
             script.checkout("master");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            // add a custom release type that matches any branch
-            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeMain", new ReleaseType() {
-                {
-                    setIdentifiers(new Identifiers(List.<String>of("extra"), Map.<String,Identifier>of("extra", new Identifier("extra", "5", IdentifierPosition.PRE_RELEASE))));
-                    setMatchBranches(".*");
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("testReleaseTypeMain"));
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that takes the commit message as the identifier to bump, if any
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*")))
+                )
+            );
+            // add a custom release type that matches any branch
+            configurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("testReleaseTypeMain"),
+                    Map.<String,ReleaseType>of(
+                        "testReleaseTypeMain", new ReleaseType() {
+                        {
+                            setIdentifiers(List.<Identifier>of(new Identifier("extra", "5", Identifier.Position.PRE_RELEASE)));
+                            setMatchBranches(".*");
+                        }}
+                    )
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -5200,9 +5646,9 @@ public class InferTestTemplates {
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("0.0.1", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.1", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
             assertFalse(command.state().getReleaseType().getCollapseVersions());
             assertNull(command.state().getReleaseType().getCollapsedVersionQualifier());
@@ -5212,7 +5658,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
-            assertEquals(1, command.state().getReleaseType().getIdentifiers().getItems().size());
+            assertEquals(1, command.state().getReleaseType().getIdentifiers().size());
             assertEquals(".*", command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
             assertEquals(Defaults.ReleaseType.MATCH_WORKSPACE_STATUS, command.state().getReleaseType().getMatchWorkspaceStatus());
@@ -5231,18 +5677,27 @@ public class InferTestTemplates {
             throws Exception {
             script.checkout("taggedwithoutbump");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            // add a custom release type that matches any branch
-            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeMain", new ReleaseType() {
-                {
-                    setIdentifiers(new Identifiers(List.<String>of("extra"), Map.<String,Identifier>of("extra", new Identifier("extra", "5", IdentifierPosition.PRE_RELEASE))));
-                    setMatchBranches(".*");
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("testReleaseTypeMain"));
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that takes the commit message as the identifier to bump, if any
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*")))
+                )
+            );
+            // add a custom release type that matches any branch
+            configurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("testReleaseTypeMain"),
+                    Map.<String,ReleaseType>of(
+                        "testReleaseTypeMain", new ReleaseType() {
+                        {
+                            setIdentifiers(List.<Identifier>of(new Identifier("extra", "5", Identifier.Position.PRE_RELEASE)));
+                            setMatchBranches(".*");
+                        }}
+                    )
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -5253,9 +5708,9 @@ public class InferTestTemplates {
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("0.2.3", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.2.3"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("0.2.3"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.2.3", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.2.3"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.2.3"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
             assertFalse(command.state().getReleaseType().getCollapseVersions());
             assertNull(command.state().getReleaseType().getCollapsedVersionQualifier());
@@ -5265,7 +5720,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
-            assertEquals(1, command.state().getReleaseType().getIdentifiers().getItems().size());
+            assertEquals(1, command.state().getReleaseType().getIdentifiers().size());
             assertEquals(".*", command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
             assertEquals(Defaults.ReleaseType.MATCH_WORKSPACE_STATUS, command.state().getReleaseType().getMatchWorkspaceStatus());
@@ -5284,18 +5739,27 @@ public class InferTestTemplates {
             throws Exception {
             script.checkout("taggedwithbump");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            // add a custom release type that matches any branch
-            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeMain", new ReleaseType() {
-                {
-                    setIdentifiers(new Identifiers(List.<String>of("extra"), Map.<String,Identifier>of("extra", new Identifier("extra", "5", IdentifierPosition.PRE_RELEASE))));
-                    setMatchBranches(".*");
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("testReleaseTypeMain"));
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that takes the commit message as the identifier to bump, if any
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*")))
+                )
+            );
+            // add a custom release type that matches any branch
+            configurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("testReleaseTypeMain"),
+                    Map.<String,ReleaseType>of(
+                        "testReleaseTypeMain", new ReleaseType() {
+                        {
+                            setIdentifiers(List.<Identifier>of(new Identifier("extra", "5", Identifier.Position.PRE_RELEASE)));
+                            setMatchBranches(".*");
+                        }}
+                    )
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -5306,9 +5770,9 @@ public class InferTestTemplates {
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("0.3.3", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.3.3"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("0.3.3"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.3.3", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.3.3"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.3.3"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
             assertFalse(command.state().getReleaseType().getCollapseVersions());
             assertNull(command.state().getReleaseType().getCollapsedVersionQualifier());
@@ -5318,7 +5782,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
-            assertEquals(1, command.state().getReleaseType().getIdentifiers().getItems().size());
+            assertEquals(1, command.state().getReleaseType().getIdentifiers().size());
             assertEquals(".*", command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
             assertEquals(Defaults.ReleaseType.MATCH_WORKSPACE_STATUS, command.state().getReleaseType().getMatchWorkspaceStatus());
@@ -5336,20 +5800,28 @@ public class InferTestTemplates {
         void runUsingCustomFlatReleaseTypeWithExtraIdentifierWithInferringCommitConventionInUntaggedwithoutbumpBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
             script.checkout("untaggedwithoutbump");
-
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            // add a custom release type that matches any branch
-            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeMain", new ReleaseType() {
-                {
-                    setIdentifiers(new Identifiers(List.<String>of("extra"), Map.<String,Identifier>of("extra", new Identifier("extra", "5", IdentifierPosition.PRE_RELEASE))));
-                    setMatchBranches(".*");
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("testReleaseTypeMain"));
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that takes the commit message as the identifier to bump, if any
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*")))
+                )
+            );
+            // add a custom release type that matches any branch
+            configurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("testReleaseTypeMain"),
+                    Map.<String,ReleaseType>of(
+                        "testReleaseTypeMain", new ReleaseType() {
+                        {
+                            setIdentifiers(List.<Identifier>of(new Identifier("extra", "5", Identifier.Position.PRE_RELEASE)));
+                            setMatchBranches(".*");
+                        }}
+                    )
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -5357,12 +5829,12 @@ public class InferTestTemplates {
             assertNull(command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(3, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getCommitIDs().get(2), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getCommitIDs().get(2), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals("0.0.1", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.1", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
             assertFalse(command.state().getReleaseType().getCollapseVersions());
             assertNull(command.state().getReleaseType().getCollapsedVersionQualifier());
@@ -5372,7 +5844,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
-            assertEquals(1, command.state().getReleaseType().getIdentifiers().getItems().size());
+            assertEquals(1, command.state().getReleaseType().getIdentifiers().size());
             assertEquals(".*", command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
             assertEquals(Defaults.ReleaseType.MATCH_WORKSPACE_STATUS, command.state().getReleaseType().getMatchWorkspaceStatus());
@@ -5391,18 +5863,27 @@ public class InferTestTemplates {
             throws Exception {
             script.checkout("untaggedwithbump");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            // add a custom release type that matches any branch
-            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeMain", new ReleaseType() {
-                {
-                    setIdentifiers(new Identifiers(List.<String>of("extra"), Map.<String,Identifier>of("extra", new Identifier("extra", "5", IdentifierPosition.PRE_RELEASE))));
-                    setMatchBranches(".*");
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("testReleaseTypeMain"));
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that takes the commit message as the identifier to bump, if any
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*")))
+                )
+            );
+            // add a custom release type that matches any branch
+            configurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("testReleaseTypeMain"),
+                    Map.<String,ReleaseType>of(
+                        "testReleaseTypeMain", new ReleaseType() {
+                        {
+                            setIdentifiers(List.<Identifier>of(new Identifier("extra", "5", Identifier.Position.PRE_RELEASE)));
+                            setMatchBranches(".*");
+                        }}
+                    )
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -5410,12 +5891,12 @@ public class InferTestTemplates {
             assertEquals("minor", command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(3, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getCommitIDs().get(2), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getCommitIDs().get(2), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals("0.0.1", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.1", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(3, command.state().getReleaseScope().getSignificantCommits().size());
             assertFalse(command.state().getReleaseType().getCollapseVersions());
             assertNull(command.state().getReleaseType().getCollapsedVersionQualifier());
@@ -5425,7 +5906,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
-            assertEquals(1, command.state().getReleaseType().getIdentifiers().getItems().size());
+            assertEquals(1, command.state().getReleaseType().getIdentifiers().size());
             assertEquals(".*", command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
             assertEquals(Defaults.ReleaseType.MATCH_WORKSPACE_STATUS, command.state().getReleaseType().getMatchWorkspaceStatus());
@@ -5444,27 +5925,35 @@ public class InferTestTemplates {
             throws Exception {
             script.checkout("master");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            // add a custom release type that matches any branch
-            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeMain", new ReleaseType() {
-                {
-                    setIdentifiers(new Identifiers(List.<String>of("extra"), Map.<String,Identifier>of("extra", new Identifier("extra", "5", IdentifierPosition.PRE_RELEASE))));
-                    setMatchBranches("^(master|main)$");    // match main and master
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeCollapsed", new ReleaseType() {
-                {
-                    setCollapseVersions(Boolean.TRUE);
-                    setCollapsedVersionQualifier("number");
-                    setFilterTags("^([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$");
-                    setMatchBranches(".*");  // match any branch (this is the fallback release type)
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("testReleaseTypeMain", "testReleaseTypeCollapsed"));
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that takes the commit message as the identifier to bump, if any
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
-
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*")))
+                )
+            );
+            // add a custom release type that matches any branch
+            configurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("testReleaseTypeMain", "testReleaseTypeCollapsed"),
+                    Map.<String,ReleaseType>of(
+                        "testReleaseTypeMain", new ReleaseType() {
+                        {
+                            setIdentifiers(List.<Identifier>of(new Identifier("extra", "5", Identifier.Position.PRE_RELEASE)));
+                            setMatchBranches("^(master|main)$");    // match main and master
+                        }},
+                        "testReleaseTypeCollapsed", new ReleaseType() {
+                        {
+                            setCollapseVersions(Boolean.TRUE);
+                            setCollapsedVersionQualifier("number");
+                            setFilterTags("^([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$");
+                            setMatchBranches(".*");  // match any branch (this is the fallback release type)
+                        }}
+                    )
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            
             command.run();
 
             assertEquals("master", command.state().getBranch());
@@ -5474,9 +5963,9 @@ public class InferTestTemplates {
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("0.0.1", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.1", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
             assertFalse(command.state().getReleaseType().getCollapseVersions());
             assertNull(command.state().getReleaseType().getCollapsedVersionQualifier());
@@ -5486,7 +5975,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
-            assertEquals(1, command.state().getReleaseType().getIdentifiers().getItems().size());
+            assertEquals(1, command.state().getReleaseType().getIdentifiers().size());
             assertEquals("^(master|main)$", command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
             assertEquals(Defaults.ReleaseType.MATCH_WORKSPACE_STATUS, command.state().getReleaseType().getMatchWorkspaceStatus());
@@ -5505,26 +5994,34 @@ public class InferTestTemplates {
             throws Exception {
             script.checkout("alpha");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            // add a custom release type that matches any branch
-            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeMain", new ReleaseType() {
-                {
-                    setIdentifiers(new Identifiers(List.<String>of("extra"), Map.<String,Identifier>of("extra", new Identifier("extra", "5", IdentifierPosition.PRE_RELEASE))));
-                    setMatchBranches("^(master|main)$");    // match main and master
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeCollapsed", new ReleaseType() {
-                {
-                    setCollapseVersions(Boolean.TRUE);
-                    setCollapsedVersionQualifier("number");
-                    setFilterTags("^([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$");
-                    setMatchBranches(".*");  // match any branch (this is the fallback release type)
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("testReleaseTypeMain", "testReleaseTypeCollapsed"));
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that takes the commit message as the identifier to bump, if any
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*")))
+                )
+            );
+            // add a custom release type that matches any branch
+            configurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("testReleaseTypeMain", "testReleaseTypeCollapsed"),
+                    Map.<String,ReleaseType>of(
+                        "testReleaseTypeMain", new ReleaseType() {
+                        {
+                            setIdentifiers(List.<Identifier>of(new Identifier("extra", "5", Identifier.Position.PRE_RELEASE)));
+                            setMatchBranches("^(master|main)$");    // match main and master
+                        }},
+                        "testReleaseTypeCollapsed", new ReleaseType() {
+                        {
+                            setCollapseVersions(Boolean.TRUE);
+                            setCollapsedVersionQualifier("number");
+                            setFilterTags("^([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$");
+                            setMatchBranches(".*");  // match any branch (this is the fallback release type)
+                        }}
+                    )
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -5535,9 +6032,9 @@ public class InferTestTemplates {
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("1.0.0-alpha.3", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("1.0.0-alpha.3"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("1.0.0-alpha.3"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.1", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
             assertTrue(command.state().getReleaseType().getCollapseVersions());
             assertEquals("number", command.state().getReleaseType().getCollapsedVersionQualifier());
@@ -5566,26 +6063,34 @@ public class InferTestTemplates {
             throws Exception {
             script.checkout("beta");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            // add a custom release type that matches any branch
-            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeMain", new ReleaseType() {
-                {
-                    setIdentifiers(new Identifiers(List.<String>of("extra"), Map.<String,Identifier>of("extra", new Identifier("extra", "5", IdentifierPosition.PRE_RELEASE))));
-                    setMatchBranches("^(master|main)$");    // match main and master
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeCollapsed", new ReleaseType() {
-                {
-                    setCollapseVersions(Boolean.TRUE);
-                    setCollapsedVersionQualifier("number");
-                    setFilterTags("^([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$");
-                    setMatchBranches(".*");  // match any branch (this is the fallback release type)
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("testReleaseTypeMain", "testReleaseTypeCollapsed"));
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that takes the commit message as the identifier to bump, if any
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*")))
+                )
+            );
+            // add a custom release type that matches any branch
+            configurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("testReleaseTypeMain", "testReleaseTypeCollapsed"),
+                    Map.<String,ReleaseType>of(
+                        "testReleaseTypeMain", new ReleaseType() {
+                        {
+                            setIdentifiers(List.<Identifier>of(new Identifier("extra", "5", Identifier.Position.PRE_RELEASE)));
+                            setMatchBranches("^(master|main)$");    // match main and master
+                        }},
+                        "testReleaseTypeCollapsed", new ReleaseType() {
+                        {
+                            setCollapseVersions(Boolean.TRUE);
+                            setCollapsedVersionQualifier("number");
+                            setFilterTags("^([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$");
+                            setMatchBranches(".*");  // match any branch (this is the fallback release type)
+                        }}
+                    )
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -5596,9 +6101,9 @@ public class InferTestTemplates {
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("1.0.0-beta.3", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("1.0.0-beta.3"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("1.0.0-beta.3"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.1", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
             assertTrue(command.state().getReleaseType().getCollapseVersions());
             assertEquals("number", command.state().getReleaseType().getCollapsedVersionQualifier());
@@ -5626,28 +6131,35 @@ public class InferTestTemplates {
         void runUsingCustomCollapsedReleaseTypeWithExtraIdentifiersWithInferringCommitConventionInGammaBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
             script.checkout("gamma");
-
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            // add a custom release type that matches any branch
-            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeMain", new ReleaseType() {
-                {
-                    setIdentifiers(new Identifiers(List.<String>of("extra"), Map.<String,Identifier>of("extra", new Identifier("extra", "5", IdentifierPosition.PRE_RELEASE))));
-                    setMatchBranches("^(master|main)$");    // match main and master
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeCollapsed", new ReleaseType() {
-                {
-                    setCollapseVersions(Boolean.TRUE);
-                    setCollapsedVersionQualifier("number");
-                    setFilterTags("^([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$");
-                    setMatchBranches(".*");  // match any branch (this is the fallback release type)
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("testReleaseTypeMain", "testReleaseTypeCollapsed"));
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that takes the commit message as the identifier to bump, if any
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*")))
+                )
+            );
+            // add a custom release type that matches any branch
+            configurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("testReleaseTypeMain", "testReleaseTypeCollapsed"),
+                    Map.<String,ReleaseType>of(
+                        "testReleaseTypeMain", new ReleaseType() {
+                        {
+                            setIdentifiers(List.<Identifier>of(new Identifier("extra", "5", Identifier.Position.PRE_RELEASE)));
+                            setMatchBranches("^(master|main)$");    // match main and master
+                        }},
+                        "testReleaseTypeCollapsed", new ReleaseType() {
+                        {
+                            setCollapseVersions(Boolean.TRUE);
+                            setCollapsedVersionQualifier("number");
+                            setFilterTags("^([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$");
+                            setMatchBranches(".*");  // match any branch (this is the fallback release type)
+                        }}
+                    )
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -5655,12 +6167,12 @@ public class InferTestTemplates {
             assertNull(command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(3, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getCommitIDs().get(2), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getCommitIDs().get(2), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals("0.0.1", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.1", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
             assertTrue(command.state().getReleaseType().getCollapseVersions());
             assertEquals("number", command.state().getReleaseType().getCollapsedVersionQualifier());
@@ -5689,39 +6201,47 @@ public class InferTestTemplates {
             throws Exception {
             script.checkout("delta");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            // add a custom release type that matches any branch
-            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeMain", new ReleaseType() {
-                {
-                    setIdentifiers(new Identifiers(List.<String>of("extra"), Map.<String,Identifier>of("extra", new Identifier("extra", "5", IdentifierPosition.PRE_RELEASE))));
-                    setMatchBranches("^(master|main)$");    // match main and master
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeCollapsed", new ReleaseType() {
-                {
-                    setCollapseVersions(Boolean.TRUE);
-                    setCollapsedVersionQualifier("number");
-                    setFilterTags("^([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$");
-                    setMatchBranches(".*");  // match any branch (this is the fallback release type)
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("testReleaseTypeMain", "testReleaseTypeCollapsed"));
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that takes the commit message as the identifier to bump, if any
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
-
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*")))
+                )
+            );
+            // add a custom release type that matches any branch
+            configurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("testReleaseTypeMain", "testReleaseTypeCollapsed"),
+                    Map.<String,ReleaseType>of(
+                        "testReleaseTypeMain", new ReleaseType() {
+                        {
+                            setIdentifiers(List.<Identifier>of(new Identifier("extra", "5", Identifier.Position.PRE_RELEASE)));
+                            setMatchBranches("^(master|main)$");    // match main and master
+                        }},
+                        "testReleaseTypeCollapsed", new ReleaseType() {
+                        {
+                            setCollapseVersions(Boolean.TRUE);
+                            setCollapsedVersionQualifier("number");
+                            setFilterTags("^([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$");
+                            setMatchBranches(".*");  // match any branch (this is the fallback release type)
+                        }}
+                    )
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            
             command.run();
 
             assertEquals("delta", command.state().getBranch());
             assertEquals("minor", command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(3, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getCommitIDs().get(2), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getCommitIDs().get(2), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals("0.0.1", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.1", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(3, command.state().getReleaseScope().getSignificantCommits().size());
             assertTrue(command.state().getReleaseType().getCollapseVersions());
             assertEquals("number", command.state().getReleaseType().getCollapsedVersionQualifier());
@@ -5750,26 +6270,34 @@ public class InferTestTemplates {
             throws Exception {
             script.checkout("epsilon");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            // add a custom release type that matches any branch
-            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeMain", new ReleaseType() {
-                {
-                    setIdentifiers(new Identifiers(List.<String>of("extra"), Map.<String,Identifier>of("extra", new Identifier("extra", "5", IdentifierPosition.PRE_RELEASE))));
-                    setMatchBranches("^(master|main)$");    // match main and master
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeCollapsed", new ReleaseType() {
-                {
-                    setCollapseVersions(Boolean.TRUE);
-                    setCollapsedVersionQualifier("number");
-                    setFilterTags("^([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$");
-                    setMatchBranches(".*");  // match any branch (this is the fallback release type)
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("testReleaseTypeMain", "testReleaseTypeCollapsed"));
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that takes the commit message as the identifier to bump, if any
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*")))
+                )
+            );
+            // add a custom release type that matches any branch
+            configurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("testReleaseTypeMain", "testReleaseTypeCollapsed"),
+                    Map.<String,ReleaseType>of(
+                        "testReleaseTypeMain", new ReleaseType() {
+                        {
+                            setIdentifiers(List.<Identifier>of(new Identifier("extra", "5", Identifier.Position.PRE_RELEASE)));
+                            setMatchBranches("^(master|main)$");    // match main and master
+                        }},
+                        "testReleaseTypeCollapsed", new ReleaseType() {
+                        {
+                            setCollapseVersions(Boolean.TRUE);
+                            setCollapsedVersionQualifier("number");
+                            setFilterTags("^([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$");
+                            setMatchBranches(".*");  // match any branch (this is the fallback release type)
+                        }}
+                    )
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -5777,12 +6305,12 @@ public class InferTestTemplates {
             assertNull(command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(1, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals("1.0.0-epsilon.3", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("1.0.0-epsilon.3"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("1.0.0-epsilon.3"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.1", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
             assertTrue(command.state().getReleaseType().getCollapseVersions());
             assertEquals("number", command.state().getReleaseType().getCollapsedVersionQualifier());
@@ -5811,26 +6339,34 @@ public class InferTestTemplates {
             throws Exception {
             script.checkout("zeta");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            // add a custom release type that matches any branch
-            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeMain", new ReleaseType() {
-                {
-                    setIdentifiers(new Identifiers(List.<String>of("extra"), Map.<String,Identifier>of("extra", new Identifier("extra", "5", IdentifierPosition.PRE_RELEASE))));
-                    setMatchBranches("^(master|main)$");    // match main and master
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeCollapsed", new ReleaseType() {
-                {
-                    setCollapseVersions(Boolean.TRUE);
-                    setCollapsedVersionQualifier("number");
-                    setFilterTags("^([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$");
-                    setMatchBranches(".*");  // match any branch (this is the fallback release type)
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("testReleaseTypeMain", "testReleaseTypeCollapsed"));
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that takes the commit message as the identifier to bump, if any
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*")))
+                )
+            );
+            // add a custom release type that matches any branch
+            configurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("testReleaseTypeMain", "testReleaseTypeCollapsed"),
+                    Map.<String,ReleaseType>of(
+                        "testReleaseTypeMain", new ReleaseType() {
+                        {
+                            setIdentifiers(List.<Identifier>of(new Identifier("extra", "5", Identifier.Position.PRE_RELEASE)));
+                            setMatchBranches("^(master|main)$");    // match main and master
+                        }},
+                        "testReleaseTypeCollapsed", new ReleaseType() {
+                        {
+                            setCollapseVersions(Boolean.TRUE);
+                            setCollapsedVersionQualifier("number");
+                            setFilterTags("^([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$");
+                            setMatchBranches(".*");  // match any branch (this is the fallback release type)
+                        }}
+                    )
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -5841,9 +6377,9 @@ public class InferTestTemplates {
             assertNull(command.state().getReleaseScope().getInitialCommit());
             assertNull(command.state().getReleaseScope().getFinalCommit());
             assertEquals("1.0.0-zeta.4", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("1.0.0-zeta.4"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("1.0.0-zeta.4"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.1", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
             assertTrue(command.state().getReleaseType().getCollapseVersions());
             assertEquals("number", command.state().getReleaseType().getCollapsedVersionQualifier());
@@ -5872,26 +6408,34 @@ public class InferTestTemplates {
             throws Exception {
             script.checkout("eta");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            // add a custom release type that matches any branch
-            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeMain", new ReleaseType() {
-                {
-                    setIdentifiers(new Identifiers(List.<String>of("extra"), Map.<String,Identifier>of("extra", new Identifier("extra", "5", IdentifierPosition.PRE_RELEASE))));
-                    setMatchBranches("^(master|main)$");    // match main and master
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeCollapsed", new ReleaseType() {
-                {
-                    setCollapseVersions(Boolean.TRUE);
-                    setCollapsedVersionQualifier("number");
-                    setFilterTags("^([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$");
-                    setMatchBranches(".*");  // match any branch (this is the fallback release type)
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("testReleaseTypeMain", "testReleaseTypeCollapsed"));
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that takes the commit message as the identifier to bump, if any
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*")))
+                )
+            );
+            // add a custom release type that matches any branch
+            configurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("testReleaseTypeMain", "testReleaseTypeCollapsed"),
+                    Map.<String,ReleaseType>of(
+                        "testReleaseTypeMain", new ReleaseType() {
+                        {
+                            setIdentifiers(List.<Identifier>of(new Identifier("extra", "5", Identifier.Position.PRE_RELEASE)));
+                            setMatchBranches("^(master|main)$");    // match main and master
+                        }},
+                    "testReleaseTypeCollapsed", new ReleaseType() {
+                        {
+                            setCollapseVersions(Boolean.TRUE);
+                            setCollapsedVersionQualifier("number");
+                            setFilterTags("^([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$");
+                            setMatchBranches(".*");  // match any branch (this is the fallback release type)
+                        }}
+                    )
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -5899,12 +6443,12 @@ public class InferTestTemplates {
             assertNull(command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(1, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals("1.0.0-eta.3", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("1.0.0-eta.3"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("1.0.0-eta.3"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.1", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
             assertTrue(command.state().getReleaseType().getCollapseVersions());
             assertEquals("number", command.state().getReleaseType().getCollapsedVersionQualifier());
@@ -5933,26 +6477,34 @@ public class InferTestTemplates {
             throws Exception {
             script.checkout("theta");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            // add a custom release type that matches any branch
-            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeMain", new ReleaseType() {
-                {
-                    setIdentifiers(new Identifiers(List.<String>of("extra"), Map.<String,Identifier>of("extra", new Identifier("extra", "5", IdentifierPosition.PRE_RELEASE))));
-                    setMatchBranches("^(master|main)$");    // match main and master
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseTypeCollapsed", new ReleaseType() {
-                {
-                    setCollapseVersions(Boolean.TRUE);
-                    setCollapsedVersionQualifier("number");
-                    setFilterTags("^([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$");
-                    setMatchBranches(".*");  // match any branch (this is the fallback release type)
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("testReleaseTypeMain", "testReleaseTypeCollapsed"));
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that takes the commit message as the identifier to bump, if any
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", "^major.*", "minor", "^minor.*", "patch", "^patch.*")))
+                )
+            );
+            // add a custom release type that matches any branch
+            configurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("testReleaseTypeMain", "testReleaseTypeCollapsed"),
+                    Map.<String,ReleaseType>of(
+                        "testReleaseTypeMain", new ReleaseType() {
+                        {
+                            setIdentifiers(List.<Identifier>of(new Identifier("extra", "5", Identifier.Position.PRE_RELEASE)));
+                            setMatchBranches("^(master|main)$");    // match main and master
+                        }},
+                        "testReleaseTypeCollapsed", new ReleaseType() {
+                        {
+                            setCollapseVersions(Boolean.TRUE);
+                            setCollapsedVersionQualifier("number");
+                            setFilterTags("^([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$");
+                            setMatchBranches(".*");  // match any branch (this is the fallback release type)
+                        }}
+                    )
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -5960,12 +6512,12 @@ public class InferTestTemplates {
             assertEquals("minor", command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(3, command.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getCommitIDs().get(2), command.state().getReleaseScope().getInitialCommit());
-            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit());
+            assertEquals(script.getCommitIDs().get(2), command.state().getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit().getSHA());
             assertEquals("0.0.1", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPreviousVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.1", command.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit());
+            assertEquals(script.getCommitByTag("0.0.1"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(3, command.state().getReleaseScope().getSignificantCommits().size());
             assertTrue(command.state().getReleaseType().getCollapseVersions());
             assertEquals("number", command.state().getReleaseType().getCollapsedVersionQualifier());

@@ -15,7 +15,7 @@
  */
 package com.mooltiverse.oss.nyx.configuration.presets;
 
-import com.mooltiverse.oss.nyx.data.CommitMessageConvention;
+import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
 
 /**
  * This class provides reusable configuration chunks for commit message conventions.

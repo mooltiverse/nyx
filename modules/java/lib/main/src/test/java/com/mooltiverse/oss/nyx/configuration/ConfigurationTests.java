@@ -31,13 +31,12 @@ import org.junit.jupiter.api.Test;
 
 import com.mooltiverse.oss.nyx.configuration.presets.Extended;
 import com.mooltiverse.oss.nyx.configuration.presets.Simple;
-import com.mooltiverse.oss.nyx.data.CommitMessageConvention;
-import com.mooltiverse.oss.nyx.data.FileMapper;
-import com.mooltiverse.oss.nyx.data.Identifier;
-import com.mooltiverse.oss.nyx.data.Identifiers;
-import com.mooltiverse.oss.nyx.data.IdentifierPosition;
-import com.mooltiverse.oss.nyx.data.ReleaseType;
-import com.mooltiverse.oss.nyx.data.Verbosity;
+import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
+import com.mooltiverse.oss.nyx.entities.EnabledItemsMap;
+import com.mooltiverse.oss.nyx.entities.Identifier;
+import com.mooltiverse.oss.nyx.entities.ReleaseType;
+import com.mooltiverse.oss.nyx.entities.Verbosity;
+import com.mooltiverse.oss.nyx.io.FileMapper;
 import com.mooltiverse.oss.nyx.version.Scheme;
 
 @DisplayName("Configuration")
@@ -64,6 +63,13 @@ public class ConfigurationTests {
         }
 
         @Test
+        @DisplayName("Configuration.getConfigurationFile() == Defaults.CONFIGURATION_FILE")
+        void getConfigurationFileTest()
+            throws Exception {
+            assertEquals(Defaults.CONFIGURATION_FILE, new Configuration().getConfigurationFile());
+        }
+
+        @Test
         @DisplayName("Configuration.getDirectory() == Defaults.DIRECTORY")
         void getDirectoryTest()
             throws Exception {
@@ -84,17 +90,17 @@ public class ConfigurationTests {
         }
 
         @Test
-        @DisplayName("Configuration.getConfigurationFile() == Defaults.CONFIGURATION_FILE")
-        void getConfigurationFileTest()
-            throws Exception {
-            assertEquals(Defaults.CONFIGURATION_FILE, new Configuration().getConfigurationFile());
-        }
-
-        @Test
         @DisplayName("Configuration.getDryRun() == Defaults.DRY_RUN")
         void getDryRunTest()
             throws Exception {
             assertEquals(Defaults.DRY_RUN, new Configuration().getDryRun());
+        }
+
+        @Test
+        @DisplayName("Configuration.getInitialVersion() == Defaults.INITIAL_VERSION")
+        void getInitialVersionTest()
+            throws Exception {
+            assertEquals(Defaults.INITIAL_VERSION, new Configuration().getInitialVersion());
         }
 
         @Test
@@ -206,8 +212,12 @@ public class ConfigurationTests {
             throws Exception {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("convention1"));
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("convention1", new CommitMessageConvention("expr1", Map.<String,String>of())));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("convention1"),
+                    Map.<String,CommitMessageConvention>of("convention1", new CommitMessageConvention("expr1", Map.<String,String>of()))
+                )
+            );
 
             // in order to make the test meaningful, make sure the default and mock values are different
             assertNotNull(Defaults.COMMIT_MESSAGE_CONVENTIONS);
@@ -215,8 +225,8 @@ public class ConfigurationTests {
             assertNotSame(configuration.getCommitMessageConventions(), configurationLayerMock.getCommitMessageConventions());
 
             // make sure the initial values come from defaults, until we inject the command line configuration
-            assertNull(Defaults.COMMIT_MESSAGE_CONVENTIONS.getEnabled());
-            assertNull(configuration.getCommitMessageConventions().getEnabled());
+            assertTrue(Defaults.COMMIT_MESSAGE_CONVENTIONS.getEnabled().isEmpty());
+            assertTrue(configuration.getCommitMessageConventions().getEnabled().isEmpty());
             assertTrue(Defaults.COMMIT_MESSAGE_CONVENTIONS.getItems().isEmpty());
             assertTrue(configuration.getCommitMessageConventions().getItems().isEmpty());
             
@@ -228,11 +238,11 @@ public class ConfigurationTests {
             assertEquals(1, configuration.getCommitMessageConventions().getEnabled().size());
             assertTrue(configuration.getCommitMessageConventions().getEnabled().contains("convention1"));
             assertEquals(1, configuration.getCommitMessageConventions().getItems().size());
-            assertEquals("expr1", configuration.getCommitMessageConventions().getItem("convention1").getExpression());
+            assertEquals("expr1", configuration.getCommitMessageConventions().getItems().get("convention1").getExpression());
 
             // now remove the command line configuration and test that now default values are returned again
             configuration.withCommandLineConfiguration(null);
-            assertNull(configuration.getCommitMessageConventions().getEnabled());
+            assertTrue(configuration.getCommitMessageConventions().getEnabled().isEmpty());
             assertTrue(configuration.getCommitMessageConventions().getItems().isEmpty());
         }
 
@@ -398,8 +408,12 @@ public class ConfigurationTests {
             throws Exception {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("type1"));
-            configurationLayerMock.getReleaseTypes().getItems().putAll(Map.<String,ReleaseType>of("type1", new ReleaseType(true, "{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}", "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{version}}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{version}}", new Identifiers(List.<String>of("build"), Map.<String,Identifier>of("PATH",new Identifier("build", "12", IdentifierPosition.BUILD))), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), "", Boolean.FALSE)));
+            configurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("type1"),
+                    Map.<String,ReleaseType>of("type1", new ReleaseType(true, "{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}", "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{version}}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{version}}", List.<Identifier>of(new Identifier("build", "12", Identifier.Position.BUILD)), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), "", Boolean.FALSE))
+                )
+            );
 
             // in order to make the test meaningful, make sure the default and mock values are different
             assertNotNull(Defaults.RELEASE_TYPES);
@@ -420,24 +434,24 @@ public class ConfigurationTests {
             assertEquals(1, configuration.getReleaseTypes().getEnabled().size());
             assertTrue(configuration.getReleaseTypes().getEnabled().contains("type1"));
             assertEquals(1, configuration.getReleaseTypes().getItems().size());
-            assertTrue(configuration.getReleaseTypes().getItem("type1").getCollapseVersions());
-            assertEquals("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}", configuration.getReleaseTypes().getItem("type1").getCollapsedVersionQualifier());
-            assertEquals("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", configuration.getReleaseTypes().getItem("type1").getFilterTags());
-            assertEquals(Boolean.TRUE.toString(), configuration.getReleaseTypes().getItem("type1").getGitCommit());
-            assertEquals("Committing {{version}}", configuration.getReleaseTypes().getItem("type1").getGitCommitMessage());
-            assertEquals(Boolean.TRUE.toString(), configuration.getReleaseTypes().getItem("type1").getGitPush());
-            assertEquals(Boolean.TRUE.toString(), configuration.getReleaseTypes().getItem("type1").getGitTag());
-            assertEquals("Tagging {{version}}", configuration.getReleaseTypes().getItem("type1").getGitTagMessage());
+            assertTrue(configuration.getReleaseTypes().getItems().get("type1").getCollapseVersions());
+            assertEquals("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}", configuration.getReleaseTypes().getItems().get("type1").getCollapsedVersionQualifier());
+            assertEquals("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", configuration.getReleaseTypes().getItems().get("type1").getFilterTags());
+            assertEquals(Boolean.TRUE.toString(), configuration.getReleaseTypes().getItems().get("type1").getGitCommit());
+            assertEquals("Committing {{version}}", configuration.getReleaseTypes().getItems().get("type1").getGitCommitMessage());
+            assertEquals(Boolean.TRUE.toString(), configuration.getReleaseTypes().getItems().get("type1").getGitPush());
+            assertEquals(Boolean.TRUE.toString(), configuration.getReleaseTypes().getItems().get("type1").getGitTag());
+            assertEquals("Tagging {{version}}", configuration.getReleaseTypes().getItems().get("type1").getGitTagMessage());
             assertNotNull(configuration.getReleaseTypes().getEnabled().contains("type1"));
-            assertNotNull(configuration.getReleaseTypes().getItem("type1").getIdentifiers());
-            assertFalse(configuration.getReleaseTypes().getItem("type1").getIdentifiers().getItems().isEmpty());
-            assertEquals("", configuration.getReleaseTypes().getItem("type1").getMatchBranches());
-            assertNotNull(configuration.getReleaseTypes().getItem("type1").getMatchEnvironmentVariables());
-            assertFalse(configuration.getReleaseTypes().getItem("type1").getMatchEnvironmentVariables().isEmpty());
-            assertNull(configuration.getReleaseTypes().getItem("type1").getMatchWorkspaceStatus());
-            assertEquals(Boolean.TRUE.toString(), configuration.getReleaseTypes().getItem("type1").getPublish());
-            assertEquals("", configuration.getReleaseTypes().getItem("type1").getVersionRange());
-            assertEquals(Boolean.FALSE, configuration.getReleaseTypes().getItem("type1").getVersionRangeFromBranchName());
+            assertNotNull(configuration.getReleaseTypes().getItems().get("type1").getIdentifiers());
+            assertFalse(configuration.getReleaseTypes().getItems().get("type1").getIdentifiers().isEmpty());
+            assertEquals("", configuration.getReleaseTypes().getItems().get("type1").getMatchBranches());
+            assertNotNull(configuration.getReleaseTypes().getItems().get("type1").getMatchEnvironmentVariables());
+            assertFalse(configuration.getReleaseTypes().getItems().get("type1").getMatchEnvironmentVariables().isEmpty());
+            assertNull(configuration.getReleaseTypes().getItems().get("type1").getMatchWorkspaceStatus());
+            assertEquals(Boolean.TRUE.toString(), configuration.getReleaseTypes().getItems().get("type1").getPublish());
+            assertEquals("", configuration.getReleaseTypes().getItems().get("type1").getVersionRange());
+            assertEquals(Boolean.FALSE, configuration.getReleaseTypes().getItems().get("type1").getVersionRangeFromBranchName());
 
             // now remove the command line configuration and test that now default values are returned again
             configuration.withCommandLineConfiguration(null);
@@ -618,8 +632,12 @@ public class ConfigurationTests {
             throws Exception {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("convention1"));
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("convention1", new CommitMessageConvention("expr1", Map.<String,String>of())));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("convention1"),
+                    Map.<String,CommitMessageConvention>of("convention1", new CommitMessageConvention("expr1", Map.<String,String>of()))
+                )
+            );
 
             // in order to make the test meaningful, make sure the default and mock values are different
             assertNotNull(Defaults.COMMIT_MESSAGE_CONVENTIONS);
@@ -627,8 +645,8 @@ public class ConfigurationTests {
             assertNotSame(configuration.getCommitMessageConventions(), configurationLayerMock.getCommitMessageConventions());
 
             // make sure the initial values come from defaults, until we inject the command line configuration
-            assertNull(Defaults.COMMIT_MESSAGE_CONVENTIONS.getEnabled());
-            assertNull(configuration.getCommitMessageConventions().getEnabled());
+            assertTrue(Defaults.COMMIT_MESSAGE_CONVENTIONS.getEnabled().isEmpty());
+            assertTrue(configuration.getCommitMessageConventions().getEnabled().isEmpty());
             assertTrue(Defaults.COMMIT_MESSAGE_CONVENTIONS.getItems().isEmpty());
             assertTrue(configuration.getCommitMessageConventions().getItems().isEmpty());
             
@@ -640,11 +658,11 @@ public class ConfigurationTests {
             assertEquals(1, configuration.getCommitMessageConventions().getEnabled().size());
             assertTrue(configuration.getCommitMessageConventions().getEnabled().contains("convention1"));
             assertEquals(1, configuration.getCommitMessageConventions().getItems().size());
-            assertEquals("expr1", configuration.getCommitMessageConventions().getItem("convention1").getExpression());
+            assertEquals("expr1", configuration.getCommitMessageConventions().getItems().get("convention1").getExpression());
 
             // now remove the command line configuration and test that now default values are returned again
             configuration.withPluginConfiguration(null);
-            assertNull(configuration.getCommitMessageConventions().getEnabled());
+            assertTrue(configuration.getCommitMessageConventions().getEnabled().isEmpty());
             assertTrue(configuration.getCommitMessageConventions().getItems().isEmpty());
         }
 
@@ -810,8 +828,12 @@ public class ConfigurationTests {
             throws Exception {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("type1"));
-            configurationLayerMock.getReleaseTypes().getItems().putAll(Map.<String,ReleaseType>of("type1", new ReleaseType(true, "{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}", "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{version}}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{version}}", new Identifiers(List.<String>of("build"), Map.<String,Identifier>of("PATH",new Identifier("build", "12", IdentifierPosition.BUILD))), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), "", Boolean.FALSE)));
+            configurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("type1"),
+                    Map.<String,ReleaseType>of("type1", new ReleaseType(true, "{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}", "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{version}}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{version}}", List.<Identifier>of(new Identifier("build", "12", Identifier.Position.BUILD)), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), "", Boolean.FALSE))
+                )
+            );
 
             // in order to make the test meaningful, make sure the default and mock values are different
             assertNotNull(Defaults.RELEASE_TYPES);
@@ -832,24 +854,24 @@ public class ConfigurationTests {
             assertEquals(1, configuration.getReleaseTypes().getEnabled().size());
             assertTrue(configuration.getReleaseTypes().getEnabled().contains("type1"));
             assertEquals(1, configuration.getReleaseTypes().getItems().size());
-            assertTrue(configuration.getReleaseTypes().getItem("type1").getCollapseVersions());
-            assertEquals("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}", configuration.getReleaseTypes().getItem("type1").getCollapsedVersionQualifier());
-            assertEquals("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", configuration.getReleaseTypes().getItem("type1").getFilterTags());
-            assertEquals(Boolean.TRUE.toString(), configuration.getReleaseTypes().getItem("type1").getGitCommit());
-            assertEquals("Committing {{version}}", configuration.getReleaseTypes().getItem("type1").getGitCommitMessage());
-            assertEquals(Boolean.TRUE.toString(), configuration.getReleaseTypes().getItem("type1").getGitPush());
-            assertEquals(Boolean.TRUE.toString(), configuration.getReleaseTypes().getItem("type1").getGitTag());
-            assertEquals("Tagging {{version}}", configuration.getReleaseTypes().getItem("type1").getGitTagMessage());
+            assertTrue(configuration.getReleaseTypes().getItems().get("type1").getCollapseVersions());
+            assertEquals("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}", configuration.getReleaseTypes().getItems().get("type1").getCollapsedVersionQualifier());
+            assertEquals("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", configuration.getReleaseTypes().getItems().get("type1").getFilterTags());
+            assertEquals(Boolean.TRUE.toString(), configuration.getReleaseTypes().getItems().get("type1").getGitCommit());
+            assertEquals("Committing {{version}}", configuration.getReleaseTypes().getItems().get("type1").getGitCommitMessage());
+            assertEquals(Boolean.TRUE.toString(), configuration.getReleaseTypes().getItems().get("type1").getGitPush());
+            assertEquals(Boolean.TRUE.toString(), configuration.getReleaseTypes().getItems().get("type1").getGitTag());
+            assertEquals("Tagging {{version}}", configuration.getReleaseTypes().getItems().get("type1").getGitTagMessage());
             assertNotNull(configuration.getReleaseTypes().getEnabled().contains("type1"));
-            assertNotNull(configuration.getReleaseTypes().getItem("type1").getIdentifiers());
-            assertFalse(configuration.getReleaseTypes().getItem("type1").getIdentifiers().getItems().isEmpty());
-            assertEquals("", configuration.getReleaseTypes().getItem("type1").getMatchBranches());
-            assertNotNull(configuration.getReleaseTypes().getItem("type1").getMatchEnvironmentVariables());
-            assertFalse(configuration.getReleaseTypes().getItem("type1").getMatchEnvironmentVariables().isEmpty());
-            assertNull(configuration.getReleaseTypes().getItem("type1").getMatchWorkspaceStatus());
-            assertEquals(Boolean.TRUE.toString(), configuration.getReleaseTypes().getItem("type1").getPublish());
-            assertEquals("", configuration.getReleaseTypes().getItem("type1").getVersionRange());
-            assertEquals(Boolean.FALSE, configuration.getReleaseTypes().getItem("type1").getVersionRangeFromBranchName());
+            assertNotNull(configuration.getReleaseTypes().getItems().get("type1").getIdentifiers());
+            assertFalse(configuration.getReleaseTypes().getItems().get("type1").getIdentifiers().isEmpty());
+            assertEquals("", configuration.getReleaseTypes().getItems().get("type1").getMatchBranches());
+            assertNotNull(configuration.getReleaseTypes().getItems().get("type1").getMatchEnvironmentVariables());
+            assertFalse(configuration.getReleaseTypes().getItems().get("type1").getMatchEnvironmentVariables().isEmpty());
+            assertNull(configuration.getReleaseTypes().getItems().get("type1").getMatchWorkspaceStatus());
+            assertEquals(Boolean.TRUE.toString(), configuration.getReleaseTypes().getItems().get("type1").getPublish());
+            assertEquals("", configuration.getReleaseTypes().getItems().get("type1").getVersionRange());
+            assertEquals(Boolean.FALSE, configuration.getReleaseTypes().getItems().get("type1").getVersionRangeFromBranchName());
 
             // now remove the command line configuration and test that now default values are returned again
             configuration.withPluginConfiguration(null);
@@ -1023,10 +1045,18 @@ public class ConfigurationTests {
             SimpleConfigurationLayer lowPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             SimpleConfigurationLayer highPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
-            lowPriorityConfigurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("convention1"));
-            lowPriorityConfigurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("convention1", new CommitMessageConvention("expr1", Map.<String,String>of())));
-            highPriorityConfigurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("convention2"));
-            highPriorityConfigurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("convention2", new CommitMessageConvention("expr2", Map.<String,String>of())));
+            lowPriorityConfigurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("convention1"),
+                    Map.<String,CommitMessageConvention>of("convention1", new CommitMessageConvention("expr1", Map.<String,String>of()))
+                )
+            );
+            highPriorityConfigurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("convention2"),
+                    Map.<String,CommitMessageConvention>of("convention2", new CommitMessageConvention("expr2", Map.<String,String>of()))
+                )
+            );
             
             // inject the command line configuration and test the new value is returned from that
             configuration.withPluginConfiguration(lowPriorityConfigurationLayerMock);
@@ -1037,7 +1067,7 @@ public class ConfigurationTests {
             assertEquals(1, configuration.getCommitMessageConventions().getEnabled().size());
             assertTrue(configuration.getCommitMessageConventions().getEnabled().contains("convention2"));
             assertEquals(1, configuration.getCommitMessageConventions().getItems().size());
-            assertEquals("expr2", configuration.getCommitMessageConventions().getItem("convention2").getExpression());
+            assertEquals("expr2", configuration.getCommitMessageConventions().getItems().get("convention2").getExpression());
         }
 
         @Test
@@ -1162,10 +1192,18 @@ public class ConfigurationTests {
             SimpleConfigurationLayer lowPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             SimpleConfigurationLayer highPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
-            lowPriorityConfigurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("type1"));
-            lowPriorityConfigurationLayerMock.getReleaseTypes().getItems().putAll(Map.<String,ReleaseType>of("type1", new ReleaseType(false, "{{branch1}}", "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{version}}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{version}}", new Identifiers(List.<String>of("build"), Map.<String,Identifier>of("PATH",new Identifier("build", "12", IdentifierPosition.BUILD))), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), "", Boolean.FALSE)));
-            highPriorityConfigurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("type2"));
-            highPriorityConfigurationLayerMock.getReleaseTypes().getItems().putAll(Map.<String,ReleaseType>of("type2", new ReleaseType(true, "{{branch2}}", "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{version}}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{version}}", new Identifiers(List.<String>of("build"), Map.<String,Identifier>of("PATH",new Identifier("build", "12", IdentifierPosition.BUILD))), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), "", Boolean.FALSE)));
+            lowPriorityConfigurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("type1"),
+                    Map.<String,ReleaseType>of("type1", new ReleaseType(false, "{{branch1}}", "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{version}}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{version}}", List.<Identifier>of(new Identifier("build", "12", Identifier.Position.BUILD)), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), "", Boolean.FALSE))
+                )
+            );
+            highPriorityConfigurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("type2"),
+                    Map.<String,ReleaseType>of("type2", new ReleaseType(true, "{{branch2}}", "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{version}}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{version}}", List.<Identifier>of(new Identifier("build", "12", Identifier.Position.BUILD)), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), "", Boolean.FALSE))
+                )
+            );
             
             // inject the command line configuration and test the new value is returned from that
             configuration.withPluginConfiguration(lowPriorityConfigurationLayerMock);
@@ -1176,24 +1214,23 @@ public class ConfigurationTests {
             assertEquals(1, configuration.getReleaseTypes().getEnabled().size());
             assertTrue(configuration.getReleaseTypes().getEnabled().contains("type2"));
             assertEquals(1, configuration.getReleaseTypes().getItems().size());
-            assertTrue(configuration.getReleaseTypes().getItem("type2").getCollapseVersions());
-            assertEquals("{{branch2}}", configuration.getReleaseTypes().getItem("type2").getCollapsedVersionQualifier());
-            assertEquals("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", configuration.getReleaseTypes().getItem("type2").getFilterTags());
-            assertEquals(Boolean.TRUE.toString(), configuration.getReleaseTypes().getItem("type2").getGitCommit());
-            assertEquals("Committing {{version}}", configuration.getReleaseTypes().getItem("type2").getGitCommitMessage());
-            assertEquals(Boolean.TRUE.toString(), configuration.getReleaseTypes().getItem("type2").getGitPush());
-            assertEquals(Boolean.TRUE.toString(), configuration.getReleaseTypes().getItem("type2").getGitTag());
-            assertEquals("Tagging {{version}}", configuration.getReleaseTypes().getItem("type2").getGitTagMessage());
-            assertNotNull(configuration.getReleaseTypes().getEnabled().contains("type2"));
-            assertNotNull(configuration.getReleaseTypes().getItem("type2").getIdentifiers());
-            assertFalse(configuration.getReleaseTypes().getItem("type2").getIdentifiers().getItems().isEmpty());
-            assertEquals("", configuration.getReleaseTypes().getItem("type2").getMatchBranches());
-            assertNotNull(configuration.getReleaseTypes().getItem("type1").getMatchEnvironmentVariables());
-            assertFalse(configuration.getReleaseTypes().getItem("type1").getMatchEnvironmentVariables().isEmpty());
-            assertNull(configuration.getReleaseTypes().getItem("type2").getMatchWorkspaceStatus());
-            assertEquals(Boolean.TRUE.toString(), configuration.getReleaseTypes().getItem("type2").getPublish());
-            assertEquals("", configuration.getReleaseTypes().getItem("type2").getVersionRange());
-            assertEquals(Boolean.FALSE, configuration.getReleaseTypes().getItem("type2").getVersionRangeFromBranchName());
+            assertTrue(configuration.getReleaseTypes().getItems().get("type2").getCollapseVersions());
+            assertEquals("{{branch2}}", configuration.getReleaseTypes().getItems().get("type2").getCollapsedVersionQualifier());
+            assertEquals("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", configuration.getReleaseTypes().getItems().get("type2").getFilterTags());
+            assertEquals(Boolean.TRUE.toString(), configuration.getReleaseTypes().getItems().get("type2").getGitCommit());
+            assertEquals("Committing {{version}}", configuration.getReleaseTypes().getItems().get("type2").getGitCommitMessage());
+            assertEquals(Boolean.TRUE.toString(), configuration.getReleaseTypes().getItems().get("type2").getGitPush());
+            assertEquals(Boolean.TRUE.toString(), configuration.getReleaseTypes().getItems().get("type2").getGitTag());
+            assertEquals("Tagging {{version}}", configuration.getReleaseTypes().getItems().get("type2").getGitTagMessage());
+            assertFalse(configuration.getReleaseTypes().getEnabled().contains("type1"));
+            assertTrue(configuration.getReleaseTypes().getEnabled().contains("type2"));
+            assertNull(configuration.getReleaseTypes().getItems().get("type1"));
+            assertNotNull(configuration.getReleaseTypes().getItems().get("type2").getIdentifiers());
+            assertFalse(configuration.getReleaseTypes().getItems().get("type2").getIdentifiers().isEmpty());
+            assertEquals("", configuration.getReleaseTypes().getItems().get("type2").getMatchBranches());
+            assertEquals(Boolean.TRUE.toString(), configuration.getReleaseTypes().getItems().get("type2").getPublish());
+            assertEquals("", configuration.getReleaseTypes().getItems().get("type2").getVersionRange());
+            assertEquals(Boolean.FALSE, configuration.getReleaseTypes().getItems().get("type2").getVersionRangeFromBranchName());
         }
 
         @Test

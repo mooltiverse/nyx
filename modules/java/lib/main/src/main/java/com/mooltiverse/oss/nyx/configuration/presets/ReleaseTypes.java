@@ -16,13 +16,10 @@
 package com.mooltiverse.oss.nyx.configuration.presets;
 
 import java.util.List;
-import java.util.Map;
 
-import com.mooltiverse.oss.nyx.data.Identifier;
-import com.mooltiverse.oss.nyx.data.IdentifierPosition;
-import com.mooltiverse.oss.nyx.data.Identifiers;
-import com.mooltiverse.oss.nyx.data.ReleaseType;
-import com.mooltiverse.oss.nyx.data.WorkspaceStatus;
+import com.mooltiverse.oss.nyx.entities.Identifier;
+import com.mooltiverse.oss.nyx.entities.ReleaseType;
+import com.mooltiverse.oss.nyx.entities.WorkspaceStatus;
 
 /**
  * This class provides reusable configuration chunks for release types.
@@ -110,7 +107,7 @@ public class ReleaseTypes {
             setGitPush(Boolean.FALSE.toString());
             setGitTag(Boolean.FALSE.toString());
             setGitTagMessage(null);
-            setIdentifiers(new Identifiers(List.<String>of("timestamp"), Map.<String,Identifier>of("timestamp", new Identifier("timestamp", "{{#timestampYYYYMMDDHHMMSS}}{{timestamp}}{{/timestampYYYYMMDDHHMMSS}}", IdentifierPosition.BUILD))));
+            setIdentifiers(List.<Identifier>of(new Identifier("timestamp", "{{#timestampYYYYMMDDHHMMSS}}{{timestamp}}{{/timestampYYYYMMDDHHMMSS}}", Identifier.Position.BUILD)));
             setMatchBranches(null);
             setMatchEnvironmentVariables(null);
             setMatchWorkspaceStatus(null);

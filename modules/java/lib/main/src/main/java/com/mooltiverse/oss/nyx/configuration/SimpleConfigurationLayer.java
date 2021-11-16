@@ -15,19 +15,14 @@
  */
 package com.mooltiverse.oss.nyx.configuration;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import com.mooltiverse.oss.nyx.data.CommitMessageConvention;
-import com.mooltiverse.oss.nyx.data.CommitMessageConventions;
-import com.mooltiverse.oss.nyx.data.ReleaseType;
-import com.mooltiverse.oss.nyx.data.ReleaseTypes;
-import com.mooltiverse.oss.nyx.data.Verbosity;
+import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
+import com.mooltiverse.oss.nyx.entities.EnabledItemsMap;
+import com.mooltiverse.oss.nyx.entities.ReleaseType;
+import com.mooltiverse.oss.nyx.entities.Verbosity;
 import com.mooltiverse.oss.nyx.version.Scheme;
 
 /**
- * A simple configuration layer, acting as a value holder for configuration options.
+ * A simple configuration layer, acting as a value holder for configuration options. This object allows read/write operations.
  */
 public class SimpleConfigurationLayer implements ConfigurationLayer {
     /**
@@ -38,7 +33,7 @@ public class SimpleConfigurationLayer implements ConfigurationLayer {
     /**
      * The value held by this object.
      */
-    private final SimpleCommitMessageConventions commitMessageConventions = new SimpleCommitMessageConventions();
+    private EnabledItemsMap<CommitMessageConvention> commitMessageConventions = new EnabledItemsMap<CommitMessageConvention>();
     
     /**
      * The value held by this object.
@@ -68,17 +63,17 @@ public class SimpleConfigurationLayer implements ConfigurationLayer {
     /**
      * The value held by this object.
      */
-    private String releasePrefix = null;
-
-    /**
-     * The value held by this object.
-     */
     private Boolean releaseLenient = null;
 
     /**
      * The value held by this object.
      */
-    private final SimpleReleaseTypes releaseTypes = new SimpleReleaseTypes();
+    private String releasePrefix = null;
+
+    /**
+     * The value held by this object.
+     */
+    private EnabledItemsMap<ReleaseType> releaseTypes = new EnabledItemsMap<ReleaseType>();
 
     /**
      * The value held by this object.
@@ -138,8 +133,17 @@ public class SimpleConfigurationLayer implements ConfigurationLayer {
      * {@inheritDoc}
      */
     @Override
-    public SimpleCommitMessageConventions getCommitMessageConventions() {
+    public EnabledItemsMap<CommitMessageConvention> getCommitMessageConventions() {
         return commitMessageConventions;
+    }
+
+    /**
+     * Sets the value for this option.
+     * 
+     * @param commitMessageConventions the value for this option.
+     */
+    public void setCommitMessageConventions(EnabledItemsMap<CommitMessageConvention> commitMessageConventions) {
+        this.commitMessageConventions = commitMessageConventions;
     }
 
     /**
@@ -197,7 +201,7 @@ public class SimpleConfigurationLayer implements ConfigurationLayer {
      * {@inheritDoc}
      */
     @Override
-    public String getInitialVersion(){
+    public String getInitialVersion() {
         return initialVersion;
     }
 
@@ -231,23 +235,6 @@ public class SimpleConfigurationLayer implements ConfigurationLayer {
      * {@inheritDoc}
      */
     @Override
-    public String getReleasePrefix() {
-        return releasePrefix;
-    }
-
-    /**
-     * Sets the value for this option.
-     * 
-     * @param releasePrefix the value for this option.
-     */
-    public void setReleasePrefix(String releasePrefix) {
-        this.releasePrefix = releasePrefix;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Boolean getReleaseLenient() {
         return releaseLenient;
     }
@@ -265,8 +252,34 @@ public class SimpleConfigurationLayer implements ConfigurationLayer {
      * {@inheritDoc}
      */
     @Override
-    public SimpleReleaseTypes getReleaseTypes() {
+    public String getReleasePrefix() {
+        return releasePrefix;
+    }
+
+    /**
+     * Sets the value for this option.
+     * 
+     * @param releasePrefix the value for this option.
+     */
+    public void setReleasePrefix(String releasePrefix) {
+        this.releasePrefix = releasePrefix;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public EnabledItemsMap<ReleaseType> getReleaseTypes() {
         return releaseTypes;
+    }
+
+    /**
+     * Sets the value for this option.
+     * 
+     * @param releaseTypes the value for this option.
+     */
+    public void setReleaseTypes(EnabledItemsMap<ReleaseType> releaseTypes) {
+        this.releaseTypes = releaseTypes;
     }
 
     /**
@@ -341,7 +354,7 @@ public class SimpleConfigurationLayer implements ConfigurationLayer {
      * {@inheritDoc}
      */
     @Override
-    public Verbosity getVerbosity(){
+    public Verbosity getVerbosity() {
         return verbosity;
     }
 
@@ -358,7 +371,7 @@ public class SimpleConfigurationLayer implements ConfigurationLayer {
      * {@inheritDoc}
      */
     @Override
-    public String getVersion(){
+    public String getVersion() {
         return version;
     }
 
@@ -369,115 +382,5 @@ public class SimpleConfigurationLayer implements ConfigurationLayer {
      */
     public void setVersion(String version) {
         this.version = version;
-    }
-
-    /**
-     * The value holder for commit message conventions.
-     */
-    public static class SimpleCommitMessageConventions implements CommitMessageConventions {
-        /**
-         * The value held by this object.
-         */
-        public List<String> enabled = null;
-
-        /**
-         * The value held by this object.
-         */
-        public final Map<String,CommitMessageConvention> items = new HashMap<String,CommitMessageConvention>();
-
-        /**
-         * Default constructor.
-         */
-        public SimpleCommitMessageConventions() {
-            super();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public List<String> getEnabled() {
-            return enabled;
-        }
-
-        /**
-         * Sets the value for this option.
-         * 
-         * @param enabled the value for this option.
-         */
-        public void setEnabled(List<String> enabled) {
-            this.enabled = enabled;
-        }
-    
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public Map<String,CommitMessageConvention> getItems() {
-            return items;
-        }
-    
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public CommitMessageConvention getItem(String name) {
-            return items.get(name);
-        }
-    }
-
-    /**
-     * The value holder for commit message conventions.
-     */
-    public static class SimpleReleaseTypes implements ReleaseTypes {
-        /**
-         * The value held by this object.
-         */
-        public List<String> enabled = null;
-
-        /**
-         * The value held by this object.
-         */
-        public final Map<String,ReleaseType> items = new HashMap<String,ReleaseType>();
-
-        /**
-         * Default constructor.
-         */
-        public SimpleReleaseTypes() {
-            super();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public List<String> getEnabled() {
-            return enabled;
-        }
-
-        /**
-         * Sets the value for this option.
-         * 
-         * @param enabled the value for this option.
-         */
-        public void setEnabled(List<String> enabled) {
-            this.enabled = enabled;
-        }
-    
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public Map<String,ReleaseType> getItems() {
-            return items;
-        }
-    
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public ReleaseType getItem(String name) {
-            return items.get(name);
-        }
     }
 }

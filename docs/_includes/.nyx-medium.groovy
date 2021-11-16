@@ -43,28 +43,25 @@ nyx {
         gitPush = 'false'
         gitTag = 'false'
         identifiers {
-          enabled = [ 'branch', 'commit', 'user', 'timestamp' ]
-          items {
-            branch {
-              position = 'BUILD'
-              qualifier = 'branch'
-              value = '{{#sanitize}}{{branch}}{{/sanitize}}'
-            }
-            commit {
-              position = 'BUILD'
-              qualifier = 'commit'
-              value = '{{#short7}}{{releaseScope.finalCommit}}{{/short7}}'
-            }
-            user {
-              position = 'BUILD'
-              qualifier = 'user'
-              value = '{{#sanitizeLower}}{{environment.user}}{{/sanitizeLower}}'
-            }
-            timestamp {
-              position = 'BUILD'
-              qualifier = 'timestamp'
-              value = '{{#timestampYYYYMMDDHHMMSS}}{{timestamp}}{{/timestampYYYYMMDDHHMMSS}}'
-            }
+          '0' {
+            position = 'BUILD'
+            qualifier = 'branch'
+            value = '{{#sanitize}}{{branch}}{{/sanitize}}'
+          }
+          '1' {
+            position = 'BUILD'
+            qualifier = 'commit'
+            value = '{{#short7}}{{releaseScope.finalCommit}}{{/short7}}'
+          }
+          '2' {
+            position = 'BUILD'
+            qualifier = 'timestamp'
+            value = '{{#timestampYYYYMMDDHHMMSS}}{{timestamp}}{{/timestampYYYYMMDDHHMMSS}}'
+          }
+          '3' {
+            position = 'BUILD'
+            qualifier = 'user'
+            value = '{{#sanitizeLower}}{{environment.user}}{{/sanitizeLower}}'
           }
         }
         publish = 'false'

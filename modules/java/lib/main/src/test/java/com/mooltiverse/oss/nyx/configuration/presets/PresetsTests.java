@@ -17,10 +17,10 @@ package com.mooltiverse.oss.nyx.configuration.presets;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.mooltiverse.oss.nyx.entities.IllegalPropertyException;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
 
 @DisplayName("Presets")
 public class PresetsTests {

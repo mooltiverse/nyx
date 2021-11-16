@@ -27,12 +27,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mooltiverse.oss.nyx.ReleaseException;
-import com.mooltiverse.oss.nyx.data.DataAccessException;
-import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
-import com.mooltiverse.oss.nyx.data.ReleaseType;
-import com.mooltiverse.oss.nyx.data.WorkspaceStatus;
+import com.mooltiverse.oss.nyx.entities.IllegalPropertyException;
+import com.mooltiverse.oss.nyx.entities.ReleaseType;
+import com.mooltiverse.oss.nyx.entities.WorkspaceStatus;
 import com.mooltiverse.oss.nyx.git.GitException;
 import com.mooltiverse.oss.nyx.git.Repository;
+import com.mooltiverse.oss.nyx.io.DataAccessException;
 import com.mooltiverse.oss.nyx.state.State;
 import com.mooltiverse.oss.nyx.template.Templates;
 
@@ -43,7 +43,7 @@ import com.mooltiverse.oss.nyx.template.Templates;
  * 
  * All implementing classes must have a public constructor that accept a {@link State} and a {@link Repository} parameter.
  */
-public abstract class AbstractCommand implements Command {
+abstract class AbstractCommand implements Command {
     /**
      * The private logger instance
      */
@@ -260,10 +260,10 @@ public abstract class AbstractCommand implements Command {
         logger.debug(COMMAND, "Resolving the release type among enabled ones: '{}'", String.join(", ", state().getConfiguration().getReleaseTypes().getEnabled()));
         for (String releaseTypeName: state().getConfiguration().getReleaseTypes().getEnabled()) {
             logger.debug(COMMAND, "Evaluating release type: '{}'", releaseTypeName);
-            ReleaseType releaseType = state().getConfiguration().getReleaseTypes().getItem(releaseTypeName);
+            ReleaseType releaseType = state().getConfiguration().getReleaseTypes().getItems().get(releaseTypeName);
 
             if (Objects.isNull(releaseType))
-                throw new ReleaseException(String.format("Release type '%s' is configured among enabled ones but is not configured", releaseTypeName));
+                throw new IllegalPropertyException(String.format("Release type '%s' is configured among enabled ones but is not configured", releaseTypeName));
             
             // evaluate the matching criteria: branch name
             if (Objects.isNull(releaseType.getMatchBranches()) || releaseType.getMatchBranches().isBlank())
@@ -276,7 +276,7 @@ public abstract class AbstractCommand implements Command {
                     logger.debug(COMMAND, "Release type '{}' specifies a match branches template '{}' that evaluates to regular expression: '{}'", releaseTypeName, releaseType.getMatchBranches(), matchBranchesRendered);
                     try {
                         if (Pattern.matches(matchBranchesRendered, getCurrentBranch()))
-                            logger.debug(COMMAND, "Current branch '{}' succesfully matched by release type '{}' matchBranches regular expression '{}'", getCurrentBranch(), releaseTypeName, matchBranchesRendered);
+                            logger.debug(COMMAND, "Current branch '{}' successfully matched by release type '{}' matchBranches regular expression '{}'", getCurrentBranch(), releaseTypeName, matchBranchesRendered);
                         else {
                             logger.debug(COMMAND, "Current branch '{}' not matched by release type '{}' matchBranches regular expression '{}'. Skipping release type '{}'", getCurrentBranch(), releaseTypeName, matchBranchesRendered, releaseTypeName);
                             continue;
@@ -307,7 +307,7 @@ public abstract class AbstractCommand implements Command {
                     String varVarueRegExp = releaseType.getMatchEnvironmentVariables().get(varName);
                     try {
                         if (Objects.isNull(varVarueRegExp) || varVarueRegExp.isBlank() || Pattern.matches(varVarueRegExp, varValue))
-                            logger.debug(COMMAND, "Environment variable '{}' value succesfully matched by release type '{}' regular expression '{}'", varName, releaseTypeName, varVarueRegExp);
+                            logger.debug(COMMAND, "Environment variable '{}' value successfully matched by release type '{}' regular expression '{}'", varName, releaseTypeName, varVarueRegExp);
                         else {
                             logger.debug(COMMAND, "Environment variable '{}' value not matched by release type '{}' regular expression '{}'", varName, releaseTypeName, varVarueRegExp);
                             mismatch = true;
@@ -330,7 +330,7 @@ public abstract class AbstractCommand implements Command {
                 logger.debug(COMMAND, "Release type '{}' does not specify any workspace status requirement", releaseTypeName);
             else {
                 if ((WorkspaceStatus.CLEAN.equals(releaseType.getMatchWorkspaceStatus()) && isRepositoryClean()) || (WorkspaceStatus.DIRTY.equals(releaseType.getMatchWorkspaceStatus()) && (!isRepositoryClean())))
-                    logger.debug(COMMAND, "Current repository status '{}' succesfully matched by release type '{}' matchWorkspaceStatus filter '{}'", isRepositoryClean() ? "CLEAN" : "DIRTY", releaseTypeName, releaseType.getMatchWorkspaceStatus().toString());
+                    logger.debug(COMMAND, "Current repository status '{}' successfully matched by release type '{}' matchWorkspaceStatus filter '{}'", isRepositoryClean() ? "CLEAN" : "DIRTY", releaseTypeName, releaseType.getMatchWorkspaceStatus().toString());
                 else {
                     logger.debug(COMMAND, "Current repository status '{}' not matched by release type '{}' matchWorkspaceStatus filter '{}'. Skipping release type '{}'", isRepositoryClean() ? "CLEAN" : "DIRTY", releaseTypeName, releaseType.getMatchWorkspaceStatus().toString(), releaseTypeName);
                     continue;

@@ -17,22 +17,20 @@ package com.mooltiverse.oss.nyx.gradle;
 
 import static org.gradle.api.Project.DEFAULT_VERSION;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 import com.mooltiverse.oss.nyx.configuration.Defaults;
-import com.mooltiverse.oss.nyx.data.CommitMessageConvention;
-import com.mooltiverse.oss.nyx.data.CommitMessageConventions;
-import com.mooltiverse.oss.nyx.data.Identifier;
-import com.mooltiverse.oss.nyx.data.Identifiers;
-import com.mooltiverse.oss.nyx.data.IdentifierPosition;
-import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
-import com.mooltiverse.oss.nyx.data.ReleaseType;
-import com.mooltiverse.oss.nyx.data.ReleaseTypes;
-import com.mooltiverse.oss.nyx.data.Verbosity;
-import com.mooltiverse.oss.nyx.data.WorkspaceStatus;
+import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
+import com.mooltiverse.oss.nyx.entities.Identifier;
+import com.mooltiverse.oss.nyx.entities.IllegalPropertyException;
+import com.mooltiverse.oss.nyx.entities.EnabledItemsMap;
+import com.mooltiverse.oss.nyx.entities.ReleaseType;
+import com.mooltiverse.oss.nyx.entities.Verbosity;
+import com.mooltiverse.oss.nyx.entities.WorkspaceStatus;
 import com.mooltiverse.oss.nyx.version.Scheme;
 
 /**
@@ -51,14 +49,14 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
     private final Object projectVersion;
 
     /**
-     * The private singleton instance of the commit message convention configuration block.
+     * The private instance of the commit message convention configuration section.
      */
-    private CommitMessageConventionsBlock commitMessageConventionsBlock = null;
+    private EnabledItemsMap<CommitMessageConvention> commitMessageConventionsSection = null;
 
     /**
-     * The private singleton instance of the release types configuration block.
+     * The private instance of the release types configuration section.
      */
-    private ReleaseTypesBlock releaseTypesBlock = null;
+    private EnabledItemsMap<ReleaseType> releaseTypesSection = null;
 
     /**
      * Standard constructor.
@@ -87,11 +85,24 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
      * {@inheritDoc}
      */
     @Override
-    public CommitMessageConventions getCommitMessageConventions() {
-        if (Objects.isNull(commitMessageConventionsBlock)) {
-            commitMessageConventionsBlock = new CommitMessageConventionsBlock();
+    public EnabledItemsMap<CommitMessageConvention> getCommitMessageConventions() {
+        if (Objects.isNull(commitMessageConventionsSection)) {
+            // the list property is always present and never null but is empty when the user doesn't define its contents
+            List<String> enabled = extension.getCommitMessageConventions().getEnabled().isPresent() && !extension.getCommitMessageConventions().getEnabled().get().isEmpty() ? extension.getCommitMessageConventions().getEnabled().get() : List.<String>of();
+
+            Map<String, CommitMessageConvention> items = new HashMap<String, CommitMessageConvention>(extension.getCommitMessageConventions().getItems().size());
+            // the map property is always present and never null but is empty when the user doesn't define its contents
+            if (!extension.getCommitMessageConventions().getItems().isEmpty()) {
+                for (NyxExtension.CommitMessageConventions.CommitMessageConvention convention: extension.getCommitMessageConventions().getItems()) {
+                    if (!items.containsKey(convention.getName())) {
+                        items.put(convention.getName(), new CommitMessageConvention(convention.getExpression().get(), convention.getBumpExpressions().isPresent() ? convention.getBumpExpressions().get() : Map.<String,String>of()));
+                    }
+                }
+            }
+
+            commitMessageConventionsSection = new EnabledItemsMap<CommitMessageConvention>(enabled, items);
         }
-        return commitMessageConventionsBlock;
+        return commitMessageConventionsSection;
     }
 
     /**
@@ -154,11 +165,51 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
      * {@inheritDoc}
      */
     @Override
-    public ReleaseTypes getReleaseTypes() {
-        if (Objects.isNull(releaseTypesBlock)) {
-            releaseTypesBlock = new ReleaseTypesBlock();
+    public EnabledItemsMap<ReleaseType> getReleaseTypes() {
+        if (Objects.isNull(releaseTypesSection)) {
+            // the list property is always present and never null but is empty when the user doesn't define its contents
+            List<String> enabled = extension.getReleaseTypes().getEnabled().isPresent() && !extension.getReleaseTypes().getEnabled().get().isEmpty() ? extension.getReleaseTypes().getEnabled().get() : List.<String>of();
+
+            Map<String, ReleaseType> items = new HashMap<String, ReleaseType>(extension.getReleaseTypes().getItems().size());
+            // the map property is always present and never null but is empty when the user doesn't define its contents
+            if (!extension.getReleaseTypes().getItems().isEmpty()) {
+                for (NyxExtension.ReleaseTypes.ReleaseType type: extension.getReleaseTypes().getItems()) {
+                    if (!items.containsKey(type.getName())) {
+                        List<Identifier> identifiers = new ArrayList<Identifier>();
+                        if (!Objects.isNull(type.getIdentifiers()) && !type.getIdentifiers().isEmpty()) {
+                            // Identifiers are modelled in a NamedDomainObjectContainer, which grants they are sorted by name
+                            for (NyxExtension.ReleaseTypes.ReleaseType.Identifier identifier: type.getIdentifiers()) {
+                                identifiers.add(new Identifier(
+                                    identifier.getQualifier().isPresent() ? identifier.getQualifier().get() : null,
+                                    identifier.getValue().isPresent() ? identifier.getValue().get() : null,
+                                    identifier.getPosition().isPresent() ? Identifier.Position.valueOf(identifier.getPosition().get()) : null)
+                                );
+                            }
+                        }
+                        items.put(type.getName(), new ReleaseType(
+                            type.getCollapseVersions().isPresent() ? type.getCollapseVersions().get() : Defaults.ReleaseType.COLLAPSE_VERSIONS,
+                            type.getCollapsedVersionQualifier().isPresent() ? type.getCollapsedVersionQualifier().get() : Defaults.ReleaseType.COLLAPSED_VERSION_QUALIFIER,
+                            type.getFilterTags().isPresent() ? type.getFilterTags().get() : Defaults.ReleaseType.FILTER_TAGS,
+                            type.getGitCommit().isPresent() ? type.getGitCommit().get() : Defaults.ReleaseType.GIT_COMMIT,
+                            type.getGitCommitMessage().isPresent() ? type.getGitCommitMessage().get() : Defaults.ReleaseType.GIT_COMMIT_MESSAGE,
+                            type.getGitPush().isPresent() ? type.getGitPush().get() : Defaults.ReleaseType.GIT_PUSH,
+                            type.getGitTag().isPresent() ? type.getGitTag().get() : Defaults.ReleaseType.GIT_TAG,
+                            type.getGitTagMessage().isPresent() ? type.getGitTagMessage().get() : Defaults.ReleaseType.GIT_TAG_MESSAGE,
+                            identifiers,
+                            type.getMatchBranches().isPresent() ? type.getMatchBranches().get() : Defaults.ReleaseType.MATCH_BRANCHES,
+                            type.getMatchEnvironmentVariables().isPresent() ? type.getMatchEnvironmentVariables().get() : Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES,
+                            type.getMatchWorkspaceStatus().isPresent() ? WorkspaceStatus.valueOf(type.getMatchWorkspaceStatus().get()) : Defaults.ReleaseType.MATCH_WORKSPACE_STATUS,
+                            type.getPublish().isPresent() ? type.getPublish().get() : Defaults.ReleaseType.PUBLISH,
+                            type.getVersionRange().isPresent() ? type.getVersionRange().get() : Defaults.ReleaseType.VERSION_RANGE,
+                            type.getVersionRangeFromBranchName().isPresent() ? type.getVersionRangeFromBranchName().get() : Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME
+                        ));
+                    }
+                }
+            }
+
+            releaseTypesSection = new EnabledItemsMap<ReleaseType>(enabled, items);
         }
-        return releaseTypesBlock;
+        return releaseTypesSection;
     }
 
     /**
@@ -231,158 +282,6 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
             return null;
         else {
             return projectVersion.toString();
-        }
-    }
-
-    /**
-     * The class implementing the {@link CommitMessageConventions} configuration block.
-     */
-    private class CommitMessageConventionsBlock implements CommitMessageConventions {
-        /**
-         * The local cache of resolved convention items.
-         */
-        private Map<String, CommitMessageConvention> items = null;
-
-        /**
-         * Default constructor is private on purpose.
-         */
-        private CommitMessageConventionsBlock() {
-            super();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public List<String> getEnabled() {
-            // the list property is always present and never null but is empty when the user doesn't define its contents
-            return extension.getCommitMessageConventions().getEnabled().isPresent() && !extension.getCommitMessageConventions().getEnabled().get().isEmpty() ? extension.getCommitMessageConventions().getEnabled().get() : null;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public Map<String,CommitMessageConvention> getItems() {
-            // the map property is always present and never null but is empty when the user doesn't define its contents
-            if (extension.getCommitMessageConventions().getItems().isEmpty())
-                return null;
-            else {
-                if (Objects.isNull(items))
-                    items = new HashMap<String, CommitMessageConvention>(extension.getCommitMessageConventions().getItems().size());
-
-                for (NyxExtension.CommitMessageConventions.CommitMessageConvention convention: extension.getCommitMessageConventions().getItems()) {
-                    if (!items.containsKey(convention.getName()))
-                        items.put(convention.getName(), getItem(convention.getName()));
-                }
-
-                return items;
-            }
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public CommitMessageConvention getItem(String name) {
-            NyxExtension.CommitMessageConventions.CommitMessageConvention convention = extension.getCommitMessageConventions().getItems().findByName(name);
-            return Objects.isNull(convention) ? null : new CommitMessageConvention(convention.getExpression().get(), convention.getBumpExpressions().isPresent() ? convention.getBumpExpressions().get() : Map.<String,String>of());
-        }
-    }
-
-    /**
-     * The class implementing the {@link ReleaseTypes} configuration block.
-     */
-    private class ReleaseTypesBlock implements ReleaseTypes {
-        /**
-         * The local cache of resolved release type items.
-         */
-        private Map<String, ReleaseType> items = null;
-
-        /**
-         * Default constructor is private on purpose.
-         */
-        private ReleaseTypesBlock() {
-            super();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public List<String> getEnabled() {
-            // the list property is always present and never null but is empty when the user doesn't define its contents
-            return extension.getReleaseTypes().getEnabled().isPresent() && !extension.getReleaseTypes().getEnabled().get().isEmpty() ? extension.getReleaseTypes().getEnabled().get() : null;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public Map<String,ReleaseType> getItems() {
-            // the map property is always present and never null but is empty when the user doesn't define its contents
-            if (extension.getReleaseTypes().getItems().isEmpty())
-                return null;
-            else {
-                if (Objects.isNull(items))
-                    items = new HashMap<String, ReleaseType>(extension.getReleaseTypes().getItems().size());
-
-                for (NyxExtension.ReleaseTypes.ReleaseType type: extension.getReleaseTypes().getItems()) {
-                    if (!items.containsKey(type.getName()))
-                        items.put(type.getName(), getItem(type.getName()));
-                }
-
-                return items;
-            }
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public ReleaseType getItem(String name) {
-            NyxExtension.ReleaseTypes.ReleaseType type = extension.getReleaseTypes().getItems().findByName(name);
-
-            if (Objects.isNull(type))
-                return null;
-            else {
-                Identifiers identifiers = null;
-                if (!Objects.isNull(type.getIdentifiers())) {
-                    Map<String,Identifier> items = null;
-                    if (!type.getIdentifiers().getItems().isEmpty()) {
-                        items = new HashMap<String,Identifier>(type.getIdentifiers().getItems().size());
-                        for (NyxExtension.ReleaseTypes.ReleaseType.Identifiers.Identifier identifier: type.getIdentifiers().getItems()) {
-                            if (!items.containsKey(identifier.getName()))
-                                items.put(identifier.getName(),
-                                    new Identifier(
-                                        identifier.getQualifier().isPresent() ? identifier.getQualifier().get() : null,
-                                        identifier.getValue().isPresent() ? identifier.getValue().get() : null,
-                                        identifier.getPosition().isPresent() ? IdentifierPosition.valueOf(identifier.getPosition().get()) : null)
-                                );
-                        }
-                    }
-                    identifiers = new Identifiers(
-                        type.getIdentifiers().getEnabled().isPresent() ? type.getIdentifiers().getEnabled().get() : null, items
-                    );
-                }
-                return new ReleaseType(
-                    type.getCollapseVersions().isPresent() ? type.getCollapseVersions().get() : Defaults.ReleaseType.COLLAPSE_VERSIONS,
-                    type.getCollapsedVersionQualifier().isPresent() ? type.getCollapsedVersionQualifier().get() : Defaults.ReleaseType.COLLAPSED_VERSION_QUALIFIER,
-                    type.getFilterTags().isPresent() ? type.getFilterTags().get() : Defaults.ReleaseType.FILTER_TAGS,
-                    type.getGitCommit().isPresent() ? type.getGitCommit().get() : Defaults.ReleaseType.GIT_COMMIT,
-                    type.getGitCommitMessage().isPresent() ? type.getGitCommitMessage().get() : Defaults.ReleaseType.GIT_COMMIT_MESSAGE,
-                    type.getGitPush().isPresent() ? type.getGitPush().get() : Defaults.ReleaseType.GIT_PUSH,
-                    type.getGitTag().isPresent() ? type.getGitTag().get() : Defaults.ReleaseType.GIT_TAG,
-                    type.getGitTagMessage().isPresent() ? type.getGitTagMessage().get() : Defaults.ReleaseType.GIT_TAG_MESSAGE,
-                    identifiers,
-                    type.getMatchBranches().isPresent() ? type.getMatchBranches().get() : Defaults.ReleaseType.MATCH_BRANCHES,
-                    type.getMatchEnvironmentVariables().isPresent() ? type.getMatchEnvironmentVariables().get() : Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES,
-                    type.getMatchWorkspaceStatus().isPresent() ? WorkspaceStatus.valueOf(type.getMatchWorkspaceStatus().get()) : Defaults.ReleaseType.MATCH_WORKSPACE_STATUS,
-                    type.getPublish().isPresent() ? type.getPublish().get() : Defaults.ReleaseType.PUBLISH,
-                    type.getVersionRange().isPresent() ? type.getVersionRange().get() : Defaults.ReleaseType.VERSION_RANGE,
-                    type.getVersionRangeFromBranchName().isPresent() ? type.getVersionRangeFromBranchName().get() : Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME
-                );
-            }
         }
     }
 }

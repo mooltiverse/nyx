@@ -28,24 +28,24 @@ import org.slf4j.LoggerFactory;
 
 import com.mooltiverse.oss.nyx.Nyx;
 import com.mooltiverse.oss.nyx.configuration.Configuration;
-import com.mooltiverse.oss.nyx.data.DataAccessException;
-import com.mooltiverse.oss.nyx.data.FileMapper;
-import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
-import com.mooltiverse.oss.nyx.data.ReleaseScope;
-import com.mooltiverse.oss.nyx.data.ReleaseType;
+import com.mooltiverse.oss.nyx.entities.IllegalPropertyException;
+import com.mooltiverse.oss.nyx.entities.ReleaseScope;
+import com.mooltiverse.oss.nyx.entities.ReleaseType;
+import com.mooltiverse.oss.nyx.io.DataAccessException;
+import com.mooltiverse.oss.nyx.io.FileMapper;
 import com.mooltiverse.oss.nyx.template.Templates;
 import com.mooltiverse.oss.nyx.version.Scheme;
 
 /**
  * The State class holds a number of attributes resulting from the execution of one or more command and so represents
  * the current status of a release process at a certain point in time.
- * 
+ * <br>
  * Each command updates the state object with new or modified attributes so the same state instance is shared among
  * all commands.
- * 
+ * <br>
  * There must be only one instance of this class for every execution and it's retrieved by {@link Nyx#state()}.
  */
-public class State implements Root {
+public class State {
     /**
      * The private logger instance
      */
@@ -62,7 +62,7 @@ public class State implements Root {
     private String bump = null;
 
     /**
-     * The private immutable instance of the configuration.
+     * The private instance of the configuration.
      */
     private Configuration configuration;
 
@@ -72,7 +72,7 @@ public class State implements Root {
     private  Map<String, String> internals = new HashMap<String, String>();
 
     /**
-     * The private immutable instance of the release scope.
+     * The private instance of the release scope.
      */
     private ReleaseScope releaseScope = new ReleaseScope();
 
@@ -82,7 +82,8 @@ public class State implements Root {
     private ReleaseType releaseType = null;
 
     /**
-     * The latest timestamp that was taken.
+     * The latest timestamp that was taken. This is initialized by default to the date and
+     * time the instance of this class has been created.
      */
     private Long timestamp = Long.valueOf(System.currentTimeMillis());
 
@@ -121,19 +122,16 @@ public class State implements Root {
         super();
         Objects.requireNonNull(configuration);
         this.configuration = configuration;
-        logger.debug(STATE, "New state object");
-
-        // initialize the timestamp
-        touchTimestamp();
+        logger.trace(STATE, "New state object");
     }
 
     /**
-     * Loads the state attributes from a previously saved state file. Note that not all attributes are loaded from the state file
-     * as many of them will still be retrieved live from the configuration.
+     * Loads the state attributes from a previously saved state file. All attributes are loaded from the given file
+     * but the nested configuration is replaced by the given one.
      * 
      * @param stateFile the file to load the state from
-     * @param configuration the configuration object to read values from. This object will be set as the {@link #getConfiguration()}
-     * of the newly instantiated object too.
+     * @param configuration the configuration object to use for the resumed state. This object will be set as the
+     * {@link #getConfiguration() configuration} of the returned instance.
      * 
      * @return the new state object deserialized from the given state file
      * 
@@ -148,9 +146,13 @@ public class State implements Root {
     }
 
     /**
-     * {@inheritDoc}
+     * Returns the current Git branch name.
+     * 
+     * @return the current Git branch name. This is {@code null} until {@link Nyx#infer()} has run.
+     * 
+     * @throws DataAccessException in case the attribute cannot be read or accessed.
+     * @throws IllegalPropertyException in case the attribute has been defined but has incorrect values or it can't be resolved.
      */
-    @Override
     public String getBranch()
         throws DataAccessException, IllegalPropertyException {
         return branch;
@@ -160,24 +162,43 @@ public class State implements Root {
      * Returns {@code true} if the scope has a non {@code null} branch name.
      * 
      * @return {@code true} if the scope has a non {@code null} branch name.
+     * 
+     * @throws DataAccessException in case the attribute cannot be read or accessed.
+     * @throws IllegalPropertyException in case the attribute has been defined but has incorrect values or it can't be resolved.
      */
-    public boolean hasBranch() {
-        return !Objects.isNull(branch);
+    public boolean hasBranch()
+        throws DataAccessException, IllegalPropertyException {
+        return !Objects.isNull(getBranch());
     }
 
     /**
      * Sets the current Git branch name
      * 
-     * @param branch the current Git branch name
+     * @param branch the current Git branch name. It may be {@code null} to reset any previous value.
+     * 
+     * @throws DataAccessException in case the attribute cannot be written or accessed.
+     * @throws IllegalPropertyException in case the attribute has incorrect values or it can't be resolved.
      */
-    public void setBranch(String branch) {
+    public void setBranch(String branch)
+        throws DataAccessException, IllegalPropertyException {
         this.branch = branch;
     }
 
     /**
-     * {@inheritDoc}
+     * Returns the version identifier to bump or bumped on the previous release to produce the new release, if any.
+     * This value is only available after {@link Nyx#infer()} has run unless it's overridden by the configuration,
+     * in which case the configuration value is returned.
+     * 
+     * @return the version identifier to bump or bumped on the previous release to produce the new release, if any.
+     * It may be {@code null} if no identifier has been bumped (i.e. because no significant changes have
+     * been detected in the release scope or because inference was inhibited by values overridden by user) and the
+     * configuration does not override this value.
+     * 
+     * @throws DataAccessException in case the attribute cannot be read or accessed.
+     * @throws IllegalPropertyException in case the attribute has been defined but has incorrect values or it can't be resolved.
+     * 
+     * @see Configuration#getBump()
      */
-    @Override
     public String getBump()
         throws DataAccessException, IllegalPropertyException {
         return Objects.isNull(getConfiguration().getBump()) ? bump : getConfiguration().getBump();
@@ -190,8 +211,8 @@ public class State implements Root {
      * @return {@code true} if the scope has a non {@code null} version identifier
      * to bump or bumped on the previous release to produce the new release.
      * 
-     * @throws DataAccessException in case the state file cannot be read or accessed.
-     * @throws IllegalPropertyException in case the state file has incorrect values.
+     * @throws DataAccessException in case the attribute cannot be read or accessed.
+     * @throws IllegalPropertyException in case the attribute has been defined but has incorrect values or it can't be resolved.
      */
     public boolean hasBump()
         throws DataAccessException, IllegalPropertyException {
@@ -207,12 +228,10 @@ public class State implements Root {
      * 
      * @param bump the identifier to bump
      * 
-     * @throws DataAccessException in case the state file cannot be read or accessed.
-     * @throws IllegalPropertyException in case the state file has incorrect values.
-     * @throws IllegalStateException if the {@link #getConfiguration() configuration} has a value for the
+     * @throws DataAccessException in case the attribute cannot be written or accessed.
+     * @throws IllegalPropertyException in case the attribute has incorrect values or it can't be resolved.
+     * @throws IllegalStateException if the {@link #getConfiguration() configuration} already has a value for the
      * {@link Configuration#getBump() bump} attribute.
-     * 
-     * @see Configuration#getBump()
      */
     public void setBump(String bump)
         throws DataAccessException, IllegalPropertyException, IllegalStateException {
@@ -222,34 +241,65 @@ public class State implements Root {
     }
 
     /**
-     * {@inheritDoc}
+     * Returns the configuration object. The configuration is a live reference.
+     * 
+     * @return the configuration object.
      */
-    @Override
     public Configuration getConfiguration() {
         return configuration;
     }
 
     /**
-     * {@inheritDoc}
+     * Returns the directory used as the working directory as it's defined by the configuration.
+     * 
+     * @return the current value for this attribute.
+     * 
+     * @throws DataAccessException in case the attribute cannot be read or accessed.
+     * @throws IllegalPropertyException in case the attribute has been defined but has incorrect values or it can't be resolved.
+     * 
+     * @see Configuration#getDirectory()
      */
-    @Override
     public File getDirectory()
         throws DataAccessException, IllegalPropertyException {
         return new File(getConfiguration().getDirectory());
     }
 
     /**
-     * {@inheritDoc}
+     * Returns the live map of internal attributes.
+     * 
+     * Internal attributes are not documented so they must not be used by users as the implementation may change
+     * them at any time. Commands and other implementation objects are free to store and remove their own
+     * attributes here (i.e. for caching or store their internal state).
+     * 
+     * When handling these attributes, entities must make sure the names (keys) do not overlap, unless for
+     * shared attributes.
+     * 
+     * This object takes no control over the values stored in this map.
+     * 
+     * Sensitive informations must not be stored here as they would be exposed when marshalling the attributes
+     * to files.
+     * 
+     * @return the live map of internal attributes. The returned map is never {@code null}
      */
-    @Override
     public Map<String, String> getInternals() {
         return internals;
     }
 
     /**
-     * {@inheritDoc}
+     * Returns {@code true} if the version ({@link #getVersion()}) is different than the previous version
+     * ({@link #getReleaseScope()}{@link ReleaseScope#getPreviousVersion()}) and a new release has to be
+     * published on the new version.
+     * 
+     * @return {@code true} if the version is new and has to be released.
+     * 
+     * @throws DataAccessException in case the attribute cannot be read or accessed.
+     * @throws IllegalPropertyException in case the attribute has been defined but has incorrect values or it can't be resolved.
+     * 
+     * @see #getVersion()
+     * @see #getReleaseScope()
+     * @see ReleaseScope#getPreviousVersion()
+     * @see Configuration#getVersion()
      */
-    @Override
     public Boolean getNewRelease()
         throws DataAccessException, IllegalPropertyException {
         if (Objects.isNull(releaseType))
@@ -263,9 +313,19 @@ public class State implements Root {
     }
 
     /**
-     * {@inheritDoc}
+     * Returns {@code true} if the version ({@link #getVersion()}) is different than the previous version
+     * ({@link #getReleaseScope()}{@link ReleaseScope#getPreviousVersion()}).
+     * 
+     * @return {@code true} if the version is new.
+     * 
+     * @throws DataAccessException in case the attribute cannot be read or accessed.
+     * @throws IllegalPropertyException in case the attribute has been defined but has incorrect values or it can't be resolved.
+     * 
+     * @see #getVersion()
+     * @see #getReleaseScope()
+     * @see ReleaseScope#getPreviousVersion()
+     * @see Configuration#getVersion()
      */
-    @Override
     public Boolean getNewVersion()
         throws DataAccessException, IllegalPropertyException {
         if (hasVersion()) {
@@ -285,18 +345,24 @@ public class State implements Root {
     }
 
     /**
-     * {@inheritDoc}
+     * Returns the object modelling the attributes defining the scope of the release.
+     * 
+     * @return the current value for this attribute.
      */
-    @Override
     public ReleaseScope getReleaseScope() {
         return releaseScope;
     }
 
     /**
-     * {@inheritDoc}
+     * Returns the object modelling the attributes defining the type of the release.
+     * 
+     * @return the current value for this attribute.
+     * 
+     * @throws DataAccessException in case the attribute cannot be read or accessed.
+     * @throws IllegalPropertyException in case the attribute has been defined but has incorrect values or it can't be resolved.
      */
-    @Override
-    public ReleaseType getReleaseType() {
+    public ReleaseType getReleaseType()
+        throws DataAccessException, IllegalPropertyException {
         return releaseType;
     }
 
@@ -305,8 +371,8 @@ public class State implements Root {
      * 
      * @return {@code true} if the scope has a non {@code null} release type set.
      * 
-     * @throws DataAccessException in case the state file cannot be read or accessed.
-     * @throws IllegalPropertyException in case the state file has incorrect values.
+     * @throws DataAccessException in case the attribute cannot be read or accessed.
+     * @throws IllegalPropertyException in case the attribute has been defined but has incorrect values or it can't be resolved.
      */
     public boolean hasReleaseType()
         throws DataAccessException, IllegalPropertyException {
@@ -317,25 +383,38 @@ public class State implements Root {
      * Sets the selected release type.
      * 
      * @param releaseType the selected release type.
+     * 
+     * @throws DataAccessException in case the attribute cannot be written or accessed.
+     * @throws IllegalPropertyException in case the attribute has incorrect values or it can't be resolved.
      */
-    public void setReleaseType(ReleaseType releaseType) {
+    public void setReleaseType(ReleaseType releaseType)
+        throws DataAccessException, IllegalPropertyException {
         this.releaseType = releaseType;
     }
 
     /**
-     * {@inheritDoc}
+     * Returns the versioning scheme used as it's defined by the configuration.
+     * 
+     * @return the current value for this attribute.
+     * 
+     * @throws DataAccessException in case the attribute cannot be read or accessed.
+     * @throws IllegalPropertyException in case the attribute has been defined but has incorrect values or it can't be resolved.
      */
-    @Override
     public Scheme getScheme()
         throws DataAccessException, IllegalPropertyException {
         return getConfiguration().getScheme();
     }
 
     /**
-     * {@inheritDoc}
+     * Returns the current timestamp.
+     * 
+     * @return the current timestamp.
+     * 
+     * @throws DataAccessException in case the attribute cannot be read or accessed.
+     * @throws IllegalPropertyException in case the attribute has been defined but has incorrect values or it can't be resolved.
      */
-    @Override
-    public Long getTimestamp() {
+    public Long getTimestamp()
+        throws DataAccessException, IllegalPropertyException {
         return timestamp;
     }
 
@@ -343,15 +422,30 @@ public class State implements Root {
      * Sets the state timestamp.
      * 
      * @param timestamp the state timestamp.
+     * 
+     * @throws DataAccessException in case the attribute cannot be written or accessed.
+     * @throws IllegalPropertyException in case the attribute has incorrect values or it can't be resolved.
      */
-    public void setTimestamp(Long timestamp) {
+    public void setTimestamp(Long timestamp)
+        throws DataAccessException, IllegalPropertyException {
         this.timestamp = timestamp;
     }
 
     /**
-     * {@inheritDoc}
+     * Returns the version inferred by Nyx, if any. If the version was overridden by configuration this will be the
+     * same as {@link Configuration#getVersion()}. This value is only available after {@link Nyx#infer()} has run.
+     * <br>
+     * The returned version also has the configured prefix, if any.
+     * 
+     * @return the current version inferred by Nyx. This is {@code null} until {@link Nyx#infer()} has run.
+     * 
+     * @throws DataAccessException in case the attribute cannot be read or accessed.
+     * @throws IllegalPropertyException in case the attribute has been defined but has incorrect values or it can't be resolved.
+     * 
+     * @see #getNewRelease()
+     * @see #getNewVersion()
+     * @see Configuration#getVersion()
      */
-    @Override
     public String getVersion() 
         throws DataAccessException, IllegalPropertyException {
         return Objects.isNull(getConfiguration().getVersion()) ? version : getConfiguration().getVersion();
@@ -362,8 +456,8 @@ public class State implements Root {
      * 
      * @return {@code true} if the scope has a non {@code null} version.
      * 
-     * @throws DataAccessException in case the state file cannot be read or accessed.
-     * @throws IllegalPropertyException in case the state file has incorrect values.
+     * @throws DataAccessException in case the attribute cannot be read or accessed.
+     * @throws IllegalPropertyException in case the attribute has been defined but has incorrect values or it can't be resolved.
      */
     public boolean hasVersion()
         throws DataAccessException, IllegalPropertyException {
@@ -379,8 +473,8 @@ public class State implements Root {
      * 
      * @param version the version inferred by Nyx.
      * 
-     * @throws DataAccessException in case the state file cannot be read or accessed.
-     * @throws IllegalPropertyException in case the state file has incorrect values.
+     * @throws DataAccessException in case the attribute cannot be written or accessed.
+     * @throws IllegalPropertyException in case the attribute has incorrect values or it can't be resolved.
      * @throws IllegalStateException if the {@link #getConfiguration() configuration} has a value for the
      * {@link Configuration#getVersion() version} attribute.
      * 
@@ -394,9 +488,24 @@ public class State implements Root {
     }
 
     /**
-     * {@inheritDoc}
+     * Returns the regular expression that is used to check whether or not the {@link #getVersion() version} is within a certain
+     * range. This value is only available after {@link Nyx#infer()} has run.
+     * <br>
+     * This attribute has a value only if {@link ReleaseType#getVersionRange() version range} or
+     * {@link ReleaseType#getVersionRangeFromBranchName() version range from branch name} are enabled. If
+     * {@link ReleaseType#getVersionRange() version range} has a value then this attribute has the same value, otherwise if
+     * {@link ReleaseType#getVersionRangeFromBranchName() version range from branch name} is {@code true} this value has the dynamically
+     * generated regular expression inferred from the branch name.
+     * 
+     * @return the regular expression that is used to check whether or not the {@link #getVersion() version} is within a certain
+     * range. This is {@code null} until {@link Nyx#infer()} has run.
+     * 
+     * @throws DataAccessException in case the attribute cannot be read or accessed.
+     * @throws IllegalPropertyException in case the attribute has been defined but has incorrect values or it can't be resolved.
+     * 
+     * @see ReleaseType#getVersionRange()
+     * @see ReleaseType#getVersionRangeFromBranchName()
      */
-    @Override
     public String getVersionRange()
         throws DataAccessException, IllegalPropertyException {
         return versionRange;
@@ -406,8 +515,12 @@ public class State implements Root {
      * Returns {@code true} if the scope has a non {@code null} version range.
      * 
      * @return {@code true} if the scope has a non {@code null} version range.
+     * 
+     * @throws DataAccessException in case the attribute cannot be read or accessed.
+     * @throws IllegalPropertyException in case the attribute has been defined but has incorrect values or it can't be resolved.
      */
-    public boolean hasVersionRange() {
+    public boolean hasVersionRange()
+        throws DataAccessException, IllegalPropertyException {
         return !Objects.isNull(versionRange);
     }
 
@@ -415,8 +528,12 @@ public class State implements Root {
      * Sets the regular expression used to check the version against a range constraint.
      * 
      * @param versionRange the regular expression used to check the version against a range constraint.
+     * 
+     * @throws DataAccessException in case the attribute cannot be written or accessed.
+     * @throws IllegalPropertyException in case the attribute has incorrect values or it can't be resolved.
      */
-    public void setVersionRange(String versionRange) {
+    public void setVersionRange(String versionRange)
+        throws DataAccessException, IllegalPropertyException {
         this.versionRange = versionRange;
     }
 

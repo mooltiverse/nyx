@@ -120,7 +120,7 @@ public class Workbench {
      */
     public Workbench(boolean initialize)
         throws Exception {
-        this(FileSystemUtil.newTempDirectory(null, null), false, initialize);
+        this(FileSystemUtil.newTempDirectory(null, "nyx-test-workbench-"), false, initialize);
     }
 
     /**
@@ -422,7 +422,19 @@ public class Workbench {
      */
     public void stage()
         throws Exception {
-        git.add().setUpdate(false).addFilepattern(".").call();
+        stage(".");
+    }
+
+    /**
+     * Adds files matched by the given pattern to the staging area, without committing.
+     * 
+     * @param pattern the pattern of the files to stage (i.e. {@code .} to stage anything)
+     * 
+     * @throws Exception in case of any issue
+     */
+    public void stage(String pattern)
+        throws Exception {
+        git.add().setUpdate(false).addFilepattern(pattern).call();
     }
 
     /**

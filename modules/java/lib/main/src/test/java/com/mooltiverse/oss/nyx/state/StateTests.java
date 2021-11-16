@@ -18,8 +18,13 @@ package com.mooltiverse.oss.nyx.state;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
+import java.io.FileReader;
+import java.io.StringWriter;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.SimpleTimeZone;
 import java.util.Objects;
 
 import org.junit.jupiter.api.DisplayName;
@@ -28,15 +33,40 @@ import org.junit.jupiter.api.Test;
 
 import com.mooltiverse.oss.nyx.configuration.Configuration;
 import com.mooltiverse.oss.nyx.configuration.SimpleConfigurationLayer;
-import com.mooltiverse.oss.nyx.data.FileMapper;
-import com.mooltiverse.oss.nyx.data.Identifier;
-import com.mooltiverse.oss.nyx.data.Identifiers;
-import com.mooltiverse.oss.nyx.data.IdentifierPosition;
-import com.mooltiverse.oss.nyx.data.ReleaseType;
-import com.mooltiverse.oss.nyx.data.WorkspaceStatus;
+import com.mooltiverse.oss.nyx.configuration.presets.CommitMessageConventions;
+import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
+import com.mooltiverse.oss.nyx.entities.EnabledItemsMap;
+import com.mooltiverse.oss.nyx.entities.Identifier;
+import com.mooltiverse.oss.nyx.entities.ReleaseType;
+import com.mooltiverse.oss.nyx.entities.WorkspaceStatus;
+import com.mooltiverse.oss.nyx.entities.git.Action;
+import com.mooltiverse.oss.nyx.entities.git.Commit;
+import com.mooltiverse.oss.nyx.entities.git.Identity;
+import com.mooltiverse.oss.nyx.entities.git.Message;
+import com.mooltiverse.oss.nyx.entities.git.Tag;
+import com.mooltiverse.oss.nyx.entities.git.TimeStamp;
+import com.mooltiverse.oss.nyx.io.FileMapper;
 
 @DisplayName("State")
 public class StateTests {
+    /**
+     * Reads the contents of the given file and returns its content as a string.
+     * 
+     * @param file the file to read
+     * 
+     * @return the file content
+     * 
+     * @throws Exception in case of any issue
+     */
+    private String readFile(File file)
+        throws Exception {
+        StringWriter buffer = new StringWriter();
+        FileReader reader = new FileReader(file);
+        reader.transferTo(buffer);
+        reader.close();
+        return buffer.toString();
+    }
+
     @Nested
     @DisplayName("Constructor")
     class ConstructorTests {
@@ -333,29 +363,38 @@ public class StateTests {
     }
 
     @Nested
-    @DisplayName("Resume")
+    @DisplayName("Save and Resume")
     class ResumeTests {
         @Test
-        @DisplayName("State.resume()")
-        void resumeTest()
+        @DisplayName("Save and Load JSON state")
+        void saveAndResumeJSONTest()
             throws Exception {
             Configuration configuration = new Configuration();
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("conventionalCommits"),
+                    Map.<String,CommitMessageConvention>of("conventionalCommits", CommitMessageConventions.CONVENTIONAL_COMMITS)
+                )
+            );
             configurationLayerMock.setResume(Boolean.TRUE);
             configurationLayerMock.setStateFile(new File(System.getProperty("java.io.tmpdir"), "state"+this.hashCode()+".json").getAbsolutePath());
             configuration.withCommandLineConfiguration(configurationLayerMock);
             State oldState = new State(configuration);
 
+            Commit initialCommit = new Commit("b50926577d36f403f4b3ebf51dfe34660b52eaa2", 1580515200, List.<String>of(), new Action(new Identity("Jim", "jim@example.com"), new TimeStamp(new Date(1580515200), new SimpleTimeZone(SimpleTimeZone.UTC_TIME, "America/Los_Angeles"))), new Action(new Identity("Jim", "jim@example.com"), new TimeStamp(new Date(1580515200), new SimpleTimeZone(SimpleTimeZone.UTC_TIME, "America/Los_Angeles"))), new Message("initial commit", "initial commit", Map.<String,String>of()), Set.<Tag>of());
+            Commit finalCommit = new Commit("e6b1c65eac4d81aadde22e796bb2a8e48da4c5d9", 1580515200, List.<String>of("b50926577d36f403f4b3ebf51dfe34660b52eaa2"), new Action(new Identity("Jim", "jim@example.com"), new TimeStamp(new Date(1580601600), new SimpleTimeZone(SimpleTimeZone.UTC_TIME, "America/Los_Angeles"))), new Action(new Identity("Jim", "jim@example.com"), new TimeStamp(new Date(1580601600), new SimpleTimeZone(SimpleTimeZone.UTC_TIME, "America/Los_Angeles"))), new Message("final commit", "final commit", Map.<String,String>of()), Set.<Tag>of());
+
             // set a few values to use later on for comparison
             oldState.setVersion("3.5.7");
             oldState.setVersionRange(".*");
             oldState.getInternals().put("attr1", "value1");
-            oldState.getReleaseScope().getCommits().add("final");
-            oldState.getReleaseScope().getCommits().add("initial");
-            oldState.getReleaseScope().setPreviousVersion("previous");
-            oldState.getReleaseScope().setPreviousVersionCommit("previousCommit");
-            oldState.getReleaseScope().setPrimeVersion("prime");
-            oldState.getReleaseScope().setPrimeVersionCommit("primeCommit");
+            oldState.getReleaseScope().getCommits().add(finalCommit);
+            oldState.getReleaseScope().getCommits().add(initialCommit);
+            oldState.getReleaseScope().setPreviousVersion("4.5.6");
+            oldState.getReleaseScope().setPreviousVersionCommit(new Commit("05cbfd58fadbec3d96b220a0054d96875aa37011", 1577833200, List.<String>of("c97e4b3d0ffed8405a6b50460a1bf0177f0fde1f"), new Action(new Identity("Jim", "jim@example.com"), new TimeStamp(new Date(1577833200), new SimpleTimeZone(SimpleTimeZone.UTC_TIME, "America/Los_Angeles"))), new Action(new Identity("Jim", "jim@example.com"), new TimeStamp(new Date(1577833200), new SimpleTimeZone(SimpleTimeZone.UTC_TIME, "America/Los_Angeles"))), new Message("fix: a commit that fixes something", "fix: a commit that fixes something", Map.<String,String>of()), Set.<Tag>of(new Tag("4.5.6", "05cbfd58fadbec3d96b220a0054d96875aa37011", false))));
+            oldState.getReleaseScope().setPrimeVersion("1.0.0");
+            oldState.getReleaseScope().setPrimeVersionCommit(new Commit("e8fa442504d91a0187865c74093a5a4212a805f9", 1577836800, List.<String>of("2e348e90e5e1b89c678555459aecbfc34e17ef44"), new Action(new Identity("Jim", "jim@example.com"), new TimeStamp(new Date(1577836800), new SimpleTimeZone(SimpleTimeZone.UTC_TIME, "America/Los_Angeles"))), new Action(new Identity("Jim", "jim@example.com"), new TimeStamp(new Date(1577836800), new SimpleTimeZone(SimpleTimeZone.UTC_TIME, "America/Los_Angeles"))), new Message("feat: a commit that adds a feature", "feat: a commit that adds a feature", Map.<String,String>of()), Set.<Tag>of(new Tag("1.0.0", "e8fa442504d91a0187865c74093a5a4212a805f9", false))));
             oldState.setReleaseType(new ReleaseType());
             oldState.getReleaseType().setCollapseVersions(true);
             oldState.getReleaseType().setCollapsedVersionQualifier("rel");
@@ -364,7 +403,7 @@ public class StateTests {
             oldState.getReleaseType().setGitPush(Boolean.TRUE.toString());
             oldState.getReleaseType().setGitTag(Boolean.TRUE.toString());
             oldState.getReleaseType().setGitTagMessage("Tag message");
-            oldState.getReleaseType().setIdentifiers(new Identifiers(List.<String>of("build"), Map.<String,Identifier>of("build", new Identifier("b", "12", IdentifierPosition.BUILD))));
+            oldState.getReleaseType().setIdentifiers(List.<Identifier>of(new Identifier("b", "12", Identifier.Position.BUILD)));
             oldState.getReleaseType().setMatchBranches(".*");
             oldState.getReleaseType().setMatchEnvironmentVariables(Map.<String,String>of("USER", ".*", "PATH", ".*"));
             oldState.getReleaseType().setMatchWorkspaceStatus(WorkspaceStatus.CLEAN);
@@ -374,7 +413,16 @@ public class StateTests {
 
             // save the file
             FileMapper.save(configurationLayerMock.getStateFile(), oldState);
-            assertTrue(new File(configurationLayerMock.getStateFile()).exists());
+            File stateFile = new File(configurationLayerMock.getStateFile());
+            assertTrue(stateFile.exists());
+
+            // print the file to standard output for inspection purpose
+            System.out.println("------ JSON state ------");
+            System.out.println("Loading from: "+stateFile.getAbsolutePath());
+            System.out.println("-----------------------------------------");
+            System.out.println(readFile(stateFile));
+            System.out.println("-----------------------------------------");
+            System.out.flush();
 
             // now we are ready to resume the file
             State resumedState = State.resume(new File(configurationLayerMock.getStateFile()), configuration);
@@ -382,12 +430,12 @@ public class StateTests {
             assertEquals(oldState.getInternals(), resumedState.getInternals());
             assertTrue(resumedState.getInternals().containsKey("attr1"));
             assertEquals("value1", resumedState.getInternals().get("attr1"));
-            assertEquals(oldState.getReleaseScope().getFinalCommit(), resumedState.getReleaseScope().getFinalCommit());
-            assertEquals(oldState.getReleaseScope().getInitialCommit(), resumedState.getReleaseScope().getInitialCommit());
+            assertEquals(oldState.getReleaseScope().getFinalCommit().getSHA(), resumedState.getReleaseScope().getFinalCommit().getSHA());
+            assertEquals(oldState.getReleaseScope().getInitialCommit().getSHA(), resumedState.getReleaseScope().getInitialCommit().getSHA());
             assertEquals(oldState.getReleaseScope().getPreviousVersion(), resumedState.getReleaseScope().getPreviousVersion());
-            assertEquals(oldState.getReleaseScope().getPreviousVersionCommit(), resumedState.getReleaseScope().getPreviousVersionCommit());
+            assertEquals(oldState.getReleaseScope().getPreviousVersionCommit().getSHA(), resumedState.getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals(oldState.getReleaseScope().getPrimeVersion(), resumedState.getReleaseScope().getPrimeVersion());
-            assertEquals(oldState.getReleaseScope().getPrimeVersionCommit(), resumedState.getReleaseScope().getPrimeVersionCommit());
+            assertEquals(oldState.getReleaseScope().getPrimeVersionCommit().getSHA(), resumedState.getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(oldState.getTimestamp(), resumedState.getTimestamp());
             assertEquals(oldState.getVersion(), resumedState.getVersion());
             assertEquals(oldState.getVersionRange(), resumedState.getVersionRange());
@@ -402,10 +450,111 @@ public class StateTests {
                 assertEquals(oldState.getReleaseType().getIdentifiers(), resumedState.getReleaseType().getIdentifiers());
             }
             else {
-                assertEquals(oldState.getReleaseType().getIdentifiers().getEnabled().size(), resumedState.getReleaseType().getIdentifiers().getEnabled().size());
-                assertTrue(oldState.getReleaseType().getIdentifiers().getEnabled().containsAll(resumedState.getReleaseType().getIdentifiers().getEnabled()));
-                assertEquals(oldState.getReleaseType().getIdentifiers().getItems().size(), resumedState.getReleaseType().getIdentifiers().getItems().size());
-                assertTrue(oldState.getReleaseType().getIdentifiers().getItems().keySet().containsAll(resumedState.getReleaseType().getIdentifiers().getItems().keySet()));
+                for (int i=0; i<oldState.getReleaseType().getIdentifiers().size(); i++) {
+                    assertEquals(oldState.getReleaseType().getIdentifiers().get(i).getQualifier(), resumedState.getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(oldState.getReleaseType().getIdentifiers().get(i).getValue(), resumedState.getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(oldState.getReleaseType().getIdentifiers().get(i).getPosition(), resumedState.getReleaseType().getIdentifiers().get(i).getPosition());
+                }
+            }
+            assertEquals(oldState.getReleaseType().getMatchBranches(), resumedState.getReleaseType().getMatchBranches());
+            assertEquals(oldState.getReleaseType().getMatchEnvironmentVariables().size(), resumedState.getReleaseType().getMatchEnvironmentVariables().size());
+            assertEquals(oldState.getReleaseType().getMatchWorkspaceStatus(), resumedState.getReleaseType().getMatchWorkspaceStatus());
+            assertEquals(oldState.getReleaseType().getPublish(), resumedState.getReleaseType().getPublish());
+            assertEquals(oldState.getReleaseType().getVersionRange(), resumedState.getReleaseType().getVersionRange());
+            assertEquals(oldState.getReleaseType().getVersionRangeFromBranchName(), resumedState.getReleaseType().getVersionRangeFromBranchName());
+        }
+
+        @Test
+        @DisplayName("Save and Load YAML state")
+        void saveAndResumeYAMLTest()
+            throws Exception {
+            Configuration configuration = new Configuration();
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("conventionalCommits"),
+                    Map.<String,CommitMessageConvention>of("conventionalCommits", CommitMessageConventions.CONVENTIONAL_COMMITS)
+                )
+            );
+            configurationLayerMock.setResume(Boolean.TRUE);
+            configurationLayerMock.setStateFile(new File(System.getProperty("java.io.tmpdir"), "state"+this.hashCode()+".yaml").getAbsolutePath());
+            configuration.withCommandLineConfiguration(configurationLayerMock);
+            State oldState = new State(configuration);
+
+            Commit initialCommit = new Commit("b50926577d36f403f4b3ebf51dfe34660b52eaa2", 1580515200, List.<String>of(), new Action(new Identity("Jim", "jim@example.com"), new TimeStamp(new Date(1580515200), new SimpleTimeZone(SimpleTimeZone.UTC_TIME, "America/Los_Angeles"))), new Action(new Identity("Jim", "jim@example.com"), new TimeStamp(new Date(1580515200), new SimpleTimeZone(SimpleTimeZone.UTC_TIME, "America/Los_Angeles"))), new Message("initial commit", "initial commit", Map.<String,String>of()), Set.<Tag>of());
+            Commit finalCommit = new Commit("e6b1c65eac4d81aadde22e796bb2a8e48da4c5d9", 1580515200, List.<String>of("b50926577d36f403f4b3ebf51dfe34660b52eaa2"), new Action(new Identity("Jim", "jim@example.com"), new TimeStamp(new Date(1580601600), new SimpleTimeZone(SimpleTimeZone.UTC_TIME, "America/Los_Angeles"))), new Action(new Identity("Jim", "jim@example.com"), new TimeStamp(new Date(1580601600), new SimpleTimeZone(SimpleTimeZone.UTC_TIME, "America/Los_Angeles"))), new Message("final commit", "final commit", Map.<String,String>of()), Set.<Tag>of());
+
+            // set a few values to use later on for comparison
+            oldState.setVersion("3.5.7");
+            oldState.setVersionRange(".*");
+            oldState.getInternals().put("attr1", "value1");
+            oldState.getReleaseScope().getCommits().add(finalCommit);
+            oldState.getReleaseScope().getCommits().add(initialCommit);
+            oldState.getReleaseScope().setPreviousVersion("4.5.6");
+            oldState.getReleaseScope().setPreviousVersionCommit(new Commit("05cbfd58fadbec3d96b220a0054d96875aa37011", 1577833200, List.<String>of("c97e4b3d0ffed8405a6b50460a1bf0177f0fde1f"), new Action(new Identity("Jim", "jim@example.com"), new TimeStamp(new Date(1577833200), new SimpleTimeZone(SimpleTimeZone.UTC_TIME, "America/Los_Angeles"))), new Action(new Identity("Jim", "jim@example.com"), new TimeStamp(new Date(1577833200), new SimpleTimeZone(SimpleTimeZone.UTC_TIME, "America/Los_Angeles"))), new Message("fix: a commit that fixes something", "fix: a commit that fixes something", Map.<String,String>of()), Set.<Tag>of(new Tag("4.5.6", "05cbfd58fadbec3d96b220a0054d96875aa37011", false))));
+            oldState.getReleaseScope().setPrimeVersion("1.0.0");
+            oldState.getReleaseScope().setPrimeVersionCommit(new Commit("e8fa442504d91a0187865c74093a5a4212a805f9", 1577836800, List.<String>of("2e348e90e5e1b89c678555459aecbfc34e17ef44"), new Action(new Identity("Jim", "jim@example.com"), new TimeStamp(new Date(1577836800), new SimpleTimeZone(SimpleTimeZone.UTC_TIME, "America/Los_Angeles"))), new Action(new Identity("Jim", "jim@example.com"), new TimeStamp(new Date(1577836800), new SimpleTimeZone(SimpleTimeZone.UTC_TIME, "America/Los_Angeles"))), new Message("feat: a commit that adds a feature", "feat: a commit that adds a feature", Map.<String,String>of()), Set.<Tag>of(new Tag("1.0.0", "e8fa442504d91a0187865c74093a5a4212a805f9", false))));
+            oldState.setReleaseType(new ReleaseType());
+            oldState.getReleaseType().setCollapseVersions(true);
+            oldState.getReleaseType().setCollapsedVersionQualifier("rel");
+            oldState.getReleaseType().setGitCommit(Boolean.TRUE.toString());
+            oldState.getReleaseType().setGitCommitMessage("Commit message");
+            oldState.getReleaseType().setGitPush(Boolean.TRUE.toString());
+            oldState.getReleaseType().setGitTag(Boolean.TRUE.toString());
+            oldState.getReleaseType().setGitTagMessage("Tag message");
+            oldState.getReleaseType().setIdentifiers(List.<Identifier>of(new Identifier("b", "12", Identifier.Position.BUILD)));
+            oldState.getReleaseType().setMatchBranches(".*");
+            oldState.getReleaseType().setMatchEnvironmentVariables(Map.<String,String>of("USER", ".*", "PATH", ".*"));
+            oldState.getReleaseType().setMatchWorkspaceStatus(WorkspaceStatus.CLEAN);
+            oldState.getReleaseType().setPublish(Boolean.TRUE.toString());
+            oldState.getReleaseType().setVersionRange("1.x");
+            oldState.getReleaseType().setVersionRangeFromBranchName(Boolean.FALSE);
+
+            // save the file
+            FileMapper.save(configurationLayerMock.getStateFile(), oldState);
+            File stateFile = new File(configurationLayerMock.getStateFile());
+            assertTrue(stateFile.exists());
+
+            // print the file to standard output for inspection purpose
+            System.out.println("------ YAML state ------");
+            System.out.println("Loading from: "+stateFile.getAbsolutePath());
+            System.out.println("-----------------------------------------");
+            System.out.println(readFile(stateFile));
+            System.out.println("-----------------------------------------");
+            System.out.flush();
+
+            // now we are ready to resume the file
+            State resumedState = State.resume(new File(configurationLayerMock.getStateFile()), configuration);
+            assertEquals(oldState.getBump(), resumedState.getBump());
+            assertEquals(oldState.getInternals(), resumedState.getInternals());
+            assertTrue(resumedState.getInternals().containsKey("attr1"));
+            assertEquals("value1", resumedState.getInternals().get("attr1"));
+            assertEquals("value1", resumedState.getInternals().get("attr1"));
+            assertEquals(oldState.getReleaseScope().getFinalCommit().getSHA(), resumedState.getReleaseScope().getFinalCommit().getSHA());
+            assertEquals(oldState.getReleaseScope().getInitialCommit().getSHA(), resumedState.getReleaseScope().getInitialCommit().getSHA());
+            assertEquals(oldState.getReleaseScope().getPreviousVersion(), resumedState.getReleaseScope().getPreviousVersion());
+            assertEquals(oldState.getReleaseScope().getPreviousVersionCommit().getSHA(), resumedState.getReleaseScope().getPreviousVersionCommit().getSHA());
+            assertEquals(oldState.getReleaseScope().getPrimeVersion(), resumedState.getReleaseScope().getPrimeVersion());
+            assertEquals(oldState.getReleaseScope().getPrimeVersionCommit().getSHA(), resumedState.getReleaseScope().getPrimeVersionCommit().getSHA());
+            assertEquals(oldState.getTimestamp(), resumedState.getTimestamp());
+            assertEquals(oldState.getVersion(), resumedState.getVersion());
+            assertEquals(oldState.getVersionRange(), resumedState.getVersionRange());
+            assertEquals(oldState.getReleaseType().getCollapseVersions(), resumedState.getReleaseType().getCollapseVersions());
+            assertEquals(oldState.getReleaseType().getCollapsedVersionQualifier(), resumedState.getReleaseType().getCollapsedVersionQualifier());
+            assertEquals(oldState.getReleaseType().getGitCommit(), resumedState.getReleaseType().getGitCommit());
+            assertEquals(oldState.getReleaseType().getGitCommitMessage(), resumedState.getReleaseType().getGitCommitMessage());
+            assertEquals(oldState.getReleaseType().getGitPush(), resumedState.getReleaseType().getGitPush());
+            assertEquals(oldState.getReleaseType().getGitTag(), resumedState.getReleaseType().getGitTag());
+            assertEquals(oldState.getReleaseType().getGitTagMessage(), resumedState.getReleaseType().getGitTagMessage());
+            if (Objects.isNull(oldState.getReleaseType().getIdentifiers())) {
+                assertEquals(oldState.getReleaseType().getIdentifiers(), resumedState.getReleaseType().getIdentifiers());
+            }
+            else {
+                for (int i=0; i<oldState.getReleaseType().getIdentifiers().size(); i++) {
+                    assertEquals(oldState.getReleaseType().getIdentifiers().get(i).getQualifier(), resumedState.getReleaseType().getIdentifiers().get(i).getQualifier());
+                    assertEquals(oldState.getReleaseType().getIdentifiers().get(i).getValue(), resumedState.getReleaseType().getIdentifiers().get(i).getValue());
+                    assertEquals(oldState.getReleaseType().getIdentifiers().get(i).getPosition(), resumedState.getReleaseType().getIdentifiers().get(i).getPosition());
+                }
             }
             assertEquals(oldState.getReleaseType().getMatchBranches(), resumedState.getReleaseType().getMatchBranches());
             assertEquals(oldState.getReleaseType().getMatchEnvironmentVariables().size(), resumedState.getReleaseType().getMatchEnvironmentVariables().size());

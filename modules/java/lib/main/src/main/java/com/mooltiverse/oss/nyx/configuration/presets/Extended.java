@@ -16,8 +16,12 @@
 package com.mooltiverse.oss.nyx.configuration.presets;
 
 import java.util.List;
+import java.util.Map;
 
 import com.mooltiverse.oss.nyx.configuration.SimpleConfigurationLayer;
+import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
+import com.mooltiverse.oss.nyx.entities.EnabledItemsMap;
+import com.mooltiverse.oss.nyx.entities.ReleaseType;
 
 /**
  * The extended configuration preset.
@@ -35,19 +39,27 @@ public class Extended extends SimpleConfigurationLayer {
         super();
 
         // add the 'conventionalCommits' and 'gitmoji' conventions
-        getCommitMessageConventions().setEnabled(List.<String>of("conventionalCommits", "gitmoji"));
-        getCommitMessageConventions().getItems().put("conventionalCommits", CommitMessageConventions.CONVENTIONAL_COMMITS);
-        getCommitMessageConventions().getItems().put("gitmoji", CommitMessageConventions.GITMOJI);
+        setCommitMessageConventions(
+            new EnabledItemsMap<CommitMessageConvention>(
+                List.<String>of("conventionalCommits", "gitmoji"),
+                Map.<String,CommitMessageConvention>of("conventionalCommits", CommitMessageConventions.CONVENTIONAL_COMMITS, "gitmoji", CommitMessageConventions.GITMOJI))
+        );
 
         // add the 'mainline' and 'internal' release types
-        getReleaseTypes().setEnabled(List.<String>of("mainline", "integration", "maturity", "feature", "hotfix", "release", "maintenance", "internal"));
-        getReleaseTypes().getItems().put("mainline", ReleaseTypes.MAINLINE);
-        getReleaseTypes().getItems().put("integration", ReleaseTypes.INTEGRATION);
-        getReleaseTypes().getItems().put("maturity", ReleaseTypes.MATURITY);
-        getReleaseTypes().getItems().put("feature", ReleaseTypes.FEATURE);
-        getReleaseTypes().getItems().put("hotfix", ReleaseTypes.HOTFIX);
-        getReleaseTypes().getItems().put("release", ReleaseTypes.RELEASE);
-        getReleaseTypes().getItems().put("maintenance", ReleaseTypes.MAINTENANCE);
-        getReleaseTypes().getItems().put("internal", ReleaseTypes.INTERNAL);
+        setReleaseTypes(
+            new EnabledItemsMap<ReleaseType>(
+                List.<String>of("mainline", "integration", "maturity", "feature", "hotfix", "release", "maintenance", "internal"),
+                Map.<String,ReleaseType>of(
+                    "mainline", ReleaseTypes.MAINLINE,
+                    "integration", ReleaseTypes.INTEGRATION,
+                    "maturity", ReleaseTypes.MATURITY,
+                    "feature", ReleaseTypes.FEATURE,
+                    "hotfix", ReleaseTypes.HOTFIX,
+                    "release", ReleaseTypes.RELEASE,
+                    "maintenance", ReleaseTypes.MAINTENANCE,
+                    "internal", ReleaseTypes.INTERNAL
+                )
+            )
+        );
     }
 }

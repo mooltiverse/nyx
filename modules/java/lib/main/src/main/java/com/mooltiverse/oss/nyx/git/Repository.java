@@ -18,9 +18,9 @@ package com.mooltiverse.oss.nyx.git;
 import java.util.Collection;
 import java.util.Set;
 
-import com.mooltiverse.oss.nyx.data.Commit;
-import com.mooltiverse.oss.nyx.data.Identity;
-import com.mooltiverse.oss.nyx.data.Tag;
+import com.mooltiverse.oss.nyx.entities.git.Commit;
+import com.mooltiverse.oss.nyx.entities.git.Identity;
+import com.mooltiverse.oss.nyx.entities.git.Tag;
 
 /**
  * This interface models coarse grained, implementation independent methods used by Nyx to access a Git repository.
@@ -210,26 +210,6 @@ public interface Repository {
         throws GitException;
 
     /**
-     * Browse the repository commit history using the given {@code visitor} to inspect each commit. Commits are
-     * evaluated in Git's natural order, from the most recent to oldest.
-     * 
-     * @param start the optional SHA-1 id of the commit to start from. If {@code null} the latest commit in the
-     * current branch ({@code HEAD}) is used. This can be a long or abbreviated SHA-1. If this commit cannot be
-     * resolved within the repository a {@link GitException} is thrown.
-     * @param end the optional SHA-1 id of the commit to end with, included. If {@code null} the repository root
-     * commit is used (until the given {@code visitor} returns {@code false}). If this commit is not reachable
-     * from the start it will be ignored. This can be a long or abbreviated SHA-1. If this commit cannot be resolved
-     * within the repository a {@link GitException} is thrown.
-     * @param visitor the visitor function that will receive commit data to evaluate. If {@code null} this method
-     * takes no action.
-     * 
-     * @throws GitException in case some problem is encountered with the underlying Git repository, including when
-     * the repository has no commits yet or a given commit identifier cannot be resolved.
-     */
-    public void walkHistory(String start, String end, CommitVisitor visitor)
-        throws GitException;
-
-    /**
      * Returns the name of the current branch or a commit SHA-1 if the repository is in the detached head state.
      * 
      * @return the name of the current branch or a commit SHA-1 if the repository is in the detached head state.
@@ -284,5 +264,25 @@ public interface Repository {
      * the repository has no commits yet or is in the 'detached HEAD' state.
      */
     public boolean isClean()
+        throws GitException;
+
+    /**
+     * Browse the repository commit history using the given {@code visitor} to inspect each commit. Commits are
+     * evaluated in Git's natural order, from the most recent to oldest.
+     * 
+     * @param start the optional SHA-1 id of the commit to start from. If {@code null} the latest commit in the
+     * current branch ({@code HEAD}) is used. This can be a long or abbreviated SHA-1. If this commit cannot be
+     * resolved within the repository a {@link GitException} is thrown.
+     * @param end the optional SHA-1 id of the commit to end with, included. If {@code null} the repository root
+     * commit is used (until the given {@code visitor} returns {@code false}). If this commit is not reachable
+     * from the start it will be ignored. This can be a long or abbreviated SHA-1. If this commit cannot be resolved
+     * within the repository a {@link GitException} is thrown.
+     * @param visitor the visitor function that will receive commit data to evaluate. If {@code null} this method
+     * takes no action.
+     * 
+     * @throws GitException in case some problem is encountered with the underlying Git repository, including when
+     * the repository has no commits yet or a given commit identifier cannot be resolved.
+     */
+    public void walkHistory(String start, String end, CommitVisitor visitor)
         throws GitException;
 }

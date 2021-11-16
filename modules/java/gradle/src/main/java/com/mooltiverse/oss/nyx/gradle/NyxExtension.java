@@ -258,10 +258,10 @@ public abstract class NyxExtension {
      * the block using the curly braces syntax in Gradle build scripts.
      * See the documentation on top of this class for more.
      * 
-     * @param configuration the configuration object for the {@code commitMessageConventions} block
+     * @param configurationAction the configuration action for the {@code commitMessageConventions} block
      */
-    public void commitMessageConventions(Action<? super CommitMessageConventions> configuration) {
-        configuration.execute(commitMessageConventions);
+    public void commitMessageConventions(Action<? super CommitMessageConventions> configurationAction) {
+        configurationAction.execute(commitMessageConventions);
     }
 
     /**
@@ -380,10 +380,10 @@ public abstract class NyxExtension {
      * the block using the curly braces syntax in Gradle build scripts.
      * See the documentation on top of this class for more.
      * 
-     * @param configuration the configuration object for the {@code releaseTypes} block
+     * @param configurationAction the configuration action for the {@code releaseTypes} block
      */
-    public void releaseTypes(Action<? super ReleaseTypes> configuration) {
-        configuration.execute(releaseTypes);
+    public void releaseTypes(Action<? super ReleaseTypes> configurationAction) {
+        configurationAction.execute(releaseTypes);
     }
 
     /**
@@ -511,10 +511,10 @@ public abstract class NyxExtension {
          * the block using the curly braces syntax in Gradle build scripts.
          * See the documentation on top of this class for more.
          * 
-         * @param configuration the configuration object for the {@code items} block
+         * @param configurationAction the configuration action for the {@code items} block
          */
-        public void items(Action<? super NamedDomainObjectContainer<CommitMessageConvention>> configuration) {
-            configuration.execute(items);
+        public void items(Action<? super NamedDomainObjectContainer<CommitMessageConvention>> configurationAction) {
+            configurationAction.execute(items);
         }
 
         /**
@@ -601,10 +601,10 @@ public abstract class NyxExtension {
              * the block using the curly braces syntax in Gradle build scripts.
              * See the documentation on top of this class for more.
              * 
-             * @param configuration the configuration object for the {@code bumpExpressions} block
+             * @param configurationAction the configuration action for the {@code bumpExpressions} block
              */
-            public void bumpExpressions(Action<? super MapProperty<String,String>> configuration) {
-                configuration.execute(bumpExpressions);
+            public void bumpExpressions(Action<? super MapProperty<String,String>> configurationAction) {
+                configurationAction.execute(bumpExpressions);
             }
         }
     }
@@ -663,10 +663,10 @@ public abstract class NyxExtension {
          * the block using the curly braces syntax in Gradle build scripts.
          * See the documentation on top of this class for more.
          * 
-         * @param configuration the configuration object for the {@code items} block
+         * @param configurationAction the configuration action for the {@code items} block
          */
-        public void items(Action<? super NamedDomainObjectContainer<ReleaseType>> configuration) {
-            configuration.execute(items);
+        public void items(Action<? super NamedDomainObjectContainer<ReleaseType>> configurationAction) {
+            configurationAction.execute(items);
         }
 
         /**
@@ -721,7 +721,14 @@ public abstract class NyxExtension {
             /**
              * The nested 'identifiers' block.
              */
-            private final Identifiers identifiers = getObjectfactory().newInstance(Identifiers.class);
+            // TODO: remove this member if and when https://github.com/mooltiverse/nyx/issues/77 is solved
+            private NamedDomainObjectContainer<Identifier> identifiers = getObjectfactory().domainObjectContainer(Identifier.class);
+            
+            /**
+             * The nested 'identifiers' block.
+             */
+            // TODO: uncomment this member if and when https://github.com/mooltiverse/nyx/issues/77 is solved
+            //private final ListProperty<Identifier> identifiers = getObjectfactory().listProperty(Identifier.class);
 
             /**
              * The optional template to render as a regular expression used to match branch names.
@@ -897,14 +904,12 @@ public abstract class NyxExtension {
             }
 
             /**
-             * Returns the object mapping the {@code identifiers} block.
+             * Returns the map of identifier items.
              * 
-             * We provide an implementation of this method instead of using the abstract definition as it's
-             * safer for old Gradle versions we support.
-             * 
-             * @return the object mapping the {@code identifiers} block
+             * @return the map of identifier items.
              */
-            public Identifiers getIdentifiers() {
+            public NamedDomainObjectContainer<Identifier> getIdentifiers() {
+                // TODO: remove this method if and when https://github.com/mooltiverse/nyx/issues/77 is solved
                 return identifiers;
             }
 
@@ -913,11 +918,37 @@ public abstract class NyxExtension {
              * the block using the curly braces syntax in Gradle build scripts.
              * See the documentation on top of this class for more.
              * 
+             * @param configurationAction the configuration action for the {@code identifiers} block
+             */
+            public void identifiers(Action<? super NamedDomainObjectContainer<Identifier>> configurationAction) {
+                // TODO: remove this method if and when https://github.com/mooltiverse/nyx/issues/77 is solved
+                configurationAction.execute(identifiers);
+            }
+
+            /**
+             * Returns the object mapping the {@code identifiers} block.
+             * 
+             * We provide an implementation of this method instead of using the abstract definition as it's
+             * safer for old Gradle versions we support.
+             * 
+             * @return the object mapping the {@code identifiers} block
+             */
+            /*public ListProperty<Identifier> getIdentifiers() {
+                // TODO: uncomment this method if and when https://github.com/mooltiverse/nyx/issues/77 is solved
+                return identifiers;
+            }*/
+
+            /**
+             * Accepts the DSL configuration for the {@code identifiers} block, needed for defining
+             * the block using the curly braces syntax in Gradle build scripts.
+             * See the documentation on top of this class for more.
+             * 
              * @param configuration the configuration object for the {@code identifiers} block
              */
-            public void identifiers(Action<? super Identifiers> configuration) {
-                configuration.execute(identifiers);
-            }
+            /*public void identifiers(Action<? super ListProperty<Identifier>> configurationAction) {
+                // TODO: uncomment this method if and when https://github.com/mooltiverse/nyx/issues/77 is solved
+                configurationAction.execute(identifiers);
+            }*/
 
             /**
              * Returns the optional template to render as a regular expression used to match branch names.
@@ -946,10 +977,10 @@ public abstract class NyxExtension {
              * the block using the curly braces syntax in Gradle build scripts.
              * See the documentation on top of this class for more.
              * 
-             * @param configuration the configuration object for the {@code matchEnvironmentVariables} block
+             * @param configurationAction the configuration action for the {@code matchEnvironmentVariables} block
              */
-            public void matchEnvironmentVariables(Action<? super MapProperty<String,String>> configuration) {
-                configuration.execute(matchEnvironmentVariables);
+            public void matchEnvironmentVariables(Action<? super MapProperty<String,String>> configurationAction) {
+                configurationAction.execute(matchEnvironmentVariables);
             }
 
             /**
@@ -1005,20 +1036,29 @@ public abstract class NyxExtension {
             }
 
             /**
-             * The class to model the 'identifiers' block within the extension.
+             * The class to model a single 'identifiers' item within the extension.
              */
-            public abstract static class Identifiers {
+            public abstract static class Identifier {
                 /**
-                 * The list of enabled identifier names.
+                 * The identifier name.
                  */
-                private final ListProperty<String> enabled = getObjectfactory().listProperty(String.class);
+                // TODO: remove this member if and when https://github.com/mooltiverse/nyx/issues/77 is solved
+                private final String name;
 
                 /**
-                 * The nested 'items' block.
-                 * 
-                 * @see Identifier
+                 * The identifier position.
                  */
-                private NamedDomainObjectContainer<Identifier> items = getObjectfactory().domainObjectContainer(Identifier.class);
+                private final Property<String> position = getObjectfactory().property(String.class);
+
+                /**
+                 * The identifier qualifier.
+                 */
+                private final Property<String> qualifier = getObjectfactory().property(String.class);
+
+                /**
+                 * The identifier value.
+                 */
+                private final Property<String> value = getObjectfactory().property(String.class);
 
                 /**
                  * Returns an object factory instance.
@@ -1036,132 +1076,64 @@ public abstract class NyxExtension {
                 protected abstract ObjectFactory getObjectfactory();
 
                 /**
-                 * Returns list of enabled identifier names.
+                 * Constructor.
                  * 
-                 * @return list of enabled identifier names.
+                 * This constructor is required as per the {@link NamedDomainObjectContainer} specification.
+                 * 
+                 * @param name the identifier name
                  */
-                public ListProperty<String> getEnabled() {
-                    return enabled;
+                public Identifier(String name) {
+                    super();
+                    // TODO: remove this member if and when https://github.com/mooltiverse/nyx/issues/77 is solved
+                    this.name = name;
                 }
 
                 /**
-                 * Returns the map of identifier items.
+                 * Returns the name read-only mandatory property.
                  * 
-                 * @return the map of identifier items.
+                 * @return the name read-only mandatory property.
                  */
-                public NamedDomainObjectContainer<Identifier> getItems() {
-                    return items;
+                public String getName() {
+                    return name;
                 }
 
                 /**
-                 * Accepts the DSL configuration for the {@code items} block, needed for defining
-                 * the block using the curly braces syntax in Gradle build scripts.
-                 * See the documentation on top of this class for more.
+                 * Returns the identifier qualifier.
+                 * When this is set by the user it overrides the inference performed by Nyx.
                  * 
-                 * @param configuration the configuration object for the {@code items} block
+                 * We provide an implementation of this method instead of using the abstract definition as it's
+                 * safer for old Gradle versions we support.
+                 * 
+                 * @return the identifier qualifier.
                  */
-                public void items(Action<? super NamedDomainObjectContainer<Identifier>> configuration) {
-                    configuration.execute(items);
+                public Property<String> getPosition() {
+                    return position;
                 }
 
                 /**
-                 * The class to model a single 'identifiers' item within the extension.
+                 * Returns the identifier qualifier.
+                 * When this is set by the user it overrides the inference performed by Nyx.
+                 * 
+                 * We provide an implementation of this method instead of using the abstract definition as it's
+                 * safer for old Gradle versions we support.
+                 * 
+                 * @return the identifier qualifier.
                  */
-                public abstract static class Identifier {
-                    /**
-                     * The identifier name.
-                     */
-                    private final String name;
+                public Property<String> getQualifier() {
+                    return qualifier;
+                }
 
-                    /**
-                     * The identifier qualifier.
-                     */
-                    private final Property<String> qualifier = getObjectfactory().property(String.class);
-
-                    /**
-                     * The identifier value.
-                     */
-                    private final Property<String> value = getObjectfactory().property(String.class);
-
-                    /**
-                     * The identifier position.
-                     */
-                    private final Property<String> position = getObjectfactory().property(String.class);
-
-                    /**
-                     * Returns an object factory instance.
-                     * 
-                     * The instance is injected by Gradle as soon as this getter method is invoked.
-                     * 
-                     * Using <a href="https://docs.gradle.org/current/userguide/custom_gradle_types.html#property_injection">property injection</a>
-                     * instead of <a href="https://docs.gradle.org/current/userguide/custom_gradle_types.html#constructor_injection">constructor injection</a>
-                     * has a few advantages: it allows Gradle to refer injecting the object until it's required and is safer for backward
-                     * compatibility (older versions can be supported).
-                     * 
-                     * @return the object factory instance
-                     */
-                    @Inject
-                    protected abstract ObjectFactory getObjectfactory();
-
-                    /**
-                     * Constructor.
-                     * 
-                     * This constructor is required as per the {@link NamedDomainObjectContainer} specification.
-                     * 
-                     * @param name the release type name
-                     */
-                    public Identifier(String name) {
-                        super();
-                        this.name = name;
-                    }
-
-                    /**
-                     * Returns the name read-only mandatory property.
-                     * 
-                     * @return the name read-only mandatory property.
-                     */
-                    public String getName() {
-                        return name;
-                    }
-
-                    /**
-                     * Returns the identifier qualifier.
-                     * When this is set by the user it overrides the inference performed by Nyx.
-                     * 
-                     * We provide an implementation of this method instead of using the abstract definition as it's
-                     * safer for old Gradle versions we support.
-                     * 
-                     * @return the identifier qualifier.
-                     */
-                    public Property<String> getQualifier() {
-                        return qualifier;
-                    }
-
-                    /**
-                     * Returns the identifier value.
-                     * When this is set by the user it overrides the inference performed by Nyx.
-                     * 
-                     * We provide an implementation of this method instead of using the abstract definition as it's
-                     * safer for old Gradle versions we support.
-                     * 
-                     * @return the identifier value.
-                     */
-                    public Property<String> getValue() {
-                        return value;
-                    }
-
-                    /**
-                     * Returns the identifier qualifier.
-                     * When this is set by the user it overrides the inference performed by Nyx.
-                     * 
-                     * We provide an implementation of this method instead of using the abstract definition as it's
-                     * safer for old Gradle versions we support.
-                     * 
-                     * @return the identifier qualifier.
-                     */
-                    public Property<String> getPosition() {
-                        return position;
-                    }
+                /**
+                 * Returns the identifier value.
+                 * When this is set by the user it overrides the inference performed by Nyx.
+                 * 
+                 * We provide an implementation of this method instead of using the abstract definition as it's
+                 * safer for old Gradle versions we support.
+                 * 
+                 * @return the identifier value.
+                 */
+                public Property<String> getValue() {
+                    return value;
                 }
             }
         }        

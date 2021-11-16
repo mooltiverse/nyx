@@ -5,6 +5,9 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.DisplayName;
@@ -17,6 +20,11 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import com.mooltiverse.oss.nyx.configuration.Configuration;
 import com.mooltiverse.oss.nyx.configuration.SimpleConfigurationLayer;
+import com.mooltiverse.oss.nyx.entities.git.Action;
+import com.mooltiverse.oss.nyx.entities.git.Commit;
+import com.mooltiverse.oss.nyx.entities.git.Identity;
+import com.mooltiverse.oss.nyx.entities.git.Message;
+import com.mooltiverse.oss.nyx.entities.git.Tag;
 import com.mooltiverse.oss.nyx.template.mock.TestScope;
 import com.mooltiverse.oss.nyx.state.State;
 
@@ -233,12 +241,12 @@ public class TemplatesTests {
             state.setTimestamp(Long.MAX_VALUE);
 
             state.getReleaseScope().setPreviousVersion("4.5.6");
-            state.getReleaseScope().setPreviousVersionCommit("05cbfd58fadbec3d96b220a0054d96875aa37011");
-            state.getReleaseScope().setPreviousVersion("4.5.6");
-            state.getReleaseScope().setPreviousVersionCommit("05cbfd58fadbec3d96b220a0054d96875aa37011");
-            state.getReleaseScope().getCommits().add("d40fcded9e516158a2901f5657794931528af106");
-            state.getReleaseScope().getCommits().add("9bed70fac8a27a4b14b6b12307d034bc59da85c3");
-            state.getReleaseScope().getCommits().add("ef6a6481adb2df26bc7eebfde465e5c2f3e93539");
+            state.getReleaseScope().setPreviousVersionCommit(new Commit("05cbfd58fadbec3d96b220a0054d96875aa37011", 0, List.<String>of(), new Action(new Identity("Jim", null), null), new Action(new Identity("Sam", null), null), new Message("full", "short", Map.<String,String>of()), Set.<Tag>of(new Tag("4.5.6", "05cbfd58fadbec3d96b220a0054d96875aa37011", false))));
+            state.getReleaseScope().setPrimeVersion("1.0.0");
+            state.getReleaseScope().setPrimeVersionCommit(new Commit("e8fa442504d91a0187865c74093a5a4212a805f9", 0, List.<String>of(), new Action(new Identity("Jim", null), null), new Action(new Identity("Sam", null), null), new Message("full", "short", Map.<String,String>of()), Set.<Tag>of(new Tag("1.0.0", "e8fa442504d91a0187865c74093a5a4212a805f9", false))));
+            state.getReleaseScope().getCommits().add(new Commit("d40fcded9e516158a2901f5657794931528af106", 0, List.<String>of(), new Action(new Identity("Jim", null), null), new Action(new Identity("Sam", null), null), new Message("full", "short", Map.<String,String>of()), Set.<Tag>of()));
+            state.getReleaseScope().getCommits().add(new Commit("9bed70fac8a27a4b14b6b12307d034bc59da85c3", 0, List.<String>of(), new Action(new Identity("Jim", null), null), new Action(new Identity("Sam", null), null), new Message("full", "short", Map.<String,String>of()), Set.<Tag>of()));
+            state.getReleaseScope().getCommits().add(new Commit("ef6a6481adb2df26bc7eebfde465e5c2f3e93539", 0, List.<String>of(), new Action(new Identity("Jim", null), null), new Action(new Identity("Sam", null), null), new Message("full", "short", Map.<String,String>of()), Set.<Tag>of()));
 
             return state;
         }

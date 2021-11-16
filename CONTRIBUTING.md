@@ -196,7 +196,7 @@ Since Nyx supports remote repositories and their extra features, tests must be p
 
 **Whenever possible use OAuth tokens or Personal Access Tokens instead of plain user name and passwords**.
 
-These accounts are used to to dynamically create repositories, fiddle with them and clean up at the end of a test run. Complete cleanup is performed at the end of tests so when tests complete succesfully there should be no contents left on the above accounts. In case some tests fail some stale repository might remain and can be deleted manually from the UI once logged in as the test user.
+These accounts are used to to dynamically create repositories, fiddle with them and clean up at the end of a test run. Complete cleanup is performed at the end of tests so when tests complete successfully there should be no contents left on the above accounts. In case some tests fail some stale repository might remain and can be deleted manually from the UI once logged in as the test user.
 
 These users are not connected to any team or organization so they do not expose any sensitive information. In case they get compromised we can replace them with some new accounts at any time.
 

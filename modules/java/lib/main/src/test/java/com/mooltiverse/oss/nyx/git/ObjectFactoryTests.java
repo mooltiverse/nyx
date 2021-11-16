@@ -21,19 +21,19 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Set;
 
+import com.mooltiverse.oss.nyx.entities.git.Action;
+import com.mooltiverse.oss.nyx.entities.git.Commit;
+import com.mooltiverse.oss.nyx.entities.git.Identity;
+import com.mooltiverse.oss.nyx.entities.git.Message;
+import com.mooltiverse.oss.nyx.entities.git.Tag;
+import com.mooltiverse.oss.nyx.entities.git.TimeStamp;
+
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.revwalk.RevCommit;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import com.mooltiverse.oss.nyx.data.Action;
-import com.mooltiverse.oss.nyx.data.Commit;
-import com.mooltiverse.oss.nyx.data.Identity;
-import com.mooltiverse.oss.nyx.data.Message;
-import com.mooltiverse.oss.nyx.data.Tag;
-import com.mooltiverse.oss.nyx.data.TimeStamp;
 
 @DisplayName("ObjectFactory")
 public class ObjectFactoryTests {

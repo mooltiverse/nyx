@@ -22,11 +22,11 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.mooltiverse.oss.nyx.data.CommitMessageConventions;
-import com.mooltiverse.oss.nyx.data.DataAccessException;
-import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
-import com.mooltiverse.oss.nyx.data.ReleaseTypes;
-import com.mooltiverse.oss.nyx.data.Verbosity;
+import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
+import com.mooltiverse.oss.nyx.entities.IllegalPropertyException;
+import com.mooltiverse.oss.nyx.entities.EnabledItemsMap;
+import com.mooltiverse.oss.nyx.entities.Verbosity;
+import com.mooltiverse.oss.nyx.io.DataAccessException;
 import com.mooltiverse.oss.nyx.version.Scheme;
 
 /**
@@ -39,7 +39,7 @@ class DefaultLayer implements ConfigurationLayer, Defaults {
     /**
      * The private logger instance
      */
-    private static final Logger logger = LoggerFactory.getLogger(Configuration.class);
+    private static final Logger logger = LoggerFactory.getLogger(DefaultLayer.class);
 
     /**
      * The single instance for this class.
@@ -83,7 +83,7 @@ class DefaultLayer implements ConfigurationLayer, Defaults {
      * {@inheritDoc}
      */
     @Override
-    public CommitMessageConventions getCommitMessageConventions()
+    public EnabledItemsMap<CommitMessageConvention> getCommitMessageConventions()
         throws DataAccessException, IllegalPropertyException {
         logger.trace(DEFAULT, "Retrieving the default '{}' configuration option", "commitMessageConventions");
         return COMMIT_MESSAGE_CONVENTIONS;
@@ -153,16 +153,6 @@ class DefaultLayer implements ConfigurationLayer, Defaults {
      * {@inheritDoc}
      */
     @Override
-    public String getReleasePrefix()
-        throws DataAccessException, IllegalPropertyException {
-        logger.trace(DEFAULT, "Retrieving the default '{}' configuration option: '{}'", "releasePrefix", RELEASE_PREFIX);
-        return RELEASE_PREFIX;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Boolean getReleaseLenient()
         throws DataAccessException, IllegalPropertyException {
         logger.trace(DEFAULT, "Retrieving the default '{}' configuration option: '{}'", "releaseLenient", RELEASE_LENIENT);
@@ -173,7 +163,17 @@ class DefaultLayer implements ConfigurationLayer, Defaults {
      * {@inheritDoc}
      */
     @Override
-    public ReleaseTypes getReleaseTypes()
+    public String getReleasePrefix()
+        throws DataAccessException, IllegalPropertyException {
+        logger.trace(DEFAULT, "Retrieving the default '{}' configuration option: '{}'", "releasePrefix", RELEASE_PREFIX);
+        return RELEASE_PREFIX;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public EnabledItemsMap<com.mooltiverse.oss.nyx.entities.ReleaseType> getReleaseTypes()
         throws DataAccessException, IllegalPropertyException {
         logger.trace(DEFAULT, "Retrieving the default '{}' release type", "releaseTypes");
         return RELEASE_TYPES;

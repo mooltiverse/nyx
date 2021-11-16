@@ -99,7 +99,7 @@ While conventions usually define a range of allowed values for `type` and `scope
 
 The `bumpExpressions` map gives Nyx instructions about which version identifiers are expected to be bumped according to the commit message. This map can be empty for those conventions not addressing the version bumping.
 
-Those commits in the release scope that succesfully match one of these expressions are available in the [`significantCommits`]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#significant-commits) map, which also brings the identifier to bump for each commit.
+Those commits in the release scope that successfully match one of these expressions are available in the [`significantCommits`]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#significant-commits) list.
 
 Each entry in this map is made of two strings: the name of a version identifier and a regular expression that, when matching the commit message, instructs Nyx to bump the identifier in the name of the map entry.
 
@@ -116,6 +116,9 @@ Bear in mind that:
 * the identifier names must comply with the configured version [`scheme`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#scheme) (the above example is using [Semantic Versioning]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/version-schemes.md %}#semantic-versioning-semver))
 * each expression must match exactly one bump type and not others or the identifier that is dumped might be unpredictable
 * capturing groups are ignored (named or not) and these expressions are just used to match or not a commit message
+
+When configuring this map using command line options or environment variables you need to pass flattened values as documented [here]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}#collections-of-objects). In this case you can pass each bump expression as a command line option like `--commit-message-conventions-<NAME>-bumpExpressions-<IDENTIFIER_NAME>=<REGEX>` or as an environment variable like `NYX_COMMIT_MESSAGE_CONVENTIONS_<NAME>_BUMP_EXPRESSIONS_<IDENTIFIER_NAME>=<REGEX>`.
+{: .notice--info}
 
 #### Name
 

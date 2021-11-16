@@ -23,10 +23,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mooltiverse.oss.nyx.ReleaseException;
-import com.mooltiverse.oss.nyx.data.DataAccessException;
-import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
+import com.mooltiverse.oss.nyx.entities.IllegalPropertyException;
 import com.mooltiverse.oss.nyx.git.GitException;
 import com.mooltiverse.oss.nyx.git.Repository;
+import com.mooltiverse.oss.nyx.io.DataAccessException;
 import com.mooltiverse.oss.nyx.state.State;
 
 /**
@@ -60,25 +60,30 @@ public class Publish extends AbstractCommand {
     }
 
     /**
-     * {@inheritDoc}
+     * Publishes the release to remotes.
+     * 
+     * @throws DataAccessException in case the configuration can't be loaded for some reason.
+     * @throws IllegalPropertyException in case the configuration has some illegal options.
+     * @throws GitException in case of unexpected issues when accessing the Git repository.
+     * @throws ReleaseException if the task is unable to complete for reasons due to the release process.
      */
-    @Override
-    public boolean isUpToDate()
-        throws DataAccessException, IllegalPropertyException, GitException {
-        logger.debug(COMMAND, "Checking whether the Publish command is up to date");
-
-        // Never up to date if this command hasn't stored a version yet into the state
-        if (Objects.isNull(state().getVersion()))
-            return false;
-        
-        return isInternalAttributeUpToDate(INTERNAL_LAST_PUBLISHED_VERSION, state().getVersion());
+    private void publish()
+        throws DataAccessException, IllegalPropertyException, GitException, ReleaseException {
+        if (state().getConfiguration().getDryRun()) {
+            logger.info(COMMAND, "Publish skipped due to dry run");
+        }
+        else {
+            logger.debug(COMMAND, "Publishing version '{}'");
+            
+            // TODO: actually do the publish using the configured services
+        }
     }
 
     /**
      * This method stores the state internal attributes used for up-to-date checks so that subsequent invocations
      * of the {@link #isUpToDate()} method can find them and determine if the command is already up to date.
      * 
-     * This method is meant to be invoked at the end of a succesful {@link #run()}.
+     * This method is meant to be invoked at the end of a successful {@link #run()}.
      * 
      * @throws DataAccessException in case the configuration can't be loaded for some reason.
      * @throws IllegalPropertyException in case the configuration has some illegal options.
@@ -99,6 +104,21 @@ public class Publish extends AbstractCommand {
      * {@inheritDoc}
      */
     @Override
+    public boolean isUpToDate()
+        throws DataAccessException, IllegalPropertyException, GitException {
+        logger.debug(COMMAND, "Checking whether the Publish command is up to date");
+
+        // Never up to date if this command hasn't stored a version yet into the state
+        if (Objects.isNull(state().getVersion()))
+            return false;
+        
+        return isInternalAttributeUpToDate(INTERNAL_LAST_PUBLISHED_VERSION, state().getVersion());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public State run()
         throws DataAccessException, IllegalPropertyException, GitException, ReleaseException {
         logger.debug(COMMAND, "Running the Publish command...");
@@ -106,14 +126,7 @@ public class Publish extends AbstractCommand {
         if (state().getNewVersion()) {
             if (renderTemplateAsBoolean(state().getReleaseType().getPublish())) {
                 logger.debug(COMMAND, "The release type has the publish flag enabled");
-                if (state().getConfiguration().getDryRun()) {
-                    logger.info(COMMAND, "Publish skipped due to dry run");
-                }
-                else {
-                    logger.debug(COMMAND, "Publishing version '{}'");
-                    
-                    // TODO: actually do the publish using the configured services
-                }
+                publish();
             }
             else logger.debug(COMMAND, "The release type has the publish flag disabled");
         }

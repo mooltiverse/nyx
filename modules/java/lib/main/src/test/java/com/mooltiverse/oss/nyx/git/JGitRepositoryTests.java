@@ -24,6 +24,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import com.mooltiverse.oss.nyx.entities.git.Commit;
+import com.mooltiverse.oss.nyx.entities.git.Identity;
+import com.mooltiverse.oss.nyx.entities.git.Tag;
+
 import java.nio.file.Files;
 import java.util.Objects;
 
@@ -32,10 +36,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import org.eclipse.jgit.revwalk.RevCommit;
-
-import com.mooltiverse.oss.nyx.data.Commit;
-import com.mooltiverse.oss.nyx.data.Identity;
-import com.mooltiverse.oss.nyx.data.Tag;
 
 @DisplayName("JGitRepository")
 public class JGitRepositoryTests {

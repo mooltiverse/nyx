@@ -211,6 +211,7 @@ public class GradleCommandInvocationContextProvider extends CommandInvocationCon
                 Project project = store.get("project", Project.class);
                 if (Objects.isNull(project)) {
                     Script script = resolveBaseline(parameterContext, extensionContext);
+                    script.andIgnore(".gitignore", "userHome"); // the 'userHome' directory is created automatically by Gradle since 7.3 unless ProjectBuilder.withGradleUserHomeDir(...) is invoked with some other directory
                     project = ProjectBuilder.builder().withProjectDir(script.getWorkingDirectory()).build();
                     project.getPluginManager().apply(NyxPlugin.ID);
                     store.put("project", project);

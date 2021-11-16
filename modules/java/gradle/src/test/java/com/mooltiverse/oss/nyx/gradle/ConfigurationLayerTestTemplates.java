@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.TestTemplate;
 
 import com.mooltiverse.oss.nyx.command.template.Baseline;
-import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
+import com.mooltiverse.oss.nyx.entities.IllegalPropertyException;
 import com.mooltiverse.oss.nyx.git.Scenario;
 import com.mooltiverse.oss.nyx.gradle.template.GradleCommandInvocationContextProvider;
 
@@ -68,10 +68,10 @@ public class ConfigurationLayerTestTemplates {
             assertNotNull(extension.getCommitMessageConventions());
             assertNotNull(configurationLayer.getCommitMessageConventions());
             assertTrue(extension.getCommitMessageConventions().getEnabled().isPresent());
-            assertNull(configurationLayer.getCommitMessageConventions().getEnabled());
+            assertTrue(configurationLayer.getCommitMessageConventions().getEnabled().isEmpty());
             assertTrue(extension.getCommitMessageConventions().getEnabled().get().isEmpty());
             //assertTrue(extension.getCommitMessageConventions().getItems().isPresent());
-            assertNull(configurationLayer.getCommitMessageConventions().getItems());
+            assertTrue(configurationLayer.getCommitMessageConventions().getItems().isEmpty());
         }
 
         @TestTemplate
@@ -170,10 +170,10 @@ public class ConfigurationLayerTestTemplates {
             assertNotNull(extension.getReleaseTypes());
             assertNotNull(configurationLayer.getReleaseTypes());
             assertTrue(extension.getReleaseTypes().getEnabled().isPresent());
-            assertNull(configurationLayer.getReleaseTypes().getEnabled());
+            assertTrue(configurationLayer.getReleaseTypes().getEnabled().isEmpty());
             assertTrue(extension.getReleaseTypes().getEnabled().get().isEmpty());
             //assertTrue(extension.getReleaseTypes().getItems().isPresent());
-            assertNull(configurationLayer.getReleaseTypes().getItems());
+            assertTrue(configurationLayer.getReleaseTypes().getItems().isEmpty());
         }
 
         @TestTemplate

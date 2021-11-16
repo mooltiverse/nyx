@@ -22,19 +22,19 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import com.mooltiverse.oss.nyx.entities.git.Action;
+import com.mooltiverse.oss.nyx.entities.git.Commit;
+import com.mooltiverse.oss.nyx.entities.git.Identity;
+import com.mooltiverse.oss.nyx.entities.git.Message;
+import com.mooltiverse.oss.nyx.entities.git.Tag;
+import com.mooltiverse.oss.nyx.entities.git.TimeStamp;
+
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.RefDatabase;
 import org.eclipse.jgit.revwalk.FooterLine;
 import org.eclipse.jgit.revwalk.RevCommit;
-
-import com.mooltiverse.oss.nyx.data.Action;
-import com.mooltiverse.oss.nyx.data.Commit;
-import com.mooltiverse.oss.nyx.data.Identity;
-import com.mooltiverse.oss.nyx.data.Message;
-import com.mooltiverse.oss.nyx.data.Tag;
-import com.mooltiverse.oss.nyx.data.TimeStamp;
 
 /**
  * This class provides methods to convert objects between one format and another.

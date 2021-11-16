@@ -18,13 +18,12 @@ package com.mooltiverse.oss.nyx.configuration;
 import java.util.List;
 import java.util.Map;
 
-import com.mooltiverse.oss.nyx.data.CommitMessageConvention;
-import com.mooltiverse.oss.nyx.data.CommitMessageConventions;
-import com.mooltiverse.oss.nyx.data.Identifiers;
-import com.mooltiverse.oss.nyx.data.ReleaseTypes;
-import com.mooltiverse.oss.nyx.data.Verbosity;
-import com.mooltiverse.oss.nyx.data.WorkspaceStatus;
 import com.mooltiverse.oss.nyx.version.Versions;
+import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
+import com.mooltiverse.oss.nyx.entities.Identifier;
+import com.mooltiverse.oss.nyx.entities.EnabledItemsMap;
+import com.mooltiverse.oss.nyx.entities.Verbosity;
+import com.mooltiverse.oss.nyx.entities.WorkspaceStatus;
 import com.mooltiverse.oss.nyx.version.Scheme;
 
 /**
@@ -39,31 +38,7 @@ public interface Defaults {
     /**
      * The default commit message conventions block.
      */
-    public static final CommitMessageConventions COMMIT_MESSAGE_CONVENTIONS = new CommitMessageConventions() {
-        /**
-         * The default enabled commit message conventions. Value: {@code null}
-         */
-        @Override
-        public List<String> getEnabled() {
-            return null;
-        }
-
-        /**
-         * The default commit message conventions. Value: is an empty map.
-         */
-        @Override
-        public Map<String,CommitMessageConvention> getItems() {
-            return Map.<String,CommitMessageConvention>of();
-        }
-
-        /**
-         * The default commit message convention. Value: {@code null}
-         */
-        @Override
-        public CommitMessageConvention getItem(String name) {
-            return null;
-        }
-    };
+    public static final EnabledItemsMap<CommitMessageConvention> COMMIT_MESSAGE_CONVENTIONS = new EnabledItemsMap<CommitMessageConvention>(List.<String>of(), Map.<String,CommitMessageConvention>of());
 
     /**
      * The default custom configuration file path. Value: {@code null}
@@ -77,12 +52,12 @@ public interface Defaults {
     public static final String DIRECTORY = System.getProperty("user.dir");
 
     /**
-     * The flag that prevents to alter any repository state and instead just log the actions that would be taken. Value: {@code false}
+     * The default flag that prevents to alter any repository state and instead just log the actions that would be taken. Value: {@code false}
      */
     public static final Boolean DRY_RUN = Boolean.FALSE;
 
     /**
-     * The initial version to use. Value: {@link Scheme#SEMVER}
+     * The default initial version to use. Value: {@link Scheme#SEMVER}
      * 
      * This strongly depends on the {@link #SCHEME} and as long as it's {@link Scheme#SEMVER}, we use that to select the initial version.
      */
@@ -94,17 +69,17 @@ public interface Defaults {
     public static final String PRESET = null;
 
     /**
+     * The default flag that alows reading releases from the history tolerating arbitrary prefixes and extra non critical characters. Value: {@code true}
+     */
+    public static final Boolean RELEASE_LENIENT = Boolean.TRUE;
+
+    /**
      * The default prefix to add at the beginning of a version identifier to generate the release identifier. Value: {@code null}
      */
     public static final String RELEASE_PREFIX = null;
 
     /**
-     * The flag that alows reading releases from the history tolerating arbitrary prefixes and extra non critical characters. Value: {@code true}
-     */
-    public static final Boolean RELEASE_LENIENT = Boolean.TRUE;
-
-    /**
-     * A utility interface that collects default configuration values for {@link com.mooltiverse.oss.nyx.data.ReleaseType} objects.
+     * A utility interface that collects default configuration values for {@link com.mooltiverse.oss.nyx.entities.ReleaseType} objects.
      */
     public interface ReleaseType {
         /**
@@ -155,7 +130,7 @@ public interface Defaults {
         /**
          * The identifiers configuration block. Value: {@code null}
          */
-        public static final Identifiers IDENTIFIERS = null;
+        public static final List<Identifier> IDENTIFIERS = null;
 
         /**
          * The optional template to render as a regular expression used to match branch names. Value: {@code null}
@@ -192,40 +167,15 @@ public interface Defaults {
     /**
      * The default release types block.
      */
-    public static final ReleaseTypes RELEASE_TYPES = new ReleaseTypes() {
-        /**
-         * The default enabled release types. Value: {@code ["default"] }
-         */
-        @Override
-        public List<String> getEnabled() {
-            return List.<String>of(Defaults.ReleaseType.NAME);
-        }
-
-        /**
-         * The default release types. Value: is a map with the default release type.
-         */
-        @Override
-        public Map<String,com.mooltiverse.oss.nyx.data.ReleaseType> getItems() {
-            // We use the default ReleaseType constructor here as it creates an object with the default fields
-            return Map.<String,com.mooltiverse.oss.nyx.data.ReleaseType>of(Defaults.ReleaseType.NAME, new com.mooltiverse.oss.nyx.data.ReleaseType());
-        }
-
-        /**
-         * The default release type.
-         */
-        @Override
-        public com.mooltiverse.oss.nyx.data.ReleaseType getItem(String name) {
-            return getItems().get(name);
-        }
-    };
+    public static final EnabledItemsMap<com.mooltiverse.oss.nyx.entities.ReleaseType> RELEASE_TYPES = new EnabledItemsMap<com.mooltiverse.oss.nyx.entities.ReleaseType>(List.<String>of(Defaults.ReleaseType.NAME), Map.<String,com.mooltiverse.oss.nyx.entities.ReleaseType>of(Defaults.ReleaseType.NAME, new com.mooltiverse.oss.nyx.entities.ReleaseType()));
 
     /**
-     * The flag that enables loading a previously stored State file and resume operations from there. Value: {@code false}
+     * The default flag that enables loading a previously stored State file and resume operations from there. Value: {@code false}
      */
     public static final Boolean RESUME = Boolean.FALSE;
 
     /**
-     * The versioning scheme to use. Value: {@link Scheme#SEMVER}
+     * The default versioning scheme to use. Value: {@link Scheme#SEMVER}
      */
     public static final Scheme SCHEME = Scheme.SEMVER;
 
@@ -235,12 +185,12 @@ public interface Defaults {
     public static final String SHARED_CONFIGURATION_FILE = null;
 
     /**
-     * The path to the local state file. Value: {@code null}
+     * The default path to the local state file. Value: {@code null}
      */
     public static final String STATE_FILE = null;
 
     /**
-     * The logging level. Value: {@link Verbosity#WARNING}.
+     * The default logging level. Value: {@link Verbosity#WARNING}.
      * 
      * Please note that the verbosity option is actually ignored in this library implementation as the event filtering based
      * on the verbosity needs to be configured outside this library, depending on the logging framework deployed along with SLF4J.
@@ -249,7 +199,7 @@ public interface Defaults {
     public static final Verbosity VERBOSITY = Verbosity.WARNING;
 
     /**
-     * The release version. Value: {@code null}
+     * The default release version. Value: {@code null}
      */
     public static final String VERSION = null;
 }

@@ -90,7 +90,7 @@ public class Script extends Workbench {
      */
     public static Script fromScratch()
         throws Exception {
-        return new Script(FileSystemUtil.newTempDirectory(null, null), false, true);
+        return new Script(FileSystemUtil.newTempDirectory(null, "nyx-test-script-"), false, true);
     }
 
     /**
@@ -495,6 +495,21 @@ public class Script extends Workbench {
         checkout(toBranch);
         andMergeFrom(fromBranch, commitMessage);
         tag(tagName, tagMessage);
+        return this;
+    }
+
+    /**
+     * Adds the given lines to the {@code .gitignore} file. The file is created if doesn't exist yet.
+     * 
+     * @param items the lines to write to the {@code .gitignore} file.
+     * 
+     * @returnthis same instance
+     * 
+     * @throws Exception in case of any issue
+     */
+    public Script andIgnore(String... items)
+        throws Exception {
+        FileSystemUtil.appendLines(new File(getWorkingDirectory(), ".gitignore"), items);
         return this;
     }
 }

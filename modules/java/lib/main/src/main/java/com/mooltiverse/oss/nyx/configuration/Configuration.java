@@ -19,7 +19,9 @@ import static com.mooltiverse.oss.nyx.log.Markers.CONFIGURATION;
 
 import java.io.File;
 
+import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -29,46 +31,44 @@ import org.slf4j.LoggerFactory;
 
 import com.mooltiverse.oss.nyx.Nyx;
 import com.mooltiverse.oss.nyx.configuration.presets.Presets;
-import com.mooltiverse.oss.nyx.data.CommitMessageConvention;
-import com.mooltiverse.oss.nyx.data.CommitMessageConventions;
-import com.mooltiverse.oss.nyx.data.DataAccessException;
-import com.mooltiverse.oss.nyx.data.FileMapper;
-import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
-import com.mooltiverse.oss.nyx.data.LayeredMapConfigurationBlock;
-import com.mooltiverse.oss.nyx.data.ReleaseType;
-import com.mooltiverse.oss.nyx.data.ReleaseTypes;
-import com.mooltiverse.oss.nyx.data.Verbosity;
+import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
+import com.mooltiverse.oss.nyx.entities.IllegalPropertyException;
+import com.mooltiverse.oss.nyx.entities.EnabledItemsMap;
+import com.mooltiverse.oss.nyx.entities.ReleaseType;
+import com.mooltiverse.oss.nyx.entities.Verbosity;
+import com.mooltiverse.oss.nyx.io.DataAccessException;
+import com.mooltiverse.oss.nyx.io.FileMapper;
 import com.mooltiverse.oss.nyx.version.Scheme;
 
 /**
  * The Nyx configuration. The configuration is a live object that resolves each option lazily, only when required.
  * This not only improves the overall performances but is also safer as in case of malformed configuration options, only
  * those actually needed are resolved.
- * 
+ * <br>
  * This means that even if the configuration sources don't change throughout a release process, the state of the
- * configuration may change every time a not yet resolved oprion is requested and evaluated.
- * 
+ * configuration may change every time a not yet resolved option is requested and evaluated.
+ * <br>
  * The configuration is layered, where each layer represents a source of configuration options. There is a clear definition
  * of priorities among different layers so there is a clear precedence of options coming from one layer or another.
  * Thanks to this, each option can be overridden by other layer with higher priority.
- * 
+ * <br>
  * There must be only one instance of this class for every execution and it's retrieved by {@link Nyx#configuration()}.
  */
-public class Configuration implements Root {
+public class Configuration implements ConfigurationRoot {
     /**
      * The private logger instance
      */
     private static final Logger logger = LoggerFactory.getLogger(Configuration.class);
 
     /**
-     * The private instance of the commit message convention configuration block.
+     * The private instance of the commit message convention configuration section.
      */
-    private CommitMessageConventionsBlock commitMessageConventionsBlock = null;
+    private EnabledItemsMap<CommitMessageConvention> commitMessageConventionsSection = null;
 
     /**
-     * The private instance of the release types configuration block.
+     * The private instance of the release types configuration section.
      */
-    private ReleaseTypesBlock releaseTypesBlock = null;
+    private EnabledItemsMap<ReleaseType> releaseTypesSection = null;
 
     /**
      * The internal representation of the configuration layers and their priorities.
@@ -84,7 +84,9 @@ public class Configuration implements Root {
         private static final long serialVersionUID = 1L;
         {
             // Initialize the layers with the default values, which have the least priority
+            // and the environment variables layer, with an high priority
             put(LayerPriority.DEFAULT, DefaultLayer.getInstance());
+            put(LayerPriority.ENVIRONMENT, EnvironmentConfigurationLayer.getInstance());
         }
     };
 
@@ -101,7 +103,7 @@ public class Configuration implements Root {
     public Configuration()
         throws DataAccessException, IllegalPropertyException {
         super();
-        logger.debug(CONFIGURATION, "New configuration object");
+        logger.trace(CONFIGURATION, "New configuration object");
         loadStandardConfigurationFileLayers();
     }
 
@@ -125,23 +127,56 @@ public class Configuration implements Root {
     }
 
     /**
+     * Loads the various standard configuration file layers, if found, searched at their default locations.
+     * 
+     * @throws DataAccessException in case data cannot be read or accessed.
+     * @throws IllegalPropertyException in case some option has been defined but has incorrect values or it can't be resolved.
+     */
+    private void loadStandardConfigurationFileLayers()
+        throws DataAccessException, IllegalPropertyException {
+        logger.debug(CONFIGURATION, "Searching for standard configuration files...");
+        // load standard local configuration files first, if any
+        for (String fileName: List.<String>of(".nyx.json", ".nyx.yaml", ".nyx.yml")) {
+            File file = getAbsoluteFilePath(fileName);
+            if (file.exists() && file.isFile()) {
+                logger.debug(CONFIGURATION, "Standard local configuration file found at '{}'. Loading...", file.getAbsolutePath());
+                layers.put(LayerPriority.STANDARD_LOCAL_FILE, FileMapper.load(file, SimpleConfigurationLayer.class));
+                logger.debug(CONFIGURATION, "Standard local configuration file '{}' loaded", file.getAbsolutePath());
+                break;
+            }
+            else logger.debug(CONFIGURATION, "Standard local configuration file '{}' not found.", file.getAbsolutePath());
+        }
+        // then load standard shared configuration files, if any
+        for (String fileName: List.<String>of(".nyx-shared.json", ".nyx-shared.yaml", ".nyx-shared.yml")) {
+            File file = getAbsoluteFilePath(fileName);
+            if (file.exists() && file.isFile()) {
+                logger.debug(CONFIGURATION, "Standard shared configuration file found at '{}'. Loading...", file.getAbsolutePath());
+                layers.put(LayerPriority.STANDARD_SHARED_FILE, FileMapper.load(file, SimpleConfigurationLayer.class));
+                logger.debug(CONFIGURATION, "Standard shared configuration file '{}' loaded", file.getAbsolutePath());
+                break;
+            }
+            else logger.debug(CONFIGURATION, "Standard shared configuration file '{}' not found.", file.getAbsolutePath());
+        }
+        if (layers.containsKey(LayerPriority.STANDARD_LOCAL_FILE) || layers.containsKey(LayerPriority.STANDARD_SHARED_FILE))
+            updateConfiguredConfigurationLayers();
+    }
+
+    /**
      * Resets the cache of resolved options.
      */
     private synchronized void resetCache() {
         logger.trace(CONFIGURATION, "Clearing the configuration cache");
-        if (!Objects.isNull(commitMessageConventionsBlock))
-            commitMessageConventionsBlock.resetCache();
-        if (!Objects.isNull(releaseTypesBlock))
-            releaseTypesBlock.resetCache();
+        commitMessageConventionsSection = null;
+        releaseTypesSection = null;
     }
 
     /**
-     * Makes sure that the configuration layers that can in turn be configured (custom configuration file, custom shared
-     * configuration file, preset) are added or removed into the internal layers representation, according to the actual
-     * configuration parameters.
+     * Makes sure that the configuration layers that can be configured (custom configuration file, custom shared
+     * configuration file, preset) are added or removed into the internal layers representation, according to the
+     * actual configuration parameters.
      * 
-     * This method should be invoked after any core layer (not among the configured ones) changes, or after a batch of
-     * those changes.
+     * This method must be invoked after any core layer (not among the configured ones) changes, or after a batch
+     * of those changes.
      * 
      * @throws DataAccessException in case data cannot be read or accessed.
      * @throws IllegalPropertyException in case some option has been defined but has incorrect values or it can't be resolved.
@@ -198,41 +233,6 @@ public class Configuration implements Root {
             layers.put(LayerPriority.PRESET, Presets.byName(getPreset()));
             logger.debug(CONFIGURATION, "Preset configuration '{}' loaded", getPreset());
         }
-    }
-
-    /**
-     * Loads the various standard configuration file layers, if found, searched at their default locations.
-     * 
-     * @throws DataAccessException in case data cannot be read or accessed.
-     * @throws IllegalPropertyException in case some option has been defined but has incorrect values or it can't be resolved.
-     */
-    private void loadStandardConfigurationFileLayers()
-        throws DataAccessException, IllegalPropertyException {
-        logger.debug(CONFIGURATION, "Searching for standard configuration files...");
-        // load standard local configuration files first, if any
-        for (String fileName: List.<String>of(".nyx.json", ".nyx.yaml", ".nyx.yml")) {
-            File file = getAbsoluteFilePath(fileName);
-            if (file.exists() && file.isFile()) {
-                logger.debug(CONFIGURATION, "Standard local configuration file found at '{}'. Loading...", file.getAbsolutePath());
-                layers.put(LayerPriority.STANDARD_LOCAL_FILE, FileMapper.load(file, SimpleConfigurationLayer.class));
-                logger.debug(CONFIGURATION, "Standard local configuration file '{}' loaded", file.getAbsolutePath());
-                break;
-            }
-            else logger.debug(CONFIGURATION, "Standard local configuration file '{}' not found.", file.getAbsolutePath());
-        }
-        // then load standard shared configuration files, if any
-        for (String fileName: List.<String>of(".nyx-shared.json", ".nyx-shared.yaml", ".nyx-shared.yml")) {
-            File file = getAbsoluteFilePath(fileName);
-            if (file.exists() && file.isFile()) {
-                logger.debug(CONFIGURATION, "Standard shared configuration file found at '{}'. Loading...", file.getAbsolutePath());
-                layers.put(LayerPriority.STANDARD_SHARED_FILE, FileMapper.load(file, SimpleConfigurationLayer.class));
-                logger.debug(CONFIGURATION, "Standard shared configuration file '{}' loaded", file.getAbsolutePath());
-                break;
-            }
-            else logger.debug(CONFIGURATION, "Standard shared configuration file '{}' not found.", file.getAbsolutePath());
-        }
-        if (layers.containsKey(LayerPriority.STANDARD_LOCAL_FILE) || layers.containsKey(LayerPriority.STANDARD_SHARED_FILE))
-            updateConfiguredConfigurationLayers();
     }
 
     /**
@@ -308,13 +308,36 @@ public class Configuration implements Root {
      * {@inheritDoc}
      */
     @Override
-    public CommitMessageConventions getCommitMessageConventions()
+    public EnabledItemsMap<CommitMessageConvention> getCommitMessageConventions()
         throws DataAccessException, IllegalPropertyException {
         logger.trace(CONFIGURATION, "Retrieving the commit message conventions");
-        if (Objects.isNull(commitMessageConventionsBlock)) {
-            commitMessageConventionsBlock = new CommitMessageConventionsBlock();
+        if (Objects.isNull(commitMessageConventionsSection)) {
+            // parse the 'enabled' items list
+            List<String> enabled = new ArrayList<String>();
+            for (ConfigurationLayer layer: layers.values()) {
+                if (!Objects.isNull(layer.getCommitMessageConventions().getEnabled())  && !layer.getCommitMessageConventions().getEnabled().isEmpty()) {
+                    enabled = layer.getCommitMessageConventions().getEnabled();
+                    logger.trace(CONFIGURATION, "The '{}.{}' configuration option value is: '{}'", "commitMessageConventions", "enabled", String.join(", ", enabled));
+                    break;
+                }
+            }
+
+            // parse the 'items' map
+            Map<String,CommitMessageConvention> items = new HashMap<String,CommitMessageConvention>();
+            for (String enabledItem: enabled) {
+                for (ConfigurationLayer layer: layers.values()) {
+                    CommitMessageConvention item = layer.getCommitMessageConventions().getItems().get(enabledItem);
+                    if (!Objects.isNull(item)) {
+                        items.put(enabledItem, item);
+                        logger.trace(CONFIGURATION, "The '{}.{}[{}]' configuration option has been resolved", "commitMessageConventions", "items", enabledItem);
+                        break;
+                    }
+                }
+            }
+
+            commitMessageConventionsSection = new EnabledItemsMap<CommitMessageConvention>(enabled, items);
         }
-        return commitMessageConventionsBlock;
+        return commitMessageConventionsSection;
     }
 
     /**
@@ -457,14 +480,35 @@ public class Configuration implements Root {
      * {@inheritDoc}
      */
     @Override
-    public ReleaseTypes getReleaseTypes()
+    public EnabledItemsMap<ReleaseType> getReleaseTypes()
         throws DataAccessException, IllegalPropertyException {
         logger.trace(CONFIGURATION, "Retrieving the release types");
+        if (Objects.isNull(releaseTypesSection)) {
+            // parse the 'enabled' items list
+            List<String> enabled = new ArrayList<String>();
+            for (ConfigurationLayer layer: layers.values()) {
+                if (!Objects.isNull(layer.getReleaseTypes().getEnabled()) && !layer.getReleaseTypes().getEnabled().isEmpty()) {
+                    enabled = layer.getReleaseTypes().getEnabled();
+                    logger.trace(CONFIGURATION, "The '{}.{}' configuration option value is: '{}'", "releaseTypes", "enabled", String.join(", ", enabled));
+                    break;
+                }
+            }
 
-        if (Objects.isNull(releaseTypesBlock)) {
-            releaseTypesBlock = new ReleaseTypesBlock();
+            // parse the 'items' map
+            Map<String,ReleaseType> items = new HashMap<String,ReleaseType>();
+            for (String enabledItem: enabled) {
+                for (ConfigurationLayer layer: layers.values()) {
+                    ReleaseType item = layer.getReleaseTypes().getItems().get(enabledItem);
+                    if (!Objects.isNull(item)) {
+                        items.put(enabledItem, item);
+                        logger.trace(CONFIGURATION, "The '{}.{}[{}]' configuration option has been resolved", "releaseTypes", "items", enabledItem);
+                        break;
+                    }
+                }
+            }
+            releaseTypesSection = new EnabledItemsMap<ReleaseType>(enabled, items);
         }
-        return releaseTypesBlock;
+        return releaseTypesSection;
     }
 
     /**
@@ -570,99 +614,5 @@ public class Configuration implements Root {
             }
         }
         return DefaultLayer.getInstance().getVersion();
-    }
-
-    /**
-     * The class implementing the {@link CommitMessageConventions} configuration block.
-     */
-    private class CommitMessageConventionsBlock extends LayeredMapConfigurationBlock<CommitMessageConvention> implements CommitMessageConventions {
-        /**
-         * Default constructor is private on purpose.
-         */
-        private CommitMessageConventionsBlock() {
-            super("commitMessageConventions");
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public List<String> getEnabled()
-            throws DataAccessException, IllegalPropertyException {
-            logger.trace(CONFIGURATION, "Retrieving the '{}.{}' configuration option", configurationBlockName, "enabled");
-            for (ConfigurationLayer layer: layers.values()) {
-                List<String> enabled = layer.getCommitMessageConventions().getEnabled();
-                if (!Objects.isNull(enabled)) {
-                    logger.trace(CONFIGURATION, "The '{}.{}' configuration option value is: '{}'", configurationBlockName, "enabled", String.join(", ", enabled));
-                    return enabled;
-                }
-            }
-            return DefaultLayer.getInstance().getCommitMessageConventions().getEnabled();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        protected CommitMessageConvention getResolvedItem(String name)
-            throws DataAccessException, IllegalPropertyException {
-            logger.trace(CONFIGURATION, "Resolving the '{}.{}[{}]' configuration option", configurationBlockName, "items", name);
-            for (ConfigurationLayer layer: layers.values()) {
-                CommitMessageConvention item = layer.getCommitMessageConventions().getItem(name);
-                if (!Objects.isNull(item)) {
-                    logger.trace(CONFIGURATION, "The '{}.{}[{}]' configuration option has been resolved", configurationBlockName, "items", name);
-                    return item;
-                }
-            }
-            logger.error(CONFIGURATION, "Unable to resolve the '{}.{}[{}]' configuration option", configurationBlockName, "items", name);
-            throw new IllegalPropertyException(String.format("Unable to resolve the '%s.%s[%s]' configuration option", configurationBlockName, "items", name));
-        }
-    }
-
-    /**
-     * The class implementing the {@link ReleaseTypes} configuration block.
-     */
-    private class ReleaseTypesBlock extends LayeredMapConfigurationBlock<ReleaseType> implements ReleaseTypes {
-        /**
-         * Default constructor is private on purpose.
-         */
-        private ReleaseTypesBlock() {
-            super("releaseTypes");
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public List<String> getEnabled()
-            throws DataAccessException, IllegalPropertyException {
-            logger.trace(CONFIGURATION, "Retrieving the '{}.{}' configuration option", configurationBlockName, "enabled");
-            for (ConfigurationLayer layer: layers.values()) {
-                List<String> enabled = layer.getReleaseTypes().getEnabled();
-                if (!Objects.isNull(enabled)) {
-                    logger.trace(CONFIGURATION, "The '{}.{}' configuration option value is: '{}'", configurationBlockName, "enabled", String.join(", ", enabled));
-                    return enabled;
-                }
-            }
-            return DefaultLayer.getInstance().getReleaseTypes().getEnabled();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        protected ReleaseType getResolvedItem(String name)
-            throws DataAccessException, IllegalPropertyException {
-            logger.trace(CONFIGURATION, "Resolving the '{}.{}[{}]' configuration option", configurationBlockName, "items", name);
-            for (ConfigurationLayer layer: layers.values()) {
-                ReleaseType item = layer.getReleaseTypes().getItem(name);
-                if (!Objects.isNull(item)) {
-                    logger.trace(CONFIGURATION, "The '{}.{}[{}]' configuration option has been resolved", configurationBlockName, "items", name);
-                    return item;
-                }
-            }
-            logger.error(CONFIGURATION, "Unable to resolve the '{}.{}[{}]' configuration option", configurationBlockName, "items", name);
-            throw new IllegalPropertyException(String.format("Unable to resolve the '%s.%s[%s]' configuration option", configurationBlockName, "items", name));
-        }
     }
 }

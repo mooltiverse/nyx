@@ -82,6 +82,7 @@ plugins {
     
     // This plugin allows to have additional test sets, configured in a testSets block, like integrationTest and functionalTest.
     // This is applied to subprojects only.
+    // TODO: replace this plugin with Gradle's core plugin 'jvm-test-suite' when stable. See https://docs.gradle.org/current/userguide/jvm_test_suite_plugin.html
     id 'org.unbroken-dome.test-sets' version '4.0.0' apply false  // See: https://github.com/unbroken-dome/gradle-testsets-plugin
 }
 
@@ -454,7 +455,7 @@ nexusPublishing {
 }
 
 // Promote (validate) and Release from the Sonatype Nexus Staging repository to Maven Central
-// Note that after the plugin exits succesfully it may take ~10-15 minutes to get the content visible on Maven Central.
+// Note that after the plugin exits successfully it may take ~10-15 minutes to get the content visible on Maven Central.
 // Once done the content is publicly available at https://repo.maven.apache.org/maven2/com/mooltiverse/oss/nyx/
 // See https://github.com/Codearte/gradle-nexus-staging-plugin/
 nexusStaging {

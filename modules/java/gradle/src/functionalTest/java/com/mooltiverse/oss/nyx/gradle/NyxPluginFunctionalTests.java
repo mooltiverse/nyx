@@ -86,7 +86,7 @@ public class NyxPluginFunctionalTests {
      */
     static String[] wellKnownWorkingGradleVersionsArray = new String[] {
         // Versions that are known to work
-        "7.2", "7.1.1", "7.1", "7.0.2", "7.0.1", "7.0",
+        "7.3", "7.2", "7.1.1", "7.1", "7.0.2", "7.0.1", "7.0",
 
         // - version "6.5" has a bug (https://github.com/gradle/gradle/issues/13367) that prevents us to test, fixed in "6.5.1"
         "6.9.1", "6.9", "6.8.3", "6.8.2", "6.8.1", "6.8", "6.7.1", "6.7", "6.6.1", "6.6", "6.5.1", /*"6.5",*/ "6.4.1", "6.4", "6.3", "6.2.2", "6.2.1", "6.2", "6.1.1", "6.1", "6.0.1", "6.0",
@@ -534,47 +534,23 @@ public class NyxPluginFunctionalTests {
     }
 
     /**
-     * Returns a string with a valid content for the .gitignore file. The returned file ignores the .gradle dir to avoid errors due to file locks.
-     * 
-     * @return a string with a valid content for the .gitignore file
-     */
-    static String gitIgnore() {
-        StringWriter stringWriter = new StringWriter();
-        PrintWriter printWriter = new PrintWriter(stringWriter);
-
-        printWriter.println(".gitignore");
-        printWriter.println(".gradle");
-        printWriter.println("build.gradle");
-        printWriter.println("settings.gradle");
-        
-        // the following files are those created for internal diagnostics by custom tasks
-        printWriter.println("diag-*.txt");
-        printWriter.println("state-*.txt");
-
-        printWriter.println();
-
-        return stringWriter.toString();
-    }
-
-    /**
      * Instantiates a new GradleRunner to use for tests, using the given Gradle version.
      * A new temporary directory is created for each test and used by the runner if none is given.
      * The settings.gradle is created with a standard content while the build.gradle file is created with the given content.
      * 
-     * @param directory the directory to create the runner in. If {@code null} a new one is created
+     * @param script the Git script
      * @param gradleVersion the Gradle version to test against
      * @oaram gradleSettingsFileContent the content of the settings.gradle to create in the project directory
      * @oaram gradleBuildFileContent the content of the build.gradle to create in the project directory
-     * @oaram gitIgnoreFileContent the content of the .gitignore to create in the project directory
      * 
      * @return the runner to use for tests, already using the temporary directory
      * 
      * @throws Exception in case of any issue
      */
-    GradleRunner setUp(File directory, String gradleVersion, String gradleSettingsFileContent, String gradleBuildFileContent, String gitIgnoreFileContent)
+    GradleRunner setUp(Script script, String gradleVersion, String gradleSettingsFileContent, String gradleBuildFileContent)
         throws Exception {
         
-        File tempProjectDir = Objects.isNull(directory) ? Files.createTempDirectory("nyx-gradle-"+gradleVersion+"-test").toFile() : directory;
+        File tempProjectDir = Objects.isNull(script.getWorkingDirectory()) ? Files.createTempDirectory("nyx-test-gradle-"+gradleVersion+"-test-").toFile() : script.getWorkingDirectory();
 
         // let the VM delete the directories on exit
         tempProjectDir.deleteOnExit(); 
@@ -591,7 +567,10 @@ public class NyxPluginFunctionalTests {
         write(new File(tempProjectDir, "build.gradle"), gradleBuildFileContent);
 
         // Create the .gitignore file
-        write(new File(tempProjectDir, ".gitignore"), gitIgnoreFileContent);
+        script.andIgnore(
+            ".gitignore", ".gradle", "build.gradle", "settings.gradle",
+            // the following files are those created for internal diagnostics by custom tasks
+            "diag-*.txt", "state-*.txt");
 
         // withPluginClasspath() puts the Nyx plugin into the classpath
         return GradleRunner.create().withGradleVersion(gradleVersion).withProjectDir(tempProjectDir).withPluginClasspath().forwardOutput();
@@ -661,24 +640,6 @@ public class NyxPluginFunctionalTests {
     @DisplayName("gradle project plugin")
     class NyxProjectPluginTests {
         /**
-         * Test that an exception is thrown when running in a directory that contains no Git repository.
-         * 
-         * @throws Exception in case of any issues
-         */
-        @ParameterizedTest(name = "gradle {0} [Gradle Version: {1}, Plugin {2}, Script: empty] ==> {3}")
-        @MethodSource("com.mooltiverse.oss.nyx.gradle.NyxPluginFunctionalTests#wellKnownTaskTestSuites")
-        void exceptionRunningNyxTaskWithNoGitRepository(String target, String gradleVersion, Map<String,String> pluginCombination, Map<String,TaskOutcome> taskOutcomes)
-            throws Exception {
-            assumeFalse(Objects.isNull(System.getProperty(MEDIUM_GROOVY_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY)), "A configuration file path must be passed to this test as a system property but it was not set");
-            GradleRunner gradleRunner = setUp(null, gradleVersion, gradleSettings(gradleVersion, false, null), gradleBuild(gradleVersion, true, pluginCombination, System.getProperty(MEDIUM_GROOVY_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY)), gitIgnore());
-
-            // Gradle wraps these exception so let's not make assumptions on the type
-            assertThrows(Exception.class, () -> runTask(gradleRunner, gradleVersion, target, taskOutcomes));
-
-            tearDown(gradleRunner);
-        }
-
-        /**
          * Test running the given task with no exceptions using the given Gradle version.
          * 
          * @throws Exception in case of any issues
@@ -690,7 +651,7 @@ public class NyxPluginFunctionalTests {
             assumeFalse(Objects.isNull(System.getProperty(MEDIUM_GROOVY_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY)), "A configuration file path must be passed to this test as a system property but it was not set");
             Script script = Scenario.INITIAL_COMMIT.realize();
             script.addRemote(Scenario.FROM_SCRATCH.realize().getGitDirectory(), "origin");
-            GradleRunner gradleRunner = setUp(script.getWorkingDirectory(), gradleVersion, gradleSettings(gradleVersion, false, null), gradleBuild(gradleVersion, true, pluginCombination, System.getProperty(MEDIUM_GROOVY_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY)), gitIgnore());
+            GradleRunner gradleRunner = setUp(script, gradleVersion, gradleSettings(gradleVersion, false, null), gradleBuild(gradleVersion, true, pluginCombination, System.getProperty(MEDIUM_GROOVY_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY)));
 
             runTask(gradleRunner, gradleVersion, target, taskOutcomes);
 
@@ -711,7 +672,7 @@ public class NyxPluginFunctionalTests {
             assumeFalse(Objects.isNull(System.getProperty(MEDIUM_GROOVY_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY)), "A configuration file path must be passed to this test as a system property but it was not set");
             Script script = Scenario.INITIAL_COMMIT.realize();
             script.addRemote(Scenario.FROM_SCRATCH.realize().getGitDirectory(), "origin");
-            GradleRunner gradleRunner = setUp(script.getWorkingDirectory(), gradleVersion, gradleSettings(gradleVersion, false, null), gradleBuild(gradleVersion, true, pluginCombination, System.getProperty(MEDIUM_GROOVY_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY)), gitIgnore());
+            GradleRunner gradleRunner = setUp(script, gradleVersion, gradleSettings(gradleVersion, false, null), gradleBuild(gradleVersion, true, pluginCombination, System.getProperty(MEDIUM_GROOVY_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY)));
 
             runTask(gradleRunner, gradleVersion, target, taskOutcomes);
 
@@ -733,7 +694,7 @@ public class NyxPluginFunctionalTests {
             assumeFalse(Objects.isNull(System.getProperty(MEDIUM_GROOVY_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY)), "A configuration file path must be passed to this test as a system property but it was not set");
             Script script = Scenario.ONE_BRANCH_SHORT.realize();
             script.addRemote(Scenario.FROM_SCRATCH.realize().getGitDirectory(), "origin");
-            GradleRunner gradleRunner = setUp(script.getWorkingDirectory(), gradleVersion, gradleSettings(gradleVersion, false, null), gradleBuild(gradleVersion, true, pluginCombination, System.getProperty(MEDIUM_GROOVY_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY)), gitIgnore());
+            GradleRunner gradleRunner = setUp(script, gradleVersion, gradleSettings(gradleVersion, false, null), gradleBuild(gradleVersion, true, pluginCombination, System.getProperty(MEDIUM_GROOVY_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY)));
 
             // do not run any nyx Task, just the tasks that write the version to a file, which must be already available
             runTask(gradleRunner, gradleVersion, "dummy", null);
@@ -758,7 +719,7 @@ public class NyxPluginFunctionalTests {
             assumeFalse(Objects.isNull(System.getProperty(MEDIUM_GROOVY_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY)), "A configuration file path must be passed to this test as a system property but it was not set");
             Script script = Scenario.ONE_BRANCH_SHORT.realize();
             script.addRemote(Scenario.FROM_SCRATCH.realize().getGitDirectory(), "origin");
-            GradleRunner gradleRunner = setUp(script.getWorkingDirectory(), gradleVersion, gradleSettings(gradleVersion, false, null), gradleBuild(gradleVersion, true, pluginCombination, System.getProperty(MEDIUM_GROOVY_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY)), gitIgnore());
+            GradleRunner gradleRunner = setUp(script, gradleVersion, gradleSettings(gradleVersion, false, null), gradleBuild(gradleVersion, true, pluginCombination, System.getProperty(MEDIUM_GROOVY_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY)));
 
             // just run the nyxInfer Task, just the tasks that write the version to a file, which must be already available
             runTask(gradleRunner, gradleVersion, "nyxInfer", null);
@@ -786,7 +747,7 @@ public class NyxPluginFunctionalTests {
             assumeFalse(Objects.isNull(System.getProperty(SIMPLE_GROOVY_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY)), "A configuration file path must be passed to this test as a system property but it was not set");
             Script script = Scenario.ONE_BRANCH_SHORT.realize();
             script.addRemote(Scenario.FROM_SCRATCH.realize().getGitDirectory(), "origin");
-            GradleRunner gradleRunner = setUp(script.getWorkingDirectory(), gradleVersion, gradleSettings(gradleVersion, false, null), gradleBuild(gradleVersion, true, pluginCombination, System.getProperty(SIMPLE_GROOVY_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY)), gitIgnore());
+            GradleRunner gradleRunner = setUp(script, gradleVersion, gradleSettings(gradleVersion, false, null), gradleBuild(gradleVersion, true, pluginCombination, System.getProperty(SIMPLE_GROOVY_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY)));
 
             // just run the nyxInfer Task, just the tasks that write the version to a file, which must be already available
             runTask(gradleRunner, gradleVersion, "nyxInfer", null);
@@ -821,7 +782,7 @@ public class NyxPluginFunctionalTests {
             assumeFalse(Objects.isNull(System.getProperty(MEDIUM_GROOVY_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY)), "A configuration file path must be passed to this test as a system property but it was not set");
             Script script = Scenario.ONE_BRANCH_SHORT.realize();
             script.addRemote(Scenario.FROM_SCRATCH.realize().getGitDirectory(), "origin");
-            GradleRunner gradleRunner = setUp(script.getWorkingDirectory(), gradleVersion, gradleSettings(gradleVersion, true, System.getProperty(MEDIUM_GROOVY_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY)), gradleBuild(gradleVersion, false, pluginCombination, null), gitIgnore());
+            GradleRunner gradleRunner = setUp(script, gradleVersion, gradleSettings(gradleVersion, true, System.getProperty(MEDIUM_GROOVY_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY)), gradleBuild(gradleVersion, false, pluginCombination, null));
 
             // do not run any nyx Task, just the tasks that write the version to a file, which must be already available
             runTask(gradleRunner, gradleVersion, "dummy", null);
@@ -857,7 +818,7 @@ public class NyxPluginFunctionalTests {
             assumeFalse(Objects.isNull(System.getProperty(SIMPLE_GROOVY_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY)), "A configuration file path must be passed to this test as a system property but it was not set");
             Script script = Scenario.ONE_BRANCH_SHORT.realize();
             script.addRemote(Scenario.FROM_SCRATCH.realize().getGitDirectory(), "origin");
-            GradleRunner gradleRunner = setUp(script.getWorkingDirectory(), gradleVersion, gradleSettings(gradleVersion, true, System.getProperty(SIMPLE_GROOVY_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY)), gradleBuild(gradleVersion, false, pluginCombination, null), gitIgnore());
+            GradleRunner gradleRunner = setUp(script, gradleVersion, gradleSettings(gradleVersion, true, System.getProperty(SIMPLE_GROOVY_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY)), gradleBuild(gradleVersion, false, pluginCombination, null));
 
             // do not run any nyx Task, just the tasks that write the version to a file, which must be already available
             runTask(gradleRunner, gradleVersion, "dummy", null);

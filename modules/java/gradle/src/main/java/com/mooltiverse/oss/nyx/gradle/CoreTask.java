@@ -24,8 +24,8 @@ import org.gradle.api.plugins.ExtensionContainer;
 import org.gradle.api.tasks.Internal;
 
 import com.mooltiverse.oss.nyx.Nyx;
-import com.mooltiverse.oss.nyx.data.DataAccessException;
-import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
+import com.mooltiverse.oss.nyx.entities.IllegalPropertyException;
+import com.mooltiverse.oss.nyx.io.DataAccessException;
 import com.mooltiverse.oss.nyx.state.State;
 
 /**

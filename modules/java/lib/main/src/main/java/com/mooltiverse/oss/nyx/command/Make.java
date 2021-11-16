@@ -23,10 +23,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mooltiverse.oss.nyx.ReleaseException;
-import com.mooltiverse.oss.nyx.data.DataAccessException;
-import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
+import com.mooltiverse.oss.nyx.entities.IllegalPropertyException;
 import com.mooltiverse.oss.nyx.git.GitException;
 import com.mooltiverse.oss.nyx.git.Repository;
+import com.mooltiverse.oss.nyx.io.DataAccessException;
 import com.mooltiverse.oss.nyx.state.State;
 
 /**
@@ -64,23 +64,10 @@ public class Make extends AbstractCommand {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isUpToDate()
-        throws DataAccessException, IllegalPropertyException, GitException {
-        logger.debug(COMMAND, "Checking whether the Make command is up to date");
-        // TODO: implement the up-to-date checks here
-        // for now let's just check if the task has executed by seeing if we have stored the last
-        // execution time. Also see where the attribute is stored in the run() method
-        return !Objects.isNull(state().getInternals().get(INTERNAL_EXECUTED));
-    }
-
-    /**
      * This method stores the state internal attributes used for up-to-date checks so that subsequent invocations
      * of the {@link #isUpToDate()} method can find them and determine if the command is already up to date.
      * 
-     * This method is meant to be invoked at the end of a succesful {@link #run()}.
+     * This method is meant to be invoked at the end of a successful {@link #run()}.
      * 
      * @throws DataAccessException in case the configuration can't be loaded for some reason.
      * @throws IllegalPropertyException in case the configuration has some illegal options.
@@ -94,6 +81,19 @@ public class Make extends AbstractCommand {
         logger.debug(COMMAND, "Storing the Make command internal attributes to the State");
         // store the last execution time
         state().getInternals().put(INTERNAL_EXECUTED, Long.toString(System.currentTimeMillis()));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isUpToDate()
+        throws DataAccessException, IllegalPropertyException, GitException {
+        logger.debug(COMMAND, "Checking whether the Make command is up to date");
+        // TODO: implement the up-to-date checks here
+        // for now let's just check if the task has executed by seeing if we have stored the last
+        // execution time. Also see where the attribute is stored in the run() method
+        return !Objects.isNull(state().getInternals().get(INTERNAL_EXECUTED));
     }
 
     /**

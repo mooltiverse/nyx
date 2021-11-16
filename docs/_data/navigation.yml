@@ -136,11 +136,6 @@ nav-user-guide:
 #        url: /guide/user/in-depth/internals/
       - title: "Gradle Plugin"
         url: /guide/user/in-depth/gradle-plugin/
-#  - title: Transitioning
-#    url: /guide/user/transitioning/
-#    children:
-#    - title: "From Semantic Release"
-#      url: /guide/user/transitioning/from-semantic-release/
   - title: Help
     url: /help/
     children:

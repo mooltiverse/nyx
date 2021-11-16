@@ -57,17 +57,37 @@ When you need to pass a configuration option as an environment variable you can 
 ### YAML
 
 ```yaml
-simpleOption: <VALUE>
+simpleOption: "<VALUE>"
 section:
-    simpleNestedOption: <VALUE>
+    simpleNestedOption: "<VALUE>"
 listOption:
-    - <VALUE1>
-    - <VALUE2>
-    - <VALUEN>
+    - "<VALUE1>"
+    - "<VALUE2>"
+    - "<VALUEN>"
+objectsListOption:
+    -
+        option1: "<VALUE1>"
+        option2: "<VALUE1>"
+    -
+        option1: "<VALUE2>"
+        option2: "<VALUE2>"
+    -
+        option1: "<VALUE2>"
+        option2: "<VALUE2>"
 mapOption:
-    <NAME>: "<VALUE>"
-    <NAME>: "<VALUE>"
-    <NAME>: "<VALUE>"
+    <NAME1>: "<VALUE>"
+    <NAME2>: "<VALUE>"
+    <NAME3>: "<VALUE>"
+objectsMapOption:
+    <NAME1>:
+        option1: "<VALUE2>"
+        option2: "<VALUE2>"
+    <NAME2>:
+        option1: "<VALUE2>"
+        option2: "<VALUE2>"
+    <NAME3>:
+        option1: "<VALUE2>"
+        option2: "<VALUE2>"
 ```
 
 The grammar definition is available at [https://yaml.org/](https://yaml.org/) and you can check the correctness of your YAML files at [http://www.yamllint.com/](http://www.yamllint.com/).
@@ -81,10 +101,38 @@ The grammar definition is available at [https://yaml.org/](https://yaml.org/) an
         "simpleNestedOption": "<VALUE>"
     },
     "listOption": ["<VALUE1>", "<VALUE2>", "<VALUEN>"],
+    "objectsListOption": [
+        {
+            "option1": "<VALUE1>",
+            "option2": "<VALUE2>"
+        },
+        {
+            "option1": "<VALUE1>",
+            "option2": "<VALUE2>"
+        },
+        {
+            "option1": "<VALUE1>",
+            "option2": "<VALUE2>"
+        }
+    ],
     "mapOption" : {
-        "<NAME>" : "<VALUE>",
-        "<NAME>" : "<VALUE>",
-        "<NAME>" : "<VALUE>"
+        "<NAME1>" : "<VALUE>",
+        "<NAME2>" : "<VALUE>",
+        "<NAME3>" : "<VALUE>"
+    },
+    "objectsMapOption" : {
+        "<NAME1>" : {
+            "option1": "<VALUE1>",
+            "option2": "<VALUE2>"
+        },
+        "<NAME2>" : {
+            "option1": "<VALUE1>",
+            "option2": "<VALUE2>"
+        },
+        "<NAME3>" : {
+            "option1": "<VALUE1>",
+            "option2": "<VALUE2>"
+        }
     }
 }
 ```
@@ -102,18 +150,37 @@ nyx {
         simpleNestedOption = '<VALUE>'
     }
     listOption = ['<VALUE1>', '<VALUE2>', '<VALUEN>']
+    objectsListOption {
+        "<NAME1>" {
+            option1 = "<VALUE>"
+            option2 = "<VALUE>"
+        }
+        "<NAME2>" {
+            option1 = "<VALUE>"
+            option2 = "<VALUE>"
+        }
+        "<NAME3>" {
+            option1 = "<VALUE>"
+            option2 = "<VALUE>"
+        }
+    }
     mapOption {
-        "<NAME>" {
-            objectOption = "<VALUE>"
-            objectSetting = "<VALUE>"
+        "<NAME1>" = "<VALUE>"
+        "<NAME2>" = "<VALUE>"
+        "<NAME3>" = "<VALUE>"
+    }
+    objectsMapOption {
+        "<NAME1>" {
+            option1 = "<VALUE>"
+            option2 = "<VALUE>"
         }
-        "<NAME>" {
-            objectOption = "<VALUE>"
-            objectSetting = "<VALUE>"
+        "<NAME2>" {
+            option1 = "<VALUE>"
+            option2 = "<VALUE>"
         }
-        "<NAME>" {
-            objectOption = "<VALUE>"
-            objectSetting = "<VALUE>"
+        "<NAME3>" {
+            option1 = "<VALUE>"
+            option2 = "<VALUE>"
         }
     }
 }
@@ -121,40 +188,61 @@ nyx {
 
 As you can see the entire Nyx configuration is enclosed within the `nyx` block to isolate it from other options.
 
+Please note that object lists in Gradle DSL are defined just like object maps. Which means you need to give each item a name, even if the object shouldn't. This is due to a limitation reported [here](https://github.com/mooltiverse/nyx/issues/77). As a rule of thumb, use the string representation (enclosed in quotes) of the item ordinal for the item name to make sure the order of items is safe.
+{: .notice--info}
+
 Gradle build scripts can be authored using the [Groovy](https://groovy-lang.org/syntax.html) or the [Kotlin](https://kotlinlang.org/docs/reference/grammar.html) grammar.
 
-## List and objects
+## Collections of objects
 
-Passing configuration options as list and objects is fairly intuitive when using configuration files, as already [shown](#supported-file-grammars). On the other hand, passing complex values as command line options or environment variables needs a clear convention.
+Passing configuration options as maps of objects is fairly intuitive when using configuration files, as already [shown](#supported-file-grammars). On the other hand, passing complex values as command line options or environment variables needs a clear convention.
 
-When passing objects belonging to a list we need to intruduce an identifier to refer to an element or another. This identifier can be a positive integer or, in all cases when list elements have a `name` attribute, the elemnt name. This identifier is represented in this guide as `<NAME>` or shortly `<ID>`.
+When passing objects belonging to a list or map we need to intruduce an identifier to refer to an element or another. This identifier can be a simple string, also used as the `name` attribute. This identifier is represented in this guide as `<NAME>` (for maps), `<#>` (for lists) or `<ID>`.
 
-For example, using the same example as per [configuration files](#supported-file-grammars), object lists can be passed as command line options as:
+For example, using the same example as per [configuration files](#supported-file-grammars), object maps can be passed as command line options as:
 
 ```bash
---objectListOption-first-name=first
---objectListOption-first-objectOption=<VALUE>
---objectListOption-first-objectSetting=<VALUE>
---objectListOption-second-name=second
---objectListOption-second-objectOption=<VALUE>
---objectListOption-second-objectSetting=<VALUE>
---objectListOption-third-name=third
---objectListOption-third-objectOption=<VALUE>
---objectListOption-third-objectSetting=<VALUE>
+--objectMapOption-first-objectOption1=<VALUE>
+--objectMapOption-first-objectOption2=<VALUE>
+--objectMapOption-second-objectOption1=<VALUE>
+--objectMapOption-second-objectOption2=<VALUE>
+--objectMapOption-third-objectOption1=<VALUE>
+--objectMapOption-third-objectOption2=<VALUE>
 ```
 
 The same goes for environment variables, so:
 
 ```bash
-NYX_OBJECT_LIST_OPTION_first_NAME=first
-NYX_OBJECT_LIST_OPTION_first_OBJECT_OPTION=<VALUE>
-NYX_OBJECT_LIST_OPTION_first_OBJECT_SETTING_=<VALUE>
-NYX_OBJECT_LIST_OPTION_second_NAME=second
-NYX_OBJECT_LIST_OPTION_second_OBJECT_OPTION=<VALUE>
-NYX_OBJECT_LIST_OPTION_second_OBJECT_SETTING=<VALUE>
-NYX_OBJECT_LIST_OPTION_third_NAME=third
-NYX_OBJECT_LIST_OPTION_third_OBJECT_OPTION_=<VALUE>
-NYX_OBJECT_LIST_OPTION_third_OBJECT_SETTING=<VALUE>
+NYX_OBJECT_MAP_OPTION_first_OBJECT_OPTION1=<VALUE>
+NYX_OBJECT_MAP_OPTION_first_OBJECT_OPTION2=<VALUE>
+NYX_OBJECT_MAP_OPTION_second_OBJECT_OPTION1=<VALUE>
+NYX_OBJECT_MAP_OPTION_second_OBJECT_OPTION2=<VALUE>
+NYX_OBJECT_MAP_OPTION_third_OBJECT_OPTION1=<VALUE>
+NYX_OBJECT_MAP_OPTION_third_OBJECT_OPTION2=<VALUE>
 ```
 
 Names in identifiers must be considered case sensitive. Moreover, item names must not contain whitespaces or characters other than alphanumeric.
+
+Object lists can be passed as command line options as:
+
+```bash
+--objectListOption-1-objectOption1=<VALUE>
+--objectListOption-1-objectOption2=<VALUE>
+--objectListOption-2-objectOption1=<VALUE>
+--objectListOption-2-objectOption2=<VALUE>
+--objectListOption-3-objectOption1=<VALUE>
+--objectListOption-3-objectOption2=<VALUE>
+```
+
+The same goes for environment variables, so:
+
+```bash
+NYX_OBJECT_LIST_OPTION_1_OBJECT_OPTION1=<VALUE>
+NYX_OBJECT_LIST_OPTION_1_OBJECT_OPTION2=<VALUE>
+NYX_OBJECT_LIST_OPTION_2_OBJECT_OPTION1=<VALUE>
+NYX_OBJECT_LIST_OPTION_2_OBJECT_OPTION2=<VALUE>
+NYX_OBJECT_LIST_OPTION_2_OBJECT_OPTION1=<VALUE>
+NYX_OBJECT_LIST_OPTION_2_OBJECT_OPTION2=<VALUE>
+```
+
+Ordinals can be positive integers only and must not contain whitespaces or characters other than numeric. The ordinal used determines the order of elements. The first ordinal is `0`.

@@ -15,9 +15,10 @@
  */
 package com.mooltiverse.oss.nyx.git.util;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.PrintStream;
+import java.io.FileWriter;
 import java.io.OutputStream;
 import java.nio.file.Files;
 
@@ -392,14 +393,32 @@ public class FileSystemUtil {
      */
     public static void writeRandomText(File file, int lines, int length)
         throws Exception {
+        String[] contentLines = new String[lines];
+        for (int i=0; i<lines; i++)
+            contentLines[i] = RandomUtil.randomAlphabeticString(length);
+        appendLines(file, contentLines);
+    }
+
+    /**
+     * Appends the given lines to the end of the given file.
+     * 
+     * @param file the file to write to. If it doesn't exist yet then it is created.
+     * @param lines the text lines to append 
+     * 
+     * @throws Exception in case of any exception
+     */
+    public static void appendLines(File file, String... lines)
+        throws Exception {
         if (!file.exists())
             file.createNewFile();
-        
-        PrintStream writer = new PrintStream(file);
-        for (int i=0; i<lines; i++)
-            for (int j=0; j<length; j++)
-                writer.println(RandomUtil.randomAlphabeticString(length));
-        writer.flush();
-        writer.close();
+
+        FileWriter fw = new FileWriter(file, true);
+        BufferedWriter bw = new BufferedWriter(fw);
+        for (String line: lines) {
+            bw.write(line);
+            bw.newLine();
+        }
+        bw.flush();
+        bw.close();
     }
 }

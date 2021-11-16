@@ -25,7 +25,6 @@ import java.util.EnumMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.mooltiverse.oss.nyx.command.AbstractCommand;
 import com.mooltiverse.oss.nyx.command.Clean;
 import com.mooltiverse.oss.nyx.command.Command;
 import com.mooltiverse.oss.nyx.command.Commands;
@@ -34,18 +33,18 @@ import com.mooltiverse.oss.nyx.command.Make;
 import com.mooltiverse.oss.nyx.command.Mark;
 import com.mooltiverse.oss.nyx.command.Publish;
 import com.mooltiverse.oss.nyx.configuration.Configuration;
-import com.mooltiverse.oss.nyx.data.DataAccessException;
-import com.mooltiverse.oss.nyx.data.FileMapper;
-import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
+import com.mooltiverse.oss.nyx.entities.IllegalPropertyException;
 import com.mooltiverse.oss.nyx.git.Git;
 import com.mooltiverse.oss.nyx.git.GitException;
 import com.mooltiverse.oss.nyx.git.Repository;
+import com.mooltiverse.oss.nyx.io.DataAccessException;
+import com.mooltiverse.oss.nyx.io.FileMapper;
 import com.mooltiverse.oss.nyx.state.State;
 
 /**
  * The Nyx entry point and main class.
  * 
- * This class is not meant to be used in multi-threaded environments.
+ * This class is not thread safe.
  */
 public class Nyx {
     /**
@@ -244,7 +243,7 @@ public class Nyx {
     }
 
     /**
-     * Runs the given command through its {@link AbstractCommand#run()}.
+     * Runs the given command through its {@link Command#run()}.
      * 
      * @param command the command to run
      * @@param saveState a boolean that, when {@code true} saves the {@link State} to the configured state file

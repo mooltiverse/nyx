@@ -111,28 +111,22 @@ releaseTypes:
       gitPush: "false"
       gitTag: "false"
       identifiers: 
-        enabled: 
-          - branch
-          - commit
-          - user
-          - timestamp
-        items: 
-          branch: 
-            position: BUILD
-            qualifier: branch
-            value: "{{#sanitize}}{{branch}}{{/sanitize}}"
-          commit: 
-            position: BUILD
-            qualifier: commit
-            value: "{{#short7}}{{releaseScope.finalCommit}}{{/short7}}"
-          timestamp: 
-            position: BUILD
-            qualifier: timestamp
-            value: "{{#timestampYYYYMMDDHHMMSS}}{{timestamp}}{{/timestampYYYYMMDDHHMMSS}}"
-          user: 
-            position: BUILD
-            qualifier: user
-            value: "{{#sanitizeLower}}{{environment.user}}{{/sanitizeLower}}"
+        -
+          position: BUILD
+          qualifier: branch
+          value: "{{#sanitize}}{{branch}}{{/sanitize}}"
+        -
+          position: BUILD
+          qualifier: commit
+          value: "{{#short7}}{{releaseScope.finalCommit}}{{/short7}}"
+        -
+          position: BUILD
+          qualifier: timestamp
+          value: "{{#timestampYYYYMMDDHHMMSS}}{{timestamp}}{{/timestampYYYYMMDDHHMMSS}}"
+        -
+          position: BUILD
+          qualifier: user
+          value: "{{#sanitizeLower}}{{environment.user}}{{/sanitizeLower}}"
       publish: "false"
       versionRangeFromBranchName: false
 resume: true

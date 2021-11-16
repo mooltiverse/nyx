@@ -16,7 +16,7 @@
 package com.mooltiverse.oss.nyx.configuration.presets;
 
 import com.mooltiverse.oss.nyx.configuration.ConfigurationLayer;
-import com.mooltiverse.oss.nyx.data.IllegalPropertyException;
+import com.mooltiverse.oss.nyx.entities.IllegalPropertyException;
 
 /**
  * The presets factory class.

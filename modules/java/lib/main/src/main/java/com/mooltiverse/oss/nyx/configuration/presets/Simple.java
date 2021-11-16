@@ -16,8 +16,12 @@
 package com.mooltiverse.oss.nyx.configuration.presets;
 
 import java.util.List;
+import java.util.Map;
 
 import com.mooltiverse.oss.nyx.configuration.SimpleConfigurationLayer;
+import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
+import com.mooltiverse.oss.nyx.entities.EnabledItemsMap;
+import com.mooltiverse.oss.nyx.entities.ReleaseType;
 
 /**
  * The simple configuration preset.
@@ -35,12 +39,21 @@ public class Simple extends SimpleConfigurationLayer {
         super();
 
         // add the 'conventionalCommits' convention
-        getCommitMessageConventions().setEnabled(List.<String>of("conventionalCommits"));
-        getCommitMessageConventions().getItems().put("conventionalCommits", CommitMessageConventions.CONVENTIONAL_COMMITS);
+        setCommitMessageConventions(
+            new EnabledItemsMap<CommitMessageConvention>(
+                List.<String>of("conventionalCommits"),
+                Map.<String,CommitMessageConvention>of("conventionalCommits", CommitMessageConventions.CONVENTIONAL_COMMITS))
+        );
 
         // add the 'mainline' and 'internal' release types
-        getReleaseTypes().setEnabled(List.<String>of("mainline", "internal"));
-        getReleaseTypes().getItems().put("mainline", ReleaseTypes.MAINLINE);
-        getReleaseTypes().getItems().put("internal", ReleaseTypes.INTERNAL);
+        setReleaseTypes(
+            new EnabledItemsMap<ReleaseType>(
+                List.<String>of("mainline", "internal"),
+                Map.<String,ReleaseType>of(
+                    "mainline", ReleaseTypes.MAINLINE,
+                    "internal", ReleaseTypes.INTERNAL
+                )
+            )
+        );
     }
 }

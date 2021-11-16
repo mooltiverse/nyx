@@ -124,36 +124,28 @@
         "gitCommit":"false",
         "gitPush":"false",
         "gitTag":"false",
-        "identifiers":{
-          "enabled":[
-            "branch",
-            "commit",
-            "user",
-            "timestamp"
-          ],
-          "items":{
-            "user":{
+        "identifiers":[
+          {
               "position":"BUILD",
               "qualifier":"user",
               "value":"{{#sanitizeLower}}{{environment.user}}{{/sanitizeLower}}"
-            },
-            "timestamp":{
+          },
+          {
               "position":"BUILD",
               "qualifier":"timestamp",
               "value":"{{#timestampYYYYMMDDHHMMSS}}{{timestamp}}{{/timestampYYYYMMDDHHMMSS}}"
-            },
-            "commit":{
+          },
+          {
               "position":"BUILD",
               "qualifier":"commit",
               "value":"{{#short7}}{{releaseScope.finalCommit}}{{/short7}}"
-            },
-            "branch":{
+          },
+          {
               "position":"BUILD",
               "qualifier":"branch",
               "value":"{{#sanitize}}{{branch}}{{/sanitize}}"
-            }
           }
-        },
+        ],
         "publish":"false",
         "versionRangeFromBranchName":false
       }

@@ -33,8 +33,9 @@ import com.mooltiverse.oss.nyx.command.template.CommandSelector;
 import com.mooltiverse.oss.nyx.command.template.StandaloneCommandProxy;
 import com.mooltiverse.oss.nyx.configuration.Defaults;
 import com.mooltiverse.oss.nyx.configuration.SimpleConfigurationLayer;
-import com.mooltiverse.oss.nyx.data.CommitMessageConvention;
-import com.mooltiverse.oss.nyx.data.ReleaseType;
+import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
+import com.mooltiverse.oss.nyx.entities.EnabledItemsMap;
+import com.mooltiverse.oss.nyx.entities.ReleaseType;
 import com.mooltiverse.oss.nyx.git.GitException;
 import com.mooltiverse.oss.nyx.git.Scenario;
 import com.mooltiverse.oss.nyx.git.Script;
@@ -164,18 +165,22 @@ public class MarkTestTemplates {
             List<String> previousCommits = script.getCommitIDs();
             Map<String,String> previousTags = script.getTags();
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            // add a custom release type that always enables committing, tagging and pushing
-            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseType", new ReleaseType() {
-                {
-                    setGitCommit(Boolean.FALSE.toString());
-                    setGitPush(Boolean.FALSE.toString());
-                    setGitTag(Boolean.FALSE.toString());
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("testReleaseType"));
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // disable all commit message conventions so no commit yields to a bump identifier
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of());
+            configurationLayerMock.setCommitMessageConventions(new EnabledItemsMap<CommitMessageConvention>(List.<String>of(),Map.<String,CommitMessageConvention>of()));
+            // add a custom release type that always enables committing, tagging and pushing
+            configurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("testReleaseType"),
+                    Map.<String,ReleaseType>of("testReleaseType", new ReleaseType() {
+                        {
+                            setGitCommit(Boolean.FALSE.toString());
+                            setGitPush(Boolean.FALSE.toString());
+                            setGitTag(Boolean.FALSE.toString());
+                        }}
+                    )
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -185,12 +190,12 @@ public class MarkTestTemplates {
                 assertEquals(Defaults.BUMP, command.state().getBump());
                 assertEquals(Defaults.SCHEME, command.state().getScheme());
                 assertEquals(2, command.state().getReleaseScope().getCommits().size());
-                assertEquals(script.getCommitIDs().get(1), command.state().getReleaseScope().getInitialCommit());
-                assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getFinalCommit());
+                assertEquals(script.getCommitIDs().get(1), command.state().getReleaseScope().getInitialCommit().getSHA());
+                assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getFinalCommit().getSHA());
                 assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion());
-                assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit());
+                assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
                 assertEquals("0.0.4", command.state().getReleaseScope().getPrimeVersion());
-                assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPrimeVersionCommit());
+                assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
                 assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
                 assertEquals(Defaults.ReleaseType.COLLAPSE_VERSIONS, command.state().getReleaseType().getCollapseVersions());
                 assertEquals(Defaults.ReleaseType.COLLAPSED_VERSION_QUALIFIER, command.state().getReleaseType().getCollapsedVersionQualifier());
@@ -203,10 +208,12 @@ public class MarkTestTemplates {
                     assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
                 }
                 else {
-                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                    assertTrue(Defaults.ReleaseType.IDENTIFIERS.getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                    assertTrue(Defaults.ReleaseType.IDENTIFIERS.getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                    assertTrue(Defaults.ReleaseType.IDENTIFIERS.containsAll(command.state().getReleaseType().getIdentifiers()));
+                    for (int i=0; i<=Defaults.ReleaseType.IDENTIFIERS.size(); i++) {
+                        assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                        assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                        assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                    }
                 }
                 assertEquals(Defaults.ReleaseType.MATCH_BRANCHES, command.state().getReleaseType().getMatchBranches());
                 assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -235,18 +242,23 @@ public class MarkTestTemplates {
             List<String> previousCommits = script.getCommitIDs();
             Map<String,String> previousTags = script.getTags();
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            // add a custom release type that always enables committing, tagging and pushing
-            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseType", new ReleaseType() {
-                {
-                    setGitCommit(Boolean.FALSE.toString());
-                    setGitPush(Boolean.FALSE.toString());
-                    setGitTag(Boolean.FALSE.toString());
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("testReleaseType"));
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // disable all commit message conventions so no commit yields to a bump identifier
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of());
+            configurationLayerMock.setCommitMessageConventions(new EnabledItemsMap<CommitMessageConvention>(List.<String>of(),Map.<String,CommitMessageConvention>of()));
+            // add a custom release type that always enables committing, tagging and pushing
+            configurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("testReleaseType"),
+                    Map.<String,ReleaseType>of("testReleaseType", new ReleaseType() {
+                        {
+                            setGitCommit(Boolean.FALSE.toString());
+                            setGitPush(Boolean.FALSE.toString());
+                            setGitTag(Boolean.FALSE.toString());
+                        }}
+                    )
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            
             // add some uncommitted changes
             script.andAddFiles();
 
@@ -258,12 +270,12 @@ public class MarkTestTemplates {
                 assertEquals(Defaults.BUMP, command.state().getBump());
                 assertEquals(Defaults.SCHEME, command.state().getScheme());
                 assertEquals(2, command.state().getReleaseScope().getCommits().size());
-                assertEquals(script.getCommitIDs().get(1), command.state().getReleaseScope().getInitialCommit());
-                assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getFinalCommit());
+                assertEquals(script.getCommitIDs().get(1), command.state().getReleaseScope().getInitialCommit().getSHA());
+                assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getFinalCommit().getSHA());
                 assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion());
-                assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit());
+                assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
                 assertEquals("0.0.4", command.state().getReleaseScope().getPrimeVersion());
-                assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPrimeVersionCommit());
+                assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
                 assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
                 assertEquals(Defaults.ReleaseType.COLLAPSE_VERSIONS, command.state().getReleaseType().getCollapseVersions());
                 assertEquals(Defaults.ReleaseType.COLLAPSED_VERSION_QUALIFIER, command.state().getReleaseType().getCollapsedVersionQualifier());
@@ -276,10 +288,12 @@ public class MarkTestTemplates {
                     assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
                 }
                 else {
-                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                    assertTrue(Defaults.ReleaseType.IDENTIFIERS.getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                    assertTrue(Defaults.ReleaseType.IDENTIFIERS.getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                    assertTrue(Defaults.ReleaseType.IDENTIFIERS.containsAll(command.state().getReleaseType().getIdentifiers()));
+                    for (int i=0; i<=Defaults.ReleaseType.IDENTIFIERS.size(); i++) {
+                        assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                        assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                        assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                    }
                 }
                 assertEquals(Defaults.ReleaseType.MATCH_BRANCHES, command.state().getReleaseType().getMatchBranches());
                 assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -308,18 +322,22 @@ public class MarkTestTemplates {
             List<String> previousCommits = script.getCommitIDs();
             Map<String,String> previousTags = script.getTags();
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            // add a custom release type that always enables committing, tagging and pushing
-            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseType", new ReleaseType() {
-                {
-                    setGitCommit(Boolean.TRUE.toString());
-                    setGitPush(Boolean.TRUE.toString());
-                    setGitTag(Boolean.TRUE.toString());
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("testReleaseType"));
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // disable all commit message conventions so no commit yields to a bump identifier
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of());
+            configurationLayerMock.setCommitMessageConventions(new EnabledItemsMap<CommitMessageConvention>(List.<String>of(),Map.<String,CommitMessageConvention>of()));
+            // add a custom release type that always enables committing, tagging and pushing
+            configurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("testReleaseType"),
+                    Map.<String,ReleaseType>of("testReleaseType", new ReleaseType() {
+                        {
+                            setGitCommit(Boolean.TRUE.toString());
+                            setGitPush(Boolean.TRUE.toString());
+                            setGitTag(Boolean.TRUE.toString());
+                        }}
+                    )
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -329,12 +347,12 @@ public class MarkTestTemplates {
                 assertEquals(Defaults.BUMP, command.state().getBump());
                 assertEquals(Defaults.SCHEME, command.state().getScheme());
                 assertEquals(2, command.state().getReleaseScope().getCommits().size());
-                assertEquals(script.getCommitIDs().get(1), command.state().getReleaseScope().getInitialCommit());
-                assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getFinalCommit());
+                assertEquals(script.getCommitIDs().get(1), command.state().getReleaseScope().getInitialCommit().getSHA());
+                assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getFinalCommit().getSHA());
                 assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion());
-                assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit());
+                assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
                 assertEquals("0.0.4", command.state().getReleaseScope().getPrimeVersion());
-                assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPrimeVersionCommit());
+                assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
                 assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
                 assertEquals(Defaults.ReleaseType.COLLAPSE_VERSIONS, command.state().getReleaseType().getCollapseVersions());
                 assertEquals(Defaults.ReleaseType.COLLAPSED_VERSION_QUALIFIER, command.state().getReleaseType().getCollapsedVersionQualifier());
@@ -347,10 +365,12 @@ public class MarkTestTemplates {
                     assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
                 }
                 else {
-                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                    assertTrue(Defaults.ReleaseType.IDENTIFIERS.getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                    assertTrue(Defaults.ReleaseType.IDENTIFIERS.getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                    assertTrue(Defaults.ReleaseType.IDENTIFIERS.containsAll(command.state().getReleaseType().getIdentifiers()));
+                    for (int i=0; i<=Defaults.ReleaseType.IDENTIFIERS.size(); i++) {
+                        assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                        assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                        assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                    }
                 }
                 assertEquals(Defaults.ReleaseType.MATCH_BRANCHES, command.state().getReleaseType().getMatchBranches());
                 assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -379,18 +399,23 @@ public class MarkTestTemplates {
             List<String> previousCommits = script.getCommitIDs();
             Map<String,String> previousTags = script.getTags();
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            // add a custom release type that always enables committing, tagging and pushing
-            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseType", new ReleaseType() {
-                {
-                    setGitCommit(Boolean.TRUE.toString());
-                    setGitPush(Boolean.TRUE.toString());
-                    setGitTag(Boolean.TRUE.toString());
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("testReleaseType"));
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // disable all commit message conventions so no commit yields to a bump identifier
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of());
+            configurationLayerMock.setCommitMessageConventions(new EnabledItemsMap<CommitMessageConvention>(List.<String>of(),Map.<String,CommitMessageConvention>of()));
+            // add a custom release type that always enables committing, tagging and pushing
+            configurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("testReleaseType"),
+                    Map.<String,ReleaseType>of("testReleaseType", new ReleaseType() {
+                        {
+                            setGitCommit(Boolean.TRUE.toString());
+                            setGitPush(Boolean.TRUE.toString());
+                            setGitTag(Boolean.TRUE.toString());
+                        }}
+                    )
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+
             // add some uncommitted changes
             script.andAddFiles();
 
@@ -402,12 +427,12 @@ public class MarkTestTemplates {
                 assertEquals(Defaults.BUMP, command.state().getBump());
                 assertEquals(Defaults.SCHEME, command.state().getScheme());
                 assertEquals(2, command.state().getReleaseScope().getCommits().size());
-                assertEquals(script.getCommitIDs().get(1), command.state().getReleaseScope().getInitialCommit());
-                assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getFinalCommit());
+                assertEquals(script.getCommitIDs().get(1), command.state().getReleaseScope().getInitialCommit().getSHA());
+                assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getFinalCommit().getSHA());
                 assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion());
-                assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit());
+                assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
                 assertEquals("0.0.4", command.state().getReleaseScope().getPrimeVersion());
-                assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPrimeVersionCommit());
+                assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
                 assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
                 assertEquals(Defaults.ReleaseType.COLLAPSE_VERSIONS, command.state().getReleaseType().getCollapseVersions());
                 assertEquals(Defaults.ReleaseType.COLLAPSED_VERSION_QUALIFIER, command.state().getReleaseType().getCollapsedVersionQualifier());
@@ -420,10 +445,12 @@ public class MarkTestTemplates {
                     assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
                 }
                 else {
-                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                    assertTrue(Defaults.ReleaseType.IDENTIFIERS.getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                    assertTrue(Defaults.ReleaseType.IDENTIFIERS.getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                    assertTrue(Defaults.ReleaseType.IDENTIFIERS.containsAll(command.state().getReleaseType().getIdentifiers()));
+                    for (int i=0; i<=Defaults.ReleaseType.IDENTIFIERS.size(); i++) {
+                        assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                        assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                        assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                    }
                 }
                 assertEquals(Defaults.ReleaseType.MATCH_BRANCHES, command.state().getReleaseType().getMatchBranches());
                 assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -452,19 +479,27 @@ public class MarkTestTemplates {
             List<String> previousCommits = script.getCommitIDs();
             Map<String,String> previousTags = script.getTags();
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            // add a custom release type that always enables committing, tagging and pushing
-            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseType", new ReleaseType() {
-                {
-                    setGitCommit(Boolean.FALSE.toString());
-                    setGitPush(Boolean.FALSE.toString());
-                    setGitTag(Boolean.FALSE.toString());
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("testReleaseType"));
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*")))
+                )
+            );
+            // add a custom release type that always enables committing, tagging and pushing
+            configurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("testReleaseType"),
+                    Map.<String,ReleaseType>of("testReleaseType", new ReleaseType() {
+                        {
+                            setGitCommit(Boolean.FALSE.toString());
+                            setGitPush(Boolean.FALSE.toString());
+                            setGitTag(Boolean.FALSE.toString());
+                        }}
+                    )
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -474,12 +509,12 @@ public class MarkTestTemplates {
                 assertEquals("patch", command.state().getBump());
                 assertEquals(Defaults.SCHEME, command.state().getScheme());
                 assertEquals(2, command.state().getReleaseScope().getCommits().size());
-                assertEquals(script.getCommitIDs().get(1), command.state().getReleaseScope().getInitialCommit());
-                assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getFinalCommit());
+                assertEquals(script.getCommitIDs().get(1), command.state().getReleaseScope().getInitialCommit().getSHA());
+                assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getFinalCommit().getSHA());
                 assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion());
-                assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit());
+                assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
                 assertEquals("0.0.4", command.state().getReleaseScope().getPrimeVersion());
-                assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPrimeVersionCommit());
+                assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
                 assertEquals(2, command.state().getReleaseScope().getSignificantCommits().size());
                 assertEquals(Defaults.ReleaseType.COLLAPSE_VERSIONS, command.state().getReleaseType().getCollapseVersions());
                 assertEquals(Defaults.ReleaseType.COLLAPSED_VERSION_QUALIFIER, command.state().getReleaseType().getCollapsedVersionQualifier());
@@ -492,10 +527,12 @@ public class MarkTestTemplates {
                     assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
                 }
                 else {
-                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                    assertTrue(Defaults.ReleaseType.IDENTIFIERS.getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                    assertTrue(Defaults.ReleaseType.IDENTIFIERS.getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                    assertTrue(Defaults.ReleaseType.IDENTIFIERS.containsAll(command.state().getReleaseType().getIdentifiers()));
+                    for (int i=0; i<=Defaults.ReleaseType.IDENTIFIERS.size(); i++) {
+                        assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                        assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                        assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                    }
                 }
                 assertEquals(Defaults.ReleaseType.MATCH_BRANCHES, command.state().getReleaseType().getMatchBranches());
                 assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -524,19 +561,28 @@ public class MarkTestTemplates {
             List<String> previousCommits = script.getCommitIDs();
             Map<String,String> previousTags = script.getTags();
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            // add a custom release type that always enables committing, tagging and pushing
-            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseType", new ReleaseType() {
-                {
-                    setGitCommit(Boolean.FALSE.toString());
-                    setGitPush(Boolean.FALSE.toString());
-                    setGitTag(Boolean.FALSE.toString());
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("testReleaseType"));
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*")))
+                )
+            );
+            // add a custom release type that always enables committing, tagging and pushing
+            configurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("testReleaseType"),
+                    Map.<String,ReleaseType>of("testReleaseType", new ReleaseType() {
+                        {
+                            setGitCommit(Boolean.FALSE.toString());
+                            setGitPush(Boolean.FALSE.toString());
+                            setGitTag(Boolean.FALSE.toString());
+                        }}
+                    )
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+
             // add some uncommitted changes
             script.andAddFiles();
 
@@ -548,12 +594,12 @@ public class MarkTestTemplates {
                 assertEquals("patch", command.state().getBump());
                 assertEquals(Defaults.SCHEME, command.state().getScheme());
                 assertEquals(2, command.state().getReleaseScope().getCommits().size());
-                assertEquals(script.getCommitIDs().get(1), command.state().getReleaseScope().getInitialCommit());
-                assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getFinalCommit());
+                assertEquals(script.getCommitIDs().get(1), command.state().getReleaseScope().getInitialCommit().getSHA());
+                assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getFinalCommit().getSHA());
                 assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion());
-                assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit());
+                assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
                 assertEquals("0.0.4", command.state().getReleaseScope().getPrimeVersion());
-                assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPrimeVersionCommit());
+                assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
                 assertEquals(2, command.state().getReleaseScope().getSignificantCommits().size());
                 assertEquals(Defaults.ReleaseType.COLLAPSE_VERSIONS, command.state().getReleaseType().getCollapseVersions());
                 assertEquals(Defaults.ReleaseType.COLLAPSED_VERSION_QUALIFIER, command.state().getReleaseType().getCollapsedVersionQualifier());
@@ -566,10 +612,12 @@ public class MarkTestTemplates {
                     assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
                 }
                 else {
-                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                    assertTrue(Defaults.ReleaseType.IDENTIFIERS.getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                    assertTrue(Defaults.ReleaseType.IDENTIFIERS.getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                    assertTrue(Defaults.ReleaseType.IDENTIFIERS.containsAll(command.state().getReleaseType().getIdentifiers()));
+                    for (int i=0; i<=Defaults.ReleaseType.IDENTIFIERS.size(); i++) {
+                        assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                        assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                        assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                    }
                 }
                 assertEquals(Defaults.ReleaseType.MATCH_BRANCHES, command.state().getReleaseType().getMatchBranches());
                 assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -598,19 +646,27 @@ public class MarkTestTemplates {
             List<String> previousCommits = script.getCommitIDs();
             Map<String,String> previousTags = script.getTags();
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            // add a custom release type that always enables committing, tagging and pushing
-            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseType", new ReleaseType() {
-                {
-                    setGitCommit(Boolean.TRUE.toString());
-                    setGitPush(Boolean.TRUE.toString());
-                    setGitTag(Boolean.TRUE.toString());
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("testReleaseType"));
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*")))
+                )
+            );
+            // add a custom release type that always enables committing, tagging and pushing
+            configurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("testReleaseType"),
+                    Map.<String,ReleaseType>of("testReleaseType", new ReleaseType() {
+                        {
+                            setGitCommit(Boolean.TRUE.toString());
+                            setGitPush(Boolean.TRUE.toString());
+                            setGitTag(Boolean.TRUE.toString());
+                        }}
+                    )
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -620,12 +676,12 @@ public class MarkTestTemplates {
                 assertEquals("patch", command.state().getBump());
                 assertEquals(Defaults.SCHEME, command.state().getScheme());
                 assertEquals(2, command.state().getReleaseScope().getCommits().size());
-                assertEquals(script.getCommitIDs().get(1), command.state().getReleaseScope().getInitialCommit());
-                assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getFinalCommit());
+                assertEquals(script.getCommitIDs().get(1), command.state().getReleaseScope().getInitialCommit().getSHA());
+                assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getFinalCommit().getSHA());
                 assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion());
-                assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit());
+                assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
                 assertEquals("0.0.4", command.state().getReleaseScope().getPrimeVersion());
-                assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPrimeVersionCommit());
+                assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
                 assertEquals(2, command.state().getReleaseScope().getSignificantCommits().size());
                 assertEquals(Defaults.ReleaseType.COLLAPSE_VERSIONS, command.state().getReleaseType().getCollapseVersions());
                 assertEquals(Defaults.ReleaseType.COLLAPSED_VERSION_QUALIFIER, command.state().getReleaseType().getCollapsedVersionQualifier());
@@ -638,10 +694,12 @@ public class MarkTestTemplates {
                     assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
                 }
                 else {
-                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                    assertTrue(Defaults.ReleaseType.IDENTIFIERS.getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                    assertTrue(Defaults.ReleaseType.IDENTIFIERS.getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                    assertTrue(Defaults.ReleaseType.IDENTIFIERS.containsAll(command.state().getReleaseType().getIdentifiers()));
+                    for (int i=0; i<=Defaults.ReleaseType.IDENTIFIERS.size(); i++) {
+                        assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                        assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                        assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                    }
                 }
                 assertEquals(Defaults.ReleaseType.MATCH_BRANCHES, command.state().getReleaseType().getMatchBranches());
                 assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -670,19 +728,28 @@ public class MarkTestTemplates {
             List<String> previousCommits = script.getCommitIDs();
             Map<String,String> previousTags = script.getTags();
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            // add a custom release type that always enables committing, tagging and pushing
-            configurationLayerMock.getReleaseTypes().getItems().put("testReleaseType", new ReleaseType() {
-                {
-                    setGitCommit(Boolean.TRUE.toString());
-                    setGitPush(Boolean.TRUE.toString());
-                    setGitTag(Boolean.TRUE.toString());
-                }}
-            );
-            configurationLayerMock.getReleaseTypes().setEnabled(List.<String>of("testReleaseType"));
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
-            configurationLayerMock.getCommitMessageConventions().getItems().putAll(Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*"))));
-            configurationLayerMock.getCommitMessageConventions().setEnabled(List.<String>of("testConvention"));
+            configurationLayerMock.setCommitMessageConventions(
+                new EnabledItemsMap<CommitMessageConvention>(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*")))
+                )
+            );
+            // add a custom release type that always enables committing, tagging and pushing
+            configurationLayerMock.setReleaseTypes(
+                new EnabledItemsMap<ReleaseType>(
+                    List.<String>of("testReleaseType"),
+                    Map.<String,ReleaseType>of("testReleaseType", new ReleaseType() {
+                        {
+                            setGitCommit(Boolean.TRUE.toString());
+                            setGitPush(Boolean.TRUE.toString());
+                            setGitTag(Boolean.TRUE.toString());
+                        }}
+                    )
+                )
+            );
+            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            
             // add some uncommitted changes
             script.andAddFiles();
 
@@ -694,12 +761,12 @@ public class MarkTestTemplates {
                 assertEquals("patch", command.state().getBump());
                 assertEquals(Defaults.SCHEME, command.state().getScheme());
                 assertEquals(3, command.state().getReleaseScope().getCommits().size());
-                assertEquals(script.getCommitIDs().get(2), command.state().getReleaseScope().getInitialCommit());
-                assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getFinalCommit());
+                assertEquals(script.getCommitIDs().get(2), command.state().getReleaseScope().getInitialCommit().getSHA());
+                assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getFinalCommit().getSHA());
                 assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion());
-                assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit());
+                assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
                 assertEquals("0.0.4", command.state().getReleaseScope().getPrimeVersion());
-                assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPrimeVersionCommit());
+                assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
                 assertEquals(2, command.state().getReleaseScope().getSignificantCommits().size());
                 assertEquals(Defaults.ReleaseType.COLLAPSE_VERSIONS, command.state().getReleaseType().getCollapseVersions());
                 assertEquals(Defaults.ReleaseType.COLLAPSED_VERSION_QUALIFIER, command.state().getReleaseType().getCollapsedVersionQualifier());
@@ -712,10 +779,12 @@ public class MarkTestTemplates {
                     assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
                 }
                 else {
-                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.getEnabled().size(), command.state().getReleaseType().getIdentifiers().getEnabled().size());
-                    assertTrue(Defaults.ReleaseType.IDENTIFIERS.getEnabled().containsAll(command.state().getReleaseType().getIdentifiers().getEnabled()));
-                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.getItems().size(), command.state().getReleaseType().getIdentifiers().getItems().size());
-                    assertTrue(Defaults.ReleaseType.IDENTIFIERS.getItems().keySet().containsAll(command.state().getReleaseType().getIdentifiers().getItems().keySet()));
+                    assertTrue(Defaults.ReleaseType.IDENTIFIERS.containsAll(command.state().getReleaseType().getIdentifiers()));
+                    for (int i=0; i<=Defaults.ReleaseType.IDENTIFIERS.size(); i++) {
+                        assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
+                        assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
+                        assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
+                    }
                 }
                 assertEquals(Defaults.ReleaseType.MATCH_BRANCHES, command.state().getReleaseType().getMatchBranches());
                 assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
