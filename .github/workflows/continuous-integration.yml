@@ -45,7 +45,7 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Assemble with Gradle
-      run: ./gradlew assemble --configuration-cache --build-cache --stacktrace
+      run: ./gradlew assemble --build-cache --stacktrace
     - name: Archive Nyx state file
       uses: actions/upload-artifact@v2
       if: ${{ always() }}
@@ -89,7 +89,7 @@ jobs:
           # See the top level https://github.com/mooltiverse/nyx/blob/master/CONTRIBUTING.md#contributing-code file for details about passing these values when testing locally
           ORG_GRADLE_PROJECT_gitHubTestUserToken: ${{ secrets.TEST_GITHUB_USER_TOKEN }}   # The test user token to test Nyx GitHub features
           ORG_GRADLE_PROJECT_gitLabTestUserToken: ${{ secrets.TEST_GITLAB_USER_TOKEN }}   # The test user token to test Nyx GitLab features
-      run: ./gradlew test --configuration-cache --build-cache --stacktrace
+      run: ./gradlew test --build-cache --stacktrace
     - name: Archive Nyx state file
       uses: actions/upload-artifact@v2
       if: ${{ always() }}
@@ -140,7 +140,7 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Run Integration Tests with Gradle
-      run: ./gradlew integrationTest --configuration-cache --build-cache --stacktrace
+      run: ./gradlew integrationTest --build-cache --stacktrace
     - name: Archive Nyx state file
       uses: actions/upload-artifact@v2
       if: ${{ always() }}
@@ -195,7 +195,7 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Run Functional Tests with Gradle
-      run: ./gradlew functionalTest --configuration-cache --build-cache --stacktrace
+      run: ./gradlew functionalTest --build-cache --stacktrace
     - name: Archive Nyx state file
       uses: actions/upload-artifact@v2
       if: ${{ always() }}
@@ -242,7 +242,7 @@ jobs:
           # See the top level https://github.com/mooltiverse/nyx/blob/master/CONTRIBUTING.md#contributing-code file for details about passing these values when testing locally
           ORG_GRADLE_PROJECT_gitHubTestUserToken: ${{ secrets.TEST_GITHUB_USER_TOKEN }}   # The test user token to test Nyx GitHub features
           ORG_GRADLE_PROJECT_gitLabTestUserToken: ${{ secrets.TEST_GITLAB_USER_TOKEN }}   # The test user token to test Nyx GitLab features
-      run: ./gradlew check --configuration-cache --build-cache --stacktrace
+      run: ./gradlew check --build-cache --stacktrace
     - name: Archive Nyx state file
       uses: actions/upload-artifact@v2
       if: ${{ always() }}
@@ -285,7 +285,7 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Build with Gradle
-      run: ./gradlew build --configuration-cache --build-cache --stacktrace
+      run: ./gradlew build --build-cache --stacktrace
     - name: Archive Nyx state file
       uses: actions/upload-artifact@v2
       if: ${{ always() }}
@@ -335,7 +335,7 @@ jobs:
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.GPC_PASSPHRASE }}
           ORG_GRADLE_PROJECT_gradlePublishKey: ${{ secrets.GRADLE_PLUGIN_PUBLISH_KEY }}
           ORG_GRADLE_PROJECT_gradlePublishSecret: ${{ secrets.GRADLE_PLUGIN_PUBLISH_SECRET }}
-        run: ./gradlew publish --configuration-cache --build-cache --stacktrace
+        run: ./gradlew publish --build-cache --stacktrace
       - name: Archive Nyx state file
         uses: actions/upload-artifact@v2
         if: ${{ always() }}
@@ -374,7 +374,7 @@ jobs:
           # See the top level https://github.com/mooltiverse/nyx/blob/master/CONTRIBUTING.md#contributing-code file for details about passing these values when testing locally
           ORG_GRADLE_PROJECT_gitHubUser: ${{ secrets.GITHUB_USERNAME }}
           ORG_GRADLE_PROJECT_gitHubToken: ${{ secrets.GITHUB_TOKEN }}
-        run: ./gradlew release --configuration-cache --build-cache --info --stacktrace
+        run: ./gradlew release --build-cache --info --stacktrace
       - name: Archive Nyx state file
         uses: actions/upload-artifact@v2
         if: ${{ always() }}
