@@ -49,8 +49,9 @@ See [here]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-w
 
 ### Publish
 
-TODO: write this section
-{: .notice--warning}
+Publishes the release using the configured remote services.
+
+See [here]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#publish) for more.
 
 ## Using the command line
 

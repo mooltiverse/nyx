@@ -20,5 +20,5 @@ docker {
 /*------------------------------------------------------------------------------
   Additional task dependencies
 ------------------------------------------------------------------------------*/
-//tasks.docker.dependsOn(':modules:java:lib:cli:build')
+//tasks.docker.dependsOn(':modules:java:main:build')
 tasks.build.dependsOn tasks.docker

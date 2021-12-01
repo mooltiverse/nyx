@@ -18,6 +18,7 @@ nyx {
   releasePrefix = 'v'
   releaseTypes {
     enabled = [ 'mainline', 'internal' ]
+    publicationServices = [ 'github' ]
     items {
       mainline {
         collapseVersions = false
@@ -38,6 +39,7 @@ nyx {
       internal {
         collapseVersions = false
         collapsedVersionQualifier = 'internal'
+        description = 'Internal release {{version}}'
         filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$'
         gitCommit = 'false'
         gitPush = 'false'
@@ -70,5 +72,15 @@ nyx {
     }
   }
   scheme = 'SEMVER'
+  services {
+    github {
+      type = 'GITHUB'
+      options {
+        AUTHENTICATION_TOKEN = '{{#environment.variable}}GITHUB_TOKEN{{/environment.variable}}'
+        REPOSITORY_NAME = 'myrepo'
+        REPOSITORY_OWNER = 'acme'
+      }
+    }
+  }
   verbosity = 'INFO'
 }

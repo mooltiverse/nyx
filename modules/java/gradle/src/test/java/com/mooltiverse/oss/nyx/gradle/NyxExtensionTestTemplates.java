@@ -175,6 +175,17 @@ public class NyxExtensionTestTemplates {
         }
 
         @TestTemplate
+        @DisplayName("NyxExtension.getServices() default value")
+        @Baseline(Scenario.FROM_SCRATCH)
+        void getServicesDefaultTest(Project project)
+            throws Exception {
+            NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
+
+            assertNotNull(extension.getServices());
+            assertTrue(extension.getServices().isEmpty());
+        }
+
+        @TestTemplate
         @DisplayName("NyxExtension.getSharedConfigurationFile() default value")
         @Baseline(Scenario.FROM_SCRATCH)
         void getSharedConfigurationFileDefaultTest(Project project)

@@ -25,12 +25,15 @@ import java.util.Objects;
 
 import com.mooltiverse.oss.nyx.configuration.Defaults;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
+import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
 import com.mooltiverse.oss.nyx.entities.Identifier;
 import com.mooltiverse.oss.nyx.entities.IllegalPropertyException;
-import com.mooltiverse.oss.nyx.entities.EnabledItemsMap;
 import com.mooltiverse.oss.nyx.entities.ReleaseType;
+import com.mooltiverse.oss.nyx.entities.ReleaseTypes;
+import com.mooltiverse.oss.nyx.entities.ServiceConfiguration;
 import com.mooltiverse.oss.nyx.entities.Verbosity;
 import com.mooltiverse.oss.nyx.entities.WorkspaceStatus;
+import com.mooltiverse.oss.nyx.services.Provider;
 import com.mooltiverse.oss.nyx.version.Scheme;
 
 /**
@@ -51,12 +54,17 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
     /**
      * The private instance of the commit message convention configuration section.
      */
-    private EnabledItemsMap<CommitMessageConvention> commitMessageConventionsSection = null;
+    private CommitMessageConventions commitMessageConventionsSection = null;
 
     /**
      * The private instance of the release types configuration section.
      */
-    private EnabledItemsMap<ReleaseType> releaseTypesSection = null;
+    private ReleaseTypes releaseTypesSection = null;
+
+    /**
+     * The private instance of the services configuration section.
+     */
+    private Map<String,ServiceConfiguration> servicesSection = null;
 
     /**
      * Standard constructor.
@@ -85,7 +93,7 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
      * {@inheritDoc}
      */
     @Override
-    public EnabledItemsMap<CommitMessageConvention> getCommitMessageConventions() {
+    public CommitMessageConventions getCommitMessageConventions() {
         if (Objects.isNull(commitMessageConventionsSection)) {
             // the list property is always present and never null but is empty when the user doesn't define its contents
             List<String> enabled = extension.getCommitMessageConventions().getEnabled().isPresent() && !extension.getCommitMessageConventions().getEnabled().get().isEmpty() ? extension.getCommitMessageConventions().getEnabled().get() : List.<String>of();
@@ -100,7 +108,7 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
                 }
             }
 
-            commitMessageConventionsSection = new EnabledItemsMap<CommitMessageConvention>(enabled, items);
+            commitMessageConventionsSection = new CommitMessageConventions(enabled, items);
         }
         return commitMessageConventionsSection;
     }
@@ -165,10 +173,14 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
      * {@inheritDoc}
      */
     @Override
-    public EnabledItemsMap<ReleaseType> getReleaseTypes() {
+    public ReleaseTypes getReleaseTypes() {
         if (Objects.isNull(releaseTypesSection)) {
             // the list property is always present and never null but is empty when the user doesn't define its contents
             List<String> enabled = extension.getReleaseTypes().getEnabled().isPresent() && !extension.getReleaseTypes().getEnabled().get().isEmpty() ? extension.getReleaseTypes().getEnabled().get() : List.<String>of();
+
+            // the list property is always present and never null but is empty when the user doesn't define its contents
+            List<String> publicationServices = extension.getReleaseTypes().getPublicationServices().isPresent() && !extension.getReleaseTypes().getPublicationServices().get().isEmpty() ? extension.getReleaseTypes().getPublicationServices().get() : List.<String>of();
+            List<String> remoteRepositories = extension.getReleaseTypes().getRemoteRepositories().isPresent() && !extension.getReleaseTypes().getRemoteRepositories().get().isEmpty() ? extension.getReleaseTypes().getRemoteRepositories().get() : List.<String>of();
 
             Map<String, ReleaseType> items = new HashMap<String, ReleaseType>(extension.getReleaseTypes().getItems().size());
             // the map property is always present and never null but is empty when the user doesn't define its contents
@@ -189,6 +201,7 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
                         items.put(type.getName(), new ReleaseType(
                             type.getCollapseVersions().isPresent() ? type.getCollapseVersions().get() : Defaults.ReleaseType.COLLAPSE_VERSIONS,
                             type.getCollapsedVersionQualifier().isPresent() ? type.getCollapsedVersionQualifier().get() : Defaults.ReleaseType.COLLAPSED_VERSION_QUALIFIER,
+                            type.getDescription().isPresent() ? type.getDescription().get() : Defaults.ReleaseType.DESCRIPTION,
                             type.getFilterTags().isPresent() ? type.getFilterTags().get() : Defaults.ReleaseType.FILTER_TAGS,
                             type.getGitCommit().isPresent() ? type.getGitCommit().get() : Defaults.ReleaseType.GIT_COMMIT,
                             type.getGitCommitMessage().isPresent() ? type.getGitCommitMessage().get() : Defaults.ReleaseType.GIT_COMMIT_MESSAGE,
@@ -207,7 +220,7 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
                 }
             }
 
-            releaseTypesSection = new EnabledItemsMap<ReleaseType>(enabled, items);
+            releaseTypesSection = new ReleaseTypes(enabled, publicationServices, remoteRepositories, items);
         }
         return releaseTypesSection;
     }
@@ -235,6 +248,31 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
             }
         }
         else return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Map<String,ServiceConfiguration> getServices()
+        throws IllegalPropertyException {
+        if (Objects.isNull(servicesSection)) {
+            servicesSection = new HashMap<String,ServiceConfiguration>(extension.getServices().size());
+            // the map property is always present and never null but is empty when the user doesn't define its contents
+            if (!extension.getServices().isEmpty()) {
+                for (NyxExtension.ServiceConfiguration service: extension.getServices()) {
+                    if (!servicesSection.containsKey(service.getName())) {
+                        if (!service.getType().isPresent())
+                            throw new IllegalPropertyException(String.format("Service '%s' has no type", service.getName()));
+                        servicesSection.put(service.getName(), new ServiceConfiguration(
+                            Provider.valueOf(service.getType().get()),
+                            service.geOptions().isPresent() ? service.geOptions().get() : Map.<String,String>of()
+                        ));
+                    }
+                }
+            }
+        }
+        return servicesSection;
     }
 
     /**

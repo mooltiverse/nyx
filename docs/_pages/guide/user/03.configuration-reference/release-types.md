@@ -13,9 +13,11 @@ You can have as many release types as you want. You can use [presets]({{ site.ba
 
 ### Release types overall options
 
-| Name                                             | Type   | Command Line Option                    | Environment Variable                | Configuration File Option              | Default                                |
-| ------------------------------------------------ | -------| -------------------------------------- | ----------------------------------- | -------------------------------------- | -------------------------------------- |
-| [`releaseTypes/enabled`](#enabled)               | list   | `--release-types-enabled=<NAMES>`      | `NYX_RELEASE_TYPES_ENABLED=<NAMES>` | `releaseTypes/enabled`                 | [ ["`default`"](#default-release-type) ] |
+| Name                                                        | Type   | Command Line Option                            | Environment Variable                             | Configuration File Option              | Default                                  |
+| ----------------------------------------------------------- | -------| ---------------------------------------------- | ------------------------------------------------ | -------------------------------------- | ---------------------------------------- |
+| [`releaseTypes/enabled`](#enabled)                          | list   | `--release-types-enabled=<NAMES>`              | `NYX_RELEASE_TYPES_ENABLED=<NAMES>`              | `releaseTypes/enabled`                 | [ ["`default`"](#default-release-type) ] |
+| [`releaseTypes/publicationServices`](#publication-services) | list   | `--release-types-publication-services=<NAMES>` | `NYX_RELEASE_TYPES_PUBLICATION_SERVICES=<NAMES>` | `releaseTypes/publicationServices`     | Empty                                    |
+| [`releaseTypes/remoteRepositories`](#remote-repositories)   | list   | `--release-types-remote-repositories=<NAMES>`  | `NYX_RELEASE_TYPES_REMOTE_REPOSITORIES=<NAMES>`  | `releaseTypes/remoteRepositories`      | Empty                                    |
 
 #### Enabled
 
@@ -34,6 +36,43 @@ Each item in the list must correspond to a release type [`name`](#name) attribut
 
 The order in which release types are listed matters. The types listed first are evaluated first, so in case of ambiguous matches the order disambiguates.
 {: .notice--info}
+
+#### Publication services
+
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `releaseTypes/publicationServices`                                                       |
+| Type                      | list                                                                                     |
+| Default                   | Empty                                                                                    |
+| Command Line Option       | `--release-types-publication-services=<NAMES>`                                           |
+| Environment Variable      | `NYX_RELEASE_TYPES_PUBLICATION_SERVICES=<NAMES>`                                         |
+| Configuration File Option | `releaseTypes/publicationServices`                                                       |
+| Related state attributes  |                                                                                          |
+
+The comma separated list of service configuration names to be used to publish releases when the matched release type has the [`publish`](#publish) flag enabled. The services listed here are the same for all release types but each release type can toggle publication on or off using the [`publish`](#publish) flag. Each name in the list must be the [`name`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}#name) of a configured [service]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}), but not all defined service configurations must be used here.
+
+Services listed here must support the `RELEASES` [feature]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}#service-features).
+
+The order in which services are listed matters. If multiple publication services are defined, publication happens in the same order they are defined here. This might be useful if you're publishing to multiple services and one has dependencies on releases published to others.
+{: .notice--info}
+
+#### Remote repositories
+
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `releaseTypes/remoteRepositories`                                                        |
+| Type                      | list                                                                                     |
+| Default                   | Empty                                                                                    |
+| Command Line Option       | `--release-types-remote-repositories=<NAMES>`                                            |
+| Environment Variable      | `NYX_RELEASE_TYPES_REMOTE_REPOSITORIES=<NAMES>`                                          |
+| Configuration File Option | `releaseTypes/remoteRepositories`                                                        |
+| Related state attributes  |                                                                                          |
+
+The comma separated list of remote repository names names to be used to push changes when the matched release type has the [`gitPush`](#git-push) flag enabled. When the `gitPush` flag is disabled this option is ignored. The remotes listed here are the same for all release types but each release type can toggle publication on or off using the `gitPush` flag. Each name in the list must be a name of a configured remote (as you can get by running [`git remote`](https://git-scm.com/docs/git-remote)), but not all configured remotes must be used here.
+
+This is optional and you should only use it when you have multiple remotes configured and you want to filter them or you need to set up credentials for specific remotes.
+
+By default, when this option is not used, changes are pushed to the default `origin` remote without credentials, if configured on the Git repository. Otherwise changes are pushed only to those remotes listed here. When this option is provided, each remote listed here must be configured on the Git repository.
+
+The credentials used to push are configured in the [`services`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}) section. For each remote to push to, all the services supporting the `GIT_REMOTE` [feature]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}#service-features) are considered. If one service explicitly defines the remote, its credentials are used. If no explicit match is found that way, the service that doesn't define the remotes list is assumed to be used for all remotes not explicitly supported by others, so its credentials are used. If no suitable `GIT_REMOTE` service is found for the specific remote (or no `GIT_REMOTE` service is configured), push will be attempted with no credentials.
 
 ### Default release type
 
@@ -58,15 +97,16 @@ Each release type has the following attributes:
 | ------------------------------------------------------------------------------------------ | ------- | --------------------------------------------------------------------- | ----------------------------------------------------------------------- | ---------------------------------------------------- |
 | [`releaseTypes/<NAME>/collapseVersions`](#collapse-versions)                               | boolean | `--release-types-<NAME>-collapse-versions=true|false`                 | `NYX_RELEASE_TYPES_<NAME>_COLLAPSE_VERSIONS=true|false`                 | `false`                                              |
 | [`releaseTypes/<NAME>/collapsedVersionQualifier`](#collapsed-version-qualifier)            | string  | `--release-types-<NAME>-collapsed-version-qualifier=<TEMPLATE>`       | `NYX_RELEASE_TYPES_<NAME>_COLLAPSED_VERSION_QUALIFIER=<TEMPLATE>`       | Empty                                                |
+| [`releaseTypes/<NAME>/description`](#description)                                          | string  | `--release-types-<NAME>-description`                                  | `NYX_RELEASE_TYPES_<NAME>_DESCRIPTION=<TEMPLATE>`                       | `{% raw %}Release {{version}}{% endraw %}`           |
 | [`releaseTypes/<NAME>/filterTags`](#filter-tags)                                           | string  | `--release-types-<NAME>-filter-tags`                                  | `NYX_RELEASE_TYPES_<NAME>_FILTER_TAGS=<TEMPLATE>`                       | Empty                                                |
 | [`releaseTypes/<NAME>/gitCommit`](#git-commit)                                             | string  | `--release-types-<NAME>-git-commit=<TEMPLATE>`                        | `NYX_RELEASE_TYPES_<NAME>_GIT_COMMIT=<TEMPLATE>`                        | `false`                                              |
-| [`releaseTypes/<NAME>/gitCommitMessage`](#git-commit-message)                              | string  | `--release-types-<NAME>-git-commit-message=<TEMPLATE>`                | `NYX_RELEASE_TYPES_<NAME>_GIT_COMMIT_MESSAGE=<TEMPLATE>`                | `{% raw %}Release version {{version}}{% endraw %}` |
+| [`releaseTypes/<NAME>/gitCommitMessage`](#git-commit-message)                              | string  | `--release-types-<NAME>-git-commit-message=<TEMPLATE>`                | `NYX_RELEASE_TYPES_<NAME>_GIT_COMMIT_MESSAGE=<TEMPLATE>`                | `{% raw %}Release version {{version}}{% endraw %}`   |
 | [`releaseTypes/<NAME>/gitPush`](#git-push)                                                 | string  | `--release-types-<NAME>-git-push=<TEMPLATE>`                          | `NYX_RELEASE_TYPES_<NAME>_GIT_PUSH=<TEMPLATE>`                          | `false`                                              |
 | [`releaseTypes/<NAME>/gitTag`](#git-tag)                                                   | string  | `--release-types-<NAME>-git-tag=<TEMPLATE>`                           | `NYX_RELEASE_TYPES_<NAME>_GIT_TAG=<TEMPLATE>`                           | `false`                                              |
 | [`releaseTypes/<NAME>/gitTagMessage`](#git-tag-message)                                    | string  | `--release-types-<NAME>-git-tag-message=<TEMPLATE>`                   | `NYX_RELEASE_TYPES_<NAME>_GIT_TAG_MESSAGE=<TEMPLATE>`                   | Empty                                                |
-| [`releaseTypes/<NAME>/identifiers`](#identifiers)                                          | list    | `--release-types-<NAME>-identifiers=<LIST>`                           | `NYX_RELEASE_TYPES_<NAME>_IDENTIFIERS=<LIST>`                           | Empty                                                |
+| [`releaseTypes/<NAME>/identifiers`](#identifiers)                                          | [list]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}#collections-of-objects) | `--release-types-<NAME>-identifiers-<#>=<ID_ATTRIBUTE>` | `NYX_RELEASE_TYPES_<NAME>_IDENTIFIERS_<#>=<ID_ATTRIBUTE>` | Empty |
 | [`releaseTypes/<NAME>/matchBranches`](#match-branches)                                     | string  | `--release-types-<NAME>-match-branches=<TEMPLATE>`                    | `NYX_RELEASE_TYPES_<NAME>_MATCH_BRANCHES=<TEMPLATE>`                    | Empty                                                |
-| [`releaseTypes/<NAME>/matchEnvironmentVariables`](#match-environment-variables)            | map     | `--release-types-<NAME>-match-environment-variables=<MAP>`            | `NYX_RELEASE_TYPES_<NAME>_MATCH_ENVIRONMENT_VARIABLES=<MAP>`            | Empty                                                |
+| [`releaseTypes/<NAME>/matchEnvironmentVariables`](#match-environment-variables)            | [map]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}#collections-of-objects) | `--release-types-<NAME>-match-environment-variables-<NAME>=<VALUE>` | `NYX_RELEASE_TYPES_<NAME>_MATCH_ENVIRONMENT_VARIABLES_<NAME>=<VALUE>` | Empty |
 | [`releaseTypes/<NAME>/matchWorkspaceStatus`](#match-workspace-status)                      | string  | `--release-types-<NAME>-match-workspace-status`                       | `NYX_RELEASE_TYPES_<NAME>_MATCH_WORKSPACE_STATUS=<STATUS>`              | Empty                                                |
 | [`releaseTypes/<NAME>/name`](#name)                                                        | string  | `--release-types-<NAME>-name=<NAME>`                                  | `NYX_RELEASE_TYPES_<NAME>_NAME=<NAME>`                                  | N/A                                                  |
 | [`releaseTypes/<NAME>/publish`](#publish)                                                  | string  | `--release-types-<NAME>-publish=<TEMPLATE>`                           | `NYX_RELEASE_TYPES_<NAME>_PUBLISH=<TEMPLATE>`                           | `false`                                              |
@@ -137,6 +177,25 @@ Examples (assuming [`collapseVersions`](#collapse-versions) is `true`):
 In the above example the `collapsedVersionQualifier` defines a [template]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}) that evaluates to the current branch name (in this case `alpha`).
 
 This option is **mandatory** when [`collapseVersions`](#collapse-versions) is `true` and if a [template]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}) is used it must resolve to a legal, non empty string.
+
+#### Description
+
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `releaseTypes/<NAME>/description`                                                        |
+| Type                      | string                                                                                   |
+| Default                   | `{% raw %}Release {{version}}{% endraw %}`                                               |
+| Command Line Option       | `--release-types-<NAME>-description=<TEMPLATE>`                                          |
+| Environment Variable      | `NYX_RELEASE_TYPES_<NAME>_DESCRIPTION=<TEMPLATE>`                                        |
+| Configuration File Option | `releaseTypes/items/<NAME>/description`                                                  |
+| Related state attributes  |                                                                                          |
+
+A [template]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}) that, once rendered, gives the description of a release. This may be a short description or a long document like a changelog or a releas notes document. The type of content might be Markdown.
+
+Note that this value is also used as the release description when [publishing](#publish) a release using [external services](#publication-services) so make sure the output of this value complies with target services.
+
+This value is optional but may be required by some [publication services](#publication-services).
+
+A common use for this option is a [`file.content`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}#filecontent) template to get the content of a release notes or changelog file which may be generated as an [asset](TODO: insert the link to the configured assets here) by the [Make]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#make) step. Example: `{% raw %}{{#file.content}}CHANGELOG.md{{/file.content}}{% endraw %}`.
 
 #### Filter tags
 
@@ -211,6 +270,10 @@ When `true` Nyx will push changes (including tags) to the remote repository upon
 
 Here you can define a [template]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}) that is [evaluated as a boolean]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}#type-conversions) at runtime to make this decision dynamic.
 
+When this flag is enabled changes are pushed to the default `origin` remote by default. If you have multiple remotes configured and you need to filter them, or your default remote is not named `origin`, you can use the [`remoteRepositories`](#remote-repositories) option for additional control.
+
+If authentication is required you can configure the credentials for specific remotes in the [`services`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}) section using services supporting the `GIT_REMOTE` [feature]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}#service-features). More on this [here](#remote-repositories).
+
 #### Git tag
 
 | ------------------------- | ---------------------------------------------------------------------------------------- |
@@ -247,10 +310,10 @@ This option is ignored when [`gitTag`](#git-tag) is `false`.
 
 | ------------------------- | ---------------------------------------------------------------------------------------- |
 | Name                      | `releaseTypes/<NAME>/identifiers`                                                        |
-| Type                      | list                                                                                     |
+| Type                      | [list]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}#collections-of-objects) |
 | Default                   | Empty (no custom identifiers)                                                            |
-| Command Line Option       | `--release-types-<NAME>-identifiers=<LIST>`                                              |
-| Environment Variable      | `NYX_RELEASE_TYPES_<NAME>_IDENTIFIERS=<LIST>`                                            |
+| Command Line Option       | `--release-types-<NAME>-identifiers-<#>=<ID_ATTRIBUTE>`                                  |
+| Environment Variable      | `NYX_RELEASE_TYPES_<NAME>_IDENTIFIERS_<#>=<ID_ATTRIBUTE>`                                |
 | Configuration File Option | `releaseTypes/items/<NAME>/identifiers`                                                  |
 | Related state attributes  |                                                                                          |
 
@@ -376,10 +439,10 @@ When using this option, the release type is only evaluated when the current bran
 
 | ------------------------- | ---------------------------------------------------------------------------------------- |
 | Name                      | `releaseTypes/<NAME>/matchEnvironmentVariables`                                          |
-| Type                      | map                                                                                      |
+| Type                      | [map]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}#collections-of-objects) |
 | Default                   | Empty (matches anything)                                                                 |
-| Command Line Option       | `--release-types-<NAME>-match-environment-variables=<MAP>`                               |
-| Environment Variable      | `NYX_RELEASE_TYPES_<NAME>_MATCH_ENVIRONMENT_VARIABLES=<MAP>`                             |
+| Command Line Option       | `--release-types-<NAME>-match-environment-variables-<NAME>=<VALUE>`                      |
+| Environment Variable      | `NYX_RELEASE_TYPES_<NAME>_MATCH_ENVIRONMENT_VARIABLES_<NAME>=<VALUE>`                    |
 | Configuration File Option | `releaseTypes/items/<NAME>/matchEnvironmentVariables`                                    |
 | Related state attributes  |                                                                                          |
 
@@ -441,8 +504,7 @@ When `true` Nyx will run the [publish]({{ site.baseurl }}{% link _pages/guide/us
 
 Here you can define a [template]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}) that is evaluated at runtime to make this decision dynamic.
 
-TODO: Check this statement and the link when Services are implemented: Please note that whether or not a certain release is published also depends on the [services](#services) configuration.
-{: .notice--warning}
+When this value evaluates to *true* releases are published to the [services]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}) listed in the [`releaseTypes/publicationServices`](#publication-services) option. Otherwise, when this evaluates to *false*, no publication is done.
 
 #### Version range
 

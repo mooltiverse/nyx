@@ -47,5 +47,6 @@ These steps are only taken if there is a [new version]({{ site.baseurl }}{% link
 
 ## Publish
 
-TODO: write this section
-{: .notice--warning}
+If the [matched release type]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#release-type) configuration has the [`publish`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#publish) flag enabled the new release, [if any]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#new-version), is published to the configured [publication services]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#publication-services).
+
+These steps are only taken if there is a [new version]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#new-version) resulting from the commit history after [inference](#infer), otherwise no action is taken.

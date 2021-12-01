@@ -49,7 +49,7 @@ Each convention has the following attributes:
 | Name                                                                   | Type    | Command Line Option                                         | Environment Variable                                           | Default                                    |
 | ---------------------------------------------------------------------- | ------- | ----------------------------------------------------------- | -------------------------------------------------------------- | ------------------------------------------ |
 | [`commitMessageConventions/<NAME>/expression`](#expression)            | string  | `--commit-message-conventions-<NAME>-expression=<REGEX>`    | `NYX_COMMIT_MESSAGE_CONVENTIONS_<NAME>_EXPRESSION=<REGEX>`     | N/A                                        |
-| [`commitMessageConventions/<NAME>/bumpExpressions`](#bump-expressions) | map     | `--commit-message-conventions-<NAME>-bumpExpressions=<MAP>` | `NYX_COMMIT_MESSAGE_CONVENTIONS_<NAME>_BUMP_EXPRESSIONS=<MAP>` | N/A                                        |
+| [`commitMessageConventions/<NAME>/bumpExpressions`](#bump-expressions) | [map]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}#collections-of-objects) | `--commit-message-conventions-<NAME>-bumpExpressions-<IDENTIFIER>=<REGEX>` | `NYX_COMMIT_MESSAGE_CONVENTIONS_<NAME>_BUMP_EXPRESSIONS_<IDENTIFIER>=<REGEX>` | N/A                                        |
 
 #### Expression
 
@@ -90,10 +90,10 @@ While conventions usually define a range of allowed values for `type` and `scope
 
 | ------------------------- | ---------------------------------------------------------------------------------------- |
 | Name                      | `commitMessageConventions/<NAME>/bumpExpressions`                                        |
-| Type                      | map                                                                                      |
+| Type                      | [map]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}#collections-of-objects) |
 | Default                   | N/A                                                                                      |
-| Command Line Option       | `--commit-message-conventions-<NAME>-bumpExpressions=<MAP>`                              |
-| Environment Variable      | `NYX_COMMIT_MESSAGE_CONVENTIONS_<NAME>_BUMP_EXPRESSIONS=<MAP>`                           |
+| Command Line Option       | `--commit-message-conventions-<NAME>-bumpExpressions-<IDENTIFIER>=<REGEX>`               |
+| Environment Variable      | `NYX_COMMIT_MESSAGE_CONVENTIONS_<NAME>_BUMP_EXPRESSIONS_<IDENTIFIER>=<REGEX>`            |
 | Configuration File Option | `commitMessageConventions/items/<NAME>/bumpExpressions`                                  |
 | Related state attributes  | [newVersion]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#new-version){: .btn .btn--info .btn--small} [releaseScope/significantCommits]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#significant-commits){: .btn .btn--info .btn--small} [scheme]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#scheme){: .btn .btn--info .btn--small} [version]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#version){: .btn .btn--info .btn--small} |
 

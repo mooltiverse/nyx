@@ -21,13 +21,18 @@ The [Conventional Commits](https://www.conventionalcommits.org/) convention come
 
 This preset comes with a few release types, suitable for a [mainline only]({{ site.baseurl }}{% link _pages/guide/user/06.best-practice/branching-models.md %}#mainline-only) branching model. An additional release type called *internal* is configured as a fallback when the mainline isn't matched.
 
+Please note that even if a release type has its [`publish`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#publish) flag enabled, publication to remote services doesn't happen because no [service]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}) is configured and none is listed in the [`publicationServices`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#publication-services) list. If you want to publish releases using this preset as a starting point you need to configure some [services]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}) and override the [`releaseTypes/publicationServices`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#publication-services).
+{: .notice--info}
+
 This corresponds to the following configuration options:
 
 | Name                                            | Value                                                                                    |
 | ----------------------------------------------- | ---------------------------------------------------------------------------------------- |
 | [`releaseTypes/enabled`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#enabled) | ["`mainline`", "`internal`"] |
+| [`releaseTypes/publicationServices`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#publication-services) | Empty |
 | [`releaseTypes/mainline/collapseVersions`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#collapse-versions) | `false` |
 | [`releaseTypes/mainline/collapsedVersionQualifier`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#collapsed-version-qualifier) | Empty |
+| [`releaseTypes/mainline/description`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#description) | Empty |
 | [`releaseTypes/mainline/filterTags`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#match-tags) | `{% raw %}"^({{configuration.releasePrefix}})?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)$"{% endraw %}` |
 | [`releaseTypes/mainline/gitCommit`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#git-commit) | `"false"` |
 | [`releaseTypes/mainline/gitCommitMessage`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#git-commit-message) | Empty (use default) |
@@ -43,6 +48,7 @@ This corresponds to the following configuration options:
 | [`releaseTypes/mainline/versionRangeFromBranchName`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#version-range-from-branch-name) | `false` |
 | [`releaseTypes/internal/collapseVersions`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#collapse-versions) | `true` |
 | [`releaseTypes/internal/collapsedVersionQualifier`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#collapsed-version-qualifier) | `"internal"` |
+| [`releaseTypes/internal/description`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#description) | Empty |
 | [`releaseTypes/internal/filterTags`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#match-tags) | Empty |
 | [`releaseTypes/internal/gitCommit`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#git-commit) | `"false"` |
 | [`releaseTypes/internal/gitCommitMessage`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#git-commit-message) | Empty (use default) |

@@ -189,6 +189,20 @@ public class ConfigurationLayerTestTemplates {
         }
 
         @TestTemplate
+        @DisplayName("ConfigurationLayer.getServices() default value")
+        @Baseline(Scenario.FROM_SCRATCH)
+        void getServicesDefaultTest(Project project)
+            throws Exception {
+            NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
+            ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
+
+            assertNotNull(extension.getServices());
+            assertNotNull(configurationLayer.getServices());
+            assertTrue(extension.getServices().isEmpty());
+            assertTrue(configurationLayer.getServices().isEmpty());
+        }
+
+        @TestTemplate
         @DisplayName("ConfigurationLayer.getSharedConfigurationFile() default value")
         @Baseline(Scenario.FROM_SCRATCH)
         void getSharedConfigurationFileDefaultTest(Project project)

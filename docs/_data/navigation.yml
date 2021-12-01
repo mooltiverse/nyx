@@ -61,18 +61,10 @@ nav-user-guide:
         url: /guide/user/introduction/ci-cd/
       - title: "Configuration Methods"
         url: /guide/user/introduction/configuration-methods/
-#      - title: "Standard Configurations"
-#        url: /guide/user/introduction/standard-configurations/
       - title: "Dynamic Configurations"
         url: /guide/user/introduction/dynamic-configurations/
       - title: "Version Schemes"
         url: /guide/user/introduction/version-schemes/
-#      - title: "Release Strategy"
-#        url: /guide/user/introduction/release-strategy/
-#      - title: "Commit Message Conventions"
-#        url: /guide/user/introduction/commit-message-conventions/
-#      - title: "Artifacts and Publications"
-#        url: /guide/user/introduction/artifacts-and-publications/
   - title: Configuration Reference
     url: /guide/user/configuration-reference/
     children:
@@ -80,22 +72,14 @@ nav-user-guide:
         url: /guide/user/configuration-reference/global-options/
       - title: "Commit Message Conventions"
         url: /guide/user/configuration-reference/commit-message-conventions/
-#      - title: "Environments"
-#        url: /guide/user/configuration-reference/environments/
-#      - title: "Services"
-#        url: /guide/user/configuration-reference/services/
-#      - title: "Extra Identifiers"
-#        url: /guide/user/configuration-reference/extra-identifiers/
       - title: "Release Types"
         url: /guide/user/configuration-reference/release-types/
+      - title: "Services"
+        url: /guide/user/configuration-reference/services/
 #      - title: "Artifacts"
 #        url: /guide/user/configuration-reference/artifacts/
-#      - title: "Expressions"
-#        url: /guide/user/configuration-reference/expressions/
       - title: "Templates"
         url: /guide/user/configuration-reference/templates/
-#      - title: "Configuration Examples"
-#        url: /guide/user/configuration-reference/configuration-examples/
   - title: Configuration Presets
     url: /guide/user/configuration-presets/
     children:
@@ -110,16 +94,6 @@ nav-user-guide:
         url: /guide/user/state-reference/global-attributes/
       - title: "Release Scope"
         url: /guide/user/state-reference/release-scope/
-#      - title: "Commit History Attributes"
-#        url: /guide/user/state-reference/commit-history-attributes/
-#      - title: "Environment Attributes"
-#        url: /guide/user/state-reference/environment-attributes/
-#      - title: "Release Type Attributes"
-#        url: /guide/user/state-reference/release-type-attributes/
-#      - title: "Artifacts Attributes"
-#        url: /guide/user/state-reference/artifacts-attributes/
-#      - title: "State Examples"
-#        url: /guide/user/state-reference/state-examples/
   - title: Best Practice
     url: /guide/user/best-practice/
     children:
@@ -130,10 +104,6 @@ nav-user-guide:
   - title: In Depth
     url: /guide/user/in-depth/
     children:
-#      - title: "Design Principles"
-#        url: /guide/user/in-depth/design-principles/
-#      - title: "Internals"
-#        url: /guide/user/in-depth/internals/
       - title: "Gradle Plugin"
         url: /guide/user/in-depth/gradle-plugin/
   - title: Help

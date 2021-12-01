@@ -24,10 +24,10 @@ configurations {
 */
 dependencies {
   // Import dependencies from other modules of this project
-  implementation project(':modules:java:lib:main')
+  implementation project(':modules:java:main')
 
   // Add this dependency to use the Git scripts from the main subproject into this project tests
-  testImplementation project(path: ':modules:java:lib:main', configuration: 'testExport')
+  testImplementation project(path: ':modules:java:main', configuration: 'testExport')
 }
 
 functionalTest {
@@ -108,7 +108,7 @@ task publish() {
 tasks.publishPlugins.dependsOn tasks.setupPublishPluginCredentials
 
 // to enforce the fail-fast principle, make sure the main library tests are executed first
-tasks.test.dependsOn project(':modules:java:lib:main').tasks.test
+tasks.test.dependsOn project(':modules:java:main').tasks.test
 
 afterEvaluate {
     // Only perform publishing if the Nyx release type enables publishing

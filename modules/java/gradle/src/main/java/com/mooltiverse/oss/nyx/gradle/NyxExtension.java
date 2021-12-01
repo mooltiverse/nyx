@@ -170,6 +170,13 @@ public abstract class NyxExtension {
     private final Property<String> scheme = getObjectfactory().property(String.class);
 
     /**
+     * The nested 'services' block.
+     * 
+     * @see ServiceConfiguration
+     */
+    private NamedDomainObjectContainer<ServiceConfiguration> services = getObjectfactory().domainObjectContainer(ServiceConfiguration.class);
+
+    /**
      * The 'sharedConfigurationFile' property.
      */
     private final Property<String> sharedConfigurationFile = getObjectfactory().property(String.class);
@@ -417,6 +424,29 @@ public abstract class NyxExtension {
     }
 
     /**
+     * Returns the object mapping the {@code services} block.
+     * 
+     * We provide an implementation of this method instead of using the abstract definition as it's
+     * safer for old Gradle versions we support.
+     * 
+     * @return the object mapping the {@code services} block
+     */
+    public NamedDomainObjectContainer<ServiceConfiguration> getServices() {
+        return services;
+    }
+
+    /**
+     * Accepts the DSL configuration for the {@code services} block, needed for defining
+     * the block using the curly braces syntax in Gradle build scripts.
+     * See the documentation on top of this class for more.
+     * 
+     * @param configurationAction the configuration action for the {@code services} block
+     */
+    public void services(Action<? super NamedDomainObjectContainer<ServiceConfiguration>> configurationAction) {
+        configurationAction.execute(services);
+    }
+
+    /**
      * Returns the custom shared configuration file to use.
      * 
      * We provide an implementation of this method instead of using the abstract definition as it's
@@ -619,6 +649,16 @@ public abstract class NyxExtension {
         private final ListProperty<String> enabled = getObjectfactory().listProperty(String.class);
 
         /**
+         * The list of publication service names.
+         */
+        private final ListProperty<String> publicationServices = getObjectfactory().listProperty(String.class);
+
+        /**
+         * The list of remote repository names.
+         */
+        private final ListProperty<String> remoteRepositories = getObjectfactory().listProperty(String.class);
+
+        /**
          * The nested 'items' block.
          * 
          * @see ReleaseType
@@ -647,6 +687,24 @@ public abstract class NyxExtension {
          */
         public ListProperty<String> getEnabled() {
             return enabled;
+        }
+
+        /**
+         * Returns list of publication service names.
+         * 
+         * @return list of publication service names.
+         */
+        public ListProperty<String> getPublicationServices() {
+            return publicationServices;
+        }
+
+        /**
+         * Returns list of remote repository names.
+         * 
+         * @return list of remote repository names.
+         */
+        public ListProperty<String> getRemoteRepositories() {
+            return remoteRepositories;
         }
 
         /**
@@ -687,6 +745,11 @@ public abstract class NyxExtension {
              * The optional qualifier or the template to render the qualifier to use for the pre-release identifier when versions are collapsed.
              */
             private final Property<String> collapsedVersionQualifier = getObjectfactory().property(String.class);
+
+            /**
+             * The optional template to render as a regular expression used for the release description.
+             */
+            private final Property<String> description = getObjectfactory().property(String.class);
 
             /**
              * The optional template to render as a regular expression used to match tags from the commit history.
@@ -822,6 +885,18 @@ public abstract class NyxExtension {
              */
             public Property<String> getCollapsedVersionQualifier() {
                 return collapsedVersionQualifier;
+            }
+
+            /**
+             * Returns the optional flag or the template to render indicating the release description.
+             * 
+             * We provide an implementation of this method instead of using the abstract definition as it's
+             * safer for old Gradle versions we support.
+             * 
+             * @return the optional flag or the template to render indicating the release description.
+             */
+            public Property<String> getDescription() {
+                return description;
             }
 
             /**
@@ -1137,5 +1212,94 @@ public abstract class NyxExtension {
                 }
             }
         }        
+    }
+
+    /**
+     * The class to model a single 'services' item within the extension.
+     */
+    public abstract static class ServiceConfiguration {
+        /**
+         * The service name.
+         */
+        private final String name;
+
+        /**
+         * The service type property.
+         */
+        private final Property<String> type = getObjectfactory().property(String.class);
+
+        /**
+         * The nested 'options' block.
+         */
+        private final MapProperty<String,String> options = getObjectfactory().mapProperty(String.class, String.class);
+
+        /**
+         * Returns an object factory instance.
+         * 
+         * The instance is injected by Gradle as soon as this getter method is invoked.
+         * 
+         * Using <a href="https://docs.gradle.org/current/userguide/custom_gradle_types.html#property_injection">property injection</a>
+         * instead of <a href="https://docs.gradle.org/current/userguide/custom_gradle_types.html#constructor_injection">constructor injection</a>
+         * has a few advantages: it allows Gradle to refer injecting the object until it's required and is safer for backward
+         * compatibility (older versions can be supported).
+         * 
+         * @return the object factory instance
+         */
+        @Inject
+        protected abstract ObjectFactory getObjectfactory();
+
+        /**
+         * Constructor.
+         * 
+         * This constructor is required as per the {@link NamedDomainObjectContainer} specification.
+         * 
+         * @param name the service name
+         */
+        public ServiceConfiguration(String name) {
+            super();
+            this.name = name;
+        }
+
+        /**
+         * Returns the name read-only mandatory property.
+         * 
+         * @return the name read-only mandatory property.
+         */
+        public String getName() {
+            return name;
+        }
+
+        /**
+         * Returns the name of the version identifier to bump. When this is set by the user it overrides
+         * the inference performed by Nyx.
+         * 
+         * We provide an implementation of this method instead of using the abstract definition as it's
+         * safer for old Gradle versions we support.
+         * 
+         * @return the name of the version identifier to bump
+         */
+        public Property<String> getType() {
+            return type;
+        }
+
+        /**
+         * Returns the map of service options.
+         * 
+         * @return the map of service options.
+         */
+        public MapProperty<String,String> geOptions() {
+            return options;
+        }
+        
+        /**
+         * Accepts the DSL configuration for the {@code options} block, needed for defining
+         * the block using the curly braces syntax in Gradle build scripts.
+         * See the documentation on top of this class for more.
+         * 
+         * @param configurationAction the configuration action for the {@code options} block
+         */
+        public void options(Action<? super MapProperty<String,String>> configurationAction) {
+            configurationAction.execute(options);
+        }
     }
 }

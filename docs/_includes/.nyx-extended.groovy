@@ -20,6 +20,8 @@ nyx {
   releasePrefix = 'v'
   releaseTypes {
     enabled = [ 'mainline', 'maturity', 'integration', 'hotfix', 'feature', 'release', 'maintenance', 'internal' ]
+    publicationServices = [ 'github', 'gitlab' ]
+    remoteRepositories = [ 'origin', 'replica' ]
     items {
       mainline {
         collapseVersions = false
@@ -40,6 +42,7 @@ nyx {
       maturity {
         collapseVersions = true
         collapsedVersionQualifier = '{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}'
+        description = 'Maturity release {{version}}'
         filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$'
         gitCommit = 'false'
         gitPush = 'true'
@@ -52,6 +55,7 @@ nyx {
       integration {
         collapseVersions = true
         collapsedVersionQualifier = '{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}'
+        description = 'Integration release {{version}}'
         filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(develop|development|integration|latest)(\\.([0-9]\\d*))?)$'
         gitCommit = 'false'
         gitPush = 'true'
@@ -64,6 +68,7 @@ nyx {
       hotfix {
         collapseVersions = true
         collapsedVersionQualifier = '{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}'
+        description = 'Hotfix release {{version}}'
         filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(fix|hotfix)(([0-9a-zA-Z]*)(\\.([0-9]\\d*))?)?)$'
         gitCommit = 'false'
         gitPush = 'true'
@@ -76,6 +81,7 @@ nyx {
       feature {
         collapseVersions = true
         collapsedVersionQualifier = '{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}'
+        description = 'Feature release {{version}}'
         filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(feat|feature)(([0-9a-zA-Z]*)(\\.([0-9]\\d*))?)?)$'
         gitCommit = 'false'
         gitPush = 'false'
@@ -87,6 +93,7 @@ nyx {
       release {
         collapseVersions = true
         collapsedVersionQualifier = '{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}'
+        description = 'Release {{version}}'
         filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(rel|release)((\\.([0-9]\\d*))?)?)$'
         gitCommit = 'false'
         gitPush = 'true'
@@ -98,6 +105,7 @@ nyx {
       }
       maintenance {
         collapseVersions = false
+        description = 'Maintenance release {{version}}'
         filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$'
         gitCommit = 'false'
         gitPush = 'true'
@@ -110,6 +118,7 @@ nyx {
       internal {
         collapseVersions = true
         collapsedVersionQualifier = 'internal'
+        description = 'Internal release {{version}}'
         gitCommit = 'false'
         gitPush = 'false'
         gitTag = 'false'
@@ -142,6 +151,26 @@ nyx {
   }
   resume = true
   scheme = 'SEMVER'
+  services {
+    github {
+      type = 'GITHUB'
+      options {
+        AUTHENTICATION_TOKEN = '{{#environment.variable}}GITHUB_TOKEN{{/environment.variable}}'
+        REPOSITORY_NAME = 'myrepo'
+        REPOSITORY_OWNER = 'acme'
+        REMOTES = 'origin'
+      }
+    }
+    gitlab {
+      type = 'GITLAB'
+      options {
+        AUTHENTICATION_TOKEN = 'glpat-a1b2c3d4e5f6g7h8i9j0'
+        REPOSITORY_NAME = 'myrepo'
+        REPOSITORY_OWNER = 'acme'
+        REMOTES = 'replica'
+      }
+    }
+  }
   sharedConfigurationFile = 'example-shared.config.json'
   stateFile = '.nyx-state.yml'
   verbosity = 'INFO'

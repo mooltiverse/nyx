@@ -25,13 +25,18 @@ Please note that *gitmoji* is listed **after** *Conventional Commits* so when a 
 
 This preset comes with a set of release types, suitable for a [mainline]({{ site.baseurl }}{% link _pages/guide/user/06.best-practice/branching-models.md %}#mainline) branching model plus [integration]({{ site.baseurl }}{% link _pages/guide/user/06.best-practice/branching-models.md %}#integration-branches), [maturity]({{ site.baseurl }}{% link _pages/guide/user/06.best-practice/branching-models.md %}#maturity-branches), [feature]({{ site.baseurl }}{% link _pages/guide/user/06.best-practice/branching-models.md %}#feature-branches), [hotfix]({{ site.baseurl }}{% link _pages/guide/user/06.best-practice/branching-models.md %}#hotfix-branches), [release]({{ site.baseurl }}{% link _pages/guide/user/06.best-practice/branching-models.md %}#release-branches) and [maintenance]({{ site.baseurl }}{% link _pages/guide/user/06.best-practice/branching-models.md %}#maintenance-branches). An additional release type called *internal* is configured as a fallback when the mainline isn't matched.
 
+Please note that even if a release type has its [`publish`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#publish) flag enabled, publication to remote services doesn't happen because no [service]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}) is listed in the [`publicationServices`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#publication-services) list. If you want to publish releases using this preset as a starting point you need to override the [`releaseTypes/publicationServices`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#publication-services) with the services you want to use as target (which may be the ones configured in the preset [services](#services) or some custom one).
+{: .notice--info}
+
 This corresponds to the following configuration options:
 
 | Name                                            | Value                                                                                    |
 | ----------------------------------------------- | ---------------------------------------------------------------------------------------- |
 | [`releaseTypes/enabled`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#enabled) | ["`mainline`", "`integration`", "`maturity`", "`feature`", "`hotfix`", "`release`", "`maintenance`", "`internal`"] |
+| [`releaseTypes/publicationServices`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#publication-services) | Empty |
 | [`releaseTypes/mainline/collapseVersions`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#collapse-versions) | `false` |
 | [`releaseTypes/mainline/collapsedVersionQualifier`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#collapsed-version-qualifier) | Empty |
+| [`releaseTypes/mainline/description`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#description) | Empty |
 | [`releaseTypes/mainline/filterTags`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#match-tags) | `{% raw %}"^({{configuration.releasePrefix}})?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)$"{% endraw %}` |
 | [`releaseTypes/mainline/gitCommit`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#git-commit) | `"false"` |
 | [`releaseTypes/mainline/gitCommitMessage`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#git-commit-message) | Empty (use default) |
@@ -47,6 +52,7 @@ This corresponds to the following configuration options:
 | [`releaseTypes/mainline/versionRangeFromBranchName`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#version-range-from-branch-name) | `false` |
 | [`releaseTypes/integration/collapseVersions`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#collapse-versions) | `true` |
 | [`releaseTypes/integration/collapsedVersionQualifier`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#collapsed-version-qualifier) | `{% raw %}"{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}"{% endraw %}` |
+| [`releaseTypes/integration/description`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#description) | Empty |
 | [`releaseTypes/integration/filterTags`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#match-tags) | `{% raw %}"^({{configuration.releasePrefix}})?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)(-(develop|development|integration|latest)(\.([0-9]\d*))?)$"{% endraw %}` |
 | [`releaseTypes/integration/gitCommit`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#git-commit) | `"false"` |
 | [`releaseTypes/integration/gitCommitMessage`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#git-commit-message) | Empty (use default) |
@@ -62,6 +68,7 @@ This corresponds to the following configuration options:
 | [`releaseTypes/integration/versionRangeFromBranchName`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#version-range-from-branch-name) | `false` |
 | [`releaseTypes/maturity/collapseVersions`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#collapse-versions) | `true` |
 | [`releaseTypes/maturity/collapsedVersionQualifier`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#collapsed-version-qualifier) | `{% raw %}"{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}"{% endraw %}` |
+| [`releaseTypes/maturity/description`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#description) | Empty |
 | [`releaseTypes/maturity/filterTags`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#match-tags) | `{% raw %}"^({{configuration.releasePrefix}})?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\.([0-9]\d*))?)?$"{% endraw %}` |
 | [`releaseTypes/maturity/gitCommit`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#git-commit) | `"false"` |
 | [`releaseTypes/maturity/gitCommitMessage`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#git-commit-message) | Empty (use default) |
@@ -77,6 +84,7 @@ This corresponds to the following configuration options:
 | [`releaseTypes/maturity/versionRangeFromBranchName`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#version-range-from-branch-name) | `false` |
 | [`releaseTypes/feature/collapseVersions`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#collapse-versions) | `true` |
 | [`releaseTypes/feature/collapsedVersionQualifier`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#collapsed-version-qualifier) | `{% raw %}"{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}"{% endraw %}` |
+| [`releaseTypes/feature/description`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#description) | Empty |
 | [`releaseTypes/feature/filterTags`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#match-tags) | `{% raw %}"^({{configuration.releasePrefix}})?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)(-(feat|feature)(([0-9a-zA-Z]*)(\.([0-9]\d*))?)?)$"{% endraw %}` |
 | [`releaseTypes/feature/gitCommit`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#git-commit) | `"false"` |
 | [`releaseTypes/feature/gitCommitMessage`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#git-commit-message) | Empty (use default) |
@@ -92,6 +100,7 @@ This corresponds to the following configuration options:
 | [`releaseTypes/feature/versionRangeFromBranchName`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#version-range-from-branch-name) | `false` |
 | [`releaseTypes/hotfix/collapseVersions`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#collapse-versions) | `true` |
 | [`releaseTypes/hotfix/collapsedVersionQualifier`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#collapsed-version-qualifier) | `{% raw %}"{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}"{% endraw %}` |
+| [`releaseTypes/hotfix/description`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#description) | Empty |
 | [`releaseTypes/hotfix/filterTags`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#match-tags) | `{% raw %}"^({{configuration.releasePrefix}})?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)(-(fix|hotfix)(([0-9a-zA-Z]*)(\.([0-9]\d*))?)?)$"{% endraw %}` |
 | [`releaseTypes/hotfix/gitCommit`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#git-commit) | `"false"` |
 | [`releaseTypes/hotfix/gitCommitMessage`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#git-commit-message) | Empty (use default) |
@@ -107,6 +116,7 @@ This corresponds to the following configuration options:
 | [`releaseTypes/hotfix/versionRangeFromBranchName`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#version-range-from-branch-name) | `false` |
 | [`releaseTypes/release/collapseVersions`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#collapse-versions) | `true` |
 | [`releaseTypes/release/collapsedVersionQualifier`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#collapsed-version-qualifier) | `{% raw %}"{{#firstLower}}{{branch}}{{/firstLower}}"{% endraw %}` |
+| [`releaseTypes/release/description`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#description) | Empty |
 | [`releaseTypes/release/filterTags`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#match-tags) | `{% raw %}"^({{configuration.releasePrefix}})?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)(-(rel|release)((\.([0-9]\d*))?)?)$"{% endraw %}` |
 | [`releaseTypes/release/gitCommit`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#git-commit) | `"false"` |
 | [`releaseTypes/release/gitCommitMessage`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#git-commit-message) | Empty (use default) |
@@ -122,6 +132,7 @@ This corresponds to the following configuration options:
 | [`releaseTypes/release/versionRangeFromBranchName`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#version-range-from-branch-name) | `true` |
 | [`releaseTypes/maintenance/collapseVersions`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#collapse-versions) | `false` |
 | [`releaseTypes/maintenance/collapsedVersionQualifier`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#collapsed-version-qualifier) | Empty |
+| [`releaseTypes/maintenance/description`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#description) | Empty |
 | [`releaseTypes/maintenance/filterTags`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#match-tags) | `{% raw %}"^({{configuration.releasePrefix}})?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)$"{% endraw %}` |
 | [`releaseTypes/maintenance/gitCommit`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#git-commit) | `"false"` |
 | [`releaseTypes/maintenance/gitCommitMessage`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#git-commit-message) | Empty (use default) |
@@ -137,6 +148,7 @@ This corresponds to the following configuration options:
 | [`releaseTypes/maintenance/versionRangeFromBranchName`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#version-range-from-branch-name) | `true` |
 | [`releaseTypes/internal/collapseVersions`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#collapse-versions) | `true` |
 | [`releaseTypes/internal/collapsedVersionQualifier`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#collapsed-version-qualifier) | `"internal"` |
+| [`releaseTypes/internal/description`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#description) | Empty |
 | [`releaseTypes/internal/filterTags`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#match-tags) | Empty |
 | [`releaseTypes/internal/gitCommit`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#git-commit) | `"false"` |
 | [`releaseTypes/internal/gitCommitMessage`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#git-commit-message) | Empty (use default) |
@@ -152,3 +164,22 @@ This corresponds to the following configuration options:
 | [`releaseTypes/internal/publish`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#publish) | `"false"` |
 | [`releaseTypes/internal/versionRange`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#version-range) | Empty |
 | [`releaseTypes/internal/versionRangeFromBranchName`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#version-range-from-branch-name) | `false` |
+
+### Services
+
+The [GitHub](https://github.com/) and [GitLab](https://gitlab.com/) services are available with this preset. They both use standard remote URIs so unless you use a privately hosted instance you don't need to change it. Authentication tokens are read from environment variables (`GITHUB_TOKEN` and `GITLAB_TOKEN`, respectively) so you can just set those variables to a valid Personal Access Token and you're set.
+
+You still need to set the remaining options.
+
+This corresponds to the following configuration options:
+
+| Name                                            | Value                                                                                    |
+| ----------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| [`services/github/type`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}#type) | `GITHUB` |
+| [`services/github/options/AUTHENTICATION_TOKEN`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}#options) | `{% raw %}"{{#environment.variable}}GITHUB_TOKEN{{/environment.variable}}"{% endraw %}` |
+| [`services/github/options/REPOSITORY_NAME`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}#options) | Empty |
+| [`services/github/options/REPOSITORY_OWNER`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}#options) | Empty |
+| [`services/gitlab/type`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}#type) | `GITLAB` |
+| [`services/gitlab/options/AUTHENTICATION_TOKEN`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}#options) | `{% raw %}"{{#environment.variable}}GITLAB_TOKEN{{/environment.variable}}"{% endraw %}` |
+| [`services/gitlab/options/REPOSITORY_NAME`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}#options) | Empty |
+| [`services/gitlab/options/REPOSITORY_OWNER`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}#options) | Empty |

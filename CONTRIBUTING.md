@@ -202,7 +202,21 @@ These users are not connected to any team or organization so they do not expose 
 
 Main credentials for these users are managed by Nyx project owners but they are also safely passed to [GitHub Actions jobs](.github/workflows/github-ci.yml) so that they can be used by CI/CD.
 
-When testing locally you can still run tests by passing credentials for your own users (never use your personal accounts, create additional  test users instead) and pass their credentials to Gradle scripts as environment variables or system properties, either on the command line or by mean of additional `gradle.properties`. Examples:
+When testing locally you can still run tests by passing credentials for your own users (never use your personal accounts, create additional test users instead) and pass their credentials to Gradle scripts as environment variables or system properties. See the [Gradle Build Environment](https://docs.gradle.org/current/userguide/build_environment.html) for more.
+
+Example using a local `gradle.properties` file in the `GRADLE_USER_HOME` (which has to be defined) directory with content:
+
+```properties
+# GitHub test user
+gitHubTestUserName="nyxtest20200701"
+gitHubTestUserToken=<token goes here>
+
+# GitLab test user
+gitLabTestUserName="nyxtest20200701"
+gitLabTestUserToken=<token goes here>
+```
+
+Examples using the command line or environment variables:
 
 ```shell script
 # Example 1: pass the credentials as system properties on the Gradle command line
