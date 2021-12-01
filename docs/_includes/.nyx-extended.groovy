@@ -164,7 +164,7 @@ nyx {
     gitlab {
       type = 'GITLAB'
       options {
-        AUTHENTICATION_TOKEN = 'glpat-a1b2c3d4e5f6g7h8i9j0'
+        AUTHENTICATION_TOKEN = 'abcde-a1b2c3d4e5f6g7h8i9j0'
         REPOSITORY_NAME = 'myrepo'
         REPOSITORY_OWNER = 'acme'
         REMOTES = 'replica'
