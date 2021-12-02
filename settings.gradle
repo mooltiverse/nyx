@@ -4,7 +4,7 @@
 ------------------------------------------------------------------------------*/
 plugins {
   // use our own plugin
-  id "com.mooltiverse.oss.nyx" version "0.2.1-alpha.9"
+  id "com.mooltiverse.oss.nyx" version "0.2.1-alpha.11"
 }
 
 /*------------------------------------------------------------------------------
@@ -143,28 +143,25 @@ nyx {
         gitPush = 'false'
         gitTag = 'false'
         identifiers {
-          enabled = [ 'branch', 'commit', 'user', 'timestamp' ]
-          items {
-            branch {
-              qualifier = 'branch'
-              value = '{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}'
-              position = 'BUILD'
-            }
-            commit {
-              qualifier = 'commit'
-              value = '{{#short7}}{{releaseScope.finalCommit}}{{/short7}}'
-              position = 'BUILD'
-            }
-            user {
-              qualifier = 'user'
-              value = '{{#sanitizeLower}}{{environment.user}}{{/sanitizeLower}}'
-              position = 'BUILD'
-            }
-            timestamp {
-              qualifier = 'timestamp'
-              value = '{{#timestampYYYYMMDDHHMMSS}}{{timestamp}}{{/timestampYYYYMMDDHHMMSS}}'
-              position = 'BUILD'
-            }
+          '0' {
+            qualifier = 'branch'
+            value = '{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}'
+            position = 'BUILD'
+          }
+          '1' {
+            qualifier = 'commit'
+            value = '{{#short7}}{{releaseScope.finalCommit}}{{/short7}}'
+            position = 'BUILD'
+          }
+          '2' {
+            qualifier = 'user'
+            value = '{{#sanitizeLower}}{{environment.user}}{{/sanitizeLower}}'
+            position = 'BUILD'
+          }
+          '3' {
+            qualifier = 'timestamp'
+            value = '{{#timestampYYYYMMDDHHMMSS}}{{timestamp}}{{/timestampYYYYMMDDHHMMSS}}'
+            position = 'BUILD'
           }
         }
         publish = 'false'
@@ -180,12 +177,9 @@ nyx {
         gitPush = 'false'
         gitTag = 'false'
         identifiers {
-          enabled = [ 'local' ]
-          items {
-            local {
-              qualifier = 'local'
-              position = 'BUILD'
-            }
+          '0' {
+            qualifier = 'local'
+            position = 'BUILD'
           }
         }
         matchBranches = '^(master|main)$'
@@ -199,12 +193,9 @@ nyx {
         gitPush = 'false'
         gitTag = 'false'
         identifiers {
-          enabled = [ 'local' ]
-          items {
-            local {
-              qualifier = 'local'
-              position = 'BUILD'
-            }
+          '0' {
+            qualifier = 'local'
+            position = 'BUILD'
           }
         }
         matchBranches = '^(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)$'
@@ -218,12 +209,9 @@ nyx {
         gitPush = 'false'
         gitTag = 'false'
         identifiers {
-          enabled = [ 'local' ]
-          items {
-            local {
-              qualifier = 'local'
-              position = 'BUILD'
-            }
+          '0' {
+            qualifier = 'local'
+            position = 'BUILD'
           }
         }
         matchBranches = '^(develop|development|integration|latest)$'
@@ -237,12 +225,9 @@ nyx {
         gitPush = 'false'
         gitTag = 'false'
         identifiers {
-          enabled = [ 'local' ]
-          items {
-            local {
-              qualifier = 'local'
-              position = 'BUILD'
-            }
+          '0' {
+            qualifier = 'local'
+            position = 'BUILD'
           }
         }
         matchBranches = '^(fix|hotfix)((-|\\/)[0-9a-zA-Z-_]+)?$'
@@ -256,12 +241,9 @@ nyx {
         gitPush = 'false'
         gitTag = 'false'
         identifiers {
-          enabled = [ 'local' ]
-          items {
-            local {
-              qualifier = 'local'
-              position = 'BUILD'
-            }
+          '0' {
+            qualifier = 'local'
+            position = 'BUILD'
           }
         }
         matchBranches = '^(feat|feature)((-|\\/)[0-9a-zA-Z-_]+)?$'
@@ -275,12 +257,9 @@ nyx {
         gitPush = 'false'
         gitTag = 'false'
         identifiers {
-          enabled = [ 'local' ]
-          items {
-            local {
-              qualifier = 'local'
-              position = 'BUILD'
-            }
+          '0' {
+            qualifier = 'local'
+            position = 'BUILD'
           }
         }
         matchBranches = '^(rel|release)(-|\\/)({{configuration.releasePrefix}})?([0-9|x]\\d*)(\\.([0-9|x]\\d*)(\\.([0-9|x]\\d*))?)?$'
@@ -293,18 +272,25 @@ nyx {
         gitPush = 'false'
         gitTag = 'false'
         identifiers {
-          enabled = [ 'local' ]
-          items {
-            local {
-              qualifier = 'local'
-              position = 'BUILD'
-            }
+          '0' {
+            qualifier = 'local'
+            position = 'BUILD'
           }
         }
         matchBranches = '^[a-zA-Z]*([0-9|x]\\d*)(\\.([0-9|x]\\d*)(\\.([0-9|x]\\d*))?)?$'
         //matchWorkspaceStatus = 'CLEAN'
         publish = 'false'
         versionRangeFromBranchName = true
+      }
+    }
+  }
+  services {
+    github {
+      type = 'GITHUB'
+      options {
+        AUTHENTICATION_TOKEN = '{{#environment.variable}}GH_TOKEN{{/environment.variable}}'
+        REPOSITORY_NAME = 'nyx'
+        REPOSITORY_OWNER = 'mooltiverse'
       }
     }
   }
