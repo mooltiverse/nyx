@@ -129,7 +129,7 @@ jobs:
     #     Warning: Cache size of ~5456 MB (5720816120 B) is over the 5GB limit, not saving cache.
     # in the 'Post setup the pipeline cache' step of this job.
     # This is not a big deal as the next jobs don't need the output from this one to complete.
-    # Start from the -unit-test cache and save the job output cache as -integration-test
+    # Start from the -assemble cache and save the job output cache as -integration-test
     - name: Set up the pipeline cache
       uses: actions/cache@v2
       with:
@@ -140,7 +140,7 @@ jobs:
           **/build/
         key: ${{ runner.os }}-nyx-gradle-${{ github.run_id }}-${{ github.job }}
         restore-keys: |
-          ${{ runner.os }}-nyx-gradle-${{ github.run_id }}-unit-test
+          ${{ runner.os }}-nyx-gradle-${{ github.run_id }}-assemble
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Run Integration Tests with Gradle
@@ -188,7 +188,7 @@ jobs:
     # in the 'Post setup the pipeline cache' step of this job.
     # This is not a big deal as the next jobs don't need the output from this one to complete.
     #
-    # Start from the -unit-test cache and save the job output cache as -functional-test
+    # Start from the -assemble cache and save the job output cache as -functional-test
     - name: Set up the pipeline cache
       uses: actions/cache@v2
       with:
@@ -199,7 +199,7 @@ jobs:
           **/build/
         key: ${{ runner.os }}-nyx-gradle-${{ github.run_id }}-${{ github.job }}
         restore-keys: |
-          ${{ runner.os }}-nyx-gradle-${{ github.run_id }}-unit-test
+          ${{ runner.os }}-nyx-gradle-${{ github.run_id }}-assemble
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Run Functional Tests with Gradle
