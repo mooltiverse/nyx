@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mooltiverse.oss.nyx.git;
+package com.mooltiverse.oss.nyx.services.git;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assumptions.*;
@@ -37,7 +37,8 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import com.mooltiverse.oss.nyx.entities.git.Commit;
 import com.mooltiverse.oss.nyx.entities.git.Identity;
 import com.mooltiverse.oss.nyx.entities.git.Tag;
-import com.mooltiverse.oss.nyx.git.util.RandomUtil;
+import com.mooltiverse.oss.nyx.services.GitException;
+import com.mooltiverse.oss.nyx.services.git.util.RandomUtil;
 import com.mooltiverse.oss.nyx.services.github.GitHub;
 import com.mooltiverse.oss.nyx.services.github.GitHubRepository;
 
@@ -657,7 +658,7 @@ public class JGitRepositoryTests {
             File directory = Files.createTempDirectory("nyx-test-git-clone-test-").toFile();
             directory.deleteOnExit();
             assertFalse(new File(directory, "README.md").exists());
-            assertNotNull(Git.clone(directory, URI.create(gitHubRepository.getHTTPURL()), System.getProperty("gitHubTestUserToken"), System.getProperty("gitHubTestUserToken")));
+            assertNotNull(Git.instance().clone(directory, URI.create(gitHubRepository.getHTTPURL()), System.getProperty("gitHubTestUserToken"), System.getProperty("gitHubTestUserToken")));
             assertTrue(new File(directory, "README.md").exists());
 
             Scenario.ONE_BRANCH_SHORT.apply(directory);
@@ -690,7 +691,7 @@ public class JGitRepositoryTests {
             File directory = Files.createTempDirectory("nyx-test-git-clone-test-").toFile();
             directory.deleteOnExit();
             assertFalse(new File(directory, "README.md").exists());
-            assertNotNull(Git.clone(directory, URI.create(gitHubRepository.getHTTPURL()), System.getProperty("gitHubTestUserToken"), System.getProperty("gitHubTestUserToken")));
+            assertNotNull(Git.instance().clone(directory, URI.create(gitHubRepository.getHTTPURL()), System.getProperty("gitHubTestUserToken"), System.getProperty("gitHubTestUserToken")));
             assertTrue(new File(directory, "README.md").exists());
 
             Scenario.ONE_BRANCH_SHORT.apply(directory);
@@ -805,7 +806,7 @@ public class JGitRepositoryTests {
             File directory = Files.createTempDirectory("nyx-test-git-clone-test-").toFile();
             directory.deleteOnExit();
             assertFalse(new File(directory, "README.md").exists());
-            assertNotNull(Git.clone(directory, URI.create(gitHubRepository.getHTTPURL()), System.getProperty("gitHubTestUserToken"), System.getProperty("gitHubTestUserToken")));
+            assertNotNull(Git.instance().clone(directory, URI.create(gitHubRepository.getHTTPURL()), System.getProperty("gitHubTestUserToken"), System.getProperty("gitHubTestUserToken")));
             assertTrue(new File(directory, "README.md").exists());
 
             Scenario.ONE_BRANCH_SHORT.apply(directory);
@@ -838,7 +839,7 @@ public class JGitRepositoryTests {
             File directory = Files.createTempDirectory("nyx-test-git-clone-test-").toFile();
             directory.deleteOnExit();
             assertFalse(new File(directory, "README.md").exists());
-            assertNotNull(Git.clone(directory, URI.create(gitHubRepository.getHTTPURL()), System.getProperty("gitHubTestUserToken"), System.getProperty("gitHubTestUserToken")));
+            assertNotNull(Git.instance().clone(directory, URI.create(gitHubRepository.getHTTPURL()), System.getProperty("gitHubTestUserToken"), System.getProperty("gitHubTestUserToken")));
             assertTrue(new File(directory, "README.md").exists());
 
             Scenario.ONE_BRANCH_SHORT.apply(directory);
@@ -961,7 +962,7 @@ public class JGitRepositoryTests {
             File directory = Files.createTempDirectory("nyx-test-git-clone-test-").toFile();
             directory.deleteOnExit();
             assertFalse(new File(directory, "README.md").exists());
-            assertNotNull(Git.clone(directory, URI.create(gitHubRepository.getHTTPURL()), System.getProperty("gitHubTestUserToken"), System.getProperty("gitHubTestUserToken")));
+            assertNotNull(Git.instance().clone(directory, URI.create(gitHubRepository.getHTTPURL()), System.getProperty("gitHubTestUserToken"), System.getProperty("gitHubTestUserToken")));
             assertTrue(new File(directory, "README.md").exists());
 
             Scenario.ONE_BRANCH_SHORT.apply(directory);
@@ -994,7 +995,7 @@ public class JGitRepositoryTests {
             File directory = Files.createTempDirectory("nyx-test-git-clone-test-").toFile();
             directory.deleteOnExit();
             assertFalse(new File(directory, "README.md").exists());
-            assertNotNull(Git.clone(directory, URI.create(gitHubRepository.getHTTPURL()), System.getProperty("gitHubTestUserToken"), System.getProperty("gitHubTestUserToken")));
+            assertNotNull(Git.instance().clone(directory, URI.create(gitHubRepository.getHTTPURL()), System.getProperty("gitHubTestUserToken"), System.getProperty("gitHubTestUserToken")));
             assertTrue(new File(directory, "README.md").exists());
 
             Scenario.ONE_BRANCH_SHORT.apply(directory);
@@ -1376,7 +1377,7 @@ public class JGitRepositoryTests {
             File directory = Files.createTempDirectory("nyx-test-git-remote-names-test-").toFile();
             directory.deleteOnExit();
 
-            Repository repository = Git.clone(directory.getAbsolutePath(), REMOTE_TEST_REPOSITORY/*, System.getProperty("gitHubTestUserToken"), ""*/);
+            Repository repository = Git.instance().clone(directory.getAbsolutePath(), REMOTE_TEST_REPOSITORY/*, System.getProperty("gitHubTestUserToken"), ""*/);
 
             assertFalse(repository.getRemoteNames().isEmpty());
             assertEquals(1, repository.getRemoteNames().size());
@@ -1407,7 +1408,7 @@ public class JGitRepositoryTests {
             File directory = Files.createTempDirectory("nyx-test-git-remote-names-test-").toFile();
             directory.deleteOnExit();
 
-            Repository repository = Git.clone(directory.getAbsolutePath(), REMOTE_TEST_REPOSITORY/*, System.getProperty("gitHubTestUserToken"), ""*/);
+            Repository repository = Git.instance().clone(directory.getAbsolutePath(), REMOTE_TEST_REPOSITORY/*, System.getProperty("gitHubTestUserToken"), ""*/);
             Script script = new Script(directory);
 
             Script localRepositoryScript = Scenario.FROM_SCRATCH.realize();

@@ -34,11 +34,11 @@ import com.mooltiverse.oss.nyx.command.Mark;
 import com.mooltiverse.oss.nyx.command.Publish;
 import com.mooltiverse.oss.nyx.configuration.Configuration;
 import com.mooltiverse.oss.nyx.entities.IllegalPropertyException;
-import com.mooltiverse.oss.nyx.git.Git;
-import com.mooltiverse.oss.nyx.git.GitException;
-import com.mooltiverse.oss.nyx.git.Repository;
 import com.mooltiverse.oss.nyx.io.DataAccessException;
 import com.mooltiverse.oss.nyx.io.FileMapper;
+import com.mooltiverse.oss.nyx.services.GitException;
+import com.mooltiverse.oss.nyx.services.git.Git;
+import com.mooltiverse.oss.nyx.services.git.Repository;
 import com.mooltiverse.oss.nyx.state.State;
 
 /**
@@ -147,7 +147,7 @@ public class Nyx {
             File repoDir = new File(configuration().getDirectory());
             logger.debug(MAIN, "Instantiating the Git repository in '{}'", repoDir);
             try {
-                repository = Git.open(repoDir);
+                repository = Git.instance().open(repoDir);
             }
             catch (IOException ioe) {
                 throw new DataAccessException(String.format("The directory '%s' is not accessible or does not contain a valid Git repository", repoDir.getAbsolutePath()), ioe);

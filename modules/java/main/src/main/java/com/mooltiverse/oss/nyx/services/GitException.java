@@ -13,27 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mooltiverse.oss.nyx.git;
-
-import com.mooltiverse.oss.nyx.NyxException;
+package com.mooltiverse.oss.nyx.services;
 
 /**
  * A generic exception raised when some Git related issue is encountered.
  */
-public class GitException extends NyxException {
+public class GitException extends ServiceException {
     /**
      * Default serial version UID
      */
     private static final long serialVersionUID = 1L;
-
-    /**
-     * Constructs a new exception with {@code null} as its detail message.
-     * The cause is not initialized, and may subsequently be initialized by a
-     * call to {@link #initCause}.
-     */
-    public GitException() {
-        super();
-    }
 
     /**
      * Constructs a new exception with the specified detail message.

@@ -253,16 +253,16 @@ public class GitLab implements GitRemoteService, GitHostingService, ReleaseServi
 
     /**
      * Returns the string {@code "PRIVATE-TOKEN"} if the {@link #AUTHENTICATION_TOKEN_OPTION_NAME} is provided
-     * (while {@link #getPasswordForRemote()} will return the token), otherwise returns {@code null}.
+     * (while {@link #getPassword()} will return the token), otherwise returns {@code null}.
      * <br>
      * This method of using {@code "PRIVATE-TOKEN"} in place of the user name and the token as the password is
      * not documented but it works.
      * 
      * @return the string {@code "PRIVATE-TOKEN"} if the {@link #AUTHENTICATION_TOKEN_OPTION_NAME} is provided
-     * (while {@link #getPasswordForRemote()} will return the token), otherwise returns {@code null}.
+     * (while {@link #getPassword()} will return the token), otherwise returns {@code null}.
      */
     @Override
-    public String getUserForRemote() {
+    public String getUser() {
         return Objects.isNull(authenticationToken) ? null : "PRIVATE-TOKEN";
     }
 
@@ -272,7 +272,7 @@ public class GitLab implements GitRemoteService, GitHostingService, ReleaseServi
      * @return the value of the given {@link #AUTHENTICATION_TOKEN_OPTION_NAME} option, if any, otherwise {@code null}.
      */
     @Override
-    public String getPasswordForRemote() {
+    public String getPassword() {
         return Objects.isNull(authenticationToken) ? null : authenticationToken;
     }
 

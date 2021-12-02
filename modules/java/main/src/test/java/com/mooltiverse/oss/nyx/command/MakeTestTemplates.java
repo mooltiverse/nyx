@@ -26,7 +26,7 @@ import com.mooltiverse.oss.nyx.command.template.Baseline;
 import com.mooltiverse.oss.nyx.command.template.CommandInvocationContextProvider;
 import com.mooltiverse.oss.nyx.command.template.CommandProxy;
 import com.mooltiverse.oss.nyx.command.template.CommandSelector;
-import com.mooltiverse.oss.nyx.git.Scenario;
+import com.mooltiverse.oss.nyx.services.git.Scenario;
 
 @DisplayName("Make")
 public class MakeTestTemplates {

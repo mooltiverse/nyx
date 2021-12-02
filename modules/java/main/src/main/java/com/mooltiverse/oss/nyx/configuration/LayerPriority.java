@@ -24,6 +24,11 @@ package com.mooltiverse.oss.nyx.configuration;
  */
 enum LayerPriority {
     /**
+     * The layer that can be used at runtime to override all other layers
+     */
+    RUNTIME(),
+
+    /**
      * The layer that reads values from command line options
      */
     COMMAND_LINE(),

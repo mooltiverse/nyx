@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mooltiverse.oss.nyx.git;
+package com.mooltiverse.oss.nyx.services.git;
 
 import java.io.File;
 import java.util.Objects;
 
-import com.mooltiverse.oss.nyx.git.util.FileSystemUtil;
+import com.mooltiverse.oss.nyx.services.git.util.FileSystemUtil;
 
 /**
  * A scenario is predefined state of a Git repository that you can realize consistently

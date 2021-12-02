@@ -29,10 +29,9 @@ import org.junit.jupiter.params.provider.EnumSource;
 
 import com.mooltiverse.oss.nyx.services.Release;
 import com.mooltiverse.oss.nyx.services.Service;
-
-import com.mooltiverse.oss.nyx.git.Scenario;
-import com.mooltiverse.oss.nyx.git.Script;
-import com.mooltiverse.oss.nyx.git.util.RandomUtil;
+import com.mooltiverse.oss.nyx.services.git.Scenario;
+import com.mooltiverse.oss.nyx.services.git.Script;
+import com.mooltiverse.oss.nyx.services.git.util.RandomUtil;
 
 @DisplayName("GitLab")
 public class GitLabTest {
@@ -60,7 +59,9 @@ public class GitLabTest {
         @EnumSource(Service.Feature.class)
         public void supportAnyFeature(Service.Feature feature)
             throws Exception {
-            assertTrue(GitLab.instance(Map.<String,String>of()).supports(feature));
+            if (Service.Feature.GIT_HOSTING.equals(feature) || Service.Feature.GIT_REMOTE.equals(feature) || Service.Feature.RELEASES.equals(feature) || Service.Feature.USERS.equals(feature))
+                assertTrue(GitLab.instance(Map.<String,String>of()).supports(feature));
+            else assertFalse(GitLab.instance(Map.<String,String>of()).supports(feature));
         }
     }
 
@@ -145,8 +146,8 @@ public class GitLabTest {
             // the 'gitLabTestUserToken' system property is set by the build script, which in turn reads it from an environment variable
             GitLab gitLab = GitLab.instance(Map.<String,String>of(GitLab.AUTHENTICATION_TOKEN_OPTION_NAME, System.getProperty("gitLabTestUserToken")));
 
-            assertEquals("PRIVATE-TOKEN", gitLab.getUserForRemote());
-            assertEquals(System.getProperty("gitLabTestUserToken"), gitLab.getPasswordForRemote());
+            assertEquals("PRIVATE-TOKEN", gitLab.getUser());
+            assertEquals(System.getProperty("gitLabTestUserToken"), gitLab.getPassword());
         }
 
         @Test
@@ -155,8 +156,8 @@ public class GitLabTest {
             throws Exception {
             GitLab gitLab = GitLab.instance(Map.<String,String>of());
 
-            assertNull(gitLab.getUserForRemote());
-            assertNull(gitLab.getPasswordForRemote());
+            assertNull(gitLab.getUser());
+            assertNull(gitLab.getPassword());
         }
     }
 
@@ -178,8 +179,8 @@ public class GitLabTest {
             // if we clone too quickly next calls may fail
             Thread.sleep(2000);
 
-            Script script = Scenario.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED.applyOnClone(gitLabRepository.getHTTPURL(), gitLab.getUserForRemote(), gitLab.getPasswordForRemote());
-            script.push(gitLab.getUserForRemote(), gitLab.getPasswordForRemote());
+            Script script = Scenario.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED.applyOnClone(gitLabRepository.getHTTPURL(), gitLab.getUser(), gitLab.getPassword());
+            script.push(gitLab.getUser(), gitLab.getPassword());
 
             // publish the release
             Release release = gitLab.publishRelease(user.getUserName(), gitLabRepository.getName(), "Release 1.0.0-alpha.1", "1.0.0-alpha.1", "A test description for the release\non multiple lines\nlike these");

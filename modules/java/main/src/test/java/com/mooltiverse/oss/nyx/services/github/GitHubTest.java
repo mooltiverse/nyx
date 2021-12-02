@@ -29,10 +29,9 @@ import org.junit.jupiter.params.provider.EnumSource;
 
 import com.mooltiverse.oss.nyx.services.Release;
 import com.mooltiverse.oss.nyx.services.Service;
-
-import com.mooltiverse.oss.nyx.git.Scenario;
-import com.mooltiverse.oss.nyx.git.Script;
-import com.mooltiverse.oss.nyx.git.util.RandomUtil;
+import com.mooltiverse.oss.nyx.services.git.Scenario;
+import com.mooltiverse.oss.nyx.services.git.Script;
+import com.mooltiverse.oss.nyx.services.git.util.RandomUtil;
 
 @DisplayName("GitHub")
 public class GitHubTest {
@@ -60,7 +59,9 @@ public class GitHubTest {
         @EnumSource(Service.Feature.class)
         public void supportAnyFeature(Service.Feature feature)
             throws Exception {
-            assertTrue(GitHub.instance(Map.<String,String>of()).supports(feature));
+            if (Service.Feature.GIT_HOSTING.equals(feature) || Service.Feature.GIT_REMOTE.equals(feature) || Service.Feature.RELEASES.equals(feature) || Service.Feature.USERS.equals(feature))
+                assertTrue(GitHub.instance(Map.<String,String>of()).supports(feature));
+            else assertFalse(GitHub.instance(Map.<String,String>of()).supports(feature));
         }
     }
 
@@ -145,8 +146,8 @@ public class GitHubTest {
             // the 'gitHubTestUserToken' system property is set by the build script, which in turn reads it from an environment variable
             GitHub gitHub = GitHub.instance(Map.<String,String>of(GitHub.AUTHENTICATION_TOKEN_OPTION_NAME, System.getProperty("gitHubTestUserToken")));
 
-            assertEquals(System.getProperty("gitHubTestUserToken"), gitHub.getUserForRemote());
-            assertEquals("", gitHub.getPasswordForRemote());
+            assertEquals(System.getProperty("gitHubTestUserToken"), gitHub.getUser());
+            assertEquals("", gitHub.getPassword());
         }
 
         @Test
@@ -155,8 +156,8 @@ public class GitHubTest {
             throws Exception {
             GitHub gitHub = GitHub.instance(Map.<String,String>of());
 
-            assertNull(gitHub.getUserForRemote());
-            assertNull(gitHub.getPasswordForRemote());
+            assertNull(gitHub.getUser());
+            assertNull(gitHub.getPassword());
         }
     }
 
@@ -178,8 +179,8 @@ public class GitHubTest {
             // if we clone too quickly next calls may fail
             Thread.sleep(2000);
 
-            Script script = Scenario.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED.applyOnClone(gitHubRepository.getHTTPURL(), gitHub.getUserForRemote(), gitHub.getPasswordForRemote());
-            script.push(gitHub.getUserForRemote(), gitHub.getPasswordForRemote());
+            Script script = Scenario.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED.applyOnClone(gitHubRepository.getHTTPURL(), gitHub.getUser(), gitHub.getPassword());
+            script.push(gitHub.getUser(), gitHub.getPassword());
 
             // publish the release
             Release release = gitHub.publishRelease(user.getUserName(), gitHubRepository.getName(), "Release 1.0.0-alpha.1", "1.0.0-alpha.1", "A test description for the release\non multiple lines\nlike these");

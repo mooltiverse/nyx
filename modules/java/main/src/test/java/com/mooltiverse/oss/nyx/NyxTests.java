@@ -33,10 +33,10 @@ import com.mooltiverse.oss.nyx.entities.git.Commit;
 import com.mooltiverse.oss.nyx.entities.git.Identity;
 import com.mooltiverse.oss.nyx.entities.git.Message;
 import com.mooltiverse.oss.nyx.entities.git.Tag;
-import com.mooltiverse.oss.nyx.git.Repository;
-import com.mooltiverse.oss.nyx.git.Scenario;
 import com.mooltiverse.oss.nyx.io.DataAccessException;
 import com.mooltiverse.oss.nyx.io.FileMapper;
+import com.mooltiverse.oss.nyx.services.git.Repository;
+import com.mooltiverse.oss.nyx.services.git.Scenario;
 import com.mooltiverse.oss.nyx.state.State;
 
 @DisplayName("Nyx")
@@ -69,7 +69,7 @@ public class NyxTests {
     /**
      * Performs checks against the repository.
      * 
-     * Note that repository details are tested in the {@link com.mooltiverse.oss.nyx.git.JGitRepositoryTests} class.
+     * Note that repository details are tested in the {@link com.mooltiverse.oss.nyx.services.git.JGitRepositoryTests} class.
      * Here only the Nyx class behavior pertaining the repository handling is tested.
      */
     @Nested
@@ -93,7 +93,7 @@ public class NyxTests {
             // initialize a repository in a new directory and pass the directory to the configuration. We'll use the command line configuration layer to pass the directory
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             configurationLayerMock.setDirectory(Scenario.FROM_SCRATCH.realize().getWorkingDirectory().getAbsolutePath());
-            nyx.configuration().withCommandLineConfiguration(configurationLayerMock);
+            nyx.configuration().withRuntimeConfiguration(configurationLayerMock);
 
             Repository repository = nyx.repository();
 
@@ -134,7 +134,7 @@ public class NyxTests {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             configurationLayerMock.setResume(Boolean.TRUE);
             configurationLayerMock.setStateFile(new File(System.getProperty("java.io.tmpdir"), "state"+this.hashCode()+".json").getAbsolutePath());
-            configuration.withCommandLineConfiguration(configurationLayerMock);
+            configuration.withRuntimeConfiguration(configurationLayerMock);
             State oldState = new State(configuration);
 
             Commit initialCommit = new Commit("initial", 0, List.<String>of(), new Action(new Identity("Jim", null), null), new Action(new Identity("Sam", null), null), new Message("full", "short", Map.<String,String>of()), Set.<Tag>of());
@@ -159,7 +159,7 @@ public class NyxTests {
 
             // now we are ready to resume the file
             Nyx nyx = new Nyx();
-            nyx.configuration().withCommandLineConfiguration(configurationLayerMock);
+            nyx.configuration().withRuntimeConfiguration(configurationLayerMock);
 
             State resumedState = nyx.state();
             assertEquals(oldState.getBump(), resumedState.getBump());

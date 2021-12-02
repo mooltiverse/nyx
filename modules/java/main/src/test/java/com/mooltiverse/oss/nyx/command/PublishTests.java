@@ -33,10 +33,10 @@ import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
 import com.mooltiverse.oss.nyx.entities.ReleaseType;
 import com.mooltiverse.oss.nyx.entities.ReleaseTypes;
 import com.mooltiverse.oss.nyx.entities.ServiceConfiguration;
-import com.mooltiverse.oss.nyx.git.Scenario;
-import com.mooltiverse.oss.nyx.git.Script;
-import com.mooltiverse.oss.nyx.git.util.RandomUtil;
 import com.mooltiverse.oss.nyx.services.Provider;
+import com.mooltiverse.oss.nyx.services.git.Scenario;
+import com.mooltiverse.oss.nyx.services.git.Script;
+import com.mooltiverse.oss.nyx.services.git.util.RandomUtil;
 import com.mooltiverse.oss.nyx.services.github.GitHub;
 import com.mooltiverse.oss.nyx.services.github.GitHubRepository;
 import com.mooltiverse.oss.nyx.services.github.GitHubRelease;
@@ -102,7 +102,7 @@ public class PublishTests {
             );
 
             Nyx nyx = new Nyx(script.getWorkingDirectory());
-            nyx.configuration().withCommandLineConfiguration(configurationLayerMock);
+            nyx.configuration().withRuntimeConfiguration(configurationLayerMock);
 
             assertNull(gitHub.getReleaseByTag(user.getUserName(), gitHubRepository.getName(), "1.0.0"));
 
@@ -178,8 +178,8 @@ public class PublishTests {
             // if we clone too quickly next calls may fail
             Thread.sleep(2000);
 
-            Script script = Scenario.ONE_BRANCH_SHORT.applyOnClone(gitLabRepository.getHTTPURL(), gitLab.getUserForRemote(), gitLab.getPasswordForRemote());
-            script.push(gitLab.getUserForRemote(), gitLab.getPasswordForRemote());
+            Script script = Scenario.ONE_BRANCH_SHORT.applyOnClone(gitLabRepository.getHTTPURL(), gitLab.getUser(), gitLab.getPassword());
+            script.push(gitLab.getUser(), gitLab.getPassword());
 
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that accepts all non null messages and dumps the major identifier for each
@@ -216,7 +216,7 @@ public class PublishTests {
             );
 
             Nyx nyx = new Nyx(script.getWorkingDirectory());
-            nyx.configuration().withCommandLineConfiguration(configurationLayerMock);
+            nyx.configuration().withRuntimeConfiguration(configurationLayerMock);
 
             assertNull(gitLab.getReleaseByTag(user.getUserName(), gitLabRepository.getName(), "1.0.0"));
 

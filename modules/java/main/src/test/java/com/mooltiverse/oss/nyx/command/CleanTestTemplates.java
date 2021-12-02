@@ -29,7 +29,7 @@ import com.mooltiverse.oss.nyx.command.template.CommandInvocationContextProvider
 import com.mooltiverse.oss.nyx.command.template.CommandProxy;
 import com.mooltiverse.oss.nyx.command.template.CommandSelector;
 import com.mooltiverse.oss.nyx.configuration.SimpleConfigurationLayer;
-import com.mooltiverse.oss.nyx.git.Scenario;
+import com.mooltiverse.oss.nyx.services.git.Scenario;
 
 @DisplayName("Clean")
 public class CleanTestTemplates {
@@ -98,7 +98,7 @@ public class CleanTestTemplates {
             String stateFilePath = "state-file.txt";
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             configurationLayerMock.setStateFile(stateFilePath);
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             // run once, to start
             command.run();
@@ -129,7 +129,7 @@ public class CleanTestTemplates {
             String stateFilePath = "state-file.txt";
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             configurationLayerMock.setStateFile(stateFilePath);
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             // run once, to start
             command.run();

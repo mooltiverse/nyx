@@ -127,7 +127,7 @@ public class StateTests {
             Configuration configuration = new Configuration();
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             configurationLayerMock.setBump("gamma");
-            configuration.withCommandLineConfiguration(configurationLayerMock);
+            configuration.withRuntimeConfiguration(configurationLayerMock);
             State state = new State(configuration);
             assertEquals("gamma", state.getBump());
         }
@@ -150,7 +150,7 @@ public class StateTests {
             Configuration configuration = new Configuration();
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             configurationLayerMock.setBump("gamma");
-            configuration.withCommandLineConfiguration(configurationLayerMock);
+            configuration.withRuntimeConfiguration(configurationLayerMock);
             State state = new State(configuration);
             assertEquals("gamma", state.getBump());
             assertThrows(IllegalStateException.class, () -> state.setBump("any value"));
@@ -302,7 +302,7 @@ public class StateTests {
             Configuration configuration = new Configuration();
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             configurationLayerMock.setVersion("1.2.3");
-            configuration.withCommandLineConfiguration(configurationLayerMock);
+            configuration.withRuntimeConfiguration(configurationLayerMock);
             State state = new State(configuration);
 
             assertEquals("1.2.3", state.getVersion());
@@ -327,7 +327,7 @@ public class StateTests {
             Configuration configuration = new Configuration();
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             configurationLayerMock.setVersion("1.2.3");
-            configuration.withCommandLineConfiguration(configurationLayerMock);
+            configuration.withRuntimeConfiguration(configurationLayerMock);
             State state = new State(configuration);
             assertEquals("1.2.3", state.getVersion());
             assertThrows(IllegalStateException.class, () -> state.setVersion("2.3.4"));
@@ -378,7 +378,7 @@ public class StateTests {
             );
             configurationLayerMock.setResume(Boolean.TRUE);
             configurationLayerMock.setStateFile(new File(System.getProperty("java.io.tmpdir"), "state"+this.hashCode()+".json").getAbsolutePath());
-            configuration.withCommandLineConfiguration(configurationLayerMock);
+            configuration.withRuntimeConfiguration(configurationLayerMock);
             State oldState = new State(configuration);
 
             Commit initialCommit = new Commit("b50926577d36f403f4b3ebf51dfe34660b52eaa2", 1580515200, List.<String>of(), new Action(new Identity("Jim", "jim@example.com"), new TimeStamp(new Date(1580515200), new SimpleTimeZone(SimpleTimeZone.UTC_TIME, "America/Los_Angeles"))), new Action(new Identity("Jim", "jim@example.com"), new TimeStamp(new Date(1580515200), new SimpleTimeZone(SimpleTimeZone.UTC_TIME, "America/Los_Angeles"))), new Message("initial commit", "initial commit", Map.<String,String>of()), Set.<Tag>of());
@@ -479,7 +479,7 @@ public class StateTests {
             );
             configurationLayerMock.setResume(Boolean.TRUE);
             configurationLayerMock.setStateFile(new File(System.getProperty("java.io.tmpdir"), "state"+this.hashCode()+".yaml").getAbsolutePath());
-            configuration.withCommandLineConfiguration(configurationLayerMock);
+            configuration.withRuntimeConfiguration(configurationLayerMock);
             State oldState = new State(configuration);
 
             Commit initialCommit = new Commit("b50926577d36f403f4b3ebf51dfe34660b52eaa2", 1580515200, List.<String>of(), new Action(new Identity("Jim", "jim@example.com"), new TimeStamp(new Date(1580515200), new SimpleTimeZone(SimpleTimeZone.UTC_TIME, "America/Los_Angeles"))), new Action(new Identity("Jim", "jim@example.com"), new TimeStamp(new Date(1580515200), new SimpleTimeZone(SimpleTimeZone.UTC_TIME, "America/Los_Angeles"))), new Message("initial commit", "initial commit", Map.<String,String>of()), Set.<Tag>of());

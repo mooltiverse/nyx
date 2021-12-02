@@ -24,9 +24,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import com.mooltiverse.oss.nyx.command.Command;
 import com.mooltiverse.oss.nyx.command.Commands;
-import com.mooltiverse.oss.nyx.git.Scenario;
-import com.mooltiverse.oss.nyx.git.Script;
-import com.mooltiverse.oss.nyx.git.Workbench;
+import com.mooltiverse.oss.nyx.services.git.Scenario;
+import com.mooltiverse.oss.nyx.services.git.Script;
+import com.mooltiverse.oss.nyx.services.git.Workbench;
 
 /**
  * Test the TemplateInvocationContextProvider and its internal classes.

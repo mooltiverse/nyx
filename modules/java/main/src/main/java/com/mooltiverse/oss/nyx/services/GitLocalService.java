@@ -13,25 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mooltiverse.oss.nyx.git;
+package com.mooltiverse.oss.nyx.services;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 
+import com.mooltiverse.oss.nyx.services.git.Repository;
+
 /**
- * This is the factory class for {@link Repository} instances.
+ * A service that {@link Service#supports(Feature) supports} the {@link Service.Feature#GIT_LOCAL} feature
+ * to manage local repositories.
  */
-public class Git {
-    /**
-     * Default constructor is private on purpose.
-     */
-    private Git() {
-        super();
-    }
-
+public interface GitLocalService extends Service {
     /**
      * Returns a repository instance working in the given directory after cloning from the given URI.
+     * If the instance has some credentials set, those are used to perform the operation, otherwise
+     * anonymous access will be used.
      * 
      * @param directory the directory where the repository has to be cloned. It is created if it doesn't exist.
      * @param uri the URI of the remote repository to clone.
@@ -42,10 +40,8 @@ public class Git {
      * @throws IllegalArgumentException if a given object is illegal for some reason, like referring to an illegal repository
      * @throws GitException in case the operation fails for some reason, including when authentication fails
      */
-    public static Repository clone(File directory, URI uri)
-        throws GitException {
-        return JGitRepository.clone(directory, uri);
-    }
+    public Repository clone(File directory, URI uri)
+        throws GitException;
 
     /**
      * Returns a repository instance working in the given directory after cloning from the given URI.
@@ -65,13 +61,13 @@ public class Git {
      * @throws IllegalArgumentException if a given object is illegal for some reason, like referring to an illegal repository
      * @throws GitException in case the operation fails for some reason, including when authentication fails
      */
-    public static Repository clone(File directory, URI uri, String user, String password)
-        throws GitException {
-        return JGitRepository.clone(directory, uri, user, password);
-    }
+    public Repository clone(File directory, URI uri, String user, String password)
+        throws GitException;
 
     /**
      * Returns a repository instance working in the given directory after cloning from the given URI.
+     * If the instance has some credentials set, those are used to perform the operation, otherwise
+     * anonymous access will be used.
      * 
      * @param directory the directory where the repository has to be cloned. It is created if it doesn't exist.
      * @param uri the URI of the remote repository to clone.
@@ -82,11 +78,8 @@ public class Git {
      * @throws IllegalArgumentException if a given object is illegal for some reason, like referring to an illegal repository
      * @throws GitException in case the operation fails for some reason, including when authentication fails
      */
-    public static Repository clone(String directory, String uri) 
-        throws GitException {
-        return JGitRepository.clone(directory, uri);
-    }
-
+    public Repository clone(String directory, String uri) 
+        throws GitException;
     /**
      * Returns a repository instance working in the given directory after cloning from the given URI.
      * 
@@ -105,10 +98,8 @@ public class Git {
      * @throws IllegalArgumentException if a given object is illegal for some reason, like referring to an illegal repository
      * @throws GitException in case the operation fails for some reason, including when authentication fails
      */
-    public static Repository clone(String directory, String uri, String user, String password) 
-        throws GitException {
-        return JGitRepository.clone(directory, uri, user, password);
-    }
+    public Repository clone(String directory, String uri, String user, String password) 
+        throws GitException;
 
     /**
      * Returns a repository instance working in the given directory.
@@ -121,10 +112,8 @@ public class Git {
      * @throws IllegalArgumentException if the given object is illegal for some reason, like referring to an illegal repository
      * @throws IOException in case of any I/O issue accessing the repository
      */
-    public static Repository open(File directory)
-        throws IOException {
-        return JGitRepository.open(directory);
-    }
+    public Repository open(File directory)
+        throws IOException;
 
     /**
      * Returns a repository instance working in the given directory.
@@ -137,8 +126,6 @@ public class Git {
      * @throws IllegalArgumentException if the given object is illegal for some reason, like referring to an illegal repository
      * @throws IOException in case of any I/O issue accessing the repository
      */
-    public static Repository open(String directory) 
-        throws IOException {
-        return JGitRepository.open(directory);
-    }
+    public Repository open(String directory) 
+        throws IOException;
 }

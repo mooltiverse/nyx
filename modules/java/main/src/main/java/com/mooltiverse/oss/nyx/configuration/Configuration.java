@@ -296,6 +296,33 @@ public class Configuration implements ConfigurationRoot {
     }
 
     /**
+     * Adds, replaces or removes the layer at the {@link LayerPriority#RUNTIME} level, which is the one that can override
+     * all other layers.
+     * 
+     * @param layer the configuration layer to set at the {@link LayerPriority#RUNTIME} level.
+     * If {@code null} any existing configuration layer at the same level is removed (if any).
+     * 
+     * @return a reference to this same object.
+     * 
+     * @throws DataAccessException in case data cannot be read or accessed.
+     * @throws IllegalPropertyException in case some option has been defined but has incorrect values or it can't be resolved.
+     */
+    public Configuration withRuntimeConfiguration(ConfigurationLayer layer)
+        throws DataAccessException, IllegalPropertyException {
+        if (Objects.isNull(layer)) {
+            logger.debug(CONFIGURATION, "Removing the existing '{}' configuration layer, if any", LayerPriority.RUNTIME);
+            layers.remove(LayerPriority.RUNTIME);
+        }
+        else {
+            logger.debug(CONFIGURATION, "Adding or replacing the '{}' configuration layer", LayerPriority.RUNTIME);
+            layers.put(LayerPriority.RUNTIME, layer);
+        }
+        updateConfiguredConfigurationLayers();
+        resetCache();
+        return this;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override

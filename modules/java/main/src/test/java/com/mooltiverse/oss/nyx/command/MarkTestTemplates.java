@@ -37,9 +37,9 @@ import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
 import com.mooltiverse.oss.nyx.entities.ReleaseType;
 import com.mooltiverse.oss.nyx.entities.ReleaseTypes;
-import com.mooltiverse.oss.nyx.git.GitException;
-import com.mooltiverse.oss.nyx.git.Scenario;
-import com.mooltiverse.oss.nyx.git.Script;
+import com.mooltiverse.oss.nyx.services.GitException;
+import com.mooltiverse.oss.nyx.services.git.Scenario;
+import com.mooltiverse.oss.nyx.services.git.Script;
 
 @DisplayName("Mark")
 public class MarkTestTemplates {
@@ -183,7 +183,7 @@ public class MarkTestTemplates {
                     )
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -263,7 +263,7 @@ public class MarkTestTemplates {
                     )
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
             
             // add some uncommitted changes
             script.andAddFiles();
@@ -346,7 +346,7 @@ public class MarkTestTemplates {
                     )
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -426,7 +426,7 @@ public class MarkTestTemplates {
                     )
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             // add some uncommitted changes
             script.andAddFiles();
@@ -514,7 +514,7 @@ public class MarkTestTemplates {
                     )
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -599,7 +599,7 @@ public class MarkTestTemplates {
                     )
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             // add some uncommitted changes
             script.andAddFiles();
@@ -687,7 +687,7 @@ public class MarkTestTemplates {
                     )
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -772,7 +772,7 @@ public class MarkTestTemplates {
                     )
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
             
             // add some uncommitted changes
             script.andAddFiles();

@@ -43,8 +43,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import com.mooltiverse.oss.nyx.git.Scenario;
-import com.mooltiverse.oss.nyx.git.Script;
+import com.mooltiverse.oss.nyx.services.git.Scenario;
+import com.mooltiverse.oss.nyx.services.git.Script;
 
 /**
  * Functional tests for the Gradle plugin.<br>
@@ -553,7 +553,7 @@ public class NyxPluginFunctionalTests {
         File tempProjectDir = Objects.isNull(script.getWorkingDirectory()) ? Files.createTempDirectory("nyx-test-gradle-"+gradleVersion+"-test-").toFile() : script.getWorkingDirectory();
 
         // let the VM delete the directories on exit
-        tempProjectDir.deleteOnExit(); 
+        tempProjectDir.deleteOnExit();
         System.out.println("Set up tests into directory: "+tempProjectDir.getAbsolutePath());
 
         // do a couple extra checks to avoid messing up with the project dir

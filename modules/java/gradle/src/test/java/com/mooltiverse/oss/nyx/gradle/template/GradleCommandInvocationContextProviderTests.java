@@ -28,8 +28,8 @@ import org.gradle.api.Task;
 import com.mooltiverse.oss.nyx.command.Commands;
 import com.mooltiverse.oss.nyx.command.template.Baseline;
 import com.mooltiverse.oss.nyx.command.template.CommandSelector;
+import com.mooltiverse.oss.nyx.services.git.Scenario;
 import com.mooltiverse.oss.nyx.command.template.CommandInvocationContextProviderTests;
-import com.mooltiverse.oss.nyx.git.Scenario;
 
 /**
  * Test the GradleCommandInvocationContextProvider and its internal classes.

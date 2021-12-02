@@ -33,10 +33,10 @@ import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
 import com.mooltiverse.oss.nyx.entities.ReleaseType;
 import com.mooltiverse.oss.nyx.entities.ReleaseTypes;
 import com.mooltiverse.oss.nyx.entities.ServiceConfiguration;
-import com.mooltiverse.oss.nyx.git.Scenario;
-import com.mooltiverse.oss.nyx.git.Script;
-import com.mooltiverse.oss.nyx.git.util.RandomUtil;
 import com.mooltiverse.oss.nyx.services.Provider;
+import com.mooltiverse.oss.nyx.services.git.Scenario;
+import com.mooltiverse.oss.nyx.services.git.Script;
+import com.mooltiverse.oss.nyx.services.git.util.RandomUtil;
 import com.mooltiverse.oss.nyx.services.github.GitHub;
 import com.mooltiverse.oss.nyx.services.github.GitHubRepository;
 import com.mooltiverse.oss.nyx.services.gitlab.GitLab;
@@ -60,7 +60,7 @@ public class MarkTests {
             Thread.sleep(2000);
 
             Script replicaScript = Scenario.FROM_SCRATCH.realize();
-            Script script = Scenario.ONE_BRANCH_SHORT.applyOnClone(gitHubRepository.getHTTPURL(), gitHub.getUserForRemote(), gitHub.getPasswordForRemote());
+            Script script = Scenario.ONE_BRANCH_SHORT.applyOnClone(gitHubRepository.getHTTPURL(), gitHub.getUser(), gitHub.getPassword());
             script.addRemote(replicaScript.getGitDirectory(), "replica");
             
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
@@ -93,7 +93,7 @@ public class MarkTests {
             );
             
             Nyx nyx = new Nyx(script.getWorkingDirectory());
-            nyx.configuration().withCommandLineConfiguration(configurationLayerMock);
+            nyx.configuration().withRuntimeConfiguration(configurationLayerMock);
 
             nyx.mark();
 
@@ -101,7 +101,7 @@ public class MarkTests {
             Thread.sleep(1000);
 
             // clone the remote repo again into a a new directory and test
-            Script remoteScript = Script.cloneFrom(gitHubRepository.getHTTPURL(), gitHub.getUserForRemote(), gitHub.getPasswordForRemote());
+            Script remoteScript = Script.cloneFrom(gitHubRepository.getHTTPURL(), gitHub.getUser(), gitHub.getPassword());
 
             assertEquals("main", nyx.state().getBranch()); // new GitHub repositories default to 'main' as the default branch
             assertEquals("patch", nyx.state().getBump());
@@ -166,7 +166,7 @@ public class MarkTests {
             Thread.sleep(2000);
 
             Script replicaScript = Scenario.FROM_SCRATCH.realize();
-            Script script = Scenario.ONE_BRANCH_SHORT.applyOnClone(gitLabRepository.getHTTPURL(), gitLab.getUserForRemote(), gitLab.getPasswordForRemote());
+            Script script = Scenario.ONE_BRANCH_SHORT.applyOnClone(gitLabRepository.getHTTPURL(), gitLab.getUser(), gitLab.getPassword());
             script.addRemote(replicaScript.getGitDirectory(), "replica");
             
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
@@ -199,7 +199,7 @@ public class MarkTests {
             );
             
             Nyx nyx = new Nyx(script.getWorkingDirectory());
-            nyx.configuration().withCommandLineConfiguration(configurationLayerMock);
+            nyx.configuration().withRuntimeConfiguration(configurationLayerMock);
 
             nyx.mark();
 
@@ -207,7 +207,7 @@ public class MarkTests {
             Thread.sleep(1000);
 
             // clone the remote repo again into a a new directory and test
-            Script remoteScript = Script.cloneFrom(gitLabRepository.getHTTPURL(), gitLab.getUserForRemote(), gitLab.getPasswordForRemote());
+            Script remoteScript = Script.cloneFrom(gitLabRepository.getHTTPURL(), gitLab.getUser(), gitLab.getPassword());
 
             assertEquals("main", nyx.state().getBranch()); // new GitLab repositories default to 'main' as the default branch
             assertEquals("patch", nyx.state().getBump());

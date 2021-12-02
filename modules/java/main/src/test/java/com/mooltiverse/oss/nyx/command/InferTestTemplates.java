@@ -47,9 +47,9 @@ import com.mooltiverse.oss.nyx.entities.IllegalPropertyException;
 import com.mooltiverse.oss.nyx.entities.ReleaseType;
 import com.mooltiverse.oss.nyx.entities.ReleaseTypes;
 import com.mooltiverse.oss.nyx.entities.WorkspaceStatus;
-import com.mooltiverse.oss.nyx.git.GitException;
-import com.mooltiverse.oss.nyx.git.Scenario;
-import com.mooltiverse.oss.nyx.git.Script;
+import com.mooltiverse.oss.nyx.services.GitException;
+import com.mooltiverse.oss.nyx.services.git.Scenario;
+import com.mooltiverse.oss.nyx.services.git.Script;
 
 @DisplayName("Infer")
 public class InferTestTemplates {
@@ -488,7 +488,7 @@ public class InferTestTemplates {
                     )
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             if (command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME))
                 assertThrows(IllegalPropertyException.class, () -> command.run());
@@ -532,7 +532,7 @@ public class InferTestTemplates {
                     )
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             // the master branch must match the first release type
             script.checkout("master");
@@ -589,7 +589,7 @@ public class InferTestTemplates {
                     )
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             // the PATH variable must be matched (with any value)
             command.run();
@@ -643,7 +643,7 @@ public class InferTestTemplates {
                     )
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             // the CLEAN release type must be matched
             script.checkout("master");
@@ -723,7 +723,7 @@ public class InferTestTemplates {
                     )
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             script.checkout("master");
             // the PATH variable must be matched (with any value)
@@ -765,7 +765,7 @@ public class InferTestTemplates {
                     )
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             if (command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME))
                 assertThrows(IllegalPropertyException.class, () -> command.run());
@@ -799,7 +799,7 @@ public class InferTestTemplates {
                     )
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -833,7 +833,7 @@ public class InferTestTemplates {
                     )
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             script.andCommit("Untagged commit #1");
             script.andTag("0.1.0-tag1.identifier1.999", null);
@@ -871,7 +871,7 @@ public class InferTestTemplates {
                     )
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -905,7 +905,7 @@ public class InferTestTemplates {
                     )
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             script.andCommit("Untagged commit #1");
             script.andTag("0.1.0+tag1.identifier1.999", null);
@@ -950,7 +950,7 @@ public class InferTestTemplates {
                     )
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -991,7 +991,7 @@ public class InferTestTemplates {
                     )
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             script.andCommit("Untagged commit #1");
             script.andTag("0.1.0-tag1.p2.999+b3.zzz", null);
@@ -1038,7 +1038,7 @@ public class InferTestTemplates {
                     )
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -1073,7 +1073,7 @@ public class InferTestTemplates {
                     )
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             // the generated version does not comply with the version range so it raises an exception
             if (command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME))
@@ -1110,7 +1110,7 @@ public class InferTestTemplates {
                     )
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             // the generated version does not comply with the version range so it raises an exception
             if (command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME))
@@ -1150,7 +1150,7 @@ public class InferTestTemplates {
                     )
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             //if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
                 // These tests may fail when running in a standalone context because the run() doee not
@@ -1199,7 +1199,7 @@ public class InferTestTemplates {
                     )
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             //if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
                 // These tests may fail when running in a standalone context because the run() doee not
@@ -1287,7 +1287,7 @@ public class InferTestTemplates {
             final String CUSTOM_INITIAL_VERSION = "12.13.14";
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             configurationLayerMock.setInitialVersion(CUSTOM_INITIAL_VERSION);
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
             command.run();
 
             assertEquals("master", command.state().getBranch());
@@ -1339,7 +1339,7 @@ public class InferTestTemplates {
             throws Exception {
             final String CUSTOM_VERSION = "1.2.3";
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
             configurationLayerMock.setVersion(CUSTOM_VERSION);
             command.run();
 
@@ -1392,7 +1392,7 @@ public class InferTestTemplates {
             throws Exception {
             final String CUSTOM_BUMP = "major";
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
             configurationLayerMock.setBump(CUSTOM_BUMP);
             command.run();
 
@@ -1445,7 +1445,7 @@ public class InferTestTemplates {
             throws Exception {
             final String CUSTOM_BUMP = "minor";
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
             configurationLayerMock.setBump(CUSTOM_BUMP);
             command.run();
 
@@ -1498,7 +1498,7 @@ public class InferTestTemplates {
             throws Exception {
             final String CUSTOM_BUMP = "patch";
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
             configurationLayerMock.setBump(CUSTOM_BUMP);
             command.run();
 
@@ -1551,7 +1551,7 @@ public class InferTestTemplates {
             throws Exception {
             final String CUSTOM_BUMP = "alpha";
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
             configurationLayerMock.setBump(CUSTOM_BUMP);
             command.run();
 
@@ -1604,7 +1604,7 @@ public class InferTestTemplates {
             throws Exception {
             final String CUSTOM_BUMP = "major";
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
             configurationLayerMock.setBump(CUSTOM_BUMP);
             command.run();
 
@@ -1657,7 +1657,7 @@ public class InferTestTemplates {
             throws Exception {
             final String CUSTOM_BUMP = "minor";
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
             configurationLayerMock.setBump(CUSTOM_BUMP);
             command.run();
 
@@ -1710,7 +1710,7 @@ public class InferTestTemplates {
             throws Exception {
             final String CUSTOM_BUMP = "patch";
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
             configurationLayerMock.setBump(CUSTOM_BUMP);
             command.run();
 
@@ -1763,7 +1763,7 @@ public class InferTestTemplates {
             throws Exception {
             final String CUSTOM_BUMP = "alpha";
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
             configurationLayerMock.setBump(CUSTOM_BUMP);
             command.run();
 
@@ -1815,7 +1815,7 @@ public class InferTestTemplates {
         void runUsingDefaultReleaseTypeWithReleaseLenientInRepoWithPrefixedVersionCommitTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
             configurationLayerMock.setReleaseLenient(Boolean.TRUE);
             script.andCommitWithTag("release-2.2.2");
             command.run();
@@ -1868,7 +1868,7 @@ public class InferTestTemplates {
         void runUsingDefaultReleaseTypeWithoutReleaseLenientInRepoWithoutPrefixedVersionCommitTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
             configurationLayerMock.setReleaseLenient(Boolean.FALSE);
             script.andCommitWithTag("release-2.2.2");
             command.run();
@@ -1921,7 +1921,7 @@ public class InferTestTemplates {
         void runUsingDefaultReleaseTypeWithoutLenientAndWithPrefixReleaseInRepoWithJustOneInitialVersionCommitTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
             configurationLayerMock.setReleaseLenient(Boolean.FALSE);
             configurationLayerMock.setReleasePrefix("release-");
             script.andCommitWithTag("release-2.2.2");
@@ -2024,7 +2024,7 @@ public class InferTestTemplates {
         void runUsingDefaultReleaseTypeInRepoWithSimpleLinearCommitHistoryAndNonSignificantCommitsWithInitialVersionOverrideTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
             configurationLayerMock.setInitialVersion("12.13.14");
             command.run();
 
@@ -2076,7 +2076,7 @@ public class InferTestTemplates {
         void runUsingDefaultReleaseTypeWithVersionOverriddenByUserInRepoWithFurtherNonSignificantCommitsTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
             configurationLayerMock.setVersion("1.2.3");
             command.run();
 
@@ -2129,7 +2129,7 @@ public class InferTestTemplates {
             throws Exception {
             final String CUSTOM_BUMP = "major";
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
             configurationLayerMock.setBump(CUSTOM_BUMP);
             command.run();
 
@@ -2182,7 +2182,7 @@ public class InferTestTemplates {
             throws Exception {
             final String CUSTOM_BUMP = "minor";
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
             configurationLayerMock.setBump(CUSTOM_BUMP);
             command.run();
 
@@ -2235,7 +2235,7 @@ public class InferTestTemplates {
             throws Exception {
             final String CUSTOM_BUMP = "patch";
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
             configurationLayerMock.setBump(CUSTOM_BUMP);
             command.run();
 
@@ -2288,7 +2288,7 @@ public class InferTestTemplates {
             throws Exception {
             final String CUSTOM_BUMP = "alpha";
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
             configurationLayerMock.setBump(CUSTOM_BUMP);
             command.run();
 
@@ -2340,7 +2340,7 @@ public class InferTestTemplates {
         void runUsingDefaultReleaseTypeWithReleaseLenientAndWithoutPrefixInRepoWithFurtherNonSignificantPrefixedCommitsTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
             configurationLayerMock.setReleaseLenient(Boolean.TRUE);
             script.andCommitWithTag("release-2.2.2");
             command.run();
@@ -2393,7 +2393,7 @@ public class InferTestTemplates {
         void runUsingDefaultReleaseTypeWithoutReleaseLenientAndWithoutPrefixInRepoWithFurtherNonSignificantPrefixedCommitsTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
             configurationLayerMock.setReleaseLenient(Boolean.FALSE);
             script.andCommitWithTag("release-2.2.2");
             command.run();
@@ -2446,7 +2446,7 @@ public class InferTestTemplates {
         void runUsingDefaultReleaseTypeWithoutReleaseLenientAndWithPrefixInRepoWithFurtherNonSignificantPrefixedCommitsTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
             configurationLayerMock.setReleaseLenient(Boolean.FALSE);
             configurationLayerMock.setReleasePrefix("release-");
             script.andCommitWithTag("release-2.2.2");
@@ -2501,7 +2501,7 @@ public class InferTestTemplates {
             throws Exception {
             final String CUSTOM_BUMP = "patch";
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
             configurationLayerMock.setBump(CUSTOM_BUMP);
             command.run();
 
@@ -2560,7 +2560,7 @@ public class InferTestTemplates {
                     Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("minor", ".*")))
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
             command.run();
 
             assertEquals("master", command.state().getBranch());
@@ -2620,7 +2620,7 @@ public class InferTestTemplates {
                     Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of()))
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
             command.run();
 
             assertEquals("master", command.state().getBranch());
@@ -2682,7 +2682,7 @@ public class InferTestTemplates {
                     Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*")))
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -2746,7 +2746,7 @@ public class InferTestTemplates {
                     Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of()))
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -2810,7 +2810,7 @@ public class InferTestTemplates {
                     Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*")))
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -2874,7 +2874,7 @@ public class InferTestTemplates {
                     Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of()))
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -2938,7 +2938,7 @@ public class InferTestTemplates {
                     Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*")))
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -3002,7 +3002,7 @@ public class InferTestTemplates {
                     Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of()))
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -3066,7 +3066,7 @@ public class InferTestTemplates {
                     Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*")))
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -3130,7 +3130,7 @@ public class InferTestTemplates {
                     Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of()))
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -3194,7 +3194,7 @@ public class InferTestTemplates {
                     Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*")))
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -3258,7 +3258,7 @@ public class InferTestTemplates {
                     Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of()))
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -3322,7 +3322,7 @@ public class InferTestTemplates {
                     Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*")))
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -3386,7 +3386,7 @@ public class InferTestTemplates {
                     Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of()))
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -3450,7 +3450,7 @@ public class InferTestTemplates {
                     Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*")))
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -3514,7 +3514,7 @@ public class InferTestTemplates {
                     Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of()))
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -3578,7 +3578,7 @@ public class InferTestTemplates {
                     Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*")))
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -3642,7 +3642,7 @@ public class InferTestTemplates {
                     Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of()))
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -3705,7 +3705,7 @@ public class InferTestTemplates {
                     Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*")))
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             // the generated version does not comply with the version range so it raises an exception
             if (command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME))
@@ -3730,7 +3730,7 @@ public class InferTestTemplates {
                     Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*")))
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -3794,7 +3794,7 @@ public class InferTestTemplates {
                     Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of()))
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -3857,7 +3857,7 @@ public class InferTestTemplates {
                     Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*")))
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             // the generated version does not comply with the version range so it raises an exception
             if (command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME))
@@ -3882,7 +3882,7 @@ public class InferTestTemplates {
                     Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*")))
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -3946,7 +3946,7 @@ public class InferTestTemplates {
                     Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of()))
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -4010,7 +4010,7 @@ public class InferTestTemplates {
                     Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*")))
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -4074,7 +4074,7 @@ public class InferTestTemplates {
                     Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of()))
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -4138,7 +4138,7 @@ public class InferTestTemplates {
                     Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*")))
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -4202,7 +4202,7 @@ public class InferTestTemplates {
                     Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of()))
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -4266,7 +4266,7 @@ public class InferTestTemplates {
                     Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*")))
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -4332,7 +4332,7 @@ public class InferTestTemplates {
                     Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of()))
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -4396,7 +4396,7 @@ public class InferTestTemplates {
                     Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*")))
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -4462,7 +4462,7 @@ public class InferTestTemplates {
                     Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of()))
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -4526,7 +4526,7 @@ public class InferTestTemplates {
                     Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*")))
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -4592,7 +4592,7 @@ public class InferTestTemplates {
                     Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of()))
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -4673,7 +4673,7 @@ public class InferTestTemplates {
                     )
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             script.andAddFiles(); // add some uncommitted changes to be committed by the Mark command
             command.run();
@@ -4748,7 +4748,7 @@ public class InferTestTemplates {
                     )
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             script.andAddFiles(); // add some uncommitted changes to be committed by the Mark command
             command.run();
@@ -4817,7 +4817,7 @@ public class InferTestTemplates {
                     )
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -4881,7 +4881,7 @@ public class InferTestTemplates {
                     )
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -4945,7 +4945,7 @@ public class InferTestTemplates {
                     )
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -5009,7 +5009,7 @@ public class InferTestTemplates {
                     )
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -5073,7 +5073,7 @@ public class InferTestTemplates {
                     )
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -5144,7 +5144,7 @@ public class InferTestTemplates {
                     )
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -5215,7 +5215,7 @@ public class InferTestTemplates {
                     )
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -5286,7 +5286,7 @@ public class InferTestTemplates {
                     )
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -5357,7 +5357,7 @@ public class InferTestTemplates {
                     )
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -5428,7 +5428,7 @@ public class InferTestTemplates {
                     )
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -5499,7 +5499,7 @@ public class InferTestTemplates {
                     )
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -5570,7 +5570,7 @@ public class InferTestTemplates {
                     )
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -5641,7 +5641,7 @@ public class InferTestTemplates {
                     )
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -5712,7 +5712,7 @@ public class InferTestTemplates {
                     )
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -5777,7 +5777,7 @@ public class InferTestTemplates {
                     )
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -5842,7 +5842,7 @@ public class InferTestTemplates {
                     )
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -5907,7 +5907,7 @@ public class InferTestTemplates {
                     )
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -5972,7 +5972,7 @@ public class InferTestTemplates {
                     )
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -6037,7 +6037,7 @@ public class InferTestTemplates {
                     )
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -6109,7 +6109,7 @@ public class InferTestTemplates {
                     )
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
             
             command.run();
 
@@ -6181,7 +6181,7 @@ public class InferTestTemplates {
                     )
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -6253,7 +6253,7 @@ public class InferTestTemplates {
                     )
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -6325,7 +6325,7 @@ public class InferTestTemplates {
                     )
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -6397,7 +6397,7 @@ public class InferTestTemplates {
                     )
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
             
             command.run();
 
@@ -6469,7 +6469,7 @@ public class InferTestTemplates {
                     )
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -6541,7 +6541,7 @@ public class InferTestTemplates {
                     )
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -6613,7 +6613,7 @@ public class InferTestTemplates {
                     )
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 
@@ -6685,7 +6685,7 @@ public class InferTestTemplates {
                     )
                 )
             );
-            command.state().getConfiguration().withCommandLineConfiguration(configurationLayerMock);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             command.run();
 

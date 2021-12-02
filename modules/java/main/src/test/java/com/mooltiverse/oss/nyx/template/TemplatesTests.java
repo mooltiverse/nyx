@@ -234,7 +234,7 @@ public class TemplatesTests {
             configurationLayerMock.setReleaseLenient(Boolean.TRUE);
             configurationLayerMock.setInitialVersion("1.2.3");
 
-            configuration.withCommandLineConfiguration(configurationLayerMock);
+            configuration.withRuntimeConfiguration(configurationLayerMock);
             State state = new State(configuration);
 
             state.setVersion("9.8.7");

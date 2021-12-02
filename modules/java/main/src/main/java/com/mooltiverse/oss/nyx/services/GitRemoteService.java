@@ -38,28 +38,26 @@ public interface GitRemoteService extends Service {
     public List<String> getSupportedRemoteNames();
 
     /**
-     * Returns the user name to be used when connecting to the {@link #getSupportedRemoteNames() supported}
-     * remote repositories.
+     * Returns the user name to be used when connecting to remote repositories.
      * 
-     * @return the user name to be used when connecting to the {@link #getSupportedRemoteNames() supported}
-     * remote repositories. When {@code null} the remote repositories are meant to allow anonymous access and,
-     * in this case, also the {@link #getPasswordForRemote() password} is {@code null}.
+     * @return the user name to be used when connecting to remote repositories.
+     * When {@code null} the remote repositories are meant to allow anonymous access and,
+     * in this case, also the {@link #getPassword() password} is {@code null}.
      * 
      * @throws UnsupportedOperationException if the underlying implementation does not
      * {@link #supports(Service.Feature) support} the {@link Service.Feature#GIT_REMOTE} feature.
      */
-    public String getUserForRemote();
+    public String getUser();
 
     /**
-     * Returns the password to be used when connecting to the {@link #getSupportedRemoteNames() supported}
-     * remote repositories.
+     * Returns the password to be used when connecting to remote repositories.
      * 
-     * @return the password to be used when connecting to the {@link #getSupportedRemoteNames() supported}
-     * remote repositories. When {@link #getUserForRemote()} returns {@code null} this method also returns
+     * @return the password to be used when connecting to remote repositories.
+     * When {@link #getUser()} returns {@code null} this method also returns
      * {@code null} amd the remote repositories are meant to allow anonymous access.
      * 
      * @throws UnsupportedOperationException if the underlying implementation does not
      * {@link #supports(Service.Feature) support} the {@link Service.Feature#GIT_REMOTE} feature.
      */
-    public String getPasswordForRemote();
+    public String getPassword();
 }

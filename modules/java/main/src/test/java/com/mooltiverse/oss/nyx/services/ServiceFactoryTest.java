@@ -48,6 +48,26 @@ public class ServiceFactoryTest {
     }
 
     @Nested
+    @DisplayName("ServiceFactory.gitLocalServiceInstance()")
+    class GitLocalServiceInstanceTests {
+        @ParameterizedTest(name = "ServiceFactory.gitLocalServiceInstance(''{0}'', Map<String,Object>).getClass() == ''{0}''.getServiceClass()")
+        @EnumSource(Provider.class)
+        void gitLocalServiceInstance(Provider provider)
+            throws Exception {
+            if (provider.equals(Provider.GIT))
+                assertEquals(provider.getServiceClass(), ServiceFactory.gitLocalServiceInstance(provider, Map.<String,String>of()).getClass());
+            else assertThrows(UnsupportedOperationException.class, () -> ServiceFactory.gitLocalServiceInstance(provider, Map.<String,String>of()));
+        }
+
+        @ParameterizedTest(name = "ServiceFactory.gitLocalServiceInstance(null, Map<String,Object>).getClass() throws NullPointerException")
+        @NullSource()
+        void exceptionUsingGitLocalServiceInstanceWithNullProvider(Provider provider)
+            throws Exception {
+            assertThrows(NullPointerException.class, () -> ServiceFactory.gitLocalServiceInstance(provider, Map.<String,String>of()));
+        }
+    }
+
+    @Nested
     @DisplayName("ServiceFactory.gitRemoteServiceInstance()")
     class GitRemoteServiceInstanceTests {
         @ParameterizedTest(name = "ServiceFactory.gitRemoteServiceInstance(''{0}'', Map<String,Object>).getClass() == ''{0}''.getServiceClass()")

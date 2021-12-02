@@ -27,10 +27,10 @@ import com.mooltiverse.oss.nyx.ReleaseException;
 import com.mooltiverse.oss.nyx.configuration.Defaults;
 import com.mooltiverse.oss.nyx.entities.IllegalPropertyException;
 import com.mooltiverse.oss.nyx.entities.git.Commit;
-import com.mooltiverse.oss.nyx.git.GitException;
-import com.mooltiverse.oss.nyx.git.Repository;
 import com.mooltiverse.oss.nyx.io.DataAccessException;
+import com.mooltiverse.oss.nyx.services.GitException;
 import com.mooltiverse.oss.nyx.services.GitRemoteService;
+import com.mooltiverse.oss.nyx.services.git.Repository;
 import com.mooltiverse.oss.nyx.state.State;
 
 /**
@@ -200,14 +200,14 @@ public class Mark extends AbstractCommand {
                         if (Objects.isNull(gitRemoteService.getSupportedRemoteNames()) || gitRemoteService.getSupportedRemoteNames().isEmpty()) {
                             // loose match
                             logger.debug(COMMAND, "Service '{}' does not define any remotes filter so it loosely matches remote '{}' and its credentials will be used unless an exact match is found among remaining services.", serviceConfigurationName, remote);
-                            user = gitRemoteService.getUserForRemote();
-                            password = gitRemoteService.getPasswordForRemote();
+                            user = gitRemoteService.getUser();
+                            password = gitRemoteService.getPassword();
                         }
                         else if (gitRemoteService.getSupportedRemoteNames().contains(remote)) {
                             //exact match
                             logger.debug(COMMAND, "Service '{}' defines a remotes filter '{}' which explicitly matches remote '{}' so its credentials will be used.", serviceConfigurationName, String.join(",", gitRemoteService.getSupportedRemoteNames()), remote);
-                            user = gitRemoteService.getUserForRemote();
-                            password = gitRemoteService.getPasswordForRemote();
+                            user = gitRemoteService.getUser();
+                            password = gitRemoteService.getPassword();
                             break;
                         }
                         else {

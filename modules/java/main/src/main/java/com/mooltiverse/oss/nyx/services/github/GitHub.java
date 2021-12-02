@@ -256,7 +256,7 @@ public class GitHub implements GitRemoteService, GitHostingService, ReleaseServi
      * @return the {@link #AUTHENTICATION_TOKEN_OPTION_NAME} option, if provided, otherwise returns {@code null}.
      */
     @Override
-    public String getUserForRemote() {
+    public String getUser() {
         return authenticationToken;
     }
 
@@ -266,7 +266,7 @@ public class GitHub implements GitRemoteService, GitHostingService, ReleaseServi
      * @return an empty string when the {@link #AUTHENTICATION_TOKEN_OPTION_NAME} option is set, otherwise {@code null}. 
      */
     @Override
-    public String getPasswordForRemote() {
+    public String getPassword() {
         return Objects.isNull(authenticationToken) ? null : "";
     }
 

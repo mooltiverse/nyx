@@ -39,9 +39,9 @@ import com.mooltiverse.oss.nyx.command.Make;
 import com.mooltiverse.oss.nyx.command.Mark;
 import com.mooltiverse.oss.nyx.command.Publish;
 import com.mooltiverse.oss.nyx.configuration.Configuration;
-import com.mooltiverse.oss.nyx.git.Git;
-import com.mooltiverse.oss.nyx.git.Script;
-import com.mooltiverse.oss.nyx.git.Workbench;
+import com.mooltiverse.oss.nyx.services.git.Git;
+import com.mooltiverse.oss.nyx.services.git.Script;
+import com.mooltiverse.oss.nyx.services.git.Workbench;
 import com.mooltiverse.oss.nyx.state.State;
 
 /**
@@ -441,11 +441,11 @@ public class CommandInvocationContextProvider implements TestTemplateInvocationC
 
                 try {
                     switch (commandName) {
-                        case CLEAN:   return new StandaloneCommandProxy(new Clean(new State(new Configuration()), Git.open(script.getWorkingDirectory())));
-                        case INFER:   return new StandaloneCommandProxy(new Infer(new State(new Configuration()), Git.open(script.getWorkingDirectory())));
-                        case MAKE:    return new StandaloneCommandProxy(new Make(new State(new Configuration()), Git.open(script.getWorkingDirectory())));
-                        case MARK:    return new StandaloneCommandProxy(new Mark(new State(new Configuration()), Git.open(script.getWorkingDirectory())));
-                        case PUBLISH: return new StandaloneCommandProxy(new Publish(new State(new Configuration()), Git.open(script.getWorkingDirectory())));
+                        case CLEAN:   return new StandaloneCommandProxy(new Clean(new State(new Configuration()), Git.instance().open(script.getWorkingDirectory())));
+                        case INFER:   return new StandaloneCommandProxy(new Infer(new State(new Configuration()), Git.instance().open(script.getWorkingDirectory())));
+                        case MAKE:    return new StandaloneCommandProxy(new Make(new State(new Configuration()), Git.instance().open(script.getWorkingDirectory())));
+                        case MARK:    return new StandaloneCommandProxy(new Mark(new State(new Configuration()), Git.instance().open(script.getWorkingDirectory())));
+                        case PUBLISH: return new StandaloneCommandProxy(new Publish(new State(new Configuration()), Git.instance().open(script.getWorkingDirectory())));
                         default:      throw new ParameterResolutionException(String.format("Unable to instantiate command % because it's unknown", commandName));
                     }
                 }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mooltiverse.oss.nyx.git;
+package com.mooltiverse.oss.nyx.services.git;
 
 import java.util.Collection;
 import java.util.Set;
@@ -23,6 +23,7 @@ import org.eclipse.jgit.lib.Constants;
 import com.mooltiverse.oss.nyx.entities.git.Commit;
 import com.mooltiverse.oss.nyx.entities.git.Identity;
 import com.mooltiverse.oss.nyx.entities.git.Tag;
+import com.mooltiverse.oss.nyx.services.GitException;
 
 /**
  * This interface models coarse grained, implementation independent methods used by Nyx to access a Git repository.

@@ -46,7 +46,7 @@ public class ReleaseTypesTests {
                 Configuration configuration = new Configuration();
                 SimpleConfigurationLayer configurationLayer = new SimpleConfigurationLayer();
                 configurationLayer.setReleasePrefix("v");
-                configuration.withCommandLineConfiguration(configurationLayer);
+                configuration.withRuntimeConfiguration(configurationLayer);
                 State state = new State(configuration);
                 Pattern pattern = Pattern.compile(Templates.render(ReleaseTypes.FEATURE.getFilterTags(), state));
 
@@ -78,7 +78,7 @@ public class ReleaseTypesTests {
                 Configuration configuration = new Configuration();
                 SimpleConfigurationLayer configurationLayer = new SimpleConfigurationLayer();
                 configurationLayer.setReleasePrefix("v");
-                configuration.withCommandLineConfiguration(configurationLayer);
+                configuration.withRuntimeConfiguration(configurationLayer);
                 State state = new State(configuration);
                 Pattern pattern = Pattern.compile(Templates.render(ReleaseTypes.FEATURE.getFilterTags(), state));
 
@@ -136,7 +136,7 @@ public class ReleaseTypesTests {
                 Configuration configuration = new Configuration();
                 SimpleConfigurationLayer configurationLayer = new SimpleConfigurationLayer();
                 configurationLayer.setReleasePrefix("v");
-                configuration.withCommandLineConfiguration(configurationLayer);
+                configuration.withRuntimeConfiguration(configurationLayer);
                 State state = new State(configuration);
                 Pattern pattern = Pattern.compile(Templates.render(ReleaseTypes.FEATURE.getMatchBranches(), state));
 
@@ -156,7 +156,7 @@ public class ReleaseTypesTests {
                 Configuration configuration = new Configuration();
                 SimpleConfigurationLayer configurationLayer = new SimpleConfigurationLayer();
                 configurationLayer.setReleasePrefix("v");
-                configuration.withCommandLineConfiguration(configurationLayer);
+                configuration.withRuntimeConfiguration(configurationLayer);
                 State state = new State(configuration);
                 Pattern pattern = Pattern.compile(Templates.render(ReleaseTypes.FEATURE.getMatchBranches(), state));
 
@@ -187,7 +187,7 @@ public class ReleaseTypesTests {
                 Configuration configuration = new Configuration();
                 SimpleConfigurationLayer configurationLayer = new SimpleConfigurationLayer();
                 configurationLayer.setReleasePrefix("v");
-                configuration.withCommandLineConfiguration(configurationLayer);
+                configuration.withRuntimeConfiguration(configurationLayer);
                 State state = new State(configuration);
                 Pattern pattern = Pattern.compile(Templates.render(ReleaseTypes.HOTFIX.getFilterTags(), state));
 
@@ -219,7 +219,7 @@ public class ReleaseTypesTests {
                 Configuration configuration = new Configuration();
                 SimpleConfigurationLayer configurationLayer = new SimpleConfigurationLayer();
                 configurationLayer.setReleasePrefix("v");
-                configuration.withCommandLineConfiguration(configurationLayer);
+                configuration.withRuntimeConfiguration(configurationLayer);
                 State state = new State(configuration);
                 Pattern pattern = Pattern.compile(Templates.render(ReleaseTypes.HOTFIX.getFilterTags(), state));
 
@@ -277,7 +277,7 @@ public class ReleaseTypesTests {
                 Configuration configuration = new Configuration();
                 SimpleConfigurationLayer configurationLayer = new SimpleConfigurationLayer();
                 configurationLayer.setReleasePrefix("v");
-                configuration.withCommandLineConfiguration(configurationLayer);
+                configuration.withRuntimeConfiguration(configurationLayer);
                 State state = new State(configuration);
                 Pattern pattern = Pattern.compile(Templates.render(ReleaseTypes.HOTFIX.getMatchBranches(), state));
 
@@ -297,7 +297,7 @@ public class ReleaseTypesTests {
                 Configuration configuration = new Configuration();
                 SimpleConfigurationLayer configurationLayer = new SimpleConfigurationLayer();
                 configurationLayer.setReleasePrefix("v");
-                configuration.withCommandLineConfiguration(configurationLayer);
+                configuration.withRuntimeConfiguration(configurationLayer);
                 State state = new State(configuration);
                 Pattern pattern = Pattern.compile(Templates.render(ReleaseTypes.HOTFIX.getMatchBranches(), state));
 
@@ -332,7 +332,7 @@ public class ReleaseTypesTests {
                 Configuration configuration = new Configuration();
                 SimpleConfigurationLayer configurationLayer = new SimpleConfigurationLayer();
                 configurationLayer.setReleasePrefix("v");
-                configuration.withCommandLineConfiguration(configurationLayer);
+                configuration.withRuntimeConfiguration(configurationLayer);
                 State state = new State(configuration);
                 Pattern pattern = Pattern.compile(Templates.render(ReleaseTypes.INTEGRATION.getFilterTags(), state));
 
@@ -368,7 +368,7 @@ public class ReleaseTypesTests {
                 Configuration configuration = new Configuration();
                 SimpleConfigurationLayer configurationLayer = new SimpleConfigurationLayer();
                 configurationLayer.setReleasePrefix("v");
-                configuration.withCommandLineConfiguration(configurationLayer);
+                configuration.withRuntimeConfiguration(configurationLayer);
                 State state = new State(configuration);
                 Pattern pattern = Pattern.compile(Templates.render(ReleaseTypes.INTEGRATION.getFilterTags(), state));
 
@@ -444,7 +444,7 @@ public class ReleaseTypesTests {
                 Configuration configuration = new Configuration();
                 SimpleConfigurationLayer configurationLayer = new SimpleConfigurationLayer();
                 configurationLayer.setReleasePrefix("v");
-                configuration.withCommandLineConfiguration(configurationLayer);
+                configuration.withRuntimeConfiguration(configurationLayer);
                 State state = new State(configuration);
                 Pattern pattern = Pattern.compile(Templates.render(ReleaseTypes.INTEGRATION.getMatchBranches(), state));
 
@@ -461,7 +461,7 @@ public class ReleaseTypesTests {
                 Configuration configuration = new Configuration();
                 SimpleConfigurationLayer configurationLayer = new SimpleConfigurationLayer();
                 configurationLayer.setReleasePrefix("v");
-                configuration.withCommandLineConfiguration(configurationLayer);
+                configuration.withRuntimeConfiguration(configurationLayer);
                 State state = new State(configuration);
                 Pattern pattern = Pattern.compile(Templates.render(ReleaseTypes.INTEGRATION.getMatchBranches(), state));
 
@@ -534,7 +534,7 @@ public class ReleaseTypesTests {
                 Configuration configuration = new Configuration();
                 SimpleConfigurationLayer configurationLayer = new SimpleConfigurationLayer();
                 configurationLayer.setReleasePrefix("v");
-                configuration.withCommandLineConfiguration(configurationLayer);
+                configuration.withRuntimeConfiguration(configurationLayer);
                 State state = new State(configuration);
                 Pattern pattern = Pattern.compile(Templates.render(ReleaseTypes.MAINLINE.getFilterTags(), state));
 
@@ -548,7 +548,7 @@ public class ReleaseTypesTests {
                 Configuration configuration = new Configuration();
                 SimpleConfigurationLayer configurationLayer = new SimpleConfigurationLayer();
                 configurationLayer.setReleasePrefix("v");
-                configuration.withCommandLineConfiguration(configurationLayer);
+                configuration.withRuntimeConfiguration(configurationLayer);
                 State state = new State(configuration);
                 Pattern pattern = Pattern.compile(Templates.render(ReleaseTypes.MAINLINE.getFilterTags(), state));
 
@@ -574,7 +574,7 @@ public class ReleaseTypesTests {
                 Configuration configuration = new Configuration();
                 SimpleConfigurationLayer configurationLayer = new SimpleConfigurationLayer();
                 configurationLayer.setReleasePrefix("v");
-                configuration.withCommandLineConfiguration(configurationLayer);
+                configuration.withRuntimeConfiguration(configurationLayer);
                 State state = new State(configuration);
                 Pattern pattern = Pattern.compile(Templates.render(ReleaseTypes.MAINLINE.getMatchBranches(), state));
 
@@ -589,7 +589,7 @@ public class ReleaseTypesTests {
                 Configuration configuration = new Configuration();
                 SimpleConfigurationLayer configurationLayer = new SimpleConfigurationLayer();
                 configurationLayer.setReleasePrefix("v");
-                configuration.withCommandLineConfiguration(configurationLayer);
+                configuration.withRuntimeConfiguration(configurationLayer);
                 State state = new State(configuration);
                 Pattern pattern = Pattern.compile(Templates.render(ReleaseTypes.MAINLINE.getMatchBranches(), state));
 
@@ -622,7 +622,7 @@ public class ReleaseTypesTests {
                 Configuration configuration = new Configuration();
                 SimpleConfigurationLayer configurationLayer = new SimpleConfigurationLayer();
                 configurationLayer.setReleasePrefix("v");
-                configuration.withCommandLineConfiguration(configurationLayer);
+                configuration.withRuntimeConfiguration(configurationLayer);
                 State state = new State(configuration);
                 Pattern pattern = Pattern.compile(Templates.render(ReleaseTypes.MAINTENANCE.getFilterTags(), state));
 
@@ -636,7 +636,7 @@ public class ReleaseTypesTests {
                 Configuration configuration = new Configuration();
                 SimpleConfigurationLayer configurationLayer = new SimpleConfigurationLayer();
                 configurationLayer.setReleasePrefix("v");
-                configuration.withCommandLineConfiguration(configurationLayer);
+                configuration.withRuntimeConfiguration(configurationLayer);
                 State state = new State(configuration);
                 Pattern pattern = Pattern.compile(Templates.render(ReleaseTypes.MAINTENANCE.getFilterTags(), state));
 
@@ -662,7 +662,7 @@ public class ReleaseTypesTests {
                 Configuration configuration = new Configuration();
                 SimpleConfigurationLayer configurationLayer = new SimpleConfigurationLayer();
                 configurationLayer.setReleasePrefix("v");
-                configuration.withCommandLineConfiguration(configurationLayer);
+                configuration.withRuntimeConfiguration(configurationLayer);
                 State state = new State(configuration);
                 Pattern pattern = Pattern.compile(Templates.render(ReleaseTypes.MAINTENANCE.getMatchBranches(), state));
 
@@ -701,7 +701,7 @@ public class ReleaseTypesTests {
                 Configuration configuration = new Configuration();
                 SimpleConfigurationLayer configurationLayer = new SimpleConfigurationLayer();
                 configurationLayer.setReleasePrefix("v");
-                configuration.withCommandLineConfiguration(configurationLayer);
+                configuration.withRuntimeConfiguration(configurationLayer);
                 State state = new State(configuration);
                 Pattern pattern = Pattern.compile(Templates.render(ReleaseTypes.MAINTENANCE.getMatchBranches(), state));
 
@@ -739,7 +739,7 @@ public class ReleaseTypesTests {
                 Configuration configuration = new Configuration();
                 SimpleConfigurationLayer configurationLayer = new SimpleConfigurationLayer();
                 configurationLayer.setReleasePrefix("v");
-                configuration.withCommandLineConfiguration(configurationLayer);
+                configuration.withRuntimeConfiguration(configurationLayer);
                 State state = new State(configuration);
                 Pattern pattern = Pattern.compile(Templates.render(ReleaseTypes.MATURITY.getFilterTags(), state));
 
@@ -779,7 +779,7 @@ public class ReleaseTypesTests {
                 Configuration configuration = new Configuration();
                 SimpleConfigurationLayer configurationLayer = new SimpleConfigurationLayer();
                 configurationLayer.setReleasePrefix("v");
-                configuration.withCommandLineConfiguration(configurationLayer);
+                configuration.withRuntimeConfiguration(configurationLayer);
                 State state = new State(configuration);
                 Pattern pattern = Pattern.compile(Templates.render(ReleaseTypes.MATURITY.getFilterTags(), state));
 
@@ -853,7 +853,7 @@ public class ReleaseTypesTests {
                 Configuration configuration = new Configuration();
                 SimpleConfigurationLayer configurationLayer = new SimpleConfigurationLayer();
                 configurationLayer.setReleasePrefix("v");
-                configuration.withCommandLineConfiguration(configurationLayer);
+                configuration.withRuntimeConfiguration(configurationLayer);
                 State state = new State(configuration);
                 Pattern pattern = Pattern.compile(Templates.render(ReleaseTypes.MATURITY.getMatchBranches(), state));
 
@@ -890,7 +890,7 @@ public class ReleaseTypesTests {
                 Configuration configuration = new Configuration();
                 SimpleConfigurationLayer configurationLayer = new SimpleConfigurationLayer();
                 configurationLayer.setReleasePrefix("v");
-                configuration.withCommandLineConfiguration(configurationLayer);
+                configuration.withRuntimeConfiguration(configurationLayer);
                 State state = new State(configuration);
                 Pattern pattern = Pattern.compile(Templates.render(ReleaseTypes.MATURITY.getMatchBranches(), state));
 
@@ -940,7 +940,7 @@ public class ReleaseTypesTests {
                 /*Configuration configuration = new Configuration();
                 SimpleConfigurationLayer configurationLayer = new SimpleConfigurationLayer();
                 configurationLayer.setReleasePrefix("v");
-                configuration.withCommandLineConfiguration(configurationLayer);
+                configuration.withRuntimeConfiguration(configurationLayer);
                 State state = new State(configuration);
                 Pattern pattern = Pattern.compile(Templates.render(ReleaseTypes.RELEASE.getFilterTags(), state));
 
@@ -954,7 +954,7 @@ public class ReleaseTypesTests {
                 Configuration configuration = new Configuration();
                 SimpleConfigurationLayer configurationLayer = new SimpleConfigurationLayer();
                 configurationLayer.setReleasePrefix("v");
-                configuration.withCommandLineConfiguration(configurationLayer);
+                configuration.withRuntimeConfiguration(configurationLayer);
                 State state = new State(configuration);
                 Pattern pattern = Pattern.compile(Templates.render(ReleaseTypes.RELEASE.getFilterTags(), state));
 
@@ -981,7 +981,7 @@ public class ReleaseTypesTests {
                 Configuration configuration = new Configuration();
                 SimpleConfigurationLayer configurationLayer = new SimpleConfigurationLayer();
                 configurationLayer.setReleasePrefix("v");
-                configuration.withCommandLineConfiguration(configurationLayer);
+                configuration.withRuntimeConfiguration(configurationLayer);
                 State state = new State(configuration);
                 Pattern pattern = Pattern.compile(Templates.render(ReleaseTypes.RELEASE.getMatchBranches(), state));
 
@@ -1101,7 +1101,7 @@ public class ReleaseTypesTests {
                 Configuration configuration = new Configuration();
                 SimpleConfigurationLayer configurationLayer = new SimpleConfigurationLayer();
                 configurationLayer.setReleasePrefix("v");
-                configuration.withCommandLineConfiguration(configurationLayer);
+                configuration.withRuntimeConfiguration(configurationLayer);
                 State state = new State(configuration);
                 Pattern pattern = Pattern.compile(Templates.render(ReleaseTypes.RELEASE.getMatchBranches(), state));
 
