@@ -265,7 +265,7 @@ jobs:
       uses: actions/upload-artifact@v2
       if: ${{ always() }}
       with:
-        name: test-reports
+        name: check-reports
         path: |
           **/build/reports/
           **/build/test-results/
