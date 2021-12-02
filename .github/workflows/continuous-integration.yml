@@ -297,7 +297,7 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Build with Gradle
-      run: ./gradlew build --build-cache --stacktrace
+      run: ./gradlew build --build-cache --stacktrace --info
     - name: Archive Nyx state file
       uses: actions/upload-artifact@v2
       if: ${{ always() }}
