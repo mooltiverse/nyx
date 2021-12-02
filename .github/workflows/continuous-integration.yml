@@ -254,7 +254,7 @@ jobs:
           # See the top level https://github.com/mooltiverse/nyx/blob/master/CONTRIBUTING.md#contributing-code file for details about passing these values when testing locally
           ORG_GRADLE_PROJECT_gitHubTestUserToken: ${{ secrets.TEST_GITHUB_USER_TOKEN }}   # The test user token to test Nyx GitHub features
           ORG_GRADLE_PROJECT_gitLabTestUserToken: ${{ secrets.TEST_GITLAB_USER_TOKEN }}   # The test user token to test Nyx GitLab features
-      run: ./gradlew check --build-cache --stacktrace
+      run: ./gradlew check --build-cache --stacktrace --info
     - name: Archive Nyx state file
       uses: actions/upload-artifact@v2
       if: ${{ always() }}
