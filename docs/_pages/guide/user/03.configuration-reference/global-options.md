@@ -9,6 +9,7 @@ These are the top level options in the configuration:
 
 | Name                                                      | Type    | Command Line Option                                       | Environment Variable                                          | Default  |
 | --------------------------------------------------------- | ------- | --------------------------------------------------------- | ------------------------------------------------------------- | -------- |
+| [`assets`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/assets.md %}) | object  | See [Assets]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/assets.md %}) | See [Assets]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/assets.md %}) | N/A      |
 | [`bump`](#bump)                                           | string  | `-b <NAME>`, `--bump=<NAME>`                              | `NYX_BUMP=<NAME>`                                             | N/A      |
 | [`commitMessageConventions`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/commit-message-conventions.md %}) | object  | See [Commit Message Conventions]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/commit-message-conventions.md %}) | See [Commit Message Conventions]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/commit-message-conventions.md %}) | N/A      |
 | [`configurationFile`](#configuration-file)                | string  | `-c <PATH>`, `--configuration-file=<PATH>`                | `NYX_CONFIGURATION_FILE=<PATH>`                               | N/A      |
@@ -21,10 +22,15 @@ These are the top level options in the configuration:
 | [`releaseTypes`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}) | object  | See [Release Types]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}) | See [Release Types]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}) | N/A      |
 | [`resume`](#resume)                                       | string  | `--resume`, `resume=true|false`                           | `NYX_RESUME=true|false`                                       | `false`  |
 | [`scheme`](#scheme)                                       | string  | `--scheme=<NAME>`                                         | `NYX_SCHEME=<NAME>`                                           | `SEMVER` |
+| [`services`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}) | object  | See [Services]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}) | See [Services]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}) | N/A      |
 | [`sharedConfigurationFile`](#shared-configuration-file)   | string  | `--shared-configuration-file=<PATH>`                      | `NYX_SHARED_CONFIGURATION_FILE=<PATH>`                        | N/A      |
 | [`stateFile`](#state-file)                                | string  | `--state-file=<PATH>`                                     | `NYX_STATE_FILE=<PATH>`                                       | N/A      |
 | [`verbosity`](#verbosity)                                 | string  | `--verbosity=<LEVEL>`, `--fatal`, `--error`, `--warning`, `--info`, `--debug`, `--trace` | `NYX_VERBOSITY=<LEVEL>`        | `WARNING`|
 | [`version`](#version)                                     | string  | `-v <VERSION>`, `--version=<VERSION>`                     | `NYX_VERSION=<VERSION>`                                       | N/A      |
+
+### Assets
+
+See [Assets]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/assets.md %}).
 
 ### Bump
 
@@ -208,6 +214,10 @@ This option only makes sense when you also set a value for the [`stateFile`](#st
 | Related state attributes  | [bump]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#bump){: .btn .btn--info .btn--small} [newVersion]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#new-version){: .btn .btn--info .btn--small} [scheme]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#scheme){: .btn .btn--info .btn--small} [version]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#version){: .btn .btn--info .btn--small} |
 
 Selects the [version scheme]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/version-schemes.md %}) to use. Defaults to [`SEMVER`]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/version-schemes.md %}#semantic-versioning-semver).
+
+### Services
+
+See [Services]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}).
 
 ### Shared configuration file
 

@@ -195,7 +195,7 @@ Note that this value is also used as the release description when [publishing](#
 
 This value is optional but may be required by some [publication services](#publication-services).
 
-A common use for this option is a [`file.content`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}#filecontent) template to get the content of a release notes or changelog file which may be generated as an [asset](TODO: insert the link to the configured assets here) by the [Make]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#make) step. Example: `{% raw %}{{#file.content}}CHANGELOG.md{{/file.content}}{% endraw %}`.
+A common use for this option is a [`file.content`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}#filecontent) template to get the content of a release notes or changelog file which may be generated as an [asset]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/assets.md %}) by the [Make]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#make) step. Example: `{% raw %}{{#file.content}}CHANGELOG.md{{/file.content}}{% endraw %}`.
 
 #### Filter tags
 

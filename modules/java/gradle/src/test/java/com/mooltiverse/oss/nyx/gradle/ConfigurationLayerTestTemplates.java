@@ -46,6 +46,20 @@ public class ConfigurationLayerTestTemplates {
     @ExtendWith(GradleCommandInvocationContextProvider.class)
     class DefaultsTests {
         @TestTemplate
+        @DisplayName("ConfigurationLayer.getAssets() default value")
+        @Baseline(Scenario.FROM_SCRATCH)
+        void getAssetsDefaultTest(Project project)
+            throws Exception {
+            NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
+            ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
+
+            assertNotNull(extension.getAssets());
+            assertNotNull(configurationLayer.getAssets());
+            assertTrue(extension.getAssets().isEmpty());
+            assertTrue(configurationLayer.getAssets().isEmpty());
+        }
+
+        @TestTemplate
         @DisplayName("ConfigurationLayer.getBump() default value")
         @Baseline(Scenario.FROM_SCRATCH)
         void getBumpDefaultTest(Project project)

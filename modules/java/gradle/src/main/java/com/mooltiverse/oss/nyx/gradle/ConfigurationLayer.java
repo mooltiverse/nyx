@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import com.mooltiverse.oss.nyx.configuration.Defaults;
+import com.mooltiverse.oss.nyx.entities.Asset;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
 import com.mooltiverse.oss.nyx.entities.Identifier;
@@ -50,6 +51,11 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
      * May be {@code null} if the user has not defined any {@code version} property in the script
      */
     private final Object projectVersion;
+
+    /**
+     * The private instance of the assets configuration section.
+     */
+    private Map<String,Asset> assetsSection = null;
 
     /**
      * The private instance of the commit message convention configuration section.
@@ -79,6 +85,29 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
             throw new IllegalArgumentException("Cannot build a configuration layer adapter with a null extension");
         this.extension = extension;
         this.projectVersion = projectVersion;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Map<String,Asset> getAssets()
+        throws IllegalPropertyException {
+        if (Objects.isNull(assetsSection)) {
+            assetsSection = new HashMap<String,Asset>(extension.getAssets().size());
+            // the map property is always present and never null but is empty when the user doesn't define its contents
+            if (!extension.getAssets().isEmpty()) {
+                for (NyxExtension.Asset asset: extension.getAssets()) {
+                    if (!assetsSection.containsKey(asset.getName())) {
+                        assetsSection.put(asset.getName(), new Asset(
+                            asset.getPath().isPresent() ? asset.getPath().get() : null,
+                            asset.getService().isPresent() ? asset.getService().get() : null
+                        ));
+                    }
+                }
+            }
+        }
+        return assetsSection;
     }
 
     /**

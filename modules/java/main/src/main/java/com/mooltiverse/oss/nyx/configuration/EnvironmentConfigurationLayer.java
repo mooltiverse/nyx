@@ -35,6 +35,7 @@ import java.util.regex.PatternSyntaxException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mooltiverse.oss.nyx.entities.Asset;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
 import com.mooltiverse.oss.nyx.entities.Identifier;
@@ -68,6 +69,46 @@ class EnvironmentConfigurationLayer implements ConfigurationLayer {
      * The prefix of all environment variables considered by this class. Value: {@value}
      */
     private static final String ENVVAR_NAME_GLOBAL_PREFIX = "NYX_";
+
+    /**
+     * The name of the environment variable to read for this value. Value: {@value}
+     */
+    private static final String ASSETS_ENVVAR_NAME = ENVVAR_NAME_GLOBAL_PREFIX.concat("ASSETS");
+
+    /**
+     * The regular expression used to scan the name of an asset from an environment
+     * variable name. This expression is used to detect if an environment variable is used to define
+     * an asset.
+     * This expression uses the 'name' capturing group which returns the asset name, if detected.
+     * Value: {@value}
+     */
+    private static final String ASSETS_ITEM_NAME_REGEX = ASSETS_ENVVAR_NAME.concat("_(?<name>[a-zA-Z0-9]+)_([a-zA-Z0-9_]+)$");
+
+    /**
+     * The parametrized name of the environment variable to read for the 'path' attribute of an
+     * asset.
+     * This string is a {@link Formatter string} that contains a '%s' parameter for the asset path
+     * and must be rendered using {@link String#format(String, Object...) String.format(ASSETS_ITEM_PATH_FORMAT_STRING, name)}
+     * in order to get the actual name of environment variable that brings the value for the asset path with the given {@code name}.
+     * Value: {@value}
+     * 
+     * @see Formatter
+     * @see String#format(String, Object...)
+     */
+    private static final String ASSETS_ITEM_PATH_FORMAT_STRING = ASSETS_ENVVAR_NAME.concat("_%s_PATH");
+
+    /**
+     * The parametrized name of the environment variable to read for the 'service' attribute of an
+     * asset.
+     * This string is a {@link Formatter string} that contains a '%s' parameter for the asset name
+     * and must be rendered using {@link String#format(String, Object...) String.format(ASSETS_ITEM_SERVICE_FORMAT_STRING, name)}
+     * in order to get the actual name of environment variable that brings the value for the asset service with the given {@code name}.
+     * Value: {@value}
+     * 
+     * @see Formatter
+     * @see String#format(String, Object...)
+     */
+    private static final String ASSETS_ITEM_SERVICE_FORMAT_STRING = ASSETS_ENVVAR_NAME.concat("_%s_SERVICE");
 
     /**
      * The name of the environment variable to read for this value. Value: {@value}
@@ -462,6 +503,11 @@ class EnvironmentConfigurationLayer implements ConfigurationLayer {
     private static final String VERSION_ENVVAR_NAME = ENVVAR_NAME_GLOBAL_PREFIX.concat("VERSION");
 
     /**
+     * The private instance of the assets configuration section.
+     */
+    private Map<String,Asset> assetsSection = null;
+
+    /**
      * The private instance of the commit message convention configuration section.
      */
     private CommitMessageConventions commitMessageConventionsSection = null;
@@ -695,6 +741,29 @@ class EnvironmentConfigurationLayer implements ConfigurationLayer {
         if (Objects.isNull(instance))
             instance = new EnvironmentConfigurationLayer();
         return instance;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Map<String,Asset> getAssets()
+        throws IllegalPropertyException {
+        if (Objects.isNull(assetsSection)) {
+            // parse the 'assets' map
+            assetsSection = new HashMap<String,Asset>();
+
+            Set<String> itemNames = scanItemNamesInEnvironmentVariables("assets", ASSETS_ITEM_NAME_REGEX, null);
+            // now we have the set of all item names configured through environment variables and we can
+            // query specific environment variables
+            for (String itemName: itemNames) {
+                String path                                     = getenv(String.format(ASSETS_ITEM_PATH_FORMAT_STRING, itemName));
+                String service                                  = getenv(String.format(ASSETS_ITEM_SERVICE_FORMAT_STRING, itemName));
+
+                assetsSection.put(itemName, new Asset(path, service));
+            }
+        }
+        return assetsSection;
     }
 
     /**

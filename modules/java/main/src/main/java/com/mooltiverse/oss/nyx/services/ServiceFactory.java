@@ -19,9 +19,11 @@ import java.util.Map;
 import java.util.Objects;
 
 import com.mooltiverse.oss.nyx.services.Service.Feature;
+import com.mooltiverse.oss.nyx.services.changelog.Changelog;
 import com.mooltiverse.oss.nyx.services.git.Git;
 import com.mooltiverse.oss.nyx.services.github.GitHub;
 import com.mooltiverse.oss.nyx.services.gitlab.GitLab;
+import com.mooltiverse.oss.nyx.services.template.Template;
 
 /**
  * The generic entry point to inspect and retrieve service implementations.
@@ -32,6 +34,35 @@ public class ServiceFactory {
      */
     private ServiceFactory() {
         super();
+    }
+
+    /**
+     * Returns an instance for the given provider using the given options.
+     * 
+     * @param provider the provider to retrieve the instance for.
+     * @param options the map of options for the requested service. It may be {@code null} if the requested
+     * service does not require the options map. To know if the service needs rhese options and, if so, which
+     * entries are to be present please check with the specific service.
+     * 
+     * @return a service instance initialized with the given options.
+     * 
+     * @throws NullPointerException if the given provider is {@code null} or the given options map is {@code null}
+     * and the service instance does not allow {@code null} options
+     * @throws IllegalArgumentException if the given provider is not supported or some entries in the given options
+     * map are illegal for some reason
+     * @throws UnsupportedOperationException if the service provider does not {@link Service#supports(Service.Feature)
+     * support} the {@link Service.Feature#ASSET} feature.
+     */
+    public static AssetService assetServiceInstance(Provider provider, Map<String,String> options){
+        Service instance = instance(provider, options);
+        if (instance.supports(Feature.ASSET))
+            try {
+                return AssetService.class.cast(instance);
+            }
+            catch (ClassCastException cce) {
+                throw new UnsupportedOperationException(String.format("The %s provider supports the %s feature but instances do not implement the %s interface", provider.toString(), Feature.ASSET.toString(), AssetService.class.getName()), cce);
+            }
+        else throw new UnsupportedOperationException(String.format("The %s provider does not support the %s feature", provider.toString(), Feature.ASSET.toString()));
     }
 
     /**
@@ -139,10 +170,12 @@ public class ServiceFactory {
         Objects.requireNonNull(provider, "Can't create a provider instance from a null provider spec");
         switch (provider)
         {
-            case GIT:    return Git.instance(options);
-            case GITHUB: return GitHub.instance(options);
-            case GITLAB: return GitLab.instance(options);
-            default:     throw new IllegalArgumentException(String.format("Illegal provider: '%s'", provider));
+            case CHANGELOG: return Changelog.instance(options);
+            case GIT:       return Git.instance(options);
+            case GITHUB:    return GitHub.instance(options);
+            case GITLAB:    return GitLab.instance(options);
+            case TEMPLATE:  return Template.instance(options);
+            default:        throw new IllegalArgumentException(String.format("Illegal provider: '%s'", provider));
         }
     }
 

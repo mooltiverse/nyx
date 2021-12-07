@@ -32,8 +32,7 @@ When merge commits are encountered scanning the commit history Nyx follows the [
 
 ## Make
 
-TODO: write this section
-{: .notice--warning}
+In this phase all the configured [assets]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/assets.md %}) are built.
 
 ## Mark
 

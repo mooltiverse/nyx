@@ -34,6 +34,7 @@ import com.mooltiverse.oss.nyx.entities.ReleaseType;
 import com.mooltiverse.oss.nyx.entities.ServiceConfiguration;
 import com.mooltiverse.oss.nyx.entities.WorkspaceStatus;
 import com.mooltiverse.oss.nyx.io.DataAccessException;
+import com.mooltiverse.oss.nyx.services.AssetService;
 import com.mooltiverse.oss.nyx.services.GitException;
 import com.mooltiverse.oss.nyx.services.GitRemoteService;
 import com.mooltiverse.oss.nyx.services.ReleaseService;
@@ -268,6 +269,39 @@ abstract class AbstractCommand implements Command {
             resolvedOptions.put(optionName, renderTemplate(options.get(optionName)));
         }
         return resolvedOptions;
+    }
+
+    /**
+     * Returns the {@link AssetService} with the given configuration name and also resolves its configuration option templates.
+     * 
+     * @param name the name of the service configuration.
+     * 
+     * @return the resolved service. Returns {@code null} if no service with such configuration name exists.
+     * 
+     * @throws DataAccessException in case the configuration can't be loaded for some reason.
+     * @throws IllegalPropertyException in case the configuration has some illegal options.
+     * @throws ReleaseException if the task is unable to complete for reasons due to the release process.
+     * @throws UnsupportedOperationException if the service configuration exists but the service class does not
+     * {@link Service#supports(Service.Feature) support} the {@link Service.Feature#ASSET} feature.
+     */
+    protected AssetService resolveAssetService(String name)
+        throws DataAccessException, IllegalPropertyException, ReleaseException, UnsupportedOperationException {
+
+        if (Objects.isNull(state().getConfiguration().getServices())) {
+            logger.debug(COMMAND, "No services have been configured. Please configure them using the services option.");
+            return null;
+        }
+
+        logger.debug(COMMAND, "Resolving the service configuration among available ones: '{}'", String.join(", ", state().getConfiguration().getServices().keySet()));
+        if (state().getConfiguration().getServices().containsKey(name)) {
+            ServiceConfiguration serviceConfiguration = state().getConfiguration().getServices().get(name);
+            logger.debug(COMMAND, "Instantiating service '{}' of type '{}' with '{}' options", name, serviceConfiguration.getType(), serviceConfiguration.getOptions().size());
+            return ServiceFactory.assetServiceInstance(serviceConfiguration.getType(), resolveServiceOptions(serviceConfiguration.getOptions()));
+        }
+        else {
+            logger.debug(COMMAND, "No service with name '{}' has been configured", name);
+            return null;
+        }
     }
 
     /**

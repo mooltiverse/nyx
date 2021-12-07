@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import com.mooltiverse.oss.nyx.Nyx;
 import com.mooltiverse.oss.nyx.configuration.presets.Presets;
+import com.mooltiverse.oss.nyx.entities.Asset;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
 import com.mooltiverse.oss.nyx.entities.IllegalPropertyException;
@@ -61,6 +62,11 @@ public class Configuration implements ConfigurationRoot {
      * The private logger instance
      */
     private static final Logger logger = LoggerFactory.getLogger(Configuration.class);
+
+    /**
+     * The private instance of the assets configuration section.
+     */
+    private Map<String,Asset> assetsSection = null;
 
     /**
      * The private instance of the commit message convention configuration section.
@@ -173,6 +179,7 @@ public class Configuration implements ConfigurationRoot {
      */
     private synchronized void resetCache() {
         logger.trace(CONFIGURATION, "Clearing the configuration cache");
+        assetsSection = null;
         commitMessageConventionsSection = null;
         releaseTypesSection = null;
         servicesSection = null;
@@ -320,6 +327,28 @@ public class Configuration implements ConfigurationRoot {
         updateConfiguredConfigurationLayers();
         resetCache();
         return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Map<String,Asset> getAssets()
+        throws DataAccessException, IllegalPropertyException {
+        logger.trace(CONFIGURATION, "Retrieving the assets");
+        if (Objects.isNull(assetsSection)) {
+            // parse the 'assets' map
+            assetsSection = new HashMap<String,Asset>();
+            for (ConfigurationLayer layer: layers.values()) {
+                for (String assetName: layer.getAssets().keySet()) {
+                    if (!assetsSection.containsKey(assetName)) {
+                        assetsSection.put(assetName, layer.getAssets().get(assetName));
+                        logger.trace(CONFIGURATION, "The '{}[{}]' configuration option has been resolved", "assets", assetName);
+                    }
+                }
+            }
+        }
+        return assetsSection;
     }
 
     /**

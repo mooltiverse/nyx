@@ -73,7 +73,7 @@ public class Publish extends AbstractCommand {
     private void publish()
         throws DataAccessException, IllegalPropertyException, GitException, ReleaseException {
         if (state().getConfiguration().getReleaseTypes().getPublicationServices().isEmpty())
-            logger.info(COMMAND, "No publication services have been configured");
+            logger.debug(COMMAND, "No publication services have been configured");
         else {
             String description = renderTemplate(state().getReleaseType().getDescription());
             for (String serviceName: state().getConfiguration().getReleaseTypes().getPublicationServices()) {

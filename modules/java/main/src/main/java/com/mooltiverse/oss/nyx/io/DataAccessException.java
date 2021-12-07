@@ -19,7 +19,7 @@ import com.mooltiverse.oss.nyx.NyxException;
 
 /**
  * This exception models an issue pertaining data access. Examples are when data can't be
- * read from the file system or from the network.
+ * read from or written to the file system or from/to the network.
  */
 public class DataAccessException extends NyxException {
     /**

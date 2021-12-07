@@ -17,16 +17,30 @@ package com.mooltiverse.oss.nyx.command;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.StringWriter;
+import java.nio.file.Files;
+import java.util.Map;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import com.mooltiverse.oss.nyx.configuration.SimpleConfigurationLayer;
 import com.mooltiverse.oss.nyx.command.template.Baseline;
 import com.mooltiverse.oss.nyx.command.template.CommandInvocationContextProvider;
 import com.mooltiverse.oss.nyx.command.template.CommandProxy;
 import com.mooltiverse.oss.nyx.command.template.CommandSelector;
+import com.mooltiverse.oss.nyx.command.template.StandaloneCommandProxy;
+import com.mooltiverse.oss.nyx.entities.Asset;
+import com.mooltiverse.oss.nyx.entities.ServiceConfiguration;
+import com.mooltiverse.oss.nyx.services.GitException;
+import com.mooltiverse.oss.nyx.services.Provider;
 import com.mooltiverse.oss.nyx.services.git.Scenario;
+import com.mooltiverse.oss.nyx.services.git.Script;
+import com.mooltiverse.oss.nyx.services.template.Template;
 
 @DisplayName("Make")
 public class MakeTestTemplates {
@@ -73,13 +87,23 @@ public class MakeTestTemplates {
          */
         @TestTemplate
         @DisplayName("Make.isUpToDate()")
-        @Baseline(Scenario.INITIAL_COMMIT)
-        void isUpToDateTest(@CommandSelector(Commands.MAKE) CommandProxy command)
+        @Baseline(Scenario.FROM_SCRATCH)
+        void isUpToDateTest(@CommandSelector(Commands.MAKE) CommandProxy command, Script script)
             throws Exception {
-            // simply test that running it twice returns false at the first run and true the second
             assertFalse(command.isUpToDate());
+
+            // running in an empty repository, with no commits, throws an exception
+            assertThrows(GitException.class, () -> command.run());
+            assertFalse(command.isUpToDate());
+
+            // add some commits to the repository and after one run the task should be up to date
+            script.andCommitWithTag("111.122.133");
             command.run();
-            assertTrue(command.isUpToDate());
+
+            // when the command is executed standalone, Infer is not executed so isUpToDate() will always return false
+            if (command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME))
+                assertFalse(command.isUpToDate());
+            else assertTrue(command.isUpToDate()); 
         }
     }
 
@@ -87,12 +111,37 @@ public class MakeTestTemplates {
     @DisplayName("Make run")
     @ExtendWith(CommandInvocationContextProvider.class)
     public static class RunTests {
-        /*@TestTemplate
-        @DisplayName("Make.run() throws exception with a valid but empty Git repository in working directory")
-        @Baseline(Scenario.FROM_SCRATCH)
-        void stateTest(@CommandSelector(Commands.MAKE) CommandProxy command)
+        @TestTemplate
+        @DisplayName("Make.run()")
+        @Baseline(Scenario.ONE_BRANCH_SHORT)
+        void runTest(@CommandSelector(Commands.MAKE) CommandProxy command)
             throws Exception {
-            assertThrows(GitException.class, () -> command.run());
-        }*/
+            // first create the temporary directory and the abstract destination file
+            File destinationDir = Files.createTempDirectory("nyx-test-mark-test-").toFile();
+            File destinationFile = new File(destinationDir, "test-asset.md");
+
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            // configure a simple template service
+            configurationLayerMock.setServices(Map.<String,ServiceConfiguration>of("service1", new ServiceConfiguration(Provider.TEMPLATE, Map.<String,String>of(Template.TEMPLATE_OPTION_NAME, "{{version}}"))));
+            // configure a simple asset to be built with the above service
+            configurationLayerMock.setAssets(Map.<String,Asset>of("test1", new Asset(destinationFile.getAbsolutePath(), "service1")));
+
+            assertFalse(destinationFile.exists());
+
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
+
+            command.run();
+
+            // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
+            if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
+                assertTrue(destinationFile.exists());
+
+                FileReader reader = new FileReader(destinationFile);
+                StringWriter writer = new StringWriter();
+                reader.transferTo(writer);
+                reader.close();
+                assertEquals("0.0.4", writer.toString());
+            }
+        }
     }
 }

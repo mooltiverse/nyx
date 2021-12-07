@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.mooltiverse.oss.nyx.version.Versions;
+import com.mooltiverse.oss.nyx.entities.Asset;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
 import com.mooltiverse.oss.nyx.entities.Identifier;
@@ -32,6 +33,11 @@ import com.mooltiverse.oss.nyx.version.Scheme;
  * A utility interface that collects default configuration values.
  */
 public interface Defaults {
+    /**
+     * The assets configuration block.
+     */
+    public static final Map<String,Asset> ASSETS = Map.<String,Asset>of();
+
     /**
      * The default version identifier to bump. Value: {@code null}
      */

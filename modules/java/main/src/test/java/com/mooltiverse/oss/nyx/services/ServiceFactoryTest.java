@@ -28,6 +28,26 @@ import org.junit.jupiter.params.provider.NullSource;
 @DisplayName("ServiceFactory")
 public class ServiceFactoryTest {
     @Nested
+    @DisplayName("ServiceFactory.assetServiceInstance()")
+    class AssetServiceInstanceTests {
+        @ParameterizedTest(name = "ServiceFactory.assetServiceInstance(''{0}'', Map<String,Object>).getClass() == ''{0}''.getServiceClass()")
+        @EnumSource(Provider.class)
+        void assetServiceInstance(Provider provider)
+            throws Exception {
+            if (provider.equals(Provider.CHANGELOG) || provider.equals(Provider.TEMPLATE))
+                assertEquals(provider.getServiceClass(), ServiceFactory.assetServiceInstance(provider, Map.<String,String>of()).getClass());
+            else assertThrows(UnsupportedOperationException.class, () -> ServiceFactory.assetServiceInstance(provider, Map.<String,String>of()));
+        }
+
+        @ParameterizedTest(name = "ServiceFactory.assetServiceInstance(null, Map<String,Object>).getClass() throws NullPointerException")
+        @NullSource()
+        void exceptionUsingAssetServiceInstanceWithNullProvider(Provider provider)
+            throws Exception {
+            assertThrows(NullPointerException.class, () -> ServiceFactory.assetServiceInstance(provider, Map.<String,String>of()));
+        }
+    }
+
+    @Nested
     @DisplayName("ServiceFactory.gitHostingServiceInstance()")
     class GitHostingServiceInstanceTests {
         @ParameterizedTest(name = "ServiceFactory.gitHostingServiceInstance(''{0}'', Map<String,Object>).getClass() == ''{0}''.getServiceClass()")

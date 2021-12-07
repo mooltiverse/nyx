@@ -52,6 +52,12 @@ public class ConfigurationFileTests {
 
         // all the following tests must consider that a value that was not defined in the source configuration gets its default value when unmarshalling
         // so nulls are to be tested against defaults, non simple nulls
+        assertEquals(source.getAssets().keySet(), target.getAssets().keySet());
+        for (String item: source.getAssets().keySet()) {
+            assertEquals(source.getAssets().get(item).getPath(), target.getAssets().get(item).getPath());
+            assertEquals(source.getAssets().get(item).getService(), target.getAssets().get(item).getService());
+        }
+
         assertEquals(Objects.isNull(source.getBump()) ? Defaults.BUMP : source.getBump(), target.getBump());
         assertEquals(Objects.isNull(source.getConfigurationFile()) ? Defaults.CONFIGURATION_FILE : source.getConfigurationFile(), target.getConfigurationFile());
         //assertEquals(Objects.isNull(source.getDirectory()) ? Defaults.DIRECTORY : source.getDirectory(), target.getDirectory()); // this depends on the current runtime
@@ -150,6 +156,12 @@ public class ConfigurationFileTests {
 
         // all the following tests must consider that a value that was not defined in the source configuration gets its default value when unmarshalling
         // so nulls are to be tested against defaults, non simple nulls
+        assertEquals(source.getAssets().keySet(), target.getAssets().keySet());
+        for (String item: source.getAssets().keySet()) {
+            assertEquals(source.getAssets().get(item).getPath(), target.getAssets().get(item).getPath());
+            assertEquals(source.getAssets().get(item).getService(), target.getAssets().get(item).getService());
+        }
+        
         assertEquals(Objects.isNull(source.getBump()) ? Defaults.BUMP : source.getBump(), target.getBump());
         assertEquals(Objects.isNull(source.getConfigurationFile()) ? Defaults.CONFIGURATION_FILE : source.getConfigurationFile(), target.getConfigurationFile());
         //assertEquals(Objects.isNull(source.getDirectory()) ? Defaults.DIRECTORY : source.getDirectory(), target.getDirectory()); // this depends on the current runtime

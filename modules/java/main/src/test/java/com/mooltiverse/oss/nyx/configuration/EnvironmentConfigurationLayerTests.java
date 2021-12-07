@@ -33,6 +33,42 @@ import com.mooltiverse.oss.nyx.version.Scheme;
 @DisplayName("EnvironmentConfigurationLayer")
 public class EnvironmentConfigurationLayerTests {
     @Test
+    @DisplayName("EnvironmentConfigurationLayer.getAssets()")
+    void getAssetsTest()
+        throws Exception {
+        EnvironmentConfigurationLayerMock environmentConfigurationLayer = EnvironmentConfigurationLayerMock.getInstance();
+        assertNotNull(environmentConfigurationLayer.getAssets());
+        assertTrue(environmentConfigurationLayer.getAssets().isEmpty());
+        
+        // get a new instance or a stale object is returned by getAssets()
+        environmentConfigurationLayer = EnvironmentConfigurationLayerMock.getInstance();
+        environmentConfigurationLayer.environment.put("NYX_ASSETS_a1_TYPE", "FILE");
+        
+        assertEquals(1, environmentConfigurationLayer.getAssets().size());
+        assertTrue(environmentConfigurationLayer.getAssets().containsKey("a1"));
+        assertNotNull(environmentConfigurationLayer.getAssets().get("a1"));
+        
+        // get a new instance or a stale object is returned by getAssets()
+        environmentConfigurationLayer = EnvironmentConfigurationLayerMock.getInstance();
+        environmentConfigurationLayer.environment.put("NYX_ASSETS_a1_PATH", "p1");
+        environmentConfigurationLayer.environment.put("NYX_ASSETS_a1_SERVICE", "e1");
+        environmentConfigurationLayer.environment.put("NYX_ASSETS_a1_TYPE", "FILE");
+        environmentConfigurationLayer.environment.put("NYX_ASSETS_a2_PATH", "p2");
+        environmentConfigurationLayer.environment.put("NYX_ASSETS_a2_SERVICE", "e2");
+        environmentConfigurationLayer.environment.put("NYX_ASSETS_a2_TYPE", "LINK");
+        
+        assertEquals(2, environmentConfigurationLayer.getAssets().size());
+        assertTrue(environmentConfigurationLayer.getAssets().containsKey("a1"));
+        assertTrue(environmentConfigurationLayer.getAssets().containsKey("a2"));
+        assertNotNull(environmentConfigurationLayer.getAssets().get("a1"));
+        assertEquals("p1", environmentConfigurationLayer.getAssets().get("a1").getPath());
+        assertEquals("e1", environmentConfigurationLayer.getAssets().get("a1").getService());
+        assertNotNull(environmentConfigurationLayer.getAssets().get("a2"));
+        assertEquals("p2", environmentConfigurationLayer.getAssets().get("a2").getPath());
+        assertEquals("e2", environmentConfigurationLayer.getAssets().get("a2").getService());
+    }
+
+    @Test
     @DisplayName("EnvironmentConfigurationLayer.getBump()")
     void getBumpTest()
         throws Exception {

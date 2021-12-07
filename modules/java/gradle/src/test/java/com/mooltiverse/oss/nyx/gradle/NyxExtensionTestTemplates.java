@@ -43,6 +43,17 @@ public class NyxExtensionTestTemplates {
     @ExtendWith(GradleCommandInvocationContextProvider.class)
     class DefaultsTests {
         @TestTemplate
+        @DisplayName("NyxExtension.getAssets() default value")
+        @Baseline(Scenario.FROM_SCRATCH)
+        void getAssetsDefaultTest(Project project)
+            throws Exception {
+            NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
+
+            assertNotNull(extension.getAssets());
+            assertTrue(extension.getAssets().isEmpty());
+        }
+
+        @TestTemplate
         @DisplayName("NyxExtension.getBump() default value")
         @Baseline(Scenario.FROM_SCRATCH)
         void getBumpDefaultTest(Project project)

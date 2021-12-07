@@ -23,6 +23,7 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mooltiverse.oss.nyx.entities.Asset;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
 import com.mooltiverse.oss.nyx.entities.IllegalPropertyException;
 import com.mooltiverse.oss.nyx.entities.ReleaseTypes;
@@ -69,6 +70,16 @@ class DefaultLayer implements ConfigurationLayer, Defaults {
         if (Objects.isNull(instance))
             instance = new DefaultLayer();
         return instance;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Map<String,Asset> getAssets()
+        throws DataAccessException, IllegalPropertyException {
+        logger.trace(DEFAULT, "Retrieving the default '{}' configuration option: '{}'", "assets", ASSETS);
+        return ASSETS;
     }
 
     /**
