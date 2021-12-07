@@ -202,12 +202,12 @@ jobs:
           ${{ runner.os }}-nyx-gradle-${{ github.run_id }}-assemble
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
-#    - name: Run Functional Tests with Gradle
-#      env:
-#          # See the top level https://github.com/mooltiverse/nyx/blob/master/CONTRIBUTING.md#contributing-code file for details about passing these values when testing locally
-#          ORG_GRADLE_PROJECT_gitHubTestUserToken: ${{ secrets.TEST_GITHUB_USER_TOKEN }}   # The test user token to test Nyx GitHub features
-#          ORG_GRADLE_PROJECT_gitLabTestUserToken: ${{ secrets.TEST_GITLAB_USER_TOKEN }}   # The test user token to test Nyx GitLab features
-#      run: ./gradlew functionalTest --build-cache --stacktrace
+    - name: Run Functional Tests with Gradle
+      env:
+          # See the top level https://github.com/mooltiverse/nyx/blob/master/CONTRIBUTING.md#contributing-code file for details about passing these values when testing locally
+          ORG_GRADLE_PROJECT_gitHubTestUserToken: ${{ secrets.TEST_GITHUB_USER_TOKEN }}   # The test user token to test Nyx GitHub features
+          ORG_GRADLE_PROJECT_gitLabTestUserToken: ${{ secrets.TEST_GITLAB_USER_TOKEN }}   # The test user token to test Nyx GitLab features
+      run: ./gradlew functionalTest --build-cache --stacktrace
     - name: Archive Nyx state file
       uses: actions/upload-artifact@v2
       if: ${{ always() }}
