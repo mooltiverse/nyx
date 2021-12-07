@@ -4,7 +4,7 @@
 ------------------------------------------------------------------------------*/
 plugins {
   // use our own plugin
-  id "com.mooltiverse.oss.nyx" version "0.2.1-alpha.11"
+  id "com.mooltiverse.oss.nyx" version "0.2.1-alpha.12"
 }
 
 /*------------------------------------------------------------------------------
@@ -31,6 +31,7 @@ nyx {
   stateFile     = 'build/.nyx-state.json'
   releaseTypes {
     enabled = [ 'mainline', 'mainlinelocal', 'maturity', 'maturitylocal', 'integration', 'integrationlocal', 'hotfix', 'hotfixlocal', 'feature', 'featurelocal', 'release', 'releaselocal', 'maintenance', 'maintenancelocal', 'internal' ]
+    publicationServices = [ 'github' ]
     items {
       // 'mainline' overrides the release type with the same name from the preset
       mainline {
