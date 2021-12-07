@@ -76,7 +76,7 @@ abstract class API {
     abstract Map<String, Object> createRepository(String name, String description, boolean restricted, boolean initialize)
         throws TransportException, SecurityException;
 
-/**
+    /**
      * Deletes a repository for the currently authenticated user.
      * <br>
      * Please note that if the service has been configured with repository owner and name those attributes are ignored
