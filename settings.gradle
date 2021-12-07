@@ -289,6 +289,10 @@ nyx {
     github {
       type = 'GITHUB'
       options {
+        // The GH_TOKEN variable is fetched from the 'secrets' context and passed as an environment variable.
+        // See:
+        // - https://docs.github.com/en/actions/security-guides/automatic-token-authentication
+        // - https://docs.github.com/en/actions/learn-github-actions/contexts#github-context
         AUTHENTICATION_TOKEN = '{{#environment.variable}}GH_TOKEN{{/environment.variable}}'
         REPOSITORY_NAME = 'nyx'
         REPOSITORY_OWNER = 'mooltiverse'

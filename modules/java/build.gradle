@@ -322,6 +322,8 @@ publishing {
             name = "GitHubPackages"
             url = uri("https://maven.pkg.github.com/"+nyxOrganizationID+"/"+nyxID)
             credentials {
+                // The 'gitHubUser' and 'gitHubToken' variables are passed as credentials fetching them in GitHub Actions as 'secrets.GITHUB_ACTOR' and 'secrets.GITHUB_TOKEN', respectively.
+                // See the GitHub Actions definition for more.
                 username = findProperty("gitHubUser")
                 password = findProperty("gitHubToken")
             }

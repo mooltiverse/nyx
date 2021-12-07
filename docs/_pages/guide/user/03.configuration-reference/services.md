@@ -141,9 +141,11 @@ This service type supports the following [options](#options):
 
 `BASE_URI` is meant to be used if you're using GitHub on a self hosted environment. If that's your case just pass the URI to your REST API endpoint here otherwise, if you're using the public service, do not pass any value.
 
-`AUTHENTICATION_TOKEN` is a [OAuth or Personal Access Token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) that is used to authenticate and perform access controlled operations. This option is **mandatory** for the service in order to work. A suggested value is a [template]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}#environmentvariable) that reads the [conventionally used](https://cli.github.com/manual/gh_help_environment) `GITHUB_TOKEN` environment variable so if you already have a token stored in `GITHUB_TOKEN` you don't have to configure anything else, otherwise just paste a PAT here. `GH_TOKEN` is another variable name often used for the same purpose.
+`AUTHENTICATION_TOKEN` is a [OAuth or Personal Access Token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) that is used to authenticate and perform access controlled operations. This option is **mandatory** for the service in order to work. Generally speaking here you can use a [template]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}#environmentvariable) that reads the [conventionally used](https://cli.github.com/manual/gh_help_environment) `GITHUB_TOKEN` or `GH_TOKEN` environment variable so you don't have to configure anything else, otherwise just paste a PAT here
 
 As of now Personal Access Tokens are the only supported authentication method. The token you use for this purpose needs to have all the `repo` [permissions](https://docs.github.com/en/developers/apps/building-oauth-apps/scopes-for-oauth-apps#available-scopes).
+
+When running [GitHub Actions](https://docs.github.com/en/actions) pipelines consider fetching the token that is [automatically generated](https://docs.github.com/en/actions/security-guides/automatic-token-authentication) by GitHub and use it to set an environment variable as in [this example]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/ci-cd.md %}#credentials).
 
 You are encouraged to create a new token for this purpose.
 {: .notice--info}
