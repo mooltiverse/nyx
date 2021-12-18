@@ -15,21 +15,14 @@
  */
 package com.mooltiverse.oss.nyx.services;
 
-import com.mooltiverse.oss.nyx.services.changelog.Changelog;
 import com.mooltiverse.oss.nyx.services.git.Git;
 import com.mooltiverse.oss.nyx.services.github.GitHub;
 import com.mooltiverse.oss.nyx.services.gitlab.GitLab;
-import com.mooltiverse.oss.nyx.services.template.Template;
 
 /**
  * These are the constants representing the available service providers.
  */
 public enum Provider {
-    /**
-     * The changelog provider.
-     */
-    CHANGELOG(Changelog.class),
-
     /**
      * The generic Git service provider.
      */
@@ -43,12 +36,7 @@ public enum Provider {
     /**
      * The <a href="https://gitlab.com/">GitLab</a> service provider.
      */
-    GITLAB(GitLab.class),
-
-    /**
-     * The template service provider.
-     */
-    TEMPLATE(Template.class);
+    GITLAB(GitLab.class);
 
     /**
      * The class implementing the service

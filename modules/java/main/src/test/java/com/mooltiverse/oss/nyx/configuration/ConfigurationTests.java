@@ -31,7 +31,6 @@ import org.junit.jupiter.api.Test;
 
 import com.mooltiverse.oss.nyx.configuration.presets.Extended;
 import com.mooltiverse.oss.nyx.configuration.presets.Simple;
-import com.mooltiverse.oss.nyx.entities.Asset;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
 import com.mooltiverse.oss.nyx.entities.Identifier;
@@ -51,13 +50,6 @@ public class ConfigurationTests {
     @Nested
     @DisplayName("Configuration defaults only")
     class DefaultsOnlyTests {
-        @Test
-        @DisplayName("Configuration.getAssets() == Defaults.ASSETS")
-        void getAssetsTest()
-            throws Exception {
-            assertEquals(Defaults.ASSETS, new Configuration().getAssets());
-        }
-
         @Test
         @DisplayName("Configuration.getBump() == Defaults.BUMP")
         void getBumpTest()
@@ -199,45 +191,6 @@ public class ConfigurationTests {
     @Nested
     @DisplayName("Configuration.withCommandLineConfiguration")
     class withCommandLineConfigurationTests {
-        @Test
-        @DisplayName("Configuration.withCommandLineConfiguration(MOCK).getAssets() == MOCK.getAssets()")
-        void getAssetsTest()
-            throws Exception {
-            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            Configuration configuration = new Configuration();
-            configurationLayerMock.setAssets(
-                Map.<String,Asset>of(
-                    "a1", new Asset("path1", "service1"),
-                    "a2", new Asset("path2", "service2")
-                )
-            );
-
-            // in order to make the test meaningful, make sure the default and mock values are different
-            assertNotNull(Defaults.ASSETS);
-            assertNotNull(configurationLayerMock.getAssets());
-            assertNotSame(configuration.getAssets(), configurationLayerMock.getAssets());
-
-            // make sure the initial values come from defaults, until we inject the command line configuration
-            assertEquals(0, Defaults.ASSETS.size());
-            assertEquals(0, configuration.getAssets().size());
-            
-            // inject the command line configuration and test the new value is returned from that
-            configuration.withCommandLineConfiguration(configurationLayerMock);
-
-            assertEquals(2, configuration.getAssets().size());
-            assertTrue(configuration.getAssets().containsKey("a1"));
-            assertTrue(configuration.getAssets().containsKey("a2"));
-            assertEquals("path1", configuration.getAssets().get("a1").getPath());
-            assertEquals("service1", configuration.getAssets().get("a1").getService());
-            assertEquals("path2", configuration.getAssets().get("a2").getPath());
-            assertEquals("service2", configuration.getAssets().get("a2").getService());
-
-            // now remove the command line configuration and test that now default values are returned again
-            configuration.withCommandLineConfiguration(null);
-            assertNotNull(configuration.getAssets());
-            assertEquals(0, configuration.getAssets().size());
-        }
-
         @Test
         @DisplayName("Configuration.withCommandLineConfiguration(MOCK).getBump() == MOCK.getBump()")
         void getBumpTest()
@@ -725,45 +678,6 @@ public class ConfigurationTests {
     @DisplayName("Configuration.withPluginConfiguration")
     class withPluginConfigurationTests {
         @Test
-        @DisplayName("Configuration.withPluginConfiguration(MOCK).getAssets() == MOCK.getAssets()")
-        void getAssetsTest()
-            throws Exception {
-            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            Configuration configuration = new Configuration();
-            configurationLayerMock.setAssets(
-                Map.<String,Asset>of(
-                    "a1", new Asset("path1", "service1"),
-                    "a2", new Asset("path2", "service2")
-                )
-            );
-
-            // in order to make the test meaningful, make sure the default and mock values are different
-            assertNotNull(Defaults.ASSETS);
-            assertNotNull(configurationLayerMock.getAssets());
-            assertNotSame(configuration.getAssets(), configurationLayerMock.getAssets());
-
-            // make sure the initial values come from defaults, until we inject the command line configuration
-            assertEquals(0, Defaults.ASSETS.size());
-            assertEquals(0, configuration.getAssets().size());
-            
-            // inject the command line configuration and test the new value is returned from that
-            configuration.withPluginConfiguration(configurationLayerMock);
-
-            assertEquals(2, configuration.getAssets().size());
-            assertTrue(configuration.getAssets().containsKey("a1"));
-            assertTrue(configuration.getAssets().containsKey("a2"));
-            assertEquals("path1", configuration.getAssets().get("a1").getPath());
-            assertEquals("service1", configuration.getAssets().get("a1").getService());
-            assertEquals("path2", configuration.getAssets().get("a2").getPath());
-            assertEquals("service2", configuration.getAssets().get("a2").getService());
-
-            // now remove the command line configuration and test that now default values are returned again
-            configuration.withPluginConfiguration(null);
-            assertNotNull(configuration.getAssets());
-            assertEquals(0, configuration.getAssets().size());
-        }
-
-        @Test
         @DisplayName("Configuration.withPluginConfiguration(MOCK).getBump() == MOCK.getBump()")
         void getBumpTest()
             throws Exception {
@@ -1250,45 +1164,6 @@ public class ConfigurationTests {
     @DisplayName("Configuration.withRuntimeConfiguration")
     class withRuntimeConfigurationTests {
         @Test
-        @DisplayName("Configuration.withRuntimeConfiguration(MOCK).getAssets() == MOCK.getAssets()")
-        void getAssetsTest()
-            throws Exception {
-            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            Configuration configuration = new Configuration();
-            configurationLayerMock.setAssets(
-                Map.<String,Asset>of(
-                    "a1", new Asset("path1", "service1"),
-                    "a2", new Asset("path2", "service2")
-                )
-            );
-
-            // in order to make the test meaningful, make sure the default and mock values are different
-            assertNotNull(Defaults.ASSETS);
-            assertNotNull(configurationLayerMock.getAssets());
-            assertNotSame(configuration.getAssets(), configurationLayerMock.getAssets());
-
-            // make sure the initial values come from defaults, until we inject the command line configuration
-            assertEquals(0, Defaults.ASSETS.size());
-            assertEquals(0, configuration.getAssets().size());
-            
-            // inject the command line configuration and test the new value is returned from that
-            configuration.withRuntimeConfiguration(configurationLayerMock);
-
-            assertEquals(2, configuration.getAssets().size());
-            assertTrue(configuration.getAssets().containsKey("a1"));
-            assertTrue(configuration.getAssets().containsKey("a2"));
-            assertEquals("path1", configuration.getAssets().get("a1").getPath());
-            assertEquals("service1", configuration.getAssets().get("a1").getService());
-            assertEquals("path2", configuration.getAssets().get("a2").getPath());
-            assertEquals("service2", configuration.getAssets().get("a2").getService());
-
-            // now remove the command line configuration and test that now default values are returned again
-            configuration.withRuntimeConfiguration(null);
-            assertNotNull(configuration.getAssets());
-            assertEquals(0, configuration.getAssets().size());
-        }
-
-        @Test
         @DisplayName("Configuration.withRuntimeConfiguration(MOCK).getBump() == MOCK.getBump()")
         void getBumpTest()
             throws Exception {
@@ -1774,47 +1649,6 @@ public class ConfigurationTests {
     @Nested
     @DisplayName("Configuration.with multiple configuration layers")
     class withMultipleConfigurationLayersTests {
-        @Test
-        @DisplayName("Configuration[multiple layers].getAssets() == MOCK.getAssets()")
-        void getAssetsTest()
-            throws Exception {
-            SimpleConfigurationLayer lowPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
-            SimpleConfigurationLayer mediumPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
-            SimpleConfigurationLayer highPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
-            Configuration configuration = new Configuration();
-            lowPriorityConfigurationLayerMock.setAssets(
-                Map.<String,Asset>of(
-                    "a1", new Asset("path1", "service1"),
-                    "a2", new Asset("path2", "service2")
-                )
-            );
-            mediumPriorityConfigurationLayerMock.setAssets(
-                Map.<String,Asset>of(
-                    "a1", new Asset("path3", "service3"),
-                    "a2", new Asset("path4", "service4")
-                )
-            );
-            highPriorityConfigurationLayerMock.setAssets(
-                Map.<String,Asset>of(
-                    "a1", new Asset("path5", "service5"),
-                    "a2", new Asset("path6", "service6")
-                )
-            );
-            
-            // inject the command line configuration and test the new value is returned from that
-            configuration.withPluginConfiguration(lowPriorityConfigurationLayerMock);
-            configuration.withCommandLineConfiguration(mediumPriorityConfigurationLayerMock);
-            configuration.withRuntimeConfiguration(highPriorityConfigurationLayerMock);
-
-            assertEquals(2, configuration.getAssets().size());
-            assertTrue(configuration.getAssets().containsKey("a1"));
-            assertTrue(configuration.getAssets().containsKey("a2"));
-            assertEquals("path5", configuration.getAssets().get("a1").getPath());
-            assertEquals("service5", configuration.getAssets().get("a1").getService());
-            assertEquals("path6", configuration.getAssets().get("a2").getPath());
-            assertEquals("service6", configuration.getAssets().get("a2").getService());
-        }
-
         @Test
         @DisplayName("Configuration[multiple layers].getBump() == MOCK.getBump()")
         void getBumpTest()

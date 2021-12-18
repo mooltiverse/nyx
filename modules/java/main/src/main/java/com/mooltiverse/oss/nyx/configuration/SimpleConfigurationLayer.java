@@ -18,7 +18,6 @@ package com.mooltiverse.oss.nyx.configuration;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.mooltiverse.oss.nyx.entities.Asset;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
 import com.mooltiverse.oss.nyx.entities.ReleaseTypes;
 import com.mooltiverse.oss.nyx.entities.ServiceConfiguration;
@@ -29,11 +28,6 @@ import com.mooltiverse.oss.nyx.version.Scheme;
  * A simple configuration layer, acting as a value holder for configuration options. This object allows read/write operations.
  */
 public class SimpleConfigurationLayer implements ConfigurationLayer {
-    /**
-     * The value held by this object.
-     */
-    private Map<String,Asset> assets = new HashMap<String,Asset>();
-
     /**
      * The value held by this object.
      */
@@ -124,23 +118,6 @@ public class SimpleConfigurationLayer implements ConfigurationLayer {
      */
     public SimpleConfigurationLayer() {
         super();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Map<String,Asset> getAssets() {
-        return assets;
-    }
-
-    /**
-     * Sets the value for this option.
-     * 
-     * @param assets the value for this option.
-     */
-    public void setAssets(Map<String,Asset> assets) {
-        this.assets = assets;
     }
 
     /**

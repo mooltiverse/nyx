@@ -41,13 +41,6 @@ public interface Service {
      */
     public enum Feature {
         /**
-         * When this feature is supported then the implementation class implements the {@link AssetService} interface
-         * (so it can be safely cast to it) and the service specific methods can be safely invoked without an
-         * {@link UnsupportedOperationException} being thrown.
-         */
-        ASSET(),
-
-        /**
          * When this feature is supported then the implementation class implements the {@link GitHostingService} interface
          * (so it can be safely cast to it) and the service specific methods can be safely invoked without an
          * {@link UnsupportedOperationException} being thrown.

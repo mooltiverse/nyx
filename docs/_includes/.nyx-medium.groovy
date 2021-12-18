@@ -1,10 +1,4 @@
 nyx {
-  assets {
-    changelog {
-      path = "CHANGELOG.md"
-      service = "changelog"
-    }
-  }
   commitMessageConventions {
     enabled = [ 'conventionalCommits' ]
     items {
@@ -79,9 +73,6 @@ nyx {
   }
   scheme = 'SEMVER'
   services {
-    changelog {
-      type = "CHANGELOG"
-    }
     github {
       type = 'GITHUB'
       options {

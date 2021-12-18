@@ -17,7 +17,6 @@ package com.mooltiverse.oss.nyx.configuration;
 
 import java.util.Map;
 
-import com.mooltiverse.oss.nyx.entities.Asset;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
 import com.mooltiverse.oss.nyx.entities.IllegalPropertyException;
 import com.mooltiverse.oss.nyx.entities.ReleaseTypes;
@@ -31,17 +30,6 @@ import com.mooltiverse.oss.nyx.version.Scheme;
  * This interface models the root configuration, with global options and nested sections.
  */
 public interface ConfigurationRoot {
-    /**
-     * Returns the assets configuration section.
-     * 
-     * @return the assets configuration section. Never {@code null}.
-     * 
-     * @throws DataAccessException in case the option cannot be read or accessed.
-     * @throws IllegalPropertyException in case the option has been defined but has incorrect values or it can't be resolved.
-     */
-    public Map<String,Asset> getAssets()
-        throws DataAccessException, IllegalPropertyException;
-
     /**
      * Returns the version identifier to bump as it's defined by this configuration.
      * 

@@ -27,7 +27,6 @@ import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.mooltiverse.oss.nyx.entities.Asset;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
 import com.mooltiverse.oss.nyx.entities.ReleaseType;
@@ -39,30 +38,6 @@ import com.mooltiverse.oss.nyx.version.Scheme;
 
 @DisplayName("SimpleConfigurationLayer")
 public class SimpleConfigurationLayerTests {
-    @Test
-    @DisplayName("SimpleConfigurationLayer.getAssets()")
-    void getAssetsTest()
-        throws Exception {
-        SimpleConfigurationLayer simpleConfigurationLayer = new SimpleConfigurationLayer();
-        assertNotNull(simpleConfigurationLayer.getAssets());
-        assertTrue(simpleConfigurationLayer.getAssets().isEmpty());
-
-        simpleConfigurationLayer.setAssets(
-            Map.<String,Asset>of(
-                "a1", new Asset( "path1", "service1"),
-                "a2", new Asset("path2", "service2")
-            )
-        );
-
-        assertEquals(2, simpleConfigurationLayer.getAssets().size());
-        assertTrue(simpleConfigurationLayer.getAssets().containsKey("a1"));
-        assertTrue(simpleConfigurationLayer.getAssets().containsKey("a2"));
-        assertEquals("path1", simpleConfigurationLayer.getAssets().get("a1").getPath());
-        assertEquals("service1", simpleConfigurationLayer.getAssets().get("a1").getService());
-        assertEquals("path2", simpleConfigurationLayer.getAssets().get("a2").getPath());
-        assertEquals("service2", simpleConfigurationLayer.getAssets().get("a2").getService());
-    }
-
     @Test
     @DisplayName("SimpleConfigurationLayer.getBump()")
     void getBumpTest()

@@ -9,7 +9,6 @@ These are the top level options in the configuration:
 
 | Name                                                      | Type    | Command Line Option                                       | Environment Variable                                          | Default  |
 | --------------------------------------------------------- | ------- | --------------------------------------------------------- | ------------------------------------------------------------- | -------- |
-| [`assets`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/assets.md %}) | object  | See [Assets]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/assets.md %}) | See [Assets]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/assets.md %}) | N/A      |
 | [`bump`](#bump)                                           | string  | `-b <NAME>`, `--bump=<NAME>`                              | `NYX_BUMP=<NAME>`                                             | N/A      |
 | [`commitMessageConventions`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/commit-message-conventions.md %}) | object  | See [Commit Message Conventions]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/commit-message-conventions.md %}) | See [Commit Message Conventions]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/commit-message-conventions.md %}) | N/A      |
 | [`configurationFile`](#configuration-file)                | string  | `-c <PATH>`, `--configuration-file=<PATH>`                | `NYX_CONFIGURATION_FILE=<PATH>`                               | N/A      |
@@ -27,10 +26,6 @@ These are the top level options in the configuration:
 | [`stateFile`](#state-file)                                | string  | `--state-file=<PATH>`                                     | `NYX_STATE_FILE=<PATH>`                                       | N/A      |
 | [`verbosity`](#verbosity)                                 | string  | `--verbosity=<LEVEL>`, `--fatal`, `--error`, `--warning`, `--info`, `--debug`, `--trace` | `NYX_VERBOSITY=<LEVEL>`        | `WARNING`|
 | [`version`](#version)                                     | string  | `-v <VERSION>`, `--version=<VERSION>`                     | `NYX_VERSION=<VERSION>`                                       | N/A      |
-
-### Assets
-
-See [Assets]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/assets.md %}).
 
 ### Bump
 

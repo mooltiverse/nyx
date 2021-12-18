@@ -38,7 +38,8 @@ See [here]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-w
 
 ### Make
 
-Builds the configured assets.
+TODO: add the documentation to the changelog creation here.
+{: .notice--warning}
 
 See [here]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#make) for more.
 

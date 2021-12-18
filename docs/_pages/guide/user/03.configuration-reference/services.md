@@ -71,32 +71,13 @@ When configuring this map using command line options or environment variables yo
 
 The type (class) of the service being configured. Available types are:
 
-* [`CHANGELOG`](#changelog)
 * [`GIT`](#git)
 * [`GITHUB`](#github)
 * [`GITLAB`](#gitlab)
-* [`TEMPLATE`](#template)
 
 This option is **mandatory**.
 
 ### Service types
-
-#### Changelog
-
-The service of `CHANGELOG` [type](#type) allowing you to build a changelog from within Nyx. This service type supports:
-
-* the `ASSET` [feature](#service-features) to build artifacts
-
-##### Changelog configuration options
-
-This service type supports the following [options](#options):
-
-| Name                                           | Type    | Command Line Option                                        | Environment Variable                                       | Configuration File Option                        | Default                                    |
-| ---------------------------------------------- | ------- | ---------------------------------------------------------- | ---------------------------------------------------------- | ------------------------------------------------ | ------------------------------------------ |
-|                                                |         |                                                            |                                                            |                                                  |                                            |
-
-TODO: write this section when the Changelog service is ready and public.
-{: .notice--warning}
 
 #### Git
 
@@ -190,35 +171,10 @@ You are encouraged to create a new token for this purpose.
 
 `REMOTES` is the optional comma separated list of remote names supported by the local Git. The names in this list are the simple names that are returned by running `git remote` on the command line and this list is a filter telling which remotes are supported by this service, or better, if the credentials configured for this service are suitable for remote operations like [pushing]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#git-push) changes (if any) to this service if it is among [enabled remotes]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#remote-repositories). If you have configured multiple [`GIT_REMOTE`](#service-features) services like this, this option allows you to match specific service credentials to specific remotes. Explicit matches (where a remote is explicitly listed among the ones in this option) have priority over implicit matches (where the service does notspecify any filter). Use this option only when you have configured multiple services providing the `GIT_REMOTE` [feature](#service-features), otherwise ignore it.
 
-#### Template
-
-The service of `TEMPLATE` [type](#type) allowing you to build a text file artifact with a [Mustache](https://mustache.github.io/) template using the current [state]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/index.md %}) as input. This service type supports:
-
-* the `ASSET` [feature](#service-features) to build artifacts
-
-##### Template configuration options
-
-This service type supports the following [options](#options):
-
-| Name                                           | Type    | Command Line Option                                        | Environment Variable                                       | Configuration File Option                        | Default                                    |
-| ---------------------------------------------- | ------- | ---------------------------------------------------------- | ---------------------------------------------------------- | ------------------------------------------------ | ------------------------------------------ |
-| `TEMPLATE`                                     | string  | `--services-<NAME>-options-TEMPLATE=<URI>`                 | `NYX_SERVICES_<NAME>_OPTIONS_TEMPLATE=<URI>`               | `services/<NAME>/options/TEMPLATE`               | N/A                                        |
-
-`TEMPLATE` is the actual [Mustache](https://mustache.github.io/) template to be used with the current [state]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/index.md %}) as input. Here you can pass a [`file.content`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}#filecontent) template to load an external file containing the template to be rendered to the asset.
-
-In order to allow using the [`file.content`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}#filecontent) template for this option value, this template is always rendered twice. In case a `file.content` template is used, the first pass loads the external file, while the second renders the template contained in the external file.
-{: .notice--info}
-
-The destination file is defined in the invocation point. For example, when this service is used to build an [asset]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/assets.md %}), the asset [`path`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/assets.md %}#path) defines the destination file.
-{: .notice--info}
-
-Only local files with relative or absolute path are supported for the destination file.
-
 ### Service features
 
 The list of possible service features is:
 
-* `ASSET`: services supporting this feature can be used to build local or remote assets (i.e. changelogs)
 * `GIT_REMOTE`: services supporting this feature can be used to perform Git tasks on remotes
 * `RELEASES`: services supporting this feature can be used to publish releases to hosting services
 

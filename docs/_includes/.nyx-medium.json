@@ -1,10 +1,4 @@
 {
-  "assets": {
-    "changelog": {
-      "path": "CHANGELOG.md",
-      "service": "changelog"
-    }
-  },
   "commitMessageConventions":{
     "enabled":[
       "conventionalCommits"
@@ -86,9 +80,6 @@
   },
   "scheme":"SEMVER",
   "services":{
-    "changelog": {
-      "type": "CHANGELOG"
-    },
     "github": {
       "type": "GITHUB",
       "options": {

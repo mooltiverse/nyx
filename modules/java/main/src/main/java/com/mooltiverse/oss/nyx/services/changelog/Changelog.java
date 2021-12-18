@@ -15,7 +15,6 @@
  */
 package com.mooltiverse.oss.nyx.services.changelog;
 
-import java.net.URI;
 import java.util.Map;
 import java.util.Objects;
 
@@ -24,17 +23,17 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 
-import com.mooltiverse.oss.nyx.io.DataAccessException;
-import com.mooltiverse.oss.nyx.io.TransportException;
-import com.mooltiverse.oss.nyx.services.AssetService;
 import com.mooltiverse.oss.nyx.services.Service;
-import com.mooltiverse.oss.nyx.services.git.Repository;
-import com.mooltiverse.oss.nyx.state.State;
 
 /**
  * The entry point to the service producing changelogs.
  */
-public class Changelog implements AssetService {
+public class Changelog implements Service {
+    /**
+     * The template to use for rendering. It can't {@code null}.
+     */
+    private String template = null;
+
     /**
      * The {@code SERVICE} marker, used when logging command events.
      */
@@ -46,10 +45,21 @@ public class Changelog implements AssetService {
     static final Logger logger = LoggerFactory.getLogger(Changelog.class);
 
     /**
-     * Builds an instance.
+     * The name of the option used to pass the template to this object instance.
+     * This is the value of the key inside the options passed to get a new instance of this class.
+     * If this option is not passed the service will raise an exception.
+     * Value: {@value}
      */
-    private Changelog() {
+    public static final String TEMPLATE_OPTION_NAME = "TEMPLATE";
+
+    /**
+     * Builds an instance.
+     * 
+     * @param template the template to use for rendering. It can't be {@code null}.
+     */
+    private Changelog(String template) {
         super();
+        this.template = template;
     }
 
     /**
@@ -65,21 +75,13 @@ public class Changelog implements AssetService {
      */
     public static Changelog instance(Map<String,String> options) {
         Objects.requireNonNull(options, "Can't create a new instance with a null options map");
-        return new Changelog();
-    }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public URI buildAsset(String destination, State state, Repository repository)
-        throws SecurityException, TransportException, DataAccessException {
-        Objects.requireNonNull(state, "Can't create a new instance with a null state reference");
-        Objects.requireNonNull(repository, "Can't create a new instance with a null repository reference");
+        String template = null;
+        if (Objects.isNull(options.get(TEMPLATE_OPTION_NAME)))
+            logger.warn(SERVICE, "No template passed to the '{}' service. Use the '{}' option to set this value", Changelog.class.getSimpleName(), TEMPLATE_OPTION_NAME);
+        else template = options.get(TEMPLATE_OPTION_NAME);
 
-        // TODO: implement this method
-        logger.info(SERVICE, "Changelog.buildAsset()");
-        return null;
+        return new Changelog(template);
     }
 
     /**
@@ -90,7 +92,6 @@ public class Changelog implements AssetService {
         Objects.requireNonNull(feature, "Can't check if the feature is supported for a null feature");
         switch (feature)
         {
-            case ASSET:         return true;
             default:            return false;
         }
     }

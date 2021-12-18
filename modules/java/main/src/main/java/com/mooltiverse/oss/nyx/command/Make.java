@@ -23,13 +23,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mooltiverse.oss.nyx.ReleaseException;
-import com.mooltiverse.oss.nyx.entities.Asset;
 import com.mooltiverse.oss.nyx.entities.IllegalPropertyException;
 import com.mooltiverse.oss.nyx.io.DataAccessException;
-import com.mooltiverse.oss.nyx.io.TransportException;
-import com.mooltiverse.oss.nyx.services.AssetService;
 import com.mooltiverse.oss.nyx.services.GitException;
-import com.mooltiverse.oss.nyx.services.SecurityException;
 import com.mooltiverse.oss.nyx.services.git.Repository;
 import com.mooltiverse.oss.nyx.state.State;
 
@@ -93,37 +89,8 @@ public class Make extends AbstractCommand {
      */
     private void buildAssets()
         throws DataAccessException, IllegalPropertyException, GitException, ReleaseException {
-        if (state().getConfiguration().getAssets().isEmpty())
-            logger.debug(COMMAND, "No assets have been configured");
-        else {
-            for (String assetName: state().getConfiguration().getAssets().keySet()) {
-                logger.debug(COMMAND, "Evaluating asset '{}'", assetName);
-
-                Asset asset = state().getConfiguration().getAssets().get(assetName);
-                if (Objects.isNull(asset.getService()) || asset.getService().isBlank())
-                    logger.debug(COMMAND, "Asset '{}' has no service configured, no build action is taken", assetName);
-                else {
-                    logger.debug(COMMAND, "Instantiating service '{}'", asset.getService());
-                    AssetService assetService = super.resolveAssetService(asset.getService());
-
-                    if (Objects.isNull(assetService))
-                        throw new IllegalPropertyException(String.format("Asset '%s' requires service '%s' but no such service has been configured", assetName, asset.getService()));
-                    
-                    if (state().getConfiguration().getDryRun())
-                        logger.info(COMMAND, "Asset build skipped due to dry run");
-                    else {
-                        logger.debug(COMMAND, "Building asset '{}' with service '{}'", assetName, asset.getService());
-                        try {
-                            assetService.buildAsset(asset.getPath(), state(), repository());
-                        }
-                        catch (SecurityException | TransportException e) {
-                            throw new ReleaseException(String.format("Can't build asset '%s' using service '%s'", assetName, asset.getService()), e);
-                        }
-                        logger.debug(COMMAND, "Asset '{}' has been built", assetName);
-                    }
-                }
-            }
-        }
+        
+        // TODO: implement this
     }
 
     /**

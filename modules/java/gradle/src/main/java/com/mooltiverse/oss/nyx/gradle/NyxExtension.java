@@ -101,13 +101,6 @@ public abstract class NyxExtension {
     public static final String NAME = "nyx";
 
     /**
-     * The nested 'assets' block.
-     * 
-     * @see Asset
-     */
-    private NamedDomainObjectContainer<Asset> assets = getObjectfactory().domainObjectContainer(Asset.class);
-
-    /**
      * The 'bump' property.
      */
     private final Property<String> bump = getObjectfactory().property(String.class);
@@ -240,29 +233,6 @@ public abstract class NyxExtension {
         NyxExtension extension = settings.getExtensions().create(NyxExtension.NAME, NyxExtension.class);
         extension.directory.convention(settings.getRootDir());
         return extension;
-    }
-
-    /**
-     * Returns the object mapping the {@code assets} block.
-     * 
-     * We provide an implementation of this method instead of using the abstract definition as it's
-     * safer for old Gradle versions we support.
-     * 
-     * @return the object mapping the {@code assets} block
-     */
-    public NamedDomainObjectContainer<Asset> getAssets() {
-        return assets;
-    }
-
-    /**
-     * Accepts the DSL configuration for the {@code assets} block, needed for defining
-     * the block using the curly braces syntax in Gradle build scripts.
-     * See the documentation on top of this class for more.
-     * 
-     * @param configurationAction the configuration action for the {@code assets} block
-     */
-    public void assets(Action<? super NamedDomainObjectContainer<Asset>> configurationAction) {
-        configurationAction.execute(assets);
     }
 
     /**
@@ -515,86 +485,6 @@ public abstract class NyxExtension {
      */
     public Property<String> getVerbosity() {
         return verbosity;
-    }
-
-    /**
-     * The class to model a single 'assets' item within the extension.
-     */
-    public abstract static class Asset {
-        /**
-         * The asset name.
-         */
-        private final String name;
-
-        /**
-         * The asset path property.
-         */
-        private final Property<String> path = getObjectfactory().property(String.class);
-
-        /**
-         * The asset service property.
-         */
-        private final Property<String> service = getObjectfactory().property(String.class);
-
-        /**
-         * Returns an object factory instance.
-         * 
-         * The instance is injected by Gradle as soon as this getter method is invoked.
-         * 
-         * Using <a href="https://docs.gradle.org/current/userguide/custom_gradle_types.html#property_injection">property injection</a>
-         * instead of <a href="https://docs.gradle.org/current/userguide/custom_gradle_types.html#constructor_injection">constructor injection</a>
-         * has a few advantages: it allows Gradle to refer injecting the object until it's required and is safer for backward
-         * compatibility (older versions can be supported).
-         * 
-         * @return the object factory instance
-         */
-        @Inject
-        protected abstract ObjectFactory getObjectfactory();
-
-        /**
-         * Constructor.
-         * 
-         * This constructor is required as per the {@link NamedDomainObjectContainer} specification.
-         * 
-         * @param name the asset name
-         */
-        public Asset(String name) {
-            super();
-            this.name = name;
-        }
-
-        /**
-         * Returns the name read-only mandatory property.
-         * 
-         * @return the name read-only mandatory property.
-         */
-        public String getName() {
-            return name;
-        }
-
-        /**
-         * Returns the asset path.
-         * 
-         * We provide an implementation of this method instead of using the abstract definition as it's
-         * safer for old Gradle versions we support.
-         * 
-         * @return the asset path
-         */
-        public Property<String> getPath() {
-            return path;
-        }
-
-        /**
-         * Returns the asset service.
-         * 
-         * We provide an implementation of this method instead of using the abstract definition as it's
-         * safer for old Gradle versions we support.
-         * 
-         * @return the asset service
-         */
-        public Property<String> getService() {
-            return service;
-        }
     }
 
     /**
