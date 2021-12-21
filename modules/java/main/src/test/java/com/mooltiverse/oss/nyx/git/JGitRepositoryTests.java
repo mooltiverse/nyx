@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mooltiverse.oss.nyx.services.git;
+package com.mooltiverse.oss.nyx.git;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assumptions.*;
@@ -37,8 +37,11 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import com.mooltiverse.oss.nyx.entities.git.Commit;
 import com.mooltiverse.oss.nyx.entities.git.Identity;
 import com.mooltiverse.oss.nyx.entities.git.Tag;
-import com.mooltiverse.oss.nyx.services.GitException;
-import com.mooltiverse.oss.nyx.services.git.util.RandomUtil;
+import com.mooltiverse.oss.nyx.git.Git;
+import com.mooltiverse.oss.nyx.git.GitException;
+import com.mooltiverse.oss.nyx.git.JGitRepository;
+import com.mooltiverse.oss.nyx.git.Repository;
+import com.mooltiverse.oss.nyx.git.util.RandomUtil;
 import com.mooltiverse.oss.nyx.services.github.GitHub;
 import com.mooltiverse.oss.nyx.services.github.GitHubRepository;
 

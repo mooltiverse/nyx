@@ -33,10 +33,10 @@ import com.mooltiverse.oss.nyx.entities.git.Commit;
 import com.mooltiverse.oss.nyx.entities.git.Identity;
 import com.mooltiverse.oss.nyx.entities.git.Message;
 import com.mooltiverse.oss.nyx.entities.git.Tag;
+import com.mooltiverse.oss.nyx.git.Repository;
+import com.mooltiverse.oss.nyx.git.Scenario;
 import com.mooltiverse.oss.nyx.io.DataAccessException;
 import com.mooltiverse.oss.nyx.io.FileMapper;
-import com.mooltiverse.oss.nyx.services.git.Repository;
-import com.mooltiverse.oss.nyx.services.git.Scenario;
 import com.mooltiverse.oss.nyx.state.State;
 
 @DisplayName("Nyx")
@@ -69,7 +69,7 @@ public class NyxTests {
     /**
      * Performs checks against the repository.
      * 
-     * Note that repository details are tested in the {@link com.mooltiverse.oss.nyx.services.git.JGitRepositoryTests} class.
+     * Note that repository details are tested in the {@link com.mooltiverse.oss.nyx.git.JGitRepositoryTests} class.
      * Here only the Nyx class behavior pertaining the repository handling is tested.
      */
     @Nested

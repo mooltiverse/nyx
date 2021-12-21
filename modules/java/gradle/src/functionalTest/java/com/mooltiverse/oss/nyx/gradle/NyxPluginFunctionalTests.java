@@ -32,6 +32,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+import com.mooltiverse.oss.nyx.git.Scenario;
+import com.mooltiverse.oss.nyx.git.Script;
+
 import org.gradle.testkit.runner.BuildResult;
 import org.gradle.testkit.runner.BuildTask;
 import org.gradle.testkit.runner.GradleRunner;
@@ -42,9 +45,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-
-import com.mooltiverse.oss.nyx.services.git.Scenario;
-import com.mooltiverse.oss.nyx.services.git.Script;
 
 /**
  * Functional tests for the Gradle plugin.<br>

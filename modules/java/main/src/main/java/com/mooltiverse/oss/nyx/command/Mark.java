@@ -27,9 +27,9 @@ import com.mooltiverse.oss.nyx.ReleaseException;
 import com.mooltiverse.oss.nyx.configuration.Defaults;
 import com.mooltiverse.oss.nyx.entities.IllegalPropertyException;
 import com.mooltiverse.oss.nyx.entities.git.Commit;
+import com.mooltiverse.oss.nyx.git.GitException;
+import com.mooltiverse.oss.nyx.git.Repository;
 import com.mooltiverse.oss.nyx.io.DataAccessException;
-import com.mooltiverse.oss.nyx.services.GitException;
-import com.mooltiverse.oss.nyx.services.git.Repository;
 import com.mooltiverse.oss.nyx.state.State;
 
 /**

@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mooltiverse.oss.nyx.services;
+package com.mooltiverse.oss.nyx.git;
+
+import com.mooltiverse.oss.nyx.NyxException;
 
 /**
  * A generic exception raised when some Git related issue is encountered.
  */
-public class GitException extends ServiceException {
+public class GitException extends NyxException {
     /**
      * Default serial version UID
      */

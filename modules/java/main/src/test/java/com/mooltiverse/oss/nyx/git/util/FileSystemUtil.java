@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mooltiverse.oss.nyx.services.git.util;
+package com.mooltiverse.oss.nyx.git.util;
 
 import java.io.BufferedWriter;
 import java.io.File;

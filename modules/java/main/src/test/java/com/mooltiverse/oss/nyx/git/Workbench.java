@@ -13,11 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mooltiverse.oss.nyx.services.git;
-
-import com.mooltiverse.oss.nyx.services.git.util.FileSystemUtil;
-import com.mooltiverse.oss.nyx.services.git.util.GitUtil;
-import com.mooltiverse.oss.nyx.services.git.util.RandomUtil;
+package com.mooltiverse.oss.nyx.git;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -31,6 +27,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
+import com.mooltiverse.oss.nyx.git.util.FileSystemUtil;
+import com.mooltiverse.oss.nyx.git.util.GitUtil;
+import com.mooltiverse.oss.nyx.git.util.RandomUtil;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.RefNotFoundException;

@@ -29,7 +29,7 @@ import com.mooltiverse.oss.nyx.command.template.CommandInvocationContextProvider
 import com.mooltiverse.oss.nyx.command.template.CommandProxy;
 import com.mooltiverse.oss.nyx.command.template.CommandSelector;
 import com.mooltiverse.oss.nyx.configuration.SimpleConfigurationLayer;
-import com.mooltiverse.oss.nyx.services.git.Scenario;
+import com.mooltiverse.oss.nyx.git.Scenario;
 
 @DisplayName("Clean")
 public class CleanTestTemplates {

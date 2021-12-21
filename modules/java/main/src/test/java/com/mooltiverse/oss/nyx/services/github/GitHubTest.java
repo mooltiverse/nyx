@@ -26,11 +26,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
+import com.mooltiverse.oss.nyx.git.Scenario;
+import com.mooltiverse.oss.nyx.git.Script;
+import com.mooltiverse.oss.nyx.git.util.RandomUtil;
 import com.mooltiverse.oss.nyx.services.Release;
 import com.mooltiverse.oss.nyx.services.Service;
-import com.mooltiverse.oss.nyx.services.git.Scenario;
-import com.mooltiverse.oss.nyx.services.git.Script;
-import com.mooltiverse.oss.nyx.services.git.util.RandomUtil;
 
 @DisplayName("GitHub")
 public class GitHubTest {

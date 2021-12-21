@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mooltiverse.oss.nyx.services.git;
+package com.mooltiverse.oss.nyx.git;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,7 +30,6 @@ import java.util.Set;
 import com.mooltiverse.oss.nyx.entities.git.Commit;
 import com.mooltiverse.oss.nyx.entities.git.Identity;
 import com.mooltiverse.oss.nyx.entities.git.Tag;
-import com.mooltiverse.oss.nyx.services.GitException;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.AddCommand;

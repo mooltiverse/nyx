@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mooltiverse.oss.nyx.services.git;
-
-import com.mooltiverse.oss.nyx.services.git.util.FileSystemUtil;
-import com.mooltiverse.oss.nyx.services.git.util.RandomUtil;
+package com.mooltiverse.oss.nyx.git;
 
 import java.io.File;
 import java.util.Objects;
+
+import com.mooltiverse.oss.nyx.git.util.FileSystemUtil;
+import com.mooltiverse.oss.nyx.git.util.RandomUtil;
 
 /**
  * An utility class built on top of a test repository and providing some coarse grained commands to be used fluently.

@@ -27,9 +27,9 @@ import com.mooltiverse.oss.nyx.command.template.CommandInvocationContextProvider
 import com.mooltiverse.oss.nyx.command.template.CommandProxy;
 import com.mooltiverse.oss.nyx.command.template.CommandSelector;
 import com.mooltiverse.oss.nyx.command.template.StandaloneCommandProxy;
-import com.mooltiverse.oss.nyx.services.GitException;
-import com.mooltiverse.oss.nyx.services.git.Scenario;
-import com.mooltiverse.oss.nyx.services.git.Script;
+import com.mooltiverse.oss.nyx.git.GitException;
+import com.mooltiverse.oss.nyx.git.Scenario;
+import com.mooltiverse.oss.nyx.git.Script;
 
 @DisplayName("Make")
 public class MakeTestTemplates {

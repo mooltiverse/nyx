@@ -37,9 +37,9 @@ import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
 import com.mooltiverse.oss.nyx.entities.ReleaseType;
 import com.mooltiverse.oss.nyx.entities.ReleaseTypes;
-import com.mooltiverse.oss.nyx.services.GitException;
-import com.mooltiverse.oss.nyx.services.git.Scenario;
-import com.mooltiverse.oss.nyx.services.git.Script;
+import com.mooltiverse.oss.nyx.git.GitException;
+import com.mooltiverse.oss.nyx.git.Scenario;
+import com.mooltiverse.oss.nyx.git.Script;
 
 @DisplayName("Mark")
 public class MarkTestTemplates {

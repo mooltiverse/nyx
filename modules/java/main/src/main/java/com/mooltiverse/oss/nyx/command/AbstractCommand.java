@@ -33,12 +33,12 @@ import com.mooltiverse.oss.nyx.entities.IllegalPropertyException;
 import com.mooltiverse.oss.nyx.entities.ReleaseType;
 import com.mooltiverse.oss.nyx.entities.ServiceConfiguration;
 import com.mooltiverse.oss.nyx.entities.WorkspaceStatus;
+import com.mooltiverse.oss.nyx.git.GitException;
+import com.mooltiverse.oss.nyx.git.Repository;
 import com.mooltiverse.oss.nyx.io.DataAccessException;
-import com.mooltiverse.oss.nyx.services.GitException;
 import com.mooltiverse.oss.nyx.services.ReleaseService;
 import com.mooltiverse.oss.nyx.services.Service;
 import com.mooltiverse.oss.nyx.services.ServiceFactory;
-import com.mooltiverse.oss.nyx.services.git.Repository;
 import com.mooltiverse.oss.nyx.state.State;
 import com.mooltiverse.oss.nyx.template.Templates;
 

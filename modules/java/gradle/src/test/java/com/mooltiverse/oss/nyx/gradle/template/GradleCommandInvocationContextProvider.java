@@ -37,13 +37,13 @@ import com.mooltiverse.oss.nyx.command.Commands;
 import com.mooltiverse.oss.nyx.command.template.Baseline;
 import com.mooltiverse.oss.nyx.command.template.CommandInvocationContextProvider;
 import com.mooltiverse.oss.nyx.command.template.CommandProxy;
+import com.mooltiverse.oss.nyx.git.Script;
+import com.mooltiverse.oss.nyx.git.Workbench;
 import com.mooltiverse.oss.nyx.gradle.CleanTask;
 import com.mooltiverse.oss.nyx.gradle.InferTask;
 import com.mooltiverse.oss.nyx.gradle.MakeTask;
 import com.mooltiverse.oss.nyx.gradle.MarkTask;
 import com.mooltiverse.oss.nyx.gradle.PublishTask;
-import com.mooltiverse.oss.nyx.services.git.Script;
-import com.mooltiverse.oss.nyx.services.git.Workbench;
 import com.mooltiverse.oss.nyx.gradle.CoreTask;
 import com.mooltiverse.oss.nyx.gradle.NyxPlugin;
 

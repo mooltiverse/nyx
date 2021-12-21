@@ -24,9 +24,9 @@ import org.slf4j.LoggerFactory;
 
 import com.mooltiverse.oss.nyx.ReleaseException;
 import com.mooltiverse.oss.nyx.entities.IllegalPropertyException;
+import com.mooltiverse.oss.nyx.git.GitException;
+import com.mooltiverse.oss.nyx.git.Repository;
 import com.mooltiverse.oss.nyx.io.DataAccessException;
-import com.mooltiverse.oss.nyx.services.GitException;
-import com.mooltiverse.oss.nyx.services.git.Repository;
 import com.mooltiverse.oss.nyx.state.State;
 
 /**

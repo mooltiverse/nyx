@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mooltiverse.oss.nyx.services.git;
+package com.mooltiverse.oss.nyx.git;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,52 +24,19 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 
-import com.mooltiverse.oss.nyx.services.GitException;
-import com.mooltiverse.oss.nyx.services.SecurityException;
-
 /**
  * The entry point to the Git local and remote service. This is also the main entry point to retrieve {@link Repository} instances
  */
 public class Git {
     /**
      * The user name to authenticate to the remote service.
-     * If {@code null} or invalid all authentication protected operations will fail with a
-     * {@link SecurityException}
      */
     private String user = null;
 
     /**
      * The password to authenticate to the remote service.
-     * If {@code null} or invalid all authentication protected operations will fail with a
-     * {@link SecurityException}
      */
     private String password = null;
-
-    /**
-     * The name of the option used to pass the list of supported remotes to this object instance.
-     * This is the value of the key inside the options passed to get a new instance of this class.
-     * If this option is not passed the service will not be able to perform some of its operations.
-     * Value: {@value}
-     */
-    public static final String REMOTES_OPTION_NAME = "REMOTES";
-
-    /**
-     * The name of the option used to pass the user name to this object instance.
-     * This is the value of the key inside the options passed to get a new instance of this class.
-     * If this option is not passed the service will not be able to authenticate and perform any
-     * of the authentication protected operations.
-     * Value: {@value}
-     */
-    public static final String USER_OPTION_NAME = "USER";
-
-    /**
-     * The name of the option used to pass the password to this object instance.
-     * This is the value of the key inside the options passed to get a new instance of this class.
-     * If this option is not passed the service will not be able to authenticate and perform any
-     * of the authentication protected operations.
-     * Value: {@value}
-     */
-    public static final String PASSWORD_OPTION_NAME = "PASSWORD";
 
     /**
      * The {@code SERVICE} marker, used when logging command events.
