@@ -29,7 +29,6 @@ import com.mooltiverse.oss.nyx.entities.IllegalPropertyException;
 import com.mooltiverse.oss.nyx.entities.git.Commit;
 import com.mooltiverse.oss.nyx.io.DataAccessException;
 import com.mooltiverse.oss.nyx.services.GitException;
-import com.mooltiverse.oss.nyx.services.GitRemoteService;
 import com.mooltiverse.oss.nyx.services.git.Repository;
 import com.mooltiverse.oss.nyx.state.State;
 
@@ -188,6 +187,9 @@ public class Mark extends AbstractCommand {
                     for (String serviceConfigurationName: state().getConfiguration().getServices().keySet()) {
                         logger.debug(COMMAND, "Looking up credentials for remote '{}': checking configured service '{}'", remote, serviceConfigurationName);
 
+                        /*
+                        TODO: implement this method
+
                         GitRemoteService gitRemoteService = null;
                         try {
                             gitRemoteService = resolveGitRemoteService(serviceConfigurationName);
@@ -204,16 +206,17 @@ public class Mark extends AbstractCommand {
                             password = gitRemoteService.getPassword();
                         }
                         else if (gitRemoteService.getSupportedRemoteNames().contains(remote)) {
-                            //exact match
+                            // exact match
                             logger.debug(COMMAND, "Service '{}' defines a remotes filter '{}' which explicitly matches remote '{}' so its credentials will be used.", serviceConfigurationName, String.join(",", gitRemoteService.getSupportedRemoteNames()), remote);
                             user = gitRemoteService.getUser();
                             password = gitRemoteService.getPassword();
                             break;
                         }
                         else {
-                            //negative match
+                            // negative match
                             logger.debug(COMMAND, "Service '{}' defines a remotes filter '{}' which doesn't match remote '{}' so its skipped.", serviceConfigurationName, String.join(",", gitRemoteService.getSupportedRemoteNames()), remote);
                         }
+                        */
                     }
                 }
 

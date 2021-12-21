@@ -17,7 +17,6 @@ package com.mooltiverse.oss.nyx.services.gitlab;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.DisplayName;
@@ -59,7 +58,7 @@ public class GitLabTest {
         @EnumSource(Service.Feature.class)
         public void supportAnyFeature(Service.Feature feature)
             throws Exception {
-            if (Service.Feature.GIT_HOSTING.equals(feature) || Service.Feature.GIT_REMOTE.equals(feature) || Service.Feature.RELEASES.equals(feature) || Service.Feature.USERS.equals(feature))
+            if (Service.Feature.GIT_HOSTING.equals(feature) || Service.Feature.RELEASES.equals(feature) || Service.Feature.USERS.equals(feature))
                 assertTrue(GitLab.instance(Map.<String,String>of()).supports(feature));
             else assertFalse(GitLab.instance(Map.<String,String>of()).supports(feature));
         }
@@ -117,51 +116,6 @@ public class GitLabTest {
     }
 
     @Nested
-    @DisplayName("Remote Service")
-    class RemoteServiceTest {
-        @Test
-        @DisplayName("GitLab.instance().getSupportedRemoteNames()")
-        public void getSupportedRemoteNames()
-            throws Exception {
-            GitLab gitLab = GitLab.instance(Map.<String,String>of(GitLab.REMOTES_OPTION_NAME, "one,two"));
-
-            assertNotNull(gitLab.getSupportedRemoteNames());
-            assertEquals(2, gitLab.getSupportedRemoteNames().size());
-            assertTrue(gitLab.getSupportedRemoteNames().containsAll(List.<String>of("one", "two")));
-        }
-
-        @Test
-        @DisplayName("GitLab.instance().getSupportedRemoteNames() with empty list")
-        public void getSupportedRemoteNamesWithEmptyList()
-            throws Exception {
-            GitLab gitLab = GitLab.instance(Map.<String,String>of());
-
-            assertNull(gitLab.getSupportedRemoteNames());
-        }
-
-        @Test
-        @DisplayName("GitLab.instance().getUserForRemote() and GitLab.instance().getPasswordForRemote()")
-        public void getUserForRemote()
-            throws Exception {
-            // the 'gitLabTestUserToken' system property is set by the build script, which in turn reads it from an environment variable
-            GitLab gitLab = GitLab.instance(Map.<String,String>of(GitLab.AUTHENTICATION_TOKEN_OPTION_NAME, System.getProperty("gitLabTestUserToken")));
-
-            assertEquals("PRIVATE-TOKEN", gitLab.getUser());
-            assertEquals(System.getProperty("gitLabTestUserToken"), gitLab.getPassword());
-        }
-
-        @Test
-        @DisplayName("GitLab.instance().getUserForRemote() and GitLab.instance().getPasswordForRemote() with no credentials")
-        public void getUserForRemoteWithNoCredentials()
-            throws Exception {
-            GitLab gitLab = GitLab.instance(Map.<String,String>of());
-
-            assertNull(gitLab.getUser());
-            assertNull(gitLab.getPassword());
-        }
-    }
-
-    @Nested
     @DisplayName("Release Service")
     class ReleaseServiceTest {
         @Test
@@ -179,8 +133,10 @@ public class GitLabTest {
             // if we clone too quickly next calls may fail
             Thread.sleep(2000);
 
-            Script script = Scenario.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED.applyOnClone(gitLabRepository.getHTTPURL(), gitLab.getUser(), gitLab.getPassword());
-            script.push(gitLab.getUser(), gitLab.getPassword());
+            // when a token for user and password authentication for plain Git operations against a GitLab repository,
+            // the user is the "PRIVATE-TOKEN" string and the password is the token
+            Script script = Scenario.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED.applyOnClone(gitLabRepository.getHTTPURL(), "PRIVATE-TOKEN", System.getProperty("gitLabTestUserToken"));
+            script.push("PRIVATE-TOKEN", System.getProperty("gitLabTestUserToken"));
 
             // publish the release
             Release release = gitLab.publishRelease(user.getUserName(), gitLabRepository.getName(), "Release 1.0.0-alpha.1", "1.0.0-alpha.1", "A test description for the release\non multiple lines\nlike these");

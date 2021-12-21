@@ -48,20 +48,6 @@ public interface Service {
         GIT_HOSTING(),
 
         /**
-         * When this feature is supported then the implementation class implements the {@link GitLocalService} interface
-         * (so it can be safely cast to it) and the service specific methods can be safely invoked without an
-         * {@link UnsupportedOperationException} being thrown.
-         */
-        GIT_LOCAL(),
-
-        /**
-         * When this feature is supported then the implementation class implements the {@link GitRemoteService} interface
-         * (so it can be safely cast to it) and the service specific methods can be safely invoked without an
-         * {@link UnsupportedOperationException} being thrown.
-         */
-        GIT_REMOTE(),
-        
-        /**
          * When this feature is supported then the implementation class implements the {@link ReleaseService} interface
          * (so it can be safely cast to it) and the service specific methods can be safely invoked without an
          * {@link UnsupportedOperationException} being thrown.

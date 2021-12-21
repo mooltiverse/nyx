@@ -53,6 +53,8 @@ public class MarkTests {
             throws Exception {
             String randomID = RandomUtil.randomAlphabeticString(5);
             // the 'gitHubTestUserToken' system property is set by the build script, which in turn reads it from an environment variable
+            // when a token for user and password authentication for plain Git operations against a GitHub repository,
+            // the user is the token and the password is the empty string
             GitHub gitHub = GitHub.instance(Map.<String,String>of(GitHub.AUTHENTICATION_TOKEN_OPTION_NAME, System.getProperty("gitHubTestUserToken")));
             GitHubRepository gitHubRepository = gitHub.createGitRepository(randomID, "Test repository "+randomID, false, true);
 
@@ -60,7 +62,7 @@ public class MarkTests {
             Thread.sleep(2000);
 
             Script replicaScript = Scenario.FROM_SCRATCH.realize();
-            Script script = Scenario.ONE_BRANCH_SHORT.applyOnClone(gitHubRepository.getHTTPURL(), gitHub.getUser(), gitHub.getPassword());
+            Script script = Scenario.ONE_BRANCH_SHORT.applyOnClone(gitHubRepository.getHTTPURL(), System.getProperty("gitHubTestUserToken"), "");
             script.addRemote(replicaScript.getGitDirectory(), "replica");
             
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
@@ -101,7 +103,7 @@ public class MarkTests {
             Thread.sleep(1000);
 
             // clone the remote repo again into a a new directory and test
-            Script remoteScript = Script.cloneFrom(gitHubRepository.getHTTPURL(), gitHub.getUser(), gitHub.getPassword());
+            Script remoteScript = Script.cloneFrom(gitHubRepository.getHTTPURL(), System.getProperty("gitHubTestUserToken"), "");
 
             assertEquals("main", nyx.state().getBranch()); // new GitHub repositories default to 'main' as the default branch
             assertEquals("patch", nyx.state().getBump());
@@ -159,6 +161,8 @@ public class MarkTests {
             throws Exception {
             String randomID = RandomUtil.randomAlphabeticString(5);
             // the 'gitLabTestUserToken' system property is set by the build script, which in turn reads it from an environment variable
+            // when a token for user and password authentication for plain Git operations against a GitLab repository,
+            // the user is the "PRIVATE-TOKEN" string and the password is the token
             GitLab gitLab = GitLab.instance(Map.<String,String>of(GitLab.AUTHENTICATION_TOKEN_OPTION_NAME, System.getProperty("gitLabTestUserToken")));
             GitLabRepository gitLabRepository = gitLab.createGitRepository(randomID, "Test repository "+randomID, false, true);
 
@@ -166,7 +170,7 @@ public class MarkTests {
             Thread.sleep(2000);
 
             Script replicaScript = Scenario.FROM_SCRATCH.realize();
-            Script script = Scenario.ONE_BRANCH_SHORT.applyOnClone(gitLabRepository.getHTTPURL(), gitLab.getUser(), gitLab.getPassword());
+            Script script = Scenario.ONE_BRANCH_SHORT.applyOnClone(gitLabRepository.getHTTPURL(), "PRIVATE-TOKEN", System.getProperty("gitLabTestUserToken"));
             script.addRemote(replicaScript.getGitDirectory(), "replica");
             
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
@@ -207,7 +211,7 @@ public class MarkTests {
             Thread.sleep(1000);
 
             // clone the remote repo again into a a new directory and test
-            Script remoteScript = Script.cloneFrom(gitLabRepository.getHTTPURL(), gitLab.getUser(), gitLab.getPassword());
+            Script remoteScript = Script.cloneFrom(gitLabRepository.getHTTPURL(), "PRIVATE-TOKEN", System.getProperty("gitLabTestUserToken"));
 
             assertEquals("main", nyx.state().getBranch()); // new GitLab repositories default to 'main' as the default branch
             assertEquals("patch", nyx.state().getBump());

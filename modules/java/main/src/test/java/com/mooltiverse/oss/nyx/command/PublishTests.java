@@ -178,8 +178,10 @@ public class PublishTests {
             // if we clone too quickly next calls may fail
             Thread.sleep(2000);
 
-            Script script = Scenario.ONE_BRANCH_SHORT.applyOnClone(gitLabRepository.getHTTPURL(), gitLab.getUser(), gitLab.getPassword());
-            script.push(gitLab.getUser(), gitLab.getPassword());
+            // when a token for user and password authentication for plain Git operations against a GitLab repository,
+            // the user is the "PRIVATE-TOKEN" string and the password is the token
+            Script script = Scenario.ONE_BRANCH_SHORT.applyOnClone(gitLabRepository.getHTTPURL(), "PRIVATE-TOKEN", System.getProperty("gitLabTestUserToken"));
+            script.push("PRIVATE-TOKEN", System.getProperty("gitLabTestUserToken"));
 
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that accepts all non null messages and dumps the major identifier for each

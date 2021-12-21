@@ -18,7 +18,6 @@ package com.mooltiverse.oss.nyx.services.github;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -29,7 +28,6 @@ import org.slf4j.MarkerFactory;
 
 import com.mooltiverse.oss.nyx.io.TransportException;
 import com.mooltiverse.oss.nyx.services.GitHostingService;
-import com.mooltiverse.oss.nyx.services.GitRemoteService;
 import com.mooltiverse.oss.nyx.services.SecurityException;
 import com.mooltiverse.oss.nyx.services.ReleaseService;
 import com.mooltiverse.oss.nyx.services.Service;
@@ -38,19 +36,7 @@ import com.mooltiverse.oss.nyx.services.UserService;
 /**
  * The entry point to the <a href="https://github.com/">GitHub</a> remote service.
  */
-public class GitHub implements GitRemoteService, GitHostingService, ReleaseService, UserService {
-    /**
-     * The security token to use to authenticate to the remote service.
-     * If {@code null} or invalid all authentication protected operations will fail with a
-     * {@link SecurityException}
-     */
-    private String authenticationToken = null;
-
-    /**
-     * The list of supported remote repository names supported by this service. It may be {@code null} or empty.
-     */
-    private List<String> remotes = null;
-
+public class GitHub implements GitHostingService, ReleaseService, UserService {
     /**
      * The name of the repository owner, used when using APIs that require the name of the repository
      * owner (individual or organization). It may be {@code null}, but some operations may fail.
@@ -128,24 +114,20 @@ public class GitHub implements GitRemoteService, GitHostingService, ReleaseServi
      * Builds an instance using the given API.
      * 
      * @param api the API to be used internally. It can't be {@code null}
-     * @param authenticationToken the token (Personal Access Token, OAuth) to use for authentication. It may be {@code null}.
      * If {@code null} the service will not be able to authenticate and perform any of the authentication protected operations.
      * @param repositoryOwner the name of the repository owner, used when using APIs that require the
      * name of the repository owner (individual or organization). It may be {@code null}, but some operations may fail
      * @param repositoryName the name of the repository, used when using APIs that require the
      * name of the repository. It may be {@code null}, but some operations may fail
-     * @param remotes the list of supported remote repository names supported by this service. It may be {@code null} or empty.
      * 
      * @throws NullPointerException if the given API is {@code null}.
      */
-    private GitHub(API api, String authenticationToken, String repositoryOwner, String repositoryName, List<String> remotes) {
+    private GitHub(API api, String repositoryOwner, String repositoryName) {
         super();
         Objects.requireNonNull(api, "Can't create a new instance with a null API");
         this.api = api;
-        this.authenticationToken = authenticationToken;
         this.repositoryOwner = repositoryOwner;
         this.repositoryName = repositoryName;
-        this.remotes = remotes;
     }
 
     /**
@@ -185,17 +167,12 @@ public class GitHub implements GitRemoteService, GitHostingService, ReleaseServi
         if (Objects.isNull(options.get(REPOSITORY_OWNER_OPTION_NAME)))
             logger.warn(SERVICE, "No repository owner passed to the '{}' service, some features may not work. Use the '{}' option to set this value", GitHub.class.getSimpleName(), REPOSITORY_OWNER_OPTION_NAME);
         else repositoryOwner = options.get(REPOSITORY_OWNER_OPTION_NAME);
-
-        List<String> remotes = null;
-        if (Objects.isNull(options.get(REMOTES_OPTION_NAME)))
-            logger.warn(SERVICE, "No supported remotes list passed to the '{}' service, assuming the service can be used for any remote. Use the '{}' option to set this value", GitHub.class.getSimpleName(), REMOTES_OPTION_NAME);
-        else remotes = List.<String>of(options.get(REMOTES_OPTION_NAME).split(","));
         
         logger.trace(SERVICE, "Instantiating new service using tha base URI: '{}'", baseURI.toString());
 
         // we have only one API and version so far so we just use that, otherwise we'd need to read additional
         // options to understand which API and version to use
-        return new GitHub(new RESTv3(baseURI, authenticationToken), authenticationToken, repositoryOwner, repositoryName, remotes);
+        return new GitHub(new RESTv3(baseURI, authenticationToken), repositoryOwner, repositoryName);
     }
 
     /**
@@ -243,37 +220,6 @@ public class GitHub implements GitRemoteService, GitHostingService, ReleaseServi
      * {@inheritDoc}
      */
     @Override
-    public List<String> getSupportedRemoteNames() {
-        return remotes;
-    }
-
-    /**
-     * Returns the {@link #AUTHENTICATION_TOKEN_OPTION_NAME} option, if provided, otherwise returns {@code null}.
-     * <br>
-     * This method of using the Personal Access Token in place of the user name and the empty string as the password
-     * is not documented but it works.
-     * 
-     * @return the {@link #AUTHENTICATION_TOKEN_OPTION_NAME} option, if provided, otherwise returns {@code null}.
-     */
-    @Override
-    public String getUser() {
-        return authenticationToken;
-    }
-
-    /**
-     * Returns an empty string when the {@link #AUTHENTICATION_TOKEN_OPTION_NAME} option is set, otherwise {@code null}. 
-     * 
-     * @return an empty string when the {@link #AUTHENTICATION_TOKEN_OPTION_NAME} option is set, otherwise {@code null}. 
-     */
-    @Override
-    public String getPassword() {
-        return Objects.isNull(authenticationToken) ? null : "";
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public GitHubRelease publishRelease(String owner, String repository, String title, String tag, String description)
         throws SecurityException, TransportException {
         if (Objects.isNull(owner) && Objects.isNull(repositoryOwner))
@@ -292,7 +238,6 @@ public class GitHub implements GitRemoteService, GitHostingService, ReleaseServi
         switch (feature)
         {
             case GIT_HOSTING:   return true;
-            case GIT_REMOTE:    return true;
             case RELEASES:      return true;
             case USERS:         return true;
             default:            return false;

@@ -25,7 +25,7 @@ To work around this you just have to configure the checkout action to always fet
 
 ### Credentials
 
-When configuring the [GitHub service]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}#github) to [push]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#git-push) repository changes to [enabled remotes]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#remote-repositories) or [publish releases]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#publication-services) you need to pass credentials to Nyx.
+When configuring the [GitHub service]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}#github) to [publish releases]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#publication-services) you need to pass credentials to Nyx.
 
 When running GitHub Actions pipelines you can take advantage of the [automatic token authentication](https://docs.github.com/en/actions/security-guides/automatic-token-authentication) that provides the `GITHUB_TOKEN` environment variable to GitHub Actions jobs so you don't need to generate a new [OAuth or Personal Access Token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) for this specific purpose. The same token is also available from within the [`secrets` context](https://docs.github.com/en/actions/learn-github-actions/contexts#github-context).
 

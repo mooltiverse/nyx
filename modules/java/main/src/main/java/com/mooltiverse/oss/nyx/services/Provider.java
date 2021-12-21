@@ -15,7 +15,6 @@
  */
 package com.mooltiverse.oss.nyx.services;
 
-import com.mooltiverse.oss.nyx.services.git.Git;
 import com.mooltiverse.oss.nyx.services.github.GitHub;
 import com.mooltiverse.oss.nyx.services.gitlab.GitLab;
 
@@ -23,11 +22,6 @@ import com.mooltiverse.oss.nyx.services.gitlab.GitLab;
  * These are the constants representing the available service providers.
  */
 public enum Provider {
-    /**
-     * The generic Git service provider.
-     */
-    GIT(Git.class),
-
     /**
      * The <a href="https://github.com/">GitHub</a> service provider.
      */

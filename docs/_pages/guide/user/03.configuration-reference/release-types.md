@@ -17,7 +17,6 @@ You can have as many release types as you want. You can use [presets]({{ site.ba
 | ----------------------------------------------------------- | -------| ---------------------------------------------- | ------------------------------------------------ | -------------------------------------- | ---------------------------------------- |
 | [`releaseTypes/enabled`](#enabled)                          | list   | `--release-types-enabled=<NAMES>`              | `NYX_RELEASE_TYPES_ENABLED=<NAMES>`              | `releaseTypes/enabled`                 | [ ["`default`"](#default-release-type) ] |
 | [`releaseTypes/publicationServices`](#publication-services) | list   | `--release-types-publication-services=<NAMES>` | `NYX_RELEASE_TYPES_PUBLICATION_SERVICES=<NAMES>` | `releaseTypes/publicationServices`     | Empty                                    |
-| [`releaseTypes/remoteRepositories`](#remote-repositories)   | list   | `--release-types-remote-repositories=<NAMES>`  | `NYX_RELEASE_TYPES_REMOTE_REPOSITORIES=<NAMES>`  | `releaseTypes/remoteRepositories`      | Empty                                    |
 
 #### Enabled
 
@@ -54,25 +53,6 @@ Services listed here must support the `RELEASES` [feature]({{ site.baseurl }}{% 
 
 The order in which services are listed matters. If multiple publication services are defined, publication happens in the same order they are defined here. This might be useful if you're publishing to multiple services and one has dependencies on releases published to others.
 {: .notice--info}
-
-#### Remote repositories
-
-| ------------------------- | ---------------------------------------------------------------------------------------- |
-| Name                      | `releaseTypes/remoteRepositories`                                                        |
-| Type                      | list                                                                                     |
-| Default                   | Empty                                                                                    |
-| Command Line Option       | `--release-types-remote-repositories=<NAMES>`                                            |
-| Environment Variable      | `NYX_RELEASE_TYPES_REMOTE_REPOSITORIES=<NAMES>`                                          |
-| Configuration File Option | `releaseTypes/remoteRepositories`                                                        |
-| Related state attributes  |                                                                                          |
-
-The comma separated list of remote repository names names to be used to push changes when the matched release type has the [`gitPush`](#git-push) flag enabled. When the `gitPush` flag is disabled this option is ignored. The remotes listed here are the same for all release types but each release type can toggle publication on or off using the `gitPush` flag. Each name in the list must be a name of a configured remote (as you can get by running [`git remote`](https://git-scm.com/docs/git-remote)), but not all configured remotes must be used here.
-
-This is optional and you should only use it when you have multiple remotes configured and you want to filter them or you need to set up credentials for specific remotes.
-
-By default, when this option is not used, changes are pushed to the default `origin` remote without credentials, if configured on the Git repository. Otherwise changes are pushed only to those remotes listed here. When this option is provided, each remote listed here must be configured on the Git repository.
-
-The credentials used to push are configured in the [`services`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}) section. For each remote to push to, all the services supporting the `GIT_REMOTE` [feature]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}#service-features) are considered. If one service explicitly defines the remote, its credentials are used. If no explicit match is found that way, the service that doesn't define the remotes list is assumed to be used for all remotes not explicitly supported by others, so its credentials are used. If no suitable `GIT_REMOTE` service is found for the specific remote (or no `GIT_REMOTE` service is configured), push will be attempted with no credentials.
 
 ### Default release type
 
@@ -273,9 +253,7 @@ When `true` Nyx will push changes (including tags) to the remote repository upon
 
 Here you can define a [template]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}) that is [evaluated as a boolean]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}#type-conversions) at runtime to make this decision dynamic.
 
-When this flag is enabled changes are pushed to the default `origin` remote by default. If you have multiple remotes configured and you need to filter them, or your default remote is not named `origin`, you can use the [`remoteRepositories`](#remote-repositories) option for additional control.
-
-If authentication is required you can configure the credentials for specific remotes in the [`services`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}) section using services supporting the `GIT_REMOTE` [feature]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}#service-features). More on this [here](#remote-repositories).
+When this flag is enabled changes are pushed to the default `origin` remote by default.
 
 #### Git tag
 

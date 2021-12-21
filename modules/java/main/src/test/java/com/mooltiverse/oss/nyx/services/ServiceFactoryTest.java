@@ -48,46 +48,6 @@ public class ServiceFactoryTest {
     }
 
     @Nested
-    @DisplayName("ServiceFactory.gitLocalServiceInstance()")
-    class GitLocalServiceInstanceTests {
-        @ParameterizedTest(name = "ServiceFactory.gitLocalServiceInstance(''{0}'', Map<String,Object>).getClass() == ''{0}''.getServiceClass()")
-        @EnumSource(Provider.class)
-        void gitLocalServiceInstance(Provider provider)
-            throws Exception {
-            if (provider.equals(Provider.GIT))
-                assertEquals(provider.getServiceClass(), ServiceFactory.gitLocalServiceInstance(provider, Map.<String,String>of()).getClass());
-            else assertThrows(UnsupportedOperationException.class, () -> ServiceFactory.gitLocalServiceInstance(provider, Map.<String,String>of()));
-        }
-
-        @ParameterizedTest(name = "ServiceFactory.gitLocalServiceInstance(null, Map<String,Object>).getClass() throws NullPointerException")
-        @NullSource()
-        void exceptionUsingGitLocalServiceInstanceWithNullProvider(Provider provider)
-            throws Exception {
-            assertThrows(NullPointerException.class, () -> ServiceFactory.gitLocalServiceInstance(provider, Map.<String,String>of()));
-        }
-    }
-
-    @Nested
-    @DisplayName("ServiceFactory.gitRemoteServiceInstance()")
-    class GitRemoteServiceInstanceTests {
-        @ParameterizedTest(name = "ServiceFactory.gitRemoteServiceInstance(''{0}'', Map<String,Object>).getClass() == ''{0}''.getServiceClass()")
-        @EnumSource(Provider.class)
-        void gitRemoteServiceInstance(Provider provider)
-            throws Exception {
-            if (provider.equals(Provider.GIT) || provider.equals(Provider.GITHUB) || provider.equals(Provider.GITLAB))
-                assertEquals(provider.getServiceClass(), ServiceFactory.gitRemoteServiceInstance(provider, Map.<String,String>of()).getClass());
-            else assertThrows(UnsupportedOperationException.class, () -> ServiceFactory.gitRemoteServiceInstance(provider, Map.<String,String>of()));
-        }
-
-        @ParameterizedTest(name = "ServiceFactory.gitRemoteServiceInstance(null, Map<String,Object>).getClass() throws NullPointerException")
-        @NullSource()
-        void exceptionUsingGitRemoteServiceInstanceWithNullProvider(Provider provider)
-            throws Exception {
-            assertThrows(NullPointerException.class, () -> ServiceFactory.gitRemoteServiceInstance(provider, Map.<String,String>of()));
-        }
-    }
-
-    @Nested
     @DisplayName("ServiceFactory.instance()")
     class InstanceTests {
         @ParameterizedTest(name = "ServiceFactory.instance(''{0}'', Map<String,Object>).getClass() == ''{0}''.getServiceClass()")

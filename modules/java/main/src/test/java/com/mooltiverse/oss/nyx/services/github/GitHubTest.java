@@ -17,7 +17,6 @@ package com.mooltiverse.oss.nyx.services.github;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.DisplayName;
@@ -59,7 +58,7 @@ public class GitHubTest {
         @EnumSource(Service.Feature.class)
         public void supportAnyFeature(Service.Feature feature)
             throws Exception {
-            if (Service.Feature.GIT_HOSTING.equals(feature) || Service.Feature.GIT_REMOTE.equals(feature) || Service.Feature.RELEASES.equals(feature) || Service.Feature.USERS.equals(feature))
+            if (Service.Feature.GIT_HOSTING.equals(feature) || Service.Feature.RELEASES.equals(feature) || Service.Feature.USERS.equals(feature))
                 assertTrue(GitHub.instance(Map.<String,String>of()).supports(feature));
             else assertFalse(GitHub.instance(Map.<String,String>of()).supports(feature));
         }
@@ -117,51 +116,6 @@ public class GitHubTest {
     }
 
     @Nested
-    @DisplayName("Remote Service")
-    class RemoteServiceTest {
-        @Test
-        @DisplayName("GitHub.instance().getSupportedRemoteNames()")
-        public void getSupportedRemoteNames()
-            throws Exception {
-            GitHub gitHub = GitHub.instance(Map.<String,String>of(GitHub.REMOTES_OPTION_NAME, "one,two"));
-
-            assertNotNull(gitHub.getSupportedRemoteNames());
-            assertEquals(2, gitHub.getSupportedRemoteNames().size());
-            assertTrue(gitHub.getSupportedRemoteNames().containsAll(List.<String>of("one", "two")));
-        }
-
-        @Test
-        @DisplayName("GitHub.instance().getSupportedRemoteNames() with empty list")
-        public void getSupportedRemoteNamesWithEmptyList()
-            throws Exception {
-            GitHub gitHub = GitHub.instance(Map.<String,String>of());
-
-            assertNull(gitHub.getSupportedRemoteNames());
-        }
-
-        @Test
-        @DisplayName("GitHub.instance().getUserForRemote() and GitHub.instance().getPasswordForRemote()")
-        public void getUserForRemote()
-            throws Exception {
-            // the 'gitHubTestUserToken' system property is set by the build script, which in turn reads it from an environment variable
-            GitHub gitHub = GitHub.instance(Map.<String,String>of(GitHub.AUTHENTICATION_TOKEN_OPTION_NAME, System.getProperty("gitHubTestUserToken")));
-
-            assertEquals(System.getProperty("gitHubTestUserToken"), gitHub.getUser());
-            assertEquals("", gitHub.getPassword());
-        }
-
-        @Test
-        @DisplayName("GitHub.instance().getUserForRemote() and GitHub.instance().getPasswordForRemote() with no credentials")
-        public void getUserForRemoteWithNoCredentials()
-            throws Exception {
-            GitHub gitHub = GitHub.instance(Map.<String,String>of());
-
-            assertNull(gitHub.getUser());
-            assertNull(gitHub.getPassword());
-        }
-    }
-
-    @Nested
     @DisplayName("Release Service")
     class ReleaseServiceTest {
         @Test
@@ -179,8 +133,10 @@ public class GitHubTest {
             // if we clone too quickly next calls may fail
             Thread.sleep(2000);
 
-            Script script = Scenario.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED.applyOnClone(gitHubRepository.getHTTPURL(), gitHub.getUser(), gitHub.getPassword());
-            script.push(gitHub.getUser(), gitHub.getPassword());
+            // when a token for user and password authentication for plain Git operations against a GitHub repository,
+            // the user is the token and the password is the empty string
+            Script script = Scenario.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED.applyOnClone(gitHubRepository.getHTTPURL(), System.getProperty("gitHubTestUserToken"), "");
+            script.push(System.getProperty("gitHubTestUserToken"), "");
 
             // publish the release
             Release release = gitHub.publishRelease(user.getUserName(), gitHubRepository.getName(), "Release 1.0.0-alpha.1", "1.0.0-alpha.1", "A test description for the release\non multiple lines\nlike these");

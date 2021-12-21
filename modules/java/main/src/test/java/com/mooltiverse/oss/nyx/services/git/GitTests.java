@@ -21,17 +21,13 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
-import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
 
 import com.mooltiverse.oss.nyx.services.GitException;
-import com.mooltiverse.oss.nyx.services.Service;
 import com.mooltiverse.oss.nyx.services.git.util.RandomUtil;
 import com.mooltiverse.oss.nyx.services.github.GitHub;
 import com.mooltiverse.oss.nyx.services.github.GitHubRepository;
@@ -47,15 +43,9 @@ public class GitTests {
     @DisplayName("Instance")
     class InstanceTest {
         @Test
-        public void exceptionWithNullOptions()
-            throws Exception {
-            assertThrows(NullPointerException.class, () -> Git.instance(null));
-        }
-
-        @Test
         public void instanceWithEmptyOptions()
             throws Exception {
-            Git service = Git.instance(Map.<String,String>of());
+            Git service = Git.instance();
             assertNotNull(service);
         }
     }
@@ -335,63 +325,6 @@ public class GitTests {
         public void openStringTest()
             throws Exception {
             assertNotNull(Git.instance().open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory().getAbsolutePath()));
-        }
-    }
-
-    @Nested
-    @DisplayName("Remote Service")
-    class RemoteServiceTest {
-        @Test
-        @DisplayName("Git.instance().getSupportedRemoteNames()")
-        public void getSupportedRemoteNames()
-            throws Exception {
-            Git git = Git.instance(Map.<String,String>of(Git.REMOTES_OPTION_NAME, "one,two"));
-
-            assertNotNull(git.getSupportedRemoteNames());
-            assertEquals(2, git.getSupportedRemoteNames().size());
-            assertTrue(git.getSupportedRemoteNames().containsAll(List.<String>of("one", "two")));
-        }
-
-        @Test
-        @DisplayName("Git.instance().getSupportedRemoteNames() with empty list")
-        public void getSupportedRemoteNamesWithEmptyList()
-            throws Exception {
-            Git git = Git.instance(Map.<String,String>of());
-
-            assertNull(git.getSupportedRemoteNames());
-        }
-
-        @Test
-        @DisplayName("Git.instance().getUserForRemote() and Git.instance().getPasswordForRemote()")
-        public void getUserForRemote()
-            throws Exception {
-            Git gitHub = Git.instance(Map.<String,String>of(Git.USER_OPTION_NAME, "jdoe", Git.PASSWORD_OPTION_NAME, "pwd"));
-
-            assertEquals("jdoe", gitHub.getUser());
-            assertEquals("pwd", gitHub.getPassword());
-        }
-
-        @Test
-        @DisplayName("Git.instance().getUserForRemote() and Git.instance().getPasswordForRemote() with no credentials")
-        public void getUserForRemoteWithNoCredentials()
-            throws Exception {
-            Git git = Git.instance(Map.<String,String>of());
-
-            assertNull(git.getUser());
-            assertNull(git.getPassword());
-        }
-    }
-
-    @Nested
-    @DisplayName("Supports")
-    class SupportsTest {
-        @ParameterizedTest(name = "Git.instance().supports(''{0}'') == true")
-        @EnumSource(Service.Feature.class)
-        public void supportAnyFeature(Service.Feature feature)
-            throws Exception {
-            if (Service.Feature.GIT_LOCAL.equals(feature) || Service.Feature.GIT_REMOTE.equals(feature))
-                assertTrue(Git.instance(Map.<String,String>of()).supports(feature));
-            else assertFalse(Git.instance(Map.<String,String>of()).supports(feature));
         }
     }
 }
