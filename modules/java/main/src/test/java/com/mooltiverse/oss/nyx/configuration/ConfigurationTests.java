@@ -33,6 +33,8 @@ import com.mooltiverse.oss.nyx.configuration.presets.Extended;
 import com.mooltiverse.oss.nyx.configuration.presets.Simple;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
+import com.mooltiverse.oss.nyx.entities.GitConfiguration;
+import com.mooltiverse.oss.nyx.entities.GitRemoteConfiguration;
 import com.mooltiverse.oss.nyx.entities.Identifier;
 import com.mooltiverse.oss.nyx.entities.ReleaseType;
 import com.mooltiverse.oss.nyx.entities.ReleaseTypes;
@@ -97,6 +99,13 @@ public class ConfigurationTests {
         void getDryRunTest()
             throws Exception {
             assertEquals(Defaults.DRY_RUN, new Configuration().getDryRun());
+        }
+
+        @Test
+        @DisplayName("Configuration.getGit() == Defaults.GIT")
+        void getGitTest()
+            throws Exception {
+            assertTrue(new Configuration().getGit().getRemotes().isEmpty());
         }
 
         @Test
@@ -322,6 +331,40 @@ public class ConfigurationTests {
 
             // now remove the command line configuration and test that now default values are returned again
             assertEquals(Defaults.DRY_RUN, configuration.withCommandLineConfiguration(null).getDryRun());
+        }
+
+        @Test
+        @DisplayName("Configuration.withCommandLineConfiguration(MOCK).getGit() == MOCK.getGit()")
+        void getGitTest()
+            throws Exception {
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            Configuration configuration = new Configuration();
+            configurationLayerMock.setGit(
+                new GitConfiguration(
+                    Map.<String,GitRemoteConfiguration>of("origin", new GitRemoteConfiguration("jdoe", "pwd"))
+                )
+            );
+
+            // in order to make the test meaningful, make sure the default and mock values are different
+            assertNotNull(Defaults.GIT);
+            assertNotNull(configurationLayerMock.getGit());
+            assertNotSame(configuration.getGit(), configurationLayerMock.getGit());
+
+            // make sure the initial values come from defaults, until we inject the command line configuration
+            assertTrue(Defaults.GIT.getRemotes().isEmpty());
+            assertTrue(configuration.getGit().getRemotes().isEmpty());
+            
+            // inject the command line configuration and test the new value is returned from that
+            configuration.withCommandLineConfiguration(configurationLayerMock);
+
+            assertNotNull(configuration.getGit().getRemotes());
+            assertEquals(1, configuration.getGit().getRemotes().size());
+            assertEquals("pwd", configuration.getGit().getRemotes().get("origin").getPassword());
+            assertEquals("jdoe", configuration.getGit().getRemotes().get("origin").getUser());
+
+            // now remove the command line configuration and test that now default values are returned again
+            configuration.withCommandLineConfiguration(null);
+            assertTrue(configuration.getGit().getRemotes().isEmpty());
         }
 
         @Test
@@ -811,6 +854,40 @@ public class ConfigurationTests {
         }
 
         @Test
+        @DisplayName("Configuration.withPluginConfiguration(MOCK).getGit() == MOCK.getGit()")
+        void getGitTest()
+            throws Exception {
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            Configuration configuration = new Configuration();
+            configurationLayerMock.setGit(
+                new GitConfiguration(
+                    Map.<String,GitRemoteConfiguration>of("origin", new GitRemoteConfiguration("jdoe", "pwd"))
+                )
+            );
+
+            // in order to make the test meaningful, make sure the default and mock values are different
+            assertNotNull(Defaults.GIT);
+            assertNotNull(configurationLayerMock.getGit());
+            assertNotSame(configuration.getGit(), configurationLayerMock.getGit());
+
+            // make sure the initial values come from defaults, until we inject the command line configuration
+            assertTrue(Defaults.GIT.getRemotes().isEmpty());
+            assertTrue(configuration.getGit().getRemotes().isEmpty());
+            
+            // inject the command line configuration and test the new value is returned from that
+            configuration.withPluginConfiguration(configurationLayerMock);
+
+            assertNotNull(configuration.getGit().getRemotes());
+            assertEquals(1, configuration.getGit().getRemotes().size());
+            assertEquals("pwd", configuration.getGit().getRemotes().get("origin").getPassword());
+            assertEquals("jdoe", configuration.getGit().getRemotes().get("origin").getUser());
+
+            // now remove the command line configuration and test that now default values are returned again
+            configuration.withPluginConfiguration(null);
+            assertTrue(configuration.getGit().getRemotes().isEmpty());
+        }
+
+        @Test
         @DisplayName("Configuration.withPluginConfiguration(MOCK).getInitialVersion() == MOCK.getInitialVersion()")
         void getInitialVersionTest()
             throws Exception {
@@ -1297,6 +1374,40 @@ public class ConfigurationTests {
         }
 
         @Test
+        @DisplayName("Configuration.withRuntimeConfiguration(MOCK).getGit() == MOCK.getGit()")
+        void getGitTest()
+            throws Exception {
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            Configuration configuration = new Configuration();
+            configurationLayerMock.setGit(
+                new GitConfiguration(
+                    Map.<String,GitRemoteConfiguration>of("origin", new GitRemoteConfiguration("jdoe", "pwd"))
+                )
+            );
+
+            // in order to make the test meaningful, make sure the default and mock values are different
+            assertNotNull(Defaults.GIT);
+            assertNotNull(configurationLayerMock.getGit());
+            assertNotSame(configuration.getGit(), configurationLayerMock.getGit());
+
+            // make sure the initial values come from defaults, until we inject the command line configuration
+            assertTrue(Defaults.GIT.getRemotes().isEmpty());
+            assertTrue(configuration.getGit().getRemotes().isEmpty());
+            
+            // inject the command line configuration and test the new value is returned from that
+            configuration.withRuntimeConfiguration(configurationLayerMock);
+
+            assertNotNull(configuration.getGit().getRemotes());
+            assertEquals(1, configuration.getGit().getRemotes().size());
+            assertEquals("pwd", configuration.getGit().getRemotes().get("origin").getPassword());
+            assertEquals("jdoe", configuration.getGit().getRemotes().get("origin").getUser());
+
+            // now remove the command line configuration and test that now default values are returned again
+            configuration.withRuntimeConfiguration(null);
+            assertTrue(configuration.getGit().getRemotes().isEmpty());
+        }
+
+        @Test
         @DisplayName("Configuration.withRuntimeConfiguration(MOCK).getInitialVersion() == MOCK.getInitialVersion()")
         void getInitialVersionTest()
             throws Exception {
@@ -1767,6 +1878,45 @@ public class ConfigurationTests {
             configuration.withCommandLineConfiguration(mediumPriorityConfigurationLayerMock);
             configuration.withRuntimeConfiguration(highPriorityConfigurationLayerMock);
             assertEquals(highPriorityConfigurationLayerMock.getDryRun(), configuration.getDryRun());
+        }
+
+        @Test
+        @DisplayName("Configuration[multiple layers].getGit() == MOCK.getGit()")
+        void getGitTest()
+            throws Exception {
+            SimpleConfigurationLayer lowPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
+            SimpleConfigurationLayer mediumPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
+            SimpleConfigurationLayer highPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
+            Configuration configuration = new Configuration();
+            lowPriorityConfigurationLayerMock.setGit(
+                new GitConfiguration(
+                    Map.<String,GitRemoteConfiguration>of("origin", new GitRemoteConfiguration("jdoe1", "pwd1"), "replica", new GitRemoteConfiguration("stiger1", "sec1"))
+                )
+            );
+            mediumPriorityConfigurationLayerMock.setGit(
+                new GitConfiguration(
+                    Map.<String,GitRemoteConfiguration>of("origin", new GitRemoteConfiguration("jdoe2", "pwd2"), "clone", new GitRemoteConfiguration("stiger2", "sec2"))
+                )
+            );
+            highPriorityConfigurationLayerMock.setGit(
+                new GitConfiguration(
+                    Map.<String,GitRemoteConfiguration>of("origin", new GitRemoteConfiguration("jdoe3", "pwd3"))
+                )
+            );
+            
+            // inject the command line configuration and test the new value is returned from that
+            configuration.withPluginConfiguration(lowPriorityConfigurationLayerMock);
+            configuration.withCommandLineConfiguration(mediumPriorityConfigurationLayerMock);
+            configuration.withRuntimeConfiguration(highPriorityConfigurationLayerMock);
+
+            assertNotNull(configuration.getGit().getRemotes());
+            assertEquals(3, configuration.getGit().getRemotes().size());
+            assertEquals("pwd3", configuration.getGit().getRemotes().get("origin").getPassword());
+            assertEquals("jdoe3", configuration.getGit().getRemotes().get("origin").getUser());
+            assertEquals("sec1", configuration.getGit().getRemotes().get("replica").getPassword());
+            assertEquals("stiger1", configuration.getGit().getRemotes().get("replica").getUser());
+            assertEquals("sec2", configuration.getGit().getRemotes().get("clone").getPassword());
+            assertEquals("stiger2", configuration.getGit().getRemotes().get("clone").getUser());
         }
 
         @Test

@@ -73,6 +73,12 @@ public class ConfigurationFileTests {
             assertEquals(source.getCommitMessageConventions().getItems().get(item).getExpression(), target.getCommitMessageConventions().getItems().get(item).getExpression());
             assertEquals(source.getCommitMessageConventions().getItems().get(item).getBumpExpressions(), target.getCommitMessageConventions().getItems().get(item).getBumpExpressions());
         }
+
+        assertEquals(source.getGit().getRemotes().keySet(), target.getGit().getRemotes().keySet());
+        for (String item: source.getGit().getRemotes().keySet()) {
+            assertEquals(source.getGit().getRemotes().get(item).getPassword(), target.getGit().getRemotes().get(item).getPassword());
+            assertEquals(source.getGit().getRemotes().get(item).getUser(), target.getGit().getRemotes().get(item).getUser());
+        }
         
         assertEquals(Objects.isNull(source.getReleaseTypes().getEnabled()) ? Defaults.RELEASE_TYPES.getEnabled() : source.getReleaseTypes().getEnabled(), target.getReleaseTypes().getEnabled());
         assertEquals(Objects.isNull(source.getReleaseTypes().getPublicationServices()) ? Defaults.RELEASE_TYPES.getPublicationServices() : source.getReleaseTypes().getPublicationServices(), target.getReleaseTypes().getPublicationServices());
@@ -170,6 +176,12 @@ public class ConfigurationFileTests {
         for (String item: source.getCommitMessageConventions().getItems().keySet()) {
             assertEquals(source.getCommitMessageConventions().getItems().get(item).getExpression(), target.getCommitMessageConventions().getItems().get(item).getExpression());
             assertEquals(source.getCommitMessageConventions().getItems().get(item).getBumpExpressions(), target.getCommitMessageConventions().getItems().get(item).getBumpExpressions());
+        }
+
+        assertEquals(source.getGit().getRemotes().keySet(), target.getGit().getRemotes().keySet());
+        for (String item: source.getGit().getRemotes().keySet()) {
+            assertEquals(source.getGit().getRemotes().get(item).getPassword(), target.getGit().getRemotes().get(item).getPassword());
+            assertEquals(source.getGit().getRemotes().get(item).getUser(), target.getGit().getRemotes().get(item).getUser());
         }
         
         assertEquals(Objects.isNull(source.getReleaseTypes().getEnabled()) ? Defaults.RELEASE_TYPES.getEnabled() : source.getReleaseTypes().getEnabled(), target.getReleaseTypes().getEnabled());

@@ -14,6 +14,18 @@ nyx {
   }
   configurationFile = '.nyx.json'
   dryRun = false
+  git {
+    remotes {
+      origin {
+        user = 'jdoe'
+        password = 'somepassword'
+      }
+      replica {
+        user = 'stiger'
+        password = 'somesecret'
+      }
+    }
+  }
   initialVersion = '1.0.0'
   preset = 'extended'
   releaseLenient = true

@@ -18,6 +18,7 @@ package com.mooltiverse.oss.nyx.configuration;
 import java.util.Map;
 
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
+import com.mooltiverse.oss.nyx.entities.GitConfiguration;
 import com.mooltiverse.oss.nyx.entities.IllegalPropertyException;
 import com.mooltiverse.oss.nyx.entities.ReleaseTypes;
 import com.mooltiverse.oss.nyx.entities.ServiceConfiguration;
@@ -50,6 +51,17 @@ public interface ConfigurationRoot {
      * @throws IllegalPropertyException in case the option has been defined but has incorrect values or it can't be resolved.
      */
     public CommitMessageConventions getCommitMessageConventions()
+        throws DataAccessException, IllegalPropertyException;
+
+    /**
+     * Returns the Git configuration section.
+     * 
+     * @return the Git configuration section. Never {@code null}.
+     * 
+     * @throws DataAccessException in case the option cannot be read or accessed.
+     * @throws IllegalPropertyException in case the option has been defined but has incorrect values or it can't be resolved.
+     */
+    public GitConfiguration getGit()
         throws DataAccessException, IllegalPropertyException;
 
     /**

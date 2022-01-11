@@ -30,6 +30,7 @@ import com.mooltiverse.oss.nyx.configuration.Defaults;
 import com.mooltiverse.oss.nyx.configuration.SimpleConfigurationLayer;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
+import com.mooltiverse.oss.nyx.entities.GitRemoteConfiguration;
 import com.mooltiverse.oss.nyx.entities.ReleaseType;
 import com.mooltiverse.oss.nyx.entities.ReleaseTypes;
 import com.mooltiverse.oss.nyx.entities.ServiceConfiguration;
@@ -70,6 +71,10 @@ public class MarkTests {
             configurationLayerMock.setServices(Map.<String,ServiceConfiguration>of(
                     "github", new ServiceConfiguration(Provider.GITHUB, Map.<String,String>of(GitHub.AUTHENTICATION_TOKEN_OPTION_NAME, System.getProperty("gitHubTestUserToken")))
                 )
+            );
+            // set up the Git remote credentials
+            configurationLayerMock.getGit().setRemotes(Map.<String,GitRemoteConfiguration>of(
+                "origin", new GitRemoteConfiguration(System.getProperty("gitHubTestUserToken"), ""))
             );
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
             configurationLayerMock.setCommitMessageConventions(
@@ -178,6 +183,10 @@ public class MarkTests {
             configurationLayerMock.setServices(Map.<String,ServiceConfiguration>of(
                     "gitlab", new ServiceConfiguration(Provider.GITLAB, Map.<String,String>of(GitLab.AUTHENTICATION_TOKEN_OPTION_NAME, System.getProperty("gitLabTestUserToken")))
                 )
+            );
+            // set up the Git remote credentials
+            configurationLayerMock.getGit().setRemotes(Map.<String,GitRemoteConfiguration>of(
+                "origin", new GitRemoteConfiguration("PRIVATE-TOKEN", System.getProperty("gitLabTestUserToken")))
             );
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
             configurationLayerMock.setCommitMessageConventions(

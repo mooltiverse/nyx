@@ -13,6 +13,14 @@ nyx {
     }
   }
   dryRun = false
+  git {
+    remotes {
+      origin {
+        user = 'jdoe'
+        password = 'somepassword'
+      }
+    }
+  }
   initialVersion = '0.1.0'
   releaseLenient = true
   releasePrefix = 'v'

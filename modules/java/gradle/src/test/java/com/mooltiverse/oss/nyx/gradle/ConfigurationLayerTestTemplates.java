@@ -112,6 +112,20 @@ public class ConfigurationLayerTestTemplates {
         }
 
         @TestTemplate
+        @DisplayName("ConfigurationLayer.getGit() default value")
+        @Baseline(Scenario.FROM_SCRATCH)
+        void getGitDefaultTest(Project project)
+            throws Exception {
+            NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
+            ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
+
+            assertNotNull(extension.getGit());
+            assertNotNull(configurationLayer.getGit());
+            //assertTrue(extension.getGit().getRemotes().isPresent());
+            assertTrue(configurationLayer.getGit().getRemotes().isEmpty());
+        }
+
+        @TestTemplate
         @DisplayName("ConfigurationLayer.getInitialVersion() default value")
         @Baseline(Scenario.FROM_SCRATCH)
         void getInitialVersionTest(Project project)
@@ -305,6 +319,18 @@ public class ConfigurationLayerTestTemplates {
 
             // no idea of how to test wrong values here
             // since the property is already modelled as a boolean, Gradle provides the validation for this
+        }*/
+
+        /* This test is commented because it has nothing to test
+        @TestTemplate
+        @DisplayName("ConfigurationLayer.getGit().set() throws IllegalPropertyException with illegal value")
+        @Baseline(Scenario.FROM_SCRATCH)
+        void exceptionUsingGetGitWithWrongValueTest(Project project)
+            throws Exception {
+            NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
+            ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
+
+            // no idea of how to test wrong values here
         }*/
 
         /*@TestTemplate

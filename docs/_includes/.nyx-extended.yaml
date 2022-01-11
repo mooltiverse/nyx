@@ -11,6 +11,14 @@ commitMessageConventions:
         patch: "(?s)(?m)^fix(?!!|.*^(BREAKING( |-)CHANGE: )).*"
 configurationFile: ".nyx.yaml"
 dryRun: false
+git:
+  remotes:
+    origin:
+      user: jdoe
+      password: somepassword
+    replica:
+      user: stiger
+      password: somesecret
 initialVersion: "1.0.0"
 preset: "extended"
 releaseLenient: true

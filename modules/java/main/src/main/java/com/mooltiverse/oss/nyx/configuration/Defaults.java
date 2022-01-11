@@ -21,6 +21,8 @@ import java.util.Map;
 import com.mooltiverse.oss.nyx.version.Versions;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
+import com.mooltiverse.oss.nyx.entities.GitConfiguration;
+import com.mooltiverse.oss.nyx.entities.GitRemoteConfiguration;
 import com.mooltiverse.oss.nyx.entities.Identifier;
 import com.mooltiverse.oss.nyx.entities.ReleaseTypes;
 import com.mooltiverse.oss.nyx.entities.ServiceConfiguration;
@@ -57,6 +59,11 @@ public interface Defaults {
      * The default flag that prevents to alter any repository state and instead just log the actions that would be taken. Value: {@code false}
      */
     public static final Boolean DRY_RUN = Boolean.FALSE;
+
+    /**
+     * The default Git configuration block.
+     */
+    public static final GitConfiguration GIT = new GitConfiguration(Map.<String,GitRemoteConfiguration>of());
 
     /**
      * The default initial version to use. Value: {@link Scheme#SEMVER}

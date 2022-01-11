@@ -30,6 +30,7 @@ import com.mooltiverse.oss.nyx.configuration.Defaults;
 import com.mooltiverse.oss.nyx.configuration.SimpleConfigurationLayer;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
+import com.mooltiverse.oss.nyx.entities.GitRemoteConfiguration;
 import com.mooltiverse.oss.nyx.entities.ReleaseType;
 import com.mooltiverse.oss.nyx.entities.ReleaseTypes;
 import com.mooltiverse.oss.nyx.entities.ServiceConfiguration;
@@ -83,6 +84,10 @@ public class PublishTests {
                     GitHub.REPOSITORY_OWNER_OPTION_NAME, user.getUserName()
                 ))
             ));
+            // set up the Git remote credentials
+            configurationLayerMock.getGit().setRemotes(Map.<String,GitRemoteConfiguration>of(
+                "origin", new GitRemoteConfiguration(System.getProperty("gitHubTestUserToken"), ""))
+            );
             // add a custom release type that always enables committing, tagging and pushing
             // and all the publishing service enabled
             configurationLayerMock.setReleaseTypes(
@@ -199,6 +204,10 @@ public class PublishTests {
                     GitLab.REPOSITORY_OWNER_OPTION_NAME, user.getUserName()
                 ))
             ));
+            // set up the Git remote credentials
+            configurationLayerMock.getGit().setRemotes(Map.<String,GitRemoteConfiguration>of(
+                "origin", new GitRemoteConfiguration("PRIVATE-TOKEN", System.getProperty("gitLabTestUserToken")))
+            );
             // add a custom release type that always enables committing, tagging and pushing
             // and all the publishing service enabled
             configurationLayerMock.setReleaseTypes(

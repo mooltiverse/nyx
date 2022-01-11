@@ -33,6 +33,8 @@ import com.mooltiverse.oss.nyx.Nyx;
 import com.mooltiverse.oss.nyx.configuration.presets.Presets;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
+import com.mooltiverse.oss.nyx.entities.GitConfiguration;
+import com.mooltiverse.oss.nyx.entities.GitRemoteConfiguration;
 import com.mooltiverse.oss.nyx.entities.IllegalPropertyException;
 import com.mooltiverse.oss.nyx.entities.ReleaseType;
 import com.mooltiverse.oss.nyx.entities.ReleaseTypes;
@@ -66,6 +68,11 @@ public class Configuration implements ConfigurationRoot {
      * The private instance of the commit message convention configuration section.
      */
     private CommitMessageConventions commitMessageConventionsSection = null;
+
+    /**
+     * The private instance of the Git configuration section.
+     */
+    private GitConfiguration gitSection = null;
 
     /**
      * The private instance of the release types configuration section.
@@ -174,6 +181,7 @@ public class Configuration implements ConfigurationRoot {
     private synchronized void resetCache() {
         logger.trace(CONFIGURATION, "Clearing the configuration cache");
         commitMessageConventionsSection = null;
+        gitSection = null;
         releaseTypesSection = null;
         servicesSection = null;
     }
@@ -438,6 +446,31 @@ public class Configuration implements ConfigurationRoot {
             }
         }
         return DefaultLayer.getInstance().getDryRun();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public GitConfiguration getGit()
+        throws DataAccessException, IllegalPropertyException {
+        logger.trace(CONFIGURATION, "Retrieving the Git configuration");
+        if (Objects.isNull(gitSection)) {
+            // parse the 'remotes' map
+            Map<String,GitRemoteConfiguration> remotes = new HashMap<String,GitRemoteConfiguration>();
+            for (ConfigurationLayer layer: layers.values()) {
+                for (String remoteName: layer.getGit().getRemotes().keySet()) {
+                    GitRemoteConfiguration remote = layer.getGit().getRemotes().get(remoteName);
+                    if (!Objects.isNull(remote) && !remotes.containsKey(remoteName)) {
+                        remotes.put(remoteName, remote);
+                        logger.trace(CONFIGURATION, "The '{}.{}[{}]' configuration option has been resolved", "git", "remotes", remoteName);
+                    }
+                }
+            }
+            
+            gitSection = new GitConfiguration(remotes);
+        }
+        return gitSection;
     }
 
     /**

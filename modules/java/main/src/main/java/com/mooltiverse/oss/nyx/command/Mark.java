@@ -176,52 +176,26 @@ public class Mark extends AbstractCommand {
             for (String remote: remotes) {
                 logger.debug(COMMAND, "Pushing local changes to remote '{}'", remote);
 
-                // Now we need to find the credentials by going through all the configured services and finding
-                // the one that supports the target remote. If no one can be found we can fall back to a service that
-                // doesn't specify any remotes filter, meaning it can be used for all remotes not specifically matched
-                // by other services.
-                logger.debug(COMMAND, "Looking up credentials for remote '{}' among configured services", remote);
+                // Now we need to find the credentials by going through all the configured remotes and finding
+                // the one that supports the target remote.
+                logger.debug(COMMAND, "Looking up credentials for remote '{}'", remote);
                 String user = null;
                 String password = null;
-                if (!Objects.isNull(state().getConfiguration().getServices())) {
-                    for (String serviceConfigurationName: state().getConfiguration().getServices().keySet()) {
-                        logger.debug(COMMAND, "Looking up credentials for remote '{}': checking configured service '{}'", remote, serviceConfigurationName);
-
-                        /*
-                        TODO: implement this method
-
-                        GitRemoteService gitRemoteService = null;
-                        try {
-                            gitRemoteService = resolveGitRemoteService(serviceConfigurationName);
-                            logger.debug(COMMAND, "Service '{}' supports the Git remotes feature. Evaluating its remotes filter.", serviceConfigurationName);
-                        }
-                        catch (UnsupportedOperationException uoe) {
-                            logger.debug(COMMAND, "Service '{}' does not support the Git remotes feature. Skipping.", serviceConfigurationName);
-                        }
-
-                        if (Objects.isNull(gitRemoteService.getSupportedRemoteNames()) || gitRemoteService.getSupportedRemoteNames().isEmpty()) {
-                            // loose match
-                            logger.debug(COMMAND, "Service '{}' does not define any remotes filter so it loosely matches remote '{}' and its credentials will be used unless an exact match is found among remaining services.", serviceConfigurationName, remote);
-                            user = gitRemoteService.getUser();
-                            password = gitRemoteService.getPassword();
-                        }
-                        else if (gitRemoteService.getSupportedRemoteNames().contains(remote)) {
-                            // exact match
-                            logger.debug(COMMAND, "Service '{}' defines a remotes filter '{}' which explicitly matches remote '{}' so its credentials will be used.", serviceConfigurationName, String.join(",", gitRemoteService.getSupportedRemoteNames()), remote);
-                            user = gitRemoteService.getUser();
-                            password = gitRemoteService.getPassword();
-                            break;
-                        }
-                        else {
-                            // negative match
-                            logger.debug(COMMAND, "Service '{}' defines a remotes filter '{}' which doesn't match remote '{}' so its skipped.", serviceConfigurationName, String.join(",", gitRemoteService.getSupportedRemoteNames()), remote);
-                        }
-                        */
+                if (Objects.isNull(state().getConfiguration().getGit()) || Objects.isNull(state().getConfiguration().getGit().getRemotes())) 
+                    logger.debug(COMMAND, "No Git remote repository has been configured");
+                else {
+                    if (state().getConfiguration().getGit().getRemotes().containsKey(remote)) {
+                        logger.debug(COMMAND, "Using configured credentials for remote '{}'", remote);
+                        user = renderTemplate(state().getConfiguration().getGit().getRemotes().get(remote).getUser());
+                        password = renderTemplate(state().getConfiguration().getGit().getRemotes().get(remote).getPassword());
+                    }
+                    else {
+                        logger.debug(COMMAND, "No configuration available for remote '{}'", remote);
                     }
                 }
 
                 if (Objects.isNull(user) && Objects.isNull(password))
-                    logger.debug(COMMAND, "No service was configured to provide credentials for remote '{}'. Attempting anonymous push.", remote);
+                    logger.debug(COMMAND, "No credentials were configured for remote '{}'. Attempting anonymous push.", remote);
 
                 // finally push
                 repository().push(remote, user, password);

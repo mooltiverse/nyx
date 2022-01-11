@@ -128,6 +128,37 @@ public class EnvironmentConfigurationLayerTests {
     }
 
     @Test
+    @DisplayName("EnvironmentConfigurationLayer.getGit()")
+    void getGitTest()
+        throws Exception {
+        EnvironmentConfigurationLayerMock environmentConfigurationLayer = EnvironmentConfigurationLayerMock.getInstance();
+        assertNotNull(environmentConfigurationLayer.getGit());
+        assertTrue(environmentConfigurationLayer.getGit().getRemotes().isEmpty());
+
+        // get a new instance or a stale object is returned by getGit()
+        environmentConfigurationLayer = EnvironmentConfigurationLayerMock.getInstance();
+        environmentConfigurationLayer.environment.put("NYX_GIT_REMOTES_one_USER", "jdoe");
+        environmentConfigurationLayer.environment.put("NYX_GIT_REMOTES_two_USER", "stiger");
+
+        assertEquals(2, environmentConfigurationLayer.getGit().getRemotes().size());
+        assertNotNull(environmentConfigurationLayer.getGit().getRemotes().get("one"));
+        assertNotNull(environmentConfigurationLayer.getGit().getRemotes().get("two"));
+
+        // get a new instance or a stale object is returned by getGit()
+        environmentConfigurationLayer = EnvironmentConfigurationLayerMock.getInstance();
+        environmentConfigurationLayer.environment.put("NYX_GIT_REMOTES_one_USER", "jdoe");
+        environmentConfigurationLayer.environment.put("NYX_GIT_REMOTES_one_PASSWORD", "pwd");
+        environmentConfigurationLayer.environment.put("NYX_GIT_REMOTES_two_USER", "stiger");
+        environmentConfigurationLayer.environment.put("NYX_GIT_REMOTES_two_PASSWORD", "sct");
+
+        assertEquals(2, environmentConfigurationLayer.getGit().getRemotes().size());
+        assertEquals("pwd", environmentConfigurationLayer.getGit().getRemotes().get("one").getPassword());
+        assertEquals("jdoe", environmentConfigurationLayer.getGit().getRemotes().get("one").getUser());
+        assertEquals("sct", environmentConfigurationLayer.getGit().getRemotes().get("two").getPassword());
+        assertEquals("stiger", environmentConfigurationLayer.getGit().getRemotes().get("two").getUser());
+    }
+
+    @Test
     @DisplayName("EnvironmentConfigurationLayer.getInitialVersion()")
     void getInitialVersionTest()
         throws Exception {

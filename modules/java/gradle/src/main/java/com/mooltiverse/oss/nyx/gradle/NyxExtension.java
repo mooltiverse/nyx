@@ -135,6 +135,11 @@ public abstract class NyxExtension {
     private final Property<Boolean> dryRun = getObjectfactory().property(Boolean.class);
 
     /**
+     * The nested 'git' block.
+     */
+    private final GitConfiguration git = getObjectfactory().newInstance(GitConfiguration.class);
+
+    /**
      * The 'initialVersion' property.
      */
     private final Property<String> initialVersion = getObjectfactory().property(String.class);
@@ -311,6 +316,29 @@ public abstract class NyxExtension {
      */
     public Property<Boolean> getDryRun() {
         return dryRun;
+    }
+
+    /**
+     * Returns the object mapping the {@code git} block.
+     * 
+     * We provide an implementation of this method instead of using the abstract definition as it's
+     * safer for old Gradle versions we support.
+     * 
+     * @return the object mapping the {@code git} block
+     */
+    public GitConfiguration getGit() {
+        return git;
+    }
+
+    /**
+     * Accepts the DSL configuration for the {@code git} block, needed for defining
+     * the block using the curly braces syntax in Gradle build scripts.
+     * See the documentation on top of this class for more.
+     * 
+     * @param configurationAction the configuration action for the {@code git} block
+     */
+    public void git(Action<? super GitConfiguration> configurationAction) {
+        configurationAction.execute(git);
     }
 
     /**
@@ -635,6 +663,135 @@ public abstract class NyxExtension {
              */
             public void bumpExpressions(Action<? super MapProperty<String,String>> configurationAction) {
                 configurationAction.execute(bumpExpressions);
+            }
+        }
+    }
+
+    /**
+     * The class to model the 'git' block within the extension.
+     */
+    public abstract static class GitConfiguration {
+        /**
+         * The nested 'remotes' block.
+         * 
+         * @see GitRemoteConfiguration
+         */
+        private NamedDomainObjectContainer<GitRemoteConfiguration> remotes = getObjectfactory().domainObjectContainer(GitRemoteConfiguration.class);
+
+        /**
+         * Returns an object factory instance.
+         * 
+         * The instance is injected by Gradle as soon as this getter method is invoked.
+         * 
+         * Using <a href="https://docs.gradle.org/current/userguide/custom_gradle_types.html#property_injection">property injection</a>
+         * instead of <a href="https://docs.gradle.org/current/userguide/custom_gradle_types.html#constructor_injection">constructor injection</a>
+         * has a few advantages: it allows Gradle to refer injecting the object until it's required and is safer for backward
+         * compatibility (older versions can be supported).
+         * 
+         * @return the object factory instance
+         */
+        @Inject
+        protected abstract ObjectFactory getObjectfactory();
+
+        /**
+         * Returns the map of remotes.
+         * 
+         * @return the map of remotes.
+         */
+        public NamedDomainObjectContainer<GitRemoteConfiguration> getRemotes() {
+            return remotes;
+        }
+
+        /**
+         * Accepts the DSL configuration for the {@code remotes} block, needed for defining
+         * the block using the curly braces syntax in Gradle build scripts.
+         * See the documentation on top of this class for more.
+         * 
+         * @param configurationAction the configuration action for the {@code items} block
+         */
+        public void remotes(Action<? super NamedDomainObjectContainer<GitRemoteConfiguration>> configurationAction) {
+            configurationAction.execute(remotes);
+        }
+
+        /**
+         * The class to model a single 'remotes' item within the extension.
+         */
+        public abstract static class GitRemoteConfiguration {
+            /**
+             * The remote name.
+             */
+            private final String name;
+
+            /**
+             * The remote password property.
+             */
+            private final Property<String> password = getObjectfactory().property(String.class);
+
+            /**
+             * The remote user property.
+             */
+            private final Property<String> user = getObjectfactory().property(String.class);
+
+            /**
+             * Returns an object factory instance.
+             * 
+             * The instance is injected by Gradle as soon as this getter method is invoked.
+             * 
+             * Using <a href="https://docs.gradle.org/current/userguide/custom_gradle_types.html#property_injection">property injection</a>
+             * instead of <a href="https://docs.gradle.org/current/userguide/custom_gradle_types.html#constructor_injection">constructor injection</a>
+             * has a few advantages: it allows Gradle to refer injecting the object until it's required and is safer for backward
+             * compatibility (older versions can be supported).
+             * 
+             * @return the object factory instance
+             */
+            @Inject
+            protected abstract ObjectFactory getObjectfactory();
+
+            /**
+             * Constructor.
+             * 
+             * This constructor is required as per the {@link NamedDomainObjectContainer} specification.
+             * 
+             * @param name the remote name
+             */
+            public GitRemoteConfiguration(String name) {
+                super();
+                this.name = name;
+            }
+
+            /**
+             * Returns the name read-only mandatory property.
+             * 
+             * @return the name read-only mandatory property.
+             */
+            public String getName() {
+                return name;
+            }
+
+            /**
+             * Returns the remote password. When this is set by the user it overrides
+             * the inference performed by Nyx.
+             * 
+             * We provide an implementation of this method instead of using the abstract definition as it's
+             * safer for old Gradle versions we support.
+             * 
+             * @return the remote password
+             */
+            public Property<String> getPassword() {
+                return password;
+            }
+
+            /**
+             * Returns the remote user. When this is set by the user it overrides
+             * the inference performed by Nyx.
+             * 
+             * We provide an implementation of this method instead of using the abstract definition as it's
+             * safer for old Gradle versions we support.
+             * 
+             * @return the remote user
+             */
+            public Property<String> getUser() {
+                return user;
             }
         }
     }

@@ -104,6 +104,19 @@ public class NyxExtensionTestTemplates {
         }
 
         @TestTemplate
+        @DisplayName("NyxExtension.getGit() default value")
+        @Baseline(Scenario.FROM_SCRATCH)
+        void getGitDefaultTest(Project project)
+            throws Exception {
+            NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
+
+            assertNotNull(extension.getGit());
+            //assertTrue(extension.getGit().getRemotes().isPresent());
+            //assertNotNull(extension.getGit().getRemotes().get());
+            assertTrue(extension.getGit().getRemotes().isEmpty());
+        }
+
+        @TestTemplate
         @DisplayName("NyxExtension.getInitialVersion() default value")
         @Baseline(Scenario.FROM_SCRATCH)
         void getInitialVersionDefaultTest(Project project)

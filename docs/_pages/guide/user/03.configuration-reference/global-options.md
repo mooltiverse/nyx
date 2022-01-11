@@ -14,6 +14,7 @@ These are the top level options in the configuration:
 | [`configurationFile`](#configuration-file)                | string  | `-c <PATH>`, `--configuration-file=<PATH>`                | `NYX_CONFIGURATION_FILE=<PATH>`                               | N/A      |
 | [`directory`](#directory)                                 | string  | `-d <PATH>`, `--directory=<PATH>`                         | `NYX_DIRECTORY=<PATH>`                                        | Current working directory |
 | [`dryRun`](#dry-run)                                      | boolean | `--dry-run`, `--dry-run=true|false`                       | `NYX_DRY_RUN=true|false`                                      | `false`  |
+| [`git`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/git.md %}) | object  | See [Git]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/git.md %}) | See [Git]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/git.md %}) | N/A      |
 | [`initialVersion`](#initial-version)                      | string  | `--initial-version=<VERSION>`                             | `NYX_INITIAL_VERSION=<VERSION>`                               |  Depends on the configured [version scheme](#scheme) |
 | [`preset`](#preset)                                       | string  | `--preset=<NAME>`                                         | `NYX_PRESET=<NAME>`                                           | N/A      |
 | [`releaseLenient`](#release-lenient)                      | boolean | `--release-lenient`, `--release-lenient=true|false`       | `NYX_RELEASE_LENIENT=true|false`                              | `true`   |
@@ -106,6 +107,10 @@ When this flag is set to `true` no action altering the repository state, either 
 When used with no value on the command line (i.e. `--dry-run` alone) `true` is assumed.
 
 When enabling this flag you probably want to raise the [verbosity](#verbosity).
+
+### Git
+
+See [Git]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/git.md %}).
 
 ### Initial version
 

@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
+import com.mooltiverse.oss.nyx.entities.GitConfiguration;
 import com.mooltiverse.oss.nyx.entities.ReleaseTypes;
 import com.mooltiverse.oss.nyx.entities.ServiceConfiguration;
 import com.mooltiverse.oss.nyx.entities.Verbosity;
@@ -52,6 +53,11 @@ public class SimpleConfigurationLayer implements ConfigurationLayer {
      * The value held by this object.
      */
     private Boolean dryRun = null;
+
+    /**
+     * The value held by this object.
+     */
+    private GitConfiguration git = new GitConfiguration();
 
     /**
      * The value held by this object.
@@ -203,6 +209,23 @@ public class SimpleConfigurationLayer implements ConfigurationLayer {
      */
     public void setDryRun(Boolean dryRun) {
         this.dryRun = dryRun;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public GitConfiguration getGit() {
+        return git;
+    }
+
+    /**
+     * Sets the value for this option.
+     * 
+     * @param git the value for this option.
+     */
+    public void setGit(GitConfiguration git) {
+        this.git = git;
     }
 
     /**

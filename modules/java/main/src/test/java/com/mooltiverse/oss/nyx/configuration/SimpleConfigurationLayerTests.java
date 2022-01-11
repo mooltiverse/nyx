@@ -29,6 +29,8 @@ import org.junit.jupiter.api.Test;
 
 import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
+import com.mooltiverse.oss.nyx.entities.GitConfiguration;
+import com.mooltiverse.oss.nyx.entities.GitRemoteConfiguration;
 import com.mooltiverse.oss.nyx.entities.ReleaseType;
 import com.mooltiverse.oss.nyx.entities.ReleaseTypes;
 import com.mooltiverse.oss.nyx.entities.ServiceConfiguration;
@@ -104,6 +106,29 @@ public class SimpleConfigurationLayerTests {
 
         simpleConfigurationLayer.setDryRun(Boolean.TRUE);
         assertEquals(Boolean.TRUE, simpleConfigurationLayer.getDryRun());
+    }
+
+    @Test
+    @DisplayName("SimpleConfigurationLayer.getGit()")
+    void getGitTest()
+        throws Exception {
+        SimpleConfigurationLayer simpleConfigurationLayer = new SimpleConfigurationLayer();
+        assertNotNull(simpleConfigurationLayer.getGit());
+        assertTrue(simpleConfigurationLayer.getGit().getRemotes().isEmpty());
+
+        simpleConfigurationLayer.setGit(
+            new GitConfiguration(
+                Map.<String,GitRemoteConfiguration>of("origin1", new GitRemoteConfiguration("jdoe1", "pwd1"), "origin2", new GitRemoteConfiguration("jdoe2", "pwd2"))
+            )
+        );
+
+        assertEquals(2, simpleConfigurationLayer.getGit().getRemotes().size());
+        assertNotNull(simpleConfigurationLayer.getGit().getRemotes().get("origin1"));
+        assertEquals("pwd1", simpleConfigurationLayer.getGit().getRemotes().get("origin1").getPassword());
+        assertEquals("jdoe1", simpleConfigurationLayer.getGit().getRemotes().get("origin1").getUser());
+        assertNotNull(simpleConfigurationLayer.getGit().getRemotes().get("origin2"));
+        assertEquals("pwd2", simpleConfigurationLayer.getGit().getRemotes().get("origin2").getPassword());
+        assertEquals("jdoe2", simpleConfigurationLayer.getGit().getRemotes().get("origin2").getUser());
     }
 
     @Test

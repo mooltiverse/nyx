@@ -26,6 +26,8 @@ import java.util.Objects;
 import com.mooltiverse.oss.nyx.configuration.Defaults;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
+import com.mooltiverse.oss.nyx.entities.GitConfiguration;
+import com.mooltiverse.oss.nyx.entities.GitRemoteConfiguration;
 import com.mooltiverse.oss.nyx.entities.Identifier;
 import com.mooltiverse.oss.nyx.entities.IllegalPropertyException;
 import com.mooltiverse.oss.nyx.entities.ReleaseType;
@@ -55,6 +57,11 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
      * The private instance of the commit message convention configuration section.
      */
     private CommitMessageConventions commitMessageConventionsSection = null;
+
+    /**
+     * The private instance of the Git configuration section.
+     */
+    private GitConfiguration gitSection = null;
 
     /**
      * The private instance of the release types configuration section.
@@ -135,6 +142,27 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
     @Override
     public Boolean getDryRun() {
         return extension.getDryRun().getOrNull();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public GitConfiguration getGit() {
+        if (Objects.isNull(gitSection)) {
+            Map<String, GitRemoteConfiguration> remotes = new HashMap<String, GitRemoteConfiguration>(extension.getGit().getRemotes().size());
+            // the map property is always present and never null but is empty when the user doesn't define its contents
+            if (!extension.getGit().getRemotes().isEmpty()) {
+                for (NyxExtension.GitConfiguration.GitRemoteConfiguration remote: extension.getGit().getRemotes()) {
+                    if (!remotes.containsKey(remote.getName())) {
+                        remotes.put(remote.getName(), new GitRemoteConfiguration(remote.getUser().get(), remote.getPassword().get()));
+                    }
+                }
+            }
+
+            gitSection = new GitConfiguration(remotes);
+        }
+        return gitSection;
     }
 
     /**
