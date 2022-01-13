@@ -70,6 +70,8 @@ nav-user-guide:
     children:
       - title: "Global Options"
         url: /guide/user/configuration-reference/global-options/
+      - title: "Changelog"
+        url: /guide/user/configuration-reference/changelog/
       - title: "Commit Message Conventions"
         url: /guide/user/configuration-reference/commit-message-conventions/
       - title: "Git"

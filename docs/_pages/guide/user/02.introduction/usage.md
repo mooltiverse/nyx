@@ -38,8 +38,7 @@ See [here]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-w
 
 ### Make
 
-TODO: add the documentation to the changelog creation here.
-{: .notice--warning}
+Builds the configured artifacts such as the changelog file, if configured.
 
 See [here]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#make) for more.
 

@@ -180,12 +180,12 @@ public class GitTests {
             // create a brand new test repository for this purpose
             GitHubRepository gitHubRepository = gitHub.createGitRepository(randomID, "Test repository "+randomID, true, true);
 
+            // if we read too quickly we often get a 404 from the server so let's wait a short while
+            Thread.sleep(2000);
+
             File directory = Files.createTempDirectory("nyx-test-git-clone-test-").toFile();
             directory.deleteOnExit();
             assertThrows(GitException.class, () -> Git.instance().clone(directory, URI.create(gitHubRepository.getHTTPURL()), null, null));
-
-            // if we delete too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(1000);
 
             // now delete it
             gitHub.deleteGitRepository(randomID);
@@ -201,12 +201,12 @@ public class GitTests {
             // create a brand new test repository for this purpose
             GitHubRepository gitHubRepository = gitHub.createGitRepository(randomID, "Test repository "+randomID, true, true);
 
+            // if we read too quickly we often get a 404 from the server so let's wait a short while
+            Thread.sleep(2000);
+
             File directory = Files.createTempDirectory("nyx-test-git-clone-test-").toFile();
             directory.deleteOnExit();
             assertThrows(GitException.class, () -> Git.instance().clone(directory.getAbsolutePath(), gitHubRepository.getHTTPURL(), null, null));
-
-            // if we delete too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(1000);
 
             // now delete it
             gitHub.deleteGitRepository(randomID);
@@ -222,14 +222,14 @@ public class GitTests {
             // create a brand new test repository for this purpose
             GitHubRepository gitHubRepository = gitHub.createGitRepository(randomID, "Test repository "+randomID, true, true);
 
+            // if we read too quickly we often get a 404 from the server so let's wait a short while
+            Thread.sleep(2000);
+
             File directory = Files.createTempDirectory("nyx-test-git-clone-test-").toFile();
             directory.deleteOnExit();
             assertFalse(new File(directory, "README.md").exists());
             assertNotNull(Git.instance().clone(directory, URI.create(gitHubRepository.getHTTPURL()), System.getProperty("gitHubTestUserToken"), System.getProperty("gitHubTestUserToken")));
             assertTrue(new File(directory, "README.md").exists());
-
-            // if we delete too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(1000);
 
             // now delete it
             gitHub.deleteGitRepository(randomID);
@@ -245,14 +245,14 @@ public class GitTests {
             // create a brand new test repository for this purpose
             GitHubRepository gitHubRepository = gitHub.createGitRepository(randomID, "Test repository "+randomID, true, true);
 
+            // if we read too quickly we often get a 404 from the server so let's wait a short while
+            Thread.sleep(2000);
+
             File directory = Files.createTempDirectory("nyx-test-git-clone-test-").toFile();
             directory.deleteOnExit();
             assertFalse(new File(directory, "README.md").exists());
             assertNotNull(Git.instance().clone(directory.getAbsolutePath(), gitHubRepository.getHTTPURL(), System.getProperty("gitHubTestUserToken"), System.getProperty("gitHubTestUserToken")));
             assertTrue(new File(directory, "README.md").exists());
-
-            // if we delete too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(1000);
 
             // now delete it
             gitHub.deleteGitRepository(randomID);

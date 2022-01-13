@@ -108,7 +108,7 @@ public class GitLabTest {
             assertEquals("https://gitlab.com/"+user.getUserName()+"/"+randomID+".git", gitLabRepository.getHTTPURL());
 
             // if we delete too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(1000);
+            Thread.sleep(2000);
 
             // now delete it
             gitLab.deleteGitRepository(gitLabRepository.getID());
@@ -142,9 +142,6 @@ public class GitLabTest {
             Release release = gitLab.publishRelease(user.getUserName(), gitLabRepository.getName(), "Release 1.0.0-alpha.1", "1.0.0-alpha.1", "A test description for the release\non multiple lines\nlike these");
             assertEquals("Release 1.0.0-alpha.1", release.getTitle());
             assertEquals("1.0.0-alpha.1", release.getTag());
-
-            // if we delete too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(1000);
 
             // now delete it
             gitLab.deleteGitRepository(gitLabRepository.getID());

@@ -32,8 +32,7 @@ When merge commits are encountered scanning the commit history Nyx follows the [
 
 ## Make
 
-TODO: add the documentation to the changelog creation here.
-{: .notice--warning}
+This is where the configured artifacts are built by Nyx, when needed. More specifically, if the [`changelog`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/changelog.md %}) has been configured, here is built and rendered.
 
 ## Mark
 

@@ -58,6 +58,34 @@ public class ConfigurationLayerTestTemplates {
         }
 
         @TestTemplate
+        @DisplayName("ConfigurationLayer.getChangelog() default value")
+        @Baseline(Scenario.FROM_SCRATCH)
+        void getChangelogDefaultTest(Project project)
+            throws Exception {
+            NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
+            ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
+
+            assertNotNull(extension.getChangelog());
+            assertNotNull(configurationLayer.getChangelog());
+            assertFalse(extension.getChangelog().getCommitLink().isPresent());
+            assertNull(extension.getChangelog().getCommitLink().getOrNull());
+            assertFalse(extension.getChangelog().getContributorLink().isPresent());
+            assertNull(extension.getChangelog().getContributorLink().getOrNull());
+            assertFalse(extension.getChangelog().getIncludeUnreleased().isPresent());
+            assertNull(extension.getChangelog().getIncludeUnreleased().getOrNull());
+            assertFalse(extension.getChangelog().getIssueId().isPresent());
+            assertNull(extension.getChangelog().getIssueId().getOrNull());
+            assertFalse(extension.getChangelog().getIssueLink().isPresent());
+            assertNull(extension.getChangelog().getIssueLink().getOrNull());
+            assertFalse(extension.getChangelog().getPath().isPresent());
+            assertNull(extension.getChangelog().getPath().getOrNull());
+            //assertTrue(extension.getChangelog().geSections().isPresent());
+            assertTrue(configurationLayer.getChangelog().getSections().isEmpty());
+            assertFalse(extension.getChangelog().getTemplate().isPresent());
+            assertNull(extension.getChangelog().getTemplate().getOrNull());
+        }
+
+        @TestTemplate
         @DisplayName("ConfigurationLayer.getCommitMessageConventions() default value")
         @Baseline(Scenario.FROM_SCRATCH)
         void getCommitMessageConventionsDefaultTest(Project project)
@@ -276,6 +304,18 @@ public class ConfigurationLayerTestTemplates {
         @DisplayName("ConfigurationLayer.getBump().set() throws IllegalPropertyException with illegal value")
         @Baseline(Scenario.FROM_SCRATCH)
         void exceptionUsingGetBumpWithWrongValueTest(Project project)
+            throws Exception {
+            NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
+            ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
+
+            // no idea of how to test wrong values here
+        }*/
+
+        /* This test is commented because it has nothing to test
+        @TestTemplate
+        @DisplayName("ConfigurationLayer.getChangelog().set() throws IllegalPropertyException with illegal value")
+        @Baseline(Scenario.FROM_SCRATCH)
+        void exceptionUsingGetChangelogWithWrongValueTest(Project project)
             throws Exception {
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
             ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);

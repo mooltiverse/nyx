@@ -1,4 +1,14 @@
 --- 
+changelog:
+  commitLink: "https://example.com/commits/%s"
+  contributorLink: "https://example.com/people/%s"
+  includeUnreleased: true
+  issueId: "(?m)#(?<id>[0-9]+)(?s).*"
+  issueLink: "https://example.com/issues/%s"
+  path: "build/CHANGELOG.md"
+  sections:
+    "Added": "^feat$"
+    "Fixed": "^fix$"
 commitMessageConventions: 
   enabled: 
     - conventionalCommits

@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.mooltiverse.oss.nyx.version.Versions;
+import com.mooltiverse.oss.nyx.entities.ChangelogConfiguration;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
 import com.mooltiverse.oss.nyx.entities.GitConfiguration;
@@ -38,6 +39,11 @@ public interface Defaults {
      * The default version identifier to bump. Value: {@code null}
      */
     public static final String BUMP = null;
+
+    /**
+     * The default changelog configuration block.
+     */
+    public static final ChangelogConfiguration CHANGELOG = new ChangelogConfiguration(null, Map.<String,String>of(), null, null, null, null, null, null);
 
     /**
      * The default commit message conventions block.

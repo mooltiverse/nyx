@@ -27,6 +27,7 @@ import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import com.mooltiverse.oss.nyx.entities.ChangelogConfiguration;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
 import com.mooltiverse.oss.nyx.entities.GitConfiguration;
@@ -49,6 +50,41 @@ public class SimpleConfigurationLayerTests {
 
         simpleConfigurationLayer.setBump("b");
         assertEquals("b", simpleConfigurationLayer.getBump());
+    }
+
+    @Test
+    @DisplayName("SimpleConfigurationLayer.getChangelog()")
+    void getChangelogTest()
+        throws Exception {
+        SimpleConfigurationLayer simpleConfigurationLayer = new SimpleConfigurationLayer();
+        assertNotNull(simpleConfigurationLayer.getChangelog());
+        assertNull(simpleConfigurationLayer.getChangelog().getCommitLink());
+        assertNull(simpleConfigurationLayer.getChangelog().getContributorLink());
+        assertNull(simpleConfigurationLayer.getChangelog().getIncludeUnreleased());
+        assertNull(simpleConfigurationLayer.getChangelog().getIssueID());
+        assertNull(simpleConfigurationLayer.getChangelog().getIssueLink());
+        assertNull(simpleConfigurationLayer.getChangelog().getPath());
+        assertTrue(simpleConfigurationLayer.getChangelog().getSections().isEmpty());
+        assertNull(simpleConfigurationLayer.getChangelog().getTemplate());
+
+        simpleConfigurationLayer.setChangelog(
+            new ChangelogConfiguration("CHANGELOG.md", Map.<String,String>of("Section1", "regex1", "Section2", "regex2"), "changelog.tpl", Boolean.TRUE, "commitLink", "contributorLink", "issueID", "issueLink")
+        );
+
+        assertNotNull(simpleConfigurationLayer.getChangelog());
+        assertEquals("commitLink", simpleConfigurationLayer.getChangelog().getCommitLink());
+        assertEquals("contributorLink", simpleConfigurationLayer.getChangelog().getContributorLink());
+        assertEquals(Boolean.TRUE, simpleConfigurationLayer.getChangelog().getIncludeUnreleased());
+        assertEquals("issueID", simpleConfigurationLayer.getChangelog().getIssueID());
+        assertEquals("issueLink", simpleConfigurationLayer.getChangelog().getIssueLink());
+        assertEquals("CHANGELOG.md", simpleConfigurationLayer.getChangelog().getPath());
+        assertFalse(simpleConfigurationLayer.getChangelog().getSections().isEmpty());
+        assertEquals(2, simpleConfigurationLayer.getChangelog().getSections().size());
+        assertTrue(simpleConfigurationLayer.getChangelog().getSections().containsKey("Section1"));
+        assertEquals("regex1", simpleConfigurationLayer.getChangelog().getSections().get("Section1"));
+        assertTrue(simpleConfigurationLayer.getChangelog().getSections().containsKey("Section2"));
+        assertEquals("regex2", simpleConfigurationLayer.getChangelog().getSections().get("Section2"));
+        assertEquals("changelog.tpl", simpleConfigurationLayer.getChangelog().getTemplate());
     }
 
     @Test

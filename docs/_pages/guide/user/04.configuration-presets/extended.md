@@ -19,7 +19,24 @@ The [Conventional Commits](https://www.conventionalcommits.org/) and [gitmoji](h
 | [`commitMessageConventions/gitmoji/expression`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/commit-message-conventions.md %}#expression) | "`(?m)^(:(?<type>[a-zA-Z0-9_]+):)( (?<title>.+))?$(?s).*`" |
 | [`commitMessageConventions/gitmoji/bumpExpressions`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/commit-message-conventions.md %}#bump-expressions) | "`major`" = "`(?m)^:boom:(?s).*`", "`minor`" = "`(?m)^:sparkles:(?s).*`", "`patch`" = "`(?m)^:(zap|bug|ambulance|lipstick|lock|arrow_down|arrow_up|pushpin|chart_with_upwards_trend|heavy_plus_sign|heavy_minus_sign|wrench|globe_with_meridians|pencil2|rewind|package|alien|bento|wheelchair|speech_balloon|card_file_box|children_crossing|iphone|egg|alembic|mag|label|triangular_flag_on_post|goal_net|dizzy|wastebasket|passport_control|adhesive_bandage):(?s).*`" |
 
-Please note that *gitmoji* is listed **after** *Conventional Commits* so when a commit message is evaluated, *gitmoji* is only taken into account if matching it against *Conventiona Commit* does not yield to a positive match.
+Please note that *gitmoji* is listed **after** *Conventional Commits* so when a commit message is evaluated, *gitmoji* is only taken into account if matching it against *Conventional Commit* does not yield to a positive match.
+
+### Changelog
+
+A standard changelog configuration is included in this preset. The destination file is `CHANGELOG.md` (in the current working directory) and is rendered using the default template.
+
+No links are produced to any specific hosting service. Sections contemplate commits matched by both the [Conventional Commits](https://www.conventionalcommits.org/) and [gitmoji](https://gitmoji.dev/) conventions.
+
+This corresponds to the following configuration options:
+
+| Name                                            | Value                                                                                    |
+| ----------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| [`changelog/includeUnreleased`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/changelog.md %}#include-unreleased) | `true` |
+| [`changelog/path`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/changelog.md %}#path) | `CHANGELOG.md` |
+| [`changelog/sections/Added`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/changelog.md %}#sections) | `"^(feat|:boom:|:sparkles:)$"` |
+| [`changelog/sections/Fixed`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/changelog.md %}#sections) | "`^(fix|:bug:|:ambulance:)$`" |
+| [`changelog/sections/Removed`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/changelog.md %}#sections) | "`^:fire:$`" |
+| [`changelog/sections/Security`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/changelog.md %}#sections) | "`^:lock:$`" |
 
 ### Release types
 

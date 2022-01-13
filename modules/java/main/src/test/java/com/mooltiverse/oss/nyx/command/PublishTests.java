@@ -114,7 +114,7 @@ public class PublishTests {
             nyx.publish();
 
             // if we read too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(1000);
+            Thread.sleep(2000);
 
             // read the release from the hosting service
             GitHubRelease gitHubRelease = gitHub.getReleaseByTag(user.getUserName(), gitHubRepository.getName(), "1.0.0");
@@ -164,7 +164,7 @@ public class PublishTests {
             assertEquals("1.0.0", gitHubRelease.getTitle());
         
             // if we delete too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(1000);
+            Thread.sleep(2000);
 
             // now delete it
             gitHub.deleteGitRepository(randomID);
@@ -234,7 +234,7 @@ public class PublishTests {
             nyx.publish();
 
             // if we read too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(1000);
+            Thread.sleep(2000);
 
             // read the release from the hosting service
             GitLabRelease gitLabRelease = gitLab.getReleaseByTag(user.getUserName(), gitLabRepository.getName(), "1.0.0");
@@ -284,7 +284,7 @@ public class PublishTests {
             assertEquals("1.0.0", gitLabRelease.getTitle());
         
             // if we delete too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(1000);
+            Thread.sleep(2000);
 
             // now delete it
             gitLab.deleteGitRepository(gitLabRepository.getID());

@@ -54,6 +54,33 @@ public class NyxExtensionTestTemplates {
         }
 
         @TestTemplate
+        @DisplayName("NyxExtension.getChangelog() default value")
+        @Baseline(Scenario.FROM_SCRATCH)
+        void getChangelogDefaultTest(Project project)
+            throws Exception {
+            NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
+
+            assertNotNull(extension.getChangelog());
+            assertFalse(extension.getChangelog().getCommitLink().isPresent());
+            assertNull(extension.getChangelog().getCommitLink().getOrNull());
+            assertFalse(extension.getChangelog().getContributorLink().isPresent());
+            assertNull(extension.getChangelog().getContributorLink().getOrNull());
+            assertFalse(extension.getChangelog().getIncludeUnreleased().isPresent());
+            assertNull(extension.getChangelog().getIncludeUnreleased().getOrNull());
+            assertFalse(extension.getChangelog().getIssueId().isPresent());
+            assertNull(extension.getChangelog().getIssueId().getOrNull());
+            assertFalse(extension.getChangelog().getIssueLink().isPresent());
+            assertNull(extension.getChangelog().getIssueLink().getOrNull());
+            assertFalse(extension.getChangelog().getPath().isPresent());
+            assertNull(extension.getChangelog().getPath().getOrNull());
+            //assertTrue(extension.getChangelog().geSections().isPresent());
+            //assertNotNull(extension.getChangelog().geSections().get());
+            assertTrue(extension.getChangelog().getSections().get().isEmpty());
+            assertFalse(extension.getChangelog().getTemplate().isPresent());
+            assertNull(extension.getChangelog().getTemplate().getOrNull());
+        }
+
+        @TestTemplate
         @DisplayName("NyxExtension.getCommitMessageConventions() default value")
         @Baseline(Scenario.FROM_SCRATCH)
         void getCommitMessageConventionsDefaultTest(Project project)

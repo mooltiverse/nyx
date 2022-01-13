@@ -169,7 +169,7 @@ This option is **mandatory** when [`collapseVersions`](#collapse-versions) is `t
 | Configuration File Option | `releaseTypes/items/<NAME>/description`                                                  |
 | Related state attributes  |                                                                                          |
 
-A [template]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}) that, once rendered, gives the description of a release. This may be a short description or a long document like a changelog or a releas notes document. The type of content might be Markdown.
+A [template]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}) that, once rendered, gives the description of a release. This may be a short description or a long document like a changelog or a release notes document. The type of content might be Markdown.
 
 Note that this value is also used as the release description when [publishing](#publish) a release using [external services](#publication-services) so make sure the output of this value complies with target services.
 
@@ -177,8 +177,7 @@ This value is optional but may be required by some [publication services](#publi
 
 A common use for this option is a [`file.content`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}#filecontent) template to get the content of a release notes or changelog file. Example: `{% raw %}{{#file.content}}CHANGELOG.md{{/file.content}}{% endraw %}`.
 
-TODO: add the link to the changelog creation here.
-{: .notice--warning}
+For more on how to generate a changelog automatically please see the [`changelog`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/changelog.md %}) configuration section.
 
 #### Filter tags
 

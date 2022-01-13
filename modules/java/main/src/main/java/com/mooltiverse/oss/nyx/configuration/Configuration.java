@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import com.mooltiverse.oss.nyx.Nyx;
 import com.mooltiverse.oss.nyx.configuration.presets.Presets;
+import com.mooltiverse.oss.nyx.entities.ChangelogConfiguration;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
 import com.mooltiverse.oss.nyx.entities.GitConfiguration;
@@ -63,6 +64,11 @@ public class Configuration implements ConfigurationRoot {
      * The private logger instance
      */
     private static final Logger logger = LoggerFactory.getLogger(Configuration.class);
+
+    /**
+     * The private instance of the changelog configuration section.
+     */
+    private ChangelogConfiguration changelogSection = null;
 
     /**
      * The private instance of the commit message convention configuration section.
@@ -180,6 +186,7 @@ public class Configuration implements ConfigurationRoot {
      */
     private synchronized void resetCache() {
         logger.trace(CONFIGURATION, "Clearing the configuration cache");
+        changelogSection = null;
         commitMessageConventionsSection = null;
         gitSection = null;
         releaseTypesSection = null;
@@ -345,6 +352,41 @@ public class Configuration implements ConfigurationRoot {
             }
         }
         return DefaultLayer.getInstance().getBump();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ChangelogConfiguration getChangelog()
+        throws DataAccessException, IllegalPropertyException {
+        logger.trace(CONFIGURATION, "Retrieving the changelog configuration");
+        if (Objects.isNull(changelogSection)) {
+            changelogSection = new ChangelogConfiguration();
+            for (ConfigurationLayer layer: layers.values()) {
+                // Since all attributes of the changelog configuration are objects we assume that if they are null
+                // they have the default values and we keep non null values as those overriding defaults.
+                // The sections map is assumed to override inherited values if its size is not 0
+                if (Objects.isNull(changelogSection.getPath()))
+                    changelogSection.setPath(layer.getChangelog().getPath());
+                if (Objects.isNull(changelogSection.getSections()) || changelogSection.getSections().isEmpty())
+                    changelogSection.setSections(layer.getChangelog().getSections());
+                if (Objects.isNull(changelogSection.getTemplate()))
+                    changelogSection.setTemplate(layer.getChangelog().getTemplate());
+                if (Objects.isNull(changelogSection.getIncludeUnreleased()))
+                    changelogSection.setIncludeUnreleased(layer.getChangelog().getIncludeUnreleased());
+                if (Objects.isNull(changelogSection.getCommitLink()))
+                    changelogSection.setCommitLink(layer.getChangelog().getCommitLink());
+                if (Objects.isNull(changelogSection.getContributorLink()))
+                    changelogSection.setContributorLink(layer.getChangelog().getContributorLink());
+                if (Objects.isNull(changelogSection.getIssueID()))
+                    changelogSection.setIssueID(layer.getChangelog().getIssueID());
+                if (Objects.isNull(changelogSection.getIssueLink()))
+                    changelogSection.setIssueLink(layer.getChangelog().getIssueLink());
+            }
+            logger.trace(CONFIGURATION, "The '{}' configuration option has been resolved", "changelog");
+        }
+        return changelogSection;
     }
 
     /**

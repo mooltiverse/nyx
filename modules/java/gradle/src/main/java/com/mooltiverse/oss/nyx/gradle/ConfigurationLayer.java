@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import com.mooltiverse.oss.nyx.configuration.Defaults;
+import com.mooltiverse.oss.nyx.entities.ChangelogConfiguration;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
 import com.mooltiverse.oss.nyx.entities.GitConfiguration;
@@ -52,6 +53,11 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
      * May be {@code null} if the user has not defined any {@code version} property in the script
      */
     private final Object projectVersion;
+
+    /**
+     * The private instance of the changelog configuration section.
+     */
+    private ChangelogConfiguration changelogConfigurationSection = null;
 
     /**
      * The private instance of the commit message convention configuration section.
@@ -94,6 +100,26 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
     @Override
     public String getBump() {
         return extension.getBump().getOrNull();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ChangelogConfiguration getChangelog() {
+        if (Objects.isNull(changelogConfigurationSection)) {
+            changelogConfigurationSection = new ChangelogConfiguration(
+                extension.getChangelog().getPath().getOrNull(),
+                extension.getChangelog().getSections().isPresent() ?  extension.getChangelog().getSections().get() : Map.<String,String>of(),
+                extension.getChangelog().getTemplate().getOrNull(),
+                extension.getChangelog().getIncludeUnreleased().getOrNull(),
+                extension.getChangelog().getCommitLink().getOrNull(),
+                extension.getChangelog().getContributorLink().getOrNull(),
+                extension.getChangelog().getIssueId().getOrNull(),
+                extension.getChangelog().getIssueLink().getOrNull()
+            );
+        }
+        return changelogConfigurationSection;
     }
 
     /**
@@ -220,8 +246,8 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
                             // Identifiers are modelled in a NamedDomainObjectContainer, which grants they are sorted by name
                             for (NyxExtension.ReleaseTypes.ReleaseType.Identifier identifier: type.getIdentifiers()) {
                                 identifiers.add(new Identifier(
-                                    identifier.getQualifier().isPresent() ? identifier.getQualifier().get() : null,
-                                    identifier.getValue().isPresent() ? identifier.getValue().get() : null,
+                                    identifier.getQualifier().getOrNull(),
+                                    identifier.getValue().getOrNull(),
                                     identifier.getPosition().isPresent() ? Identifier.Position.valueOf(identifier.getPosition().get()) : null)
                                 );
                             }

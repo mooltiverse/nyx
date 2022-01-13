@@ -23,6 +23,7 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mooltiverse.oss.nyx.entities.ChangelogConfiguration;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
 import com.mooltiverse.oss.nyx.entities.GitConfiguration;
 import com.mooltiverse.oss.nyx.entities.IllegalPropertyException;
@@ -80,6 +81,16 @@ class DefaultLayer implements ConfigurationLayer, Defaults {
         throws DataAccessException, IllegalPropertyException {
         logger.trace(DEFAULT, "Retrieving the default '{}' configuration option: '{}'", "bump", BUMP);
         return BUMP;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ChangelogConfiguration getChangelog()
+        throws DataAccessException, IllegalPropertyException {
+        logger.trace(DEFAULT, "Retrieving the default '{}' configuration option", "changelog");
+        return CHANGELOG;
     }
 
     /**

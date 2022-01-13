@@ -67,6 +67,19 @@ public class ConfigurationFileTests {
         assertEquals(Objects.isNull(source.getVerbosity()) ? Defaults.VERBOSITY : source.getVerbosity(), target.getVerbosity());
         assertEquals(Objects.isNull(source.getVersion()) ? Defaults.VERSION : source.getVersion(), target.getVersion());
 
+        assertEquals(source.getChangelog().getCommitLink(), target.getChangelog().getCommitLink());
+        assertEquals(source.getChangelog().getContributorLink(), target.getChangelog().getContributorLink());
+        assertEquals(source.getChangelog().getIncludeUnreleased(), target.getChangelog().getIncludeUnreleased());
+        assertEquals(source.getChangelog().getIssueID(), target.getChangelog().getIssueID());
+        assertEquals(source.getChangelog().getIssueLink(), target.getChangelog().getIssueLink());
+        assertEquals(source.getChangelog().getPath(), target.getChangelog().getPath());
+        assertEquals(source.getChangelog().getSections().keySet(), target.getChangelog().getSections().keySet());
+        for (String item: source.getChangelog().getSections().keySet()) {
+            assertEquals(source.getChangelog().getSections().get(item), target.getChangelog().getSections().get(item));
+            assertEquals(source.getChangelog().getSections().get(item), target.getChangelog().getSections().get(item));
+        }
+        assertEquals(source.getChangelog().getTemplate(), target.getChangelog().getTemplate());
+
         assertEquals(Objects.isNull(source.getCommitMessageConventions().getEnabled()) ? Defaults.COMMIT_MESSAGE_CONVENTIONS.getEnabled() : source.getCommitMessageConventions().getEnabled(), target.getCommitMessageConventions().getEnabled());
         assertEquals(source.getCommitMessageConventions().getItems().keySet(), target.getCommitMessageConventions().getItems().keySet());
         for (String item: source.getCommitMessageConventions().getItems().keySet()) {
@@ -170,6 +183,19 @@ public class ConfigurationFileTests {
         assertEquals(Objects.isNull(source.getStateFile()) ? Defaults.STATE_FILE : source.getStateFile(), target.getStateFile());
         assertEquals(Objects.isNull(source.getVerbosity()) ? Defaults.VERBOSITY : source.getVerbosity(), target.getVerbosity());
         assertEquals(Objects.isNull(source.getVersion()) ? Defaults.VERSION : source.getVersion(), target.getVersion());
+
+        assertEquals(source.getChangelog().getCommitLink(), target.getChangelog().getCommitLink());
+        assertEquals(source.getChangelog().getContributorLink(), target.getChangelog().getContributorLink());
+        assertEquals(source.getChangelog().getIncludeUnreleased(), target.getChangelog().getIncludeUnreleased());
+        assertEquals(source.getChangelog().getIssueID(), target.getChangelog().getIssueID());
+        assertEquals(source.getChangelog().getIssueLink(), target.getChangelog().getIssueLink());
+        assertEquals(source.getChangelog().getPath(), target.getChangelog().getPath());
+        assertEquals(source.getChangelog().getSections().keySet(), target.getChangelog().getSections().keySet());
+        for (String item: source.getChangelog().getSections().keySet()) {
+            assertEquals(source.getChangelog().getSections().get(item), target.getChangelog().getSections().get(item));
+            assertEquals(source.getChangelog().getSections().get(item), target.getChangelog().getSections().get(item));
+        }
+        assertEquals(source.getChangelog().getTemplate(), target.getChangelog().getTemplate());
 
         assertEquals(Objects.isNull(source.getCommitMessageConventions().getEnabled()) ? Defaults.COMMIT_MESSAGE_CONVENTIONS.getEnabled() : source.getCommitMessageConventions().getEnabled(), target.getCommitMessageConventions().getEnabled());
         assertEquals(source.getCommitMessageConventions().getItems().keySet(), target.getCommitMessageConventions().getItems().keySet());

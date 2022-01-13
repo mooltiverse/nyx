@@ -105,7 +105,7 @@ public class MarkTests {
             nyx.mark();
 
             // if we read too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(1000);
+            Thread.sleep(2000);
 
             // clone the remote repo again into a a new directory and test
             Script remoteScript = Script.cloneFrom(gitHubRepository.getHTTPURL(), System.getProperty("gitHubTestUserToken"), "");
@@ -154,7 +154,7 @@ public class MarkTests {
             assertEquals(script.getTags().size(), remoteScript.getTags().size());
 
             // if we delete too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(1000);
+            Thread.sleep(2000);
 
             // now delete it
             gitHub.deleteGitRepository(randomID);
@@ -217,7 +217,7 @@ public class MarkTests {
             nyx.mark();
 
             // if we read too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(1000);
+            Thread.sleep(2000);
 
             // clone the remote repo again into a a new directory and test
             Script remoteScript = Script.cloneFrom(gitLabRepository.getHTTPURL(), "PRIVATE-TOKEN", System.getProperty("gitLabTestUserToken"));
@@ -266,7 +266,7 @@ public class MarkTests {
             assertEquals(script.getTags().size(), remoteScript.getTags().size());
 
             // if we delete too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(1000);
+            Thread.sleep(2000);
 
             // now delete it
             gitLab.deleteGitRepository(gitLabRepository.getID());

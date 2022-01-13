@@ -37,10 +37,6 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import com.mooltiverse.oss.nyx.entities.git.Commit;
 import com.mooltiverse.oss.nyx.entities.git.Identity;
 import com.mooltiverse.oss.nyx.entities.git.Tag;
-import com.mooltiverse.oss.nyx.git.Git;
-import com.mooltiverse.oss.nyx.git.GitException;
-import com.mooltiverse.oss.nyx.git.JGitRepository;
-import com.mooltiverse.oss.nyx.git.Repository;
 import com.mooltiverse.oss.nyx.git.util.RandomUtil;
 import com.mooltiverse.oss.nyx.services.github.GitHub;
 import com.mooltiverse.oss.nyx.services.github.GitHubRepository;
@@ -184,14 +180,11 @@ public class JGitRepositoryTests {
             GitHubRepository gitHubRepository = gitHub.createGitRepository(randomID, "Test repository "+randomID, true, true);
 
             // if we read too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(1000);
+            Thread.sleep(2000);
 
             File directory = Files.createTempDirectory("nyx-test-git-clone-test-").toFile();
             directory.deleteOnExit();
             assertThrows(GitException.class, () -> JGitRepository.clone(directory, URI.create(gitHubRepository.getHTTPURL()), null, null));
-
-            // if we delete too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(1000);
 
             // now delete it
             gitHub.deleteGitRepository(randomID);
@@ -208,14 +201,11 @@ public class JGitRepositoryTests {
             GitHubRepository gitHubRepository = gitHub.createGitRepository(randomID, "Test repository "+randomID, true, true);
 
             // if we read too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(1000);
+            Thread.sleep(2000);
 
             File directory = Files.createTempDirectory("nyx-test-git-clone-test-").toFile();
             directory.deleteOnExit();
             assertThrows(GitException.class, () -> JGitRepository.clone(directory.getAbsolutePath(), gitHubRepository.getHTTPURL(), null, null));
-
-            // if we delete too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(1000);
 
             // now delete it
             gitHub.deleteGitRepository(randomID);
@@ -232,16 +222,13 @@ public class JGitRepositoryTests {
             GitHubRepository gitHubRepository = gitHub.createGitRepository(randomID, "Test repository "+randomID, true, true);
 
             // if we read too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(1000);
+            Thread.sleep(2000);
 
             File directory = Files.createTempDirectory("nyx-test-git-clone-test-").toFile();
             directory.deleteOnExit();
             assertFalse(new File(directory, "README.md").exists());
             assertNotNull(JGitRepository.clone(directory, URI.create(gitHubRepository.getHTTPURL()), System.getProperty("gitHubTestUserToken"), System.getProperty("gitHubTestUserToken")));
             assertTrue(new File(directory, "README.md").exists());
-
-            // if we delete too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(1000);
 
             // now delete it
             gitHub.deleteGitRepository(randomID);
@@ -258,16 +245,13 @@ public class JGitRepositoryTests {
             GitHubRepository gitHubRepository = gitHub.createGitRepository(randomID, "Test repository "+randomID, true, true);
 
             // if we read too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(1000);
+            Thread.sleep(2000);
 
             File directory = Files.createTempDirectory("nyx-test-git-clone-test-").toFile();
             directory.deleteOnExit();
             assertFalse(new File(directory, "README.md").exists());
             assertNotNull(JGitRepository.clone(directory.getAbsolutePath(), gitHubRepository.getHTTPURL(), System.getProperty("gitHubTestUserToken"), System.getProperty("gitHubTestUserToken")));
             assertTrue(new File(directory, "README.md").exists());
-
-            // if we delete too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(1000);
 
             // now delete it
             gitHub.deleteGitRepository(randomID);
@@ -656,7 +640,7 @@ public class JGitRepositoryTests {
             GitHubRepository gitHubRepository = gitHub.createGitRepository(randomID, "Test repository "+randomID, true, true);
 
             // if we read too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(1000);
+            Thread.sleep(2000);
 
             File directory = Files.createTempDirectory("nyx-test-git-clone-test-").toFile();
             directory.deleteOnExit();
@@ -670,9 +654,6 @@ public class JGitRepositoryTests {
             
             // the 'gitHubTestUserToken' system property is set by the build script, which in turn reads it from an environment variable
             assertThrows(GitException.class, () -> repository.push(null, null));
-
-            // if we delete too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(1000);
 
             // now delete it
             gitHub.deleteGitRepository(randomID);
@@ -689,7 +670,7 @@ public class JGitRepositoryTests {
             GitHubRepository gitHubRepository = gitHub.createGitRepository(randomID, "Test repository "+randomID, true, true);
 
             // if we read too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(1000);
+            Thread.sleep(2000);
 
             File directory = Files.createTempDirectory("nyx-test-git-clone-test-").toFile();
             directory.deleteOnExit();
@@ -703,9 +684,6 @@ public class JGitRepositoryTests {
             
             // the 'gitHubTestUserToken' system property is set by the build script, which in turn reads it from an environment variable
             repository.push(System.getProperty("gitHubTestUserToken"), System.getProperty("gitHubTestUserToken"));
-
-            // if we delete too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(1000);
 
             // now delete it
             gitHub.deleteGitRepository(randomID);
@@ -804,7 +782,7 @@ public class JGitRepositoryTests {
             GitHubRepository gitHubRepository = gitHub.createGitRepository(randomID, "Test repository "+randomID, true, true);
 
             // if we read too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(1000);
+            Thread.sleep(2000);
 
             File directory = Files.createTempDirectory("nyx-test-git-clone-test-").toFile();
             directory.deleteOnExit();
@@ -818,9 +796,6 @@ public class JGitRepositoryTests {
             
             // the 'gitHubTestUserToken' system property is set by the build script, which in turn reads it from an environment variable
             assertThrows(GitException.class, () -> repository.push("origin", null, null));
-
-            // if we delete too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(1000);
 
             // now delete it
             gitHub.deleteGitRepository(randomID);
@@ -837,7 +812,7 @@ public class JGitRepositoryTests {
             GitHubRepository gitHubRepository = gitHub.createGitRepository(randomID, "Test repository "+randomID, true, true);
 
             // if we read too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(1000);
+            Thread.sleep(2000);
 
             File directory = Files.createTempDirectory("nyx-test-git-clone-test-").toFile();
             directory.deleteOnExit();
@@ -851,9 +826,6 @@ public class JGitRepositoryTests {
             
             // the 'gitHubTestUserToken' system property is set by the build script, which in turn reads it from an environment variable
             repository.push("origin", System.getProperty("gitHubTestUserToken"), System.getProperty("gitHubTestUserToken"));
-
-            // if we delete too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(1000);
 
             // now delete it
             gitHub.deleteGitRepository(randomID);
@@ -960,7 +932,7 @@ public class JGitRepositoryTests {
             GitHubRepository gitHubRepository = gitHub.createGitRepository(randomID, "Test repository "+randomID, true, true);
 
             // if we read too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(1000);
+            Thread.sleep(2000);
 
             File directory = Files.createTempDirectory("nyx-test-git-clone-test-").toFile();
             directory.deleteOnExit();
@@ -974,9 +946,6 @@ public class JGitRepositoryTests {
             
             // the 'gitHubTestUserToken' system property is set by the build script, which in turn reads it from an environment variable
             assertThrows(GitException.class, () -> repository.push(List.<String>of("origin"), null, null));
-
-            // if we delete too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(1000);
 
             // now delete it
             gitHub.deleteGitRepository(randomID);
@@ -993,7 +962,7 @@ public class JGitRepositoryTests {
             GitHubRepository gitHubRepository = gitHub.createGitRepository(randomID, "Test repository "+randomID, true, true);
 
             // if we read too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(1000);
+            Thread.sleep(2000);
 
             File directory = Files.createTempDirectory("nyx-test-git-clone-test-").toFile();
             directory.deleteOnExit();
@@ -1007,9 +976,6 @@ public class JGitRepositoryTests {
             
             // the 'gitHubTestUserToken' system property is set by the build script, which in turn reads it from an environment variable
             repository.push(List.<String>of("origin"), System.getProperty("gitHubTestUserToken"), System.getProperty("gitHubTestUserToken"));
-
-            // if we delete too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(1000);
 
             // now delete it
             gitHub.deleteGitRepository(randomID);

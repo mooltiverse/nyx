@@ -40,6 +40,9 @@ public class Extended extends SimpleConfigurationLayer {
     public Extended() {
         super();
 
+        // add a changelog configuration suitable for all the conventions used in this preset
+        setChangelog(Changelogs.ANY);
+
         // add the 'conventionalCommits' and 'gitmoji' conventions
         setCommitMessageConventions(
             new CommitMessageConventions(

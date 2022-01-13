@@ -10,6 +10,7 @@ These are the top level options in the configuration:
 | Name                                                      | Type    | Command Line Option                                       | Environment Variable                                          | Default  |
 | --------------------------------------------------------- | ------- | --------------------------------------------------------- | ------------------------------------------------------------- | -------- |
 | [`bump`](#bump)                                           | string  | `-b <NAME>`, `--bump=<NAME>`                              | `NYX_BUMP=<NAME>`                                             | N/A      |
+| [`changelog`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/changelog.md %}) | object  | See [Changelog]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/changelog.md %}) | See [Changelog]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/changelog.md %}) | N/A      |
 | [`commitMessageConventions`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/commit-message-conventions.md %}) | object  | See [Commit Message Conventions]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/commit-message-conventions.md %}) | See [Commit Message Conventions]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/commit-message-conventions.md %}) | N/A      |
 | [`configurationFile`](#configuration-file)                | string  | `-c <PATH>`, `--configuration-file=<PATH>`                | `NYX_CONFIGURATION_FILE=<PATH>`                               | N/A      |
 | [`directory`](#directory)                                 | string  | `-d <PATH>`, `--directory=<PATH>`                         | `NYX_DIRECTORY=<PATH>`                                        | Current working directory |
@@ -70,6 +71,9 @@ Consider using a [standard path for configuration files]({{ site.baseurl }}{% li
 In order to avoid chaining this option is ignored when defined in custom configuration files loaded by means of this same option.
 {: .notice--info}
 
+### Changelog
+
+See [Changelog]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/changelog.md %}).
 ### Commit message conventions
 
 See [Commit Message Conventions]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/commit-message-conventions.md %}).

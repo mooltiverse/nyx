@@ -18,6 +18,7 @@ package com.mooltiverse.oss.nyx.configuration;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.mooltiverse.oss.nyx.entities.ChangelogConfiguration;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
 import com.mooltiverse.oss.nyx.entities.GitConfiguration;
 import com.mooltiverse.oss.nyx.entities.ReleaseTypes;
@@ -33,6 +34,11 @@ public class SimpleConfigurationLayer implements ConfigurationLayer {
      * The value held by this object.
      */
     private String bump = null;
+
+    /**
+     * The value held by this object.
+     */
+    private ChangelogConfiguration changelog = new ChangelogConfiguration();
 
     /**
      * The value held by this object.
@@ -141,6 +147,23 @@ public class SimpleConfigurationLayer implements ConfigurationLayer {
      */
     public void setBump(String bump) {
         this.bump = bump;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ChangelogConfiguration getChangelog() {
+        return changelog;
+    }
+
+    /**
+     * Sets the value for this option.
+     * 
+     * @param changelog the value for this option.
+     */
+    public void setChangelog(ChangelogConfiguration changelog) {
+        this.changelog = changelog;
     }
 
     /**

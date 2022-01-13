@@ -108,7 +108,7 @@ public class GitHubTest {
             assertEquals("https://github.com/"+user.getUserName()+"/"+randomID+".git", gitHubRepository.getHTTPURL());
 
             // if we delete too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(1000);
+            Thread.sleep(2000);
 
             // now delete it
             gitHub.deleteGitRepository(randomID);
@@ -142,9 +142,6 @@ public class GitHubTest {
             Release release = gitHub.publishRelease(user.getUserName(), gitHubRepository.getName(), "Release 1.0.0-alpha.1", "1.0.0-alpha.1", "A test description for the release\non multiple lines\nlike these");
             assertEquals("Release 1.0.0-alpha.1", release.getTitle());
             assertEquals("1.0.0-alpha.1", release.getTag());
-            
-            // if we delete too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(1000);
 
             // now delete it
             gitHub.deleteGitRepository(randomID);

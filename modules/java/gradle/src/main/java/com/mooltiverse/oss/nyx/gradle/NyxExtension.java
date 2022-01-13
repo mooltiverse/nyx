@@ -106,6 +106,11 @@ public abstract class NyxExtension {
     private final Property<String> bump = getObjectfactory().property(String.class);
 
     /**
+     * The nested 'changelog' block.
+     */
+    private final ChangelogConfiguration changelog = getObjectfactory().newInstance(ChangelogConfiguration.class);
+
+    /**
      * The nested 'commitMessageConventions' block.
      */
     private final CommitMessageConventions commitMessageConventions = getObjectfactory().newInstance(CommitMessageConventions.class);
@@ -251,6 +256,29 @@ public abstract class NyxExtension {
      */
     public Property<String> getBump() {
         return bump;
+    }
+
+    /**
+     * Returns the object mapping the {@code changelog} block.
+     * 
+     * We provide an implementation of this method instead of using the abstract definition as it's
+     * safer for old Gradle versions we support.
+     * 
+     * @return the object mapping the {@code changelog} block
+     */
+    public ChangelogConfiguration getChangelog() {
+        return changelog;
+    }
+
+    /**
+     * Accepts the DSL configuration for the {@code changelog} block, needed for defining
+     * the block using the curly braces syntax in Gradle build scripts.
+     * See the documentation on top of this class for more.
+     * 
+     * @param configurationAction the configuration action for the {@code changelog} block
+     */
+    public void changelog(Action<? super ChangelogConfiguration> configurationAction) {
+        configurationAction.execute(changelog);
     }
 
     /**
@@ -516,6 +544,177 @@ public abstract class NyxExtension {
     }
 
     /**
+     * The class to model the 'changelog' block within the extension.
+     */
+    public abstract static class ChangelogConfiguration {
+        /**
+         * The format expression to use to generate working links to commits.
+         */
+        private final Property<String> commitLink = getObjectfactory().property(String.class);
+
+        /**
+         * The format expression to use to generate working links to contributors.
+         */
+        private final Property<String> contributorLink = getObjectfactory().property(String.class);
+
+        /**
+         * The flag telling if the unreleased section must be generated.
+         */
+        private final Property<Boolean> includeUnreleased = getObjectfactory().property(Boolean.class);
+
+        /**
+         * The regular expression to use to detect references to issues mentioned in commit messages.
+         */
+        private final Property<String> issueId = getObjectfactory().property(String.class);
+
+        /**
+         * The format expression to use to generate working links to issues mentioned in commit messages.
+         */
+        private final Property<String> issueLink = getObjectfactory().property(String.class);
+
+        /**
+         * The path to the destination file.
+         */
+        private final Property<String> path = getObjectfactory().property(String.class);
+
+        /**
+         * The path to the optional template file.
+         */
+        private final Property<String> template = getObjectfactory().property(String.class);
+
+        /**
+         * The nested 'sections' block.
+         */
+        private final MapProperty<String,String> sections = getObjectfactory().mapProperty(String.class, String.class);
+
+        /**
+         * Returns an object factory instance.
+         * 
+         * The instance is injected by Gradle as soon as this getter method is invoked.
+         * 
+         * Using <a href="https://docs.gradle.org/current/userguide/custom_gradle_types.html#property_injection">property injection</a>
+         * instead of <a href="https://docs.gradle.org/current/userguide/custom_gradle_types.html#constructor_injection">constructor injection</a>
+         * has a few advantages: it allows Gradle to refer injecting the object until it's required and is safer for backward
+         * compatibility (older versions can be supported).
+         * 
+         * @return the object factory instance
+         */
+        @Inject
+        protected abstract ObjectFactory getObjectfactory();
+
+        /**
+         * Returns the format expression to use to generate working links to commits. When this is set by the user it overrides
+         * the inference performed by Nyx.
+         * 
+         * We provide an implementation of this method instead of using the abstract definition as it's
+         * safer for old Gradle versions we support.
+         * 
+         * @return the format expression to use to generate working links to commits.
+         */
+        public Property<String> getCommitLink() {
+            return commitLink;
+        }
+
+        /**
+         * Returns the format expression to use to generate working links to contributors. When this is set by the user it overrides
+         * the inference performed by Nyx.
+         * 
+         * We provide an implementation of this method instead of using the abstract definition as it's
+         * safer for old Gradle versions we support.
+         * 
+         * @return the format expression to use to generate working links to contributors.
+         */
+        public Property<String> getContributorLink() {
+            return contributorLink;
+        }
+
+        /**
+         * Returns the flag telling if the unreleased section must be generated. When this is set by the user it overrides
+         * the inference performed by Nyx.
+         * 
+         * We provide an implementation of this method instead of using the abstract definition as it's
+         * safer for old Gradle versions we support.
+         * 
+         * @return the flag telling if the unreleased section must be generated.
+         */
+        public Property<Boolean> getIncludeUnreleased() {
+            return includeUnreleased;
+        }
+
+        /**
+         * Returns the regular expression to use to detect references to issues mentioned in commit messages.
+         * When this is set by the user it overrides the inference performed by Nyx.
+         * 
+         * We provide an implementation of this method instead of using the abstract definition as it's
+         * safer for old Gradle versions we support.
+         * 
+         * @return the regular expression to use to detect references to issues mentioned in commit messages.
+         */
+        public Property<String> getIssueId() {
+            return issueId;
+        }
+
+        /**
+         * Returns the format expression to use to generate working links to issues mentioned in commit messages.
+         * When this is set by the user it overrides the inference performed by Nyx.
+         * 
+         * We provide an implementation of this method instead of using the abstract definition as it's
+         * safer for old Gradle versions we support.
+         * 
+         * @return the format expression to use to generate working links to issues mentioned in commit messages.
+         */
+        public Property<String> getIssueLink() {
+            return issueLink;
+        }
+
+        /**
+         * Returns the path to the destination file. When this is set by the user it overrides
+         * the inference performed by Nyx.
+         * 
+         * We provide an implementation of this method instead of using the abstract definition as it's
+         * safer for old Gradle versions we support.
+         * 
+         * @return the path to the destination file.
+         */
+        public Property<String> getPath() {
+            return path;
+        }
+
+        /**
+         * Returns the path to the optional template file. When this is set by the user it overrides
+         * the inference performed by Nyx.
+         * 
+         * We provide an implementation of this method instead of using the abstract definition as it's
+         * safer for old Gradle versions we support.
+         * 
+         * @return the path to the optional template file.
+         */
+        public Property<String> getTemplate() {
+            return template;
+        }
+
+        /**
+         * Returns the map of changelog sections.
+         * 
+         * @return the map of changelog sections.
+         */
+        public MapProperty<String,String> getSections() {
+            return sections;
+        }
+        
+        /**
+         * Accepts the DSL configuration for the {@code sections} block, needed for defining
+         * the block using the curly braces syntax in Gradle build scripts.
+         * See the documentation on top of this class for more.
+         * 
+         * @param configurationAction the configuration action for the {@code sections} block
+         */
+        public void sections(Action<? super MapProperty<String,String>> configurationAction) {
+            configurationAction.execute(sections);
+        }     
+    }
+
+    /**
      * The class to model the 'commitMessageConventions' block within the extension.
      */
     public abstract static class CommitMessageConventions {
@@ -633,13 +832,13 @@ public abstract class NyxExtension {
             }
 
             /**
-             * Returns the name of the version identifier to bump. When this is set by the user it overrides
+             * Returns the regular expression to infer fields from a commit message. When this is set by the user it overrides
              * the inference performed by Nyx.
              * 
              * We provide an implementation of this method instead of using the abstract definition as it's
              * safer for old Gradle versions we support.
              * 
-             * @return the name of the version identifier to bump
+             * @return the regular expression to infer fields from a commit message
              */
             public Property<String> getExpression() {
                 return expression;
@@ -1427,13 +1626,13 @@ public abstract class NyxExtension {
         }
 
         /**
-         * Returns the name of the version identifier to bump. When this is set by the user it overrides
+         * Returns the service type. When this is set by the user it overrides
          * the inference performed by Nyx.
          * 
          * We provide an implementation of this method instead of using the abstract definition as it's
          * safer for old Gradle versions we support.
          * 
-         * @return the name of the version identifier to bump
+         * @return the service type
          */
         public Property<String> getType() {
             return type;
