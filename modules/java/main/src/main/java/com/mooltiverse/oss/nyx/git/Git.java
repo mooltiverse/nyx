@@ -21,8 +21,6 @@ import java.net.URI;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
-import org.slf4j.MarkerFactory;
 
 /**
  * The entry point to the Git local and remote service. This is also the main entry point to retrieve {@link Repository} instances
@@ -37,11 +35,6 @@ public class Git {
      * The password to authenticate to the remote service.
      */
     private String password = null;
-
-    /**
-     * The {@code SERVICE} marker, used when logging command events.
-     */
-    static final Marker SERVICE = MarkerFactory.getMarker("SERVICE");
 
     /**
      * The logger instance.

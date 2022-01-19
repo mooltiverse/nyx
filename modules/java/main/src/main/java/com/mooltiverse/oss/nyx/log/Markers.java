@@ -45,6 +45,11 @@ public class Markers {
     public static Marker DEFAULT = MarkerFactory.getMarker("DEFAULT");
 
     /**
+     * The {@code GIT} marker, used when performing Git operations.
+     */
+    public static Marker GIT = MarkerFactory.getMarker("GIT");
+
+    /**
      * The {@code TEMPLATE} marker, used when logging events about templates and their rendering.
      */
     public static Marker TEMPLATE = MarkerFactory.getMarker("TEMPLATE");
@@ -53,6 +58,11 @@ public class Markers {
      * The {@code MAIN} marker, used when logging events from the main classes.
      */
     public static Marker MAIN = MarkerFactory.getMarker("MAIN");
+
+    /**
+     * The {@code SERVICE} marker, used when logging events from within service implementations.
+     */
+    public static Marker SERVICE = MarkerFactory.getMarker("SERVICE");
 
     /**
      * The {@code STATE} marker, used when logging state events.

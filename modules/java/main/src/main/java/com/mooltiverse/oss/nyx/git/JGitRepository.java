@@ -15,6 +15,8 @@
  */
 package com.mooltiverse.oss.nyx.git;
 
+import static com.mooltiverse.oss.nyx.log.Markers.GIT;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -57,18 +59,11 @@ import org.eclipse.jgit.transport.RefSpec;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
-import org.slf4j.MarkerFactory;
 
 /**
  * A local repository implementation that encapsulates the backing <a href="https://www.eclipse.org/jgit/">JGit</a> library.
  */
 class JGitRepository implements Repository {
-    /**
-     * The {@code GIT} marker, used when logging events.
-     */
-    private static Marker GIT = MarkerFactory.getMarker("GIT");
-
     /**
      * The private logger instance
      */

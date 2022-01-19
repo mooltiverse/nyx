@@ -125,6 +125,7 @@ public class MarkTestTemplates {
             // add some commits to the repository and after one run the task should be up to date
             script.andCommitWithTag("111.122.133");
             command.run();
+            
             // when the command is executed standalone, Infer is not executed so isUpToDate() will always return false
             if (command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME))
                 assertFalse(command.isUpToDate());

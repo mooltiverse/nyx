@@ -15,6 +15,8 @@
  */
 package com.mooltiverse.oss.nyx.services.github;
 
+import static com.mooltiverse.oss.nyx.log.Markers.SERVICE;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -23,8 +25,6 @@ import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
-import org.slf4j.MarkerFactory;
 
 import com.mooltiverse.oss.nyx.io.TransportException;
 import com.mooltiverse.oss.nyx.services.GitHostingService;
@@ -48,11 +48,6 @@ public class GitHub implements GitHostingService, ReleaseService, UserService {
      * It may be {@code null}, but some operations may fail.
      */
     private String repositoryName = null;
-
-    /**
-     * The {@code SERVICE} marker, used when logging command events.
-     */
-    static final Marker SERVICE = MarkerFactory.getMarker("SERVICE");
 
     /**
      * The logger instance.

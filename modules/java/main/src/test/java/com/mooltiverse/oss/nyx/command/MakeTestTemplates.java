@@ -17,6 +17,11 @@ package com.mooltiverse.oss.nyx.command;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.StringWriter;
+import java.nio.file.Files;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.TestTemplate;
@@ -27,12 +32,31 @@ import com.mooltiverse.oss.nyx.command.template.CommandInvocationContextProvider
 import com.mooltiverse.oss.nyx.command.template.CommandProxy;
 import com.mooltiverse.oss.nyx.command.template.CommandSelector;
 import com.mooltiverse.oss.nyx.command.template.StandaloneCommandProxy;
+import com.mooltiverse.oss.nyx.configuration.SimpleConfigurationLayer;
 import com.mooltiverse.oss.nyx.git.GitException;
 import com.mooltiverse.oss.nyx.git.Scenario;
 import com.mooltiverse.oss.nyx.git.Script;
 
 @DisplayName("Make")
 public class MakeTestTemplates {
+    /**
+     * Reads the contents of the given file and returns its content as a string.
+     * 
+     * @param file the file to read
+     * 
+     * @return the file content
+     * 
+     * @throws Exception in case of any issue
+     */
+    private static String readFile(File file)
+        throws Exception {
+        StringWriter buffer = new StringWriter();
+        FileReader reader = new FileReader(file);
+        reader.transferTo(buffer);
+        reader.close();
+        return buffer.toString();
+    }
+
     @Nested
     @DisplayName("Make constructor")
     @ExtendWith(CommandInvocationContextProvider.class)
@@ -93,6 +117,51 @@ public class MakeTestTemplates {
             if (command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME))
                 assertFalse(command.isUpToDate());
             else assertTrue(command.isUpToDate()); 
+
+            // and running again with no changes must still be up to date
+            command.run();
+            // when the command is executed standalone, Infer is not executed so isUpToDate() will always return false
+            if (command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME))
+                assertFalse(command.isUpToDate());
+            else assertTrue(command.isUpToDate()); 
+        }
+
+        /**
+         * Check that the isUpToDate() returns {@code false} when the changelog destination file is configured but
+         * the file is missing
+         */
+        @TestTemplate
+        @DisplayName("Make.isUpToDate() == false when changelog file is configured but missing")
+        @Baseline(Scenario.FROM_SCRATCH)
+        void isUpToDateTestWithMissingChangelogFile(@CommandSelector(Commands.MAKE) CommandProxy command, Script script)
+            throws Exception {
+            // first create the temporary directory and the abstract destination file
+            File destinationDir = Files.createTempDirectory("nyx-test-make-test-").toFile();
+            File changelogFile = new File(destinationDir, "CHANGELOG.md");
+
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            configurationLayerMock.getChangelog().setPath(changelogFile.getAbsolutePath());
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
+
+            assertFalse(command.isUpToDate());
+            assertFalse(changelogFile.exists());
+
+            // add some commits to the repository and after one run the task should be up to date
+            script.andCommitWithTag("111.122.133");
+            command.run();
+
+            assertTrue(changelogFile.exists());
+
+            // when the command is executed standalone, Infer is not executed so isUpToDate() will always return false
+            if (command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME))
+                assertFalse(command.isUpToDate());
+            else assertTrue(command.isUpToDate());
+
+            // now delete the file and make sure it's no longer up to date
+            changelogFile.delete();
+            assertFalse(changelogFile.exists());
+
+            assertFalse(command.isUpToDate());
         }
     }
 
@@ -105,33 +174,33 @@ public class MakeTestTemplates {
         @Baseline(Scenario.ONE_BRANCH_SHORT)
         void runTest(@CommandSelector(Commands.MAKE) CommandProxy command)
             throws Exception {
-            /*
             // first create the temporary directory and the abstract destination file
-            File destinationDir = Files.createTempDirectory("nyx-test-mark-test-").toFile();
-            File destinationFile = new File(destinationDir, "test-asset.md");
+            File destinationDir = Files.createTempDirectory("nyx-test-make-test-").toFile();
+            File changelogFile = new File(destinationDir, "CHANGELOG.md");
 
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            // configure a simple template service
-            configurationLayerMock.setServices(Map.<String,ServiceConfiguration>of("service1", new ServiceConfiguration(Provider.TEMPLATE, Map.<String,String>of(Template.TEMPLATE_OPTION_NAME, "{{version}}"))));
-            // configure a simple asset to be built with the above service
-            configurationLayerMock.setAssets(Map.<String,Asset>of("test1", new Asset(destinationFile.getAbsolutePath(), "service1")));
-
-            assertFalse(destinationFile.exists());
-
+            configurationLayerMock.getChangelog().setPath(changelogFile.getAbsolutePath());
             command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
+
+            assertFalse(changelogFile.exists());
 
             command.run();
 
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
             if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
-                assertTrue(destinationFile.exists());
+                assertTrue(changelogFile.exists());
 
-                FileReader reader = new FileReader(destinationFile);
-                StringWriter writer = new StringWriter();
-                reader.transferTo(writer);
-                reader.close();
-                assertEquals("0.0.4", writer.toString());
-            }*/
+                String fileContent = readFile(changelogFile);
+                assertTrue(fileContent.contains("PLACEHOLDER")); // TODO: change this test with actual contents
+            }
+
+            // print the file to standard output for inspection purpose
+            System.out.println("------- CHANGELOG -------");
+            System.out.println("Loading from: "+changelogFile.getAbsolutePath());
+            System.out.println("-----------------------------------------");
+            System.out.println(readFile(changelogFile));
+            System.out.println("-----------------------------------------");
+            System.out.flush();
         }
     }
 }

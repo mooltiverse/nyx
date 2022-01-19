@@ -15,8 +15,8 @@
  */
 package com.mooltiverse.oss.nyx.services.gitlab;
 
+import static com.mooltiverse.oss.nyx.log.Markers.SERVICE;
 import static com.mooltiverse.oss.nyx.services.gitlab.GitLab.logger;
-import static com.mooltiverse.oss.nyx.services.gitlab.GitLab.SERVICE;
 
 import java.io.IOException;
 

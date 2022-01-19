@@ -15,8 +15,8 @@
  */
 package com.mooltiverse.oss.nyx.services.github;
 
+import static com.mooltiverse.oss.nyx.log.Markers.SERVICE;
 import static com.mooltiverse.oss.nyx.services.github.GitHub.logger;
-import static com.mooltiverse.oss.nyx.services.github.GitHub.SERVICE;
 
 import java.io.IOException;
 

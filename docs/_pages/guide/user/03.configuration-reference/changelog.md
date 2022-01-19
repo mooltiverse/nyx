@@ -137,7 +137,7 @@ In order for links to work you need to define the project and/or team name in th
 | Configuration File Option | `changelog/path`                                                                         |
 | Related state attributes  |                                                                                          |
 
-The absolute or relative path to a local file where the changelog is saved when generated. If a file already exists at the given location it is overwritten. Parent directories are created if needed.
+The absolute or relative path to a local file where the changelog is saved when generated. If a file already exists at the given location it is overwritten.
 
 Setting this value also enables the changelog creation, which is to say, when this option is not defined no changelog is generated.
 
