@@ -24,31 +24,6 @@ import java.util.Objects;
  */
 public class ChangelogConfiguration {
     /**
-     * The format expression to use to generate working links to commits.
-     */
-    private String commitLink = null;
-
-    /**
-     * The format expression to use to generate working links to contributors.
-     */
-    private String contributorLink = null;
-
-    /**
-     * The flag telling if the unreleased section must be generated.
-     */
-    private Boolean includeUnreleased = null;
-
-    /**
-     * The regular expression to use to detect references to issues mentioned in commit messages.
-     */
-    private String issueID = null;
-
-    /**
-     * The format expression to use to generate working links to issues mentioned in commit messages.
-     */
-    private String issueLink = null;
-
-    /**
      * The path to the destination file.
      */
     private String path = null;
@@ -57,6 +32,11 @@ public class ChangelogConfiguration {
      * The map of sections and commit types.
      */
     private Map<String,String> sections = null;
+
+    /**
+     * The map of substitution strings.
+     */
+    private Map<String,String> substitutions = null;
 
     /**
      * The path to the optional template file.
@@ -69,6 +49,7 @@ public class ChangelogConfiguration {
     public ChangelogConfiguration() {
         super();
         this.sections = new HashMap<String,String>();
+        this.substitutions = new HashMap<String,String>();
     }
 
     /**
@@ -77,135 +58,17 @@ public class ChangelogConfiguration {
      * @param path the path to the destination file. It may be {@code null}.
      * @param sections the map of sections and commit types.
      * @param template the path to the optional template file. It may be {@code null}.
-     * @param includeUnreleased the flag telling if the unreleased section must be generated. It may be {@code null}.
-     * @param commitLink the format expression to use to generate working links to commits. It may be {@code null}.
-     * @param contributorLink the format expression to use to generate working links to contributors. It may be {@code null}.
-     * @param issueID the regular expression to use to detect references to issues mentioned in commit messages. It may be {@code null}.
-     * @param issueLink the format expression to use to generate working links to issues mentioned in commit messages. It may be {@code null}.
+     * @param substitutions the map of substitution strings.
      * 
      * @throws NullPointerException if some mandatory argument is {@code null}
      */
-    public ChangelogConfiguration(String path, Map<String,String> sections, String template, Boolean includeUnreleased, String commitLink, String contributorLink, String issueID, String issueLink) {
+    public ChangelogConfiguration(String path, Map<String,String> sections, String template, Map<String,String> substitutions) {
         super();
         Objects.requireNonNull(sections);
         this.path = path;
         this.sections = sections;
         this.template = template;
-        this.includeUnreleased = includeUnreleased;
-        this.commitLink = commitLink;
-        this.contributorLink = contributorLink;
-        this.issueID = issueID;
-        this.issueLink = issueLink;
-    }
-
-    /**
-     * Returns the format expression to use to generate working links to commits.
-     * It may be {@code null}.
-     * 
-     * @return the format expression to use to generate working links to commits.
-     * It may be {@code null}.
-     */
-    public String getCommitLink() {
-        return commitLink;
-    }
-
-    /**
-     * Sets the format expression to use to generate working links to commits.
-     * It may be {@code null}.
-     * 
-     * @param commitLink the format expression to use to generate working links to commits.
-     * It may be {@code null}.
-     */
-    public void setCommitLink(String commitLink) {
-        this.commitLink = commitLink;
-    }
-
-    /**
-     * Returns the format expression to use to generate working links to contributors.
-     * It may be {@code null}.
-     * 
-     * @return the format expression to use to generate working links to contributors.
-     * It may be {@code null}.
-     */
-    public String getContributorLink() {
-        return contributorLink;
-    }
-
-    /**
-     * Sets the format expression to use to generate working links to contributors.
-     * It may be {@code null}.
-     * 
-     * @param contributorLink the format expression to use to generate working links to contributors.
-     * It may be {@code null}.
-     */
-    public void setContributorLink(String contributorLink) {
-        this.contributorLink = contributorLink;
-    }
-
-    /**
-     * Returns the flag telling if the unreleased section must be generated.
-     * It may be {@code null}.
-     * 
-     * @return the flag telling if the unreleased section must be generated.
-     * It may be {@code null}.
-     */
-    public Boolean getIncludeUnreleased() {
-        return includeUnreleased;
-    }
-
-    /**
-     * Sets the flag telling if the unreleased section must be generated.
-     * It may be {@code null}.
-     * 
-     * @param includeUnreleased the flag telling if the unreleased section must be generated.
-     * It may be {@code null}.
-     */
-    public void setIncludeUnreleased(Boolean includeUnreleased) {
-        this.includeUnreleased = includeUnreleased;
-    }
-
-    /**
-     * Returns the regular expression to use to detect references to issues mentioned in commit messages.
-     * It may be {@code null}.
-     * 
-     * @return the regular expression to use to detect references to issues mentioned in commit messages.
-     * It may be {@code null}.
-     */
-    public String getIssueID() {
-        return issueID;
-    }
-
-    /**
-     * Sets the regular expression to use to detect references to issues mentioned in commit messages.
-     * It may be {@code null}.
-     * 
-     * @param issueID the regular expression to use to detect references to issues mentioned in commit messages.
-     * It may be {@code null}.
-     */
-    public void setIssueID(String issueID) {
-        this.issueID = issueID;
-    }
-
-    /**
-     * Returns the format expression to use to generate working links to issues mentioned in commit messages.
-     * It may be {@code null}.
-     * 
-     * @return the format expression to use to generate working links to issues mentioned in commit messages.
-     * It may be {@code null}.
-     */
-    public String getIssueLink() {
-        return issueLink;
-    }
-
-    /**
-     * Sets the format expression to use to generate working links to issues mentioned in commit messages.
-     * It may be {@code null}.
-     * 
-     * @param issueLink the format expression to use to generate working links to issues mentioned in commit messages.
-     * It may be {@code null}.
-     */
-    public void setIssueLink(String issueLink) {
-        this.issueLink = issueLink;
+        this.substitutions = substitutions;
     }
 
     /**
@@ -242,6 +105,24 @@ public class ChangelogConfiguration {
      */
     public void setSections(Map<String,String> sections) {
         this.sections = sections;
+    }
+
+    /**
+     * Returns the map of substitution strings.
+     * 
+     * @return the map of substitution strings.
+     */
+    public Map<String,String> getSubstitutions() {
+        return substitutions;
+    }
+
+    /**
+     * Sets the map of substitution strings.
+     * 
+     * @param substitutions the map of substitution strings.
+     */
+    public void setSubstitutions(Map<String,String> substitutions) {
+        this.substitutions = substitutions;
     }
 
     /**

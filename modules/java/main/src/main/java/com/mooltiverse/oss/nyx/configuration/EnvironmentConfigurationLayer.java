@@ -85,31 +85,6 @@ class EnvironmentConfigurationLayer implements ConfigurationLayer {
     /**
      * The name of the environment variable to read for this value. Value: {@value}
      */
-    private static final String CHANGELOG_CONFIGURATION_COMMIT_LINK_ENVVAR_NAME = CHANGELOG_CONFIGURATION_ENVVAR_NAME.concat("_COMMIT_LINK");
-
-    /**
-     * The name of the environment variable to read for this value. Value: {@value}
-     */
-    private static final String CHANGELOG_CONFIGURATION_CONTRIBUTOR_LINK_ENVVAR_NAME = CHANGELOG_CONFIGURATION_ENVVAR_NAME.concat("_CONTRIBUTOR_LINK");
-
-    /**
-     * The name of the environment variable to read for this value. Value: {@value}
-     */
-    private static final String CHANGELOG_CONFIGURATION_INCLUDE_UNRELEASED_ENVVAR_NAME = CHANGELOG_CONFIGURATION_ENVVAR_NAME.concat("_INCLUDE_UNRELEASED");
-
-    /**
-     * The name of the environment variable to read for this value. Value: {@value}
-     */
-    private static final String CHANGELOG_CONFIGURATION_ISSUE_ID_ENVVAR_NAME = CHANGELOG_CONFIGURATION_ENVVAR_NAME.concat("_ISSUE_ID");
-
-    /**
-     * The name of the environment variable to read for this value. Value: {@value}
-     */
-    private static final String CHANGELOG_CONFIGURATION_ISSUE_LINK_ENVVAR_NAME = CHANGELOG_CONFIGURATION_ENVVAR_NAME.concat("_ISSUE_LINK");
-
-    /**
-     * The name of the environment variable to read for this value. Value: {@value}
-     */
     private static final String CHANGELOG_CONFIGURATION_PATH_ENVVAR_NAME = CHANGELOG_CONFIGURATION_ENVVAR_NAME.concat("_PATH");
 
     /**
@@ -127,7 +102,7 @@ class EnvironmentConfigurationLayer implements ConfigurationLayer {
     private static final String CHANGELOG_CONFIGURATION_SECTIONS_ITEM_NAME_REGEX = CHANGELOG_CONFIGURATION_SECTIONS_ENVVAR_NAME.concat("_(?<name>[a-zA-Z0-9]+)$");
 
     /**
-     * The parametrized name of the environment variable to read for the regulat expression attribute of a
+     * The parametrized name of the environment variable to read for the regular expression attribute of a
      * changelog section configuration.
      * This string is a {@link Formatter string} that contains a '%s' parameter for the section name
      * and must be rendered using {@link String#format(String, Object...) String.format(CHANGELOG_CONFIGURATION_SECTIONS_ITEM_REGEXP_FORMAT_STRING, name)}
@@ -138,6 +113,33 @@ class EnvironmentConfigurationLayer implements ConfigurationLayer {
      * @see String#format(String, Object...)
      */
     private static final String CHANGELOG_CONFIGURATION_SECTIONS_ITEM_REGEXP_FORMAT_STRING = CHANGELOG_CONFIGURATION_SECTIONS_ENVVAR_NAME.concat("_%s");
+
+    /**
+     * The name of the environment variable to read for this value. Value: {@value}
+     */
+    private static final String CHANGELOG_CONFIGURATION_SUBSTITUTIONS_ENVVAR_NAME = CHANGELOG_CONFIGURATION_ENVVAR_NAME.concat("_SUBSTITUTIONS");
+
+    /**
+     * The regular expression used to scan the name of a changelog substitution from an environment
+     * variable name. This expression is used to detect if an environment variable is used to define
+     * a changelog substitution.
+     * This expression uses the 'name' capturing group which returns the substitution regex, if detected.
+     * Value: {@value}
+     */
+    private static final String CHANGELOG_CONFIGURATION_SUBSTITUTIONS_ITEM_NAME_REGEX = CHANGELOG_CONFIGURATION_SUBSTITUTIONS_ENVVAR_NAME.concat("_(?<name>[a-zA-Z0-9]+)$");
+
+    /**
+     * The parametrized name of the environment variable to read for the regular expression attribute of a
+     * changelog substitution configuration.
+     * This string is a {@link Formatter string} that contains a '%s' parameter for the substitution name
+     * and must be rendered using {@link String#format(String, Object...) String.format(CHANGELOG_CONFIGURATION_SUBSTITUTIONS_ITEM_REGEXP_FORMAT_STRING, name)}
+     * in order to get the actual name of environment variable that brings the value for the substitution with the given {@code name}.
+     * Value: {@value}
+     * 
+     * @see Formatter
+     * @see String#format(String, Object...)
+     */
+    private static final String CHANGELOG_CONFIGURATION_SUBSTITUTIONS_ITEM_REGEXP_FORMAT_STRING = CHANGELOG_CONFIGURATION_SUBSTITUTIONS_ENVVAR_NAME.concat("_%s");
 
     /**
      * The name of the environment variable to read for this value. Value: {@value}
@@ -838,15 +840,6 @@ class EnvironmentConfigurationLayer implements ConfigurationLayer {
     public ChangelogConfiguration getChangelog()
         throws IllegalPropertyException {
         if (Objects.isNull(changelogSection)) {
-            Boolean includeUnreleased = null;
-            try {
-                if (!Objects.isNull(getenv(CHANGELOG_CONFIGURATION_INCLUDE_UNRELEASED_ENVVAR_NAME)) && !getenv(CHANGELOG_CONFIGURATION_INCLUDE_UNRELEASED_ENVVAR_NAME).isBlank())
-                    includeUnreleased = Boolean.valueOf(getenv(CHANGELOG_CONFIGURATION_INCLUDE_UNRELEASED_ENVVAR_NAME));
-            }
-            catch (IllegalArgumentException iae) {
-                throw new IllegalPropertyException(String.format("The environment variable '%s' has an illegal value '%s'", CHANGELOG_CONFIGURATION_INCLUDE_UNRELEASED_ENVVAR_NAME, getenv(CHANGELOG_CONFIGURATION_INCLUDE_UNRELEASED_ENVVAR_NAME)), iae);
-            }
-
             // parse the 'sections' map
             Map<String,String> sections = new HashMap<String,String>();
             Set<String> sectionNames = scanItemNamesInEnvironmentVariables("changelog", CHANGELOG_CONFIGURATION_SECTIONS_ITEM_NAME_REGEX, null);
@@ -856,7 +849,16 @@ class EnvironmentConfigurationLayer implements ConfigurationLayer {
                 sections.put(sectionName, getenv(String.format(CHANGELOG_CONFIGURATION_SECTIONS_ITEM_REGEXP_FORMAT_STRING, sectionName)));
             }
 
-            changelogSection = new ChangelogConfiguration(getenv(CHANGELOG_CONFIGURATION_PATH_ENVVAR_NAME), sections, getenv(CHANGELOG_CONFIGURATION_TEMPLATE_ENVVAR_NAME), includeUnreleased, getenv(CHANGELOG_CONFIGURATION_COMMIT_LINK_ENVVAR_NAME), getenv(CHANGELOG_CONFIGURATION_CONTRIBUTOR_LINK_ENVVAR_NAME), getenv(CHANGELOG_CONFIGURATION_ISSUE_ID_ENVVAR_NAME), getenv(CHANGELOG_CONFIGURATION_ISSUE_LINK_ENVVAR_NAME));
+            // parse the 'substitutions' map
+            Map<String,String> substitutions = new HashMap<String,String>();
+            Set<String> substitutionNames = scanItemNamesInEnvironmentVariables("changelog", CHANGELOG_CONFIGURATION_SUBSTITUTIONS_ITEM_NAME_REGEX, null);
+            // now we have the set of all section names configured through environment variables and we can
+            // query specific environment variables
+            for (String substitutionName: substitutionNames) {
+                substitutions.put(substitutionName, getenv(String.format(CHANGELOG_CONFIGURATION_SUBSTITUTIONS_ITEM_REGEXP_FORMAT_STRING, substitutionName)));
+            }
+
+            changelogSection = new ChangelogConfiguration(getenv(CHANGELOG_CONFIGURATION_PATH_ENVVAR_NAME), sections, getenv(CHANGELOG_CONFIGURATION_TEMPLATE_ENVVAR_NAME), substitutions);
         }
         return changelogSection;
     }

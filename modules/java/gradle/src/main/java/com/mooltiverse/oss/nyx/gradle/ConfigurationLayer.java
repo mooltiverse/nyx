@@ -112,11 +112,7 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
                 extension.getChangelog().getPath().getOrNull(),
                 extension.getChangelog().getSections().isPresent() ?  extension.getChangelog().getSections().get() : Map.<String,String>of(),
                 extension.getChangelog().getTemplate().getOrNull(),
-                extension.getChangelog().getIncludeUnreleased().getOrNull(),
-                extension.getChangelog().getCommitLink().getOrNull(),
-                extension.getChangelog().getContributorLink().getOrNull(),
-                extension.getChangelog().getIssueId().getOrNull(),
-                extension.getChangelog().getIssueLink().getOrNull()
+                extension.getChangelog().getSubstitutions().isPresent() ?  extension.getChangelog().getSubstitutions().get() : Map.<String,String>of()
             );
         }
         return changelogConfigurationSection;

@@ -13,6 +13,7 @@ The following attributes are at the top of the hierarchy:
 | ----------------------------------------- | ------- | ------------------------------------------- |
 | [`branch`](#branch)                       | string  | The current Git branch                      |
 | [`bump`](#bump)                           | string  | The bumped version identifier               |
+| [`changelog`](#changelog)                 | object  | The changelog data model                    |
 | [`configuration`](#configuration)         | object  | The resolved configuration                  |
 | [`directory`](#directory)                 | string  | Directory path                              |
 | [`internals`](#internals)                 | map     | Name-Value pairs                            |
@@ -54,6 +55,19 @@ This attribute is not initialized if the [`version`]({{ site.baseurl }}{% link _
 This attribute is not available until [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer) has run.
 
 When using [collapsed versioning]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#collapse-versions) this attribute contains the value of the bumped *core* identifier only (if any was bumped), not the [collapsed version qualifier]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#collapsed-version-qualifier). Broadly speaking, no [extra identifier]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#identifiers) is ever used to set this value. This might be misleading as sometimes you don't see the *core* identifier actually bumped on the [previous version]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#previous-version) as it might have already been bumped on the [prime version]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#prime-version).
+{: .notice--info}
+
+### Changelog
+
+| ----------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                          | `changelog`                                                                           |
+| Type                          | object                                                                                   |
+| Related configuration options | See the [details]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/changelog.md %}) |
+| Initialized by task           | [make]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#make){: .btn .btn--small} |
+
+This object holds the data used to render the changelog, documented [here]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/changelog.md %}).
+
+Please note that the `changelog` object is only present when the changelog generation has been enabled by setting the changelog [`path`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/changelog.md %}#path) option.
 {: .notice--info}
 
 ### Configuration
@@ -121,8 +135,8 @@ This attribute is not available until [infer]({{ site.baseurl }}{% link _pages/g
 | ----------------------------- | ---------------------------------------------------------------------------------------- |
 | Name                          | `releaseScope`                                                                           |
 | Type                          | object                                                                                   |
-| Related configuration options | See the [details]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}) |
-| Initialized by task           | See the [details]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}) |
+| Related configuration options |                                                                                          |
+| Initialized by task           | [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#infer){: .btn .btn--small} |
 
 This object collects several attributes defining the release scope, documented [here]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}).
 

@@ -18,7 +18,7 @@ The following attributes are children of the [`releaseScope`]({{ site.baseurl }}
 | [`releaseScope/previousVersionCommit`](#previous-version-commit)    | string  | The previous version [commit](#commit-objects)            |
 | [`releaseScope/primeVersion`](#prime-version)                       | string  | The prime version                                         |
 | [`releaseScope/primeVersionCommit`](#prime-version-commit)          | string  | The prime version [commit](#commit-objects)               |
-| [`releaseScope/significantCommits`](#significant-commits)           | map     | The significant [commits](#commit-objects)                |
+| [`releaseScope/significantCommits`](#significant-commits)           | list    | The significant [commits](#commit-objects)                |
 
 ### Commits
 

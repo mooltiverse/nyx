@@ -33,6 +33,7 @@ import org.junit.jupiter.api.Test;
 
 import com.mooltiverse.oss.nyx.configuration.Configuration;
 import com.mooltiverse.oss.nyx.configuration.SimpleConfigurationLayer;
+import com.mooltiverse.oss.nyx.entities.Changelog;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
 import com.mooltiverse.oss.nyx.entities.Identifier;
@@ -154,6 +155,30 @@ public class StateTests {
             State state = new State(configuration);
             assertEquals("gamma", state.getBump());
             assertThrows(IllegalStateException.class, () -> state.setBump("any value"));
+        }
+
+        @Test
+        @DisplayName("State.getChangelog()")
+        void getChangelogTest()
+            throws Exception {
+            // make sure the changelog is null in the beginning (it's set only after the Infer task has run)
+            State state = new State(new Configuration());
+            assertNull(state.getChangelog());
+            Changelog changelog = new Changelog();
+            state.setChangelog(changelog);
+            assertSame(changelog, state.getChangelog());
+        }
+
+        @Test
+        @DisplayName("State.setChangelog()")
+        void setChangelogTest()
+            throws Exception {
+            // make sure the changelog is null in the beginning (it's set only after the Infer task has run)
+            State state = new State(new Configuration());
+            assertNull(state.getChangelog());
+            Changelog changelog = new Changelog();
+            state.setChangelog(changelog);
+            assertSame(changelog, state.getChangelog());
         }
 
         @Test
@@ -385,6 +410,9 @@ public class StateTests {
             Commit finalCommit = new Commit("e6b1c65eac4d81aadde22e796bb2a8e48da4c5d9", 1580515200, List.<String>of("b50926577d36f403f4b3ebf51dfe34660b52eaa2"), new Action(new Identity("Jim", "jim@example.com"), new TimeStamp(new Date(1580601600), new SimpleTimeZone(SimpleTimeZone.UTC_TIME, "America/Los_Angeles"))), new Action(new Identity("Jim", "jim@example.com"), new TimeStamp(new Date(1580601600), new SimpleTimeZone(SimpleTimeZone.UTC_TIME, "America/Los_Angeles"))), new Message("final commit", "final commit", Map.<String,String>of()), Set.<Tag>of());
 
             // set a few values to use later on for comparison
+            oldState.setChangelog(new Changelog());
+            oldState.getChangelog().setReleases(List.<Changelog.Release>of(new Changelog.Release("MyRelease", "today")));
+            oldState.getChangelog().getReleases().get(0).setSections(List.<Changelog.Release.Section>of(new Changelog.Release.Section("MySection")));
             oldState.setVersion("3.5.7");
             oldState.setVersionRange(".*");
             oldState.getInternals().put("attr1", "value1");
@@ -427,6 +455,12 @@ public class StateTests {
             // now we are ready to resume the file
             State resumedState = State.resume(new File(configurationLayerMock.getStateFile()), configuration);
             assertEquals(oldState.getBump(), resumedState.getBump());
+            assertNotNull(resumedState.getChangelog());
+            assertEquals(1, resumedState.getChangelog().getReleases().size());
+            assertEquals("MyRelease", resumedState.getChangelog().getReleases().get(0).getName());
+            assertEquals("today", resumedState.getChangelog().getReleases().get(0).getDate());
+            assertEquals(1, resumedState.getChangelog().getReleases().get(0).getSections().size());
+            assertEquals("MySection", resumedState.getChangelog().getReleases().get(0).getSections().get(0).getName());
             assertEquals(oldState.getInternals(), resumedState.getInternals());
             assertTrue(resumedState.getInternals().containsKey("attr1"));
             assertEquals("value1", resumedState.getInternals().get("attr1"));
@@ -486,6 +520,9 @@ public class StateTests {
             Commit finalCommit = new Commit("e6b1c65eac4d81aadde22e796bb2a8e48da4c5d9", 1580515200, List.<String>of("b50926577d36f403f4b3ebf51dfe34660b52eaa2"), new Action(new Identity("Jim", "jim@example.com"), new TimeStamp(new Date(1580601600), new SimpleTimeZone(SimpleTimeZone.UTC_TIME, "America/Los_Angeles"))), new Action(new Identity("Jim", "jim@example.com"), new TimeStamp(new Date(1580601600), new SimpleTimeZone(SimpleTimeZone.UTC_TIME, "America/Los_Angeles"))), new Message("final commit", "final commit", Map.<String,String>of()), Set.<Tag>of());
 
             // set a few values to use later on for comparison
+            oldState.setChangelog(new Changelog());
+            oldState.getChangelog().setReleases(List.<Changelog.Release>of(new Changelog.Release("MyRelease", "today")));
+            oldState.getChangelog().getReleases().get(0).setSections(List.<Changelog.Release.Section>of(new Changelog.Release.Section("MySection")));
             oldState.setVersion("3.5.7");
             oldState.setVersionRange(".*");
             oldState.getInternals().put("attr1", "value1");
@@ -528,6 +565,12 @@ public class StateTests {
             // now we are ready to resume the file
             State resumedState = State.resume(new File(configurationLayerMock.getStateFile()), configuration);
             assertEquals(oldState.getBump(), resumedState.getBump());
+            assertNotNull(resumedState.getChangelog());
+            assertEquals(1, resumedState.getChangelog().getReleases().size());
+            assertEquals("MyRelease", resumedState.getChangelog().getReleases().get(0).getName());
+            assertEquals("today", resumedState.getChangelog().getReleases().get(0).getDate());
+            assertEquals(1, resumedState.getChangelog().getReleases().get(0).getSections().size());
+            assertEquals("MySection", resumedState.getChangelog().getReleases().get(0).getSections().get(0).getName());
             assertEquals(oldState.getInternals(), resumedState.getInternals());
             assertTrue(resumedState.getInternals().containsKey("attr1"));
             assertEquals("value1", resumedState.getInternals().get("attr1"));

@@ -1,23 +1,25 @@
-PLACEHOLDER
-{{#general_title}}
-# {{{title}}}
+# Changelog
 
 
-{{/general_title}}
-{{#versions}}
-## {{{label}}}
+{{#releases}}
+## {{name}} ({{date}})
 
 {{#sections}}
-### {{{label}}}
+### {{name}}
 
 {{#commits}}
-* {{{subject}}} [{{{author}}}]
-{{#body}}
-
-{{{body_indented}}}
-{{/body}}
+* [{{#short5}}{{SHA}}{{/short5}}] {{message.shortMessage}} ({{authorAction.identity.name}})
 
 {{/commits}}
+{{^commits}}
+No changes.
+{{/commits}}
+{{/sections}}
+{{^sections}}
+No changes.
 {{/sections}}
 
-{{/versions}}
+{{/releases}}
+{{^releases}}
+No releases.
+{{/releases}}

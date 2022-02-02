@@ -9,122 +9,18 @@ The `changelog` *section* is where you configure the (optional) changelog genera
 
 There is only one `changelog` *section* per configuration.
 
-The changelog scope includes only those changes belonging to the current release plus, optionally, [unreleased](#include-unreleased) changes. What appears in the changelog is the first line of the commit message and, optionally, some decorators that may have been configured here or added by a custom template.
+The range of commits included in the changelog is limited to those in the current [release scope]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#commits). What appears in the changelog is the first line of the commit message and, optionally, some decorators that may have been configured here or added by a custom template.
+
+The changelog is generated only when a [new version]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#new-version) has been [inferred]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#infer).
 
 ### Changelog options
 
 | Name                                                 | Type    | Command Line Option                                                           | Environment Variable                             | Default                                |
 | ---------------------------------------------------- | ------- | ----------------------------------------------------------------------------- | ------------------------------------------------ | -------------------------------------- |
-| [`changelog/commitLink`](#commit-link)               | string  | `--changelog-commit-link=<EXPR>`                                              | `NYX_CHANGELOG_COMMIT_LINK=<EXPR>`               | N/A                                    |
-| [`changelog/contributorLink`](#contributor-link)     | string  | `--changelog-contributor-link=<EXPR>`                                         | `NYX_CHANGELOG_CONTRIBUTOR_LINK=<EXPR>`          | N/A                                    |
-| [`changelog/includeUnreleased`](#include-unreleased) | boolean | `--changelog-include-unreleased`, `--changelog-include-unreleased=true|false` | `NYX_CHANGELOG_INCLUDE_UNRELEASED=true|false`    | N/A                                    |
-| [`changelog/issueId`](#issue-id)                     | string  | `--changelog-issue-id=<REGEX>`                                                | `NYX_CHANGELOG_ISSUE_ID=<REGEX>`                 | N/A                                    |
-| [`changelog/issueLink`](#issue-link)                 | string  | `--changelog-issue-link=<EXPR>`                                               | `NYX_CHANGELOG_ISSUE_LINK=<EXPR>`                | N/A                                    |
 | [`changelog/path`](#path)                            | string  | `--changelog-path=<PATH>`                                                     | `NYX_CHANGELOG_PATH=<PATH>`                      | N/A                                    |
 | [`changelog/sections`](#sections)                    | [map]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}#collections-of-objects) | `--changelog-sections-<NAME>=<REGEX>` | `NYX_CHANGELOG_SECTIONS_<NAME>=<REGEX>` | N/A                                    |
+| [`changelog/substitutions`](#substitutions)          | [map]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}#collections-of-objects) | `--changelog-substitutions-<REGEX>=<FORMAT_STRING>` | `NYX_CHANGELOG_SUBSTITUTIONS_<REGEX>=<FORMAT_STRING>` | N/A                                    |
 | [`changelog/template`](#template)                    | string  | `--changelog-template=<PATH>`                                                 | `NYX_CHANGELOG_TEMPLATE=<PATH>`                  | N/A                                    |
-
-#### Commit link
-
-| ------------------------- | ---------------------------------------------------------------------------------------- |
-| Name                      | `changelog/commitLink`                                                                   |
-| Type                      | string                                                                                   |
-| Default                   | N/A                                                                                      |
-| Command Line Option       | `--changelog-commit-link=<EXPR>`                                                         |
-| Environment Variable      | `NYX_CHANGELOG_COMMIT_LINK=<EXPR>`                                                       |
-| Configuration File Option | `changelog/commitLink`                                                                   |
-| Related state attributes  |                                                                                          |
-
-A format string used to generate working links to commits using the commit SHA ID. This format expression must have one `%s` parameter that will be replaced by the commit ID.
-
-If this option is not specified commits will not be linked.
-
-For example, for a commit `cc6ab7319a606a65f5be4b683045ba3cd052aa4d`, using the `https://example.com/commits/%s` link expression will produce the `https://example.com/commits/cc6ab7319a606a65f5be4b683045ba3cd052aa4d` link.
-
-The expression you use here depends on the hosting platform you use for hosting the Git repository.
-
-In order for links to work you need to define the project and/or team name in the URL.
-{: .notice--info}
-
-#### Contributor link
-
-| ------------------------- | ---------------------------------------------------------------------------------------- |
-| Name                      | `changelog/contributorLink`                                                              |
-| Type                      | string                                                                                   |
-| Default                   | N/A                                                                                      |
-| Command Line Option       | `--changelog-contributor-link=<EXPR>`                                                    |
-| Environment Variable      | `NYX_CHANGELOG_CONTRIBUTOR_LINK=<EXPR>`                                                  |
-| Configuration File Option | `changelog/contributorLink`                                                              |
-| Related state attributes  |                                                                                          |
-
-A format string used to generate working links to contributors using the commit contributor ID. This format expression must have one `%s` parameter that will be replaced by the committer ID.
-
-If this option is not specified contributors will not be linked.
-
-For example, for a committer `jdoe`, using the `https://example.com/people/%s` link expression will produce the `https://example.com/people/jdoe` link.
-
-The expression you use here depends on the hosting platform you use for hosting the Git repository.
-
-In order for links to work you may need to define the project and/or team name in the URL.
-{: .notice--info}
-
-#### Include unreleased
-
-| ------------------------- | ---------------------------------------------------------------------------------------- |
-| Name                      | `changelog/includeUnreleased`                                                            |
-| Type                      | boolean                                                                                  |
-| Default                   | N/A                                                                                      |
-| Command Line Option       | `--changelog-include-unreleased`, `--changelog-include-unreleased=true|false`            |
-| Environment Variable      | `NYX_CHANGELOG_INCLUDE_UNRELEASED=true|false`                                            |
-| Configuration File Option | `changelog/includeUnreleased`                                                            |
-| Related state attributes  |                                                                                          |
-
-When this option is enabled, an *Unlereased* section is added on top of the regular releases with all the changes that have not been released yet (not even with the current Nyx run). This may happen when only when non [significant]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#significant-commits) changes have been committed since the last tagged release.
-
-When used with no value on the command line (i.e. `--changelog-include-unreleased` alone) `true` is assumed.
-
-#### Issue ID
-
-| ------------------------- | ---------------------------------------------------------------------------------------- |
-| Name                      | `changelog/issueId`                                                                      |
-| Type                      | string                                                                                   |
-| Default                   | N/A                                                                                      |
-| Command Line Option       | `--changelog-issue-id=<REGEX>`                                                           |
-| Environment Variable      | `NYX_CHANGELOG_ISSUE_ID=<REGEX>`                                                         |
-| Configuration File Option | `changelog/issueId`                                                                      |
-| Related state attributes  |                                                                                          |
-
-A regular expression used to find references to issues in commit messages. Those references are then used to generate working links to issues in the changelog by using the [issue link](#issue-link).
-
-The expression must define a *named capturing group* `id` which only captures the issue ID without delimiters. The ID captured this way is used as the value to format using the [issue link](#issue-link) expression.
-
-If this option is not specified issue references will not be transformed.
-
-A common value used for this option is `(?m)#(?<id>[0-9]+)(?s).*` which captures all IDs starting with the `#` character followed by the issue ID (as [GitHub](https://github.com/) and [GitLab](https://gitlab.com/) do). The `id` captuning group only captures the digits after the `#` delimiter so only the following digits will be used as ID in the [issue link](#issue-link) expression.
-
-For example, if a commit message contains the `#123` string at some point, the issue ID `123` will be used in [issue link](#issue-link).
-
-#### Issue link
-
-| ------------------------- | ---------------------------------------------------------------------------------------- |
-| Name                      | `changelog/issueLink`                                                                    |
-| Type                      | string                                                                                   |
-| Default                   | N/A                                                                                      |
-| Command Line Option       | `--changelog-issue-link=<EXPR>`                                                          |
-| Environment Variable      | `NYX_CHANGELOG_ISSUE_LINK=<EXPR>`                                                        |
-| Configuration File Option | `changelog/issueLink`                                                                    |
-| Related state attributes  |                                                                                          |
-
-A format string used to generate working links to issues whose ID has been detected by the [issue ID](#issue-id) regular expression. This format expression must have one `%s` parameter that will be replaced by the issue ID.
-
-If this option is not specified issue references will not be transformed.
-
-For example, for an issue ID `123`, using the `https://example.com/issues/%s` link expression will produce the `https://example.com/issues/123` link.
-
-The expression you use here depends on the hosting platform you use for issues.
-
-In order for links to work you need to define the project and/or team name in the URL.
-{: .notice--info}
 
 #### Path
 
@@ -135,7 +31,7 @@ In order for links to work you need to define the project and/or team name in th
 | Command Line Option       | `--changelog-path=<PATH>`                                                                |
 | Environment Variable      | `NYX_CHANGELOG_PATH=<PATH>`                                                              |
 | Configuration File Option | `changelog/path`                                                                         |
-| Related state attributes  |                                                                                          |
+| Related state attributes  | [changelog]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/changelog.md %}){: .btn .btn--info .btn--small} |
 
 The absolute or relative path to a local file where the changelog is saved when generated. If a file already exists at the given location it is overwritten.
 
@@ -152,7 +48,7 @@ A common value used for this option is `CHANGELOG.md`.
 | Command Line Option       | `--changelog-sections-<NAME>=<REGEX>`                                                    |
 | Environment Variable      | `NYX_CHANGELOG_SECTIONS_<NAME>=<REGEX>`                                                  |
 | Configuration File Option | `changelog/sections`                                                                     |
-| Related state attributes  |                                                                                          |
+| Related state attributes  | [changelog/releases/ID/sections]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/changelog.md %}#sections){: .btn .btn--info .btn--small} |
 
 The `sections` option lets you define the sections that will appear inside a single release in the changelog, each one grouping changes of the same *type*. Each section is defined by a *Name*, which is the name of the section to show in the changelog, and a regular expression that matches zero or more commit *types*, as they are inferred by the [`expression`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/commit-message-conventions.md %}#expression) option of the [commit message convention]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/commit-message-conventions.md %}) in use. If a commit *type* is not matched by any itemp in this map then it will not appear in the changelog, and this might be useful to skim all the unrelevant changes.
 
@@ -169,9 +65,43 @@ For example, when using the [Conventional Commits](https://www.conventionalcommi
 * `Added` = `^feat$`
 * `Fixed` = `^fix$`
 
-to ignore all changes not bringing bug fixes or new features.
+With this example definition, all changes not bringing bug fixes or new features are ignored.
 
 As you can guess the sections you define here strongly depend on the configured [commit message convention]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/commit-message-conventions.md %}).
+
+#### Substitutions
+
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `changelog/substitutions`                                                                |
+| Type                      | [map]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}#collections-of-objects) |
+| Default                   | N/A                                                                                      |
+| Command Line Option       | `--changelog-substitutions-<REGEX>=<FORMAT_STRING>`                                      |
+| Environment Variable      | `NYX_CHANGELOG_SUBSTITUTIONS_<REGEX>=<FORMAT_STRING>`                                    |
+| Configuration File Option | `changelog/substitutions`                                                                |
+| Related state attributes  |                                                                                          |
+
+The optional `substitutions` map lets you define string replacements to make to the rendered document. These are usually the issue IDs (i.e. `#123`) to be replaced with links (i.e. `{% raw %}[#123](https://github.com/example/prj/issues/123){% endraw %}`) but they can be used for anything.
+
+The replacement string must be coherent with the type of the rendered document. In the above example it's a Markdown link.
+{: .notice--info}
+
+Each entry in the map is made of a pair of strings: the entry name is a regular expression used to match the strings to be replaced, while the value is a *printf* format string used to generate the new string.
+
+The format string can thereby use the `%s` placeholder to insert the value captured by the regular expression in the new string. You may use the `%s` placeholder up to five times in the format string and all occurrences will be replaced by the same value captured by the regular expression. This sule is because the argument index in format strings is not portable so we need to use a standard placeholder definition.
+
+The regular expression needs to have at least one (named or unnamed) capture group. In case more than one capture group is present, only the first one is considered (and used for the format string parameters).
+
+Both the regular expression and the format string are required for each entry.
+
+For example, to replace all occurrences of numeric IDs starting with the `#` character (like issue IDs) with a link like `{% raw %}[#XXX](https://github.com/example/prj/issues/XXX){% endraw %}`, an entry can be:
+
+`{% raw %}(?m)#([0-9]+)(?s){% endraw %}` = `{% raw %}[#%s](https://github.com/example/prj/issues/%s){% endraw %}`
+
+So if the changelog contains the `#123` string it will be replaced with `{% raw %}[#123](https://github.com/example/prj/issues/123){% endraw %}`.
+
+As you can see by the example, the `%s` placeholder is used twice in the format string but the same value `123` is used for both replacements.
+
+Note that all occurrences are treated as strings, so the `%s` placeholder is the only one allowed (no numbers, dates etc), which means that even numbers will be treated as strings.
 
 #### Template
 
@@ -184,4 +114,8 @@ As you can guess the sections you define here strongly depend on the configured 
 | Configuration File Option | `changelog/template`                                                                     |
 | Related state attributes  |                                                                                          |
 
-The absolute or relative path to a local file to use as a template instead of the Nyx built-in. The file must contain a valid [Mustache](https://mustache.github.io/) template.
+The absolute or relative path to a local file to use as a template instead of the Nyx built-in. The file must contain a valid [Mustache](https://mustache.github.io/) template. Template [functions]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}#functions) can be used in custom templates.
+
+If you need to know the object model available when customizing a see [this reference]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/changelog.md %}#functions)
+
+You can find the default template [here](https://raw.githubusercontent.com/mooltiverse/nyx/master/modules/java/main/src/main/resources/changelog.tpl){:target="_blank"}.

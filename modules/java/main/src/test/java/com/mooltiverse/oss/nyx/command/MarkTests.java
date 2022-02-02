@@ -19,14 +19,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import com.mooltiverse.oss.nyx.Nyx;
-import com.mooltiverse.oss.nyx.configuration.Defaults;
 import com.mooltiverse.oss.nyx.configuration.SimpleConfigurationLayer;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
@@ -110,46 +108,7 @@ public class MarkTests {
             // clone the remote repo again into a a new directory and test
             Script remoteScript = Script.cloneFrom(gitHubRepository.getHTTPURL(), System.getProperty("gitHubTestUserToken"), "");
 
-            assertEquals("main", nyx.state().getBranch()); // new GitHub repositories default to 'main' as the default branch
-            assertEquals("patch", nyx.state().getBump());
-            assertEquals(Defaults.SCHEME, nyx.state().getScheme());
-            assertEquals(2, nyx.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getCommitIDs().get(1), nyx.state().getReleaseScope().getInitialCommit().getSHA());
-            assertEquals(script.getCommitIDs().get(0), nyx.state().getReleaseScope().getFinalCommit().getSHA());
-            assertEquals("0.0.4", nyx.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.4"), nyx.state().getReleaseScope().getPreviousVersionCommit().getSHA());
-            assertEquals("0.0.4", nyx.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.4"), nyx.state().getReleaseScope().getPrimeVersionCommit().getSHA());
-            assertEquals(2, nyx.state().getReleaseScope().getSignificantCommits().size());
-            assertEquals(Defaults.ReleaseType.COLLAPSE_VERSIONS, nyx.state().getReleaseType().getCollapseVersions());
-            assertEquals(Defaults.ReleaseType.COLLAPSED_VERSION_QUALIFIER, nyx.state().getReleaseType().getCollapsedVersionQualifier());
-            assertEquals(Defaults.ReleaseType.DESCRIPTION, nyx.state().getReleaseType().getDescription());
-            assertEquals(Boolean.TRUE.toString(), nyx.state().getReleaseType().getGitCommit());
-            assertEquals(Defaults.ReleaseType.GIT_COMMIT_MESSAGE, nyx.state().getReleaseType().getGitCommitMessage());
-            assertEquals(Boolean.TRUE.toString(), nyx.state().getReleaseType().getGitPush());
-            assertEquals(Boolean.TRUE.toString(), nyx.state().getReleaseType().getGitTag());
-            assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, nyx.state().getReleaseType().getGitTagMessage());
-            if (Objects.isNull(Defaults.ReleaseType.IDENTIFIERS)) {
-                assertEquals(Defaults.ReleaseType.IDENTIFIERS, nyx.state().getReleaseType().getIdentifiers());
-            }
-            else {
-                assertTrue(Defaults.ReleaseType.IDENTIFIERS.containsAll(nyx.state().getReleaseType().getIdentifiers()));
-                for (int i=0; i<=Defaults.ReleaseType.IDENTIFIERS.size(); i++) {
-                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getQualifier(), nyx.state().getReleaseType().getIdentifiers().get(i).getQualifier());
-                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getValue(), nyx.state().getReleaseType().getIdentifiers().get(i).getValue());
-                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getPosition(), nyx.state().getReleaseType().getIdentifiers().get(i).getPosition());
-                }
-            }
-            assertEquals(Defaults.ReleaseType.MATCH_BRANCHES, nyx.state().getReleaseType().getMatchBranches());
-            assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, nyx.state().getReleaseType().getMatchEnvironmentVariables());
-            assertEquals(Defaults.ReleaseType.MATCH_WORKSPACE_STATUS, nyx.state().getReleaseType().getMatchWorkspaceStatus());
-            assertEquals(Defaults.ReleaseType.PUBLISH, nyx.state().getReleaseType().getPublish());
-            assertEquals(Defaults.ReleaseType.VERSION_RANGE, nyx.state().getReleaseType().getVersionRange());
-            assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, nyx.state().getReleaseType().getVersionRangeFromBranchName());
-            assertTrue(nyx.state().getNewVersion());
-            assertFalse(nyx.state().getNewRelease());
             assertEquals("0.0.5", nyx.state().getVersion());
-            assertNull(nyx.state().getVersionRange());
             assertEquals(script.getTags().size(), replicaScript.getTags().size());
             assertEquals(script.getTags().size(), remoteScript.getTags().size());
 
@@ -222,46 +181,7 @@ public class MarkTests {
             // clone the remote repo again into a a new directory and test
             Script remoteScript = Script.cloneFrom(gitLabRepository.getHTTPURL(), "PRIVATE-TOKEN", System.getProperty("gitLabTestUserToken"));
 
-            assertEquals("main", nyx.state().getBranch()); // new GitLab repositories default to 'main' as the default branch
-            assertEquals("patch", nyx.state().getBump());
-            assertEquals(Defaults.SCHEME, nyx.state().getScheme());
-            assertEquals(2, nyx.state().getReleaseScope().getCommits().size());
-            assertEquals(script.getCommitIDs().get(1), nyx.state().getReleaseScope().getInitialCommit().getSHA());
-            assertEquals(script.getCommitIDs().get(0), nyx.state().getReleaseScope().getFinalCommit().getSHA());
-            assertEquals("0.0.4", nyx.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.4"), nyx.state().getReleaseScope().getPreviousVersionCommit().getSHA());
-            assertEquals("0.0.4", nyx.state().getReleaseScope().getPrimeVersion());
-            assertEquals(script.getCommitByTag("0.0.4"), nyx.state().getReleaseScope().getPrimeVersionCommit().getSHA());
-            assertEquals(2, nyx.state().getReleaseScope().getSignificantCommits().size());
-            assertEquals(Defaults.ReleaseType.COLLAPSE_VERSIONS, nyx.state().getReleaseType().getCollapseVersions());
-            assertEquals(Defaults.ReleaseType.COLLAPSED_VERSION_QUALIFIER, nyx.state().getReleaseType().getCollapsedVersionQualifier());
-            assertEquals(Defaults.ReleaseType.DESCRIPTION, nyx.state().getReleaseType().getDescription());
-            assertEquals(Boolean.TRUE.toString(), nyx.state().getReleaseType().getGitCommit());
-            assertEquals(Defaults.ReleaseType.GIT_COMMIT_MESSAGE, nyx.state().getReleaseType().getGitCommitMessage());
-            assertEquals(Boolean.TRUE.toString(), nyx.state().getReleaseType().getGitPush());
-            assertEquals(Boolean.TRUE.toString(), nyx.state().getReleaseType().getGitTag());
-            assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, nyx.state().getReleaseType().getGitTagMessage());
-            if (Objects.isNull(Defaults.ReleaseType.IDENTIFIERS)) {
-                assertEquals(Defaults.ReleaseType.IDENTIFIERS, nyx.state().getReleaseType().getIdentifiers());
-            }
-            else {
-                assertTrue(Defaults.ReleaseType.IDENTIFIERS.containsAll(nyx.state().getReleaseType().getIdentifiers()));
-                for (int i=0; i<=Defaults.ReleaseType.IDENTIFIERS.size(); i++) {
-                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getQualifier(), nyx.state().getReleaseType().getIdentifiers().get(i).getQualifier());
-                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getValue(), nyx.state().getReleaseType().getIdentifiers().get(i).getValue());
-                    assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getPosition(), nyx.state().getReleaseType().getIdentifiers().get(i).getPosition());
-                }
-            }
-            assertEquals(Defaults.ReleaseType.MATCH_BRANCHES, nyx.state().getReleaseType().getMatchBranches());
-            assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, nyx.state().getReleaseType().getMatchEnvironmentVariables());
-            assertEquals(Defaults.ReleaseType.MATCH_WORKSPACE_STATUS, nyx.state().getReleaseType().getMatchWorkspaceStatus());
-            assertEquals(Defaults.ReleaseType.PUBLISH, nyx.state().getReleaseType().getPublish());
-            assertEquals(Defaults.ReleaseType.VERSION_RANGE, nyx.state().getReleaseType().getVersionRange());
-            assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, nyx.state().getReleaseType().getVersionRangeFromBranchName());
-            assertTrue(nyx.state().getNewVersion());
-            assertFalse(nyx.state().getNewRelease());
             assertEquals("0.0.5", nyx.state().getVersion());
-            assertNull(nyx.state().getVersionRange());
             assertEquals(script.getTags().size(), replicaScript.getTags().size());
             assertEquals(script.getTags().size(), remoteScript.getTags().size());
 

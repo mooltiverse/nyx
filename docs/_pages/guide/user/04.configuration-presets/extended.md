@@ -31,7 +31,6 @@ This corresponds to the following configuration options:
 
 | Name                                            | Value                                                                                    |
 | ----------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| [`changelog/includeUnreleased`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/changelog.md %}#include-unreleased) | `true` |
 | [`changelog/path`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/changelog.md %}#path) | `CHANGELOG.md` |
 | [`changelog/sections/Added`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/changelog.md %}#sections) | `"^(feat|:boom:|:sparkles:)$"` |
 | [`changelog/sections/Fixed`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/changelog.md %}#sections) | "`^(fix|:bug:|:ambulance:)$`" |

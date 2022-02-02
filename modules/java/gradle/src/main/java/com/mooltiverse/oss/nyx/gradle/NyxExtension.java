@@ -548,31 +548,6 @@ public abstract class NyxExtension {
      */
     public abstract static class ChangelogConfiguration {
         /**
-         * The format expression to use to generate working links to commits.
-         */
-        private final Property<String> commitLink = getObjectfactory().property(String.class);
-
-        /**
-         * The format expression to use to generate working links to contributors.
-         */
-        private final Property<String> contributorLink = getObjectfactory().property(String.class);
-
-        /**
-         * The flag telling if the unreleased section must be generated.
-         */
-        private final Property<Boolean> includeUnreleased = getObjectfactory().property(Boolean.class);
-
-        /**
-         * The regular expression to use to detect references to issues mentioned in commit messages.
-         */
-        private final Property<String> issueId = getObjectfactory().property(String.class);
-
-        /**
-         * The format expression to use to generate working links to issues mentioned in commit messages.
-         */
-        private final Property<String> issueLink = getObjectfactory().property(String.class);
-
-        /**
          * The path to the destination file.
          */
         private final Property<String> path = getObjectfactory().property(String.class);
@@ -588,6 +563,11 @@ public abstract class NyxExtension {
         private final MapProperty<String,String> sections = getObjectfactory().mapProperty(String.class, String.class);
 
         /**
+         * The nested 'substitutions' block.
+         */
+        private final MapProperty<String,String> substitutions = getObjectfactory().mapProperty(String.class, String.class);
+
+        /**
          * Returns an object factory instance.
          * 
          * The instance is injected by Gradle as soon as this getter method is invoked.
@@ -601,71 +581,6 @@ public abstract class NyxExtension {
          */
         @Inject
         protected abstract ObjectFactory getObjectfactory();
-
-        /**
-         * Returns the format expression to use to generate working links to commits. When this is set by the user it overrides
-         * the inference performed by Nyx.
-         * 
-         * We provide an implementation of this method instead of using the abstract definition as it's
-         * safer for old Gradle versions we support.
-         * 
-         * @return the format expression to use to generate working links to commits.
-         */
-        public Property<String> getCommitLink() {
-            return commitLink;
-        }
-
-        /**
-         * Returns the format expression to use to generate working links to contributors. When this is set by the user it overrides
-         * the inference performed by Nyx.
-         * 
-         * We provide an implementation of this method instead of using the abstract definition as it's
-         * safer for old Gradle versions we support.
-         * 
-         * @return the format expression to use to generate working links to contributors.
-         */
-        public Property<String> getContributorLink() {
-            return contributorLink;
-        }
-
-        /**
-         * Returns the flag telling if the unreleased section must be generated. When this is set by the user it overrides
-         * the inference performed by Nyx.
-         * 
-         * We provide an implementation of this method instead of using the abstract definition as it's
-         * safer for old Gradle versions we support.
-         * 
-         * @return the flag telling if the unreleased section must be generated.
-         */
-        public Property<Boolean> getIncludeUnreleased() {
-            return includeUnreleased;
-        }
-
-        /**
-         * Returns the regular expression to use to detect references to issues mentioned in commit messages.
-         * When this is set by the user it overrides the inference performed by Nyx.
-         * 
-         * We provide an implementation of this method instead of using the abstract definition as it's
-         * safer for old Gradle versions we support.
-         * 
-         * @return the regular expression to use to detect references to issues mentioned in commit messages.
-         */
-        public Property<String> getIssueId() {
-            return issueId;
-        }
-
-        /**
-         * Returns the format expression to use to generate working links to issues mentioned in commit messages.
-         * When this is set by the user it overrides the inference performed by Nyx.
-         * 
-         * We provide an implementation of this method instead of using the abstract definition as it's
-         * safer for old Gradle versions we support.
-         * 
-         * @return the format expression to use to generate working links to issues mentioned in commit messages.
-         */
-        public Property<String> getIssueLink() {
-            return issueLink;
-        }
 
         /**
          * Returns the path to the destination file. When this is set by the user it overrides
@@ -711,7 +626,27 @@ public abstract class NyxExtension {
          */
         public void sections(Action<? super MapProperty<String,String>> configurationAction) {
             configurationAction.execute(sections);
-        }     
+        }
+
+        /**
+         * Returns the map of changelog substitutions.
+         * 
+         * @return the map of changelog substitutions.
+         */
+        public MapProperty<String,String> getSubstitutions() {
+            return substitutions;
+        }
+        
+        /**
+         * Accepts the DSL configuration for the {@code substitutions} block, needed for defining
+         * the block using the curly braces syntax in Gradle build scripts.
+         * See the documentation on top of this class for more.
+         * 
+         * @param configurationAction the configuration action for the {@code substitutions} block
+         */
+        public void substitutions(Action<? super MapProperty<String,String>> configurationAction) {
+            configurationAction.execute(substitutions);
+        }
     }
 
     /**

@@ -28,7 +28,6 @@ public class Changelogs {
      */
     public static final ChangelogConfiguration ANY = new ChangelogConfiguration() {
         {
-            setIncludeUnreleased(Boolean.TRUE);
             setPath("CHANGELOG.md");
             setSections(Map.<String,String>of("Added", "^(feat|:boom:|:sparkles:)$", "Fixed", "^(fix|:bug:|:ambulance:)$", "Removed", "^:fire:$", "Security", "^:lock:$"));
         }
@@ -39,7 +38,6 @@ public class Changelogs {
      */
     public static final ChangelogConfiguration CONVENTIONAL_COMMITS = new ChangelogConfiguration() {
         {
-            setIncludeUnreleased(Boolean.TRUE);
             setPath("CHANGELOG.md");
             setSections(Map.<String,String>of("Added", "^feat$", "Fixed", "^fix$"));
         }
@@ -50,7 +48,6 @@ public class Changelogs {
      */
     public static final ChangelogConfiguration GITMOJI = new ChangelogConfiguration() {
         {
-            setIncludeUnreleased(Boolean.TRUE);
             setPath("CHANGELOG.md");
             setSections(Map.<String,String>of("Added", "^(:boom:|:sparkles:)$", "Fixed", "^(:bug:|:ambulance:)$", "Removed", "^:fire:$", "Security", "^:lock:$"));
         }

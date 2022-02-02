@@ -49,51 +49,37 @@ public class EnvironmentConfigurationLayerTests {
         throws Exception {
         EnvironmentConfigurationLayerMock environmentConfigurationLayer = EnvironmentConfigurationLayerMock.getInstance();
         assertNotNull(environmentConfigurationLayer.getChangelog());
-        assertNull(environmentConfigurationLayer.getChangelog().getCommitLink());
-        assertNull(environmentConfigurationLayer.getChangelog().getContributorLink());
-        assertNull(environmentConfigurationLayer.getChangelog().getIncludeUnreleased());
-        assertNull(environmentConfigurationLayer.getChangelog().getIssueID());
-        assertNull(environmentConfigurationLayer.getChangelog().getIssueLink());
         assertNull(environmentConfigurationLayer.getChangelog().getPath());
         assertTrue(environmentConfigurationLayer.getChangelog().getSections().isEmpty());
+        assertTrue(environmentConfigurationLayer.getChangelog().getSubstitutions().isEmpty());
         assertNull(environmentConfigurationLayer.getChangelog().getTemplate());
 
         // get a new instance or a stale object is returned by getChangelog()
         environmentConfigurationLayer = EnvironmentConfigurationLayerMock.getInstance();
         environmentConfigurationLayer.environment.put("NYX_CHANGELOG_PATH", "CHANGELOG.md");
 
-        assertNull(environmentConfigurationLayer.getChangelog().getCommitLink());
-        assertNull(environmentConfigurationLayer.getChangelog().getContributorLink());
-        assertNull(environmentConfigurationLayer.getChangelog().getIncludeUnreleased());
-        assertNull(environmentConfigurationLayer.getChangelog().getIssueID());
-        assertNull(environmentConfigurationLayer.getChangelog().getIssueLink());
         assertEquals("CHANGELOG.md", environmentConfigurationLayer.getChangelog().getPath());
         assertTrue(environmentConfigurationLayer.getChangelog().getSections().isEmpty());
+        assertTrue(environmentConfigurationLayer.getChangelog().getSubstitutions().isEmpty());
         assertNull(environmentConfigurationLayer.getChangelog().getTemplate());
         
         // get a new instance or a stale object is returned by getChangelog()
         environmentConfigurationLayer = EnvironmentConfigurationLayerMock.getInstance();
-        environmentConfigurationLayer.environment.put("NYX_CHANGELOG_COMMIT_LINK", "commitLink");
-        environmentConfigurationLayer.environment.put("NYX_CHANGELOG_CONTRIBUTOR_LINK", "contributorLink");
-        environmentConfigurationLayer.environment.put("NYX_CHANGELOG_INCLUDE_UNRELEASED", Boolean.TRUE.toString());
-        environmentConfigurationLayer.environment.put("NYX_CHANGELOG_ISSUE_ID", "issueID");
-        environmentConfigurationLayer.environment.put("NYX_CHANGELOG_ISSUE_LINK", "issueLink");
         environmentConfigurationLayer.environment.put("NYX_CHANGELOG_PATH", "CHANGELOG.md");
         environmentConfigurationLayer.environment.put("NYX_CHANGELOG_SECTIONS_Section1", "regex1");
         environmentConfigurationLayer.environment.put("NYX_CHANGELOG_SECTIONS_Section2", "regex2");
+        environmentConfigurationLayer.environment.put("NYX_CHANGELOG_SUBSTITUTIONS_Expr1", "string1");
         environmentConfigurationLayer.environment.put("NYX_CHANGELOG_TEMPLATE", "changelog.tpl");
 
-        assertEquals("commitLink", environmentConfigurationLayer.getChangelog().getCommitLink());
-        assertEquals("contributorLink", environmentConfigurationLayer.getChangelog().getContributorLink());
-        assertEquals(Boolean.TRUE, environmentConfigurationLayer.getChangelog().getIncludeUnreleased());
-        assertEquals("issueID", environmentConfigurationLayer.getChangelog().getIssueID());
-        assertEquals("issueLink", environmentConfigurationLayer.getChangelog().getIssueLink());
         assertEquals("CHANGELOG.md", environmentConfigurationLayer.getChangelog().getPath());
         assertEquals(2, environmentConfigurationLayer.getChangelog().getSections().size());
         assertTrue(environmentConfigurationLayer.getChangelog().getSections().containsKey("Section1"));
         assertEquals("regex1", environmentConfigurationLayer.getChangelog().getSections().get("Section1"));
         assertTrue(environmentConfigurationLayer.getChangelog().getSections().containsKey("Section2"));
         assertEquals("regex2", environmentConfigurationLayer.getChangelog().getSections().get("Section2"));
+        assertEquals(1, environmentConfigurationLayer.getChangelog().getSubstitutions().size());
+        assertTrue(environmentConfigurationLayer.getChangelog().getSubstitutions().containsKey("Expr1"));
+        assertEquals("string1", environmentConfigurationLayer.getChangelog().getSubstitutions().get("Expr1"));
         assertEquals("changelog.tpl", environmentConfigurationLayer.getChangelog().getTemplate());
     }
 

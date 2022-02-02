@@ -88,6 +88,33 @@ public enum Scenario {
     ),
 
     /**
+     * The scenario where the Git repository has been created with a few tagged commits plus a couple of trailing
+     * untagged commits.
+     * Commit messages are formatted as conventional commits.
+     * The latest commit is tagged as {@code 0.4.0}.
+     * This yields to a repository like:
+     * 
+     * <pre>
+     *   * cb9423c (HEAD -> master) Untagged commit #2
+     *   * ddb0b9f Untagged commit #1
+     *   * 44944e7 (tag: 0.0.4) Commit lij
+     *   * 92cd45c (tag: 0.0.3) Commit aem
+     *   * 9709d14 (tag: 0.0.2) Commit gin
+     *   * c996caa (tag: 0.0.1) Commit rfi
+     *   * 2b0ce8c Initial commit
+     * </pre>
+     */
+    ONE_BRANCH_SHORT_CONVENTIONAL_COMMITS( f -> Script.fromScratch(f).andAddFiles()
+        .andCommit("Initial commit")
+        .andCommitWithTag("0.0.1")
+        .andCommitWithTag("0.0.2", "fix: Annotated tag to commit 0.0.2")
+        .andCommitWithTag("0.0.3")
+        .andCommitWithTag("0.0.4", "feat: Annotated tag to commit 0.0.4")
+        .andCommit("fix: Untagged commit #1")
+        .andCommit("feat: Untagged commit #2")
+    ),
+
+    /**
      * The scenario where the Git repository has been created with just one commit after the initial commit.
      * The latest tagged commit has overlapping tags, applied in reverse order, and is useful to test which
      * one is selected for bumping.

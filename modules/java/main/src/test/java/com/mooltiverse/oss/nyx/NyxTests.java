@@ -28,6 +28,7 @@ import org.junit.jupiter.api.Test;
 
 import com.mooltiverse.oss.nyx.configuration.Configuration;
 import com.mooltiverse.oss.nyx.configuration.SimpleConfigurationLayer;
+import com.mooltiverse.oss.nyx.entities.Changelog;
 import com.mooltiverse.oss.nyx.entities.git.Action;
 import com.mooltiverse.oss.nyx.entities.git.Commit;
 import com.mooltiverse.oss.nyx.entities.git.Identity;
@@ -141,6 +142,9 @@ public class NyxTests {
             Commit finalCommit = new Commit("final", 0, List.<String>of(), new Action(new Identity("Jim", null), null), new Action(new Identity("Sam", null), null), new Message("full", "short", Map.<String,String>of()), Set.<Tag>of());
 
             // set a few values to use later on for comparison
+            oldState.setChangelog(new Changelog());
+            oldState.getChangelog().setReleases(List.<Changelog.Release>of(new Changelog.Release("MyRelease", "today")));
+            oldState.getChangelog().getReleases().get(0).setSections(List.<Changelog.Release.Section>of(new Changelog.Release.Section("MySection")));
             oldState.setVersion("3.5.7");
             oldState.setVersionRange(".*");
             oldState.getInternals().put("attr1", "value1");
@@ -163,6 +167,12 @@ public class NyxTests {
 
             State resumedState = nyx.state();
             assertEquals(oldState.getBump(), resumedState.getBump());
+            assertNotNull(resumedState.getChangelog());
+            assertEquals(1, resumedState.getChangelog().getReleases().size());
+            assertEquals("MyRelease", resumedState.getChangelog().getReleases().get(0).getName());
+            assertEquals("today", resumedState.getChangelog().getReleases().get(0).getDate());
+            assertEquals(1, resumedState.getChangelog().getReleases().get(0).getSections().size());
+            assertEquals("MySection", resumedState.getChangelog().getReleases().get(0).getSections().get(0).getName());
             assertEquals(oldState.getInternals(), resumedState.getInternals());
             assertTrue(resumedState.getInternals().containsKey("attr1"));
             assertEquals("value1", resumedState.getInternals().get("attr1"));
@@ -178,7 +188,6 @@ public class NyxTests {
             assertEquals(2, resumedState.getReleaseScope().getSignificantCommits().size());
             assertTrue(resumedState.getReleaseScope().getSignificantCommits().contains(finalCommit));
             assertTrue(resumedState.getReleaseScope().getSignificantCommits().contains(initialCommit));
-
             assertEquals(oldState.getTimestamp(), resumedState.getTimestamp());
             assertEquals(oldState.getVersion(), resumedState.getVersion());
             assertEquals(oldState.getVersionRange(), resumedState.getVersionRange());

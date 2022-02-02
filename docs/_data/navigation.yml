@@ -94,6 +94,8 @@ nav-user-guide:
     children:
       - title: "Global Attributes"
         url: /guide/user/state-reference/global-attributes/
+      - title: "Changelog"
+        url: /guide/user/state-reference/changelog/
       - title: "Release Scope"
         url: /guide/user/state-reference/release-scope/
   - title: Best Practice

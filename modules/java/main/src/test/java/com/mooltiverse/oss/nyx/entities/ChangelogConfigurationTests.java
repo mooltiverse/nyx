@@ -28,14 +28,10 @@ public class ChangelogConfigurationTests {
     @DisplayName("ChangelogConfiguration()")
     void constructorTest()
         throws Exception {
-        assertEquals("CHANGELOG.md", new ChangelogConfiguration("CHANGELOG.md", Map.<String,String>of("Section1", "regex1", "Section2", "regex2"), "changelog.tpl", Boolean.TRUE, "commitLink", "contributorLink", "issueID", "issueLink").getPath());
-        assertEquals("regex1", new ChangelogConfiguration("CHANGELOG.md", Map.<String,String>of("Section1", "regex1", "Section2", "regex2"), "changelog.tpl", Boolean.TRUE, "commitLink", "contributorLink", "issueID", "issueLink").getSections().get("Section1"));
-        assertEquals("regex2", new ChangelogConfiguration("CHANGELOG.md", Map.<String,String>of("Section1", "regex1", "Section2", "regex2"), "changelog.tpl", Boolean.TRUE, "commitLink", "contributorLink", "issueID", "issueLink").getSections().get("Section2"));
-        assertEquals("changelog.tpl", new ChangelogConfiguration("CHANGELOG.md", Map.<String,String>of("Section1", "regex1", "Section2", "regex2"), "changelog.tpl", Boolean.TRUE, "commitLink", "contributorLink", "issueID", "issueLink").getTemplate());
-        assertEquals(Boolean.TRUE, new ChangelogConfiguration("CHANGELOG.md", Map.<String,String>of("Section1", "regex1", "Section2", "regex2"), "changelog.tpl", Boolean.TRUE, "commitLink", "contributorLink", "issueID", "issueLink").getIncludeUnreleased());
-        assertEquals("commitLink", new ChangelogConfiguration("CHANGELOG.md", Map.<String,String>of("Section1", "regex1", "Section2", "regex2"), "changelog.tpl", Boolean.TRUE, "commitLink", "contributorLink", "issueID", "issueLink").getCommitLink());
-        assertEquals("contributorLink", new ChangelogConfiguration("CHANGELOG.md", Map.<String,String>of("Section1", "regex1", "Section2", "regex2"), "changelog.tpl", Boolean.TRUE, "commitLink", "contributorLink", "issueID", "issueLink").getContributorLink());
-        assertEquals("issueID", new ChangelogConfiguration("CHANGELOG.md", Map.<String,String>of("Section1", "regex1", "Section2", "regex2"), "changelog.tpl", Boolean.TRUE, "commitLink", "contributorLink", "issueID", "issueLink").getIssueID());
-        assertEquals("issueLink", new ChangelogConfiguration("CHANGELOG.md", Map.<String,String>of("Section1", "regex1", "Section2", "regex2"), "changelog.tpl", Boolean.TRUE, "commitLink", "contributorLink", "issueID", "issueLink").getIssueLink());
+        assertEquals("CHANGELOG.md", new ChangelogConfiguration("CHANGELOG.md", Map.<String,String>of("Section1", "regex1", "Section2", "regex2"), "changelog.tpl", Map.<String,String>of("Expression1", "string1")).getPath());
+        assertEquals("regex1", new ChangelogConfiguration("CHANGELOG.md", Map.<String,String>of("Section1", "regex1", "Section2", "regex2"), "changelog.tpl", Map.<String,String>of("Expression1", "string1")).getSections().get("Section1"));
+        assertEquals("regex2", new ChangelogConfiguration("CHANGELOG.md", Map.<String,String>of("Section1", "regex1", "Section2", "regex2"), "changelog.tpl", Map.<String,String>of("Expression1", "string1")).getSections().get("Section2"));
+        assertEquals("string1", new ChangelogConfiguration("CHANGELOG.md", Map.<String,String>of("Section1", "regex1", "Section2", "regex2"), "changelog.tpl", Map.<String,String>of("Expression1", "string1")).getSubstitutions().get("Expression1"));
+        assertEquals("changelog.tpl", new ChangelogConfiguration("CHANGELOG.md", Map.<String,String>of("Section1", "regex1", "Section2", "regex2"), "changelog.tpl", Map.<String,String>of("Expression1", "string1")).getTemplate());
     }
 }

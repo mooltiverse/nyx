@@ -371,18 +371,10 @@ public class Configuration implements ConfigurationRoot {
                     changelogSection.setPath(layer.getChangelog().getPath());
                 if (Objects.isNull(changelogSection.getSections()) || changelogSection.getSections().isEmpty())
                     changelogSection.setSections(layer.getChangelog().getSections());
+                if (Objects.isNull(changelogSection.getSubstitutions()) || changelogSection.getSubstitutions().isEmpty())
+                    changelogSection.setSubstitutions(layer.getChangelog().getSubstitutions());
                 if (Objects.isNull(changelogSection.getTemplate()))
                     changelogSection.setTemplate(layer.getChangelog().getTemplate());
-                if (Objects.isNull(changelogSection.getIncludeUnreleased()))
-                    changelogSection.setIncludeUnreleased(layer.getChangelog().getIncludeUnreleased());
-                if (Objects.isNull(changelogSection.getCommitLink()))
-                    changelogSection.setCommitLink(layer.getChangelog().getCommitLink());
-                if (Objects.isNull(changelogSection.getContributorLink()))
-                    changelogSection.setContributorLink(layer.getChangelog().getContributorLink());
-                if (Objects.isNull(changelogSection.getIssueID()))
-                    changelogSection.setIssueID(layer.getChangelog().getIssueID());
-                if (Objects.isNull(changelogSection.getIssueLink()))
-                    changelogSection.setIssueLink(layer.getChangelog().getIssueLink());
             }
             logger.trace(CONFIGURATION, "The '{}' configuration option has been resolved", "changelog");
         }

@@ -64,14 +64,11 @@ public class ConfigurationTests {
         @DisplayName("Configuration.getChangelog() == Defaults.CHANGELOG")
         void getChangelogTest()
             throws Exception {
-            assertEquals(Defaults.CHANGELOG.getCommitLink(), new Configuration().getChangelog().getCommitLink());
-            assertEquals(Defaults.CHANGELOG.getContributorLink(), new Configuration().getChangelog().getContributorLink());
-            assertEquals(Defaults.CHANGELOG.getIncludeUnreleased(), new Configuration().getChangelog().getIncludeUnreleased());
-            assertEquals(Defaults.CHANGELOG.getIssueID(), new Configuration().getChangelog().getIssueID());
-            assertEquals(Defaults.CHANGELOG.getIssueLink(), new Configuration().getChangelog().getIssueLink());
             assertEquals(Defaults.CHANGELOG.getPath(), new Configuration().getChangelog().getPath());
             assertEquals(Defaults.CHANGELOG.getSections().size(), new Configuration().getChangelog().getSections().size());
             assertTrue(new Configuration().getChangelog().getSections().isEmpty());
+            assertEquals(Defaults.CHANGELOG.getSections().size(), new Configuration().getChangelog().getSubstitutions().size());
+            assertTrue(new Configuration().getChangelog().getSubstitutions().isEmpty());
             assertEquals(Defaults.CHANGELOG.getTemplate(), new Configuration().getChangelog().getTemplate());
         }
 
@@ -248,7 +245,7 @@ public class ConfigurationTests {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
             configurationLayerMock.setChangelog(
-                new ChangelogConfiguration("CHANGELOG.md", Map.<String,String>of("Section1", "regex1", "Section2", "regex2"), "changelog.tpl", Boolean.TRUE, "commitLink", "contributorLink", "issueID", "issueLink")
+                new ChangelogConfiguration("CHANGELOG.md", Map.<String,String>of("Section1", "regex1", "Section2", "regex2"), "changelog.tpl", Map.<String,String>of("Expression1", "string1"))
             );
 
             // in order to make the test meaningful, make sure the default and mock values are different
@@ -257,47 +254,33 @@ public class ConfigurationTests {
             assertNotSame(configuration.getChangelog(), configurationLayerMock.getChangelog());
 
             // make sure the initial values come from defaults, until we inject the command line configuration
-            assertNull(Defaults.CHANGELOG.getCommitLink());
-            assertNull(configuration.getChangelog().getCommitLink());
-            assertNull(Defaults.CHANGELOG.getContributorLink());
-            assertNull(configuration.getChangelog().getContributorLink());
-            assertNull(Defaults.CHANGELOG.getIncludeUnreleased());
-            assertNull(configuration.getChangelog().getIncludeUnreleased());
-            assertNull(Defaults.CHANGELOG.getIssueID());
-            assertNull(configuration.getChangelog().getIssueID());
-            assertNull(Defaults.CHANGELOG.getIssueLink());
-            assertNull(configuration.getChangelog().getIssueLink());
             assertNull(Defaults.CHANGELOG.getPath());
             assertNull(configuration.getChangelog().getPath());
             assertTrue(Defaults.CHANGELOG.getSections().isEmpty());
             assertTrue(configuration.getChangelog().getSections().isEmpty());
+            assertTrue(Defaults.CHANGELOG.getSubstitutions().isEmpty());
+            assertTrue(configuration.getChangelog().getSubstitutions().isEmpty());
             assertNull(Defaults.CHANGELOG.getTemplate());
             assertNull(configuration.getChangelog().getTemplate());
             
             // inject the command line configuration and test the new value is returned from that
             configuration.withCommandLineConfiguration(configurationLayerMock);
 
-            assertEquals("commitLink", configuration.getChangelog().getCommitLink());
-            assertEquals("contributorLink", configuration.getChangelog().getContributorLink());
-            assertEquals(Boolean.TRUE, configuration.getChangelog().getIncludeUnreleased());
-            assertEquals("issueID", configuration.getChangelog().getIssueID());
-            assertEquals("issueLink", configuration.getChangelog().getIssueLink());
             assertEquals("CHANGELOG.md", configuration.getChangelog().getPath());
             assertNotNull(configuration.getChangelog().getSections());
             assertEquals(2, configuration.getChangelog().getSections().size());
             assertEquals("regex1", configuration.getChangelog().getSections().get("Section1"));
             assertEquals("regex2", configuration.getChangelog().getSections().get("Section2"));
+            assertNotNull(configuration.getChangelog().getSubstitutions());
+            assertEquals(1, configuration.getChangelog().getSubstitutions().size());
+            assertEquals("string1", configuration.getChangelog().getSubstitutions().get("Expression1"));
             assertEquals("changelog.tpl", configuration.getChangelog().getTemplate());
 
             // now remove the command line configuration and test that now default values are returned again
             configuration.withCommandLineConfiguration(null);
-            assertNull(configuration.getChangelog().getCommitLink());
-            assertNull(configuration.getChangelog().getContributorLink());
-            assertNull(configuration.getChangelog().getIncludeUnreleased());
-            assertNull(configuration.getChangelog().getIssueID());
-            assertNull(configuration.getChangelog().getIssueLink());
             assertNull(configuration.getChangelog().getPath());
             assertTrue(configuration.getChangelog().getSections().isEmpty());
+            assertTrue(configuration.getChangelog().getSubstitutions().isEmpty());
             assertNull(configuration.getChangelog().getTemplate());
         }
 
@@ -828,7 +811,7 @@ public class ConfigurationTests {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
             configurationLayerMock.setChangelog(
-                new ChangelogConfiguration("CHANGELOG.md", Map.<String,String>of("Section1", "regex1", "Section2", "regex2"), "changelog.tpl", Boolean.TRUE, "commitLink", "contributorLink", "issueID", "issueLink")
+                new ChangelogConfiguration("CHANGELOG.md", Map.<String,String>of("Section1", "regex1", "Section2", "regex2"), "changelog.tpl", Map.<String,String>of("Expression1", "string1"))
             );
 
             // in order to make the test meaningful, make sure the default and mock values are different
@@ -837,47 +820,33 @@ public class ConfigurationTests {
             assertNotSame(configuration.getChangelog(), configurationLayerMock.getChangelog());
 
             // make sure the initial values come from defaults, until we inject the command line configuration
-            assertNull(Defaults.CHANGELOG.getCommitLink());
-            assertNull(configuration.getChangelog().getCommitLink());
-            assertNull(Defaults.CHANGELOG.getContributorLink());
-            assertNull(configuration.getChangelog().getContributorLink());
-            assertNull(Defaults.CHANGELOG.getIncludeUnreleased());
-            assertNull(configuration.getChangelog().getIncludeUnreleased());
-            assertNull(Defaults.CHANGELOG.getIssueID());
-            assertNull(configuration.getChangelog().getIssueID());
-            assertNull(Defaults.CHANGELOG.getIssueLink());
-            assertNull(configuration.getChangelog().getIssueLink());
             assertNull(Defaults.CHANGELOG.getPath());
             assertNull(configuration.getChangelog().getPath());
             assertTrue(Defaults.CHANGELOG.getSections().isEmpty());
             assertTrue(configuration.getChangelog().getSections().isEmpty());
+            assertTrue(Defaults.CHANGELOG.getSubstitutions().isEmpty());
+            assertTrue(configuration.getChangelog().getSubstitutions().isEmpty());
             assertNull(Defaults.CHANGELOG.getTemplate());
             assertNull(configuration.getChangelog().getTemplate());
             
             // inject the command line configuration and test the new value is returned from that
             configuration.withPluginConfiguration(configurationLayerMock);
 
-            assertEquals("commitLink", configuration.getChangelog().getCommitLink());
-            assertEquals("contributorLink", configuration.getChangelog().getContributorLink());
-            assertEquals(Boolean.TRUE, configuration.getChangelog().getIncludeUnreleased());
-            assertEquals("issueID", configuration.getChangelog().getIssueID());
-            assertEquals("issueLink", configuration.getChangelog().getIssueLink());
             assertEquals("CHANGELOG.md", configuration.getChangelog().getPath());
             assertNotNull(configuration.getChangelog().getSections());
             assertEquals(2, configuration.getChangelog().getSections().size());
             assertEquals("regex1", configuration.getChangelog().getSections().get("Section1"));
             assertEquals("regex2", configuration.getChangelog().getSections().get("Section2"));
+            assertNotNull(configuration.getChangelog().getSubstitutions());
+            assertEquals(1, configuration.getChangelog().getSubstitutions().size());
+            assertEquals("string1", configuration.getChangelog().getSubstitutions().get("Expression1"));
             assertEquals("changelog.tpl", configuration.getChangelog().getTemplate());
 
             // now remove the command line configuration and test that now default values are returned again
             configuration.withPluginConfiguration(null);
-            assertNull(configuration.getChangelog().getCommitLink());
-            assertNull(configuration.getChangelog().getContributorLink());
-            assertNull(configuration.getChangelog().getIncludeUnreleased());
-            assertNull(configuration.getChangelog().getIssueID());
-            assertNull(configuration.getChangelog().getIssueLink());
             assertNull(configuration.getChangelog().getPath());
             assertTrue(configuration.getChangelog().getSections().isEmpty());
+            assertTrue(configuration.getChangelog().getSubstitutions().isEmpty());
             assertNull(configuration.getChangelog().getTemplate());
         }
 
@@ -1408,7 +1377,7 @@ public class ConfigurationTests {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
             configurationLayerMock.setChangelog(
-                new ChangelogConfiguration("CHANGELOG.md", Map.<String,String>of("Section1", "regex1", "Section2", "regex2"), "changelog.tpl", Boolean.TRUE, "commitLink", "contributorLink", "issueID", "issueLink")
+                new ChangelogConfiguration("CHANGELOG.md", Map.<String,String>of("Section1", "regex1", "Section2", "regex2"), "changelog.tpl", Map.<String,String>of("Expression1", "string1"))
             );
 
             // in order to make the test meaningful, make sure the default and mock values are different
@@ -1417,47 +1386,33 @@ public class ConfigurationTests {
             assertNotSame(configuration.getChangelog(), configurationLayerMock.getChangelog());
 
             // make sure the initial values come from defaults, until we inject the command line configuration
-            assertNull(Defaults.CHANGELOG.getCommitLink());
-            assertNull(configuration.getChangelog().getCommitLink());
-            assertNull(Defaults.CHANGELOG.getContributorLink());
-            assertNull(configuration.getChangelog().getContributorLink());
-            assertNull(Defaults.CHANGELOG.getIncludeUnreleased());
-            assertNull(configuration.getChangelog().getIncludeUnreleased());
-            assertNull(Defaults.CHANGELOG.getIssueID());
-            assertNull(configuration.getChangelog().getIssueID());
-            assertNull(Defaults.CHANGELOG.getIssueLink());
-            assertNull(configuration.getChangelog().getIssueLink());
             assertNull(Defaults.CHANGELOG.getPath());
             assertNull(configuration.getChangelog().getPath());
             assertTrue(Defaults.CHANGELOG.getSections().isEmpty());
             assertTrue(configuration.getChangelog().getSections().isEmpty());
+            assertTrue(Defaults.CHANGELOG.getSubstitutions().isEmpty());
+            assertTrue(configuration.getChangelog().getSubstitutions().isEmpty());
             assertNull(Defaults.CHANGELOG.getTemplate());
             assertNull(configuration.getChangelog().getTemplate());
             
             // inject the command line configuration and test the new value is returned from that
             configuration.withRuntimeConfiguration(configurationLayerMock);
 
-            assertEquals("commitLink", configuration.getChangelog().getCommitLink());
-            assertEquals("contributorLink", configuration.getChangelog().getContributorLink());
-            assertEquals(Boolean.TRUE, configuration.getChangelog().getIncludeUnreleased());
-            assertEquals("issueID", configuration.getChangelog().getIssueID());
-            assertEquals("issueLink", configuration.getChangelog().getIssueLink());
             assertEquals("CHANGELOG.md", configuration.getChangelog().getPath());
             assertNotNull(configuration.getChangelog().getSections());
             assertEquals(2, configuration.getChangelog().getSections().size());
             assertEquals("regex1", configuration.getChangelog().getSections().get("Section1"));
             assertEquals("regex2", configuration.getChangelog().getSections().get("Section2"));
+            assertNotNull(configuration.getChangelog().getSubstitutions());
+            assertEquals(1, configuration.getChangelog().getSubstitutions().size());
+            assertEquals("string1", configuration.getChangelog().getSubstitutions().get("Expression1"));
             assertEquals("changelog.tpl", configuration.getChangelog().getTemplate());
 
             // now remove the command line configuration and test that now default values are returned again
             configuration.withRuntimeConfiguration(null);
-            assertNull(configuration.getChangelog().getCommitLink());
-            assertNull(configuration.getChangelog().getContributorLink());
-            assertNull(configuration.getChangelog().getIncludeUnreleased());
-            assertNull(configuration.getChangelog().getIssueID());
-            assertNull(configuration.getChangelog().getIssueLink());
             assertNull(configuration.getChangelog().getPath());
             assertTrue(configuration.getChangelog().getSections().isEmpty());
+            assertTrue(configuration.getChangelog().getSubstitutions().isEmpty());
             assertNull(configuration.getChangelog().getTemplate());
         }
 
@@ -1985,13 +1940,13 @@ public class ConfigurationTests {
             SimpleConfigurationLayer highPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
             lowPriorityConfigurationLayerMock.setChangelog(
-                new ChangelogConfiguration("CHANGELOG1.md", Map.<String,String>of("SectionA1", "regexA1", "SectionA2", "regexA2"), "changelog1.tpl", Boolean.TRUE, "commitLink1", "contributorLink1", "issueID1", "issueLink1")
+                new ChangelogConfiguration("CHANGELOG1.md", Map.<String,String>of("SectionA1", "regexA1", "SectionA2", "regexA2"), "changelog1.tpl", Map.<String,String>of("Expression1", "string1"))
             );
             mediumPriorityConfigurationLayerMock.setChangelog(
-                new ChangelogConfiguration("CHANGELOG2.md", Map.<String,String>of("SectionB1", "regexB1", "SectionB2", "regexB2"), "changelog2.tpl", Boolean.TRUE, "commitLink2", "contributorLink2", "issueID2", "issueLink2")
+                new ChangelogConfiguration("CHANGELOG2.md", Map.<String,String>of("SectionB1", "regexB1", "SectionB2", "regexB2"), "changelog2.tpl", Map.<String,String>of("Expression2", "string2"))
             );
             highPriorityConfigurationLayerMock.setChangelog(
-                new ChangelogConfiguration("CHANGELOG3.md", Map.<String,String>of("SectionC1", "regexC1", "SectionC2", "regexC2"), "changelog3.tpl", Boolean.TRUE, "commitLink3", "contributorLink3", "issueID3", "issueLink3")
+                new ChangelogConfiguration("CHANGELOG3.md", Map.<String,String>of("SectionC1", "regexC1", "SectionC2", "regexC2"), "changelog3.tpl", Map.<String,String>of("Expression3", "string3"))
             );
             
             // inject the command line configuration and test the new value is returned from that
@@ -1999,16 +1954,14 @@ public class ConfigurationTests {
             configuration.withCommandLineConfiguration(mediumPriorityConfigurationLayerMock);
             configuration.withRuntimeConfiguration(highPriorityConfigurationLayerMock);
 
-            assertEquals("commitLink3", configuration.getChangelog().getCommitLink());
-            assertEquals("contributorLink3", configuration.getChangelog().getContributorLink());
-            assertEquals(Boolean.TRUE, configuration.getChangelog().getIncludeUnreleased());
-            assertEquals("issueID3", configuration.getChangelog().getIssueID());
-            assertEquals("issueLink3", configuration.getChangelog().getIssueLink());
             assertEquals("CHANGELOG3.md", configuration.getChangelog().getPath());
             assertNotNull(configuration.getChangelog().getSections());
             assertEquals(2, configuration.getChangelog().getSections().size());
             assertEquals("regexC1", configuration.getChangelog().getSections().get("SectionC1"));
             assertEquals("regexC2", configuration.getChangelog().getSections().get("SectionC2"));
+            assertNotNull(configuration.getChangelog().getSubstitutions());
+            assertEquals(1, configuration.getChangelog().getSubstitutions().size());
+            assertEquals("string3", configuration.getChangelog().getSubstitutions().get("Expression3"));
             assertEquals("changelog3.tpl", configuration.getChangelog().getTemplate());
         }
 

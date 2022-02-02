@@ -67,20 +67,12 @@ public class ConfigurationLayerTestTemplates {
 
             assertNotNull(extension.getChangelog());
             assertNotNull(configurationLayer.getChangelog());
-            assertFalse(extension.getChangelog().getCommitLink().isPresent());
-            assertNull(extension.getChangelog().getCommitLink().getOrNull());
-            assertFalse(extension.getChangelog().getContributorLink().isPresent());
-            assertNull(extension.getChangelog().getContributorLink().getOrNull());
-            assertFalse(extension.getChangelog().getIncludeUnreleased().isPresent());
-            assertNull(extension.getChangelog().getIncludeUnreleased().getOrNull());
-            assertFalse(extension.getChangelog().getIssueId().isPresent());
-            assertNull(extension.getChangelog().getIssueId().getOrNull());
-            assertFalse(extension.getChangelog().getIssueLink().isPresent());
-            assertNull(extension.getChangelog().getIssueLink().getOrNull());
             assertFalse(extension.getChangelog().getPath().isPresent());
             assertNull(extension.getChangelog().getPath().getOrNull());
             //assertTrue(extension.getChangelog().geSections().isPresent());
             assertTrue(configurationLayer.getChangelog().getSections().isEmpty());
+            //assertTrue(extension.getChangelog().getSubstitutions().isPresent());
+            assertTrue(configurationLayer.getChangelog().getSubstitutions().isEmpty());
             assertFalse(extension.getChangelog().getTemplate().isPresent());
             assertNull(extension.getChangelog().getTemplate().getOrNull());
         }

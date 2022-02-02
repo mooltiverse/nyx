@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import com.mooltiverse.oss.nyx.Nyx;
 import com.mooltiverse.oss.nyx.configuration.Configuration;
+import com.mooltiverse.oss.nyx.entities.Changelog;
 import com.mooltiverse.oss.nyx.entities.IllegalPropertyException;
 import com.mooltiverse.oss.nyx.entities.ReleaseScope;
 import com.mooltiverse.oss.nyx.entities.ReleaseType;
@@ -64,7 +65,12 @@ public class State {
     /**
      * The private instance of the configuration.
      */
-    private Configuration configuration;
+    private Changelog changelog = null;
+
+    /**
+     * The private instance of the configuration.
+     */
+    private Configuration configuration = null;
 
     /**
      * The map containing the internal attributes.
@@ -238,6 +244,45 @@ public class State {
         if (Objects.isNull(getConfiguration().getBump()))
             this.bump = bump;
         else throw new IllegalStateException(String.format("The state bump attribute can't be set when it's ovverridden by the configuration. Configuration bump attribute is '%s'", getConfiguration().getBump()));
+    }
+
+    /**
+     * Returns the current changelog data model.
+     * 
+     * @return the current changelog data model. This is {@code null} until {@link Nyx#make()} has run.
+     * 
+     * @throws DataAccessException in case the attribute cannot be read or accessed.
+     * @throws IllegalPropertyException in case the attribute has been defined but has incorrect values or it can't be resolved.
+     */
+    public Changelog getChangelog()
+        throws DataAccessException, IllegalPropertyException {
+        return changelog;
+    }
+
+    /**
+     * Returns {@code true} if the scope has a non {@code null} changelog data model.
+     * 
+     * @return {@code true} if the scope has a non {@code null} changelog data model.
+     * 
+     * @throws DataAccessException in case the attribute cannot be read or accessed.
+     * @throws IllegalPropertyException in case the attribute has been defined but has incorrect values or it can't be resolved.
+     */
+    public boolean hasChangelog()
+        throws DataAccessException, IllegalPropertyException {
+        return !Objects.isNull(getChangelog());
+    }
+
+    /**
+     * Sets the changelog data model
+     * 
+     * @param changelog the current changelog data model. It may be {@code null} to reset any previous value.
+     * 
+     * @throws DataAccessException in case the attribute cannot be written or accessed.
+     * @throws IllegalPropertyException in case the attribute has incorrect values or it can't be resolved.
+     */
+    public void setChangelog(Changelog changelog)
+        throws DataAccessException, IllegalPropertyException {
+        this.changelog = changelog;
     }
 
     /**

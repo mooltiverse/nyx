@@ -19,7 +19,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -31,7 +30,6 @@ import com.mooltiverse.oss.nyx.command.template.CommandInvocationContextProvider
 import com.mooltiverse.oss.nyx.command.template.CommandProxy;
 import com.mooltiverse.oss.nyx.command.template.CommandSelector;
 import com.mooltiverse.oss.nyx.command.template.StandaloneCommandProxy;
-import com.mooltiverse.oss.nyx.configuration.Defaults;
 import com.mooltiverse.oss.nyx.configuration.SimpleConfigurationLayer;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
@@ -190,46 +188,7 @@ public class MarkTestTemplates {
 
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
             if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
-                assertEquals("master", command.state().getBranch());
-                assertEquals(Defaults.BUMP, command.state().getBump());
-                assertEquals(Defaults.SCHEME, command.state().getScheme());
-                assertEquals(2, command.state().getReleaseScope().getCommits().size());
-                assertEquals(script.getCommitIDs().get(1), command.state().getReleaseScope().getInitialCommit().getSHA());
-                assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getFinalCommit().getSHA());
-                assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion());
-                assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
-                assertEquals("0.0.4", command.state().getReleaseScope().getPrimeVersion());
-                assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
-                assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
-                assertEquals(Defaults.ReleaseType.COLLAPSE_VERSIONS, command.state().getReleaseType().getCollapseVersions());
-                assertEquals(Defaults.ReleaseType.COLLAPSED_VERSION_QUALIFIER, command.state().getReleaseType().getCollapsedVersionQualifier());
-                assertEquals(Defaults.ReleaseType.DESCRIPTION, command.state().getReleaseType().getDescription());
-                assertEquals(Defaults.ReleaseType.GIT_COMMIT, command.state().getReleaseType().getGitCommit());
-                assertEquals(Defaults.ReleaseType.GIT_COMMIT_MESSAGE, command.state().getReleaseType().getGitCommitMessage());
-                assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
-                assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
-                assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
-                if (Objects.isNull(Defaults.ReleaseType.IDENTIFIERS)) {
-                    assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
-                }
-                else {
-                    assertTrue(Defaults.ReleaseType.IDENTIFIERS.containsAll(command.state().getReleaseType().getIdentifiers()));
-                    for (int i=0; i<=Defaults.ReleaseType.IDENTIFIERS.size(); i++) {
-                        assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
-                        assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
-                        assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
-                    }
-                }
-                assertEquals(Defaults.ReleaseType.MATCH_BRANCHES, command.state().getReleaseType().getMatchBranches());
-                assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
-                assertEquals(Defaults.ReleaseType.MATCH_WORKSPACE_STATUS, command.state().getReleaseType().getMatchWorkspaceStatus());
-                assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
-                assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
-                assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
-                assertFalse(command.state().getNewVersion());
-                assertFalse(command.state().getNewRelease());
                 assertEquals("0.0.4", command.state().getVersion());
-                assertNull(command.state().getVersionRange());
                 assertEquals(previousLastCommit, script.getLastCommitID());
                 assertEquals(previousCommits.size(), script.getCommitIDs().size());
                 assertEquals(previousTags.size(), script.getTags().size());
@@ -273,46 +232,7 @@ public class MarkTestTemplates {
 
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
             if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
-                assertEquals("master", command.state().getBranch());
-                assertEquals(Defaults.BUMP, command.state().getBump());
-                assertEquals(Defaults.SCHEME, command.state().getScheme());
-                assertEquals(2, command.state().getReleaseScope().getCommits().size());
-                assertEquals(script.getCommitIDs().get(1), command.state().getReleaseScope().getInitialCommit().getSHA());
-                assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getFinalCommit().getSHA());
-                assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion());
-                assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
-                assertEquals("0.0.4", command.state().getReleaseScope().getPrimeVersion());
-                assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
-                assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
-                assertEquals(Defaults.ReleaseType.COLLAPSE_VERSIONS, command.state().getReleaseType().getCollapseVersions());
-                assertEquals(Defaults.ReleaseType.COLLAPSED_VERSION_QUALIFIER, command.state().getReleaseType().getCollapsedVersionQualifier());
-                assertEquals(Defaults.ReleaseType.DESCRIPTION, command.state().getReleaseType().getDescription());
-                assertEquals(Defaults.ReleaseType.GIT_COMMIT, command.state().getReleaseType().getGitCommit());
-                assertEquals(Defaults.ReleaseType.GIT_COMMIT_MESSAGE, command.state().getReleaseType().getGitCommitMessage());
-                assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
-                assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
-                assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
-                if (Objects.isNull(Defaults.ReleaseType.IDENTIFIERS)) {
-                    assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
-                }
-                else {
-                    assertTrue(Defaults.ReleaseType.IDENTIFIERS.containsAll(command.state().getReleaseType().getIdentifiers()));
-                    for (int i=0; i<=Defaults.ReleaseType.IDENTIFIERS.size(); i++) {
-                        assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
-                        assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
-                        assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
-                    }
-                }
-                assertEquals(Defaults.ReleaseType.MATCH_BRANCHES, command.state().getReleaseType().getMatchBranches());
-                assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
-                assertEquals(Defaults.ReleaseType.MATCH_WORKSPACE_STATUS, command.state().getReleaseType().getMatchWorkspaceStatus());
-                assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
-                assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
-                assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
-                assertFalse(command.state().getNewVersion());
-                assertFalse(command.state().getNewRelease());
                 assertEquals("0.0.4", command.state().getVersion());
-                assertNull(command.state().getVersionRange());
                 assertEquals(previousLastCommit, script.getLastCommitID());
                 assertEquals(previousCommits.size(), script.getCommitIDs().size());
                 assertEquals(previousTags.size(), script.getTags().size());
@@ -353,46 +273,7 @@ public class MarkTestTemplates {
 
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
             if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
-                assertEquals("master", command.state().getBranch());
-                assertEquals(Defaults.BUMP, command.state().getBump());
-                assertEquals(Defaults.SCHEME, command.state().getScheme());
-                assertEquals(2, command.state().getReleaseScope().getCommits().size());
-                assertEquals(script.getCommitIDs().get(1), command.state().getReleaseScope().getInitialCommit().getSHA());
-                assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getFinalCommit().getSHA());
-                assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion());
-                assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
-                assertEquals("0.0.4", command.state().getReleaseScope().getPrimeVersion());
-                assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
-                assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
-                assertEquals(Defaults.ReleaseType.COLLAPSE_VERSIONS, command.state().getReleaseType().getCollapseVersions());
-                assertEquals(Defaults.ReleaseType.COLLAPSED_VERSION_QUALIFIER, command.state().getReleaseType().getCollapsedVersionQualifier());
-                assertEquals(Defaults.ReleaseType.DESCRIPTION, command.state().getReleaseType().getDescription());
-                assertEquals(Boolean.TRUE.toString(), command.state().getReleaseType().getGitCommit());
-                assertEquals(Defaults.ReleaseType.GIT_COMMIT_MESSAGE, command.state().getReleaseType().getGitCommitMessage());
-                assertEquals(Boolean.TRUE.toString(), command.state().getReleaseType().getGitPush());
-                assertEquals(Boolean.TRUE.toString(), command.state().getReleaseType().getGitTag());
-                assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
-                if (Objects.isNull(Defaults.ReleaseType.IDENTIFIERS)) {
-                    assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
-                }
-                else {
-                    assertTrue(Defaults.ReleaseType.IDENTIFIERS.containsAll(command.state().getReleaseType().getIdentifiers()));
-                    for (int i=0; i<=Defaults.ReleaseType.IDENTIFIERS.size(); i++) {
-                        assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
-                        assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
-                        assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
-                    }
-                }
-                assertEquals(Defaults.ReleaseType.MATCH_BRANCHES, command.state().getReleaseType().getMatchBranches());
-                assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
-                assertEquals(Defaults.ReleaseType.MATCH_WORKSPACE_STATUS, command.state().getReleaseType().getMatchWorkspaceStatus());
-                assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
-                assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
-                assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
-                assertFalse(command.state().getNewVersion());
-                assertFalse(command.state().getNewRelease());
                 assertEquals("0.0.4", command.state().getVersion());
-                assertNull(command.state().getVersionRange());
                 assertEquals(previousLastCommit, script.getLastCommitID());
                 assertEquals(previousCommits.size(), script.getCommitIDs().size());
                 assertEquals(previousTags.size(), script.getTags().size());
@@ -436,46 +317,7 @@ public class MarkTestTemplates {
 
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
             if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
-                assertEquals("master", command.state().getBranch());
-                assertEquals(Defaults.BUMP, command.state().getBump());
-                assertEquals(Defaults.SCHEME, command.state().getScheme());
-                assertEquals(2, command.state().getReleaseScope().getCommits().size());
-                assertEquals(script.getCommitIDs().get(1), command.state().getReleaseScope().getInitialCommit().getSHA());
-                assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getFinalCommit().getSHA());
-                assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion());
-                assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
-                assertEquals("0.0.4", command.state().getReleaseScope().getPrimeVersion());
-                assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
-                assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
-                assertEquals(Defaults.ReleaseType.COLLAPSE_VERSIONS, command.state().getReleaseType().getCollapseVersions());
-                assertEquals(Defaults.ReleaseType.COLLAPSED_VERSION_QUALIFIER, command.state().getReleaseType().getCollapsedVersionQualifier());
-                assertEquals(Defaults.ReleaseType.DESCRIPTION, command.state().getReleaseType().getDescription());
-                assertEquals(Boolean.TRUE.toString(), command.state().getReleaseType().getGitCommit());
-                assertEquals(Defaults.ReleaseType.GIT_COMMIT_MESSAGE, command.state().getReleaseType().getGitCommitMessage());
-                assertEquals(Boolean.TRUE.toString(), command.state().getReleaseType().getGitPush());
-                assertEquals(Boolean.TRUE.toString(), command.state().getReleaseType().getGitTag());
-                assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
-                if (Objects.isNull(Defaults.ReleaseType.IDENTIFIERS)) {
-                    assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
-                }
-                else {
-                    assertTrue(Defaults.ReleaseType.IDENTIFIERS.containsAll(command.state().getReleaseType().getIdentifiers()));
-                    for (int i=0; i<=Defaults.ReleaseType.IDENTIFIERS.size(); i++) {
-                        assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
-                        assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
-                        assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
-                    }
-                }
-                assertEquals(Defaults.ReleaseType.MATCH_BRANCHES, command.state().getReleaseType().getMatchBranches());
-                assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
-                assertEquals(Defaults.ReleaseType.MATCH_WORKSPACE_STATUS, command.state().getReleaseType().getMatchWorkspaceStatus());
-                assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
-                assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
-                assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
-                assertFalse(command.state().getNewVersion());
-                assertFalse(command.state().getNewRelease());
                 assertEquals("0.0.4", command.state().getVersion());
-                assertNull(command.state().getVersionRange());
                 assertEquals(previousLastCommit, script.getLastCommitID());
                 assertEquals(previousCommits.size(), script.getCommitIDs().size());
                 assertEquals(previousTags.size(), script.getTags().size());
@@ -521,46 +363,7 @@ public class MarkTestTemplates {
 
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
             if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
-                assertEquals("master", command.state().getBranch());
-                assertEquals("patch", command.state().getBump());
-                assertEquals(Defaults.SCHEME, command.state().getScheme());
-                assertEquals(2, command.state().getReleaseScope().getCommits().size());
-                assertEquals(script.getCommitIDs().get(1), command.state().getReleaseScope().getInitialCommit().getSHA());
-                assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getFinalCommit().getSHA());
-                assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion());
-                assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
-                assertEquals("0.0.4", command.state().getReleaseScope().getPrimeVersion());
-                assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
-                assertEquals(2, command.state().getReleaseScope().getSignificantCommits().size());
-                assertEquals(Defaults.ReleaseType.COLLAPSE_VERSIONS, command.state().getReleaseType().getCollapseVersions());
-                assertEquals(Defaults.ReleaseType.COLLAPSED_VERSION_QUALIFIER, command.state().getReleaseType().getCollapsedVersionQualifier());
-                assertEquals(Defaults.ReleaseType.DESCRIPTION, command.state().getReleaseType().getDescription());
-                assertEquals(Defaults.ReleaseType.GIT_COMMIT, command.state().getReleaseType().getGitCommit());
-                assertEquals(Defaults.ReleaseType.GIT_COMMIT_MESSAGE, command.state().getReleaseType().getGitCommitMessage());
-                assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
-                assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
-                assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
-                if (Objects.isNull(Defaults.ReleaseType.IDENTIFIERS)) {
-                    assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
-                }
-                else {
-                    assertTrue(Defaults.ReleaseType.IDENTIFIERS.containsAll(command.state().getReleaseType().getIdentifiers()));
-                    for (int i=0; i<=Defaults.ReleaseType.IDENTIFIERS.size(); i++) {
-                        assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
-                        assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
-                        assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
-                    }
-                }
-                assertEquals(Defaults.ReleaseType.MATCH_BRANCHES, command.state().getReleaseType().getMatchBranches());
-                assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
-                assertEquals(Defaults.ReleaseType.MATCH_WORKSPACE_STATUS, command.state().getReleaseType().getMatchWorkspaceStatus());
-                assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
-                assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
-                assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
-                assertTrue(command.state().getNewVersion());
-                assertFalse(command.state().getNewRelease());
                 assertEquals("0.0.5", command.state().getVersion());
-                assertNull(command.state().getVersionRange());
                 assertEquals(previousLastCommit, script.getLastCommitID());
                 assertEquals(previousCommits.size(), script.getCommitIDs().size());
                 assertEquals(previousTags.size(), script.getTags().size());
@@ -609,46 +412,7 @@ public class MarkTestTemplates {
 
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
             if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
-                assertEquals("master", command.state().getBranch());
-                assertEquals("patch", command.state().getBump());
-                assertEquals(Defaults.SCHEME, command.state().getScheme());
-                assertEquals(2, command.state().getReleaseScope().getCommits().size());
-                assertEquals(script.getCommitIDs().get(1), command.state().getReleaseScope().getInitialCommit().getSHA());
-                assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getFinalCommit().getSHA());
-                assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion());
-                assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
-                assertEquals("0.0.4", command.state().getReleaseScope().getPrimeVersion());
-                assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
-                assertEquals(2, command.state().getReleaseScope().getSignificantCommits().size());
-                assertEquals(Defaults.ReleaseType.COLLAPSE_VERSIONS, command.state().getReleaseType().getCollapseVersions());
-                assertEquals(Defaults.ReleaseType.COLLAPSED_VERSION_QUALIFIER, command.state().getReleaseType().getCollapsedVersionQualifier());
-                assertEquals(Defaults.ReleaseType.DESCRIPTION, command.state().getReleaseType().getDescription());
-                assertEquals(Defaults.ReleaseType.GIT_COMMIT, command.state().getReleaseType().getGitCommit());
-                assertEquals(Defaults.ReleaseType.GIT_COMMIT_MESSAGE, command.state().getReleaseType().getGitCommitMessage());
-                assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
-                assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
-                assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
-                if (Objects.isNull(Defaults.ReleaseType.IDENTIFIERS)) {
-                    assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
-                }
-                else {
-                    assertTrue(Defaults.ReleaseType.IDENTIFIERS.containsAll(command.state().getReleaseType().getIdentifiers()));
-                    for (int i=0; i<=Defaults.ReleaseType.IDENTIFIERS.size(); i++) {
-                        assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
-                        assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
-                        assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
-                    }
-                }
-                assertEquals(Defaults.ReleaseType.MATCH_BRANCHES, command.state().getReleaseType().getMatchBranches());
-                assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
-                assertEquals(Defaults.ReleaseType.MATCH_WORKSPACE_STATUS, command.state().getReleaseType().getMatchWorkspaceStatus());
-                assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
-                assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
-                assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
-                assertTrue(command.state().getNewVersion());
-                assertFalse(command.state().getNewRelease());
                 assertEquals("0.0.5", command.state().getVersion());
-                assertNull(command.state().getVersionRange());
                 assertEquals(previousLastCommit, script.getLastCommitID());
                 assertEquals(previousCommits.size(), script.getCommitIDs().size());
                 assertEquals(previousTags.size(), script.getTags().size());
@@ -694,46 +458,7 @@ public class MarkTestTemplates {
 
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
             if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
-                assertEquals("master", command.state().getBranch());
-                assertEquals("patch", command.state().getBump());
-                assertEquals(Defaults.SCHEME, command.state().getScheme());
-                assertEquals(2, command.state().getReleaseScope().getCommits().size());
-                assertEquals(script.getCommitIDs().get(1), command.state().getReleaseScope().getInitialCommit().getSHA());
-                assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getFinalCommit().getSHA());
-                assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion());
-                assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
-                assertEquals("0.0.4", command.state().getReleaseScope().getPrimeVersion());
-                assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
-                assertEquals(2, command.state().getReleaseScope().getSignificantCommits().size());
-                assertEquals(Defaults.ReleaseType.COLLAPSE_VERSIONS, command.state().getReleaseType().getCollapseVersions());
-                assertEquals(Defaults.ReleaseType.COLLAPSED_VERSION_QUALIFIER, command.state().getReleaseType().getCollapsedVersionQualifier());
-                assertEquals(Defaults.ReleaseType.DESCRIPTION, command.state().getReleaseType().getDescription());
-                assertEquals(Boolean.TRUE.toString(), command.state().getReleaseType().getGitCommit());
-                assertEquals(Defaults.ReleaseType.GIT_COMMIT_MESSAGE, command.state().getReleaseType().getGitCommitMessage());
-                assertEquals(Boolean.TRUE.toString(), command.state().getReleaseType().getGitPush());
-                assertEquals(Boolean.TRUE.toString(), command.state().getReleaseType().getGitTag());
-                assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
-                if (Objects.isNull(Defaults.ReleaseType.IDENTIFIERS)) {
-                    assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
-                }
-                else {
-                    assertTrue(Defaults.ReleaseType.IDENTIFIERS.containsAll(command.state().getReleaseType().getIdentifiers()));
-                    for (int i=0; i<=Defaults.ReleaseType.IDENTIFIERS.size(); i++) {
-                        assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
-                        assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
-                        assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
-                    }
-                }
-                assertEquals(Defaults.ReleaseType.MATCH_BRANCHES, command.state().getReleaseType().getMatchBranches());
-                assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
-                assertEquals(Defaults.ReleaseType.MATCH_WORKSPACE_STATUS, command.state().getReleaseType().getMatchWorkspaceStatus());
-                assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
-                assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
-                assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
-                assertTrue(command.state().getNewVersion());
-                assertFalse(command.state().getNewRelease());
                 assertEquals("0.0.5", command.state().getVersion());
-                assertNull(command.state().getVersionRange());
                 assertEquals(previousLastCommit, script.getLastCommitID());
                 assertEquals(previousCommits.size(), script.getCommitIDs().size());
                 assertEquals(previousTags.size()+1, script.getTags().size());
@@ -782,46 +507,7 @@ public class MarkTestTemplates {
 
             // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
             if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
-                assertEquals("master", command.state().getBranch());
-                assertEquals("patch", command.state().getBump());
-                assertEquals(Defaults.SCHEME, command.state().getScheme());
-                assertEquals(3, command.state().getReleaseScope().getCommits().size());
-                assertEquals(script.getCommitIDs().get(2), command.state().getReleaseScope().getInitialCommit().getSHA());
-                assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getFinalCommit().getSHA());
-                assertEquals("0.0.4", command.state().getReleaseScope().getPreviousVersion());
-                assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
-                assertEquals("0.0.4", command.state().getReleaseScope().getPrimeVersion());
-                assertEquals(script.getCommitByTag("0.0.4"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
-                assertEquals(2, command.state().getReleaseScope().getSignificantCommits().size());
-                assertEquals(Defaults.ReleaseType.COLLAPSE_VERSIONS, command.state().getReleaseType().getCollapseVersions());
-                assertEquals(Defaults.ReleaseType.COLLAPSED_VERSION_QUALIFIER, command.state().getReleaseType().getCollapsedVersionQualifier());
-                assertEquals(Defaults.ReleaseType.DESCRIPTION, command.state().getReleaseType().getDescription());
-                assertEquals(Boolean.TRUE.toString(), command.state().getReleaseType().getGitCommit());
-                assertEquals(Defaults.ReleaseType.GIT_COMMIT_MESSAGE, command.state().getReleaseType().getGitCommitMessage());
-                assertEquals(Boolean.TRUE.toString(), command.state().getReleaseType().getGitPush());
-                assertEquals(Boolean.TRUE.toString(), command.state().getReleaseType().getGitTag());
-                assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
-                if (Objects.isNull(Defaults.ReleaseType.IDENTIFIERS)) {
-                    assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
-                }
-                else {
-                    assertTrue(Defaults.ReleaseType.IDENTIFIERS.containsAll(command.state().getReleaseType().getIdentifiers()));
-                    for (int i=0; i<=Defaults.ReleaseType.IDENTIFIERS.size(); i++) {
-                        assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getQualifier(), command.state().getReleaseType().getIdentifiers().get(i).getQualifier());
-                        assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getValue(), command.state().getReleaseType().getIdentifiers().get(i).getValue());
-                        assertEquals(Defaults.ReleaseType.IDENTIFIERS.get(i).getPosition(), command.state().getReleaseType().getIdentifiers().get(i).getPosition());
-                    }
-                }
-                assertEquals(Defaults.ReleaseType.MATCH_BRANCHES, command.state().getReleaseType().getMatchBranches());
-                assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
-                assertEquals(Defaults.ReleaseType.MATCH_WORKSPACE_STATUS, command.state().getReleaseType().getMatchWorkspaceStatus());
-                assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
-                assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
-                assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
-                assertTrue(command.state().getNewVersion());
-                assertFalse(command.state().getNewRelease());
                 assertEquals("0.0.5", command.state().getVersion());
-                assertNull(command.state().getVersionRange());
                 assertNotEquals(previousLastCommit, script.getLastCommitID());
                 assertEquals(previousCommits.size()+1, script.getCommitIDs().size());
                 assertEquals(previousTags.size()+1, script.getTags().size());
