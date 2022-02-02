@@ -216,9 +216,10 @@ public class Make extends AbstractCommand {
                         logger.debug(COMMAND, "Evaluating commit '{}' against message convention '{}'", commit.getSHA(), cmcEntry.getKey());                                
                         Matcher messageMatcher = Pattern.compile(cmcEntry.getValue().getExpression()).matcher(commit.getMessage().getFullMessage());
                         try {
-                            messageMatcher.find();
-                            commitType = messageMatcher.group("type");
-                            logger.debug(COMMAND, "The type of commit '{}' is '{}'", commit.getSHA(), commitType);
+                            if (messageMatcher.find()) {
+                                commitType = messageMatcher.group("type");
+                                logger.debug(COMMAND, "The type of commit '{}' is '{}'", commit.getSHA(), commitType);
+                            }
                         }
                         catch (IllegalArgumentException iae) {
                             throw new IllegalPropertyException(String.format("The regular expression '%s' defined for commit message convention '%s' does not define the 'type' named capturing group", cmcEntry.getValue().getExpression(), cmcEntry.getKey()), iae);
