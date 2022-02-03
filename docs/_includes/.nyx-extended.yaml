@@ -1,6 +1,6 @@
 --- 
 changelog:
-  path: "build/CHANGELOG.md"
+  path: "CHANGELOG.md"
   sections:
     "Added": "^feat$"
     "Fixed": "^fix$"

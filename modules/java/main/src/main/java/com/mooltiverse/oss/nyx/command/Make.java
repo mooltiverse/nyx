@@ -291,7 +291,7 @@ public class Make extends AbstractCommand {
                 fileWriter.close();
             }
             catch (IOException ioe) {
-                throw new DataAccessException(String.format("Unable to render the changelog to file '%s'", changelogFile.getAbsolutePath()));
+                throw new DataAccessException(String.format("Unable to render the changelog to file '%s'. Make sure the path to the file exists and can be written.", changelogFile.getAbsolutePath()), ioe);
             }
 
             logger.debug(COMMAND, "The changelog has been saved to '{}'", changelogFile.getAbsolutePath());
