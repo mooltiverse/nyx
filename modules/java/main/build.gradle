@@ -19,7 +19,7 @@ configurations {
   // In particular we need the Git scripts (in the test source set) to be available for other projects.
   // This is actually not trivial and we had to follow directions from this post:
   // - https://softnoise.wordpress.com/2014/09/07/gradle-sub-project-test-dependencies-in-multi-project-builds/
-  testExport.extendsFrom(testRuntimeOnly)
+  integrationTestExport.extendsFrom(integrationTestRuntimeOnly)
 }
 
 /*------------------------------------------------------------------------------
@@ -38,10 +38,11 @@ dependencies {
 
   // The SLF4J framework that prints all test output to System err
   // See http://www.slf4j.org/apidocs/org/slf4j/impl/SimpleLogger.html for the system properties available to change verbosity levels
-  testImplementation    'org.slf4j:slf4j-simple:1.7.32'
+  testImplementation            'org.slf4j:slf4j-simple:1.7.32'
+  integrationTestImplementation 'org.slf4j:slf4j-simple:1.7.32'
 
-  // See the 'testExport' about this
-  testExport             sourceSets.test.output
+  // See the 'integrationTestExport' about this
+  integrationTestExport  sourceSets.integrationTest.output
 }
 
 test {
@@ -55,7 +56,9 @@ test {
   systemProperty 'mediumYAMLExampleConfigurationFile', file("$rootDir/docs/_includes/.nyx-medium.yaml").absolutePath
   systemProperty 'simpleYAMLExampleConfigurationFile', file("$rootDir/docs/_includes/.nyx-simple.yaml").absolutePath
   systemProperty 'simplestYAMLExampleConfigurationFile', file("$rootDir/docs/_includes/.nyx-simplest.yaml").absolutePath
+}
 
+integrationTest {
   // Pass the credentials to test suites as per https://github.com/mooltiverse/nyx/blob/master/CONTRIBUTING.md#contributing-code
   // Suggestion is to set the $GRADLE_USER_HOME environment variable and create a gradle.properties therein, with these
   // properties defined

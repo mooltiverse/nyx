@@ -28,7 +28,6 @@ allprojects {
   group   = 'com.mooltiverse.oss.nyx'
 
   // This task is useful to run all verification tasks (check, test but also functionalTest and integrationTest)
-  
   task verify() {
     description 'Runs all tests and verification tasks'
     group 'Verification'

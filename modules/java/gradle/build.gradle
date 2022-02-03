@@ -27,7 +27,8 @@ dependencies {
   implementation project(':modules:java:main')
 
   // Add this dependency to use the Git scripts from the main subproject into this project tests
-  testImplementation project(path: ':modules:java:main', configuration: 'testExport')
+  integrationTestImplementation project(path: ':modules:java:main', configuration: 'integrationTestExport')
+  functionalTestImplementation  project(path: ':modules:java:main', configuration: 'integrationTestExport')
 }
 
 functionalTest {
