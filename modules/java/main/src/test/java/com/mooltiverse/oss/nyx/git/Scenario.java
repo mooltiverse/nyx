@@ -379,7 +379,7 @@ public enum Scenario {
      * - rel/1.x: a release branch with a few non tagged commits
      * - feature/SSO: a feature branch with a few tagged commits
      * - feature/IN-12345: a feature branch with a few non tagged commits
-     * - fix-98765: an hotfix branch with a few tagged commits
+     * - hotfix-98765: an hotfix branch with a few tagged commits
      * - somebranch: a generic branch for 'internal' contributions with a few tagged commits
      * - someotherbranch: a generic branch for 'internal' contributions with a few non tagged commits
      * </pre>
@@ -423,9 +423,9 @@ public enum Scenario {
      *   * | db26bd2 (tag: 0.0.6-integration.2) Commit xkk
      *   |/  
      *   * 8673f95 (tag: 0.0.6-integration.1, master) Commit jad
-     *   | * fe6db90 (fix-98765) Untagged commit in branch fix-98765
-     *   | * f352f79 (tag: 0.0.8-fix98765.2) Commit fee
-     *   | * 4b5687a (tag: 0.0.8-fix98765.1) Commit ogx
+     *   | * fe6db90 (hotfix-98765) Untagged commit in branch hotfix-98765
+     *   | * f352f79 (tag: 0.0.8-hotfix98765.2) Commit fee
+     *   | * 4b5687a (tag: 0.0.8-hotfix98765.1) Commit ogx
      *   | * 890e188 (v0.x) Untagged commit in branch v0.x
      *   | * d69e85b (tag: 0.0.7-v0x.1) Commit vvv
      *   | * 47aa910 (tag: 0.0.7) Commit uie
@@ -529,10 +529,10 @@ public enum Scenario {
         .andAddFiles().andStage().andCommit("Untagged commit #1 in branch feature/IN-12345")
         .andAddFiles().andStage().andCommit("Untagged commit #2 in branch feature/IN-12345")
         .andAddFiles().andStage().andCommit("Untagged commit #3 in branch feature/IN-12345")
-        // feed the HOTFIX branch: fix-98765 (forking from v0.x)
+        // feed the HOTFIX branch: hotfix-98765 (forking from v0.x)
         .inBranch("v0.x")
-        .andCommitWithTagInBranch("fix-98765", "0.0.8-fix98765.1", "Annotated tag to commit 0.0.8-fix98765.1")
-        .andCommitWithTagInBranch("fix-98765", "0.0.8-fix98765.2")
+        .andCommitWithTagInBranch("hotfix-98765", "0.0.8-hotfix98765.1", "Annotated tag to commit 0.0.8-hotfix98765.1")
+        .andCommitWithTagInBranch("hotfix-98765", "0.0.8-hotfix98765.2")
         .andAddFiles().andStage().andCommit("Untagged commit in branch fix-98765")
         // feed the MATURITY branch: alpha (forking from integration)
         .inBranch("integration")

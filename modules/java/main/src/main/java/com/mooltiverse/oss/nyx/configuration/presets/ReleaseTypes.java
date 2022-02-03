@@ -50,6 +50,30 @@ public class ReleaseTypes {
     };
 
     /**
+     * The release type used for fix branches
+     */
+    public static final ReleaseType FIX = new ReleaseType() {
+        {
+            setCollapseVersions(Boolean.TRUE);
+            setCollapsedVersionQualifier("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}");
+            setDescription(null);
+            setFilterTags("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-fix(([0-9a-zA-Z]*)(\\.([0-9]\\d*))?)?)$");
+            setGitCommit(Boolean.FALSE.toString());
+            setGitCommitMessage(null);
+            setGitPush(Boolean.FALSE.toString());
+            setGitTag(Boolean.FALSE.toString());
+            setGitTagMessage(null);
+            setIdentifiers(null);
+            setMatchBranches("^fix((-|\\/)[0-9a-zA-Z-_]+)?$");
+            setMatchEnvironmentVariables(null);
+            setMatchWorkspaceStatus(WorkspaceStatus.CLEAN);
+            setPublish(Boolean.FALSE.toString());
+            setVersionRange(null);
+            setVersionRangeFromBranchName(Boolean.FALSE);
+        }
+    };
+
+    /**
      * The release type used for hotfix branches
      */
     public static final ReleaseType HOTFIX = new ReleaseType() {
@@ -57,14 +81,14 @@ public class ReleaseTypes {
             setCollapseVersions(Boolean.TRUE);
             setCollapsedVersionQualifier("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}");
             setDescription(null);
-            setFilterTags("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(fix|hotfix)(([0-9a-zA-Z]*)(\\.([0-9]\\d*))?)?)$");
+            setFilterTags("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-hotfix(([0-9a-zA-Z]*)(\\.([0-9]\\d*))?)?)$");
             setGitCommit(Boolean.FALSE.toString());
             setGitCommitMessage(null);
             setGitPush(Boolean.TRUE.toString());
             setGitTag(Boolean.TRUE.toString());
             setGitTagMessage(null);
             setIdentifiers(null);
-            setMatchBranches("^(fix|hotfix)((-|\\/)[0-9a-zA-Z-_]+)?$");
+            setMatchBranches("^hotfix((-|\\/)[0-9a-zA-Z-_]+)?$");
             setMatchEnvironmentVariables(null);
             setMatchWorkspaceStatus(WorkspaceStatus.CLEAN);
             setPublish(Boolean.TRUE.toString());

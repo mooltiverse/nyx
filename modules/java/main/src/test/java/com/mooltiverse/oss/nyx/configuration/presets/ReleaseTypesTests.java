@@ -175,6 +175,150 @@ public class ReleaseTypesTests {
     }
 
     @Nested
+    @DisplayName("Fix")
+    class FixixTests {
+        @Nested
+        @DisplayName("Fix filter tags")
+        class FilterTagsTests {
+            @Test
+            @DisplayName("Fix positive filter tags")
+            void positiveFilterTags()
+                throws Exception {
+                Configuration configuration = new Configuration();
+                SimpleConfigurationLayer configurationLayer = new SimpleConfigurationLayer();
+                configurationLayer.setReleasePrefix("v");
+                configuration.withRuntimeConfiguration(configurationLayer);
+                State state = new State(configuration);
+                Pattern pattern = Pattern.compile(Templates.render(ReleaseTypes.FIX.getFilterTags(), state));
+
+                assertTrue(pattern.matcher("1.2.3-fix").matches());
+                assertTrue(pattern.matcher("1.2.3-fix.1").matches());
+                assertTrue(pattern.matcher("1.2.3-fixABC").matches());
+                assertTrue(pattern.matcher("1.2.3-fixABC.1").matches());
+
+                assertTrue(pattern.matcher("v1.2.3-fix").matches());
+                assertTrue(pattern.matcher("v1.2.3-fix.1").matches());
+                assertTrue(pattern.matcher("v1.2.3-fixABC").matches());
+                assertTrue(pattern.matcher("v1.2.3-fixABC.1").matches());
+            }
+
+            @Test
+            @DisplayName("Fix tag does not filter")
+            void negativeFilterTags()
+                throws Exception {
+                Configuration configuration = new Configuration();
+                SimpleConfigurationLayer configurationLayer = new SimpleConfigurationLayer();
+                configurationLayer.setReleasePrefix("v");
+                configuration.withRuntimeConfiguration(configurationLayer);
+                State state = new State(configuration);
+                Pattern pattern = Pattern.compile(Templates.render(ReleaseTypes.FIX.getFilterTags(), state));
+
+                assertFalse(pattern.matcher("1.2.3").matches());
+                assertFalse(pattern.matcher("a.b.c").matches());
+
+                assertFalse(pattern.matcher("1.2.3-fx").matches());
+                assertFalse(pattern.matcher("1.2.3-fx.1").matches());
+                assertFalse(pattern.matcher("1.2.3-fxABC").matches());
+                assertFalse(pattern.matcher("1.2.3-fxABC.1").matches());
+                
+                assertFalse(pattern.matcher("1.2.3-htfix").matches());
+                assertFalse(pattern.matcher("1.2.3-htfix.1").matches());
+                assertFalse(pattern.matcher("1.2.3-htfixABC").matches());
+                assertFalse(pattern.matcher("1.2.3-htfixABC.1").matches());
+
+                assertFalse(pattern.matcher("1.2.3-hotfix").matches());
+                assertFalse(pattern.matcher("1.2.3-hotfix.1").matches());
+                assertFalse(pattern.matcher("1.2.3-hotfixABC").matches());
+                assertFalse(pattern.matcher("1.2.3-hotfixABC.1").matches());
+
+                assertFalse(pattern.matcher("1.2.3-hotfix-1").matches());
+                assertFalse(pattern.matcher("1.2.3-hotfixABC-1").matches());
+
+                assertFalse(pattern.matcher("v1.2.3").matches());
+                assertFalse(pattern.matcher("va.b.c").matches());
+
+                assertFalse(pattern.matcher("v1.2.3-fx").matches());
+                assertFalse(pattern.matcher("v1.2.3-fx.1").matches());
+                assertFalse(pattern.matcher("v1.2.3-fxABC").matches());
+                assertFalse(pattern.matcher("v1.2.3-fxABC.1").matches());
+
+                assertFalse(pattern.matcher("v1.2.3-fix-1").matches());
+                assertFalse(pattern.matcher("v1.2.3-fixABC-1").matches());
+
+                assertFalse(pattern.matcher("z1.2.3-fix").matches());
+                assertFalse(pattern.matcher("z1.2.3-fix.1").matches());
+                assertFalse(pattern.matcher("z1.2.3-fixABC").matches());
+                assertFalse(pattern.matcher("z1.2.3-fixABC.1").matches());
+                
+                assertFalse(pattern.matcher("v1.2.3-htfix").matches());
+                assertFalse(pattern.matcher("v1.2.3-htfix.1").matches());
+                assertFalse(pattern.matcher("v1.2.3-htfixABC").matches());
+                assertFalse(pattern.matcher("v1.2.3-htfixABC.1").matches());
+
+                assertFalse(pattern.matcher("v1.2.3-hotfix").matches());
+                assertFalse(pattern.matcher("v1.2.3-hotfix.1").matches());
+                assertFalse(pattern.matcher("v1.2.3-hotfixABC").matches());
+                assertFalse(pattern.matcher("v1.2.3-hotfixABC.1").matches());
+                
+                assertFalse(pattern.matcher("z1.2.3-hotfix").matches());
+                assertFalse(pattern.matcher("z1.2.3-hotfix.1").matches());
+                assertFalse(pattern.matcher("z1.2.3-hotfixABC").matches());
+                assertFalse(pattern.matcher("z1.2.3-hotfixABC.1").matches());
+            }
+        }
+
+        @Nested
+        @DisplayName("Fix branch match")
+        class BranchMatchTests {
+            @Test
+            @DisplayName("Fixix positive branch matches")
+            void positiveMatchBranches()
+                throws Exception {
+                Configuration configuration = new Configuration();
+                SimpleConfigurationLayer configurationLayer = new SimpleConfigurationLayer();
+                configurationLayer.setReleasePrefix("v");
+                configuration.withRuntimeConfiguration(configurationLayer);
+                State state = new State(configuration);
+                Pattern pattern = Pattern.compile(Templates.render(ReleaseTypes.FIX.getMatchBranches(), state));
+
+                assertTrue(pattern.matcher("fix").matches());
+                assertTrue(pattern.matcher("fix-123").matches());
+                assertTrue(pattern.matcher("fix/abc").matches());
+            }
+
+            @Test
+            @DisplayName("Hotfix branch does not match")
+            void negativeMatchBranches() 
+                throws Exception {
+                Configuration configuration = new Configuration();
+                SimpleConfigurationLayer configurationLayer = new SimpleConfigurationLayer();
+                configurationLayer.setReleasePrefix("v");
+                configuration.withRuntimeConfiguration(configurationLayer);
+                State state = new State(configuration);
+                Pattern pattern = Pattern.compile(Templates.render(ReleaseTypes.FIX.getMatchBranches(), state));
+
+                assertFalse(pattern.matcher("").matches());
+                assertFalse(pattern.matcher("f").matches());
+                assertFalse(pattern.matcher("fi").matches());
+                assertFalse(pattern.matcher("fixx").matches());
+                assertFalse(pattern.matcher("h").matches());
+                assertFalse(pattern.matcher("hot").matches());
+                assertFalse(pattern.matcher("hotfixx").matches());
+                assertFalse(pattern.matcher("fix-").matches());
+                assertFalse(pattern.matcher("fix/").matches());
+                assertFalse(pattern.matcher("hotfix-").matches());
+                assertFalse(pattern.matcher("hotfix/").matches());
+                assertFalse(pattern.matcher("hotfix").matches());
+                assertFalse(pattern.matcher("hotfix-123").matches());
+                assertFalse(pattern.matcher("hotfix/abc").matches());
+
+                assertFalse(pattern.matcher("something-").matches());
+                assertFalse(pattern.matcher("something/").matches());
+            }
+        }
+    }
+
+    @Nested
     @DisplayName("Hotfix")
     class HotfixTests {
         @Nested
@@ -190,21 +334,11 @@ public class ReleaseTypesTests {
                 configuration.withRuntimeConfiguration(configurationLayer);
                 State state = new State(configuration);
                 Pattern pattern = Pattern.compile(Templates.render(ReleaseTypes.HOTFIX.getFilterTags(), state));
-
-                assertTrue(pattern.matcher("1.2.3-fix").matches());
-                assertTrue(pattern.matcher("1.2.3-fix.1").matches());
-                assertTrue(pattern.matcher("1.2.3-fixABC").matches());
-                assertTrue(pattern.matcher("1.2.3-fixABC.1").matches());
                 
                 assertTrue(pattern.matcher("1.2.3-hotfix").matches());
                 assertTrue(pattern.matcher("1.2.3-hotfix.1").matches());
                 assertTrue(pattern.matcher("1.2.3-hotfixABC").matches());
                 assertTrue(pattern.matcher("1.2.3-hotfixABC.1").matches());
-
-                assertTrue(pattern.matcher("v1.2.3-fix").matches());
-                assertTrue(pattern.matcher("v1.2.3-fix.1").matches());
-                assertTrue(pattern.matcher("v1.2.3-fixABC").matches());
-                assertTrue(pattern.matcher("v1.2.3-fixABC.1").matches());
                 
                 assertTrue(pattern.matcher("v1.2.3-hotfix").matches());
                 assertTrue(pattern.matcher("v1.2.3-hotfix.1").matches());
@@ -236,6 +370,11 @@ public class ReleaseTypesTests {
                 assertFalse(pattern.matcher("1.2.3-htfixABC").matches());
                 assertFalse(pattern.matcher("1.2.3-htfixABC.1").matches());
 
+                assertFalse(pattern.matcher("1.2.3-fix").matches());
+                assertFalse(pattern.matcher("1.2.3-fix.1").matches());
+                assertFalse(pattern.matcher("1.2.3-fixABC").matches());
+                assertFalse(pattern.matcher("1.2.3-fixABC.1").matches());
+
                 assertFalse(pattern.matcher("1.2.3-hotfix-1").matches());
                 assertFalse(pattern.matcher("1.2.3-hotfixABC-1").matches());
 
@@ -259,6 +398,11 @@ public class ReleaseTypesTests {
                 assertFalse(pattern.matcher("v1.2.3-htfix.1").matches());
                 assertFalse(pattern.matcher("v1.2.3-htfixABC").matches());
                 assertFalse(pattern.matcher("v1.2.3-htfixABC.1").matches());
+
+                assertFalse(pattern.matcher("v1.2.3-fix").matches());
+                assertFalse(pattern.matcher("v1.2.3-fix.1").matches());
+                assertFalse(pattern.matcher("v1.2.3-fixABC").matches());
+                assertFalse(pattern.matcher("v1.2.3-fixABC.1").matches());
                 
                 assertFalse(pattern.matcher("z1.2.3-hotfix").matches());
                 assertFalse(pattern.matcher("z1.2.3-hotfix.1").matches());
@@ -280,10 +424,6 @@ public class ReleaseTypesTests {
                 configuration.withRuntimeConfiguration(configurationLayer);
                 State state = new State(configuration);
                 Pattern pattern = Pattern.compile(Templates.render(ReleaseTypes.HOTFIX.getMatchBranches(), state));
-
-                assertTrue(pattern.matcher("fix").matches());
-                assertTrue(pattern.matcher("fix-123").matches());
-                assertTrue(pattern.matcher("fix/abc").matches());
                 
                 assertTrue(pattern.matcher("hotfix").matches());
                 assertTrue(pattern.matcher("hotfix-123").matches());
@@ -310,6 +450,9 @@ public class ReleaseTypesTests {
                 assertFalse(pattern.matcher("hotfixx").matches());
                 assertFalse(pattern.matcher("fix-").matches());
                 assertFalse(pattern.matcher("fix/").matches());
+                assertFalse(pattern.matcher("fix").matches());
+                assertFalse(pattern.matcher("fix-123").matches());
+                assertFalse(pattern.matcher("fix/abc").matches());
                 assertFalse(pattern.matcher("hotfix-").matches());
                 assertFalse(pattern.matcher("hotfix/").matches());
 

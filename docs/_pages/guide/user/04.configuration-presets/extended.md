@@ -7,6 +7,22 @@ permalink: /guide/user/configuration-presets/extended/
 
 This preset can be used by setting the [`preset`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#preset) global configuration option value to `extended` and brings rich standard configurations suitable for projects with several options in place.
 
+### Changelog
+
+A standard changelog configuration is included in this preset. The destination file is `CHANGELOG.md` (in the current working directory) and is rendered using the default template.
+
+The rendered changelog uses the default template so its content is flat and no links are produced to any specific hosting service. Sections include commits matched by both the [Conventional Commits](https://www.conventionalcommits.org/) and [gitmoji](https://gitmoji.dev/) conventions.
+
+This corresponds to the following configuration options:
+
+| Name                                            | Value                                                                                    |
+| ----------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| [`changelog/path`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/changelog.md %}#path) | `CHANGELOG.md` |
+| [`changelog/sections/Added`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/changelog.md %}#sections) | `"^(feat|:boom:|:sparkles:)$"` |
+| [`changelog/sections/Fixed`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/changelog.md %}#sections) | "`^(fix|:bug:|:ambulance:)$`" |
+| [`changelog/sections/Removed`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/changelog.md %}#sections) | "`^:fire:$`" |
+| [`changelog/sections/Security`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/changelog.md %}#sections) | "`^:lock:$`" |
+
 ### Commit message conventions
 
 The [Conventional Commits](https://www.conventionalcommits.org/) and [gitmoji](https://gitmoji.dev/) conventions come with this preset. This corresponds to the following configuration options:
@@ -21,25 +37,11 @@ The [Conventional Commits](https://www.conventionalcommits.org/) and [gitmoji](h
 
 Please note that *gitmoji* is listed **after** *Conventional Commits* so when a commit message is evaluated, *gitmoji* is only taken into account if matching it against *Conventional Commit* does not yield to a positive match.
 
-### Changelog
-
-A standard changelog configuration is included in this preset. The destination file is `CHANGELOG.md` (in the current working directory) and is rendered using the default template.
-
-No links are produced to any specific hosting service. Sections contemplate commits matched by both the [Conventional Commits](https://www.conventionalcommits.org/) and [gitmoji](https://gitmoji.dev/) conventions.
-
-This corresponds to the following configuration options:
-
-| Name                                            | Value                                                                                    |
-| ----------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| [`changelog/path`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/changelog.md %}#path) | `CHANGELOG.md` |
-| [`changelog/sections/Added`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/changelog.md %}#sections) | `"^(feat|:boom:|:sparkles:)$"` |
-| [`changelog/sections/Fixed`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/changelog.md %}#sections) | "`^(fix|:bug:|:ambulance:)$`" |
-| [`changelog/sections/Removed`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/changelog.md %}#sections) | "`^:fire:$`" |
-| [`changelog/sections/Security`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/changelog.md %}#sections) | "`^:lock:$`" |
-
 ### Release types
 
-This preset comes with a set of release types, suitable for a [mainline]({{ site.baseurl }}{% link _pages/guide/user/06.best-practice/branching-models.md %}#mainline) branching model plus [integration]({{ site.baseurl }}{% link _pages/guide/user/06.best-practice/branching-models.md %}#integration-branches), [maturity]({{ site.baseurl }}{% link _pages/guide/user/06.best-practice/branching-models.md %}#maturity-branches), [feature]({{ site.baseurl }}{% link _pages/guide/user/06.best-practice/branching-models.md %}#feature-branches), [hotfix]({{ site.baseurl }}{% link _pages/guide/user/06.best-practice/branching-models.md %}#hotfix-branches), [release]({{ site.baseurl }}{% link _pages/guide/user/06.best-practice/branching-models.md %}#release-branches) and [maintenance]({{ site.baseurl }}{% link _pages/guide/user/06.best-practice/branching-models.md %}#maintenance-branches). An additional release type called *internal* is configured as a fallback when the mainline isn't matched.
+This preset comes with a set of release types, suitable for a [mainline]({{ site.baseurl }}{% link _pages/guide/user/06.best-practice/branching-models.md %}#mainline) branching model plus [integration]({{ site.baseurl }}{% link _pages/guide/user/06.best-practice/branching-models.md %}#integration-branches), [maturity]({{ site.baseurl }}{% link _pages/guide/user/06.best-practice/branching-models.md %}#maturity-branches), [feature]({{ site.baseurl }}{% link _pages/guide/user/06.best-practice/branching-models.md %}#feature-branches), fix, [hotfix]({{ site.baseurl }}{% link _pages/guide/user/06.best-practice/branching-models.md %}#hotfix-branches), [release]({{ site.baseurl }}{% link _pages/guide/user/06.best-practice/branching-models.md %}#release-branches) and [maintenance]({{ site.baseurl }}{% link _pages/guide/user/06.best-practice/branching-models.md %}#maintenance-branches). An additional release type called *internal* is configured as a fallback when the mainline isn't matched.
+
+You may notice that *fix* and *hotfix* are different types in that *hotfix* is meant to deliver (and publish) a new release while the (simple) *fix* is supposed to happen under regular conditions, with no need to issue a new release, and behaves pretty much like a *feature* release type with just a different prefix in branches and tags.
 
 Please note that even if a release type has its [`publish`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#publish) flag enabled, publication to remote services doesn't happen because no [service]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}) is listed in the [`publicationServices`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#publication-services) list. If you want to publish releases using this preset as a starting point you need to override the [`releaseTypes/publicationServices`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#publication-services) with the services you want to use as target (which may be the ones configured in the preset [services](#services) or some custom one).
 {: .notice--info}
@@ -114,22 +116,39 @@ This corresponds to the following configuration options:
 | [`releaseTypes/feature/publish`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#publish) | `"false"` |
 | [`releaseTypes/feature/versionRange`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#version-range) | Empty |
 | [`releaseTypes/feature/versionRangeFromBranchName`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#version-range-from-branch-name) | `false` |
+| [`releaseTypes/fix/collapseVersions`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#collapse-versions) | `true` |
+| [`releaseTypes/fix/collapsedVersionQualifier`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#collapsed-version-qualifier) | `{% raw %}"{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}"{% endraw %}` |
+| [`releaseTypes/fix/description`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#description) | Empty |
+| [`releaseTypes/fix/filterTags`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#match-tags) | `{% raw %}"^({{configuration.releasePrefix}})?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)(-fix(([0-9a-zA-Z]*)(\.([0-9]\d*))?)?)$"{% endraw %}` |
+| [`releaseTypes/fix/gitCommit`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#git-commit) | `"false"` |
+| [`releaseTypes/fix/gitCommitMessage`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#git-commit-message) | Empty (use default) |
+| [`releaseTypes/fix/gitPush`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#git-push) | `"true"` |
+| [`releaseTypes/fix/gitTag`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#git-tag) | `"false"` |
+| [`releaseTypes/fix/gitTagMessage`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#git-tag-message) | Empty (use default) |
+| [`releaseTypes/fix/identifiers`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#identifiers) | Empty |
+| [`releaseTypes/fix/matchBranches`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#match-branches) | `{% raw %}"^fix((-|\/)[0-9a-zA-Z-_]+)?$"{% endraw %}` |
+| [`releaseTypes/fix/matchEnvironmentVariables`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#match-environment-variables) | Empty |
+| [`releaseTypes/fix/matchWorkspaceStatus`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#match-workspace-status) | Empty |
+| [`releaseTypes/fix/publish`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#publish) | `"false"` |
+| [`releaseTypes/fix/versionRange`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#version-range) | Empty |
+| [`releaseTypes/fix/versionRangeFromBranchName`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#version-range-from-branch-name) | `false` |
 | [`releaseTypes/hotfix/collapseVersions`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#collapse-versions) | `true` |
 | [`releaseTypes/hotfix/collapsedVersionQualifier`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#collapsed-version-qualifier) | `{% raw %}"{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}"{% endraw %}` |
 | [`releaseTypes/hotfix/description`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#description) | Empty |
-| [`releaseTypes/hotfix/filterTags`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#match-tags) | `{% raw %}"^({{configuration.releasePrefix}})?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)(-(fix|hotfix)(([0-9a-zA-Z]*)(\.([0-9]\d*))?)?)$"{% endraw %}` |
+| [`releaseTypes/hotfix/filterTags`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#match-tags) | `{% raw %}"^({{configuration.releasePrefix}})?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)(-hotfix(([0-9a-zA-Z]*)(\.([0-9]\d*))?)?)$"{% endraw %}` |
 | [`releaseTypes/hotfix/gitCommit`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#git-commit) | `"false"` |
 | [`releaseTypes/hotfix/gitCommitMessage`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#git-commit-message) | Empty (use default) |
 | [`releaseTypes/hotfix/gitPush`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#git-push) | `"true"` |
 | [`releaseTypes/hotfix/gitTag`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#git-tag) | `"true"` |
 | [`releaseTypes/hotfix/gitTagMessage`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#git-tag-message) | Empty (use default) |
 | [`releaseTypes/hotfix/identifiers`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#identifiers) | Empty |
-| [`releaseTypes/hotfix/matchBranches`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#match-branches) | `{% raw %}"^(fix|hotfix)((-|\/)[0-9a-zA-Z-_]+)?$"{% endraw %}` |
+| [`releaseTypes/hotfix/matchBranches`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#match-branches) | `{% raw %}"^hotfix((-|\/)[0-9a-zA-Z-_]+)?$"{% endraw %}` |
 | [`releaseTypes/hotfix/matchEnvironmentVariables`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#match-environment-variables) | Empty |
 | [`releaseTypes/hotfix/matchWorkspaceStatus`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#match-workspace-status) | Empty |
 | [`releaseTypes/hotfix/publish`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#publish) | `"true"` |
 | [`releaseTypes/hotfix/versionRange`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#version-range) | Empty |
 | [`releaseTypes/hotfix/versionRangeFromBranchName`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#version-range-from-branch-name) | `false` |
+
 | [`releaseTypes/release/collapseVersions`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#collapse-versions) | `true` |
 | [`releaseTypes/release/collapsedVersionQualifier`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#collapsed-version-qualifier) | `{% raw %}"{{#firstLower}}{{branch}}{{/firstLower}}"{% endraw %}` |
 | [`releaseTypes/release/description`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#description) | Empty |

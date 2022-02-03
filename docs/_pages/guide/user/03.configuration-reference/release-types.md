@@ -17,6 +17,7 @@ You can have as many release types as you want. You can use [presets]({{ site.ba
 | ----------------------------------------------------------- | -------| ---------------------------------------------- | ------------------------------------------------ | -------------------------------------- | ---------------------------------------- |
 | [`releaseTypes/enabled`](#enabled)                          | list   | `--release-types-enabled=<NAMES>`              | `NYX_RELEASE_TYPES_ENABLED=<NAMES>`              | `releaseTypes/enabled`                 | [ ["`default`"](#default-release-type) ] |
 | [`releaseTypes/publicationServices`](#publication-services) | list   | `--release-types-publication-services=<NAMES>` | `NYX_RELEASE_TYPES_PUBLICATION_SERVICES=<NAMES>` | `releaseTypes/publicationServices`     | Empty                                    |
+| [`releaseTypes/remoteRepositories`](#remote-repositories)   | list   | `--release-types-remote-repositories=<NAMES>`  | `NYX_RELEASE_TYPES_REMOTE_REPOSITORIES=<NAMES>`  | `releaseTypes/remoteRepositories`      | Empty                                    |
 
 #### Enabled
 
@@ -52,6 +53,24 @@ The comma separated list of service configuration names to be used to publish re
 Services listed here must support the `RELEASES` [feature]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}#service-features).
 
 The order in which services are listed matters. If multiple publication services are defined, publication happens in the same order they are defined here. This might be useful if you're publishing to multiple services and one has dependencies on releases published to others.
+{: .notice--info}
+
+#### Remote repositories
+
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `releaseTypes/remoteRepositories`                                                        |
+| Type                      | list                                                                                     |
+| Default                   | [`origin`]                                                                               |
+| Command Line Option       | `--release-types-remote-repositories=<NAMES>`                                            |
+| Environment Variable      | `NYX_RELEASE_TYPES_REMOTE_REPOSITORIES=<NAMES>`                                          |
+| Configuration File Option | `releaseTypes/remoteRepositories`                                                        |
+| Related state attributes  |                                                                                          |
+
+The comma separated list of remote repository names to be used to push changes to when the matched release type has the [`gitPush`](#git-push) flag enabled. The remotes listed here are the same for all release types but each release type can toggle publication on or off using the [`gitPush`](#git-push) flag. Each name in the list must be the [`name`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/git.md %}#name) of a configured [Git remote repository]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/git.md %}#remotes), but not all defined Git remotes must be used here.
+
+If this option is not set and the [`gitPush`](#git-push) flag is enabled, the default `origin` remote name is used.
+
+The order in which remotes are listed matters. If multiple remotes are defined, push happens in the same order they are defined here. This might be useful if you're pushing to multiple remotes and one has dependencies on changes pushed to others.
 {: .notice--info}
 
 ### Default release type
@@ -190,12 +209,18 @@ For more on how to generate a changelog automatically please see the [`changelog
 | Configuration File Option | `releaseTypes/items/<NAME>/filterTags`                                                   |
 | Related state attributes  | [releaseScope/previousVersion]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#previous-version){: .btn .btn--info .btn--small} [releaseScope/previousVersionCommit]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#previous-version-commit){: .btn .btn--info .btn--small} |
 
-A [template]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}) that, once rendered, produces a regular expression that filter tags in the commit history so that the [*prime* and *previous* version]({{ site.baseurl }}{% link _posts/2020-01-01-whats-the-difference-between-the-prime-version-and-the-previous-version.md %}) can be correctly inferred, ignoring non relevant tags that may be found.
+A [template]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}) that, once rendered, produces a regular expression that filter tags in the commit history so that the [*prime* and *previous* version]({{ site.baseurl }}{% link _posts/2020-01-01-whats-the-difference-between-the-prime-version-and-the-previous-version.md %}) can be correctly inferred, ignoring non relevant tags that may be found. This is a *positive* filter so, when defined, only tags *matched* by the regular expression are considered, while those not matched are ignored.
 
 By default this is empty so all tags are matched.
 
 Please note that this string value is rendered as a template in the first place and then the outcome is used as a regular expression. For example, `{% raw %}"^({{configuration.releasePrefix}})?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)$"{% endraw %}` is first rendered to `{% raw %}"^(v)?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)$"{% endraw %}` (assuming the [`releasePrefix`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#release-prefix) is set to `"v"`), then this regular expression is used to match actual values.
 {: .notice--info}
+
+Be careful when defining this option as it affects the depth of commits browsed by the tool when inferring the [*prime* and *previous* version]({{ site.baseurl }}{% link _posts/2020-01-01-whats-the-difference-between-the-prime-version-and-the-previous-version.md %}). If your filter is too strict you may miss some tags in the commit history (causing the inspection to go too far in the past), while if it's too loose you may stumble upon unnecessary tags that appear in the commit history. This is something you have to consider especially when:
+
+* you apply extra tags manually, other than those applied by the tool, and the manual tags do not follow the same rules as automatic tags applied by Nyx
+* you are dealing with a repository that already had other tags
+* you are working in a branch with some specific tagging (i.e. a *pre-release* branch, like `1.2.3-alpha`) but your backward search may need to end in a parent branch (i.e. one that uses *core identifiers* only, like `1.2.3`)
 
 A few examples:
 
@@ -252,7 +277,7 @@ When `true` Nyx will push changes (including tags) to the remote repository upon
 
 Here you can define a [template]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}) that is [evaluated as a boolean]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}#type-conversions) at runtime to make this decision dynamic.
 
-When this flag is enabled changes are pushed to the default `origin` remote by default.
+When this flag is enabled changes are pushed to the default `origin` remote by default unless the [`remoteRepositories`](#remote-repositories) option has been used to set a specific list of remotes to push to.
 
 #### Git tag
 
@@ -326,6 +351,7 @@ When extra identifiers are used and [tagging](#git-tag) is enabled the [regular 
 {: .notice--info}
 
 Each item in the `identifiers` block is made of a `qualifier`, a `value` and a `position`, as follows.
+
 ##### Identifier definition
 
 Within the `releaseTypes/<NAME>/identifiers` block you can define as many identifiers as you want, each in its own separate block.

@@ -4122,11 +4122,11 @@ public class InferTestTemplates {
         }
 
         @TestTemplate
-        @DisplayName("Infer.run() inferring the hotfix release type from the Extended preset on repository with several branches and commits, with a commit message convention that accepts all commits as significant, in fix-98765 branch > yield to new version and release")
+        @DisplayName("Infer.run() inferring the hotfix release type from the Extended preset on repository with several branches and commits, with a commit message convention that accepts all commits as significant, in hotfix-98765 branch > yield to new version and release")
         @Baseline(Scenario.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED)
-        void runUsingExtendedPresetReleaseTypesWithAlwaysPositiveCommitConventionInFix98765BranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
+        void runUsingExtendedPresetReleaseTypesWithAlwaysPositiveCommitConventionInHotfix98765BranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
-            script.checkout("fix-98765");
+            script.checkout("hotfix-98765");
             final String MATCHING_RELEASE_TYPE_NAME = "hotfix"; // the name of the release type that must be matched in the branch
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add the 'extended' preset, which comes with standard release types
@@ -4142,14 +4142,14 @@ public class InferTestTemplates {
 
             command.run();
 
-            assertEquals("fix-98765", command.state().getBranch());
+            assertEquals("hotfix-98765", command.state().getBranch());
             assertEquals("patch", command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(1, command.state().getReleaseScope().getCommits().size());
             assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getInitialCommit().getSHA());
             assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit().getSHA());
-            assertEquals("0.0.8-fix98765.2", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.8-fix98765.2"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
+            assertEquals("0.0.8-hotfix98765.2", command.state().getReleaseScope().getPreviousVersion());
+            assertEquals(script.getCommitByTag("0.0.8-hotfix98765.2"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.7", command.state().getReleaseScope().getPrimeVersion());
             assertEquals(script.getCommitByTag("0.0.7"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(1, command.state().getReleaseScope().getSignificantCommits().size());
@@ -4181,16 +4181,16 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
             assertTrue(command.state().getNewVersion());
             assertTrue(command.state().getNewRelease());
-            assertEquals("0.0.8-fix98765.3", command.state().getVersion());
+            assertEquals("0.0.8-hotfix98765.3", command.state().getVersion());
             assertNull(command.state().getVersionRange());
         }
 
         @TestTemplate
-        @DisplayName("Infer.run() inferring the hotfix release type from the Extended preset on repository with several branches and commits, with a commit message convention that accepts no commits as significant, in fix-98765 branch > yield to no new version or release")
+        @DisplayName("Infer.run() inferring the hotfix release type from the Extended preset on repository with several branches and commits, with a commit message convention that accepts no commits as significant, in hotfix-98765 branch > yield to no new version or release")
         @Baseline(Scenario.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED)
-        void runUsingExtendedPresetReleaseTypesWithAlwaysNegativeCommitConventionInFix98765BranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
+        void runUsingExtendedPresetReleaseTypesWithAlwaysNegativeCommitConventionInHotfix98765BranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
-            script.checkout("fix-98765");
+            script.checkout("hotfix-98765");
             final String MATCHING_RELEASE_TYPE_NAME = "hotfix"; // the name of the release type that must be matched in the branch
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add the 'extended' preset, which comes with standard release types
@@ -4206,14 +4206,14 @@ public class InferTestTemplates {
 
             command.run();
 
-            assertEquals("fix-98765", command.state().getBranch());
+            assertEquals("hotfix-98765", command.state().getBranch());
             assertNull(command.state().getBump());
             assertEquals(Defaults.SCHEME, command.state().getScheme());
             assertEquals(1, command.state().getReleaseScope().getCommits().size());
             assertEquals(script.getCommitIDs().get(0), command.state().getReleaseScope().getInitialCommit().getSHA());
             assertEquals(script.getLastCommitID(), command.state().getReleaseScope().getFinalCommit().getSHA());
-            assertEquals("0.0.8-fix98765.2", command.state().getReleaseScope().getPreviousVersion());
-            assertEquals(script.getCommitByTag("0.0.8-fix98765.2"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
+            assertEquals("0.0.8-hotfix98765.2", command.state().getReleaseScope().getPreviousVersion());
+            assertEquals(script.getCommitByTag("0.0.8-hotfix98765.2"), command.state().getReleaseScope().getPreviousVersionCommit().getSHA());
             assertEquals("0.0.7", command.state().getReleaseScope().getPrimeVersion());
             assertEquals(script.getCommitByTag("0.0.7"), command.state().getReleaseScope().getPrimeVersionCommit().getSHA());
             assertEquals(0, command.state().getReleaseScope().getSignificantCommits().size());
@@ -4245,7 +4245,7 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
-            assertEquals("0.0.8-fix98765.2", command.state().getVersion());
+            assertEquals("0.0.8-hotfix98765.2", command.state().getVersion());
             assertNull(command.state().getVersionRange());
         }
 
