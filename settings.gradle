@@ -4,7 +4,7 @@
 ------------------------------------------------------------------------------*/
 plugins {
   // use our own plugin
-  id "com.mooltiverse.oss.nyx" version "0.2.1-alpha.16"
+  id "com.mooltiverse.oss.nyx" version "0.2.1-alpha.17"
 }
 
 /*------------------------------------------------------------------------------
@@ -29,12 +29,24 @@ nyx {
   // - the 'mainline' and 'internal' release types (that we override here)
   preset        = 'simple'
   stateFile     = 'build/.nyx-state.json'
+  changelog {
+    path = 'build/CHANGELOG.md'
+    template = 'config/CHANGELOG.tpl'
+    sections = [
+      'Added' : '^feat$',
+      'Fixed' : '^fix$',
+    ]
+    substitutions = [
+      '(?m)#([0-9]+)(?s)': '[#%s](https://github.com/mooltiverse/nyx/issues/%s)'
+    ]
+  }
   releaseTypes {
-    enabled = [ 'mainline', 'mainlinelocal', 'maturity', 'maturitylocal', 'integration', 'integrationlocal', 'hotfix', 'hotfixlocal', 'feature', 'featurelocal', 'release', 'releaselocal', 'maintenance', 'maintenancelocal', 'internal' ]
+    enabled = [ 'mainline', 'maturity', 'integration', 'hotfix', 'feature', 'release', 'maintenance', 'internal' ]
     publicationServices = [ 'github' ]
     items {
       // 'mainline' overrides the release type with the same name from the preset
       mainline {
+        description = '{{#file.content}}build/CHANGELOG.md{{/file.content}}'
         filterTags = '^({{configuration.releasePrefix}})?([0-9]\\\\d*)\\\\.([0-9]\\\\d*)\\\\.([0-9]\\\\d*)$'
         gitPush = 'true'
         gitTag = 'true'
@@ -48,6 +60,7 @@ nyx {
         publish = 'true'
       }
       maturity {
+        description = '{{#file.content}}build/CHANGELOG.md{{/file.content}}'
         collapseVersions = true
         collapsedVersionQualifier = '{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}'
         filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$'
@@ -63,6 +76,7 @@ nyx {
         publish = 'true'
       }
       integration {
+        description = '{{#file.content}}build/CHANGELOG.md{{/file.content}}'
         collapseVersions = true
         collapsedVersionQualifier = '{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}'
         filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(develop|development|integration|latest)(\\.([0-9]\\d*))?)$'
@@ -78,6 +92,7 @@ nyx {
         publish = 'false'
       }
       hotfix {
+        description = '{{#file.content}}build/CHANGELOG.md{{/file.content}}'
         collapseVersions = true
         collapsedVersionQualifier = '{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}'
         filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(fix|hotfix)(([0-9a-zA-Z]*)(\\.([0-9]\\d*))?)?)$'
@@ -93,6 +108,7 @@ nyx {
         publish = 'true'
       }
       feature {
+        description = '{{#file.content}}build/CHANGELOG.md{{/file.content}}'
         collapseVersions = true
         collapsedVersionQualifier = '{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}'
         filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(feat|feature)(([0-9a-zA-Z]*)(\\.([0-9]\\d*))?)?)$'
@@ -108,6 +124,7 @@ nyx {
         publish = 'false'
       }
       release {
+        description = '{{#file.content}}build/CHANGELOG.md{{/file.content}}'
         collapseVersions = true
         collapsedVersionQualifier = '{{#firstLower}}{{branch}}{{/firstLower}}'
         filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(rel|release)((\\.([0-9]\\d*))?)?)$'
@@ -124,6 +141,7 @@ nyx {
         versionRangeFromBranchName = true
       }
       maintenance {
+        description = '{{#file.content}}build/CHANGELOG.md{{/file.content}}'
         filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$'
         gitPush = 'true'
         gitTag = 'true'
@@ -139,6 +157,7 @@ nyx {
       }
       // 'internal' overrides the release type with the same name from the preset adding some qualifiers and is the global fallback for all release types
       internal {
+        description = '{{#file.content}}build/CHANGELOG.md{{/file.content}}'
         collapseVersions = true
         collapsedVersionQualifier = 'internal'
         gitPush = 'false'
@@ -166,122 +185,6 @@ nyx {
           }
         }
         publish = 'false'
-      }
-
-
-      // TODO: remove the following '*local' release types once the plugin has been tested in production
-      // The following release types are replicas of the main ones above and we just use them to test in production
-      // so that when builds are executed locally no push or publish is performed and an extra identifier is added.
-      // These have the environment variable constraints removed.
-      mainlinelocal {
-        filterTags = '^({{configuration.releasePrefix}})?([0-9]\\\\d*)\\\\.([0-9]\\\\d*)\\\\.([0-9]\\\\d*)$'
-        gitPush = 'false'
-        gitTag = 'false'
-        identifiers {
-          '0' {
-            qualifier = 'local'
-            position = 'BUILD'
-          }
-        }
-        matchBranches = '^(master|main)$'
-        //matchWorkspaceStatus = 'CLEAN'
-        publish = 'false'
-      }
-      maturitylocal {
-        collapseVersions = true
-        collapsedVersionQualifier = '{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}'
-        filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$'
-        gitPush = 'false'
-        gitTag = 'false'
-        identifiers {
-          '0' {
-            qualifier = 'local'
-            position = 'BUILD'
-          }
-        }
-        matchBranches = '^(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)$'
-        //matchWorkspaceStatus = 'CLEAN'
-        publish = 'false'
-      }
-      integrationlocal {
-        collapseVersions = true
-        collapsedVersionQualifier = '{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}'
-        filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(develop|development|integration|latest)(\\.([0-9]\\d*))?)$'
-        gitPush = 'false'
-        gitTag = 'false'
-        identifiers {
-          '0' {
-            qualifier = 'local'
-            position = 'BUILD'
-          }
-        }
-        matchBranches = '^(develop|development|integration|latest)$'
-        //matchWorkspaceStatus = 'CLEAN'
-        publish = 'false'
-      }
-      hotfixlocal {
-        collapseVersions = true
-        collapsedVersionQualifier = '{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}'
-        filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(fix|hotfix)(([0-9a-zA-Z]*)(\\.([0-9]\\d*))?)?)$'
-        gitPush = 'false'
-        gitTag = 'false'
-        identifiers {
-          '0' {
-            qualifier = 'local'
-            position = 'BUILD'
-          }
-        }
-        matchBranches = '^(fix|hotfix)((-|\\/)[0-9a-zA-Z-_]+)?$'
-        //matchWorkspaceStatus = 'CLEAN'
-        publish = 'false'
-      }
-      featurelocal {
-        collapseVersions = true
-        collapsedVersionQualifier = '{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}'
-        filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(feat|feature)(([0-9a-zA-Z]*)(\\.([0-9]\\d*))?)?)$'
-        gitPush = 'false'
-        gitTag = 'false'
-        identifiers {
-          '0' {
-            qualifier = 'local'
-            position = 'BUILD'
-          }
-        }
-        matchBranches = '^(feat|feature)((-|\\/)[0-9a-zA-Z-_]+)?$'
-        //matchWorkspaceStatus = 'CLEAN'
-        publish = 'false'
-      }
-      releaselocal {
-        collapseVersions = true
-        collapsedVersionQualifier = '{{#firstLower}}{{branch}}{{/firstLower}}'
-        filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(rel|release)((\\.([0-9]\\d*))?)?)$'
-        gitPush = 'false'
-        gitTag = 'false'
-        identifiers {
-          '0' {
-            qualifier = 'local'
-            position = 'BUILD'
-          }
-        }
-        matchBranches = '^(rel|release)(-|\\/)({{configuration.releasePrefix}})?([0-9|x]\\d*)(\\.([0-9|x]\\d*)(\\.([0-9|x]\\d*))?)?$'
-        //matchWorkspaceStatus = 'CLEAN'
-        publish = 'false'
-        versionRangeFromBranchName = true
-      }
-      maintenancelocal {
-        filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$'
-        gitPush = 'false'
-        gitTag = 'false'
-        identifiers {
-          '0' {
-            qualifier = 'local'
-            position = 'BUILD'
-          }
-        }
-        matchBranches = '^[a-zA-Z]*([0-9|x]\\d*)(\\.([0-9|x]\\d*)(\\.([0-9|x]\\d*))?)?$'
-        //matchWorkspaceStatus = 'CLEAN'
-        publish = 'false'
-        versionRangeFromBranchName = true
       }
     }
   }

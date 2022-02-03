@@ -18,7 +18,6 @@ No changes.
 {{^sections}}
 No changes.
 {{/sections}}
-
 {{/releases}}
 {{^releases}}
 No releases.
