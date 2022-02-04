@@ -57,3 +57,4 @@ If you like Nyx please consider showing the badge [![](https://img.shields.io/ba
 ```md
 [![](https://img.shields.io/badge/powered%20by-Nyx-blue)](https://github.com/mooltiverse/nyx)
 ```
+
