@@ -11,62 +11,26 @@ Nyx provides the same features in all the available versions but the means to in
 
 | Name                                        | Command Line Command                   | Gradle Task Name                       |
 | ------------------------------------------- | -------------------------------------- | -------------------------------------- |
-| [Clean](#clean)                             | `clean`                                | [`nyxClean`](#nyxclean)                |
-| [Help](#help)                               | `help`                                 | N/A                                    |
-| [Infer](#infer)                             | `infer`                                | [`nyxInfer`](#nyxinfer)                |
-| [Make](#make)                               | `make`                                 | [`nyxMake`](#nyxmake)                  |
-| [Mark](#mark)                               | `mark`                                 | [`nyxMark`](#nyxmark)                  |
-| [Publish](#publish)                         | `publish`                              | [`nyxPublish`](#nyxpublish)            |
-
-### Clean
-
-Reverts the local state to initial, deleting all the local artifacts that have been created, if any.
-
-This command/task has no dependencies.
-
-### Help
-
-Prints the synopis and usage instructions and exits.
-
-This command has no dependencies.
-
-### Infer
-
-Scans the Git repository searching for significant information used to generate the new release. This command never applies any change as it just collects and computes all the required information to be used next.
-
-See [here]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer) for more.
-
-### Make
-
-Builds the configured artifacts such as the changelog file, if configured.
-
-See [here]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#make) for more.
-
-### Mark
-
-Commits the configured release artifacts (if any) and marks the latest commit with a release tag. If configured to do so it also pushes these changes to remote rrepositories.
-
-See [here]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#mark) for more.
-
-### Publish
-
-Publishes the release using the configured remote services.
-
-See [here]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#publish) for more.
+| Clean                                       | `clean`                                | [`nyxClean`](#nyxclean)                |
+| Help                                        | `help`                                 | N/A                                    |
+| Infer                                       | `infer`                                | [`nyxInfer`](#nyxinfer)                |
+| Make                                        | `make`                                 | [`nyxMake`](#nyxmake)                  |
+| Mark                                        | `mark`                                 | [`nyxMark`](#nyxmark)                  |
+| Publish                                     | `publish`                              | [`nyxPublish`](#nyxpublish)            |
 
 ## Using the command line
 
-TODO: write this section
+The command line is not yet available and this section is marked as a TODO.
 {: .notice--warning}
 
 ### Synopsis
 
-TODO: write this section
+The command line is not yet available and this section is marked as a TODO.
 {: .notice--warning}
 
 ### Exit codes
 
-TODO: write this section
+The command line is not yet available and this section is marked as a TODO.
 {: .notice--warning}
 
 ## Using the Gradle plugin
@@ -76,7 +40,8 @@ When using Gradle, the native Nyx plugin is the easiest and most effective way o
 All the examples in this page assume you're using the plain `gradle` command. If you're using the (recommended) [wrapper](https://docs.gradle.org/current/userguide/gradle_wrapper.html) just change instances of the `gradle` command with `./gradlew`.
 {: .notice--info}
 
-You can find more on the Gradle Plugin internals [here]({{ site.baseurl }}{% link _pages/guide/user/07.in-depth/gradle-plugin.md %}).
+Some extra information on the Gradle Plugin internals is available [here]({{ site.baseurl }}{% link _pages/guide/user/07.in-depth/gradle-plugin.md %}).
+{: .notice--info}
 
 ### Requisites
 
@@ -175,13 +140,13 @@ When running Gradle there is no specific task to run the [`help`](#help) command
 
 #### `nyxClean`
 
-Runs the [`clean`](#clean) command.
+Runs the `clean` command.
 
 This task has no efferent dependecies but if the `clean` lifecycle task is defined (like when using the [Base](https://docs.gradle.org/current/userguide/base_plugin.html) plugin) it is attached with a dependency on this task.
 
 #### `nyxInfer`
 
-Runs the [`infer`](#infer) command.
+Runs the `infer` command.
 
 This task has no efferent dependecies while [`nyxMake`](#nyxmake) depends on on this task.
 
@@ -192,6 +157,12 @@ Otherwise, when the plugin is applied as a *project plugin*, since this is the t
 For example:
 
 ```groovy
+tasks.myTask.dependsOn rootProject.tasks.nyxInfer
+```
+
+or 
+
+```groovy
 tasks.register('myTask')  {
     dependsOn ':nyxInfer'
     doLast {
@@ -200,30 +171,24 @@ tasks.register('myTask')  {
 }
 ```
 
-or
-
-```groovy
-tasks.myTask.dependsOn rootProject.tasks.nyxInfer
-```
-
 See [this post]({{ site.baseurl }}{% link _posts/2020-01-01-the-gradle-version-project-property-is-unspecified.md %}) for more on the early inference of the `version` and other properties.
 {: .notice--info}
 
 #### `nyxMake`
 
-Runs the [`make`](#make) command.
+Runs the `make` command.
 
 This task depends on the [`nyxInfer`](#nyxinfer) task while [`nyxMark`](#nyxmark) depends on on this task. Moreover, if an `assemble` lifecycle tasks is defined (like when using the [Base](https://docs.gradle.org/current/userguide/base_plugin.html) plugin) it is attached with a dependency on this task.
 
 #### `nyxMark`
 
-Runs the [`mark`](#mark) command.
+Runs the `mark` command.
 
 This task depends on the [`nyxMake`](#nyxmake) task while [`nyxPublish`](#nyxpublish) depends on on this task.
 
 #### `nyxPublish`
 
-Runs the [`publish`](#publish) command.
+Runs the `publish` command.
 
 This task depends on the [`nyxMark`](#nyxmark) task while the [`release`](#release) task is attached to depend on this task.
 
@@ -246,7 +211,7 @@ The entire State is bound to the project *extra properties* with the `nyxState` 
 The `nyxState` property is only available after at least one [core task](#core-tasks) has executed. When using the [settings plugin](#apply-the-plugin) this is not an issue as the tasks run automatically in the early phases. Not all State properties are available at the same type (after the same task execution), please check out the [reference]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/index.md %}) for each property to know when it's available.
 {: .notice--info}
 
-This way you can have all the Nyx properties handy without even [storing the State file]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#state-file). For example, to only run a task if the [release scope]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}) contains [significant changes]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#significant-commits) you can check the `project.nyxState.releaseScope.significantCommits` list property while to reuse the same timestamp used by Nyx you can read the [`project.nyxState.significant`]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#timestamp).
+This way you can have all the Nyx properties handy without even [storing the State file]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#state-file) on disk. For example, to only run a task if the [release scope]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}) contains [significant changes]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#significant-commits) you can check the `project.nyxState.releaseScope.significantCommits` list property while to reuse the same timestamp used by Nyx you can read the [`project.nyxState.significant`]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#timestamp).
 
 Example:
 

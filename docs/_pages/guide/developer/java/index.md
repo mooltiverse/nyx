@@ -8,7 +8,7 @@ tags: weird strange whatever semver version
 
 In this section you can find instructions to use the available Java libraries to be used in your own projects.
 
-All java libraries have public API docs hosted [here](https://javadoc.io/doc/com.mooltiverse.oss.nyx) (thanks [javadoc.io](https://javadoc.io/)).
+All java libraries have public API docs hosted [here](https://javadoc.io/doc/com.mooltiverse.oss.nyx/java) (thanks [javadoc.io](https://javadoc.io/)).
 
 All artifacts are available at the [Maven Central](https://search.maven.org/search?q=com.mooltiverse.oss.nyx) and the [GitHub Packages](https://github.com/mooltiverse/nyx/packages/) repositories.
 

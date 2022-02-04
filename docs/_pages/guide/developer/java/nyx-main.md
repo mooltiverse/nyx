@@ -9,9 +9,6 @@ permalink: /guide/developer/java/nyx-main/
 
 You can use the main Nyx library to embed it into your project and use all or some of its features. The `com.mooltiverse.oss.nyx` package brings the [`Nyx`](https://javadoc.io/doc/com.mooltiverse.oss.nyx/main/latest/com/mooltiverse/oss/nyx/Nyx.html){:target="_blank"} class that is the entry point for all the available commands and features.
 
-When using the library you may benefit from knowing some insights about the implementation available in [this]({{ site.baseurl }}{% link _pages/guide/user/07.in-depth/index.md %}) section.
-{: .notice--info}
-
 ## Get the library
 
 ### Manual download

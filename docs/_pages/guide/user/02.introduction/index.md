@@ -20,11 +20,11 @@ Some of these tasks can be automated and here is where Nyx comes into play. Once
 
 ## Things you need before you get started
 
-To get started you need a [Git](https://git-scm.com/) repository, which can be local only or hosted on a central repository, including services like [GitHub](https://github.com/) and [GitLab](https://gitlab.com/).
+To get started you need a [Git](https://git-scm.com/) repository, which can be local only or hosted on a central repository like [GitHub](https://github.com/) and [GitLab](https://gitlab.com/).
 
 You also need to make a few decisions such as:
 
-* the [version scheme]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/version-schemes.md %}) to use (chances are you want to use [SemVer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/version-schemes.md %}#semantic-versioning-semver)
+* the [version scheme]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/version-schemes.md %}) to use (chances are you want to use [SemVer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/version-schemes.md %}#semantic-versioning-semver))
 * the [branching strategy]({{ site.baseurl }}{% link _pages/guide/user/06.best-practice/branching-models.md %}) to use. If you don't have one you can assume you're using the [mainline only]({{ site.baseurl }}{% link _pages/guide/user/06.best-practice/branching-models.md %}#mainline-only), which is the simplest one to start with
 * the [release types]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}) you want to manage and what is your desired workflow for each
 * the [commit message conventions]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/commit-message-conventions.md %}) you have adopted to provide structured information along with commits
