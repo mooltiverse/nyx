@@ -41,7 +41,7 @@ nyx {
     ]
   }
   releaseTypes {
-    enabled = [ 'mainline', 'maturity', 'integration', 'hotfix', 'feature', 'release', 'maintenance', 'internal' ]
+    enabled = [ 'mainline', 'maturity', 'integration', 'fix', 'hotfix', 'feature', 'release', 'maintenance', 'internal' ]
     publicationServices = [ 'github' ]
     items {
       // 'mainline' overrides the release type with the same name from the preset
@@ -91,14 +91,30 @@ nyx {
         matchWorkspaceStatus = 'CLEAN'
         publish = 'false'
       }
+      fix {
+        description = '{{#file.content}}build/CHANGELOG.md{{/file.content}}'
+        collapseVersions = true
+        collapsedVersionQualifier = '{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}'
+        filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-fix(([0-9a-zA-Z]*)(\\.([0-9]\\d*))?)?)$'
+        gitPush = 'true'
+        gitTag = 'true'
+        matchBranches = '^fix((-|\\/)[0-9a-zA-Z-_]+)?$'
+        matchEnvironmentVariables {
+          // tie this release type to GitHub CI servers. See https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables
+          CI = '^true$'
+          GITHUB_ACTIONS = '^true$'
+        }
+        matchWorkspaceStatus = 'CLEAN'
+        publish = 'false'
+      }
       hotfix {
         description = '{{#file.content}}build/CHANGELOG.md{{/file.content}}'
         collapseVersions = true
         collapsedVersionQualifier = '{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}'
-        filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(fix|hotfix)(([0-9a-zA-Z]*)(\\.([0-9]\\d*))?)?)$'
+        filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-hotfix(([0-9a-zA-Z]*)(\\.([0-9]\\d*))?)?)$'
         gitPush = 'true'
         gitTag = 'true'
-        matchBranches = '^(fix|hotfix)((-|\\/)[0-9a-zA-Z-_]+)?$'
+        matchBranches = '^hotfix((-|\\/)[0-9a-zA-Z-_]+)?$'
         matchEnvironmentVariables {
           // tie this release type to GitHub CI servers. See https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables
           CI = '^true$'
