@@ -1,0 +1,130 @@
+/*------------------------------------------------------------------------------
+  Plugins DSL block
+  https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
+------------------------------------------------------------------------------*/
+plugins {
+    id 'java-gradle-plugin'                             // See: https://docs.gradle.org/current/userguide/java_gradle_plugin.html
+    id 'com.gradle.plugin-publish' version '0.16.0'     // See: https://guides.gradle.org/publishing-plugins-to-gradle-plugin-portal/ and https://plugins.gradle.org/docs/publish-plugin
+}
+
+/*------------------------------------------------------------------------------
+  Local sub-project properties
+------------------------------------------------------------------------------*/
+description = 'The Nyx Gradle plugin automates the sematic release process for Gradle projects using semantic versioning and leveraging the Git branching model.'
+
+/*------------------------------------------------------------------------------
+  Configurations
+*/
+configurations {
+}
+
+/*------------------------------------------------------------------------------
+  Repositories and dependencies
+  https://docs.gradle.org/current/userguide/dependency_management_for_java_projects.html
+*/
+dependencies {
+  // Import dependencies from other modules of this project
+  implementation project(':modules:java:main')
+
+  // Add this dependency to use the Git scripts from the main subproject into this project tests
+  integrationTestImplementation project(path: ':modules:java:main', configuration: 'integrationTestExport')
+  functionalTestImplementation  project(path: ':modules:java:main', configuration: 'integrationTestExport')
+}
+
+functionalTest {
+  // Pass the name of the configuration file examples to tests.
+  // We use the same files used for the documentation here.
+  systemProperty 'extendedGROOVYExampleConfigurationFile', file("$rootDir/docs/_includes/.nyx-extended.groovy").absolutePath
+  systemProperty 'mediumGROOVYExampleConfigurationFile', file("$rootDir/docs/_includes/.nyx-medium.groovy").absolutePath
+  systemProperty 'simpleGROOVYExampleConfigurationFile', file("$rootDir/docs/_includes/.nyx-simple.groovy").absolutePath
+  systemProperty 'simplestGROOVYExampleConfigurationFile', file("$rootDir/docs/_includes/.nyx-simplest.groovy").absolutePath
+}
+
+/*------------------------------------------------------------------------------
+  Extension configurations
+------------------------------------------------------------------------------*/
+gradlePlugin {
+    plugins {
+        nyxPlugin {
+            id = rootProject.group
+            version = rootProject.version
+            displayName = 'Nyx Gradle plugin'
+            description = project.description
+            implementationClass = 'com.mooltiverse.oss.nyx.gradle.NyxPlugin'
+        }
+    }
+}
+
+pluginBundle {
+    website = 'https://github.com/mooltiverse/nyx'
+    vcsUrl = 'https://github.com/mooltiverse/nyx.git'
+    tags = [ 'auto-versioning', 'changelog', 'continuous delivery', 'git', 'github', 'gitlab', 'release', 'semantic', 'semantic-release', 'semantic-version', 'semver', 'version', 'versioning' ]
+
+    /*plugins {
+        nyxPlugin {
+            id = rootProject.group
+            version = rootProject.version
+            displayName = 'Nyx Gradle plugin'
+            description = project.description
+            tags = [ 'auto-versioning', 'changelog', 'continuous delivery', 'git', 'github', 'gitlab', 'release', 'semantic', 'semantic-release', 'semantic-version', 'semver', 'version', 'versioning' ]
+        }
+    }*/
+
+    mavenCoordinates {
+        // Overriding the groupId requires manual approval
+        groupId = rootProject.group
+        version = rootProject.version
+        //artifactId = project.name
+    }
+}
+
+// See https://github.com/gradle/gradle/issues/1246
+task setupPublishPluginCredentials() {
+    group = 'Publishing'
+    description = 'Sets the system properties from environment variables gradlePublishKey and gradlePublishSecret to allow the Gradle Plugin Publish to authenticate'
+
+    doLast {
+        def key = findProperty("gradlePublishKey")
+        def secret = findProperty("gradlePublishSecret")
+
+        if( !key || !secret)
+        {
+            logger.warn("Warning: gradlePublishKey and/or gradlePublishSecret are not defined environment variables. This might be ok if not running the publishing tasks but if you need to publish the Gradle Plugin this prevents the publication.")
+        }
+
+        System.properties.setProperty("gradle.publish.key", key)
+        System.properties.setProperty("gradle.publish.secret", secret)
+    }
+}
+
+task publish() {
+    group = 'Publishing'
+    description = 'Publishes the plugin to the Gradle Plugins Portal'
+    dependsOn publishPlugins
+}
+
+/*------------------------------------------------------------------------------
+  Additional task dependencies
+------------------------------------------------------------------------------*/
+tasks.publishPlugins.dependsOn tasks.setupPublishPluginCredentials
+
+// to enforce the fail-fast principle, make sure the main library tests are executed first
+tasks.test.dependsOn project(':modules:java:main').tasks.test
+
+afterEvaluate {
+    // Only perform publishing if the Nyx release type enables publishing
+    // Remember that setting the 'onlyIf' on a task does not prevent its dependencies
+    // to run so the tasks of the entire tree must be disabled
+    // This is why we set the onlyIf to all tasks in the Publish group
+    tasks.matching {
+        it.group.equals('publishing')
+    }.all {
+        it.onlyIf { rootProject.nyxState.newRelease }
+    }
+
+    // The tasks listed here are those not caught in the section above
+    tasks.publish.onlyIf { rootProject.nyxState.newRelease }                    // this actually belongs to the 'publishing' group but doesn't get captured by the above section for some reason
+    tasks.publishPlugins.onlyIf { rootProject.nyxState.newRelease }             // from the 'plugin portal' group
+    tasks.publishPluginJar.onlyIf { rootProject.nyxState.newRelease }           // from the 'build' group
+    tasks.publishPluginJavaDocsJar.onlyIf { rootProject.nyxState.newRelease }   // from the 'build' group
+}

@@ -1,0 +1,13 @@
+source "https://rubygems.org"
+
+# The following is the only gem required when using the theme as remote_theme (see _config.yml)
+gem "github-pages", group: :jekyll_plugins
+
+# The following shoudl't be needed but... it is. See https://github.com/mmistakes/minimal-mistakes/issues/1937
+gem "jekyll-include-cache", group: :jekyll_plugins
+
+# This is used to check against broken links. See https://www.supertechcrew.com/jekyll-check-for-broken-links/ and  https://clementbm.github.io/github%20action/jekyll/link%20checking/2020/05/31/automatically-validate-links-on-jekyll-website.html
+# Run with:
+#    bundle exec jekyll build
+#    bundle exec htmlproofer --allow-hash-href ./_site
+#gem "html-proofer", group: :jekyll_plugins

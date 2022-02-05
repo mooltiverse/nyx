@@ -1,0 +1,17 @@
+---
+layout: single
+title:  "What is the difference between *version* and *release*?"
+date:   2020-01-01 00:00:00 +0000
+categories: faq user
+tags: misc concepts
+---
+
+Broadly speaking they are often used interchangeably but it depends on the perspective you're looking at it from. If you're asking is probably because in Nyx they are sometimes used as different entities.
+
+The difference is subtle and it all revolves around the prefix and is better explained by an example: `1.2.3` is a *version* identifier while `v1.2.3` is a *release* identifier, using `v` as the prefix.
+
+Formally speaking, the *release* identifier is the *version* identifier with an **optional** prefix. The two are the same when the prefix is not used.
+
+When using [Semantic Version](https://semver.org/) you might have noticed from the [FAQ](https://semver.org/#is-v123-a-semantic-version) that *`v1.2.3` is not a semantic version*, although the rule is often relaxed to meet common practice in using the `v` prefix. If you read that meticulously, it says *not a semantic version*, not mentioning the *release*.
+
+While the above may seem a syntactic tweak, it can be generalized as follows: the *release* identifier is the *name* of a *publication* of a specific *version*.

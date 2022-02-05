@@ -1,0 +1,205 @@
+/*------------------------------------------------------------------------------
+  Plugins DSL block
+  https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
+------------------------------------------------------------------------------*/
+plugins {
+  // use our own plugin
+  id "com.mooltiverse.oss.nyx" version "1.0.0-alpha.1"
+}
+
+/*------------------------------------------------------------------------------
+  Root project properties
+------------------------------------------------------------------------------*/
+rootProject.name = 'nyx'
+
+include 'docs'
+include 'modules:java'
+include 'modules:java:version'
+include 'modules:java:main'
+include 'modules:java:gradle'
+// re-enable the Docker module once we have something to build and publish
+//include 'modules:docker'
+
+/*------------------------------------------------------------------------------
+  Extension configurations
+------------------------------------------------------------------------------*/
+nyx {
+  // starting from the 'simple' preset gives us:
+  // - the Conventional Commits convention
+  // - the 'mainline' and 'internal' release types (that we override here)
+  preset         = 'simple'
+  stateFile      = 'build/.nyx-state.json'
+  changelog {
+    path = 'build/CHANGELOG.md'
+    template = 'config/CHANGELOG.tpl'
+    sections = [
+      'Added' : '^feat$',
+      'Fixed' : '^fix$',
+    ]
+    substitutions = [
+      '(?m)#([0-9]+)(?s)': '[#%s](https://github.com/mooltiverse/nyx/issues/%s)'
+    ]
+  }
+  releaseTypes {
+    enabled = [ 'mainline', 'maturity', 'integration', 'hotfix', 'feature', 'release', 'maintenance', 'internal' ]
+    publicationServices = [ 'github' ]
+    items {
+      // 'mainline' overrides the release type with the same name from the preset
+      mainline {
+        description = '{{#file.content}}build/CHANGELOG.md{{/file.content}}'
+        filterTags = '^({{configuration.releasePrefix}})?([0-9]\\\\d*)\\\\.([0-9]\\\\d*)\\\\.([0-9]\\\\d*)$'
+        gitPush = 'true'
+        gitTag = 'true'
+        matchBranches = '^(master|main)$'
+        matchEnvironmentVariables {
+          // tie this release type to GitHub CI servers. See https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables
+          CI = '^true$'
+          GITHUB_ACTIONS = '^true$'
+        }
+        matchWorkspaceStatus = 'CLEAN'
+        publish = 'true'
+      }
+      maturity {
+        description = '{{#file.content}}build/CHANGELOG.md{{/file.content}}'
+        collapseVersions = true
+        collapsedVersionQualifier = '{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}'
+        filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$'
+        gitPush = 'true'
+        gitTag = 'true'
+        matchBranches = '^(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)$'
+        matchEnvironmentVariables {
+          // tie this release type to GitHub CI servers. See https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables
+          CI = '^true$'
+          GITHUB_ACTIONS = '^true$'
+        }
+        matchWorkspaceStatus = 'CLEAN'
+        publish = 'true'
+      }
+      integration {
+        description = '{{#file.content}}build/CHANGELOG.md{{/file.content}}'
+        collapseVersions = true
+        collapsedVersionQualifier = '{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}'
+        filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(develop|development|integration|latest)(\\.([0-9]\\d*))?)$'
+        gitPush = 'true'
+        gitTag = 'true'
+        matchBranches = '^(develop|development|integration|latest)$'
+        matchEnvironmentVariables {
+          // tie this release type to GitHub CI servers. See https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables
+          CI = '^true$'
+          GITHUB_ACTIONS = '^true$'
+        }
+        matchWorkspaceStatus = 'CLEAN'
+        publish = 'false'
+      }
+      hotfix {
+        description = '{{#file.content}}build/CHANGELOG.md{{/file.content}}'
+        collapseVersions = true
+        collapsedVersionQualifier = '{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}'
+        filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(fix|hotfix)(([0-9a-zA-Z]*)(\\.([0-9]\\d*))?)?)$'
+        gitPush = 'true'
+        gitTag = 'true'
+        matchBranches = '^(fix|hotfix)((-|\\/)[0-9a-zA-Z-_]+)?$'
+        matchEnvironmentVariables {
+          // tie this release type to GitHub CI servers. See https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables
+          CI = '^true$'
+          GITHUB_ACTIONS = '^true$'
+        }
+        matchWorkspaceStatus = 'CLEAN'
+        publish = 'true'
+      }
+      feature {
+        description = '{{#file.content}}build/CHANGELOG.md{{/file.content}}'
+        collapseVersions = true
+        collapsedVersionQualifier = '{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}'
+        filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(feat|feature)(([0-9a-zA-Z]*)(\\.([0-9]\\d*))?)?)$'
+        gitPush = 'true'
+        gitTag = 'true'
+        matchBranches = '^(feat|feature)((-|\\/)[0-9a-zA-Z-_]+)?$'
+        matchEnvironmentVariables {
+          // tie this release type to GitHub CI servers. See https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables
+          CI = '^true$'
+          GITHUB_ACTIONS = '^true$'
+        }
+        matchWorkspaceStatus = 'CLEAN'
+        publish = 'false'
+      }
+      release {
+        description = '{{#file.content}}build/CHANGELOG.md{{/file.content}}'
+        collapseVersions = true
+        collapsedVersionQualifier = '{{#firstLower}}{{branch}}{{/firstLower}}'
+        filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(rel|release)((\\.([0-9]\\d*))?)?)$'
+        gitPush = 'true'
+        gitTag = 'true'
+        matchBranches = '^(rel|release)(-|\\/)({{configuration.releasePrefix}})?([0-9|x]\\d*)(\\.([0-9|x]\\d*)(\\.([0-9|x]\\d*))?)?$'
+        matchEnvironmentVariables {
+          // tie this release type to GitHub CI servers. See https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables
+          CI = '^true$'
+          GITHUB_ACTIONS = '^true$'
+        }
+        matchWorkspaceStatus = 'CLEAN'
+        publish = 'false'
+        versionRangeFromBranchName = true
+      }
+      maintenance {
+        description = '{{#file.content}}build/CHANGELOG.md{{/file.content}}'
+        filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$'
+        gitPush = 'true'
+        gitTag = 'true'
+        matchBranches = '^[a-zA-Z]*([0-9|x]\\d*)(\\.([0-9|x]\\d*)(\\.([0-9|x]\\d*))?)?$'
+        matchEnvironmentVariables {
+          // tie this release type to GitHub CI servers. See https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables
+          CI = '^true$'
+          GITHUB_ACTIONS = '^true$'
+        }
+        matchWorkspaceStatus = 'CLEAN'
+        publish = 'true'
+        versionRangeFromBranchName = true
+      }
+      // 'internal' overrides the release type with the same name from the preset adding some qualifiers and is the global fallback for all release types
+      internal {
+        description = '{{#file.content}}build/CHANGELOG.md{{/file.content}}'
+        collapseVersions = true
+        collapsedVersionQualifier = 'internal'
+        gitPush = 'false'
+        gitTag = 'false'
+        identifiers {
+          '0' {
+            qualifier = 'branch'
+            value = '{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}'
+            position = 'BUILD'
+          }
+          '1' {
+            qualifier = 'commit'
+            value = '{{#short7}}{{releaseScope.finalCommit}}{{/short7}}'
+            position = 'BUILD'
+          }
+          '2' {
+            qualifier = 'user'
+            value = '{{#sanitizeLower}}{{environment.user}}{{/sanitizeLower}}'
+            position = 'BUILD'
+          }
+          '3' {
+            qualifier = 'timestamp'
+            value = '{{#timestampYYYYMMDDHHMMSS}}{{timestamp}}{{/timestampYYYYMMDDHHMMSS}}'
+            position = 'BUILD'
+          }
+        }
+        publish = 'false'
+      }
+    }
+  }
+  services {
+    github {
+      type = 'GITHUB'
+      options {
+        // The GH_TOKEN variable is fetched from the 'secrets' context and passed as an environment variable.
+        // See:
+        // - https://docs.github.com/en/actions/security-guides/automatic-token-authentication
+        // - https://docs.github.com/en/actions/learn-github-actions/contexts#github-context
+        AUTHENTICATION_TOKEN = '{{#environment.variable}}GH_TOKEN{{/environment.variable}}'
+        REPOSITORY_NAME = 'nyx'
+        REPOSITORY_OWNER = 'mooltiverse'
+      }
+    }
+  }
+}

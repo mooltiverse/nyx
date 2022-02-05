@@ -1,0 +1,9 @@
+nyx {
+  dryRun = false
+  initialVersion = "0.1.0"
+  preset = 'simple'
+  releaseLenient = true
+  releasePrefix = 'v'
+  scheme = "SEMVER"
+  verbosity = "WARNING"
+}

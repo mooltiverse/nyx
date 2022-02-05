@@ -1,0 +1,10 @@
+_site
+.sass-cache
+.jekyll-cache
+.jekyll-metadata
+.bundle/
+vendor
+build
+Gemfile.lock
+gradle.rb
+

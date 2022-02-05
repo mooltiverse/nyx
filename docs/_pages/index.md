@@ -1,7 +1,9 @@
-[![](https://github.com/mooltiverse/nyx/workflows/CI/badge.svg)](https://github.com/mooltiverse/nyx/actions?query=workflow%3ACI) 
-[![Javadoc](https://javadoc.io/badge2/com.mooltiverse.oss.nyx/java/Javadoc.svg)](https://javadoc.io/doc/com.mooltiverse.oss.nyx/java) 
-[![](https://img.shields.io/badge/powered%20by-Nyx-blue)](https://github.com/mooltiverse/nyx) 
-[![License](https://img.shields.io/badge/License-Apache%202.0-grey.svg)](LICENSE.md) [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-grey.svg)](CODE_OF_CONDUCT.md)
+---
+title: Nyx documentation
+layout: single
+toc: true
+permalink: /
+---
 
 Nyx is a powerful, flexible and extremely configurable **semantic release** tool. You can put release management on *auto pilot* regardless of the kind of project, languages, tools and technologies or you can control any aspect of release management manually. Preset configuration values let you get started in minutes without digging into detailed settings.
 
@@ -17,7 +19,7 @@ Nyx is the *all in one* tool that gives you integrated support for:
 
 Want to embed the libraries into your own project instead? We got you covered as they are published just for that. See the [available libraries](#libraries) for more.
 
-Browse the [documentation](https://mooltiverse.github.io/nyx/) for more. Check out the [**quick start**](https://mooltiverse.github.io/nyx/guide/user/quick-start/) guide to get Nyx running in minutes or see the [developer guide](https://mooltiverse.github.io/nyx/guide/developer/) if you're interested in using the libraries.
+Browse the [documentation]({{ site.baseurl }}{% link _pages/index.md %}) for more. Check out the [**quick start**]({{ site.baseurl }}{% link _pages/guide/user/01.quick-start/index.md %}) guide to get Nyx running in minutes or see the [developer guide]({{ site.baseurl }}{% link _pages/guide/developer/index.md %}) if you're interested in using the libraries.
 
 The project is open source and hosted on [GitHub](https://github.com/mooltiverse/nyx).
 
@@ -57,4 +59,3 @@ If you like Nyx please consider showing the badge [![](https://img.shields.io/ba
 ```md
 [![](https://img.shields.io/badge/powered%20by-Nyx-blue)](https://github.com/mooltiverse/nyx)
 ```
-

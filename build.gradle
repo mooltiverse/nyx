@@ -1,0 +1,69 @@
+/*------------------------------------------------------------------------------
+  Plugins DSL block
+  https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
+------------------------------------------------------------------------------*/
+plugins {
+    // Builds a dependency tree of Gradle tasks, i.e. 'gradle <task> taskTree'
+    // (at times it doesn't work when using the ./gradlew wrapper).
+    // This plugin can be commented out and used only when needed.
+    // See: https://github.com/dorongold/gradle-task-tree
+    id "com.dorongold.task-tree" version "2.1.0"
+}
+
+/*------------------------------------------------------------------------------
+  Root project properties
+------------------------------------------------------------------------------*/
+description = 'Nyx is a portable and flexible semantic release tool.'
+
+/*------------------------------------------------------------------------------
+  This is the configuration for this project and all sub-projects
+------------------------------------------------------------------------------*/
+allprojects {
+  // See: https://docs.gradle.org/current/userguide/base_plugin.html
+  apply plugin: 'base'
+
+  /*------------------------------------------------------------------------------
+    Project overall attributes
+  ------------------------------------------------------------------------------*/
+  group   = 'com.mooltiverse.oss.nyx'
+
+  // This task is useful to run all verification tasks (check, test but also functionalTest and integrationTest)
+  task verify() {
+    description 'Runs all tests and verification tasks'
+    group 'Verification'
+
+    dependsOn project.tasks.matching {
+        // skip this task itself to avoid circular dependencies
+        it.group.equals('verification') && !it.name.equals('verify')
+    }
+  }
+
+  // This task is useful to see all the configurations for projects. Run this with 'gradle configurations'
+  task configurations() {
+    description 'Prints the project configurations'
+    group 'Help'
+
+    doLast() {
+      println "Project Name: $project.name configurations:"
+      configurations.each {
+        println "    $it.name"
+      }
+    }
+  }
+}
+
+/*------------------------------------------------------------------------------
+  This is the configuration for this all sub-projects
+------------------------------------------------------------------------------*/
+subprojects {
+    // let all sub projects have the same version as the root project
+    version = rootProject.version
+}
+
+/*------------------------------------------------------------------------------
+  Extension configurations
+------------------------------------------------------------------------------*/
+
+/*------------------------------------------------------------------------------
+  Additional task dependencies
+------------------------------------------------------------------------------*/
