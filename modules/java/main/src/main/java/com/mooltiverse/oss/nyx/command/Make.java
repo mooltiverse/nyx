@@ -258,43 +258,47 @@ public class Make extends AbstractCommand {
             }
 
             logger.debug(COMMAND, "Rendering the changelog");
+            if (state().getConfiguration().getDryRun()) {
+                logger.info(COMMAND, "Changelog rendering skipped due to dry run");
+            }
+            else {
+                try {
+                    StringWriter stringWriter = new StringWriter();
+                    Templates.render(getChangelogTemplateReader(), changelog, stringWriter);
+                    stringWriter.flush();
+                    stringWriter.close();
 
-            try {
-                StringWriter stringWriter = new StringWriter();
-                Templates.render(getChangelogTemplateReader(), changelog, stringWriter);
-                stringWriter.flush();
-                stringWriter.close();
+                    String changelogBuffer = stringWriter.toString();
 
-                String changelogBuffer = stringWriter.toString();
-
-                // if substitutions have been defined, let's apply them
-                if (!Objects.isNull(state().getConfiguration().getChangelog().getSubstitutions())) {
-                    logger.debug(COMMAND, "Applying configured substitutions to the changelog");
-                    for (Map.Entry<String,String> substitutionEntry: state().getConfiguration().getChangelog().getSubstitutions().entrySet()) {
-                        Pattern substitutionPattern = Pattern.compile(substitutionEntry.getKey());
-                        Matcher substitutionMatcher = substitutionPattern.matcher(changelogBuffer);
-                        StringBuffer buffer = new StringBuffer();
-                        while (substitutionMatcher.find()) {
-                            String substitutionValue = substitutionMatcher.group(1); // by the docs, only the group 1 is considered
-                            substitutionMatcher.appendReplacement(buffer, String.format(substitutionEntry.getValue(), substitutionValue, substitutionValue, substitutionValue, substitutionValue, substitutionValue)); // by the docs, the %s placeholder can be used up to 5 times
+                    // if substitutions have been defined, let's apply them
+                    if (!Objects.isNull(state().getConfiguration().getChangelog().getSubstitutions())) {
+                        logger.debug(COMMAND, "Applying configured substitutions to the changelog");
+                        for (Map.Entry<String,String> substitutionEntry: state().getConfiguration().getChangelog().getSubstitutions().entrySet()) {
+                            Pattern substitutionPattern = Pattern.compile(substitutionEntry.getKey());
+                            Matcher substitutionMatcher = substitutionPattern.matcher(changelogBuffer);
+                            StringBuffer buffer = new StringBuffer();
+                            while (substitutionMatcher.find()) {
+                                String substitutionValue = substitutionMatcher.group(1); // by the docs, only the group 1 is considered
+                                substitutionMatcher.appendReplacement(buffer, String.format(substitutionEntry.getValue(), substitutionValue, substitutionValue, substitutionValue, substitutionValue, substitutionValue)); // by the docs, the %s placeholder can be used up to 5 times
+                            }
+                            substitutionMatcher.appendTail(buffer);
+                            changelogBuffer = buffer.toString();
                         }
-                        substitutionMatcher.appendTail(buffer);
-                        changelogBuffer = buffer.toString();
+                        logger.debug(COMMAND, "Configured substitutions have been applied to the changelog");
                     }
-                    logger.debug(COMMAND, "Configured substitutions have been applied to the changelog");
+
+                    // now write to the actual destination file
+                    FileWriter fileWriter = new FileWriter(changelogFile);
+                    fileWriter.write(changelogBuffer);
+                    fileWriter.flush();
+                    fileWriter.close();
+                }
+                catch (IOException ioe) {
+                    throw new DataAccessException(String.format("Unable to render the changelog to file '%s'. Make sure the path to the file exists and can be written.", changelogFile.getAbsolutePath()), ioe);
                 }
 
-                // now write to the actual destination file
-                FileWriter fileWriter = new FileWriter(changelogFile);
-                fileWriter.write(changelogBuffer);
-                fileWriter.flush();
-                fileWriter.close();
+                logger.debug(COMMAND, "The changelog has been saved to '{}'", changelogFile.getAbsolutePath());
             }
-            catch (IOException ioe) {
-                throw new DataAccessException(String.format("Unable to render the changelog to file '%s'. Make sure the path to the file exists and can be written.", changelogFile.getAbsolutePath()), ioe);
-            }
-
-            logger.debug(COMMAND, "The changelog has been saved to '{}'", changelogFile.getAbsolutePath());
         }
     }
 
