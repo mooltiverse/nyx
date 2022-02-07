@@ -30,7 +30,7 @@ dependencies {
   // Import dependencies from other modules of this project
   api                   project(':modules:java:version')
   implementation        'org.slf4j:slf4j-api:1.7.35'                                               // SLF4J API (http://www.slf4j.org/)
-  implementation        'org.eclipse.jgit:org.eclipse.jgit:5.13.0.202109080827-r'                  // JGit (https://www.eclipse.org/jgit/)
+  implementation        'org.eclipse.jgit:org.eclipse.jgit:6.0.0.202111291000-r'                   // JGit (https://www.eclipse.org/jgit/)
   implementation        'com.fasterxml.jackson.core:jackson-databind:2.13.0'                       // Jackson JSON library (https://github.com/FasterXML/jackson)
   implementation        'com.fasterxml.jackson.core:jackson-annotations:2.13.0'                    // Jackson JSON library (https://github.com/FasterXML/jackson)
   implementation        'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.13.0'          // Jackson YAML library (https://github.com/FasterXML/jackson-dataformats-text/tree/master/yaml)
