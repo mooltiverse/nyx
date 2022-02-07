@@ -253,7 +253,8 @@ sourcesJar.from(subprojects.collect { it.sourceSets.main.allJava })
 task testReport(type: TestReport) {
     destinationDir = file("$buildDir/reports/tests/all")
     // Include the results from the "test" task in all subprojects
-    reportOn subprojects*.test, subprojects*.integrationTest, subprojects*.functionalTest
+    // Be careful as including report sets implicitly makes the task dependent on the tasks producing those reports
+    reportOn subprojects*.test//, subprojects*.integrationTest, subprojects*.functionalTest
 }
 tasks.check.finalizedBy tasks.testReport
 
