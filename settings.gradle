@@ -47,7 +47,7 @@ nyx {
       // 'mainline' overrides the release type with the same name from the preset
       mainline {
         description = '{{#file.content}}build/CHANGELOG.md{{/file.content}}'
-        filterTags = '^({{configuration.releasePrefix}})?([0-9]\\\\d*)\\\\.([0-9]\\\\d*)\\\\.([0-9]\\\\d*)$'
+        filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$'
         gitPush = 'true'
         gitTag = 'true'
         matchBranches = '^(master|main)$'
