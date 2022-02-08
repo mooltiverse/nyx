@@ -53,7 +53,7 @@ public class Extended extends SimpleConfigurationLayer {
         // add the 'mainline' and 'internal' release types
         setReleaseTypes(
             new ReleaseTypes(
-                List.<String>of("mainline", "integration", "maturity", "feature", "hotfix", "release", "maintenance", "internal"),
+                List.<String>of("mainline", "integration", "maturity", "feature", "fix", "hotfix", "release", "maintenance", "internal"),
                 List.<String>of(),
                 List.<String>of(),
                 Map.<String,ReleaseType>of(
@@ -61,6 +61,7 @@ public class Extended extends SimpleConfigurationLayer {
                     "integration", com.mooltiverse.oss.nyx.configuration.presets.ReleaseTypes.INTEGRATION,
                     "maturity", com.mooltiverse.oss.nyx.configuration.presets.ReleaseTypes.MATURITY,
                     "feature", com.mooltiverse.oss.nyx.configuration.presets.ReleaseTypes.FEATURE,
+                    "fix", com.mooltiverse.oss.nyx.configuration.presets.ReleaseTypes.FIX,
                     "hotfix", com.mooltiverse.oss.nyx.configuration.presets.ReleaseTypes.HOTFIX,
                     "release", com.mooltiverse.oss.nyx.configuration.presets.ReleaseTypes.RELEASE,
                     "maintenance", com.mooltiverse.oss.nyx.configuration.presets.ReleaseTypes.MAINTENANCE,

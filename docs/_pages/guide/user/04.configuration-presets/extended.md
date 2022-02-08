@@ -50,7 +50,7 @@ This corresponds to the following configuration options:
 
 | Name                                            | Value                                                                                    |
 | ----------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| [`releaseTypes/enabled`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#enabled) | ["`mainline`", "`integration`", "`maturity`", "`feature`", "`hotfix`", "`release`", "`maintenance`", "`internal`"] |
+| [`releaseTypes/enabled`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#enabled) | ["`mainline`", "`integration`", "`maturity`", "`feature`", "`fix`", "`hotfix`", "`release`", "`maintenance`", "`internal`"] |
 | [`releaseTypes/publicationServices`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#publication-services) | Empty |
 | [`releaseTypes/mainline/collapseVersions`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#collapse-versions) | `false` |
 | [`releaseTypes/mainline/collapsedVersionQualifier`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#collapsed-version-qualifier) | Empty |
