@@ -8,7 +8,7 @@ Nyx is a powerful, flexible and extremely configurable **semantic release** tool
 Nyx is the *all in one* tool that gives you integrated support for:
 
 * the [Semantic Versioning (SemVer)](https://semver.org/) scheme
-* *semantic* and *conventional* specifications and best practices like [Semantic Versioning](https://semver.org/), [Conventional Commits](https://www.conventionalcommits.org/), [Keep a Changelog](https://keepachangelog.com/)
+* *conventional* specifications and best practices like [Conventional Commits](https://www.conventionalcommits.org/), [Keep a Changelog](https://keepachangelog.com/)
 * build tools like [Gradle](https://gradle.org/)
 * Git hosting services like [GitHub](https://github.com/) and [GitLab](https://gitlab.com/) and their extra features like [GitHub Releases](https://docs.github.com/en/github/administering-a-repository/about-releases) and [GitLab Releases](https://docs.gitlab.com/ee/user/project/releases/)
 * CI/CD platforms like [GitHub Actions](https://docs.github.com/en/free-pro-team@latest/actions/guides/about-continuous-integration), [GitLab CI](https://docs.gitlab.com/ee/ci/), [Bamboo](https://www.atlassian.com/software/bamboo), [CircleCI](https://circleci.com/), [Jenkins](https://www.jenkins.io/), [TeamCity](https://www.jetbrains.com/teamcity/)
@@ -45,6 +45,8 @@ The project is open source and hosted on [GitHub](https://github.com/mooltiverse
     * [user guide](https://mooltiverse.github.io/nyx/guide/user/)
     * [developer guide](https://mooltiverse.github.io/nyx/guide/developer/)
   * [Javadoc API](https://javadoc.io/doc/com.mooltiverse.oss.nyx/java)
+* Articles:
+  * [Semantic Release Automation with Gradle using Nyx](https://levelup.gitconnected.com/semantic-release-automation-with-gradle-using-nyx-ba345235a365)
 * Deliverables:
   * [GitHub packages](https://github.com/mooltiverse/nyx/packages)
   * [Maven repository](https://search.maven.org/search?q=g:com.mooltiverse.oss.nyx) ([raw version](https://repo.maven.apache.org/maven2/com/mooltiverse/oss/nyx/))
