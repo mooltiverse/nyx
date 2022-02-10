@@ -13,7 +13,7 @@ description = 'The Nyx Java library providing the version classes, without any o
 
 /*------------------------------------------------------------------------------
   Configurations
-*/
+------------------------------------------------------------------------------*/
 configurations {
 }
 

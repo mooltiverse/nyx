@@ -7,7 +7,7 @@
 ### {{name}}
 
 {{#commits}}
-* [{{#short5}}{{SHA}}{{/short5}}](https://github.com/mooltiverse/nyx/commit/{{SHA}}) {{message.shortMessage}} [{{authorAction.identity.name}}](https://github.com/{{authorAction.identity.name}})
+* [{{#short5}}{{SHA}}{{/short5}}](https://github.com/mooltiverse/nyx/commit/{{SHA}}) {{message.shortMessage}} {{authorAction.identity.name}}
 
 {{/commits}}
 {{^commits}}
