@@ -65,6 +65,11 @@ jobs:
       with:
         name: jar
         path: '**/build/libs/'
+    - name: Archive Binaries
+      uses: actions/upload-artifact@v2
+      with:
+        name: bin
+        path: 'modules/go/main/build/bin/*'
   
   unit-test:
     needs: assemble

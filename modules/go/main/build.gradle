@@ -3,6 +3,7 @@
   https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
 ------------------------------------------------------------------------------*/
 plugins {
+  id 'maven-publish' // See: https://docs.gradle.org/current/userguide/publishing_maven.html
 }
 
 /*------------------------------------------------------------------------------
@@ -27,6 +28,72 @@ dependencies {
 }
 
 /*------------------------------------------------------------------------------
+  Publications
+------------------------------------------------------------------------------*/
+publishing {
+    repositories {
+        // The GitHub Packages repository, visible at https://github.com/mooltiverse/nyx/packages
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/"+nyxOrganizationID+"/"+nyxID)
+            credentials {
+                // The 'gitHubUser' and 'gitHubToken' variables are passed as credentials fetching them in GitHub Actions as 'secrets.GITHUB_ACTOR' and 'secrets.GITHUB_TOKEN', respectively.
+                // See the GitHub Actions definition for more.
+                username = findProperty("gitHubUser")
+                password = findProperty("gitHubToken")
+            }
+        }
+    }
+
+    publications {
+        // For binary files we create one publication for each platform,
+        // reading the platforms from the targetPlatforms matrix
+        targetPlatforms.each {
+            def os = it[0]
+            def arch = it[1]
+            def extension = it[2]
+            def platform = os+'-'+arch
+            def binaryName = rootProject.name+'-'+platform
+            def binaryFile = file(binDir.path+'/'+binaryName+extension)
+            "$binaryName"(MavenPublication) {
+                afterEvaluate {
+                    groupId = 'bin'
+                    artifactId = "$binaryName"
+                    version = rootProject.version
+                    artifacts = [ binaryFile ]
+                }
+
+                pom {
+                    name = "$binaryName"
+                    description = "$binaryName $rootProject.version"
+                    url = nyxHomeURL
+                    licenses {
+                        license {
+                            name = nyxLicenseName
+                            url = nyxLicenseURL
+                        }
+                    }
+                    developers {
+                        developer {
+                            id = nyxID
+                            name = nyxTeamName
+                            email = nyxTeamEmail
+                            organization = nyxOrganizationName
+                            organizationUrl = nyxOrganizationURL
+                        }
+                    }
+                    scm {
+                        connection = nyxGitURL
+                        developerConnection = nyxGitURL
+                        url = nyxHomeURL
+                    }
+                }
+            }            
+        }
+    }
+}
+
+/*------------------------------------------------------------------------------
   Additional tasks
 ------------------------------------------------------------------------------*/
 task goBuild(group: 'build', description: 'Builds the Go binaries') {
@@ -48,14 +115,14 @@ task goBuild(group: 'build', description: 'Builds the Go binaries') {
 
             logger.info('Building Go binaries for '+platform+' to '+binaryFile)
             exec {
-              environment 'GOOS', os
-              environment 'GOARCH', arch
-              workingDir = projectDir
-              standardOutput = new ByteArrayOutputStream()
-              // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
-              commandLine 'go', 'build', '-o', binaryFile, '-ldflags=.="-X=main.release='+version+'"', modulePath
-              ext.output = { return standardOutput.toString() }
-          }
+                environment 'GOOS', os
+                environment 'GOARCH', arch
+                workingDir = projectDir
+                standardOutput = new ByteArrayOutputStream()
+                // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
+                commandLine 'go', 'build', '-o', binaryFile, '-ldflags=.="-X=main.release='+version+'"', modulePath
+                ext.output = { return standardOutput.toString() }
+            }
         }
     }
 }
@@ -64,3 +131,4 @@ task goBuild(group: 'build', description: 'Builds the Go binaries') {
   Additional task dependencies
 ------------------------------------------------------------------------------*/
 tasks.assemble.dependsOn tasks.goBuild
+tasks.goPublish.dependsOn tasks.goBuild

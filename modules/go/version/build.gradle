@@ -29,6 +29,9 @@ dependencies {
 /*------------------------------------------------------------------------------
   Additional tasks
 ------------------------------------------------------------------------------*/
+task publish(group: 'publishing', description: 'Publishes the module') {
+    // This task is actually empty as it's just needed for task dependency consistency
+}
 
 /*------------------------------------------------------------------------------
   Additional task dependencies

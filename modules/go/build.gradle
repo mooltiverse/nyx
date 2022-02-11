@@ -134,10 +134,47 @@ subprojects {
         }
     }
 
+    task goPublish(group: 'publishing', description: 'Lists the module to https://pkg.go.dev/') {
+        // Task dependencies
+        dependsOn build
+
+        // Declare inputs and outputs of this task
+        inputs.dir(binDir)
+
+        // See https://go.dev/doc/modules/publishing
+        doLast {
+            //def modulereference = modulePath+'@'+version
+            def modulereference = modulePath+'@1.0.0'
+
+            logger.info('Listing Go module '+modulereference+' to https://pkg.go.dev/')
+            exec {
+                environment 'GOPROXY', 'proxy.golang.org'
+                workingDir = projectDir
+                standardOutput = new ByteArrayOutputStream()
+                // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
+                commandLine 'go', 'list', '-m', modulereference
+                ext.output = { return standardOutput.toString() }
+            }
+        }
+    }
+
     /*------------------------------------------------------------------------------
       Additional task dependencies
     ------------------------------------------------------------------------------*/
-    tasks.clean.dependsOn tasks.goClean
+    afterEvaluate {
+        tasks.clean.dependsOn tasks.goClean
+        tasks.publish.dependsOn tasks.goPublish
+
+        // Only perform publishing if the Nyx release type enables publishing
+        // Remember that setting the 'onlyIf' on a task does not prevent its dependencies
+        // to run so the tasks of the entire tree must be disabled
+        // This is why we set the onlyIf to all tasks in the Publish group
+/*        tasks.matching {
+            it.group.equals('publishing')
+        }.all {
+            it.onlyIf { rootProject.nyxState.newRelease }
+        }*/
+    }
 }
 
 /*------------------------------------------------------------------------------
