@@ -13,6 +13,9 @@ plugins {
 rootProject.name = 'nyx'
 
 include 'docs'
+include 'modules:go'
+include 'modules:go:version'
+include 'modules:go:main'
 include 'modules:java'
 include 'modules:java:version'
 include 'modules:java:main'

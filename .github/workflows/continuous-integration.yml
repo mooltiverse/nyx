@@ -35,6 +35,10 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 11
+    - name: Set up Go 1.17
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.17.6
     # Start with a new empty cache (no restore-keys) and save the job output cache as -assemble
     - name: Set up the pipeline cache
       uses: actions/cache@v2
@@ -74,6 +78,10 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 11
+    - name: Set up Go 1.17
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.17.6
     # Start from the -assemble cache and save the job output cache as -unit-test
     - name: Set up the pipeline cache
       uses: actions/cache@v2
@@ -124,6 +132,10 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 11
+    - name: Set up Go 1.17
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.17.6
     # Storing the output cache probably fails because the size is over the 5GB. If it fails you
     # see a message like:
     #     Warning: Cache size of ~5456 MB (5720816120 B) is over the 5GB limit, not saving cache.
@@ -182,6 +194,10 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 11
+    - name: Set up Go 1.17
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.17.6
     # Storing the output cache probably fails because the size is over the 5GB. If it fails you
     # see a message like:
     #     Warning: Cache size of ~5456 MB (5720816120 B) is over the 5GB limit, not saving cache.
@@ -235,6 +251,10 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 11
+    - name: Set up Go 1.17
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.17.6
     # Start from the -unit-test cache and save the job output cache as -check
     - name: Set up the pipeline cache
       uses: actions/cache@v2
@@ -282,6 +302,10 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 11
+    - name: Set up Go 1.17
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.17.6
     # Start from the -check cache and save the job output cache as -build
     - name: Set up the pipeline cache
       uses: actions/cache@v2
@@ -329,6 +353,10 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
+      - name: Set up Go 1.17
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.17.6
       # Start from the -build cache and save the job output cache as -publish
       - name: Set up the pipeline cache
         uses: actions/cache@v2
@@ -374,6 +402,10 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
+      - name: Set up Go 1.17
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.17.6
       # Start from the -publish cache and save the job output cache as -release
       - name: Set up the pipeline cache
         uses: actions/cache@v2

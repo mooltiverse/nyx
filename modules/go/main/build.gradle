@@ -1,0 +1,66 @@
+/*------------------------------------------------------------------------------
+  Plugins DSL block
+  https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
+------------------------------------------------------------------------------*/
+plugins {
+}
+
+/*------------------------------------------------------------------------------
+  Local sub-project properties
+------------------------------------------------------------------------------*/
+description = 'The Nyx main library and entry point.'
+ext { 
+  modulePath = 'github.com/mooltiverse/nyx/modules/go/main'
+}
+
+/*------------------------------------------------------------------------------
+  Configurations
+------------------------------------------------------------------------------*/
+configurations {
+}
+
+/*------------------------------------------------------------------------------
+  Repositories and dependencies
+  https://docs.gradle.org/current/userguide/dependency_management_for_java_projects.html
+*/
+dependencies {
+}
+
+/*------------------------------------------------------------------------------
+  Additional tasks
+------------------------------------------------------------------------------*/
+task goBuild(group: 'build', description: 'Builds the Go binaries') {
+    // Task dependencies
+    dependsOn goInit
+
+    // Declare inputs and outputs of this task
+    inputs.dir(projectDir)
+    outputs.dir(binDir)
+
+    // See https://golang.org/doc/install/source#environment for variables determining the build platform ans OS
+    doLast {
+        targetPlatforms.each {
+            def os = it[0]
+            def arch = it[1]
+            def extension = it[2]
+            def platform = os+'-'+arch
+            def binaryFile = file(binDir.path+'/'+rootProject.name+'-'+platform+extension)
+
+            logger.info('Building Go binaries for '+platform+' to '+binaryFile)
+            exec {
+              environment 'GOOS', os
+              environment 'GOARCH', arch
+              workingDir = projectDir
+              standardOutput = new ByteArrayOutputStream()
+              // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
+              commandLine 'go', 'build', '-o', binaryFile, '-ldflags=.="-X=main.release='+version+'"', modulePath
+              ext.output = { return standardOutput.toString() }
+          }
+        }
+    }
+}
+
+/*------------------------------------------------------------------------------
+  Additional task dependencies
+------------------------------------------------------------------------------*/
+tasks.assemble.dependsOn tasks.goBuild
