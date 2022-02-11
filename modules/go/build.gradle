@@ -173,11 +173,11 @@ subprojects {
         // Remember that setting the 'onlyIf' on a task does not prevent its dependencies
         // to run so the tasks of the entire tree must be disabled
         // This is why we set the onlyIf to all tasks in the Publish group
-        /*tasks.matching {
+        tasks.matching {
             it.group.equals('publishing')
         }.all {
             it.onlyIf { rootProject.nyxState.newRelease }
-        }*/
+        }
     }
 }
 
