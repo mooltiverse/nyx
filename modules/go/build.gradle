@@ -136,18 +136,22 @@ subprojects {
 
     task goPublish(group: 'publishing', description: 'Lists the module to https://pkg.go.dev/') {
         // Task dependencies
-        dependsOn build
+        dependsOn build, rootProject.tasks.nyxMark
+
+        // The command only needs to run if a new release has been issued and already tagged by 'nyxMark'
+        // otherwise the 'go list' commands fails because there is no such tagged version to read the go.mod file from
+        onlyIf { rootProject.nyxState.newRelease }
 
         // Declare inputs and outputs of this task
         inputs.dir(binDir)
 
         // See https://go.dev/doc/modules/publishing
         doLast {
-            //def modulereference = modulePath+'@'+version
-            def modulereference = modulePath+'@1.0.0'
+            def modulereference = modulePath+'@'+version
 
             logger.info('Listing Go module '+modulereference+' to https://pkg.go.dev/')
             exec {
+                //ignoreExitValue = true // TODO: remove this flag once the command is known to work
                 environment 'GOPROXY', 'proxy.golang.org'
                 workingDir = projectDir
                 standardOutput = new ByteArrayOutputStream()
@@ -169,7 +173,7 @@ subprojects {
         // Remember that setting the 'onlyIf' on a task does not prevent its dependencies
         // to run so the tasks of the entire tree must be disabled
         // This is why we set the onlyIf to all tasks in the Publish group
-/*        tasks.matching {
+        /*tasks.matching {
             it.group.equals('publishing')
         }.all {
             it.onlyIf { rootProject.nyxState.newRelease }

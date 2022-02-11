@@ -56,12 +56,10 @@ publishing {
             def binaryName = rootProject.name+'-'+platform
             def binaryFile = file(binDir.path+'/'+binaryName+extension)
             "$binaryName"(MavenPublication) {
-                afterEvaluate {
-                    groupId = 'bin'
-                    artifactId = "$binaryName"
-                    version = rootProject.version
-                    artifacts = [ binaryFile ]
-                }
+                groupId = 'bin'
+                artifactId = "$binaryName"
+                version = rootProject.version
+                artifacts = [ file(binaryFile) ]
 
                 pom {
                     name = "$binaryName"
