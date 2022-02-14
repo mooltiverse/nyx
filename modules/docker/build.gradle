@@ -82,6 +82,7 @@ task publish(group: 'publishing', description: 'Publishes Docker images produced
 ------------------------------------------------------------------------------*/
 tasks.clean.dependsOn tasks.dockerClean
 tasks.docker.dependsOn(':modules:go:main:build')
+tasks.build.dependsOn tasks.docker
 tasks.assemble.dependsOn tasks.docker
 tasks.dockerPush.dependsOn tasks.dockerLogin
 
