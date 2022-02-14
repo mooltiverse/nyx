@@ -13,6 +13,7 @@ plugins {
 rootProject.name = 'nyx'
 
 include 'docs'
+include 'modules:docker'
 include 'modules:go'
 include 'modules:go:version'
 include 'modules:go:main'
@@ -20,8 +21,6 @@ include 'modules:java'
 include 'modules:java:version'
 include 'modules:java:main'
 include 'modules:java:gradle'
-// re-enable the Docker module once we have something to build and publish
-//include 'modules:docker'
 
 /*------------------------------------------------------------------------------
   Extension configurations

@@ -4,7 +4,8 @@
 ------------------------------------------------------------------------------*/
 plugins {
     // See: https://github.com/palantir/gradle-docker
-    id 'com.palantir.docker' version '0.30.0'
+    id 'com.palantir.docker'      version '0.32.0'
+    id 'com.palantir.docker-run'  version '0.32.0'
 }
 
 /*------------------------------------------------------------------------------
@@ -12,13 +13,103 @@ plugins {
 ------------------------------------------------------------------------------*/
 description = 'The Nyx Docker image'
 
+// The project version may have a '+' sign (when using extra identifier in the 'build' part)
+// but since Docker doesn't handle it as a valid label we replace '+' with '_'.
+// Nonetheless the 'palantir' plugin tries to apply tags not just according to the 'tag' property
+// below but also with the project version. This is fixed below by setting those tasks' enabled=false
+def sanitizedVersion = rootProject.version.replaceAll('\\+','_')
+
 docker {
-    name rootProject.name
-    dockerfile  project.file('src/main/docker/Dockerfile')
+    name "$rootProject.name:$sanitizedVersion"
+    dockerfile  project.file('Dockerfile')
+    labels([version:sanitizedVersion])
+    // add the files built from ':modules:go:main' to the Docker build context so they are available for ADD and COPY directives
+    files project(':modules:go:main').buildDir
+    tag 'DockerHub', "${nyxOrganizationID}/${rootProject.name}/gradle-docker-example:${sanitizedVersion}"
+    tag 'DockerHubLatest', "${nyxOrganizationID}/${rootProject.name}/gradle-docker-example:latest"
+    tag 'GitHubContainerRegistry', "ghcr.io/${nyxOrganizationID}/${rootProject.name}:${sanitizedVersion}"
+    tag 'GitHubContainerRegistryLatest', "ghcr.io/${nyxOrganizationID}/${rootProject.name}:latest"
+}
+
+dockerRun {
+    name "${project.name}"
+    image "$rootProject.name:$sanitizedVersion"
+    clean true
+}
+
+/*------------------------------------------------------------------------------
+  Additional tasks
+------------------------------------------------------------------------------*/
+task dockerLogin(group: 'publishing', description: 'Logs in to remote Docker registries') {
+    doLast {
+        // make sure we have the credentials to log in
+        if ((findProperty("dockerHubUser") == null) || (findProperty("dockerHubToken") == null)) {
+            throw new GradleException("The environment variable DOCKER_HUB_USERNAME or DOCKER_HUB_TOKEN is not defined so I can't log in to GitHub's Docker Container Registry to publish the new Docker image")
+        }
+        if ((findProperty("gitHubUser") == null) || (findProperty("gitHubToken") == null)) {
+            throw new GradleException("The environment variable GITHUB_USERNAME or GITHUB_TOKEN is not defined so I can't log in to GitHub's Docker Container Registry to publish the new Docker image")
+        }
+
+        logger.info('Logging in Docker Hub')
+        exec {
+            standardOutput = new ByteArrayOutputStream()
+            // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
+            // The 'dockerHubUser' and 'dockerHubToken' variables are passed as credentials fetching them in GitHub Actions as 'secrets.DOCKER_HUB_USERNAME' and 'secrets.DOCKER_HUB_TOKEN', respectively.
+            // See the GitHub Actions definition for more.
+            commandLine 'echo', findProperty("dockerHubToken"), '|', 'docker', 'login', '--user', findProperty("dockerHubUser"), '--password-stdin'
+            ext.output = { return standardOutput.toString() }
+        }
+
+        logger.info('Logging in GitHub Container Registry')
+        exec {
+            standardOutput = new ByteArrayOutputStream()
+            // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
+            // The 'gitHubUser' and 'gitHubToken' variables are passed as credentials fetching them in GitHub Actions as 'secrets.GITHUB_ACTOR' and 'secrets.GITHUB_TOKEN', respectively.
+            // See the GitHub Actions definition for more.
+            commandLine 'echo', findProperty("gitHubToken"), '|', 'docker', 'login', 'ghcr.io', '--user', findProperty("gitHubUser"), '--password-stdin'
+            ext.output = { return standardOutput.toString() }
+        }
+    }
+}
+
+// This is just a lifecycle task
+task publish(group: 'publishing', description: 'Publishes Docker images produced by this project.') {
+    dependsOn tasks.dockerPush
 }
 
 /*------------------------------------------------------------------------------
   Additional task dependencies
 ------------------------------------------------------------------------------*/
-//tasks.docker.dependsOn(':modules:java:main:build')
-tasks.build.dependsOn tasks.docker
+tasks.clean.dependsOn tasks.dockerClean
+tasks.docker.dependsOn(':modules:go:main:build')
+tasks.assemble.dependsOn tasks.docker
+tasks.dockerPush.dependsOn tasks.dockerLogin
+
+afterEvaluate {
+    // Only perform publishing if the Nyx release type enables publishing
+    // Remember that setting the 'onlyIf' on a task does not prevent its dependencies
+    // to run so the tasks of the entire tree must be disabled
+    // This is why we set the onlyIf to all tasks in the Publish group
+    tasks.matching {
+        it.name.startsWith('dockerPush') || it.name.startsWith('dockerTag') || it.name.startsWith('dockerLogin')
+    }.all {
+        it.onlyIf { rootProject.nyxState.newRelease }
+    }
+
+    // Only publish with the 'latest' label for standard (official, like x.y.z) releases
+    tasks.matching {
+        it.name.startsWith('docker') && it.name.endsWith('Latest')
+    }.all {
+        it.onlyIf { Pattern.matches("^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\$", rootProject.version) }
+    }
+
+    // The 'palantir' plugin also creates an additional dockerTagXXXX task using the project version, regardless
+    // of the tags we have configured for the plugin. In case of a version containing a '+' (like local versions)
+    // the build fails because of that. So in that case we just disable the task.
+    // See here for more: https://github.com/palantir/gradle-docker/issues/516
+    tasks.matching {
+        it.name.contains('+')
+    }.all {
+        it.enabled = false
+    }
+}
