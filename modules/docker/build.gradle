@@ -99,11 +99,11 @@ afterEvaluate {
     // Remember that setting the 'onlyIf' on a task does not prevent its dependencies
     // to run so the tasks of the entire tree must be disabled
     // This is why we set the onlyIf to all tasks in the Publish group
-    tasks.matching {
+    /*tasks.matching {
         it.name.startsWith('dockerPush') || it.name.startsWith('dockerTag') || it.name.startsWith('dockerLogin')
     }.all {
         it.onlyIf { rootProject.nyxState.newRelease }
-    }
+    }*/
 
     // Only publish with the 'latest' label for standard (official, like x.y.z) releases
     tasks.matching {
