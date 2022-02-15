@@ -29,40 +29,6 @@ subprojects {
     ext {
         // The module file
         modFile = file('go.mod')
-
-        // The output directory for binary files
-        binDir = file(buildDir.path+'/bin')
-
-        // The list of maps of target platforms (taken from https://go.dev/doc/install/source#environment)
-        // For each item you have a sub list with 3 elements: the Operating System, the Architecture, the expected Extension of executable files
-        targetPlatforms = [ ['darwin','amd64',''],
-                                ['darwin','arm64',''],
-                                ['dragonfly','amd64',''],
-                                ['freebsd','386',''],
-                                ['freebsd','amd64',''],
-                                ['freebsd','arm',''],
-                                ['linux','386',''],
-                                ['linux','amd64',''],
-                                ['linux','arm',''],
-                                ['linux','arm64',''],
-                                ['linux','ppc64',''],
-                                ['linux','ppc64le',''],
-                                ['linux','mips',''],
-                                ['linux','mipsle',''],
-                                ['linux','mips64',''],
-                                ['linux','mips64le',''],
-                                ['netbsd','386',''],
-                                ['netbsd','amd64',''],
-                                ['netbsd','arm',''],
-                                ['openbsd','386',''],
-                                ['openbsd','amd64',''],
-                                ['openbsd','arm',''],
-                                ['openbsd','arm64',''],
-                                ['solaris','amd64',''],
-                                ['windows','386','.exe'],
-                                ['windows','amd64','.exe'],
-                                ['windows','arm','.exe'],
-                                ['windows','arm64','.exe'] ]
     }
 
     task goClean(group: 'build', description: 'Cleans Go object files and cached files') {
@@ -127,23 +93,28 @@ subprojects {
         dependsOn goModInit, goModUpdate
 
         // Declare inputs and outputs of this task
-        outputs.dir(binDir)
+        outputs.dir(file(buildDir.path+'/bin'))
 
         doLast {
-            mkdir binDir
+            mkdir file(buildDir.path+'/bin')
         }
+    }
+
+    task goBuild(group: 'build', description: 'Builds the Go binaries') {
+        // Task dependencies
+        dependsOn goInit
+
+        // This is pretty much a lifecycle task that sub-projects need to add dependencies to
     }
 
     task goPublish(group: 'publishing', description: 'Lists the module to https://pkg.go.dev/') {
         // Task dependencies
-        dependsOn build, rootProject.tasks.nyxMark
+        // nyxMark is required because the tag must already be available on GitHub when we run this task
+        dependsOn goBuild, rootProject.tasks.nyxMark
 
         // The command only needs to run if a new release has been issued and already tagged by 'nyxMark'
         // otherwise the 'go list' commands fails because there is no such tagged version to read the go.mod file from
         onlyIf { rootProject.nyxState.newRelease }
-
-        // Declare inputs and outputs of this task
-        inputs.dir(binDir)
 
         // See https://go.dev/doc/modules/publishing
         doLast {
@@ -165,10 +136,10 @@ subprojects {
     /*------------------------------------------------------------------------------
       Additional task dependencies
     ------------------------------------------------------------------------------*/
-    afterEvaluate {
-        tasks.clean.dependsOn tasks.goClean
-        tasks.publish.dependsOn tasks.goPublish
+    tasks.clean.dependsOn tasks.goClean
+    tasks.assemble.dependsOn tasks.goBuild
 
+    afterEvaluate {
         // Only perform publishing if the Nyx release type enables publishing
         // Remember that setting the 'onlyIf' on a task does not prevent its dependencies
         // to run so the tasks of the entire tree must be disabled
