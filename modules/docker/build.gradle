@@ -19,12 +19,21 @@ description = 'The Nyx Docker image'
 // below but also with the project version. This is fixed below by setting those tasks' enabled=false
 def sanitizedVersion = rootProject.version.replaceAll('\\+','_')
 
+// These statements force the other projects to be evaluated before this one. Without these,
+// the ':modules:go:main:goBuild-nyx-linux-amd64' task would fail because its dependency ('goInit')
+// would not be available yet.
+// With these statements, instead, the project is entirely evaluated in advance, so we can use the
+// ':modules:go:main:goBuild-nyx-linux-amd64' task outputs as it runs without errors.
+project.evaluationDependsOn(":modules:go")
+//project.evaluationDependsOn(":modules:go:main")
+
 docker {
     name "$rootProject.name:$sanitizedVersion"
     dockerfile  project.file('Dockerfile')
     labels([version:sanitizedVersion])
-    // add the files built from ':modules:go:main' to the Docker build context so they are available for ADD and COPY directives
-    files project(':modules:go:main').buildDir
+    // add the files built from ':modules:go:main:goBuild-nyx-linux-amd64' to the Docker build context so they are available for ADD and COPY directives
+    // this also adds an implicit dependency to task ':modules:go:main:goBuild-nyx-linux-amd64'
+    files tasks.getByPath(':modules:go:main:goBuild-nyx-linux-amd64').outputs
     tag 'DockerHub', "${nyxOrganizationID}/${rootProject.name}/gradle-docker-example:${sanitizedVersion}"
     tag 'DockerHubLatest', "${nyxOrganizationID}/${rootProject.name}/gradle-docker-example:latest"
     tag 'GitHubContainerRegistry', "ghcr.io/${nyxOrganizationID}/${rootProject.name}:${sanitizedVersion}"
@@ -81,7 +90,6 @@ task publish(group: 'publishing', description: 'Publishes Docker images produced
   Additional task dependencies
 ------------------------------------------------------------------------------*/
 tasks.clean.dependsOn tasks.dockerClean
-tasks.docker.dependsOn(':modules:go:main:build')
 tasks.build.dependsOn tasks.docker
 tasks.assemble.dependsOn tasks.docker
 tasks.dockerPush.dependsOn tasks.dockerLogin
