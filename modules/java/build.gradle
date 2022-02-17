@@ -223,6 +223,9 @@ subprojects {
         maxHeapSize = "1024m"
     }
 
+    // TODO: aggregate JaCoCo reports among sub-projects into one using the JaCoCo Report Aggregation Plugin
+    // (https://docs.gradle.org/7.4/userguide/jacoco_report_aggregation_plugin.html)
+    // as per https://docs.gradle.org/7.4/release-notes.html#new-features-and-usability-improvements
     jacocoTestReport {
         reports {
             html.enabled true
@@ -249,7 +252,9 @@ sourcesJar.from(subprojects.collect { it.sourceSets.main.allJava })
 /*------------------------------------------------------------------------------
   Test reports
 ------------------------------------------------------------------------------*/
-// Aggregate test reports from subprojects into one.
+// TODO: aggregate test reports among sub-projects into one using the Test Report Aggregation Plugin
+// (https://docs.gradle.org/7.4/userguide/test_report_aggregation_plugin.html)
+// as per https://docs.gradle.org/7.4/release-notes.html#new-features-and-usability-improvements
 task testReport(type: TestReport) {
     destinationDir = file("$buildDir/reports/tests/all")
     // Include the results from the "test" task in all subprojects
