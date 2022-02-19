@@ -5,7 +5,6 @@
 plugins {
     // See: https://github.com/palantir/gradle-docker
     id 'com.palantir.docker'      version '0.32.0'
-    id 'com.palantir.docker-run'  version '0.32.0'
 }
 
 /*------------------------------------------------------------------------------
@@ -41,12 +40,6 @@ docker {
     // The following settings publish images to: https://github.com/orgs/mooltiverse/packages/container/package/nyx
     tag 'GitHubContainerRegistry', "ghcr.io/${nyxOrganizationID}/${rootProject.name}:${sanitizedVersion}"
     tag 'GitHubContainerRegistryLatest', "ghcr.io/${nyxOrganizationID}/${rootProject.name}:latest"
-}
-
-dockerRun {
-    name "${project.name}"
-    image "$rootProject.name:$sanitizedVersion"
-    clean true
 }
 
 /*------------------------------------------------------------------------------
