@@ -140,4 +140,12 @@ afterEvaluate {
     }.all {
         it.enabled = false
     }
+    // For the same reason above, the 'palantir' plugin also creates an additional Push task that just tries to push
+    // with the project version as a tag, where the target registry is unknown. Since this task fails we need to disable it.
+    // This way only the 'dockerPush*' tasks with tags we have explicitly defined are executed.
+    tasks.matching {
+        it.name.equals('dockerPush'+rootProject.version)
+    }.all {
+        it.enabled = false
+    }
 }
