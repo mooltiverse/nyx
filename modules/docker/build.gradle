@@ -111,6 +111,7 @@ task publish(group: 'publishing', description: 'Publishes Docker images produced
 tasks.clean.dependsOn tasks.dockerClean
 tasks.build.dependsOn tasks.docker
 tasks.assemble.dependsOn tasks.docker
+tasks.dockerTag.dependsOn tasks.dockerLogin
 tasks.dockerPush.dependsOn tasks.dockerLogin
 
 afterEvaluate {
