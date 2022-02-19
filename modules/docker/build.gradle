@@ -3,20 +3,12 @@
   https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
 ------------------------------------------------------------------------------*/
 plugins {
-    // See: https://github.com/palantir/gradle-docker
-    id 'com.palantir.docker'      version '0.32.0'
 }
 
 /*------------------------------------------------------------------------------
   Local sub-project properties
 ------------------------------------------------------------------------------*/
 description = 'The Nyx Docker image'
-
-// The project version may have a '+' sign (when using extra identifier in the 'build' part)
-// but since Docker doesn't handle it as a valid label we replace '+' with '_'.
-// Nonetheless the 'palantir' plugin tries to apply tags not just according to the 'tag' property
-// below but also with the project version. This is fixed below by setting those tasks' enabled=false
-def sanitizedVersion = rootProject.version.replaceAll('\\+','_')
 
 // These statements force the other projects to be evaluated before this one. Without these,
 // the ':modules:go:main:goBuild-nyx-linux-amd64' task would fail because its dependency ('goInit')
@@ -26,26 +18,69 @@ def sanitizedVersion = rootProject.version.replaceAll('\\+','_')
 project.evaluationDependsOn(":modules:go")
 //project.evaluationDependsOn(":modules:go:main")
 
-docker {
-    name "$rootProject.name:$sanitizedVersion"
-    dockerfile  project.file('Dockerfile')
-    labels([version:sanitizedVersion])
-    // add the files built from ':modules:go:main:goBuild-nyx-linux-amd64' to the Docker build context so they are available for ADD and COPY directives
-    // this also adds an implicit dependency to task ':modules:go:main:goBuild-nyx-linux-amd64'
-    // The repository 'mooltiverse/nyx' had to be created manually beforehand and permissions to write the repo had to be assigned to the service user.
-    // The following settings publish images to: https://hub.docker.com/repository/docker/mooltiverse/nyx
-    files tasks.getByPath(':modules:go:main:goBuild-nyx-linux-amd64').outputs
-    tag 'DockerHub', "${nyxOrganizationID}/${rootProject.name}:${sanitizedVersion}"
-    tag 'DockerHubLatest', "${nyxOrganizationID}/${rootProject.name}:latest"
-    // The following settings publish images to: https://github.com/orgs/mooltiverse/packages/container/package/nyx
-    tag 'GitHubContainerRegistry', "ghcr.io/${nyxOrganizationID}/${rootProject.name}:${sanitizedVersion}"
-    tag 'GitHubContainerRegistryLatest', "ghcr.io/${nyxOrganizationID}/${rootProject.name}:latest"
+// The project version may have a '+' sign (when using extra identifier in the 'build' part)
+// but since Docker doesn't handle it as a valid label we replace '+' with '_'.
+def sanitizedVersion = rootProject.version.replaceAll('\\+','_')
+
+// The directory used to build the Docker image
+def dockerContextDir = file(buildDir.path+'/docker')
+
+// The map of registries to publish the image to
+// About DockerHub:
+// - the repository 'mooltiverse/nyx' had to be created manually beforehand and permissions to write the repo had to be assigned to the service user.
+// - images are published to: https://hub.docker.com/repository/docker/mooltiverse/nyx
+// About GitHubContainerRegistry:
+// - images are published to: https://github.com/orgs/mooltiverse/packages/container/package/nyx
+def registries = [ 'DockerHub':"${nyxOrganizationID}/${rootProject.name}",
+                   'GitHubContainerRegistry':"ghcr.io/${nyxOrganizationID}/${rootProject.name}" ]
+
+// The list of labels to publish with. The 'latest' label is only added if we are publishing an official version (like x.y.z, without extra identifiers)
+def labels = [ sanitizedVersion ]
+if (java.util.regex.Pattern.matches("^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\$", rootProject.version)) {
+    labels.add('latest')
 }
 
 /*------------------------------------------------------------------------------
   Additional tasks
 ------------------------------------------------------------------------------*/
+task dockerContext(group: 'build', description: 'Builds the Docker context') {
+    dependsOn tasks.getByPath(':modules:go:main:goBuild-nyx-linux-amd64')
+
+    doLast {
+        logger.info('Building the Docker context')
+        mkdir dockerContextDir
+        copy {
+            // 
+            from file('Dockerfile')
+            into dockerContextDir
+        }
+        copy {
+            // add the files built from ':modules:go:main:goBuild-nyx-linux-amd64' to the Docker build context so they are available for ADD and COPY directives
+            // this also adds an implicit dependency to task ':modules:go:main:goBuild-nyx-linux-amd64'
+            from tasks.getByPath(':modules:go:main:goBuild-nyx-linux-amd64').outputs
+            into dockerContextDir
+            include 'nyx-linux-amd64'
+        }
+    }
+}
+
+task dockerImage(group: 'build', description: 'Builds the Docker image') {
+    dependsOn dockerContext
+
+    doLast {
+        logger.info('Building the Docker image')
+        exec {
+            workingDir = dockerContextDir
+            standardOutput = new ByteArrayOutputStream()
+            // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
+            commandLine 'docker', 'build', '--label', "version=$sanitizedVersion", '--tag', "${rootProject.name}:${sanitizedVersion}", '--rm', '.'
+            ext.output = { return standardOutput.toString() }
+        }
+    }
+}
+
 task dockerLogin(group: 'publishing', description: 'Logs in to remote Docker registries') {
+    // Here we should iterate the registries map instead of using hardoded registries, but to do so we should also put credentials in the map
     doLast {
         // make sure we have the credentials to log in
         if ((findProperty("dockerHubUser") == null) || (findProperty("dockerHubToken") == null)) {
@@ -94,52 +129,79 @@ task dockerLogin(group: 'publishing', description: 'Logs in to remote Docker reg
 }
 
 // This is just a lifecycle task
-task publish(group: 'publishing', description: 'Publishes Docker images produced by this project.') {
+task dockerTag(group: 'build', description: 'Tags the Docker image for the configured registries and labels') {
+    // Dependencies are created along with dynamic tasks below
+
+    // Only perform publishing if the Nyx release type enables publishing
+    it.onlyIf { rootProject.nyxState.newRelease }
+}
+
+// This is just a lifecycle task
+task dockerPush(group: 'publishing', description: 'Pushes the Docker image to the configured registries') {
+    // Dependencies are created along with dynamic tasks below
+
+    // Only perform publishing if the Nyx release type enables publishing
+    it.onlyIf { rootProject.nyxState.newRelease }
+}
+
+// For each target registry and each label:
+// - create a tag task
+// - create a publish task
+registries.each { registry ->
+    labels.each { label ->
+        // The tag tasks for the specific registry and label
+        tasks.create(group: 'build', name: "dockerTag-${registry.key}-${label}", description: "Tags the Docker image for the ${registry.key} registry with the ${label} label") {
+            // Task dependencies
+            dependsOn dockerImage
+
+            // Only perform publishing if the Nyx release type enables publishing
+            it.onlyIf { rootProject.nyxState.newRelease }
+
+            doLast {
+                logger.info("Tagging the Docker image for the ${registry.key} registry with the ${label} label")
+                exec {
+                    standardOutput = new ByteArrayOutputStream()
+                    // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
+                    commandLine 'docker', 'tag', "${rootProject.name}:${sanitizedVersion}", "${registry.value}:${label}"
+                    ext.output = { return standardOutput.toString() }
+                }
+            }
+        }
+        tasks.create(group: 'publishing', name: "dockerPush-${registry.key}-${label}", description: "Pushes the Docker image to the ${registry.key} registry with the ${label} label") {
+            // Task dependencies
+            dependsOn dockerLogin
+
+            // Only perform publishing if the Nyx release type enables publishing
+            dependsOn tasks.named("dockerTag-${registry.key}-${label}")
+
+            onlyIf { rootProject.nyxState.newRelease }
+
+            doLast {
+                logger.info("Pushing the Docker image to the ${registry.key} registry with the ${label} label")
+                exec {
+                    standardOutput = new ByteArrayOutputStream()
+                    // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
+                    commandLine 'docker', 'push', "${registry.value}:${label}"
+                    ext.output = { return standardOutput.toString() }
+                }
+            }
+        }
+
+        // Make the overall dockerTag lifecycle task depend on the platform specific tag task
+        tasks.dockerTag.dependsOn tasks.named("dockerTag-${registry.key}-${label}")
+        // Make the overall dockerPush lifecycle task depend on the platform specific tag task
+        tasks.dockerPush.dependsOn tasks.named("dockerPush-${registry.key}-${label}")
+    }
+}
+
+// This is just a lifecycle task
+task publish(group: 'publishing', description: 'Publishes Docker images produced by this project') {
     dependsOn tasks.dockerPush
 }
 
 /*------------------------------------------------------------------------------
   Additional task dependencies
 ------------------------------------------------------------------------------*/
-tasks.clean.dependsOn tasks.dockerClean
-tasks.build.dependsOn tasks.docker
-tasks.assemble.dependsOn tasks.docker
-tasks.dockerTag.dependsOn tasks.dockerLogin
-tasks.dockerPush.dependsOn tasks.dockerLogin
-
-afterEvaluate {
-    // Only perform publishing if the Nyx release type enables publishing
-    // Remember that setting the 'onlyIf' on a task does not prevent its dependencies
-    // to run so the tasks of the entire tree must be disabled
-    // This is why we set the onlyIf to all tasks in the Publish group
-    /*tasks.matching {
-        it.name.startsWith('dockerPush') || it.name.startsWith('dockerTag') || it.name.startsWith('dockerLogin')
-    }.all {
-        it.onlyIf { rootProject.nyxState.newRelease }
-    }*/
-
-    // Only publish with the 'latest' label for standard (official, like x.y.z) releases
-    tasks.matching {
-        it.name.startsWith('docker') && it.name.endsWith('Latest')
-    }.all {
-        it.onlyIf { java.util.regex.Pattern.matches("^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\$", rootProject.version) }
-    }
-
-    // The 'palantir' plugin also creates an additional dockerTagXXXX task using the project version, regardless
-    // of the tags we have configured for the plugin. In case of a version containing a '+' (like local versions)
-    // the build fails because of that. So in that case we just disable the task.
-    // See here for more: https://github.com/palantir/gradle-docker/issues/516
-    tasks.matching {
-        it.name.contains('+')
-    }.all {
-        it.enabled = false
-    }
-    // For the same reason above, the 'palantir' plugin also creates an additional Push task that just tries to push
-    // with the project version as a tag, where the target registry is unknown. Since this task fails we need to disable it.
-    // This way only the 'dockerPush*' tasks with tags we have explicitly defined are executed.
-    tasks.matching {
-        it.name.equals('dockerPush'+rootProject.version)
-    }.all {
-        it.enabled = false
-    }
-}
+tasks.assemble.dependsOn tasks.dockerImage
+tasks.build.dependsOn tasks.dockerImage
+/*tasks.clean.dependsOn tasks.dockerClean*/
