@@ -155,7 +155,7 @@ registries.each { registry ->
             dependsOn dockerImage
 
             // Only perform publishing if the Nyx release type enables publishing
-            it.onlyIf { rootProject.nyxState.newRelease }
+//            it.onlyIf { rootProject.nyxState.newRelease }
 
             doLast {
                 logger.info("Tagging the Docker image for the ${registry.key} registry with the ${label} label")
@@ -174,7 +174,7 @@ registries.each { registry ->
             // Only perform publishing if the Nyx release type enables publishing
             dependsOn tasks.named("dockerTag-${registry.key}-${label}")
 
-            onlyIf { rootProject.nyxState.newRelease }
+//            onlyIf { rootProject.nyxState.newRelease }
 
             doLast {
                 logger.info("Pushing the Docker image to the ${registry.key} registry with the ${label} label")
