@@ -133,7 +133,7 @@ task dockerTag(group: 'build', description: 'Tags the Docker image for the confi
     // Dependencies are created along with dynamic tasks below
 
     // Only perform publishing if the Nyx release type enables publishing
-    it.onlyIf { rootProject.nyxState.newRelease }
+//    it.onlyIf { rootProject.nyxState.newRelease }
 }
 
 // This is just a lifecycle task
@@ -141,7 +141,7 @@ task dockerPush(group: 'publishing', description: 'Pushes the Docker image to th
     // Dependencies are created along with dynamic tasks below
 
     // Only perform publishing if the Nyx release type enables publishing
-    it.onlyIf { rootProject.nyxState.newRelease }
+//    it.onlyIf { rootProject.nyxState.newRelease }
 }
 
 // For each target registry and each label:
