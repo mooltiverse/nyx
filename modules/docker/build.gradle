@@ -133,6 +133,7 @@ task dockerTag(group: 'build', description: 'Tags the Docker image for the confi
     // Dependencies are created along with dynamic tasks below
 
     // Only perform publishing if the Nyx release type enables publishing
+// TODO: uncomment this
 //    it.onlyIf { rootProject.nyxState.newRelease }
 }
 
@@ -141,6 +142,7 @@ task dockerPush(group: 'publishing', description: 'Pushes the Docker image to th
     // Dependencies are created along with dynamic tasks below
 
     // Only perform publishing if the Nyx release type enables publishing
+// TODO: uncomment this
 //    it.onlyIf { rootProject.nyxState.newRelease }
 }
 
@@ -155,6 +157,7 @@ registries.each { registry ->
             dependsOn dockerImage
 
             // Only perform publishing if the Nyx release type enables publishing
+// TODO: uncomment this
 //            it.onlyIf { rootProject.nyxState.newRelease }
 
             doLast {
@@ -174,10 +177,17 @@ registries.each { registry ->
             // Only perform publishing if the Nyx release type enables publishing
             dependsOn tasks.named("dockerTag-${registry.key}-${label}")
 
+// TODO: uncomment this
 //            onlyIf { rootProject.nyxState.newRelease }
 
             doLast {
                 logger.info("Pushing the Docker image to the ${registry.key} registry with the ${label} label")
+// TODO: remove this exec block
+exec {
+    standardOutput = new ByteArrayOutputStream()
+    commandLine 'docker', '--version'
+    ext.output = { return standardOutput.toString() }
+}
                 exec {
                     standardOutput = new ByteArrayOutputStream()
                     // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
