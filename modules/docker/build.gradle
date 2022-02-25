@@ -182,10 +182,15 @@ registries.each { registry ->
 
             doLast {
                 logger.info("Pushing the Docker image to the ${registry.key} registry with the ${label} label")
-// TODO: remove this exec block
+// TODO: remove these exec block
 exec {
     standardOutput = new ByteArrayOutputStream()
     commandLine 'docker', '--version'
+    ext.output = { return standardOutput.toString() }
+}
+exec {
+    standardOutput = new ByteArrayOutputStream()
+    commandLine 'docker', 'images'
     ext.output = { return standardOutput.toString() }
 }
                 exec {
