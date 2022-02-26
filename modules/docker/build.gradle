@@ -162,6 +162,26 @@ registries.each { registry ->
 
             doLast {
                 logger.info("Tagging the Docker image for the ${registry.key} registry with the ${label} label")
+// TODO: remove these exec block
+logger.quiet("Printing the Docker version")
+exec {
+    standardOutput = new ByteArrayOutputStream()
+    commandLine 'docker', '--version'
+    ext.output = { return standardOutput.toString() }
+}
+logger.quiet("Listing the Docker images #1")
+exec {
+    standardOutput = new ByteArrayOutputStream()
+    commandLine 'docker', 'image', 'ls'
+    ext.output = { return standardOutput.toString() }
+}
+logger.quiet("Listing the Docker images #2")
+exec {
+    standardOutput = new ByteArrayOutputStream()
+    commandLine 'docker', 'images'
+    ext.output = { return standardOutput.toString() }
+}
+logger.quiet("Tagging Docker images")
                 exec {
                     standardOutput = new ByteArrayOutputStream()
                     // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
@@ -183,16 +203,25 @@ registries.each { registry ->
             doLast {
                 logger.info("Pushing the Docker image to the ${registry.key} registry with the ${label} label")
 // TODO: remove these exec block
+logger.quiet("Printing the Docker version")
 exec {
     standardOutput = new ByteArrayOutputStream()
     commandLine 'docker', '--version'
     ext.output = { return standardOutput.toString() }
 }
+logger.quiet("Listing the Docker images #1")
+exec {
+    standardOutput = new ByteArrayOutputStream()
+    commandLine 'docker', 'image', 'ls'
+    ext.output = { return standardOutput.toString() }
+}
+logger.quiet("Listing the Docker images #2")
 exec {
     standardOutput = new ByteArrayOutputStream()
     commandLine 'docker', 'images'
     ext.output = { return standardOutput.toString() }
 }
+logger.quiet("Pushing Docker images")
                 exec {
                     standardOutput = new ByteArrayOutputStream()
                     // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
