@@ -167,18 +167,21 @@ logger.quiet("Printing the Docker version")
 exec {
     standardOutput = new ByteArrayOutputStream()
     commandLine 'docker', '--version'
+    println standardOutput.toString()
     ext.output = { return standardOutput.toString() }
 }
 logger.quiet("Listing the Docker images #1")
 exec {
     standardOutput = new ByteArrayOutputStream()
     commandLine 'docker', 'image', 'ls'
+    println standardOutput.toString()
     ext.output = { return standardOutput.toString() }
 }
 logger.quiet("Listing the Docker images #2")
 exec {
     standardOutput = new ByteArrayOutputStream()
     commandLine 'docker', 'images'
+    println standardOutput.toString()
     ext.output = { return standardOutput.toString() }
 }
 logger.quiet("Tagging Docker images")
@@ -207,18 +210,21 @@ logger.quiet("Printing the Docker version")
 exec {
     standardOutput = new ByteArrayOutputStream()
     commandLine 'docker', '--version'
+    println standardOutput.toString()
     ext.output = { return standardOutput.toString() }
 }
 logger.quiet("Listing the Docker images #1")
 exec {
     standardOutput = new ByteArrayOutputStream()
     commandLine 'docker', 'image', 'ls'
+    println standardOutput.toString()
     ext.output = { return standardOutput.toString() }
 }
 logger.quiet("Listing the Docker images #2")
 exec {
     standardOutput = new ByteArrayOutputStream()
     commandLine 'docker', 'images'
+    println standardOutput.toString()
     ext.output = { return standardOutput.toString() }
 }
 logger.quiet("Pushing Docker images")
