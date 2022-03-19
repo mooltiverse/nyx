@@ -31,7 +31,8 @@ def dockerContextDir = file(buildDir.path+'/docker')
 // - images are published to: https://hub.docker.com/repository/docker/mooltiverse/nyx
 // About GitHubContainerRegistry:
 // - images are published to: https://github.com/orgs/mooltiverse/packages/container/package/nyx
-def registries = [ 'DockerHub':"${nyxOrganizationID}/${rootProject.name}",
+def registries = [ 
+//def registries = [ 'DockerHub':"${nyxOrganizationID}/${rootProject.name}",
                    'GitHubContainerRegistry':"ghcr.io/${nyxOrganizationID}/${rootProject.name}" ]
 
 // The list of labels to publish with. The 'latest' label is only added if we are publishing an official version (like x.y.z, without extra identifiers)
@@ -232,6 +233,7 @@ logger.quiet("Pushing Docker images")
                     standardOutput = new ByteArrayOutputStream()
                     // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
                     commandLine 'docker', 'push', "${registry.value}:${label}"
+println standardOutput.toString()
                     ext.output = { return standardOutput.toString() }
                 }
             }
