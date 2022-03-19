@@ -31,8 +31,7 @@ def dockerContextDir = file(buildDir.path+'/docker')
 // - images are published to: https://hub.docker.com/repository/docker/mooltiverse/nyx
 // About GitHubContainerRegistry:
 // - images are published to: https://github.com/orgs/mooltiverse/packages/container/package/nyx
-def registries = [ 
-//def registries = [ 'DockerHub':"${nyxOrganizationID}/${rootProject.name}",
+def registries = [ 'DockerHub':"${nyxOrganizationID}/${rootProject.name}",
                    'GitHubContainerRegistry':"ghcr.io/${nyxOrganizationID}/${rootProject.name}" ]
 
 // The list of labels to publish with. The 'latest' label is only added if we are publishing an official version (like x.y.z, without extra identifiers)
@@ -73,6 +72,7 @@ task dockerImage(group: 'build', description: 'Builds the Docker image') {
         exec {
             workingDir = dockerContextDir
             standardOutput = new ByteArrayOutputStream()
+            errorOutput = new ByteArrayOutputStream()
             // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
             commandLine 'docker', 'build', '--label', "version=$sanitizedVersion", '--tag', "${rootProject.name}:${sanitizedVersion}", '--rm', '.'
             ext.output = { return standardOutput.toString() }
@@ -94,6 +94,7 @@ task dockerLogin(group: 'publishing', description: 'Logs in to remote Docker reg
         logger.info('Logging in Docker Hub')
         exec {
             standardOutput = new ByteArrayOutputStream()
+            errorOutput = new ByteArrayOutputStream()
             // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
             // The 'dockerHubUser' and 'dockerHubToken' variables are passed as credentials fetching them in GitHub Actions as 'secrets.DOCKER_HUB_USERNAME' and 'secrets.DOCKER_HUB_TOKEN', respectively.
             // The actual environment variable names are 'ORG_GRADLE_PROJECT_dockerHubUser' and 'ORG_GRADLE_PROJECT_dockerHubToken'
@@ -106,12 +107,15 @@ task dockerLogin(group: 'publishing', description: 'Logs in to remote Docker reg
             } else {
                 commandLine 'echo', '$ORG_GRADLE_PROJECT_dockerHubToken', '|', 'docker', 'login', '--username', findProperty("dockerHubUser"), '--password-stdin'
             }
+logger.info(standardOutput.toString())
+logger.error(errorOutput.toString())
             ext.output = { return standardOutput.toString() }
         }
 
         logger.info('Logging in GitHub Container Registry')
         exec {
             standardOutput = new ByteArrayOutputStream()
+            errorOutput = new ByteArrayOutputStream()
             // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
             // The 'gitHubUser' and 'gitHubToken' variables are passed as credentials fetching them in GitHub Actions as 'secrets.GITHUB_ACTOR' and 'secrets.GITHUB_TOKEN', respectively.
             // The actual environment variable names are 'ORG_GRADLE_PROJECT_gitHubUser' and 'ORG_GRADLE_PROJECT_gitHubToken'
@@ -124,6 +128,8 @@ task dockerLogin(group: 'publishing', description: 'Logs in to remote Docker reg
             } else {
                 commandLine 'echo', '$ORG_GRADLE_PROJECT_gitHubToken', '|', 'docker', 'login', 'ghcr.io', '--username', findProperty("gitHubUser"), '--password-stdin'
             }
+logger.info(standardOutput.toString())
+logger.error(errorOutput.toString())
             ext.output = { return standardOutput.toString() }
         }
     }
@@ -167,29 +173,38 @@ registries.each { registry ->
 logger.quiet("Printing the Docker version")
 exec {
     standardOutput = new ByteArrayOutputStream()
+    errorOutput = new ByteArrayOutputStream()
     commandLine 'docker', '--version'
-    println standardOutput.toString()
+    logger.info(standardOutput.toString())
+    logger.error(errorOutput.toString())
     ext.output = { return standardOutput.toString() }
 }
 logger.quiet("Listing the Docker images #1")
 exec {
     standardOutput = new ByteArrayOutputStream()
+    errorOutput = new ByteArrayOutputStream()
     commandLine 'docker', 'image', 'ls'
-    println standardOutput.toString()
+    logger.info(standardOutput.toString())
+    logger.error(errorOutput.toString())
     ext.output = { return standardOutput.toString() }
 }
 logger.quiet("Listing the Docker images #2")
 exec {
     standardOutput = new ByteArrayOutputStream()
+    errorOutput = new ByteArrayOutputStream()
     commandLine 'docker', 'images'
-    println standardOutput.toString()
+    logger.info(standardOutput.toString())
+    logger.error(errorOutput.toString())
     ext.output = { return standardOutput.toString() }
 }
 logger.quiet("Tagging Docker images")
                 exec {
                     standardOutput = new ByteArrayOutputStream()
+                    errorOutput = new ByteArrayOutputStream()
                     // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
                     commandLine 'docker', 'tag', "${rootProject.name}:${sanitizedVersion}", "${registry.value}:${label}"
+logger.info(standardOutput.toString())
+logger.error(errorOutput.toString())
                     ext.output = { return standardOutput.toString() }
                 }
             }
@@ -210,30 +225,38 @@ logger.quiet("Tagging Docker images")
 logger.quiet("Printing the Docker version")
 exec {
     standardOutput = new ByteArrayOutputStream()
+    errorOutput = new ByteArrayOutputStream()
     commandLine 'docker', '--version'
-    println standardOutput.toString()
+    logger.info(standardOutput.toString())
+    logger.error(errorOutput.toString())
     ext.output = { return standardOutput.toString() }
 }
 logger.quiet("Listing the Docker images #1")
 exec {
     standardOutput = new ByteArrayOutputStream()
+    errorOutput = new ByteArrayOutputStream()
     commandLine 'docker', 'image', 'ls'
-    println standardOutput.toString()
+    logger.info(standardOutput.toString())
+    logger.error(errorOutput.toString())
     ext.output = { return standardOutput.toString() }
 }
 logger.quiet("Listing the Docker images #2")
 exec {
     standardOutput = new ByteArrayOutputStream()
+    errorOutput = new ByteArrayOutputStream()
     commandLine 'docker', 'images'
-    println standardOutput.toString()
+    logger.info(standardOutput.toString())
+    logger.error(errorOutput.toString())
     ext.output = { return standardOutput.toString() }
 }
 logger.quiet("Pushing Docker images")
                 exec {
                     standardOutput = new ByteArrayOutputStream()
+                    errorOutput = new ByteArrayOutputStream()
                     // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
                     commandLine 'docker', 'push', "${registry.value}:${label}"
-println standardOutput.toString()
+logger.info(standardOutput.toString())
+logger.error(errorOutput.toString())
                     ext.output = { return standardOutput.toString() }
                 }
             }
