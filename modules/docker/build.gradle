@@ -79,55 +79,6 @@ task dockerImage(group: 'build', description: 'Builds the Docker image') {
     }
 }
 
-task dockerLogin(group: 'publishing', description: 'Logs in to remote Docker registries') {
-    // Here we should iterate the registries map instead of using hardoded registries, but to do so we should also put credentials in the map
-    doLast {
-        // make sure we have the credentials to log in
-        if ((findProperty("dockerHubUser") == null) || (findProperty("dockerHubToken") == null)) {
-            throw new GradleException("The environment variable DOCKER_HUB_USERNAME or DOCKER_HUB_TOKEN is not defined so I can't log in to GitHub's Docker Container Registry to publish the new Docker image")
-        }
-        if ((findProperty("gitHubUser") == null) || (findProperty("gitHubToken") == null)) {
-            throw new GradleException("The environment variable GITHUB_USERNAME or GITHUB_TOKEN is not defined so I can't log in to GitHub's Docker Container Registry to publish the new Docker image")
-        }
-
-        logger.info('Logging in Docker Hub')
-        exec {
-            logging.captureStandardOutput LogLevel.INFO
-            logging.captureStandardError  LogLevel.ERROR
-            // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
-            // The 'dockerHubUser' and 'dockerHubToken' variables are passed as credentials fetching them in GitHub Actions as 'secrets.DOCKER_HUB_USERNAME' and 'secrets.DOCKER_HUB_TOKEN', respectively.
-            // The actual environment variable names are 'ORG_GRADLE_PROJECT_dockerHubUser' and 'ORG_GRADLE_PROJECT_dockerHubToken'
-            // See the GitHub Actions definition for more.
-            if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
-                // Windows is used only on local development machines so there is no risk of exposing secrets from logs etc.
-                // To make the 'stdin' method work on Windows we should also take care of when running on cmd or PowerShell, as they have different
-                // means to echo environment variables. In short, it's not worth it and we just use the 'unsafe' method of passing the token as the '--password'
-                commandLine 'docker', 'login', '--username', findProperty("dockerHubUser"), '--password', findProperty("dockerHubToken")
-            } else {
-                commandLine 'echo', '$ORG_GRADLE_PROJECT_dockerHubToken', '|', 'docker', 'login', '--username', findProperty("dockerHubUser"), '--password-stdin'
-            }
-        }
-
-        logger.info('Logging in GitHub Container Registry')
-        exec {
-            logging.captureStandardOutput LogLevel.INFO
-            logging.captureStandardError  LogLevel.ERROR
-            // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
-            // The 'gitHubUser' and 'gitHubToken' variables are passed as credentials fetching them in GitHub Actions as 'secrets.GITHUB_ACTOR' and 'secrets.GITHUB_TOKEN', respectively.
-            // The actual environment variable names are 'ORG_GRADLE_PROJECT_gitHubUser' and 'ORG_GRADLE_PROJECT_gitHubToken'
-            // See the GitHub Actions definition for more.
-            if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
-                // Windows is used only on local development machines so there is no risk of exposing secrets from logs etc.
-                // To make the 'stdin' method work on Windows we should also take care of when running on cmd or PowerShell, as they have different
-                // means to echo environment variables. In short, it's not worth it and we just use the 'unsafe' method of passing the token as the '--password'
-                commandLine 'docker', 'login', 'ghcr.io', '--username', findProperty("gitHubUser"), '--password', findProperty("gitHubToken")
-            } else {
-                commandLine 'echo', '$ORG_GRADLE_PROJECT_gitHubToken', '|', 'docker', 'login', 'ghcr.io', '--username', findProperty("gitHubUser"), '--password-stdin'
-            }
-        }
-    }
-}
-
 // This is just a lifecycle task
 task dockerTag(group: 'build', description: 'Tags the Docker image for the configured registries and labels') {
     // Dependencies are created along with dynamic tasks below
@@ -172,9 +123,6 @@ registries.each { registry ->
         }
         tasks.create(group: 'publishing', name: "dockerPush-${registry.key}-${label}", description: "Pushes the Docker image to the ${registry.key} registry with the ${label} label") {
             // Task dependencies
-            dependsOn dockerLogin
-
-            // Only perform publishing if the Nyx release type enables publishing
             dependsOn tasks.named("dockerTag-${registry.key}-${label}")
 
 // TODO: uncomment this
@@ -189,10 +137,65 @@ logging.captureStandardOutput LogLevel.INFO
 logging.captureStandardError  LogLevel.ERROR
     commandLine 'docker', '--version'
 }
-logger.quiet("Pushing Docker images")
+logger.quiet("Logging out Docker from previous sessions")
+                logger.info('Logging out Docker from previous sessions')
                 exec {
-logging.captureStandardOutput LogLevel.INFO
-logging.captureStandardError  LogLevel.ERROR
+                    logging.captureStandardOutput LogLevel.INFO
+                    logging.captureStandardError  LogLevel.ERROR
+                    // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
+                    commandLine 'docker', 'logout'
+                }
+logger.quiet("Logging in Docker")
+
+                exec {
+                    logging.captureStandardOutput LogLevel.INFO
+                    logging.captureStandardError  LogLevel.ERROR
+                    // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
+                    //
+                    // Here we should have credentials parametrized in the 'registry' map so we could avoid the confitional below.
+                    //
+                    // The 'dockerHubUser', 'dockerHubToken', 'gitHubUser' and 'gitHubToken' variables are passed as credentials fetching them in
+                    // GitHub Actions as 'secrets.DOCKER_HUB_USERNAME', 'secrets.DOCKER_HUB_TOKEN', 'secrets.GITHUB_ACTOR' and 'secrets.GITHUB_TOKEN'
+                    // respectively.
+                    // The actual environment variable names are 'ORG_GRADLE_PROJECT_dockerHubUser', 'ORG_GRADLE_PROJECT_dockerHubToken',
+                    // 'ORG_GRADLE_PROJECT_gitHubUser' and 'ORG_GRADLE_PROJECT_gitHubToken'
+                    // See the GitHub Actions definition for more.
+                    if ('DockerHub'.equals(registry.key)) {
+                        logger.info('Logging in Docker Hub')
+                        if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
+                            // Windows is used only on local development machines so there is no risk of exposing secrets from logs etc.
+                            // To make the 'stdin' method work on Windows we should also take care of when running on cmd or PowerShell, as they have different
+                            // means to echo environment variables. In short, it's not worth it and we just use the 'unsafe' method of passing the token as the '--password'
+                            commandLine 'docker', 'login', '--username', findProperty("dockerHubUser"), '--password', findProperty("dockerHubToken")
+                        } else {
+                            commandLine 'echo', '$ORG_GRADLE_PROJECT_dockerHubToken', '|', 'docker', 'login', '--username', findProperty("dockerHubUser"), '--password-stdin'
+                        }
+                    }
+                    else if ('GitHubContainerRegistry'.equals(registry.key)) {
+                        logger.info('Logging in GitHub Container Registry')
+                        if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
+                            // Windows is used only on local development machines so there is no risk of exposing secrets from logs etc.
+                            // To make the 'stdin' method work on Windows we should also take care of when running on cmd or PowerShell, as they have different
+                            // means to echo environment variables. In short, it's not worth it and we just use the 'unsafe' method of passing the token as the '--password'
+                            commandLine 'docker', 'login', 'ghcr.io', '--username', findProperty("gitHubUser"), '--password', findProperty("gitHubToken")
+                        } else {
+                            commandLine 'echo', '$ORG_GRADLE_PROJECT_gitHubToken', '|', 'docker', 'login', 'ghcr.io', '--username', findProperty("gitHubUser"), '--password-stdin'
+                        }
+                    }
+                    else throw new GradleException("Don't know how to log in to registry "+registry.key)
+                }
+
+
+
+
+
+
+
+logger.quiet("Pushing Docker images")
+                logger.info("Pushing the Docker image to the ${registry.key} registry with the ${label} label")
+                exec {
+                    logging.captureStandardOutput LogLevel.INFO
+                    logging.captureStandardError  LogLevel.ERROR
                     // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
 //                    commandLine 'docker', 'push', "${registry.value}:${label}"
                     commandLine 'docker', 'image', 'push', "${registry.value}:${label}"
