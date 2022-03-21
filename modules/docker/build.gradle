@@ -104,7 +104,7 @@ task dockerLogin(group: 'publishing', description: 'Logs in to remote Docker reg
                 // means to echo environment variables. In short, it's not worth it and we just use the 'unsafe' method of passing the token as the '--password'
                 commandLine 'docker', 'login', '--username', findProperty("dockerHubUser"), '--password', findProperty("dockerHubToken")
             } else {
-                commandLine 'echo', '$ORG_GRADLE_PROJECT_dockerHubToken', '|', 'sudo', 'docker', 'login', '--username', findProperty("dockerHubUser"), '--password-stdin'
+                commandLine 'echo', '$ORG_GRADLE_PROJECT_dockerHubToken', '|', 'docker', 'login', '--username', findProperty("dockerHubUser"), '--password-stdin'
             }
         }
 
@@ -122,7 +122,7 @@ task dockerLogin(group: 'publishing', description: 'Logs in to remote Docker reg
                 // means to echo environment variables. In short, it's not worth it and we just use the 'unsafe' method of passing the token as the '--password'
                 commandLine 'docker', 'login', 'ghcr.io', '--username', findProperty("gitHubUser"), '--password', findProperty("gitHubToken")
             } else {
-                commandLine 'echo', '$ORG_GRADLE_PROJECT_gitHubToken', '|', 'sudo', 'docker', 'login', 'ghcr.io', '--username', findProperty("gitHubUser"), '--password-stdin'
+                commandLine 'echo', '$ORG_GRADLE_PROJECT_gitHubToken', '|', 'docker', 'login', 'ghcr.io', '--username', findProperty("gitHubUser"), '--password-stdin'
             }
         }
     }
@@ -162,23 +162,11 @@ registries.each { registry ->
 
             doLast {
                 logger.info("Tagging the Docker image for the ${registry.key} registry with the ${label} label")
-// TODO: remove these exec block
-logger.quiet("Printing the Docker version")
-exec {
-logging.captureStandardOutput LogLevel.INFO
-logging.captureStandardError  LogLevel.ERROR
-    commandLine 'sudo', 'docker', '--version'
-}
-logger.quiet("Tagging Docker images")
                 exec {
-logging.captureStandardOutput LogLevel.INFO
-logging.captureStandardError  LogLevel.ERROR
+                    logging.captureStandardOutput LogLevel.INFO
+                    logging.captureStandardError  LogLevel.ERROR
                     // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
-                    if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
-                        commandLine 'docker', 'tag', "${rootProject.name}:${sanitizedVersion}", "${registry.value}:${label}"
-                    } else {
-                        commandLine 'sudo', 'docker', 'tag', "${rootProject.name}:${sanitizedVersion}", "${registry.value}:${label}"
-                    }
+                    commandLine 'docker', 'tag', "${rootProject.name}:${sanitizedVersion}", "${registry.value}:${label}"
                 }
             }
         }
@@ -199,18 +187,15 @@ logger.quiet("Printing the Docker version")
 exec {
 logging.captureStandardOutput LogLevel.INFO
 logging.captureStandardError  LogLevel.ERROR
-    commandLine 'sudo', 'docker', '--version'
+    commandLine 'docker', '--version'
 }
 logger.quiet("Pushing Docker images")
                 exec {
 logging.captureStandardOutput LogLevel.INFO
 logging.captureStandardError  LogLevel.ERROR
                     // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
-                    if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
-                        commandLine 'docker', 'push', "${registry.value}:${label}"
-                    } else {
-                        commandLine 'sudo', 'docker', 'push', "${registry.value}:${label}"
-                    }
+//                    commandLine 'docker', 'push', "${registry.value}:${label}"
+                    commandLine 'docker', 'image', 'push', "${registry.value}:${label}"
                 }
             }
         }
