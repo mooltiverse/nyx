@@ -169,7 +169,7 @@ logger.quiet("Logging in Docker")
                             commandLine 'docker', 'login', 'docker.io', '--username', findProperty("dockerHubUser"), '--password', findProperty("dockerHubToken")
                         } else {
                             //commandLine 'echo', '$ORG_GRADLE_PROJECT_dockerHubToken', '|', 'docker', 'login', '--username', findProperty("dockerHubUser"), '--password-stdin'
-commandLine 'echo', findProperty("dockerHubToken"), '|', 'docker', 'login', '--username', findProperty("dockerHubUser"), '--password-stdin'
+commandLine 'docker', 'login', 'docker.io', '--username', findProperty("dockerHubUser"), '--password', findProperty("dockerHubToken")
                         }
                     }
                     else if ('GitHubContainerRegistry'.equals(registry.key)) {
@@ -185,16 +185,6 @@ commandLine 'echo', findProperty("dockerHubToken"), '|', 'docker', 'login', '--u
                     }
                     else throw new GradleException("Don't know how to log in to registry "+registry.key)
                 }
-
-
-logger.quiet("Listing Docker images")
-
-exec {
-    logging.captureStandardOutput LogLevel.INFO
-    logging.captureStandardError  LogLevel.ERROR
-    commandLine 'docker', 'image', 'ls', '-a'
-}
-
 
 
 
