@@ -168,7 +168,8 @@ logger.quiet("Logging in Docker")
                             // means to echo environment variables. In short, it's not worth it and we just use the 'unsafe' method of passing the token as the '--password'
                             commandLine 'docker', 'login', 'docker.io', '--username', findProperty("dockerHubUser"), '--password', findProperty("dockerHubToken")
                         } else {
-                            commandLine 'echo', '$ORG_GRADLE_PROJECT_dockerHubToken', '|', 'docker', 'login', '--username', findProperty("dockerHubUser"), '--password-stdin'
+                            //commandLine 'echo', '$ORG_GRADLE_PROJECT_dockerHubToken', '|', 'docker', 'login', '--username', findProperty("dockerHubUser"), '--password-stdin'
+commandLine 'echo', findProperty("dockerHubToken"), '|', 'docker', 'login', '--username', findProperty("dockerHubUser"), '--password-stdin'
                         }
                     }
                     else if ('GitHubContainerRegistry'.equals(registry.key)) {
