@@ -137,7 +137,6 @@ logging.captureStandardOutput LogLevel.INFO
 logging.captureStandardError  LogLevel.ERROR
     commandLine 'docker', '--version'
 }
-logger.quiet("Logging out Docker from previous sessions")
                 logger.info('Logging out Docker from previous sessions')
                 exec {
                     logging.captureStandardOutput LogLevel.INFO
@@ -162,7 +161,7 @@ logger.quiet("Logging in Docker")
                     // 'ORG_GRADLE_PROJECT_gitHubUser' and 'ORG_GRADLE_PROJECT_gitHubToken'
                     // See the GitHub Actions definition for more.
                     if ('DockerHub'.equals(registry.key)) {
-                        logger.info('Logging in Docker Hub')
+                        logger.info('Logging into Docker Hub')
                         if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
                             // Windows is used only on local development machines so there is no risk of exposing secrets from logs etc.
                             // To make the 'stdin' method work on Windows we should also take care of when running on cmd or PowerShell, as they have different
@@ -173,7 +172,7 @@ logger.quiet("Logging in Docker")
                         }
                     }
                     else if ('GitHubContainerRegistry'.equals(registry.key)) {
-                        logger.info('Logging in GitHub Container Registry')
+                        logger.info('Logging into GitHub Container Registry')
                         if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
                             // Windows is used only on local development machines so there is no risk of exposing secrets from logs etc.
                             // To make the 'stdin' method work on Windows we should also take care of when running on cmd or PowerShell, as they have different
@@ -187,7 +186,13 @@ logger.quiet("Logging in Docker")
                 }
 
 
+logger.quiet("Listing Docker images")
 
+exec {
+    logging.captureStandardOutput LogLevel.INFO
+    logging.captureStandardError  LogLevel.ERROR
+    commandLine 'docker', 'image', 'ls', '-a'
+}
 
 
 
