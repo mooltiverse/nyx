@@ -180,7 +180,8 @@ commandLine 'docker', 'login', 'docker.io', '--username', findProperty("dockerHu
                             // means to echo environment variables. In short, it's not worth it and we just use the 'unsafe' method of passing the token as the '--password'
                             commandLine 'docker', 'login', 'ghcr.io', '--username', findProperty("gitHubUser"), '--password', findProperty("gitHubToken")
                         } else {
-                            commandLine 'echo', '$ORG_GRADLE_PROJECT_gitHubToken', '|', 'docker', 'login', 'ghcr.io', '--username', findProperty("gitHubUser"), '--password-stdin'
+                            //commandLine 'echo', '$ORG_GRADLE_PROJECT_gitHubToken', '|', 'docker', 'login', 'ghcr.io', '--username', findProperty("gitHubUser"), '--password-stdin'
+commandLine 'docker', 'login', 'ghcr.io', '--username', findProperty("gitHubUser"), '--password', findProperty("gitHubToken")
                         }
                     }
                     else throw new GradleException("Don't know how to log in to registry "+registry.key)
