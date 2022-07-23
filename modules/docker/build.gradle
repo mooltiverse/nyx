@@ -145,6 +145,7 @@ logger.quiet("Logging out Docker from previous sessions")
                     // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
                     commandLine 'docker', 'logout'
                 }
+                
 logger.quiet("Logging in Docker")
 
                 exec {
