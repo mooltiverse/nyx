@@ -145,7 +145,7 @@ logger.quiet("Logging out Docker from previous sessions")
                     // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
                     commandLine 'docker', 'logout'
                 }
-                
+
 logger.quiet("Logging in Docker")
 
                 exec {
@@ -167,7 +167,7 @@ logger.quiet("Logging in Docker")
                             // Windows is used only on local development machines so there is no risk of exposing secrets from logs etc.
                             // To make the 'stdin' method work on Windows we should also take care of when running on cmd or PowerShell, as they have different
                             // means to echo environment variables. In short, it's not worth it and we just use the 'unsafe' method of passing the token as the '--password'
-                            commandLine 'docker', 'login', '--username', findProperty("dockerHubUser"), '--password', findProperty("dockerHubToken")
+                            commandLine 'docker', 'login', 'docker.io', '--username', findProperty("dockerHubUser"), '--password', findProperty("dockerHubToken")
                         } else {
                             commandLine 'echo', '$ORG_GRADLE_PROJECT_dockerHubToken', '|', 'docker', 'login', '--username', findProperty("dockerHubUser"), '--password-stdin'
                         }
