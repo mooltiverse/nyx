@@ -155,7 +155,7 @@ registries.each { registry ->
 
                         if( !findProperty("dockerHubUser") || !findProperty("dockerHubToken"))
                         {
-                            logger.warn("Warning: dockerHubUser and/or dockerHubToken are not defined environment variables. This will make the login and push tasks fail.")
+                            logger.warn("Warning: dockerHubUser and/or dockerHubToken environment variables are not defined. This will make the login and push tasks fail.")
                         }
 
                         if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
@@ -172,9 +172,18 @@ registries.each { registry ->
                     else if ('GitHubContainerRegistry'.equals(registry.key)) {
                         logger.info('Logging into GitHub Container Registry')
 
+if( !findProperty("gitHubUser") )
+{
+logger.warn("Warning!!!! gitHubUser environment variables is not defined.")
+}
+if( !findProperty("gitHubToken") )
+{
+logger.warn("Warning!!!! gitHubToken environment variables is not defined.")
+}
+
                         if( !findProperty("gitHubUser") || !findProperty("gitHubToken"))
                         {
-                            logger.warn("Warning: gitHubUser and/or gitHubToken are not defined environment variables. This will make the login and push tasks fail.")
+                            logger.warn("Warning: gitHubUser and/or gitHubToken environment variables are not defined. This will make the login and push tasks fail.")
                         }
 
                         if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
