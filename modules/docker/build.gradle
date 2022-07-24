@@ -30,6 +30,8 @@ def dockerContextDir = file(buildDir.path+'/docker')
 // - the repository 'mooltiverse/nyx' had to be created manually beforehand and permissions to write the repo had to be assigned to the service user.
 // - images are published to: https://hub.docker.com/repository/docker/mooltiverse/nyx
 // About GitHubContainerRegistry:
+// - in order to use the GITHUB_TOKEN issued by GitHub Actions, a first image must be published by hand and permissions set giving access to the repository
+//   according to https://docs.github.com/en/packages/managing-github-packages-using-github-actions-workflows/publishing-and-installing-a-package-with-github-actions#upgrading-a-workflow-that-accesses-ghcrio
 // - images are published to: https://github.com/orgs/mooltiverse/packages/container/package/nyx
 def registries = [ 'DockerHub':"${nyxOrganizationID}/${rootProject.name}",
                    'GitHubContainerRegistry':"ghcr.io/${nyxOrganizationID}/${rootProject.name}" ]
@@ -84,8 +86,7 @@ task dockerTag(group: 'build', description: 'Tags the Docker image for the confi
     // Dependencies are created along with dynamic tasks below
 
     // Only perform publishing if the Nyx release type enables publishing
-// TODO: uncomment this
-//    it.onlyIf { rootProject.nyxState.newRelease }
+    it.onlyIf { rootProject.nyxState.newRelease }
 }
 
 // This is just a lifecycle task
@@ -93,8 +94,7 @@ task dockerPush(group: 'publishing', description: 'Pushes the Docker image to th
     // Dependencies are created along with dynamic tasks below
 
     // Only perform publishing if the Nyx release type enables publishing
-// TODO: uncomment this
-//    it.onlyIf { rootProject.nyxState.newRelease }
+    it.onlyIf { rootProject.nyxState.newRelease }
 }
 
 // For each target registry and each label:
@@ -108,8 +108,7 @@ registries.each { registry ->
             dependsOn dockerImage
 
             // Only perform publishing if the Nyx release type enables publishing
-// TODO: uncomment this
-//            it.onlyIf { rootProject.nyxState.newRelease }
+            it.onlyIf { rootProject.nyxState.newRelease }
 
             doLast {
                 logger.info("Tagging the Docker image for the ${registry.key} registry with the ${label} label")
@@ -125,8 +124,7 @@ registries.each { registry ->
             // Task dependencies
             dependsOn tasks.named("dockerTag-${registry.key}-${label}")
 
-// TODO: uncomment this
-//            onlyIf { rootProject.nyxState.newRelease }
+            onlyIf { rootProject.nyxState.newRelease }
 
             doLast {
                 logger.info('Logging out Docker from previous sessions')
@@ -185,8 +183,9 @@ registries.each { registry ->
                         } else {
                             //This version using the '--password-stdin' option doesn't work but credentials are not exposed in GitHub Actions logs anyway, so let's use the plain version
                             //commandLine 'echo', '$ORG_GRADLE_PROJECT_gitHubToken', '|', 'docker', 'login', 'ghcr.io', '--username', findProperty("gitHubUser"), '--password-stdin'
+                            //In order to use the GITHUB_TOKEN issued by GitHub Actions, a first image must be published by hand and permissions set giving access to the repository
+                            //according to https://docs.github.com/en/packages/managing-github-packages-using-github-actions-workflows/publishing-and-installing-a-package-with-github-actions#upgrading-a-workflow-that-accesses-ghcrio
                             commandLine 'docker', 'login', 'ghcr.io', '--username', findProperty("gitHubUser"), '--password', findProperty("gitHubToken")
-//commandLine 'docker', 'login', 'ghcr.io', '--username', '$', '--password', findProperty("gitHubToken")
                         }
                     }
                     else throw new GradleException("Don't know how to log in to registry "+registry.key)
