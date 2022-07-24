@@ -172,18 +172,6 @@ registries.each { registry ->
                     else if ('GitHubContainerRegistry'.equals(registry.key)) {
                         logger.info('Logging into GitHub Container Registry')
 
-if( !findProperty("gitHubUser") )
-{
-logger.warn("Warning!!!! gitHubUser environment variables is not defined.")
-}
-if( !findProperty("gitHubToken") )
-{
-logger.warn("Warning!!!! gitHubToken environment variables is not defined.")
-}
-logger.warn("Here's the USER")
-commandLine 'echo', '$'
-commandLine 'echo', findProperty("gitHubUser")
-
                         if( !findProperty("gitHubUser") || !findProperty("gitHubToken"))
                         {
                             logger.warn("Warning: gitHubUser and/or gitHubToken environment variables are not defined. This will make the login and push tasks fail.")
@@ -197,8 +185,8 @@ commandLine 'echo', findProperty("gitHubUser")
                         } else {
                             //This version using the '--password-stdin' option doesn't work but credentials are not exposed in GitHub Actions logs anyway, so let's use the plain version
                             //commandLine 'echo', '$ORG_GRADLE_PROJECT_gitHubToken', '|', 'docker', 'login', 'ghcr.io', '--username', findProperty("gitHubUser"), '--password-stdin'
-                            //commandLine 'docker', 'login', 'ghcr.io', '--username', findProperty("gitHubUser"), '--password', findProperty("gitHubToken")
-commandLine 'docker', 'login', 'ghcr.io', '--username', '$', '--password', findProperty("gitHubToken")
+                            commandLine 'docker', 'login', 'ghcr.io', '--username', findProperty("gitHubUser"), '--password', findProperty("gitHubToken")
+//commandLine 'docker', 'login', 'ghcr.io', '--username', '$', '--password', findProperty("gitHubToken")
                         }
                     }
                     else throw new GradleException("Don't know how to log in to registry "+registry.key)
