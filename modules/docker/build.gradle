@@ -182,6 +182,7 @@ logger.warn("Warning!!!! gitHubToken environment variables is not defined.")
 }
 logger.warn("Here's the USER")
 commandLine 'echo', '$'
+commandLine 'echo', findProperty("gitHubUser")
 
                         if( !findProperty("gitHubUser") || !findProperty("gitHubToken"))
                         {
