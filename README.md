@@ -23,6 +23,11 @@ The project is open source and hosted on [GitHub](https://github.com/mooltiverse
 
 ## Availability
 
+### Docker images
+
+* on [Docker Hub](https://hub.docker.com/repository/docker/mooltiverse/nyx)
+* on [GitHub container registry](https://github.com/mooltiverse/nyx/pkgs/container/nyx)
+
 ### Build tools
 
 * [Gradle plug-in](https://plugins.gradle.org/plugin/com.mooltiverse.oss.nyx)
@@ -48,7 +53,7 @@ The project is open source and hosted on [GitHub](https://github.com/mooltiverse
 * Articles:
   * [Semantic Release Automation with Gradle using Nyx](https://levelup.gitconnected.com/semantic-release-automation-with-gradle-using-nyx-ba345235a365)
 * Deliverables:
-  * [GitHub packages](https://github.com/mooltiverse/nyx/packages)
+  * [GitHub packages](https://github.com/mooltiverse/nyx/packages) and [GitHub container images](https://github.com/mooltiverse/nyx/pkgs/container/nyx)
   * [Maven repository](https://search.maven.org/search?q=g:com.mooltiverse.oss.nyx) ([raw version](https://repo.maven.apache.org/maven2/com/mooltiverse/oss/nyx/))
   * [Gradle plugin](https://plugins.gradle.org/plugin/com.mooltiverse.oss.nyx)
 

@@ -33,6 +33,91 @@ The command line is not yet available and this section is marked as a TODO.
 The command line is not yet available and this section is marked as a TODO.
 {: .notice--warning}
 
+## Using the Docker image
+
+Many teams prefer using Docker containers for their CI/CD and local development environments. If that's your case you can use the Docker container that comes out of the box with Nyx.
+
+The Docker images are published onto the two main registries:
+
+* [Docker Hub](https://hub.docker.com/repository/docker/mooltiverse/nyx) (the default)
+* [GitHub Container Registry](https://github.com/mooltiverse/nyx/pkgs/container/nyx)
+
+Nyx' Docker image has a small footprint (less than 10Mb) and uses [Alpine Linux](https://www.alpinelinux.org/) as the base image.
+
+All the examples in this page assume you're using the `latest` image pulling it from [Docker Hub](https://hub.docker.com/repository/docker/mooltiverse/nyx). They also assume you're making an ephemeral use of the container (you run it and dispose it every time). In case you need advanced use cases other than these please refer to the official [Docker Documentation](https://docs.docker.com/).
+{: .notice--info}
+
+### Requisites
+
+All you need is a recent version of [Docker](https://www.docker.com/) installed and running.
+
+### Pull the image
+
+Let's start by pulling the image from the public registry. Open a shell and run:
+
+```bash
+$ docker pull mooltiverse/nyx:latest
+latest: Pulling from mooltiverse/nyx
+ab6db1bc80d0: Pull complete
+[...]
+Digest: sha256:976f4821d643e02fc55c884cd6c9af5e958011132145150b7dd97e01d71ba055
+Status: Downloaded newer image for mooltiverse/latest
+mooltiverse/latest
+```
+
+and make sure the new image is there:
+
+```bash
+$ docker image ls
+REPOSITORY                                            TAG                 IMAGE ID       CREATED        SIZE
+mooltiverse/nyx                                       latest              a14cbc284e81   2 days ago     7.35MB
+```
+
+### Run the container
+
+To run the container you simply run a command like:
+
+```bash
+$ docker run -it --rm -v /local/path/to/project:/project mooltiverse/nyx:latest
+```
+
+A few things to note here:
+
+1. there is no explicit command executed within the container because [`nyx infer`]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer) is executed by default. This will generate and display the latest version for the project but will not change anything in the project directory. To run other commands you can specify them explicitly, as shown below
+2. a local folder (`/local/path/to/project`) is mounted from the host into the container at the default location `/project`. You need to change `/local/path/to/project` to whatever path is hosting your Git repository, or mount a Docker volume hosting the Git repository in case you already have one (in this case, pass your volume name to the command line like `docker run -it --rm -v project-volume:/project mooltiverse/nyx:latest [...]`, where `project-volume` has to be changed to your volume name)
+3. Nyx is using the default configuration means ([configuration files]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}#supported-file-grammars) available in the project directory at standard locations)
+
+Let's see how to tweak these.
+
+#### Running specific commands
+
+In order to run a specific command you need to pass it on the command line, like:
+
+```bash
+$ docker run -it --rm -v /local/path/to/project:/project mooltiverse/nyx:latest nyx <COMMAND>
+```
+
+So if you need to run the [publish]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#publish) command, run the container as:
+
+```bash
+$ docker run -it --rm -v /local/path/to/project:/project mooltiverse/nyx:latest nyx publish
+```
+
+#### Mounting the project volume or folder
+
+You can pass Nyx your project folder as a path on the host or as a Docker volume. Whet you need to do is:
+
+* replace `/local/path/to/project` with an actual host path when the project directory is shared from the Docker host to the container
+* replace `/local/path/to/project` with a Docker volume name when the project directory is already in a Docker volume
+
+For more on volumes and mounts please see [the official Docker documentation](https://docs.docker.com/storage/volumes/).
+
+#### Passing the configuration to Nyx
+
+Generally speaking, configuring Nyx within a container is just like using it from the [command line](#using-the-command-line). This means that if [configuration files]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}#supported-file-grammars) are available in the project directory at their default locations they will be loaded as usual and if additional options are passed on the [command line]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}#command-line-options) they will be used.
+
+The one caveat abous passing configuration as [environment variables]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}#environment-variables) in a Docker container is about setting those variables by means of one or more `-e` [flags](https://docs.docker.com/engine/reference/run/#env-environment-variables).
+
 ## Using the Gradle plugin
 
 When using Gradle, the native Nyx plugin is the easiest and most effective way of using Nyx.

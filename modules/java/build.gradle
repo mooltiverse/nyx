@@ -123,7 +123,7 @@ allprojects {
     /*------------------------------------------------------------------------------
       Repositories and dependencies
       https://docs.gradle.org/current/userguide/dependency_management_for_java_projects.html
-    */
+    ------------------------------------------------------------------------------*/
     repositories {
         mavenCentral()
         maven {

@@ -35,6 +35,10 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 11
+    - name: Set up Go 1.17
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.17.6
     # Start with a new empty cache (no restore-keys) and save the job output cache as -assemble
     - name: Set up the pipeline cache
       uses: actions/cache@v2
@@ -61,6 +65,11 @@ jobs:
       with:
         name: jar
         path: '**/build/libs/'
+    - name: Archive Binaries
+      uses: actions/upload-artifact@v2
+      with:
+        name: bin
+        path: 'modules/go/main/build/bin/*'
   
   unit-test:
     needs: assemble
@@ -74,6 +83,10 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 11
+    - name: Set up Go 1.17
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.17.6
     # Start from the -assemble cache and save the job output cache as -unit-test
     - name: Set up the pipeline cache
       uses: actions/cache@v2
@@ -124,6 +137,10 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 11
+    - name: Set up Go 1.17
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.17.6
     # Storing the output cache probably fails because the size is over the 5GB. If it fails you
     # see a message like:
     #     Warning: Cache size of ~5456 MB (5720816120 B) is over the 5GB limit, not saving cache.
@@ -182,6 +199,10 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 11
+    - name: Set up Go 1.17
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.17.6
     # Storing the output cache probably fails because the size is over the 5GB. If it fails you
     # see a message like:
     #     Warning: Cache size of ~5456 MB (5720816120 B) is over the 5GB limit, not saving cache.
@@ -235,6 +256,10 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 11
+    - name: Set up Go 1.17
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.17.6
     # Start from the -unit-test cache and save the job output cache as -check
     - name: Set up the pipeline cache
       uses: actions/cache@v2
@@ -282,6 +307,10 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 11
+    - name: Set up Go 1.17
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.17.6
     # Start from the -check cache and save the job output cache as -build
     - name: Set up the pipeline cache
       uses: actions/cache@v2
@@ -320,6 +349,12 @@ jobs:
   publish:
     needs: build
     runs-on: ubuntu-latest
+    # These permissions are assigned to the GITHUB_TOKEN to allow to write packages to the GitHub package registry when using the GITHUB_TOKEN
+    # You laso need to make sure (after a first package has been published) you followed the 'Upgrading a workflow that accesses ghcr.io' instructions at:
+    # - https://docs.github.com/en/packages/managing-github-packages-using-github-actions-workflows/publishing-and-installing-a-package-with-github-actions#upgrading-a-workflow-that-accesses-ghcrio
+    # otherwise GitHub Actions won't be able to access the repository to publish packages.
+    permissions:
+      packages: write
     steps:
       - name: Git checkout
         uses: actions/checkout@v2
@@ -329,6 +364,10 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
+      - name: Set up Go 1.17
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.17.6
       # Start from the -build cache and save the job output cache as -publish
       - name: Set up the pipeline cache
         uses: actions/cache@v2
@@ -345,9 +384,19 @@ jobs:
         run: chmod +x gradlew
       - name: Publish with Gradle
         env:
+          # The 'gitHubUser' and 'gitHubToken' variables are passed as credentials to publish packages to the GitHub Packages repository, see: https://docs.github.com/en/actions/publishing-packages/publishing-java-packages-with-gradle#publishing-packages-to-github-packages.
+          # The GH_TOKEN is used by Nyx configured service 'github' (see the top level settings.gradle) to publish the release to GitHub Releases.
+          # The 'GITHUB_TOKEN' is automatically generated and provided by GitHub Actions so it doesn't need to be manually created. We just use it and copy as Gradle properties or environment variables.
+          # See:
+          # - the Automatic Token Authentication: https://docs.github.com/en/actions/security-guides/automatic-token-authentication
+          # - the 'secrets' Context:  https://docs.github.com/en/actions/learn-github-actions/contexts
+          # - the Default Environment Variables: https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables
+          # - enabling GITHUB_TOKEN to publish packages: https://docs.github.com/en/packages/managing-github-packages-using-github-actions-workflows/publishing-and-installing-a-package-with-github-actions#upgrading-a-workflow-that-accesses-ghcrio
           # See the top level https://github.com/mooltiverse/nyx/blob/master/CONTRIBUTING.md#contributing-code file for details about passing these values when testing locally
-          ORG_GRADLE_PROJECT_gitHubUser: ${{ secrets.GITHUB_USERNAME }}
+          ORG_GRADLE_PROJECT_gitHubUser: ${{ github.actor }}
           ORG_GRADLE_PROJECT_gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          ORG_GRADLE_PROJECT_dockerHubUser: ${{ secrets.DOCKER_HUB_USERNAME }}
+          ORG_GRADLE_PROJECT_dockerHubToken: ${{ secrets.DOCKER_HUB_TOKEN }}
           ORG_GRADLE_PROJECT_ossrhUsername: ${{ secrets.MAVEN_USER }}
           ORG_GRADLE_PROJECT_ossrhPassword: ${{ secrets.MAVEN_PASSWORD }}
           ORG_GRADLE_PROJECT_signingKeyBase64: ${{ secrets.GPG_PRIVATE_KEY_BASE64 }}
@@ -374,6 +423,10 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
+      - name: Set up Go 1.17
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.17.6
       # Start from the -publish cache and save the job output cache as -release
       - name: Set up the pipeline cache
         uses: actions/cache@v2
@@ -397,8 +450,9 @@ jobs:
           # - the Automatic Token Authentication: https://docs.github.com/en/actions/security-guides/automatic-token-authentication
           # - the 'secrets' Context:  https://docs.github.com/en/actions/learn-github-actions/contexts
           # - the Default Environment Variables: https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables
+          # See the top level https://github.com/mooltiverse/nyx/blob/master/CONTRIBUTING.md#contributing-code file for details about passing these values when testing locally
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ORG_GRADLE_PROJECT_gitHubUser: ${{ secrets.GITHUB_ACTOR }}
+          ORG_GRADLE_PROJECT_gitHubUser: ${{ github.actor }}
           ORG_GRADLE_PROJECT_gitHubToken: ${{ secrets.GITHUB_TOKEN }}
         run: ./gradlew release --build-cache --info --stacktrace
       - name: Archive Nyx state file
