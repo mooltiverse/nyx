@@ -8,7 +8,7 @@ WORKDIR /project
 VOLUME /project
 
 # Put the binary into the image
-COPY nyx-linux-amd64 /nyx
+COPY nyx-linux-amd64 /usr/bin/nyx
 
 # Run Infer by default
-CMD ["/nyx", "infer"]
+CMD ["/usr/bin/nyx", "infer"]

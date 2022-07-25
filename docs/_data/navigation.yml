@@ -46,8 +46,10 @@ nav-user-guide:
   - title: Quick Start
     url: /guide/user/quick-start/
     children:
-#      - title: "Command Line"
-#        url: /guide/user/quick-start/command-line/
+      - title: "Command Line"
+        url: /guide/user/quick-start/command-line/
+      - title: "Docker Container"
+        url: /guide/user/quick-start/docker-container/
       - title: "Gradle Plugin"
         url: /guide/user/quick-start/gradle-plugin/
   - title: Introduction
