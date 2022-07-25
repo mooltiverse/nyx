@@ -349,12 +349,6 @@ jobs:
   publish:
     needs: build
     runs-on: ubuntu-latest
-    # These permissions are assigned to the GITHUB_TOKEN to allow to write packages to the GitHub package registry when using the GITHUB_TOKEN
-    # You laso need to make sure (after a first package has been published) you followed the 'Upgrading a workflow that accesses ghcr.io' instructions at:
-    # - https://docs.github.com/en/packages/managing-github-packages-using-github-actions-workflows/publishing-and-installing-a-package-with-github-actions#upgrading-a-workflow-that-accesses-ghcrio
-    # otherwise GitHub Actions won't be able to access the repository to publish packages.
-    permissions:
-      packages: write
     steps:
       - name: Git checkout
         uses: actions/checkout@v2
