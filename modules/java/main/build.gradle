@@ -34,7 +34,7 @@ dependencies {
   implementation        'com.fasterxml.jackson.core:jackson-databind:2.13.0'                       // Jackson JSON library (https://github.com/FasterXML/jackson)
   implementation        'com.fasterxml.jackson.core:jackson-annotations:2.13.0'                    // Jackson JSON library (https://github.com/FasterXML/jackson)
   implementation        'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.13.0'          // Jackson YAML library (https://github.com/FasterXML/jackson-dataformats-text/tree/master/yaml)
-  implementation        'com.github.spullara.mustache.java:compiler:0.9.10'                        // Mustache library (https://github.com/spullara/mustache.java)
+  implementation        'com.github.jknack:handlebars:4.3.0'                                       // Handlebars library (https://github.com/jknack/handlebars.java)
 
   // The SLF4J framework that prints all test output to System err
   // See http://www.slf4j.org/apidocs/org/slf4j/impl/SimpleLogger.html for the system properties available to change verbosity levels

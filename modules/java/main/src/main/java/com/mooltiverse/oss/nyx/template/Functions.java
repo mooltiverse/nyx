@@ -16,6 +16,10 @@ import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.github.jknack.handlebars.HelperRegistry;
+import com.github.jknack.handlebars.Helper;
+import com.github.jknack.handlebars.Options;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,9 +72,58 @@ class Functions {
     }
 
     /**
+     * Registers all the available functions as a helpers with their names for the given registry.
+     * 
+     * @param registry the registry to register the helpers to
+     */
+    public static void registerHelpers(HelperRegistry registry) {
+        registry.registerHelper(Lower.NAME,                   new Lower());
+        registry.registerHelper(Upper.NAME,                   new Upper());
+        registry.registerHelper(Trim.NAME,                    new Trim());
+        registry.registerHelper(First.NAME,                   new First());
+        registry.registerHelper(FirstLower.NAME,              new FirstLower());
+        registry.registerHelper(FirstUpper.NAME,              new FirstUpper());
+        registry.registerHelper(Last.NAME,                    new Last());
+        registry.registerHelper(LastLower.NAME,               new LastLower());
+        registry.registerHelper(LastUpper.NAME,               new LastUpper());
+        registry.registerHelper(Sanitize.NAME,                new Sanitize());
+        registry.registerHelper(SanitizeLower.NAME,           new SanitizeLower());
+        registry.registerHelper(SanitizeUpper.NAME,           new SanitizeUpper());
+        registry.registerHelper(Short5.NAME,                  new Short5());
+        registry.registerHelper(Short6.NAME,                  new Short6());
+        registry.registerHelper(Short7.NAME,                  new Short7());
+        registry.registerHelper(TimestampISO8601.NAME,        new TimestampISO8601());
+        registry.registerHelper(TimestampYYYYMMDDHHMMSS.NAME, new TimestampYYYYMMDDHHMMSS());
+
+        registry.registerHelper(Environment.User.NAME,        new Environment.User());
+        registry.registerHelper(Environment.Variable.NAME,    new Environment.Variable());
+
+        registry.registerHelper(File.Content.NAME,            new File.Content());
+        registry.registerHelper(File.Exists.NAME,             new File.Exists());
+    }
+
+    /**
+     * This class provides basic features for functions.
+     * 
+     * In particular this class offers the {@link Helper} implementation as an adapter method
+     * used by Handlebars to invoke the actual business method of the function.
+     */
+    static abstract class AbstractFunction implements Function<String,String>, Helper<Object> {
+        /**
+         * {@inheritDoc}}
+         */
+        @Override
+        public Object apply(Object context, Options options)
+            throws IOException {
+            // The docs are poorly documented by all examples show that options.fn(this) is the only way to have the block resolved
+            return (Objects.isNull(options) ? "" : apply(options.fn(this).toString()));
+        }
+    }
+
+    /**
      * This function returns the lower case representation of the input string.
      */
-    public static class Lower implements Function<String,String> {
+    public static class Lower extends AbstractFunction {
         /**
          * The name to use for this function.
          */
@@ -94,7 +147,7 @@ class Functions {
     /**
      * This function returns the trimmed case representation of the input string.
      */
-    public static class Trim implements Function<String,String> {
+    public static class Trim extends AbstractFunction {
         /**
          * The name to use for this function.
          */
@@ -118,7 +171,7 @@ class Functions {
     /**
      * This function returns the upper case representation of the input string.
      */
-    public static class Upper implements Function<String,String> {
+    public static class Upper extends AbstractFunction {
         /**
          * The name to use for this function.
          */
@@ -143,7 +196,7 @@ class Functions {
      * This function returns the input string with everything from the first occurrence of a character other
      * than letters and positive digits discarded.
      */
-    public static class First implements Function<String,String> {
+    public static class First extends AbstractFunction {
         /**
          * The name to use for this function.
          */
@@ -171,7 +224,7 @@ class Functions {
      * This function returns the input string with everything from the first occurrence of a character other
      * than letters and positive digits discarded and the remainder transformed to lower case.
      */
-    public static class FirstLower implements Function<String,String> {
+    public static class FirstLower extends AbstractFunction {
         /**
          * The name to use for this function.
          */
@@ -198,7 +251,7 @@ class Functions {
      * This function returns the input string with everything from the first occurrence of a character other
      * than letters and positive digits discarded and the remainder transformed to upper case.
      */
-    public static class FirstUpper implements Function<String,String> {
+    public static class FirstUpper extends AbstractFunction {
         /**
          * The name to use for this function.
          */
@@ -225,7 +278,7 @@ class Functions {
      * This function returns the last part of the input string that does not contains characters other than
      * letters and positive digits.
      */
-    public static class Last implements Function<String,String> {
+    public static class Last extends AbstractFunction {
         /**
          * The name to use for this function.
          */
@@ -253,7 +306,7 @@ class Functions {
      * This function returns the last part of the input string that does not contains characters other than
      * letters and positive digits and the remainder transformed to lower case.
      */
-    public static class LastLower implements Function<String,String> {
+    public static class LastLower extends AbstractFunction {
         /**
          * The name to use for this function.
          */
@@ -280,7 +333,7 @@ class Functions {
      * This function returns the last part of the input string that does not contains characters other than
      * letters and positive digits and the remainder transformed to upper case.
      */
-    public static class LastUpper implements Function<String,String> {
+    public static class LastUpper extends AbstractFunction {
         /**
          * The name to use for this function.
          */
@@ -306,7 +359,7 @@ class Functions {
     /**
      * This function returns the input string with everything other than letters and positive digits discarded.
      */
-    public static class Sanitize implements Function<String,String> {
+    public static class Sanitize extends AbstractFunction {
         /**
          * The name to use for this function.
          */
@@ -331,7 +384,7 @@ class Functions {
      * This function returns the input string with everything other than letters and positive digits discarded
      * and the remainder transformed to lower case.
      */
-    public static class SanitizeLower implements Function<String,String> {
+    public static class SanitizeLower extends AbstractFunction {
         /**
          * The name to use for this function.
          */
@@ -358,7 +411,7 @@ class Functions {
      * This function returns the input string with everything other than letters and positive digits discarded
      * and the remainder transformed to upper case.
      */
-    public static class SanitizeUpper implements Function<String,String> {
+    public static class SanitizeUpper extends AbstractFunction {
         /**
          * The name to use for this function.
          */
@@ -385,7 +438,7 @@ class Functions {
      * This function returns the first 5 characters of the input string, if it's longer than 5 characters,
      * otherwise returns the input string.
      */
-    public static class Short5 implements Function<String,String> {
+    public static class Short5 extends AbstractFunction {
         /**
          * The name to use for this function.
          */
@@ -412,7 +465,7 @@ class Functions {
      * This function returns the first 6 characters of the input string, if it's longer than 6 characters,
      * otherwise returns the input string.
      */
-    public static class Short6 implements Function<String,String> {
+    public static class Short6 extends AbstractFunction {
         /**
          * The name to use for this function.
          */
@@ -439,7 +492,7 @@ class Functions {
      * This function returns the first 7 characters of the input string, if it's longer than 7 characters,
      * otherwise returns the input string.
      */
-    public static class Short7 implements Function<String,String> {
+    public static class Short7 extends AbstractFunction {
         /**
          * The name to use for this function.
          */
@@ -467,7 +520,7 @@ class Functions {
      * <a href="https://www.unixtimestamp.com/">unix format</a> and returns it formatted as
      * <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO 8601</a> UTC timestamp.
      */
-    public static class TimestampISO8601 implements Function<String,String> {
+    public static class TimestampISO8601 extends AbstractFunction {
         /**
          * The name to use for this function.
          */
@@ -507,7 +560,7 @@ class Functions {
      * <a href="https://www.unixtimestamp.com/">unix format</a> and returns it formatted as
      * {@code YYYYMMDDHHMMSS} UTC.
      */
-    public static class TimestampYYYYMMDDHHMMSS implements Function<String,String> {
+    public static class TimestampYYYYMMDDHHMMSS extends AbstractFunction {
         /**
          * The name to use for this function.
          */
@@ -554,7 +607,7 @@ class Functions {
         /**
          * This function returns the value of the environment variable with the given name, if any.
          */
-        public static class Variable implements Function<String,String> {
+        public static class Variable extends AbstractFunction {
             /**
              * The name to use for this function.
              */
@@ -579,7 +632,7 @@ class Functions {
         /**
          * This function returns the current user name. The input parameter is ignored.
          */
-        public static class User implements Function<String,String> {
+        public static class User extends AbstractFunction {
             /**
              * The name to use for this function.
              */
@@ -610,7 +663,7 @@ class Functions {
         /**
          * This function returns the content of the given file, if any.
          */
-        public static class Content implements Function<String,String> {
+        public static class Content extends AbstractFunction {
             /**
              * The name to use for this function.
              */
@@ -649,7 +702,7 @@ class Functions {
         /**
          * This function returns {@code true} if the file with the given name exists, {@code false} otherwise.
          */
-        public static class Exists implements Function<String,String> {
+        public static class Exists extends AbstractFunction {
             /**
              * The name to use for this function.
              */

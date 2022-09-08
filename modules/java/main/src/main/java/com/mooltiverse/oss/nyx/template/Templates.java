@@ -1,3 +1,18 @@
+/*
+ * Copyright 2020 Mooltiverse
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.mooltiverse.oss.nyx.template;
 
 import java.io.IOException;
@@ -9,24 +24,27 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import com.github.mustachejava.DefaultMustacheFactory;
-import com.github.mustachejava.Mustache;
-import com.github.mustachejava.MustacheFactory;
+import com.github.jknack.handlebars.Context;
+import com.github.jknack.handlebars.context.FieldValueResolver;
+import com.github.jknack.handlebars.context.JavaBeanValueResolver;
+import com.github.jknack.handlebars.context.MapValueResolver;
+import com.github.jknack.handlebars.context.MethodValueResolver;
+import com.github.jknack.handlebars.Handlebars;
 
 /**
  * The base class used for template management and rendering, encapsulating the
- * <a href="https://github.com/spullara/mustache.java">Mustache.java</a> library.
+ * <a href="https://jknack.github.io/handlebars.java/">Handlebars.java</a> library.
  */
 public class Templates {
     /**
      * The opening delimiter of a template.
      */
-    private static final String OPENING_DELIMITER = "{{";
+    private static final String OPENING_DELIMITER = Handlebars.DELIM_START;
 
     /**
      * The closing delimiter of a template.
      */
-    private static final String CLOSING_DELIMITER = "}}";
+    private static final String CLOSING_DELIMITER = Handlebars.DELIM_END;
 
     /**
      * Default constructor is private on purpose.
@@ -63,9 +81,22 @@ public class Templates {
      */
     public static String render(String template, Object scope)
         throws IOException {
-        StringWriter writer = new StringWriter();
-        render(new StringReader(template), scope, writer);
-        return writer.toString();
+        // prepare the context with the value object (scope) and all the available resolvers
+        Context handlebarsContext = Context.newBuilder(scope)
+            .resolver(
+                JavaBeanValueResolver.INSTANCE,
+                MethodValueResolver.INSTANCE,
+                FieldValueResolver.INSTANCE,
+                MapValueResolver.INSTANCE
+            ).build();
+
+        Handlebars handlebars = new Handlebars();
+        // register the helper functions
+        Functions.registerHelpers(handlebars);
+        // this avoids handlebar to add extra new lines and, instead,
+        // stick with Mustache's rules about spaces and new lines
+        handlebars.prettyPrint(true);
+        return handlebars.compileInline(template).apply(handlebarsContext);
     }
 
     /**
@@ -81,9 +112,9 @@ public class Templates {
      */
     public static String render(Reader template, Object scope)
         throws IOException {
-        StringWriter writer = new StringWriter();
-        render(template, scope, writer);
-        return writer.toString();
+        StringWriter templateString = new StringWriter();
+        template.transferTo(templateString);
+        return render(templateString.toString(), scope);
     }
 
     /**
@@ -98,15 +129,7 @@ public class Templates {
      */
     public static void render(Reader template, Object scope, Writer writer)
         throws IOException {
-        MustacheFactory mf = new DefaultMustacheFactory();
-        Mustache mustache = mf.compile(template, "template");
-
-        // prepare the scopes with the object passed by the used plust the map of all standard functions
-        List<Object> scopes = new ArrayList<Object>(2);
-        if (!Objects.isNull(scope))
-            scopes.add(scope);
-        scopes.add(Functions.FUNCTIONS);
-        mustache.execute(writer, scopes).flush();
+        writer.write(render(template, scope));
     }
 
     /**

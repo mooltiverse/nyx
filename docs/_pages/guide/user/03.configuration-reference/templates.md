@@ -7,7 +7,10 @@ permalink: /guide/user/configuration-reference/templates/
 
 Templates can be used in several places to make configuration dynamic or parametrize text outputs, be them strings, messages or even whole text files.
 
-Nyx uses [Mustache](https://mustache.github.io/) templates passing the engine the [internal state]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/index.md %}) for the template scope (the template input value) so it's easy to figure out which values are available. Moreover a few [functions](#functions) (lambdas) are available for common needs.
+Nyx uses [Handlebars](https://handlebarsjs.com/) templates passing the engine the [internal state]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/index.md %}) for the template scope (the template input value) so it's easy to figure out which values are available. Moreover a few [functions](#functions) (lambdas) are available for common needs.
+
+Handlebars is also compatible with [Mustache](https://mustache.github.io/) templates so you can reuse them.
+{: .notice--info}
 
 Tip: when writing templates you may find useful to [serialize the state to a file]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#state-file) for reference or troubleshooting.
 {: .notice--info}
@@ -30,7 +33,7 @@ option = "Hello World"
 
 Often times you just need to use a simple value from the [Nyx state]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/index.md %}) to be the result of the template.
 
-This is fairly simple as you just need to wrap the name of the [state]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/index.md %}) attribute with double curly braces, like `{% raw %}{{attribute}}{% endraw %}`. This is the simplest form of a [Mustache tag](https://mustache.github.io/mustache.5.html) (and yes, the double curly brances are the *mustaches*).
+This is fairly simple as you just need to wrap the name of the [state]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/index.md %}) attribute with double curly braces, like `{% raw %}{{attribute}}{% endraw %}`. This is the simplest form of a [Handlebars expression](https://handlebarsjs.com/guide/#simple-expressions) (and yes, the double curly brances are the *handlebars*, or *mustaches*).
 
 So if we want to set our configuration `option` to the current value of the `version` attribute from the [state]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/index.md %}) our definition will look like:
 
@@ -73,8 +76,8 @@ option = "{% raw %}{{#upper}}{{ attribute }}{{/upper}}{% endraw %}"
 
 Here `upper` is a function accepting one parameter (`attribute`) and returning the same output, with upper case. Below you can find the list of available lambdas.
 
-Function expressions are sensitive to whitespaces, in the sense that Mustache doesn't recognize them if you have spaces between curly braces and the function identifiers, so make sure there are no extra spaces within curly braces. For example `{% raw %}{{ #upper }}{{ attribute }}{{ /upper }}{% endraw %}` doesn't work, while `{% raw %}{{#upper}}{{ attribute }}{{/upper}}{% endraw %}` does.
-{: .notice--warning}
+The underlying [Handlebars](https://handlebarsjs.com/) template engine also provides an powerful set of built-in functions to handle conditionals, loops, lookups and log messages. Those functions (a.k.a. *helpers*) can be freely used in templates but they are not officially supported by Nyx. For more on those helpers see [Built-in Helpers](https://handlebarsjs.com/guide/builtin-helpers.html).
+{: .notice--info}
 
 ### The functions library
 

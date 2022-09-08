@@ -114,7 +114,7 @@ Note that all occurrences are treated as strings, so the `%s` placeholder is the
 | Configuration File Option | `changelog/template`                                                                     |
 | Related state attributes  |                                                                                          |
 
-The absolute or relative path to a local file to use as a template instead of the Nyx built-in. The file must contain a valid [Mustache](https://mustache.github.io/) template. Template [functions]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}#functions) can be used in custom templates.
+The absolute or relative path to a local file to use as a template instead of the Nyx built-in. The file must contain a valid [Handlebars](https://handlebarsjs.com/) template ([Mustache](https://mustache.github.io/) templates are also supported). Template [functions]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}#functions) can be used in custom templates.
 
 If you need to know the object model available when customizing a see [this reference]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/changelog.md %}#functions)
 

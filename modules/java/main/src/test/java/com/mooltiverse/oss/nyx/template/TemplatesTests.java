@@ -1,8 +1,25 @@
+/*
+ * Copyright 2020 Mooltiverse
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.mooltiverse.oss.nyx.template;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.List;
@@ -129,6 +146,259 @@ public class TemplatesTests {
             assertEquals(1, Templates.toInteger("1"));
             assertEquals(100, Templates.toInteger("100"));
             assertEquals(9999999, Templates.toInteger("9999999"));
+        }
+    }
+
+    @Nested
+    @DisplayName("Templates.render functions")
+    class RenderFunctionsTests {
+        @Nested
+        @DisplayName("Templates.render Lower function")
+        class RenderLowerFunctionTests {
+            @Test
+            @DisplayName("Templates.render(String, null)")
+            void renderWithNullScopeTest1()
+                throws Exception {
+                assertEquals("abcde 12345 fghij", Templates.render("{{#lower}}abcde 12345 FGHIJ{{/lower}}", null));
+            }
+        }
+
+        @Nested
+        @DisplayName("Templates.render Trim function")
+        class RenderTrimFunctionTests {
+            @Test
+            @DisplayName("Templates.render(String, null)")
+            void renderWithNullScopeTest1()
+                throws Exception {
+                assertEquals("abcde 12345 FGHIJ", Templates.render("{{#trim}} abcde 12345 FGHIJ  {{/trim}}", null));
+            }
+        }
+
+        @Nested
+        @DisplayName("Templates.render Upper function")
+        class RenderUpperFunctionTests {
+            @Test
+            @DisplayName("Templates.render(String, null)")
+            void renderWithNullScopeTest1()
+                throws Exception {
+                assertEquals("ABCDE 12345 FGHIJ", Templates.render("{{#upper}}abcde 12345 FGHIJ{{/upper}}", null));
+            }
+        }
+
+        @Nested
+        @DisplayName("Templates.render First function")
+        class RenderFirstFunctionTests {
+            @Test
+            @DisplayName("Templates.render(String, null)")
+            void renderWithNullScopeTest1()
+                throws Exception {
+                assertEquals("ABCDE", Templates.render("{{#first}}ABCDE 12345 FGHIJ{{/first}}", null));
+            }
+        }
+
+        @Nested
+        @DisplayName("Templates.render FirstLower function")
+        class RenderFirstLowerFunctionTests {
+            @Test
+            @DisplayName("Templates.render(String, null)")
+            void renderWithNullScopeTest1()
+                throws Exception {
+                assertEquals("abcde", Templates.render("{{#firstLower}}ABCDE 12345 FGHIJ{{/firstLower}}", null));
+            }
+        }
+
+        @Nested
+        @DisplayName("Templates.render FirstUpper function")
+        class RenderFirstUpperFunctionTests {
+            @Test
+            @DisplayName("Templates.render(String, null)")
+            void renderWithNullScopeTest1()
+                throws Exception {
+                assertEquals("ABCDE", Templates.render("{{#firstUpper}}abcde 12345 FGHIJ{{/firstUpper}}", null));
+            }
+        }
+
+        @Nested
+        @DisplayName("Templates.render Last function")
+        class RenderLastFunctionTests {
+            @Test
+            @DisplayName("Templates.render(String, null)")
+            void renderWithNullScopeTest1()
+                throws Exception {
+                assertEquals("FGHIJ", Templates.render("{{#last}}ABCDE 12345 FGHIJ{{/last}}", null));
+            }
+        }
+
+        @Nested
+        @DisplayName("Templates.render LastLower function")
+        class RenderLastLowerFunctionTests {
+            @Test
+            @DisplayName("Templates.render(String, null)")
+            void renderWithNullScopeTest1()
+                throws Exception {
+                assertEquals("fghij", Templates.render("{{#lastLower}}ABCDE 12345 FGHIJ{{/lastLower}}", null));
+            }
+        }
+
+        @Nested
+        @DisplayName("Templates.render LastUpper function")
+        class RenderLastUpperFunctionTests {
+            @Test
+            @DisplayName("Templates.render(String, null)")
+            void renderWithNullScopeTest1()
+                throws Exception {
+                assertEquals("FGHIJ", Templates.render("{{#lastUpper}}abcde 12345 FGHIJ{{/lastUpper}}", null));
+            }
+        }
+
+        @Nested
+        @DisplayName("Templates.render Sanitize function")
+        class RenderSanitizeFunctionTests {
+            @Test
+            @DisplayName("Templates.render(String, null)")
+            void renderWithNullScopeTest1()
+                throws Exception {
+                assertEquals("aBc123defgHI", Templates.render("{{#sanitize}} a!B£c$ 123 d%e&f/g(H)I  {{/sanitize}}", null));
+            }
+        }
+
+        @Nested
+        @DisplayName("Templates.render SanitizeLower function")
+        class RenderSanitizeLowerFunctionTests {
+            @Test
+            @DisplayName("Templates.render(String, null)")
+            void renderWithNullScopeTest1()
+                throws Exception {
+                assertEquals("abc123defghi", Templates.render("{{#sanitizeLower}} a!B£c$ 123 d%e&f/g(H)I  {{/sanitizeLower}}", null));
+            }
+        }
+
+        @Nested
+        @DisplayName("Templates.render SanitizeUpper function")
+        class RenderSanitizeUpperFunctionTests {
+            @Test
+            @DisplayName("Templates.render(String, null)")
+            void renderWithNullScopeTest1()
+                throws Exception {
+                assertEquals("ABC123DEFGHI", Templates.render("{{#sanitizeUpper}} a!B£c$ 123 d%e&f/g(H)I  {{/sanitizeUpper}}", null));
+            }
+        }
+
+        @Nested
+        @DisplayName("Templates.render Short5 function")
+        class RenderShort5FunctionTests {
+            @Test
+            @DisplayName("Templates.render(String, null)")
+            void renderWithNullScopeTest1()
+                throws Exception {
+                assertEquals("12345", Templates.render("{{#short5}}1234567890{{/short5}}", null));
+            }
+        }
+
+        @Nested
+        @DisplayName("Templates.render Short6 function")
+        class RenderShort6FunctionTests {
+            @Test
+            @DisplayName("Templates.render(String, null)")
+            void renderWithNullScopeTest1()
+                throws Exception {
+                assertEquals("123456", Templates.render("{{#short6}}1234567890{{/short6}}", null));
+            }
+        }
+
+        @Nested
+        @DisplayName("Templates.render Short7 function")
+        class RenderShort7FunctionTests {
+            @Test
+            @DisplayName("Templates.render(String, null)")
+            void renderWithNullScopeTest1()
+                throws Exception {
+                assertEquals("1234567", Templates.render("{{#short7}}1234567890{{/short7}}", null));
+            }
+        }
+
+        @Nested
+        @DisplayName("Templates.render TimestampISO8601 function")
+        class RenderTimestampISO8601FunctionTests {
+            @Test
+            @DisplayName("Templates.render(String, null)")
+            void renderWithNullScopeTest1()
+                throws Exception {
+                assertEquals("1970-01-01T00:00:00", Templates.render("{{#timestampISO8601}}0{{/timestampISO8601}}", null));
+            }
+        }
+
+        @Nested
+        @DisplayName("Templates.render TimestampYYYYMMDDHHMMSS function")
+        class RenderTimestampYYYYMMDDHHMMSSFunctionTests {
+            @Test
+            @DisplayName("Templates.render(String, null)")
+            void renderWithNullScopeTest1()
+                throws Exception {
+                assertEquals("19700101000000", Templates.render("{{#timestampYYYYMMDDHHMMSS}}0{{/timestampYYYYMMDDHHMMSS}}", null));
+            }
+        }
+
+        @Nested
+        @DisplayName("Templates.render Environment.Variable function")
+        class RenderEnvironmentVariableFunctionTests {
+            @Test
+            @DisplayName("Templates.render(String, null)")
+            void renderWithNullScopeTest1()
+                throws Exception {
+                // just test it's not empty as it changes depending on the runtime environment
+                assertFalse(Templates.render("{{#environment.variable}}PATH{{/environment.variable}}", null).isBlank());
+            }
+        }
+
+        @Nested
+        @DisplayName("Templates.render Environment.User function")
+        class RenderEnvironmentUserFunctionTests {
+            @Test
+            @DisplayName("Templates.render(String, null)")
+            void renderWithNullScopeTest1()
+                throws Exception {
+                // just test it's not empty as it changes depending on the runtime environment
+                assertFalse(Templates.render("{{environment.user}}", null).isBlank());
+                assertFalse(Templates.render("{{#environment.user}}{{/environment.user}}", null).isBlank());
+            }
+        }
+
+        @Nested
+        @DisplayName("Templates.render File.Content function")
+        class RenderFileContentFunctionTests {
+            @Test
+            @DisplayName("Templates.render(String, null)")
+            void renderWithNullScopeTest1()
+                throws Exception {
+                String hashCode = Integer.toString(this.hashCode());
+                File savedFile = new File(System.getProperty("java.io.tmpdir"), "templates1"+hashCode+".txt");
+                FileWriter savedFileWriter = new FileWriter(savedFile);
+                savedFileWriter.write("test12345");
+                savedFileWriter.flush();
+                savedFileWriter.close();
+                savedFile.deleteOnExit();
+                assertEquals("test12345", Templates.render("{{#file.content}}"+savedFile.getAbsolutePath()+"{{/file.content}}", null));
+            }
+        }
+
+        @Nested
+        @DisplayName("Templates.render File.Exists function")
+        class RenderFileExistsFunctionTests {
+            @Test
+            @DisplayName("Templates.render(String, null)")
+            void renderWithNullScopeTest1()
+                throws Exception {
+                String hashCode = Integer.toString(this.hashCode());
+                File savedFile = new File(System.getProperty("java.io.tmpdir"), "templates1"+hashCode+".txt");
+                assertEquals("false", Templates.render("{{#file.exists}}"+savedFile.getAbsolutePath()+"{{/file.exists}}", null));
+                FileWriter savedFileWriter = new FileWriter(savedFile);
+                savedFileWriter.write("test12345");
+                savedFileWriter.flush();
+                savedFileWriter.close();
+                savedFile.deleteOnExit();
+                assertEquals("true", Templates.render("{{#file.exists}}"+savedFile.getAbsolutePath()+"{{/file.exists}}", null));
+            }
         }
     }
 
