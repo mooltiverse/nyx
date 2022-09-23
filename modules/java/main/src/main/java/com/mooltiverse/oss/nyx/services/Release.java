@@ -15,12 +15,23 @@
  */
 package com.mooltiverse.oss.nyx.services;
 
+import java.util.Set;
+
+import com.mooltiverse.oss.nyx.entities.Attachment;
+
 /**
  * A published release. These entities are managed through services implementing the
  * {@link ReleaseService} interface and {@link Service#supports(Feature) supporting} the
  * {@link Service.Feature#RELEASES} feature.
  */
 public interface Release {
+    /**
+     * Returns the assets attached to the relese, otherwise returns {@code null}.
+     * 
+     * @return the assets attached to the relese, if any, otherwise {@code null}.
+     */
+    public Set<Attachment> getAssets();
+
     /**
      * Returns the tag the release refers to.
      * 

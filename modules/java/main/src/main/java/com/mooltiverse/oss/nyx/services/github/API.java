@@ -27,12 +27,15 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mooltiverse.oss.nyx.entities.Attachment;
 import com.mooltiverse.oss.nyx.io.TransportException;
 import com.mooltiverse.oss.nyx.services.SecurityException;
 
@@ -133,6 +136,23 @@ abstract class API {
         throws SecurityException;
 
     /**
+     * Returns a set of published assets for the release identified by the given attributes.
+     * 
+     * @param owner the name of the owner of the repository of the release. It can't be {@code null}
+     * @param repository the name of the repository of the release. It can't be {@code null}
+     * @param tag the release tag (i.e. {@code 1.2.3}, {@code v4.5.6}). It can't be {@code null}
+     * 
+     * @return the published release artifacts
+     * 
+     * @throws SecurityException if authentication or authorization fails
+     * @throws TransportException if communication to the remote endpoint fails
+     * @throws UnsupportedOperationException if the underlying implementation does not
+     * {@link #supports(Service.Feature) support} the {@link Service.Feature.RELEASE_ASSETS} feature.
+     */
+    abstract Set<Attachment> listReleaseAssets(String owner, String repository, String tag)
+        throws SecurityException, TransportException;
+
+    /**
      * Retrieves the attributes of the user with the given ID. If the given used ID is {@code null}
      * then the current authenticated user for the given session is retrieved, otherwise the user with the
      * given ID is fetched. The authenticated user is the one owning the configured credentials.
@@ -179,6 +199,30 @@ abstract class API {
         throws SecurityException, TransportException;
 
     /**
+     * Publishes a set of assets for a release. Not all types of assets may be supported.
+     * Please check the implementation class for any restrictions on the supported assets.
+     * 
+     * @param owner the name of the owner of the repository to create the assets for. It can't be {@code null}
+     * @param repository the name of the repository to create the assets for. It can't be {@code null}
+     * @param uploadURL the URL to upload assets to. This must be the {@code upload_url} attribute that is returned
+     * along with the release when the release was created
+     * @param assets the set of assets to publish. Each asset is interpreted differently depending on its 
+     * {@link Attachment#getPath() path}. If the asset path is a relatve path or has {@code file} as the scheme/protocol
+     * it is interpreted as a local file to upload, and the link of the uploaded asset will be returned along with the
+     * release. If the asset path is a remote link it will be ignored because GitHub does not support
+     * links as release assets
+     * 
+     * @return the published release artifacts
+     * 
+     * @throws SecurityException if authentication or authorization fails
+     * @throws TransportException if communication to the remote endpoint fails
+     * @throws UnsupportedOperationException if the underlying implementation does not
+     * {@link #supports(Service.Feature) support} the {@link Service.Feature.RELEASE_ASSETS} feature.
+     */
+    abstract Set<Attachment> publishReleaseAssets(String owner, String repository, String uploadURL, Set<Attachment> assets)
+        throws SecurityException, TransportException;
+
+    /**
      * Sends the given request and returns the response, logging as needed.
      * 
      * @param request the request to send
@@ -218,6 +262,55 @@ abstract class API {
                 throw new TransportException("Unmarshalling JSON content returned a null object");
 
             return GitHubEntity.toAttributeMap(rootNode);
+        }
+        catch (JsonProcessingException jpe) {
+            throw new TransportException("An error occurred while unmarshalling JSON response", jpe);
+        }
+    }
+
+    /**
+     * Parses the given string as a collection of JSON object tree and returns each item in the resulting list of maps.
+     * 
+     * @param body the JSON collection to parse
+     * 
+     * @return the list of map of properties parsed from the given body
+     * 
+     * @throws TransportException in case unmarshalling fails
+     */
+    protected List<Map<String, Object>> unmarshalJSONBodyAsCollection(String body)
+        throws TransportException {
+        try {
+            JsonNode rootNode = new ObjectMapper().readTree(body);
+            if (rootNode == null)
+                throw new TransportException("Unmarshalling JSON content returned a null object");
+
+            return GitHubEntity.toAttributeMaps(rootNode);
+        }
+        catch (JsonProcessingException jpe) {
+            throw new TransportException("An error occurred while unmarshalling JSON response", jpe);
+        }
+    }
+
+    /**
+     * Parses the given string as a JSON object tree, selects the element with the given name and returns its attributes
+     * item in the resulting map.
+     * 
+     * @param body the JSON string to parse
+     * 
+     * @return the map of properties parsed from the given element in the given body. It's {@code null} if no element
+     * with the gibven name is available in the JSON body
+     * 
+     * @throws TransportException in case unmarshalling fails
+     */
+    protected Map<String, Object> unmarshalJSONBodyElement(String body, String element)
+        throws TransportException {
+        try {
+            JsonNode rootNode = new ObjectMapper().readTree(body);
+            if (rootNode == null)
+                throw new TransportException("Unmarshalling JSON content returned a null object");
+            
+            JsonNode elementNode = rootNode.get(element);
+            return Objects.isNull(elementNode) ? null : GitHubEntity.toAttributeMap(elementNode);
         }
         catch (JsonProcessingException jpe) {
             throw new TransportException("An error occurred while unmarshalling JSON response", jpe);
