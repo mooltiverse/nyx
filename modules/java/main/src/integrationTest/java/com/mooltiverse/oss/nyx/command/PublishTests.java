@@ -78,7 +78,7 @@ public class PublishTests {
             // add release assets to the configuration
             configurationLayerMock.setReleaseAssets(Map.<String,Attachment>of(
                 "asset1", new Attachment("asset1.txt", "Text asset", "text/plain", assetPath1.toFile().getAbsolutePath()),
-                "asset2", new Attachment("asset2", "Binary asset", "application/octet-stream", assetPath2.toFile().getAbsolutePath()),
+                "asset2", new Attachment("asset2.bin", "Binary asset", "application/octet-stream", assetPath2.toFile().getAbsolutePath()),
                 "nonexistentfile", new Attachment("nonexistentfile", "Non existent asset", "application/octet-stream", "nonexistentfile"), // this file does not exist and should only generate a warning
                 "remote1", new Attachment("remote1", "Remote link asset", "application/octet-stream", "http://www.example.com/remote1") // this is an URL and should be skipped by GitHub
             ));
@@ -141,7 +141,7 @@ public class PublishTests {
             // the release assets must contain the two existing files but not the remote URL (not supported by GitHub), nor the non existing file
             assertEquals(2, gitHubRelease.getAssets().size());
             for (Attachment asset: gitHubRelease.getAssets()) {
-                assertTrue(asset.getFileName().equals("asset1") || asset.getFileName().equals("asset2"));
+                assertTrue(asset.getFileName().equals("asset1.txt") || asset.getFileName().equals("asset2.bin"));
                 assertTrue(asset.getDescription().equals("Text asset") || asset.getDescription().equals("Binary asset"));
                 assertTrue(asset.getType().equals("text/plain") || asset.getType().equals("application/octet-stream"));
                 assertTrue(asset.getPath().startsWith("https://api.github.com/repos/"));
@@ -179,7 +179,7 @@ public class PublishTests {
             // add release assets to the configuration
             configurationLayerMock.setReleaseAssets(Map.<String,Attachment>of(
                 "asset1", new Attachment("asset1.txt", "Text asset", "text/plain", assetPath1.toFile().getAbsolutePath()),
-                "asset2", new Attachment("asset2", "Binary asset", "application/octet-stream", assetPath2.toFile().getAbsolutePath()),
+                "asset2", new Attachment("asset2.bin", "Binary asset", "application/octet-stream", assetPath2.toFile().getAbsolutePath()),
                 "nonexistentfile", new Attachment("nonexistentfile", "Non existent asset", "application/octet-stream", "nonexistentfile"), // this file does not exist and should only generate a warning
                 "remote1", new Attachment("remote1", "Remote link asset", "application/octet-stream", "http://www.example.com/remote1") // this is an URL and should be skipped by GitHub
             ));
@@ -243,9 +243,9 @@ public class PublishTests {
             // the release assets must contain only the 'asset1' as it was filtered by the release type
             assertEquals(1, gitHubRelease.getAssets().size());
             for (Attachment asset: gitHubRelease.getAssets()) {
-                assertTrue(asset.getFileName().equals("asset1"));
-                assertTrue(asset.getDescription().equals("Text asset"));
-                assertTrue(asset.getType().equals("text/plain"));
+                assertEquals("asset1.txt", asset.getFileName());
+                assertEquals("Text asset", asset.getDescription());
+                assertEquals("text/plain", asset.getType());
                 assertTrue(asset.getPath().startsWith("https://api.github.com/repos/"));
             }
         
@@ -283,7 +283,7 @@ public class PublishTests {
             // add release assets to the configuration
             configurationLayerMock.setReleaseAssets(Map.<String,Attachment>of(
                 "asset1", new Attachment("asset1.txt", "Text asset", "text/plain", assetPath1.toFile().getAbsolutePath()),
-                "asset2", new Attachment("asset2", "Binary asset", "application/octet-stream", assetPath2.toFile().getAbsolutePath()),
+                "asset2", new Attachment("asset2.bin", "Binary asset", "application/octet-stream", assetPath2.toFile().getAbsolutePath()),
                 "nonexistentfile", new Attachment("nonexistentfile", "Non existent asset", "application/octet-stream", "nonexistentfile"), // this file does not exist and should only generate a warning
                 "remote1", new Attachment("remote1", "Remote link asset", "application/octet-stream", "http://www.example.com/remote1") // this is an URL and should be published by GitLab
             ));
@@ -346,7 +346,7 @@ public class PublishTests {
             // the release assets must contain the two existing files and the remote URL, but not the non existing file
             assertEquals(3, gitLabRelease.getAssets().size());
             for (Attachment asset: gitLabRelease.getAssets()) {
-                assertTrue(asset.getFileName().equals("asset1") || asset.getFileName().equals("asset2") || asset.getFileName().equals("remote1"));
+                assertTrue(asset.getFileName().equals("asset1.txt") || asset.getFileName().equals("asset2.bin") || asset.getFileName().equals("remote1"));
                 //assertTrue(asset.getDescription().equals("Text asset") || asset.getDescription().equals("Binary asset") || asset.getDescription().equals("Remote link asset")); // the description is not available via this API
                 //assertTrue(asset.getType().equals("text/plain") || asset.getType().equals("application/octet-stream")); // the content type is not available via this API
                 //assertTrue(asset.getPath().startsWith("https://api.github.com/repos/")); // as of now these URLS are like https://storage.googleapis.com...
@@ -386,7 +386,7 @@ public class PublishTests {
             // add release assets to the configuration
             configurationLayerMock.setReleaseAssets(Map.<String,Attachment>of(
                 "asset1", new Attachment("asset1.txt", "Text asset", "text/plain", assetPath1.toFile().getAbsolutePath()),
-                "asset2", new Attachment("asset2", "Binary asset", "application/octet-stream", assetPath2.toFile().getAbsolutePath()),
+                "asset2", new Attachment("asset2.bin", "Binary asset", "application/octet-stream", assetPath2.toFile().getAbsolutePath()),
                 "nonexistentfile", new Attachment("nonexistentfile", "Non existent asset", "application/octet-stream", "nonexistentfile"), // this file does not exist and should only generate a warning
                 "remote1", new Attachment("remote1", "Remote link asset", "application/octet-stream", "http://www.example.com/remote1") // this is an URL and should be published by GitLab
             ));
@@ -450,9 +450,9 @@ public class PublishTests {
             // the release assets must contain only the 'asset1' as it was filtered by the release type
             assertEquals(1, gitLabRelease.getAssets().size());
             for (Attachment asset: gitLabRelease.getAssets()) {
-                assertTrue(asset.getFileName().equals("asset1"));
-                //assertTrue(asset.getDescription().equals("Text asset")); // the description is not available via this API
-                //assertTrue(asset.getType().equals("text/plain")); // the content type is not available via this API
+                assertEquals("asset1.txt", asset.getFileName());
+                //assertEquals("Text asset", asset.getDescription()); // the description is not available via this API
+                //assertEquals("text/plain", asset.getType()); // the content type is not available via this API
                 //assertTrue(asset.getPath().startsWith("https://api.github.com/repos/")); // as of now these URLS are like https://storage.googleapis.com...
             }
         

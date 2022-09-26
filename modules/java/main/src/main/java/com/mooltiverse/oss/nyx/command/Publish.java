@@ -100,7 +100,7 @@ public class Publish extends AbstractCommand {
                             for (Map.Entry<String,Attachment> configuredAsset: state().getConfiguration().getReleaseAssets().entrySet()) {
                                 // if the release type has configured the release types, that is considered a filter over the global release types
                                 // so only the ones enabled in the release type must be published
-                                if (!Objects.isNull(state().getReleaseType().getAssets()) && state().getReleaseType().getAssets().contains(configuredAsset.getKey())) {
+                                if (Objects.isNull(state().getReleaseType().getAssets()) || state().getReleaseType().getAssets().contains(configuredAsset.getKey())) {
                                     logger.debug(COMMAND, "Publishing release asset '{}'", configuredAsset.getKey());
                                     release = service.publishReleaseAssets(null, null, release, Set.<Attachment>of(configuredAsset.getValue()));
                                     state().getReleaseAssets().add(configuredAsset.getValue());
