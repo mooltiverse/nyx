@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.mooltiverse.oss.nyx.version.Versions;
+import com.mooltiverse.oss.nyx.entities.Attachment;
 import com.mooltiverse.oss.nyx.entities.ChangelogConfiguration;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
@@ -84,6 +85,11 @@ public interface Defaults {
     public static final String PRESET = null;
 
     /**
+     * The release assets configuration block.
+     */
+    public static final Map<String,Attachment> RELEASE_ASSETS = Map.<String,Attachment>of();
+
+    /**
      * The default flag that alows reading releases from the history tolerating arbitrary prefixes and extra non critical characters. Value: {@code true}
      */
     public static final Boolean RELEASE_LENIENT = Boolean.TRUE;
@@ -97,6 +103,11 @@ public interface Defaults {
      * A utility interface that collects default configuration values for {@link com.mooltiverse.oss.nyx.entities.ReleaseType} objects.
      */
     public interface ReleaseType {
+        /**
+         * The list of selected asset names to publish for the release type. Value: {@code null}
+         */
+        public static final List<String> ASSETS = null;
+
         /**
          * The flag indicating whether or not the 'collapsed' versioning (pre-release style) must be used. Value: {@code false}
          */

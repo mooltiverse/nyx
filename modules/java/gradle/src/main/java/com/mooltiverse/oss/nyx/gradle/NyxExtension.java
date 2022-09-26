@@ -155,14 +155,21 @@ public abstract class NyxExtension {
     private final Property<String> preset = getObjectfactory().property(String.class);
 
     /**
-     * The 'releasePrefix' property.
+     * The nested 'releaseAssets' block.
+     * 
+     * @see AssetConfiguration
      */
-    private final Property<String> releasePrefix = getObjectfactory().property(String.class);
+    private NamedDomainObjectContainer<AssetConfiguration> releaseAssets = getObjectfactory().domainObjectContainer(AssetConfiguration.class);
 
     /**
      * The 'releaseLenient' property.
      */
     private final Property<Boolean> releaseLenient = getObjectfactory().property(Boolean.class);
+
+    /**
+     * The 'releasePrefix' property.
+     */
+    private final Property<String> releasePrefix = getObjectfactory().property(String.class);
 
     /**
      * The nested 'releaseTypes' block.
@@ -399,17 +406,26 @@ public abstract class NyxExtension {
     }
 
     /**
-     * Returns the prefix used to generate release names.
+     * Returns the object mapping the {@code releaseAssets} block.
      * 
      * We provide an implementation of this method instead of using the abstract definition as it's
      * safer for old Gradle versions we support.
      * 
-     * @return the prefix used to generate release names
-     * 
-     * @see Defaults#RELEASE_PREFIX
+     * @return the object mapping the {@code releaseAssets} block
      */
-    public Property<String> getReleasePrefix() {
-        return releasePrefix;
+    public NamedDomainObjectContainer<AssetConfiguration> getReleaseAssets() {
+        return releaseAssets;
+    }
+
+    /**
+     * Accepts the DSL configuration for the {@code releaseAssets} block, needed for defining
+     * the block using the curly braces syntax in Gradle build scripts.
+     * See the documentation on top of this class for more.
+     * 
+     * @param configurationAction the configuration action for the {@code releaseAssets} block
+     */
+    public void releaseAssets(Action<? super NamedDomainObjectContainer<AssetConfiguration>> configurationAction) {
+        configurationAction.execute(releaseAssets);
     }
 
     /**
@@ -424,6 +440,20 @@ public abstract class NyxExtension {
      */
     public Property<Boolean> getReleaseLenient() {
         return releaseLenient;
+    }
+
+    /**
+     * Returns the prefix used to generate release names.
+     * 
+     * We provide an implementation of this method instead of using the abstract definition as it's
+     * safer for old Gradle versions we support.
+     * 
+     * @return the prefix used to generate release names
+     * 
+     * @see Defaults#RELEASE_PREFIX
+     */
+    public Property<String> getReleasePrefix() {
+        return releasePrefix;
     }
 
     /**
@@ -931,6 +961,120 @@ public abstract class NyxExtension {
     }
 
     /**
+     * The class to model a single 'releaseAssets' item within the extension.
+     */
+    public abstract static class AssetConfiguration {
+        /**
+         * The asset name.
+         */
+        private final String name;
+
+        /**
+         * The asset file name property.
+         */
+        private final Property<String> fileName = getObjectfactory().property(String.class);
+
+        /**
+         * The asset (short) description (or label) property.
+         */
+        private final Property<String> description = getObjectfactory().property(String.class);
+
+        /**
+         * The asset path property (local file or URL).
+         */
+        private final Property<String> path = getObjectfactory().property(String.class);
+
+        /**
+         * The asset MIME type property.
+         */
+        private final Property<String> type = getObjectfactory().property(String.class);
+
+        /**
+         * Returns an object factory instance.
+         * 
+         * The instance is injected by Gradle as soon as this getter method is invoked.
+         * 
+         * Using <a href="https://docs.gradle.org/current/userguide/custom_gradle_types.html#property_injection">property injection</a>
+         * instead of <a href="https://docs.gradle.org/current/userguide/custom_gradle_types.html#constructor_injection">constructor injection</a>
+         * has a few advantages: it allows Gradle to refer injecting the object until it's required and is safer for backward
+         * compatibility (older versions can be supported).
+         * 
+         * @return the object factory instance
+         */
+        @Inject
+        protected abstract ObjectFactory getObjectfactory();
+
+        /**
+         * Constructor.
+         * 
+         * This constructor is required as per the {@link NamedDomainObjectContainer} specification.
+         * 
+         * @param name the asset name (the map key)
+         */
+        public AssetConfiguration(String name) {
+            super();
+            this.name = name;
+        }
+
+        /**
+         * Returns the asset name read-only mandatory property.
+         * 
+         * @return the asset name read-only mandatory property.
+         */
+        public String getName() {
+            return name;
+        }
+
+        /**
+         * Returns the asset file name.
+         * 
+         * We provide an implementation of this method instead of using the abstract definition as it's
+         * safer for old Gradle versions we support.
+         * 
+         * @return the asset name (usually the file name)
+         */
+        public Property<String> getFileName() {
+            return fileName;
+        }
+
+        /**
+         * Returns the asset (short) description (or label) property.
+         * 
+         * We provide an implementation of this method instead of using the abstract definition as it's
+         * safer for old Gradle versions we support.
+         * 
+         * @return the asset (short) description (or label)
+         */
+        public Property<String> getDescription() {
+            return description;
+        }
+
+        /**
+         * Returns the asset path (local file or URL).
+         * 
+         * We provide an implementation of this method instead of using the abstract definition as it's
+         * safer for old Gradle versions we support.
+         * 
+         * @return the asset path (local file or URL)
+         */
+        public Property<String> getPath() {
+            return path;
+        }
+
+        /**
+         * Returns the asset MIME type.
+         * 
+         * We provide an implementation of this method instead of using the abstract definition as it's
+         * safer for old Gradle versions we support.
+         * 
+         * @return the asset MIME type
+         */
+        public Property<String> getType() {
+            return type;
+        }
+    }
+
+    /**
      * The class to model the 'releaseTypes' block within the extension.
      */
     public abstract static class ReleaseTypes {
@@ -1026,6 +1170,11 @@ public abstract class NyxExtension {
              * The release type name.
              */
             private final String name;
+
+            /**
+             * The list of enabled assets for the release type.
+             */
+            private final ListProperty<String> assets = getObjectfactory().listProperty(String.class);
 
             /**
              * The flag indicating whether or not the 'collapsed' versioning (pre-release style) must be used.
@@ -1148,6 +1297,20 @@ public abstract class NyxExtension {
              */
             public String getName() {
                 return name;
+            }
+
+            /**
+             * Returns the list of selected asset names to publish with the release. When {@code null}
+             * all assets configured globally (if any) must be published, otherwise only the assets
+             * in this list must be published for this release type.
+             * 
+             * We provide an implementation of this method instead of using the abstract definition as it's
+             * safer for old Gradle versions we support.
+             * 
+             * @return the list of selected asset names to publish with the release.
+             */
+            public ListProperty<String> getAssets() {
+                return assets;
             }
 
             /**

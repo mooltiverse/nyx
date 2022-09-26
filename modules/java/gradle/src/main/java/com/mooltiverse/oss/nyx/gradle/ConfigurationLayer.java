@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import com.mooltiverse.oss.nyx.configuration.Defaults;
+import com.mooltiverse.oss.nyx.entities.Attachment;
 import com.mooltiverse.oss.nyx.entities.ChangelogConfiguration;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
@@ -68,6 +69,11 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
      * The private instance of the Git configuration section.
      */
     private GitConfiguration gitSection = null;
+
+    /**
+     * The private instance of the release assets configuration section.
+     */
+    private Map<String,Attachment> releaseAssetsSection = null;
 
     /**
      * The private instance of the release types configuration section.
@@ -207,8 +213,20 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
      * {@inheritDoc}
      */
     @Override
-    public String getReleasePrefix() {
-        return extension.getReleasePrefix().getOrNull();
+    public Map<String,Attachment> getReleaseAssets()
+        throws IllegalPropertyException {
+        if (Objects.isNull(releaseAssetsSection)) {
+            releaseAssetsSection = new HashMap<String,Attachment>(extension.getReleaseAssets().size());
+            // the map property is always present and never null but is empty when the user doesn't define its contents
+            if (!extension.getReleaseAssets().isEmpty()) {
+                for (NyxExtension.AssetConfiguration asset: extension.getReleaseAssets()) {
+                    if (!releaseAssetsSection.containsKey(asset.getName())) {
+                        releaseAssetsSection.put(asset.getName(), new Attachment(asset.getFileName().getOrNull(), asset.getDescription().getOrNull(), asset.getType().getOrNull(), asset.getPath().getOrNull()));
+                    }
+                }
+            }
+        }
+        return releaseAssetsSection;
     }
 
     /**
@@ -217,6 +235,14 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
     @Override
     public Boolean getReleaseLenient() {
         return extension.getReleaseLenient().getOrNull();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getReleasePrefix() {
+        return extension.getReleasePrefix().getOrNull();
     }
 
     /**
@@ -249,6 +275,7 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
                             }
                         }
                         items.put(type.getName(), new ReleaseType(
+                            type.getAssets().isPresent() ? type.getAssets().get() : Defaults.ReleaseType.ASSETS,
                             type.getCollapseVersions().isPresent() ? type.getCollapseVersions().get() : Defaults.ReleaseType.COLLAPSE_VERSIONS,
                             type.getCollapsedVersionQualifier().isPresent() ? type.getCollapsedVersionQualifier().get() : Defaults.ReleaseType.COLLAPSED_VERSION_QUALIFIER,
                             type.getDescription().isPresent() ? type.getDescription().get() : Defaults.ReleaseType.DESCRIPTION,

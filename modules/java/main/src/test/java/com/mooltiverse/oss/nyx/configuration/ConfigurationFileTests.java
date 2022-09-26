@@ -58,6 +58,15 @@ public class ConfigurationFileTests {
         assertEquals(Objects.isNull(source.getDryRun()) ? Defaults.DRY_RUN : source.getDryRun(), target.getDryRun());
         assertEquals(Objects.isNull(source.getInitialVersion()) ? Defaults.INITIAL_VERSION : source.getInitialVersion(), target.getInitialVersion());
         assertEquals(Objects.isNull(source.getPreset()) ? Defaults.PRESET : source.getPreset(), target.getPreset());
+
+        assertEquals(source.getReleaseAssets().keySet(), target.getReleaseAssets().keySet());
+        for (String item: source.getReleaseAssets().keySet()) {
+            assertEquals(source.getReleaseAssets().get(item).getFileName(), target.getReleaseAssets().get(item).getFileName());
+            assertEquals(source.getReleaseAssets().get(item).getDescription(), target.getReleaseAssets().get(item).getDescription());
+            assertEquals(source.getReleaseAssets().get(item).getType(), target.getReleaseAssets().get(item).getType());
+            assertEquals(source.getReleaseAssets().get(item).getPath(), target.getReleaseAssets().get(item).getPath());
+        }
+
         assertEquals(Objects.isNull(source.getReleaseLenient()) ? Defaults.RELEASE_LENIENT : source.getReleaseLenient(), target.getReleaseLenient());
         assertEquals(Objects.isNull(source.getReleasePrefix()) ? Defaults.RELEASE_PREFIX : source.getReleasePrefix(), target.getReleasePrefix());
         assertEquals(Objects.isNull(source.getResume()) ? Defaults.RESUME : source.getResume(), target.getResume());
@@ -98,6 +107,13 @@ public class ConfigurationFileTests {
         assertEquals(Objects.isNull(source.getReleaseTypes().getRemoteRepositories()) ? Defaults.RELEASE_TYPES.getRemoteRepositories() : source.getReleaseTypes().getRemoteRepositories(), target.getReleaseTypes().getRemoteRepositories());
         assertEquals(source.getReleaseTypes().getItems().keySet(), target.getReleaseTypes().getItems().keySet());
         for (String item: source.getReleaseTypes().getItems().keySet()) {
+            if (Objects.isNull(source.getReleaseTypes().getItems().get(item).getAssets()))
+                assertEquals(Defaults.ReleaseType.ASSETS, target.getReleaseTypes().getItems().get(item).getAssets());
+            else {
+                assertEquals(source.getReleaseTypes().getItems().get(item).getAssets().size(), target.getReleaseTypes().getItems().get(item).getAssets().size());
+                assertTrue(target.getReleaseTypes().getItems().get(item).getAssets().containsAll(source.getReleaseTypes().getItems().get(item).getAssets()));
+            }
+
             assertEquals(Objects.isNull(source.getReleaseTypes().getItems().get(item).getCollapseVersions()) ? Defaults.ReleaseType.COLLAPSE_VERSIONS : source.getReleaseTypes().getItems().get(item).getCollapseVersions(), target.getReleaseTypes().getItems().get(item).getCollapseVersions());
             assertEquals(Objects.isNull(source.getReleaseTypes().getItems().get(item).getCollapsedVersionQualifier()) ? Defaults.ReleaseType.COLLAPSED_VERSION_QUALIFIER : source.getReleaseTypes().getItems().get(item).getCollapsedVersionQualifier(), target.getReleaseTypes().getItems().get(item).getCollapsedVersionQualifier());
             assertEquals(Objects.isNull(source.getReleaseTypes().getItems().get(item).getDescription()) ? Defaults.ReleaseType.DESCRIPTION : source.getReleaseTypes().getItems().get(item).getDescription(), target.getReleaseTypes().getItems().get(item).getDescription());
@@ -175,6 +191,15 @@ public class ConfigurationFileTests {
         assertEquals(Objects.isNull(source.getDryRun()) ? Defaults.DRY_RUN : source.getDryRun(), target.getDryRun());
         assertEquals(Objects.isNull(source.getInitialVersion()) ? Defaults.INITIAL_VERSION : source.getInitialVersion(), target.getInitialVersion());
         assertEquals(Objects.isNull(source.getPreset()) ? Defaults.PRESET : source.getPreset(), target.getPreset());
+
+        assertEquals(source.getReleaseAssets().keySet(), target.getReleaseAssets().keySet());
+        for (String item: source.getReleaseAssets().keySet()) {
+            assertEquals(source.getReleaseAssets().get(item).getFileName(), target.getReleaseAssets().get(item).getFileName());
+            assertEquals(source.getReleaseAssets().get(item).getDescription(), target.getReleaseAssets().get(item).getDescription());
+            assertEquals(source.getReleaseAssets().get(item).getType(), target.getReleaseAssets().get(item).getType());
+            assertEquals(source.getReleaseAssets().get(item).getPath(), target.getReleaseAssets().get(item).getPath());
+        }
+        
         assertEquals(Objects.isNull(source.getReleaseLenient()) ? Defaults.RELEASE_LENIENT : source.getReleaseLenient(), target.getReleaseLenient());
         assertEquals(Objects.isNull(source.getReleasePrefix()) ? Defaults.RELEASE_PREFIX : source.getReleasePrefix(), target.getReleasePrefix());
         assertEquals(Objects.isNull(source.getResume()) ? Defaults.RESUME : source.getResume(), target.getResume());
@@ -215,6 +240,13 @@ public class ConfigurationFileTests {
         assertEquals(Objects.isNull(source.getReleaseTypes().getRemoteRepositories()) ? Defaults.RELEASE_TYPES.getRemoteRepositories() : source.getReleaseTypes().getRemoteRepositories(), target.getReleaseTypes().getRemoteRepositories());
         assertEquals(source.getReleaseTypes().getItems().keySet(), target.getReleaseTypes().getItems().keySet());
         for (String item: source.getReleaseTypes().getItems().keySet()) {
+            if (Objects.isNull(source.getReleaseTypes().getItems().get(item).getAssets()))
+                assertEquals(Defaults.ReleaseType.ASSETS, target.getReleaseTypes().getItems().get(item).getAssets());
+            else {
+                assertEquals(source.getReleaseTypes().getItems().get(item).getAssets().size(), target.getReleaseTypes().getItems().get(item).getAssets().size());
+                assertTrue(target.getReleaseTypes().getItems().get(item).getAssets().containsAll(source.getReleaseTypes().getItems().get(item).getAssets()));
+            }
+            
             assertEquals(Objects.isNull(source.getReleaseTypes().getItems().get(item).getCollapseVersions()) ? Defaults.ReleaseType.COLLAPSE_VERSIONS : source.getReleaseTypes().getItems().get(item).getCollapseVersions(), target.getReleaseTypes().getItems().get(item).getCollapseVersions());
             assertEquals(Objects.isNull(source.getReleaseTypes().getItems().get(item).getCollapsedVersionQualifier()) ? Defaults.ReleaseType.COLLAPSED_VERSION_QUALIFIER : source.getReleaseTypes().getItems().get(item).getCollapsedVersionQualifier(), target.getReleaseTypes().getItems().get(item).getCollapsedVersionQualifier());
             assertEquals(Objects.isNull(source.getReleaseTypes().getItems().get(item).getDescription()) ? Defaults.ReleaseType.DESCRIPTION : source.getReleaseTypes().getItems().get(item).getDescription(), target.getReleaseTypes().getItems().get(item).getDescription());

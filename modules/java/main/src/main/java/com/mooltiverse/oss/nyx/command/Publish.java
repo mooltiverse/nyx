@@ -17,18 +17,22 @@ package com.mooltiverse.oss.nyx.command;
 
 import static com.mooltiverse.oss.nyx.log.Markers.COMMAND;
 
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mooltiverse.oss.nyx.ReleaseException;
+import com.mooltiverse.oss.nyx.entities.Attachment;
 import com.mooltiverse.oss.nyx.entities.IllegalPropertyException;
 import com.mooltiverse.oss.nyx.git.GitException;
 import com.mooltiverse.oss.nyx.git.Repository;
 import com.mooltiverse.oss.nyx.io.DataAccessException;
 import com.mooltiverse.oss.nyx.io.TransportException;
 import com.mooltiverse.oss.nyx.state.State;
+import com.mooltiverse.oss.nyx.services.Release;
 import com.mooltiverse.oss.nyx.services.ReleaseService;
 import com.mooltiverse.oss.nyx.services.SecurityException;
 
@@ -86,7 +90,32 @@ public class Publish extends AbstractCommand {
                         ReleaseService service = resolveReleaseService(serviceName);
                         // The first two parameters here are null because the repository owner and name are expected to be passed
                         // along with service options. This is just a place where we could override them.
-                        service.publishRelease(null, null, state().getVersion(), state().getVersion(), description);
+                        Release release = service.publishRelease(null, null, state().getVersion(), state().getVersion(), description);
+
+                        // publish release assets now
+                        if (Objects.isNull(state().getConfiguration().getReleaseAssets()) || state().getConfiguration().getReleaseAssets().isEmpty()) {
+                            logger.debug(COMMAND, "No release asset has been configured for publication");
+                        }
+                        else {
+                            for (Map.Entry<String,Attachment> configuredAsset: state().getConfiguration().getReleaseAssets().entrySet()) {
+                                // if the release type has configured the release types, that is considered a filter over the global release types
+                                // so only the ones enabled in the release type must be published
+                                if (Objects.isNull(state().getReleaseType().getAssets()) || state().getReleaseType().getAssets().contains(configuredAsset.getKey())) {
+                                    logger.debug(COMMAND, "Publishing release asset '{}'", configuredAsset.getKey());
+
+                                    // we need to render each asset's field before we publish, so we create a new Attachment instance with all the fields rendered from the configured asset
+                                    Attachment asset = new Attachment(renderTemplate(configuredAsset.getValue().getFileName()), renderTemplate(configuredAsset.getValue().getDescription()), renderTemplate(configuredAsset.getValue().getType()), renderTemplate(configuredAsset.getValue().getPath()));
+
+                                    // now actually publish the asset
+                                    release = service.publishReleaseAssets(null, null, release, Set.<Attachment>of(asset));
+                                    state().getReleaseAssets().add(asset);
+                                    logger.debug(COMMAND, "Release asset '{}' has been published to '{}' for release '{}'", configuredAsset.getKey(), serviceName, release.getTag());
+                                }
+                                else {
+                                    logger.debug(COMMAND, "Release asset '{}' has been configured globally but the current release type is configured to skip it", configuredAsset.getKey());
+                                }
+                            }
+                        }
                     }
                     catch (SecurityException se) {
                         throw new ReleaseException(String.format("A security error occurred while publishing the release to service '%s'", serviceName), se);

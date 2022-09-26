@@ -50,7 +50,7 @@ The order in which release types are listed matters. The types listed first are 
 
 The comma separated list of service configuration names to be used to publish releases when the matched release type has the [`publish`](#publish) flag enabled. The services listed here are the same for all release types but each release type can toggle publication on or off using the [`publish`](#publish) flag. Each name in the list must be the [`name`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}#name) of a configured [service]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}), but not all defined service configurations must be used here.
 
-Services listed here must support the `RELEASES` [feature]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}#service-features).
+Services listed here must support the `RELEASES` [feature]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}#service-features). If they also support the `RELEASE_ASSETS` feature they can also publish the configured [release assets]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-assets.md %}) along with the release.
 
 The order in which services are listed matters. If multiple publication services are defined, publication happens in the same order they are defined here. This might be useful if you're publishing to multiple services and one has dependencies on releases published to others.
 {: .notice--info}
@@ -94,9 +94,10 @@ Each release type has the following attributes:
 
 | Name                                                                                       | Type    | Command Line Option                                                   | Environment Variable                                                    | Default                                              |
 | ------------------------------------------------------------------------------------------ | ------- | --------------------------------------------------------------------- | ----------------------------------------------------------------------- | ---------------------------------------------------- |
+| [`releaseTypes/<NAME>/assets`](#assets)                                                    | list    | `--release-types-<NAME>-assets=<NAMES>`                               | `NYX_RELEASE_TYPES_<NAME>_ASSETS=<NAMES>`                               | N/A                                                    |
 | [`releaseTypes/<NAME>/collapseVersions`](#collapse-versions)                               | boolean | `--release-types-<NAME>-collapse-versions=true|false`                 | `NYX_RELEASE_TYPES_<NAME>_COLLAPSE_VERSIONS=true|false`                 | `false`                                              |
 | [`releaseTypes/<NAME>/collapsedVersionQualifier`](#collapsed-version-qualifier)            | string  | `--release-types-<NAME>-collapsed-version-qualifier=<TEMPLATE>`       | `NYX_RELEASE_TYPES_<NAME>_COLLAPSED_VERSION_QUALIFIER=<TEMPLATE>`       | Empty                                                |
-| [`releaseTypes/<NAME>/description`](#description)                                          | string  | `--release-types-<NAME>-description`                                  | `NYX_RELEASE_TYPES_<NAME>_DESCRIPTION=<TEMPLATE>`                       | `{% raw %}Release {{version}}{% endraw %}`           |
+| [`releaseTypes/<NAME>/description`](#description)                                          | string  | `--release-types-<NAME>-description`                                  | `NYX_RELEASE_TYPES_<NAME>_DESCRIPTION=<TEMPLATE>`                       | `{% raw %}Release {{version}}{% endraw %}`                                                    |
 | [`releaseTypes/<NAME>/filterTags`](#filter-tags)                                           | string  | `--release-types-<NAME>-filter-tags`                                  | `NYX_RELEASE_TYPES_<NAME>_FILTER_TAGS=<TEMPLATE>`                       | Empty                                                |
 | [`releaseTypes/<NAME>/gitCommit`](#git-commit)                                             | string  | `--release-types-<NAME>-git-commit=<TEMPLATE>`                        | `NYX_RELEASE_TYPES_<NAME>_GIT_COMMIT=<TEMPLATE>`                        | `false`                                              |
 | [`releaseTypes/<NAME>/gitCommitMessage`](#git-commit-message)                              | string  | `--release-types-<NAME>-git-commit-message=<TEMPLATE>`                | `NYX_RELEASE_TYPES_<NAME>_GIT_COMMIT_MESSAGE=<TEMPLATE>`                | `{% raw %}Release version {{version}}{% endraw %}`   |
@@ -107,10 +108,33 @@ Each release type has the following attributes:
 | [`releaseTypes/<NAME>/matchBranches`](#match-branches)                                     | string  | `--release-types-<NAME>-match-branches=<TEMPLATE>`                    | `NYX_RELEASE_TYPES_<NAME>_MATCH_BRANCHES=<TEMPLATE>`                    | Empty                                                |
 | [`releaseTypes/<NAME>/matchEnvironmentVariables`](#match-environment-variables)            | [map]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}#collections-of-objects) | `--release-types-<NAME>-match-environment-variables-<NAME>=<VALUE>` | `NYX_RELEASE_TYPES_<NAME>_MATCH_ENVIRONMENT_VARIABLES_<NAME>=<VALUE>` | Empty |
 | [`releaseTypes/<NAME>/matchWorkspaceStatus`](#match-workspace-status)                      | string  | `--release-types-<NAME>-match-workspace-status`                       | `NYX_RELEASE_TYPES_<NAME>_MATCH_WORKSPACE_STATUS=<STATUS>`              | Empty                                                |
-| [`releaseTypes/<NAME>/name`](#name)                                                        | string  | `--release-types-<NAME>-name=<NAME>`                                  | `NYX_RELEASE_TYPES_<NAME>_NAME=<NAME>`                                  | N/A                                                  |
+| [`releaseTypes/<NAME>/name`](#name)                                                        | string  | `--release-types-<NAME>-name=<NAME>`                                  | `NYX_RELEASE_TYPES_<NAME>_NAME=<NAME>`                                  | N/A                                                    |
 | [`releaseTypes/<NAME>/publish`](#publish)                                                  | string  | `--release-types-<NAME>-publish=<TEMPLATE>`                           | `NYX_RELEASE_TYPES_<NAME>_PUBLISH=<TEMPLATE>`                           | `false`                                              |
-| [`releaseTypes/<NAME>/versionRange`](#version-range)                                       | string  | `--release-types-<NAME>-version-range=<TEMPLATE>`                     | `NYX_RELEASE_TYPES_<NAME>_VERSION_RANGE=<TEMPLATE>`                     | Empty (no constrained range)                         |
+| [`releaseTypes/<NAME>/versionRange`](#version-range)                                       | string  | `--release-types-<NAME>-version-range=<TEMPLATE>`                     | `NYX_RELEASE_TYPES_<NAME>_VERSION_RANGE=<TEMPLATE>`                     | Empty (no constrained range)                                               |
 | [`releaseTypes/<NAME>/versionRangeFromBranchName`](#version-range-from-branch-name)        | boolean | `--release-types-<NAME>-version-range-from-branch-name=true|false`    | `NYX_RELEASE_TYPES_<NAME>_VERSION_RANGE_FROM_BRANCH_NAME=true|false`    | `false`                                              |
+
+#### Assets
+
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `releaseTypes/<NAME>/assets`                                                             |
+| Type                      | list                                                                                     |
+| Default                   | null                                                                                     |
+| Command Line Option       | `--release-types-<NAME>-assets=<NAMES>`                                                  |
+| Environment Variable      | `NYX_RELEASE_TYPES_<NAME>_ASSETS=<NAMES>`                                                |
+| Configuration File Option | `releaseTypes/items/<NAME>/assets`                                                       |
+| Related state attributes  | [releaseAssets]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-assets.md %}){: .btn .btn--info .btn--small} |
+
+The comma separated list of release asset [names]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-assets.md %}#name) to be published for this release type.
+
+This option gives you finer control over the assets being published for the release type as:
+
+* when `null` (by default) all the globally configured [release assets]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-assets.md %}) are published for this release type.
+* when defined (not `null`) only the release assets whose [`name`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-assets.md %}#name) appears in this list are published for this release type
+* when defined but empty no assets are published by this release type
+
+Each item in the list must correspond to a release asset [`name`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-assets.md %}#name) (not the file name). Each named asset must be configured. Release assets not listed here will just be ignored by Nyx when this release type is matched as if they were not even defined.
+
+Think of this configuration option as a means to filter a subset of assets to publish for this release type.
 
 #### Collapse versions
 
@@ -511,6 +535,8 @@ When `true` Nyx will run the [publish]({{ site.baseurl }}{% link _pages/guide/us
 Here you can define a [template]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}) that is evaluated at runtime to make this decision dynamic.
 
 When this value evaluates to *true* releases are published to the [services]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}) listed in the [`releaseTypes/publicationServices`](#publication-services) option. Otherwise, when this evaluates to *false*, no publication is done.
+
+Also see [`assets`](#assets) for more on the assets attached to releases upon publication.
 
 #### Version range
 

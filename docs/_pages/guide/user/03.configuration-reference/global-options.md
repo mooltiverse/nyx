@@ -18,6 +18,7 @@ These are the top level options in the configuration:
 | [`git`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/git.md %}) | object  | See [Git]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/git.md %}) | See [Git]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/git.md %}) | N/A      |
 | [`initialVersion`](#initial-version)                      | string  | `--initial-version=<VERSION>`                             | `NYX_INITIAL_VERSION=<VERSION>`                               |  Depends on the configured [version scheme](#scheme) |
 | [`preset`](#preset)                                       | string  | `--preset=<NAME>`                                         | `NYX_PRESET=<NAME>`                                           | N/A      |
+| [`releaseAssets`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-assets.md %}) | object  | See [Release Assets]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-assets.md %}) | See [Release Assets]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-assets.md %}) | N/A      |
 | [`releaseLenient`](#release-lenient)                      | boolean | `--release-lenient`, `--release-lenient=true|false`       | `NYX_RELEASE_LENIENT=true|false`                              | `true`   |
 | [`releasePrefix`](#release-prefix)                        | string  | `--release-prefix=<PREFIX>`                               | `NYX_RELEASE_PREFIX=<PREFIX>`                                 | N/A      |
 | [`releaseTypes`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}) | object  | See [Release Types]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}) | See [Release Types]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}) | N/A      |
@@ -147,6 +148,10 @@ This value is ignored when the [version](#version) option is used. See [this exa
 This option allows you to import one [preset configuration]({{ site.baseurl }}{% link _pages/guide/user/04.configuration-presets/index.md %}) into your configuration to save configuration time and effort.
 
 Presets have low priority in the [evaluation order]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}#evaluation-order) so you can override their values by several means if you need to. On the other hand they are an effective way to get started in minutes using well known and tested streamlined configurations.
+
+### Release assets
+
+See [Release Assets]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-assets.md %}).
 
 ### Release lenient
 

@@ -80,7 +80,20 @@ This option is **mandatory**.
 
 #### GitHub
 
-The service of `GITHUB` [type](#type) giving you access to [GitHub](https://github.com/) extra features. This service type supports the `RELEASES` [feature](#service-features) to publish a [GitHub Release](https://help.github.com/en/github/administering-a-repository/releasing-projects-on-github) when a new release is produced
+The service of `GITHUB` [type](#type) giving you access to [GitHub](https://github.com/) extra features. This service type supports the `RELEASES` and `RELEASE_ASSETS` [features](#service-features) to publish a [GitHub Release](https://help.github.com/en/github/administering-a-repository/releasing-projects-on-github) when a new release is produced, also with attached assets.
+
+##### Release support
+
+This service type supports all release publication features with no limitations. See below for release assets.
+
+##### Release assets support
+
+This service supports only local files for [release assets]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-assets.md %}) while links to external elements are not supported. This means that if you declare an asset whose [path]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-assets.md %}#path) is an URL it will be ignored and the asset will not appear along with the release. This is due to the way GitHub manages release assets.
+
+One way to work around this limitation and add links to the release is to customize the [changelog template]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/changelog.md %}#template) so that remote URLs appear as links within the changelog.
+{: .notice--info}
+
+Release assets whose [path]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-assets.md %}#path) cannot be resolved to a local file are skipped.
 
 ##### GitHub configuration options
 
@@ -110,7 +123,17 @@ You are encouraged to create a new token for this purpose.
 
 #### GitLab
 
-The service of `GITLAB` [type](#type) giving you access to [GitLab](https://gitlab.com/) extra features. This service type supports the `RELEASES` [feature](#service-features) to publish a [GitLab Release](https://docs.gitlab.com/ee/user/project/releases/) when a new release is produced
+The service of `GITLAB` [type](#type) giving you access to [GitLab](https://gitlab.com/) extra features. This service type supports the `RELEASES` and `RELEASE_ASSETS` [features](#service-features) to publish a [GitLab Release](https://docs.gitlab.com/ee/user/project/releases/) when a new release is produced, also with attached assets.
+
+##### Release support
+
+This service type supports all release publication features with no limitations. See below for release assets.
+
+##### Release assets support
+
+This service supports both local files and remote URLs for [release assets]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-assets.md %}).
+
+Release assets whose [path]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-assets.md %}#path) represents a local file but cannot be resolved to an existing file are skipped.
 
 ##### GitLab configuration options
 
@@ -141,6 +164,7 @@ You are encouraged to create a new token for this purpose.
 The list of possible service features is:
 
 * `RELEASES`: services supporting this feature can be used to publish releases to hosting services
+* `RELEASE_ASSETS`: services supporting this feature can also attach [assets]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-assets.md %}) to published releases
 
 Please note that using a service for a feature that is not supported will result in an error.
 {: .notice--info}

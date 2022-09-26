@@ -31,6 +31,7 @@ import org.junit.jupiter.api.Test;
 
 import com.mooltiverse.oss.nyx.configuration.presets.Extended;
 import com.mooltiverse.oss.nyx.configuration.presets.Simple;
+import com.mooltiverse.oss.nyx.entities.Attachment;
 import com.mooltiverse.oss.nyx.entities.ChangelogConfiguration;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
@@ -133,6 +134,13 @@ public class ConfigurationTests {
         void getPresetTest()
             throws Exception {
             assertEquals(Defaults.PRESET, new Configuration().getPreset());
+        }
+
+        @Test
+        @DisplayName("Configuration.getReleaseAssets() == Defaults.SERVICES")
+        void getReleaseAssetsTest()
+            throws Exception {
+            assertEquals(Defaults.RELEASE_ASSETS, new Configuration().getReleaseAssets());
         }
 
         @Test
@@ -471,25 +479,46 @@ public class ConfigurationTests {
         }
 
         @Test
-        @DisplayName("Configuration.withCommandLineConfiguration(MOCK).getReleasePrefix() == MOCK.getReleasePrefix()")
-        void getReleasePrefixTest()
+        @DisplayName("Configuration.withCommandLineConfiguration(MOCK).getReleaseAssets() == MOCK.getReleaseAssets()")
+        void getReleaseAssetsTest()
             throws Exception {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
-            configurationLayerMock.setReleasePrefix("testprefix");
+            configurationLayerMock.setReleaseAssets(
+                Map.<String,Attachment>of(
+                "asset1", new Attachment("asset.txt", "Text Asset", "text/plain", "asset.txt"),
+                "asset2", new Attachment("asset.bin", "Binary Asset", "application/octet-stream", "asset.bin")
+            )
+            );
 
             // in order to make the test meaningful, make sure the default and mock values are different
-            assertNotEquals(Defaults.RELEASE_PREFIX, configurationLayerMock.getReleasePrefix());
+            assertNotNull(Defaults.RELEASE_ASSETS);
+            assertNotNull(configurationLayerMock.getReleaseAssets());
+            assertNotSame(configuration.getReleaseAssets(), configurationLayerMock.getReleaseAssets());
 
             // make sure the initial values come from defaults, until we inject the command line configuration
-            assertEquals(Defaults.RELEASE_PREFIX, configuration.getReleasePrefix());
+            assertEquals(0, Defaults.RELEASE_ASSETS.size());
+            assertEquals(0, configuration.getReleaseAssets().size());
             
             // inject the command line configuration and test the new value is returned from that
             configuration.withCommandLineConfiguration(configurationLayerMock);
-            assertEquals(configurationLayerMock.getReleasePrefix(), configuration.getReleasePrefix());
+
+            assertEquals(2, configuration.getReleaseAssets().size());
+            assertTrue(configuration.getReleaseAssets().containsKey("asset1"));
+            assertTrue(configuration.getReleaseAssets().containsKey("asset2"));
+            assertEquals("asset.txt", configuration.getReleaseAssets().get("asset1").getFileName());
+            assertEquals("Text Asset", configuration.getReleaseAssets().get("asset1").getDescription());
+            assertEquals("text/plain", configuration.getReleaseAssets().get("asset1").getType());
+            assertEquals("asset.txt", configuration.getReleaseAssets().get("asset1").getPath());
+            assertEquals("asset.bin", configuration.getReleaseAssets().get("asset2").getFileName());
+            assertEquals("Binary Asset", configuration.getReleaseAssets().get("asset2").getDescription());
+            assertEquals("application/octet-stream", configuration.getReleaseAssets().get("asset2").getType());
+            assertEquals("asset.bin", configuration.getReleaseAssets().get("asset2").getPath());
 
             // now remove the command line configuration and test that now default values are returned again
-            assertEquals(Defaults.RELEASE_PREFIX, configuration.withCommandLineConfiguration(null).getReleasePrefix());
+            configuration.withCommandLineConfiguration(null);
+            assertNotNull(configuration.getReleaseAssets());
+            assertEquals(0, configuration.getReleaseAssets().size());
         }
 
         @Test
@@ -515,6 +544,28 @@ public class ConfigurationTests {
         }
 
         @Test
+        @DisplayName("Configuration.withCommandLineConfiguration(MOCK).getReleasePrefix() == MOCK.getReleasePrefix()")
+        void getReleasePrefixTest()
+            throws Exception {
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            Configuration configuration = new Configuration();
+            configurationLayerMock.setReleasePrefix("testprefix");
+
+            // in order to make the test meaningful, make sure the default and mock values are different
+            assertNotEquals(Defaults.RELEASE_PREFIX, configurationLayerMock.getReleasePrefix());
+
+            // make sure the initial values come from defaults, until we inject the command line configuration
+            assertEquals(Defaults.RELEASE_PREFIX, configuration.getReleasePrefix());
+            
+            // inject the command line configuration and test the new value is returned from that
+            configuration.withCommandLineConfiguration(configurationLayerMock);
+            assertEquals(configurationLayerMock.getReleasePrefix(), configuration.getReleasePrefix());
+
+            // now remove the command line configuration and test that now default values are returned again
+            assertEquals(Defaults.RELEASE_PREFIX, configuration.withCommandLineConfiguration(null).getReleasePrefix());
+        }
+
+        @Test
         @DisplayName("Configuration.withCommandLineConfiguration(MOCK).getReleaseTypes() == MOCK.getReleaseTypes()")
         void getReleaseTypesTest()
             throws Exception {
@@ -525,7 +576,7 @@ public class ConfigurationTests {
                     List.<String>of("type1"),
                     List.<String>of("service1"),
                     List.<String>of("remote1"),
-                    Map.<String,ReleaseType>of("type1", new ReleaseType(true, "{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}", "Release description", "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{version}}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{version}}", List.<Identifier>of(new Identifier("build", "12", Identifier.Position.BUILD)), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), "", Boolean.FALSE))
+                    Map.<String,ReleaseType>of("type1", new ReleaseType(List.<String>of("asset1", "asset2"), true, "{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}", "Release description", "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{version}}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{version}}", List.<Identifier>of(new Identifier("build", "12", Identifier.Position.BUILD)), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), "", Boolean.FALSE))
                 )
             );
 
@@ -558,6 +609,9 @@ public class ConfigurationTests {
             assertEquals(1, configuration.getReleaseTypes().getRemoteRepositories().size());
             assertTrue(configuration.getReleaseTypes().getRemoteRepositories().contains("remote1"));
             assertEquals(1, configuration.getReleaseTypes().getItems().size());
+            assertEquals(2, configuration.getReleaseTypes().getItems().get("type1").getAssets().size());
+            assertEquals("asset1", configuration.getReleaseTypes().getItems().get("type1").getAssets().get(0));
+            assertEquals("asset2", configuration.getReleaseTypes().getItems().get("type1").getAssets().get(1));
             assertTrue(configuration.getReleaseTypes().getItems().get("type1").getCollapseVersions());
             assertEquals("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}", configuration.getReleaseTypes().getItems().get("type1").getCollapsedVersionQualifier());
             assertEquals("Release description", configuration.getReleaseTypes().getItems().get("type1").getDescription());
@@ -1037,25 +1091,46 @@ public class ConfigurationTests {
         }
 
         @Test
-        @DisplayName("Configuration.withPluginConfiguration(MOCK).getReleasePrefix() == MOCK.getReleasePrefix()")
-        void getReleasePrefixTest()
+        @DisplayName("Configuration.withPluginConfiguration(MOCK).getReleaseAssets() == MOCK.getReleaseAssets()")
+        void getReleaseAssetsTest()
             throws Exception {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
-            configurationLayerMock.setReleasePrefix("testprefix");
+            configurationLayerMock.setReleaseAssets(
+                Map.<String,Attachment>of(
+                "asset1", new Attachment("asset.txt", "Text Asset", "text/plain", "asset.txt"),
+                "asset2", new Attachment("asset.bin", "Binary Asset", "application/octet-stream", "asset.bin")
+            )
+            );
 
             // in order to make the test meaningful, make sure the default and mock values are different
-            assertNotEquals(Defaults.RELEASE_PREFIX, configurationLayerMock.getReleasePrefix());
+            assertNotNull(Defaults.RELEASE_ASSETS);
+            assertNotNull(configurationLayerMock.getReleaseAssets());
+            assertNotSame(configuration.getReleaseAssets(), configurationLayerMock.getReleaseAssets());
 
-            // make sure the initial values come from defaults, until we inject the plugin configuration
-            assertEquals(Defaults.RELEASE_PREFIX, configuration.getReleasePrefix());
+            // make sure the initial values come from defaults, until we inject the command line configuration
+            assertEquals(0, Defaults.RELEASE_ASSETS.size());
+            assertEquals(0, configuration.getReleaseAssets().size());
             
-            // inject the plugin configuration and test the new value is returned from that
+            // inject the command line configuration and test the new value is returned from that
             configuration.withPluginConfiguration(configurationLayerMock);
-            assertEquals(configurationLayerMock.getReleasePrefix(), configuration.getReleasePrefix());
 
-            // now remove the plugin configuration and test that now default values are returned again
-            assertEquals(Defaults.RELEASE_PREFIX, configuration.withPluginConfiguration(null).getReleasePrefix());
+            assertEquals(2, configuration.getReleaseAssets().size());
+            assertTrue(configuration.getReleaseAssets().containsKey("asset1"));
+            assertTrue(configuration.getReleaseAssets().containsKey("asset2"));
+            assertEquals("asset.txt", configuration.getReleaseAssets().get("asset1").getFileName());
+            assertEquals("Text Asset", configuration.getReleaseAssets().get("asset1").getDescription());
+            assertEquals("text/plain", configuration.getReleaseAssets().get("asset1").getType());
+            assertEquals("asset.txt", configuration.getReleaseAssets().get("asset1").getPath());
+            assertEquals("asset.bin", configuration.getReleaseAssets().get("asset2").getFileName());
+            assertEquals("Binary Asset", configuration.getReleaseAssets().get("asset2").getDescription());
+            assertEquals("application/octet-stream", configuration.getReleaseAssets().get("asset2").getType());
+            assertEquals("asset.bin", configuration.getReleaseAssets().get("asset2").getPath());
+
+            // now remove the command line configuration and test that now default values are returned again
+            configuration.withPluginConfiguration(null);
+            assertNotNull(configuration.getReleaseAssets());
+            assertEquals(0, configuration.getReleaseAssets().size());
         }
 
         @Test
@@ -1081,6 +1156,28 @@ public class ConfigurationTests {
         }
 
         @Test
+        @DisplayName("Configuration.withPluginConfiguration(MOCK).getReleasePrefix() == MOCK.getReleasePrefix()")
+        void getReleasePrefixTest()
+            throws Exception {
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            Configuration configuration = new Configuration();
+            configurationLayerMock.setReleasePrefix("testprefix");
+
+            // in order to make the test meaningful, make sure the default and mock values are different
+            assertNotEquals(Defaults.RELEASE_PREFIX, configurationLayerMock.getReleasePrefix());
+
+            // make sure the initial values come from defaults, until we inject the plugin configuration
+            assertEquals(Defaults.RELEASE_PREFIX, configuration.getReleasePrefix());
+            
+            // inject the plugin configuration and test the new value is returned from that
+            configuration.withPluginConfiguration(configurationLayerMock);
+            assertEquals(configurationLayerMock.getReleasePrefix(), configuration.getReleasePrefix());
+
+            // now remove the plugin configuration and test that now default values are returned again
+            assertEquals(Defaults.RELEASE_PREFIX, configuration.withPluginConfiguration(null).getReleasePrefix());
+        }
+
+        @Test
         @DisplayName("Configuration.withPluginConfiguration(MOCK).getReleaseTypes() == MOCK.getReleaseTypes()")
         void getReleaseTypesTest()
             throws Exception {
@@ -1091,7 +1188,7 @@ public class ConfigurationTests {
                     List.<String>of("type1"),
                     List.<String>of("service1"),
                     List.<String>of("remote1"),
-                    Map.<String,ReleaseType>of("type1", new ReleaseType(true, "{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}", "Release description", "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{version}}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{version}}", List.<Identifier>of(new Identifier("build", "12", Identifier.Position.BUILD)), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), "", Boolean.FALSE))
+                    Map.<String,ReleaseType>of("type1", new ReleaseType(List.<String>of("asset1", "asset2"), true, "{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}", "Release description", "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{version}}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{version}}", List.<Identifier>of(new Identifier("build", "12", Identifier.Position.BUILD)), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), "", Boolean.FALSE))
                 )
             );
 
@@ -1124,6 +1221,9 @@ public class ConfigurationTests {
             assertEquals(1, configuration.getReleaseTypes().getRemoteRepositories().size());
             assertTrue(configuration.getReleaseTypes().getRemoteRepositories().contains("remote1"));
             assertEquals(1, configuration.getReleaseTypes().getItems().size());
+            assertEquals(2, configuration.getReleaseTypes().getItems().get("type1").getAssets().size());
+            assertEquals("asset1", configuration.getReleaseTypes().getItems().get("type1").getAssets().get(0));
+            assertEquals("asset2", configuration.getReleaseTypes().getItems().get("type1").getAssets().get(1));
             assertTrue(configuration.getReleaseTypes().getItems().get("type1").getCollapseVersions());
             assertEquals("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}", configuration.getReleaseTypes().getItems().get("type1").getCollapsedVersionQualifier());
             assertEquals("Release description", configuration.getReleaseTypes().getItems().get("type1").getDescription());
@@ -1603,25 +1703,46 @@ public class ConfigurationTests {
         }
 
         @Test
-        @DisplayName("Configuration.withRuntimeConfiguration(MOCK).getReleasePrefix() == MOCK.getReleasePrefix()")
-        void getReleasePrefixTest()
+        @DisplayName("Configuration.withRuntimeConfiguration(MOCK).getReleaseAssets() == MOCK.getReleaseAssets()")
+        void getReleaseAssetsTest()
             throws Exception {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
-            configurationLayerMock.setReleasePrefix("testprefix");
+            configurationLayerMock.setReleaseAssets(
+                Map.<String,Attachment>of(
+                "asset1", new Attachment("asset.txt", "Text Asset", "text/plain", "asset.txt"),
+                "asset2", new Attachment("asset.bin", "Binary Asset", "application/octet-stream", "asset.bin")
+            )
+            );
 
             // in order to make the test meaningful, make sure the default and mock values are different
-            assertNotEquals(Defaults.RELEASE_PREFIX, configurationLayerMock.getReleasePrefix());
+            assertNotNull(Defaults.RELEASE_ASSETS);
+            assertNotNull(configurationLayerMock.getReleaseAssets());
+            assertNotSame(configuration.getReleaseAssets(), configurationLayerMock.getReleaseAssets());
 
             // make sure the initial values come from defaults, until we inject the command line configuration
-            assertEquals(Defaults.RELEASE_PREFIX, configuration.getReleasePrefix());
+            assertEquals(0, Defaults.RELEASE_ASSETS.size());
+            assertEquals(0, configuration.getReleaseAssets().size());
             
             // inject the command line configuration and test the new value is returned from that
             configuration.withRuntimeConfiguration(configurationLayerMock);
-            assertEquals(configurationLayerMock.getReleasePrefix(), configuration.getReleasePrefix());
+
+            assertEquals(2, configuration.getReleaseAssets().size());
+            assertTrue(configuration.getReleaseAssets().containsKey("asset1"));
+            assertTrue(configuration.getReleaseAssets().containsKey("asset2"));
+            assertEquals("asset.txt", configuration.getReleaseAssets().get("asset1").getFileName());
+            assertEquals("Text Asset", configuration.getReleaseAssets().get("asset1").getDescription());
+            assertEquals("text/plain", configuration.getReleaseAssets().get("asset1").getType());
+            assertEquals("asset.txt", configuration.getReleaseAssets().get("asset1").getPath());
+            assertEquals("asset.bin", configuration.getReleaseAssets().get("asset2").getFileName());
+            assertEquals("Binary Asset", configuration.getReleaseAssets().get("asset2").getDescription());
+            assertEquals("application/octet-stream", configuration.getReleaseAssets().get("asset2").getType());
+            assertEquals("asset.bin", configuration.getReleaseAssets().get("asset2").getPath());
 
             // now remove the command line configuration and test that now default values are returned again
-            assertEquals(Defaults.RELEASE_PREFIX, configuration.withRuntimeConfiguration(null).getReleasePrefix());
+            configuration.withRuntimeConfiguration(null);
+            assertNotNull(configuration.getReleaseAssets());
+            assertEquals(0, configuration.getReleaseAssets().size());
         }
 
         @Test
@@ -1647,6 +1768,28 @@ public class ConfigurationTests {
         }
 
         @Test
+        @DisplayName("Configuration.withRuntimeConfiguration(MOCK).getReleasePrefix() == MOCK.getReleasePrefix()")
+        void getReleasePrefixTest()
+            throws Exception {
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            Configuration configuration = new Configuration();
+            configurationLayerMock.setReleasePrefix("testprefix");
+
+            // in order to make the test meaningful, make sure the default and mock values are different
+            assertNotEquals(Defaults.RELEASE_PREFIX, configurationLayerMock.getReleasePrefix());
+
+            // make sure the initial values come from defaults, until we inject the command line configuration
+            assertEquals(Defaults.RELEASE_PREFIX, configuration.getReleasePrefix());
+            
+            // inject the command line configuration and test the new value is returned from that
+            configuration.withRuntimeConfiguration(configurationLayerMock);
+            assertEquals(configurationLayerMock.getReleasePrefix(), configuration.getReleasePrefix());
+
+            // now remove the command line configuration and test that now default values are returned again
+            assertEquals(Defaults.RELEASE_PREFIX, configuration.withRuntimeConfiguration(null).getReleasePrefix());
+        }
+
+        @Test
         @DisplayName("Configuration.withRuntimeConfiguration(MOCK).getReleaseTypes() == MOCK.getReleaseTypes()")
         void getReleaseTypesTest()
             throws Exception {
@@ -1657,7 +1800,7 @@ public class ConfigurationTests {
                     List.<String>of("type1"),
                     List.<String>of("service1"),
                     List.<String>of("remote1"),
-                    Map.<String,ReleaseType>of("type1", new ReleaseType(true, "{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}", "Release description", "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{version}}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{version}}", List.<Identifier>of(new Identifier("build", "12", Identifier.Position.BUILD)), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), "", Boolean.FALSE))
+                    Map.<String,ReleaseType>of("type1", new ReleaseType(List.<String>of("asset1", "asset2"), true, "{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}", "Release description", "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{version}}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{version}}", List.<Identifier>of(new Identifier("build", "12", Identifier.Position.BUILD)), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), "", Boolean.FALSE))
                 )
             );
 
@@ -1690,6 +1833,9 @@ public class ConfigurationTests {
             assertEquals(1, configuration.getReleaseTypes().getRemoteRepositories().size());
             assertTrue(configuration.getReleaseTypes().getRemoteRepositories().contains("remote1"));
             assertEquals(1, configuration.getReleaseTypes().getItems().size());
+            assertEquals(2, configuration.getReleaseTypes().getItems().get("type1").getAssets().size());
+            assertEquals("asset1", configuration.getReleaseTypes().getItems().get("type1").getAssets().get(0));
+            assertEquals("asset2", configuration.getReleaseTypes().getItems().get("type1").getAssets().get(1));
             assertTrue(configuration.getReleaseTypes().getItems().get("type1").getCollapseVersions());
             assertEquals("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}", configuration.getReleaseTypes().getItems().get("type1").getCollapsedVersionQualifier());
             assertEquals("Release description", configuration.getReleaseTypes().getItems().get("type1").getDescription());
@@ -2143,22 +2289,70 @@ public class ConfigurationTests {
         }
 
         @Test
-        @DisplayName("Configuration[multiple layers].getReleasePrefix() == MOCK.getReleasePrefix()")
-        void getReleasePrefixTest()
+        @DisplayName("Configuration[multiple layers].getReleaseAssets() == MOCK.getReleaseAssets()")
+        void getReleaseAssetsTest()
             throws Exception {
             SimpleConfigurationLayer lowPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             SimpleConfigurationLayer mediumPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             SimpleConfigurationLayer highPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
-            lowPriorityConfigurationLayerMock.setReleasePrefix("lpprefix");
-            mediumPriorityConfigurationLayerMock.setReleasePrefix("mpprefix");
-            highPriorityConfigurationLayerMock.setReleasePrefix("hpprefix");
+            lowPriorityConfigurationLayerMock.setReleaseAssets(
+                Map.<String,Attachment>of(
+                "lpasset1", new Attachment("lpasset.txt", "LP Text Asset", "text/plain", "lpasset.txt"),
+                "lpasset2", new Attachment("lpasset.bin", "LP Binary Asset", "application/octet-stream", "lpasset.bin")
+            )
+            );
+            mediumPriorityConfigurationLayerMock.setReleaseAssets(
+                Map.<String,Attachment>of(
+                "mpasset1", new Attachment("mpasset.txt", "MP Text Asset", "text/plain", "mpasset.txt"),
+                "mpasset2", new Attachment("mpasset.bin", "MP Binary Asset", "application/octet-stream", "mpasset.bin")
+            )
+            );
+            highPriorityConfigurationLayerMock.setReleaseAssets(
+                Map.<String,Attachment>of(
+                "hpasset1", new Attachment("hpasset.txt", "HP Text Asset", "text/plain", "hpasset.txt"),
+                "hpasset2", new Attachment("hpasset.bin", "HP Binary Asset", "application/octet-stream", "hpasset.bin")
+            )
+            );
             
-            // inject the plugin configuration and test the new value is returned from that
+            // inject the command line configuration and test the new value is returned from that
             configuration.withPluginConfiguration(lowPriorityConfigurationLayerMock);
             configuration.withCommandLineConfiguration(mediumPriorityConfigurationLayerMock);
             configuration.withRuntimeConfiguration(highPriorityConfigurationLayerMock);
-            assertEquals(highPriorityConfigurationLayerMock.getReleasePrefix(), configuration.getReleasePrefix());
+
+            assertEquals(6, configuration.getReleaseAssets().size());
+            assertTrue(configuration.getReleaseAssets().containsKey("lpasset1"));
+            assertTrue(configuration.getReleaseAssets().containsKey("lpasset2"));
+            assertEquals("lpasset.txt", configuration.getReleaseAssets().get("lpasset1").getFileName());
+            assertEquals("LP Text Asset", configuration.getReleaseAssets().get("lpasset1").getDescription());
+            assertEquals("text/plain", configuration.getReleaseAssets().get("lpasset1").getType());
+            assertEquals("lpasset.txt", configuration.getReleaseAssets().get("lpasset1").getPath());
+            assertEquals("lpasset.bin", configuration.getReleaseAssets().get("lpasset2").getFileName());
+            assertEquals("LP Binary Asset", configuration.getReleaseAssets().get("lpasset2").getDescription());
+            assertEquals("application/octet-stream", configuration.getReleaseAssets().get("lpasset2").getType());
+            assertEquals("lpasset.bin", configuration.getReleaseAssets().get("lpasset2").getPath());
+
+            assertTrue(configuration.getReleaseAssets().containsKey("mpasset1"));
+            assertTrue(configuration.getReleaseAssets().containsKey("mpasset2"));
+            assertEquals("mpasset.txt", configuration.getReleaseAssets().get("mpasset1").getFileName());
+            assertEquals("MP Text Asset", configuration.getReleaseAssets().get("mpasset1").getDescription());
+            assertEquals("text/plain", configuration.getReleaseAssets().get("mpasset1").getType());
+            assertEquals("mpasset.txt", configuration.getReleaseAssets().get("mpasset1").getPath());
+            assertEquals("mpasset.bin", configuration.getReleaseAssets().get("mpasset2").getFileName());
+            assertEquals("MP Binary Asset", configuration.getReleaseAssets().get("mpasset2").getDescription());
+            assertEquals("application/octet-stream", configuration.getReleaseAssets().get("mpasset2").getType());
+            assertEquals("mpasset.bin", configuration.getReleaseAssets().get("mpasset2").getPath());
+
+            assertTrue(configuration.getReleaseAssets().containsKey("hpasset1"));
+            assertTrue(configuration.getReleaseAssets().containsKey("hpasset2"));
+            assertEquals("hpasset.txt", configuration.getReleaseAssets().get("hpasset1").getFileName());
+            assertEquals("HP Text Asset", configuration.getReleaseAssets().get("hpasset1").getDescription());
+            assertEquals("text/plain", configuration.getReleaseAssets().get("hpasset1").getType());
+            assertEquals("hpasset.txt", configuration.getReleaseAssets().get("hpasset1").getPath());
+            assertEquals("hpasset.bin", configuration.getReleaseAssets().get("hpasset2").getFileName());
+            assertEquals("HP Binary Asset", configuration.getReleaseAssets().get("hpasset2").getDescription());
+            assertEquals("application/octet-stream", configuration.getReleaseAssets().get("hpasset2").getType());
+            assertEquals("hpasset.bin", configuration.getReleaseAssets().get("hpasset2").getPath());
         }
 
         @Test
@@ -2181,6 +2375,25 @@ public class ConfigurationTests {
         }
 
         @Test
+        @DisplayName("Configuration[multiple layers].getReleasePrefix() == MOCK.getReleasePrefix()")
+        void getReleasePrefixTest()
+            throws Exception {
+            SimpleConfigurationLayer lowPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
+            SimpleConfigurationLayer mediumPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
+            SimpleConfigurationLayer highPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
+            Configuration configuration = new Configuration();
+            lowPriorityConfigurationLayerMock.setReleasePrefix("lpprefix");
+            mediumPriorityConfigurationLayerMock.setReleasePrefix("mpprefix");
+            highPriorityConfigurationLayerMock.setReleasePrefix("hpprefix");
+            
+            // inject the plugin configuration and test the new value is returned from that
+            configuration.withPluginConfiguration(lowPriorityConfigurationLayerMock);
+            configuration.withCommandLineConfiguration(mediumPriorityConfigurationLayerMock);
+            configuration.withRuntimeConfiguration(highPriorityConfigurationLayerMock);
+            assertEquals(highPriorityConfigurationLayerMock.getReleasePrefix(), configuration.getReleasePrefix());
+        }
+
+        @Test
         @DisplayName("Configuration[multiple layers].getReleaseTypes() == MOCK.getReleaseTypes()")
         void getReleaseTypesTest()
             throws Exception {
@@ -2193,7 +2406,7 @@ public class ConfigurationTests {
                     List.<String>of("type1"),
                     List.<String>of("service1"),
                     List.<String>of("remote1"),
-                    Map.<String,ReleaseType>of("type1", new ReleaseType(false, "{{branch1}}", "Release description 1", "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{version}}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{version}}", List.<Identifier>of(new Identifier("build", "12", Identifier.Position.BUILD)), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), "", Boolean.FALSE))
+                    Map.<String,ReleaseType>of("type1", new ReleaseType(List.<String>of("assetA1", "assetA2"), false, "{{branch1}}", "Release description 1", "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{version}}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{version}}", List.<Identifier>of(new Identifier("build", "12", Identifier.Position.BUILD)), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), "", Boolean.FALSE))
                 )
             );
             mediumPriorityConfigurationLayerMock.setReleaseTypes(
@@ -2201,7 +2414,7 @@ public class ConfigurationTests {
                     List.<String>of("type2"),
                     List.<String>of("service2"),
                     List.<String>of("remote2"),
-                    Map.<String,ReleaseType>of("type2", new ReleaseType(true, "{{branch2}}", "Release description 2", "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{version}}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{version}}", List.<Identifier>of(new Identifier("build", "12", Identifier.Position.BUILD)), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), "", Boolean.FALSE))
+                    Map.<String,ReleaseType>of("type2", new ReleaseType(List.<String>of("assetB1", "assetB2"), true, "{{branch2}}", "Release description 2", "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{version}}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{version}}", List.<Identifier>of(new Identifier("build", "12", Identifier.Position.BUILD)), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), "", Boolean.FALSE))
                 )
             );
             highPriorityConfigurationLayerMock.setReleaseTypes(
@@ -2209,7 +2422,7 @@ public class ConfigurationTests {
                     List.<String>of("type3"),
                     List.<String>of("service3"),
                     List.<String>of("remote3"),
-                    Map.<String,ReleaseType>of("type3", new ReleaseType(true, "{{branch3}}", "Release description 3", "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{version}}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{version}}", List.<Identifier>of(new Identifier("build", "12", Identifier.Position.BUILD)), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), "", Boolean.FALSE))
+                    Map.<String,ReleaseType>of("type3", new ReleaseType(List.<String>of("assetC1", "assetC2"), true, "{{branch3}}", "Release description 3", "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{version}}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{version}}", List.<Identifier>of(new Identifier("build", "12", Identifier.Position.BUILD)), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), "", Boolean.FALSE))
                 )
             );
             
@@ -2229,6 +2442,9 @@ public class ConfigurationTests {
             assertEquals(1, configuration.getReleaseTypes().getRemoteRepositories().size());
             assertTrue(configuration.getReleaseTypes().getRemoteRepositories().contains("remote3"));
             assertEquals(1, configuration.getReleaseTypes().getItems().size());
+            assertEquals(2, configuration.getReleaseTypes().getItems().get("type3").getAssets().size());
+            assertEquals("assetC1", configuration.getReleaseTypes().getItems().get("type3").getAssets().get(0));
+            assertEquals("assetC2", configuration.getReleaseTypes().getItems().get("type3").getAssets().get(1));
             assertTrue(configuration.getReleaseTypes().getItems().get("type3").getCollapseVersions());
             assertEquals("{{branch3}}", configuration.getReleaseTypes().getItems().get("type3").getCollapsedVersionQualifier());
             assertEquals("Release description 3", configuration.getReleaseTypes().getItems().get("type3").getDescription());

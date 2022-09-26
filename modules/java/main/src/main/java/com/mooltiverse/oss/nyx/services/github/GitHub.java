@@ -22,13 +22,16 @@ import java.net.URISyntaxException;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mooltiverse.oss.nyx.entities.Attachment;
 import com.mooltiverse.oss.nyx.io.TransportException;
 import com.mooltiverse.oss.nyx.services.GitHostingService;
 import com.mooltiverse.oss.nyx.services.SecurityException;
+import com.mooltiverse.oss.nyx.services.Release;
 import com.mooltiverse.oss.nyx.services.ReleaseService;
 import com.mooltiverse.oss.nyx.services.Service;
 import com.mooltiverse.oss.nyx.services.UserService;
@@ -163,7 +166,7 @@ public class GitHub implements GitHostingService, ReleaseService, UserService {
             logger.warn(SERVICE, "No repository owner passed to the '{}' service, some features may not work. Use the '{}' option to set this value", GitHub.class.getSimpleName(), REPOSITORY_OWNER_OPTION_NAME);
         else repositoryOwner = options.get(REPOSITORY_OWNER_OPTION_NAME);
         
-        logger.trace(SERVICE, "Instantiating new service using tha base URI: '{}'", baseURI.toString());
+        logger.trace(SERVICE, "Instantiating new service using the base URI: '{}'", baseURI.toString());
 
         // we have only one API and version so far so we just use that, otherwise we'd need to read additional
         // options to understand which API and version to use
@@ -208,7 +211,7 @@ public class GitHub implements GitHostingService, ReleaseService, UserService {
         if (Objects.isNull(repository) && Objects.isNull(repositoryName))
             logger.warn(SERVICE, "The repository name was not passed as a service option nor overridden as an argument, getting the release may fail. Use the '{}' option to set this option or override it when invoking this method.", REPOSITORY_NAME_OPTION_NAME);
         Map<String, Object> releaseAttributes = api.getReleaseByTag(Objects.isNull(owner) ? repositoryOwner : owner, Objects.isNull(repository) ? this.repositoryName : repository, tag);
-        return Objects.isNull(releaseAttributes) ? null : new GitHubRelease(api, releaseAttributes);
+        return Objects.isNull(releaseAttributes) ? null : new GitHubRelease(api, releaseAttributes, api.listReleaseAssets(owner, repository, releaseAttributes.get("id").toString()));
     }
 
     /**
@@ -228,14 +231,42 @@ public class GitHub implements GitHostingService, ReleaseService, UserService {
      * {@inheritDoc}
      */
     @Override
+    public GitHubRelease publishReleaseAssets(String owner, String repository, Release release, Set<Attachment> assets)
+        throws SecurityException, TransportException {
+        Objects.requireNonNull(release);
+        if (Objects.isNull(owner) && Objects.isNull(repositoryOwner))
+            logger.warn(SERVICE, "The repository owner was not passed as a service option nor overridden as an argument, creating the release may fail. Use the '{}' option to set this option or override it when invoking this method.", REPOSITORY_OWNER_OPTION_NAME);
+        if (Objects.isNull(repository) && Objects.isNull(repositoryName))
+            logger.warn(SERVICE, "The repository name was not passed as a service option nor overridden as an argument, creating the release may fail. Use the '{}' option to set this option or override it when invoking this method.", REPOSITORY_NAME_OPTION_NAME);
+        try {
+            GitHubRelease ghRelease = GitHubRelease.class.cast(release);
+            if (Objects.isNull(assets) || assets.isEmpty())
+                return ghRelease;
+            // See: https://docs.github.com/en/rest/releases/releases#create-a-release
+            // The upload_url attribute is the one we need to upload assets
+            Object uploadURLObject = ghRelease.getAttributes().get("upload_url");
+            if (Objects.isNull(uploadURLObject))
+                throw new IllegalArgumentException(String.format("The given release does not have the '%s' attribute which is required to upload assets. Make sure it was created with this service", "upload_url"));
+            return new GitHubRelease(api, ghRelease.getAttributes(), api.publishReleaseAssets(Objects.isNull(owner) ? repositoryOwner : owner, Objects.isNull(repository) ? this.repositoryName : repository, uploadURLObject.toString(), assets));
+        }
+        catch (ClassCastException cce) {
+            throw new IllegalArgumentException("The given release was not created by this service", cce);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean supports(Service.Feature feature) {
         Objects.requireNonNull(feature, "Can't check if the feature is supported for a null feature");
         switch (feature)
         {
-            case GIT_HOSTING:   return true;
-            case RELEASES:      return true;
-            case USERS:         return true;
-            default:            return false;
+            case GIT_HOSTING:       return true;
+            case RELEASES:          return true;
+            case RELEASE_ASSETS:    return true;
+            case USERS:             return true;
+            default:                return false;
         }
     }
 }

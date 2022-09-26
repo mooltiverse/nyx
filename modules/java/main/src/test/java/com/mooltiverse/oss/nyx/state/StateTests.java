@@ -33,6 +33,7 @@ import org.junit.jupiter.api.Test;
 
 import com.mooltiverse.oss.nyx.configuration.Configuration;
 import com.mooltiverse.oss.nyx.configuration.SimpleConfigurationLayer;
+import com.mooltiverse.oss.nyx.entities.Attachment;
 import com.mooltiverse.oss.nyx.entities.Changelog;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
@@ -215,7 +216,7 @@ public class StateTests {
             throws Exception {
             State state = new State(new Configuration());
             // inject a releaseType with the 'publish' flag to TRUE
-            state.setReleaseType(new ReleaseType(true, null, null, null, Boolean.FALSE.toString(), null, Boolean.FALSE.toString(), Boolean.FALSE.toString(), null, null, null, null, null, /*this is the 'publish' flag -> */ Boolean.TRUE.toString(), null, Boolean.FALSE));
+            state.setReleaseType(new ReleaseType(null, true, null, null, null, Boolean.FALSE.toString(), null, Boolean.FALSE.toString(), Boolean.FALSE.toString(), null, null, null, null, null, /*this is the 'publish' flag -> */ Boolean.TRUE.toString(), null, Boolean.FALSE));
             state.setVersion("1.2.3");
             state.getReleaseScope().setPreviousVersion("1.2.3");
             assertFalse(state.getNewVersion());
@@ -226,7 +227,7 @@ public class StateTests {
             assertTrue(state.getNewRelease());
 
             // now replace the releaseType with the 'publish' flag to FALSE
-            state.setReleaseType(new ReleaseType(true, null, null, null, Boolean.FALSE.toString(), null, Boolean.FALSE.toString(), Boolean.FALSE.toString(), null, null, null, null, null, /*this is the 'publish' flag -> */ Boolean.FALSE.toString(), null, Boolean.FALSE));
+            state.setReleaseType(new ReleaseType(null, true, null, null, null, Boolean.FALSE.toString(), null, Boolean.FALSE.toString(), Boolean.FALSE.toString(), null, null, null, null, null, /*this is the 'publish' flag -> */ Boolean.FALSE.toString(), null, Boolean.FALSE));
 
             state.getReleaseScope().setPreviousVersion("0.1.0");
             assertTrue(state.getNewVersion());
@@ -245,6 +246,20 @@ public class StateTests {
 
             state.getReleaseScope().setPreviousVersion("0.1.0");
             assertTrue(state.getNewVersion());
+        }
+
+        @Test
+        @DisplayName("State.getReleaseAssets()")
+        void getReleaseAssetsTest()
+            throws Exception {
+            State state = new State(new Configuration());
+
+            // make sure the release type is never null but empty upon initialization
+            assertNotNull(state.getReleaseAssets());
+            assertTrue(state.getReleaseAssets().isEmpty());
+            state.getReleaseAssets().add(new Attachment("f1", "d1", "t1", "p1"));
+            state.getReleaseAssets().add(new Attachment("f2", "d2", "t2", "p2"));
+            assertEquals(2, state.getReleaseAssets().size());
         }
 
         @Test

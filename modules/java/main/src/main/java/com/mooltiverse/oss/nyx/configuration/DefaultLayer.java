@@ -23,6 +23,7 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mooltiverse.oss.nyx.entities.Attachment;
 import com.mooltiverse.oss.nyx.entities.ChangelogConfiguration;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
 import com.mooltiverse.oss.nyx.entities.GitConfiguration;
@@ -109,7 +110,7 @@ class DefaultLayer implements ConfigurationLayer, Defaults {
     @Override
     public String getConfigurationFile()
         throws DataAccessException, IllegalPropertyException {
-        logger.trace(DEFAULT, "Retrieving the default '{}' configuration option", "configurationFile");
+        logger.trace(DEFAULT, "Retrieving the default '{}' configuration option: '{}'", "configurationFile", CONFIGURATION_FILE);
         return CONFIGURATION_FILE;
     }
 
@@ -177,6 +178,16 @@ class DefaultLayer implements ConfigurationLayer, Defaults {
      * {@inheritDoc}
      */
     @Override
+    public Map<String,Attachment> getReleaseAssets()
+        throws DataAccessException, IllegalPropertyException {
+        logger.trace(DEFAULT, "Retrieving the default '{}' configuration option", "releaseAssets");
+        return RELEASE_ASSETS;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Boolean getReleaseLenient()
         throws DataAccessException, IllegalPropertyException {
         logger.trace(DEFAULT, "Retrieving the default '{}' configuration option: '{}'", "releaseLenient", RELEASE_LENIENT);
@@ -199,7 +210,7 @@ class DefaultLayer implements ConfigurationLayer, Defaults {
     @Override
     public ReleaseTypes getReleaseTypes()
         throws DataAccessException, IllegalPropertyException {
-        logger.trace(DEFAULT, "Retrieving the default '{}' release type", "releaseTypes");
+        logger.trace(DEFAULT, "Retrieving the default '{}' configuration option", "releaseTypes");
         return RELEASE_TYPES;
     }
 
@@ -229,7 +240,7 @@ class DefaultLayer implements ConfigurationLayer, Defaults {
     @Override
     public Map<String,ServiceConfiguration> getServices()
         throws DataAccessException, IllegalPropertyException {
-        logger.trace(DEFAULT, "Retrieving the default '{}' configuration option: '{}'", "services", SERVICES);
+        logger.trace(DEFAULT, "Retrieving the default '{}' configuration option", "services");
         return SERVICES;
     }
 

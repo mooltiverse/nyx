@@ -11,7 +11,7 @@ There is only one `changelog` *section* per configuration.
 
 The range of commits included in the changelog is limited to those in the current [release scope]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#commits). What appears in the changelog is the first line of the commit message and, optionally, some decorators that may have been configured here or added by a custom template.
 
-The changelog is generated only when a [new version]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#new-version) has been [inferred]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#infer).
+The changelog is generated only when a [new version]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#new-version) has been [inferred]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer).
 
 ### Changelog options
 

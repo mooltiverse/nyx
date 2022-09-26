@@ -35,6 +35,7 @@ import java.util.regex.PatternSyntaxException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mooltiverse.oss.nyx.entities.Attachment;
 import com.mooltiverse.oss.nyx.entities.ChangelogConfiguration;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
@@ -264,6 +265,72 @@ class EnvironmentConfigurationLayer implements ConfigurationLayer {
     /**
      * The name of the environment variable to read for this value. Value: {@value}
      */
+    private static final String RELEASE_ASSETS_ENVVAR_NAME = ENVVAR_NAME_GLOBAL_PREFIX.concat("RELEASE_ASSETS");
+
+    /**
+     * The regular expression used to scan the name of a release asset from an environment
+     * variable name. This expression is used to detect if an environment variable is used to define
+     * a release asset.
+     * This expression uses the 'name' capturing group which returns the release asset name, if detected.
+     * Value: {@value}
+     */
+    private static final String RELEASE_ASSETS_ITEM_NAME_REGEX = RELEASE_ASSETS_ENVVAR_NAME.concat("_(?<name>[a-zA-Z0-9]+)_([a-zA-Z0-9_]+)$");
+
+    /**
+     * The parametrized name of the environment variable to read for the 'fileName' attribute of a
+     * release asset.
+     * This string is a {@link Formatter string} that contains a '%s' parameter for the release asset name
+     * and must be rendered using {@link String#format(String, Object...) String.format(RELEASE_ASSETS_ITEM_FILE_NAME_FORMAT_STRING, name)}
+     * in order to get the actual name of environment variable that brings the value for the release assetm file name with the given {@code name}.
+     * Value: {@value}
+     * 
+     * @see Formatter
+     * @see String#format(String, Object...)
+     */
+    private static final String RELEASE_ASSETS_ITEM_FILE_NAME_FORMAT_STRING = RELEASE_ASSETS_ENVVAR_NAME.concat("_%s_FILE_NAME");
+
+    /**
+     * The parametrized name of the environment variable to read for the 'description' attribute of a
+     * release asset.
+     * This string is a {@link Formatter string} that contains a '%s' parameter for the release asset name
+     * and must be rendered using {@link String#format(String, Object...) String.format(RELEASE_ASSETS_ITEM_DESCRIPTION_FORMAT_STRING, name)}
+     * in order to get the actual name of environment variable that brings the value for the release asset description with the given {@code name}.
+     * Value: {@value}
+     * 
+     * @see Formatter
+     * @see String#format(String, Object...)
+     */
+    private static final String RELEASE_ASSETS_ITEM_DESCRIPTION_FORMAT_STRING = RELEASE_ASSETS_ENVVAR_NAME.concat("_%s_DESCRIPTION");
+
+    /**
+     * The parametrized name of the environment variable to read for the 'path' attribute of a
+     * release asset.
+     * This string is a {@link Formatter string} that contains a '%s' parameter for the release asset name
+     * and must be rendered using {@link String#format(String, Object...) String.format(RELEASE_ASSETS_ITEM_PATH_FORMAT_STRING, name)}
+     * in order to get the actual name of environment variable that brings the value for the release asset path with the given {@code name}.
+     * Value: {@value}
+     * 
+     * @see Formatter
+     * @see String#format(String, Object...)
+     */
+    private static final String RELEASE_ASSETS_ITEM_PATH_FORMAT_STRING = RELEASE_ASSETS_ENVVAR_NAME.concat("_%s_PATH");
+
+    /**
+     * The parametrized name of the environment variable to read for the 'type' attribute of a
+     * release asset.
+     * This string is a {@link Formatter string} that contains a '%s' parameter for the release asset name
+     * and must be rendered using {@link String#format(String, Object...) String.format(RELEASE_ASSETS_ITEM_TYPE_FORMAT_STRING, name)}
+     * in order to get the actual name of environment variable that brings the value for the release asset type with the given {@code name}.
+     * Value: {@value}
+     * 
+     * @see Formatter
+     * @see String#format(String, Object...)
+     */
+    private static final String RELEASE_ASSETS_ITEM_TYPE_FORMAT_STRING = RELEASE_ASSETS_ENVVAR_NAME.concat("_%s_TYPE");
+
+    /**
+     * The name of the environment variable to read for this value. Value: {@value}
+     */
     private static final String RELEASE_LENIENT_ENVVAR_NAME = ENVVAR_NAME_GLOBAL_PREFIX.concat("RELEASE_LENIENT");
 
     /**
@@ -299,6 +366,19 @@ class EnvironmentConfigurationLayer implements ConfigurationLayer {
      * Value: {@value}
      */
     private static final String RELEASE_TYPES_ITEM_NAME_REGEX = RELEASE_TYPES_ENVVAR_NAME.concat("_(?<name>[a-zA-Z0-9]+)_([a-zA-Z0-9_]+)$");
+
+    /**
+     * The parametrized name of the environment variable to read for the 'assets' attribute of a
+     * release type.
+     * This string is a {@link Formatter string} that contains a '%s' parameter for the release type name
+     * and must be rendered using {@link String#format(String, Object...) String.format(RELEASE_TYPES_ITEM_ASSETS_FORMAT_STRING, name)}
+     * in order to get the actual name of environment variable that brings the value for the release type with the given {@code name}.
+     * Value: {@value}
+     * 
+     * @see Formatter
+     * @see String#format(String, Object...)
+     */
+    private static final String RELEASE_TYPES_ITEM_ASSETS_FORMAT_STRING = RELEASE_TYPES_ENVVAR_NAME.concat("_%s_ASSETS");
 
     /**
      * The parametrized name of the environment variable to read for the 'collapseVersions' attribute of a
@@ -592,6 +672,11 @@ class EnvironmentConfigurationLayer implements ConfigurationLayer {
      * The private instance of the git configuration section.
      */
     private GitConfiguration gitSection = null;
+
+    /**
+     * The private instance of the release assets configuration section.
+     */
+    private Map<String,Attachment> releaseAssetsSection = null;
 
     /**
      * The private instance of the release types configuration section.
@@ -966,8 +1051,25 @@ class EnvironmentConfigurationLayer implements ConfigurationLayer {
      * {@inheritDoc}
      */
     @Override
-    public String getReleasePrefix() {
-        return getenv(RELEASE_PREFIX_ENVVAR_NAME);
+    public Map<String,Attachment> getReleaseAssets()
+        throws IllegalPropertyException {
+        if (Objects.isNull(releaseAssetsSection)) {
+            // parse the 'releaseAssets' map
+            releaseAssetsSection = new HashMap<String,Attachment>();
+
+            Set<String> itemNames = scanItemNamesInEnvironmentVariables("releaseAssets", RELEASE_ASSETS_ITEM_NAME_REGEX, null);
+            // now we have the set of all item names configured through environment variables and we can
+            // query specific environment variables
+            for (String itemName: itemNames) {
+                String fileName    = getenv(String.format(RELEASE_ASSETS_ITEM_FILE_NAME_FORMAT_STRING, itemName));
+                String description = getenv(String.format(RELEASE_ASSETS_ITEM_DESCRIPTION_FORMAT_STRING, itemName));
+                String path        = getenv(String.format(RELEASE_ASSETS_ITEM_PATH_FORMAT_STRING, itemName));
+                String type        = getenv(String.format(RELEASE_ASSETS_ITEM_TYPE_FORMAT_STRING, itemName));
+
+                releaseAssetsSection.put(itemName, new Attachment(fileName, description, type, path));
+            }
+        }
+        return releaseAssetsSection;
     }
 
     /**
@@ -982,6 +1084,14 @@ class EnvironmentConfigurationLayer implements ConfigurationLayer {
         catch (IllegalArgumentException iae) {
             throw new IllegalPropertyException(String.format("The environment variable '%s' has an illegal value '%s'", RELEASE_LENIENT_ENVVAR_NAME, getenv(RELEASE_LENIENT_ENVVAR_NAME)), iae);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getReleasePrefix() {
+        return getenv(RELEASE_PREFIX_ENVVAR_NAME);
     }
 
     /**
@@ -1017,6 +1127,8 @@ class EnvironmentConfigurationLayer implements ConfigurationLayer {
                 catch (IllegalArgumentException iae) {
                     throw new IllegalPropertyException(String.format("The environment variable '%s' has an illegal value '%s'", String.format(RELEASE_TYPES_ITEM_COLLAPSE_VERSIONS_FORMAT_STRING, itemName), collapseVersionsString), iae);
                 }
+                String assetsList                               = getenv(String.format(RELEASE_TYPES_ITEM_ASSETS_FORMAT_STRING, itemName));
+                List<String> assets                             = Objects.isNull(assetsList) ? null : List.<String>of(assetsList.split(","));
                 String collapseVersionQualifier                 = getenv(String.format(RELEASE_TYPES_ITEM_COLLAPSED_VERSION_QUALIFIER_FORMAT_STRING, itemName));
                 String description                              = getenv(String.format(RELEASE_TYPES_ITEM_DESCRIPTION_FORMAT_STRING, itemName));
                 String filterTags                               = getenv(String.format(RELEASE_TYPES_ITEM_FILTER_TAGS_FORMAT_STRING, itemName));
@@ -1049,7 +1161,7 @@ class EnvironmentConfigurationLayer implements ConfigurationLayer {
                     throw new IllegalPropertyException(String.format("The environment variable '%s' has an illegal value '%s'", String.format(RELEASE_TYPES_ITEM_VERSION_RANGE_FROM_BRANCH_NAME_FORMAT_STRING, itemName), versionRangeFromBranchNameString), iae);
                 }
 
-                items.put(itemName, new ReleaseType(Objects.isNull(collapseVersions) ? Defaults.ReleaseType.COLLAPSE_VERSIONS : collapseVersions, collapseVersionQualifier, description, filterTags, gitCommit, gitCommitMessage, gitPush, gitTag, gitTagMessage, identifiers, matchBranches, matchEnvironmentVariables, matchWorkspaceStatus, publish, versionRange, versionRangeFromBranchName));
+                items.put(itemName, new ReleaseType(assets, Objects.isNull(collapseVersions) ? Defaults.ReleaseType.COLLAPSE_VERSIONS : collapseVersions, collapseVersionQualifier, description, filterTags, gitCommit, gitCommitMessage, gitPush, gitTag, gitTagMessage, identifiers, matchBranches, matchEnvironmentVariables, matchWorkspaceStatus, publish, versionRange, versionRangeFromBranchName));
             }
 
             releaseTypesSection = new ReleaseTypes(enabled, publicationServices, remoteRepositories, items);

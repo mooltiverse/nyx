@@ -18,6 +18,7 @@ package com.mooltiverse.oss.nyx.configuration;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.mooltiverse.oss.nyx.entities.Attachment;
 import com.mooltiverse.oss.nyx.entities.ChangelogConfiguration;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
 import com.mooltiverse.oss.nyx.entities.GitConfiguration;
@@ -74,6 +75,11 @@ public class SimpleConfigurationLayer implements ConfigurationLayer {
      * The value held by this object.
      */
     private String preset = null;
+
+    /**
+     * The value held by this object.
+     */
+    private Map<String,Attachment> releaseAssets = new HashMap<String,Attachment>();
 
     /**
      * The value held by this object.
@@ -283,6 +289,23 @@ public class SimpleConfigurationLayer implements ConfigurationLayer {
      */
     public void setPreset(String preset) {
         this.preset = preset;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Map<String,Attachment> getReleaseAssets() {
+        return releaseAssets;
+    }
+
+    /**
+     * Sets the value for this option.
+     * 
+     * @param releaseAssets the value for this option.
+     */
+    public void setReleaseAssets(Map<String,Attachment> releaseAssets) {
+        this.releaseAssets = releaseAssets;
     }
 
     /**

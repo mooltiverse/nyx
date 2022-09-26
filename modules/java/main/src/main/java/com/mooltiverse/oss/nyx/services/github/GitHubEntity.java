@@ -15,13 +15,16 @@
  */
 package com.mooltiverse.oss.nyx.services.github;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeType;
 
 /**
  * A common superclass for GitHub entities providing basic features for marshalling and unmarshalling objects
@@ -77,6 +80,36 @@ abstract class GitHubEntity {
             res.put(field.getKey(), field.getValue().asText());
         }
 
+        return res;
+    }
+
+    /**
+     * Reads all the attributes of the given object immediate children and puts them in the resulting maps,
+     * one map for each child.
+     * 
+     * @param node the node to read the attributes from
+     * 
+     * @return the maps with all the attributes from the immediate children of the given node
+     * 
+     * @throws NullPointerException if the given node is {@code null}
+     */
+    protected static List<Map<String, Object>> toAttributeMaps(JsonNode node) {
+        Objects.requireNonNull(node, "Can't parse attributes from a null node");
+        List<Map<String, Object>> res = new ArrayList<Map<String, Object>>();
+
+        if (JsonNodeType.ARRAY.equals(node.getNodeType())) {
+            // it's a collection
+            Iterator<JsonNode> nodesIterator = node.elements();
+            while (nodesIterator.hasNext()) {
+                JsonNode itemNode = nodesIterator.next();
+                res.add(toAttributeMap(itemNode));
+            }
+        }
+        else {
+            // it's a simple node, just return one item with its attributes
+            return List.<Map<String, Object>>of(toAttributeMap(node));
+        }
+        
         return res;
     }
 

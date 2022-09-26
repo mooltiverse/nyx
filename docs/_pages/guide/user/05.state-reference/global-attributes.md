@@ -32,7 +32,7 @@ The following attributes are at the top of the hierarchy:
 | Name                          | `branch`                                                                                 |
 | Type                          | string                                                                                   |
 | Related configuration options |                                                                                          |
-| Initialized by task           | [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#infer){: .btn .btn--small} |
+| Initialized by task           | [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer){: .btn .btn--small} |
 
 This string contains the current Git branch name.
 
@@ -46,7 +46,7 @@ This attribute is not available until [infer]({{ site.baseurl }}{% link _pages/g
 | Name                          | `bump`                                                                                   |
 | Type                          | string                                                                                   |
 | Related configuration options | [bump]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#bump){: .btn .btn--success .btn--small} [initialVersion]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#initial-version){: .btn .btn--success .btn--small} [releaseTypes/ID/collapseVersions]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#collapse-versions){: .btn .btn--success .btn--small} [scheme]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#scheme){: .btn .btn--success .btn--small} [version]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#version){: .btn .btn--success .btn--small} |
-| Initialized by task           | [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#infer){: .btn .btn--small} |
+| Initialized by task           | [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer){: .btn .btn--small} |
 
 This string contains the name of the identifier that has been bumped to create the new [`version`](#version). Version identifiers depend on the selected version [scheme](#scheme).
 
@@ -63,7 +63,7 @@ When using [collapsed versioning]({{ site.baseurl }}{% link _pages/guide/user/03
 | Name                          | `changelog`                                                                           |
 | Type                          | object                                                                                   |
 | Related configuration options | See the [details]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/changelog.md %}) |
-| Initialized by task           | [make]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#make){: .btn .btn--small} |
+| Initialized by task           | [make]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#make){: .btn .btn--small} |
 
 This object holds the data used to render the changelog, documented [here]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/changelog.md %}).
 
@@ -103,14 +103,13 @@ A map of attributes for internal use only.
 Using the attributes in this section is not supported. You should never rely on the attributes in this block as they may change at any time without any notice.
 {: .notice--warning}
 
-
 ### New release
 
 | ----------------------------- | ---------------------------------------------------------------------------------------- |
 | Name                          | `newRelease`                                                                             |
 | Type                          | boolean                                                                                  |
 | Related configuration options | [bump]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#bump){: .btn .btn--success .btn--small} [initialVersion]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#initial-version){: .btn .btn--success .btn--small} [releasePrefix]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#release-prefix){: .btn .btn--success .btn--small} [releaseTypes/ID/publish]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#publish){: .btn .btn--success .btn--small} [scheme]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#scheme){: .btn .btn--success .btn--small} [version]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#version){: .btn .btn--success .btn--small} |
-| Initialized by task           | [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#infer){: .btn .btn--small} |
+| Initialized by task           | [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer){: .btn .btn--small} |
 
 This value is `true` when the [`newVersion`](#version) is `true` and a new release with the current [`version`](#version) has to be [issued]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#publish).
 
@@ -124,7 +123,7 @@ This attribute is not available until [infer]({{ site.baseurl }}{% link _pages/g
 | Name                          | `newVersion`                                                                             |
 | Type                          | boolean                                                                                  |
 | Related configuration options | [bump]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#bump){: .btn .btn--success .btn--small} [initialVersion]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#initial-version){: .btn .btn--success .btn--small} [releasePrefix]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#release-prefix){: .btn .btn--success .btn--small} [scheme]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#scheme){: .btn .btn--success .btn--small} [version]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#version){: .btn .btn--success .btn--small} |
-| Initialized by task           | [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#infer){: .btn .btn--small} |
+| Initialized by task           | [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer){: .btn .btn--small} |
 
 This value is `true` when the [`version`](#version) is new and is basically a shorthand to testing if [`version`](#version) is different than the [`releaseScope/previousVersion`]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#previous-version).
 
@@ -136,7 +135,7 @@ This attribute is not available until [infer]({{ site.baseurl }}{% link _pages/g
 | Name                          | `releaseScope`                                                                           |
 | Type                          | object                                                                                   |
 | Related configuration options |                                                                                          |
-| Initialized by task           | [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#infer){: .btn .btn--small} |
+| Initialized by task           | [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer){: .btn .btn--small} |
 
 This object collects several attributes defining the release scope, documented [here]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}).
 
@@ -146,7 +145,7 @@ This object collects several attributes defining the release scope, documented [
 | Name                          | `releaseType`                                                                            |
 | Type                          | object                                                                                   |
 | Related configuration options | [releaseType]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#release-type-definition){: .btn .btn--success .btn--small} |
-| Initialized by task           | [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#infer){: .btn .btn--small} |
+| Initialized by task           | [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer){: .btn .btn--small} |
 
 This object references the release type that has been selected among the [enabled ones]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#enabled) by [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer).
 
@@ -184,7 +183,7 @@ If this is not used as the sole timestamp you may see a skew due to when the sys
 | Name                          | `version`                                                                                |
 | Type                          | string                                                                                   |
 | Related configuration options | [bump]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#bump){: .btn .btn--success .btn--small} [initialVersion]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#initial-version){: .btn .btn--success .btn--small} [releasePrefix]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#release-prefix){: .btn .btn--success .btn--small} [scheme]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#scheme){: .btn .btn--success .btn--small} [version]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#version){: .btn .btn--success .btn--small} |
-| Initialized by task           | [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#infer){: .btn .btn--small} |
+| Initialized by task           | [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer){: .btn .btn--small} |
 
 The version that was [inferred]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer), unless the [`version`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#version) configuration option was passed to override inference. When the version is not overridden or inferred the [`initialVersion`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#initial-version) is used.
 
@@ -198,7 +197,7 @@ This attribute is not available until [infer]({{ site.baseurl }}{% link _pages/g
 | Name                          | `versionRange`                                                                           |
 | Type                          | string                                                                                   |
 | Related configuration options | [versionRange]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#version-range){: .btn .btn--success .btn--small} [versionRangeFromBranchName]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#version-range-from-branch-name){: .btn .btn--success .btn--small} |
-| Initialized by task           | [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#infer){: .btn .btn--small} |
+| Initialized by task           | [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer){: .btn .btn--small} |
 
 The regular expression matched against the [`version`](#version) to make sure it's within a specific range.
 
