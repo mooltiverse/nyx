@@ -76,6 +76,8 @@ nav-user-guide:
         url: /guide/user/configuration-reference/commit-message-conventions/
       - title: "Git"
         url: /guide/user/configuration-reference/git/
+      - title: "Release Assets"
+        url: /guide/user/configuration-reference/release-assets/
       - title: "Release Types"
         url: /guide/user/configuration-reference/release-types/
       - title: "Services"
@@ -96,6 +98,8 @@ nav-user-guide:
         url: /guide/user/state-reference/global-attributes/
       - title: "Changelog"
         url: /guide/user/state-reference/changelog/
+      - title: "Release Assets"
+        url: /guide/user/state-reference/release-assets/
       - title: "Release Scope"
         url: /guide/user/state-reference/release-scope/
   - title: Best Practice

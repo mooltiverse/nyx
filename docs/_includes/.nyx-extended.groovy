@@ -38,6 +38,20 @@ nyx {
   }
   initialVersion = '1.0.0'
   preset = 'extended'
+  releaseAssets {
+    asset1 {
+      name = "asset.txt"
+      description = "Text Asset"
+      type = "text/plain"
+      path = "asset.txt"
+    }
+    asset2 {
+      name = "asset.bin"
+      description = "Binary Asset"
+      type = "application/octet-stream"
+      path = "asset.bin"
+    }
+  }
   releaseLenient = true
   releasePrefix = 'v'
   releaseTypes {
@@ -75,6 +89,7 @@ nyx {
         versionRangeFromBranchName = false
       }
       integration {
+        assets = []
         collapseVersions = true
         collapsedVersionQualifier = '{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}'
         description = 'Integration release {{version}}'
@@ -88,6 +103,7 @@ nyx {
         versionRangeFromBranchName = false
       }
       hotfix {
+        assets = [ "asset1" ]
         collapseVersions = true
         collapsedVersionQualifier = '{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}'
         description = 'Hotfix release {{version}}'

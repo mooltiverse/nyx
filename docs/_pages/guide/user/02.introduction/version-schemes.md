@@ -16,11 +16,6 @@ Nyx supports and complies with [Semantic Versioning](#semantic-versioning-semver
 The above statement is about the versioning strategy only. You can still use Maven as a build tool even when using Semantic Versioning.
 {: .notice--info}
 
-| ----------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| Related configuration options | [scheme]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#scheme){: .btn .btn--success .btn--small} |
-| Related state attributes      | [scheme]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#scheme){: .btn .btn--info .btn--small} [version]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#version){: .btn .btn--info .btn--small} |
-{: .notice--info}
-
 ### Semantic Versioning (SemVer)
 
 [Semantic Versioning](https://semver.org/) has become the standard *de-facto* as it's the most expressive scheme and defines clear rules about version ordering and expectations.

@@ -26,13 +26,13 @@ The following attributes are children of the [`releaseScope`]({{ site.baseurl }}
 | Name                          | `releaseScope/commits`                                                                   |
 | Type                          | list                                                                                     |
 | Related configuration options |                                                                                          |
-| Initialized by task           | [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#infer){: .btn .btn--small} [mark]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#mark){: .btn .btn--small} |
+| Initialized by task           | [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer){: .btn .btn--small} [mark]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#mark){: .btn .btn--small} |
 
 The ordered list of all [commits](#commit-objects) in the release scope. The list is reverse ordered, so the [newest commit](#final-commit) appears as the first element in the list, while the [oldest](#initial-commit) is the last in the list.
 
 This value may remain undefined when [inference]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer) is skipped because the user overrides the [`version`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#version).
 
-Furthermore this attribute may be changed by the [mark]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#mark) task in case a new commit is added (i.e. to include generated release artifacts).
+Furthermore this attribute may be changed by the [mark]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#mark) task in case a new commit is added (i.e. to include generated release artifacts).
 
 ### Final commit
 
@@ -40,13 +40,13 @@ Furthermore this attribute may be changed by the [mark]({{ site.baseurl }}{% lin
 | Name                          | `releaseScope/finalCommit`                                                               |
 | Type                          | string                                                                                   |
 | Related configuration options |                                                                                          |
-| Initialized by task           | [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#infer){: .btn .btn--small} [mark]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#mark){: .btn .btn--small} |
+| Initialized by task           | [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer){: .btn .btn--small} [mark]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#mark){: .btn .btn--small} |
 
 The last [commit](#commit-objects) in the release scope, which is to say the commit to be tagged upon release, the latest commit in the current branch (`HEAD`). This is the first element of the [`commits`](#commits) list.
 
 This value may remain undefined when [inference]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer) is skipped because the user overrides the [`version`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#version) or if there is no further commits after the [previous version](#previous-version-commit).
 
-Furthermore this attribute may be changed by the [mark]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#mark) task in case a new commit is added (i.e. to include generated release artifacts).
+Furthermore this attribute may be changed by the [mark]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#mark) task in case a new commit is added (i.e. to include generated release artifacts).
 
 ### Initial commit
 
@@ -54,7 +54,7 @@ Furthermore this attribute may be changed by the [mark]({{ site.baseurl }}{% lin
 | Name                          | `releaseScope/initialCommit`                                                             |
 | Type                          | string                                                                                   |
 | Related configuration options | [releaseLenient]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#release-lenient){: .btn .btn--success .btn--small} [releasePrefix]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#release-prefix){: .btn .btn--success .btn--small} [scheme]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#scheme){: .btn .btn--success .btn--small} |
-| Initialized by task           | [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#infer){: .btn .btn--small} [mark]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#mark){: .btn .btn--small} |
+| Initialized by task           | [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer){: .btn .btn--small} [mark]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#mark){: .btn .btn--small} |
 
 The [commit](#commit-objects) that became right after the [`releaseScope/previousVersionCommit`](#previous-version-commit), so the first commit in the range of commits belonging to the release being prepared. This is the last element of the [`commits`](#commits) list.
 
@@ -68,7 +68,7 @@ If no [`releaseScope/previousVersion`](#previous-version) is detected this value
 | Name                          | `releaseScope/previousVersion`                                                           |
 | Type                          | string                                                                                   |
 | Related configuration options | [initialVersion]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#initial-version){: .btn .btn--success .btn--small} [releaseLenient]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#release-lenient){: .btn .btn--success .btn--small} [releasePrefix]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#release-prefix){: .btn .btn--success .btn--small} [releaseTypes/ID/collapseVersions]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#collapse-versions){: .btn .btn--success .btn--small} [releaseTypes/ID/collapsedVersionQualifier]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#collapsed-version-qualifier){: .btn .btn--success .btn--small} [releaseTypes/ID/filterTags]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#filter-tags){: .btn .btn--success .btn--small} [scheme]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#scheme){: .btn .btn--success .btn--small} [version]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#version){: .btn .btn--success .btn--small} |
-| Initialized by task           | [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#infer){: .btn .btn--small} |
+| Initialized by task           | [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer){: .btn .btn--small} |
 
 The version that was released before the one being created. This is the value of the version tag applied to the [`releaseScope/previousVersionCommit`](#previous-version-commit) and is found by browsing the commit history backward (in Git's natural order) until this tag that successfully matches the [release types filter]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#filter-tags) is found. Upon merge commits only the [first parent]({{ site.baseurl }}{% link _posts/2020-01-01-how-does-nyx-deal-with-merge-commits-when-scanning-the-commit-history.md %}) is considered. The search stops at the first tag that is valid according to:
 
@@ -84,7 +84,7 @@ This value remains undefined when [inference]({{ site.baseurl }}{% link _pages/g
 | Name                          | `releaseScope/previousVersionCommit`                                                     |
 | Type                          | string                                                                                   |
 | Related configuration options | [initialVersion]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#initial-version){: .btn .btn--success .btn--small} [releaseLenient]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#release-lenient){: .btn .btn--success .btn--small} [releasePrefix]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#release-prefix){: .btn .btn--success .btn--small} [releaseTypes/ID/collapseVersions]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#collapse-versions){: .btn .btn--success .btn--small} [releaseTypes/ID/collapsedVersionQualifier]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#collapsed-version-qualifier){: .btn .btn--success .btn--small} [releaseTypes/ID/filterTags]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#filter-tags){: .btn .btn--success .btn--small} [scheme]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#scheme){: .btn .btn--success .btn--small} [version]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#version){: .btn .btn--success .btn--small} |
-| Initialized by task           | [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#infer){: .btn .btn--small} |
+| Initialized by task           | [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer){: .btn .btn--small} |
 
 The [commit](#commit-objects) that the [`previousVersion`](#previous-version) tag points to.
 
@@ -96,7 +96,7 @@ This value remains undefined when no previous version can be found in the commit
 | Name                          | `releaseScope/primeVersion`                                                              |
 | Type                          | string                                                                                   |
 | Related configuration options | [initialVersion]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#initial-version){: .btn .btn--success .btn--small} [releaseLenient]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#release-lenient){: .btn .btn--success .btn--small} [releasePrefix]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#release-prefix){: .btn .btn--success .btn--small} [releaseTypes/ID/collapseVersions]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#collapse-versions){: .btn .btn--success .btn--small} [releaseTypes/ID/collapsedVersionQualifier]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#collapsed-version-qualifier){: .btn .btn--success .btn--small} [scheme]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#scheme){: .btn .btn--success .btn--small} [version]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#version){: .btn .btn--success .btn--small} |
-| Initialized by task           | [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#infer){: .btn .btn--small} |
+| Initialized by task           | [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer){: .btn .btn--small} |
 
 The version that is used as the baseline when bumping version numbers when the release type uses [collapsed versioning]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#collapse-versions) (the *pre-release* versioning).
 
@@ -115,7 +115,7 @@ Also see [this F.A.Q.]({{ site.baseurl }}{% link _posts/2020-01-01-how-does-coll
 | Name                          | `releaseScope/primeVersionCommit`                                                        |
 | Type                          | string                                                                                   |
 | Related configuration options | [initialVersion]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#initial-version){: .btn .btn--success .btn--small} [releaseLenient]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#release-lenient){: .btn .btn--success .btn--small} [releasePrefix]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#release-prefix){: .btn .btn--success .btn--small} [releaseTypes/ID/collapseVersions]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#collapse-versions){: .btn .btn--success .btn--small} [releaseTypes/ID/collapsedVersionQualifier]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#collapsed-version-qualifier){: .btn .btn--success .btn--small} [releaseTypes/ID/filterTags]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#filter-tags){: .btn .btn--success .btn--small} [scheme]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#scheme){: .btn .btn--success .btn--small} [version]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#version){: .btn .btn--success .btn--small} |
-| Initialized by task           | [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#infer){: .btn .btn--small} |
+| Initialized by task           | [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer){: .btn .btn--small} |
 
 The [commit](#commit-objects) that the [`primeVersion`](#prime-version) tag points to.
 
@@ -127,7 +127,7 @@ This value remains undefined when no previous or prime version can be found in t
 | Name                          | `releaseScope/significantCommits`                                                        |
 | Type                          | list                                                                                     |
 | Related configuration options | [commitMessageConventions/ID/bumpExpressions]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/commit-message-conventions.md %}#bump-expressions){: .btn .btn--success .btn--small} |
-| Initialized by task           | [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#infer){: .btn .btn--small} |
+| Initialized by task           | [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer){: .btn .btn--small} |
 
 The ordered list of all significant [commits](#commit-objects) in the release scope, considering commits to be *significant* when they bring informations about some version identifier to bump, according to [`commitMessageConventions/<ID>/bumpExpressions`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/commit-message-conventions.md %}#bump-expressions). The list is reverse ordered, so the [newest commit](#final-commit) appears as the first element in the list, while the [oldest](#initial-commit) is the last in the list.
 

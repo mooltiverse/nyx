@@ -13,7 +13,7 @@ The following attributes are children of the [`changelog`]({{ site.baseurl }}{% 
 | ------------------------------------------------------------------- | ------- | --------------------------------------------------------- |
 | [`changelog/releases`](#releases)                                   | list    | The [releases](#releases) in the changelog                |
 
-Please note that the `changelog` object is only present when a [new version]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#new-version) has been [inferred]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#infer) and the changelog generation has been enabled by setting the changelog [`path`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/changelog.md %}#path) option.
+Please note that the `changelog` object is only present when a [new version]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#new-version) has been [inferred]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer) and the changelog generation has been enabled by setting the changelog [`path`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/changelog.md %}#path) option.
 {: .notice--info}
 
 ### Releases
@@ -22,7 +22,7 @@ Please note that the `changelog` object is only present when a [new version]({{ 
 | Name                          | `changelog/releases`                                                                     |
 | Type                          | list                                                                                     |
 | Related configuration options |                                                                                          |
-| Initialized by task           | [make]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#make){: .btn .btn--small} |
+| Initialized by task           | [make]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#make){: .btn .btn--small} |
 
 The ordered list of all changelog releases. The list is reverse ordered, so the newest release appears as the first element in the list, while the oldest is the last in the list.
 
@@ -40,7 +40,7 @@ Each release item has the following attributes:
 | Name                          | `changelog/releases/<ID>/sections`                                                       |
 | Type                          | list                                                                                     |
 | Related configuration options | [commitMessageConventions/NAME/expression]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/commit-message-conventions.md %}#expression){: .btn .btn--success .btn--small} [sections]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/changelog.md %}#sections){: .btn .btn--success .btn--small} |
-| Initialized by task           | [make]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#make){: .btn .btn--small} |
+| Initialized by task           | [make]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#make){: .btn .btn--small} |
 
 The sections of changes (commits) within a release. This is a the list of [commits](#commit-objects) within the section for the release.
 
