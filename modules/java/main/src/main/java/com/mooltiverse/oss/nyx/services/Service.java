@@ -56,7 +56,7 @@ public interface Service {
 
         /**
          * When this feature is supported then the implementation class implements the {@link ReleaseService} interface
-         * and the {@link ReleaseService#publishReleaseAssets(Release, java.util.Set)} method can be safely published
+         * and the {@link ReleaseService#publishReleaseAssets(String, String, Release, java.util.Set)} method can be safely published
          * without exceptions. See for more details on the supported assets on the service implementation class.
          */
         RELEASE_ASSETS,
