@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import com.mooltiverse.oss.nyx.Nyx;
 import com.mooltiverse.oss.nyx.configuration.presets.Presets;
+import com.mooltiverse.oss.nyx.entities.Attachment;
 import com.mooltiverse.oss.nyx.entities.ChangelogConfiguration;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
@@ -79,6 +80,11 @@ public class Configuration implements ConfigurationRoot {
      * The private instance of the Git configuration section.
      */
     private GitConfiguration gitSection = null;
+
+    /**
+     * The private instance of the release assets configuration section.
+     */
+    private Map<String,Attachment> releaseAssetsSection = null;
 
     /**
      * The private instance of the release types configuration section.
@@ -189,6 +195,7 @@ public class Configuration implements ConfigurationRoot {
         changelogSection = null;
         commitMessageConventionsSection = null;
         gitSection = null;
+        releaseAssetsSection = null;
         releaseTypesSection = null;
         servicesSection = null;
     }
@@ -548,17 +555,22 @@ public class Configuration implements ConfigurationRoot {
      * {@inheritDoc}
      */
     @Override
-    public String getReleasePrefix()
+    public Map<String,Attachment> getReleaseAssets()
         throws DataAccessException, IllegalPropertyException {
-        logger.trace(CONFIGURATION, "Retrieving the '{}' configuration option", "releasePrefix");
-        for (ConfigurationLayer layer: layers.values()) {
-            String releasePrefix = layer.getReleasePrefix();
-            if (!Objects.isNull(releasePrefix)) {
-                logger.trace(CONFIGURATION, "The '{}' configuration option value is: '{}'", "releasePrefix", releasePrefix);
-                return releasePrefix;
+        logger.trace(CONFIGURATION, "Retrieving the release assets");
+        if (Objects.isNull(releaseAssetsSection)) {
+            // parse the 'releaseAssets' map
+            releaseAssetsSection = new HashMap<String,Attachment>();
+            for (ConfigurationLayer layer: layers.values()) {
+                for (String releaseAssetName: layer.getReleaseAssets().keySet()) {
+                    if (!releaseAssetsSection.containsKey(releaseAssetName)) {
+                        releaseAssetsSection.put(releaseAssetName, layer.getReleaseAssets().get(releaseAssetName));
+                        logger.trace(CONFIGURATION, "The '{}[{}]' configuration option has been resolved", "releaseAssets", releaseAssetName);
+                    }
+                }
             }
         }
-        return DefaultLayer.getInstance().getReleasePrefix();
+        return releaseAssetsSection;
     }
 
     /**
@@ -576,6 +588,23 @@ public class Configuration implements ConfigurationRoot {
             }
         }
         return DefaultLayer.getInstance().getReleaseLenient();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getReleasePrefix()
+        throws DataAccessException, IllegalPropertyException {
+        logger.trace(CONFIGURATION, "Retrieving the '{}' configuration option", "releasePrefix");
+        for (ConfigurationLayer layer: layers.values()) {
+            String releasePrefix = layer.getReleasePrefix();
+            if (!Objects.isNull(releasePrefix)) {
+                logger.trace(CONFIGURATION, "The '{}' configuration option value is: '{}'", "releasePrefix", releasePrefix);
+                return releasePrefix;
+            }
+        }
+        return DefaultLayer.getInstance().getReleasePrefix();
     }
 
     /**

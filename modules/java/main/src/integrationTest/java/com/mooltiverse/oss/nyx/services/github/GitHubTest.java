@@ -168,7 +168,7 @@ public class GitHubTest {
             Release releaseWithAssets = gitHub.publishReleaseAssets(user.getUserName(), gitHubRepository.getName(), release, assetsToUpload);
             assertEquals(2, releaseWithAssets.getAssets().size());
             for (Attachment asset: releaseWithAssets.getAssets()) {
-                assertTrue(asset.getName().equals("asset1") || asset.getName().equals("asset2"));
+                assertTrue(asset.getFileName().equals("asset1") || asset.getFileName().equals("asset2"));
                 assertTrue(asset.getDescription().equals("Text asset") || asset.getDescription().equals("Binary asset"));
                 assertTrue(asset.getType().equals("text/plain") || asset.getType().equals("application/octet-stream"));
                 assertTrue(asset.getPath().startsWith("https://api.github.com/repos/"));
@@ -180,7 +180,7 @@ public class GitHubTest {
             assertEquals("1.0.0-alpha.1", release.getTag());
             assertEquals(2, release.getAssets().size());
             for (Attachment asset: release.getAssets()) {
-                assertTrue(asset.getName().equals("asset1") || asset.getName().equals("asset2"));
+                assertTrue(asset.getFileName().equals("asset1") || asset.getFileName().equals("asset2"));
                 assertTrue(asset.getDescription().equals("Text asset") || asset.getDescription().equals("Binary asset"));
                 assertTrue(asset.getType().equals("text/plain") || asset.getType().equals("application/octet-stream"));
                 assertTrue(asset.getPath().startsWith("https://api.github.com/repos/"));

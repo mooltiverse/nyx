@@ -31,6 +31,7 @@ public class ReleaseTypeTests {
         throws Exception {
         assertNotNull(
             new ReleaseType(
+                null,
                 true,
                 "{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}",
                 "Release description",
@@ -46,6 +47,7 @@ public class ReleaseTypeTests {
                 Boolean.TRUE.toString(),
                 "",
                 Boolean.FALSE));
+        assertNull(new ReleaseType().getAssets());
         assertNull(new ReleaseType().getMatchEnvironmentVariables());
     }
 }

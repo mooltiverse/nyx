@@ -15,8 +15,6 @@
  */
 package com.mooltiverse.oss.nyx.entities;
 
-import java.util.Objects;
-
 /**
  * This object models a MIME attachment.
  * 
@@ -24,24 +22,24 @@ import java.util.Objects;
  */
 public class Attachment {
     /**
-     * The attachment name (usually the file name).
+     * The attachment file name.
      */
-    private String name = null;
+    private String fileName = null;
 
     /**
-     * The attachment (short) description or label.
+     * The attachment (short) description (or label).
      */
     private String description = null;
-
-    /**
-     * The attachment MIME type.
-     */
-    private String type = null;
 
     /**
      * The attachment path (local file or URL).
      */
     private String path = null;
+
+    /**
+     * The attachment MIME type.
+     */
+    private String type = null;
 
     /**
      * Default constructor.
@@ -53,77 +51,53 @@ public class Attachment {
     /**
      * Standard constructor.
      * 
-     * @param name the attachment name (usually the file name).
-     * @param description the attachment (short) description or label.
+     * @param fileName the attachment file name.
+     * @param description the attachment (short) description (or label).
      * @param type the attachment MIME type.
      * @param path the attachment path (local file or URL).
-     * 
-     * @throws NullPointerException if some argument is {@code null}
      */
-    public Attachment(String name, String description, String type, String path) {
+    public Attachment(String fileName, String description, String type, String path) {
         super();
-        Objects.requireNonNull(name);
-        Objects.requireNonNull(description);
-        Objects.requireNonNull(type);
-        Objects.requireNonNull(path);
-        this.name = name;
+        this.fileName = fileName;
         this.description = description;
-        this.type = type;
         this.path = path;
+        this.type = type;
     }
 
     /**
-     * Returns the attachment name (usually the file name).
+     * Returns the attachment file name.
      * 
-     * @return the attachment name (usually the file name).
+     * @return the attachment file name.
      */
-    public String getName() {
-        return name;
+    public String getFileName() {
+        return fileName;
     }
 
     /**
-     * Sets the attachment name (usually the file name).
+     * Sets the attachment nfile name.
      * 
-     * @param name the attachment name (usually the file name).
+     * @param fileName the attachment file name.
      */
-    public void setName(String name) {
-        this.name = name;
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
     /**
-     * Returns the attachment (short) description or label.
+     * Returns the attachment (short) description (or label).
      * 
-     * @return the attachment (short) description or label.
+     * @return the attachment (short) description (or label).
      */
     public String getDescription() {
         return description;
     }
 
     /**
-     * Sets the attachment (short) description or label.
+     * Sets the attachment (short) description (or label).
      * 
-     * @param description the attachment (short) description or label.
+     * @param description the attachment (short) description (or label).
      */
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    /**
-     * Returns the attachment MIME type.
-     * 
-     * @return the attachment MIME type.
-     */
-    public String getType() {
-        return type;
-    }
-
-    /**
-     * Sets the attachment MIME type.
-     * 
-     * @param type the attachment MIME type.
-     */
-    public void setType(String type) {
-        this.type = type;
     }
 
     /**
@@ -142,5 +116,23 @@ public class Attachment {
      */
     public void setPath(String path) {
         this.path = path;
+    }
+
+    /**
+     * Returns the attachment MIME type.
+     * 
+     * @return the attachment MIME type.
+     */
+    public String getType() {
+        return type;
+    }
+
+    /**
+     * Sets the attachment MIME type.
+     * 
+     * @param type the attachment MIME type.
+     */
+    public void setType(String type) {
+        this.type = type;
     }
 }

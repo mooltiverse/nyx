@@ -27,6 +27,7 @@ import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import com.mooltiverse.oss.nyx.entities.Attachment;
 import com.mooltiverse.oss.nyx.entities.ChangelogConfiguration;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
@@ -182,6 +183,34 @@ public class SimpleConfigurationLayerTests {
 
         simpleConfigurationLayer.setPreset("simple");
         assertEquals("simple", simpleConfigurationLayer.getPreset());
+    }
+
+    @Test
+    @DisplayName("SimpleConfigurationLayer.getReleaseAssets()")
+    void getReleaseAssetsTest()
+        throws Exception {
+        SimpleConfigurationLayer simpleConfigurationLayer = new SimpleConfigurationLayer();
+        assertNotNull(simpleConfigurationLayer.getReleaseAssets());
+        assertTrue(simpleConfigurationLayer.getReleaseAssets().isEmpty());
+
+        simpleConfigurationLayer.setReleaseAssets(
+            Map.<String,Attachment>of(
+                "asset1", new Attachment("asset.txt", "Text Asset", "text/plain", "asset.txt"),
+                "asset2", new Attachment("asset.bin", "Binary Asset", "application/octet-stream", "asset.bin")
+            )
+        );
+
+        assertEquals(2, simpleConfigurationLayer.getReleaseAssets().size());
+        assertTrue(simpleConfigurationLayer.getReleaseAssets().containsKey("asset1"));
+        assertTrue(simpleConfigurationLayer.getReleaseAssets().containsKey("asset2"));
+        assertEquals("asset.txt", simpleConfigurationLayer.getReleaseAssets().get("asset1").getFileName());
+        assertEquals("Text Asset", simpleConfigurationLayer.getReleaseAssets().get("asset1").getDescription());
+        assertEquals("text/plain", simpleConfigurationLayer.getReleaseAssets().get("asset1").getType());
+        assertEquals("asset.txt", simpleConfigurationLayer.getReleaseAssets().get("asset1").getPath());
+        assertEquals("asset.bin", simpleConfigurationLayer.getReleaseAssets().get("asset2").getFileName());
+        assertEquals("Binary Asset", simpleConfigurationLayer.getReleaseAssets().get("asset2").getDescription());
+        assertEquals("application/octet-stream", simpleConfigurationLayer.getReleaseAssets().get("asset2").getType());
+        assertEquals("asset.bin", simpleConfigurationLayer.getReleaseAssets().get("asset2").getPath());
     }
 
     @Test

@@ -361,10 +361,10 @@ class RESTv4 extends API {
         for (Attachment asset: assets) {
             File assetFile = new File(asset.getPath());
             if (assetFile.exists()) {
-                logger.debug(SERVICE, "Uploading asset '{}' (description: '{}', type: '{}', path: '{}') to URL '{}'", asset.getName(), asset.getDescription(), asset.getType(), asset.getPath(), uri.toString());
+                logger.debug(SERVICE, "Uploading asset '{}' (description: '{}', type: '{}', path: '{}') to URL '{}'", asset.getFileName(), asset.getDescription(), asset.getType(), asset.getPath(), uri.toString());
                 // See: https://docs.gitlab.com/ee/user/packages/generic_packages/index.html
                 // we always upload to the 'generic' package registry here
-                URI uri = newRequestURI("/projects/"+URLEncoder.encode(owner+"/"+repository, StandardCharsets.UTF_8)+"/packages/generic/"+URLEncoder.encode(asset.getDescription(), StandardCharsets.UTF_8)+"/"+URLEncoder.encode(version, StandardCharsets.UTF_8)+"/"+URLEncoder.encode(asset.getName(), StandardCharsets.UTF_8)+"?select=package_file");
+                URI uri = newRequestURI("/projects/"+URLEncoder.encode(owner+"/"+repository, StandardCharsets.UTF_8)+"/packages/generic/"+URLEncoder.encode(asset.getDescription(), StandardCharsets.UTF_8)+"/"+URLEncoder.encode(version, StandardCharsets.UTF_8)+"/"+URLEncoder.encode(asset.getFileName(), StandardCharsets.UTF_8)+"?select=package_file");
 
                 HttpResponse<String> response = null;
                 try {
@@ -382,12 +382,12 @@ class RESTv4 extends API {
                 }
 
                 String assetURL = unmarshalJSONBodyElement(response.body(), "file").get("url").toString();
-                logger.debug(SERVICE, "Asset '{}' (type: '{}', path: '{}') has been uploaded and is available to URL '{}'", asset.getName(), asset.getType(), asset.getPath(), assetURL);
-                result.add(new Attachment(asset.getName(), asset.getDescription(), asset.getType(), assetURL));
+                logger.debug(SERVICE, "Asset '{}' (type: '{}', path: '{}') has been uploaded and is available to URL '{}'", asset.getFileName(), asset.getType(), asset.getPath(), assetURL);
+                result.add(new Attachment(asset.getFileName(), asset.getDescription(), asset.getType(), assetURL));
             }
             else 
             {
-                logger.debug(SERVICE, "The path '{}' for the asset '{}' cannot be resolved to a local file", asset.getPath(), asset.getName());
+                logger.debug(SERVICE, "The path '{}' for the asset '{}' cannot be resolved to a local file", asset.getPath(), asset.getFileName());
 
                 try {
                     // just check if it's a valid URL and if it is add it to the result assets
@@ -395,21 +395,21 @@ class RESTv4 extends API {
                     result.add(asset);
                 }
                 catch (MalformedURLException mue) {
-                    logger.warn(SERVICE, "The path '{}' for the asset '{}' cannot be resolved to a local file and is not a valid URL and will be skipped", asset.getPath(), asset.getName());
+                    logger.warn(SERVICE, "The path '{}' for the asset '{}' cannot be resolved to a local file and is not a valid URL and will be skipped", asset.getPath(), asset.getFileName());
                 }
             }
         }
 
         // step 2: upload asset links to the release
         for (Attachment asset: result) {
-            logger.debug(SERVICE, "Updating release '{}' with asset '{}' (description: '{}', type: '{}', path: '{}') to URL '{}'", version, asset.getName(), asset.getDescription(), asset.getType(), asset.getPath(), uri.toString());
+            logger.debug(SERVICE, "Updating release '{}' with asset '{}' (description: '{}', type: '{}', path: '{}') to URL '{}'", version, asset.getFileName(), asset.getDescription(), asset.getType(), asset.getPath(), uri.toString());
             // See: https://docs.gitlab.com/ee/user/packages/generic_packages/index.html
             // we always upload to the 'generic' package registry here
             URI uri = newRequestURI("/projects/"+URLEncoder.encode(owner+"/"+repository, StandardCharsets.UTF_8)+"/releases/"+URLEncoder.encode(version, StandardCharsets.UTF_8)+"/assets/links");
 
             Map<String,Object> requestParameters = new HashMap<String,Object>();
             //requestParameters.put("name", asset.getName());
-            requestParameters.put("name", asset.getName()); // maybe the description could be used here?
+            requestParameters.put("name", asset.getFileName()); // maybe the description could be used here?
             requestParameters.put("url", asset.getPath());
 
             HttpResponse<String> response = null;
@@ -427,7 +427,7 @@ class RESTv4 extends API {
                 else throw new TransportException(String.format("Request returned a status code '%d': %s", response.statusCode(), response.body()));
             }
 
-            logger.debug(SERVICE, "Asset '{}' (type: '{}', path: '{}') has been uploaded to release '{}'", asset.getName(), asset.getType(), asset.getPath(), version);
+            logger.debug(SERVICE, "Asset '{}' (type: '{}', path: '{}') has been uploaded to release '{}'", asset.getFileName(), asset.getType(), asset.getPath(), version);
         }
 
         logger.debug(SERVICE, "Uploaded '{}' assets", result.size());

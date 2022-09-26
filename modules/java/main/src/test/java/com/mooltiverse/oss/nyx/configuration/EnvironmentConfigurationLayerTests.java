@@ -221,6 +221,46 @@ public class EnvironmentConfigurationLayerTests {
     }
 
     @Test
+    @DisplayName("EnvironmentConfigurationLayer.getReleaseAssets()")
+    void getReleaseAssetsTest()
+        throws Exception {
+        EnvironmentConfigurationLayerMock environmentConfigurationLayer = EnvironmentConfigurationLayerMock.getInstance();
+        assertNotNull(environmentConfigurationLayer.getReleaseAssets());
+        assertTrue(environmentConfigurationLayer.getReleaseAssets().isEmpty());
+        
+        // get a new instance or a stale object is returned by getReleaseAssets()
+        environmentConfigurationLayer = EnvironmentConfigurationLayerMock.getInstance();
+        environmentConfigurationLayer.environment.put("NYX_RELEASE_ASSETS_asset1_TYPE", "text/plain");
+        
+        assertEquals(1, environmentConfigurationLayer.getReleaseAssets().size());
+        assertTrue(environmentConfigurationLayer.getReleaseAssets().containsKey("asset1"));
+        assertNotNull(environmentConfigurationLayer.getReleaseAssets().get("asset1"));
+        
+        // get a new instance or a stale object is returned by getReleaseAssets()
+        environmentConfigurationLayer = EnvironmentConfigurationLayerMock.getInstance();
+        environmentConfigurationLayer.environment.put("NYX_RELEASE_ASSETS_asset1_FILE_NAME", "asset.txt");
+        environmentConfigurationLayer.environment.put("NYX_RELEASE_ASSETS_asset1_DESCRIPTION", "Text Asset");
+        environmentConfigurationLayer.environment.put("NYX_RELEASE_ASSETS_asset1_TYPE", "text/plain");
+        environmentConfigurationLayer.environment.put("NYX_RELEASE_ASSETS_asset1_PATH", "asset.txt");
+        environmentConfigurationLayer.environment.put("NYX_RELEASE_ASSETS_asset2_FILE_NAME", "asset.bin");
+        environmentConfigurationLayer.environment.put("NYX_RELEASE_ASSETS_asset2_DESCRIPTION", "Binary Asset");
+        environmentConfigurationLayer.environment.put("NYX_RELEASE_ASSETS_asset2_TYPE", "application/octet-stream");
+        environmentConfigurationLayer.environment.put("NYX_RELEASE_ASSETS_asset2_PATH", "asset.bin");
+
+        assertEquals(2, environmentConfigurationLayer.getReleaseAssets().size());
+        assertTrue(environmentConfigurationLayer.getReleaseAssets().containsKey("asset1"));
+        assertTrue(environmentConfigurationLayer.getReleaseAssets().containsKey("asset2"));
+        assertEquals("asset.txt", environmentConfigurationLayer.getReleaseAssets().get("asset1").getFileName());
+        assertEquals("Text Asset", environmentConfigurationLayer.getReleaseAssets().get("asset1").getDescription());
+        assertEquals("text/plain", environmentConfigurationLayer.getReleaseAssets().get("asset1").getType());
+        assertEquals("asset.txt", environmentConfigurationLayer.getReleaseAssets().get("asset1").getPath());
+        assertEquals("asset.bin", environmentConfigurationLayer.getReleaseAssets().get("asset2").getFileName());
+        assertEquals("Binary Asset", environmentConfigurationLayer.getReleaseAssets().get("asset2").getDescription());
+        assertEquals("application/octet-stream", environmentConfigurationLayer.getReleaseAssets().get("asset2").getType());
+        assertEquals("asset.bin", environmentConfigurationLayer.getReleaseAssets().get("asset2").getPath());
+    }
+
+    @Test
     @DisplayName("EnvironmentConfigurationLayer.getReleaseLenient()")
     void getReleaseLenientTest()
         throws Exception {
@@ -291,6 +331,7 @@ public class EnvironmentConfigurationLayerTests {
         environmentConfigurationLayer.environment.put("NYX_RELEASE_TYPES_ENABLED", "one,two");
         environmentConfigurationLayer.environment.put("NYX_RELEASE_TYPES_PUBLICATION_SERVICES", "first,second");
         environmentConfigurationLayer.environment.put("NYX_RELEASE_TYPES_REMOTE_REPOSITORIES", "origin,replica");
+        environmentConfigurationLayer.environment.put("NYX_RELEASE_TYPES_one_ASSETS", "asset1,asset2");
         environmentConfigurationLayer.environment.put("NYX_RELEASE_TYPES_one_COLLAPSE_VERSIONS", "true");
         environmentConfigurationLayer.environment.put("NYX_RELEASE_TYPES_one_COLLAPSED_VERSION_QUALIFIER", "qualifier1");
         environmentConfigurationLayer.environment.put("NYX_RELEASE_TYPES_one_DESCRIPTION", "description1");
@@ -331,6 +372,9 @@ public class EnvironmentConfigurationLayerTests {
         assertEquals(2, environmentConfigurationLayer.getReleaseTypes().getRemoteRepositories().size());
         assertTrue(environmentConfigurationLayer.getReleaseTypes().getRemoteRepositories().containsAll(List.<String>of("origin", "replica")));
         assertEquals(2, environmentConfigurationLayer.getReleaseTypes().getItems().size());
+        assertEquals(2, environmentConfigurationLayer.getReleaseTypes().getItems().get("one").getAssets().size());
+        assertEquals("asset1", environmentConfigurationLayer.getReleaseTypes().getItems().get("one").getAssets().get(0));
+        assertEquals("asset2", environmentConfigurationLayer.getReleaseTypes().getItems().get("one").getAssets().get(1));
         assertTrue(environmentConfigurationLayer.getReleaseTypes().getItems().get("one").getCollapseVersions());
         assertEquals("qualifier1", environmentConfigurationLayer.getReleaseTypes().getItems().get("one").getCollapsedVersionQualifier());
         assertEquals("description1", environmentConfigurationLayer.getReleaseTypes().getItems().get("one").getDescription());
@@ -347,6 +391,7 @@ public class EnvironmentConfigurationLayerTests {
         assertEquals("false", environmentConfigurationLayer.getReleaseTypes().getItems().get("one").getPublish());
         assertEquals("true", environmentConfigurationLayer.getReleaseTypes().getItems().get("one").getVersionRange());
         assertNull(environmentConfigurationLayer.getReleaseTypes().getItems().get("one").getVersionRangeFromBranchName());
+        assertNull(environmentConfigurationLayer.getReleaseTypes().getItems().get("two").getAssets());
         assertEquals(false, environmentConfigurationLayer.getReleaseTypes().getItems().get("two").getCollapseVersions());
         assertNull(environmentConfigurationLayer.getReleaseTypes().getItems().get("two").getCollapsedVersionQualifier());
         assertEquals("description2", environmentConfigurationLayer.getReleaseTypes().getItems().get("two").getDescription());

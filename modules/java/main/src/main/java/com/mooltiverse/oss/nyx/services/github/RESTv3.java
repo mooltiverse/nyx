@@ -352,11 +352,11 @@ class RESTv3 extends API {
         for (Attachment asset: assets) {
             File assetFile = new File(asset.getPath());
             if (assetFile.exists()) {
-                logger.debug(SERVICE, "Uploading asset '{}' (description: '{}', type: '{}', path: '{}') to URL '{}'", asset.getName(), asset.getDescription(), asset.getType(), asset.getPath(), uri.toString());
+                logger.debug(SERVICE, "Uploading asset '{}' (description: '{}', type: '{}', path: '{}') to URL '{}'", asset.getFileName(), asset.getDescription(), asset.getType(), asset.getPath(), uri.toString());
                 // See: https://docs.github.com/en/rest/releases/assets
                 URI uri = null;
                 try {
-                    uri = URI.create(uploadURL+"?name="+URLEncoder.encode(asset.getName(), StandardCharsets.UTF_8)+"&"+"label="+URLEncoder.encode(asset.getDescription(), StandardCharsets.UTF_8));
+                    uri = URI.create(uploadURL+"?name="+URLEncoder.encode(asset.getFileName(), StandardCharsets.UTF_8)+"&"+"label="+URLEncoder.encode(asset.getDescription(), StandardCharsets.UTF_8));
                 }
                 catch (IllegalArgumentException iae) {
                     throw new TransportException(String.format("The '%s' attribute '%s' returned by the release doesn't seem to be a valid URI", "upload_url", uploadURL), iae);
@@ -375,12 +375,12 @@ class RESTv3 extends API {
                 }
 
                 String assetURL = unmarshalJSONBody(response.body()).get("url").toString();
-                logger.debug(SERVICE, "Asset '{}' (type: '{}', path: '{}') has been uploaded and is available to URL '{}'", asset.getName(), asset.getType(), asset.getPath(), assetURL);
-                result.add(new Attachment(asset.getName(), asset.getDescription(), asset.getType(), assetURL));
+                logger.debug(SERVICE, "Asset '{}' (type: '{}', path: '{}') has been uploaded and is available to URL '{}'", asset.getFileName(), asset.getType(), asset.getPath(), assetURL);
+                result.add(new Attachment(asset.getFileName(), asset.getDescription(), asset.getType(), assetURL));
             }
             else 
             {
-                logger.warn(SERVICE, "The path '{}' for the asset '{}' cannot be resolved to a local file and will be skipped", asset.getPath(), asset.getName());
+                logger.warn(SERVICE, "The path '{}' for the asset '{}' cannot be resolved to a local file and will be skipped", asset.getPath(), asset.getFileName());
             }
         }
 

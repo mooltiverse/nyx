@@ -170,6 +170,20 @@ public class ConfigurationLayerTestTemplates {
         }
 
         @TestTemplate
+        @DisplayName("ConfigurationLayer.getReleaseAssets() default value")
+        @Baseline(Scenario.FROM_SCRATCH)
+        void getReleaseAssetsDefaultTest(Project project)
+            throws Exception {
+            NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
+            ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
+
+            assertNotNull(extension.getReleaseAssets());
+            assertNotNull(configurationLayer.getReleaseAssets());
+            assertTrue(extension.getReleaseAssets().isEmpty());
+            assertTrue(configurationLayer.getReleaseAssets().isEmpty());
+        }
+
+        @TestTemplate
         @DisplayName("ConfigurationLayer.getReleaseLenient() default value")
         @Baseline(Scenario.FROM_SCRATCH)
         void getReleaseLenientDefaultTest(Project project)
@@ -379,9 +393,9 @@ public class ConfigurationLayerTestTemplates {
 
         /* This test is commented because it has nothing to test
         @TestTemplate
-        @DisplayName("ConfigurationLayer.getReleasePrefix().set() throws IllegalPropertyException with illegal value")
+        @DisplayName("ConfigurationLayer.getReleaseAssets().set() throws IllegalPropertyException with illegal value")
         @Baseline(Scenario.FROM_SCRATCH)
-        void exceptionUsingGetReleasePrefixWithWrongValueTest(Project project)
+        void exceptionUsingGetReleaseAssetsWithWrongValueTest(Project project)
             throws Exception {
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
             ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
@@ -404,9 +418,33 @@ public class ConfigurationLayerTestTemplates {
 
         /* This test is commented because it has nothing to test
         @TestTemplate
+        @DisplayName("ConfigurationLayer.getReleasePrefix().set() throws IllegalPropertyException with illegal value")
+        @Baseline(Scenario.FROM_SCRATCH)
+        void exceptionUsingGetReleasePrefixWithWrongValueTest(Project project)
+            throws Exception {
+            NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
+            ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
+
+            // no idea of how to test wrong values here
+        }*/
+
+        /* This test is commented because it has nothing to test
+        @TestTemplate
         @DisplayName("ConfigurationLayer.getReleaseTypes().set() throws IllegalPropertyException with illegal value")
         @Baseline(Scenario.FROM_SCRATCH)
         void exceptionUsingGetReleaseTypesWithWrongValueTest(Project project)
+            throws Exception {
+            NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
+            ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
+
+            // no idea of how to test wrong values here
+        }*/
+
+        /* This test is commented because it has nothing to test
+        @TestTemplate
+        @DisplayName("ConfigurationLayer.getServices().set() throws IllegalPropertyException with illegal value")
+        @Baseline(Scenario.FROM_SCRATCH)
+        void exceptionUsingGetServicesWithWrongValueTest(Project project)
             throws Exception {
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
             ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);

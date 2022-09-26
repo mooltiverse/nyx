@@ -25,6 +25,14 @@ import com.mooltiverse.oss.nyx.configuration.Defaults;
  */
 public class ReleaseType {
     /**
+     * The list of assets to publish with this release type. When {@code null}
+     * all assets configured globally (if any) are published, otherwise only the assets
+     * in this list must be published for this release type. The names in this list are the map
+     * keys defined in the global {@code releaseAssets}.
+     */
+    private List<String> assets = Defaults.ReleaseType.ASSETS;
+
+    /**
      * The flag indicating whether or not the 'collapsed' versioning (pre-release style) must be used.
      */
     private boolean collapseVersions = Defaults.ReleaseType.COLLAPSE_VERSIONS;
@@ -119,6 +127,8 @@ public class ReleaseType {
     /**
      * Standard constructor.
      * 
+     * @param assets the list of selected asset names to publish with the release. The names
+     * in this list are the map keys defined in the global {@code releaseAssets}.
      * @param collapseVersions the flag indicating whether or not the 'collapsed' versioning
      * (pre-release style) must be used.
      * @param collapsedVersionQualifier the optional qualifier or the template to render the
@@ -152,8 +162,9 @@ public class ReleaseType {
      * 
      * @see Defaults.ReleaseType
      */
-    public ReleaseType(boolean collapseVersions, String collapsedVersionQualifier, String description, String filterTags, String gitCommit, String gitCommitMessage, String gitPush, String gitTag, String gitTagMessage, List<Identifier> identifiers, String matchBranches, Map<String,String> matchEnvironmentVariables, WorkspaceStatus matchWorkspaceStatus, String publish, String versionRange, Boolean versionRangeFromBranchName) {
+    public ReleaseType(List<String> assets, boolean collapseVersions, String collapsedVersionQualifier, String description, String filterTags, String gitCommit, String gitCommitMessage, String gitPush, String gitTag, String gitTagMessage, List<Identifier> identifiers, String matchBranches, Map<String,String> matchEnvironmentVariables, WorkspaceStatus matchWorkspaceStatus, String publish, String versionRange, Boolean versionRangeFromBranchName) {
         super();
+        this.assets = assets;
         this.collapseVersions = collapseVersions;
         this.collapsedVersionQualifier = collapsedVersionQualifier;
         this.description = description;
@@ -170,6 +181,36 @@ public class ReleaseType {
         this.publish = publish;
         this.versionRange = versionRange;
         this.versionRangeFromBranchName = versionRangeFromBranchName;
+    }
+
+    /**
+     * Returns the list of selected asset names to publish with the release. When {@code null}
+     * all assets configured globally (if any) are published, otherwise only the assets
+     * in this list must be published for this release type. The names in this list are the map
+     * keys defined in the global {@code releaseAssets}.
+     * 
+     * @return the list of selected asset names to publish with the release. When {@code null}
+     * all assets configured globally (if any) are published, otherwise only the assets
+     * in this list must be published for this release type. The names in this list are the map
+     * keys defined in the global {@code releaseAssets}.
+     */
+    public List<String> getAssets() {
+        return assets;
+    }
+
+    /**
+     * Sets the list of selected asset names to publish with the release. When {@code null}
+     * all assets configured globally (if any) are published, otherwise only the assets
+     * in this list must be published for this release type. The names in this list are the map
+     * keys defined in the global {@code releaseAssets}.
+     * 
+     * @param assets the list of selected asset names to publish with the release. When {@code null}
+     * all assets configured globally (if any) are published, otherwise only the assets
+     * in this list must be published for this release type. The names in this list are the map
+     * keys defined in the global {@code releaseAssets}.
+     */
+    public void setAssets(List<String> assets) {
+        this.assets = assets;
     }
 
     /**

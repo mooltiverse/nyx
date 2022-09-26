@@ -17,6 +17,7 @@ package com.mooltiverse.oss.nyx.configuration;
 
 import java.util.Map;
 
+import com.mooltiverse.oss.nyx.entities.Attachment;
 import com.mooltiverse.oss.nyx.entities.ChangelogConfiguration;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
 import com.mooltiverse.oss.nyx.entities.GitConfiguration;
@@ -131,6 +132,17 @@ public interface ConfigurationRoot {
      * @throws IllegalPropertyException in case the option has been defined but has incorrect values or it can't be resolved.
      */
     public String getPreset()
+        throws DataAccessException, IllegalPropertyException;
+
+    /**
+     * Returns the release assets configuration section.
+     * 
+     * @return the release assets configuration section. Never {@code null}.
+     * 
+     * @throws DataAccessException in case the option cannot be read or accessed.
+     * @throws IllegalPropertyException in case the option has been defined but has incorrect values or it can't be resolved.
+     */
+    public Map<String,Attachment> getReleaseAssets()
         throws DataAccessException, IllegalPropertyException;
 
     /**

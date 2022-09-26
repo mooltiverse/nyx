@@ -159,6 +159,17 @@ public class NyxExtensionTestTemplates {
         }
 
         @TestTemplate
+        @DisplayName("NyxExtension.getReleaseAssets() default value")
+        @Baseline(Scenario.FROM_SCRATCH)
+        void getReleaseAssetsDefaultTest(Project project)
+            throws Exception {
+            NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
+
+            assertNotNull(extension.getReleaseAssets());
+            assertTrue(extension.getReleaseAssets().isEmpty());
+        }
+
+        @TestTemplate
         @DisplayName("NyxExtension.getReleaseLenient() default value")
         @Baseline(Scenario.FROM_SCRATCH)
         void getReleaseLenientDefaultTest(Project project)

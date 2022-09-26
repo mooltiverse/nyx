@@ -19,6 +19,8 @@ import static com.mooltiverse.oss.nyx.log.Markers.STATE;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -28,6 +30,7 @@ import org.slf4j.LoggerFactory;
 
 import com.mooltiverse.oss.nyx.Nyx;
 import com.mooltiverse.oss.nyx.configuration.Configuration;
+import com.mooltiverse.oss.nyx.entities.Attachment;
 import com.mooltiverse.oss.nyx.entities.Changelog;
 import com.mooltiverse.oss.nyx.entities.IllegalPropertyException;
 import com.mooltiverse.oss.nyx.entities.ReleaseScope;
@@ -76,6 +79,11 @@ public class State {
      * The map containing the internal attributes.
      */
     private  Map<String, String> internals = new HashMap<String, String>();
+
+    /**
+     * The list containing the released assets.
+     */
+    private List<Attachment> releaseAssets = new ArrayList<Attachment>();
 
     /**
      * The private instance of the release scope.
@@ -387,6 +395,19 @@ public class State {
             }
         }
         else return false;
+    }
+
+    /**
+     * Returns the list of assets published with the release. The returned object is a live collection whose contents can be changed.
+     * 
+     * @return the current value for this attribute.
+     * 
+     * @throws DataAccessException in case the attribute cannot be read or accessed.
+     * @throws IllegalPropertyException in case the attribute has been defined but has incorrect values or it can't be resolved.
+     */
+    public List<Attachment> getReleaseAssets()
+        throws DataAccessException, IllegalPropertyException {
+        return releaseAssets;
     }
 
     /**

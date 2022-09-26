@@ -26,8 +26,9 @@ public class AttachmentTests {
     @DisplayName("Attachment()")
     void constructorTest()
         throws Exception {
-        assertEquals("n1", new Attachment("n1", "t1", "p1").getName());
-        assertEquals("t1", new Attachment("n1", "t1", "p1").getType());
-        assertEquals("p1", new Attachment("n1", "t1", "p1").getPath());
+        assertEquals("n1", new Attachment("n1", "d1", "t1", "p1").getFileName());
+        assertEquals("d1", new Attachment("n1", "d1", "t1", "p1").getDescription());
+        assertEquals("t1", new Attachment("n1", "d1", "t1", "p1").getType());
+        assertEquals("p1", new Attachment("n1", "d1", "t1", "p1").getPath());
     }
 }
