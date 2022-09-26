@@ -75,10 +75,10 @@ public class PublishTests {
             script.push(System.getProperty("gitHubTestUserToken"), "");
 
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            // add release assets to the configuration
+            // add release assets to the configuration and also use templates for asset options to make sure they are rendered
             configurationLayerMock.setReleaseAssets(Map.<String,Attachment>of(
-                "asset1", new Attachment("asset1.txt", "Text asset", "text/plain", assetPath1.toFile().getAbsolutePath()),
-                "asset2", new Attachment("asset2.bin", "Binary asset", "application/octet-stream", assetPath2.toFile().getAbsolutePath()),
+                "asset1", new Attachment("{{#lower}}ASSET1.TXT{{/lower}}", "{{#trim}} Text asset   {{/trim}}", "{{#trim}}  text/plain   {{/trim}}", assetPath1.toFile().getAbsolutePath()),
+                "asset2", new Attachment("{{#lower}}ASSET2.BIN{{/lower}}", "{{#trim}} Binary asset   {{/trim}}", "{{#trim}}  application/octet-stream   {{/trim}}", assetPath2.toFile().getAbsolutePath()),
                 "nonexistentfile", new Attachment("nonexistentfile", "Non existent asset", "application/octet-stream", "nonexistentfile"), // this file does not exist and should only generate a warning
                 "remote1", new Attachment("remote1", "Remote link asset", "application/octet-stream", "http://www.example.com/remote1") // this is an URL and should be skipped by GitHub
             ));
@@ -176,10 +176,10 @@ public class PublishTests {
             script.push(System.getProperty("gitHubTestUserToken"), "");
 
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            // add release assets to the configuration
+            // add release assets to the configuration and also use templates for asset options to make sure they are rendered
             configurationLayerMock.setReleaseAssets(Map.<String,Attachment>of(
-                "asset1", new Attachment("asset1.txt", "Text asset", "text/plain", assetPath1.toFile().getAbsolutePath()),
-                "asset2", new Attachment("asset2.bin", "Binary asset", "application/octet-stream", assetPath2.toFile().getAbsolutePath()),
+                "asset1", new Attachment("{{#lower}}ASSET1.TXT{{/lower}}", "{{#trim}} Text asset   {{/trim}}", "{{#trim}}  text/plain   {{/trim}}", assetPath1.toFile().getAbsolutePath()),
+                "asset2", new Attachment("{{#lower}}ASSET2.BIN{{/lower}}", "{{#trim}} Binary asset   {{/trim}}", "{{#trim}}  application/octet-stream   {{/trim}}", assetPath2.toFile().getAbsolutePath()),
                 "nonexistentfile", new Attachment("nonexistentfile", "Non existent asset", "application/octet-stream", "nonexistentfile"), // this file does not exist and should only generate a warning
                 "remote1", new Attachment("remote1", "Remote link asset", "application/octet-stream", "http://www.example.com/remote1") // this is an URL and should be skipped by GitHub
             ));
@@ -280,10 +280,10 @@ public class PublishTests {
             script.push("PRIVATE-TOKEN", System.getProperty("gitLabTestUserToken"));
 
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            // add release assets to the configuration
+            // add release assets to the configuration and also use templates for asset options to make sure they are rendered
             configurationLayerMock.setReleaseAssets(Map.<String,Attachment>of(
-                "asset1", new Attachment("asset1.txt", "Text asset", "text/plain", assetPath1.toFile().getAbsolutePath()),
-                "asset2", new Attachment("asset2.bin", "Binary asset", "application/octet-stream", assetPath2.toFile().getAbsolutePath()),
+                "asset1", new Attachment("{{#lower}}ASSET1.TXT{{/lower}}", "{{#trim}} Text asset   {{/trim}}", "{{#trim}}  text/plain   {{/trim}}", assetPath1.toFile().getAbsolutePath()),
+                "asset2", new Attachment("{{#lower}}ASSET2.BIN{{/lower}}", "{{#trim}} Binary asset   {{/trim}}", "{{#trim}}  application/octet-stream   {{/trim}}", assetPath2.toFile().getAbsolutePath()),
                 "nonexistentfile", new Attachment("nonexistentfile", "Non existent asset", "application/octet-stream", "nonexistentfile"), // this file does not exist and should only generate a warning
                 "remote1", new Attachment("remote1", "Remote link asset", "application/octet-stream", "http://www.example.com/remote1") // this is an URL and should be published by GitLab
             ));
@@ -383,10 +383,10 @@ public class PublishTests {
             script.push("PRIVATE-TOKEN", System.getProperty("gitLabTestUserToken"));
 
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
-            // add release assets to the configuration
+            // add release assets to the configuration and also use templates for asset options to make sure they are rendered
             configurationLayerMock.setReleaseAssets(Map.<String,Attachment>of(
-                "asset1", new Attachment("asset1.txt", "Text asset", "text/plain", assetPath1.toFile().getAbsolutePath()),
-                "asset2", new Attachment("asset2.bin", "Binary asset", "application/octet-stream", assetPath2.toFile().getAbsolutePath()),
+                "asset1", new Attachment("{{#lower}}ASSET1.TXT{{/lower}}", "{{#trim}} Text asset   {{/trim}}", "{{#trim}}  text/plain   {{/trim}}", assetPath1.toFile().getAbsolutePath()),
+                "asset2", new Attachment("{{#lower}}ASSET2.BIN{{/lower}}", "{{#trim}} Binary asset   {{/trim}}", "{{#trim}}  application/octet-stream   {{/trim}}", assetPath2.toFile().getAbsolutePath()),
                 "nonexistentfile", new Attachment("nonexistentfile", "Non existent asset", "application/octet-stream", "nonexistentfile"), // this file does not exist and should only generate a warning
                 "remote1", new Attachment("remote1", "Remote link asset", "application/octet-stream", "http://www.example.com/remote1") // this is an URL and should be published by GitLab
             ));

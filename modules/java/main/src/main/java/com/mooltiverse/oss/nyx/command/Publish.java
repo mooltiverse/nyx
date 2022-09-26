@@ -102,8 +102,13 @@ public class Publish extends AbstractCommand {
                                 // so only the ones enabled in the release type must be published
                                 if (Objects.isNull(state().getReleaseType().getAssets()) || state().getReleaseType().getAssets().contains(configuredAsset.getKey())) {
                                     logger.debug(COMMAND, "Publishing release asset '{}'", configuredAsset.getKey());
-                                    release = service.publishReleaseAssets(null, null, release, Set.<Attachment>of(configuredAsset.getValue()));
-                                    state().getReleaseAssets().add(configuredAsset.getValue());
+
+                                    // we need to render each asset's field before we publish, so we create a new Attachment instance with all the fields rendered from the configured asset
+                                    Attachment asset = new Attachment(renderTemplate(configuredAsset.getValue().getFileName()), renderTemplate(configuredAsset.getValue().getDescription()), renderTemplate(configuredAsset.getValue().getType()), renderTemplate(configuredAsset.getValue().getPath()));
+
+                                    // now actually publish the asset
+                                    release = service.publishReleaseAssets(null, null, release, Set.<Attachment>of(asset));
+                                    state().getReleaseAssets().add(asset);
                                     logger.debug(COMMAND, "Release asset '{}' has been published to '{}' for release '{}'", configuredAsset.getKey(), serviceName, release.getTag());
                                 }
                                 else {
