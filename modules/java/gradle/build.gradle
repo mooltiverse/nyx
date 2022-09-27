@@ -4,7 +4,7 @@
 ------------------------------------------------------------------------------*/
 plugins {
     id 'java-gradle-plugin'                             // See: https://docs.gradle.org/current/userguide/java_gradle_plugin.html
-    id 'com.gradle.plugin-publish' version '0.20.0'     // See: https://guides.gradle.org/publishing-plugins-to-gradle-plugin-portal/ and https://plugins.gradle.org/docs/publish-plugin
+    id 'com.gradle.plugin-publish' version '1.0.0'      // See: https://guides.gradle.org/publishing-plugins-to-gradle-plugin-portal/ and https://plugins.gradle.org/docs/publish-plugin
 }
 
 /*------------------------------------------------------------------------------
@@ -69,13 +69,6 @@ pluginBundle {
             tags = [ 'auto-versioning', 'changelog', 'continuous delivery', 'git', 'github', 'gitlab', 'release', 'semantic', 'semantic-release', 'semantic-version', 'semver', 'version', 'versioning' ]
         }
     }*/
-
-    mavenCoordinates {
-        // Overriding the groupId requires manual approval
-        groupId = rootProject.group
-        version = rootProject.version
-        //artifactId = project.name
-    }
 }
 
 // See https://github.com/gradle/gradle/issues/1246
@@ -97,16 +90,11 @@ task setupPublishPluginCredentials() {
     }
 }
 
-task publish() {
-    group = 'Publishing'
-    description = 'Publishes the plugin to the Gradle Plugins Portal'
-    dependsOn publishPlugins
-}
-
 /*------------------------------------------------------------------------------
   Additional task dependencies
 ------------------------------------------------------------------------------*/
 tasks.publishPlugins.dependsOn tasks.setupPublishPluginCredentials
+tasks.publish.dependsOn tasks.publishPlugins
 
 // to enforce the fail-fast principle, make sure the main library tests are executed first
 tasks.test.dependsOn project(':modules:java:main').tasks.test
@@ -125,6 +113,4 @@ afterEvaluate {
     // The tasks listed here are those not caught in the section above
     tasks.publish.onlyIf { rootProject.nyxState.newRelease }                    // this actually belongs to the 'publishing' group but doesn't get captured by the above section for some reason
     tasks.publishPlugins.onlyIf { rootProject.nyxState.newRelease }             // from the 'plugin portal' group
-    tasks.publishPluginJar.onlyIf { rootProject.nyxState.newRelease }           // from the 'build' group
-    tasks.publishPluginJavaDocsJar.onlyIf { rootProject.nyxState.newRelease }   // from the 'build' group
 }

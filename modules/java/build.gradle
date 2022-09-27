@@ -133,12 +133,12 @@ allprojects {
         }
     }
     dependencies {
-        testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
+        testImplementation 'org.junit.jupiter:junit-jupiter:5.9.1'
         testRuntimeOnly    'org.junit.jupiter:junit-jupiter-engine'
 
         // plug the Logback SLF4J implementation when testing so we can get log messages logged to the standard output
-        testRuntimeOnly    'ch.qos.logback:logback-core:1.2.10'
-        testRuntimeOnly    'ch.qos.logback:logback-classic:1.2.10'
+        testRuntimeOnly    'ch.qos.logback:logback-core:1.4.1'
+        testRuntimeOnly    'ch.qos.logback:logback-classic:1.4.1'
     }
 
     /*------------------------------------------------------------------------------
@@ -166,7 +166,7 @@ allprojects {
     javadoc {
         options {
             // Link generated javadocs to external docs
-            links 'https://download.eclipse.org/jgit/site/6.0.0.202111291000-r/apidocs/'
+            links 'https://download.eclipse.org/jgit/site/6.3.0.202209071007-r/apidocs/'
             links 'https://www.slf4j.org/apidocs/'
             links 'https://docs.gradle.org/current/javadoc/'
             links 'https://junit.org/junit5/docs/current/api/'
@@ -274,6 +274,7 @@ allprojects.each {prj ->
             "$prj.name"(MavenPublication) {
                 afterEvaluate {
                     artifactId = prj.name
+                    groupId = rootProject.group
                     version = rootProject.version
                     from prj.components.java
                 }

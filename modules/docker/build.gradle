@@ -4,7 +4,7 @@
 ------------------------------------------------------------------------------*/
 plugins {
     // See: https://github.com/palantir/gradle-docker
-    id 'com.palantir.docker' version '0.30.0'
+    id 'com.palantir.docker' version '0.34.0'
 }
 
 /*------------------------------------------------------------------------------
