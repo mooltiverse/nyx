@@ -32,6 +32,8 @@ nav-main:
     children:
       - title: "Releases & Changelog"
         url: https://github.com/mooltiverse/nyx/releases
+      - title: "Release Notes"
+        url: https://github.com/mooltiverse/nyx/blob/master/RELEASE_NOTES.md
       - title: "Code of Conduct"
         url: https://github.com/mooltiverse/nyx/blob/master/CODE_OF_CONDUCT.md
       - title: "Contributing"
@@ -129,6 +131,8 @@ nav-user-guide:
     children:
       - title: "Releases & Changelog"
         url: https://github.com/mooltiverse/nyx/releases
+      - title: "Release Notes"
+        url: https://github.com/mooltiverse/nyx/blob/master/RELEASE_NOTES.md
       - title: "Code of Conduct"
         url: https://github.com/mooltiverse/nyx/blob/master/CODE_OF_CONDUCT.md
       - title: "Contributing"
@@ -167,6 +171,8 @@ nav-developer-guide:
     children:
       - title: "Releases & Changelog"
         url: https://github.com/mooltiverse/nyx/releases
+      - title: "Release Notes"
+        url: https://github.com/mooltiverse/nyx/blob/master/RELEASE_NOTES.md
       - title: "Code of Conduct"
         url: https://github.com/mooltiverse/nyx/blob/master/CODE_OF_CONDUCT.md
       - title: "Contributing"
