@@ -156,6 +156,17 @@ public class State {
         throws DataAccessException, IllegalPropertyException {
         State state = FileMapper.load(stateFile, State.class);
         state.configuration = configuration;
+
+        // The values that are overridden by the configuration must be set to null after deserialization so that
+        // their getter/setter methods will consistently check if they've been defined by the configuration and return those
+        // instead of local ones.
+        // Consider that setter methods for those values need to be permissive because when the State is unmarshalled
+        // the internal reference to the configuration is not yet set.
+        if (!Objects.isNull(configuration.getBump()))
+            state.bump = null;
+        if (!Objects.isNull(configuration.getVersion()))
+            state.version = null;
+
         return state;
     }
 
@@ -249,7 +260,11 @@ public class State {
      */
     public void setBump(String bump)
         throws DataAccessException, IllegalPropertyException, IllegalStateException {
-        if (Objects.isNull(getConfiguration().getBump()))
+        // We need to be permissive here as when this method is called by the unmarshaller the configuration object is not set yet
+        // but on the other hand the 'resume' method will handle this situation right after unmarshalling by checking if the
+        // configuration overrides this value and, if so, set the local reference to null.
+        // This causes a temporary inconsistency until the unmarshalling is finished, but this has no consequences
+        if (Objects.isNull(getConfiguration()) || Objects.isNull(getConfiguration().getBump()))
             this.bump = bump;
         else throw new IllegalStateException(String.format("The state bump attribute can't be set when it's ovverridden by the configuration. Configuration bump attribute is '%s'", getConfiguration().getBump()));
     }
@@ -548,7 +563,11 @@ public class State {
      */
     public void setVersion(String version)
         throws DataAccessException, IllegalPropertyException, IllegalStateException {
-        if (Objects.isNull(getConfiguration().getVersion()))
+        // We need to be permissive here as when this method is called by the unmarshaller the configuration object is not set yet
+        // but on the other hand the 'resume' method will handle this situation right after unmarshalling by checking if the
+        // configuration overrides this value and, if so, set the local reference to null.
+        // This causes a temporary inconsistency until the unmarshalling is finished, but this has no consequences
+        if (Objects.isNull(getConfiguration()) || Objects.isNull(getConfiguration().getVersion()))
             this.version = version;
         else throw new IllegalStateException(String.format("The state version attribute can't be set when it's ovverridden by the configuration. Configuration version attribute is '%s'", getConfiguration().getVersion()));
     }
