@@ -262,7 +262,9 @@ public class SimpleConfigurationLayerTests {
         assertTrue(simpleConfigurationLayer.getReleaseTypes().getRemoteRepositories().containsAll(List.<String>of("origin", "replica")));
         assertEquals(2, simpleConfigurationLayer.getReleaseTypes().getItems().size());
         assertNotNull(simpleConfigurationLayer.getReleaseTypes().getItems().get("one"));
+        assertNull(simpleConfigurationLayer.getReleaseTypes().getItems().get("one").getAssets());
         assertNotNull(simpleConfigurationLayer.getReleaseTypes().getItems().get("two"));
+        assertNull(simpleConfigurationLayer.getReleaseTypes().getItems().get("two").getAssets());
     }
 
     @Test
