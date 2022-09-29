@@ -1174,7 +1174,7 @@ public abstract class NyxExtension {
             /**
              * The list of enabled assets for the release type.
              */
-            private final ListProperty<String> assets = getObjectfactory().listProperty(String.class);
+            private final ListProperty<String> assets = getObjectfactory().listProperty(String.class).convention((Iterable<String>)null);
 
             /**
              * The flag indicating whether or not the 'collapsed' versioning (pre-release style) must be used.
