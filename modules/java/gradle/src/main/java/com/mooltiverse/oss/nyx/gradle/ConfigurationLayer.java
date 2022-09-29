@@ -274,6 +274,10 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
                                 );
                             }
                         }
+                        // TODO: remove this statement as it's here just for debug purposes
+                        org.gradle.api.logging.Logging.getLogger(this.getClass()).debug("The release type '{}' from configuration layer of type '{}' defines the assets filter? '{}'", type.getMatchBranches().getOrNull(), "Gradle", type.getAssets().isPresent());
+                        org.gradle.api.logging.Logging.getLogger(this.getClass()).debug("The release type '{}' from configuration layer of type '{}' has defined the assets filter: '{}'", type.getMatchBranches().getOrNull(), "Gradle", type.getAssets().getOrNull());
+
                         items.put(type.getName(), new ReleaseType(
                             type.getAssets().isPresent() ? type.getAssets().get() : Defaults.ReleaseType.ASSETS,
                             type.getCollapseVersions().isPresent() ? type.getCollapseVersions().get() : Defaults.ReleaseType.COLLAPSE_VERSIONS,
