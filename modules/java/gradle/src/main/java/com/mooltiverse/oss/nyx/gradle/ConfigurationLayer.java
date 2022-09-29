@@ -274,12 +274,10 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
                                 );
                             }
                         }
-                        // TODO: remove this statement as it's here just for debug purposes
-                        org.gradle.api.logging.Logging.getLogger(this.getClass()).debug("The release type '{}' from configuration layer of type '{}' defines the assets filter? '{}'", type.getMatchBranches().getOrNull(), "Gradle", type.getAssets().isPresent());
-                        org.gradle.api.logging.Logging.getLogger(this.getClass()).debug("The release type '{}' from configuration layer of type '{}' has defined the assets filter: '{}'", type.getMatchBranches().getOrNull(), "Gradle", type.getAssets().getOrNull());
-
                         items.put(type.getName(), new ReleaseType(
-                            type.getAssets().isPresent() ? type.getAssets().get() : Defaults.ReleaseType.ASSETS,
+                            // See the NyxExtension.ReleaseTypes.ReleaseType.assets comments to know why this 'assets' property is a string property instead of a list property
+                            // Anyway, if the string property is defined we split its items and return it as a list
+                            type.getAssets().isPresent() ? List.<String>of(type.getAssets().get().split(",")) : Defaults.ReleaseType.ASSETS,
                             type.getCollapseVersions().isPresent() ? type.getCollapseVersions().get() : Defaults.ReleaseType.COLLAPSE_VERSIONS,
                             type.getCollapsedVersionQualifier().isPresent() ? type.getCollapsedVersionQualifier().get() : Defaults.ReleaseType.COLLAPSED_VERSION_QUALIFIER,
                             type.getDescription().isPresent() ? type.getDescription().get() : Defaults.ReleaseType.DESCRIPTION,
