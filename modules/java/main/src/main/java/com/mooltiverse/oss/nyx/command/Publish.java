@@ -98,18 +98,6 @@ public class Publish extends AbstractCommand {
                         }
                         else {
                             for (Map.Entry<String,Attachment> configuredAsset: state().getConfiguration().getReleaseAssets().entrySet()) {
-                                // TODO: remove this block as it's here just for debug purposes
-                                if (Objects.isNull(state().getReleaseType().getAssets()))
-                                    logger.debug(COMMAND, "The release type assets object is null, which means it's not filtering any asset so '{}' will be published", configuredAsset.getKey());
-                                else if (state().getReleaseType().getAssets().isEmpty())
-                                    logger.debug(COMMAND, "The release type assets object is empty but not null, which means it's filtering out any asset so '{}' will not be published", configuredAsset.getKey());
-                                else {
-                                    logger.debug(COMMAND, "The release type assets object is not empty which means only listed assets will be published.");
-                                    if (state().getReleaseType().getAssets().contains(configuredAsset.getKey()))
-                                        logger.debug(COMMAND, "Release asset '{}' is listed among the enabled assets to publish for this release type", configuredAsset.getKey());
-                                    else logger.debug(COMMAND, "Release asset '{}' is NOT listed among the enabled assets to publish for this release type", configuredAsset.getKey());
-                                } 
-
                                 // if the release type has configured the release types, that is considered a filter over the global release types
                                 // so only the ones enabled in the release type must be published
                                 if (Objects.isNull(state().getReleaseType().getAssets()) || state().getReleaseType().getAssets().contains(configuredAsset.getKey())) {

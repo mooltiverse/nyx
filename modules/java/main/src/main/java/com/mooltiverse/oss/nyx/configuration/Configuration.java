@@ -653,10 +653,6 @@ public class Configuration implements ConfigurationRoot {
                     if (!Objects.isNull(item)) {
                         items.put(enabledItem, item);
                         logger.trace(CONFIGURATION, "The '{}.{}[{}]' configuration option has been resolved", "releaseTypes", "items", enabledItem);
-
-                        // TODO: remove this statement as it's here just for debug purposes
-                        logger.debug(CONFIGURATION, "The release type '{}' from configuration layer of type '{}' has defined the assets filter: '{}'", item.getMatchBranches(), layer.getClass().getName(), item.getAssets());
-
                         break;
                     }
                 }
