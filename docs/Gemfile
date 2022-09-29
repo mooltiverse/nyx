@@ -11,3 +11,9 @@ gem "jekyll-include-cache", group: :jekyll_plugins
 #    bundle exec jekyll build
 #    bundle exec htmlproofer --allow-hash-href ./_site
 #gem "html-proofer", group: :jekyll_plugins
+
+# In case of issues also run 'gem install wdm' on the console
+gem 'wdm', '>= 0.1.0' if Gem.win_platform?
+
+# In case of issues also run 'bundle add webrick' on the console
+gem "webrick", "~> 1.7"

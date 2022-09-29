@@ -136,6 +136,9 @@ Each item in the list must correspond to a release asset [`name`]({{ site.baseur
 
 Think of this configuration option as a means to filter a subset of assets to publish for this release type.
 
+When using Gradle and [using the plugin configuration]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#using-the-extension) this option needs to be defined as a string containing a comma separated list of names rather than a list of strings. For example, use `assets = "asset1,asset2"` instead of `assets = [ "asset1", "asset2" ]`. This is because Gradle returns an empty list even when the user doesn't define the option so, when reading it, there is no difference between an undefined list or a list defined as empty. Since we need to distinguish between the two semantics, this workaround was needed.
+{: .notice--warning}
+
 #### Collapse versions
 
 | ------------------------- | ---------------------------------------------------------------------------------------- |

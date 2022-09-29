@@ -324,8 +324,10 @@ public class EnvironmentConfigurationLayerTests {
         assertTrue(environmentConfigurationLayer.getReleaseTypes().getRemoteRepositories().containsAll(List.<String>of("origin", "replica")));
         assertEquals(2, environmentConfigurationLayer.getReleaseTypes().getItems().size());
         assertNotNull(environmentConfigurationLayer.getReleaseTypes().getItems().get("one"));
+        assertNull(environmentConfigurationLayer.getReleaseTypes().getItems().get("one").getAssets());
         assertNotNull(environmentConfigurationLayer.getReleaseTypes().getItems().get("two"));
-
+        assertNull(environmentConfigurationLayer.getReleaseTypes().getItems().get("two").getAssets());
+        
         // get a new instance or a stale object is returned by getReleaseTypes()
         environmentConfigurationLayer = EnvironmentConfigurationLayerMock.getInstance();
         environmentConfigurationLayer.environment.put("NYX_RELEASE_TYPES_ENABLED", "one,two");
