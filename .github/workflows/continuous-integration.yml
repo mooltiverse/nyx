@@ -48,6 +48,8 @@ jobs:
         #restore-keys: not used here, start from scratch
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
+    - name: Make Git ignore execute permission changes in files (like gradlew)
+      run: git config core.fileMode false
     - name: Assemble with Gradle
       run: ./gradlew assemble --build-cache --stacktrace
     - name: Archive Nyx state file
@@ -88,6 +90,8 @@ jobs:
           ${{ runner.os }}-nyx-gradle-${{ github.run_id }}-assemble
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
+    - name: Make Git ignore execute permission changes in files (like gradlew)
+      run: git config core.fileMode false
     - name: Run Unit Tests with Gradle
       env:
           # See the top level https://github.com/mooltiverse/nyx/blob/master/CONTRIBUTING.md#contributing-code file for details about passing these values when testing locally
@@ -143,6 +147,8 @@ jobs:
           ${{ runner.os }}-nyx-gradle-${{ github.run_id }}-assemble
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
+    - name: Make Git ignore execute permission changes in files (like gradlew)
+      run: git config core.fileMode false
     - name: Run Integration Tests with Gradle
       env:
           # See the top level https://github.com/mooltiverse/nyx/blob/master/CONTRIBUTING.md#contributing-code file for details about passing these values when testing locally
@@ -202,6 +208,8 @@ jobs:
           ${{ runner.os }}-nyx-gradle-${{ github.run_id }}-assemble
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
+    - name: Make Git ignore execute permission changes in files (like gradlew)
+      run: git config core.fileMode false
     - name: Run Functional Tests with Gradle
       env:
           # See the top level https://github.com/mooltiverse/nyx/blob/master/CONTRIBUTING.md#contributing-code file for details about passing these values when testing locally
@@ -249,6 +257,8 @@ jobs:
           ${{ runner.os }}-nyx-gradle-${{ github.run_id }}-unit-test
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
+    - name: Make Git ignore execute permission changes in files (like gradlew)
+      run: git config core.fileMode false
     - name: Finalize Tests with Gradle
       env:
           # See the top level https://github.com/mooltiverse/nyx/blob/master/CONTRIBUTING.md#contributing-code file for details about passing these values when testing locally
@@ -296,6 +306,8 @@ jobs:
           ${{ runner.os }}-nyx-gradle-${{ github.run_id }}-unit-test
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
+    - name: Make Git ignore execute permission changes in files (like gradlew)
+      run: git config core.fileMode false
     - name: Build with Gradle
       # We have a Gradle build cache issue here. Although we import the cache from the previous jobs, the :modules:java:main:test task keeps resulting
       # not up to date. Probably the cause is on its dependency ':modules:java:version:jar', which is 'Not worth caching' (according to Gradle).
@@ -343,9 +355,19 @@ jobs:
             ${{ runner.os }}-nyx-gradle-${{ github.run_id }}-build
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
+      - name: Make Git ignore execute permission changes in files (like gradlew)
+        run: git config core.fileMode false
       - name: Publish with Gradle
         env:
-          # See the top level https://github.com/mooltiverse/nyx/blob/master/CONTRIBUTING.md#contributing-code file for details about passing these values when testing locally
+          # The 'gitHubUser' and 'gitHubToken' variables are passed as credentials to publish packages to the GitHub Packages repository, see: https://docs.github.com/en/actions/publishing-packages/publishing-java-packages-with-gradle#publishing-packages-to-github-packages.
+          # The GH_TOKEN is used by Nyx configured service 'github' (see the top level settings.gradle) to publish the release to GitHub Releases.
+          # The 'GITHUB_TOKEN' is automatically generated and provided by GitHub Actions so it doesn't need to be manually created. We just use it and copy as Gradle properties or environment variables.
+          # See:
+          # - the Automatic Token Authentication: https://docs.github.com/en/actions/security-guides/automatic-token-authentication
+          # - the 'secrets' Context:  https://docs.github.com/en/actions/learn-github-actions/contexts
+          # - the Default Environment Variables: https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables
+          # - GITHUB_TOKEN permissions for repository: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository#setting-the-permissions-of-the-github_token-for-your-repository
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ORG_GRADLE_PROJECT_gitHubUser: ${{ secrets.GITHUB_USERNAME }}
           ORG_GRADLE_PROJECT_gitHubToken: ${{ secrets.GITHUB_TOKEN }}
           ORG_GRADLE_PROJECT_ossrhUsername: ${{ secrets.MAVEN_USER }}
@@ -388,6 +410,8 @@ jobs:
             ${{ runner.os }}-nyx-gradle-${{ github.run_id }}-publish
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
+      - name: Make Git ignore execute permission changes in files (like gradlew)
+        run: git config core.fileMode false
       - name: Release with Gradle
         env:
           # The 'gitHubUser' and 'gitHubToken' variables are passed as credentials to publish packages to the GitHub Packages repository, see: https://docs.github.com/en/actions/publishing-packages/publishing-java-packages-with-gradle#publishing-packages-to-github-packages.
@@ -397,6 +421,7 @@ jobs:
           # - the Automatic Token Authentication: https://docs.github.com/en/actions/security-guides/automatic-token-authentication
           # - the 'secrets' Context:  https://docs.github.com/en/actions/learn-github-actions/contexts
           # - the Default Environment Variables: https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables
+          # - GITHUB_TOKEN permissions for repository: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository#setting-the-permissions-of-the-github_token-for-your-repository
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ORG_GRADLE_PROJECT_gitHubUser: ${{ secrets.GITHUB_ACTOR }}
           ORG_GRADLE_PROJECT_gitHubToken: ${{ secrets.GITHUB_TOKEN }}

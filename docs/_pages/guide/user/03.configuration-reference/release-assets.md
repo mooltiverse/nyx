@@ -47,6 +47,8 @@ Each release asset has the following attributes:
 
 The name that identifies the asset within the configuration. This is actually not a field to be set within assets but instead the key of the map element.
 
+This value never appears on published artifacts as it's only used internally by Nyx.
+
 This option is **mandatory**.
 
 #### Description
@@ -62,7 +64,7 @@ This option is **mandatory**.
 
 This attribute gives the description (or label) for the artifact.
 
-The way this description appears in the generated release depends on the [publication service]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}) and may even be ignored.
+This is the user facing identifier for the artifact upon publication, when supported. The way this description appears in the generated release depends on the [publication service]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}) and may even be ignored by some services.
 
 Here you can pass a [template]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}) to generate this attribute dynamically at runtime.
 
@@ -81,9 +83,7 @@ This attribute gives the name to the artifact file.
 
 Although it's suggested to make this name coherent with the [path](#path) you are not required to.
 
-The way this name appears in the generated release depends on the [publication service]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}) and may even be ignored.
-
-The file doesn't need to exist until the [publish]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#publish) command runs so you can define an abstract file name here that will be generated during the build process.
+This is the user facing file name for the artifact upon publication (i.e. the name of the file being downloaded), when supported. This name is used for the published artifacts only and doesn't need to exist locally nor match the [path](#path). The way this name appears in the generated release depends on the [publication service]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}) and may even be ignored by some services.
 
 Here you can pass a [template]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}) to generate this attribute dynamically at runtime (i.e. when the file name contains the version number).
 
@@ -98,9 +98,11 @@ Here you can pass a [template]({{ site.baseurl }}{% link _pages/guide/user/03.co
 | Configuration File Option | `releaseAssets/items/<NAME>/path`                                                        |
 | Related state attributes  | [path]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-assets.md %}#path){: .btn .btn--info .btn--small} |
 
-This attribute defines the spurce path for the artifact, which may be a local file or a remote URL.
+This attribute defines the source path for the artifact, which may be a local file or a remote URL.
 
 The way this attribute affects the artifacts in the generated release depends on the [publication service]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}) but as a rule of thumb local files are uploaded and attached to the release while remote URLs are just listed as attachments and can be clicked to open the remote URL (also to download a file that was previously uploaded somewhere). Not all services support all types of paths.
+
+When this is a local file the file doesn't need to exist until the [publish]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#publish) command runs so you can define an abstract file name here that will be generated during the build process. When the remote service supports custom [file names](#file-name) this file name will not affect the name of the file that will be published and, in that case, the two fields don't need to match.
 
 Here you can pass a [template]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}) to generate this attribute dynamically at runtime.
 
@@ -117,6 +119,6 @@ Here you can pass a [template]({{ site.baseurl }}{% link _pages/guide/user/03.co
 
 This attribute defines the [MIME type](https://www.iana.org/assignments/media-types/media-types.xhtml) for the artifact.
 
-The way this attribute affects the artifacts in the generated release depends on the [publication service]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}) and may even be ignored.
+The way this attribute affects the artifacts in the generated release depends on the [publication service]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}) and may even be ignored. When in doubt just set this to `application/octet-stream`.
 
 Here you can pass a [template]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}) to generate this attribute dynamically at runtime.

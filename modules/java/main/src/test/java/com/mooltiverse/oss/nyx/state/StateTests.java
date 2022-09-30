@@ -425,6 +425,7 @@ public class StateTests {
             Commit finalCommit = new Commit("e6b1c65eac4d81aadde22e796bb2a8e48da4c5d9", 1580515200, List.<String>of("b50926577d36f403f4b3ebf51dfe34660b52eaa2"), new Action(new Identity("Jim", "jim@example.com"), new TimeStamp(new Date(1580601600), new SimpleTimeZone(SimpleTimeZone.UTC_TIME, "America/Los_Angeles"))), new Action(new Identity("Jim", "jim@example.com"), new TimeStamp(new Date(1580601600), new SimpleTimeZone(SimpleTimeZone.UTC_TIME, "America/Los_Angeles"))), new Message("final commit", "final commit", Map.<String,String>of()), Set.<Tag>of());
 
             // set a few values to use later on for comparison
+            oldState.setBump("minor");
             oldState.setChangelog(new Changelog());
             oldState.getChangelog().setReleases(List.<Changelog.Release>of(new Changelog.Release("MyRelease", "today")));
             oldState.getChangelog().getReleases().get(0).setSections(List.<Changelog.Release.Section>of(new Changelog.Release.Section("MySection")));
@@ -535,6 +536,7 @@ public class StateTests {
             Commit finalCommit = new Commit("e6b1c65eac4d81aadde22e796bb2a8e48da4c5d9", 1580515200, List.<String>of("b50926577d36f403f4b3ebf51dfe34660b52eaa2"), new Action(new Identity("Jim", "jim@example.com"), new TimeStamp(new Date(1580601600), new SimpleTimeZone(SimpleTimeZone.UTC_TIME, "America/Los_Angeles"))), new Action(new Identity("Jim", "jim@example.com"), new TimeStamp(new Date(1580601600), new SimpleTimeZone(SimpleTimeZone.UTC_TIME, "America/Los_Angeles"))), new Message("final commit", "final commit", Map.<String,String>of()), Set.<Tag>of());
 
             // set a few values to use later on for comparison
+            oldState.setBump("minor");
             oldState.setChangelog(new Changelog());
             oldState.getChangelog().setReleases(List.<Changelog.Release>of(new Changelog.Release("MyRelease", "today")));
             oldState.getChangelog().getReleases().get(0).setSections(List.<Changelog.Release.Section>of(new Changelog.Release.Section("MySection")));

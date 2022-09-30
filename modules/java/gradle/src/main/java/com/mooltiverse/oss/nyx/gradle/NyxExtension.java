@@ -1174,7 +1174,12 @@ public abstract class NyxExtension {
             /**
              * The list of enabled assets for the release type.
              */
-            private final ListProperty<String> assets = getObjectfactory().listProperty(String.class);
+            // We need to let Gradle parse this as a string rather than a list of strings.
+            // As documented at https://github.com/mooltiverse/nyx/issues/110, ListProperty.isPresent() never returns 'false', even when the
+            // property hasn't been defined by the user, so we are unable to distinguish when it was defined as empty or not defined at all.
+            // Within Nyx we have different semantics for the two cases o we need to read it as a simple string of comma separated items and
+            // then (in the ConfigurationLayer class) split them to a list, if the string property was defined.
+            private final Property<String> assets = getObjectfactory().property(String.class);
 
             /**
              * The flag indicating whether or not the 'collapsed' versioning (pre-release style) must be used.
@@ -1300,8 +1305,8 @@ public abstract class NyxExtension {
             }
 
             /**
-             * Returns the list of selected asset names to publish with the release. When {@code null}
-             * all assets configured globally (if any) must be published, otherwise only the assets
+             * Returns a string with the comma separatedlist of selected asset names to publish with the release.
+             * When {@code null} all assets configured globally (if any) must be published, otherwise only the assets
              * in this list must be published for this release type.
              * 
              * We provide an implementation of this method instead of using the abstract definition as it's
@@ -1309,7 +1314,7 @@ public abstract class NyxExtension {
              * 
              * @return the list of selected asset names to publish with the release.
              */
-            public ListProperty<String> getAssets() {
+            public Property<String> getAssets() {
                 return assets;
             }
 

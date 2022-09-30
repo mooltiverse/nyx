@@ -275,7 +275,9 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
                             }
                         }
                         items.put(type.getName(), new ReleaseType(
-                            type.getAssets().isPresent() ? type.getAssets().get() : Defaults.ReleaseType.ASSETS,
+                            // See the NyxExtension.ReleaseTypes.ReleaseType.assets comments to know why this 'assets' property is a string property instead of a list property
+                            // Anyway, if the string property is defined we split its items and return it as a list
+                            type.getAssets().isPresent() ? List.<String>of(type.getAssets().get().split(",")) : Defaults.ReleaseType.ASSETS,
                             type.getCollapseVersions().isPresent() ? type.getCollapseVersions().get() : Defaults.ReleaseType.COLLAPSE_VERSIONS,
                             type.getCollapsedVersionQualifier().isPresent() ? type.getCollapsedVersionQualifier().get() : Defaults.ReleaseType.COLLAPSED_VERSION_QUALIFIER,
                             type.getDescription().isPresent() ? type.getDescription().get() : Defaults.ReleaseType.DESCRIPTION,

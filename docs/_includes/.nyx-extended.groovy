@@ -89,7 +89,7 @@ nyx {
         versionRangeFromBranchName = false
       }
       integration {
-        assets = []
+        assets = ""
         collapseVersions = true
         collapsedVersionQualifier = '{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}'
         description = 'Integration release {{version}}'
@@ -103,7 +103,7 @@ nyx {
         versionRangeFromBranchName = false
       }
       hotfix {
-        assets = [ "asset1" ]
+        assets = "asset1"
         collapseVersions = true
         collapsedVersionQualifier = '{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}'
         description = 'Hotfix release {{version}}'
