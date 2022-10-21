@@ -95,6 +95,7 @@ public class Nyx {
     public Nyx() {
         super();
         logger.trace(MAIN, "New Nyx instance");
+        logger.debug(MAIN, "Nyx version {}", this.getClass().getPackage().getImplementationVersion());
 
         // this is not actually needed for production but some tests may leave the default directory dirty, so this is safer
         Configuration.setDefaultDirectory(null);
