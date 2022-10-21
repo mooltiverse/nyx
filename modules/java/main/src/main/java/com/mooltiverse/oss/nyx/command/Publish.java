@@ -48,10 +48,30 @@ public class Publish extends AbstractCommand {
     private static final Logger logger = LoggerFactory.getLogger(Publish.class);
 
     /**
+     * The common prefix used for all the internal state attributes managed by this class.
+     */
+    private static final String INTERNAL_ATTRIBUTE_PREFIX = "publish";
+
+    /**
+     * The common prefix used for all the internal state attributes managed by this class, representing an input.
+     */
+    private static final String INTERNAL_INPUT_ATTRIBUTE_PREFIX = INTERNAL_ATTRIBUTE_PREFIX.concat(".").concat("input");
+
+    /**
+     * The common prefix used for all the internal state attributes managed by this class, representing an output.
+     */
+    private static final String INTERNAL_OUTPUT_ATTRIBUTE_PREFIX = INTERNAL_ATTRIBUTE_PREFIX.concat(".").concat("output");
+
+    /**
+     * The name used for the internal state attribute where we store the version.
+     */
+    private static final String INTERNAL_INPUT_ATTRIBUTE_STATE_VERSION = INTERNAL_INPUT_ATTRIBUTE_PREFIX.concat(".").concat("state").concat(".").concat("version");
+
+    /**
      * The name used for the internal state attribute where we store the last version
      * that was published by this command.
      */
-    private static final String INTERNAL_LAST_PUBLISHED_VERSION = Mark.class.getSimpleName().concat(".").concat("last").concat(".").concat("published").concat(".").concat("version");
+    private static final String INTERNAL_OUPUT_ATTRIBUTE_STATE_VERSION = INTERNAL_OUTPUT_ATTRIBUTE_PREFIX.concat(".").concat("state").concat(".").concat("version");
 
     /**
      * Standard constructor.
@@ -91,6 +111,7 @@ public class Publish extends AbstractCommand {
                         // The first two parameters here are null because the repository owner and name are expected to be passed
                         // along with service options. This is just a place where we could override them.
                         Release release = service.publishRelease(null, null, state().getVersion(), state().getVersion(), description);
+                        putInternalAttribute(INTERNAL_OUPUT_ATTRIBUTE_STATE_VERSION, state().getVersion());
 
                         // publish release assets now
                         if (Objects.isNull(state().getConfiguration().getReleaseAssets()) || state().getConfiguration().getReleaseAssets().isEmpty()) {
@@ -150,7 +171,7 @@ public class Publish extends AbstractCommand {
         throws DataAccessException, IllegalPropertyException, GitException {
         logger.debug(COMMAND, "Storing the Publish command internal attributes to the State");
         if (!state().getConfiguration().getDryRun()) {
-            putInternalAttribute(INTERNAL_LAST_PUBLISHED_VERSION, state().getVersion());
+            putInternalAttribute(INTERNAL_INPUT_ATTRIBUTE_STATE_VERSION, state().getVersion());
         }
     }
 
@@ -162,11 +183,13 @@ public class Publish extends AbstractCommand {
         throws DataAccessException, IllegalPropertyException, GitException {
         logger.debug(COMMAND, "Checking whether the Publish command is up to date");
 
-        // Never up to date if this command hasn't stored a version yet into the state
-        if (Objects.isNull(state().getVersion()))
+        // Never up to date if this command hasn't stored a version yet into the state or the stored version is different than the state version
+        if (Objects.isNull(state().getVersion()) || !isInternalAttributeUpToDate(INTERNAL_INPUT_ATTRIBUTE_STATE_VERSION, state().getVersion())) {
+            logger.debug(COMMAND, "The Publish command is not up to date because the internal state has no version yet or the state version doesn't match the version previously published by Publish");
             return false;
+        }
         
-        return isInternalAttributeUpToDate(INTERNAL_LAST_PUBLISHED_VERSION, state().getVersion());
+        return isInternalAttributeUpToDate(INTERNAL_INPUT_ATTRIBUTE_STATE_VERSION, state().getVersion());
     }
 
     /**

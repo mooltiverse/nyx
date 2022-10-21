@@ -64,9 +64,17 @@ public class Clean extends AbstractCommand {
 
         // Check if there a State file
         String stateFilePath = state().getConfiguration().getStateFile();
-
-        if (!Objects.isNull(stateFilePath) && !stateFilePath.isBlank() && new File(stateFilePath).exists())
+        if (!Objects.isNull(stateFilePath) && !stateFilePath.isBlank() && new File(stateFilePath).exists()) {
+            logger.debug(COMMAND, "The Clean command is not up to date because the state file has been configured ('{}') and is present on the file system so it can be deleted", stateFilePath);
             return false;
+        }
+
+        // Check if there a Changelog file
+        File changelogFile = getChangelogFile();
+        if (!Objects.isNull(changelogFile) && changelogFile.exists()) {
+            logger.debug(COMMAND, "The Clean command is not up to date because the changelog file has been configured ('{}') and is present on the file system so it can be deleted", changelogFile.getAbsolutePath());
+            return false;
+        }
 
         // Otherwise return true
         return true;

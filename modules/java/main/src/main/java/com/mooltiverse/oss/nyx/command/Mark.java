@@ -44,45 +44,70 @@ public class Mark extends AbstractCommand {
     private static final Logger logger = LoggerFactory.getLogger(Mark.class);
 
     /**
-     * The name used for the internal state attribute where we store current branch name.
+     * The common prefix used for all the internal state attributes managed by this class.
      */
-    private static final String INTERNAL_BRANCH = Mark.class.getSimpleName().concat(".").concat("repository").concat(".").concat("current").concat(".").concat("branch");
+    private static final String INTERNAL_ATTRIBUTE_PREFIX = "mark";
+
+    /**
+     * The common prefix used for all the internal state attributes managed by this class, representing an input.
+     */
+    private static final String INTERNAL_INPUT_ATTRIBUTE_PREFIX = INTERNAL_ATTRIBUTE_PREFIX.concat(".").concat("input");
+
+    /**
+     * The common prefix used for all the internal state attributes managed by this class, representing an output.
+     */
+    private static final String INTERNAL_OUTPUT_ATTRIBUTE_PREFIX = INTERNAL_ATTRIBUTE_PREFIX.concat(".").concat("output");
 
     /**
      * The name used for the internal state attribute where we store the commit flag.
      */
-    private static final String INTERNAL_GIT_COMMIT = Mark.class.getSimpleName().concat(".").concat("git").concat(".").concat("commit");
+    private static final String INTERNAL_INPUT_ATTRIBUTE_CONFIGURED_GIT_COMMIT = INTERNAL_INPUT_ATTRIBUTE_PREFIX.concat(".").concat("configured").concat(".").concat("git").concat(".").concat("commit");
 
     /**
      * The name used for the internal state attribute where we store the push flag.
      */
-    private static final String INTERNAL_GIT_PUSH = Mark.class.getSimpleName().concat(".").concat("git").concat(".").concat("push");
+    private static final String INTERNAL_INPUT_ATTRIBUTE_CONFIGURED_GIT_PUSH = INTERNAL_INPUT_ATTRIBUTE_PREFIX.concat(".").concat("configured").concat(".").concat("git").concat(".").concat("push");
 
     /**
      * The name used for the internal state attribute where we store the tag flag.
      */
-    private static final String INTERNAL_GIT_TAG = Mark.class.getSimpleName().concat(".").concat("git").concat(".").concat("tag");
+    private static final String INTERNAL_INPUT_ATTRIBUTE_CONFIGURED_GIT_TAG = INTERNAL_INPUT_ATTRIBUTE_PREFIX.concat(".").concat("configured").concat(".").concat("git").concat(".").concat("tag");
+
+    /**
+     * The name used for the internal state attribute where we store current branch name.
+     */
+    private static final String INTERNAL_INPUT_ATTRIBUTE_REPOSITORY_CURRENT_BRANCH = INTERNAL_INPUT_ATTRIBUTE_PREFIX.concat(".").concat("repository").concat(".").concat("current").concat(".").concat("branch");
 
     /**
      * The name used for the internal state attribute where we store the SHA-1 of the last
      * commit in the current branch by the time this command was last executed.
      */
-    private static final String INTERNAL_LAST_COMMIT = Mark.class.getSimpleName().concat(".").concat("last").concat(".").concat("commit");
+    private static final String INTERNAL_INPUT_ATTRIBUTE_REPOSITORY_LAST_COMMIT = INTERNAL_INPUT_ATTRIBUTE_PREFIX.concat(".").concat("repository").concat(".").concat("last").concat(".").concat("commit");
 
     /**
      * The name used for the internal state attribute where we store the initial commit.
      */
-    private static final String STATE_INITIAL_COMMIT = Mark.class.getSimpleName().concat(".").concat("state").concat(".").concat("initialCommit");
+    private static final String INTERNAL_INPUT_ATTRIBUTE_STATE_INITIAL_COMMIT = INTERNAL_INPUT_ATTRIBUTE_PREFIX.concat(".").concat("state").concat(".").concat("initialCommit");
 
     /**
      * The flag telling if the current version is new.
      */
-    private static final String STATE_NEW_VERSION = Mark.class.getSimpleName().concat(".").concat("state").concat(".").concat("newVersion");
+    private static final String INTERNAL_INPUT_ATTRIBUTE_STATE_NEW_VERSION = INTERNAL_INPUT_ATTRIBUTE_PREFIX.concat(".").concat("state").concat(".").concat("newVersion");
 
     /**
      * The name used for the internal state attribute where we store the version.
      */
-    private static final String STATE_VERSION = Mark.class.getSimpleName().concat(".").concat("state").concat(".").concat("version");
+    private static final String INTERNAL_INPUT_ATTRIBUTE_STATE_VERSION = INTERNAL_INPUT_ATTRIBUTE_PREFIX.concat(".").concat("state").concat(".").concat("version");
+
+    /**
+     * The name used for the internal state attribute where we store the last commit created by this command.
+     */
+    private static final String INTERNAL_OUPUT_ATTRIBUTE_COMMIT = INTERNAL_OUTPUT_ATTRIBUTE_PREFIX.concat(".").concat("commit");
+
+    /**
+     * The name used for the internal state attribute where we store the last tag created by this command.
+     */
+    private static final String INTERNAL_OUPUT_ATTRIBUTE_TAG = INTERNAL_OUTPUT_ATTRIBUTE_PREFIX.concat(".").concat("tag");
 
     /**
      * Standard constructor.
@@ -125,6 +150,7 @@ public class Mark extends AbstractCommand {
                 // Here we can also specify the Author and Committer Identity as per https://github.com/mooltiverse/nyx/issues/65
                 Commit finalCommit = repository().commit(List.<String>of("."), commitMessage);
                 logger.debug(COMMAND, "Local changes committed at '{}'", finalCommit.getSHA());
+                putInternalAttribute(INTERNAL_OUPUT_ATTRIBUTE_COMMIT, finalCommit.getSHA());
 
                 logger.debug(COMMAND, "Adding commit '{}' to the release scope", finalCommit.getSHA());
                 state().getReleaseScope().getCommits().add(0, finalCommit);
@@ -150,6 +176,7 @@ public class Mark extends AbstractCommand {
             // Here we can also specify the Tagger Identity as per https://github.com/mooltiverse/nyx/issues/65
             repository().tag(state().getVersion(), Objects.isNull(tagMessage) || tagMessage.isBlank() ? null : tagMessage);
             logger.debug(COMMAND, "Tag '{}' applied to commit '{}'", state().getVersion(), repository().getLatestCommit());
+            putInternalAttribute(INTERNAL_OUPUT_ATTRIBUTE_TAG, state().getVersion());
         }
     }
 
@@ -222,14 +249,14 @@ public class Mark extends AbstractCommand {
         throws DataAccessException, IllegalPropertyException, GitException {
         logger.debug(COMMAND, "Storing the Mark command internal attributes to the State");
         if (!state().getConfiguration().getDryRun()) {
-            putInternalAttribute(INTERNAL_BRANCH, getCurrentBranch());
-            putInternalAttribute(INTERNAL_GIT_COMMIT, Objects.isNull(state().getReleaseType()) ? null : state().getReleaseType().getGitCommit());
-            putInternalAttribute(INTERNAL_GIT_PUSH, Objects.isNull(state().getReleaseType()) ? null : state().getReleaseType().getGitPush());
-            putInternalAttribute(INTERNAL_GIT_TAG, Objects.isNull(state().getReleaseType()) ? null : state().getReleaseType().getGitTag());
-            putInternalAttribute(INTERNAL_LAST_COMMIT, getLatestCommit());
-            putInternalAttribute(STATE_VERSION, state().getVersion());
-            putInternalAttribute(STATE_INITIAL_COMMIT, state().getReleaseScope().getInitialCommit());
-            putInternalAttribute(STATE_NEW_VERSION, state().getNewVersion());
+            putInternalAttribute(INTERNAL_INPUT_ATTRIBUTE_CONFIGURED_GIT_COMMIT, Objects.isNull(state().getReleaseType()) ? null : state().getReleaseType().getGitCommit());
+            putInternalAttribute(INTERNAL_INPUT_ATTRIBUTE_CONFIGURED_GIT_PUSH, Objects.isNull(state().getReleaseType()) ? null : state().getReleaseType().getGitPush());
+            putInternalAttribute(INTERNAL_INPUT_ATTRIBUTE_CONFIGURED_GIT_TAG, Objects.isNull(state().getReleaseType()) ? null : state().getReleaseType().getGitTag());
+            putInternalAttribute(INTERNAL_INPUT_ATTRIBUTE_REPOSITORY_CURRENT_BRANCH, getCurrentBranch());
+            putInternalAttribute(INTERNAL_INPUT_ATTRIBUTE_REPOSITORY_LAST_COMMIT, getLatestCommit());
+            putInternalAttribute(INTERNAL_INPUT_ATTRIBUTE_STATE_INITIAL_COMMIT, state().getReleaseScope().getInitialCommit());
+            putInternalAttribute(INTERNAL_INPUT_ATTRIBUTE_STATE_NEW_VERSION, state().getNewVersion());
+            putInternalAttribute(INTERNAL_INPUT_ATTRIBUTE_STATE_VERSION, state().getVersion());
         }
     }
 
@@ -243,20 +270,34 @@ public class Mark extends AbstractCommand {
         // The command is never considered up to date when the repository is not clean
         if (!isRepositoryClean())
             return false;
-        // Never up to date if this command hasn't stored a version yet into the state
-        if (Objects.isNull(state().getVersion()))
+
+        // Never up to date if this command hasn't stored a version yet into the state or the stored version is different than the state version
+        if (Objects.isNull(state().getVersion()) || !isInternalAttributeUpToDate(INTERNAL_INPUT_ATTRIBUTE_STATE_VERSION, state().getVersion())) {
+            logger.debug(COMMAND, "The Mark command is not up to date because the internal state has no version yet or the state version doesn't match the version previously generated by Mark");
             return false;
+        }
 
         // The command is never considered up to date when the repository branch or last commit has changed
-        if ((!isInternalAttributeUpToDate(INTERNAL_BRANCH, getCurrentBranch())) || (!isInternalAttributeUpToDate(INTERNAL_LAST_COMMIT, getLatestCommit())))
+        if ((!isInternalAttributeUpToDate(INTERNAL_INPUT_ATTRIBUTE_REPOSITORY_CURRENT_BRANCH, getCurrentBranch())) || (!isInternalAttributeUpToDate(INTERNAL_INPUT_ATTRIBUTE_REPOSITORY_LAST_COMMIT, getLatestCommit()))) {
+            logger.debug(COMMAND, "The Mark command is not up to date because the last commit or the current branch has changed");
             return false;
+        }
         // The command is never considered up to date when the commit, tag or push configurantion flags have changed
-        if ((!isInternalAttributeUpToDate(INTERNAL_GIT_COMMIT, state().getReleaseType().getGitCommit())) || (!isInternalAttributeUpToDate(INTERNAL_GIT_PUSH, state().getReleaseType().getGitPush())) || (!isInternalAttributeUpToDate(INTERNAL_GIT_TAG, state().getReleaseType().getGitTag())))
+        if ((!isInternalAttributeUpToDate(INTERNAL_INPUT_ATTRIBUTE_CONFIGURED_GIT_COMMIT, state().getReleaseType().getGitCommit())) || (!isInternalAttributeUpToDate(INTERNAL_INPUT_ATTRIBUTE_CONFIGURED_GIT_PUSH, state().getReleaseType().getGitPush())) || (!isInternalAttributeUpToDate(INTERNAL_INPUT_ATTRIBUTE_CONFIGURED_GIT_TAG, state().getReleaseType().getGitTag()))) {
+            logger.debug(COMMAND, "The Mark command is not up to date because the configuration of Git flags has changed");
             return false;
+        }
+            
         // Check if configuration parameters have changed
-        return isInternalAttributeUpToDate(STATE_VERSION, state().getVersion()) &&
-            isInternalAttributeUpToDate(STATE_INITIAL_COMMIT, state().getReleaseScope().getInitialCommit()) &&
-            isInternalAttributeUpToDate(STATE_NEW_VERSION, state().getNewVersion());
+        boolean res = isInternalAttributeUpToDate(INTERNAL_INPUT_ATTRIBUTE_STATE_INITIAL_COMMIT, state().getReleaseScope().getInitialCommit()) &&
+            isInternalAttributeUpToDate(INTERNAL_INPUT_ATTRIBUTE_STATE_NEW_VERSION, state().getNewVersion());
+        if (res) {
+            logger.debug(COMMAND, "The Mark command is up to date");
+        }
+        else {
+            logger.debug(COMMAND, "The Mark command is not up to date because the configuration or the internal state has changed");
+        }
+        return res;
     }
 
     /**

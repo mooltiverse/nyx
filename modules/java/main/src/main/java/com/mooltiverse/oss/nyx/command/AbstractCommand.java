@@ -17,6 +17,7 @@ package com.mooltiverse.oss.nyx.command;
 
 import static com.mooltiverse.oss.nyx.log.Markers.COMMAND;
 
+import java.io.File;
 import java.io.IOException;
 
 import java.util.HashMap;
@@ -97,6 +98,28 @@ abstract class AbstractCommand implements Command {
      */
     public final Repository repository() {
         return repository;
+    }
+
+    /**
+     * Returns the reference to the configured changelog file, if configured, or {@code null}
+     * of no destination file has been set by the configuration.
+     * 
+     * @return the reference to the configured changelog file, if configured
+     * 
+     * @throws DataAccessException in case the configuration can't be loaded for some reason.
+     * @throws IllegalPropertyException in case the configuration has some illegal options.
+     */
+    protected File getChangelogFile() 
+        throws DataAccessException, IllegalPropertyException {
+        if (Objects.isNull(state().getConfiguration().getChangelog()) || Objects.isNull(state().getConfiguration().getChangelog().getPath()) || Objects.isNull(state().getConfiguration().getChangelog().getPath().isBlank()))
+            return null;
+
+        File changelogFile = new File(state().getConfiguration().getChangelog().getPath());
+        // if the file path is relative make it relative to the configured directory
+        if (!changelogFile.isAbsolute())
+            changelogFile = new File(state().getConfiguration().getDirectory(), state().getConfiguration().getChangelog().getPath());
+        
+        return changelogFile;
     }
 
     /**

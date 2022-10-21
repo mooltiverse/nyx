@@ -179,6 +179,7 @@ public class Nyx {
                     if (stateFile.exists()) {
                         logger.debug(MAIN, "Resuming the state from file '{}'", configuration().getStateFile());
                         state = State.resume(stateFile, configuration());
+                        logger.debug(MAIN, "State has been resumed from file '{}'", configuration().getStateFile());
                     }
                     else {
                         logger.warn(MAIN, "The resume flag has been set and the state file has been configured but no state file exists at the given location {}. The state file will not be resumed.", configuration().getStateFile());
@@ -234,8 +235,13 @@ public class Nyx {
     private Command getCommandInstance(Commands command)
         throws DataAccessException, IllegalPropertyException, GitException {
         logger.debug(MAIN, "Looking up command instance '{}' from cache", command);
-        if (commands.containsKey(command))
+        if (commands.containsKey(command)) {
+            logger.debug(MAIN, "Command instance '{}' found in cache cache", command);
             return commands.get(command);
+        }
+        else {
+            logger.debug(MAIN, "No command instance '{}' found in cache cache", command);
+        }
         
         Command res = newCommandInstance(command);
         commands.put(command, res);
@@ -266,11 +272,13 @@ public class Nyx {
         else {
             logger.debug(MAIN, "Command '{}' is not up to date, running...", command.toString());
             commandInstance.run();
+            logger.debug(MAIN, "Command '{}' finished.", command.toString());
 
             // optionally save the state file
             if (saveState && !Objects.isNull(configuration().getStateFile())) {
                 logger.debug(MAIN, "Storing the state to '{}'", configuration().getStateFile());
                 FileMapper.save(configuration().getStateFile(), state());
+                logger.debug(MAIN, "State stored to to '{}'", configuration().getStateFile());
             }
         }
     }
@@ -288,11 +296,12 @@ public class Nyx {
      */
     public boolean isUpToDate(Commands command)
         throws DataAccessException, IllegalPropertyException, GitException {
-        logger.debug(MAIN, "Nyx.isUpTodate({})", command.toString());
         Objects.requireNonNull(command, "Command cannot be null");
 
-        logger.debug(MAIN, "Checking up-to-date status for command '{}'", command);
-        return commands.containsKey(command) && commands.get(command).isUpToDate();
+        boolean res = commands.containsKey(command) && commands.get(command).isUpToDate();
+
+        logger.debug(MAIN, "Checking if command '{}' is up to date: '{}'", command, res);
+        return res;
     }
 
     /**
