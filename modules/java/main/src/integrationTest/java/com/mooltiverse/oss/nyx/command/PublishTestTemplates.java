@@ -85,6 +85,40 @@ public class PublishTestTemplates {
             if (command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME))
                 assertFalse(command.isUpToDate());
             else assertTrue(command.isUpToDate()); 
+
+            // and running again with no changes must still be up to date
+            command.run();
+            // when the command is executed standalone, Infer is not executed so isUpToDate() will always return false
+            if (command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME))
+                assertFalse(command.isUpToDate());
+            else assertTrue(command.isUpToDate()); 
+        }
+    }
+
+    @Nested
+    @DisplayName("Publish idempotency")
+    @ExtendWith(CommandInvocationContextProvider.class)
+    public static class IdempotencyTests {
+        @TestTemplate
+        @DisplayName("Publish idempotency")
+        @Baseline(Scenario.INITIAL_COMMIT)
+        void idempotency(@CommandSelector(Commands.PUBLISH) CommandProxy command)
+            throws Exception {
+            // simply test that running it twice returns false at the first run and true the second
+            assertFalse(command.isUpToDate());
+            command.run();
+
+            // when the command is executed standalone, Infer is not executed so isUpToDate() will always return false
+            if (command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME))
+                assertFalse(command.isUpToDate());
+            else assertTrue(command.isUpToDate()); 
+
+            // and running again with no changes must still be up to date
+            command.run();
+            // when the command is executed standalone, Infer is not executed so isUpToDate() will always return false
+            if (command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME))
+                assertFalse(command.isUpToDate());
+            else assertTrue(command.isUpToDate()); 
         }
     }
 

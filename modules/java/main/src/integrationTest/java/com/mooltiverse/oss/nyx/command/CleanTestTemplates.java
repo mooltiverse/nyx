@@ -91,7 +91,7 @@ public class CleanTestTemplates {
          * Check that the isUpToDate() returns {@code false} when there's a state file
          */
         @TestTemplate
-        @DisplayName("Clean.isUpToDate()")
+        @DisplayName("Clean.isUpToDate() with state file")
         @Baseline(Scenario.INITIAL_COMMIT)
         void isUpToDateWithStateFileTest(@CommandSelector(Commands.CLEAN) CommandProxy command)
             throws Exception {
@@ -108,11 +108,94 @@ public class CleanTestTemplates {
             stateFile.createNewFile();
 
             // now it's not up do date anymore
+            assertTrue(stateFile.exists());
             assertFalse(command.isUpToDate());
 
-            stateFile.delete();
+            command.run();
+
+            // now it's up do date again
+            assertFalse(stateFile.exists());
+            assertTrue(command.isUpToDate());
+        }
+
+        /**
+         * Check that the isUpToDate() returns {@code false} when there's a changelog file
+         */
+        @TestTemplate
+        @DisplayName("Clean.isUpToDate() with changelog file")
+        @Baseline(Scenario.INITIAL_COMMIT)
+        void isUpToDateWithChangelogFileTest(@CommandSelector(Commands.CLEAN) CommandProxy command)
+            throws Exception {
+            String changelogFilePath = "changelog-file.txt";
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            configurationLayerMock.getChangelog().setPath(changelogFilePath);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
+
+            // run once, to start
+            command.run();
+            assertTrue(command.isUpToDate());
+
+            File changelogFile = new File(changelogFilePath);
+            changelogFile.createNewFile();
+
+            // now it's up do date anymore
+            assertTrue(changelogFile.exists());
+            assertFalse(command.isUpToDate());
+
+            command.run();
+
+            // now it's up do date again
+            assertFalse(changelogFile.exists());
+            assertTrue(command.isUpToDate());
+        }
+    }
+
+    @Nested
+    @DisplayName("Clean idempotency")
+    @ExtendWith(CommandInvocationContextProvider.class)
+    public static class IdempotencyTests {
+        /**
+         * Check that multiple runs yield to the same result
+         */
+        @TestTemplate
+        @DisplayName("Clean idempotency")
+        @Baseline(Scenario.INITIAL_COMMIT)
+        void idempotency(@CommandSelector(Commands.CLEAN) CommandProxy command)
+            throws Exception {
+            String stateFilePath = "state-file.txt";
+            String changelogFilePath = "changelog-file.txt";
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            configurationLayerMock.setStateFile(stateFilePath);
+            configurationLayerMock.getChangelog().setPath(changelogFilePath);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
+
+            // run once, to start
+            command.run();
+            assertTrue(command.isUpToDate());
+
+            File stateFile = new File(stateFilePath);
+            stateFile.createNewFile();
+            File changelogFile = new File(changelogFilePath);
+            changelogFile.createNewFile();
+
+            // now it's not up do date anymore
+            assertTrue(changelogFile.exists());
+            assertTrue(stateFile.exists());
+            assertFalse(command.isUpToDate());
+
+            command.run();
+
+            // now it's up do date again
+            assertFalse(stateFile.exists());
+            assertFalse(changelogFile.exists());
+            assertTrue(command.isUpToDate());
+
+            // run again and test for idempotency
+            command.run();
 
             // now it's not up do date again
+            assertFalse(stateFile.exists());
+            assertFalse(changelogFile.exists());
             assertTrue(command.isUpToDate());
         }
     }
@@ -141,6 +224,36 @@ public class CleanTestTemplates {
             // now running the clean must delete the file
             command.run();
             assertFalse(stateFile.exists());
+
+            // run again and test for idempotency
+            command.run();
+            assertFalse(stateFile.exists());
+        }
+
+        @TestTemplate
+        @DisplayName("Clean.run() deletes changelog file")
+        @Baseline(Scenario.FROM_SCRATCH)
+        void deleteChangelogFileTest(@CommandSelector(Commands.CLEAN) CommandProxy command)
+            throws Exception {
+            String changelogFilePath = "changelog-file.txt";
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            configurationLayerMock.getChangelog().setPath(changelogFilePath);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
+
+            // run once, to start
+            command.run();
+
+            File changelogFile = new File(changelogFilePath);
+            changelogFile.createNewFile();
+            assertTrue(changelogFile.exists());
+    
+            // now running the clean must delete the file
+            command.run();
+            assertFalse(changelogFile.exists());
+
+            // run again and test for idempotency
+            command.run();
+            assertFalse(changelogFile.exists());
         }
     }
 }

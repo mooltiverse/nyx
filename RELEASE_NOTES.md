@@ -1,5 +1,28 @@
 # Nyx Release Notes
 
+## 1.2.2
+
+This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/1.2.2).
+
+### Upgrade instructions
+
+There are no actions to take for backward compatibility.
+
+### New features and improvements
+
+There are no new features or improvements in this release.
+
+### Fixed issues
+
+This release:
+
+* fixes the issue with up-to-date checks causing duplicate tags to be applied when runnin in *dirty* repositories [#116](https://github.com/mooltiverse/nyx/issues/116)
+* bug [#116](https://github.com/mooltiverse/nyx/issues/116) also fixes bug bug [#115](https://github.com/mooltiverse/nyx/issues/115) although it was originally about a different issue
+
+### Known issues
+
+There are no known issues in this release.
+
 ## 1.2.1
 
 This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/1.2.1).

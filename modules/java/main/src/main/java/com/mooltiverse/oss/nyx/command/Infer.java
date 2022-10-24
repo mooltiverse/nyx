@@ -62,45 +62,65 @@ public class Infer extends AbstractCommand {
     private static final Logger logger = LoggerFactory.getLogger(Infer.class);
 
     /**
+     * The common prefix used for all the internal state attributes managed by this class.
+     */
+    private static final String INTERNAL_ATTRIBUTE_PREFIX = "infer";
+
+    /**
+     * The common prefix used for all the internal state attributes managed by this class, representing an input.
+     */
+    private static final String INTERNAL_INPUT_ATTRIBUTE_PREFIX = INTERNAL_ATTRIBUTE_PREFIX.concat(".").concat("input");
+
+    /**
+     * The common prefix used for all the internal state attributes managed by this class, representing an output.
+     */
+    private static final String INTERNAL_OUTPUT_ATTRIBUTE_PREFIX = INTERNAL_ATTRIBUTE_PREFIX.concat(".").concat("output");
+
+    /**
      * The name used for the internal state attribute where we store the configured bump.
      */
-    private static final String CONFIGURED_BUMP = Infer.class.getSimpleName().concat(".").concat("configured").concat(".").concat("bump");
+    private static final String INTERNAL_INPUT_ATTRIBUTE_CONFIGURED_BUMP = INTERNAL_INPUT_ATTRIBUTE_PREFIX.concat(".").concat("configured").concat(".").concat("bump");
 
     /**
      * The name used for the internal state attribute where we store the configured initial version.
      */
-    private static final String CONFIGURED_INITIAL_VERSION = Infer.class.getSimpleName().concat(".").concat("configured").concat(".").concat("initialVersion");
+    private static final String INTERNAL_INPUT_ATTRIBUTE_CONFIGURED_INITIAL_VERSION = INTERNAL_INPUT_ATTRIBUTE_PREFIX.concat(".").concat("configured").concat(".").concat("initialVersion");
 
     /**
      * The name used for the internal state attribute where we store the configured release lenient.
      */
-    private static final String CONFIGURED_RELEASE_LENIENT = Infer.class.getSimpleName().concat(".").concat("configured").concat(".").concat("releaseLenient");
+    private static final String INTERNAL_INPUT_ATTRIBUTE_CONFIGURED_RELEASE_LENIENT = INTERNAL_INPUT_ATTRIBUTE_PREFIX.concat(".").concat("configured").concat(".").concat("releaseLenient");
 
     /**
      * The name used for the internal state attribute where we store the configured release prefix.
      */
-    private static final String CONFIGURED_RELEASE_PREFIX = Infer.class.getSimpleName().concat(".").concat("configured").concat(".").concat("releasePrefix");
+    private static final String INTERNAL_INPUT_ATTRIBUTE_CONFIGURED_RELEASE_PREFIX = INTERNAL_INPUT_ATTRIBUTE_PREFIX.concat(".").concat("configured").concat(".").concat("releasePrefix");
 
     /**
      * The name used for the internal state attribute where we store the configured scheme.
      */
-    private static final String CONFIGURED_SCHEME = Infer.class.getSimpleName().concat(".").concat("configured").concat(".").concat("scheme");
+    private static final String INTERNAL_INPUT_ATTRIBUTE_CONFIGURED_SCHEME = INTERNAL_INPUT_ATTRIBUTE_PREFIX.concat(".").concat("configured").concat(".").concat("scheme");
 
     /**
      * The name used for the internal state attribute where we store the configured version.
      */
-    private static final String CONFIGURED_VERSION = Infer.class.getSimpleName().concat(".").concat("configured").concat(".").concat("version");
+    private static final String INTERNAL_INPUT_ATTRIBUTE_CONFIGURED_VERSION = INTERNAL_INPUT_ATTRIBUTE_PREFIX.concat(".").concat("configured").concat(".").concat("version");
 
     /**
      * The name used for the internal state attribute where we store current branch name.
      */
-    private static final String INTERNAL_BRANCH = Infer.class.getSimpleName().concat(".").concat("repository").concat(".").concat("current").concat(".").concat("branch");
+    private static final String INTERNAL_INPUT_ATTRIBUTE_REPOSITORY_CURRENT_BRANCH = INTERNAL_INPUT_ATTRIBUTE_PREFIX.concat(".").concat("repository").concat(".").concat("current").concat(".").concat("branch");
 
     /**
      * The name used for the internal state attribute where we store the SHA-1 of the last
      * commit in the current branch by the time this command was last executed.
      */
-    private static final String INTERNAL_LAST_COMMIT = Infer.class.getSimpleName().concat(".").concat("last").concat(".").concat("commit");
+    private static final String INTERNAL_INPUT_ATTRIBUTE_REPOSITORY_LAST_COMMIT = INTERNAL_INPUT_ATTRIBUTE_PREFIX.concat(".").concat("repository").concat(".").concat("last").concat(".").concat("commit");
+
+    /**
+     * The name used for the internal state attribute where we store the version.
+     */
+    private static final String INTERNAL_INPUT_ATTRIBUTE_STATE_VERSION = INTERNAL_OUTPUT_ATTRIBUTE_PREFIX.concat(".").concat("state").concat(".").concat("version");
 
     /**
      * This regular expression is used to match a branch name in order to see if it's a wildcard that may represent
@@ -745,6 +765,37 @@ public class Infer extends AbstractCommand {
     }
 
     /**
+     * Reset the attributes store by this command into the internal state object.
+     * This is required before running the command in order to make sure that the new execution is not affected
+     * by a stala status coming from previous runs.
+     * 
+     * @throws DataAccessException in case the configuration can't be loaded for some reason.
+     * @throws IllegalPropertyException in case the configuration has some illegal options.
+     * 
+     * @see #isUpToDate()
+     * @see State#getInternals()
+     */
+    private void clearStateOutputAttributes() 
+        throws DataAccessException, IllegalPropertyException {
+        logger.debug(COMMAND, "Clearing the state from Infer outputs");
+        state().setBranch(null);
+        // the bump attribute can only be set (or reset) when the used didn't override the value from the configuration
+        if (Objects.isNull(state().getConfiguration().getBump()))
+            state().setBump(null);
+        state().getReleaseScope().getCommits().clear();
+        state().getReleaseScope().setPreviousVersion(null);
+        state().getReleaseScope().setPreviousVersionCommit(null);
+        state().getReleaseScope().setPrimeVersion(null);
+        state().getReleaseScope().setPrimeVersionCommit(null);
+        state().getReleaseScope().getSignificantCommits().clear();
+        state().setReleaseType(null);
+        // the version attribute can only be set (or reset) when the used didn't override the value from the configuration
+        if (Objects.isNull(state().getConfiguration().getVersion()))
+            state().setVersion(null);
+        state().setVersionRange(null);
+    }
+
+    /**
      * This method stores the state internal attributes used for up-to-date checks so that subsequent invocations
      * of the {@link #isUpToDate()} method can find them and determine if the command is already up to date.
      * 
@@ -760,14 +811,16 @@ public class Infer extends AbstractCommand {
     private void storeStatusInternalAttributes()
         throws DataAccessException, IllegalPropertyException, GitException {
         logger.debug(COMMAND, "Storing the Infer command internal attributes to the State");
-        putInternalAttribute(INTERNAL_BRANCH, getCurrentBranch());
-        putInternalAttribute(INTERNAL_LAST_COMMIT, getLatestCommit());
-        putInternalAttribute(CONFIGURED_VERSION, state().getConfiguration().getVersion());
-        putInternalAttribute(CONFIGURED_BUMP, state().getConfiguration().getBump());
-        putInternalAttribute(CONFIGURED_SCHEME, state().getConfiguration().getScheme());
-        putInternalAttribute(CONFIGURED_INITIAL_VERSION, state().getConfiguration().getInitialVersion());
-        putInternalAttribute(CONFIGURED_RELEASE_PREFIX, state().getConfiguration().getReleasePrefix());
-        putInternalAttribute(CONFIGURED_RELEASE_LENIENT, state().getConfiguration().getReleaseLenient());
+        putInternalAttribute(INTERNAL_INPUT_ATTRIBUTE_CONFIGURED_BUMP, state().getConfiguration().getBump());
+        putInternalAttribute(INTERNAL_INPUT_ATTRIBUTE_CONFIGURED_INITIAL_VERSION, state().getConfiguration().getInitialVersion());
+        putInternalAttribute(INTERNAL_INPUT_ATTRIBUTE_CONFIGURED_RELEASE_LENIENT, state().getConfiguration().getReleaseLenient());
+        putInternalAttribute(INTERNAL_INPUT_ATTRIBUTE_CONFIGURED_RELEASE_PREFIX, state().getConfiguration().getReleasePrefix());
+        putInternalAttribute(INTERNAL_INPUT_ATTRIBUTE_CONFIGURED_SCHEME, state().getConfiguration().getScheme());
+        putInternalAttribute(INTERNAL_INPUT_ATTRIBUTE_CONFIGURED_VERSION, state().getConfiguration().getVersion());
+        putInternalAttribute(INTERNAL_INPUT_ATTRIBUTE_REPOSITORY_CURRENT_BRANCH, getCurrentBranch());
+        putInternalAttribute(INTERNAL_INPUT_ATTRIBUTE_REPOSITORY_LAST_COMMIT, getLatestCommit());
+
+        putInternalAttribute(INTERNAL_INPUT_ATTRIBUTE_STATE_VERSION, state().getVersion());
     }
 
     /**
@@ -777,23 +830,31 @@ public class Infer extends AbstractCommand {
     public boolean isUpToDate()
         throws DataAccessException, IllegalPropertyException, GitException {
         logger.debug(COMMAND, "Checking whether the Infer command is up to date");
-        // The command is never considered up to date when the repository is not clean
-        if (!isRepositoryClean())
+        // Never up to date if this command hasn't stored a version yet into the state or the stored version is different than the state version
+        if (Objects.isNull(state().getVersion()) || !isInternalAttributeUpToDate(INTERNAL_INPUT_ATTRIBUTE_STATE_VERSION, state().getVersion())) {
+            logger.debug(COMMAND, "The Infer command is not up to date because the internal state has no version yet or the state version doesn't match the version previously generated by Infer");
             return false;
-        // Never up to date if this command hasn't stored a version yet into the state
-        if (Objects.isNull(state().getVersion()))
-            return false;
+        }
 
         // The command is never considered up to date when the repository branch or last commit has changed
-        if ((!isInternalAttributeUpToDate(INTERNAL_BRANCH, getCurrentBranch())) || (!isInternalAttributeUpToDate(INTERNAL_LAST_COMMIT, getLatestCommit())))
+        if ((!isInternalAttributeUpToDate(INTERNAL_INPUT_ATTRIBUTE_REPOSITORY_CURRENT_BRANCH, getCurrentBranch())) || (!isInternalAttributeUpToDate(INTERNAL_INPUT_ATTRIBUTE_REPOSITORY_LAST_COMMIT, getLatestCommit()))) {
+            logger.debug(COMMAND, "The Infer command is not up to date because the last commit or the current branch has changed");
             return false;
+        }
         // Check if configuration parameters have changed
-        return isInternalAttributeUpToDate(CONFIGURED_VERSION, state().getConfiguration().getVersion()) &&
-            isInternalAttributeUpToDate(CONFIGURED_BUMP, state().getConfiguration().getBump()) &&
-            isInternalAttributeUpToDate(CONFIGURED_SCHEME, state().getConfiguration().getScheme()) &&
-            isInternalAttributeUpToDate(CONFIGURED_INITIAL_VERSION, state().getConfiguration().getInitialVersion()) &&
-            isInternalAttributeUpToDate(CONFIGURED_RELEASE_PREFIX, state().getConfiguration().getReleasePrefix()) &&
-            isInternalAttributeUpToDate(CONFIGURED_RELEASE_LENIENT, state().getConfiguration().getReleaseLenient());
+        boolean res = isInternalAttributeUpToDate(INTERNAL_INPUT_ATTRIBUTE_CONFIGURED_BUMP, state().getConfiguration().getBump()) &&
+            isInternalAttributeUpToDate(INTERNAL_INPUT_ATTRIBUTE_CONFIGURED_INITIAL_VERSION, state().getConfiguration().getInitialVersion()) &&
+            isInternalAttributeUpToDate(INTERNAL_INPUT_ATTRIBUTE_CONFIGURED_RELEASE_LENIENT, state().getConfiguration().getReleaseLenient()) &&
+            isInternalAttributeUpToDate(INTERNAL_INPUT_ATTRIBUTE_CONFIGURED_RELEASE_PREFIX, state().getConfiguration().getReleasePrefix()) &&
+            isInternalAttributeUpToDate(INTERNAL_INPUT_ATTRIBUTE_CONFIGURED_SCHEME, state().getConfiguration().getScheme()) &&
+            isInternalAttributeUpToDate(INTERNAL_INPUT_ATTRIBUTE_CONFIGURED_VERSION, state().getConfiguration().getVersion());
+        if (res) {
+            logger.debug(COMMAND, "The Infer command is up to date");
+        }
+        else {
+            logger.debug(COMMAND, "The Infer command is not up to date because the configuration or the internal state has changed");
+        }
+        return res;
     }
 
     /**
@@ -837,6 +898,8 @@ public class Infer extends AbstractCommand {
     public State run()
         throws DataAccessException, IllegalPropertyException, GitException, ReleaseException {
         logger.debug(COMMAND, "Running the Infer command...");
+
+        clearStateOutputAttributes();
 
         state().setReleaseType(resolveReleaseType());
 
@@ -886,6 +949,7 @@ public class Infer extends AbstractCommand {
         }
 
         storeStatusInternalAttributes();
+        
         return state();
     }
 }

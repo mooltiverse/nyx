@@ -314,7 +314,6 @@ abstract class AbstractCommand implements Command {
      */
     protected ReleaseType resolveReleaseType()
         throws DataAccessException, IllegalPropertyException, GitException, ReleaseException {
-
         if (Objects.isNull(state().getConfiguration().getReleaseTypes()) || Objects.isNull(state().getConfiguration().getReleaseTypes().getEnabled()) || state().getConfiguration().getReleaseTypes().getEnabled().isEmpty())
             throw new ReleaseException("No release types have been configured. Please configure them using the releaseTypes option.");
 

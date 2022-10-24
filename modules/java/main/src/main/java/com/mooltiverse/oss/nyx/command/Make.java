@@ -66,35 +66,45 @@ public class Make extends AbstractCommand {
     private static final Logger logger = LoggerFactory.getLogger(Make.class);
 
     /**
-     * The name used for the internal state attribute where we store current branch name.
+     * The common prefix used for all the internal state attributes managed by this class.
      */
-    private static final String INTERNAL_BRANCH = Make.class.getSimpleName().concat(".").concat("repository").concat(".").concat("current").concat(".").concat("branch");
+    private static final String INTERNAL_ATTRIBUTE_PREFIX = "make";
+
+    /**
+     * The common prefix used for all the internal state attributes managed by this class, representing an input.
+     */
+    private static final String INTERNAL_INPUT_ATTRIBUTE_PREFIX = INTERNAL_ATTRIBUTE_PREFIX.concat(".").concat("input");
 
     /**
      * The name used for the internal state attribute where we store the path to the changelog file.
      */
-    private static final String INTERNAL_CHANGELOG_FILE = Make.class.getSimpleName().concat(".").concat("changelog").concat(".").concat("file");
+    private static final String INTERNAL_INPUT_ATTRIBUTE_CHANGELOG_FILE = INTERNAL_INPUT_ATTRIBUTE_PREFIX.concat(".").concat("changelog").concat(".").concat("file");
+
+    /**
+     * The name used for the internal state attribute where we store current branch name.
+     */
+    private static final String INTERNAL_INPUT_ATTRIBUTE_REPOSITORY_CURRENT_BRANCH = INTERNAL_INPUT_ATTRIBUTE_PREFIX.concat(".").concat("repository").concat(".").concat("current").concat(".").concat("branch");
 
     /**
      * The name used for the internal state attribute where we store the SHA-1 of the last
      * commit in the current branch by the time this command was last executed.
      */
-    private static final String INTERNAL_LAST_COMMIT = Make.class.getSimpleName().concat(".").concat("last").concat(".").concat("commit");
+    private static final String INTERNAL_INPUT_ATTRIBUTE_REPOSITORY_LAST_COMMIT = INTERNAL_INPUT_ATTRIBUTE_PREFIX.concat(".").concat("repository").concat(".").concat("last").concat(".").concat("commit");
 
     /**
      * The name used for the internal state attribute where we store the initial commit.
      */
-    private static final String STATE_INITIAL_COMMIT = Make.class.getSimpleName().concat(".").concat("state").concat(".").concat("initialCommit");
+    private static final String INTERNAL_INPUT_ATTRIBUTE_STATE_INITIAL_COMMIT = INTERNAL_INPUT_ATTRIBUTE_PREFIX.concat(".").concat("state").concat(".").concat("initialCommit");
 
     /**
      * The flag telling if the current version is new.
      */
-    private static final String STATE_NEW_VERSION = Make.class.getSimpleName().concat(".").concat("state").concat(".").concat("newVersion");
+    private static final String INTERNAL_INPUT_ATTRIBUTE_STATE_NEW_VERSION = INTERNAL_INPUT_ATTRIBUTE_PREFIX.concat(".").concat("state").concat(".").concat("newVersion");
 
     /**
      * The name used for the internal state attribute where we store the version.
      */
-    private static final String STATE_VERSION = Make.class.getSimpleName().concat(".").concat("state").concat(".").concat("version");
+    private static final String INTERNAL_INPUT_ATTRIBUTE_VERSION = INTERNAL_INPUT_ATTRIBUTE_PREFIX.concat(".").concat("version");
 
     /**
      * Standard constructor.
@@ -317,6 +327,23 @@ public class Make extends AbstractCommand {
     }
 
     /**
+     * Reset the attributes store by this command into the internal state object.
+     * This is required before running the command in order to make sure that the new execution is not affected
+     * by a stala status coming from previous runs.
+     * 
+     * @throws DataAccessException in case the configuration can't be loaded for some reason.
+     * @throws IllegalPropertyException in case the configuration has some illegal options.
+     * 
+     * @see #isUpToDate()
+     * @see State#getInternals()
+     */
+    private void clearStateOutputAttributes() 
+        throws DataAccessException, IllegalPropertyException {
+        logger.debug(COMMAND, "Clearing the state from Make outputs");
+        state().setChangelog(null);
+    }
+
+    /**
      * This method stores the state internal attributes used for up-to-date checks so that subsequent invocations
      * of the {@link #isUpToDate()} method can find them and determine if the command is already up to date.
      * 
@@ -334,12 +361,12 @@ public class Make extends AbstractCommand {
         logger.debug(COMMAND, "Storing the Make command internal attributes to the State");
         if (!state().getConfiguration().getDryRun()) {
             File changelogFile = getChangelogFile();
-            putInternalAttribute(INTERNAL_BRANCH, getCurrentBranch());
-            putInternalAttribute(INTERNAL_CHANGELOG_FILE, Objects.isNull(changelogFile) ? "null" : changelogFile.getAbsolutePath());
-            putInternalAttribute(INTERNAL_LAST_COMMIT, getLatestCommit());
-            putInternalAttribute(STATE_VERSION, state().getVersion());
-            putInternalAttribute(STATE_INITIAL_COMMIT, state().getReleaseScope().getInitialCommit());
-            putInternalAttribute(STATE_NEW_VERSION, state().getNewVersion());
+            putInternalAttribute(INTERNAL_INPUT_ATTRIBUTE_CHANGELOG_FILE, Objects.isNull(changelogFile) ? "null" : changelogFile.getAbsolutePath());
+            putInternalAttribute(INTERNAL_INPUT_ATTRIBUTE_REPOSITORY_CURRENT_BRANCH, getCurrentBranch());
+            putInternalAttribute(INTERNAL_INPUT_ATTRIBUTE_REPOSITORY_LAST_COMMIT, getLatestCommit());
+            putInternalAttribute(INTERNAL_INPUT_ATTRIBUTE_STATE_INITIAL_COMMIT, state().getReleaseScope().getInitialCommit());
+            putInternalAttribute(INTERNAL_INPUT_ATTRIBUTE_STATE_NEW_VERSION, state().getNewVersion());
+            putInternalAttribute(INTERNAL_INPUT_ATTRIBUTE_VERSION, state().getVersion());
         }
     }
 
@@ -351,28 +378,50 @@ public class Make extends AbstractCommand {
         throws DataAccessException, IllegalPropertyException, GitException {
         logger.debug(COMMAND, "Checking whether the Make command is up to date");
         // Never up to date if this command hasn't stored a version yet into the state
-        if (Objects.isNull(state().getVersion()))
+        if (Objects.isNull(state().getVersion())) {
+            logger.debug(COMMAND, "The Make command is not up to date because the internal state has no version yet");
             return false;
+        }
 
-        // The command is never considered up to date when the configuration requires a changelog file but the state has no such object reference
-        if (!Objects.isNull(getChangelogFile()) && Objects.isNull(state().getChangelog()))
-            return false;
+        if (state().getNewVersion()) {
+            File changelogFile = getChangelogFile();
+            if (!Objects.isNull(changelogFile)) {
+                // The command is never considered up to date when the configuration requires a changelog file but the state has no such object reference
+                if (Objects.isNull(state().getChangelog())) {
+                    logger.debug(COMMAND, "The Make command is not up to date because a changelog file has been configured ('{}') but the internal state has no changelog yet", changelogFile.getAbsolutePath());
+                    return false;
+                }
+                // The command is never considered up to date when the changelog file hasn't been saved yet or it has changed
+                if (!isInternalAttributeUpToDate(INTERNAL_INPUT_ATTRIBUTE_CHANGELOG_FILE, changelogFile.getAbsolutePath())) {
+                    logger.debug(COMMAND, "The Make command is not up to date because a changelog file has been configured ('{}') but the configured path has changed", changelogFile.getAbsolutePath());
+                    return false;
+                }
+                if (!changelogFile.exists()) {
+                    logger.debug(COMMAND, "The Make command is not up to date because a changelog file has been configured ('{}') but the file does not exist", changelogFile.getAbsolutePath());
+                    return false;
+                }
+            }
+        }
+        else {
+            logger.debug(COMMAND, "No new version has been generated so up-to-date checks for the Make command in regards to the changelog file are skipped");
+        }
 
         // The command is never considered up to date when the repository branch or last commit has changed
-        if ((!isInternalAttributeUpToDate(INTERNAL_BRANCH, getCurrentBranch())) || (!isInternalAttributeUpToDate(INTERNAL_LAST_COMMIT, getLatestCommit())))
+        if ((!isInternalAttributeUpToDate(INTERNAL_INPUT_ATTRIBUTE_REPOSITORY_CURRENT_BRANCH, getCurrentBranch())) || (!isInternalAttributeUpToDate(INTERNAL_INPUT_ATTRIBUTE_REPOSITORY_LAST_COMMIT, getLatestCommit())) || (!isInternalAttributeUpToDate(INTERNAL_INPUT_ATTRIBUTE_STATE_INITIAL_COMMIT, state().getReleaseScope().getInitialCommit()))) {
+            logger.debug(COMMAND, "The Make command is not up to date because the range of commits or the current branch has changed");
             return false;
-
-        // The command is never considered up to date when the changelog file hasn't been saved yet or it has changed
-        File changelogFile = getChangelogFile();
-        if ((!isInternalAttributeUpToDate(INTERNAL_CHANGELOG_FILE, Objects.isNull(changelogFile) ? "null" : changelogFile.getAbsolutePath())))
-            return false;
-        if (!Objects.isNull(changelogFile) && !changelogFile.exists())
-            return false;
+        }
 
         // Check if configuration parameters have changed
-        return isInternalAttributeUpToDate(STATE_VERSION, state().getVersion()) &&
-            isInternalAttributeUpToDate(STATE_INITIAL_COMMIT, state().getReleaseScope().getInitialCommit()) &&
-            isInternalAttributeUpToDate(STATE_NEW_VERSION, state().getNewVersion());
+        boolean res = isInternalAttributeUpToDate(INTERNAL_INPUT_ATTRIBUTE_VERSION, state().getVersion()) &&
+            isInternalAttributeUpToDate(INTERNAL_INPUT_ATTRIBUTE_STATE_NEW_VERSION, state().getNewVersion());
+        if (res) {
+            logger.debug(COMMAND, "The Make command is up to date");
+        }
+        else {
+            logger.debug(COMMAND, "The Make command is not up to date because the configuration or the internal state has changed");
+        }
+        return res;
     }
 
     /**
@@ -383,9 +432,12 @@ public class Make extends AbstractCommand {
         throws DataAccessException, IllegalPropertyException, GitException, ReleaseException {
         logger.debug(COMMAND, "Running the Make command...");
 
+        clearStateOutputAttributes();
+
         buildAssets();
 
         storeStatusInternalAttributes();
+        
         return state();
     }
 }

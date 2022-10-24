@@ -35,9 +35,11 @@ import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
 import com.mooltiverse.oss.nyx.entities.ReleaseType;
 import com.mooltiverse.oss.nyx.entities.ReleaseTypes;
+import com.mooltiverse.oss.nyx.entities.git.Commit;
 import com.mooltiverse.oss.nyx.git.GitException;
 import com.mooltiverse.oss.nyx.git.Scenario;
 import com.mooltiverse.oss.nyx.git.Script;
+import com.mooltiverse.oss.nyx.version.Scheme;
 
 @DisplayName("Mark")
 public class MarkTestTemplates {
@@ -111,10 +113,10 @@ public class MarkTestTemplates {
         }
 
         /**
-         * Check that the isUpToDate() always returns {@code false} when the repository is dirty.
+         * Check that the isUpToDate() always returns {@code true} even when the repository is dirty.
          */
         @TestTemplate
-        @DisplayName("Mark.isUpToDate() == false in dirty repository")
+        @DisplayName("Mark.isUpToDate() == true in dirty repository")
         @Baseline(Scenario.FROM_SCRATCH)
         void isUpToDateInDirtyRepositoryTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script)
             throws Exception {
@@ -129,17 +131,464 @@ public class MarkTestTemplates {
                 assertFalse(command.isUpToDate());
             else assertTrue(command.isUpToDate()); 
 
-            // but if we add uncommitted files it must return false
+            // if we add uncommitted files it must return still return true
             script.addRandomTextWorkbenchFiles(1);
-            assertFalse(command.isUpToDate());
-            command.run();
-            assertFalse(command.isUpToDate());
+            // when the command is executed standalone, Infer is not executed so isUpToDate() will always return false
+            if (command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
+                assertFalse(command.isUpToDate());
+            }
+            else {
+                command.run();
+                assertTrue(command.isUpToDate());
 
-            // still false even after staging
-            script.stage();
-            assertFalse(command.isUpToDate());
+                // still true even after staging
+                script.stage();
+                assertTrue(command.isUpToDate());
+                command.run();
+                assertTrue(command.isUpToDate());
+
+                // but returns false with a new commit as long as it doesn't run again
+                script.andCommitWithTag("111.122.144");
+                assertFalse(command.isUpToDate());
+                command.run();
+                assertTrue(command.isUpToDate());
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("Mark idempotency")
+    @ExtendWith(CommandInvocationContextProvider.class)
+    public static class IdempotencyTests {
+        /**
+         * Check that multiple runs yield to the same result with a commit message convention configured
+         */
+        @TestTemplate
+        @DisplayName("Mark idempotency with commit message convention")
+        @Baseline(Scenario.ONE_BRANCH_SHORT)
+        void idempotencyWithCommitMessageConvention(@CommandSelector(Commands.MARK) CommandProxy command, Script script)
+            throws Exception {
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            // add a mock convention that accepts all non null messages and dumps the minor identifier for each
+            configurationLayerMock.setCommitMessageConventions(
+                new CommitMessageConventions(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("minor", ".*")))
+                )
+            );
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
+
+            // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
+            if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
+                // run a first time
+                command.run();
+
+                // collect its state values
+                String branch = command.state().getBranch();
+                String bump = command.state().getBump();
+                Boolean newRelease = command.state().getNewRelease();
+                Boolean newVersion = command.state().getNewVersion();
+                List<Commit> commits = List.<Commit>copyOf(command.state().getReleaseScope().getCommits());
+                List<Commit> significantCommits = List.<Commit>copyOf(command.state().getReleaseScope().getSignificantCommits());
+                String previousVersion = command.state().getReleaseScope().getPreviousVersion();
+                Commit previousVersionCommit = command.state().getReleaseScope().getPreviousVersionCommit();
+                String matchBranches = command.state().getReleaseType().getMatchBranches();
+                Scheme scheme = command.state().getScheme();
+                Long timestamp = command.state().getTimestamp();
+                String version = command.state().getVersion();
+                String versionRange = command.state().getVersionRange();
+
+                // collect repository values
+                List<String> branches = List.<String>copyOf(script.getBranches());
+                List<String> commitIDs = List.<String>copyOf(script.getCommitIDs());
+                String lastCommitID = script.getLastCommitID();
+                Map<String,String> tags =  Map.<String,String>copyOf(script.getTags());
+
+                // run again and check that all values are still the same
+                assertTrue(command.isUpToDate());
+                command.run();
+
+                assertEquals(branch, command.state().getBranch());
+                assertEquals(bump, command.state().getBump());
+                assertEquals(newRelease, command.state().getNewRelease());
+                assertEquals(newVersion, command.state().getNewVersion());
+                assertEquals(commits, command.state().getReleaseScope().getCommits());
+                assertEquals(significantCommits, command.state().getReleaseScope().getSignificantCommits());
+                assertEquals(previousVersion, command.state().getReleaseScope().getPreviousVersion());
+                assertEquals(previousVersionCommit, command.state().getReleaseScope().getPreviousVersionCommit());
+                assertEquals(matchBranches, command.state().getReleaseType().getMatchBranches());
+                assertEquals(scheme, command.state().getScheme());
+                assertEquals(timestamp, command.state().getTimestamp());
+                assertEquals(version, command.state().getVersion());
+                assertEquals(versionRange, command.state().getVersionRange());
+                assertEquals(branches, script.getBranches());
+                assertEquals(commitIDs, script.getCommitIDs());
+                assertEquals(lastCommitID, script.getLastCommitID());
+                assertEquals(tags, script.getTags());
+
+                // add some commits to the repository and after one run the task should be up to date
+                script.andCommitWithTag("111.122.133");
+                assertFalse(command.isUpToDate());
+                command.run();
+                assertTrue(command.isUpToDate());
+
+                // chech that some values have changed
+                assertNotEquals(commits, command.state().getReleaseScope().getCommits());
+                assertNotEquals(significantCommits, command.state().getReleaseScope().getSignificantCommits());
+                assertNotEquals(previousVersion, command.state().getReleaseScope().getPreviousVersion());
+                assertNotEquals(previousVersionCommit, command.state().getReleaseScope().getPreviousVersionCommit());
+                assertEquals(timestamp, command.state().getTimestamp());
+                assertNotEquals(version, command.state().getVersion());
+                assertNotEquals(commitIDs, script.getCommitIDs());
+                assertNotEquals(lastCommitID, script.getLastCommitID());
+                assertNotEquals(tags, script.getTags());
+                
+                // collect state values again
+                branch = command.state().getBranch();
+                bump = command.state().getBump();
+                newRelease = command.state().getNewRelease();
+                newVersion = command.state().getNewVersion();
+                commits = List.<Commit>copyOf(command.state().getReleaseScope().getCommits());
+                significantCommits = List.<Commit>copyOf(command.state().getReleaseScope().getSignificantCommits());
+                previousVersion = command.state().getReleaseScope().getPreviousVersion();
+                previousVersionCommit = command.state().getReleaseScope().getPreviousVersionCommit();
+                matchBranches = command.state().getReleaseType().getMatchBranches();
+                scheme = command.state().getScheme();
+                timestamp = command.state().getTimestamp();
+                version = command.state().getVersion();
+                versionRange = command.state().getVersionRange();
+
+                // collect repository values again
+                branches = List.<String>copyOf(script.getBranches());
+                commitIDs = List.<String>copyOf(script.getCommitIDs());
+                lastCommitID = script.getLastCommitID();
+                tags = Map.<String,String>copyOf(script.getTags());
+
+                // run again and make sure values didn't change
+                assertTrue(command.isUpToDate());
+                command.run();
+                assertTrue(command.isUpToDate());
+
+                assertEquals(branch, command.state().getBranch());
+                assertEquals(bump, command.state().getBump());
+                assertEquals(newRelease, command.state().getNewRelease());
+                assertEquals(newVersion, command.state().getNewVersion());
+                assertEquals(commits, command.state().getReleaseScope().getCommits());
+                assertEquals(significantCommits, command.state().getReleaseScope().getSignificantCommits());
+                assertEquals(previousVersion, command.state().getReleaseScope().getPreviousVersion());
+                assertEquals(previousVersionCommit, command.state().getReleaseScope().getPreviousVersionCommit());
+                assertEquals(matchBranches, command.state().getReleaseType().getMatchBranches());
+                assertEquals(scheme, command.state().getScheme());
+                assertEquals(timestamp, command.state().getTimestamp());
+                assertEquals(version, command.state().getVersion());
+                assertEquals(versionRange, command.state().getVersionRange());
+                assertEquals(branches, script.getBranches());
+                assertEquals(commitIDs, script.getCommitIDs());
+                assertEquals(lastCommitID, script.getLastCommitID());
+                assertEquals(tags, script.getTags());
+
+                // once more, also considering that its still up to date
+                assertTrue(command.isUpToDate());
+                command.run();
+
+                assertEquals(branch, command.state().getBranch());
+                assertEquals(bump, command.state().getBump());
+                assertEquals(newRelease, command.state().getNewRelease());
+                assertEquals(newVersion, command.state().getNewVersion());
+                assertEquals(commits, command.state().getReleaseScope().getCommits());
+                assertEquals(significantCommits, command.state().getReleaseScope().getSignificantCommits());
+                assertEquals(previousVersion, command.state().getReleaseScope().getPreviousVersion());
+                assertEquals(previousVersionCommit, command.state().getReleaseScope().getPreviousVersionCommit());
+                assertEquals(matchBranches, command.state().getReleaseType().getMatchBranches());
+                assertEquals(scheme, command.state().getScheme());
+                assertEquals(timestamp, command.state().getTimestamp());
+                assertEquals(version, command.state().getVersion());
+                assertEquals(versionRange, command.state().getVersionRange());
+                assertEquals(branches, script.getBranches());
+                assertEquals(commitIDs, script.getCommitIDs());
+                assertEquals(lastCommitID, script.getLastCommitID());
+                assertEquals(tags, script.getTags());
+            }
+        }
+
+        /**
+         * Check that multiple runs yield to the same result without a commit message convention configured
+         */
+        @TestTemplate
+        @DisplayName("Mark idempotency without commit message convention")
+        @Baseline(Scenario.ONE_BRANCH_SHORT)
+        void idempotencyWithoutCommitMessageConvention(@CommandSelector(Commands.MARK) CommandProxy command, Script script)
+            throws Exception {
+            // run a first time
             command.run();
-            assertFalse(command.isUpToDate());
+
+            // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
+            if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
+                // collect its state values
+                String branch = command.state().getBranch();
+                String bump = command.state().getBump();
+                Boolean newRelease = command.state().getNewRelease();
+                Boolean newVersion = command.state().getNewVersion();
+                List<Commit> commits = List.<Commit>copyOf(command.state().getReleaseScope().getCommits());
+                List<Commit> significantCommits = List.<Commit>copyOf(command.state().getReleaseScope().getSignificantCommits());
+                String previousVersion = command.state().getReleaseScope().getPreviousVersion();
+                Commit previousVersionCommit = command.state().getReleaseScope().getPreviousVersionCommit();
+                Scheme scheme = command.state().getScheme();
+                Long timestamp = command.state().getTimestamp();
+                String version = command.state().getVersion();
+                String versionRange = command.state().getVersionRange();
+
+                // collect repository values
+                List<String> branches = List.<String>copyOf(script.getBranches());
+                List<String> commitIDs = List.<String>copyOf(script.getCommitIDs());
+                String lastCommitID = script.getLastCommitID();
+                Map<String,String> tags =  Map.<String,String>copyOf(script.getTags());
+                
+                // run again and check that all values are still the same
+                assertTrue(command.isUpToDate());
+                command.run();
+
+                assertEquals(branch, command.state().getBranch());
+                assertEquals(bump, command.state().getBump());
+                assertEquals(newRelease, command.state().getNewRelease());
+                assertEquals(newVersion, command.state().getNewVersion());
+                assertEquals(commits, command.state().getReleaseScope().getCommits());
+                assertEquals(significantCommits, command.state().getReleaseScope().getSignificantCommits());
+                assertEquals(previousVersion, command.state().getReleaseScope().getPreviousVersion());
+                assertEquals(previousVersionCommit, command.state().getReleaseScope().getPreviousVersionCommit());
+                assertEquals(scheme, command.state().getScheme());
+                assertEquals(timestamp, command.state().getTimestamp());
+                assertEquals(version, command.state().getVersion());
+                assertEquals(versionRange, command.state().getVersionRange());
+                assertEquals(branches, script.getBranches());
+                assertEquals(commitIDs, script.getCommitIDs());
+                assertEquals(lastCommitID, script.getLastCommitID());
+                assertEquals(tags, script.getTags());
+
+                // add some commits to the repository and after one run the task should be up to date
+                script.andCommitWithTag("111.122.133");
+                assertFalse(command.isUpToDate());
+                command.run();
+                assertTrue(command.isUpToDate());
+
+                // chech that some values have changed
+                assertNotEquals(commits, command.state().getReleaseScope().getCommits());
+                assertEquals(significantCommits, command.state().getReleaseScope().getSignificantCommits()); // with no convention no commit is significant
+                assertNotEquals(previousVersion, command.state().getReleaseScope().getPreviousVersion());
+                assertNotEquals(previousVersionCommit, command.state().getReleaseScope().getPreviousVersionCommit());
+                assertEquals(timestamp, command.state().getTimestamp());
+                assertNotEquals(version, command.state().getVersion());
+                assertNotEquals(commitIDs, script.getCommitIDs());
+                assertNotEquals(lastCommitID, script.getLastCommitID());
+                assertNotEquals(tags, script.getTags());
+                
+                // collect state values again
+                branch = command.state().getBranch();
+                bump = command.state().getBump();
+                newRelease = command.state().getNewRelease();
+                newVersion = command.state().getNewVersion();
+                commits = List.<Commit>copyOf(command.state().getReleaseScope().getCommits());
+                significantCommits = List.<Commit>copyOf(command.state().getReleaseScope().getSignificantCommits());
+                previousVersion = command.state().getReleaseScope().getPreviousVersion();
+                previousVersionCommit = command.state().getReleaseScope().getPreviousVersionCommit();
+                scheme = command.state().getScheme();
+                timestamp = command.state().getTimestamp();
+                version = command.state().getVersion();
+                versionRange = command.state().getVersionRange();
+
+                // collect repository values again
+                branches = List.<String>copyOf(script.getBranches());
+                commitIDs = List.<String>copyOf(script.getCommitIDs());
+                lastCommitID = script.getLastCommitID();
+                tags = Map.<String,String>copyOf(script.getTags());
+
+                // run again and make sure values didn't change
+                assertTrue(command.isUpToDate());
+                command.run();
+                assertTrue(command.isUpToDate());
+
+                assertEquals(branch, command.state().getBranch());
+                assertEquals(bump, command.state().getBump());
+                assertEquals(newRelease, command.state().getNewRelease());
+                assertEquals(newVersion, command.state().getNewVersion());
+                assertEquals(commits, command.state().getReleaseScope().getCommits());
+                assertEquals(significantCommits, command.state().getReleaseScope().getSignificantCommits());
+                assertEquals(previousVersion, command.state().getReleaseScope().getPreviousVersion());
+                assertEquals(previousVersionCommit, command.state().getReleaseScope().getPreviousVersionCommit());
+                assertEquals(scheme, command.state().getScheme());
+                assertEquals(timestamp, command.state().getTimestamp());
+                assertEquals(version, command.state().getVersion());
+                assertEquals(versionRange, command.state().getVersionRange());
+                assertEquals(branches, script.getBranches());
+                assertEquals(commitIDs, script.getCommitIDs());
+                assertEquals(lastCommitID, script.getLastCommitID());
+                assertEquals(tags, script.getTags());
+
+                // once more, also considering that its still up to date
+                assertTrue(command.isUpToDate());
+                command.run();
+
+                assertEquals(branch, command.state().getBranch());
+                assertEquals(bump, command.state().getBump());
+                assertEquals(newRelease, command.state().getNewRelease());
+                assertEquals(newVersion, command.state().getNewVersion());
+                assertEquals(commits, command.state().getReleaseScope().getCommits());
+                assertEquals(significantCommits, command.state().getReleaseScope().getSignificantCommits());
+                assertEquals(previousVersion, command.state().getReleaseScope().getPreviousVersion());
+                assertEquals(previousVersionCommit, command.state().getReleaseScope().getPreviousVersionCommit());
+                assertEquals(scheme, command.state().getScheme());
+                assertEquals(timestamp, command.state().getTimestamp());
+                assertEquals(version, command.state().getVersion());
+                assertEquals(versionRange, command.state().getVersionRange());
+                assertEquals(branches, script.getBranches());
+                assertEquals(commitIDs, script.getCommitIDs());
+                assertEquals(lastCommitID, script.getLastCommitID());
+                assertEquals(tags, script.getTags());
+            }
+        }
+
+        /**
+         * Check that multiple runs yield to the same result without a commit message convention configured
+         */
+        @TestTemplate
+        @DisplayName("Mark idempotency in dirty repository")
+        @Baseline(Scenario.ONE_BRANCH_SHORT)
+        void idempotencyInDirtyRepository(@CommandSelector(Commands.MARK) CommandProxy command, Script script)
+            throws Exception {
+            if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
+                // run a first time
+                command.run();
+
+                // collect its state values
+                String branch = command.state().getBranch();
+                String bump = command.state().getBump();
+                Boolean newRelease = command.state().getNewRelease();
+                Boolean newVersion = command.state().getNewVersion();
+                List<Commit> commits = List.<Commit>copyOf(command.state().getReleaseScope().getCommits());
+                List<Commit> significantCommits = List.<Commit>copyOf(command.state().getReleaseScope().getSignificantCommits());
+                String previousVersion = command.state().getReleaseScope().getPreviousVersion();
+                Commit previousVersionCommit = command.state().getReleaseScope().getPreviousVersionCommit();
+                Scheme scheme = command.state().getScheme();
+                Long timestamp = command.state().getTimestamp();
+                String version = command.state().getVersion();
+                String versionRange = command.state().getVersionRange();
+
+                // collect repository values
+                List<String> branches = List.<String>copyOf(script.getBranches());
+                List<String> commitIDs = List.<String>copyOf(script.getCommitIDs());
+                String lastCommitID = script.getLastCommitID();
+                Map<String,String> tags =  Map.<String,String>copyOf(script.getTags());
+
+                // add some uncommitted changes
+                script.updateAllWorkbenchFiles();
+
+                // run again and check that all values are still the same
+                assertTrue(command.isUpToDate());
+                command.run();
+
+                assertEquals(branch, command.state().getBranch());
+                assertEquals(bump, command.state().getBump());
+                assertEquals(newRelease, command.state().getNewRelease());
+                assertEquals(newVersion, command.state().getNewVersion());
+                assertEquals(commits, command.state().getReleaseScope().getCommits());
+                assertEquals(significantCommits, command.state().getReleaseScope().getSignificantCommits());
+                assertEquals(previousVersion, command.state().getReleaseScope().getPreviousVersion());
+                assertEquals(previousVersionCommit, command.state().getReleaseScope().getPreviousVersionCommit());
+                assertEquals(scheme, command.state().getScheme());
+                assertEquals(timestamp, command.state().getTimestamp());
+                assertEquals(version, command.state().getVersion());
+                assertEquals(versionRange, command.state().getVersionRange());
+                assertEquals(branches, script.getBranches());
+                assertEquals(commitIDs, script.getCommitIDs());
+                assertEquals(lastCommitID, script.getLastCommitID());
+                assertEquals(tags, script.getTags());
+
+                // add some commits to the repository and after one run the task should be up to date
+                script.andCommitWithTag("111.122.133");
+                assertFalse(command.isUpToDate());
+                command.run();
+                assertTrue(command.isUpToDate());
+
+                // chech that some values have changed
+                assertNotEquals(commits, command.state().getReleaseScope().getCommits());
+                assertEquals(significantCommits, command.state().getReleaseScope().getSignificantCommits()); // with no convention no commit is significant
+                assertNotEquals(previousVersion, command.state().getReleaseScope().getPreviousVersion());
+                assertNotEquals(previousVersionCommit, command.state().getReleaseScope().getPreviousVersionCommit());
+                assertEquals(timestamp, command.state().getTimestamp());
+                assertNotEquals(version, command.state().getVersion());
+                assertNotEquals(commitIDs, script.getCommitIDs());
+                assertNotEquals(lastCommitID, script.getLastCommitID());
+                assertNotEquals(tags, script.getTags());
+                
+                // collect state values again
+                branch = command.state().getBranch();
+                bump = command.state().getBump();
+                newRelease = command.state().getNewRelease();
+                newVersion = command.state().getNewVersion();
+                commits = List.<Commit>copyOf(command.state().getReleaseScope().getCommits());
+                significantCommits = List.<Commit>copyOf(command.state().getReleaseScope().getSignificantCommits());
+                previousVersion = command.state().getReleaseScope().getPreviousVersion();
+                previousVersionCommit = command.state().getReleaseScope().getPreviousVersionCommit();
+                scheme = command.state().getScheme();
+                timestamp = command.state().getTimestamp();
+                version = command.state().getVersion();
+                versionRange = command.state().getVersionRange();
+
+                // collect repository values again
+                branches = List.<String>copyOf(script.getBranches());
+                commitIDs = List.<String>copyOf(script.getCommitIDs());
+                lastCommitID = script.getLastCommitID();
+                tags = Map.<String,String>copyOf(script.getTags());
+
+                // add some uncommitted changes
+                script.updateAllWorkbenchFiles();
+
+                // run again and make sure values didn't change
+                assertTrue(command.isUpToDate());
+                command.run();
+                assertTrue(command.isUpToDate());
+
+                assertEquals(branch, command.state().getBranch());
+                assertEquals(bump, command.state().getBump());
+                assertEquals(newRelease, command.state().getNewRelease());
+                assertEquals(newVersion, command.state().getNewVersion());
+                assertEquals(commits, command.state().getReleaseScope().getCommits());
+                assertEquals(significantCommits, command.state().getReleaseScope().getSignificantCommits());
+                assertEquals(previousVersion, command.state().getReleaseScope().getPreviousVersion());
+                assertEquals(previousVersionCommit, command.state().getReleaseScope().getPreviousVersionCommit());
+                assertEquals(scheme, command.state().getScheme());
+                assertEquals(timestamp, command.state().getTimestamp());
+                assertEquals(version, command.state().getVersion());
+                assertEquals(versionRange, command.state().getVersionRange());
+                assertEquals(branches, script.getBranches());
+                assertEquals(commitIDs, script.getCommitIDs());
+                assertEquals(lastCommitID, script.getLastCommitID());
+                assertEquals(tags, script.getTags());
+
+                // add some uncommitted changes
+                script.updateAllWorkbenchFiles();
+
+                // once more, also considering that its still up to date
+                assertTrue(command.isUpToDate());
+                command.run();
+
+                assertEquals(branch, command.state().getBranch());
+                assertEquals(bump, command.state().getBump());
+                assertEquals(newRelease, command.state().getNewRelease());
+                assertEquals(newVersion, command.state().getNewVersion());
+                assertEquals(commits, command.state().getReleaseScope().getCommits());
+                assertEquals(significantCommits, command.state().getReleaseScope().getSignificantCommits());
+                assertEquals(previousVersion, command.state().getReleaseScope().getPreviousVersion());
+                assertEquals(previousVersionCommit, command.state().getReleaseScope().getPreviousVersionCommit());
+                assertEquals(scheme, command.state().getScheme());
+                assertEquals(timestamp, command.state().getTimestamp());
+                assertEquals(version, command.state().getVersion());
+                assertEquals(versionRange, command.state().getVersionRange());
+                assertEquals(branches, script.getBranches());
+                assertEquals(commitIDs, script.getCommitIDs());
+                assertEquals(lastCommitID, script.getLastCommitID());
+                assertEquals(tags, script.getTags());
+            }
         }
     }
 

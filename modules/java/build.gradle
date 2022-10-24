@@ -212,6 +212,25 @@ subprojects {
         //functionalTestImplementation.extendsFrom testImplementation
     }
 
+    // Set jar manifest properties
+    jar {
+        manifest {
+            attributes(
+                'Specification-Title'       : "${nyxID} ${project.name}",
+                'Specification-Version'     : rootProject.version,
+                'Specification-Vendor'      : nyxOrganizationName,
+                'Implementation-Title'      : "${nyxID} ${project.name} java",
+                'Implementation-Version'    : rootProject.version,
+                'Implementation-Vendor'     : nyxOrganizationName,
+                'Build-Timestamp'           : new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").format(new Date()),
+                'Build-Revision'            : rootProject.version,
+                'Created-By'                : "Gradle ${gradle.gradleVersion}",
+                'Build-Jdk'                 : "${System.properties['java.version']} (${System.properties['java.vendor']} ${System.properties['java.vm.version']})",
+                'Build-OS'                  : "${System.properties['os.name']} ${System.properties['os.arch']} ${System.properties['os.version']}"
+            )
+        }
+    }
+
     // This includes all test sets like regular unit tests, integration and functional tests
     tasks.withType(Test) {
         useJUnitPlatform()

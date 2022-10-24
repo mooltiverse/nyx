@@ -64,9 +64,17 @@ public class Clean extends AbstractCommand {
 
         // Check if there a State file
         String stateFilePath = state().getConfiguration().getStateFile();
-
-        if (!Objects.isNull(stateFilePath) && !stateFilePath.isBlank() && new File(stateFilePath).exists())
+        if (!Objects.isNull(stateFilePath) && !stateFilePath.isBlank() && new File(stateFilePath).exists()) {
+            logger.debug(COMMAND, "The Clean command is not up to date because the state file has been configured ('{}') and is present on the file system so it can be deleted", stateFilePath);
             return false;
+        }
+
+        // Check if there a Changelog file
+        String changelogFilePath = state().getConfiguration().getChangelog().getPath();
+        if (!Objects.isNull(changelogFilePath) && !changelogFilePath.isBlank() && new File(changelogFilePath).exists()) {
+            logger.debug(COMMAND, "The Clean command is not up to date because the changelog file has been configured ('{}') and is present on the file system so it can be deleted", changelogFilePath);
+            return false;
+        }
 
         // Otherwise return true
         return true;
@@ -90,6 +98,16 @@ public class Clean extends AbstractCommand {
             File stateFile = new File(stateFilePath);
             if (stateFile.exists()) {
                 stateFile.delete();
+            }
+        }
+
+        // Delete the changelog file, if any
+        String changelogFilePath = state().getConfiguration().getChangelog().getPath();
+        if (!Objects.isNull(changelogFilePath) && !changelogFilePath.isBlank()) {
+            logger.debug(COMMAND, "Deleting changelog file '{}', if present", changelogFilePath);
+            File changelogFile = new File(changelogFilePath);
+            if (changelogFile.exists()) {
+                changelogFile.delete();
             }
         }
             

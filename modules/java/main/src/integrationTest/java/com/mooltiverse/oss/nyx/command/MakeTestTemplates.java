@@ -39,6 +39,7 @@ import com.mooltiverse.oss.nyx.command.template.StandaloneCommandProxy;
 import com.mooltiverse.oss.nyx.configuration.SimpleConfigurationLayer;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
+import com.mooltiverse.oss.nyx.entities.Changelog.Release;
 import com.mooltiverse.oss.nyx.git.GitException;
 import com.mooltiverse.oss.nyx.git.Scenario;
 import com.mooltiverse.oss.nyx.git.Script;
@@ -191,6 +192,268 @@ public class MakeTestTemplates {
                 assertFalse(changelogFile.exists());
 
                 assertFalse(command.isUpToDate());
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("Make idempotency")
+    @ExtendWith(CommandInvocationContextProvider.class)
+    public static class IdempotencyTests {
+        /**
+         * Check that multiple runs yield to the same result with a commit message convention configured
+         */
+        @TestTemplate
+        @DisplayName("Make idempotency with conventional commit message convention")
+        @Baseline(Scenario.ONE_BRANCH_SHORT_CONVENTIONAL_COMMITS)
+        void idempotencyWithCommitMessageConvention(@CommandSelector(Commands.MAKE) CommandProxy command, Script script)
+            throws Exception {
+            // first create the temporary directory and the abstract destination file
+            File destinationDir = Files.createTempDirectory("nyx-test-make-test-").toFile();
+            File changelogFile = new File(destinationDir, "CHANGELOG.md");
+
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            configurationLayerMock.getChangelog().setPath(changelogFile.getAbsolutePath());
+            // add the conventional commits convention
+            configurationLayerMock.setCommitMessageConventions(
+                new CommitMessageConventions(
+                    List.<String>of("conventionalCommits"),
+                    Map.<String,CommitMessageConvention>of("conventionalCommits", CONVENTIONAL_COMMITS))
+            );
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
+
+            assertFalse(changelogFile.exists());
+
+            // run a first time
+            command.run();
+
+            // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
+            if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
+                assertTrue(changelogFile.exists());
+
+                // collect its state values
+                List<Release> changelogReleases = List.<Release>copyOf(command.state().getChangelog().getReleases());
+                Boolean newVersion = command.state().getNewVersion();
+                String version = command.state().getVersion();
+                String changelogFileContent = readFile(changelogFile);
+
+                // run again and check that all values are still the same
+                assertTrue(command.isUpToDate());
+                command.run();
+
+                assertTrue(changelogFile.exists());
+                assertEquals(changelogReleases, command.state().getChangelog().getReleases());
+                assertEquals(newVersion, command.state().getNewVersion());
+                assertEquals(version, command.state().getVersion());
+                assertEquals(changelogFileContent, readFile(changelogFile));
+
+                // now delete the file and make sure it's no longer up to date
+                changelogFile.delete();
+                assertFalse(changelogFile.exists());
+                changelogFileContent = null;
+
+                // add some commits to the repository and after one run the task should be up to date
+                script.andCommitWithTag("111.122.133");
+                assertFalse(command.isUpToDate());
+                command.run();
+                assertTrue(command.isUpToDate());
+
+                // chech that some values have changed
+                assertNull(command.state().getChangelog()); // the internal changelog is now null because there is no new version and the changelog hasn't been recreated
+                assertNotEquals(newVersion, command.state().getNewVersion());
+                assertNotEquals(version, command.state().getVersion());
+                assertFalse(changelogFile.exists());
+                
+                // collect state values again
+                changelogReleases = null;
+                newVersion = command.state().getNewVersion();
+                version = command.state().getVersion();
+
+                // run again and make sure values didn't change
+                assertTrue(command.isUpToDate());
+                command.run();
+                assertTrue(command.isUpToDate());
+
+                assertNull(command.state().getChangelog()); // the internal changelog is now null because there is no new version
+                assertEquals(newVersion, command.state().getNewVersion());
+                assertEquals(version, command.state().getVersion());
+                assertFalse(changelogFile.exists());
+
+                // once more, also considering that its still up to date
+                assertTrue(command.isUpToDate());
+                command.run();
+
+                assertNull(command.state().getChangelog()); // the internal changelog is now null because there is no new version
+                assertEquals(newVersion, command.state().getNewVersion());
+                assertEquals(version, command.state().getVersion());
+                assertFalse(changelogFile.exists());
+            }
+        }
+
+        /**
+         * Check that multiple runs yield to the same result without a commit message convention configured
+         */
+        @TestTemplate
+        @DisplayName("Make idempotency without commit message convention")
+        @Baseline(Scenario.ONE_BRANCH_SHORT_CONVENTIONAL_COMMITS)
+        void idempotencyWithoutCommitMessageConvention(@CommandSelector(Commands.MAKE) CommandProxy command, Script script)
+            throws Exception {
+            // first create the temporary directory and the abstract destination file
+            File destinationDir = Files.createTempDirectory("nyx-test-make-test-").toFile();
+            File changelogFile = new File(destinationDir, "CHANGELOG.md");
+
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            configurationLayerMock.getChangelog().setPath(changelogFile.getAbsolutePath());
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
+
+            assertFalse(changelogFile.exists());
+
+            // run a first time
+            command.run();
+
+            // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
+            if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
+                assertFalse(changelogFile.exists()); // with no convention no version is generated and no changelog is written
+
+                // collect its state values
+                Boolean newVersion = command.state().getNewVersion();
+                String version = command.state().getVersion();
+
+                // run again and check that all values are still the same
+                assertTrue(command.isUpToDate());
+                command.run();
+
+                assertFalse(changelogFile.exists());
+                assertNull(command.state().getChangelog());
+                assertEquals(newVersion, command.state().getNewVersion());
+                assertEquals(version, command.state().getVersion());
+
+                // add some commits to the repository and after one run the task should be up to date
+                script.andCommitWithTag("111.122.133");
+                assertFalse(command.isUpToDate());
+                command.run();
+                assertTrue(command.isUpToDate());
+
+                // chech that some values have changed
+                assertNull(command.state().getChangelog()); // the internal changelog is still null because there is no new version and the changelog hasn't been recreated
+                assertEquals(newVersion, command.state().getNewVersion());
+                assertNotEquals(version, command.state().getVersion());
+                assertFalse(changelogFile.exists());
+                
+                // collect state values again
+                version = command.state().getVersion();
+
+                // run again and make sure values didn't change
+                assertTrue(command.isUpToDate());
+                command.run();
+                assertTrue(command.isUpToDate());
+
+                assertNull(command.state().getChangelog()); // the internal changelog is now null because there is no new version
+                assertEquals(newVersion, command.state().getNewVersion());
+                assertEquals(version, command.state().getVersion());
+                assertFalse(changelogFile.exists());
+
+                // once more, also considering that its still up to date
+                assertTrue(command.isUpToDate());
+                command.run();
+
+                assertNull(command.state().getChangelog()); // the internal changelog is now null because there is no new version
+                assertEquals(newVersion, command.state().getNewVersion());
+                assertEquals(version, command.state().getVersion());
+                assertFalse(changelogFile.exists());
+            }
+        }
+
+        /**
+         * Check that multiple runs yield to the same result with a commit message convention configured
+         */
+        @TestTemplate
+        @DisplayName("Make idempotency in dirty repository")
+        @Baseline(Scenario.ONE_BRANCH_SHORT_CONVENTIONAL_COMMITS)
+        void idempotencyInDirtyRepository(@CommandSelector(Commands.MAKE) CommandProxy command, Script script)
+            throws Exception {
+            // first create the temporary directory and the abstract destination file
+            File destinationDir = Files.createTempDirectory("nyx-test-make-test-").toFile();
+            File changelogFile = new File(destinationDir, "CHANGELOG.md");
+
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            configurationLayerMock.getChangelog().setPath(changelogFile.getAbsolutePath());
+            // add the conventional commits convention
+            configurationLayerMock.setCommitMessageConventions(
+                new CommitMessageConventions(
+                    List.<String>of("conventionalCommits"),
+                    Map.<String,CommitMessageConvention>of("conventionalCommits", CONVENTIONAL_COMMITS))
+            );
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
+
+            assertFalse(changelogFile.exists());
+
+            // run a first time
+            command.run();
+
+            // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
+            if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
+                assertTrue(changelogFile.exists());
+
+                // collect its state values
+                List<Release> changelogReleases = List.<Release>copyOf(command.state().getChangelog().getReleases());
+                Boolean newVersion = command.state().getNewVersion();
+                String version = command.state().getVersion();
+                String changelogFileContent = readFile(changelogFile);
+
+                // add some uncommitted changes
+                script.updateAllWorkbenchFiles();
+
+                // run again and check that all values are still the same
+                assertTrue(command.isUpToDate());
+                command.run();
+
+                assertTrue(changelogFile.exists());
+                assertEquals(changelogReleases, command.state().getChangelog().getReleases());
+                assertEquals(newVersion, command.state().getNewVersion());
+                assertEquals(version, command.state().getVersion());
+                assertEquals(changelogFileContent, readFile(changelogFile));
+
+                // now delete the file and make sure it's no longer up to date
+                changelogFile.delete();
+                assertFalse(changelogFile.exists());
+                changelogFileContent = null;
+
+                // add some commits to the repository and after one run the task should be up to date
+                script.andCommitWithTag("111.122.133");
+                assertFalse(command.isUpToDate());
+                command.run();
+                assertTrue(command.isUpToDate());
+
+                // chech that some values have changed
+                assertNull(command.state().getChangelog()); // the internal changelog is now null because there is no new version and the changelog hasn't been recreated
+                assertNotEquals(newVersion, command.state().getNewVersion());
+                assertNotEquals(version, command.state().getVersion());
+                assertFalse(changelogFile.exists());
+                
+                // collect state values again
+                changelogReleases = null;
+                newVersion = command.state().getNewVersion();
+                version = command.state().getVersion();
+
+                // run again and make sure values didn't change
+                assertTrue(command.isUpToDate());
+                command.run();
+                assertTrue(command.isUpToDate());
+
+                assertNull(command.state().getChangelog()); // the internal changelog is now null because there is no new version
+                assertEquals(newVersion, command.state().getNewVersion());
+                assertEquals(version, command.state().getVersion());
+                assertFalse(changelogFile.exists());
+
+                // once more, also considering that its still up to date
+                assertTrue(command.isUpToDate());
+                command.run();
+
+                assertNull(command.state().getChangelog()); // the internal changelog is now null because there is no new version
+                assertEquals(newVersion, command.state().getNewVersion());
+                assertEquals(version, command.state().getVersion());
+                assertFalse(changelogFile.exists());
             }
         }
     }
