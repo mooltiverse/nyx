@@ -676,6 +676,37 @@ public class NyxPluginFunctionalTests {
 
             runTask(gradleRunner, gradleVersion, target, taskOutcomes);
 
+            // run again to test for idempotency
+            runTask(gradleRunner, gradleVersion, target, taskOutcomes);
+
+            tearDown(gradleRunner);
+        }
+
+        /**
+         * Test running the given task with no exceptions using the given Gradle version in a dirty repository.
+         * 
+         * This test runs using a configuration preset.
+         * 
+         * @throws Exception in case of any issues
+         */
+        @ParameterizedTest(name = "gradle {0} [Gradle Version: {1}, Plugins {2}, Script: simple] ==> {3} (in dirty repository)")
+        @MethodSource("com.mooltiverse.oss.nyx.gradle.NyxPluginFunctionalTests#wellKnownTaskTestSuites")
+        void runNyxTaskWithSimpleScriptWithPresetTestInDirtyRepository(String target, String gradleVersion, Map<String,String> pluginCombination, Map<String,TaskOutcome> taskOutcomes)
+            throws Exception {
+            assumeFalse(Objects.isNull(System.getProperty(MEDIUM_GROOVY_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY)), "A configuration file path must be passed to this test as a system property but it was not set");
+            Script script = Scenario.INITIAL_COMMIT.realize();
+            script.addRemote(Scenario.FROM_SCRATCH.realize().getGitDirectory(), "origin");
+
+            // add some uncommitted changes
+            script.updateAllWorkbenchFiles();
+
+            GradleRunner gradleRunner = setUp(script, gradleVersion, gradleSettings(gradleVersion, false, null), gradleBuild(gradleVersion, true, pluginCombination, System.getProperty(MEDIUM_GROOVY_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY)));
+
+            runTask(gradleRunner, gradleVersion, target, taskOutcomes);
+
+            // run again to test for idempotency
+            runTask(gradleRunner, gradleVersion, target, taskOutcomes);
+
             tearDown(gradleRunner);
         }
 

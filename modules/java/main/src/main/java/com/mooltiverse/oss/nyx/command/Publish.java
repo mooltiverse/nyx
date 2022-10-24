@@ -212,6 +212,7 @@ public class Publish extends AbstractCommand {
         }
 
         storeStatusInternalAttributes();
+        
         return state();
     }
 }

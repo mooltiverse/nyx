@@ -115,6 +115,12 @@ public class MarkTests {
             // if we delete too quickly we often get a 404 from the server so let's wait a short while
             Thread.sleep(2000);
 
+            // test for idempotency running the command again
+            nyx.mark();
+            assertEquals("0.0.5", nyx.state().getVersion());
+            assertEquals(script.getTags().size(), replicaScript.getTags().size());
+            assertEquals(script.getTags().size(), remoteScript.getTags().size());
+
             // now delete it
             gitHub.deleteGitRepository(randomID);
         }
@@ -187,6 +193,12 @@ public class MarkTests {
 
             // if we delete too quickly we often get a 404 from the server so let's wait a short while
             Thread.sleep(2000);
+
+            // test for idempotency running the command again
+            nyx.mark();
+            assertEquals("0.0.5", nyx.state().getVersion());
+            assertEquals(script.getTags().size(), replicaScript.getTags().size());
+            assertEquals(script.getTags().size(), remoteScript.getTags().size());
 
             // now delete it
             gitLab.deleteGitRepository(gitLabRepository.getID());

@@ -150,6 +150,23 @@ public class PublishTests {
             // if we delete too quickly we often get a 404 from the server so let's wait a short while
             Thread.sleep(2000);
 
+            // test for idempotency running the command again
+            nyx.publish();
+            gitHubRelease = gitHub.getReleaseByTag(user.getUserName(), gitHubRepository.getName(), "1.0.0");
+        
+            assertEquals("1.0.0", nyx.state().getVersion());
+            assertNotNull(gitHubRelease);
+            assertEquals("1.0.0", gitHubRelease.getTag());
+            assertEquals("1.0.0", gitHubRelease.getTitle());
+            // the release assets must contain the two existing files but not the remote URL (not supported by GitHub), nor the non existing file
+            assertEquals(2, gitHubRelease.getAssets().size());
+            for (Attachment asset: gitHubRelease.getAssets()) {
+                assertTrue(asset.getFileName().equals("asset1.txt") || asset.getFileName().equals("asset2.bin"));
+                assertTrue(asset.getDescription().equals("Text asset") || asset.getDescription().equals("Binary asset"));
+                assertTrue(asset.getType().equals("text/plain") || asset.getType().equals("application/octet-stream"));
+                assertTrue(asset.getPath().startsWith("https://api.github.com/repos/"));
+            }
+
             // now delete it
             gitHub.deleteGitRepository(randomID);
         }
@@ -251,6 +268,23 @@ public class PublishTests {
         
             // if we delete too quickly we often get a 404 from the server so let's wait a short while
             Thread.sleep(2000);
+
+            // test for idempotency running the command again
+            nyx.publish();
+            gitHubRelease = gitHub.getReleaseByTag(user.getUserName(), gitHubRepository.getName(), "1.0.0");
+        
+            assertEquals("1.0.0", nyx.state().getVersion());
+            assertNotNull(gitHubRelease);
+            assertEquals("1.0.0", gitHubRelease.getTag());
+            assertEquals("1.0.0", gitHubRelease.getTitle());
+            // the release assets must contain only the 'asset1' as it was filtered by the release type
+            assertEquals(1, gitHubRelease.getAssets().size());
+            for (Attachment asset: gitHubRelease.getAssets()) {
+                assertEquals("asset1.txt", asset.getFileName());
+                assertEquals("Text asset", asset.getDescription());
+                assertEquals("text/plain", asset.getType());
+                assertTrue(asset.getPath().startsWith("https://api.github.com/repos/"));
+            }
 
             // now delete it
             gitHub.deleteGitRepository(randomID);
@@ -355,6 +389,23 @@ public class PublishTests {
             // if we delete too quickly we often get a 404 from the server so let's wait a short while
             Thread.sleep(2000);
 
+            // test for idempotency running the command again
+            nyx.publish();
+            gitLabRelease = gitLab.getReleaseByTag(user.getUserName(), gitLabRepository.getName(), "1.0.0");
+        
+            assertEquals("1.0.0", nyx.state().getVersion());
+            assertNotNull(gitLabRelease);
+            assertEquals("1.0.0", gitLabRelease.getTag());
+            assertEquals("1.0.0", gitLabRelease.getTitle());
+            // the release assets must contain the two existing files and the remote URL, but not the non existing file
+            assertEquals(3, gitLabRelease.getAssets().size());
+            for (Attachment asset: gitLabRelease.getAssets()) {
+                assertTrue(asset.getFileName().equals("asset1.txt") || asset.getFileName().equals("asset2.bin") || asset.getFileName().equals("remote1"));
+                //assertTrue(asset.getDescription().equals("Text asset") || asset.getDescription().equals("Binary asset") || asset.getDescription().equals("Remote link asset")); // the description is not available via this API
+                //assertTrue(asset.getType().equals("text/plain") || asset.getType().equals("application/octet-stream")); // the content type is not available via this API
+                //assertTrue(asset.getPath().startsWith("https://api.github.com/repos/")); // as of now these URLS are like https://storage.googleapis.com...
+            }
+
             // now delete it
             gitLab.deleteGitRepository(gitLabRepository.getID());
         }
@@ -458,6 +509,23 @@ public class PublishTests {
         
             // if we delete too quickly we often get a 404 from the server so let's wait a short while
             Thread.sleep(2000);
+
+            // test for idempotency running the command again
+            nyx.publish();
+            gitLabRelease = gitLab.getReleaseByTag(user.getUserName(), gitLabRepository.getName(), "1.0.0");
+        
+            assertEquals("1.0.0", nyx.state().getVersion());
+            assertNotNull(gitLabRelease);
+            assertEquals("1.0.0", gitLabRelease.getTag());
+            assertEquals("1.0.0", gitLabRelease.getTitle());
+            // the release assets must contain only the 'asset1' as it was filtered by the release type
+            assertEquals(1, gitLabRelease.getAssets().size());
+            for (Attachment asset: gitLabRelease.getAssets()) {
+                assertEquals("asset1.txt", asset.getFileName());
+                //assertEquals("Text asset", asset.getDescription()); // the description is not available via this API
+                //assertEquals("text/plain", asset.getType()); // the content type is not available via this API
+                //assertTrue(asset.getPath().startsWith("https://api.github.com/repos/")); // as of now these URLS are like https://storage.googleapis.com...
+            }
 
             // now delete it
             gitLab.deleteGitRepository(gitLabRepository.getID());

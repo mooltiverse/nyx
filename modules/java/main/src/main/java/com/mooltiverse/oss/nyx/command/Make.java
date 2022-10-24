@@ -120,6 +120,28 @@ public class Make extends AbstractCommand {
     }
 
     /**
+     * Returns the reference to the configured changelog file, if configured, or {@code null}
+     * of no destination file has been set by the configuration.
+     * 
+     * @return the reference to the configured changelog file, if configured
+     * 
+     * @throws DataAccessException in case the configuration can't be loaded for some reason.
+     * @throws IllegalPropertyException in case the configuration has some illegal options.
+     */
+    protected File getChangelogFile() 
+        throws DataAccessException, IllegalPropertyException {
+        if (Objects.isNull(state().getConfiguration().getChangelog()) || Objects.isNull(state().getConfiguration().getChangelog().getPath()) || Objects.isNull(state().getConfiguration().getChangelog().getPath().isBlank()))
+            return null;
+
+        File changelogFile = new File(state().getConfiguration().getChangelog().getPath());
+        // if the file path is relative make it relative to the configured directory
+        if (!changelogFile.isAbsolute())
+            changelogFile = new File(state().getConfiguration().getDirectory(), state().getConfiguration().getChangelog().getPath());
+        
+        return changelogFile;
+    }
+
+    /**
      * Returns a reader object that reads the template to be used for rendering.
      * If the configuretion overrides the template then the reader will point to that
      * template otherwise the default template will be returned.
@@ -305,6 +327,23 @@ public class Make extends AbstractCommand {
     }
 
     /**
+     * Reset the attributes store by this command into the internal state object.
+     * This is required before running the command in order to make sure that the new execution is not affected
+     * by a stala status coming from previous runs.
+     * 
+     * @throws DataAccessException in case the configuration can't be loaded for some reason.
+     * @throws IllegalPropertyException in case the configuration has some illegal options.
+     * 
+     * @see #isUpToDate()
+     * @see State#getInternals()
+     */
+    private void clearStateOutputAttributes() 
+        throws DataAccessException, IllegalPropertyException {
+        logger.debug(COMMAND, "Clearing the state from Make outputs");
+        state().setChangelog(null);
+    }
+
+    /**
      * This method stores the state internal attributes used for up-to-date checks so that subsequent invocations
      * of the {@link #isUpToDate()} method can find them and determine if the command is already up to date.
      * 
@@ -344,22 +383,27 @@ public class Make extends AbstractCommand {
             return false;
         }
 
-        File changelogFile = getChangelogFile();
-        if (!Objects.isNull(changelogFile)) {
-            // The command is never considered up to date when the configuration requires a changelog file but the state has no such object reference
-            if (Objects.isNull(state().getChangelog())) {
-                logger.debug(COMMAND, "The Make command is not up to date because a changelog file has been configured ('{}') but the internal state has no changelog yet", changelogFile.getAbsolutePath());
-                return false;
+        if (state().getNewVersion()) {
+            File changelogFile = getChangelogFile();
+            if (!Objects.isNull(changelogFile)) {
+                // The command is never considered up to date when the configuration requires a changelog file but the state has no such object reference
+                if (Objects.isNull(state().getChangelog())) {
+                    logger.debug(COMMAND, "The Make command is not up to date because a changelog file has been configured ('{}') but the internal state has no changelog yet", changelogFile.getAbsolutePath());
+                    return false;
+                }
+                // The command is never considered up to date when the changelog file hasn't been saved yet or it has changed
+                if (!isInternalAttributeUpToDate(INTERNAL_INPUT_ATTRIBUTE_CHANGELOG_FILE, changelogFile.getAbsolutePath())) {
+                    logger.debug(COMMAND, "The Make command is not up to date because a changelog file has been configured ('{}') but the configured path has changed", changelogFile.getAbsolutePath());
+                    return false;
+                }
+                if (!changelogFile.exists()) {
+                    logger.debug(COMMAND, "The Make command is not up to date because a changelog file has been configured ('{}') but the file does not exist", changelogFile.getAbsolutePath());
+                    return false;
+                }
             }
-            // The command is never considered up to date when the changelog file hasn't been saved yet or it has changed
-            if (!isInternalAttributeUpToDate(INTERNAL_INPUT_ATTRIBUTE_CHANGELOG_FILE, changelogFile.getAbsolutePath())) {
-                logger.debug(COMMAND, "The Make command is not up to date because a changelog file has been configured ('{}') but the configured path has changed", changelogFile.getAbsolutePath());
-                return false;
-            }
-            if (!changelogFile.exists()) {
-                logger.debug(COMMAND, "The Make command is not up to date because a changelog file has been configured ('{}') but the file does not exist", changelogFile.getAbsolutePath());
-                return false;
-            }
+        }
+        else {
+            logger.debug(COMMAND, "No new version has been generated so up-to-date checks for the Make command in regards to the changelog file are skipped");
         }
 
         // The command is never considered up to date when the repository branch or last commit has changed
@@ -388,9 +432,12 @@ public class Make extends AbstractCommand {
         throws DataAccessException, IllegalPropertyException, GitException, ReleaseException {
         logger.debug(COMMAND, "Running the Make command...");
 
+        clearStateOutputAttributes();
+
         buildAssets();
 
         storeStatusInternalAttributes();
+        
         return state();
     }
 }

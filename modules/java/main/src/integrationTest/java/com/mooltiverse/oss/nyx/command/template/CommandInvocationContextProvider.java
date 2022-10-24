@@ -486,7 +486,7 @@ public class CommandInvocationContextProvider implements TestTemplateInvocationC
             throws ParameterResolutionException {
             if (parameterContext.getParameter().getType().isAssignableFrom(CommandProxy.class)) {
                 // first off let's find out which command has to be created
-                Commands commandName = resolveCommandSelector(parameterContext, extensionContext);
+                Commands command = resolveCommandSelector(parameterContext, extensionContext);
 
                 // now resolve the Baseline to get a valid Script
                 Script script = null;
@@ -498,7 +498,7 @@ public class CommandInvocationContextProvider implements TestTemplateInvocationC
                 }
 
                 try {
-                    return new NyxCommandProxy(new Nyx(script.getWorkingDirectory()), commandName);
+                    return new NyxCommandProxy(new Nyx(script.getWorkingDirectory()), command);
                 }
                 catch (Exception e)
                 {
