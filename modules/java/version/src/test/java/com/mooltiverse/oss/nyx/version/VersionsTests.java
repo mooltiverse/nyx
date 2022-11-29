@@ -32,6 +32,109 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 @DisplayName("Versions")
 public class VersionsTests {
     @Nested
+    @DisplayName("Versions.compare")
+    class CompareTests {
+        @Test
+        @DisplayName("Versions.compare(Scheme.SEMVER, [...])")
+        void compareVersions() {
+            assertEquals(0, Versions.compare(Scheme.SEMVER, null, null));
+            assertEquals(0, Versions.compare(Scheme.SEMVER, null, null, null));
+            assertEquals(0, Versions.compare(Scheme.SEMVER, null, null, false));
+            assertEquals(0, Versions.compare(Scheme.SEMVER, "1.0.0", "1.0.0"));
+            assertEquals(0, Versions.compare(Scheme.SEMVER, "1.0.0", "1.0.0", null));
+            assertEquals(0, Versions.compare(Scheme.SEMVER, "1.0.0", "1.0.0", false));
+            assertEquals(0, Versions.compare(Scheme.SEMVER, "1.2.3-alpha.1", "1.2.3-alpha.1"));
+            assertEquals(0, Versions.compare(Scheme.SEMVER, "1.2.3-alpha.1", "1.2.3-alpha.1", null));
+            assertEquals(0, Versions.compare(Scheme.SEMVER, "1.2.3-alpha.1", "1.2.3-alpha.1", false));
+
+            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0", null) > 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0", null, null) > 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0", null, false) > 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0", "0.1.0") > 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0", "0.1.0", null) > 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0", "0.1.0", false) > 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0", "1.0.0-alpha.1") > 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0", "1.0.0-alpha.1", null) > 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0", "1.0.0-alpha.1", false) > 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0-alpha.2", "1.0.0-alpha.1") > 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0-alpha.2", "1.0.0-alpha.1", null) > 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0-alpha.2", "1.0.0-alpha.1", false) > 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0-alpha.10", "1.0.0-alpha.9", false) > 0);
+
+            assertTrue(Versions.compare(Scheme.SEMVER, null, "1.0.0") < 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, null, "1.0.0", null) < 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, null, "1.0.0", false) < 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, "0.1.0", "1.0.0") < 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, "0.1.0", "1.0.0", null) < 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, "0.1.0", "1.0.0", false) < 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0-alpha.1", "1.0.0") < 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0-alpha.1", "1.0.0", null) < 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0-alpha.1", "1.0.0", false) < 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0-alpha.1", "1.0.0-alpha.2") < 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0-alpha.1", "1.0.0-alpha.2", null) < 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0-alpha.1", "1.0.0-alpha.2", false) < 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0-alpha.9", "1.0.0-alpha.10", false) < 0);
+        }
+
+        @Test
+        @DisplayName("Versions.compare(Scheme.SEMVER, [...])")
+        void compareAndSanitizeVersions() {
+            assertEquals(0, Versions.compare(Scheme.SEMVER, null, null, true));
+            assertEquals(0, Versions.compare(Scheme.SEMVER, "1.00.0", "01.0.0", true));
+            assertEquals(0, Versions.compare(Scheme.SEMVER, "01.2.3-alpha.1", "1.2.3-alpha.1", true));
+
+            assertTrue(Versions.compare(Scheme.SEMVER, "01.0.0", null, true) > 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, "01.0.0", "0.1.00", true) > 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, "01.0.0", "1.0.00-alpha.1", true) > 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.00-alpha.2", "1.0.00-alpha.1", true) > 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.00-alpha.010", "1.0.00-alpha.9", true) > 0);
+
+            assertTrue(Versions.compare(Scheme.SEMVER, null, "01.0.0", true) < 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, "0.1.00", "01.0.000", true) < 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, "1.00.0-alpha.1", "01.0.0", true) < 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, "01.0.0-alpha.1", "1.0.00-alpha.2", true) < 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, "01.0.0-alpha.9", "1.0.00-alpha.010", true) < 0);
+        }
+
+        @Test
+        @DisplayName("Versions.compare(Scheme.SEMVER, [...])")
+        void compareVersionsWithPrefix() {
+            assertEquals(0, Versions.compare(Scheme.SEMVER, null, null, "rel-"));
+            assertEquals(0, Versions.compare(Scheme.SEMVER, "1.0.0", "1.0.0", "rel-"));
+            assertEquals(0, Versions.compare(Scheme.SEMVER, "rel-1.0.0", "1.0.0", "rel-"));
+            assertEquals(0, Versions.compare(Scheme.SEMVER, "1.0.0", "rel-1.0.0", "rel-"));
+            assertEquals(0, Versions.compare(Scheme.SEMVER, "1.2.3-alpha.1", "1.2.3-alpha.1", "rel-"));
+            assertEquals(0, Versions.compare(Scheme.SEMVER, "rel-1.2.3-alpha.1", "1.2.3-alpha.1", "rel-"));
+            assertEquals(0, Versions.compare(Scheme.SEMVER, "1.2.3-alpha.1", "rel-1.2.3-alpha.1", "rel-"));
+
+            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0", null, "rel-") > 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, "rel-1.0.0", null, "rel-") > 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0", "0.1.0", "rel-") > 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, "rel-1.0.0", "0.1.0", "rel-") > 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0", "rel-0.1.0", "rel-") > 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0", "1.0.0-alpha.1", "rel-") > 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, "rel-1.0.0", "1.0.0-alpha.1", "rel-") > 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0", "rel-1.0.0-alpha.1", "rel-") > 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0-alpha.2", "1.0.0-alpha.1", "rel-") > 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, "rel-1.0.0-alpha.2", "1.0.0-alpha.1", "rel-") > 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0-alpha.2", "rel-1.0.0-alpha.1", "rel-") > 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0-alpha.10", "rel-1.0.0-alpha.9", "rel-") > 0);
+
+            assertTrue(Versions.compare(Scheme.SEMVER, null, "1.0.0", "rel-") < 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, null, "rel-1.0.0", "rel-") < 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, "0.1.0", "1.0.0", "rel-") < 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, "rel-0.1.0", "1.0.0", "rel-") < 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, "0.1.0", "rel-1.0.0", "rel-") < 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0-alpha.1", "1.0.0", "rel-") < 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, "rel-1.0.0-alpha.1", "1.0.0", "rel-") < 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0-alpha.1", "rel-1.0.0", "rel-") < 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0-alpha.1", "1.0.0-alpha.2", "rel-") < 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, "rel-1.0.0-alpha.1", "1.0.0-alpha.2", "rel-") < 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0-alpha.1", "rel-1.0.0-alpha.2", "rel-") < 0);
+            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0-alpha.9", "rel-1.0.0-alpha.10", "rel-") < 0);
+        }
+    }
+    @Nested
     @DisplayName("Versions.defaultInitial")
     class DefaultInitialTests {
         @Test
@@ -170,71 +273,6 @@ public class VersionsTests {
     }
 
     @Nested
-    @DisplayName("Versions.valueOf")
-    class ValueOfTests {
-        @ParameterizedTest(name = "Versions.valueOf(Scheme.SEMVER, ''{0}'') throws IllegalArgumentException")
-        @EmptySource
-        void exceptionUsingValueOfWithEmptyString(String version) {
-            assertThrows(IllegalArgumentException.class, () -> Versions.valueOf(Scheme.SEMVER, version));
-        }
-
-        @ParameterizedTest(name = "Versions.valueOf(Scheme.SEMVER, ''{0}'') throws NullPointerException")
-        @NullSource
-        void exceptionUsingValueOfWithNullString(String version) {
-            assertThrows(NullPointerException.class, () -> Versions.valueOf(Scheme.SEMVER, version));
-        }
-
-        @ParameterizedTest(name = "Versions.valueOf(Scheme.SEMVER, ''{0}'') throws RuntimeException")
-        @NullAndEmptySource
-        void exceptionUsingValueOfWithNullOrEmptyString(String version) {
-            assertThrows(RuntimeException.class, () -> Versions.valueOf(Scheme.SEMVER, version));
-        }
-
-        @ParameterizedTest(name = "Versions.valueOf(Scheme.SEMVER, ''{0}'') throws ''{1}''")
-        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownInvalidVersions")
-        void exceptionUsingValueOfWithInvalidVersion(String version, Class<? extends Exception> expectedException) {
-            assertThrows(expectedException, () -> Versions.valueOf(Scheme.SEMVER, version));
-        }
-
-        @ParameterizedTest(name = "Versions.valueOf(Scheme.SEMVER, ''{0}'').toString() == ''{0}''")
-        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
-        void valueOfValidString(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
-            assertEquals(version, Versions.valueOf(Scheme.SEMVER, version).toString());
-        }
-
-        @ParameterizedTest(name = "Versions.valueOf(Scheme.SEMVER, ''{0}'', prefix).toString() == ''{0}''")
-        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
-        void valueOfValidStringWithPrefix(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
-            assertEquals(version, Versions.valueOf(Scheme.SEMVER, "".concat(version), null).toString());
-            assertEquals(version, Versions.valueOf(Scheme.SEMVER, "".concat(version), "").toString());
-            assertEquals(version, Versions.valueOf(Scheme.SEMVER, "v".concat(version), "v").toString());
-            assertEquals(version, Versions.valueOf(Scheme.SEMVER, "prefix".concat(version), "prefix").toString());
-
-            assertThrows(IllegalArgumentException.class, () -> Versions.valueOf(Scheme.SEMVER, "v".concat(version), null));
-            assertThrows(IllegalArgumentException.class, () -> Versions.valueOf(Scheme.SEMVER, "v".concat(version), ""));
-            assertThrows(IllegalArgumentException.class, () -> Versions.valueOf(Scheme.SEMVER, "prefix".concat(version), null));
-            assertThrows(IllegalArgumentException.class, () -> Versions.valueOf(Scheme.SEMVER, "prefix".concat(version), ""));
-        }
-
-        @ParameterizedTest(name = "Versions.valueOf(Scheme.SEMVER, ''{0}'', true).toString() == ''{0}''")
-        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
-        void valueOfSanitizedString(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
-            // test that invoking valueOf with sanitization on a valid string returns the same string
-            assertEquals(version, Versions.valueOf(Scheme.SEMVER, version, true).toString());
-        }
-
-        @ParameterizedTest(name = "Versions.valueOf(Scheme.SEMVER, ''{0}'', true).toString() == SemanticVersion.sanitize(''{0}'')")
-        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownSanitizableVersions")
-        void valueOfSanitizableString(String version) {
-            // the method must fail without sanitization and succeed when using sanitization
-            assertThrows(IllegalArgumentException.class, () -> Versions.valueOf(Scheme.SEMVER, version));
-            assertThrows(IllegalArgumentException.class, () -> Versions.valueOf(Scheme.SEMVER, version, false).toString());
-            assertNotEquals(version, Versions.valueOf(Scheme.SEMVER, version, true).toString());
-            assertEquals(SemanticVersion.sanitize(version), Versions.valueOf(Scheme.SEMVER, version, true).toString());
-        }
-    }
-
-    @Nested
     @DisplayName("Versions.mostRelevantIdentifier")
     class SortIdentifiersTests {
         @Test
@@ -297,106 +335,67 @@ public class VersionsTests {
     }
 
     @Nested
-    @DisplayName("Versions.compare")
-    class CompareTests {
-        @Test
-        @DisplayName("Versions.compare(Scheme.SEMVER, [...])")
-        void compareVersions() {
-            assertEquals(0, Versions.compare(Scheme.SEMVER, null, null));
-            assertEquals(0, Versions.compare(Scheme.SEMVER, null, null, null));
-            assertEquals(0, Versions.compare(Scheme.SEMVER, null, null, false));
-            assertEquals(0, Versions.compare(Scheme.SEMVER, "1.0.0", "1.0.0"));
-            assertEquals(0, Versions.compare(Scheme.SEMVER, "1.0.0", "1.0.0", null));
-            assertEquals(0, Versions.compare(Scheme.SEMVER, "1.0.0", "1.0.0", false));
-            assertEquals(0, Versions.compare(Scheme.SEMVER, "1.2.3-alpha.1", "1.2.3-alpha.1"));
-            assertEquals(0, Versions.compare(Scheme.SEMVER, "1.2.3-alpha.1", "1.2.3-alpha.1", null));
-            assertEquals(0, Versions.compare(Scheme.SEMVER, "1.2.3-alpha.1", "1.2.3-alpha.1", false));
-
-            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0", null) > 0);
-            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0", null, null) > 0);
-            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0", null, false) > 0);
-            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0", "0.1.0") > 0);
-            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0", "0.1.0", null) > 0);
-            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0", "0.1.0", false) > 0);
-            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0", "1.0.0-alpha.1") > 0);
-            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0", "1.0.0-alpha.1", null) > 0);
-            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0", "1.0.0-alpha.1", false) > 0);
-            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0-alpha.2", "1.0.0-alpha.1") > 0);
-            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0-alpha.2", "1.0.0-alpha.1", null) > 0);
-            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0-alpha.2", "1.0.0-alpha.1", false) > 0);
-            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0-alpha.10", "1.0.0-alpha.9", false) > 0);
-
-            assertTrue(Versions.compare(Scheme.SEMVER, null, "1.0.0") < 0);
-            assertTrue(Versions.compare(Scheme.SEMVER, null, "1.0.0", null) < 0);
-            assertTrue(Versions.compare(Scheme.SEMVER, null, "1.0.0", false) < 0);
-            assertTrue(Versions.compare(Scheme.SEMVER, "0.1.0", "1.0.0") < 0);
-            assertTrue(Versions.compare(Scheme.SEMVER, "0.1.0", "1.0.0", null) < 0);
-            assertTrue(Versions.compare(Scheme.SEMVER, "0.1.0", "1.0.0", false) < 0);
-            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0-alpha.1", "1.0.0") < 0);
-            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0-alpha.1", "1.0.0", null) < 0);
-            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0-alpha.1", "1.0.0", false) < 0);
-            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0-alpha.1", "1.0.0-alpha.2") < 0);
-            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0-alpha.1", "1.0.0-alpha.2", null) < 0);
-            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0-alpha.1", "1.0.0-alpha.2", false) < 0);
-            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0-alpha.9", "1.0.0-alpha.10", false) < 0);
+    @DisplayName("Versions.valueOf")
+    class ValueOfTests {
+        @ParameterizedTest(name = "Versions.valueOf(Scheme.SEMVER, ''{0}'') throws IllegalArgumentException")
+        @EmptySource
+        void exceptionUsingValueOfWithEmptyString(String version) {
+            assertThrows(IllegalArgumentException.class, () -> Versions.valueOf(Scheme.SEMVER, version));
         }
 
-        @Test
-        @DisplayName("Versions.compare(Scheme.SEMVER, [...])")
-        void compareAndSanitizeVersions() {
-            assertEquals(0, Versions.compare(Scheme.SEMVER, null, null, true));
-            assertEquals(0, Versions.compare(Scheme.SEMVER, "1.00.0", "01.0.0", true));
-            assertEquals(0, Versions.compare(Scheme.SEMVER, "01.2.3-alpha.1", "1.2.3-alpha.1", true));
-
-            assertTrue(Versions.compare(Scheme.SEMVER, "01.0.0", null, true) > 0);
-            assertTrue(Versions.compare(Scheme.SEMVER, "01.0.0", "0.1.00", true) > 0);
-            assertTrue(Versions.compare(Scheme.SEMVER, "01.0.0", "1.0.00-alpha.1", true) > 0);
-            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.00-alpha.2", "1.0.00-alpha.1", true) > 0);
-            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.00-alpha.010", "1.0.00-alpha.9", true) > 0);
-
-            assertTrue(Versions.compare(Scheme.SEMVER, null, "01.0.0", true) < 0);
-            assertTrue(Versions.compare(Scheme.SEMVER, "0.1.00", "01.0.000", true) < 0);
-            assertTrue(Versions.compare(Scheme.SEMVER, "1.00.0-alpha.1", "01.0.0", true) < 0);
-            assertTrue(Versions.compare(Scheme.SEMVER, "01.0.0-alpha.1", "1.0.00-alpha.2", true) < 0);
-            assertTrue(Versions.compare(Scheme.SEMVER, "01.0.0-alpha.9", "1.0.00-alpha.010", true) < 0);
+        @ParameterizedTest(name = "Versions.valueOf(Scheme.SEMVER, ''{0}'') throws NullPointerException")
+        @NullSource
+        void exceptionUsingValueOfWithNullString(String version) {
+            assertThrows(NullPointerException.class, () -> Versions.valueOf(Scheme.SEMVER, version));
         }
 
-        @Test
-        @DisplayName("Versions.compare(Scheme.SEMVER, [...])")
-        void compareVersionsWithPrefix() {
-            assertEquals(0, Versions.compare(Scheme.SEMVER, null, null, "rel-"));
-            assertEquals(0, Versions.compare(Scheme.SEMVER, "1.0.0", "1.0.0", "rel-"));
-            assertEquals(0, Versions.compare(Scheme.SEMVER, "rel-1.0.0", "1.0.0", "rel-"));
-            assertEquals(0, Versions.compare(Scheme.SEMVER, "1.0.0", "rel-1.0.0", "rel-"));
-            assertEquals(0, Versions.compare(Scheme.SEMVER, "1.2.3-alpha.1", "1.2.3-alpha.1", "rel-"));
-            assertEquals(0, Versions.compare(Scheme.SEMVER, "rel-1.2.3-alpha.1", "1.2.3-alpha.1", "rel-"));
-            assertEquals(0, Versions.compare(Scheme.SEMVER, "1.2.3-alpha.1", "rel-1.2.3-alpha.1", "rel-"));
+        @ParameterizedTest(name = "Versions.valueOf(Scheme.SEMVER, ''{0}'') throws RuntimeException")
+        @NullAndEmptySource
+        void exceptionUsingValueOfWithNullOrEmptyString(String version) {
+            assertThrows(RuntimeException.class, () -> Versions.valueOf(Scheme.SEMVER, version));
+        }
 
-            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0", null, "rel-") > 0);
-            assertTrue(Versions.compare(Scheme.SEMVER, "rel-1.0.0", null, "rel-") > 0);
-            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0", "0.1.0", "rel-") > 0);
-            assertTrue(Versions.compare(Scheme.SEMVER, "rel-1.0.0", "0.1.0", "rel-") > 0);
-            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0", "rel-0.1.0", "rel-") > 0);
-            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0", "1.0.0-alpha.1", "rel-") > 0);
-            assertTrue(Versions.compare(Scheme.SEMVER, "rel-1.0.0", "1.0.0-alpha.1", "rel-") > 0);
-            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0", "rel-1.0.0-alpha.1", "rel-") > 0);
-            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0-alpha.2", "1.0.0-alpha.1", "rel-") > 0);
-            assertTrue(Versions.compare(Scheme.SEMVER, "rel-1.0.0-alpha.2", "1.0.0-alpha.1", "rel-") > 0);
-            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0-alpha.2", "rel-1.0.0-alpha.1", "rel-") > 0);
-            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0-alpha.10", "rel-1.0.0-alpha.9", "rel-") > 0);
+        @ParameterizedTest(name = "Versions.valueOf(Scheme.SEMVER, ''{0}'') throws ''{1}''")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownInvalidVersions")
+        void exceptionUsingValueOfWithInvalidVersion(String version, Class<? extends Exception> expectedException) {
+            assertThrows(expectedException, () -> Versions.valueOf(Scheme.SEMVER, version));
+        }
 
-            assertTrue(Versions.compare(Scheme.SEMVER, null, "1.0.0", "rel-") < 0);
-            assertTrue(Versions.compare(Scheme.SEMVER, null, "rel-1.0.0", "rel-") < 0);
-            assertTrue(Versions.compare(Scheme.SEMVER, "0.1.0", "1.0.0", "rel-") < 0);
-            assertTrue(Versions.compare(Scheme.SEMVER, "rel-0.1.0", "1.0.0", "rel-") < 0);
-            assertTrue(Versions.compare(Scheme.SEMVER, "0.1.0", "rel-1.0.0", "rel-") < 0);
-            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0-alpha.1", "1.0.0", "rel-") < 0);
-            assertTrue(Versions.compare(Scheme.SEMVER, "rel-1.0.0-alpha.1", "1.0.0", "rel-") < 0);
-            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0-alpha.1", "rel-1.0.0", "rel-") < 0);
-            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0-alpha.1", "1.0.0-alpha.2", "rel-") < 0);
-            assertTrue(Versions.compare(Scheme.SEMVER, "rel-1.0.0-alpha.1", "1.0.0-alpha.2", "rel-") < 0);
-            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0-alpha.1", "rel-1.0.0-alpha.2", "rel-") < 0);
-            assertTrue(Versions.compare(Scheme.SEMVER, "1.0.0-alpha.9", "rel-1.0.0-alpha.10", "rel-") < 0);
+        @ParameterizedTest(name = "Versions.valueOf(Scheme.SEMVER, ''{0}'').toString() == ''{0}''")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
+        void valueOfValidString(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
+            assertEquals(version, Versions.valueOf(Scheme.SEMVER, version).toString());
+        }
+
+        @ParameterizedTest(name = "Versions.valueOf(Scheme.SEMVER, ''{0}'', prefix).toString() == ''{0}''")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
+        void valueOfValidStringWithPrefix(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
+            assertEquals(version, Versions.valueOf(Scheme.SEMVER, "".concat(version), null).toString());
+            assertEquals(version, Versions.valueOf(Scheme.SEMVER, "".concat(version), "").toString());
+            assertEquals(version, Versions.valueOf(Scheme.SEMVER, "v".concat(version), "v").toString());
+            assertEquals(version, Versions.valueOf(Scheme.SEMVER, "prefix".concat(version), "prefix").toString());
+
+            assertThrows(IllegalArgumentException.class, () -> Versions.valueOf(Scheme.SEMVER, "v".concat(version), null));
+            assertThrows(IllegalArgumentException.class, () -> Versions.valueOf(Scheme.SEMVER, "v".concat(version), ""));
+            assertThrows(IllegalArgumentException.class, () -> Versions.valueOf(Scheme.SEMVER, "prefix".concat(version), null));
+            assertThrows(IllegalArgumentException.class, () -> Versions.valueOf(Scheme.SEMVER, "prefix".concat(version), ""));
+        }
+
+        @ParameterizedTest(name = "Versions.valueOf(Scheme.SEMVER, ''{0}'', true).toString() == ''{0}''")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownValidVersions")
+        void valueOfSanitizedString(String version, int major, int minor, int patch, List<String> pre, List<String> build) {
+            // test that invoking valueOf with sanitization on a valid string returns the same string
+            assertEquals(version, Versions.valueOf(Scheme.SEMVER, version, true).toString());
+        }
+
+        @ParameterizedTest(name = "Versions.valueOf(Scheme.SEMVER, ''{0}'', true).toString() == SemanticVersion.sanitize(''{0}'')")
+        @MethodSource("com.mooltiverse.oss.nyx.version.SemanticVersionTests#wellKnownSanitizableVersions")
+        void valueOfSanitizableString(String version) {
+            // the method must fail without sanitization and succeed when using sanitization
+            assertThrows(IllegalArgumentException.class, () -> Versions.valueOf(Scheme.SEMVER, version));
+            assertThrows(IllegalArgumentException.class, () -> Versions.valueOf(Scheme.SEMVER, version, false).toString());
+            assertNotEquals(version, Versions.valueOf(Scheme.SEMVER, version, true).toString());
+            assertEquals(SemanticVersion.sanitize(version), Versions.valueOf(Scheme.SEMVER, version, true).toString());
         }
     }
 }

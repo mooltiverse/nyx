@@ -29,7 +29,7 @@ import com.mooltiverse.oss.nyx.command.template.CommandInvocationContextProvider
 import com.mooltiverse.oss.nyx.command.template.CommandProxy;
 import com.mooltiverse.oss.nyx.command.template.CommandSelector;
 import com.mooltiverse.oss.nyx.configuration.SimpleConfigurationLayer;
-import com.mooltiverse.oss.nyx.git.Scenario;
+import com.mooltiverse.oss.nyx.git.tools.Scenario;
 
 @DisplayName("Clean")
 public class CleanTestTemplates {
@@ -179,8 +179,8 @@ public class CleanTestTemplates {
             changelogFile.createNewFile();
 
             // now it's not up do date anymore
-            assertTrue(changelogFile.exists());
             assertTrue(stateFile.exists());
+            assertTrue(changelogFile.exists());
             assertFalse(command.isUpToDate());
 
             command.run();

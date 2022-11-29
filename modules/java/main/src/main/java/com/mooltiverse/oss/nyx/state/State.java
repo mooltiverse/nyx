@@ -230,10 +230,10 @@ public class State {
     }
 
     /**
-     * Returns {@code true} if the scope has a non {@code null} version identifier
+     * Returns {@code true} if the scope has a non {@code null} bump identifier
      * to bump or bumped on the previous release to produce the new release.
      * 
-     * @return {@code true} if the scope has a non {@code null} version identifier
+     * @return {@code true} if the scope has a non {@code null} bump identifier
      * to bump or bumped on the previous release to produce the new release.
      * 
      * @throws DataAccessException in case the attribute cannot be read or accessed.

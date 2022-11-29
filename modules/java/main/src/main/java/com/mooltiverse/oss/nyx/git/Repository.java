@@ -196,7 +196,7 @@ public interface Repository {
         throws GitException;
 
     /**
-     * Pushes local changes in the current branch to the default remote {@code origin} using no authentication.
+     * Pushes local changes in the current branch to the default remote {@code origin}.
      * 
      * @param user the user name to create when credentials are required. If this and {@code password} are both {@code null}
      * then no credentials is used. When using single token authentication (i.e. OAuth or Personal Access Tokens)

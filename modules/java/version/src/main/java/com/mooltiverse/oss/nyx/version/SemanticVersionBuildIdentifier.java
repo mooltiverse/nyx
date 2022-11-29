@@ -197,6 +197,9 @@ class SemanticVersionBuildIdentifier extends CompositeStringIdentifier {
      * the return value is {@code null}
      */
     SemanticVersionBuildIdentifier removeAttribute(String name, boolean removeValue) {
+        if (Objects.isNull(name))
+            return this;
+            
         if (!hasAttribute(name))
             return this;
 
@@ -214,7 +217,6 @@ class SemanticVersionBuildIdentifier extends CompositeStringIdentifier {
             else newValues.add(previousValue.toString());
         }
         
-       
         return newValues.isEmpty() ? null : valueOf(false, newValues.toArray(new String[0]));
     }
 }

@@ -146,12 +146,11 @@ public class FileMapper {
      * @param content the object to marshal.
      * 
      * @throws DataAccessException in case of any exception due to data access
-     * 
      * @throws IllegalArgumentException if the given file path does not contain a supported extension
      */
     public static void save(String filePath, Object content)
         throws DataAccessException {
-        logger.trace(DATA, "Marshalling object to file '{}' to type '{}'", filePath, content.getClass().getName());
+        logger.trace(DATA, "Marshalling object of type '{}' to file '{}'", content.getClass().getName(), filePath);
         try {
             File file = new File(filePath);
             // create parent directories, if any and if needed

@@ -37,8 +37,8 @@ import com.mooltiverse.oss.nyx.entities.ReleaseType;
 import com.mooltiverse.oss.nyx.entities.ReleaseTypes;
 import com.mooltiverse.oss.nyx.entities.git.Commit;
 import com.mooltiverse.oss.nyx.git.GitException;
-import com.mooltiverse.oss.nyx.git.Scenario;
-import com.mooltiverse.oss.nyx.git.Script;
+import com.mooltiverse.oss.nyx.git.tools.Scenario;
+import com.mooltiverse.oss.nyx.git.tools.Script;
 import com.mooltiverse.oss.nyx.version.Scheme;
 
 @DisplayName("Mark")
@@ -232,7 +232,7 @@ public class MarkTestTemplates {
                 command.run();
                 assertTrue(command.isUpToDate());
 
-                // chech that some values have changed
+                // check that some values have changed
                 assertNotEquals(commits, command.state().getReleaseScope().getCommits());
                 assertNotEquals(significantCommits, command.state().getReleaseScope().getSignificantCommits());
                 assertNotEquals(previousVersion, command.state().getReleaseScope().getPreviousVersion());
@@ -242,7 +242,7 @@ public class MarkTestTemplates {
                 assertNotEquals(commitIDs, script.getCommitIDs());
                 assertNotEquals(lastCommitID, script.getLastCommitID());
                 assertNotEquals(tags, script.getTags());
-                
+
                 // collect state values again
                 branch = command.state().getBranch();
                 bump = command.state().getBump();
@@ -371,7 +371,7 @@ public class MarkTestTemplates {
                 command.run();
                 assertTrue(command.isUpToDate());
 
-                // chech that some values have changed
+                // check that some values have changed
                 assertNotEquals(commits, command.state().getReleaseScope().getCommits());
                 assertEquals(significantCommits, command.state().getReleaseScope().getSignificantCommits()); // with no convention no commit is significant
                 assertNotEquals(previousVersion, command.state().getReleaseScope().getPreviousVersion());
@@ -509,7 +509,7 @@ public class MarkTestTemplates {
                 command.run();
                 assertTrue(command.isUpToDate());
 
-                // chech that some values have changed
+                // check that some values have changed
                 assertNotEquals(commits, command.state().getReleaseScope().getCommits());
                 assertEquals(significantCommits, command.state().getReleaseScope().getSignificantCommits()); // with no convention no commit is significant
                 assertNotEquals(previousVersion, command.state().getReleaseScope().getPreviousVersion());
@@ -607,8 +607,9 @@ public class MarkTestTemplates {
         @TestTemplate
         @DisplayName("Mark.run() on a clean workspace using a release type with Commit, Tag and Push disabled after Infer has generated no new Version > yield to no new commit or tag, no changes pushed to remote")
         @Baseline(Scenario.ONE_BRANCH_SHORT)
-        void runOnCleanWorkspaceWithNoNewVersionOrNewReleaseWithCommitAndTagAndPushDisabledTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script, @Baseline(Scenario.FROM_SCRATCH) Script remoteScript)
+        void runOnCleanWorkspaceWithNoNewVersionOrNewReleaseWithCommitAndTagAndPushDisabledTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script)
             throws Exception {
+            Script remoteScript = Scenario.BARE.realize(true);
             script.addRemote(remoteScript.getGitDirectory(), "replica");
             String previousLastCommit = script.getLastCommitID();
             List<String> previousCommits = script.getCommitIDs();
@@ -648,8 +649,9 @@ public class MarkTestTemplates {
         @TestTemplate
         @DisplayName("Mark.run() on a dirty workspace using a release type with Commit, Tag and Push disabled after Infer has generated no new Version > yield to no new commit or tag, no changes pushed to remote")
         @Baseline(Scenario.ONE_BRANCH_SHORT)
-        void runOnDirtyWorkspaceWithNoNewVersionOrNewReleaseWithCommitAndTagAndPushDisabledTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script, @Baseline(Scenario.FROM_SCRATCH) Script remoteScript)
+        void runOnDirtyWorkspaceWithNoNewVersionOrNewReleaseWithCommitAndTagAndPushDisabledTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script)
             throws Exception {
+            Script remoteScript = Scenario.BARE.realize(true);
             script.addRemote(remoteScript.getGitDirectory(), "replica");
             String previousLastCommit = script.getLastCommitID();
             List<String> previousCommits = script.getCommitIDs();
@@ -692,8 +694,9 @@ public class MarkTestTemplates {
         @TestTemplate
         @DisplayName("Mark.run() on a clean workspace using a release type with Commit, Tag and Push enabled after Infer has generated no new Version > yield to no new commit or tag, no changes pushed to remote")
         @Baseline(Scenario.ONE_BRANCH_SHORT)
-        void runOnCleanWorkspaceWithNoNewVersionOrNewReleaseWithCommitAndTagAndPushEnabledTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script, @Baseline(Scenario.FROM_SCRATCH) Script remoteScript)
+        void runOnCleanWorkspaceWithNoNewVersionOrNewReleaseWithCommitAndTagAndPushEnabledTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script)
             throws Exception {
+            Script remoteScript = Scenario.BARE.realize(true);
             script.addRemote(remoteScript.getGitDirectory(), "replica");
             String previousLastCommit = script.getLastCommitID();
             List<String> previousCommits = script.getCommitIDs();
@@ -733,8 +736,9 @@ public class MarkTestTemplates {
         @TestTemplate
         @DisplayName("Mark.run() on a dirty workspace using a release type with Commit, Tag and Push enabled after Infer has generated no new Version > yield to no new commit or tag, no changes pushed to remote")
         @Baseline(Scenario.ONE_BRANCH_SHORT)
-        void runOnDirtyWorkspaceWithNoNewVersionOrNewReleaseWithCommitAndTagAndPushEnabledTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script, @Baseline(Scenario.FROM_SCRATCH) Script remoteScript)
+        void runOnDirtyWorkspaceWithNoNewVersionOrNewReleaseWithCommitAndTagAndPushEnabledTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script)
             throws Exception {
+            Script remoteScript = Scenario.BARE.realize(true);
             script.addRemote(remoteScript.getGitDirectory(), "replica");
             String previousLastCommit = script.getLastCommitID();
             List<String> previousCommits = script.getCommitIDs();
@@ -777,8 +781,9 @@ public class MarkTestTemplates {
         @TestTemplate
         @DisplayName("Mark.run() on a clean workspace using a release type with Commit, Tag and Push disabled after Infer has generated a new Version > yield to no new commit or tag, no changes pushed to remote")
         @Baseline(Scenario.ONE_BRANCH_SHORT)
-        void runOnCleanWorkspaceWithNewVersionOrNewReleaseWithCommitAndTagAndPushDisabledTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script, @Baseline(Scenario.FROM_SCRATCH) Script remoteScript)
+        void runOnCleanWorkspaceWithNewVersionOrNewReleaseWithCommitAndTagAndPushDisabledTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script)
             throws Exception {
+            Script remoteScript = Scenario.BARE.realize(true);
             script.addRemote(remoteScript.getGitDirectory(), "replica");
             String previousLastCommit = script.getLastCommitID();
             List<String> previousCommits = script.getCommitIDs();
@@ -823,8 +828,9 @@ public class MarkTestTemplates {
         @TestTemplate
         @DisplayName("Mark.run() on a dirty workspace using a release type with Commit, Tag and Push disabled after Infer has generated a new Version > yield to no new commit or tag, no changes pushed to remote")
         @Baseline(Scenario.ONE_BRANCH_SHORT)
-        void runOnDirtyWorkspaceWithNewVersionOrNewReleaseWithCommitAndTagAndPushDisabledTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script, @Baseline(Scenario.FROM_SCRATCH) Script remoteScript)
+        void runOnDirtyWorkspaceWithNewVersionOrNewReleaseWithCommitAndTagAndPushDisabledTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script)
             throws Exception {
+            Script remoteScript = Scenario.BARE.realize(true);
             script.addRemote(remoteScript.getGitDirectory(), "replica");
             String previousLastCommit = script.getLastCommitID();
             List<String> previousCommits = script.getCommitIDs();
@@ -872,8 +878,9 @@ public class MarkTestTemplates {
         @TestTemplate
         @DisplayName("Mark.run() on a clean workspace using a release type with Commit, Tag and Push enabled after Infer has generated a new Version > yield to a new commit and a new tag, with changes pushed to remote")
         @Baseline(Scenario.ONE_BRANCH_SHORT)
-        void runOnCleanWorkspaceWithNewVersionOrNewReleaseWithCommitAndTagAndPushEnabledTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script, @Baseline(Scenario.FROM_SCRATCH) Script remoteScript)
+        void runOnCleanWorkspaceWithNewVersionOrNewReleaseWithCommitAndTagAndPushEnabledTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script)
             throws Exception {
+            Script remoteScript = Scenario.BARE.realize(true);
             script.addRemote(remoteScript.getGitDirectory(), "replica");
             String previousLastCommit = script.getLastCommitID();
             List<String> previousCommits = script.getCommitIDs();
@@ -918,8 +925,9 @@ public class MarkTestTemplates {
         @TestTemplate
         @DisplayName("Mark.run() on a dirty workspace using a release type with Commit, Tag and Push enabled after Infer has generated a new Version > yield to a new commit and a new tag, with changes pushed to remote")
         @Baseline(Scenario.ONE_BRANCH_SHORT)
-        void runOnDirtyWorkspaceWithNewVersionOrNewReleaseWithCommitAndTagAndPushEnabledTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script, @Baseline(Scenario.FROM_SCRATCH) Script remoteScript)
+        void runOnDirtyWorkspaceWithNewVersionOrNewReleaseWithCommitAndTagAndPushEnabledTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script)
             throws Exception {
+            Script remoteScript = Scenario.BARE.realize(true);
             script.addRemote(remoteScript.getGitDirectory(), "replica");
             String previousLastCommit = script.getLastCommitID();
             List<String> previousCommits = script.getCommitIDs();

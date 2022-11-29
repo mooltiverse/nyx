@@ -65,10 +65,10 @@ public class ReleaseScope {
     }
 
     /**
-     * Returns the list of SHA-1 identifiers of all commits in the scope.
+     * Returns the list of commits in the scope.
      * Elements are in reverse order so the newest commit is at position 0 and the oldest is in the final position.
      * 
-     * @return the list of SHA-1 identifiers of all commits in the scope.
+     * @return the list of commits in the scope.
      */
     public List<Commit> getCommits() {
         return commits;

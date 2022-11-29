@@ -48,6 +48,13 @@ Since there are so many different ways to configure Nyx, knowing how options are
 
 When you need to pass a configuration option on the command line you can use the option name listed in the *Command Line Option* column available in the [configuration reference]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/index.md %}) sections.
 
+Some options are available in two forms, the regular one and the short one. For example, [`bump`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#bump) can be passed both as `--bump=<NAME>` or `-b=<NAME>`. In case both are used, the short one has priority.
+
+Other options act as boolean flags so you can explicitly pass a value for them or just set the name and `true` is assumed. For example, if you want to pass [`dryRun`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#dry-run) you can either pass `--dry-run=true` or simply `--dry-run` and they will have the same effect. If you want to pass `false` you need to pass the value as `--dry-run=false`.
+
+In order to support dynamic argument names, unsupported or malformed arguments are ignored and don't cause any error.
+{: .notice--info}
+
 ## Environment variables
 
 When you need to pass a configuration option as an environment variable you can use the variable listed in the *Environment Variable* column available in the [configuration reference]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/index.md %}) sections.

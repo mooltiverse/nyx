@@ -48,7 +48,7 @@ import com.mooltiverse.oss.nyx.state.State;
  */
 public class Nyx {
     /**
-     * The private logger instance
+     * The private logger instance.
      */
     private static final Logger logger = LoggerFactory.getLogger(Nyx.class);
 
@@ -237,11 +237,11 @@ public class Nyx {
         throws DataAccessException, IllegalPropertyException, GitException {
         logger.debug(MAIN, "Looking up command instance '{}' from cache", command);
         if (commands.containsKey(command)) {
-            logger.debug(MAIN, "Command instance '{}' found in cache cache", command);
+            logger.debug(MAIN, "Command instance '{}' found in cache", command);
             return commands.get(command);
         }
         else {
-            logger.debug(MAIN, "No command instance '{}' found in cache cache", command);
+            logger.debug(MAIN, "No command instance '{}' found in cache", command);
         }
         
         Command res = newCommandInstance(command);

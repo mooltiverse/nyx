@@ -3,8 +3,6 @@
   https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
 ------------------------------------------------------------------------------*/
 plugins {
-    // See: https://github.com/palantir/gradle-docker
-    id 'com.palantir.docker' version '0.34.0'
 }
 
 /*------------------------------------------------------------------------------
@@ -12,13 +10,220 @@ plugins {
 ------------------------------------------------------------------------------*/
 description = 'The Nyx Docker image'
 
-docker {
-    name rootProject.name
-    dockerfile  project.file('src/main/docker/Dockerfile')
+// These statements force the other projects to be evaluated before this one. Without these,
+// the ':modules:go:nyx:goBuild-nyx-linux-amd64' task would fail because its dependency ('goInit')
+// would not be available yet.
+// With these statements, instead, the project is entirely evaluated in advance, so we can use the
+// ':modules:go:nyx:goBuild-nyx-linux-amd64' task outputs as it runs without errors.
+project.evaluationDependsOn(":modules:go")
+//project.evaluationDependsOn(":modules:go:nyx")
+
+// The project version may have a '+' sign (when using extra identifier in the 'build' part)
+// but since Docker doesn't handle it as a valid label we replace '+' with '_'.
+def sanitizedVersion = rootProject.version.replaceAll('\\+','_')
+
+// The directory used to build the Docker image
+def dockerContextDir = file(buildDir.path+'/docker')
+
+// The map of registries to publish the image to
+// About DockerHub:
+// - the repository 'mooltiverse/nyx' had to be created manually beforehand and permissions to write the repo had to be assigned to the service user.
+// - images are published to: https://hub.docker.com/repository/docker/mooltiverse/nyx
+// About GitHubContainerRegistry:
+// - in order to use the GITHUB_TOKEN issued by GitHub Actions, a first image must be published by hand and permissions set giving access to the repository
+//   according to https://docs.github.com/en/packages/managing-github-packages-using-github-actions-workflows/publishing-and-installing-a-package-with-github-actions#upgrading-a-workflow-that-accesses-ghcrio
+// - images are published to: https://github.com/orgs/mooltiverse/packages/container/package/nyx
+def registries = [ 'DockerHub':"${nyxOrganizationID}/${rootProject.name}",
+                   'GitHubContainerRegistry':"ghcr.io/${nyxOrganizationID}/${rootProject.name}" ]
+
+// The list of labels to publish with. The 'latest' label is only added if we are publishing an official version (like x.y.z, without extra identifiers)
+def labels = [ sanitizedVersion ]
+if (java.util.regex.Pattern.matches("^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\$", rootProject.version)) {
+    labels.add('latest')
+}
+
+/*------------------------------------------------------------------------------
+  Additional tasks
+------------------------------------------------------------------------------*/
+task dockerContext(group: 'build', description: 'Builds the Docker context') {
+    dependsOn tasks.getByPath(':modules:go:nyx:goBuild-nyx-linux-amd64')
+
+    doLast {
+        logger.info('Building the Docker context')
+        mkdir dockerContextDir
+        copy {
+            // 
+            from file('Dockerfile')
+            into dockerContextDir
+        }
+        copy {
+            // add the files built from ':modules:go:nyx:goBuild-nyx-linux-amd64' to the Docker build context so they are available for ADD and COPY directives
+            // this also adds an implicit dependency to task ':modules:go:nyx:goBuild-nyx-linux-amd64'
+            from tasks.getByPath(':modules:go:nyx:goBuild-nyx-linux-amd64').outputs
+            into dockerContextDir
+            include 'nyx-linux-amd64'
+        }
+    }
+}
+
+task dockerImage(group: 'build', description: 'Builds the Docker image') {
+    dependsOn dockerContext
+
+    doLast {
+        logger.info('Building the Docker image')
+        exec {
+            workingDir = dockerContextDir
+            logging.captureStandardOutput LogLevel.INFO
+            logging.captureStandardError  LogLevel.ERROR
+            // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
+            commandLine 'docker', 'build', '--label', "version=$sanitizedVersion", '--tag', "${rootProject.name}:${sanitizedVersion}", '--rm', '.'
+        }
+    }
+}
+
+// This is just a lifecycle task
+task dockerTag(group: 'build', description: 'Tags the Docker image for the configured registries and labels') {
+    // Dependencies are created along with dynamic tasks below
+
+    // Only perform publishing if the Nyx release type enables publishing
+    it.onlyIf { rootProject.nyxState.newRelease }
+}
+
+// This is just a lifecycle task
+task dockerPush(group: 'publishing', description: 'Pushes the Docker image to the configured registries') {
+    // Dependencies are created along with dynamic tasks below
+
+    // Only perform publishing if the Nyx release type enables publishing
+    it.onlyIf { rootProject.nyxState.newRelease }
+}
+
+// For each target registry and each label:
+// - create a tag task
+// - create a publish task
+registries.each { registry ->
+    labels.each { label ->
+        // The tag tasks for the specific registry and label
+        tasks.create(group: 'build', name: "dockerTag-${registry.key}-${label}", description: "Tags the Docker image for the ${registry.key} registry with the ${label} label") {
+            // Task dependencies
+            dependsOn dockerImage
+
+            // Only perform publishing if the Nyx release type enables publishing
+            it.onlyIf { rootProject.nyxState.newRelease }
+
+            doLast {
+                logger.info("Tagging the Docker image for the ${registry.key} registry with the ${label} label")
+                exec {
+                    logging.captureStandardOutput LogLevel.INFO
+                    logging.captureStandardError  LogLevel.ERROR
+                    // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
+                    commandLine 'docker', 'tag', "${rootProject.name}:${sanitizedVersion}", "${registry.value}:${label}"
+                }
+            }
+        }
+        tasks.create(group: 'publishing', name: "dockerPush-${registry.key}-${label}", description: "Pushes the Docker image to the ${registry.key} registry with the ${label} label") {
+            // Task dependencies
+            dependsOn tasks.named("dockerTag-${registry.key}-${label}")
+
+            onlyIf { rootProject.nyxState.newRelease }
+
+            doLast {
+                logger.info('Logging out Docker from previous sessions')
+                exec {
+                    logging.captureStandardOutput LogLevel.INFO
+                    logging.captureStandardError  LogLevel.ERROR
+                    // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
+                    commandLine 'docker', 'logout'
+                }
+
+                exec {
+                    logging.captureStandardOutput LogLevel.INFO
+                    logging.captureStandardError  LogLevel.ERROR
+                    // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
+                    //
+                    // Here we should have credentials parametrized in the 'registry' map so we could avoid the confitional below.
+                    //
+                    // The 'dockerHubUser', 'dockerHubToken', 'gitHubUser' and 'gitHubToken' variables are passed as credentials fetching them in
+                    // GitHub Actions as 'secrets.DOCKER_HUB_USERNAME', 'secrets.DOCKER_HUB_TOKEN', 'secrets.GITHUB_ACTOR' and 'secrets.GITHUB_TOKEN'
+                    // respectively.
+                    // The actual environment variable names are 'ORG_GRADLE_PROJECT_dockerHubUser', 'ORG_GRADLE_PROJECT_dockerHubToken',
+                    // 'ORG_GRADLE_PROJECT_gitHubUser' and 'ORG_GRADLE_PROJECT_gitHubToken'
+                    // See the GitHub Actions definition for more.
+                    if ('DockerHub'.equals(registry.key)) {
+                        logger.info('Logging into Docker Hub')
+
+                        if( !findProperty("dockerHubUser") || !findProperty("dockerHubToken"))
+                        {
+                            logger.warn("Warning: dockerHubUser and/or dockerHubToken environment variables are not defined. This will make the login and push tasks fail.")
+                        }
+
+                        if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
+                            // Windows is used only on local development machines so there is no risk of exposing secrets from logs etc.
+                            // To make the 'stdin' method work on Windows we should also take care of when running on cmd or PowerShell, as they have different
+                            // means to echo environment variables. In short, it's not worth it and we just use the 'unsafe' method of passing the token as the '--password'
+                            commandLine 'docker', 'login', 'docker.io', '--username', findProperty("dockerHubUser"), '--password', findProperty("dockerHubToken")
+                        } else {
+                            //This version using the '--password-stdin' option doesn't work but credentials are not exposed in GitHub Actions logs anyway, so let's use the plain version
+                            //commandLine 'echo', '$ORG_GRADLE_PROJECT_dockerHubToken', '|', 'docker', 'login', '--username', findProperty("dockerHubUser"), '--password-stdin'
+                            commandLine 'docker', 'login', 'docker.io', '--username', findProperty("dockerHubUser"), '--password', findProperty("dockerHubToken")
+                        }
+                    }
+                    else if ('GitHubContainerRegistry'.equals(registry.key)) {
+                        logger.info('Logging into GitHub Container Registry')
+
+                        if( !findProperty("gitHubUser") || !findProperty("gitHubToken"))
+                        {
+                            logger.warn("Warning: gitHubUser and/or gitHubToken environment variables are not defined. This will make the login and push tasks fail.")
+                        }
+
+                        if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
+                            // Windows is used only on local development machines so there is no risk of exposing secrets from logs etc.
+                            // To make the 'stdin' method work on Windows we should also take care of when running on cmd or PowerShell, as they have different
+                            // means to echo environment variables. In short, it's not worth it and we just use the 'unsafe' method of passing the token as the '--password'
+                            commandLine 'docker', 'login', 'ghcr.io', '--username', findProperty("gitHubUser"), '--password', findProperty("gitHubToken")
+                        } else {
+                            //This version using the '--password-stdin' option doesn't work but credentials are not exposed in GitHub Actions logs anyway, so let's use the plain version
+                            //commandLine 'echo', '$ORG_GRADLE_PROJECT_gitHubToken', '|', 'docker', 'login', 'ghcr.io', '--username', findProperty("gitHubUser"), '--password-stdin'
+                            //In order to use the GITHUB_TOKEN issued by GitHub Actions, a first image must be published by hand and permissions set giving access to the repository
+                            //according to https://docs.github.com/en/packages/managing-github-packages-using-github-actions-workflows/publishing-and-installing-a-package-with-github-actions#upgrading-a-workflow-that-accesses-ghcrio
+                            commandLine 'docker', 'login', 'ghcr.io', '--username', findProperty("gitHubUser"), '--password', findProperty("gitHubToken")
+                        }
+                    }
+                    else throw new GradleException("Don't know how to log in to registry "+registry.key)
+                }
+
+                logger.info("Pushing the Docker image to the ${registry.key} registry with the ${label} label")
+                exec {
+                    logging.captureStandardOutput LogLevel.INFO
+                    logging.captureStandardError  LogLevel.ERROR
+                    // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
+                    commandLine 'docker', 'image', 'push', "${registry.value}:${label}"
+                }
+            }
+        }
+
+        // Make the overall dockerTag lifecycle task depend on the platform specific tag task
+        tasks.dockerTag.dependsOn tasks.named("dockerTag-${registry.key}-${label}")
+        // Make the overall dockerPush lifecycle task depend on the platform specific tag task
+        tasks.dockerPush.dependsOn tasks.named("dockerPush-${registry.key}-${label}")
+    }
+}
+
+// This is just a lifecycle task
+task publish(group: 'publishing', description: 'Publishes Docker images produced by this project') {
+    dependsOn tasks.dockerPush
+}
+
+// Run functional tests using the Docker image
+task functionalTest() {
+    description 'Runs all Docker functional tests and verification tasks'
+    group 'Verification'
+
+    // here we need to define the task to run these tests
 }
 
 /*------------------------------------------------------------------------------
   Additional task dependencies
 ------------------------------------------------------------------------------*/
-//tasks.docker.dependsOn(':modules:java:main:build')
-tasks.build.dependsOn tasks.docker
+tasks.assemble.dependsOn tasks.dockerImage
+tasks.build.dependsOn tasks.dockerImage
+/*tasks.clean.dependsOn tasks.dockerClean*/

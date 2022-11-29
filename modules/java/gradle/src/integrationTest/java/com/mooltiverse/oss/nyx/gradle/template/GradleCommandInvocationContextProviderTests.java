@@ -28,7 +28,7 @@ import org.gradle.api.Task;
 import com.mooltiverse.oss.nyx.command.Commands;
 import com.mooltiverse.oss.nyx.command.template.Baseline;
 import com.mooltiverse.oss.nyx.command.template.CommandSelector;
-import com.mooltiverse.oss.nyx.git.Scenario;
+import com.mooltiverse.oss.nyx.git.tools.Scenario;
 import com.mooltiverse.oss.nyx.command.template.CommandInvocationContextProviderTests;
 
 /**

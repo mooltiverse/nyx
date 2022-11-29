@@ -40,6 +40,12 @@ import com.mooltiverse.oss.nyx.services.UserService;
  * The entry point to the <a href="https://gitlab.com/">GitLab</a> remote service.
  */
 public class GitLab implements GitHostingService, ReleaseService, UserService {
+    /*
+     * The implementation of this class could rely on the GitLab4J library (https://github.com/gitlab4j/gitlab4j-api)
+     * but unfortunately, as of this writing, it doesn't support release assets.
+     * When it will, we can replace the custom, low-lever REST API implementation of this package with GitLab4J.
+     */
+
     /**
      * The name of the repository owner, used when using APIs that require the name of the repository
      * owner (individual or organization). It may be {@code null}, but some operations may fail.

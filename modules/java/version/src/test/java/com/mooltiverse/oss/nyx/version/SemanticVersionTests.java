@@ -1765,7 +1765,7 @@ public class SemanticVersionTests {
             assertFalse(sv3.toString().contains(randomName));
             assertTrue(sv3.toString().contains(randomValue.toString())); // the value must be still there
 
-            SemanticVersion sv4 = sv2.removePrereleaseAttribute(randomName, true); // also remove the value (which is not present)
+            SemanticVersion sv4 = sv2.removePrereleaseAttribute(randomName, true); // also remove the value
             assertFalse(sv4.toString().contains(randomName));
             assertFalse(sv4.toString().contains(randomValue.toString())); // the value must be gone
 

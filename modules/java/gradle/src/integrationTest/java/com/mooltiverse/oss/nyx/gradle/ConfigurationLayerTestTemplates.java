@@ -30,7 +30,7 @@ import org.junit.jupiter.api.TestTemplate;
 
 import com.mooltiverse.oss.nyx.command.template.Baseline;
 import com.mooltiverse.oss.nyx.entities.IllegalPropertyException;
-import com.mooltiverse.oss.nyx.git.Scenario;
+import com.mooltiverse.oss.nyx.git.tools.Scenario;
 import com.mooltiverse.oss.nyx.gradle.template.GradleCommandInvocationContextProvider;
 
 /**

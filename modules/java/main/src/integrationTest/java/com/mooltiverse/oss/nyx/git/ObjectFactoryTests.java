@@ -27,6 +27,8 @@ import com.mooltiverse.oss.nyx.entities.git.Identity;
 import com.mooltiverse.oss.nyx.entities.git.Message;
 import com.mooltiverse.oss.nyx.entities.git.Tag;
 import com.mooltiverse.oss.nyx.entities.git.TimeStamp;
+import com.mooltiverse.oss.nyx.git.tools.Scenario;
+import com.mooltiverse.oss.nyx.git.tools.Script;
 
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.revwalk.RevCommit;

@@ -4,4 +4,4 @@
 
 # Nyx Version
 # This variable can be used as {{ site.data.nyx.version }} to parametrize the version of Nyx
-version: "1.0.0"
+version: "1.2.2"

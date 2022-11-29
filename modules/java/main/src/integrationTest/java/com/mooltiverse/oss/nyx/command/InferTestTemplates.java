@@ -37,11 +37,11 @@ import com.mooltiverse.oss.nyx.command.template.CommandInvocationContextProvider
 import com.mooltiverse.oss.nyx.command.template.CommandProxy;
 import com.mooltiverse.oss.nyx.command.template.CommandSelector;
 import com.mooltiverse.oss.nyx.command.template.StandaloneCommandProxy;
-import com.mooltiverse.oss.nyx.configuration.Defaults;
 import com.mooltiverse.oss.nyx.configuration.SimpleConfigurationLayer;
 import com.mooltiverse.oss.nyx.configuration.presets.Extended;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
+import com.mooltiverse.oss.nyx.entities.Defaults;
 import com.mooltiverse.oss.nyx.entities.Identifier;
 import com.mooltiverse.oss.nyx.entities.IllegalPropertyException;
 import com.mooltiverse.oss.nyx.entities.ReleaseType;
@@ -49,8 +49,8 @@ import com.mooltiverse.oss.nyx.entities.ReleaseTypes;
 import com.mooltiverse.oss.nyx.entities.WorkspaceStatus;
 import com.mooltiverse.oss.nyx.entities.git.Commit;
 import com.mooltiverse.oss.nyx.git.GitException;
-import com.mooltiverse.oss.nyx.git.Scenario;
-import com.mooltiverse.oss.nyx.git.Script;
+import com.mooltiverse.oss.nyx.git.tools.Scenario;
+import com.mooltiverse.oss.nyx.git.tools.Script;
 import com.mooltiverse.oss.nyx.version.Scheme;
 
 @DisplayName("Infer")
@@ -514,7 +514,7 @@ public class InferTestTemplates {
             List<String> branches = List.<String>copyOf(script.getBranches());
             List<String> commitIDs = List.<String>copyOf(script.getCommitIDs());
             String lastCommitID = script.getLastCommitID();
-            Map<String,String> tags =  Map.<String,String>copyOf(script.getTags());
+            Map<String,String> tags = Map.<String,String>copyOf(script.getTags());
 
             // run again and check that all values are still the same
             assertTrue(command.isUpToDate());
@@ -544,7 +544,7 @@ public class InferTestTemplates {
             command.run();
             assertTrue(command.isUpToDate());
 
-            // chech that some values have changed
+            // check that some values have changed
             assertNotEquals(commits, command.state().getReleaseScope().getCommits());
             assertNotEquals(significantCommits, command.state().getReleaseScope().getSignificantCommits());
             assertNotEquals(previousVersion, command.state().getReleaseScope().getPreviousVersion());
@@ -682,7 +682,7 @@ public class InferTestTemplates {
             command.run();
             assertTrue(command.isUpToDate());
 
-            // chech that some values have changed
+            // check that some values have changed
             assertNotEquals(commits, command.state().getReleaseScope().getCommits());
             assertEquals(significantCommits, command.state().getReleaseScope().getSignificantCommits()); // with no convention no commit is significant
             assertNotEquals(previousVersion, command.state().getReleaseScope().getPreviousVersion());
@@ -823,7 +823,7 @@ public class InferTestTemplates {
             command.run();
             assertTrue(command.isUpToDate());
 
-            // chech that some values have changed
+            // check that some values have changed
             assertNotEquals(commits, command.state().getReleaseScope().getCommits());
             assertEquals(significantCommits, command.state().getReleaseScope().getSignificantCommits()); // with no convention no commit is significant
             assertNotEquals(previousVersion, command.state().getReleaseScope().getPreviousVersion());
@@ -1647,7 +1647,7 @@ public class InferTestTemplates {
             command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             //if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
-                // These tests may fail when running in a standalone context because the run() doee not
+                // These tests may fail when running in a standalone context because the run() does not
                 // imply up-to-date checks and the execution may inherit stale State values from previous
                 // runs. Keep this in mind if they fail and uncomment this conditional so that
                 // tests are executed only in non-standalone contexts.
@@ -1696,7 +1696,7 @@ public class InferTestTemplates {
             command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             //if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
-                // These tests may fail when running in a standalone context because the run() doee not
+                // These tests may fail when running in a standalone context because the run() does not
                 // imply up-to-date checks and the execution may inherit stale State values from previous
                 // runs. Keep this in mind if they fail and uncomment this conditional so that
                 // tests are executed only in non-standalone contexts.

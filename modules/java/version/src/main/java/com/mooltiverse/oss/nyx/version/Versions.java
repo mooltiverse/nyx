@@ -32,6 +32,92 @@ public class Versions {
     }
 
     /**
+     * Returns a negative integer, zero, or a positive integer as the version represented by {@code v1} is less than, equal to,
+     * or greater than the version represented by {@code v2}, according to the given scheme. {@code null} values are always
+     * considered less than non null valid version identifiers.
+     * This method does no sanitization or prefix interpretation.
+     * 
+     * @param scheme the scheme to check against.
+     * @param v1 the first version to compare. It may be {@code null}. If it's not a valid version it's considered as {@code null}.
+     * @param v2 the second version to compare. It may be {@code null}. If it's not a valid version it's considered as {@code null}.
+     * 
+     * @return a negative integer, zero, or a positive integer as the version represented by {@code v1} is less than, equal to,
+     * or greater than the version represented by {@code v2}
+     * 
+     * @throws IllegalArgumentException if a given string doesn't represent a legal version, according to the selected scheme
+     */
+    public static int compare(Scheme scheme, String v1, String v2) {
+        return compare(scheme, v1, v2, false);
+    }
+
+    /**
+     * Returns a negative integer, zero, or a positive integer as the version represented by {@code v1} is less than, equal to,
+     * or greater than the version represented by {@code v2}, according to the given scheme. {@code null} values are always
+     * considered less than non null valid version identifiers.
+     * This method is different than {@link #compare(Scheme, String, String, boolean)} as it only tolerates a prefix, while
+     * {@link #compare(Scheme, String, String, boolean)} is more lenient as it also sanitizes extra characters in the body
+     * of the version identifier (when {@code sanitize} is {@code true}).
+     * 
+     * @param scheme the scheme to check against.
+     * @param v1 the first version to compare. It may be {@code null}. If it's not a valid version it's considered as {@code null}.
+     * @param v2 the second version to compare. It may be {@code null}. If it's not a valid version it's considered as {@code null}.
+     * @param prefix the initial string that is used for the version prefix. This will be stripped off from the given
+     * string representation of the versions. It can be {@code null} or empty, in which case it's ignored. If not empty
+     * and the given version string doesn't start with this prefix, this prefix is ignored.
+     * 
+     * @return a negative integer, zero, or a positive integer as the version represented by {@code v1} is less than, equal to,
+     * or greater than the version represented by {@code v2}
+     * 
+     * @throws IllegalArgumentException if a given string doesn't represent a legal version, according to the selected scheme
+     */
+    public static int compare(Scheme scheme, String v1, String v2, String prefix) {
+        if (Objects.isNull(v1) && Objects.isNull(v2))
+            return 0;
+        
+        String v1b = Objects.isNull(v1) || Objects.isNull(prefix) ? v1 : (v1.startsWith(prefix) ? v1.replaceFirst(prefix, "") : v1);
+        String v2b = Objects.isNull(v2) || Objects.isNull(prefix) ? v2 : (v2.startsWith(prefix) ? v2.replaceFirst(prefix, "") : v2);
+        return compare(scheme, v1b, v2b, false);
+    }
+
+    /**
+     * Returns a negative integer, zero, or a positive integer as the version represented by {@code v1} is less than, equal to,
+     * or greater than the version represented by {@code v2}, according to the given scheme. {@code null} values are always
+     * considered less than non null valid version identifiers.
+     * If {@code sanitize} is {@code true} this method will try to sanitize the given strings before parsing so that if there are
+     * illegal characters like a prefix or leading zeroes in numeric identifiers they are removed.
+     * <br>
+     * This method is different than {@link #compare(Scheme, String, String, String)} as it also sanitizes extra characters
+     * in the body of the version identifiers instead of just an optional prefix (when {@code sanitize} is {@code true}).
+     * 
+     * @param scheme the scheme to check against.
+     * @param v1 the first version to compare. It may be {@code null}. If it's not a valid version it's considered as {@code null}.
+     * @param v2 the second version to compare. It may be {@code null}. If it's not a valid version it's considered as {@code null}.
+     * @param sanitize optionally enables sanitization before parsing versions
+     * 
+     * @return a negative integer, zero, or a positive integer as the version represented by {@code v1} is less than, equal to,
+     * or greater than the version represented by {@code v2}
+     * 
+     * @throws IllegalArgumentException if a given string doesn't represent a legal version, according to the selected scheme
+     */
+    public static int compare(Scheme scheme, String v1, String v2, boolean sanitize) {
+        switch (scheme) {
+            case SEMVER: {
+                SemanticVersion sv1 = Objects.isNull(v1) ? null : SemanticVersion.valueOf(v1, sanitize);
+                SemanticVersion sv2 = Objects.isNull(v2) ? null : SemanticVersion.valueOf(v2, sanitize);
+                if (Objects.isNull(sv1) && Objects.isNull(sv2))
+                    return 0;
+                else if (Objects.isNull(sv1))
+                    return -1;
+                else if (Objects.isNull(sv2))
+                    return 1;
+                else return sv1.compareTo(sv2);
+            }
+            //MAVEN: not yet supported
+            default: throw new IllegalArgumentException(String.format("Illegal or unsupported scheme '%s'", scheme));
+        }
+    }
+
+    /**
      * Returns a Version instance representing the default initial value to use for the given scheme.
      *
      * @param scheme the scheme to get the initial version for
@@ -331,91 +417,5 @@ public class Versions {
         if (!Objects.isNull(prefix) && s.startsWith(prefix))
             s = s.replaceFirst(prefix, "");
         return valueOf(scheme, s);
-    }
-
-    /**
-     * Returns a negative integer, zero, or a positive integer as the version represented by {@code v1} is less than, equal to,
-     * or greater than the version represented by {@code v2}, according to the given scheme. {@code null} values are always
-     * considered less than non null valid version identifiers.
-     * This method does no sanitization or prefix interpretation.
-     * 
-     * @param scheme the scheme to check against.
-     * @param v1 the first version to compare. It may be {@code null}. If it's not a valid version it's considered as {@code null}.
-     * @param v2 the second version to compare. It may be {@code null}. If it's not a valid version it's considered as {@code null}.
-     * 
-     * @return a negative integer, zero, or a positive integer as the version represented by {@code v1} is less than, equal to,
-     * or greater than the version represented by {@code v2}
-     * 
-     * @throws IllegalArgumentException if a given string doesn't represent a legal version, according to the selected scheme
-     */
-    public static int compare(Scheme scheme, String v1, String v2) {
-        return compare(scheme, v1, v2, false);
-    }
-
-    /**
-     * Returns a negative integer, zero, or a positive integer as the version represented by {@code v1} is less than, equal to,
-     * or greater than the version represented by {@code v2}, according to the given scheme. {@code null} values are always
-     * considered less than non null valid version identifiers.
-     * This method is different than {@link #compare(Scheme, String, String, boolean)} as it only tolerates a prefix, while
-     * {@link #compare(Scheme, String, String, boolean)} is more lenient as it also sanitizes extra characters in the body
-     * of the version identifier (when {@code sanitize} is {@code true}).
-     * 
-     * @param scheme the scheme to check against.
-     * @param v1 the first version to compare. It may be {@code null}. If it's not a valid version it's considered as {@code null}.
-     * @param v2 the second version to compare. It may be {@code null}. If it's not a valid version it's considered as {@code null}.
-     * @param prefix the initial string that is used for the version prefix. This will be stripped off from the given
-     * string representation of the versions. It can be {@code null} or empty, in which case it's ignored. If not empty
-     * and the given version string doesn't start with this prefix, this prefix is ignored.
-     * 
-     * @return a negative integer, zero, or a positive integer as the version represented by {@code v1} is less than, equal to,
-     * or greater than the version represented by {@code v2}
-     * 
-     * @throws IllegalArgumentException if a given string doesn't represent a legal version, according to the selected scheme
-     */
-    public static int compare(Scheme scheme, String v1, String v2, String prefix) {
-        if (Objects.isNull(v1) && Objects.isNull(v2))
-            return 0;
-        
-        String v1b = Objects.isNull(v1) || Objects.isNull(prefix) ? v1 : (v1.startsWith(prefix) ? v1.replaceFirst(prefix, "") : v1);
-        String v2b = Objects.isNull(v2) || Objects.isNull(prefix) ? v2 : (v2.startsWith(prefix) ? v2.replaceFirst(prefix, "") : v2);
-        return compare(scheme, v1b, v2b, false);
-    }
-
-    /**
-     * Returns a negative integer, zero, or a positive integer as the version represented by {@code v1} is less than, equal to,
-     * or greater than the version represented by {@code v2}, according to the given scheme. {@code null} values are always
-     * considered less than non null valid version identifiers.
-     * If {@code sanitize} is {@code true} this method will try to sanitize the given strings before parsing so that if there are
-     * illegal characters like a prefix or leading zeroes in numeric identifiers they are removed.
-     * <br>
-     * This method is different than {@link #compare(Scheme, String, String, String)} as it also sanitizes extra characters
-     * in the body of the version identifiers instead of just an optional prefix (when {@code sanitize} is {@code true}).
-     * 
-     * @param scheme the scheme to check against.
-     * @param v1 the first version to compare. It may be {@code null}. If it's not a valid version it's considered as {@code null}.
-     * @param v2 the second version to compare. It may be {@code null}. If it's not a valid version it's considered as {@code null}.
-     * @param sanitize optionally enables sanitization before parsing versions
-     * 
-     * @return a negative integer, zero, or a positive integer as the version represented by {@code v1} is less than, equal to,
-     * or greater than the version represented by {@code v2}
-     * 
-     * @throws IllegalArgumentException if a given string doesn't represent a legal version, according to the selected scheme
-     */
-    public static int compare(Scheme scheme, String v1, String v2, boolean sanitize) {
-        switch (scheme) {
-            case SEMVER: {
-                SemanticVersion sv1 = Objects.isNull(v1) ? null : SemanticVersion.valueOf(v1, sanitize);
-                SemanticVersion sv2 = Objects.isNull(v2) ? null : SemanticVersion.valueOf(v2, sanitize);
-                if (Objects.isNull(sv1) && Objects.isNull(sv2))
-                    return 0;
-                else if (Objects.isNull(sv1))
-                    return -1;
-                else if (Objects.isNull(sv2))
-                    return 1;
-                else return sv1.compareTo(sv2);
-            }
-            //MAVEN: not yet supported
-            default: throw new IllegalArgumentException(String.format("Illegal or unsupported scheme '%s'", scheme));
-        }
     }
 }

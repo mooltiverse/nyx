@@ -123,7 +123,7 @@ allprojects {
     /*------------------------------------------------------------------------------
       Repositories and dependencies
       https://docs.gradle.org/current/userguide/dependency_management_for_java_projects.html
-    */
+    ------------------------------------------------------------------------------*/
     repositories {
         mavenCentral()
         maven {
@@ -499,10 +499,31 @@ nexusStaging {
 /*------------------------------------------------------------------------------
   Additional tasks
 ------------------------------------------------------------------------------*/
+// Create an overall Java integration test lifecycle task to trigger all integration tests in subprojects 
+task integrationTest() {
+    description 'Runs all Java integration tests and verification tasks'
+    group 'Verification'
+
+    dependsOn subprojects*.integrationTest
+}
+
+// Create an overall Java functional test lifecycle task to trigger all intefunctionalgration tests in subprojects 
+task functionalTest() {
+    description 'Runs all Java functional tests and verification tasks'
+    group 'Verification'
+
+    dependsOn subprojects*.functionalTest
+}
 
 /*------------------------------------------------------------------------------
   Additional task dependencies
 ------------------------------------------------------------------------------*/
+// Make this overall assemble task dependent on subprojects assemble tasks
+tasks.assemble.dependsOn subprojects*.assemble
+
+// Make this overall Java unit test task dependent on subprojects unit test tasks
+// so that we can run all Java unit tests with one task
+tasks.test.dependsOn subprojects*.test
 
 // Publish artifacts to the Staging Sonatype Nexus
 //

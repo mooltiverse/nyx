@@ -208,7 +208,7 @@ public class Publish extends AbstractCommand {
             else logger.debug(COMMAND, "The release type has the publish flag disabled");
         }
         else {
-            logger.info(COMMAND, "No version change detected. Nothing to publish.");
+            logger.debug(COMMAND, "No version change detected. Nothing to publish.");
         }
 
         storeStatusInternalAttributes();

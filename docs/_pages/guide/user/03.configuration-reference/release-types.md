@@ -84,7 +84,7 @@ This release type should not be used in production configurations and you should
 
 Within the `releaseTypes` block you can define as many types as you want, each in its own separate block. The `name` identifies the type so to define a brand new release type make sure you give it a `name` that was not already in use. If you use a `name` that was already defined for a release type (given the [evaluation order]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}#evaluation-order)) then you are **overriding** an existing type. Depending on the [configuration method]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}) you use the `name` property might be defined inside or outside the block that configures a single type.
 
-Configuring release types gives Nyx informations about:
+Configuring release types gives Nyx information about:
 
 * how to assume which type to select given a certain set of facts that are automatically inferred or overridden by user. The rules defining how to match a release type are [`matchBranches`](#match-branches), [`matchEnvironmentVariables`](#match-environment-variables) and [`matchWorkspaceStatus`](#match-workspace-status) and they are evaluated by an `AND` logic so **they must all evaluate `true` to make a successful match**
 * which tags in the Git history must be considered for the release type so that the commit history can be consistently parsed. The match is done using the regular expression configured as the [`filterTags`](#filter-tags)
@@ -106,7 +106,7 @@ Each release type has the following attributes:
 | [`releaseTypes/<NAME>/gitTagMessage`](#git-tag-message)                                    | string  | `--release-types-<NAME>-git-tag-message=<TEMPLATE>`                   | `NYX_RELEASE_TYPES_<NAME>_GIT_TAG_MESSAGE=<TEMPLATE>`                   | Empty                                                |
 | [`releaseTypes/<NAME>/identifiers`](#identifiers)                                          | [list]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}#collections-of-objects) | `--release-types-<NAME>-identifiers-<#>=<ID_ATTRIBUTE>` | `NYX_RELEASE_TYPES_<NAME>_IDENTIFIERS_<#>=<ID_ATTRIBUTE>` | Empty |
 | [`releaseTypes/<NAME>/matchBranches`](#match-branches)                                     | string  | `--release-types-<NAME>-match-branches=<TEMPLATE>`                    | `NYX_RELEASE_TYPES_<NAME>_MATCH_BRANCHES=<TEMPLATE>`                    | Empty                                                |
-| [`releaseTypes/<NAME>/matchEnvironmentVariables`](#match-environment-variables)            | [map]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}#collections-of-objects) | `--release-types-<NAME>-match-environment-variables-<NAME>=<VALUE>` | `NYX_RELEASE_TYPES_<NAME>_MATCH_ENVIRONMENT_VARIABLES_<NAME>=<VALUE>` | Empty |
+| [`releaseTypes/<NAME>/matchEnvironmentVariables`](#match-environment-variables)            | [map]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}#collections-of-objects) | `--release-types-<NAME>-match-environment-variables-<VARNAME>=<VALUE>` | `NYX_RELEASE_TYPES_<NAME>_MATCH_ENVIRONMENT_VARIABLES_<VARNAME>=<VALUE>` | Empty |
 | [`releaseTypes/<NAME>/matchWorkspaceStatus`](#match-workspace-status)                      | string  | `--release-types-<NAME>-match-workspace-status`                       | `NYX_RELEASE_TYPES_<NAME>_MATCH_WORKSPACE_STATUS=<STATUS>`              | Empty                                                |
 | [`releaseTypes/<NAME>/name`](#name)                                                        | string  | `--release-types-<NAME>-name=<NAME>`                                  | `NYX_RELEASE_TYPES_<NAME>_NAME=<NAME>`                                  | N/A                                                    |
 | [`releaseTypes/<NAME>/publish`](#publish)                                                  | string  | `--release-types-<NAME>-publish=<TEMPLATE>`                           | `NYX_RELEASE_TYPES_<NAME>_PUBLISH=<TEMPLATE>`                           | `false`                                              |
@@ -221,7 +221,7 @@ Note that this value is also used as the release description when [publishing](#
 
 This value is optional but may be required by some [publication services](#publication-services).
 
-A common use for this option is a [`file.content`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}#filecontent) template to get the content of a release notes or changelog file. Example: `{% raw %}{{#file.content}}CHANGELOG.md{{/file.content}}{% endraw %}`.
+A common use for this option is a [`fileContent`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}#filecontent) template to get the content of a release notes or changelog file. Example: `{% raw %}{{#fileContent}}CHANGELOG.md{{/fileContent}}{% endraw %}`.
 
 For more on how to generate a changelog automatically please see the [`changelog`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/changelog.md %}) configuration section.
 
@@ -388,7 +388,7 @@ Within the `releaseTypes/<NAME>/identifiers` block you can define as many identi
 | ------------------------- | ---------------------------------------------------------------------------------------- |
 | Name                      | `releaseTypes/<NAME>/identifiers/<#>/position`                                           |
 | Type                      | string                                                                                   |
-| Default                   | `build`                                                                                  |
+| Default                   | `BUILD`                                                                                  |
 | Command Line Option       | `--release-types-<NAME>-identifiers-<#>-position=PRE_RELEASE|BUILD`                      |
 | Environment Variable      | `NYX_RELEASE_TYPES_<NAME>_IDENTIFIERS_<#>_POSITION=PRE_RELEASE|BUILD`                    |
 | Configuration File Option | `releaseTypes/items/<NAME>/identifiers/items/<#>/position`                               |
@@ -474,8 +474,8 @@ When using this option, the release type is only evaluated when the current bran
 | Name                      | `releaseTypes/<NAME>/matchEnvironmentVariables`                                          |
 | Type                      | [map]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}#collections-of-objects) |
 | Default                   | Empty (matches anything)                                                                 |
-| Command Line Option       | `--release-types-<NAME>-match-environment-variables-<NAME>=<VALUE>`                      |
-| Environment Variable      | `NYX_RELEASE_TYPES_<NAME>_MATCH_ENVIRONMENT_VARIABLES_<NAME>=<VALUE>`                    |
+| Command Line Option       | `--release-types-<NAME>-match-environment-variables-<VARNAME>=<VALUE>`                      |
+| Environment Variable      | `NYX_RELEASE_TYPES_<NAME>_MATCH_ENVIRONMENT_VARIABLES_<VARNAME>=<VALUE>`                    |
 | Configuration File Option | `releaseTypes/items/<NAME>/matchEnvironmentVariables`                                    |
 | Related state attributes  |                                                                                          |
 
@@ -489,7 +489,7 @@ This option can be used to enable or disable a release type based on the environ
 
 The default is the empty map, which matches any environment, making the release type independent from the environment.
 
-When configuring this map using command line options or environment variables you need to pass flattened values as documented [here]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}#collections-of-objects). In this case you can pass each environment variable to be matched as a command line option like `--release-types-<NAME>-match-environment-variables-<VARIABLE_NAME>=<REGEX>` or as an environment variable like `NYX_RELEASE_TYPES_<NAME>_MATCH_ENVIRONMENT_VARIABLES_<VARIABLE_NAME>=<REGEX>`.
+When configuring this map using command line options or environment variables you need to pass flattened values as documented [here]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}#collections-of-objects). In this case you can pass each environment variable to be matched as a command line option like `--release-types-<NAME>-match-environment-variables-<VARNAME>=<REGEX>` or as an environment variable like `NYX_RELEASE_TYPES_<NAME>_MATCH_ENVIRONMENT_VARIABLES_<VARNAME>=<REGEX>`.
 {: .notice--info}
 
 #### Match workspace status

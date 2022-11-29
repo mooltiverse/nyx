@@ -414,7 +414,7 @@ public class FunctionsTests {
         @DisplayName("Functions.timestampYYYYMMDDHHMMSS.apply()")
         void applyTest()
             throws Exception {
-            assertEquals("", new Functions.TimestampISO8601().apply(null));
+            assertEquals("", new Functions.TimestampYYYYMMDDHHMMSS().apply(null));
             assertEquals("19700101000000", new Functions.TimestampYYYYMMDDHHMMSS().apply("0"));
             assertEquals("20200101120000", new Functions.TimestampYYYYMMDDHHMMSS().apply("1577880000000"));
 
@@ -426,11 +426,41 @@ public class FunctionsTests {
     }
 
     @Nested
-    @DisplayName("Functions.environment.variable")
+    @DisplayName("Functions.environmentVariable")
     class EnvironmentVariableTests {
         @Test
-        @DisplayName("Functions.environment.variable.apply()")
+        @DisplayName("Functions.environmentVariable.apply()")
         void applyTest()
+            throws Exception {
+            // on CI platforms the OS variable may not be defined, causing this test to fail, so let's make it conditional
+            if (Objects.isNull(System.getenv("OS"))) {
+                assertEquals("", new Functions.EnvironmentVariable().apply(null));
+                assertEquals("", new Functions.EnvironmentVariable().apply("OS"));
+
+                // also run the same tests by selecting the function by name, as the template engine does
+                assertEquals("", Functions.FUNCTIONS.get("environmentVariable").apply(null));
+                assertEquals("", Functions.FUNCTIONS.get("environmentVariable").apply("OS"));
+            }
+            else {
+                assertEquals("", new Functions.EnvironmentVariable().apply(null));
+                assertEquals(System.getenv("OS"), new Functions.EnvironmentVariable().apply("OS"));
+
+                // also run the same tests by selecting the function by name, as the template engine does
+                assertEquals("", Functions.FUNCTIONS.get("environmentVariable").apply(null));
+                assertEquals(System.getenv("OS"), Functions.FUNCTIONS.get("environmentVariable").apply("OS"));
+            }
+        }
+    }
+
+    // TODO: remove this method as per release 2.0.0 or more
+    @Nested
+    @DisplayName("Functions.environment.variable (deprecated dotted name)")
+    @Deprecated(since="1.1.0", forRemoval=true) //The dotted name is deprecated and will be removed in future releases. Use the camel case name instead. See the user manual for more."
+    class EnvironmentVariableDeprecatedDottedNameTests {
+        @Test
+        @DisplayName("Functions.environment.variable.apply() (deprecated dotted name)")
+        @Deprecated(since="1.1.0", forRemoval=true) //The dotted name is deprecated and will be removed in future releases. Use the camel case name instead. See the user manual for more."
+        void applyDeprecatedDottedNameTest()
             throws Exception {
             // on CI platforms the OS variable may not be defined, causing this test to fail, so let's make it conditional
             if (Objects.isNull(System.getenv("OS"))) {
@@ -453,11 +483,31 @@ public class FunctionsTests {
     }
 
     @Nested
-    @DisplayName("Functions.environment.user")
+    @DisplayName("Functions.environmentUser")
     class EnvironmentUserTests {
         @Test
-        @DisplayName("Functions.environment.user.apply()")
+        @DisplayName("Functions.environmentUser.apply()")
         void applyTest()
+            throws Exception {
+            // the input value is ignored by this function, it always returns the system user name
+            assertEquals(System.getProperty("user.name"), new Functions.EnvironmentUser().apply(null));
+            assertEquals(System.getProperty("user.name"), new Functions.EnvironmentUser().apply("any"));
+
+            // also run the same tests by selecting the function by name, as the template engine does
+            assertEquals(System.getProperty("user.name"), Functions.FUNCTIONS.get("environmentUser").apply(null));
+            assertEquals(System.getProperty("user.name"), Functions.FUNCTIONS.get("environmentUser").apply("any"));
+        }
+    }
+
+    // TODO: remove this method as per release 2.0.0 or more
+    @Nested
+    @DisplayName("Functions.environment.user (deprecated dotted name)")
+    @Deprecated(since="1.1.0", forRemoval=true) //The dotted name is deprecated and will be removed in future releases. Use the camel case name instead. See the user manual for more."
+    class EnvironmentUserDeprecatedDottedNameTests {
+        @Test
+        @DisplayName("Functions.environment.user.apply() (deprecated dotted name)")
+        @Deprecated(since="1.1.0", forRemoval=true) //The dotted name is deprecated and will be removed in future releases. Use the camel case name instead. See the user manual for more."
+        void applyDeprecatedDottedNameTest()
             throws Exception {
             // the input value is ignored by this function, it always returns the system user name
             assertEquals(System.getProperty("user.name"), new Functions.Environment.User().apply(null));
@@ -470,11 +520,41 @@ public class FunctionsTests {
     }
 
     @Nested
-    @DisplayName("Functions.file.content")
+    @DisplayName("Functions.fileContent")
     class FileContentTests {
         @Test
-        @DisplayName("Functions.file.content.apply()")
+        @DisplayName("Functions.fileContent.apply()")
         void applyTest()
+            throws Exception {
+            final String FILE_CONTENT = "file content to test";
+
+            File f = File.createTempFile("filecontenttest", "file", new File(System.getProperty("java.io.tmpdir")));
+            f.deleteOnExit();
+            FileWriter w = new FileWriter(f);
+            w.write(FILE_CONTENT);
+            w.flush();
+            w.close();
+
+            assertEquals("", new Functions.FileContent().apply(null));
+            assertEquals("", new Functions.FileContent().apply("afilethatdoesnotexists"));
+            assertEquals(FILE_CONTENT, new Functions.FileContent().apply(f.getAbsolutePath()));
+
+            // also run the same tests by selecting the function by name, as the template engine does
+            assertEquals("", Functions.FUNCTIONS.get("fileContent").apply(null));
+            assertEquals("", Functions.FUNCTIONS.get("fileContent").apply("afilethatdoesnotexists"));
+            assertEquals(FILE_CONTENT, Functions.FUNCTIONS.get("fileContent").apply(f.getAbsolutePath()));
+        }
+    }
+
+    // TODO: remove this method as per release 2.0.0 or more
+    @Nested
+    @DisplayName("Functions.file.content (deprecated dotted name)")
+    @Deprecated(since="1.1.0", forRemoval=true) //The dotted name is deprecated and will be removed in future releases. Use the camel case name instead. See the user manual for more."
+    class FileContentDeprecatedDottedNameTests {
+        @Test
+        @DisplayName("Functions.file.content.apply() (deprecated dotted name)")
+        @Deprecated(since="1.1.0", forRemoval=true) //The dotted name is deprecated and will be removed in future releases. Use the camel case name instead. See the user manual for more."
+        void applyDeprecatedDottedNameTest()
             throws Exception {
             final String FILE_CONTENT = "file content to test";
 
@@ -497,11 +577,35 @@ public class FunctionsTests {
     }
 
     @Nested
-    @DisplayName("Functions.file.exists")
+    @DisplayName("Functions.fileExists")
     class FileExistsTests {
         @Test
-        @DisplayName("Functions.file.exists.apply()")
+        @DisplayName("Functions.fileExists.apply()")
         void applyTest()
+            throws Exception {
+            File f = File.createTempFile("fileexiststest", "file", new File(System.getProperty("java.io.tmpdir")));
+            f.deleteOnExit();
+
+            assertEquals("false", new Functions.FileExists().apply(null));
+            assertEquals("false", new Functions.FileExists().apply("afilethatdoesnotexists"));
+            assertEquals("true", new Functions.FileExists().apply(f.getAbsolutePath()));
+
+            // also run the same tests by selecting the function by name, as the template engine does
+            assertEquals("false", Functions.FUNCTIONS.get("fileExists").apply(null));
+            assertEquals("false", Functions.FUNCTIONS.get("fileExists").apply("afilethatdoesnotexists"));
+            assertEquals("true", Functions.FUNCTIONS.get("fileExists").apply(f.getAbsolutePath()));
+        }
+    }
+
+    // TODO: remove this method as per release 2.0.0 or more
+    @Nested
+    @DisplayName("Functions.file.exists (deprecated dotted name)")
+    @Deprecated(since="1.1.0", forRemoval=true) //The dotted name is deprecated and will be removed in future releases. Use the camel case name instead. See the user manual for more."
+    class FileExistsDeprecatedDottedNameTests {
+        @Test
+        @DisplayName("Functions.file.exists.apply() (deprecated dotted name)")
+        @Deprecated(since="1.1.0", forRemoval=true) //The dotted name is deprecated and will be removed in future releases. Use the camel case name instead. See the user manual for more."
+        void applyDeprecatedDottedNameTest()
             throws Exception {
             File f = File.createTempFile("fileexiststest", "file", new File(System.getProperty("java.io.tmpdir")));
             f.deleteOnExit();

@@ -18,6 +18,7 @@ package com.mooltiverse.oss.nyx.services;
 import java.util.Map;
 import java.util.Objects;
 
+import com.mooltiverse.oss.nyx.entities.Provider;
 import com.mooltiverse.oss.nyx.services.Service.Feature;
 import com.mooltiverse.oss.nyx.services.github.GitHub;
 import com.mooltiverse.oss.nyx.services.gitlab.GitLab;

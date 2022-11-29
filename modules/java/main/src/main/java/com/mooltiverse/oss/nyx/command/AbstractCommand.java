@@ -175,12 +175,15 @@ abstract class AbstractCommand implements Command {
      * Retrieves the attribute with the given name from the internal attributes map. The returned value is always
      * the {@link Object#toString()} representation of the stored value.
      * 
-     * @param attributeName the name of the attribute to store. It can't be {@code null}
+     * @param attributeName the name of the attribute to get. It can't be {@code null}
      * 
      * @return the value of the attribute, if available, otherwise {@code null}
      */
     protected String getInternalAttribute(String attributeName) {
-        return state().getInternals().get(attributeName);
+        String res = state().getInternals().get(attributeName);
+        if (Objects.isNull(res) || "null".equals(res))
+            return null;
+        else return res;
     }
 
     /**
@@ -284,7 +287,6 @@ abstract class AbstractCommand implements Command {
      */
     protected ReleaseService resolveReleaseService(String name)
         throws DataAccessException, IllegalPropertyException, ReleaseException, UnsupportedOperationException {
-
         if (Objects.isNull(state().getConfiguration().getServices())) {
             logger.debug(COMMAND, "No services have been configured. Please configure them using the services option.");
             return null;

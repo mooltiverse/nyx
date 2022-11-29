@@ -60,7 +60,7 @@ abstract class Identifier implements Cloneable, Serializable {
     public abstract boolean equals(Object obj);
 
     /**
-     * Returns a string representation of the object, coherent with the identigfier scope,
+     * Returns a string representation of the object, coherent with the identifier scope,
      * suitable for generating a version string.
      * 
      * @return a string representation of the object

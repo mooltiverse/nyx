@@ -9,14 +9,15 @@ These are the top level options in the configuration:
 
 | Name                                                      | Type    | Command Line Option                                       | Environment Variable                                          | Default  |
 | --------------------------------------------------------- | ------- | --------------------------------------------------------- | ------------------------------------------------------------- | -------- |
-| [`bump`](#bump)                                           | string  | `-b <NAME>`, `--bump=<NAME>`                              | `NYX_BUMP=<NAME>`                                             | N/A      |
+| [`bump`](#bump)                                           | string  | `-b=<NAME>`, `--bump=<NAME>`                              | `NYX_BUMP=<NAME>`                                             | N/A      |
 | [`changelog`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/changelog.md %}) | object  | See [Changelog]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/changelog.md %}) | See [Changelog]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/changelog.md %}) | N/A      |
 | [`commitMessageConventions`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/commit-message-conventions.md %}) | object  | See [Commit Message Conventions]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/commit-message-conventions.md %}) | See [Commit Message Conventions]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/commit-message-conventions.md %}) | N/A      |
-| [`configurationFile`](#configuration-file)                | string  | `-c <PATH>`, `--configuration-file=<PATH>`                | `NYX_CONFIGURATION_FILE=<PATH>`                               | N/A      |
-| [`directory`](#directory)                                 | string  | `-d <PATH>`, `--directory=<PATH>`                         | `NYX_DIRECTORY=<PATH>`                                        | Current working directory |
+| [`configurationFile`](#configuration-file)                | string  | `-c=<PATH>`, `--configuration-file=<PATH>`                | `NYX_CONFIGURATION_FILE=<PATH>`                               | N/A      |
+| [`directory`](#directory)                                 | string  | `-d=<PATH>`, `--directory=<PATH>`                         | `NYX_DIRECTORY=<PATH>`                                        | Current working directory |
 | [`dryRun`](#dry-run)                                      | boolean | `--dry-run`, `--dry-run=true|false`                       | `NYX_DRY_RUN=true|false`                                      | `false`  |
 | [`git`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/git.md %}) | object  | See [Git]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/git.md %}) | See [Git]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/git.md %}) | N/A      |
-| [`initialVersion`](#initial-version)                      | string  | `--initial-version=<VERSION>`                             | `NYX_INITIAL_VERSION=<VERSION>`                               |  Depends on the configured [version scheme](#scheme) |
+| [`help`](#help)                                           | flag    | `--help`                                                  | N/A                                                           | N/A |
+| [`initialVersion`](#initial-version)                      | string  | `--initial-version=<VERSION>`                             | `NYX_INITIAL_VERSION=<VERSION>`                               | Depends on the configured [version scheme](#scheme) |
 | [`preset`](#preset)                                       | string  | `--preset=<NAME>`                                         | `NYX_PRESET=<NAME>`                                           | N/A      |
 | [`releaseAssets`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-assets.md %}) | object  | See [Release Assets]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-assets.md %}) | See [Release Assets]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-assets.md %}) | N/A      |
 | [`releaseLenient`](#release-lenient)                      | boolean | `--release-lenient`, `--release-lenient=true|false`       | `NYX_RELEASE_LENIENT=true|false`                              | `true`   |
@@ -28,7 +29,7 @@ These are the top level options in the configuration:
 | [`sharedConfigurationFile`](#shared-configuration-file)   | string  | `--shared-configuration-file=<PATH>`                      | `NYX_SHARED_CONFIGURATION_FILE=<PATH>`                        | N/A      |
 | [`stateFile`](#state-file)                                | string  | `--state-file=<PATH>`                                     | `NYX_STATE_FILE=<PATH>`                                       | N/A      |
 | [`verbosity`](#verbosity)                                 | string  | `--verbosity=<LEVEL>`, `--fatal`, `--error`, `--warning`, `--info`, `--debug`, `--trace` | `NYX_VERBOSITY=<LEVEL>`        | `WARNING`|
-| [`version`](#version)                                     | string  | `-v <VERSION>`, `--version=<VERSION>`                     | `NYX_VERSION=<VERSION>`                                       | N/A      |
+| [`version`](#version)                                     | string  | `-v=<VERSION>`, `--version=<VERSION>`                     | `NYX_VERSION=<VERSION>`                                       | N/A      |
 
 ### Bump
 
@@ -36,7 +37,7 @@ These are the top level options in the configuration:
 | Name                      | `bump`                                                                                   |
 | Type                      | string                                                                                   |
 | Default                   | N/A                                                                                      |
-| Command Line Option       | `-b <NAME>`, `--bump=<NAME>`                                                             |
+| Command Line Option       | `-b=<NAME>`, `--bump=<NAME>`                                                             |
 | Environment Variable      | `NYX_BUMP=<NAME>`                                                                        |
 | Configuration File Option | `bump`                                                                                   |
 | Related state attributes  | [bump]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#bump){: .btn .btn--info .btn--small} [newVersion]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#new-version){: .btn .btn--info .btn--small} [scheme]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#scheme){: .btn .btn--info .btn--small} [version]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#version){: .btn .btn--info .btn--small} [releaseScope/previousVersion]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#previous-version){: .btn .btn--info .btn--small} [releaseScope/significantCommits]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#significant-commits){: .btn .btn--info .btn--small} |
@@ -51,13 +52,15 @@ Using [Semver]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/versi
 
 This option has no effect if [`version`](#version) is also used.
 
+The short option name `-b=<NAME>` has priority over the extended `--bump=<NAME>` in case they are used together.
+
 ### Configuration file
 
 | ------------------------- | ---------------------------------------------------------------------------------------- |
 | Name                      | `configurationFile`                                                                      |
 | Type                      | string                                                                                   |
 | Default                   | N/A                                                                                      |
-| Command Line Option       | `-c <PATH>`, `--configuration-file=<PATH>`                                               |
+| Command Line Option       | `-c=<PATH>`, `--configuration-file=<PATH>`                                               |
 | Environment Variable      | `NYX_CONFIGURATION_FILE=<PATH>`                                                          |
 | Configuration File Option | `configurationFile`                                                                      |
 | Related state attributes  | [directory]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#directory){: .btn .btn--info .btn--small} |
@@ -72,6 +75,8 @@ Consider using a [standard path for configuration files]({{ site.baseurl }}{% li
 In order to avoid chaining this option is ignored when defined in custom configuration files loaded by means of this same option.
 {: .notice--info}
 
+The short option name `-c=<PATH>` has priority over the extended `--configuration-file=<PATH>` in case they are used together.
+
 ### Changelog
 
 See [Changelog]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/changelog.md %}).
@@ -85,7 +90,7 @@ See [Commit Message Conventions]({{ site.baseurl }}{% link _pages/guide/user/03.
 | Name                      | `directory`                                                                              |
 | Type                      | string                                                                                   |
 | Default                   | Current working directory                                                                |
-| Command Line Option       | `-d <PATH>`, `--directory=<PATH>`                                                        |
+| Command Line Option       | `-d=<PATH>`, `--directory=<PATH>`                                                        |
 | Environment Variable      | `NYX_DIRECTORY=<PATH>`                                                                   |
 | Configuration File Option | `directory`                                                                              |
 | Related state attributes  | [directory]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#directory){: .btn .btn--info .btn--small} |
@@ -95,6 +100,8 @@ Sets the working directory for Nyx. The directory is where Nyx searches for the 
 By default Nyx uses the process' working directory for this.
 
 The [**Gradle plugin**]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#using-the-gradle-plugin) reads the current working directory by the [`projectDir`](https://docs.gradle.org/current/userguide/writing_build_scripts.html#sec:standard_project_properties) property by default, unless it's overridden by this configuration.
+
+The short option name `-d=<PATH>` has priority over the extended `--directory=<PATH>` in case they are used together.
 
 ### Dry run
 
@@ -116,6 +123,21 @@ When enabling this flag you probably want to raise the [verbosity](#verbosity).
 ### Git
 
 See [Git]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/git.md %}).
+
+### Help
+
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `help`                                                                                   |
+| Type                      | flag                                                                                     |
+| Default                   | N/A                                                                                      |
+| Command Line Option       | `--help`                                                                                 |
+| Environment Variable      | N/A                                                                                      |
+| Configuration File Option | N/A                                                                                      |
+| Related state attributes  |                                                                                          |
+
+Prints the command line synopsis and exits with code 0, without running any command. Any other option is ignored.
+
+This option is only available on the command line.
 
 ### Initial version
 
@@ -211,6 +233,8 @@ When this flag is set to `true` Nyx tries to load an existing [state file](#stat
 
 This option only makes sense when you also set a value for the [`stateFile`](#state-file). If no `stateFile` is defined this option just has no effect.
 
+When used with no value on the command line (i.e. `--resume` alone) `true` is assumed.
+
 ### Scheme
 
 | ------------------------- | ---------------------------------------------------------------------------------------- |
@@ -289,11 +313,11 @@ This option can also be used in conjunction with [`resume`](#resume) in case you
 Controls the amount of output emitted by Nyx, where values are:
 
 * `FATAL`: only prints critical errors that prevent Nyx to complete. No output is printed when no fatal error is encountered
-* `ERROR`: only prints errors along with some essential informations
-* `WARNING`: only prints errors and warnings along with some essential informations (like the generated version number)
-* `INFO` : prints high level informations about the internal action that Nyx runs
-* `DEBUG`: prints informations obout internals that can be useful to debug Nyx in case of anomalies
-* `TRACE`: this is the most verbose option that prints lots of informations, including internals
+* `ERROR`: only prints errors along with some essential information
+* `WARNING`: only prints errors and warnings along with some essential information (like the generated version number)
+* `INFO` : prints high level information about the internal action that Nyx runs
+* `DEBUG`: prints information obout internals that can be useful to debug Nyx in case of anomalies
+* `TRACE`: this is the most verbose option that prints lots of information, including internals
 
 The [**command line**]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#using-the-command-line) supports a shorthand option for each verbosity level so you can also use `--fatal`, `--error`, `--warning`, `--info`, `--debug`, `--trace` instead of `--verbosity=<LEVEL>`. When multiple verbosity levels are given, the most verbose one is used.
 
@@ -307,12 +331,14 @@ The [**Gradle plugin**]({{ site.baseurl }}{% link _pages/guide/user/02.introduct
 | Name                      | `version`                                                                                |
 | Type                      | string                                                                                   |
 | Default                   | N/A                                                                                      |
-| Command Line Option       | `-v <VERSION>`, `--version=<VERSION>`                                                    |
+| Command Line Option       | `-v=<VERSION>`, `--version=<VERSION>`                                                    |
 | Environment Variable      | `NYX_VERSION=<VERSION>`                                                                  |
 | Configuration File Option | `version`                                                                                |
 | Related state attributes  | [bump]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#bump){: .btn .btn--info .btn--small} [newVersion]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#new-version){: .btn .btn--info .btn--small} [scheme]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#scheme){: .btn .btn--info .btn--small} [version]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#version){: .btn .btn--info .btn--small} [releaseScope/previousVersion]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#previous-version){: .btn .btn--info .btn--small} [releaseScope/significantCommits]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#significant-commits){: .btn .btn--info .btn--small} |
 
 Overrides the version and prevents Nyx to [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer). When overriding this value you take over the tool and go the *manual versioning* way so Nyx won't try to read past versions from the commit history nor determine which identifiers to bump.
+
+The short option name `-v=<VERSION>` has priority over the extended `--version=<VERSION>` in case they are used together.
 
 #### The version in Gradle scripts
 

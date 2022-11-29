@@ -41,8 +41,8 @@ import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
 import com.mooltiverse.oss.nyx.entities.Changelog.Release;
 import com.mooltiverse.oss.nyx.git.GitException;
-import com.mooltiverse.oss.nyx.git.Scenario;
-import com.mooltiverse.oss.nyx.git.Script;
+import com.mooltiverse.oss.nyx.git.tools.Scenario;
+import com.mooltiverse.oss.nyx.git.tools.Script;
 
 @DisplayName("Make")
 public class MakeTestTemplates {
@@ -258,7 +258,7 @@ public class MakeTestTemplates {
                 command.run();
                 assertTrue(command.isUpToDate());
 
-                // chech that some values have changed
+                // check that some values have changed
                 assertNull(command.state().getChangelog()); // the internal changelog is now null because there is no new version and the changelog hasn't been recreated
                 assertNotEquals(newVersion, command.state().getNewVersion());
                 assertNotEquals(version, command.state().getVersion());
@@ -334,7 +334,7 @@ public class MakeTestTemplates {
                 command.run();
                 assertTrue(command.isUpToDate());
 
-                // chech that some values have changed
+                // check that some values have changed
                 assertNull(command.state().getChangelog()); // the internal changelog is still null because there is no new version and the changelog hasn't been recreated
                 assertEquals(newVersion, command.state().getNewVersion());
                 assertNotEquals(version, command.state().getVersion());
@@ -425,7 +425,7 @@ public class MakeTestTemplates {
                 command.run();
                 assertTrue(command.isUpToDate());
 
-                // chech that some values have changed
+                // check that some values have changed
                 assertNull(command.state().getChangelog()); // the internal changelog is now null because there is no new version and the changelog hasn't been recreated
                 assertNotEquals(newVersion, command.state().getNewVersion());
                 assertNotEquals(version, command.state().getVersion());

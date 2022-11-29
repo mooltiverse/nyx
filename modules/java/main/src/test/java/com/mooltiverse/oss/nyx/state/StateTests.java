@@ -395,9 +395,8 @@ public class StateTests {
             Configuration configuration = new Configuration();
             State state = new State(configuration);
 
-            String version = ".*";
-            state.setVersionRange(version);
-            assertEquals(version, state.getVersionRange());
+            state.setVersionRange(".*");
+            assertEquals(".*", state.getVersionRange());
         }
     }
 
@@ -513,6 +512,12 @@ public class StateTests {
             assertEquals(oldState.getReleaseType().getPublish(), resumedState.getReleaseType().getPublish());
             assertEquals(oldState.getReleaseType().getVersionRange(), resumedState.getReleaseType().getVersionRange());
             assertEquals(oldState.getReleaseType().getVersionRangeFromBranchName(), resumedState.getReleaseType().getVersionRangeFromBranchName());
+
+            // finally also test transient attributes, which should render to the same value even if they are computed on the fly
+            assertEquals(oldState.getDirectory(), resumedState.getDirectory());
+            assertEquals(oldState.getNewVersion(), resumedState.getNewVersion());
+            assertEquals(oldState.getNewRelease(), resumedState.getNewRelease());
+            assertEquals(oldState.getScheme(), resumedState.getScheme());
         }
 
         @Test
@@ -625,6 +630,12 @@ public class StateTests {
             assertEquals(oldState.getReleaseType().getPublish(), resumedState.getReleaseType().getPublish());
             assertEquals(oldState.getReleaseType().getVersionRange(), resumedState.getReleaseType().getVersionRange());
             assertEquals(oldState.getReleaseType().getVersionRangeFromBranchName(), resumedState.getReleaseType().getVersionRangeFromBranchName());
+
+            // finally also test transient attributes, which should render to the same value even if they are computed on the fly
+            assertEquals(oldState.getDirectory(), resumedState.getDirectory());
+            assertEquals(oldState.getNewVersion(), resumedState.getNewVersion());
+            assertEquals(oldState.getNewRelease(), resumedState.getNewRelease());
+            assertEquals(oldState.getScheme(), resumedState.getScheme());
         }
     }
 }

@@ -1,5 +1,25 @@
 # Nyx Release Notes
 
+## NEXT
+
+TODO
+
+### Upgrade instructions
+
+TODO
+
+### New features and improvements
+
+TODO
+
+### Fixed issues
+
+TODO
+
+### Known issues
+
+* GitHub release assets are only displayed by their file names, while the description is ignored (due to a limitation in the underlying library)
+
 ## 1.2.2
 
 This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/1.2.2).

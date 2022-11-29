@@ -69,7 +69,6 @@ public abstract class Version implements Cloneable, Serializable {
     /**
      * Returns a new instance with the number identified by the given value bumped. The supported identifiers depend
      * on the concrete subclass.
-     * <br>
      *
      * @param id the name of the identifier to bump
      *

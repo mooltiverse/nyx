@@ -18,8 +18,6 @@ package com.mooltiverse.oss.nyx.entities;
 import java.util.List;
 import java.util.Map;
 
-import com.mooltiverse.oss.nyx.configuration.Defaults;
-
 /**
  * This object models the fields used to configure a generic release type.
  */

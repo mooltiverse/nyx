@@ -17,8 +17,8 @@ package com.mooltiverse.oss.nyx.configuration;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import static com.mooltiverse.oss.nyx.configuration.ConfigurationExamples.SIMPLEST_JSON_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY;
-import static com.mooltiverse.oss.nyx.configuration.ConfigurationExamples.SIMPLEST_YAML_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY;
+import static com.mooltiverse.oss.nyx.configuration.ConfigurationExamplesTests.SIMPLEST_JSON_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY;
+import static com.mooltiverse.oss.nyx.configuration.ConfigurationExamplesTests.SIMPLEST_YAML_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -35,14 +35,15 @@ import com.mooltiverse.oss.nyx.entities.Attachment;
 import com.mooltiverse.oss.nyx.entities.ChangelogConfiguration;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
+import com.mooltiverse.oss.nyx.entities.Defaults;
 import com.mooltiverse.oss.nyx.entities.GitConfiguration;
 import com.mooltiverse.oss.nyx.entities.GitRemoteConfiguration;
 import com.mooltiverse.oss.nyx.entities.Identifier;
+import com.mooltiverse.oss.nyx.entities.Provider;
 import com.mooltiverse.oss.nyx.entities.ReleaseType;
 import com.mooltiverse.oss.nyx.entities.ReleaseTypes;
 import com.mooltiverse.oss.nyx.entities.ServiceConfiguration;
 import com.mooltiverse.oss.nyx.entities.Verbosity;
-import com.mooltiverse.oss.nyx.services.Provider;
 import com.mooltiverse.oss.nyx.io.FileMapper;
 import com.mooltiverse.oss.nyx.version.Scheme;
 
@@ -137,7 +138,7 @@ public class ConfigurationTests {
         }
 
         @Test
-        @DisplayName("Configuration.getReleaseAssets() == Defaults.SERVICES")
+        @DisplayName("Configuration.getReleaseAssets() == Defaults.RELEASE_ASSETS")
         void getReleaseAssetsTest()
             throws Exception {
             assertEquals(Defaults.RELEASE_ASSETS, new Configuration().getReleaseAssets());
@@ -220,11 +221,12 @@ public class ConfigurationTests {
      */
     @Nested
     @DisplayName("Configuration.withCommandLineConfiguration")
-    class withCommandLineConfigurationTests {
+    class WithCommandLineConfigurationTests {
         @Test
         @DisplayName("Configuration.withCommandLineConfiguration(MOCK).getBump() == MOCK.getBump()")
         void getBumpTest()
             throws Exception {
+            // this configuration layer must be replaced with the command line layer, once we have it
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
             configurationLayerMock.setBump("alpha");
@@ -250,6 +252,7 @@ public class ConfigurationTests {
         @DisplayName("Configuration.withCommandLineConfiguration(MOCK).getChangelog() == MOCK.getChangelog()")
         void getChangelogTest()
             throws Exception {
+            // this configuration layer must be replaced with the command line layer, once we have it
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
             configurationLayerMock.setChangelog(
@@ -296,6 +299,7 @@ public class ConfigurationTests {
         @DisplayName("Configuration.withCommandLineConfiguration(MOCK).getCommitMessageConventions() == MOCK.getCommitMessageConventions()")
         void getCommitMessageConventionsTest()
             throws Exception {
+            // this configuration layer must be replaced with the command line layer, once we have it
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
             configurationLayerMock.setCommitMessageConventions(
@@ -336,6 +340,7 @@ public class ConfigurationTests {
         @DisplayName("Configuration.withCommandLineConfiguration(MOCK).getConfigurationFile() == MOCK.getConfigurationFile()")
         void getConfigurationFileTest()
             throws Exception {
+            // this configuration layer must be replaced with the command line layer, once we have it
             assertNotNull(System.getProperty(SIMPLEST_JSON_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY), "A configuration file path must be passed to this test as a system property but it was not set");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
@@ -359,6 +364,7 @@ public class ConfigurationTests {
         @DisplayName("Configuration.withCommandLineConfiguration(MOCK).getDirectory() == MOCK.getDirectory()")
         void getDirectoryTest()
             throws Exception {
+            // this configuration layer must be replaced with the command line layer, once we have it
             Configuration.setDefaultDirectory(null); // clean the singleton from previous runs
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
@@ -382,6 +388,7 @@ public class ConfigurationTests {
         @DisplayName("Configuration.withCommandLineConfiguration(MOCK).getDryRun() == MOCK.getDryRun()")
         void getDryRunTest()
             throws Exception {
+            // this configuration layer must be replaced with the command line layer, once we have it
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
             configurationLayerMock.setDryRun(Boolean.TRUE);
@@ -404,6 +411,7 @@ public class ConfigurationTests {
         @DisplayName("Configuration.withCommandLineConfiguration(MOCK).getGit() == MOCK.getGit()")
         void getGitTest()
             throws Exception {
+            // this configuration layer must be replaced with the command line layer, once we have it
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
             configurationLayerMock.setGit(
@@ -438,6 +446,7 @@ public class ConfigurationTests {
         @DisplayName("Configuration.withCommandLineConfiguration(MOCK).getInitialVersion() == MOCK.getInitialVersion()")
         void getInitialVersionTest()
             throws Exception {
+            // this configuration layer must be replaced with the command line layer, once we have it
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
             configurationLayerMock.setInitialVersion("9.9.9");
@@ -460,6 +469,7 @@ public class ConfigurationTests {
         @DisplayName("Configuration.withCommandLineConfiguration(MOCK).getPreset() == MOCK.getPreset()")
         void getPresetTest()
             throws Exception {
+            // this configuration layer must be replaced with the command line layer, once we have it
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
             configurationLayerMock.setPreset("simple");
@@ -482,6 +492,7 @@ public class ConfigurationTests {
         @DisplayName("Configuration.withCommandLineConfiguration(MOCK).getReleaseAssets() == MOCK.getReleaseAssets()")
         void getReleaseAssetsTest()
             throws Exception {
+            // this configuration layer must be replaced with the command line layer, once we have it
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
             configurationLayerMock.setReleaseAssets(
@@ -525,6 +536,7 @@ public class ConfigurationTests {
         @DisplayName("Configuration.withCommandLineConfiguration(MOCK).getReleaseLenient() == MOCK.getReleaseLenient()")
         void getReleaseLenientTest()
             throws Exception {
+            // this configuration layer must be replaced with the command line layer, once we have it
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
             configurationLayerMock.setReleaseLenient(Boolean.FALSE);
@@ -569,6 +581,7 @@ public class ConfigurationTests {
         @DisplayName("Configuration.withCommandLineConfiguration(MOCK).getReleaseTypes() == MOCK.getReleaseTypes()")
         void getReleaseTypesTest()
             throws Exception {
+            // this configuration layer must be replaced with the command line layer, once we have it
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
             configurationLayerMock.setReleaseTypes(
@@ -642,6 +655,7 @@ public class ConfigurationTests {
         @DisplayName("Configuration.withCommandLineConfiguration(MOCK).getResume() == MOCK.getResume()")
         void getResumeTest()
             throws Exception {
+            // this configuration layer must be replaced with the command line layer, once we have it
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
             configurationLayerMock.setResume(Boolean.TRUE);
@@ -664,6 +678,7 @@ public class ConfigurationTests {
         @DisplayName("Configuration.withCommandLineConfiguration(MOCK).getScheme() == MOCK.getScheme()")
         void getSchemeTest()
             throws Exception {
+            // this configuration layer must be replaced with the command line layer, once we have it
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
             configurationLayerMock.setScheme(Scheme.SEMVER);
@@ -686,17 +701,18 @@ public class ConfigurationTests {
         @DisplayName("Configuration.withCommandLineConfiguration(MOCK).getServices() == MOCK.getServices()")
         void getServicesTest()
             throws Exception {
+            // this configuration layer must be replaced with the command line layer, once we have it
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
             configurationLayerMock.setServices(
                 Map.<String,ServiceConfiguration>of(
                     "github", new ServiceConfiguration(Provider.GITHUB,Map.<String,String>of(
-                        "AUTHENTICATION_TOKEN", "{{#environment.variable}}GITHUB_TOKEN{{/environment.variable}}",
+                        "AUTHENTICATION_TOKEN", "{{#environmentVariable}}GITHUB_TOKEN{{/environmentVariable}}",
                         "REPOSITORY_NAME", "repo1",
                         "REPOSITORY_OWNER", "owner1"
                         )),
                     "gitlab", new ServiceConfiguration(Provider.GITLAB,Map.<String,String>of(
-                        "AUTHENTICATION_TOKEN", "{{#environment.variable}}GITLAB_TOKEN{{/environment.variable}}",
+                        "AUTHENTICATION_TOKEN", "{{#environmentVariable}}GITLAB_TOKEN{{/environmentVariable}}",
                         "REPOSITORY_NAME", "repo2",
                         "REPOSITORY_OWNER", "owner2"
                     ))
@@ -720,12 +736,12 @@ public class ConfigurationTests {
             assertTrue(configuration.getServices().containsKey("gitlab"));
             assertEquals(Provider.GITHUB, configuration.getServices().get("github").getType());
             assertEquals(3, configuration.getServices().get("github").getOptions().size());
-            assertEquals("{{#environment.variable}}GITHUB_TOKEN{{/environment.variable}}", configuration.getServices().get("github").getOptions().get("AUTHENTICATION_TOKEN"));
+            assertEquals("{{#environmentVariable}}GITHUB_TOKEN{{/environmentVariable}}", configuration.getServices().get("github").getOptions().get("AUTHENTICATION_TOKEN"));
             assertEquals("repo1", configuration.getServices().get("github").getOptions().get("REPOSITORY_NAME"));
             assertEquals("owner1", configuration.getServices().get("github").getOptions().get("REPOSITORY_OWNER"));
             assertEquals(Provider.GITLAB, configuration.getServices().get("gitlab").getType());
             assertEquals(3, configuration.getServices().get("gitlab").getOptions().size());
-            assertEquals("{{#environment.variable}}GITLAB_TOKEN{{/environment.variable}}", configuration.getServices().get("gitlab").getOptions().get("AUTHENTICATION_TOKEN"));
+            assertEquals("{{#environmentVariable}}GITLAB_TOKEN{{/environmentVariable}}", configuration.getServices().get("gitlab").getOptions().get("AUTHENTICATION_TOKEN"));
             assertEquals("repo2", configuration.getServices().get("gitlab").getOptions().get("REPOSITORY_NAME"));
             assertEquals("owner2", configuration.getServices().get("gitlab").getOptions().get("REPOSITORY_OWNER"));
 
@@ -739,6 +755,7 @@ public class ConfigurationTests {
         @DisplayName("Configuration.withCommandLineConfiguration(MOCK).getSharedConfigurationFile() == MOCK.getSharedConfigurationFile()")
         void getSharedConfigurationFileTest()
             throws Exception {
+            // this configuration layer must be replaced with the command line layer, once we have it
             assertNotNull(System.getProperty(SIMPLEST_JSON_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY), "A configuration file path must be passed to this test as a system property but it was not set");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
@@ -762,6 +779,7 @@ public class ConfigurationTests {
         @DisplayName("Configuration.withCommandLineConfiguration(MOCK).getStateFile() == MOCK.getStateFile()")
         void getStateFileTest()
             throws Exception {
+            // this configuration layer must be replaced with the command line layer, once we have it
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
             configurationLayerMock.setStateFile("state-file.yml");
@@ -784,6 +802,7 @@ public class ConfigurationTests {
         @DisplayName("Configuration.withCommandLineConfiguration(MOCK).getVerbosity() == MOCK.getVerbosity()")
         void getVerbosityTest()
             throws Exception {
+            // this configuration layer must be replaced with the command line layer, once we have it
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
             configurationLayerMock.setVerbosity(Verbosity.TRACE);
@@ -806,6 +825,7 @@ public class ConfigurationTests {
         @DisplayName("Configuration.withCommandLineConfiguration(MOCK).getVersion() == MOCK.getVersion()")
         void getVersionTest()
             throws Exception {
+            // this configuration layer must be replaced with the command line layer, once we have it
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
             configurationLayerMock.setVersion("11.12.13");
@@ -832,7 +852,7 @@ public class ConfigurationTests {
      */
     @Nested
     @DisplayName("Configuration.withPluginConfiguration")
-    class withPluginConfigurationTests {
+    class WithPluginConfigurationTests {
         @Test
         @DisplayName("Configuration.withPluginConfiguration(MOCK).getBump() == MOCK.getBump()")
         void getBumpTest()
@@ -1303,12 +1323,12 @@ public class ConfigurationTests {
             configurationLayerMock.setServices(
                 Map.<String,ServiceConfiguration>of(
                     "github", new ServiceConfiguration(Provider.GITHUB,Map.<String,String>of(
-                        "AUTHENTICATION_TOKEN", "{{#environment.variable}}GITHUB_TOKEN{{/environment.variable}}",
+                        "AUTHENTICATION_TOKEN", "{{#environmentVariable}}GITHUB_TOKEN{{/environmentVariable}}",
                         "REPOSITORY_NAME", "repo1",
                         "REPOSITORY_OWNER", "owner1"
                         )),
                     "gitlab", new ServiceConfiguration(Provider.GITLAB,Map.<String,String>of(
-                        "AUTHENTICATION_TOKEN", "{{#environment.variable}}GITLAB_TOKEN{{/environment.variable}}",
+                        "AUTHENTICATION_TOKEN", "{{#environmentVariable}}GITLAB_TOKEN{{/environmentVariable}}",
                         "REPOSITORY_NAME", "repo2",
                         "REPOSITORY_OWNER", "owner2"
                     ))
@@ -1332,12 +1352,12 @@ public class ConfigurationTests {
             assertTrue(configuration.getServices().containsKey("gitlab"));
             assertEquals(Provider.GITHUB, configuration.getServices().get("github").getType());
             assertEquals(3, configuration.getServices().get("github").getOptions().size());
-            assertEquals("{{#environment.variable}}GITHUB_TOKEN{{/environment.variable}}", configuration.getServices().get("github").getOptions().get("AUTHENTICATION_TOKEN"));
+            assertEquals("{{#environmentVariable}}GITHUB_TOKEN{{/environmentVariable}}", configuration.getServices().get("github").getOptions().get("AUTHENTICATION_TOKEN"));
             assertEquals("repo1", configuration.getServices().get("github").getOptions().get("REPOSITORY_NAME"));
             assertEquals("owner1", configuration.getServices().get("github").getOptions().get("REPOSITORY_OWNER"));
             assertEquals(Provider.GITLAB, configuration.getServices().get("gitlab").getType());
             assertEquals(3, configuration.getServices().get("gitlab").getOptions().size());
-            assertEquals("{{#environment.variable}}GITLAB_TOKEN{{/environment.variable}}", configuration.getServices().get("gitlab").getOptions().get("AUTHENTICATION_TOKEN"));
+            assertEquals("{{#environmentVariable}}GITLAB_TOKEN{{/environmentVariable}}", configuration.getServices().get("gitlab").getOptions().get("AUTHENTICATION_TOKEN"));
             assertEquals("repo2", configuration.getServices().get("gitlab").getOptions().get("REPOSITORY_NAME"));
             assertEquals("owner2", configuration.getServices().get("gitlab").getOptions().get("REPOSITORY_OWNER"));
 
@@ -1444,7 +1464,7 @@ public class ConfigurationTests {
      */
     @Nested
     @DisplayName("Configuration.withRuntimeConfiguration")
-    class withRuntimeConfigurationTests {
+    class WithRuntimeConfigurationTests {
         @Test
         @DisplayName("Configuration.withRuntimeConfiguration(MOCK).getBump() == MOCK.getBump()")
         void getBumpTest()
@@ -1915,12 +1935,12 @@ public class ConfigurationTests {
             configurationLayerMock.setServices(
                 Map.<String,ServiceConfiguration>of(
                     "github", new ServiceConfiguration(Provider.GITHUB,Map.<String,String>of(
-                        "AUTHENTICATION_TOKEN", "{{#environment.variable}}GITHUB_TOKEN{{/environment.variable}}",
+                        "AUTHENTICATION_TOKEN", "{{#environmentVariable}}GITHUB_TOKEN{{/environmentVariable}}",
                         "REPOSITORY_NAME", "repo1",
                         "REPOSITORY_OWNER", "owner1"
                         )),
                     "gitlab", new ServiceConfiguration(Provider.GITLAB,Map.<String,String>of(
-                        "AUTHENTICATION_TOKEN", "{{#environment.variable}}GITLAB_TOKEN{{/environment.variable}}",
+                        "AUTHENTICATION_TOKEN", "{{#environmentVariable}}GITLAB_TOKEN{{/environmentVariable}}",
                         "REPOSITORY_NAME", "repo2",
                         "REPOSITORY_OWNER", "owner2"
                     ))
@@ -1944,12 +1964,12 @@ public class ConfigurationTests {
             assertTrue(configuration.getServices().containsKey("gitlab"));
             assertEquals(Provider.GITHUB, configuration.getServices().get("github").getType());
             assertEquals(3, configuration.getServices().get("github").getOptions().size());
-            assertEquals("{{#environment.variable}}GITHUB_TOKEN{{/environment.variable}}", configuration.getServices().get("github").getOptions().get("AUTHENTICATION_TOKEN"));
+            assertEquals("{{#environmentVariable}}GITHUB_TOKEN{{/environmentVariable}}", configuration.getServices().get("github").getOptions().get("AUTHENTICATION_TOKEN"));
             assertEquals("repo1", configuration.getServices().get("github").getOptions().get("REPOSITORY_NAME"));
             assertEquals("owner1", configuration.getServices().get("github").getOptions().get("REPOSITORY_OWNER"));
             assertEquals(Provider.GITLAB, configuration.getServices().get("gitlab").getType());
             assertEquals(3, configuration.getServices().get("gitlab").getOptions().size());
-            assertEquals("{{#environment.variable}}GITLAB_TOKEN{{/environment.variable}}", configuration.getServices().get("gitlab").getOptions().get("AUTHENTICATION_TOKEN"));
+            assertEquals("{{#environmentVariable}}GITLAB_TOKEN{{/environmentVariable}}", configuration.getServices().get("gitlab").getOptions().get("AUTHENTICATION_TOKEN"));
             assertEquals("repo2", configuration.getServices().get("gitlab").getOptions().get("REPOSITORY_NAME"));
             assertEquals("owner2", configuration.getServices().get("gitlab").getOptions().get("REPOSITORY_OWNER"));
 
@@ -2055,13 +2075,14 @@ public class ConfigurationTests {
      * Performs checks against the injection of multiple configuration layers
      */
     @Nested
-    @DisplayName("Configuration.with multiple configuration layers")
-    class withMultipleConfigurationLayersTests {
+    @DisplayName("Configuration with multiple configuration layers")
+    class WithMultipleConfigurationLayersTests {
         @Test
         @DisplayName("Configuration[multiple layers].getBump() == MOCK.getBump()")
         void getBumpTest()
             throws Exception {
             SimpleConfigurationLayer lowPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
+            // this configuration layer must be replaced with the command line layer, once we have it
             SimpleConfigurationLayer mediumPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             SimpleConfigurationLayer highPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
@@ -2082,6 +2103,7 @@ public class ConfigurationTests {
         void getChangelogTest()
             throws Exception {
             SimpleConfigurationLayer lowPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
+            // this configuration layer must be replaced with the command line layer, once we have it
             SimpleConfigurationLayer mediumPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             SimpleConfigurationLayer highPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
@@ -2116,6 +2138,7 @@ public class ConfigurationTests {
         void getCommitMessageConventionsTest()
             throws Exception {
             SimpleConfigurationLayer lowPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
+            // this configuration layer must be replaced with the command line layer, once we have it
             SimpleConfigurationLayer mediumPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             SimpleConfigurationLayer highPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
@@ -2158,6 +2181,7 @@ public class ConfigurationTests {
             assertNotNull(System.getProperty(SIMPLEST_JSON_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY), "A configuration file path must be passed to this test as a system property but it was not set");
             assertNotNull(System.getProperty(SIMPLEST_YAML_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY), "A configuration file path must be passed to this test as a system property but it was not set");
             SimpleConfigurationLayer lowPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
+            // this configuration layer must be replaced with the command line layer, once we have it
             SimpleConfigurationLayer mediumPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             SimpleConfigurationLayer highPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
@@ -2178,6 +2202,7 @@ public class ConfigurationTests {
             throws Exception {
             Configuration.setDefaultDirectory(null); // clean the singleton from previous runs
             SimpleConfigurationLayer lowPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
+            // this configuration layer must be replaced with the command line layer, once we have it
             SimpleConfigurationLayer mediumPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             SimpleConfigurationLayer highPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
@@ -2197,6 +2222,7 @@ public class ConfigurationTests {
         void getDryRunTest()
             throws Exception {
             SimpleConfigurationLayer lowPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
+            // this configuration layer must be replaced with the command line layer, once we have it
             SimpleConfigurationLayer mediumPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             SimpleConfigurationLayer highPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
@@ -2216,6 +2242,7 @@ public class ConfigurationTests {
         void getGitTest()
             throws Exception {
             SimpleConfigurationLayer lowPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
+            // this configuration layer must be replaced with the command line layer, once we have it
             SimpleConfigurationLayer mediumPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             SimpleConfigurationLayer highPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
@@ -2255,6 +2282,7 @@ public class ConfigurationTests {
         void getInitialVersionTest()
             throws Exception {
             SimpleConfigurationLayer lowPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
+            // this configuration layer must be replaced with the command line layer, once we have it
             SimpleConfigurationLayer mediumPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             SimpleConfigurationLayer highPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
@@ -2274,6 +2302,7 @@ public class ConfigurationTests {
         void getPresetTest()
             throws Exception {
             SimpleConfigurationLayer lowPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
+            // this configuration layer must be replaced with the command line layer, once we have it
             SimpleConfigurationLayer mediumPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             SimpleConfigurationLayer highPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
@@ -2360,6 +2389,7 @@ public class ConfigurationTests {
         void getReleaseLenientTest()
             throws Exception {
             SimpleConfigurationLayer lowPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
+            // this configuration layer must be replaced with the command line layer, once we have it
             SimpleConfigurationLayer mediumPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             SimpleConfigurationLayer highPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
@@ -2398,6 +2428,7 @@ public class ConfigurationTests {
         void getReleaseTypesTest()
             throws Exception {
             SimpleConfigurationLayer lowPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
+            // this configuration layer must be replaced with the command line layer, once we have it
             SimpleConfigurationLayer mediumPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             SimpleConfigurationLayer highPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
@@ -2472,6 +2503,7 @@ public class ConfigurationTests {
         void getResumeTest()
             throws Exception {
             SimpleConfigurationLayer lowPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
+            // this configuration layer must be replaced with the command line layer, once we have it
             SimpleConfigurationLayer mediumPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             SimpleConfigurationLayer highPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
@@ -2491,6 +2523,7 @@ public class ConfigurationTests {
         void getSchemeTest()
             throws Exception {
             SimpleConfigurationLayer lowPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
+            // this configuration layer must be replaced with the command line layer, once we have it
             SimpleConfigurationLayer mediumPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             SimpleConfigurationLayer highPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
@@ -2510,6 +2543,7 @@ public class ConfigurationTests {
         void getServicesTest()
             throws Exception {
             SimpleConfigurationLayer lowPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
+            // this configuration layer must be replaced with the command line layer, once we have it
             SimpleConfigurationLayer mediumPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             SimpleConfigurationLayer highPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
@@ -2530,12 +2564,12 @@ public class ConfigurationTests {
             mediumPriorityConfigurationLayerMock.setServices(
                 Map.<String,ServiceConfiguration>of(
                     "github", new ServiceConfiguration(Provider.GITHUB,Map.<String,String>of(
-                        "AUTHENTICATION_TOKEN", "{{#environment.variable}}GITHUB_TOKEN{{/environment.variable}}",
+                        "AUTHENTICATION_TOKEN", "{{#environmentVariable}}GITHUB_TOKEN{{/environmentVariable}}",
                         "REPOSITORY_NAME", "repo1",
                         "REPOSITORY_OWNER", "owner1"
                         )),
                     "gitlab", new ServiceConfiguration(Provider.GITLAB,Map.<String,String>of(
-                        "AUTHENTICATION_TOKEN", "{{#environment.variable}}GITLAB_TOKEN{{/environment.variable}}",
+                        "AUTHENTICATION_TOKEN", "{{#environmentVariable}}GITLAB_TOKEN{{/environmentVariable}}",
                         "REPOSITORY_NAME", "repo2",
                         "REPOSITORY_OWNER", "owner2"
                     ))
@@ -2544,12 +2578,12 @@ public class ConfigurationTests {
             highPriorityConfigurationLayerMock.setServices(
                 Map.<String,ServiceConfiguration>of(
                     "github", new ServiceConfiguration(Provider.GITHUB,Map.<String,String>of(
-                        "AUTHENTICATION_TOKEN", "{{#environment.variable}}GITHUB_TOKEN{{/environment.variable}}",
+                        "AUTHENTICATION_TOKEN", "{{#environmentVariable}}GITHUB_TOKEN{{/environmentVariable}}",
                         "REPOSITORY_NAME", "repo3",
                         "REPOSITORY_OWNER", "owner3"
                         )),
                     "gitlab", new ServiceConfiguration(Provider.GITLAB,Map.<String,String>of(
-                        "AUTHENTICATION_TOKEN", "{{#environment.variable}}GITLAB_TOKEN{{/environment.variable}}",
+                        "AUTHENTICATION_TOKEN", "{{#environmentVariable}}GITLAB_TOKEN{{/environmentVariable}}",
                         "REPOSITORY_NAME", "repo4",
                         "REPOSITORY_OWNER", "owner4"
                     ))
@@ -2566,12 +2600,12 @@ public class ConfigurationTests {
             assertTrue(configuration.getServices().containsKey("gitlab"));
             assertEquals(Provider.GITHUB, configuration.getServices().get("github").getType());
             assertEquals(3, configuration.getServices().get("github").getOptions().size());
-            assertEquals("{{#environment.variable}}GITHUB_TOKEN{{/environment.variable}}", configuration.getServices().get("github").getOptions().get("AUTHENTICATION_TOKEN"));
+            assertEquals("{{#environmentVariable}}GITHUB_TOKEN{{/environmentVariable}}", configuration.getServices().get("github").getOptions().get("AUTHENTICATION_TOKEN"));
             assertEquals("repo3", configuration.getServices().get("github").getOptions().get("REPOSITORY_NAME"));
             assertEquals("owner3", configuration.getServices().get("github").getOptions().get("REPOSITORY_OWNER"));
             assertEquals(Provider.GITLAB, configuration.getServices().get("gitlab").getType());
             assertEquals(3, configuration.getServices().get("gitlab").getOptions().size());
-            assertEquals("{{#environment.variable}}GITLAB_TOKEN{{/environment.variable}}", configuration.getServices().get("gitlab").getOptions().get("AUTHENTICATION_TOKEN"));
+            assertEquals("{{#environmentVariable}}GITLAB_TOKEN{{/environmentVariable}}", configuration.getServices().get("gitlab").getOptions().get("AUTHENTICATION_TOKEN"));
             assertEquals("repo4", configuration.getServices().get("gitlab").getOptions().get("REPOSITORY_NAME"));
             assertEquals("owner4", configuration.getServices().get("gitlab").getOptions().get("REPOSITORY_OWNER"));
         }
@@ -2583,12 +2617,13 @@ public class ConfigurationTests {
             assertNotNull(System.getProperty(SIMPLEST_JSON_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY), "A configuration file path must be passed to this test as a system property but it was not set");
             assertNotNull(System.getProperty(SIMPLEST_YAML_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY), "A configuration file path must be passed to this test as a system property but it was not set");
             SimpleConfigurationLayer lowPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
+            // this configuration layer must be replaced with the command line layer, once we have it
             SimpleConfigurationLayer mediumPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             SimpleConfigurationLayer highPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
-            lowPriorityConfigurationLayerMock.setConfigurationFile(System.getProperty(SIMPLEST_JSON_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY));
-            mediumPriorityConfigurationLayerMock.setConfigurationFile(System.getProperty(SIMPLEST_JSON_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY));
-            highPriorityConfigurationLayerMock.setConfigurationFile(System.getProperty(SIMPLEST_YAML_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY));
+            lowPriorityConfigurationLayerMock.setSharedConfigurationFile(System.getProperty(SIMPLEST_JSON_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY));
+            mediumPriorityConfigurationLayerMock.setSharedConfigurationFile(System.getProperty(SIMPLEST_JSON_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY));
+            highPriorityConfigurationLayerMock.setSharedConfigurationFile(System.getProperty(SIMPLEST_YAML_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY));
 
             // inject the plugin configuration and test the new value is returned from that
             configuration.withPluginConfiguration(lowPriorityConfigurationLayerMock);
@@ -2602,6 +2637,7 @@ public class ConfigurationTests {
         void getStateFileTest()
             throws Exception {
             SimpleConfigurationLayer lowPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
+            // this configuration layer must be replaced with the command line layer, once we have it
             SimpleConfigurationLayer mediumPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             SimpleConfigurationLayer highPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
@@ -2621,6 +2657,7 @@ public class ConfigurationTests {
         void getVerbosityTest()
             throws Exception {
             SimpleConfigurationLayer lowPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
+            // this configuration layer must be replaced with the command line layer, once we have it
             SimpleConfigurationLayer mediumPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             SimpleConfigurationLayer highPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
@@ -2640,6 +2677,7 @@ public class ConfigurationTests {
         void getVersionTest()
             throws Exception {
             SimpleConfigurationLayer lowPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
+            // this configuration layer must be replaced with the command line layer, once we have it
             SimpleConfigurationLayer mediumPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             SimpleConfigurationLayer highPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
@@ -2659,8 +2697,8 @@ public class ConfigurationTests {
      * Performs checks against the injection of a combination of configuration layers
      */
     @Nested
-    @DisplayName("Configuration.with combined configuration layers")
-    class withCombinedConfigurationLayersTests {
+    @DisplayName("Configuration with combined configuration layers")
+    class WithCombinedConfigurationLayersTests {
         @Test
         @DisplayName("Configuration[combined layers with standard files]")
         void combinedConfigurationWithStandardFilesTest()
@@ -2760,6 +2798,7 @@ public class ConfigurationTests {
             customCmdlineConfigurationFile.setReleasePrefix("cmdlinePrefix");
 
             // also create the command line layer, which defines a different custom local file
+            // this configuration layer must be replaced with the command line layer, once we have it
             SimpleConfigurationLayer commandLineConfiguration = new SimpleConfigurationLayer();
             commandLineConfiguration.setBump("cmdline");
             commandLineConfiguration.setConfigurationFile("custom-cmdline.json");
@@ -2794,7 +2833,6 @@ public class ConfigurationTests {
             // overwriting the previous configuration file
             configuration.withCommandLineConfiguration(commandLineConfiguration);
 
-            // first test against the standard files, which must have been loaded by default
             assertEquals("cmdlinePrefix", configuration.getReleasePrefix()); // this must come from the custom configuration file defined by the command line config
             assertEquals("cmdline", configuration.getBump()); // this is the value configured in the command line and has higher priority over all others
         }

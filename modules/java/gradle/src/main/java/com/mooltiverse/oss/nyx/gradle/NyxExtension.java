@@ -28,7 +28,7 @@ import org.gradle.api.provider.MapProperty;
 import org.gradle.api.provider.Property;
 import org.gradle.api.provider.Provider;
 
-import com.mooltiverse.oss.nyx.configuration.Defaults;
+import com.mooltiverse.oss.nyx.entities.Defaults;
 
 /**
  * The plugin configuration object. This object is responsible for reading the {@code nyx {...} } configuration block that users

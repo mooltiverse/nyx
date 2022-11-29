@@ -10,6 +10,9 @@ plugins {
     id "com.dorongold.task-tree" version "2.1.0"
 }
 
+import groovy.json.JsonSlurper
+import groovy.json.JsonOutput
+
 /*------------------------------------------------------------------------------
   Root project properties
 ------------------------------------------------------------------------------*/
@@ -53,11 +56,120 @@ allprojects {
 }
 
 /*------------------------------------------------------------------------------
-  This is the configuration for this all sub-projects
+  This is the configuration for all sub-projects
 ------------------------------------------------------------------------------*/
 subprojects {
     // let all sub projects have the same version as the root project
     version = rootProject.version
+}
+
+/*------------------------------------------------------------------------------
+  This is the configuration for the top level project
+------------------------------------------------------------------------------*/
+task deleteTestDirectories() {
+  // This task deletes all temporary files and directories that may have been created and not deleted by tests.
+  // Tests should delete their temporary contents but when they break they don't clean up, so this task is
+  // meant to delete those leftovers.
+  description 'Delete all test temporary directories'
+  group 'Build'
+
+  doLast() {
+    String tmpdir = System.getProperty("java.io.tmpdir")
+    Arrays.stream(new File(System.getProperty("java.io.tmpdir")).list()).forEach {
+      d -> if (d.startsWith("nyx-test-")) {
+        println tmpdir+d
+        delete tmpdir+d
+      }
+    }
+  }
+}
+
+task deleteGitHubTestProjects() {
+  // This task deletes all projects for the GitHub test user. These projects are created during tests and are supposed
+  // to be removed at the end of each succesful test but when a test breaks the projects remains there.
+  // this task delets those leftovers.
+  description 'Delete all test projects created on GitHub'
+  group 'Build'
+
+  doLast() {
+    if (!findProperty("gitHubTestUserToken")) {
+      throw new GradleException("The 'gitHubTestUserToken' property must be defined in order to delete the remote test projects")
+    }
+    logger.quiet "Fetching data about the authenticated user..."
+    URL getAuthenticatedUserURL = new URL('https://api.github.com/user')
+    HttpURLConnection getAuthenticatedUserURLConnection = (HttpURLConnection)getAuthenticatedUserURL.openConnection()
+    getAuthenticatedUserURLConnection.setRequestProperty("Accept", "application/vnd.github+json")
+    getAuthenticatedUserURLConnection.setRequestProperty("Authorization", "Bearer "+findProperty("gitHubTestUserToken"))
+    logger.quiet "Status code: ${getAuthenticatedUserURLConnection.getResponseCode()}"
+    def user = new JsonSlurper().parseText(getAuthenticatedUserURLConnection.getInputStream().getText())
+    logger.quiet "The authenticated user is: "+user.login
+
+    logger.quiet "Fetching the list of GitHub projects..."
+    URL getProjectsURL = new URL('https://api.github.com/user/repos?per_page=100') // 100 is the maximum number of items per page
+    HttpURLConnection getProjectsURLConnection = (HttpURLConnection)getProjectsURL.openConnection()
+    getProjectsURLConnection.setRequestProperty("Accept", "application/vnd.github+json")
+    getProjectsURLConnection.setRequestProperty("Authorization", "Bearer "+findProperty("gitHubTestUserToken"))
+    logger.quiet "Status code: ${getProjectsURLConnection.getResponseCode()}"
+    logger.quiet "The list of GitHub projects is:"
+    def projects = new JsonSlurper().parseText(getProjectsURLConnection.getInputStream().getText())
+
+    projects.each { project ->
+      logger.quiet "   Deleting project: ${project.name}"
+
+      URL deleteProjectsURL = new URL('https://api.github.com/repos/'+user.login+'/'+project.name)
+      HttpURLConnection deleteProjectsURLConnection = (HttpURLConnection)deleteProjectsURL.openConnection()
+      deleteProjectsURLConnection.setRequestMethod("DELETE")
+      deleteProjectsURLConnection.setRequestProperty("Accept", "application/vnd.github+json")
+      deleteProjectsURLConnection.setRequestProperty("Authorization", "Bearer "+findProperty("gitHubTestUserToken"))
+      logger.quiet "   Status code: ${deleteProjectsURLConnection.getResponseCode()}"
+    }
+  }
+}
+
+task deleteGitLabTestProjects() {
+  // This task deletes all projects for the GitLab test user. These projects are created during tests and are supposed
+  // to be removed at the end of each succesful test but when a test breaks the projects remains there.
+  // this task delets those leftovers.
+  description 'Delete all test projects created on GitLab'
+  group 'Build'
+
+  doLast() {
+    if (!findProperty("gitLabTestUserToken")) {
+      throw new GradleException("The 'gitLabTestUserToken' property must be defined in order to delete the remote test projects")
+    }
+    logger.quiet "Fetching data about the authenticated user..."
+    URL getAuthenticatedUserURL = new URL('https://gitlab.com/api/v4/user')
+    HttpURLConnection getAuthenticatedUserURLConnection = (HttpURLConnection)getAuthenticatedUserURL.openConnection()
+    getAuthenticatedUserURLConnection.setRequestProperty("Authorization", "Bearer "+findProperty("gitLabTestUserToken"))
+    logger.quiet "Status code: ${getAuthenticatedUserURLConnection.getResponseCode()}"
+    def user = new JsonSlurper().parseText(getAuthenticatedUserURLConnection.getInputStream().getText())
+    logger.quiet "The authenticated user is: "+user.username
+
+    logger.quiet "Fetching the list of GitLab projects..."
+    URL getProjectsURL = new URL('https://gitlab.com/api/v4/users/'+user.username+'/projects?per_page=100') // 100 is the maximum number of items per page
+    HttpURLConnection getProjectsURLConnection = (HttpURLConnection)getProjectsURL.openConnection()
+    getProjectsURLConnection.setRequestProperty("Authorization", "Bearer "+findProperty("gitLabTestUserToken"))
+    logger.quiet "Status code: ${getProjectsURLConnection.getResponseCode()}"
+    logger.quiet "The list of GitLab projects is:"
+    def projects = new JsonSlurper().parseText(getProjectsURLConnection.getInputStream().getText())
+
+    projects.each { project ->
+      logger.quiet "   Deleting project: ${project.path}"
+
+      URL deleteProjectsURL = new URL('https://gitlab.com/api/v4/projects/'+project.id)
+      HttpURLConnection deleteProjectsURLConnection = (HttpURLConnection)deleteProjectsURL.openConnection()
+      deleteProjectsURLConnection.setRequestMethod("DELETE")
+      deleteProjectsURLConnection.setRequestProperty("Authorization", "Bearer "+findProperty("gitLabTestUserToken"))
+      logger.quiet "   Status code: ${deleteProjectsURLConnection.getResponseCode()}"
+    }
+  }
+}
+
+task testClean() {
+  description 'Deletes all local and remote contents created by tests'
+  group 'Build'
+
+  dependsOn deleteTestDirectories, deleteGitHubTestProjects, deleteGitLabTestProjects
 }
 
 /*------------------------------------------------------------------------------

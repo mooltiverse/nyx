@@ -23,21 +23,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import com.mooltiverse.oss.nyx.configuration.Defaults;
 import com.mooltiverse.oss.nyx.entities.Attachment;
 import com.mooltiverse.oss.nyx.entities.ChangelogConfiguration;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
+import com.mooltiverse.oss.nyx.entities.Defaults;
 import com.mooltiverse.oss.nyx.entities.GitConfiguration;
 import com.mooltiverse.oss.nyx.entities.GitRemoteConfiguration;
 import com.mooltiverse.oss.nyx.entities.Identifier;
 import com.mooltiverse.oss.nyx.entities.IllegalPropertyException;
+import com.mooltiverse.oss.nyx.entities.Provider;
 import com.mooltiverse.oss.nyx.entities.ReleaseType;
 import com.mooltiverse.oss.nyx.entities.ReleaseTypes;
 import com.mooltiverse.oss.nyx.entities.ServiceConfiguration;
 import com.mooltiverse.oss.nyx.entities.Verbosity;
 import com.mooltiverse.oss.nyx.entities.WorkspaceStatus;
-import com.mooltiverse.oss.nyx.services.Provider;
 import com.mooltiverse.oss.nyx.version.Scheme;
 
 /**

@@ -33,11 +33,11 @@ import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
 import com.mooltiverse.oss.nyx.entities.GitConfiguration;
 import com.mooltiverse.oss.nyx.entities.GitRemoteConfiguration;
+import com.mooltiverse.oss.nyx.entities.Provider;
 import com.mooltiverse.oss.nyx.entities.ReleaseType;
 import com.mooltiverse.oss.nyx.entities.ReleaseTypes;
 import com.mooltiverse.oss.nyx.entities.ServiceConfiguration;
 import com.mooltiverse.oss.nyx.entities.Verbosity;
-import com.mooltiverse.oss.nyx.services.Provider;
 import com.mooltiverse.oss.nyx.version.Scheme;
 
 @DisplayName("SimpleConfigurationLayer")
@@ -300,12 +300,12 @@ public class SimpleConfigurationLayerTests {
         simpleConfigurationLayer.setServices(
             Map.<String,ServiceConfiguration>of(
                 "github", new ServiceConfiguration(Provider.GITHUB,Map.<String,String>of(
-                    "AUTHENTICATION_TOKEN", "{{#environment.variable}}GITHUB_TOKEN{{/environment.variable}}",
+                    "AUTHENTICATION_TOKEN", "{{#environmentVariable}}GITHUB_TOKEN{{/environmentVariable}}",
                     "REPOSITORY_NAME", "repo1",
                     "REPOSITORY_OWNER", "owner1"
                     )),
                 "gitlab", new ServiceConfiguration(Provider.GITLAB,Map.<String,String>of(
-                    "AUTHENTICATION_TOKEN", "{{#environment.variable}}GITLAB_TOKEN{{/environment.variable}}",
+                    "AUTHENTICATION_TOKEN", "{{#environmentVariable}}GITLAB_TOKEN{{/environmentVariable}}",
                     "REPOSITORY_NAME", "repo2",
                     "REPOSITORY_OWNER", "owner2"
                 ))
@@ -317,12 +317,12 @@ public class SimpleConfigurationLayerTests {
         assertTrue(simpleConfigurationLayer.getServices().containsKey("gitlab"));
         assertEquals(Provider.GITHUB, simpleConfigurationLayer.getServices().get("github").getType());
         assertEquals(3, simpleConfigurationLayer.getServices().get("github").getOptions().size());
-        assertEquals("{{#environment.variable}}GITHUB_TOKEN{{/environment.variable}}", simpleConfigurationLayer.getServices().get("github").getOptions().get("AUTHENTICATION_TOKEN"));
+        assertEquals("{{#environmentVariable}}GITHUB_TOKEN{{/environmentVariable}}", simpleConfigurationLayer.getServices().get("github").getOptions().get("AUTHENTICATION_TOKEN"));
         assertEquals("repo1", simpleConfigurationLayer.getServices().get("github").getOptions().get("REPOSITORY_NAME"));
         assertEquals("owner1", simpleConfigurationLayer.getServices().get("github").getOptions().get("REPOSITORY_OWNER"));
         assertEquals(Provider.GITLAB, simpleConfigurationLayer.getServices().get("gitlab").getType());
         assertEquals(3, simpleConfigurationLayer.getServices().get("gitlab").getOptions().size());
-        assertEquals("{{#environment.variable}}GITLAB_TOKEN{{/environment.variable}}", simpleConfigurationLayer.getServices().get("gitlab").getOptions().get("AUTHENTICATION_TOKEN"));
+        assertEquals("{{#environmentVariable}}GITLAB_TOKEN{{/environmentVariable}}", simpleConfigurationLayer.getServices().get("gitlab").getOptions().get("AUTHENTICATION_TOKEN"));
         assertEquals("repo2", simpleConfigurationLayer.getServices().get("gitlab").getOptions().get("REPOSITORY_NAME"));
         assertEquals("owner2", simpleConfigurationLayer.getServices().get("gitlab").getOptions().get("REPOSITORY_OWNER"));
     }

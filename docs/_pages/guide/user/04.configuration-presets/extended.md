@@ -211,10 +211,10 @@ This corresponds to the following configuration options:
 | Name                                            | Value                                                                                    |
 | ----------------------------------------------- | ---------------------------------------------------------------------------------------- |
 | [`services/github/type`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}#type) | `GITHUB` |
-| [`services/github/options/AUTHENTICATION_TOKEN`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}#options) | `{% raw %}"{{#environment.variable}}GITHUB_TOKEN{{/environment.variable}}"{% endraw %}` |
+| [`services/github/options/AUTHENTICATION_TOKEN`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}#options) | `{% raw %}"{{#environmentVariable}}GITHUB_TOKEN{{/environmentVariable}}"{% endraw %}` |
 | [`services/github/options/REPOSITORY_NAME`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}#options) | Empty |
 | [`services/github/options/REPOSITORY_OWNER`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}#options) | Empty |
 | [`services/gitlab/type`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}#type) | `GITLAB` |
-| [`services/gitlab/options/AUTHENTICATION_TOKEN`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}#options) | `{% raw %}"{{#environment.variable}}GITLAB_TOKEN{{/environment.variable}}"{% endraw %}` |
+| [`services/gitlab/options/AUTHENTICATION_TOKEN`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}#options) | `{% raw %}"{{#environmentVariable}}GITLAB_TOKEN{{/environmentVariable}}"{% endraw %}` |
 | [`services/gitlab/options/REPOSITORY_NAME`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}#options) | Empty |
 | [`services/gitlab/options/REPOSITORY_OWNER`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}#options) | Empty |

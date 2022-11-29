@@ -89,8 +89,9 @@ Other scopes will be added in the future.
 You can work on the project on any platform (Linux, Windows, Mac). You need to have installed:
 
 * [Git](https://git-scm.com/)
+* [Go](https://go.dev/) 1.17 or above
 * Java JDK or JRE version 8 or above, either from [Oracle](https://www.oracle.com/java/technologies/javase-downloads.html) or [OpenJDK](https://openjdk.java.net/install/)
-* [Gradle](https://gradle.org/install/) 6.x or above
+* [Gradle](https://gradle.org/install/) 7.x or above
 * [Docker CE](https://docs.docker.com/install/)
 * [Jekyll](https://jekyllrb.com/docs/installation/) 4.2.0 or above (also requires [Ruby](https://www.ruby-lang.org/en/downloads/) 2.4.0 or above)
 
@@ -122,12 +123,13 @@ nyx
 +-- gradle                          # Gradle wrapper files
 +-- modules                         # Project sub-modules
 |   +--- docker                     # Docker image sub module
+|   \--- go                         # Go sub modules
+|        +--- main                  # Go Main library sub module
+|        \--- version               # Go Version library sub module
 |   \--- java                       # Java sub modules
 |        +--- gradle                # Gradle plugin sub module
-|        \--- lib                   # Java libraries sub modules
-|             +--- main             # Java Main library sub module
-|             +--- git              # Java Git library sub module
-|             \--- version          # Java Version library sub module
+|        +--- main                  # Java Main library sub module
+|        \--- version               # Java Version library sub module
 +-- build.gradle                    # Gradle build script (main)
 +-- gradle.properties               # Project and system properties
 +-- gradlew                         # Gradle wrapper
@@ -208,11 +210,11 @@ Example using a local `gradle.properties` file in the `GRADLE_USER_HOME` (which 
 
 ```properties
 # GitHub test user
-gitHubTestUserName="nyxtest20200701"
+gitHubTestUserName=nyxtest20200701
 gitHubTestUserToken=<token goes here>
 
 # GitLab test user
-gitLabTestUserName="nyxtest20200701"
+gitLabTestUserName=nyxtest20200701
 gitLabTestUserToken=<token goes here>
 ```
 

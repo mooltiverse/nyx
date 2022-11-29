@@ -5,7 +5,7 @@ toc: true
 permalink: /guide/user/in-depth/gradle-plugin/
 ---
 
-In this page you can find extra informations about the Nyx Gradle Plugin internals that may be useful for [troubleshooting]({{ site.baseurl }}/troubleshooting/).
+In this page you can find extra information about the Nyx Gradle Plugin internals that may be useful for [troubleshooting]({{ site.baseurl }}/troubleshooting/).
 
 See the [Quick Start]({{ site.baseurl }}{% link _pages/guide/user/01.quick-start/gradle-plugin.md %}) or [Using the Gradle plugin]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#using-the-gradle-plugin) for regular usage instructions.
 

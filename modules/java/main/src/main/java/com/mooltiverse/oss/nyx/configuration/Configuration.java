@@ -119,7 +119,7 @@ public class Configuration implements ConfigurationRoot {
     /**
      * Default constructor. Returns a new configuration object at its initial state.
      * 
-     * Instances if this class are created using the {@link Nyx#configuration()} method so this constructor should never be used alone.
+     * Instances of this class are created using the {@link Nyx#configuration()} method so this constructor should never be used alone.
      * 
      * See {@link Nyx#configuration()}
      * 
@@ -399,7 +399,7 @@ public class Configuration implements ConfigurationRoot {
             // parse the 'enabled' items list
             List<String> enabled = new ArrayList<String>();
             for (ConfigurationLayer layer: layers.values()) {
-                if (!Objects.isNull(layer.getCommitMessageConventions().getEnabled())  && !layer.getCommitMessageConventions().getEnabled().isEmpty()) {
+                if (!Objects.isNull(layer.getCommitMessageConventions().getEnabled()) && !layer.getCommitMessageConventions().getEnabled().isEmpty()) {
                     enabled = layer.getCommitMessageConventions().getEnabled();
                     logger.trace(CONFIGURATION, "The '{}.{}' configuration option value is: '{}'", "commitMessageConventions", "enabled", String.join(", ", enabled));
                     break;
@@ -420,6 +420,7 @@ public class Configuration implements ConfigurationRoot {
             }
 
             commitMessageConventionsSection = new CommitMessageConventions(enabled, items);
+            logger.trace(CONFIGURATION, "The '{}' configuration option has been resolved", "commitMessageConventions");
         }
         return commitMessageConventionsSection;
     }

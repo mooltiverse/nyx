@@ -27,6 +27,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import com.mooltiverse.oss.nyx.git.tools.Scenario;
 import com.mooltiverse.oss.nyx.git.util.RandomUtil;
 import com.mooltiverse.oss.nyx.services.github.GitHub;
 import com.mooltiverse.oss.nyx.services.github.GitHubRepository;
@@ -76,14 +77,14 @@ public class GitTests {
 
         @DisplayName("Git.instance().clone(String, String) throws GitException with non empty directory")
         @Test
-        public void exceptionWithNewEmptyDirectoryAsString()
+        public void exceptionWithNonEmptyDirectoryAsString()
             throws Exception {
             assertThrows(GitException.class, () -> Git.instance().clone(Scenario.FROM_SCRATCH.realize().getWorkingDirectory().getAbsolutePath(), REMOTE_TEST_REPOSITORY));
         }
 
         @DisplayName("Git.instance().clone(File, URI) throws GitException with non empty directory")
         @Test
-        public void exceptionWithNewEmptyDirectoryAsFile()
+        public void exceptionWithNonEmptyDirectoryAsFile()
             throws Exception {
             assertThrows(GitException.class, () -> Git.instance().clone(Scenario.FROM_SCRATCH.realize().getWorkingDirectory(), URI.create(REMOTE_TEST_REPOSITORY)));
         }
@@ -181,7 +182,7 @@ public class GitTests {
             GitHubRepository gitHubRepository = gitHub.createGitRepository(randomID, "Test repository "+randomID, true, true);
 
             // if we read too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(2000);
+            Thread.sleep(4000);
 
             File directory = Files.createTempDirectory("nyx-test-git-clone-test-").toFile();
             directory.deleteOnExit();
@@ -202,7 +203,7 @@ public class GitTests {
             GitHubRepository gitHubRepository = gitHub.createGitRepository(randomID, "Test repository "+randomID, true, true);
 
             // if we read too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(2000);
+            Thread.sleep(4000);
 
             File directory = Files.createTempDirectory("nyx-test-git-clone-test-").toFile();
             directory.deleteOnExit();
@@ -223,7 +224,7 @@ public class GitTests {
             GitHubRepository gitHubRepository = gitHub.createGitRepository(randomID, "Test repository "+randomID, true, true);
 
             // if we read too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(2000);
+            Thread.sleep(4000);
 
             File directory = Files.createTempDirectory("nyx-test-git-clone-test-").toFile();
             directory.deleteOnExit();
@@ -246,7 +247,7 @@ public class GitTests {
             GitHubRepository gitHubRepository = gitHub.createGitRepository(randomID, "Test repository "+randomID, true, true);
 
             // if we read too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(2000);
+            Thread.sleep(4000);
 
             File directory = Files.createTempDirectory("nyx-test-git-clone-test-").toFile();
             directory.deleteOnExit();

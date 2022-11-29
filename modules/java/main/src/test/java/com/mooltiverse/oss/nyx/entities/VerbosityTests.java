@@ -38,17 +38,17 @@ public class VerbosityTests {
     }
 
     @Test
-    @DisplayName("Verbosity.from(Level)")
+    @DisplayName("Verbosity.fromLevel(Level)")
     void fromLevelTest()
         throws Exception {
 
-        assertEquals(Verbosity.TRACE, Verbosity.from(Level.TRACE));
-        assertEquals(Verbosity.DEBUG, Verbosity.from(Level.DEBUG));
-        assertEquals(Verbosity.INFO, Verbosity.from(Level.INFO));
-        assertEquals(Verbosity.WARNING, Verbosity.from(Level.WARN));
-        assertEquals(Verbosity.ERROR, Verbosity.from(Level.ERROR));
+        assertEquals(Verbosity.TRACE, Verbosity.fromLevel(Level.TRACE));
+        assertEquals(Verbosity.DEBUG, Verbosity.fromLevel(Level.DEBUG));
+        assertEquals(Verbosity.INFO, Verbosity.fromLevel(Level.INFO));
+        assertEquals(Verbosity.WARNING, Verbosity.fromLevel(Level.WARN));
+        assertEquals(Verbosity.ERROR, Verbosity.fromLevel(Level.ERROR));
         // FATAL is not available in SLF4J
 
-        assertThrows(NullPointerException.class, () -> { Verbosity.from((Level)null); });
+        assertThrows(NullPointerException.class, () -> { Verbosity.fromLevel((Level)null); });
     }
 }

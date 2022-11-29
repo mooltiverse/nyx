@@ -103,7 +103,7 @@ public enum Verbosity {
      * @throws IllegalArgumentException if the given value cannot be mapped to any existing verbosity level
      * @throws NullPointerException if the given value is {@code null}
      */
-    public static Verbosity from(Level level)
+    public static Verbosity fromLevel(Level level)
         throws IllegalArgumentException, NullPointerException {
         if (Objects.isNull(level))
             throw new NullPointerException();

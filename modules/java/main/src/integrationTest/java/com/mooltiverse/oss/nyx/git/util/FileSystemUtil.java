@@ -115,7 +115,7 @@ public class FileSystemUtil {
      */
     private static void renderDirectoryItem(StringBuilder sb, String lineStart, File item, int maxDepth, boolean last) {
         if (maxDepth > 0) {
-            lineStart = lineStart + (last ? "   " : "   ");
+            lineStart = lineStart + "   ";
             sb.append(lineStart);
             sb.append(item.getName());
             if (item.isFile()) {
@@ -188,16 +188,16 @@ public class FileSystemUtil {
      * Creates a new temporary file with a random name in the given directory.
      * 
      * @param dir the directory to create the file in.
-     * @param suffix the file name prefix. If {@code null} the file will have a random prefix.
+     * @param prefix the file name prefix. If {@code null} the file will have a random prefix.
      * @param suffix the file extension. If {@code null} the file will have the {@code .tmp} extension.
      * 
      * @return the file that has been created
      * 
      * @throws Exception in case of any exception
      */
-    public static File newTempFile(File dir, String prefix, String extension)
+    public static File newTempFile(File dir, String prefix, String suffix)
         throws Exception {
-        return File.createTempFile(Objects.isNull(prefix) ? RandomUtil.randomAlphabeticString(3) : prefix, extension, dir);
+        return File.createTempFile(Objects.isNull(prefix) ? RandomUtil.randomAlphabeticString(3) : prefix, suffix, dir);
     }
 
     /**
@@ -300,7 +300,7 @@ public class FileSystemUtil {
      * 
      * @param dir the directory to create the file in.
      * @param suffix the file name prefix. If {@code null} the file will have a random prefix.
-     * @param suffix the file extension. If {@code null} the file will have the {@code .tmp} extension.
+     * @param extension the file extension. If {@code null} the file will have the {@code .tmp} extension.
      * @param length the number of bytes to write to the target file.
      * 
      * @return the file that has been created
@@ -318,8 +318,8 @@ public class FileSystemUtil {
      * Creates a new temporary file with a random name and text content in the given directory.
      * 
      * @param dir the directory to create the file in.
-     * @param suffix the file name prefix. If {@code null} the file will have a random prefix.
-     * @param suffix the file extension. If {@code null} the file will have the {@code .tmp} extension.
+     * @param prefix the file name prefix. If {@code null} the file will have a random prefix.
+     * @param extension the file extension. If {@code null} the file will have the {@code .tmp} extension.
      * @param lines the number of lines to write to the target file.
      * @param length the length of lines to write to the target file.
      * 

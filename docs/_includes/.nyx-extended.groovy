@@ -40,13 +40,13 @@ nyx {
   preset = 'extended'
   releaseAssets {
     asset1 {
-      name = "asset.txt"
+      fileName = "asset.txt"
       description = "Text Asset"
       type = "text/plain"
       path = "asset.txt"
     }
     asset2 {
-      name = "asset.bin"
+      fileName = "asset.bin"
       description = "Binary Asset"
       type = "application/octet-stream"
       path = "asset.bin"
@@ -179,7 +179,7 @@ nyx {
           '3' {
             position = 'BUILD'
             qualifier = 'user'
-            value = '{{#sanitizeLower}}{{environment.user}}{{/sanitizeLower}}'
+            value = '{{#sanitizeLower}}{{environmentUser}}{{/sanitizeLower}}'
           }
         }
         publish = 'false'
@@ -193,7 +193,7 @@ nyx {
     github {
       type = 'GITHUB'
       options {
-        AUTHENTICATION_TOKEN = '{{#environment.variable}}GITHUB_TOKEN{{/environment.variable}}'
+        AUTHENTICATION_TOKEN = '{{#environmentVariable}}GITHUB_TOKEN{{/environmentVariable}}'
         REPOSITORY_NAME = 'myrepo'
         REPOSITORY_OWNER = 'acme'
       }

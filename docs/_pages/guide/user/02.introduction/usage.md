@@ -12,7 +12,6 @@ Nyx provides the same features in all the available versions but the means to in
 | Name                                        | Command Line Command                   | Gradle Task Name                       |
 | ------------------------------------------- | -------------------------------------- | -------------------------------------- |
 | Clean                                       | `clean`                                | [`nyxClean`](#nyxclean)                |
-| Help                                        | `help`                                 | N/A                                    |
 | Infer                                       | `infer`                                | [`nyxInfer`](#nyxinfer)                |
 | Make                                        | `make`                                 | [`nyxMake`](#nyxmake)                  |
 | Mark                                        | `mark`                                 | [`nyxMark`](#nyxmark)                  |
@@ -20,18 +19,203 @@ Nyx provides the same features in all the available versions but the means to in
 
 ## Using the command line
 
-The command line is not yet available and this section is marked as a TODO.
-{: .notice--warning}
+### Download the binary
+
+You can find the latest binaries for any platform in the [latest release](https://github.com/mooltiverse/nyx/releases/latest) assets.
+
+Make sure you store the binary so that it's available from the `PATH` and it has execution permissions.
+
+This guide assumes you rename the executable as `nyx`, regardless of the platform (or `nyx.exe` on Windows).
+{: .notice--info}
+
+This is all you need to use Nyx on the command line.
 
 ### Synopsis
 
-The command line is not yet available and this section is marked as a TODO.
-{: .notice--warning}
+Nyx comes with a whole lot of arguments that you can pass on the command line to let you control every single aspect of its behavior. You can see them all by running `nyx --help`, from which we have an abbreviated output here:
+
+```bash
+nyx --help
+
+Nyx version: {{ site.data.nyx.version }}
+
+Usage:
+    nyx [arguments] [command]
+
+Commands are:
+    clean               reverts the repository to its initial state and removes files created by other commands, if any
+    infer               inspects the commit history and repository status and computes the project version
+    make                produces artifacts (i.e. changelog) as per the configuration
+    mark                commits, tags and pushes, according to the configuration and the repository status
+    publish             publish the new release, if any, to the configured services
+
+Global arguments are:
+    [...]
+
+Changelog arguments are:
+    [...]
+
+Commit Message Conventions arguments are:
+    [...]
+
+Git arguments are:
+    [...]
+
+Git arguments are:
+    [...]
+
+Release Type arguments are:
+    [...]
+
+Services arguments are:
+    [...]
+```
+
+As you can see you can give as much arguments as you like and one command at the end. Arguments start with a single (`-`) or double dash (`--`) and are detailed in the full output from `nyx --help` and in the [configuration reference]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/index.md %}#configuration-file).
+
+The command needs to appear at the end of the command line with no dash sign. If you don't specify any command Nyx will run the default one `infer`. For an introduction on what every command does see [below](#commands) or [How Nyx Works]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}).
+
+#### Dynamic argument names
+
+One thing that is important to note is that many arguments names are dynamic and this may be confusing at first as it's different than common arguments on other tools. For example, the [`--services-<NAME>-type=<TYPE>`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}#type) argument has a dynamic `<NAME>` in the attribute name.
+
+This is to allow users to define the `<TYPE>` value for arbitrary services whose name is dynamically configured. When passing this as an actual argument on the command line also the `<NAME>` part needs to be replaced so for example `--services-gh-type=GITHUB` sets the type `GITHUB` for a service instance configured under the name `gh`.
+
+This kind of notation implies that the internal configuration model always creates a service configuration named `gh` whenever an argument like this is provided. This is somewhat different from configuration files where you need to create a `gh` section and then define additional options underneath.
+
+Since argument names are dynamically defined Nyx will not complain in case of unsupported arguments.
+{: .notice--info}
+
+### Run the command
+
+All you have to do is run the command according to the synopsis above. Remember to run Nyx from the Git project directory or pass the [`--directory`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#directory) argument.
+
+Also keep in mind that when no command is given on the command line [`infer`]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer) is executed by default. This will generate and display the latest version for the project but will not change anything in the project directory. To run other commands you can specify them explicitly, as shown below.
+
+### Configuration
+
+You have different means to configure the tool. Whichever combination you use, see the [configuration reference]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/index.md %}) for a detailed description of each option.
+
+In some cases you might prefer using command line arguments while in others configuration files (or even a combination of) might be the way you pick. In order to support some edge cases, all options can also be passed as environment variables.
+
+Different configuration methods can be combined together with well known priorities of each means over the others so you have complete freedom to create configuration baselines and override values as you need. This might be especially useful for large organizations. See the [configuration methods]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}) for more on this.
+
+#### Using command line arguments
+
+With the above said, you can start easy with:
+
+```bash
+nyx --preset=simple infer
+```
+
+This runs the *infer* command and uses the [*simple* preset]({{ site.baseurl }}{% link _pages/guide/user/04.configuration-presets/simple.md %}).
+
+Keep in mind that while presets are a handy way to avoid repeating streamlined configurations, you don't need to use them and you can define your own from scratch by whatever configuration means.
+
+#### Using configuration files
+
+If you rather prefer to configure Nyx by means of configuration files you can use one of the [default configuration files]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}#evaluation-order) that are looked up automatically or set the [`configurationFile`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#configuration-file) global option to look for a file in a custom location.
+
+Nonetheless, you can override configuration options from configuration files with command line arguments.
+
+### The Nyx State
+
+You can enable writing the Nyx [state]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/index.md %}) file by using the [`--state-file`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#state-file) argument. You can have it in JSON or YAML, depending on the extension you set. Example:
+
+```bash
+nyx --state-file=nyx-state.json infer
+```
+
+After this command runs you can read the `nyx-state.json` file to inspect its contents and use them for other purposes. Check out the [State Reference]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/index.md %}) to know more about the contents and how powerful this can be.
 
 ### Exit codes
 
-The command line is not yet available and this section is marked as a TODO.
-{: .notice--warning}
+Nyx always returns 0 as the exit code unless some error occured, in which case 1 or other values other than 0 are returned.
+
+## Using the Docker image
+
+Many teams prefer using Docker containers for their CI/CD and local development environments. If that's your case you can use the Docker container that comes out of the box with Nyx.
+
+The Docker images are published onto the two main registries:
+
+* [Docker Hub](https://hub.docker.com/repository/docker/mooltiverse/nyx) (the default)
+* [GitHub Container Registry](https://github.com/mooltiverse/nyx/pkgs/container/nyx)
+
+Nyx' Docker image has a small footprint (less than 10Mb) and uses [Alpine Linux](https://www.alpinelinux.org/) as the base image.
+
+All the examples in this page assume you're using the `latest` image pulling it from [Docker Hub](https://hub.docker.com/repository/docker/mooltiverse/nyx). They also assume you're making an ephemeral use of the container (you run it and dispose it every time). In case you need advanced use cases other than these please refer to the official [Docker Documentation](https://docs.docker.com/).
+{: .notice--info}
+
+### Requisites
+
+All you need is a recent version of [Docker](https://www.docker.com/) installed and running.
+
+### Pull the image
+
+Let's start by pulling the image from the public registry. Open a shell and run:
+
+```bash
+$ docker pull mooltiverse/nyx:latest
+latest: Pulling from mooltiverse/nyx
+ab6db1bc80d0: Pull complete
+[...]
+Digest: sha256:976f4821d643e02fc55c884cd6c9af5e958011132145150b7dd97e01d71ba055
+Status: Downloaded newer image for mooltiverse/latest
+mooltiverse/latest
+```
+
+and make sure the new image is there:
+
+```bash
+$ docker image ls
+REPOSITORY                                            TAG                 IMAGE ID       CREATED        SIZE
+mooltiverse/nyx                                       latest              a14cbc284e81   2 days ago     7.35MB
+```
+
+### Run the container
+
+To run the container you simply run a command like:
+
+```bash
+$ docker run -it --rm -v /local/path/to/project:/project mooltiverse/nyx:latest
+```
+
+A few things to note here:
+
+1. there is no explicit command executed within the container because [`nyx infer`]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer) is executed by default. This will generate and display the latest version for the project but will not change anything in the project directory. To run other commands you can specify them explicitly, as shown below
+2. a local folder (`/local/path/to/project`) is mounted from the host into the container at the default location `/project`. You need to change `/local/path/to/project` to whatever path is hosting your Git repository, or mount a Docker volume hosting the Git repository in case you already have one (in this case, pass your volume name to the command line like `docker run -it --rm -v project-volume:/project mooltiverse/nyx:latest [...]`, where `project-volume` has to be changed to your volume name)
+3. Nyx is using the default configuration means ([configuration files]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}#supported-file-grammars) available in the project directory at standard locations)
+
+Let's see how to tweak these.
+
+#### Running specific commands
+
+In order to run a specific command you need to pass it on the command line, like:
+
+```bash
+$ docker run -it --rm -v /local/path/to/project:/project mooltiverse/nyx:latest nyx <COMMAND>
+```
+
+So if you need to run the [publish]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#publish) command, run the container as:
+
+```bash
+$ docker run -it --rm -v /local/path/to/project:/project mooltiverse/nyx:latest nyx publish
+```
+
+#### Mounting the project volume or folder
+
+You can pass Nyx your project folder as a path on the host or as a Docker volume. Whet you need to do is:
+
+* replace `/local/path/to/project` with an actual host path when the project directory is shared from the Docker host to the container
+* replace `/local/path/to/project` with a Docker volume name when the project directory is already in a Docker volume
+
+For more on volumes and mounts please see [the official Docker documentation](https://docs.docker.com/storage/volumes/).
+
+#### Passing the configuration to Nyx
+
+Generally speaking, configuring Nyx within a container is just like using it from the [command line](#using-the-command-line). This means that if [configuration files]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}#supported-file-grammars) are available in the project directory at their default locations they will be loaded as usual and if additional options are passed on the [command line]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}#command-line-options) they will be used.
+
+The one caveat abous passing configuration as [environment variables]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}#environment-variables) in a Docker container is about setting those variables by means of one or more `-e` [flags](https://docs.docker.com/engine/reference/run/#env-environment-variables).
 
 ## Using the Gradle plugin
 
@@ -134,9 +318,6 @@ subprojects {
 ### Core tasks
 
 Once the plugin is applied the following tasks and [dependencies](https://docs.gradle.org/current/userguide/tutorial_using_tasks.html#sec:task_dependencies) are available. All tasks belong to the `Release` group.
-
-When running Gradle there is no specific task to run the [`help`](#help) command but you can use Gradle's commands like `gradle --help` to print the generic command line help or `gradle tasks [--all]` to see the list of available tasks. See the [Gradle Command-Line Interface](https://docs.gradle.org/current/userguide/command_line_interface.html) for more.
-{: .notice--info}
 
 #### `nyxClean`
 

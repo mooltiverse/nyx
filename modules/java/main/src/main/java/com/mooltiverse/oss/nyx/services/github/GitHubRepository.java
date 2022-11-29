@@ -15,8 +15,11 @@
  */
 package com.mooltiverse.oss.nyx.services.github;
 
-import java.util.Map;
+import java.util.Objects;
 
+import org.kohsuke.github.GHRepository;
+
+import com.mooltiverse.oss.nyx.io.TransportException;
 import com.mooltiverse.oss.nyx.services.GitHostedRepository;
 
 /**
@@ -24,16 +27,47 @@ import com.mooltiverse.oss.nyx.services.GitHostedRepository;
  */
 public class GitHubRepository extends GitHubEntity implements GitHostedRepository {
     /**
-     * Creates the repository object modelled by the given attributes.
-     * 
-     * @param api the reference to the API used to communicate with the remote end. Can't be {@code null}
-     * @param attributes the map of attributes for this object. Can't be {@code null}
-     * 
-     * @throws NullPointerException if the given attributes map is {@code null}
-     * @throws IllegalArgumentException if the map of attributes is empty
+     * The repository name
      */
-    GitHubRepository(API api, Map<String, Object> attributes) {
-        super(api, attributes);
+    private final String name;
+
+    /**
+     * The repository full name
+     */
+    private final String fullName;
+
+    /**
+     * The repository description
+     */
+    private final String description;
+
+    /**
+     * The repository default branch
+     */
+    private final String defaultBranch;
+
+    /**
+     * The repository HTTP URL
+     */
+    private final String httpUrl;
+
+    /**
+     * Creates the repository object modelled by the given reference.
+     * 
+     * @param repo the reference to the backing object. Can't be {@code null}
+     * 
+     * @throws NullPointerException if the given reference is {@code null}
+     * @throws TransportException if the given reference can't be read for some reasons
+     */
+    GitHubRepository(GHRepository repo)
+        throws TransportException {
+        super(repo);
+        Objects.requireNonNull(repo, "The repository reference cannot be null");
+        this.name = repo.getName();
+        this.fullName = repo.getFullName();
+        this.description = repo.getDescription();
+        this.defaultBranch = repo.getDefaultBranch();
+        this.httpUrl = repo.getHttpTransportUrl();
     }
 
     /**
@@ -41,7 +75,7 @@ public class GitHubRepository extends GitHubEntity implements GitHostedRepositor
      */
     @Override
     public String getDefaultBranch() {
-        return getAttributes().get("default_branch").toString();
+        return defaultBranch;
     }
 
     /**
@@ -49,7 +83,7 @@ public class GitHubRepository extends GitHubEntity implements GitHostedRepositor
      */
     @Override
     public String getDescription() {
-        return getAttributes().get("description").toString();
+        return description;
     }
 
     /**
@@ -57,7 +91,7 @@ public class GitHubRepository extends GitHubEntity implements GitHostedRepositor
      */
     @Override
     public String getFullName() {
-        return getAttributes().get("full_name").toString();
+        return fullName;
     }
 
     /**
@@ -65,15 +99,7 @@ public class GitHubRepository extends GitHubEntity implements GitHostedRepositor
      */
     @Override
     public String getHTTPURL() {
-        return getAttributes().get("clone_url").toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getID() {
-        return getAttributes().get("id").toString();
+        return httpUrl;
     }
 
     /**
@@ -81,6 +107,6 @@ public class GitHubRepository extends GitHubEntity implements GitHostedRepositor
      */
     @Override
     public String getName() {
-        return getAttributes().get("name").toString();
+        return name;
     }
 }

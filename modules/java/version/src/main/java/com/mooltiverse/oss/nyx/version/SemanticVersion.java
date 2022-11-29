@@ -120,7 +120,7 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
      * objects to use as identifiers in the prerelease block. {@code null} items are ignored. Integers and strings
      * representing integers must not have leading zeroes or represent negative numbers. If the array is {@code null}
      * then the instance will have no prerelease block
-     * @param buildIdentifiers the {@code buildIdentifiers} the array of  {@link String} to use as identifiers in
+     * @param buildIdentifiers the {@code buildIdentifiers} the array of {@link String} to use as identifiers in
      * the build block. {@code null} items are ignored. If the array is {@code null} then the instance will
      * have no build block
      *
@@ -268,7 +268,7 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
      * that the object with "lower precedence" returns a negative number.
      * <br><br>
      * However, to cope with the {@link Comparable} contract, which imposes a total ordering, we need to amend the above
-     * rules and make them s little stricter just because two versions with different values can't be considered equal
+     * rules and make them a little stricter just because two versions with different values can't be considered equal
      * (also see {@link #equals(Object)}). With more detail:
      * <br>
      * - rule #10 is amended so that two versions that only differ in their build metadata will not return 0 (as if they
@@ -563,7 +563,7 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
      * All numeric identifiers in the core version ({@code major.minor.patch}) and in the prerelease metadata are
      * sanitized by removing all leading zeroes to make them compliant. Numeric identifiers in the build metadata part
      * are left intact, even when they have leading zeroes.
-     * If the given string contains a prefix (see {@link #sanitizePrefix(String)}) or illegal characters  they are left
+     * If the given string contains a prefix (see {@link #sanitizePrefix(String)}) or illegal characters they are left
      * untouched and they are returned as they were in the input string.
      *
      * @param s a semantic version string which may have illegal leading zeroes to be removed in the numeric identifiers
@@ -1165,7 +1165,7 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
      * incremented by one. Prerelease and build parts are left intact.
      *
      * @return a new instance with the major and minor numbers of this current instance and the patch number
-     *      * incremented by one.
+     * incremented by one.
      */
     public SemanticVersion bumpPatch() {
         return new SemanticVersion(coreIdentifier.bumpPatch(), prereleaseIdentifier, buildIdentifier);
@@ -1238,7 +1238,7 @@ public class SemanticVersion extends Version implements Comparable<SemanticVersi
         try {
             Integer.valueOf(id);
             // it's a number and can't be bumped
-            throw new IllegalArgumentException(String.format("The value '%s' is numeric ant can't be used as a string identifier in the prerelease", id));
+            throw new IllegalArgumentException(String.format("The value '%s' is numeric and can't be used as a string identifier in the prerelease", id));
         }
         catch (NumberFormatException nfe) {
             // ok, not a number. Proceed
