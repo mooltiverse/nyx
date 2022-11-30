@@ -69,6 +69,9 @@ With this example definition, all changes not bringing bug fixes or new features
 
 As you can guess the sections you define here strongly depend on the configured [commit message convention]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/commit-message-conventions.md %}).
 
+When using multiple [configuration methods]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}) or customizing [presets]({{ site.baseurl }}{% link _pages/guide/user/04.configuration-presets/index.md %}), these values must be inherited or overridden as a whole. Overriding single values and inheriting others is not supported for this type of configuration option so when they are re-declared at one configuration level, all inherited values from those configuration methods with lower precedence are suppressed.
+{: .notice--warning}
+
 #### Substitutions
 
 | ------------------------- | ---------------------------------------------------------------------------------------- |
@@ -102,6 +105,9 @@ So if the changelog contains the `#123` string it will be replaced with `{% raw 
 As you can see by the example, the `%s` placeholder is used twice in the format string but the same value `123` is used for both replacements.
 
 Note that all occurrences are treated as strings, so the `%s` placeholder is the only one allowed (no numbers, dates etc), which means that even numbers will be treated as strings.
+
+When using multiple [configuration methods]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}) or customizing [presets]({{ site.baseurl }}{% link _pages/guide/user/04.configuration-presets/index.md %}), these values must be inherited or overridden as a whole. Overriding single values and inheriting others is not supported for this type of configuration option so when they are re-declared at one configuration level, all inherited values from those configuration methods with lower precedence are suppressed.
+{: .notice--warning}
 
 #### Template
 

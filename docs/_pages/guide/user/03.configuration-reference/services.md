@@ -23,6 +23,9 @@ Each service configuration has the following attributes:
 | [`services/<NAME>/options`](#options)                                                      | [map]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}#collections-of-objects) | `--services-<NAME>-options-<OPTION>=<VALUE>`                          | `NYX_SERVICES_<NAME>_OPTIONS-<OPTION>=<VALUE>`                          | Empty                                                |
 | [`services/<NAME>/type`](#type)                                                            | string  | `--services-<NAME>-type=<TYPE>`                                       | `NYX_SERVICES_<NAME>_TYPE=<TYPE>`                                       | N/A                                                  |
 
+When using multiple [configuration methods]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}) or customizing [presets]({{ site.baseurl }}{% link _pages/guide/user/04.configuration-presets/index.md %}), these values must be inherited or overridden as a whole. Overriding single values and inheriting others is not supported for this type of configuration option so when they are re-declared at one configuration level, all inherited values from those configuration methods with lower precedence are suppressed.
+{: .notice--warning}
+
 #### Name
 
 | ------------------------- | ---------------------------------------------------------------------------------------- |
