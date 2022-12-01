@@ -39,7 +39,7 @@ public class CommitMessageConventions {
      */
     public static final CommitMessageConvention GITMOJI = new CommitMessageConvention() {
         {
-            setExpression("(?m)^(:(?<type>[a-zA-Z0-9_]+):)( (?<title>.+))?$(?s).*");
+            setExpression("(?m)^(?<type>:[a-zA-Z0-9_]+:)( (?<title>.+))?$(?s).*"); 
 
             getBumpExpressions().put("major", "(?m)^:boom:(?s).*");
             getBumpExpressions().put("minor", "(?m)^:sparkles:(?s).*");
