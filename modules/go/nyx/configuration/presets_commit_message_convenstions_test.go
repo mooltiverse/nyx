@@ -103,13 +103,13 @@ var (
 		title        *string
 		bump         *string
 	}{
-		{message: utl.PointerToString(":boom:"), returnedType: utl.PointerToString("boom"), scope: nil, title: nil, bump: utl.PointerToString("major")},
-		{message: utl.PointerToString(":zap: A single line message :art:"), returnedType: utl.PointerToString("zap"), scope: nil, title: utl.PointerToString("A single line message :art:"), bump: utl.PointerToString("patch")},
-		{message: utl.PointerToString(":zap: A double line message :art:\nSecond line"), returnedType: utl.PointerToString("zap"), scope: nil, title: utl.PointerToString("A double line message :art:"), bump: utl.PointerToString("patch")},
-		//{message: utl.PointerToString(":zap: A double line message :art:\r\nSecond line"), returnedType: utl.PointerToString("zap"), scope: nil, title: utl.PointerToString("A double line message :art:"), bump: utl.PointerToString("patch")},
-		{message: utl.PointerToString(":unknownemoji:"), returnedType: utl.PointerToString("unknownemoji"), scope: nil, title: nil, bump: nil},
-		{message: utl.PointerToString(":unknownemoji: A commit with unknown type"), returnedType: utl.PointerToString("unknownemoji"), scope: nil, title: utl.PointerToString("A commit with unknown type"), bump: nil},
-		{message: utl.PointerToString(":unknownemoji: A commit with unknown type\nAnd a second line"), returnedType: utl.PointerToString("unknownemoji"), scope: nil, title: utl.PointerToString("A commit with unknown type"), bump: nil},
+		{message: utl.PointerToString(":boom:"), returnedType: utl.PointerToString(":boom:"), scope: nil, title: nil, bump: utl.PointerToString("major")},
+		{message: utl.PointerToString(":zap: A single line message :art:"), returnedType: utl.PointerToString(":zap:"), scope: nil, title: utl.PointerToString("A single line message :art:"), bump: utl.PointerToString("patch")},
+		{message: utl.PointerToString(":zap: A double line message :art:\nSecond line"), returnedType: utl.PointerToString(":zap:"), scope: nil, title: utl.PointerToString("A double line message :art:"), bump: utl.PointerToString("patch")},
+		//{message: utl.PointerToString(":zap: A double line message :art:\r\nSecond line"), returnedType: utl.PointerToString(":zap:"), scope: nil, title: utl.PointerToString("A double line message :art:"), bump: utl.PointerToString("patch")},
+		{message: utl.PointerToString(":unknownemoji:"), returnedType: utl.PointerToString(":unknownemoji:"), scope: nil, title: nil, bump: nil},
+		{message: utl.PointerToString(":unknownemoji: A commit with unknown type"), returnedType: utl.PointerToString(":unknownemoji:"), scope: nil, title: utl.PointerToString("A commit with unknown type"), bump: nil},
+		{message: utl.PointerToString(":unknownemoji: A commit with unknown type\nAnd a second line"), returnedType: utl.PointerToString(":unknownemoji:"), scope: nil, title: utl.PointerToString("A commit with unknown type"), bump: nil},
 	}
 
 	/*
