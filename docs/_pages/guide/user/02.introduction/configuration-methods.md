@@ -34,7 +34,7 @@ Options are evaluated in the following order:
 8. [preset]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#preset) configuration
 9. default value
 
-This means that command line options have priority over all others while default values are only taken into account if no other mean is used for a certain option.
+This means that command line options have priority over all others while default values are only taken into account if no other means is used for a certain option.
 
 Please note that Nyx searches configuration files at standard locations using default names `.nyx.yaml` (or `.nyx.yml`), `.nyx.json`, `.nyx-shared.yaml` (or `.nyx-shared.yml`), `.nyx-shared.json` (pay attention to the leading `.`) so as long as you use one of these file names and the file is available in the current working directory you don't need to use the [`configurationFile`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#configuration-file) option. The file extension reflects the grammar the file must be authored with and if none is available among the ones listed above JSON is assumed by default. If more than one default file is present, they will be evaluated following the above order (`.nyx.yaml` takes precedence over `.nyx.json`, while `.nyx-shared.yaml` takes precedence over `.nyx-shared.json`).
 
@@ -43,6 +43,9 @@ As a rule of thumb, consider using default values and [presets]({{ site.baseurl 
 
 Since there are so many different ways to configure Nyx, knowing how options are evaluated in the end might be cumbersome. A quick way to see how the final configuration is resolved is by [serializing the state file]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#state-file) and inspect the [`configuration`]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#configuration) element.
 {: .notice--info}
+
+When using multiple configuration methods or customizing [presets]({{ site.baseurl }}{% link _pages/guide/user/04.configuration-presets/index.md %}), complex configuration options (like `commitMessageConventions`, `releaseTypes`, `services`, for example) must be inherited or overridden as a whole. Overriding single values and inheriting others is not supported for this type of configuration option so when they are re-declared at one configuration level, all inherited values from those configuration methods with lower precedence are suppressed.
+{: .notice--warning}
 
 ## Command line options
 
@@ -148,7 +151,7 @@ The grammar definition is available at [https://www.json.org/](https://www.json.
 
 ### Gradle
 
-[Gradle build scripts](https://docs.gradle.org/current/userguide/writing_build_scripts.html) can be used to pass options to Nyx by mean of extension configuration. To use it just define the extension configuration section in your `settings.gradle` or `build.gradle` script like:
+[Gradle build scripts](https://docs.gradle.org/current/userguide/writing_build_scripts.html) can be used to pass options to Nyx by means of extension configuration. To use it just define the extension configuration section in your `settings.gradle` or `build.gradle` script like:
 
 ```groovy
 nyx {

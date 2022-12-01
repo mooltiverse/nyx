@@ -34,6 +34,9 @@ Each release asset has the following attributes:
 | [`releaseAssets/<NAME>/path`](#path)                                                       | string  | `--release-assets-<NAME>-path=<TEMPLATE>`                             | `NYX_RELEASE_ASSETS_<NAME>_PATH=<TEMPLATE>`                             | N/A                                                    |
 | [`releaseAssets/<NAME>/type`](#type)                                                       | string  | `--release-assets-<NAME>-type=<TEMPLATE>`                             | `NYX_RELEASE_ASSETS_<NAME>_TYPE=<TEMPLATE>`                             | N/A                                                    |
 
+When using multiple [configuration methods]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}) or customizing [presets]({{ site.baseurl }}{% link _pages/guide/user/04.configuration-presets/index.md %}), these values must be inherited or overridden as a whole. Overriding single values and inheriting others is not supported for this type of configuration option so when they are re-declared at one configuration level, all inherited values from those configuration methods with lower precedence are suppressed.
+{: .notice--warning}
+
 #### Name
 
 | ------------------------- | ---------------------------------------------------------------------------------------- |

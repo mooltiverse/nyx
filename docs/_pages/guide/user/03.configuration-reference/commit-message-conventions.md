@@ -51,6 +51,9 @@ Each convention has the following attributes:
 | [`commitMessageConventions/<NAME>/expression`](#expression)            | string  | `--commit-message-conventions-<NAME>-expression=<REGEX>`    | `NYX_COMMIT_MESSAGE_CONVENTIONS_<NAME>_EXPRESSION=<REGEX>`     | N/A                                        |
 | [`commitMessageConventions/<NAME>/bumpExpressions`](#bump-expressions) | [map]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}#collections-of-objects) | `--commit-message-conventions-<NAME>-bumpExpressions-<IDENTIFIER>=<REGEX>` | `NYX_COMMIT_MESSAGE_CONVENTIONS_<NAME>_BUMP_EXPRESSIONS_<IDENTIFIER>=<REGEX>` | N/A                                        |
 
+When using multiple [configuration methods]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}) or customizing [presets]({{ site.baseurl }}{% link _pages/guide/user/04.configuration-presets/index.md %}), these values must be inherited or overridden as a whole. Overriding single values and inheriting others is not supported for this type of configuration option so when they are re-declared at one configuration level, all inherited values from those configuration methods with lower precedence are suppressed.
+{: .notice--warning}
+
 #### Expression
 
 | ------------------------- | ---------------------------------------------------------------------------------------- |

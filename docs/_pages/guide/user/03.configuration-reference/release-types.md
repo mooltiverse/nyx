@@ -113,6 +113,9 @@ Each release type has the following attributes:
 | [`releaseTypes/<NAME>/versionRange`](#version-range)                                       | string  | `--release-types-<NAME>-version-range=<TEMPLATE>`                     | `NYX_RELEASE_TYPES_<NAME>_VERSION_RANGE=<TEMPLATE>`                     | Empty (no constrained range)                                               |
 | [`releaseTypes/<NAME>/versionRangeFromBranchName`](#version-range-from-branch-name)        | boolean | `--release-types-<NAME>-version-range-from-branch-name=true|false`    | `NYX_RELEASE_TYPES_<NAME>_VERSION_RANGE_FROM_BRANCH_NAME=true|false`    | `false`                                              |
 
+When using multiple [configuration methods]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}) or customizing [presets]({{ site.baseurl }}{% link _pages/guide/user/04.configuration-presets/index.md %}), these values must be inherited or overridden as a whole. Overriding single values and inheriting others is not supported for this type of configuration option so when they are re-declared at one configuration level, all inherited values from those configuration methods with lower precedence are suppressed.
+{: .notice--warning}
+
 #### Assets
 
 | ------------------------- | ---------------------------------------------------------------------------------------- |

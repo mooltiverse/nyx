@@ -85,13 +85,13 @@ public class CommitMessageConventionsTests {
      */
     static Stream<Arguments> wellKnownValidGitMojiMessages() {
         return Stream.of(
-            arguments(":boom:", "boom", null, null, "major"),
-            arguments(":zap: A single line message :art:", "zap", null, "A single line message :art:", "patch"),
-            arguments(":zap: A double line message :art:\nSecond line", "zap", null, "A double line message :art:", "patch"),
-            arguments(":zap: A double line message :art:\r\nSecond line", "zap", null, "A double line message :art:", "patch"),
-            arguments(":unknownemoji:", "unknownemoji", null, null, null),
-            arguments(":unknownemoji: A commit with unknown type", "unknownemoji", null, "A commit with unknown type", null),
-            arguments(":unknownemoji: A commit with unknown type\nAnd a second line", "unknownemoji", null, "A commit with unknown type", null)
+            arguments(":boom:", ":boom:", null, null, "major"),
+            arguments(":zap: A single line message :art:", ":zap:", null, "A single line message :art:", "patch"),
+            arguments(":zap: A double line message :art:\nSecond line", ":zap:", null, "A double line message :art:", "patch"),
+            arguments(":zap: A double line message :art:\r\nSecond line", ":zap:", null, "A double line message :art:", "patch"),
+            arguments(":unknownemoji:", ":unknownemoji:", null, null, null),
+            arguments(":unknownemoji: A commit with unknown type", ":unknownemoji:", null, "A commit with unknown type", null),
+            arguments(":unknownemoji: A commit with unknown type\nAnd a second line", ":unknownemoji:", null, "A commit with unknown type", null)
         );
     }
 
