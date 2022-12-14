@@ -30,6 +30,7 @@ import com.mooltiverse.oss.nyx.command.template.CommandProxy;
 import com.mooltiverse.oss.nyx.command.template.CommandSelector;
 import com.mooltiverse.oss.nyx.configuration.SimpleConfigurationLayer;
 import com.mooltiverse.oss.nyx.git.tools.Scenario;
+import com.mooltiverse.oss.nyx.git.tools.Script;
 
 @DisplayName("Clean")
 public class CleanTestTemplates {
@@ -44,8 +45,9 @@ public class CleanTestTemplates {
         @TestTemplate
         @DisplayName("Clean()")
         @Baseline(Scenario.FROM_SCRATCH)
-        void constructorTest(@CommandSelector(Commands.CLEAN) CommandProxy command)
+        void constructorTest(@CommandSelector(Commands.CLEAN) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             assertNotNull(command);
         }
     }
@@ -60,8 +62,9 @@ public class CleanTestTemplates {
         @TestTemplate
         @DisplayName("Clean.state()")
         @Baseline(Scenario.FROM_SCRATCH)
-        void stateTest(@CommandSelector(Commands.CLEAN) CommandProxy command)
+        void stateTest(@CommandSelector(Commands.CLEAN) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             assertNotNull(command.state());
         }
     }
@@ -77,8 +80,9 @@ public class CleanTestTemplates {
         @TestTemplate
         @DisplayName("Clean.isUpToDate()")
         @Baseline(Scenario.INITIAL_COMMIT)
-        void isUpToDateTest(@CommandSelector(Commands.CLEAN) CommandProxy command)
+        void isUpToDateTest(@CommandSelector(Commands.CLEAN) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
 
             // run once, to start
             command.run();
@@ -93,8 +97,9 @@ public class CleanTestTemplates {
         @TestTemplate
         @DisplayName("Clean.isUpToDate() with state file")
         @Baseline(Scenario.INITIAL_COMMIT)
-        void isUpToDateWithStateFileTest(@CommandSelector(Commands.CLEAN) CommandProxy command)
+        void isUpToDateWithStateFileTest(@CommandSelector(Commands.CLEAN) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             String stateFilePath = "state-file.txt";
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             configurationLayerMock.setStateFile(stateFilePath);
@@ -105,6 +110,7 @@ public class CleanTestTemplates {
             assertTrue(command.isUpToDate());
 
             File stateFile = new File(stateFilePath);
+            stateFile.deleteOnExit();
             stateFile.createNewFile();
 
             // now it's not up do date anymore
@@ -124,8 +130,9 @@ public class CleanTestTemplates {
         @TestTemplate
         @DisplayName("Clean.isUpToDate() with changelog file")
         @Baseline(Scenario.INITIAL_COMMIT)
-        void isUpToDateWithChangelogFileTest(@CommandSelector(Commands.CLEAN) CommandProxy command)
+        void isUpToDateWithChangelogFileTest(@CommandSelector(Commands.CLEAN) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             String changelogFilePath = "changelog-file.txt";
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             configurationLayerMock.getChangelog().setPath(changelogFilePath);
@@ -136,6 +143,7 @@ public class CleanTestTemplates {
             assertTrue(command.isUpToDate());
 
             File changelogFile = new File(changelogFilePath);
+            changelogFile.deleteOnExit();
             changelogFile.createNewFile();
 
             // now it's up do date anymore
@@ -160,8 +168,9 @@ public class CleanTestTemplates {
         @TestTemplate
         @DisplayName("Clean idempotency")
         @Baseline(Scenario.INITIAL_COMMIT)
-        void idempotency(@CommandSelector(Commands.CLEAN) CommandProxy command)
+        void idempotency(@CommandSelector(Commands.CLEAN) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             String stateFilePath = "state-file.txt";
             String changelogFilePath = "changelog-file.txt";
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
@@ -174,8 +183,10 @@ public class CleanTestTemplates {
             assertTrue(command.isUpToDate());
 
             File stateFile = new File(stateFilePath);
+            stateFile.deleteOnExit();
             stateFile.createNewFile();
             File changelogFile = new File(changelogFilePath);
+            changelogFile.deleteOnExit();
             changelogFile.createNewFile();
 
             // now it's not up do date anymore
@@ -207,8 +218,9 @@ public class CleanTestTemplates {
         @TestTemplate
         @DisplayName("Clean.run() deletes state file")
         @Baseline(Scenario.FROM_SCRATCH)
-        void deleteStateFileTest(@CommandSelector(Commands.CLEAN) CommandProxy command)
+        void deleteStateFileTest(@CommandSelector(Commands.CLEAN) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             String stateFilePath = "state-file.txt";
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             configurationLayerMock.setStateFile(stateFilePath);
@@ -218,6 +230,7 @@ public class CleanTestTemplates {
             command.run();
 
             File stateFile = new File(stateFilePath);
+            stateFile.deleteOnExit();
             stateFile.createNewFile();
             assertTrue(stateFile.exists());
 
@@ -233,8 +246,9 @@ public class CleanTestTemplates {
         @TestTemplate
         @DisplayName("Clean.run() deletes changelog file")
         @Baseline(Scenario.FROM_SCRATCH)
-        void deleteChangelogFileTest(@CommandSelector(Commands.CLEAN) CommandProxy command)
+        void deleteChangelogFileTest(@CommandSelector(Commands.CLEAN) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             String changelogFilePath = "changelog-file.txt";
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             configurationLayerMock.getChangelog().setPath(changelogFilePath);
@@ -244,6 +258,7 @@ public class CleanTestTemplates {
             command.run();
 
             File changelogFile = new File(changelogFilePath);
+            changelogFile.deleteOnExit();
             changelogFile.createNewFile();
             assertTrue(changelogFile.exists());
     

@@ -85,7 +85,6 @@ public class Script extends Workbench {
     public static Script cloneFrom(String uri, String user, String password)
         throws Exception {
         File directory = FileSystemUtil.newTempDirectory(null, "nyx-test-script-");
-        directory.deleteOnExit();
         return cloneFrom(uri, directory, user, password);
     }
 

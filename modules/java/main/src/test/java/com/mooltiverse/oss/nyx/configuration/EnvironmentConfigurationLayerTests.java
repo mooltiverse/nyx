@@ -152,6 +152,7 @@ public class EnvironmentConfigurationLayerTests {
         assertNull(environmentConfigurationLayer.getDirectory());
 
         File directory = Files.createTempDirectory(null).toFile();
+        directory.deleteOnExit();
         environmentConfigurationLayer.environment.put("NYX_DIRECTORY", directory.getAbsolutePath());
         assertEquals(directory.getAbsolutePath(), new File(environmentConfigurationLayer.getDirectory()).getAbsolutePath());
     }

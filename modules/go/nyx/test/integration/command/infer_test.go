@@ -23,6 +23,7 @@ package command_test
 
 import (
 	"fmt"     // https://pkg.go.dev/fmt
+	"os"      // https://pkg.go.dev/os
 	"strings" // https://pkg.go.dev/strings
 	"testing" // https://pkg.go.dev/testing
 
@@ -389,6 +390,7 @@ func containsAllIdentifiers(s1 *[]*ent.Identifier, s2 *[]*ent.Identifier) bool {
 func TestInferConstructor(t *testing.T) {
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.FROM_SCRATCH()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			assert.NotNil(t, command)
 		})
 	}
@@ -400,6 +402,7 @@ Check that the State method never returns a nil object
 func TestInferState(t *testing.T) {
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.FROM_SCRATCH()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			assert.NotNil(t, (*command).State())
 		})
 	}
@@ -414,6 +417,7 @@ func TestInferIsUpToDate(t *testing.T) {
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.FROM_SCRATCH()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			upToDate, err := (*command).IsUpToDate()
 			assert.NoError(t, err)
 			assert.False(t, upToDate)
@@ -449,6 +453,7 @@ func TestInferIsUpToDateInDirtyRepository(t *testing.T) {
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.FROM_SCRATCH()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			upToDate, err := (*command).IsUpToDate()
 			assert.NoError(t, err)
 			assert.False(t, upToDate)
@@ -509,6 +514,7 @@ func TestInferIdempotencyWithCommitMessageConvention(t *testing.T) {
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.ONE_BRANCH_SHORT()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			// add a mock convention that accepts all non nil messages and dumps the minor identifier for each
 			commitMessageConventions, _ := ent.NewCommitMessageConventionsWith(&[]*string{utl.PointerToString("testConvention")},
@@ -745,6 +751,7 @@ func TestInferIdempotencyWithoutCommitMessageConvention(t *testing.T) {
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.ONE_BRANCH_SHORT()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			// run a first time
 			_, err := (*command).Run()
 			assert.NoError(t, err)
@@ -973,6 +980,7 @@ func TestInferIdempotencyInDirtyRepository(t *testing.T) {
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.ONE_BRANCH_SHORT()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			// run a first time
 			_, err := (*command).Run()
 			assert.NoError(t, err)
@@ -1207,6 +1215,7 @@ func TestInferMatchReleaseTypeWithNonExistingReleaseTypeThrowsError(t *testing.T
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			// add some fictional release types
 			releaseType := ent.NewReleaseType()
@@ -1234,6 +1243,7 @@ func TestInferMatchReleaseTypeBasedOnBranchName(t *testing.T) {
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			// add some fictional release types
 			unmatchedReleaseType := ent.NewReleaseType()
@@ -1288,6 +1298,7 @@ func TestInferMatchReleaseTypeBasedOnEnvironmentVariables(t *testing.T) {
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			// since we can't set environment variables here we just use the PATH variable, which is always present
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			// add some fictional release types
@@ -1332,6 +1343,7 @@ func TestInferMatchCleanReleaseTypeBasedOnWorkspaceStatus(t *testing.T) {
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			// add some fictional release types
 			unmatchedReleaseType := ent.NewReleaseType()
@@ -1381,6 +1393,7 @@ func TestInferMatchDirtyReleaseTypeBasedOnWorkspaceStatus(t *testing.T) {
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			// add some fictional release types
 			unmatchedReleaseType := ent.NewReleaseType()
@@ -1432,6 +1445,7 @@ func TestInferMatchReleaseTypeBasedOnBranchNameAndEnvironmentVariablesAndWorkspa
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			// since we can't set environment variables here we just use the PATH variable, which is always present
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			// add some fictional release types
@@ -1493,6 +1507,7 @@ func TestInferExtraNonIntegerPrereleaseIdentifierThrowsError(t *testing.T) {
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.ONE_BRANCH_SHORT()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			// add a mock convention that accepts all non nil messages and dumps the minor identifier for each
 			commitMessageConventions, _ := ent.NewCommitMessageConventionsWith(&[]*string{utl.PointerToString("testConvention")},
@@ -1522,6 +1537,7 @@ func TestInferExtraIntegerPrereleaseIdentifier(t *testing.T) {
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.ONE_BRANCH_SHORT()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			// add a mock convention that accepts all non nil messages and dumps the minor identifier for each
 			commitMessageConventions, _ := ent.NewCommitMessageConventionsWith(&[]*string{utl.PointerToString("testConvention")},
@@ -1554,6 +1570,7 @@ func TestInferExtraIntegerPrereleaseIdentifierOverExistingOnes(t *testing.T) {
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.ONE_BRANCH_SHORT()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			// add a mock convention that accepts all non nil messages and dumps the minor identifier for each
 			commitMessageConventions, _ := ent.NewCommitMessageConventionsWith(&[]*string{utl.PointerToString("testConvention")},
@@ -1590,6 +1607,7 @@ func TestInferExtraBuildIdentifier(t *testing.T) {
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.ONE_BRANCH_SHORT()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			// add a mock convention that accepts all non nil messages and dumps the minor identifier for each
 			commitMessageConventions, _ := ent.NewCommitMessageConventionsWith(&[]*string{utl.PointerToString("testConvention")},
@@ -1622,6 +1640,7 @@ func TestInferExtraBuildIdentifierOverExistingOnes(t *testing.T) {
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.ONE_BRANCH_SHORT()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			// add a mock convention that accepts all non nil messages and dumps the minor identifier for each
 			commitMessageConventions, _ := ent.NewCommitMessageConventionsWith(&[]*string{utl.PointerToString("testConvention")},
@@ -1658,6 +1677,7 @@ func TestInferExtraMultipleIdentifiers(t *testing.T) {
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.ONE_BRANCH_SHORT()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			// add a mock convention that accepts all non nil messages and dumps the minor identifier for each
 			commitMessageConventions, _ := ent.NewCommitMessageConventionsWith(&[]*string{utl.PointerToString("testConvention")},
@@ -1690,6 +1710,7 @@ func TestInferExtraMultipledentifiersOverExistingOnes(t *testing.T) {
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.ONE_BRANCH_SHORT()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			// add a mock convention that accepts all non nil messages and dumps the minor identifier for each
 			commitMessageConventions, _ := ent.NewCommitMessageConventionsWith(&[]*string{utl.PointerToString("testConvention")},
@@ -1730,6 +1751,7 @@ func TestInferVersionRangeCheckWithStaticMatchingExpression(t *testing.T) {
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.ONE_BRANCH_SHORT()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			// add a mock convention that accepts all non nil messages and dumps the minor identifier for each
 			commitMessageConventions, _ := ent.NewCommitMessageConventionsWith(&[]*string{utl.PointerToString("testConvention")},
@@ -1764,6 +1786,7 @@ func TestInferVersionRangeCheckWithStaticNonMatchingExpression(t *testing.T) {
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.ONE_BRANCH_SHORT()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			// add a mock convention that accepts all non nil messages and dumps the minor identifier for each
 			commitMessageConventions, _ := ent.NewCommitMessageConventionsWith(&[]*string{utl.PointerToString("testConvention")},
@@ -1797,6 +1820,7 @@ func TestInferVersionRangeCheckWithStaticMalformedExpression(t *testing.T) {
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.ONE_BRANCH_SHORT()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			// add a mock convention that accepts all non nil messages and dumps the minor identifier for each
 			commitMessageConventions, _ := ent.NewCommitMessageConventionsWith(&[]*string{utl.PointerToString("testConvention")},
@@ -1830,6 +1854,7 @@ func TestInferVersionRangeCheckWithDynamicExpressionInferredFromParseableBranchN
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.INITIAL_COMMIT()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			// add a mock convention that accepts all non nil messages and dumps the minor identifier for each
 			commitMessageConventions, _ := ent.NewCommitMessageConventionsWith(&[]*string{utl.PointerToString("testConvention")},
@@ -1873,6 +1898,7 @@ func TestInferVersionRangeCheckWithDynamicExpressionInferredFromUnparseableBranc
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.INITIAL_COMMIT()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			// add a mock convention that accepts all non nil messages and dumps the minor identifier for each
 			commitMessageConventions, _ := ent.NewCommitMessageConventionsWith(&[]*string{utl.PointerToString("testConvention")},
@@ -1917,6 +1943,7 @@ func TestInferErrorOnRunWithValidButEmptyGitRepository(t *testing.T) {
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.FROM_SCRATCH()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			_, err := (*command).Run() // this always throws an error with these branches
 			assert.Error(t, err)
 
@@ -1930,6 +1957,7 @@ func TestInferRunUsingDefaultReleaseTypeWithInitialCommitOnly(t *testing.T) {
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.INITIAL_COMMIT()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			_, err := (*command).Run()
 			assert.NoError(t, err)
 
@@ -1992,6 +2020,7 @@ func TestInferRunUsingDefaultReleaseTypeWithInitialCommitOnlyAndInitialVersionOv
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.INITIAL_COMMIT()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			CUSTOM_INITIAL_VERSION := "12.13.14"
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			configurationLayerMock.SetInitialVersion(&CUSTOM_INITIAL_VERSION)
@@ -2059,6 +2088,7 @@ func TestInferRunUsingDefaultReleaseTypeWithInitialCommitOnlyAndVersionOverride(
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.INITIAL_COMMIT()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			CUSTOM_VERSION := "1.2.3"
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			var configurationLayer cnf.ConfigurationLayer
@@ -2126,6 +2156,7 @@ func TestInferRunUsingDefaultReleaseTypeWithInitialCommitOnlyAndBumpMajorOverrid
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.INITIAL_COMMIT()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			CUSTOM_BUMP := "major"
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			var configurationLayer cnf.ConfigurationLayer
@@ -2193,6 +2224,7 @@ func TestInferRunUsingDefaultReleaseTypeWithInitialCommitOnlyAndBumpMinorOverrid
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.INITIAL_COMMIT()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			CUSTOM_BUMP := "minor"
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			var configurationLayer cnf.ConfigurationLayer
@@ -2260,6 +2292,7 @@ func TestInferRunUsingDefaultReleaseTypeWithInitialCommitOnlyAndBumpPatchOverrid
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.INITIAL_COMMIT()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			CUSTOM_BUMP := "patch"
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			var configurationLayer cnf.ConfigurationLayer
@@ -2327,6 +2360,7 @@ func TestInferRunUsingDefaultReleaseTypeWithInitialCommitOnlyAndBumpAlphaOverrid
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.INITIAL_COMMIT()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			CUSTOM_BUMP := "alpha"
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			var configurationLayer cnf.ConfigurationLayer
@@ -2394,6 +2428,7 @@ func TestInferRunUsingDefaultReleaseTypeWithBumpMajorOverriddenByUserInRepoWithJ
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.INITIAL_VERSION()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			CUSTOM_BUMP := "major"
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			var configurationLayer cnf.ConfigurationLayer
@@ -2461,6 +2496,7 @@ func TestInferRunUsingDefaultReleaseTypeWithBumpMinorOverriddenByUserInRepoWithJ
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.INITIAL_VERSION()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			CUSTOM_BUMP := "minor"
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			var configurationLayer cnf.ConfigurationLayer
@@ -2528,6 +2564,7 @@ func TestInferRunUsingDefaultReleaseTypeWithBumpPatchOverriddenByUserInRepoWithJ
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.INITIAL_VERSION()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			CUSTOM_BUMP := "patch"
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			var configurationLayer cnf.ConfigurationLayer
@@ -2595,6 +2632,7 @@ func TestInferRunUsingDefaultReleaseTypeWithBumpAlphaOverriddenByUserInRepoWithJ
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.INITIAL_VERSION()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			CUSTOM_BUMP := "alpha"
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			var configurationLayer cnf.ConfigurationLayer
@@ -2662,6 +2700,7 @@ func TestInferRunUsingDefaultReleaseTypeWithReleaseLenientInRepoWithPrefixedVers
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.INITIAL_VERSION()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			var configurationLayer cnf.ConfigurationLayer
 			configurationLayer = configurationLayerMock
@@ -2729,6 +2768,7 @@ func TestInferRunUsingDefaultReleaseTypeWithoutReleaseLenientInRepoWithoutPrefix
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.INITIAL_VERSION()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			var configurationLayer cnf.ConfigurationLayer
 			configurationLayer = configurationLayerMock
@@ -2796,6 +2836,7 @@ func TestInferRunUsingDefaultReleaseTypeWithoutLenientAndWithPrefixReleaseInRepo
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.INITIAL_VERSION()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			var configurationLayer cnf.ConfigurationLayer
 			configurationLayer = configurationLayerMock
@@ -2864,6 +2905,7 @@ func TestInferRunUsingDefaultReleaseTypeInRepoWithSimpleLinearCommitHistoryAndNo
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.ONE_BRANCH_SHORT()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			_, err := (*command).Run()
 			assert.NoError(t, err)
 
@@ -2925,6 +2967,7 @@ func TestInferRunUsingDefaultReleaseTypeInRepoWithSimpleLinearCommitHistoryAndNo
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.ONE_BRANCH_SHORT()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			var configurationLayer cnf.ConfigurationLayer
 			configurationLayer = configurationLayerMock
@@ -2991,6 +3034,7 @@ func TestInferRunUsingDefaultReleaseTypeWithVersionOverriddenByUserInRepoWithFur
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.ONE_BRANCH_SHORT()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			var configurationLayer cnf.ConfigurationLayer
 			configurationLayer = configurationLayerMock
@@ -3057,6 +3101,7 @@ func TestInferRunUsingDefaultReleaseTypeWithBumpMajorOverrideInRepoWithFurtherNo
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.ONE_BRANCH_SHORT()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			CUSTOM_BUMP := "major"
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			var configurationLayer cnf.ConfigurationLayer
@@ -3124,6 +3169,7 @@ func TestInferRunUsingDefaultReleaseTypeWithBumpMinorOverrideInRepoWithFurtherNo
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.ONE_BRANCH_SHORT()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			CUSTOM_BUMP := "minor"
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			var configurationLayer cnf.ConfigurationLayer
@@ -3191,6 +3237,7 @@ func TestInferRunUsingDefaultReleaseTypeWithBumpPatchOverrideInRepoWithFurtherNo
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.ONE_BRANCH_SHORT()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			CUSTOM_BUMP := "patch"
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			var configurationLayer cnf.ConfigurationLayer
@@ -3258,6 +3305,7 @@ func TestInferRunUsingDefaultReleaseTypeWithBumpAlphaOverrideInRepoWithFurtherNo
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.ONE_BRANCH_SHORT()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			CUSTOM_BUMP := "alpha"
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			var configurationLayer cnf.ConfigurationLayer
@@ -3325,6 +3373,7 @@ func TestInferRunUsingDefaultReleaseTypeWithReleaseLenientAndWithoutPrefixInRepo
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.ONE_BRANCH_SHORT()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			var configurationLayer cnf.ConfigurationLayer
 			configurationLayer = configurationLayerMock
@@ -3392,6 +3441,7 @@ func TestInferRunUsingDefaultReleaseTypeWithoutReleaseLenientAndWithoutPrefixInR
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.ONE_BRANCH_SHORT()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			var configurationLayer cnf.ConfigurationLayer
 			configurationLayer = configurationLayerMock
@@ -3459,6 +3509,7 @@ func TestInferRunUsingDefaultReleaseTypeWithoutReleaseLenientAndWithPrefixInRepo
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.ONE_BRANCH_SHORT()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			var configurationLayer cnf.ConfigurationLayer
 			configurationLayer = configurationLayerMock
@@ -3528,6 +3579,7 @@ func TestInferRunUsingDefaultReleaseTypeInRepoWithOverlappingTagsCommit(t *testi
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.ONE_BRANCH_WITH_OVERLAPPING_TAGS()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			CUSTOM_BUMP := "patch"
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			var configurationLayer cnf.ConfigurationLayer
@@ -3595,6 +3647,7 @@ func TestInferRunUsingDefaultReleaseTypeWithAlwaysPositiveCommitConventionInRepo
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.ONE_BRANCH_SHORT()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			// add a mock convention that accepts all non nil messages and dumps the minor identifier for each
 			commitMessageConventions, _ := ent.NewCommitMessageConventionsWith(&[]*string{utl.PointerToString("testConvention")},
@@ -3667,6 +3720,7 @@ func TestInferRunUsingDefaultReleaseTypeWithAlwaysNegativeCommitConventionInRepo
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.ONE_BRANCH_SHORT()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			// add a mock convention that accepts all non nil messages and dumps the minor identifier for each
 			commitMessageConventions, _ := ent.NewCommitMessageConventionsWith(&[]*string{utl.PointerToString("testConvention")},
@@ -3738,6 +3792,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysPositiveCommitConventi
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("master")
 			MATCHING_RELEASE_TYPE_NAME := "mainline" // the name of the release type that must be matched in the branch
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
@@ -3816,6 +3871,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysNegativeCommitConventi
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("master")
 			MATCHING_RELEASE_TYPE_NAME := "mainline" // the name of the release type that must be matched in the branch
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
@@ -3894,6 +3950,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysPositiveCommitConventi
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("main")
 			MATCHING_RELEASE_TYPE_NAME := "mainline" // the name of the release type that must be matched in the branch
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
@@ -3971,6 +4028,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysNegativeCommitConventi
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("main")
 			MATCHING_RELEASE_TYPE_NAME := "mainline" // the name of the release type that must be matched in the branch
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
@@ -4048,6 +4106,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysPositiveCommitConventi
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("integration")
 			MATCHING_RELEASE_TYPE_NAME := "integration" // the name of the release type that must be matched in the branch
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
@@ -4125,6 +4184,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysNegativeCommitConventi
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("integration")
 			MATCHING_RELEASE_TYPE_NAME := "integration" // the name of the release type that must be matched in the branch
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
@@ -4202,6 +4262,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysPositiveCommitConventi
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("development")
 			MATCHING_RELEASE_TYPE_NAME := "integration" // the name of the release type that must be matched in the branch
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
@@ -4279,6 +4340,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysNegativeCommitConventi
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("development")
 			MATCHING_RELEASE_TYPE_NAME := "integration" // the name of the release type that must be matched in the branch
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
@@ -4356,6 +4418,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysPositiveCommitConventi
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("alpha")
 			MATCHING_RELEASE_TYPE_NAME := "maturity" // the name of the release type that must be matched in the branch
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
@@ -4433,6 +4496,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysNegativeCommitConventi
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("alpha")
 			MATCHING_RELEASE_TYPE_NAME := "maturity" // the name of the release type that must be matched in the branch
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
@@ -4510,6 +4574,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysPositiveCommitConventi
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("beta")
 			MATCHING_RELEASE_TYPE_NAME := "maturity" // the name of the release type that must be matched in the branch
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
@@ -4587,6 +4652,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysNegativeCommitConventi
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("beta")
 			MATCHING_RELEASE_TYPE_NAME := "maturity" // the name of the release type that must be matched in the branch
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
@@ -4664,6 +4730,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysPositiveCommitConventi
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("gamma")
 			MATCHING_RELEASE_TYPE_NAME := "maturity" // the name of the release type that must be matched in the branch
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
@@ -4741,6 +4808,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysNegativeCommitConventi
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("gamma")
 			MATCHING_RELEASE_TYPE_NAME := "maturity" // the name of the release type that must be matched in the branch
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
@@ -4818,6 +4886,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysPositiveCommitConventi
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("v0.x")
 			MATCHING_RELEASE_TYPE_NAME := "maintenance" // the name of the release type that must be matched in the branch
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
@@ -4895,6 +4964,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysNegativeCommitConventi
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("v0.x")
 			MATCHING_RELEASE_TYPE_NAME := "maintenance" // the name of the release type that must be matched in the branch
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
@@ -4972,6 +5042,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysPositiveCommitConventi
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("v1.x")
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			// add the 'extended' preset, which comes with standard release types
@@ -4998,6 +5069,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysPositiveCommitConventi
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("rel/0.x")
 			MATCHING_RELEASE_TYPE_NAME := "release" // the name of the release type that must be matched in the branch
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
@@ -5075,6 +5147,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysNegativeCommitConventi
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("rel/0.x")
 			MATCHING_RELEASE_TYPE_NAME := "release" // the name of the release type that must be matched in the branch
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
@@ -5152,6 +5225,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysPositiveCommitConventi
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("rel/1.x")
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			// add the 'extended' preset, which comes with standard release types
@@ -5178,6 +5252,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysPositiveCommitConventi
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("feature/SSO")
 			MATCHING_RELEASE_TYPE_NAME := "feature" // the name of the release type that must be matched in the branch
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
@@ -5255,6 +5330,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysNegativeCommitConventi
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("feature/SSO")
 			MATCHING_RELEASE_TYPE_NAME := "feature" // the name of the release type that must be matched in the branch
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
@@ -5332,6 +5408,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysPositiveCommitConventi
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("feature/IN-12345")
 			MATCHING_RELEASE_TYPE_NAME := "feature" // the name of the release type that must be matched in the branch
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
@@ -5409,6 +5486,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysNegativeCommitConventi
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("feature/IN-12345")
 			MATCHING_RELEASE_TYPE_NAME := "feature" // the name of the release type that must be matched in the branch
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
@@ -5486,6 +5564,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysPositiveCommitConventi
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("hotfix-98765")
 			MATCHING_RELEASE_TYPE_NAME := "hotfix" // the name of the release type that must be matched in the branch
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
@@ -5563,6 +5642,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysNegativeCommitConventi
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("hotfix-98765")
 			MATCHING_RELEASE_TYPE_NAME := "hotfix" // the name of the release type that must be matched in the branch
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
@@ -5640,6 +5720,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysPositiveCommitConventi
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("internal")
 			MATCHING_RELEASE_TYPE_NAME := "internal" // the name of the release type that must be matched in the branch
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
@@ -5719,6 +5800,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysNegativeCommitConventi
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("internal")
 			MATCHING_RELEASE_TYPE_NAME := "internal" // the name of the release type that must be matched in the branch
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
@@ -5796,6 +5878,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysPositiveCommitConventi
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("somebranch")
 			MATCHING_RELEASE_TYPE_NAME := "internal" // the name of the release type that must be matched in the branch
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
@@ -5875,6 +5958,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysNegativeCommitConventi
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("somebranch")
 			MATCHING_RELEASE_TYPE_NAME := "internal" // the name of the release type that must be matched in the branch
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
@@ -5952,6 +6036,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysPositiveCommitConventi
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("someotherbranch")
 			MATCHING_RELEASE_TYPE_NAME := "internal" // the name of the release type that must be matched in the branch
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
@@ -6031,6 +6116,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysNegativeCommitConventi
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("someotherbranch")
 			MATCHING_RELEASE_TYPE_NAME := "internal" // the name of the release type that must be matched in the branch
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
@@ -6108,6 +6194,7 @@ func TestInferRunUsingCustomReleaseTypeWithAlwaysPositiveCommitConventionInInter
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("internal")
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			// add a mock convention that accepts all non nil messages and dumps the minor identifier for each
@@ -6189,6 +6276,7 @@ func TestInferRunUsingCustomReleaseTypeWithAlwaysNegativeCommitConventionInInter
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("internal")
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			// add a mock convention that accepts all non nil messages and dumps the minor identifier for each
@@ -6270,6 +6358,7 @@ func TestInferRunUsingCustomFlatReleaseTypeWithInferringCommitConventionInMaster
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.FIVE_BRANCH_UNMERGED_BUMPING()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("master")
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			// add a mock convention that takes the commit message as the identifier to bump, if any
@@ -6339,6 +6428,7 @@ func TestInferRunUsingCustomFlatReleaseTypeWithInferringCommitConventionInTagged
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.FIVE_BRANCH_UNMERGED_BUMPING()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("taggedwithoutbump")
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			// add a mock convention that takes the commit message as the identifier to bump, if any
@@ -6408,6 +6498,7 @@ func TestInferRunUsingCustomFlatReleaseTypeWithInferringCommitConventionInTagged
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.FIVE_BRANCH_UNMERGED_BUMPING()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("taggedwithbump")
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			// add a mock convention that takes the commit message as the identifier to bump, if any
@@ -6477,6 +6568,7 @@ func TestInferRunUsingCustomFlatReleaseTypeWithInferringCommitConventionInUntagg
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.FIVE_BRANCH_UNMERGED_BUMPING()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("untaggedwithoutbump")
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			// add a mock convention that takes the commit message as the identifier to bump, if any
@@ -6546,6 +6638,7 @@ func TestInferRunUsingCustomFlatReleaseTypeWithInferringCommitConventionInUntagg
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.FIVE_BRANCH_UNMERGED_BUMPING()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("untaggedwithbump")
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			// add a mock convention that takes the commit message as the identifier to bump, if any
@@ -6615,6 +6708,7 @@ func TestInferRunUsingCustomCollapsedReleaseTypeWithInferringCommitConventionInM
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("master")
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			// add a mock convention that takes the commit message as the identifier to bump, if any
@@ -6689,6 +6783,7 @@ func TestInferRunUsingCustomCollapsedReleaseTypeWithInferringCommitConventionInA
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("alpha")
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			// add a mock convention that takes the commit message as the identifier to bump, if any
@@ -6763,6 +6858,7 @@ func TestInferRunUsingCustomCollapsedReleaseTypeWithInferringCommitConventionInB
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("beta")
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			// add a mock convention that takes the commit message as the identifier to bump, if any
@@ -6837,6 +6933,7 @@ func TestInferRunUsingCustomCollapsedReleaseTypeWithInferringCommitConventionInG
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("gamma")
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			// add a mock convention that takes the commit message as the identifier to bump, if any
@@ -6911,6 +7008,7 @@ func TestInferRunUsingCustomCollapsedReleaseTypeWithInferringCommitConventionInD
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("delta")
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			// add a mock convention that takes the commit message as the identifier to bump, if any
@@ -6985,6 +7083,7 @@ func TestInferRunUsingCustomCollapsedReleaseTypeWithInferringCommitConventionInE
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("epsilon")
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			// add a mock convention that takes the commit message as the identifier to bump, if any
@@ -7059,6 +7158,7 @@ func TestInferRunUsingCustomCollapsedReleaseTypeWithInferringCommitConventionInZ
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("zeta")
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			// add a mock convention that takes the commit message as the identifier to bump, if any
@@ -7133,6 +7233,7 @@ func TestInferRunUsingCustomCollapsedReleaseTypeWithInferringCommitConventionInE
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("eta")
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			// add a mock convention that takes the commit message as the identifier to bump, if any
@@ -7207,6 +7308,7 @@ func TestInferRunUsingCustomCollapsedReleaseTypeWithInferringCommitConventionInT
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("theta")
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			// add a mock convention that takes the commit message as the identifier to bump, if any
@@ -7281,6 +7383,7 @@ func TestInferRunUsingCustomFlatReleaseTypeWithExtraIdentifierWithInferringCommi
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.FIVE_BRANCH_UNMERGED_BUMPING()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("master")
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			// add a mock convention that takes the commit message as the identifier to bump, if any
@@ -7351,6 +7454,7 @@ func TestInferRunUsingCustomFlatReleaseTypeWithExtraIdentifierWithInferringCommi
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.FIVE_BRANCH_UNMERGED_BUMPING()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("taggedwithoutbump")
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			// add a mock convention that takes the commit message as the identifier to bump, if any
@@ -7421,6 +7525,7 @@ func TestInferRunUsingCustomFlatReleaseTypeWithExtraIdentifierWithInferringCommi
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.FIVE_BRANCH_UNMERGED_BUMPING()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("taggedwithbump")
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			// add a mock convention that takes the commit message as the identifier to bump, if any
@@ -7491,6 +7596,7 @@ func TestInferRunUsingCustomFlatReleaseTypeWithExtraIdentifierWithInferringCommi
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.FIVE_BRANCH_UNMERGED_BUMPING()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("untaggedwithoutbump")
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			// add a mock convention that takes the commit message as the identifier to bump, if any
@@ -7561,6 +7667,7 @@ func TestInferRunUsingCustomFlatReleaseTypeWithExtraIdentifierWithInferringCommi
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.FIVE_BRANCH_UNMERGED_BUMPING()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("untaggedwithbump")
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			// add a mock convention that takes the commit message as the identifier to bump, if any
@@ -7631,6 +7738,7 @@ func TestInferRunUsingCustomCollapsedReleaseTypeWithExtraIdentifiersWithInferrin
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("master")
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			// add a mock convention that takes the commit message as the identifier to bump, if any
@@ -7706,6 +7814,7 @@ func TestInferRunUsingCustomCollapsedReleaseTypeWithExtraIdentifiersWithInferrin
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("alpha")
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			// add a mock convention that takes the commit message as the identifier to bump, if any
@@ -7781,6 +7890,7 @@ func TestInferRunUsingCustomCollapsedReleaseTypeWithExtraIdentifiersWithInferrin
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("beta")
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			// add a mock convention that takes the commit message as the identifier to bump, if any
@@ -7856,6 +7966,7 @@ func TestInferRunUsingCustomCollapsedReleaseTypeWithExtraIdentifiersWithInferrin
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("gamma")
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			// add a mock convention that takes the commit message as the identifier to bump, if any
@@ -7931,6 +8042,7 @@ func TestInferRunUsingCustomCollapsedReleaseTypeWithExtraIdentifiersWithInferrin
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("delta")
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			// add a mock convention that takes the commit message as the identifier to bump, if any
@@ -8006,6 +8118,7 @@ func TestInferRunUsingCustomCollapsedReleaseTypeWithExtraIdentifiersWithInferrin
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("epsilon")
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			// add a mock convention that takes the commit message as the identifier to bump, if any
@@ -8081,6 +8194,7 @@ func TestInferRunUsingCustomCollapsedReleaseTypeWithExtraIdentifiersWithInferrin
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("zeta")
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			// add a mock convention that takes the commit message as the identifier to bump, if any
@@ -8156,6 +8270,7 @@ func TestInferRunUsingCustomCollapsedReleaseTypeWithExtraIdentifiersWithInferrin
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("eta")
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			// add a mock convention that takes the commit message as the identifier to bump, if any
@@ -8231,6 +8346,7 @@ func TestInferRunUsingCustomCollapsedReleaseTypeWithExtraIdentifiersWithExtraIde
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			(*command).Script().Checkout("theta")
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			// add a mock convention that takes the commit message as the identifier to bump, if any

@@ -55,17 +55,20 @@ $ docker run -it --rm -v /local/path/to/project:/project mooltiverse/nyx:latest
 
 For details on command line options and advanced use see the [Docker run reference](https://docs.docker.com/engine/reference/run/).
 
-The `nyx` executable within the container is executed by default passing the [`infer`]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer) command so the above command line is equivalent to `docker run -it --rm -v /local/path/to/project:/project mooltiverse/nyx:latest nyx infer`. This will display the new or current version number for the project but takes no further action.
+The `nyx` executable within the container is executed by default passing the [`infer`]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer) command so the above command line is equivalent to `docker run -it --rm -v /local/path/to/project:/project mooltiverse/nyx:latest infer`.
 
 To run a different command, pass it on the command line. For example, to run the [publish]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#publish) command, run the container as:
 
 ```bash
-$ docker run -it --rm -v /local/path/to/project:/project mooltiverse/nyx:latest nyx publish
+$ docker run -it --rm -v /local/path/to/project:/project mooltiverse/nyx:latest publish
 ```
+
+When running on Linux or Mac hosts you may also want to map the host user ID to the container user in order to avoid issue with file permissions. You can do this by adding this option to the command line: `-u $(id -u):$(id -g)`. See the [Docker run reference](https://docs.docker.com/engine/reference/run/) for more.
+{: .notice--info}
 
 ### Mounting the Git project folder
 
-What's important to note in the above command is the `-v /local/path/to/project:/project` option, which mounts a local path (`/local/path/to/project` in this example) to the `/project` path within the container. You must not change the `/project` part (unless you know what you're doing) but you must change `/local/path/to/project` to whatever path contains the Git repository for your project, otherwise Nyx will have no access to the project files and won't be able to run.
+What's important to note in the above command is the `-v /local/path/to/project:/project` option, which mounts a local path (`/local/path/to/project` in this example) to the `/project` path within the container. You need to change `/local/path/to/project` to whatever path contains the Git repository for your project, otherwise Nyx will have no access to the project files and won't be able to run.
 
 In case you have a *Dockerized* development environment, chances are that your project files live inside a Docker volume instead of a local host folder. In this case you can mount the Docker volume instead of the local folder, by bassing the volume name, so the above command would look like:
 

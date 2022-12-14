@@ -457,6 +457,7 @@ public class StateTests {
             // save the file
             FileMapper.save(configurationLayerMock.getStateFile(), oldState);
             File stateFile = new File(configurationLayerMock.getStateFile());
+            stateFile.deleteOnExit();
             assertTrue(stateFile.exists());
 
             // print the file to standard output for inspection purpose
@@ -574,6 +575,7 @@ public class StateTests {
             // save the file
             FileMapper.save(configurationLayerMock.getStateFile(), oldState);
             File stateFile = new File(configurationLayerMock.getStateFile());
+            stateFile.deleteOnExit();
             assertTrue(stateFile.exists());
 
             // print the file to standard output for inspection purpose

@@ -208,7 +208,7 @@ subprojects {
     configurations {
         // make integrations tests extend other tests
         //integrationTestImplementation.extendsFrom testImplementation
-        // make integrations tests extend other tests
+        // make functional tests extend other tests
         //functionalTestImplementation.extendsFrom testImplementation
     }
 

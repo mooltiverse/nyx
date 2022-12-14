@@ -160,19 +160,19 @@ subprojects {
         outputs.dir(buildDir.path+'/test-results/test/')
         outputs.dir(buildDir.path+'/reports/tests/test/')
 
-        // Pass the name of the configuration file examples to tests. These are passed as environment variables.
-        // We use the same files used for the documentation here.
-        def testEnvironmentVariables = [:]
-        testEnvironmentVariables['extendedJSONExampleConfigurationFile']=file("$rootDir/docs/_includes/.nyx-extended.json").absolutePath
-        testEnvironmentVariables['mediumJSONExampleConfigurationFile']=file("$rootDir/docs/_includes/.nyx-medium.json").absolutePath
-        testEnvironmentVariables['simpleJSONExampleConfigurationFile']=file("$rootDir/docs/_includes/.nyx-simple.json").absolutePath
-        testEnvironmentVariables['simplestJSONExampleConfigurationFile']=file("$rootDir/docs/_includes/.nyx-simplest.json").absolutePath
-        testEnvironmentVariables['extendedYAMLExampleConfigurationFile']=file("$rootDir/docs/_includes/.nyx-extended.yaml").absolutePath
-        testEnvironmentVariables['mediumYAMLExampleConfigurationFile']=file("$rootDir/docs/_includes/.nyx-medium.yaml").absolutePath
-        testEnvironmentVariables['simpleYAMLExampleConfigurationFile']=file("$rootDir/docs/_includes/.nyx-simple.yaml").absolutePath
-        testEnvironmentVariables['simplestYAMLExampleConfigurationFile']=file("$rootDir/docs/_includes/.nyx-simplest.yaml").absolutePath
-
         doLast {
+            // Pass the name of the configuration file examples to tests. These are passed as environment variables.
+            // We use the same files used for the documentation here.
+            def testEnvironmentVariables = [:]
+            testEnvironmentVariables['extendedJSONExampleConfigurationFile']=file("$rootDir/docs/_includes/.nyx-extended.json").absolutePath
+            testEnvironmentVariables['mediumJSONExampleConfigurationFile']=file("$rootDir/docs/_includes/.nyx-medium.json").absolutePath
+            testEnvironmentVariables['simpleJSONExampleConfigurationFile']=file("$rootDir/docs/_includes/.nyx-simple.json").absolutePath
+            testEnvironmentVariables['simplestJSONExampleConfigurationFile']=file("$rootDir/docs/_includes/.nyx-simplest.json").absolutePath
+            testEnvironmentVariables['extendedYAMLExampleConfigurationFile']=file("$rootDir/docs/_includes/.nyx-extended.yaml").absolutePath
+            testEnvironmentVariables['mediumYAMLExampleConfigurationFile']=file("$rootDir/docs/_includes/.nyx-medium.yaml").absolutePath
+            testEnvironmentVariables['simpleYAMLExampleConfigurationFile']=file("$rootDir/docs/_includes/.nyx-simple.yaml").absolutePath
+            testEnvironmentVariables['simplestYAMLExampleConfigurationFile']=file("$rootDir/docs/_includes/.nyx-simplest.yaml").absolutePath
+
             logger.info('Unit testing Go module '+modulePath)
             exec {
                 workingDir = projectDir
@@ -206,14 +206,14 @@ subprojects {
         outputs.dir(buildDir.path+'/test-results/integrationTest/')
         outputs.dir(buildDir.path+'/reports/tests/integrationTest/')
 
-        // Pass the credentials to test suites as per https://github.com/mooltiverse/nyx/blob/master/CONTRIBUTING.md#contributing-code
-        // Suggestion is to set the $GRADLE_USER_HOME environment variable and create a gradle.properties therein, with these
-        // properties defined
-        def testEnvironmentVariables = [:]
-        testEnvironmentVariables['gitHubTestUserToken']=findProperty("gitHubTestUserToken")
-        testEnvironmentVariables['gitLabTestUserToken']=findProperty("gitLabTestUserToken")
-
         doLast {
+            // Pass the credentials to test suites as per https://github.com/mooltiverse/nyx/blob/master/CONTRIBUTING.md#contributing-code
+            // Suggestion is to set the $GRADLE_USER_HOME environment variable and create a gradle.properties therein, with these
+            // properties defined
+            def testEnvironmentVariables = [:]
+            testEnvironmentVariables['gitHubTestUserToken']=findProperty("gitHubTestUserToken")
+            testEnvironmentVariables['gitLabTestUserToken']=findProperty("gitLabTestUserToken")
+
             logger.info('Integration testing Go module '+modulePath)
             exec {
                 workingDir = projectDir
@@ -251,11 +251,14 @@ subprojects {
         outputs.dir(buildDir.path+'/test-results/functionalTest/')
         outputs.dir(buildDir.path+'/reports/tests/functionalTest/')
 
-        // Pass the parameters to run functional tests
-        def testEnvironmentVariables = [:]
-        testEnvironmentVariables['goBinDir']=file(buildDir.path+'/bin/').absolutePath // the path to the binaries
-
         doLast {
+            // Pass the parameters to run functional tests
+            def testEnvironmentVariables = [:]
+            testEnvironmentVariables['nyxBinDir']=file(buildDir.path+'/bin/').absolutePath // the path to the binaries
+            testEnvironmentVariables['quickTests']=findProperty("quickTests") // the flag to narrow the number of tests, added on the command line using the -PquickTests=true option
+            testEnvironmentVariables['gitHubTestUserToken']=findProperty("gitHubTestUserToken")
+            testEnvironmentVariables['gitLabTestUserToken']=findProperty("gitLabTestUserToken")
+
             logger.info('Functional testing Go module '+modulePath)
             exec {
                 workingDir = projectDir
@@ -303,12 +306,10 @@ subprojects {
                 //ignoreExitValue = true // TODO: remove this flag once the command is known to work
                 environment 'GOPROXY', 'proxy.golang.org'
                 workingDir = projectDir
-                standardOutput = new ByteArrayOutputStream()
                 logging.captureStandardOutput LogLevel.INFO
                 logging.captureStandardError  LogLevel.ERROR
                 // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
                 commandLine 'go', 'list', '-m', modulereference
-                ext.output = { return standardOutput.toString() }
             }
         }
     }

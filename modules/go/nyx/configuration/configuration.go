@@ -681,11 +681,13 @@ func (c *Configuration) GetCommitMessageConventions() (*ent.CommitMessageConvent
 						return nil, err
 					}
 
-					item := (*(*commitMessageConventions).GetItems())[*enabledItem]
-					if item != nil {
-						items[*enabledItem] = item
-						log.Tracef("the '%s.%s[%s]' configuration option has been resolved", "commitMessageConventions", "items", *enabledItem)
-						break
+					if commitMessageConventions != nil && (*commitMessageConventions).GetItems() != nil {
+						item := (*(*commitMessageConventions).GetItems())[*enabledItem]
+						if item != nil {
+							items[*enabledItem] = item
+							log.Tracef("the '%s.%s[%s]' configuration option has been resolved", "commitMessageConventions", "items", *enabledItem)
+							break
+						}
 					}
 				}
 			}

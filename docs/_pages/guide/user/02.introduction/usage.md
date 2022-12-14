@@ -186,27 +186,28 @@ A few things to note here:
 2. a local folder (`/local/path/to/project`) is mounted from the host into the container at the default location `/project`. You need to change `/local/path/to/project` to whatever path is hosting your Git repository, or mount a Docker volume hosting the Git repository in case you already have one (in this case, pass your volume name to the command line like `docker run -it --rm -v project-volume:/project mooltiverse/nyx:latest [...]`, where `project-volume` has to be changed to your volume name)
 3. Nyx is using the default configuration means ([configuration files]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}#supported-file-grammars) available in the project directory at standard locations)
 
-Let's see how to tweak these.
+When running on Linux or Mac hosts you may also want to map the host user ID to the container user in order to avoid issue with file permissions. You can do this by adding this option to the command line: `-u $(id -u):$(id -g)`. See the [Docker run reference](https://docs.docker.com/engine/reference/run/) for more.
+{: .notice--info}
 
 #### Running specific commands
 
 In order to run a specific command you need to pass it on the command line, like:
 
 ```bash
-$ docker run -it --rm -v /local/path/to/project:/project mooltiverse/nyx:latest nyx <COMMAND>
+$ docker run -it --rm -v /local/path/to/project:/project mooltiverse/nyx:latest <COMMAND>
 ```
 
 So if you need to run the [publish]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#publish) command, run the container as:
 
 ```bash
-$ docker run -it --rm -v /local/path/to/project:/project mooltiverse/nyx:latest nyx publish
+$ docker run -it --rm -v /local/path/to/project:/project mooltiverse/nyx:latest publish
 ```
 
 #### Mounting the project volume or folder
 
-You can pass Nyx your project folder as a path on the host or as a Docker volume. Whet you need to do is:
+You can pass Nyx your project folder as a path on the host or as a Docker volume. What you need to do is:
 
-* replace `/local/path/to/project` with an actual host path when the project directory is shared from the Docker host to the container
+* replace `/local/path/to/project` with an actual host path when the project directory is shared from the Docker host to the container, or
 * replace `/local/path/to/project` with a Docker volume name when the project directory is already in a Docker volume
 
 For more on volumes and mounts please see [the official Docker documentation](https://docs.docker.com/storage/volumes/).
@@ -232,7 +233,7 @@ Some extra information on the Gradle Plugin internals is available [here]({{ sit
 In order to run the Gradle plugin you need:
 
 * Java release `11` or later
-* Gradle release `6.0` or later. Tests have been successfully executed up to release `7.5.1`. [Here](https://gradle.org/releases/) you can find the list of available releases.
+* Gradle release `6.0` or later. Tests have been successfully executed up to release `7.6`. [Here](https://gradle.org/releases/) you can find the list of available releases.
 
 ### Apply the plugin
 

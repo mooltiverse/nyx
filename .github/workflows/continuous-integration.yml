@@ -28,16 +28,16 @@
 # overlappings across multiple pipeline runs.
 #
 # The caches we use in the pipeline are:
-# - the pipeline cache (using key ${{ runner.os }}-pipeline-${{ github.run_id }}-[JOB_ID]) that brings
+# - the pipeline cache (using key pipeline-${{ github.run_id }}-[JOB_ID]) that brings
 #   some pipeline overall artifacts like the Nyx state
-# - the Java cache (using key ${{ runner.os }}-java-${{ github.run_id }}--[JOB_ID]) that brings
+# - the Java cache (using key java-${{ github.run_id }}--[JOB_ID]) that brings
 #   Java specific artifacts from the assemble tasks up to tests
-# - the Go cache (using key ${{ runner.os }}-go-${{ github.run_id }}--[JOB_ID]) that brings
+# - the Go cache (using key go-${{ github.run_id }}--[JOB_ID]) that brings
 #   Go specific artifacts from the assemble tasks up to tests
-# - the Docker cache (using key ${{ runner.os }}-docker-${{ github.run_id }}--[JOB_ID]) that brings
+# - the Docker cache (using key docker-${{ github.run_id }}--[JOB_ID]) that brings
 #   Docker specific artifacts from the assemble tasks up to tests. Since the Docker image needs the
 #   Go binaries this cache is forked from the Go cache after Go build/assemble tasks have completed
-# - the Build cache (using key ${{ runner.os }}-build-${{ github.run_id }}) that brings all Build
+# - the Build cache (using key build-${{ github.run_id }}) that brings all Build
 #   artifacts (but no tests) from the language specific build tasks
 #
 # MORE ON CACHES
@@ -80,7 +80,7 @@ jobs:
       with:
         path: |
           build/
-        key: ${{ runner.os }}-pipeline-${{ github.run_id }}-${{ github.job }}
+        key: pipeline-${{ github.run_id }}-${{ github.job }}
         #restore-keys: not used here, start from scratch
     # Running the gradle-cache-action with no arguments makes it run just as a remote cache and not as a wrapper
     - name: Enable the Gradle remote cache
@@ -127,16 +127,16 @@ jobs:
       with:
         path: |
           build/
-        key: ${{ runner.os }}-pipeline-${{ github.run_id }}-${{ github.job }}
+        key: pipeline-${{ github.run_id }}-${{ github.job }}
         restore-keys: |
-          ${{ runner.os }}-pipeline-${{ github.run_id }}-init
+          pipeline-${{ github.run_id }}-init
     # Bootstrap (no restore-keys) the Java cache and store it as -build-java
     - name: Set up the Java cache bringing Java artifacts
       uses: actions/cache@v3
       with:
         path: |
           modules/java/**/build/
-        key: ${{ runner.os }}-java-${{ github.run_id }}-${{ github.job }}
+        key: java-${{ github.run_id }}-${{ github.job }}
     # Running the gradle-cache-action with no arguments makes it run just as a remote cache and not as a wrapper
     - name: Enable the Gradle remote cache
       uses: burrunan/gradle-cache-action@v1
@@ -190,9 +190,9 @@ jobs:
       with:
         path: |
           build/
-        key: ${{ runner.os }}-pipeline-${{ github.run_id }}-${{ github.job }}
+        key: pipeline-${{ github.run_id }}-${{ github.job }}
         restore-keys: |
-          ${{ runner.os }}-pipeline-${{ github.run_id }}-init
+          pipeline-${{ github.run_id }}-init
     # Bootstrap (no restore-keys) the Go cache and store it as -build-go
     - name: Set up the Go cache bringing Go artifacts
       uses: actions/cache@v3
@@ -201,7 +201,7 @@ jobs:
           modules/go/**/build/
           ~/.cache/go-build
           ~/go/pkg/mod
-        key: ${{ runner.os }}-go-${{ github.run_id }}-${{ github.job }}
+        key: go-${{ github.run_id }}-${{ github.job }}
     # Running the gradle-cache-action with no arguments makes it run just as a remote cache and not as a wrapper
     - name: Enable the Gradle remote cache
       uses: burrunan/gradle-cache-action@v1
@@ -250,9 +250,9 @@ jobs:
       with:
         path: |
           build/
-        key: ${{ runner.os }}-pipeline-${{ github.run_id }}-${{ github.job }}
+        key: pipeline-${{ github.run_id }}-${{ github.job }}
         restore-keys: |
-          ${{ runner.os }}-pipeline-${{ github.run_id }}-init
+          pipeline-${{ github.run_id }}-init
     # Bootstrap (no restore-keys) the Docker cache starting from the -build-go (to get binaries) and store it as -build-docker
     - name: Set up the Go cache bringing Go artifacts
       uses: actions/cache@v3
@@ -261,9 +261,9 @@ jobs:
           modules/go/**/build/
           ~/.cache/go-build
           ~/go/pkg/mod
-        key: ${{ runner.os }}-docker-${{ github.run_id }}-${{ github.job }}
+        key: docker-${{ github.run_id }}-${{ github.job }}
         restore-keys: |
-          ${{ runner.os }}-go-${{ github.run_id }}-build-go
+          go-${{ github.run_id }}-build-go
     # Running the gradle-cache-action with no arguments makes it run just as a remote cache and not as a wrapper
     - name: Enable the Gradle remote cache
       uses: burrunan/gradle-cache-action@v1
@@ -287,16 +287,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     # Pull the -build-docker cache (read only). This will be used in the next steps to create a new cache that merges this one and others
-    - name: Set up the Go cache bringing Go artifacts
-      uses: actions/cache@v3
-      with:
-        path: |
-          modules/go/**/build/
-          ~/.cache/go-build
-          ~/go/pkg/mod
-        key: ${{ runner.os }}-docker-${{ github.run_id }}-${{ github.job }}
-        restore-keys: |
-          ${{ runner.os }}-docker-${{ github.run_id }}-build-docker
+    # This may cause the next one fail as they both restore the same paths
+    #- name: Set up the Go cache bringing Docker artifacts
+    #  uses: actions/cache@v3
+    #  with:
+    #    path: |
+    #      modules/go/**/build/
+    #      ~/.cache/go-build
+    #      ~/go/pkg/mod
+    #    key: docker-${{ github.run_id }}-${{ github.job }}
+    #    restore-keys: |
+    #      docker-${{ github.run_id }}-build-docker
     # Pull the -build-go cache (read only). This will be used in the next steps to create a new cache that merges this one and others
     - name: Set up the Go cache bringing Go artifacts
       uses: actions/cache@v3
@@ -305,14 +306,14 @@ jobs:
           modules/go/**/build/
           ~/.cache/go-build
           ~/go/pkg/mod
-        key: ${{ runner.os }}-go-${{ github.run_id }}-build-go
+        key: go-${{ github.run_id }}-build-go
     # Pull the -build-java cache (read only). This will be used in the next steps to create a new cache that merges this one and others
     - name: Set up the Java cache bringing Java artifacts
       uses: actions/cache@v3
       with:
         path: |
           modules/java/**/build/
-        key: ${{ runner.os }}-java-${{ github.run_id }}-build-java
+        key: java-${{ github.run_id }}-build-java
     # Bootstrap (no restore-keys) the Build cache to collect all artifacts coming from upstream build jobs
     - name: Set up the Build cache bringing artifacts from the upstream Build jobs
       uses: actions/cache@v3
@@ -323,7 +324,7 @@ jobs:
           modules/go/**/build/
           ~/.cache/go-build
           ~/go/pkg/mod
-        key: ${{ runner.os }}-build-${{ github.run_id }}
+        key: build-${{ github.run_id }}
     - name: List contents in the cache
       run: ls -alR modules/java/**/build/ modules/go/**/build/ ~/.cache/go-build ~/go/pkg/mod
 
@@ -356,16 +357,16 @@ jobs:
       with:
         path: |
           build/
-        key: ${{ runner.os }}-pipeline-${{ github.run_id }}-build-java
+        key: pipeline-${{ github.run_id }}-build-java
     # Start from the -build-java cache and save the job output cache as -java-unit-test
     - name: Set up the Java cache bringing Java artifacts
       uses: actions/cache@v3
       with:
         path: |
           modules/java/**/build/
-        key: ${{ runner.os }}-java-${{ github.run_id }}-${{ github.job }}
+        key: java-${{ github.run_id }}-${{ github.job }}
         restore-keys: |
-          ${{ runner.os }}-java-${{ github.run_id }}-build-java
+          java-${{ github.run_id }}-build-java
     # Running the gradle-cache-action with no arguments makes it run just as a remote cache and not as a wrapper
     - name: Enable the Gradle remote cache
       uses: burrunan/gradle-cache-action@v1
@@ -417,16 +418,16 @@ jobs:
       with:
         path: |
           build/
-        key: ${{ runner.os }}-pipeline-${{ github.run_id }}-build-java
+        key: pipeline-${{ github.run_id }}-build-java
     # Start from the -java-unit-test cache and save the job output cache as -java-integration-test
     - name: Set up the Java cache bringing Java artifacts
       uses: actions/cache@v3
       with:
         path: |
           modules/java/**/build/
-        key: ${{ runner.os }}-java-${{ github.run_id }}-${{ github.job }}
+        key: java-${{ github.run_id }}-${{ github.job }}
         restore-keys: |
-          ${{ runner.os }}-java-${{ github.run_id }}-java-unit-test
+          java-${{ github.run_id }}-java-unit-test
     # Running the gradle-cache-action with no arguments makes it run just as a remote cache and not as a wrapper
     - name: Enable the Gradle remote cache
       uses: burrunan/gradle-cache-action@v1
@@ -482,23 +483,28 @@ jobs:
       with:
         path: |
           build/
-        key: ${{ runner.os }}-pipeline-${{ github.run_id }}-build-java
+        key: pipeline-${{ github.run_id }}-build-java
     # Start from the -java-integration-test cache and save the job output cache as -java-functional-test
     - name: Set up the Java cache bringing Java artifacts
       uses: actions/cache@v3
       with:
         path: |
           modules/java/**/build/
-        key: ${{ runner.os }}-java-${{ github.run_id }}-java-integration-test
+        key: java-${{ github.run_id }}-java-integration-test
         restore-keys: |
-          ${{ runner.os }}-java-${{ github.run_id }}-java-integration-test
+          java-${{ github.run_id }}-java-integration-test
     # Running the gradle-cache-action with no arguments makes it run just as a remote cache and not as a wrapper
     - name: Enable the Gradle remote cache
       uses: burrunan/gradle-cache-action@v1
       with:
           # Disable warning about missing distributionSha256Sum property in gradle-wrapper.properties
           gradle-distribution-sha-256-sum-warning: false
+    # Add the -PquickTests=true option to the Gradle command line to narrow the number of tests
     - name: Run Java Functional Tests with Gradle
+      env:
+        # See the top level https://github.com/mooltiverse/nyx/blob/master/CONTRIBUTING.md#contributing-code file for details about passing these values when testing locally
+        ORG_GRADLE_PROJECT_gitHubTestUserToken: ${{ secrets.TEST_GITHUB_USER_TOKEN }}   # The test user token to test Nyx GitHub features
+        ORG_GRADLE_PROJECT_gitLabTestUserToken: ${{ secrets.TEST_GITLAB_USER_TOKEN }}   # The test user token to test Nyx GitLab features
       run: ./gradlew modules:java:functionalTest --build-cache --stacktrace
     - name: Archive Nyx state file
       uses: actions/upload-artifact@v3
@@ -544,7 +550,7 @@ jobs:
       with:
         path: |
           build/
-        key: ${{ runner.os }}-pipeline-${{ github.run_id }}-build-java
+        key: pipeline-${{ github.run_id }}-build-java
     # Start from the -build-go cache and save the job output cache as -go-unit-test
     - name: Set up the Go cache bringing Go artifacts
       uses: actions/cache@v3
@@ -553,9 +559,9 @@ jobs:
           modules/go/**/build/
           ~/.cache/go-build
           ~/go/pkg/mod
-        key: ${{ runner.os }}-go-${{ github.run_id }}-${{ github.job }}
+        key: go-${{ github.run_id }}-${{ github.job }}
         restore-keys: |
-          ${{ runner.os }}-go-${{ github.run_id }}-build-go
+          go-${{ github.run_id }}-build-go
     # Running the gradle-cache-action with no arguments makes it run just as a remote cache and not as a wrapper
     - name: Enable the Gradle remote cache
       uses: burrunan/gradle-cache-action@v1
@@ -610,7 +616,7 @@ jobs:
       with:
         path: |
           build/
-        key: ${{ runner.os }}-pipeline-${{ github.run_id }}-build-java
+        key: pipeline-${{ github.run_id }}-build-java
     # Start from the -go-unit-test cache and save the job output cache as -go-integration-test
     - name: Set up the Go cache bringing Go artifacts
       uses: actions/cache@v3
@@ -619,9 +625,9 @@ jobs:
           modules/go/**/build/
           ~/.cache/go-build
           ~/go/pkg/mod
-        key: ${{ runner.os }}-go-${{ github.run_id }}-${{ github.job }}
+        key: go-${{ github.run_id }}-${{ github.job }}
         restore-keys: |
-          ${{ runner.os }}-go-${{ github.run_id }}-go-unit-test
+          go-${{ github.run_id }}-go-unit-test
     # Running the gradle-cache-action with no arguments makes it run just as a remote cache and not as a wrapper
     - name: Enable the Gradle remote cache
       uses: burrunan/gradle-cache-action@v1
@@ -655,7 +661,10 @@ jobs:
   go-functional-test:
     name: Test (Functional) - Go
     needs: go-integration-test
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     steps:
     - name: Git checkout
       uses: actions/checkout@v3
@@ -680,7 +689,7 @@ jobs:
       with:
         path: |
           build/
-        key: ${{ runner.os }}-pipeline-${{ github.run_id }}-build-java
+        key: pipeline-${{ github.run_id }}-build-java
     # Start from the -go-integration-test cache and save the job output cache as -go-functional-test
     - name: Set up the Go cache bringing Go artifacts
       uses: actions/cache@v3
@@ -689,16 +698,21 @@ jobs:
           modules/go/**/build/
           ~/.cache/go-build
           ~/go/pkg/mod
-        key: ${{ runner.os }}-go-${{ github.run_id }}-${{ github.job }}
+        key: go-${{ github.run_id }}-${{ github.job }}
         restore-keys: |
-          ${{ runner.os }}-go-${{ github.run_id }}-go-integration-test
+          go-${{ github.run_id }}-go-integration-test
     # Running the gradle-cache-action with no arguments makes it run just as a remote cache and not as a wrapper
     - name: Enable the Gradle remote cache
       uses: burrunan/gradle-cache-action@v1
       with:
           # Disable warning about missing distributionSha256Sum property in gradle-wrapper.properties
           gradle-distribution-sha-256-sum-warning: false
+    # Add the -PquickTests=true option to the Gradle command line to narrow the number of tests
     - name: Run Go Functional Tests with Gradle
+      env:
+        # See the top level https://github.com/mooltiverse/nyx/blob/master/CONTRIBUTING.md#contributing-code file for details about passing these values when testing locally
+        ORG_GRADLE_PROJECT_gitHubTestUserToken: ${{ secrets.TEST_GITHUB_USER_TOKEN }}   # The test user token to test Nyx GitHub features
+        ORG_GRADLE_PROJECT_gitLabTestUserToken: ${{ secrets.TEST_GITLAB_USER_TOKEN }}   # The test user token to test Nyx GitLab features
       run: ./gradlew modules:go:functionalTest --build-cache --stacktrace
     - name: Archive Nyx state file
       uses: actions/upload-artifact@v3
@@ -746,7 +760,7 @@ jobs:
       with:
         path: |
           build/
-        key: ${{ runner.os }}-pipeline-${{ github.run_id }}-build-java
+        key: pipeline-${{ github.run_id }}-build-java
     # Start from the -build-docker cache and save the job output cache as -docker-functional-test
     - name: Set up the Go cache bringing Go artifacts
       uses: actions/cache@v3
@@ -755,16 +769,21 @@ jobs:
           modules/go/**/build/
           ~/.cache/go-build
           ~/go/pkg/mod
-        key: ${{ runner.os }}-docker-${{ github.run_id }}-${{ github.job }}
+        key: docker-${{ github.run_id }}-${{ github.job }}
         restore-keys: |
-          ${{ runner.os }}-docker-${{ github.run_id }}-build-docker
+          docker-${{ github.run_id }}-build-docker
     # Running the gradle-cache-action with no arguments makes it run just as a remote cache and not as a wrapper
     - name: Enable the Gradle remote cache
       uses: burrunan/gradle-cache-action@v1
       with:
           # Disable warning about missing distributionSha256Sum property in gradle-wrapper.properties
           gradle-distribution-sha-256-sum-warning: false
+    # Add the -PquickTests=true option to the Gradle command line to narrow the number of tests
     - name: Run Docker Functional Tests with Gradle
+      env:
+        # See the top level https://github.com/mooltiverse/nyx/blob/master/CONTRIBUTING.md#contributing-code file for details about passing these values when testing locally
+        ORG_GRADLE_PROJECT_gitHubTestUserToken: ${{ secrets.TEST_GITHUB_USER_TOKEN }}   # The test user token to test Nyx GitHub features
+        ORG_GRADLE_PROJECT_gitLabTestUserToken: ${{ secrets.TEST_GITLAB_USER_TOKEN }}   # The test user token to test Nyx GitLab features
       run: ./gradlew modules:docker:functionalTest --build-cache --stacktrace
     - name: Archive Nyx state file
       uses: actions/upload-artifact@v3
@@ -806,9 +825,9 @@ jobs:
         with:
           path: |
             build/
-          key: ${{ runner.os }}-pipeline-${{ github.run_id }}-${{ github.job }}
+          key: pipeline-${{ github.run_id }}-${{ github.job }}
           restore-keys: |
-            ${{ runner.os }}-pipeline-${{ github.run_id }}-init
+            pipeline-${{ github.run_id }}-init
       - name: Pull the Build cache bringing artifacts from the upstream Build jobs
         uses: actions/cache@v3
         with:
@@ -817,7 +836,7 @@ jobs:
             modules/go/**/build/
             ~/.cache/go-build
             ~/go/pkg/mod
-          key: ${{ runner.os }}-build-${{ github.run_id }}
+          key: build-${{ github.run_id }}
       # Running the gradle-cache-action with no arguments makes it run just as a remote cache and not as a wrapper
       - name: Enable the Gradle remote cache
         uses: burrunan/gradle-cache-action@v1
@@ -882,9 +901,9 @@ jobs:
         with:
           path: |
             build/
-          key: ${{ runner.os }}-pipeline-${{ github.run_id }}-${{ github.job }}
+          key: pipeline-${{ github.run_id }}-${{ github.job }}
           restore-keys: |
-            ${{ runner.os }}-pipeline-${{ github.run_id }}-publish
+            pipeline-${{ github.run_id }}-publish
       - name: Pull the Build cache bringing artifacts from the upstream Build jobs
         uses: actions/cache@v3
         with:
@@ -893,7 +912,7 @@ jobs:
             modules/go/**/build/
             ~/.cache/go-build
             ~/go/pkg/mod
-          key: ${{ runner.os }}-build-${{ github.run_id }}-${{ github.job }}
+          key: build-${{ github.run_id }}-${{ github.job }}
       # Running the gradle-cache-action with no arguments makes it run just as a remote cache and not as a wrapper
       - name: Enable the Gradle remote cache
         uses: burrunan/gradle-cache-action@v1

@@ -392,11 +392,11 @@ public class TemplatesTests {
                 throws Exception {
                 String hashCode = Integer.toString(this.hashCode());
                 File savedFile = new File(System.getProperty("java.io.tmpdir"), "templates1"+hashCode+".txt");
+                savedFile.deleteOnExit();
                 FileWriter savedFileWriter = new FileWriter(savedFile);
                 savedFileWriter.write("test12345");
                 savedFileWriter.flush();
                 savedFileWriter.close();
-                savedFile.deleteOnExit();
                 assertEquals("test12345", Templates.render("{{#fileContent}}"+savedFile.getAbsolutePath()+"{{/fileContent}}", null));
             }
         }
@@ -413,11 +413,11 @@ public class TemplatesTests {
                 throws Exception {
                 String hashCode = Integer.toString(this.hashCode());
                 File savedFile = new File(System.getProperty("java.io.tmpdir"), "templates2"+hashCode+".txt");
+                savedFile.deleteOnExit();
                 FileWriter savedFileWriter = new FileWriter(savedFile);
                 savedFileWriter.write("test12345");
                 savedFileWriter.flush();
                 savedFileWriter.close();
-                savedFile.deleteOnExit();
                 assertEquals("test12345", Templates.render("{{#file.content}}"+savedFile.getAbsolutePath()+"{{/file.content}}", null));
             }
         }
@@ -431,12 +431,12 @@ public class TemplatesTests {
                 throws Exception {
                 String hashCode = Integer.toString(this.hashCode());
                 File savedFile = new File(System.getProperty("java.io.tmpdir"), "templates3"+hashCode+".txt");
+                savedFile.deleteOnExit();
                 assertEquals("false", Templates.render("{{#fileExists}}"+savedFile.getAbsolutePath()+"{{/fileExists}}", null));
                 FileWriter savedFileWriter = new FileWriter(savedFile);
                 savedFileWriter.write("test12345");
                 savedFileWriter.flush();
                 savedFileWriter.close();
-                savedFile.deleteOnExit();
                 assertEquals("true", Templates.render("{{#fileExists}}"+savedFile.getAbsolutePath()+"{{/fileExists}}", null));
             }
         }
@@ -453,12 +453,12 @@ public class TemplatesTests {
                 throws Exception {
                 String hashCode = Integer.toString(this.hashCode());
                 File savedFile = new File(System.getProperty("java.io.tmpdir"), "templates4"+hashCode+".txt");
+                savedFile.deleteOnExit();
                 assertEquals("false", Templates.render("{{#file.exists}}"+savedFile.getAbsolutePath()+"{{/file.exists}}", null));
                 FileWriter savedFileWriter = new FileWriter(savedFile);
                 savedFileWriter.write("test12345");
                 savedFileWriter.flush();
                 savedFileWriter.close();
-                savedFile.deleteOnExit();
                 assertEquals("true", Templates.render("{{#file.exists}}"+savedFile.getAbsolutePath()+"{{/file.exists}}", null));
             }
         }

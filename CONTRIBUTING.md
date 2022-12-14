@@ -189,6 +189,16 @@ To troubleshoot the documentation site or to set up your local environment it's 
 
 When contributing code make sure that you also provide extensive tests for the changes you make and that those tests achieve a sufficient coverage.
 
+##### Narrowing the test sets for daily activities
+
+Some tests, specifically among functional tests, are very extensive and may take hours to complete. While running the entire suite of tests is critical and must always be performed for any release, during daily work we can run a reduced, yet significant, set of tests. For example we can run tests against the latest version of Gradle only rather than any supported version.
+
+To limit the number of tests to a smaller set you can run setting the `quickTests` property to `true` when launching the Gradle script, like:
+
+```shell script
+./gradlew -PquickTests=true functionaltest
+```
+
 ##### Testing against remote repositories
 
 Since Nyx supports remote repositories and their extra features, tests must be provided against those features as well. To do so we need a test user on each platform along with its credentials:

@@ -68,6 +68,7 @@ func TestGoGitRepositoryCloneErrorWithEmptyDirectory(t *testing.T) {
 func TestGoGitRepositoryCloneErrorWithNonEmptyDirectory(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.FROM_SCRATCH().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
 	tr := REMOTE_TEST_REPOSITORY
 	dir := script.GetWorkingDirectory()
 	_, err := GitInstance().Clone(&dir, &tr)
@@ -79,6 +80,7 @@ func TestGoGitRepositoryCloneErrorWithNilURI(t *testing.T) {
 	dir := "nyx-test-git-clone-test-"
 	_, err := GitInstance().Clone(&dir, nil)
 	assert.Error(t, err)
+	defer os.RemoveAll(dir)
 }
 
 func TestGoGitRepositoryCloneErrorWithEmptyURI(t *testing.T) {
@@ -90,6 +92,7 @@ func TestGoGitRepositoryCloneErrorWithEmptyURI(t *testing.T) {
 	uri = "  "
 	_, err = GitInstance().Clone(&dir, &uri)
 	assert.Error(t, err)
+	defer os.RemoveAll(dir)
 }
 
 func TestGoGitRepositoryCloneErrorWithNonExistingURI(t *testing.T) {
@@ -98,6 +101,7 @@ func TestGoGitRepositoryCloneErrorWithNonExistingURI(t *testing.T) {
 	uri := "https://adomainwiththisnamesuredoesnotexists.com/"
 	_, err := GitInstance().Clone(&dir, &uri)
 	assert.Error(t, err)
+	defer os.RemoveAll(dir)
 }
 
 func TestGoGitRepositoryClone(t *testing.T) {
@@ -154,6 +158,7 @@ func TestGoGitRepositoryCloneWithoutRequiredCredentials(t *testing.T) {
 	time.Sleep(4000 * time.Millisecond)
 
 	directory, err := os.MkdirTemp("", "nyx-test-git-clone-test-")
+	defer os.RemoveAll(directory)
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	_, err = GitInstance().CloneWithCredentials(&directory, utl.PointerToString((*gitHubRepository).GetHTTPURL()), nil, nil)
 	assert.Error(t, err)
@@ -182,6 +187,7 @@ func TestGoGitRepositoryCloneWithRequiredCredentials(t *testing.T) {
 	time.Sleep(4000 * time.Millisecond)
 
 	directory, err := os.MkdirTemp("", "nyx-test-git-clone-test-")
+	defer os.RemoveAll(directory)
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	_, err = GitInstance().CloneWithCredentials(&directory, utl.PointerToString((*gitHubRepository).GetHTTPURL()), utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(os.Getenv("gitHubTestUserToken")))
 	assert.NoError(t, err)
@@ -219,6 +225,7 @@ func TestGoGitRepositoryOpenErrorWithNewEmptyDirectory(t *testing.T) {
 func TestGoGitRepositoryOpen(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.FROM_SCRATCH().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
 	dir := script.GetWorkingDirectory()
 	_, err := GitInstance().Open(dir)
 	assert.NoError(t, err)
@@ -227,6 +234,7 @@ func TestGoGitRepositoryOpen(t *testing.T) {
 func TestGoGitRepositoryAddErrorWithEmptyPaths(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.FROM_SCRATCH().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
 	dir := script.GetWorkingDirectory()
 	repository, err := GitInstance().Open(dir)
 	assert.NoError(t, err)
@@ -238,6 +246,7 @@ func TestGoGitRepositoryAddErrorWithEmptyPaths(t *testing.T) {
 func TestGoGitRepositoryAddErrorWithNilPaths(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.FROM_SCRATCH().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
 	dir := script.GetWorkingDirectory()
 	repository, err := GitInstance().Open(dir)
 	assert.NoError(t, err)
@@ -249,6 +258,7 @@ func TestGoGitRepositoryAddErrorWithNilPaths(t *testing.T) {
 func TestGoGitRepositoryAdd(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.FROM_SCRATCH().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
 	dir := script.GetWorkingDirectory()
 	repository, err := GitInstance().Open(dir)
 	assert.NoError(t, err)
@@ -268,6 +278,7 @@ func TestGoGitRepositoryAdd(t *testing.T) {
 func TestGoGitRepositoryCommitErrorWithNilMessageOn1Params(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.FROM_SCRATCH().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
 	dir := script.GetWorkingDirectory()
 	repository, err := GitInstance().Open(dir)
 	assert.NoError(t, err)
@@ -280,6 +291,7 @@ func TestGoGitRepositoryCommitErrorWithNilMessageOn1Params(t *testing.T) {
 func TestGoGitRepositoryCommit1Params(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.INITIAL_COMMIT().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
 	dir := script.GetWorkingDirectory()
 	repository, err := GitInstance().Open(dir)
 	assert.NoError(t, err)
@@ -301,6 +313,7 @@ func TestGoGitRepositoryCommit1Params(t *testing.T) {
 func TestGoGitRepositoryCommitErrorWithEmptyPathsOn2Params(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.FROM_SCRATCH().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
 	dir := script.GetWorkingDirectory()
 	repository, err := GitInstance().Open(dir)
 	assert.NoError(t, err)
@@ -313,6 +326,7 @@ func TestGoGitRepositoryCommitErrorWithEmptyPathsOn2Params(t *testing.T) {
 func TestGoGitRepositoryCommitErrorWithNilPathsOn2Params(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.FROM_SCRATCH().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
 	dir := script.GetWorkingDirectory()
 	repository, err := GitInstance().Open(dir)
 	assert.NoError(t, err)
@@ -325,6 +339,7 @@ func TestGoGitRepositoryCommitErrorWithNilPathsOn2Params(t *testing.T) {
 func TestGoGitRepositoryCommitErrorWithNilMessageOn2Params(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.FROM_SCRATCH().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
 	dir := script.GetWorkingDirectory()
 	repository, err := GitInstance().Open(dir)
 	assert.NoError(t, err)
@@ -337,6 +352,7 @@ func TestGoGitRepositoryCommitErrorWithNilMessageOn2Params(t *testing.T) {
 func TestGoGitRepositoryCommit2Params(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.INITIAL_COMMIT().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
 	dir := script.GetWorkingDirectory()
 	repository, err := GitInstance().Open(dir)
 	assert.NoError(t, err)
@@ -358,6 +374,7 @@ func TestGoGitRepositoryCommit2Params(t *testing.T) {
 func TestGoGitRepositoryCommitErrorWithNilMessageOn3Params(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.FROM_SCRATCH().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
 	dir := script.GetWorkingDirectory()
 	repository, err := GitInstance().Open(dir)
 	assert.NoError(t, err)
@@ -370,6 +387,7 @@ func TestGoGitRepositoryCommitErrorWithNilMessageOn3Params(t *testing.T) {
 func TestGoGitRepositoryCommit3Params(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.INITIAL_COMMIT().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
 	dir := script.GetWorkingDirectory()
 	repository, err := GitInstance().Open(dir)
 	assert.NoError(t, err)
@@ -401,6 +419,7 @@ func TestGoGitRepositoryCommit3Params(t *testing.T) {
 func TestGoGitRepositoryCommitErrorWithEmptyPathsOn4Params(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.FROM_SCRATCH().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
 	dir := script.GetWorkingDirectory()
 	repository, err := GitInstance().Open(dir)
 	assert.NoError(t, err)
@@ -413,6 +432,7 @@ func TestGoGitRepositoryCommitErrorWithEmptyPathsOn4Params(t *testing.T) {
 func TestGoGitRepositoryCommitErrorWithNilPathsOn4Params(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.FROM_SCRATCH().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
 	dir := script.GetWorkingDirectory()
 	repository, err := GitInstance().Open(dir)
 	assert.NoError(t, err)
@@ -425,6 +445,7 @@ func TestGoGitRepositoryCommitErrorWithNilPathsOn4Params(t *testing.T) {
 func TestGoGitRepositoryCommitErrorWithNilMessageOn4Params(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.FROM_SCRATCH().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
 	dir := script.GetWorkingDirectory()
 	repository, err := GitInstance().Open(dir)
 	assert.NoError(t, err)
@@ -437,6 +458,7 @@ func TestGoGitRepositoryCommitErrorWithNilMessageOn4Params(t *testing.T) {
 func TestGoGitRepositoryCommit4Params(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.INITIAL_COMMIT().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
 	dir := script.GetWorkingDirectory()
 	repository, err := GitInstance().Open(dir)
 	assert.NoError(t, err)
@@ -458,10 +480,13 @@ func TestGoGitRepositoryCommit4Params(t *testing.T) {
 func TestGoGitRepositoryPush(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.INITIAL_COMMIT().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
 
 	// also create two new empty repositories to use as remotes
 	remote1script := gittools.BARE().RealizeBare(true)
+	defer os.RemoveAll(remote1script.GetWorkingDirectory())
 	remote2script := gittools.BARE().RealizeBare(true)
+	defer os.RemoveAll(remote2script.GetWorkingDirectory())
 	script.AddRemote(remote1script.GetWorkingDirectory(), "origin") // use the GitDirectory even if it's a bare repository as it's managed internally and still points to the repo dir
 	script.AddRemote(remote2script.GetWorkingDirectory(), "custom") // use the GitDirectory even if it's a bare repository as it's managed internally and still points to the repo dir
 
@@ -501,10 +526,13 @@ func TestGoGitRepositoryPush(t *testing.T) {
 func TestGoGitRepositoryPushWithNonRequiredCredentials(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.INITIAL_COMMIT().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
 
 	// also create two new empty repositories to use as remotes
 	remote1script := gittools.BARE().RealizeBare(true)
+	defer os.RemoveAll(remote1script.GetWorkingDirectory())
 	remote2script := gittools.BARE().RealizeBare(true)
+	defer os.RemoveAll(remote2script.GetWorkingDirectory())
 	script.AddRemote(remote1script.GetWorkingDirectory(), "origin") // use the GitDirectory even if it's a bare repository as it's managed internally and still points to the repo dir
 	script.AddRemote(remote2script.GetWorkingDirectory(), "custom") // use the GitDirectory even if it's a bare repository as it's managed internally and still points to the repo dir
 
@@ -561,6 +589,7 @@ func TestGoGitRepositoryPushWithoutRequiredCredentials(t *testing.T) {
 	time.Sleep(4000 * time.Millisecond)
 
 	directory, err := os.MkdirTemp("", "nyx-test-git-clone-test-")
+	defer os.RemoveAll(directory)
 	_, err = os.Stat(filepath.Join(directory, "README.md"))
 	assert.Error(t, err)
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
@@ -598,6 +627,7 @@ func TestGoGitRepositoryPushWithRequiredCredentials(t *testing.T) {
 	time.Sleep(4000 * time.Millisecond)
 
 	directory, err := os.MkdirTemp("", "nyx-test-git-clone-test-")
+	defer os.RemoveAll(directory)
 	_, err = os.Stat(filepath.Join(directory, "README.md"))
 	assert.Error(t, err)
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
@@ -621,10 +651,13 @@ func TestGoGitRepositoryPushWithRequiredCredentials(t *testing.T) {
 func TestGoGitRepositoryPushToRemote(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.INITIAL_COMMIT().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
 
 	// also create two new empty repositories to use as remotes
 	remote1script := gittools.BARE().RealizeBare(true)
+	defer os.RemoveAll(remote1script.GetWorkingDirectory())
 	remote2script := gittools.BARE().RealizeBare(true)
+	defer os.RemoveAll(remote2script.GetWorkingDirectory())
 	script.AddRemote(remote1script.GetWorkingDirectory(), "origin") // use the GitDirectory even if it's a bare repository as it's managed internally and still points to the repo dir
 	script.AddRemote(remote2script.GetWorkingDirectory(), "custom") // use the GitDirectory even if it's a bare repository as it's managed internally and still points to the repo dir
 
@@ -665,10 +698,13 @@ func TestGoGitRepositoryPushToRemote(t *testing.T) {
 func TestGoGitRepositoryPushToRemoteWithNonRequiredCredentials(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.INITIAL_COMMIT().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
 
 	// also create two new empty repositories to use as remotes
 	remote1script := gittools.BARE().RealizeBare(true)
+	defer os.RemoveAll(remote1script.GetWorkingDirectory())
 	remote2script := gittools.BARE().RealizeBare(true)
+	defer os.RemoveAll(remote2script.GetWorkingDirectory())
 	script.AddRemote(remote1script.GetWorkingDirectory(), "origin") // use the GitDirectory even if it's a bare repository as it's managed internally and still points to the repo dir
 	script.AddRemote(remote2script.GetWorkingDirectory(), "custom") // use the GitDirectory even if it's a bare repository as it's managed internally and still points to the repo dir
 
@@ -726,6 +762,7 @@ func TestGoGitRepositoryPushToRemoteWithoutRequiredCredentials(t *testing.T) {
 	time.Sleep(4000 * time.Millisecond)
 
 	directory, err := os.MkdirTemp("", "nyx-test-git-clone-test-")
+	defer os.RemoveAll(directory)
 	_, err = os.Stat(filepath.Join(directory, "README.md"))
 	assert.Error(t, err)
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
@@ -763,6 +800,7 @@ func TestGoGitRepositoryPushToRemoteWithRequiredCredentials(t *testing.T) {
 	time.Sleep(4000 * time.Millisecond)
 
 	directory, err := os.MkdirTemp("", "nyx-test-git-clone-test-")
+	defer os.RemoveAll(directory)
 	_, err = os.Stat(filepath.Join(directory, "README.md"))
 	assert.Error(t, err)
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
@@ -786,10 +824,13 @@ func TestGoGitRepositoryPushToRemoteWithRequiredCredentials(t *testing.T) {
 func TestGoGitRepositoryPushToRemotes(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.INITIAL_COMMIT().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
 
 	// also create two new empty repositories to use as remotes
 	remote1script := gittools.BARE().RealizeBare(true)
+	defer os.RemoveAll(remote1script.GetWorkingDirectory())
 	remote2script := gittools.BARE().RealizeBare(true)
+	defer os.RemoveAll(remote2script.GetWorkingDirectory())
 	script.AddRemote(remote1script.GetWorkingDirectory(), "origin") // use the GitDirectory even if it's a bare repository as it's managed internally and still points to the repo dir
 	script.AddRemote(remote2script.GetWorkingDirectory(), "custom") // use the GitDirectory even if it's a bare repository as it's managed internally and still points to the repo dir
 
@@ -832,10 +873,13 @@ func TestGoGitRepositoryPushToRemotes(t *testing.T) {
 func TestGoGitRepositoryPushToRemotesWithNonRequiredCredentials(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.INITIAL_COMMIT().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
 
 	// also create two new empty repositories to use as remotes
 	remote1script := gittools.BARE().RealizeBare(true)
+	defer os.RemoveAll(remote1script.GetWorkingDirectory())
 	remote2script := gittools.BARE().RealizeBare(true)
+	defer os.RemoveAll(remote2script.GetWorkingDirectory())
 	script.AddRemote(remote1script.GetWorkingDirectory(), "origin") // use the GitDirectory even if it's a bare repository as it's managed internally and still points to the repo dir
 	script.AddRemote(remote2script.GetWorkingDirectory(), "custom") // use the GitDirectory even if it's a bare repository as it's managed internally and still points to the repo dir
 
@@ -895,6 +939,7 @@ func TestGoGitRepositoryPushToRemotesWithoutRequiredCredentials(t *testing.T) {
 	time.Sleep(4000 * time.Millisecond)
 
 	directory, err := os.MkdirTemp("", "nyx-test-git-clone-test-")
+	defer os.RemoveAll(directory)
 	_, err = os.Stat(filepath.Join(directory, "README.md"))
 	assert.Error(t, err)
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
@@ -932,6 +977,7 @@ func TestGoGitRepositoryPushToRemotesWithRequiredCredentials(t *testing.T) {
 	time.Sleep(4000 * time.Millisecond)
 
 	directory, err := os.MkdirTemp("", "nyx-test-git-clone-test-")
+	defer os.RemoveAll(directory)
 	_, err = os.Stat(filepath.Join(directory, "README.md"))
 	assert.Error(t, err)
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
@@ -955,6 +1001,7 @@ func TestGoGitRepositoryPushToRemotesWithRequiredCredentials(t *testing.T) {
 func TestGoGitRepositoryTag(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.INITIAL_COMMIT().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
 	dir := script.GetWorkingDirectory()
 	repository, err := GitInstance().Open(dir)
 	assert.NoError(t, err)
@@ -987,6 +1034,7 @@ func TestGoGitRepositoryTag(t *testing.T) {
 func TestGoGitRepositoryTagWithMessage(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.INITIAL_COMMIT().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
 	dir := script.GetWorkingDirectory()
 	repository, err := GitInstance().Open(dir)
 	assert.NoError(t, err)
@@ -1038,6 +1086,7 @@ func TestGoGitRepositoryTagWithMessage(t *testing.T) {
 func TestGoGitRepositoryTagWithMessageAndIdentity(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.INITIAL_COMMIT().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
 	dir := script.GetWorkingDirectory()
 	repository, err := GitInstance().Open(dir)
 	assert.NoError(t, err)
@@ -1089,6 +1138,7 @@ func TestGoGitRepositoryTagWithMessageAndIdentity(t *testing.T) {
 func TestGoGitRepositoryTagCommitWithMessageAndIdentity(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.INITIAL_COMMIT().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
 	dir := script.GetWorkingDirectory()
 	repository, err := GitInstance().Open(dir)
 	assert.NoError(t, err)
@@ -1170,6 +1220,7 @@ func TestGoGitRepositoryTagCommitWithMessageAndIdentity(t *testing.T) {
 func TestGoGitRepositoryGetCurrentBranch(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.INITIAL_COMMIT().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
 	dir := script.GetWorkingDirectory()
 	repository, err := GitInstance().Open(dir)
 	assert.NoError(t, err)
@@ -1195,6 +1246,7 @@ func TestGoGitRepositoryGetCurrentBranch(t *testing.T) {
 func TestGoGitRepositoryGetLatestCommitErrorWithRepositoryWithNoCommits(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.FROM_SCRATCH().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
 	dir := script.GetWorkingDirectory()
 	repository, err := GitInstance().Open(dir)
 	assert.NoError(t, err)
@@ -1218,6 +1270,7 @@ func TestGoGitRepositoryGetLatestCommitErrorWithRepositoryWithNoCommits(t *testi
 func TestGoGitRepositoryGetLatestCommit(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.FROM_SCRATCH().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
 	dir := script.GetWorkingDirectory()
 	repository, err := GitInstance().Open(dir)
 	assert.NoError(t, err)
@@ -1255,6 +1308,7 @@ func TestGoGitRepositoryGetLatestCommit(t *testing.T) {
 func TestGoGitRepositoryGetRootCommitErrorWithRepositoryWithNoCommits(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.FROM_SCRATCH().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
 	dir := script.GetWorkingDirectory()
 	repository, err := GitInstance().Open(dir)
 	assert.NoError(t, err)
@@ -1278,6 +1332,7 @@ func TestGoGitRepositoryGetRootCommitErrorWithRepositoryWithNoCommits(t *testing
 func TestGoGitRepositoryGetRootCommit(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.FROM_SCRATCH().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
 	dir := script.GetWorkingDirectory()
 	repository, err := GitInstance().Open(dir)
 	assert.NoError(t, err)
@@ -1315,6 +1370,7 @@ func TestGoGitRepositoryGetRootCommit(t *testing.T) {
 func TestGoGitRepositoryIsClean(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.FROM_SCRATCH().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
 	dir := script.GetWorkingDirectory()
 	repository, err := GitInstance().Open(dir)
 	assert.NoError(t, err)
@@ -1345,6 +1401,7 @@ func TestGoGitRepositoryIsClean(t *testing.T) {
 func TestGoGitRepositoryGetCommitTagsReturnsEmptyResultWithRepositoryWithNoCommits(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.FROM_SCRATCH().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
 	dir := script.GetWorkingDirectory()
 	repository, err := GitInstance().Open(dir)
 	assert.NoError(t, err)
@@ -1357,6 +1414,7 @@ func TestGoGitRepositoryGetCommitTagsReturnsEmptyResultWithRepositoryWithNoCommi
 func TestGoGitRepositoryGetCommitTags(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.FROM_SCRATCH().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
 	dir := script.GetWorkingDirectory()
 	repository, err := GitInstance().Open(dir)
 	assert.NoError(t, err)
@@ -1389,6 +1447,7 @@ func TestGoGitRepositoryGetCommitTags(t *testing.T) {
 func TestGoGitRepositoryGetRemoteNamesWithNoRemotes(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.FROM_SCRATCH().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
 	dir := script.GetWorkingDirectory()
 	repository, err := GitInstance().Open(dir)
 	assert.NoError(t, err)
@@ -1400,6 +1459,7 @@ func TestGoGitRepositoryGetRemoteNamesWithNoRemotes(t *testing.T) {
 func TestGoGitRepositoryGetRemoteNamesAfterClone(t *testing.T) {
 	dir := "nyx-test-git-remote-names-test-"
 	dir = gitutil.NewTempDirectory("", &dir)
+	defer os.RemoveAll(dir)
 	tr := REMOTE_TEST_REPOSITORY
 	repository, err := GitInstance().Clone(&dir, &tr)
 	assert.NoError(t, err)
@@ -1412,11 +1472,13 @@ func TestGoGitRepositoryGetRemoteNamesAfterClone(t *testing.T) {
 func TestGoGitRepositoryGetRemoteNamesAfterAddingLocalRepository(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.FROM_SCRATCH().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
 	dir := script.GetWorkingDirectory()
 	repository, err := GitInstance().Open(dir)
 	assert.NoError(t, err)
 
 	localRepositoryScript := gittools.FROM_SCRATCH().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
 	localRepositoryScriptDir := localRepositoryScript.GetWorkingDirectory()
 
 	script.AddRemote(localRepositoryScriptDir, "local")
@@ -1429,6 +1491,7 @@ func TestGoGitRepositoryGetRemoteNamesAfterAddingLocalRepository(t *testing.T) {
 func TestGoGitRepositoryGetRemoteNamesAfterCloneAndAddingLocalRepository(t *testing.T) {
 	dir := "nyx-test-git-remote-names-test-"
 	dir = gitutil.NewTempDirectory("", &dir)
+	defer os.RemoveAll(dir)
 	tr := REMOTE_TEST_REPOSITORY
 
 	repository, err := GitInstance().Clone(&dir, &tr)
@@ -1436,6 +1499,7 @@ func TestGoGitRepositoryGetRemoteNamesAfterCloneAndAddingLocalRepository(t *test
 	script := gittools.From(dir)
 
 	localRepositoryScript := gittools.FROM_SCRATCH().Realize()
+	defer os.RemoveAll(localRepositoryScript.GetWorkingDirectory())
 	localRepositoryScriptDir := localRepositoryScript.GetWorkingDirectory()
 	script.AddRemote(localRepositoryScriptDir, "local")
 
@@ -1448,6 +1512,7 @@ func TestGoGitRepositoryGetRemoteNamesAfterCloneAndAddingLocalRepository(t *test
 func TestGoGitRepositoryWalkHistoryWithNoBoundaries(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.TWO_BRANCH_SHORT_MERGED().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
 	dir := script.GetWorkingDirectory()
 	repository, err := GitInstance().Open(dir)
 	assert.NoError(t, err)
@@ -1471,6 +1536,7 @@ func TestGoGitRepositoryWalkHistoryWithNoBoundaries(t *testing.T) {
 func TestGoGitRepositoryWalkHistoryErrorWithRepositoryWithNoCommits(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.FROM_SCRATCH().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
 	dir := script.GetWorkingDirectory()
 	repository, err := GitInstance().Open(dir)
 	assert.NoError(t, err)
@@ -1484,6 +1550,7 @@ func TestGoGitRepositoryWalkHistoryErrorWithRepositoryWithNoCommits(t *testing.T
 func TestGoGitRepositoryWalkHistoryWithVisitorStoppingBrowsing(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.TWO_BRANCH_SHORT_MERGED().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
 	dir := script.GetWorkingDirectory()
 	repository, err := GitInstance().Open(dir)
 	assert.NoError(t, err)
@@ -1502,6 +1569,7 @@ func TestGoGitRepositoryWalkHistoryWithVisitorStoppingBrowsing(t *testing.T) {
 func TestGoGitRepositoryWalkHistoryWithStartBoundary(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.TWO_BRANCH_SHORT_MERGED().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
 	dir := script.GetWorkingDirectory()
 	repository, err := GitInstance().Open(dir)
 	assert.NoError(t, err)
@@ -1533,6 +1601,7 @@ func TestGoGitRepositoryWalkHistoryWithStartBoundary(t *testing.T) {
 func TestGoGitRepositoryWalkHistoryWithEndBoundary(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.TWO_BRANCH_SHORT_MERGED().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
 	dir := script.GetWorkingDirectory()
 	repository, err := GitInstance().Open(dir)
 	assert.NoError(t, err)
@@ -1564,6 +1633,7 @@ func TestGoGitRepositoryWalkHistoryWithEndBoundary(t *testing.T) {
 func TestGoGitRepositoryWalkHistoryWithBothBoundaries(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.TWO_BRANCH_SHORT_MERGED().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
 	dir := script.GetWorkingDirectory()
 	repository, err := GitInstance().Open(dir)
 	assert.NoError(t, err)
@@ -1596,6 +1666,7 @@ func TestGoGitRepositoryWalkHistoryWithBothBoundaries(t *testing.T) {
 func TestGoGitRepositoryWalkHistoryWithStartBoundaryUnresolved(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.TWO_BRANCH_SHORT_MERGED().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
 	dir := script.GetWorkingDirectory()
 	repository, err := GitInstance().Open(dir)
 	assert.NoError(t, err)
@@ -1614,6 +1685,7 @@ func TestGoGitRepositoryWalkHistoryWithStartBoundaryUnresolved(t *testing.T) {
 func TestGoGitRepositoryWalkHistoryWithEndBoundaryUnresolved(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.TWO_BRANCH_SHORT_MERGED().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
 	dir := script.GetWorkingDirectory()
 	repository, err := GitInstance().Open(dir)
 	assert.NoError(t, err)
@@ -1632,6 +1704,7 @@ func TestGoGitRepositoryWalkHistoryWithEndBoundaryUnresolved(t *testing.T) {
 func TestGoGitRepositoryWalkHistoryWithBothBoundariesUnresolved(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.TWO_BRANCH_SHORT_MERGED().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
 	dir := script.GetWorkingDirectory()
 	repository, err := GitInstance().Open(dir)
 	assert.NoError(t, err)
@@ -1651,6 +1724,7 @@ func TestGoGitRepositoryWalkHistoryWithBothBoundariesUnresolved(t *testing.T) {
 func TestGoGitRepositoryWalkHistoryWithEndBoundaryOutOfScope(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.TWO_BRANCH_SHORT_MERGED().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
 	dir := script.GetWorkingDirectory()
 	repository, err := GitInstance().Open(dir)
 	assert.NoError(t, err)

@@ -64,14 +64,17 @@ public class PublishTests {
             GitHubRepository gitHubRepository = gitHub.createGitRepository(randomID, "Test repository "+randomID, false, true);
 
             Path assetPath1 = Files.createTempFile("nyx-test-github-release-test-", ".txt");
+            assetPath1.toFile().deleteOnExit();
             Files.write(assetPath1, "content1".getBytes());
             Path assetPath2 = Files.createTempFile("nyx-test-github-release-test-", ".bin");
+            assetPath2.toFile().deleteOnExit();
             Files.write(assetPath2, "content2".getBytes());
 
             // if we clone too quickly next calls may fail
             Thread.sleep(4000);
 
             Script script = Scenario.ONE_BRANCH_SHORT.applyOnClone(gitHubRepository.getHTTPURL(), System.getProperty("gitHubTestUserToken"), "");
+            script.getWorkingDirectory().deleteOnExit();
             script.push(System.getProperty("gitHubTestUserToken"), "");
 
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
@@ -182,14 +185,17 @@ public class PublishTests {
             GitHubRepository gitHubRepository = gitHub.createGitRepository(randomID, "Test repository "+randomID, false, true);
 
             Path assetPath1 = Files.createTempFile("nyx-test-github-release-test-", ".txt");
+            assetPath1.toFile().deleteOnExit();
             Files.write(assetPath1, "content1".getBytes());
             Path assetPath2 = Files.createTempFile("nyx-test-github-release-test-", ".bin");
+            assetPath2.toFile().deleteOnExit();
             Files.write(assetPath2, "content2".getBytes());
 
             // if we clone too quickly next calls may fail
             Thread.sleep(4000);
 
             Script script = Scenario.ONE_BRANCH_SHORT.applyOnClone(gitHubRepository.getHTTPURL(), System.getProperty("gitHubTestUserToken"), "");
+            script.getWorkingDirectory().deleteOnExit();
             script.push(System.getProperty("gitHubTestUserToken"), "");
 
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
@@ -301,8 +307,10 @@ public class PublishTests {
             GitLabRepository gitLabRepository = gitLab.createGitRepository(randomID, "Test repository "+randomID, false, true);
 
             Path assetPath1 = Files.createTempFile("nyx-test-gitlab-release-test-", ".txt");
+            assetPath1.toFile().deleteOnExit();
             Files.write(assetPath1, "content1".getBytes());
             Path assetPath2 = Files.createTempFile("nyx-test-gitlab-release-test-", ".bin");
+            assetPath2.toFile().deleteOnExit();
             Files.write(assetPath2, "content2".getBytes());
 
             // if we clone too quickly next calls may fail
@@ -311,6 +319,7 @@ public class PublishTests {
             // when a token for user and password authentication for plain Git operations against a GitLab repository,
             // the user is the "PRIVATE-TOKEN" string and the password is the token
             Script script = Scenario.ONE_BRANCH_SHORT.applyOnClone(gitLabRepository.getHTTPURL(), "PRIVATE-TOKEN", System.getProperty("gitLabTestUserToken"));
+            script.getWorkingDirectory().deleteOnExit();
             script.push("PRIVATE-TOKEN", System.getProperty("gitLabTestUserToken"));
 
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
@@ -421,8 +430,10 @@ public class PublishTests {
             GitLabRepository gitLabRepository = gitLab.createGitRepository(randomID, "Test repository "+randomID, false, true);
 
             Path assetPath1 = Files.createTempFile("nyx-test-gitlab-release-test-", ".txt");
+            assetPath1.toFile().deleteOnExit();
             Files.write(assetPath1, "content1".getBytes());
             Path assetPath2 = Files.createTempFile("nyx-test-gitlab-release-test-", ".bin");
+            assetPath2.toFile().deleteOnExit();
             Files.write(assetPath2, "content2".getBytes());
 
             // if we clone too quickly next calls may fail
@@ -431,6 +442,7 @@ public class PublishTests {
             // when a token for user and password authentication for plain Git operations against a GitLab repository,
             // the user is the "PRIVATE-TOKEN" string and the password is the token
             Script script = Scenario.ONE_BRANCH_SHORT.applyOnClone(gitLabRepository.getHTTPURL(), "PRIVATE-TOKEN", System.getProperty("gitLabTestUserToken"));
+            script.getWorkingDirectory().deleteOnExit();
             script.push("PRIVATE-TOKEN", System.getProperty("gitLabTestUserToken"));
 
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();

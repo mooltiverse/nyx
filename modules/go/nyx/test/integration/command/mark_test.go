@@ -46,6 +46,7 @@ func TestMarkConstructor(t *testing.T) {
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.MARK, gittools.FROM_SCRATCH()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			assert.NotNil(t, command)
 		})
 	}
@@ -60,6 +61,7 @@ func TestMarkState(t *testing.T) {
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.MARK, gittools.FROM_SCRATCH()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			assert.NotNil(t, (*command).State())
 		})
 	}
@@ -75,6 +77,7 @@ func TestMarkIsUpToDate(t *testing.T) {
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.MARK, gittools.FROM_SCRATCH()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 
 			upToDate, err := (*command).IsUpToDate()
 			assert.NoError(t, err)
@@ -129,6 +132,7 @@ func TestMarkIsUpToDateInDirtyRepository(t *testing.T) {
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.MARK, gittools.FROM_SCRATCH()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 
 			upToDate, err := (*command).IsUpToDate()
 			assert.NoError(t, err)
@@ -199,6 +203,7 @@ func TestMarkIdempotencyWithCommitMessageConvention(t *testing.T) {
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.MARK, gittools.ONE_BRANCH_SHORT()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			// add a mock convention that accepts all non nil messages and dumps the minor identifier for each
 			commitMessageConventions, _ := ent.NewCommitMessageConventionsWith(&[]*string{utl.PointerToString("testConvention")},
@@ -466,6 +471,7 @@ func TestMarkIdempotencyWithoutCommitMessageConvention(t *testing.T) {
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.MARK, gittools.ONE_BRANCH_SHORT()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			// run a first time
 			_, err := (*command).Run()
 			assert.NoError(t, err)
@@ -708,6 +714,7 @@ func TestMarkIdempotencyInDirtyRepository(t *testing.T) {
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.MARK, gittools.ONE_BRANCH_SHORT()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			if (*command).GetContextName() != cmdtpl.STANDALONE_CONTEXT_NAME {
 				// run a first time
 				_, err := (*command).Run()
@@ -955,6 +962,7 @@ func TestMarkErrorOnRunWithValidButEmptyGitRepository(t *testing.T) {
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.MARK, gittools.FROM_SCRATCH()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			_, err := (*command).Run()
 			assert.Error(t, err)
 		})
@@ -967,7 +975,9 @@ func TestMarkRunOnCleanWorkspaceWithNoNewVersionOrNewReleaseWithCommitAndTagAndP
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.MARK, gittools.ONE_BRANCH_SHORT()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			remoteScript := gittools.BARE().RealizeBare(true)
+			defer os.RemoveAll(remoteScript.GetWorkingDirectory())
 			(*command).Script().AddRemote(remoteScript.GetWorkingDirectory(), "replica") // use the GitDirectory even if it's a bare repository as it's managed internally and still points to the repo dir
 			previousLastCommit := (*command).Script().GetLastCommitID()
 			previousCommits := (*command).Script().GetCommitIDs()
@@ -1012,7 +1022,9 @@ func TestMarkRunOnDirtyWorkspaceWithNoNewVersionOrNewReleaseWithCommitAndTagAndP
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.MARK, gittools.ONE_BRANCH_SHORT()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			remoteScript := gittools.BARE().RealizeBare(true)
+			defer os.RemoveAll(remoteScript.GetWorkingDirectory())
 			(*command).Script().AddRemote(remoteScript.GetWorkingDirectory(), "replica") // use the GitDirectory even if it's a bare repository as it's managed internally and still points to the repo dir
 			previousLastCommit := (*command).Script().GetLastCommitID()
 			previousCommits := (*command).Script().GetCommitIDs()
@@ -1060,7 +1072,9 @@ func TestMarkRunOnCleanWorkspaceWithNoNewVersionOrNewReleaseWithCommitAndTagAndP
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.MARK, gittools.ONE_BRANCH_SHORT()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			remoteScript := gittools.BARE().RealizeBare(true)
+			defer os.RemoveAll(remoteScript.GetWorkingDirectory())
 			(*command).Script().AddRemote(remoteScript.GetWorkingDirectory(), "replica") // use the GitDirectory even if it's a bare repository as it's managed internally and still points to the repo dir
 			previousLastCommit := (*command).Script().GetLastCommitID()
 			previousCommits := (*command).Script().GetCommitIDs()
@@ -1105,7 +1119,9 @@ func TestMarkRunOnDirtyWorkspaceWithNoNewVersionOrNewReleaseWithCommitAndTagAndP
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.MARK, gittools.ONE_BRANCH_SHORT()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			remoteScript := gittools.BARE().RealizeBare(true)
+			defer os.RemoveAll(remoteScript.GetWorkingDirectory())
 			(*command).Script().AddRemote(remoteScript.GetWorkingDirectory(), "replica") // use the GitDirectory even if it's a bare repository as it's managed internally and still points to the repo dir
 			previousLastCommit := (*command).Script().GetLastCommitID()
 			previousCommits := (*command).Script().GetCommitIDs()
@@ -1153,7 +1169,9 @@ func TestMarkRunOnCleanWorkspaceWithNewVersionOrNewReleaseWithCommitAndTagAndPus
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.MARK, gittools.ONE_BRANCH_SHORT()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			remoteScript := gittools.BARE().RealizeBare(true)
+			defer os.RemoveAll(remoteScript.GetWorkingDirectory())
 			(*command).Script().AddRemote(remoteScript.GetWorkingDirectory(), "replica") // use the GitDirectory even if it's a bare repository as it's managed internally and still points to the repo dir
 			previousLastCommit := (*command).Script().GetLastCommitID()
 			previousCommits := (*command).Script().GetCommitIDs()
@@ -1199,7 +1217,9 @@ func TestMarkRunOnDirtyWorkspaceWithNewVersionOrNewReleaseWithCommitAndTagAndPus
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.MARK, gittools.ONE_BRANCH_SHORT()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			remoteScript := gittools.BARE().RealizeBare(true)
+			defer os.RemoveAll(remoteScript.GetWorkingDirectory())
 			(*command).Script().AddRemote(remoteScript.GetWorkingDirectory(), "replica") // use the GitDirectory even if it's a bare repository as it's managed internally and still points to the repo dir
 			previousLastCommit := (*command).Script().GetLastCommitID()
 			previousCommits := (*command).Script().GetCommitIDs()
@@ -1248,7 +1268,9 @@ func TestMarkRunOnCleanWorkspaceWithNewVersionOrNewReleaseWithCommitAndTagAndPus
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.MARK, gittools.ONE_BRANCH_SHORT()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			remoteScript := gittools.BARE().RealizeBare(true)
+			defer os.RemoveAll(remoteScript.GetWorkingDirectory())
 			(*command).Script().AddRemote(remoteScript.GetWorkingDirectory(), "replica") // use the GitDirectory even if it's a bare repository as it's managed internally and still points to the repo dir
 			previousLastCommit := (*command).Script().GetLastCommitID()
 			previousCommits := (*command).Script().GetCommitIDs()
@@ -1294,7 +1316,9 @@ func TestMarkRunOnDirtyWorkspaceWithNewVersionOrNewReleaseWithCommitAndTagAndPus
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.MARK, gittools.ONE_BRANCH_SHORT()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			remoteScript := gittools.BARE().RealizeBare(true)
+			defer os.RemoveAll(remoteScript.GetWorkingDirectory())
 			(*command).Script().AddRemote(remoteScript.GetWorkingDirectory(), "replica") // use the GitDirectory even if it's a bare repository as it's managed internally and still points to the repo dir
 			previousLastCommit := (*command).Script().GetLastCommitID()
 			previousCommits := (*command).Script().GetCommitIDs()
@@ -1352,7 +1376,9 @@ func TestMarkRunOnGitHubClonedWorkspaceWithAdditionalRemoteWithNewVersionOrNewRe
 	time.Sleep(4000 * time.Millisecond)
 
 	replicaScript := gittools.FROM_SCRATCH().Realize()
+	defer os.RemoveAll(replicaScript.GetWorkingDirectory())
 	script := gittools.ONE_BRANCH_SHORT().ApplyOnCloneFromWithCredentials((*gitHubRepository).GetHTTPURL(), utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(""))
+	defer os.RemoveAll(script.GetWorkingDirectory())
 	script.AddRemote(replicaScript.GetGitDirectory(), "replica")
 
 	configurationLayerMock := cnf.NewSimpleConfigurationLayer()
@@ -1393,6 +1419,7 @@ func TestMarkRunOnGitHubClonedWorkspaceWithAdditionalRemoteWithNewVersionOrNewRe
 
 	// clone the remote repo again into a a new directory and test
 	remoteScript := gittools.CloneFromWithCredentials((*gitHubRepository).GetHTTPURL(), utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(""))
+	defer os.RemoveAll(remoteScript.GetWorkingDirectory())
 
 	version, _ := state.GetVersion()
 	assert.Equal(t, "0.0.5", *version)
@@ -1430,7 +1457,9 @@ func TestMarkRunOnGitLabClonedWorkspaceWithAdditionalRemoteWithNewVersionOrNewRe
 	time.Sleep(4000 * time.Millisecond)
 
 	replicaScript := gittools.FROM_SCRATCH().Realize()
+	defer os.RemoveAll(replicaScript.GetWorkingDirectory())
 	script := gittools.ONE_BRANCH_SHORT().ApplyOnCloneFromWithCredentials((*gitLabRepository).GetHTTPURL(), utl.PointerToString("PRIVATE-TOKEN"), utl.PointerToString(os.Getenv("gitLabTestUserToken")))
+	defer os.RemoveAll(script.GetWorkingDirectory())
 	script.AddRemote(replicaScript.GetGitDirectory(), "replica")
 
 	configurationLayerMock := cnf.NewSimpleConfigurationLayer()
@@ -1471,6 +1500,7 @@ func TestMarkRunOnGitLabClonedWorkspaceWithAdditionalRemoteWithNewVersionOrNewRe
 
 	// clone the remote repo again into a a new directory and test
 	remoteScript := gittools.CloneFromWithCredentials((*gitLabRepository).GetHTTPURL(), utl.PointerToString("PRIVATE-TOKEN"), utl.PointerToString(os.Getenv("gitLabTestUserToken")))
+	defer os.RemoveAll(remoteScript.GetWorkingDirectory())
 
 	version, _ := state.GetVersion()
 	assert.Equal(t, "0.0.5", *version)

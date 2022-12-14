@@ -54,8 +54,9 @@ public class MarkTestTemplates {
         @TestTemplate
         @DisplayName("Mark()")
         @Baseline(Scenario.FROM_SCRATCH)
-        void constructorTest(@CommandSelector(Commands.MARK) CommandProxy command)
+        void constructorTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             assertNotNull(command);
         }
     }
@@ -70,8 +71,9 @@ public class MarkTestTemplates {
         @TestTemplate
         @DisplayName("Mark.state()")
         @Baseline(Scenario.FROM_SCRATCH)
-        void stateTest(@CommandSelector(Commands.MARK) CommandProxy command)
+        void stateTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             assertNotNull(command.state());
         }
     }
@@ -89,6 +91,7 @@ public class MarkTestTemplates {
         @Baseline(Scenario.FROM_SCRATCH)
         void isUpToDateTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             assertFalse(command.isUpToDate());
 
             // running in an empty repository, with no commits, throws an exception
@@ -120,6 +123,7 @@ public class MarkTestTemplates {
         @Baseline(Scenario.FROM_SCRATCH)
         void isUpToDateInDirtyRepositoryTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             assertFalse(command.isUpToDate());
 
             // add some commits to the repository and after one run the task should be up to date
@@ -168,6 +172,7 @@ public class MarkTestTemplates {
         @Baseline(Scenario.ONE_BRANCH_SHORT)
         void idempotencyWithCommitMessageConvention(@CommandSelector(Commands.MARK) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
             configurationLayerMock.setCommitMessageConventions(
@@ -319,6 +324,7 @@ public class MarkTestTemplates {
         @Baseline(Scenario.ONE_BRANCH_SHORT)
         void idempotencyWithoutCommitMessageConvention(@CommandSelector(Commands.MARK) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             // run a first time
             command.run();
 
@@ -455,6 +461,7 @@ public class MarkTestTemplates {
         @Baseline(Scenario.ONE_BRANCH_SHORT)
         void idempotencyInDirtyRepository(@CommandSelector(Commands.MARK) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
                 // run a first time
                 command.run();
@@ -599,8 +606,9 @@ public class MarkTestTemplates {
         @TestTemplate
         @DisplayName("Mark.run() throws exception with a valid but empty Git repository in working directory")
         @Baseline(Scenario.FROM_SCRATCH)
-        void exceptionOnRunWithValidButEmptyGitRepositoryTest(@CommandSelector(Commands.MARK) CommandProxy command)
+        void exceptionOnRunWithValidButEmptyGitRepositoryTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             assertThrows(Exception.class, () -> command.run());
         }
 
@@ -609,7 +617,9 @@ public class MarkTestTemplates {
         @Baseline(Scenario.ONE_BRANCH_SHORT)
         void runOnCleanWorkspaceWithNoNewVersionOrNewReleaseWithCommitAndTagAndPushDisabledTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             Script remoteScript = Scenario.BARE.realize(true);
+            remoteScript.getGitDirectory().deleteOnExit();
             script.addRemote(remoteScript.getGitDirectory(), "replica");
             String previousLastCommit = script.getLastCommitID();
             List<String> previousCommits = script.getCommitIDs();
@@ -651,7 +661,9 @@ public class MarkTestTemplates {
         @Baseline(Scenario.ONE_BRANCH_SHORT)
         void runOnDirtyWorkspaceWithNoNewVersionOrNewReleaseWithCommitAndTagAndPushDisabledTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             Script remoteScript = Scenario.BARE.realize(true);
+            remoteScript.getGitDirectory().deleteOnExit();
             script.addRemote(remoteScript.getGitDirectory(), "replica");
             String previousLastCommit = script.getLastCommitID();
             List<String> previousCommits = script.getCommitIDs();
@@ -696,7 +708,9 @@ public class MarkTestTemplates {
         @Baseline(Scenario.ONE_BRANCH_SHORT)
         void runOnCleanWorkspaceWithNoNewVersionOrNewReleaseWithCommitAndTagAndPushEnabledTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             Script remoteScript = Scenario.BARE.realize(true);
+            remoteScript.getGitDirectory().deleteOnExit();
             script.addRemote(remoteScript.getGitDirectory(), "replica");
             String previousLastCommit = script.getLastCommitID();
             List<String> previousCommits = script.getCommitIDs();
@@ -738,7 +752,9 @@ public class MarkTestTemplates {
         @Baseline(Scenario.ONE_BRANCH_SHORT)
         void runOnDirtyWorkspaceWithNoNewVersionOrNewReleaseWithCommitAndTagAndPushEnabledTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             Script remoteScript = Scenario.BARE.realize(true);
+            remoteScript.getGitDirectory().deleteOnExit();
             script.addRemote(remoteScript.getGitDirectory(), "replica");
             String previousLastCommit = script.getLastCommitID();
             List<String> previousCommits = script.getCommitIDs();
@@ -783,7 +799,9 @@ public class MarkTestTemplates {
         @Baseline(Scenario.ONE_BRANCH_SHORT)
         void runOnCleanWorkspaceWithNewVersionOrNewReleaseWithCommitAndTagAndPushDisabledTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             Script remoteScript = Scenario.BARE.realize(true);
+            remoteScript.getGitDirectory().deleteOnExit();
             script.addRemote(remoteScript.getGitDirectory(), "replica");
             String previousLastCommit = script.getLastCommitID();
             List<String> previousCommits = script.getCommitIDs();
@@ -830,7 +848,9 @@ public class MarkTestTemplates {
         @Baseline(Scenario.ONE_BRANCH_SHORT)
         void runOnDirtyWorkspaceWithNewVersionOrNewReleaseWithCommitAndTagAndPushDisabledTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             Script remoteScript = Scenario.BARE.realize(true);
+            remoteScript.getGitDirectory().deleteOnExit();
             script.addRemote(remoteScript.getGitDirectory(), "replica");
             String previousLastCommit = script.getLastCommitID();
             List<String> previousCommits = script.getCommitIDs();
@@ -880,7 +900,9 @@ public class MarkTestTemplates {
         @Baseline(Scenario.ONE_BRANCH_SHORT)
         void runOnCleanWorkspaceWithNewVersionOrNewReleaseWithCommitAndTagAndPushEnabledTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             Script remoteScript = Scenario.BARE.realize(true);
+            remoteScript.getGitDirectory().deleteOnExit();
             script.addRemote(remoteScript.getGitDirectory(), "replica");
             String previousLastCommit = script.getLastCommitID();
             List<String> previousCommits = script.getCommitIDs();
@@ -927,7 +949,9 @@ public class MarkTestTemplates {
         @Baseline(Scenario.ONE_BRANCH_SHORT)
         void runOnDirtyWorkspaceWithNewVersionOrNewReleaseWithCommitAndTagAndPushEnabledTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             Script remoteScript = Scenario.BARE.realize(true);
+            remoteScript.getGitDirectory().deleteOnExit();
             script.addRemote(remoteScript.getGitDirectory(), "replica");
             String previousLastCommit = script.getLastCommitID();
             List<String> previousCommits = script.getCommitIDs();

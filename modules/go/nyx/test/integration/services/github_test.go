@@ -163,6 +163,7 @@ func TestGitHubReleaseServiceCreateRelease(t *testing.T) {
 	// when a token for user and password authentication for plain Git operations against a GitHub repository,
 	// the user is the token and the password is the empty string
 	script := gittools.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED().ApplyOnCloneFromWithCredentials((*gitHubRepository).GetHTTPURL(), utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(""))
+	defer os.RemoveAll(script.GetWorkingDirectory())
 	script.PushWithCredentials(utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(""))
 
 	// publish the release
@@ -186,6 +187,8 @@ func TestGitHubReleaseServiceCreateRelease(t *testing.T) {
 	assetAbsolutePath1, _ := filepath.Abs(assetPath1.Name())
 	assetsToUpload = append(assetsToUpload, *ent.NewAttachmentWith(utl.PointerToString("asset1"), utl.PointerToString("Text asset"), utl.PointerToString(assetAbsolutePath1), utl.PointerToString("text/plain")))
 	assetAbsolutePath2, _ := filepath.Abs(assetPath2.Name())
+	defer os.Remove(assetAbsolutePath1)
+	defer os.Remove(assetAbsolutePath2)
 	assetsToUpload = append(assetsToUpload, *ent.NewAttachmentWith(utl.PointerToString("asset2"), utl.PointerToString("Binary asset"), utl.PointerToString(assetAbsolutePath2), utl.PointerToString("application/octet-stream")))
 	assetsToUpload = append(assetsToUpload, *ent.NewAttachmentWith(utl.PointerToString("nonexistentfile"), utl.PointerToString("Non existent asset"), utl.PointerToString("nonexistentfile"), utl.PointerToString("application/octet-stream")))       // this file does not exist and should only generate a warning
 	assetsToUpload = append(assetsToUpload, *ent.NewAttachmentWith(utl.PointerToString("remote1"), utl.PointerToString("Remote link asset"), utl.PointerToString("http://www.example.com/remote1"), utl.PointerToString("application/octet-stream"))) // this is an URL and should be ignored

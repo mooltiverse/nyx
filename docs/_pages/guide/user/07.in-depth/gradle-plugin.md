@@ -16,3 +16,7 @@ See the [Quick Start]({{ site.baseurl }}{% link _pages/guide/user/01.quick-start
 According to [configuration avoidance](https://docs.gradle.org/current/userguide/task_configuration_avoidance.html) the plugin *registers* the tasks to the gradle project instead of *creating* them. This means that Gradle will only instantiate them when needed to improve the overall performances and avoid unnecessary tasks to run when not needed.
 
 For more see the [`register`](https://docs.gradle.org/current/javadoc/org/gradle/api/tasks/TaskContainer.html#register-java.lang.String-java.lang.Class-) and [`create`](https://docs.gradle.org/current/javadoc/org/gradle/api/tasks/TaskContainer.html#create-java.lang.String-java.lang.Class-) methods on the [`TaskContainer`](https://docs.gradle.org/current/javadoc/org/gradle/api/tasks/TaskContainer.html) class.
+
+### Task dependencies
+
+Nyx tasks have *chained* [dependencies]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#core-tasks) among each others. However, these dependencies are implemented within the Nyx core, not at the Gradle task level. This makes no difference from the user's point of view but it may be helpful to know if you're playing with Gradle task dependencies.

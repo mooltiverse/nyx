@@ -328,6 +328,8 @@ public class ConfigurationFileTests {
         void configurationSerializationWithMultipleConfigurationLayersTestJSON()
             throws Exception {
             File tempDir = Files.createTempDirectory(String.valueOf(this.hashCode())).toFile();
+            tempDir.deleteOnExit();
+            tempDir.deleteOnExit();
             Configuration.setDefaultDirectory(tempDir);
 
             SimpleConfigurationLayer lowPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
@@ -577,6 +579,7 @@ public class ConfigurationFileTests {
         void configurationSerializationWithMultipleConfigurationLayersTestYAML()
             throws Exception {
             File tempDir = Files.createTempDirectory(String.valueOf(this.hashCode())).toFile();
+            tempDir.deleteOnExit();
             Configuration.setDefaultDirectory(tempDir);
 
             SimpleConfigurationLayer lowPriorityConfigurationLayerMock = new SimpleConfigurationLayer();

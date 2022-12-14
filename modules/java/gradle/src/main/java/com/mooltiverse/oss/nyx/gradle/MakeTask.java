@@ -48,9 +48,6 @@ public abstract class MakeTask extends CoreTask {
     public MakeTask(NyxExtension extension) {
         super(extension);
         setDescription(DESCRIPTION);
-
-        // Configure dependencies
-        dependsOn(InferTask.NAME);
     }
 
     /**

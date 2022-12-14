@@ -120,6 +120,7 @@ public class ObjectFactoryTests {
             String fullCommitMessage = fullMessageStringWriter.toString();
 
             Script script = Scenario.FROM_SCRATCH.realize().andAddFiles();
+            script.getWorkingDirectory().deleteOnExit();
 
             // test with a message with just the simple message
             RevCommit commit = script.commit(messageHeader);
@@ -145,6 +146,7 @@ public class ObjectFactoryTests {
         public void tagFrom()
             throws Exception {
             Script script = Scenario.FROM_SCRATCH.realize().andAddFiles();
+            script.getWorkingDirectory().deleteOnExit();
 
             script.commit("Commit 1");
 
@@ -168,6 +170,7 @@ public class ObjectFactoryTests {
         public void commitFrom()
             throws Exception {
             Script script = Scenario.FROM_SCRATCH.realize().andAddFiles();
+            script.getWorkingDirectory().deleteOnExit();
 
             // test with a message with just the simple message
             RevCommit revCommit1 = script.commit("Commit 1");

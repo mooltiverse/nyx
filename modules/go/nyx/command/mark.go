@@ -561,7 +561,7 @@ func (c *Mark) Run() (*stt.State, error) {
 			}
 
 			// PUSH
-			doPush, err := c.renderTemplateAsBoolean(releaseType.GetGitCommit())
+			doPush, err := c.renderTemplateAsBoolean(releaseType.GetGitPush())
 			if err != nil {
 				return nil, err
 			}

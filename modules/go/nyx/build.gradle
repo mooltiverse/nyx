@@ -86,6 +86,7 @@ targetPlatforms.each { platformItem ->
             exec {
                 environment 'GOOS', os
                 environment 'GOARCH', arch
+                environment 'CGO_ENABLED', "0" // disable CGO for the binary to run on Alpine Linux, which requires full static linking
                 workingDir = "$projectDir/main"
                 logging.captureStandardOutput LogLevel.QUIET
                 logging.captureStandardError  LogLevel.ERROR

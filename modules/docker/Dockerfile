@@ -10,5 +10,9 @@ VOLUME /project
 # Put the binary into the image
 COPY nyx-linux-amd64 /usr/bin/nyx
 
-# Run Infer by default
-CMD ["/usr/bin/nyx", "infer"]
+# Also install Git, as it's required by the libraries used in Go
+RUN apk update \
+    apk add git
+
+# Run Nyx, using the Infer command by default.
+ENTRYPOINT ["/usr/bin/nyx"]

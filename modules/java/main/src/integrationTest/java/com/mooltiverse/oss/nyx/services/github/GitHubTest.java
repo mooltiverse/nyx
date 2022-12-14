@@ -140,6 +140,7 @@ public class GitHubTest {
             // when a token for user and password authentication for plain Git operations against a GitHub repository,
             // the user is the token and the password is the empty string
             Script script = Scenario.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED.applyOnClone(gitHubRepository.getHTTPURL(), System.getProperty("gitHubTestUserToken"), "");
+            script.getWorkingDirectory().deleteOnExit();
             script.push(System.getProperty("gitHubTestUserToken"), "");
 
             // publish the release
@@ -155,8 +156,10 @@ public class GitHubTest {
             Thread.sleep(2000);
 
             Path assetPath1 = Files.createTempFile("nyx-test-github-release-test-", ".txt");
+            assetPath1.toFile().deleteOnExit();
             Files.write(assetPath1, "content1".getBytes());
             Path assetPath2 = Files.createTempFile("nyx-test-github-release-test-", ".bin");
+            assetPath2.toFile().deleteOnExit();
             Files.write(assetPath2, "content2".getBytes());
             Set<Attachment> assetsToUpload = new HashSet<Attachment>();
             assetsToUpload.add(new Attachment("asset1", "Text asset", "text/plain", assetPath1.toFile().getAbsolutePath()));

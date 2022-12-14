@@ -383,8 +383,9 @@ public class InferTestTemplates {
         @TestTemplate
         @DisplayName("Infer()")
         @Baseline(Scenario.FROM_SCRATCH)
-        void constructorTest(@CommandSelector(Commands.INFER) CommandProxy command)
+        void constructorTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             assertNotNull(command);
         }
     }
@@ -399,8 +400,9 @@ public class InferTestTemplates {
         @TestTemplate
         @DisplayName("Infer.state()")
         @Baseline(Scenario.FROM_SCRATCH)
-        void stateTest(@CommandSelector(Commands.INFER) CommandProxy command)
+        void stateTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             assertNotNull(command.state());
         }
     }
@@ -418,6 +420,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.FROM_SCRATCH)
         void isUpToDateTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             assertFalse(command.isUpToDate());
 
             // running in an empty repository, with no commits, throws an exception
@@ -442,6 +445,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.FROM_SCRATCH)
         void isUpToDateInDirtyRepositoryTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             assertFalse(command.isUpToDate());
 
             // add some commits to the repository and after one run the task should be up to date
@@ -482,6 +486,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.ONE_BRANCH_SHORT)
         void idempotencyWithCommitMessageConvention(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
             configurationLayerMock.setCommitMessageConventions(
@@ -630,6 +635,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.ONE_BRANCH_SHORT)
         void idempotencyWithoutCommitMessageConvention(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             // run a first time
             command.run();
 
@@ -768,6 +774,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.ONE_BRANCH_SHORT)
         void idempotencyInDirtyRepository(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             // run a first time
             command.run();
 
@@ -917,6 +924,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED)
         void matchReleaseTypeWithNonExistingReleaseTypeThrowsExceptionTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add some fictional release types
             configurationLayerMock.setReleaseTypes(
@@ -947,6 +955,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED)
         void matchReleaseTypeBasedOnBranchNameTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add some fictional release types
             configurationLayerMock.setReleaseTypes(
@@ -1003,6 +1012,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED)
         void matchReleaseTypeBasedOnEnvironmentVariablesTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             // since we can't set environment variables here we just use the PATH variable, which is always present
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add some fictional release types
@@ -1051,6 +1061,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED)
         void matchCleanReleaseTypeBasedOnWorkspaceStatusTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add some fictional release types
             configurationLayerMock.setReleaseTypes(
@@ -1106,6 +1117,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED)
         void matchDirtyReleaseTypeBasedOnWorkspaceStatusTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add some fictional release types
             configurationLayerMock.setReleaseTypes(
@@ -1163,6 +1175,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED)
         void matchReleaseTypeBasedOnBranchNameAndEnvironmentVariablesAndWorkspaceStatusTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             // since we can't set environment variables here we just use the PATH variable, which is always present
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add some fictional release types
@@ -1237,6 +1250,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.ONE_BRANCH_SHORT)
         void extraNonIntegerPrereleaseIdentifierThrowsExceptionTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
             configurationLayerMock.setCommitMessageConventions(
@@ -1271,6 +1285,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.ONE_BRANCH_SHORT)
         void extraIntegerPrereleaseIdentifierTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
             configurationLayerMock.setCommitMessageConventions(
@@ -1305,6 +1320,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.ONE_BRANCH_SHORT)
         void extraIntegerPrereleaseIdentifierOverExistingOnesTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
             configurationLayerMock.setCommitMessageConventions(
@@ -1343,6 +1359,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.ONE_BRANCH_SHORT)
         void extraBuildIdentifierTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
             configurationLayerMock.setCommitMessageConventions(
@@ -1377,6 +1394,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.ONE_BRANCH_SHORT)
         void extraBuildIdentifierOverExistingOnesTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
             configurationLayerMock.setCommitMessageConventions(
@@ -1415,6 +1433,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.ONE_BRANCH_SHORT)
         void extraMultipleIdentifiersTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
             configurationLayerMock.setCommitMessageConventions(
@@ -1456,6 +1475,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.ONE_BRANCH_SHORT)
         void extraMultipledentifiersOverExistingOnesTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
             configurationLayerMock.setCommitMessageConventions(
@@ -1510,6 +1530,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.ONE_BRANCH_SHORT)
         void versionRangeCheckWithStaticMatchingExpressionTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
             configurationLayerMock.setCommitMessageConventions(
@@ -1545,6 +1566,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.ONE_BRANCH_SHORT)
         void versionRangeCheckWithStaticNonMatchingExpressionTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
             configurationLayerMock.setCommitMessageConventions(
@@ -1582,6 +1604,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.ONE_BRANCH_SHORT)
         void versionRangeCheckWithStaticMalformedExpressionTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
             configurationLayerMock.setCommitMessageConventions(
@@ -1622,6 +1645,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.INITIAL_COMMIT)
         void versionRangeCheckWithDynamicExpressionInferredFromParseableBranchNamesTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
             configurationLayerMock.setCommitMessageConventions(
@@ -1671,6 +1695,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.INITIAL_COMMIT)
         void versionRangeCheckWithDynamicExpressionInferredFromUnparseableBranchNamesTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
             configurationLayerMock.setCommitMessageConventions(
@@ -1718,8 +1743,9 @@ public class InferTestTemplates {
         @TestTemplate
         @DisplayName("Infer.run() throws exception with a valid but empty Git repository in working directory")
         @Baseline(Scenario.FROM_SCRATCH)
-        void exceptionOnRunWithValidButEmptyGitRepositoryTest(@CommandSelector(Commands.INFER) CommandProxy command)
+        void exceptionOnRunWithValidButEmptyGitRepositoryTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             assertThrows(Exception.class, () -> command.run());
         }
 
@@ -1728,6 +1754,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.INITIAL_COMMIT)
         void runUsingDefaultReleaseTypeWithInitialCommitOnlyTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             command.run();
 
             assertEquals("master", command.state().getBranch());
@@ -1778,6 +1805,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.INITIAL_COMMIT)
         void runUsingDefaultReleaseTypeWithInitialCommitOnlyAndInitialVersionOverrideTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             final String CUSTOM_INITIAL_VERSION = "12.13.14";
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             configurationLayerMock.setInitialVersion(CUSTOM_INITIAL_VERSION);
@@ -1831,6 +1859,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.INITIAL_COMMIT)
         void runUsingDefaultReleaseTypeWithInitialCommitOnlyAndVersionOverrideTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             final String CUSTOM_VERSION = "1.2.3";
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
@@ -1884,6 +1913,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.INITIAL_COMMIT)
         void runUsingDefaultReleaseTypeWithInitialCommitOnlyAndBumpMajorOverrideTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             final String CUSTOM_BUMP = "major";
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
@@ -1937,6 +1967,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.INITIAL_COMMIT)
         void runUsingDefaultReleaseTypeWithInitialCommitOnlyAndBumpMinorOverrideTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             final String CUSTOM_BUMP = "minor";
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
@@ -1990,6 +2021,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.INITIAL_COMMIT)
         void runUsingDefaultReleaseTypeWithInitialCommitOnlyAndBumpPatchOverrideTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             final String CUSTOM_BUMP = "patch";
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
@@ -2043,6 +2075,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.INITIAL_COMMIT)
         void runUsingDefaultReleaseTypeWithInitialCommitOnlyAndBumpAlphaOverrideTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             final String CUSTOM_BUMP = "alpha";
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
@@ -2096,6 +2129,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.INITIAL_VERSION)
         void runUsingDefaultReleaseTypeWithBumpMajorOverriddenByUserInRepoWithJustOneInitialVersionCommitTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             final String CUSTOM_BUMP = "major";
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
@@ -2149,6 +2183,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.INITIAL_VERSION)
         void runUsingDefaultReleaseTypeWithBumpMinorOverriddenByUserInRepoWithJustOneInitialVersionCommitTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             final String CUSTOM_BUMP = "minor";
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
@@ -2202,6 +2237,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.INITIAL_VERSION)
         void runUsingDefaultReleaseTypeWithBumpPatchOverriddenByUserInRepoWithJustOneInitialVersionCommitTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             final String CUSTOM_BUMP = "patch";
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
@@ -2255,6 +2291,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.INITIAL_VERSION)
         void runUsingDefaultReleaseTypeWithBumpAlphaOverriddenByUserInRepoWithJustOneInitialVersionCommitTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             final String CUSTOM_BUMP = "alpha";
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
@@ -2308,6 +2345,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.INITIAL_VERSION)
         void runUsingDefaultReleaseTypeWithReleaseLenientInRepoWithPrefixedVersionCommitTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
             configurationLayerMock.setReleaseLenient(Boolean.TRUE);
@@ -2361,6 +2399,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.INITIAL_VERSION)
         void runUsingDefaultReleaseTypeWithoutReleaseLenientInRepoWithoutPrefixedVersionCommitTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
             configurationLayerMock.setReleaseLenient(Boolean.FALSE);
@@ -2414,6 +2453,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.INITIAL_VERSION)
         void runUsingDefaultReleaseTypeWithoutLenientAndWithPrefixReleaseInRepoWithJustOneInitialVersionCommitTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
             configurationLayerMock.setReleaseLenient(Boolean.FALSE);
@@ -2468,6 +2508,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.ONE_BRANCH_SHORT)
         void runUsingDefaultReleaseTypeInRepoWithSimpleLinearCommitHistoryAndNonSignificantCommitsTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             command.run();
 
             assertEquals("master", command.state().getBranch());
@@ -2517,6 +2558,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.ONE_BRANCH_SHORT)
         void runUsingDefaultReleaseTypeInRepoWithSimpleLinearCommitHistoryAndNonSignificantCommitsWithInitialVersionOverrideTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
             configurationLayerMock.setInitialVersion("12.13.14");
@@ -2569,6 +2611,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.ONE_BRANCH_SHORT)
         void runUsingDefaultReleaseTypeWithVersionOverriddenByUserInRepoWithFurtherNonSignificantCommitsTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
             configurationLayerMock.setVersion("1.2.3");
@@ -2621,6 +2664,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.ONE_BRANCH_SHORT)
         void runUsingDefaultReleaseTypeWithBumpMajorOverrideInRepoWithFurtherNonSignificantCommitsTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             final String CUSTOM_BUMP = "major";
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
@@ -2674,6 +2718,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.ONE_BRANCH_SHORT)
         void runUsingDefaultReleaseTypeWithBumpMinorOverrideInRepoWithFurtherNonSignificantCommitsTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             final String CUSTOM_BUMP = "minor";
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
@@ -2727,6 +2772,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.ONE_BRANCH_SHORT)
         void runUsingDefaultReleaseTypeWithBumpPatchOverrideInRepoWithFurtherNonSignificantCommitsTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             final String CUSTOM_BUMP = "patch";
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
@@ -2780,6 +2826,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.ONE_BRANCH_SHORT)
         void runUsingDefaultReleaseTypeWithBumpAlphaOverrideInRepoWithFurtherNonSignificantCommitsTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             final String CUSTOM_BUMP = "alpha";
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
@@ -2833,6 +2880,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.ONE_BRANCH_SHORT)
         void runUsingDefaultReleaseTypeWithReleaseLenientAndWithoutPrefixInRepoWithFurtherNonSignificantPrefixedCommitsTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
             configurationLayerMock.setReleaseLenient(Boolean.TRUE);
@@ -2886,6 +2934,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.ONE_BRANCH_SHORT)
         void runUsingDefaultReleaseTypeWithoutReleaseLenientAndWithoutPrefixInRepoWithFurtherNonSignificantPrefixedCommitsTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
             configurationLayerMock.setReleaseLenient(Boolean.FALSE);
@@ -2939,6 +2988,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.ONE_BRANCH_SHORT)
         void runUsingDefaultReleaseTypeWithoutReleaseLenientAndWithPrefixInRepoWithFurtherNonSignificantPrefixedCommitsTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
             configurationLayerMock.setReleaseLenient(Boolean.FALSE);
@@ -2993,6 +3043,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.ONE_BRANCH_WITH_OVERLAPPING_TAGS)
         void runUsingDefaultReleaseTypeInRepoWithOverlappingTagsCommitTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             final String CUSTOM_BUMP = "patch";
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
@@ -3046,6 +3097,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.ONE_BRANCH_SHORT)
         void runUsingDefaultReleaseTypeWithAlwaysPositiveCommitConventionInRepoWithFurtherNonSignificantPrefixedCommitsTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
             configurationLayerMock.setCommitMessageConventions(
@@ -3106,6 +3158,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.ONE_BRANCH_SHORT)
         void runUsingDefaultReleaseTypeWithAlwaysNegativeCommitConventionInRepoWithFurtherNonSignificantPrefixedCommitsTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
             configurationLayerMock.setCommitMessageConventions(
@@ -3164,6 +3217,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED)
         void runUsingExtendedPresetReleaseTypesWithAlwaysPositiveCommitConventionInMasterBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("master");
             final String MATCHING_RELEASE_TYPE_NAME = "mainline"; // the name of the release type that must be matched in the branch
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
@@ -3228,6 +3282,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED)
         void runUsingExtendedPresetReleaseTypesWithAlwaysNegativeCommitConventionInMasterBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("master");
             final String MATCHING_RELEASE_TYPE_NAME = "mainline"; // the name of the release type that must be matched in the branch
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
@@ -3292,6 +3347,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED)
         void runUsingExtendedPresetReleaseTypesWithAlwaysPositiveCommitConventionInMainBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("main");
             final String MATCHING_RELEASE_TYPE_NAME = "mainline"; // the name of the release type that must be matched in the branch
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
@@ -3356,6 +3412,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED)
         void runUsingExtendedPresetReleaseTypesWithAlwaysNegativeCommitConventionInMainBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("main");
             final String MATCHING_RELEASE_TYPE_NAME = "mainline"; // the name of the release type that must be matched in the branch
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
@@ -3420,6 +3477,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED)
         void runUsingExtendedPresetReleaseTypesWithAlwaysPositiveCommitConventionInIntegrationBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("integration");
             final String MATCHING_RELEASE_TYPE_NAME = "integration"; // the name of the release type that must be matched in the branch
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
@@ -3484,6 +3542,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED)
         void runUsingExtendedPresetReleaseTypesWithAlwaysNegativeCommitConventionInIntegrationBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("integration");
             final String MATCHING_RELEASE_TYPE_NAME = "integration"; // the name of the release type that must be matched in the branch
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
@@ -3548,6 +3607,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED)
         void runUsingExtendedPresetReleaseTypesWithAlwaysPositiveCommitConventionInDevelopmentBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("development");
             final String MATCHING_RELEASE_TYPE_NAME = "integration"; // the name of the release type that must be matched in the branch
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
@@ -3612,6 +3672,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED)
         void runUsingExtendedPresetReleaseTypesWithAlwaysNegativeCommitConventionInDevelopmentBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("development");
             final String MATCHING_RELEASE_TYPE_NAME = "integration"; // the name of the release type that must be matched in the branch
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
@@ -3676,6 +3737,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED)
         void runUsingExtendedPresetReleaseTypesWithAlwaysPositiveCommitConventionInAlphaBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("alpha");
             final String MATCHING_RELEASE_TYPE_NAME = "maturity"; // the name of the release type that must be matched in the branch
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
@@ -3740,6 +3802,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED)
         void runUsingExtendedPresetReleaseTypesWithAlwaysNegativeCommitConventionInAlphaBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("alpha");
             final String MATCHING_RELEASE_TYPE_NAME = "maturity"; // the name of the release type that must be matched in the branch
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
@@ -3804,6 +3867,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED)
         void runUsingExtendedPresetReleaseTypesWithAlwaysPositiveCommitConventionInBetaBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("beta");
             final String MATCHING_RELEASE_TYPE_NAME = "maturity"; // the name of the release type that must be matched in the branch
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
@@ -3868,6 +3932,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED)
         void runUsingExtendedPresetReleaseTypesWithAlwaysNegativeCommitConventionInBetaBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("beta");
             final String MATCHING_RELEASE_TYPE_NAME = "maturity"; // the name of the release type that must be matched in the branch
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
@@ -3932,6 +3997,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED)
         void runUsingExtendedPresetReleaseTypesWithAlwaysPositiveCommitConventionInGammaBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("gamma");
             final String MATCHING_RELEASE_TYPE_NAME = "maturity"; // the name of the release type that must be matched in the branch
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
@@ -3996,6 +4062,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED)
         void runUsingExtendedPresetReleaseTypesWithAlwaysNegativeCommitConventionInGammaBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("gamma");
             final String MATCHING_RELEASE_TYPE_NAME = "maturity"; // the name of the release type that must be matched in the branch
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
@@ -4060,6 +4127,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED)
         void runUsingExtendedPresetReleaseTypesWithAlwaysPositiveCommitConventionInV0xBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("v0.x");
             final String MATCHING_RELEASE_TYPE_NAME = "maintenance"; // the name of the release type that must be matched in the branch
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
@@ -4124,6 +4192,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED)
         void runUsingExtendedPresetReleaseTypesWithAlwaysNegativeCommitConventionInV0xBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("v0.x");
             final String MATCHING_RELEASE_TYPE_NAME = "maintenance"; // the name of the release type that must be matched in the branch
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
@@ -4188,6 +4257,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED)
         void runUsingExtendedPresetReleaseTypesWithAlwaysPositiveCommitConventionInV1xBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("v1.x");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add the 'extended' preset, which comes with standard release types
@@ -4212,6 +4282,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED)
         void runUsingExtendedPresetReleaseTypesWithAlwaysPositiveCommitConventionInRel0xBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("rel/0.x");
             final String MATCHING_RELEASE_TYPE_NAME = "release"; // the name of the release type that must be matched in the branch
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
@@ -4276,6 +4347,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED)
         void runUsingExtendedPresetReleaseTypesWithAlwaysNegativeCommitConventionInRel0xBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("rel/0.x");
             final String MATCHING_RELEASE_TYPE_NAME = "release"; // the name of the release type that must be matched in the branch
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
@@ -4340,6 +4412,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED)
         void runUsingExtendedPresetReleaseTypesWithAlwaysPositiveCommitConventionInRel1xBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("rel/1.x");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add the 'extended' preset, which comes with standard release types
@@ -4364,6 +4437,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED)
         void runUsingExtendedPresetReleaseTypesWithAlwaysPositiveCommitConventionInFeatureSSOBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("feature/SSO");
             final String MATCHING_RELEASE_TYPE_NAME = "feature"; // the name of the release type that must be matched in the branch
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
@@ -4428,6 +4502,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED)
         void runUsingExtendedPresetReleaseTypesWithAlwaysNegativeCommitConventionInFeatureSSOBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("feature/SSO");
             final String MATCHING_RELEASE_TYPE_NAME = "feature"; // the name of the release type that must be matched in the branch
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
@@ -4492,6 +4567,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED)
         void runUsingExtendedPresetReleaseTypesWithAlwaysPositiveCommitConventionInFeatureIN12345BranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("feature/IN-12345");
             final String MATCHING_RELEASE_TYPE_NAME = "feature"; // the name of the release type that must be matched in the branch
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
@@ -4556,6 +4632,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED)
         void runUsingExtendedPresetReleaseTypesWithAlwaysNegativeCommitConventionInFeatureIN12345BranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("feature/IN-12345");
             final String MATCHING_RELEASE_TYPE_NAME = "feature"; // the name of the release type that must be matched in the branch
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
@@ -4620,6 +4697,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED)
         void runUsingExtendedPresetReleaseTypesWithAlwaysPositiveCommitConventionInHotfix98765BranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("hotfix-98765");
             final String MATCHING_RELEASE_TYPE_NAME = "hotfix"; // the name of the release type that must be matched in the branch
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
@@ -4684,6 +4762,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED)
         void runUsingExtendedPresetReleaseTypesWithAlwaysNegativeCommitConventionInHotfix98765BranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("hotfix-98765");
             final String MATCHING_RELEASE_TYPE_NAME = "hotfix"; // the name of the release type that must be matched in the branch
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
@@ -4748,6 +4827,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED)
         void runUsingExtendedPresetReleaseTypesWithAlwaysPositiveCommitConventionInInternalBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("internal");
             final String MATCHING_RELEASE_TYPE_NAME = "internal"; // the name of the release type that must be matched in the branch
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
@@ -4814,6 +4894,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED)
         void runUsingExtendedPresetReleaseTypesWithAlwaysNegativeCommitConventionInInternalBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("internal");
             final String MATCHING_RELEASE_TYPE_NAME = "internal"; // the name of the release type that must be matched in the branch
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
@@ -4878,6 +4959,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED)
         void runUsingExtendedPresetReleaseTypesWithAlwaysPositiveCommitConventionInSomebranchBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("somebranch");
             final String MATCHING_RELEASE_TYPE_NAME = "internal"; // the name of the release type that must be matched in the branch
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
@@ -4944,6 +5026,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED)
         void runUsingExtendedPresetReleaseTypesWithAlwaysNegativeCommitConventionInSomebranchBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("somebranch");
             final String MATCHING_RELEASE_TYPE_NAME = "internal"; // the name of the release type that must be matched in the branch
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
@@ -5008,6 +5091,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED)
         void runUsingExtendedPresetReleaseTypesWithAlwaysPositiveCommitConventionInSomeotherbranchBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("someotherbranch");
             final String MATCHING_RELEASE_TYPE_NAME = "internal"; // the name of the release type that must be matched in the branch
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
@@ -5074,6 +5158,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED)
         void runUsingExtendedPresetReleaseTypesWithAlwaysNegativeCommitConventionInSomeotherbranchBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("someotherbranch");
             final String MATCHING_RELEASE_TYPE_NAME = "internal"; // the name of the release type that must be matched in the branch
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
@@ -5138,6 +5223,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED)
         void runUsingCustomReleaseTypeWithAlwaysPositiveCommitConventionInInternalBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("internal");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
@@ -5213,6 +5299,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED)
         void runUsingCustomReleaseTypeWithAlwaysNegativeCommitConventionInInternalBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("internal");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
@@ -5288,6 +5375,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.FIVE_BRANCH_UNMERGED_BUMPING)
         void runUsingCustomFlatReleaseTypeWithInferringCommitConventionInMasterBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("master");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that takes the commit message as the identifier to bump, if any
@@ -5352,6 +5440,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.FIVE_BRANCH_UNMERGED_BUMPING)
         void runUsingCustomFlatReleaseTypeWithInferringCommitConventionInTaggedwithoutbumpBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("taggedwithoutbump");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that takes the commit message as the identifier to bump, if any
@@ -5416,6 +5505,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.FIVE_BRANCH_UNMERGED_BUMPING)
         void runUsingCustomFlatReleaseTypeWithInferringCommitConventionInTaggedwithbumpBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("taggedwithbump");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that takes the commit message as the identifier to bump, if any
@@ -5480,6 +5570,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.FIVE_BRANCH_UNMERGED_BUMPING)
         void runUsingCustomFlatReleaseTypeWithInferringCommitConventionInUntaggedwithoutbumpBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("untaggedwithoutbump");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that takes the commit message as the identifier to bump, if any
@@ -5544,6 +5635,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.FIVE_BRANCH_UNMERGED_BUMPING)
         void runUsingCustomFlatReleaseTypeWithInferringCommitConventionInUntaggedwithbumpBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("untaggedwithbump");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that takes the commit message as the identifier to bump, if any
@@ -5608,6 +5700,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED)
         void runUsingCustomCollapsedReleaseTypeWithInferringCommitConventionInMasterBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("master");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that takes the commit message as the identifier to bump, if any
@@ -5679,6 +5772,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED)
         void runUsingCustomCollapsedReleaseTypeWithInferringCommitConventionInAlphaBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("alpha");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that takes the commit message as the identifier to bump, if any
@@ -5750,6 +5844,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED)
         void runUsingCustomCollapsedReleaseTypeWithInferringCommitConventionInBetaBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("beta");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that takes the commit message as the identifier to bump, if any
@@ -5821,6 +5916,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED)
         void runUsingCustomCollapsedReleaseTypeWithInferringCommitConventionInGammaBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("gamma");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that takes the commit message as the identifier to bump, if any
@@ -5892,6 +5988,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED)
         void runUsingCustomCollapsedReleaseTypeWithInferringCommitConventionInDeltaBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("delta");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that takes the commit message as the identifier to bump, if any
@@ -5963,6 +6060,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED)
         void runUsingCustomCollapsedReleaseTypeWithInferringCommitConventionInEpsilonBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("epsilon");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that takes the commit message as the identifier to bump, if any
@@ -6034,6 +6132,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED)
         void runUsingCustomCollapsedReleaseTypeWithInferringCommitConventionInZetaBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("zeta");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that takes the commit message as the identifier to bump, if any
@@ -6105,6 +6204,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED)
         void runUsingCustomCollapsedReleaseTypeWithInferringCommitConventionInEtaBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("eta");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that takes the commit message as the identifier to bump, if any
@@ -6176,6 +6276,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED)
         void runUsingCustomCollapsedReleaseTypeWithInferringCommitConventionInThetaBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("theta");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that takes the commit message as the identifier to bump, if any
@@ -6247,6 +6348,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.FIVE_BRANCH_UNMERGED_BUMPING)
         void runUsingCustomFlatReleaseTypeWithExtraIdentifierWithInferringCommitConventionInMasterBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("master");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that takes the commit message as the identifier to bump, if any
@@ -6312,6 +6414,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.FIVE_BRANCH_UNMERGED_BUMPING)
         void runUsingCustomFlatReleaseTypeWithExtraIdentifierWithInferringCommitConventionInTaggedwithoutbumpBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("taggedwithoutbump");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that takes the commit message as the identifier to bump, if any
@@ -6377,6 +6480,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.FIVE_BRANCH_UNMERGED_BUMPING)
         void runUsingCustomFlatReleaseTypeWithExtraIdentifierWithInferringCommitConventionInTaggedwithbumpBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("taggedwithbump");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that takes the commit message as the identifier to bump, if any
@@ -6442,6 +6546,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.FIVE_BRANCH_UNMERGED_BUMPING)
         void runUsingCustomFlatReleaseTypeWithExtraIdentifierWithInferringCommitConventionInUntaggedwithoutbumpBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("untaggedwithoutbump");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that takes the commit message as the identifier to bump, if any
@@ -6507,6 +6612,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.FIVE_BRANCH_UNMERGED_BUMPING)
         void runUsingCustomFlatReleaseTypeWithExtraIdentifierWithInferringCommitConventionInUntaggedwithbumpBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("untaggedwithbump");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that takes the commit message as the identifier to bump, if any
@@ -6572,6 +6678,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED)
         void runUsingCustomCollapsedReleaseTypeWithExtraIdentifiersWithInferringCommitConventionInMasterBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("master");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that takes the commit message as the identifier to bump, if any
@@ -6644,6 +6751,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED)
         void runUsingCustomCollapsedReleaseTypeWithExtraIdentifiersWithInferringCommitConventionInAlphaBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("alpha");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that takes the commit message as the identifier to bump, if any
@@ -6716,6 +6824,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED)
         void runUsingCustomCollapsedReleaseTypeWithExtraIdentifiersWithInferringCommitConventionInBetaBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("beta");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that takes the commit message as the identifier to bump, if any
@@ -6788,6 +6897,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED)
         void runUsingCustomCollapsedReleaseTypeWithExtraIdentifiersWithInferringCommitConventionInGammaBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("gamma");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that takes the commit message as the identifier to bump, if any
@@ -6860,6 +6970,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED)
         void runUsingCustomCollapsedReleaseTypeWithExtraIdentifiersWithInferringCommitConventionInDeltaBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("delta");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that takes the commit message as the identifier to bump, if any
@@ -6932,6 +7043,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED)
         void runUsingCustomCollapsedReleaseTypeWithExtraIdentifiersWithInferringCommitConventionInEpsilonBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("epsilon");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that takes the commit message as the identifier to bump, if any
@@ -7004,6 +7116,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED)
         void runUsingCustomCollapsedReleaseTypeWithExtraIdentifiersWithInferringCommitConventionInZetaBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("zeta");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that takes the commit message as the identifier to bump, if any
@@ -7076,6 +7189,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED)
         void runUsingCustomCollapsedReleaseTypeWithExtraIdentifiersWithInferringCommitConventionInEtaBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("eta");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that takes the commit message as the identifier to bump, if any
@@ -7148,6 +7262,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED)
         void runUsingCustomCollapsedReleaseTypeWithExtraIdentifiersWithExtraIdentifierWithInferringCommitConventionInThetaBranchTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             script.checkout("theta");
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add a mock convention that takes the commit message as the identifier to bump, if any

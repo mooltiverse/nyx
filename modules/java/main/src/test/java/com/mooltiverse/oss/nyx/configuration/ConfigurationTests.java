@@ -102,6 +102,7 @@ public class ConfigurationTests {
         void setDirectoryTest()
             throws Exception {
             File directory = Files.createTempDirectory(null).toFile();
+            directory.deleteOnExit();
             Configuration.setDefaultDirectory(directory);
             
             assertEquals(directory.getAbsolutePath(), new File(new Configuration().getDirectory()).getAbsolutePath());
@@ -2704,6 +2705,7 @@ public class ConfigurationTests {
         void combinedConfigurationWithStandardFilesTest()
             throws Exception {
             File tempDir = Files.createTempDirectory(String.valueOf(this.hashCode())).toFile();
+            tempDir.deleteOnExit();
             Configuration.setDefaultDirectory(tempDir);
 
             // create 4 different config files with the bump field different for each
@@ -2733,6 +2735,7 @@ public class ConfigurationTests {
         void combinedConfigurationWithStandardAndCustomFilesTest()
             throws Exception {
             File tempDir = Files.createTempDirectory(String.valueOf(this.hashCode())).toFile();
+            tempDir.deleteOnExit();
             Configuration.setDefaultDirectory(tempDir);
 
             // create 4 different config files with the bump field different for each
@@ -2778,6 +2781,7 @@ public class ConfigurationTests {
         void combinedConfigurationWithStandardCustomFilesAndCommandLineTest()
             throws Exception {
             File tempDir = Files.createTempDirectory(String.valueOf(this.hashCode())).toFile();
+            tempDir.deleteOnExit();
             Configuration.setDefaultDirectory(tempDir);
 
             // create 4 different config files with the bump field different for each

@@ -22,6 +22,7 @@
 package git_test
 
 import (
+	"os"      // https://pkg.go.dev/os
 	"testing" // https://pkg.go.dev/testing
 
 	assert "github.com/stretchr/testify/assert" // https://pkg.go.dev/github.com/stretchr/testify/assert
@@ -33,6 +34,7 @@ import (
 
 func TestObjectFactoryActionFrom(t *testing.T) {
 	script := gittools.FROM_SCRATCH().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
 	commit := script.AndAddFiles().Commit("A message")
 	action := ActionFrom(commit.Author)
 
@@ -45,6 +47,7 @@ func TestObjectFactoryActionFrom(t *testing.T) {
 
 func TestObjectFactoryTimeStampFrom(t *testing.T) {
 	script := gittools.FROM_SCRATCH().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
 	commit := script.AndAddFiles().Commit("A message")
 	timestamp := TimeStampFrom(commit.Committer)
 
@@ -54,6 +57,7 @@ func TestObjectFactoryTimeStampFrom(t *testing.T) {
 
 func TestObjectFactoryIdentityFrom(t *testing.T) {
 	script := gittools.FROM_SCRATCH().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
 	commit := script.AndAddFiles().Commit("A message")
 	identity := IdentityFrom(commit.Committer)
 
@@ -76,6 +80,7 @@ Issue: 98765
 `
 
 	script := gittools.FROM_SCRATCH().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
 	commit := script.AndAddFiles().Commit(messageHeader)
 	message := MessageFrom(commit)
 
@@ -95,6 +100,7 @@ Issue: 98765
 
 func TestObjectFactoryTagFrom(t *testing.T) {
 	script := gittools.FROM_SCRATCH().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
 	commit := script.AndAddFiles().Commit("Commit 1")
 
 	// test a lightweight tag
@@ -115,6 +121,7 @@ func TestObjectFactoryTagFrom(t *testing.T) {
 
 func TestObjectFactoryCommitFrom(t *testing.T) {
 	script := gittools.FROM_SCRATCH().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
 
 	revCommit1 := script.AndAddFiles().Commit("Commit 1")
 	refTag1 := script.Tag("t1", nil)

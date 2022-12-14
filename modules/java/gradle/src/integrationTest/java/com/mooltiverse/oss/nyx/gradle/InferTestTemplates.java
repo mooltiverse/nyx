@@ -98,6 +98,7 @@ public class InferTestTemplates {
         @Baseline(Scenario.INITIAL_COMMIT)
         void noExceptionOnExecuteWithValidGitRepositoryInCustomDirectoryTest(Project project, @CommandSelector(Commands.INFER) CommandProxy command, Script script)
         throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             //make sure the Gradle working directory and the Git repository directory are not the same
             assertFalse(project.getBuildDir().equals(script.getWorkingDirectory()));
             assertFalse(project.getBuildDir().getAbsolutePath().equals(script.getWorkingDirectory().getAbsolutePath()));
@@ -111,16 +112,18 @@ public class InferTestTemplates {
         @TestTemplate
         @DisplayName("InferTask.getActions().execute() doesn't throw exceptions without a valid Git repository in working directory")
         @Baseline(Scenario.INITIAL_COMMIT)
-        void noExceptionOnExecuteWithValidGitRepositoryInWorkingDirectoryTest(@CommandSelector(Commands.INFER) CommandProxy command)
+        void noExceptionOnExecuteWithValidGitRepositoryInWorkingDirectoryTest(@CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             assertDoesNotThrow(() -> command.run());
         }
 
         @TestTemplate
         @DisplayName("InferTask.getActions().execute() feeds the nyxState extra property")
         @Baseline(Scenario.INITIAL_COMMIT)
-        void nyxStateExtraProperty(Project project, @CommandSelector(Commands.INFER) CommandProxy command)
+        void nyxStateExtraProperty(Project project, @CommandSelector(Commands.INFER) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             assertNull(project.findProperty("nyxState"));
 
             // after running the command the extra property must be available

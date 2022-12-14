@@ -1,24 +1,46 @@
 # Nyx Release Notes
 
-## NEXT
+## 1.3.0
 
-TODO
+This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/1.3.0).
 
 ### Upgrade instructions
 
-TODO
+There are no actions to take for backward compatibility.
 
 ### New features and improvements
 
-TODO
+The command line version is now available [#120](https://github.com/mooltiverse/nyx/issues/120). Binaries can be downloaded from [the release page](https://github.com/mooltiverse/nyx/releases/tag/1.3.0).
 
 ### Fixed issues
 
-TODO
+There are no fixes in this release.
 
 ### Known issues
 
 * GitHub release assets are only displayed by their file names, while the description is ignored (due to a limitation in the underlying library)
+
+## 1.2.3
+
+This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/1.2.3).
+
+### Upgrade instructions
+
+There are no actions to take for backward compatibility.
+
+### New features and improvements
+
+There are no new features or improvements in this release.
+
+### Fixed issues
+
+This release:
+
+* fixes bug [#122](https://github.com/mooltiverse/nyx/issues/122) about extracting the commit type using Gitmoji and rendering the changelog
+
+### Known issues
+
+There are no known issues in this release.
 
 ## 1.2.2
 
@@ -37,7 +59,7 @@ There are no new features or improvements in this release.
 This release:
 
 * fixes the issue with up-to-date checks causing duplicate tags to be applied when runnin in *dirty* repositories [#116](https://github.com/mooltiverse/nyx/issues/116)
-* bug [#116](https://github.com/mooltiverse/nyx/issues/116) also fixes bug bug [#115](https://github.com/mooltiverse/nyx/issues/115) although it was originally about a different issue
+* bug [#116](https://github.com/mooltiverse/nyx/issues/116) also fixes bug [#115](https://github.com/mooltiverse/nyx/issues/115) although it was originally about a different issue
 
 ### Known issues
 

@@ -262,8 +262,6 @@ func (c *Make) buildChangelog() error {
 							commitType = &commitTypeString
 							log.Debugf("the type of commit '%s' is '%s'", commit.GetSHA(), *commitType)
 						}
-					} else {
-						return &errs.IllegalPropertyError{Message: fmt.Sprintf("the regular expression '%s' defined for commit message convention '%s' does not define the 'type' named capturing group", *cmcEntryValue.GetExpression(), cmcEntryKey), Cause: err}
 					}
 					if commitType == nil {
 						log.Debugf("the commit type cannot be inferred for commit '%s' using the regular expression '%s' from commit message convention '%s'", commit.GetSHA(), *cmcEntryValue.GetExpression(), cmcEntryKey)

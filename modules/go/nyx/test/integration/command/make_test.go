@@ -62,6 +62,7 @@ func writeFile(file string, content string) {
 func TestMakeConstructor(t *testing.T) {
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.MAKE, gittools.FROM_SCRATCH()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			assert.NotNil(t, command)
 		})
 	}
@@ -73,6 +74,7 @@ Check that the State method never returns a nil object
 func TestMakeState(t *testing.T) {
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.MAKE, gittools.FROM_SCRATCH()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			assert.NotNil(t, (*command).State())
 		})
 	}
@@ -87,6 +89,7 @@ func TestMakeIsUpToDate(t *testing.T) {
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.MAKE, gittools.FROM_SCRATCH()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			upToDate, err := (*command).IsUpToDate()
 			assert.NoError(t, err)
 			assert.False(t, upToDate)
@@ -138,8 +141,10 @@ func TestMakeIsUpToDateTestWithMissingChangelogFile(t *testing.T) {
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.MAKE, gittools.ONE_BRANCH_SHORT_CONVENTIONAL_COMMITS()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			// first create the temporary directory and the abstract destination file
 			destinationDir, _ := os.MkdirTemp("", "nyx-test-make-test-")
+			defer os.RemoveAll(destinationDir)
 			changelogFile := filepath.Join(destinationDir, "CHANGELOG.md")
 
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
@@ -199,8 +204,10 @@ func TestMakeIdempotencyWithCommitMessageConvention(t *testing.T) {
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.MAKE, gittools.ONE_BRANCH_SHORT_CONVENTIONAL_COMMITS()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			// first create the temporary directory and the abstract destination file
 			destinationDir, _ := os.MkdirTemp("", "nyx-test-make-test-")
+			defer os.RemoveAll(destinationDir)
 			changelogFile := filepath.Join(destinationDir, "CHANGELOG.md")
 
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
@@ -338,8 +345,10 @@ func TestMakeIdempotencyWithoutCommitMessageConvention(t *testing.T) {
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.MAKE, gittools.ONE_BRANCH_SHORT_CONVENTIONAL_COMMITS()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			// first create the temporary directory and the abstract destination file
 			destinationDir, _ := os.MkdirTemp("", "nyx-test-make-test-")
+			defer os.RemoveAll(destinationDir)
 			changelogFile := filepath.Join(destinationDir, "CHANGELOG.md")
 
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
@@ -458,8 +467,10 @@ func TestMakeIdempotencyInDirtyRepository(t *testing.T) {
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.MAKE, gittools.ONE_BRANCH_SHORT_CONVENTIONAL_COMMITS()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			// first create the temporary directory and the abstract destination file
 			destinationDir, _ := os.MkdirTemp("", "nyx-test-make-test-")
+			defer os.RemoveAll(destinationDir)
 			changelogFile := filepath.Join(destinationDir, "CHANGELOG.md")
 
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
@@ -596,6 +607,7 @@ func TestMakeRunWithNoDestinationFile(t *testing.T) {
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.MAKE, gittools.ONE_BRANCH_SHORT_CONVENTIONAL_COMMITS()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			// add the conventional commits convention
 			commitMessageConventions, _ := ent.NewCommitMessageConventionsWith(&[]*string{utl.PointerToString("conventionalCommits")},
@@ -623,8 +635,10 @@ func TestMakeRunWithNoCommitConvention(t *testing.T) {
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.MAKE, gittools.ONE_BRANCH_SHORT_CONVENTIONAL_COMMITS()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			// first create the temporary directory and the abstract destination file
 			destinationDir, _ := os.MkdirTemp("", "nyx-test-make-test-")
+			defer os.RemoveAll(destinationDir)
 			changelogFile := filepath.Join(destinationDir, "CHANGELOG.md")
 
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
@@ -660,8 +674,10 @@ func TestMakeRunWithConventionalCommitsConventionAndWithoutSections(t *testing.T
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.MAKE, gittools.ONE_BRANCH_SHORT_CONVENTIONAL_COMMITS()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			// first create the temporary directory and the abstract destination file
 			destinationDir, _ := os.MkdirTemp("", "nyx-test-make-test-")
+			defer os.RemoveAll(destinationDir)
 			changelogFile := filepath.Join(destinationDir, "CHANGELOG.md")
 
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
@@ -725,8 +741,10 @@ func TestMakeRunWithConventionalCommitsConventionAndWithCustomSections(t *testin
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.MAKE, gittools.ONE_BRANCH_SHORT_CONVENTIONAL_COMMITS()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			// first create the temporary directory and the abstract destination file
 			destinationDir, _ := os.MkdirTemp("", "nyx-test-make-test-")
+			defer os.RemoveAll(destinationDir)
 			changelogFile := filepath.Join(destinationDir, "CHANGELOG.md")
 
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
@@ -795,8 +813,10 @@ func TestMakeRunWithConventionalCommitsConventionAndWithCustomSectionsAndSubstit
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.MAKE, gittools.ONE_BRANCH_SHORT_CONVENTIONAL_COMMITS()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			// first create the temporary directory and the abstract destination file
 			destinationDir, _ := os.MkdirTemp("", "nyx-test-make-test-")
+			defer os.RemoveAll(destinationDir)
 			changelogFile := filepath.Join(destinationDir, "CHANGELOG.md")
 
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
@@ -871,8 +891,10 @@ func TestMakeRunWithCustomTemplate(t *testing.T) {
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.MAKE, gittools.ONE_BRANCH_SHORT_CONVENTIONAL_COMMITS()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			// first create the temporary directory and the abstract destination file
 			destinationDir, _ := os.MkdirTemp("", "nyx-test-make-test-")
+			defer os.RemoveAll(destinationDir)
 			// create the custom template, with simple strings used as markers
 			templateFile := filepath.Join(destinationDir, "template.tpl")
 			writeFile(templateFile, "# This is a custom changelog\n            {{#releases}}\n            ## {{name}} ({{date}})\n            {{/releases}}\n")

@@ -61,7 +61,9 @@ public class MarkTests {
             Thread.sleep(4000);
 
             Script replicaScript = Scenario.FROM_SCRATCH.realize();
+            replicaScript.getWorkingDirectory().deleteOnExit();
             Script script = Scenario.ONE_BRANCH_SHORT.applyOnClone(gitHubRepository.getHTTPURL(), System.getProperty("gitHubTestUserToken"), "");
+            script.getWorkingDirectory().deleteOnExit();
             script.addRemote(replicaScript.getGitDirectory(), "replica");
             
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
@@ -107,6 +109,7 @@ public class MarkTests {
 
             // clone the remote repo again into a a new directory and test
             Script remoteScript = Script.cloneFrom(gitHubRepository.getHTTPURL(), System.getProperty("gitHubTestUserToken"), "");
+            remoteScript.getWorkingDirectory().deleteOnExit();
 
             assertEquals("0.0.5", nyx.state().getVersion());
             assertEquals(script.getTags().size(), replicaScript.getTags().size());
@@ -140,7 +143,9 @@ public class MarkTests {
             Thread.sleep(4000);
 
             Script replicaScript = Scenario.FROM_SCRATCH.realize();
+            replicaScript.getWorkingDirectory().deleteOnExit();
             Script script = Scenario.ONE_BRANCH_SHORT.applyOnClone(gitLabRepository.getHTTPURL(), "PRIVATE-TOKEN", System.getProperty("gitLabTestUserToken"));
+            script.getWorkingDirectory().deleteOnExit();
             script.addRemote(replicaScript.getGitDirectory(), "replica");
             
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
@@ -186,6 +191,7 @@ public class MarkTests {
 
             // clone the remote repo again into a a new directory and test
             Script remoteScript = Script.cloneFrom(gitLabRepository.getHTTPURL(), "PRIVATE-TOKEN", System.getProperty("gitLabTestUserToken"));
+            remoteScript.getWorkingDirectory().deleteOnExit();
 
             assertEquals("0.0.5", nyx.state().getVersion());
             assertEquals(script.getTags().size(), replicaScript.getTags().size());

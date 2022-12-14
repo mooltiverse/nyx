@@ -66,6 +66,7 @@ func TestGitCloneErrorWithEmptyDirectory(t *testing.T) {
 
 func TestGitCloneErrorWithNonEmptyDirectory(t *testing.T) {
 	script := gittools.FROM_SCRATCH().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
 	tr := REMOTE_TEST_REPOSITORY
 	dir := script.GetWorkingDirectory()
 	_, err := GitInstance().Clone(&dir, &tr)
@@ -76,6 +77,7 @@ func TestGitCloneErrorWithNilURI(t *testing.T) {
 	dir := "nyx-test-git-clone-test-"
 	_, err := GitInstance().Clone(&dir, nil)
 	assert.Error(t, err)
+	defer os.RemoveAll(dir)
 }
 
 func TestGitCloneErrorWithEmptyURI(t *testing.T) {
@@ -86,6 +88,7 @@ func TestGitCloneErrorWithEmptyURI(t *testing.T) {
 	uri = "  "
 	_, err = GitInstance().Clone(&dir, &uri)
 	assert.Error(t, err)
+	defer os.RemoveAll(dir)
 }
 
 func TestGitCloneErrorWithNonExistingURI(t *testing.T) {
@@ -93,6 +96,7 @@ func TestGitCloneErrorWithNonExistingURI(t *testing.T) {
 	uri := "https://adomainwiththisnamesuredoesnotexists.com/"
 	_, err := GitInstance().Clone(&dir, &uri)
 	assert.Error(t, err)
+	defer os.RemoveAll(dir)
 }
 
 func TestGitClone(t *testing.T) {
@@ -149,6 +153,7 @@ func TestGitCloneWithoutRequiredCredentials(t *testing.T) {
 	time.Sleep(4000 * time.Millisecond)
 
 	directory, err := os.MkdirTemp("", "nyx-test-git-clone-test-")
+	defer os.RemoveAll(directory)
 	_, err = GitInstance().CloneWithCredentials(&directory, utl.PointerToString((*gitHubRepository).GetHTTPURL()), nil, nil)
 	assert.Error(t, err)
 
@@ -176,6 +181,7 @@ func TestGitCloneWithRequiredCredentials(t *testing.T) {
 	time.Sleep(4000 * time.Millisecond)
 
 	directory, err := os.MkdirTemp("", "nyx-test-git-clone-test-")
+	defer os.RemoveAll(directory)
 	_, err = GitInstance().CloneWithCredentials(&directory, utl.PointerToString((*gitHubRepository).GetHTTPURL()), utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(os.Getenv("gitHubTestUserToken")))
 	assert.NoError(t, err)
 
@@ -208,6 +214,7 @@ func TestGitOpenErrorWithNewEmptyDirectory(t *testing.T) {
 
 func TestGitOpen(t *testing.T) {
 	script := gittools.FROM_SCRATCH().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
 	dir := script.GetWorkingDirectory()
 	_, err := GitInstance().Open(dir)
 	assert.NoError(t, err)

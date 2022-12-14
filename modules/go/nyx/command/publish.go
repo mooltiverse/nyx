@@ -125,6 +125,9 @@ func (c *Publish) publish() error {
 				if err != nil {
 					return err
 				}
+				if service == nil {
+					return &errs.IllegalPropertyError{Message: fmt.Sprintf("the release type uses the '%s' publication service but no such service has been configured in the 'services' section", *serviceName)}
+				}
 				// The first two parameters here are nil because the repository owner and name are expected to be passed
 				// along with service options. This is just a place where we could override them.
 				release, err := (*service).PublishRelease(nil, nil, version, *version, description)

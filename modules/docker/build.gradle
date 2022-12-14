@@ -16,7 +16,6 @@ description = 'The Nyx Docker image'
 // With these statements, instead, the project is entirely evaluated in advance, so we can use the
 // ':modules:go:nyx:goBuild-nyx-linux-amd64' task outputs as it runs without errors.
 project.evaluationDependsOn(":modules:go")
-//project.evaluationDependsOn(":modules:go:nyx")
 
 // The project version may have a '+' sign (when using extra identifier in the 'build' part)
 // but since Docker doesn't handle it as a valid label we replace '+' with '_'.
@@ -42,11 +41,30 @@ if (java.util.regex.Pattern.matches("^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\
     labels.add('latest')
 }
 
+// The file used to store the latest Docker image SHA
+def dockerImageSHAFile = new File(buildDir, "dockerImageSHA.txt")
+
+ext {
+  // The property storing the SHA of the built Docker image (only available after the image has been built)
+  dockerImageSHA = ""
+
+  // The Go module path
+  modulePath = 'github.com/mooltiverse/nyx/modules/docker/test/functional'
+
+  // The Go module file
+  modFile = file(projectDir.path+'/test/functional/go.mod')
+}
+
 /*------------------------------------------------------------------------------
   Additional tasks
 ------------------------------------------------------------------------------*/
 task dockerContext(group: 'build', description: 'Builds the Docker context') {
     dependsOn tasks.getByPath(':modules:go:nyx:goBuild-nyx-linux-amd64')
+
+    // Declare inputs and outputs of this task
+    inputs.file(file('Dockerfile'))
+    inputs.files(tasks.getByPath(':modules:go:nyx:goBuild-nyx-linux-amd64').outputs.files)
+    outputs.dir(dockerContextDir)
 
     doLast {
         logger.info('Building the Docker context')
@@ -68,6 +86,10 @@ task dockerContext(group: 'build', description: 'Builds the Docker context') {
 
 task dockerImage(group: 'build', description: 'Builds the Docker image') {
     dependsOn dockerContext
+    // Declare inputs and outputs of this task
+    // The output here is the Docker image SHA that needs to be written to a file or gradle would fail up to date checks.
+    inputs.files(tasks.dockerContext.outputs.files)
+    outputs.files(dockerImageSHAFile)
 
     doLast {
         logger.info('Building the Docker image')
@@ -78,6 +100,27 @@ task dockerImage(group: 'build', description: 'Builds the Docker image') {
             // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
             commandLine 'docker', 'build', '--label', "version=$sanitizedVersion", '--tag', "${rootProject.name}:${sanitizedVersion}", '--rm', '.'
         }
+
+        logger.info('Retrieving the Docker image SHA')
+        def stdOut = new ByteArrayOutputStream()
+        exec {
+            workingDir = dockerContextDir
+            logging.captureStandardOutput LogLevel.INFO
+            logging.captureStandardError  LogLevel.ERROR
+            // looks like the docker command otputs everything to standard error so we need to redirect stdout and stderr together
+            // in order to capture output
+            standardOutput = stdOut
+            errorOutput = stdOut
+            // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
+            commandLine 'docker', 'inspect', '--format="{{.Id}}"', "${rootProject.name}:${sanitizedVersion}"
+        }
+        println stdOut.toString()
+
+        // extract the image SHA from the line looking like 'sha256:6307b6481d67da57f227c226289fb4d63adb95d5345adef23a4877acdf82ee59'
+        // this line uses Groovy regular expressions
+        ext.dockerImageSHA = (stdOut.toString() =~ "sha256:([a-z0-9]+)").findAll()[0][1]
+        println "Docker image SHA is:"+ext.dockerImageSHA
+        dockerImageSHAFile.text = ext.dockerImageSHA
     }
 }
 
@@ -210,15 +253,120 @@ registries.each { registry ->
 
 // This is just a lifecycle task
 task publish(group: 'publishing', description: 'Publishes Docker images produced by this project') {
-    dependsOn tasks.dockerPush
+    dependsOn dockerPush
+}
+
+task goFunctionalTestModInit(group: 'build', description: 'Initializes the go.mod file unless it aleady exists') {
+    // Run this task only if the module file doesn't exist (which might also be ignored by .gitignore although it shouldn't)
+    // Overwriting this file could be harmless as it could be generated again if it only contains dependencies that can be
+    // automatically inferred from sources but it may cause a loss of information and break the project when it also has
+    // extra directives like 'replace' (like in our case).
+    onlyIf { !modFile.exists() }
+
+    // Declare inputs and outputs of this task
+    inputs.files(fileTree(projectDir).filter { File f ->
+        f.name.endsWith(".go")
+    })
+    outputs.file(modFile)
+
+    doLast {
+        logger.info('Initializing the Go module '+modulePath+' file: '+modFile.path)
+        exec {
+            workingDir = projectDir.path+'/test/functional'
+            logging.captureStandardOutput LogLevel.QUIET
+            logging.captureStandardError  LogLevel.ERROR
+            // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
+            commandLine 'go', 'mod', 'init', modulePath
+        }
+    }
+}
+
+task goFunctionalTestModUpdate(group: 'build', description: 'Updates the go.mod file by adding new dependencies or removing those unnecessary') {
+    // Task dependencies
+    dependsOn goFunctionalTestModInit
+
+    // Declare inputs and outputs of this task
+    inputs.files(fileTree(projectDir.path+'/test/functional').filter { File f ->
+        f.name.endsWith(".go")
+    })
+    outputs.file(modFile)
+
+    doLast {
+        logger.info('Updating the Go module '+modulePath+' file: '+modFile.path)
+        exec {
+            workingDir = projectDir.path+'/test/functional'
+            logging.captureStandardOutput LogLevel.QUIET
+            logging.captureStandardError  LogLevel.ERROR
+            // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
+            commandLine 'go', 'mod', 'tidy', '-v'
+        }
+    }
+}
+
+task goFunctionalTestInit(group: 'build', description: 'Initializes the module') {
+    // Task dependencies
+    dependsOn goFunctionalTestModInit, goFunctionalTestModUpdate
+
+    // Declare inputs and outputs of this task
+    outputs.dir(file(buildDir.path+'/bin'))
+
+    doLast {
+        mkdir file(buildDir.path+'/bin')
+    }
 }
 
 // Run functional tests using the Docker image
-task functionalTest() {
-    description 'Runs all Docker functional tests and verification tasks'
-    group 'Verification'
+task functionalTest(group: 'Verification', description: 'Runs all Docker functional tests and verification tasks') {
+    dependsOn dockerImage, goFunctionalTestInit
 
-    // here we need to define the task to run these tests
+    // Declare inputs and outputs of this task
+    inputs.files(dockerImageSHAFile)
+    inputs.files(fileTree(projectDir.path+'/test/functional').filter { File f ->
+        f.name.endsWith(".go") || f.name.endsWith(".mod") || f.name.endsWith(".sum")
+    })
+    inputs.files(fileTree(project(':modules:go:errors').projectDir).filter { File f ->
+        f.name.endsWith(".go") || f.name.endsWith(".mod") || f.name.endsWith(".sum")
+    })
+    inputs.files(fileTree(project(':modules:go:nyx').projectDir).filter { File f ->
+        f.name.endsWith(".go") || f.name.endsWith(".mod") || f.name.endsWith(".sum")
+    })
+    inputs.files(fileTree(project(':modules:go:utils').projectDir).filter { File f ->
+        f.name.endsWith(".go") || f.name.endsWith(".mod") || f.name.endsWith(".sum")
+    })
+    inputs.files(fileTree(project(':modules:go:version').projectDir).filter { File f ->
+        f.name.endsWith(".go") || f.name.endsWith(".mod") || f.name.endsWith(".sum")
+    })
+    outputs.dir(buildDir.path+'/test-results/functionalTest/')
+    outputs.dir(buildDir.path+'/reports/tests/functionalTest/')
+
+    doLast {
+        // Pass the parameters to run functional tests
+        def testEnvironmentVariables = [:]
+        testEnvironmentVariables['nyxDockerImage']=dockerImageSHAFile.text // the Docker image to run
+        testEnvironmentVariables['quickTests']=findProperty("quickTests") // the flag to narrow the number of tests, added on the command line using the -PquickTests=true option
+        testEnvironmentVariables['gitHubTestUserToken']=findProperty("gitHubTestUserToken")
+        testEnvironmentVariables['gitLabTestUserToken']=findProperty("gitLabTestUserToken")
+
+        logger.info('Functional testing Docker image ${rootProject.name}:${sanitizedVersion}')
+        exec {
+            workingDir = projectDir.path+'/test/functional'
+            environment += testEnvironmentVariables
+            logging.captureStandardOutput LogLevel.QUIET
+            logging.captureStandardError  LogLevel.ERROR
+            // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
+            // note that with '--tags=functional' we only run tests declared in files with the '+build functional' directive on top
+            commandLine 'go', 'test', '--tags=functional', '-coverprofile='+buildDir.path+'/test-results/functionalTest/functionalTest-coverprofile.out', '-v', './...'
+        }
+        
+        logger.info('Rendering functional test coverage report for Docker image ${rootProject.name}:${sanitizedVersion}')
+        exec {
+            workingDir = projectDir.path+'/test/functional'
+            logging.captureStandardOutput LogLevel.QUIET
+            logging.captureStandardError  LogLevel.ERROR
+            // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
+            commandLine 'go', 'tool', 'cover', '-html', buildDir.path+'/test-results/functionalTest/functionalTest-coverprofile.out', '-o', buildDir.path+'/reports/tests/functionalTest/functionalTest.html'
+        }
+    }
 }
 
 /*------------------------------------------------------------------------------

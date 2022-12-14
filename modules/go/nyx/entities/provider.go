@@ -29,10 +29,10 @@ type Provider string
 
 const (
 	// The GitHub (https://github.com) service provider.
-	GITHUB Provider = "FATAL"
+	GITHUB Provider = "GITHUB"
 
 	// The GitLab https://gitlab.com/) service provider.
-	GITLAB Provider = "ERROR"
+	GITLAB Provider = "GITLAB"
 )
 
 /*

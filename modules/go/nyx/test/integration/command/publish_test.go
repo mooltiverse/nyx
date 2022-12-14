@@ -47,6 +47,7 @@ func TestPublishConstructor(t *testing.T) {
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.PUBLISH, gittools.FROM_SCRATCH()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			assert.NotNil(t, command)
 		})
 	}
@@ -61,6 +62,7 @@ func TestPublishState(t *testing.T) {
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.PUBLISH, gittools.FROM_SCRATCH()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			assert.NotNil(t, (*command).State())
 		})
 	}
@@ -76,6 +78,7 @@ func TestPublishIsUpToDate(t *testing.T) {
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.MARK, gittools.INITIAL_COMMIT()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			// simply test that running it twice returns false at the first run and true the second
 			upToDate, err := (*command).IsUpToDate()
 			assert.False(t, upToDate)
@@ -113,6 +116,7 @@ func TestPublishIdempotency(t *testing.T) {
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.MARK, gittools.INITIAL_COMMIT()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			// simply test that running it twice returns false at the first run and true the second
 			upToDate, err := (*command).IsUpToDate()
 			assert.False(t, upToDate)
@@ -164,11 +168,14 @@ func TestPublishRunWithNewReleaseAndGlobalAssetsOnGitHubRepository(t *testing.T)
 	assetPath2.Write([]byte("content2"))
 	assetAbsolutePath1, _ := filepath.Abs(assetPath1.Name())
 	assetAbsolutePath2, _ := filepath.Abs(assetPath2.Name())
+	defer os.Remove(assetAbsolutePath1)
+	defer os.Remove(assetAbsolutePath2)
 
 	// if we clone too quickly next calls may fail
 	time.Sleep(4000 * time.Millisecond)
 
 	script := gittools.ONE_BRANCH_SHORT().ApplyOnCloneFromWithCredentials((*gitHubRepository).GetHTTPURL(), utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(""))
+	defer os.RemoveAll(script.GetWorkingDirectory())
 	script.PushWithCredentials(utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(""))
 
 	configurationLayerMock := cnf.NewSimpleConfigurationLayer()
@@ -298,11 +305,14 @@ func TestPublishRunWithNewReleaseAndFilteredAssetsOnGitHubRepository(t *testing.
 	assetPath2.Write([]byte("content2"))
 	assetAbsolutePath1, _ := filepath.Abs(assetPath1.Name())
 	assetAbsolutePath2, _ := filepath.Abs(assetPath2.Name())
+	defer os.Remove(assetAbsolutePath1)
+	defer os.Remove(assetAbsolutePath2)
 
 	// if we clone too quickly next calls may fail
 	time.Sleep(4000 * time.Millisecond)
 
 	script := gittools.ONE_BRANCH_SHORT().ApplyOnCloneFromWithCredentials((*gitHubRepository).GetHTTPURL(), utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(""))
+	defer os.RemoveAll(script.GetWorkingDirectory())
 	script.PushWithCredentials(utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(""))
 
 	configurationLayerMock := cnf.NewSimpleConfigurationLayer()
@@ -433,6 +443,8 @@ func TestPublishRunWithNewReleaseAndGlobalAssetsOnGitLabRepository(t *testing.T)
 	assetPath2.Write([]byte("content2"))
 	assetAbsolutePath1, _ := filepath.Abs(assetPath1.Name())
 	assetAbsolutePath2, _ := filepath.Abs(assetPath2.Name())
+	defer os.Remove(assetAbsolutePath1)
+	defer os.Remove(assetAbsolutePath2)
 
 	// if we clone too quickly next calls may fail
 	time.Sleep(4000 * time.Millisecond)
@@ -440,6 +452,7 @@ func TestPublishRunWithNewReleaseAndGlobalAssetsOnGitLabRepository(t *testing.T)
 	// when a token for user and password authentication for plain Git operations against a GitLab repository,
 	// the user is the "PRIVATE-TOKEN" string and the password is the token
 	script := gittools.ONE_BRANCH_SHORT().ApplyOnCloneFromWithCredentials((*gitLabRepository).GetHTTPURL(), utl.PointerToString("PRIVATE-TOKEN"), utl.PointerToString(os.Getenv("gitLabTestUserToken")))
+	defer os.RemoveAll(script.GetWorkingDirectory())
 	script.PushWithCredentials(utl.PointerToString("PRIVATE-TOKEN"), utl.PointerToString(os.Getenv("gitLabTestUserToken")))
 
 	configurationLayerMock := cnf.NewSimpleConfigurationLayer()
@@ -565,6 +578,8 @@ func TestPublishRunWithNewReleaseAndFilteredAssetsOnGitLabRepository(t *testing.
 	assetPath2.Write([]byte("content2"))
 	assetAbsolutePath1, _ := filepath.Abs(assetPath1.Name())
 	assetAbsolutePath2, _ := filepath.Abs(assetPath2.Name())
+	defer os.Remove(assetAbsolutePath1)
+	defer os.Remove(assetAbsolutePath2)
 
 	// if we clone too quickly next calls may fail
 	time.Sleep(4000 * time.Millisecond)
@@ -572,6 +587,7 @@ func TestPublishRunWithNewReleaseAndFilteredAssetsOnGitLabRepository(t *testing.
 	// when a token for user and password authentication for plain Git operations against a GitLab repository,
 	// the user is the "PRIVATE-TOKEN" string and the password is the token
 	script := gittools.ONE_BRANCH_SHORT().ApplyOnCloneFromWithCredentials((*gitLabRepository).GetHTTPURL(), utl.PointerToString("PRIVATE-TOKEN"), utl.PointerToString(os.Getenv("gitLabTestUserToken")))
+	defer os.RemoveAll(script.GetWorkingDirectory())
 	script.PushWithCredentials(utl.PointerToString("PRIVATE-TOKEN"), utl.PointerToString(os.Getenv("gitLabTestUserToken")))
 
 	configurationLayerMock := cnf.NewSimpleConfigurationLayer()

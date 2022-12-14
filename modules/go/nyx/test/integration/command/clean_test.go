@@ -36,6 +36,7 @@ import (
 func TestCleanConstructor(t *testing.T) {
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.CLEAN, gittools.FROM_SCRATCH()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			assert.NotNil(t, command)
 		})
 	}
@@ -44,6 +45,7 @@ func TestCleanConstructor(t *testing.T) {
 func TestCleanState(t *testing.T) {
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.CLEAN, gittools.FROM_SCRATCH()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			assert.NotNil(t, (*command).State())
 		})
 	}
@@ -52,6 +54,7 @@ func TestCleanState(t *testing.T) {
 func TestCleanIsUpToDate(t *testing.T) {
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.CLEAN, gittools.INITIAL_COMMIT()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			// run once, to start
 			_, err := (*command).Run()
 			assert.NoError(t, err)
@@ -68,6 +71,7 @@ func TestCleanIsUpToDate(t *testing.T) {
 func TestCleanIsUpToDateWithStateFile(t *testing.T) {
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.CLEAN, gittools.INITIAL_COMMIT()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			stateFilePath := "state-file.txt"
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			configurationLayerMock.SetStateFile(&stateFilePath)
@@ -109,6 +113,7 @@ func TestCleanIsUpToDateWithStateFile(t *testing.T) {
 func TestCleanIsUpToDateWithChangelogFile(t *testing.T) {
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.CLEAN, gittools.INITIAL_COMMIT()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			changelogFilePath := "changelog-file.txt"
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			changelogConfiguration, _ := configurationLayerMock.GetChangelog()
@@ -148,6 +153,7 @@ func TestCleanIsUpToDateWithChangelogFile(t *testing.T) {
 func TestCleanIdempotency(t *testing.T) {
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.CLEAN, gittools.INITIAL_COMMIT()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			stateFilePath := "state-file.txt"
 			changelogFilePath := "changelog-file.txt"
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
@@ -206,6 +212,7 @@ func TestCleanIdempotency(t *testing.T) {
 func TestCleanRunDeleteStateFile(t *testing.T) {
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.CLEAN, gittools.INITIAL_COMMIT()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			stateFilePath := "state-file.txt"
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			configurationLayerMock.SetStateFile(&stateFilePath)
@@ -242,6 +249,7 @@ func TestCleanRunDeleteStateFile(t *testing.T) {
 func TestCleanRunDeleteChangelogFile(t *testing.T) {
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.CLEAN, gittools.INITIAL_COMMIT()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			changelogFilePath := "changelog-file.txt"
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			changelogConfiguration, _ := configurationLayerMock.GetChangelog()

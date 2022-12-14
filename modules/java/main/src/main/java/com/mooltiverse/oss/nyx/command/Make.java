@@ -233,7 +233,8 @@ public class Make extends AbstractCommand {
                             }
                         }
                         catch (IllegalArgumentException iae) {
-                            throw new IllegalPropertyException(String.format("The regular expression '%s' defined for commit message convention '%s' does not define the 'type' named capturing group", cmcEntry.getValue().getExpression(), cmcEntry.getKey()), iae);
+                            // the regular expression doesn't match the name capturing group, no commit type is inferred
+                            //throw new IllegalPropertyException(String.format("The regular expression '%s' defined for commit message convention '%s' does not define the 'type' named capturing group", cmcEntry.getValue().getExpression(), cmcEntry.getKey()), iae);
                         }
                         catch (IllegalStateException ise) {
                             throw new ReleaseException(String.format("Cannot infer the commit type for commit '%s' match operation failed for the regular expression '%s' from commit message convention '%s'", commit.getSHA(), cmcEntry.getValue().getExpression(), cmcEntry.getKey()), ise);

@@ -31,6 +31,7 @@ import org.junit.jupiter.api.TestTemplate;
 import com.mooltiverse.oss.nyx.command.template.Baseline;
 import com.mooltiverse.oss.nyx.entities.IllegalPropertyException;
 import com.mooltiverse.oss.nyx.git.tools.Scenario;
+import com.mooltiverse.oss.nyx.git.tools.Script;
 import com.mooltiverse.oss.nyx.gradle.template.GradleCommandInvocationContextProvider;
 
 /**
@@ -48,8 +49,9 @@ public class ConfigurationLayerTestTemplates {
         @TestTemplate
         @DisplayName("ConfigurationLayer.getBump() default value")
         @Baseline(Scenario.FROM_SCRATCH)
-        void getBumpDefaultTest(Project project)
+        void getBumpDefaultTest(Project project, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
             ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
 
@@ -60,8 +62,9 @@ public class ConfigurationLayerTestTemplates {
         @TestTemplate
         @DisplayName("ConfigurationLayer.getChangelog() default value")
         @Baseline(Scenario.FROM_SCRATCH)
-        void getChangelogDefaultTest(Project project)
+        void getChangelogDefaultTest(Project project, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
             ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
 
@@ -80,8 +83,9 @@ public class ConfigurationLayerTestTemplates {
         @TestTemplate
         @DisplayName("ConfigurationLayer.getCommitMessageConventions() default value")
         @Baseline(Scenario.FROM_SCRATCH)
-        void getCommitMessageConventionsDefaultTest(Project project)
+        void getCommitMessageConventionsDefaultTest(Project project, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
             ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
 
@@ -97,8 +101,9 @@ public class ConfigurationLayerTestTemplates {
         @TestTemplate
         @DisplayName("ConfigurationLayer.getConfigurationFile() default value")
         @Baseline(Scenario.FROM_SCRATCH)
-        void getConfigurationFileDefaultTest(Project project)
+        void getConfigurationFileDefaultTest(Project project, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
             ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
 
@@ -109,8 +114,9 @@ public class ConfigurationLayerTestTemplates {
         @TestTemplate
         @DisplayName("ConfigurationLayer.getDirectory() default value")
         @Baseline(Scenario.FROM_SCRATCH)
-        void getDirectoryDefaultTest(Project project)
+        void getDirectoryDefaultTest(Project project, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
             ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
 
@@ -122,8 +128,9 @@ public class ConfigurationLayerTestTemplates {
         @TestTemplate
         @DisplayName("ConfigurationLayer.getDryRun() default value")
         @Baseline(Scenario.FROM_SCRATCH)
-        void getDryRunDefaultTest(Project project)
+        void getDryRunDefaultTest(Project project, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
             ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
 
@@ -134,8 +141,9 @@ public class ConfigurationLayerTestTemplates {
         @TestTemplate
         @DisplayName("ConfigurationLayer.getGit() default value")
         @Baseline(Scenario.FROM_SCRATCH)
-        void getGitDefaultTest(Project project)
+        void getGitDefaultTest(Project project, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
             ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
 
@@ -148,8 +156,9 @@ public class ConfigurationLayerTestTemplates {
         @TestTemplate
         @DisplayName("ConfigurationLayer.getInitialVersion() default value")
         @Baseline(Scenario.FROM_SCRATCH)
-        void getInitialVersionTest(Project project)
+        void getInitialVersionTest(Project project, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
             ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
 
@@ -160,8 +169,9 @@ public class ConfigurationLayerTestTemplates {
         @TestTemplate
         @DisplayName("ConfigurationLayer.getPreset() default value")
         @Baseline(Scenario.FROM_SCRATCH)
-        void getPresetDefaultTest(Project project)
+        void getPresetDefaultTest(Project project, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
             ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
 
@@ -172,8 +182,9 @@ public class ConfigurationLayerTestTemplates {
         @TestTemplate
         @DisplayName("ConfigurationLayer.getReleaseAssets() default value")
         @Baseline(Scenario.FROM_SCRATCH)
-        void getReleaseAssetsDefaultTest(Project project)
+        void getReleaseAssetsDefaultTest(Project project, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
             ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
 
@@ -186,8 +197,9 @@ public class ConfigurationLayerTestTemplates {
         @TestTemplate
         @DisplayName("ConfigurationLayer.getReleaseLenient() default value")
         @Baseline(Scenario.FROM_SCRATCH)
-        void getReleaseLenientDefaultTest(Project project)
+        void getReleaseLenientDefaultTest(Project project, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
             ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
 
@@ -198,8 +210,9 @@ public class ConfigurationLayerTestTemplates {
         @TestTemplate
         @DisplayName("ConfigurationLayer.getReleasePrefix() default value")
         @Baseline(Scenario.FROM_SCRATCH)
-        void getReleasePrefixDefaultTest(Project project)
+        void getReleasePrefixDefaultTest(Project project, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
             ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
 
@@ -210,8 +223,9 @@ public class ConfigurationLayerTestTemplates {
         @TestTemplate
         @DisplayName("ConfigurationLayer.getReleaseTypes() default value")
         @Baseline(Scenario.FROM_SCRATCH)
-        void getReleaseTypesDefaultTest(Project project)
+        void getReleaseTypesDefaultTest(Project project, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
             ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
 
@@ -227,8 +241,9 @@ public class ConfigurationLayerTestTemplates {
         @TestTemplate
         @DisplayName("ConfigurationLayer.getScheme() default value")
         @Baseline(Scenario.FROM_SCRATCH)
-        void getSchemeDefaultTest(Project project)
+        void getSchemeDefaultTest(Project project, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
             ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
 
@@ -239,8 +254,9 @@ public class ConfigurationLayerTestTemplates {
         @TestTemplate
         @DisplayName("ConfigurationLayer.getServices() default value")
         @Baseline(Scenario.FROM_SCRATCH)
-        void getServicesDefaultTest(Project project)
+        void getServicesDefaultTest(Project project, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
             ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
 
@@ -253,8 +269,9 @@ public class ConfigurationLayerTestTemplates {
         @TestTemplate
         @DisplayName("ConfigurationLayer.getSharedConfigurationFile() default value")
         @Baseline(Scenario.FROM_SCRATCH)
-        void getSharedConfigurationFileDefaultTest(Project project)
+        void getSharedConfigurationFileDefaultTest(Project project, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
             ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
 
@@ -265,8 +282,9 @@ public class ConfigurationLayerTestTemplates {
         @TestTemplate
         @DisplayName("ConfigurationLayer.getVerbosity() default value")
         @Baseline(Scenario.FROM_SCRATCH)
-        void getVerbosityDefaultTest(Project project)
+        void getVerbosityDefaultTest(Project project, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
             ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
 
@@ -279,8 +297,9 @@ public class ConfigurationLayerTestTemplates {
         @TestTemplate
         @DisplayName("ConfigurationLayer.getVersion() default value")
         @Baseline(Scenario.FROM_SCRATCH)
-        void getVersionDefaultTest(Project project)
+        void getVersionDefaultTest(Project project, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
 
             // the extension has no 'version' property as it must be taken from the standard project property with the same name
@@ -309,8 +328,9 @@ public class ConfigurationLayerTestTemplates {
         @TestTemplate
         @DisplayName("ConfigurationLayer.getBump().set() throws IllegalPropertyException with illegal value")
         @Baseline(Scenario.FROM_SCRATCH)
-        void exceptionUsingGetBumpWithWrongValueTest(Project project)
+        void exceptionUsingGetBumpWithWrongValueTest(Project project, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
             ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
 
@@ -321,8 +341,9 @@ public class ConfigurationLayerTestTemplates {
         @TestTemplate
         @DisplayName("ConfigurationLayer.getChangelog().set() throws IllegalPropertyException with illegal value")
         @Baseline(Scenario.FROM_SCRATCH)
-        void exceptionUsingGetChangelogWithWrongValueTest(Project project)
+        void exceptionUsingGetChangelogWithWrongValueTest(Project project, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
             ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
 
@@ -333,8 +354,9 @@ public class ConfigurationLayerTestTemplates {
         @TestTemplate
         @DisplayName("ConfigurationLayer.getCommitMessageConventions().set() throws IllegalPropertyException with illegal value")
         @Baseline(Scenario.FROM_SCRATCH)
-        void exceptionUsingGetCommitMessageConventionsWithWrongValueTest(Project project)
+        void exceptionUsingGetCommitMessageConventionsWithWrongValueTest(Project project, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
             ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
 
@@ -345,8 +367,9 @@ public class ConfigurationLayerTestTemplates {
         @TestTemplate
         @DisplayName("ConfigurationLayer.getDirectory().set() throws IllegalPropertyException with illegal value")
         @Baseline(Scenario.FROM_SCRATCH)
-        void exceptionUsingGetDirectoryWithWrongValueTest(Project project)
+        void exceptionUsingGetDirectoryWithWrongValueTest(Project project, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
             ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
 
@@ -358,8 +381,9 @@ public class ConfigurationLayerTestTemplates {
         @TestTemplate
         @DisplayName("ConfigurationLayer.getDryRun().set() throws IllegalPropertyException with illegal value")
         @Baseline(Scenario.FROM_SCRATCH)
-        void exceptionUsingGetDryRunWithWrongValueTest(Project project)
+        void exceptionUsingGetDryRunWithWrongValueTest(Project project, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
             ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
 
@@ -371,8 +395,9 @@ public class ConfigurationLayerTestTemplates {
         @TestTemplate
         @DisplayName("ConfigurationLayer.getGit().set() throws IllegalPropertyException with illegal value")
         @Baseline(Scenario.FROM_SCRATCH)
-        void exceptionUsingGetGitWithWrongValueTest(Project project)
+        void exceptionUsingGetGitWithWrongValueTest(Project project, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
             ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
 
@@ -382,8 +407,9 @@ public class ConfigurationLayerTestTemplates {
         /*@TestTemplate
         @DisplayName("ConfigurationLayer.getInitialVersion().set() throws IllegalPropertyException with illegal value")
         @Baseline(Scenario.FROM_SCRATCH)
-        void exceptionUsingGetInitialVersionWithWrongValueTest(Project project)
+        void exceptionUsingGetInitialVersionWithWrongValueTest(Project project, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
             ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
 
@@ -395,8 +421,9 @@ public class ConfigurationLayerTestTemplates {
         @TestTemplate
         @DisplayName("ConfigurationLayer.getReleaseAssets().set() throws IllegalPropertyException with illegal value")
         @Baseline(Scenario.FROM_SCRATCH)
-        void exceptionUsingGetReleaseAssetsWithWrongValueTest(Project project)
+        void exceptionUsingGetReleaseAssetsWithWrongValueTest(Project project, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
             ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
 
@@ -407,8 +434,9 @@ public class ConfigurationLayerTestTemplates {
         @TestTemplate
         @DisplayName("ConfigurationLayer.getReleaseLenient().set() throws IllegalPropertyException with illegal value")
         @Baseline(Scenario.FROM_SCRATCH)
-        void exceptionUsingGetReleaseLenientWithWrongValueTest(Project project)
+        void exceptionUsingGetReleaseLenientWithWrongValueTest(Project project, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
             ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
 
@@ -420,8 +448,9 @@ public class ConfigurationLayerTestTemplates {
         @TestTemplate
         @DisplayName("ConfigurationLayer.getReleasePrefix().set() throws IllegalPropertyException with illegal value")
         @Baseline(Scenario.FROM_SCRATCH)
-        void exceptionUsingGetReleasePrefixWithWrongValueTest(Project project)
+        void exceptionUsingGetReleasePrefixWithWrongValueTest(Project project, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
             ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
 
@@ -432,8 +461,9 @@ public class ConfigurationLayerTestTemplates {
         @TestTemplate
         @DisplayName("ConfigurationLayer.getReleaseTypes().set() throws IllegalPropertyException with illegal value")
         @Baseline(Scenario.FROM_SCRATCH)
-        void exceptionUsingGetReleaseTypesWithWrongValueTest(Project project)
+        void exceptionUsingGetReleaseTypesWithWrongValueTest(Project project, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
             ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
 
@@ -444,8 +474,9 @@ public class ConfigurationLayerTestTemplates {
         @TestTemplate
         @DisplayName("ConfigurationLayer.getServices().set() throws IllegalPropertyException with illegal value")
         @Baseline(Scenario.FROM_SCRATCH)
-        void exceptionUsingGetServicesWithWrongValueTest(Project project)
+        void exceptionUsingGetServicesWithWrongValueTest(Project project, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
             ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
 
@@ -455,8 +486,9 @@ public class ConfigurationLayerTestTemplates {
         @TestTemplate
         @DisplayName("ConfigurationLayer.getScheme().set() throws IllegalPropertyException with illegal value")
         @Baseline(Scenario.FROM_SCRATCH)
-        void exceptionUsingGetSchemeWithWrongValueTest(Project project)
+        void exceptionUsingGetSchemeWithWrongValueTest(Project project, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
             ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
 
@@ -468,8 +500,9 @@ public class ConfigurationLayerTestTemplates {
         @TestTemplate
         @DisplayName("ConfigurationLayer.getVerbosity().set() throws IllegalPropertyException with illegal value")
         @Baseline(Scenario.FROM_SCRATCH)
-        void exceptionUsingGetVerbosityWithWrongValueTest(Project project)
+        void exceptionUsingGetVerbosityWithWrongValueTest(Project project, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
             ConfigurationLayer configurationLayer = new ConfigurationLayer(extension, null);
 

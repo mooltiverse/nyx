@@ -28,6 +28,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import com.mooltiverse.oss.nyx.command.template.Baseline;
 import com.mooltiverse.oss.nyx.git.tools.Scenario;
+import com.mooltiverse.oss.nyx.git.tools.Script;
 import com.mooltiverse.oss.nyx.gradle.template.GradleCommandInvocationContextProvider;
 
 /**
@@ -45,8 +46,9 @@ public class NyxExtensionTestTemplates {
         @TestTemplate
         @DisplayName("NyxExtension.getBump() default value")
         @Baseline(Scenario.FROM_SCRATCH)
-        void getBumpDefaultTest(Project project)
+        void getBumpDefaultTest(Project project, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
 
             assertFalse(extension.getBump().isPresent());
@@ -56,8 +58,9 @@ public class NyxExtensionTestTemplates {
         @TestTemplate
         @DisplayName("NyxExtension.getChangelog() default value")
         @Baseline(Scenario.FROM_SCRATCH)
-        void getChangelogDefaultTest(Project project)
+        void getChangelogDefaultTest(Project project, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
 
             assertNotNull(extension.getChangelog());
@@ -76,8 +79,9 @@ public class NyxExtensionTestTemplates {
         @TestTemplate
         @DisplayName("NyxExtension.getCommitMessageConventions() default value")
         @Baseline(Scenario.FROM_SCRATCH)
-        void getCommitMessageConventionsDefaultTest(Project project)
+        void getCommitMessageConventionsDefaultTest(Project project, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
 
             assertNotNull(extension.getCommitMessageConventions());
@@ -92,8 +96,9 @@ public class NyxExtensionTestTemplates {
         @TestTemplate
         @DisplayName("NyxExtension.getConfigurationFile() default value")
         @Baseline(Scenario.FROM_SCRATCH)
-        void getConfigurationFileDefaultTest(Project project)
+        void getConfigurationFileDefaultTest(Project project, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
 
             assertFalse(extension.getConfigurationFile().isPresent());
@@ -103,8 +108,9 @@ public class NyxExtensionTestTemplates {
         @TestTemplate
         @DisplayName("NyxExtension.getDirectory() default value")
         @Baseline(Scenario.FROM_SCRATCH)
-        void getDirectoryDefaultTest(Project project)
+        void getDirectoryDefaultTest(Project project, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
 
             // the default must be the project directory
@@ -115,8 +121,9 @@ public class NyxExtensionTestTemplates {
         @TestTemplate
         @DisplayName("NyxExtension.getDryRun() default value")
         @Baseline(Scenario.FROM_SCRATCH)
-        void getDryRunDefaultTest(Project project)
+        void getDryRunDefaultTest(Project project, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
 
             assertFalse(extension.getDryRun().isPresent());
@@ -126,8 +133,9 @@ public class NyxExtensionTestTemplates {
         @TestTemplate
         @DisplayName("NyxExtension.getGit() default value")
         @Baseline(Scenario.FROM_SCRATCH)
-        void getGitDefaultTest(Project project)
+        void getGitDefaultTest(Project project, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
 
             assertNotNull(extension.getGit());
@@ -139,8 +147,9 @@ public class NyxExtensionTestTemplates {
         @TestTemplate
         @DisplayName("NyxExtension.getInitialVersion() default value")
         @Baseline(Scenario.FROM_SCRATCH)
-        void getInitialVersionDefaultTest(Project project)
+        void getInitialVersionDefaultTest(Project project, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
 
             assertFalse(extension.getInitialVersion().isPresent());
@@ -150,8 +159,9 @@ public class NyxExtensionTestTemplates {
         @TestTemplate
         @DisplayName("NyxExtension.getPreset() default value")
         @Baseline(Scenario.FROM_SCRATCH)
-        void getPresetDefaultTest(Project project)
+        void getPresetDefaultTest(Project project, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
 
             assertFalse(extension.getPreset().isPresent());
@@ -161,8 +171,9 @@ public class NyxExtensionTestTemplates {
         @TestTemplate
         @DisplayName("NyxExtension.getReleaseAssets() default value")
         @Baseline(Scenario.FROM_SCRATCH)
-        void getReleaseAssetsDefaultTest(Project project)
+        void getReleaseAssetsDefaultTest(Project project, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
 
             assertNotNull(extension.getReleaseAssets());
@@ -172,8 +183,9 @@ public class NyxExtensionTestTemplates {
         @TestTemplate
         @DisplayName("NyxExtension.getReleaseLenient() default value")
         @Baseline(Scenario.FROM_SCRATCH)
-        void getReleaseLenientDefaultTest(Project project)
+        void getReleaseLenientDefaultTest(Project project, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
 
             assertFalse(extension.getReleaseLenient().isPresent());
@@ -183,8 +195,9 @@ public class NyxExtensionTestTemplates {
         @TestTemplate
         @DisplayName("NyxExtension.getReleasePrefix() default value")
         @Baseline(Scenario.FROM_SCRATCH)
-        void getReleasePrefixDefaultTest(Project project)
+        void getReleasePrefixDefaultTest(Project project, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
 
             assertFalse(extension.getReleasePrefix().isPresent());
@@ -194,8 +207,9 @@ public class NyxExtensionTestTemplates {
         @TestTemplate
         @DisplayName("NyxExtension.getReleaseTypes() default value")
         @Baseline(Scenario.FROM_SCRATCH)
-        void getReleaseTypesDefaultTest(Project project)
+        void getReleaseTypesDefaultTest(Project project, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
 
             assertNotNull(extension.getReleaseTypes());
@@ -210,8 +224,9 @@ public class NyxExtensionTestTemplates {
         @TestTemplate
         @DisplayName("NyxExtension.getScheme() default value")
         @Baseline(Scenario.FROM_SCRATCH)
-        void getSchemeDefaultTest(Project project)
+        void getSchemeDefaultTest(Project project, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
 
             assertFalse(extension.getScheme().isPresent());
@@ -221,8 +236,9 @@ public class NyxExtensionTestTemplates {
         @TestTemplate
         @DisplayName("NyxExtension.getServices() default value")
         @Baseline(Scenario.FROM_SCRATCH)
-        void getServicesDefaultTest(Project project)
+        void getServicesDefaultTest(Project project, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
 
             assertNotNull(extension.getServices());
@@ -232,8 +248,9 @@ public class NyxExtensionTestTemplates {
         @TestTemplate
         @DisplayName("NyxExtension.getSharedConfigurationFile() default value")
         @Baseline(Scenario.FROM_SCRATCH)
-        void getSharedConfigurationFileDefaultTest(Project project)
+        void getSharedConfigurationFileDefaultTest(Project project, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
 
             assertFalse(extension.getSharedConfigurationFile().isPresent());
@@ -243,8 +260,9 @@ public class NyxExtensionTestTemplates {
         @TestTemplate
         @DisplayName("NyxExtension.getVerbosity() default value")
         @Baseline(Scenario.FROM_SCRATCH)
-        void getVerbosityDefaultTest(Project project)
+        void getVerbosityDefaultTest(Project project, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
 
             assertFalse(extension.getVerbosity().isPresent());

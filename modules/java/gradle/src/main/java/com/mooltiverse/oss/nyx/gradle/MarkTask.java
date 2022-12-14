@@ -48,9 +48,6 @@ public abstract class MarkTask extends CoreTask {
     public MarkTask(NyxExtension extension) {
         super(extension);
         setDescription(DESCRIPTION);
-
-        // Configure dependencies
-        dependsOn(MakeTask.NAME);
     }
 
     /**

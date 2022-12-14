@@ -80,9 +80,9 @@ public class TestData {
         {
             put(CleanTask.NAME,   List.<String>of());
             put(InferTask.NAME,   List.<String>of());
-            put(MakeTask.NAME,    List.<String>of(InferTask.NAME));
-            put(MarkTask.NAME,    List.<String>of(MakeTask.NAME));
-            put(PublishTask.NAME, List.<String>of(MarkTask.NAME));
+            put(MakeTask.NAME,    List.<String>of());
+            put(MarkTask.NAME,    List.<String>of());
+            put(PublishTask.NAME, List.<String>of());
         }
     };
 

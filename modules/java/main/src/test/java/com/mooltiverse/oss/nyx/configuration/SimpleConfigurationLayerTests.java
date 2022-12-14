@@ -125,6 +125,7 @@ public class SimpleConfigurationLayerTests {
         assertNull(simpleConfigurationLayer.getDirectory());
 
         File directory = Files.createTempDirectory(null).toFile();
+        directory.deleteOnExit();
         simpleConfigurationLayer.setDirectory(directory.getAbsolutePath());
         assertEquals(directory.getAbsolutePath(), new File(simpleConfigurationLayer.getDirectory()).getAbsolutePath());
     }

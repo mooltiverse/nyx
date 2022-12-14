@@ -277,8 +277,12 @@ public class Nyx {
 
             // optionally save the state file
             if (saveState && !Objects.isNull(configuration().getStateFile())) {
+                File stateFile = new File(configuration().getStateFile());
+                // if the file path is relative make it relative to the configured directory
+                if (!stateFile.isAbsolute())
+                    stateFile = new File(configuration().getDirectory(), configuration().getStateFile());
                 logger.debug(MAIN, "Storing the state to '{}'", configuration().getStateFile());
-                FileMapper.save(configuration().getStateFile(), state());
+                FileMapper.save(stateFile.getAbsolutePath(), state());
                 logger.debug(MAIN, "State stored to to '{}'", configuration().getStateFile());
             }
         }

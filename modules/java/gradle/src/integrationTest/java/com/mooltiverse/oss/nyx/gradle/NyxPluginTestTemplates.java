@@ -26,6 +26,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import com.mooltiverse.oss.nyx.command.template.Baseline;
 import com.mooltiverse.oss.nyx.git.tools.Scenario;
+import com.mooltiverse.oss.nyx.git.tools.Script;
 import com.mooltiverse.oss.nyx.gradle.template.GradleCommandInvocationContextProvider;
 
 /**
@@ -42,8 +43,9 @@ public class NyxPluginTestTemplates {
         @TestTemplate
         @DisplayName("NyxPlugin.apply()")
         @Baseline(Scenario.FROM_SCRATCH)
-        void applyTest(Project project)
+        void applyTest(Project project, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             // Now make sure the plugin is there.
             // ... with PluginManager (Project.getPluginManager())...
             assertTrue(project.getPluginManager().hasPlugin(NyxPlugin.ID));
