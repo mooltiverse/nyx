@@ -1,5 +1,27 @@
 # Nyx Release Notes
 
+## 2.0.0
+
+* support for deprecated [template functions](https://mooltiverse.github.io/nyx/guide/user/configuration-reference/templates/#functions) `environment.user`, `environment.variable`, `file.content`, `file.exists` has been removed, replaced by `environmentUser`, `environmentVariable`, `fileContent`, `fileExists`
+
+This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/2.0.0).
+
+### Upgrade instructions
+
+* replace usage of deprecated [template functions](https://mooltiverse.github.io/nyx/guide/user/configuration-reference/templates/#functions) `environment.user`, `environment.variable`, `file.content`, `file.exists` (with dots) with `environmentUser`, `environmentVariable`, `fileContent`, `fileExists` (camel case names) in the configuration
+
+### New features and improvements
+
+There are no new features or improvements in this release.
+
+### Fixed issues
+
+There are no fixes in this release.
+
+### Known issues
+
+There are no known issues in this release.
+
 ## 1.3.0
 
 This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/1.3.0).

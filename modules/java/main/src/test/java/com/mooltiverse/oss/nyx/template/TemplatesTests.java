@@ -339,21 +339,6 @@ public class TemplatesTests {
             }
         }
 
-        // TODO: remove this method as per release 2.0.0 or more
-        @Nested
-        @DisplayName("Templates.render Environment.Variable function (deprecated dotted name)")
-        @Deprecated(since="1.1.0", forRemoval=true) //The dotted name is deprecated and will be removed in future releases. Use the camel case name instead. See the user manual for more."
-        class RenderEnvironmentVariableFunctionDeprecatedDottedNameTests {
-            @Test
-            @DisplayName("Templates.render(String, null) (deprecated dotted name)")
-            @Deprecated(since="1.1.0", forRemoval=true) //The dotted name is deprecated and will be removed in future releases. Use the camel case name instead. See the user manual for more."
-            void renderEnvironmentVariableDeprecatedDottedName()
-                throws Exception {
-                // just test it's not empty as it changes depending on the runtime environment
-                assertFalse(Templates.render("{{#environment.variable}}PATH{{/environment.variable}}", null).isBlank());
-            }
-        }
-
         @Nested
         @DisplayName("Templates.render EnvironmentUser function")
         class RenderEnvironmentUserFunctionTests {
@@ -364,22 +349,6 @@ public class TemplatesTests {
                 // just test it's not empty as it changes depending on the runtime environment
                 assertFalse(Templates.render("{{environmentUser}}", null).isBlank());
                 assertFalse(Templates.render("{{#environmentUser}}{{/environmentUser}}", null).isBlank());
-            }
-        }
-
-        // TODO: remove this method as per release 2.0.0 or more
-        @Nested
-        @DisplayName("Templates.render Environment.User function (deprecated dotted name)")
-        @Deprecated(since="1.1.0", forRemoval=true) //The dotted name is deprecated and will be removed in future releases. Use the camel case name instead. See the user manual for more."
-        class RenderEnvironmentUserFunctionDeprecatedDottedNameTests {
-            @Test
-            @DisplayName("Templates.render(String, null) (deprecated dotted name)")
-            @Deprecated(since="1.1.0", forRemoval=true) //The dotted name is deprecated and will be removed in future releases. Use the camel case name instead. See the user manual for more."
-            void renderEnvironmentUserDeprecatedDottedName()
-                throws Exception {
-                // just test it's not empty as it changes depending on the runtime environment
-                assertFalse(Templates.render("{{environment.user}}", null).isBlank());
-                assertFalse(Templates.render("{{#environment.user}}{{/environment.user}}", null).isBlank());
             }
         }
 
@@ -401,27 +370,6 @@ public class TemplatesTests {
             }
         }
 
-        // TODO: remove this method as per release 2.0.0 or more
-        @Nested
-        @DisplayName("Templates.render File.Content function (deprecated dotted name)")
-        @Deprecated(since="1.1.0", forRemoval=true) //The dotted name is deprecated and will be removed in future releases. Use the camel case name instead. See the user manual for more."
-        class RenderFileContentFunctionDeprecatedDottedNameTests {
-            @Test
-            @DisplayName("Templates.render(String, null) (deprecated dotted name)")
-            @Deprecated(since="1.1.0", forRemoval=true) //The dotted name is deprecated and will be removed in future releases. Use the camel case name instead. See the user manual for more."
-            void renderFileDeprecatedDottedNameContent()
-                throws Exception {
-                String hashCode = Integer.toString(this.hashCode());
-                File savedFile = new File(System.getProperty("java.io.tmpdir"), "templates2"+hashCode+".txt");
-                savedFile.deleteOnExit();
-                FileWriter savedFileWriter = new FileWriter(savedFile);
-                savedFileWriter.write("test12345");
-                savedFileWriter.flush();
-                savedFileWriter.close();
-                assertEquals("test12345", Templates.render("{{#file.content}}"+savedFile.getAbsolutePath()+"{{/file.content}}", null));
-            }
-        }
-
         @Nested
         @DisplayName("Templates.render FileExists function")
         class RenderFileExistsFunctionTests {
@@ -438,28 +386,6 @@ public class TemplatesTests {
                 savedFileWriter.flush();
                 savedFileWriter.close();
                 assertEquals("true", Templates.render("{{#fileExists}}"+savedFile.getAbsolutePath()+"{{/fileExists}}", null));
-            }
-        }
-
-        // TODO: remove this method as per release 2.0.0 or more
-        @Nested
-        @DisplayName("Templates.render File.Exists function (deprecated dotted name)")
-        @Deprecated(since="1.1.0", forRemoval=true) //The dotted name is deprecated and will be removed in future releases. Use the camel case name instead. See the user manual for more."
-        class RenderFileExistsFunctionDeprecatedDottedNameTests {
-            @Test
-            @DisplayName("Templates.render(String, null) (deprecated dotted name)")
-            @Deprecated(since="1.1.0", forRemoval=true) //The dotted name is deprecated and will be removed in future releases. Use the camel case name instead. See the user manual for more."
-            void renderFileExistsDeprecatedDottedName()
-                throws Exception {
-                String hashCode = Integer.toString(this.hashCode());
-                File savedFile = new File(System.getProperty("java.io.tmpdir"), "templates4"+hashCode+".txt");
-                savedFile.deleteOnExit();
-                assertEquals("false", Templates.render("{{#file.exists}}"+savedFile.getAbsolutePath()+"{{/file.exists}}", null));
-                FileWriter savedFileWriter = new FileWriter(savedFile);
-                savedFileWriter.write("test12345");
-                savedFileWriter.flush();
-                savedFileWriter.close();
-                assertEquals("true", Templates.render("{{#file.exists}}"+savedFile.getAbsolutePath()+"{{/file.exists}}", null));
             }
         }
     }

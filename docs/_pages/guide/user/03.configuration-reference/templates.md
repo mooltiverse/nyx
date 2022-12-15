@@ -373,9 +373,6 @@ user = "{% raw %}{{#environmentUser}}{{/environmentUser}}{% endraw %}"
 
 In case you pass a value to this function it is ignored.
 
-The Java version of Nyx, including Gradle, also supports the dotted notation for this function so you can use `environment.user` or `environmentUser`. However the dotted notation is deprecated and will be removed in future releases so use the camel case notation `environmentUser`.
-{: .notice--warning}
-
 #### `environmentVariable`
 
 Returns the value of the environment variable used as parameter, if any. Example:
@@ -385,9 +382,6 @@ os = "{% raw %}{{#environmentVariable}}OS{{/environmentVariable}}{% endraw %}"
 ```
 
 returns the value of the `OS` environment variable, if present, or an empty string.
-
-The Java version of Nyx, including Gradle, also supports the dotted notation for this function so you can use `environment.variable` or `environmentVariable`. However the dotted notation is deprecated and will be removed in future releases so use the camel case notation `environmentVariable`.
-{: .notice--warning}
 
 #### `fileContent`
 
@@ -403,9 +397,6 @@ The file name can be a relative or an absolute path. Please note that when a rel
 
 Be careful with the file content type, which must be text, and its size.
 
-The Java version of Nyx, including Gradle, also supports the dotted notation for this function so you can use `file.content` or `fileContent`. However the dotted notation is deprecated and will be removed in future releases so use the camel case notation `fileContent`.
-{: .notice--warning}
-
 #### `fileExists`
 
 Returns the string representation of a boolean, depending on whether the the given file exists. Example:
@@ -417,9 +408,6 @@ fileexists = "{% raw %}{{#fileExists}}example.txt{{/fileExists}}{% endraw %}"
 returns `true` if the `example.txt` file exists, `false` otherwise.
 
 The file name can be a relative or an absolute path. Please note that when a relative path is used, it's always resolved to the current working directory and other configured directories are ignored.
-
-The Java version of Nyx, including Gradle, also supports the dotted notation for this function so you can use `file.exists` or `fileExists`. However the dotted notation is deprecated and will be removed in future releases so use the camel case notation `fileExists`.
-{: .notice--warning}
 
 ## Example
 

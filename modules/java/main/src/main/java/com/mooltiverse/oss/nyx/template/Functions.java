@@ -61,13 +61,6 @@ class Functions {
 
             put(FileContent.NAME,             new FileContent());
             put(FileExists.NAME,              new FileExists());
-
-            // TODO: remove the next 4 functions starting from release 2.0.0 or more as they are deprecated. Use the camel case names (above) instead
-            put(Environment.User.NAME,        new Environment.User());
-            put(Environment.Variable.NAME,    new Environment.Variable());
-
-            put(File.Content.NAME,            new File.Content());
-            put(File.Exists.NAME,             new File.Exists());
         }
     };
 
@@ -107,13 +100,6 @@ class Functions {
 
         registry.registerHelper(FileContent.NAME,             new FileContent());
         registry.registerHelper(FileExists.NAME,              new FileExists());
-
-        // TODO: remove the next 4 functions starting from release 2.0.0 or more as they are deprecated. Use the camel case names (above) instead
-        registry.registerHelper(Environment.User.NAME,        new Environment.User());
-        registry.registerHelper(Environment.Variable.NAME,    new Environment.Variable());
-
-        registry.registerHelper(File.Content.NAME,            new File.Content());
-        registry.registerHelper(File.Exists.NAME,             new File.Exists());
     }
 
     /**
@@ -718,116 +704,6 @@ class Functions {
             java.io.File f = new java.io.File(path);
             logger.trace(TEMPLATE, "Checking whether file '{}' ('{}') exists", path, f.getAbsolutePath());
             return Boolean.toString(f.exists() && f.isFile());
-        }
-    }
-
-    // TODO: remove this method as per release 2.0.0 or more
-    /**
-     * The class enclosing environment related functions.
-     */
-    @Deprecated(since="1.1.0", forRemoval=true) //The dotted name is deprecated and will be removed in future releases. Use the camel case name instead. See the user manual for more."
-    public static class Environment {
-        /**
-         * The prefix to use for functions within this class.
-         */
-        public static final String NAME = "environment";
-
-        /**
-         * This function returns the value of the environment variable with the given name, if any.
-         */
-        public static class Variable extends AbstractFunction {
-            /**
-             * The name to use for this function.
-             */
-            public static final String NAME = Environment.NAME.concat(".").concat("variable");
-
-            /**
-             * This method returns the value of the environment variable with the given name, if any.
-             * 
-             * @param name the name of the requested variable. If {@code null} an empty string is returned.
-             * 
-             * @return the value of the environment variable with the given name, if any.
-             */ 
-            public String apply(String name) {
-                return new EnvironmentVariable().apply(name);
-            }
-        }
-
-        /**
-         * This function returns the current user name. The input parameter is ignored.
-         */
-        public static class User extends AbstractFunction {
-            /**
-             * The name to use for this function.
-             */
-            public static final String NAME = Environment.NAME.concat(".").concat("user");
-
-            /**
-             * This method returns the current user name.
-             * 
-             * @param name ignored.
-             * 
-             * @return the current user name.
-             */ 
-            public String apply(String name) {
-                return new EnvironmentUser().apply(name);
-            }
-        }
-    }
-
-    /**
-     * The class enclosing file related functions.
-     */
-    // TODO: remove this method as per release 2.0.0 or more
-    @Deprecated(since="1.1.0", forRemoval=true) //The dotted name is deprecated and will be removed in future releases. Use the camel case name instead. See the user manual for more."
-    public static class File {
-        /**
-         * The prefix to use for functions within this class.
-         */
-        public static final String NAME = "file";
-
-        /**
-         * This function returns the content of the given file, if any.
-         */
-        public static class Content extends AbstractFunction {
-            /**
-             * The name to use for this function.
-             */
-            public static final String NAME = File.NAME.concat(".").concat("content");
-
-            /**
-             * This method returns the content of the given file, if any.
-             * 
-             * @param path the path of file to get the content from. When a relative path is used it's resolved
-             * against the system current directory (configured directories are ignored here).
-             * 
-             * @return the content of the given file, if any.
-             */ 
-            public String apply(String path) {
-                return new FileContent().apply(path);
-            }
-        }
-
-        /**
-         * This function returns {@code true} if the file with the given name exists, {@code false} otherwise.
-         */
-        public static class Exists extends AbstractFunction {
-            /**
-             * The name to use for this function.
-             */
-            public static final String NAME = File.NAME.concat(".").concat("exists");
-
-            /**
-             * This method returns {@code true} if the file with the given name exists, {@code false} otherwise.
-             * 
-             * @param path the path of file to check. When a relative path is used it's resolved against the system
-             * current directory (configured directories are ignored here).
-             * 
-             * @return {@code true} if the file with the given name exists, {@code false} otherwise.
-             */ 
-            public String apply(String path) {
-                return new FileExists().apply(path);
-            }
         }
     }
 }
