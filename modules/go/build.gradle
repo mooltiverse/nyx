@@ -303,7 +303,7 @@ subprojects {
 
             logger.info('Listing Go module '+modulereference+' to https://pkg.go.dev/')
             exec {
-                //ignoreExitValue = true // TODO: remove this flag once the command is known to work
+                ignoreExitValue = true // sometimes response is too slow to come and results in a timeout error
                 environment 'GOPROXY', 'proxy.golang.org'
                 workingDir = projectDir
                 logging.captureStandardOutput LogLevel.INFO
@@ -330,6 +330,11 @@ subprojects {
     task functionalTest(group: 'verification', description: 'Runs the functional tests') {
         // Task dependencies
         dependsOn goFunctionalTest
+    }
+
+    task publish(group: 'publishing', description: 'Publishes artifacts') {
+        // Task dependencies
+        dependsOn goPublish
     }
 
     /*------------------------------------------------------------------------------
@@ -396,6 +401,11 @@ task functionalTest() {
 task testReport(group: 'verification', description: 'Produces Go test coverage reports') {
     // Task dependencies
     dependsOn subprojects*.goTest
+}
+
+task publish(group: 'publishing', description: 'Publishes artifacts') {
+    // Task dependencies
+    dependsOn subprojects*.publish
 }
 
 tasks.check.finalizedBy tasks.testReport

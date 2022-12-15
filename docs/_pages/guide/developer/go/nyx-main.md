@@ -5,10 +5,7 @@ toc: true
 permalink: /guide/developer/go/nyx-main/
 ---
 
-TODO: Double check on the information in this page before release
-{: .notice--warning}
-
-You can use the main Nyx library to embed it into your project and use all or some of its features. The `github.com/mooltiverse/nyx/modules/go/nyx` package brings the [`Nyx`](TODO: set the link to the API docs on https://pkg.go.dev/){:target="_blank"} structure that is the entry point for all the available commands and features.
+You can use the main Nyx library to embed it into your project and use all or some of its features. The `github.com/mooltiverse/nyx/modules/go/nyx` package brings the [`Nyx`](https://pkg.go.dev/github.com/mooltiverse/nyx/modules/go/nyx){:target="_blank"} structure that is the entry point for all the available commands and features.
 
 ## Get the library
 
@@ -20,11 +17,11 @@ go get github.com/mooltiverse/nyx/modules/go/nyx
 
 ## API docs
 
-Thanks to [Go docs](https://pkg.go.dev/) you can browse the API docs at [this URL](TODO: set the link to the API docs on https://pkg.go.dev/).
+Thanks to [Go docs](https://pkg.go.dev/) you can browse the API docs at [this URL](https://pkg.go.dev/github.com/mooltiverse/nyx/modules/go/nyx).
 
 ## Using the library
 
-Using the library is simple. You just need to create a [`Nyx`](TODO: set the link to the API docs on https://pkg.go.dev/){:target="_blank"} instance and run the `publish` command. It takes just one line of code, like:
+Using the library is simple. You just need to create a [`Nyx`](https://pkg.go.dev/github.com/mooltiverse/nyx/modules/go/nyx){:target="_blank"} instance and run the `publish` command. It takes just one line of code, like:
 
 ```go
 package main
@@ -39,7 +36,7 @@ func main() {
 
 In this example Nyx loads the configuration from the files it optionally finds at their [default locations]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}#evaluation-order) and runs the `publish` command, which also implies `infer`, `mark` and `make`.
 
-You can get more control on the behavior by injecting some configuration programmatically and running tasks one by one. You can also start Nyx in a specific directory, get access to the internal Git [repository](TODO: set the link to the API docs on https://pkg.go.dev/){:target="_blank"} object and even the internal [state](TODO: set the link to the API docs on https://pkg.go.dev/){:target="_blank"}, like in this example:
+You can get more control on the behavior by injecting some configuration programmatically and running tasks one by one. You can also start Nyx in a specific directory, get access to the internal Git [repository](https://pkg.go.dev/github.com/mooltiverse/nyx/modules/go/nyx){:target="_blank"} object and even the internal [state](https://pkg.go.dev/github.com/mooltiverse/nyx/modules/go/nyx){:target="_blank"}, like in this example:
 
 ```go
 package main
