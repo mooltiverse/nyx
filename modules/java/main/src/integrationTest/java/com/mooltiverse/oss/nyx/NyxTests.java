@@ -35,7 +35,7 @@ import com.mooltiverse.oss.nyx.entities.git.Identity;
 import com.mooltiverse.oss.nyx.entities.git.Message;
 import com.mooltiverse.oss.nyx.entities.git.Tag;
 import com.mooltiverse.oss.nyx.git.Repository;
-import com.mooltiverse.oss.nyx.git.Scenario;
+import com.mooltiverse.oss.nyx.git.tools.Scenario;
 import com.mooltiverse.oss.nyx.io.DataAccessException;
 import com.mooltiverse.oss.nyx.io.FileMapper;
 import com.mooltiverse.oss.nyx.state.State;

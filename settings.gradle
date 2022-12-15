@@ -13,12 +13,16 @@ plugins {
 rootProject.name = 'nyx'
 
 include 'docs'
+include 'modules:docker'
+include 'modules:go'
+include 'modules:go:errors'
+include 'modules:go:utils'
+include 'modules:go:version'
+include 'modules:go:nyx'
 include 'modules:java'
 include 'modules:java:version'
 include 'modules:java:main'
 include 'modules:java:gradle'
-// re-enable the Docker module once we have something to build and publish
-//include 'modules:docker'
 
 /*------------------------------------------------------------------------------
   Extension configurations
@@ -28,7 +32,176 @@ nyx {
   // - the Conventional Commits convention
   // - the 'mainline' and 'internal' release types (that we override here)
   preset         = 'simple'
-  stateFile      = 'build/.nyx-state.json'
+  releaseAssets {
+    "nyx-darwin-amd64" {
+      fileName = "nyx-darwin-amd64"
+      description = "Nyx {{version}} Binary for Darwin-amd64"
+      type = "application/octet-stream"
+      path = "modules/go/nyx/build/bin/nyx-darwin-amd64"
+    }
+    "nyx-darwin-arm64" {
+      fileName = "nyx-darwin-arm64"
+      description = "Nyx {{version}} Binary for Darwin-arm64"
+      type = "application/octet-stream"
+      path = "modules/go/nyx/build/bin/nyx-darwin-arm64"
+    }
+    "nyx-dragonfly-amd64" {
+      fileName = "nyx-dragonfly-amd64"
+      description = "Nyx {{version}} Binary for Dragonfly-amd64"
+      type = "application/octet-stream"
+      path = "modules/go/nyx/build/bin/nyx-dragonfly-amd64"
+    }
+    "nyx-freebsd-386" {
+      fileName = "nyx-freebsd-386"
+      description = "Nyx {{version}} Binary for FreeBSD-386"
+      type = "application/octet-stream"
+      path = "modules/go/nyx/build/bin/nyx-freebsd-386"
+    }
+    "nyx-freebsd-amd64" {
+      fileName = "nyx-freebsd-amd64"
+      description = "Nyx {{version}} Binary for FreeBSD-amd64"
+      type = "application/octet-stream"
+      path = "modules/go/nyx/build/bin/nyx-freebsd-amd64"
+    }
+    "nyx-freebsd-arm" {
+      fileName = "nyx-freebsd-arm"
+      description = "Nyx {{version}} Binary for FreeBSD-arm"
+      type = "application/octet-stream"
+      path = "modules/go/nyx/build/bin/nyx-freebsd-arm"
+    }
+    "nyx-linux-386" {
+      fileName = "nyx-linux-386"
+      description = "Nyx {{version}} Binary for Linux-386"
+      type = "application/octet-stream"
+      path = "modules/go/nyx/build/bin/nyx-linux-386"
+    }
+    "nyx-linux-amd64" {
+      fileName = "nyx-linux-amd64"
+      description = "Nyx {{version}} Binary for Linux-amd64"
+      type = "application/octet-stream"
+      path = "modules/go/nyx/build/bin/nyx-linux-amd64"
+    }
+    "nyx-linux-arm" {
+      fileName = "nyx-linux-arm"
+      description = "Nyx {{version}} Binary for Linux-arm"
+      type = "application/octet-stream"
+      path = "modules/go/nyx/build/bin/nyx-linux-arm"
+    }
+    "nyx-linux-arm64" {
+      fileName = "nyx-linux-arm64"
+      description = "Nyx {{version}} Binary for Linux-arm64"
+      type = "application/octet-stream"
+      path = "modules/go/nyx/build/bin/nyx-linux-arm64"
+    }
+    "nyx-linux-mips" {
+      fileName = "nyx-linux-mips"
+      description = "Nyx {{version}} Binary for Linux-mips"
+      type = "application/octet-stream"
+      path = "modules/go/nyx/build/bin/nyx-linux-mips"
+    }
+    "nyx-linux-mips64" {
+      fileName = "nyx-linux-mips64"
+      description = "Nyx {{version}} Binary for Linux-mips64"
+      type = "application/octet-stream"
+      path = "modules/go/nyx/build/bin/nyx-linux-mips64"
+    }
+    "nyx-linux-mips64le" {
+      fileName = "nyx-linux-mips64le"
+      description = "Nyx {{version}} Binary for Linux-mips64le"
+      type = "application/octet-stream"
+      path = "modules/go/nyx/build/bin/nyx-linux-mips64le"
+    }
+    "nyx-linux-mipsle" {
+      fileName = "nyx-linux-mipsle"
+      description = "Nyx {{version}} Binary for Linux-mipsle"
+      type = "application/octet-stream"
+      path = "modules/go/nyx/build/bin/nyx-linux-mipsle"
+    }
+    "nyx-linux-ppc64" {
+      fileName = "nyx-linux-ppc64"
+      description = "Nyx {{version}} Binary for Linux-ppc64"
+      type = "application/octet-stream"
+      path = "modules/go/nyx/build/bin/nyx-linux-ppc64"
+    }
+    "nyx-linux-ppc64le" {
+      fileName = "nyx-linux-ppc64le"
+      description = "Nyx {{version}} Binary for Linux-ppc64le"
+      type = "application/octet-stream"
+      path = "modules/go/nyx/build/bin/nyx-linux-ppc64le"
+    }
+    "nyx-netbsd-386" {
+      fileName = "nyx-netbsd-386"
+      description = "Nyx {{version}} Binary for NetBSD-386"
+      type = "application/octet-stream"
+      path = "modules/go/nyx/build/bin/nyx-netbsd-386"
+    }
+    "nyx-netbsd-amd64" {
+      fileName = "nyx-netbsd-amd64"
+      description = "Nyx {{version}} Binary for NetBSD-amd64"
+      type = "application/octet-stream"
+      path = "modules/go/nyx/build/bin/nyx-netbsd-amd64"
+    }
+    "nyx-netbsd-arm" {
+      fileName = "nyx-netbsd-arm"
+      description = "Nyx {{version}} Binary for NetBSD-arm"
+      type = "application/octet-stream"
+      path = "modules/go/nyx/build/bin/nyx-netbsd-arm"
+    }
+    "nyx-openbsd-386" {
+      fileName = "nyx-openbsd-386"
+      description = "Nyx {{version}} Binary for OpenBSD-386"
+      type = "application/octet-stream"
+      path = "modules/go/nyx/build/bin/nyx-openbsd-386"
+    }
+    "nyx-openbsd-amd64" {
+      fileName = "nyx-openbsd-amd64"
+      description = "Nyx {{version}} Binary for OpenBSD-amd64"
+      type = "application/octet-stream"
+      path = "modules/go/nyx/build/bin/nyx-openbsd-amd64"
+    }
+    "nyx-openbsd-arm" {
+      fileName = "nyx-openbsd-arm"
+      description = "Nyx {{version}} Binary for OpenBSD-arm"
+      type = "application/octet-stream"
+      path = "modules/go/nyx/build/bin/nyx-openbsd-arm"
+    }
+    "nyx-openbsd-arm64" {
+      fileName = "nyx-openbsd-arm64"
+      description = "Nyx {{version}} Binary for OpenBSD-arm64"
+      type = "application/octet-stream"
+      path = "modules/go/nyx/build/bin/nyx-openbsd-arm64"
+    }
+    "nyx-solaris-amd64" {
+      fileName = "nyx-solaris-amd64"
+      description = "Nyx {{version}} Binary for Solaris-amd64"
+      type = "application/octet-stream"
+      path = "modules/go/nyx/build/bin/nyx-solaris-amd64"
+    }
+    "nyx-windows-386.exe" {
+      fileName = "nyx-windows-386.exe"
+      description = "Nyx {{version}} Binary for Windows-386"
+      type = "application/octet-stream"
+      path = "modules/go/nyx/build/bin/nyx-windows-386.exe"
+    }
+    "nyx-windows-amd64.exe" {
+      fileName = "nyx-windows-amd64.exe"
+      description = "Nyx {{version}} Binary for Windows-amd64"
+      type = "application/octet-stream"
+      path = "modules/go/nyx/build/bin/nyx-windows-amd64.exe"
+    }
+    "nyx-windows-arm.exe" {
+      fileName = "nyx-windows-arm.exe"
+      description = "Nyx {{version}} Binary for Windows-arm"
+      type = "application/octet-stream"
+      path = "modules/go/nyx/build/bin/nyx-windows-arm.exe"
+    }
+    "nyx-windows-arm64.exe" {
+      fileName = "nyx-windows-arm64.exe"
+      description = "Nyx {{version}} Binary for Windows-arm64"
+      type = "application/octet-stream"
+      path = "modules/go/nyx/build/bin/nyx-windows-arm64.exe"
+    }
+  }
   changelog {
     path = 'build/CHANGELOG.md'
     template = 'config/CHANGELOG.tpl'
@@ -178,4 +351,5 @@ nyx {
       }
     }
   }
+  stateFile = 'build/.nyx-state.json'
 }

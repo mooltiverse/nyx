@@ -48,9 +48,6 @@ public abstract class PublishTask extends CoreTask {
     public PublishTask(NyxExtension extension) {
         super(extension);
         setDescription(DESCRIPTION);
-
-        // Configure dependencies
-        dependsOn(MarkTask.NAME);
     }
 
     /**

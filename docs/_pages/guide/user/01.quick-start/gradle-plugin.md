@@ -44,7 +44,7 @@ In this example the only configuration option is `preset`, which uses the [*simp
 [Presets]({{ site.baseurl }}{% link _pages/guide/user/04.configuration-presets/index.md %}) are a very powerful way of configuring Nyx with streamlined settings without dealing with configuration details. While Nyx gives you control on every detail with lots of configuration options, presets are the most effective way to avoid that complexity.
 {: .notice--success}
 
-See [here]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#configure-the-plugin) or the [configuration reference]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/index.md %}) for more informations on how to configure the Gradle plugin. There are also several [examples]({{ site.baseurl }}/examples/) available.
+See [here]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#configure-the-plugin) or the [configuration reference]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/index.md %}) for more information on how to configure the Gradle plugin. There are also several [examples]({{ site.baseurl }}/examples/) available.
 {: .notice--info}
 
 Now run `gradle tasks` to make sure the above works. You should see the *Release tasks* section showing the new tasks along with a summary description of their intents:
@@ -61,7 +61,7 @@ $ gradle tasks
 Release tasks
 -------------
 nyxClean - Deletes local release artifacts and reverts the release process to its initial state
-nyxInfer - Collects informations from the local Git repository to generate the new version and plan the release actions
+nyxInfer - Collects information from the local Git repository to generate the new version and plan the release actions
 nyxMake - Builds the configured local release artifacts
 nyxMark - Marks the release by tagging and committing the repository
 nyxPublish - Publishes the new release to remote services and emits notifications
@@ -87,7 +87,7 @@ nyx {
 
 This preset:
 
-* configures the [Conventional Commits](https://www.conventionalcommits.org/) convention so that Nyx knows how to infer release informations from the Git commit history
+* configures the [Conventional Commits](https://www.conventionalcommits.org/) convention so that Nyx knows how to infer release information from the Git commit history
 * configures two [release types]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}): the *mainline* for official releases managed through the main branch (`main` or `master`) and another one for any other branch for *internal* use
 
 Other features like the changelog generation, custom version identifiers, environment variables constraints, complex branching strategies etc are not enabled.
@@ -110,7 +110,7 @@ nyx {
       type = 'GITHUB'
       options {
         // The authentication token is read from the GH_TOKEN environment variable.
-        AUTHENTICATION_TOKEN = '{% raw %}{{#environment.variable}}GH_TOKEN{{/environment.variable}}{% endraw %}'
+        AUTHENTICATION_TOKEN = '{% raw %}{{#environmentVariable}}GH_TOKEN{{/environmentVariable}}{% endraw %}'
         REPOSITORY_NAME = ... // your project name here
         REPOSITORY_OWNER = ... // your user or organization name here
       }
@@ -121,7 +121,7 @@ nyx {
 
 As you can see, we are still using the *simple* preset as a baseline, just extending it with new options. You can see the [configuration reference]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/index.md %}) to see how powerful the configuration mechanism is but for now let's stay simple.
 
-You've just been introduced to an extremely powerful feature in Nyx: [templates]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}). In this case the `environment.variable` is used to read the value of the `GH_TOKEN` variable at runtime but many others are available. By using templates your configuration can be dynamic and adaptive.
+You've just been introduced to an extremely powerful feature in Nyx: [templates]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}). In this case the `environmentVariable` is used to read the value of the `GH_TOKEN` variable at runtime but many others are available. By using templates your configuration can be dynamic and adaptive.
 {: .notice--success}
 
 ## Running the tasks
@@ -148,7 +148,7 @@ The other *core tasks* (*nyxInfer*, *nyxMake*, *nyxMark*, *nyxPublish*), instead
 Please note that when using the *settings plugin* (applied in the `settings.gradle` file), using the `nyxInfer` task is not needed (unless your Git repository changes throughout the build process) as it is executed during the project initialization phase.
 {: .notice--info}
 
-*nyxInfer* scans the commit history according to the configured commit message convention ([Conventional Commits](https://www.conventionalcommits.org/) as it's defined in the [*simple* preset]({{ site.baseurl }}{% link _pages/guide/user/04.configuration-presets/simple.md %})) and determines the project [version](https://docs.gradle.org/current/userguide/writing_build_scripts.html#sec:standard_project_properties), which may be a new one if there are significant and unreleased commits, or the latest (already tagged) if there are no new significant commits. *nyxInfer* also instantiates and makes available the [state]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/index.md %}) object, that you can inspect to get lots of useful informations for any custom purpose.
+*nyxInfer* scans the commit history according to the configured commit message convention ([Conventional Commits](https://www.conventionalcommits.org/) as it's defined in the [*simple* preset]({{ site.baseurl }}{% link _pages/guide/user/04.configuration-presets/simple.md %})) and determines the project [version](https://docs.gradle.org/current/userguide/writing_build_scripts.html#sec:standard_project_properties), which may be a new one if there are significant and unreleased commits, or the latest (already tagged) if there are no new significant commits. *nyxInfer* also instantiates and makes available the [state]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/index.md %}) object, that you can inspect to get lots of useful information for any custom purpose.
 
 The way the new version is generated depends on what has been found in the release scope and the configuration. You can find a detailed description on how this process works in the following sections but generally speaking, the version is determined by *bumping* an indentifier against the *previous version* and (optionally) adding some extra qualifiers. Determining the identifiers to bump depends on the configured commit message convention and the release type. Nyx covers all use cases about version bumping, from manual override to linear increments up to *pre-releases* using the *collapsed* versioning. You may wish to start with some [examples]({{ site.baseurl }}{% link _posts/2020-01-01-git-history-examples.md %}) on the various cases.
 
@@ -185,7 +185,7 @@ nyx {
 }
 ```
 
-Finally, *nyxPublish* is when the new release is published. As we've already seen, for this to actually happen you need to configure Nyx so it knows which services to use for your own project. Let's recall the example of using [GitHub](https://github.com/)
+Finally, *nyxPublish* is when the new release is published. As we've already seen, for this to actually happen you need to configure Nyx so it knows which services to use for your own project. Let's recall the example of using [GitHub](https://github.com/):
 
 ```groovy
 nyx {
@@ -205,7 +205,7 @@ nyx {
       type = 'GITHUB'
       options {
         // The authentication token is read from the GH_TOKEN environment variable.
-        AUTHENTICATION_TOKEN = '{% raw %}{{#environment.variable}}GH_TOKEN{{/environment.variable}}{% endraw %}'
+        AUTHENTICATION_TOKEN = '{% raw %}{{#environmentVariable}}GH_TOKEN{{/environmentVariable}}{% endraw %}'
         REPOSITORY_NAME = ... // your project name here
         REPOSITORY_OWNER = ... // your user or organization name here
       }
@@ -228,7 +228,7 @@ nyx {
     items {
       mainline {
         ...
-        description = '{% raw %}{{#file.content}}build/CHANGELOG.md{{/file.content}}{% endraw %}'
+        description = '{% raw %}{{#fileContent}}build/CHANGELOG.md{{/fileContent}}{% endraw %}'
         gitCommit = 'true'
       }
     }
@@ -238,7 +238,7 @@ nyx {
       type = 'GITHUB'
       options {
         // The authentication token is read from the GH_TOKEN environment variable.
-        AUTHENTICATION_TOKEN = '{% raw %}{{#environment.variable}}GH_TOKEN{{/environment.variable}}{% endraw %}'
+        AUTHENTICATION_TOKEN = '{% raw %}{{#environmentVariable}}GH_TOKEN{{/environmentVariable}}{% endraw %}'
         REPOSITORY_NAME = ... // your project name here
         REPOSITORY_OWNER = ... // your user or organization name here
       }
@@ -276,7 +276,7 @@ We have seen:
 * the configuration means and the power of [presets]({{ site.baseurl }}{% link _pages/guide/user/04.configuration-presets/index.md %})
 * how [templates]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}) can be used to make configurations even more flexible and dynamic
 * the tasks provided by Nyx and their features, like inspecting the commit history to detect new versions, generate changelogs, commit, tag and push Git changes, publish releases
-* how to fetch Nyx internal informations from the [state]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/index.md %}) object
+* how to fetch Nyx internal information from the [state]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/index.md %}) object
 
 This is just a first introduction on the features provided by the tool! Jump to the [introduction]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/index.md %}) if you want to know more!
 

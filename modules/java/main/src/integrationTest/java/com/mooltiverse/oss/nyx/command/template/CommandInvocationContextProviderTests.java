@@ -24,9 +24,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import com.mooltiverse.oss.nyx.command.Command;
 import com.mooltiverse.oss.nyx.command.Commands;
-import com.mooltiverse.oss.nyx.git.Scenario;
-import com.mooltiverse.oss.nyx.git.Script;
-import com.mooltiverse.oss.nyx.git.Workbench;
+import com.mooltiverse.oss.nyx.git.tools.Scenario;
+import com.mooltiverse.oss.nyx.git.tools.Script;
+import com.mooltiverse.oss.nyx.git.tools.Workbench;
 
 /**
  * Test the TemplateInvocationContextProvider and its internal classes.
@@ -41,6 +41,8 @@ public class CommandInvocationContextProviderTests {
         @DisplayName("Baseline yields to different script instances when all parameters are annotated")
         void baselineTest1(@Baseline(Scenario.INITIAL_COMMIT) Script script1, @Baseline(Scenario.INITIAL_COMMIT) Script script2)
             throws Exception {
+            script1.getWorkingDirectory().deleteOnExit();
+            script2.getWorkingDirectory().deleteOnExit();
             assertNotEquals(script1.hashCode(), script2.hashCode());
         }
 
@@ -49,6 +51,8 @@ public class CommandInvocationContextProviderTests {
         @Baseline(Scenario.INITIAL_COMMIT)
         void baselineTest2(@Baseline(Scenario.INITIAL_COMMIT) Script script1, @Baseline(Scenario.INITIAL_COMMIT) Script script2)
             throws Exception {
+            script1.getWorkingDirectory().deleteOnExit();
+            script2.getWorkingDirectory().deleteOnExit();
             assertNotEquals(script1.hashCode(), script2.hashCode());
         }
 
@@ -57,6 +61,8 @@ public class CommandInvocationContextProviderTests {
         @Baseline(Scenario.INITIAL_COMMIT)
         void baselineTest3(@Baseline(Scenario.INITIAL_COMMIT) Script script1, Script script2)
             throws Exception {
+            script1.getWorkingDirectory().deleteOnExit();
+            script2.getWorkingDirectory().deleteOnExit();
             assertNotEquals(script1.hashCode(), script2.hashCode());
         }
 
@@ -65,6 +71,8 @@ public class CommandInvocationContextProviderTests {
         @Baseline(Scenario.INITIAL_COMMIT)
         void baselineTest4(Script script1, Script script2)
             throws Exception {
+            script1.getWorkingDirectory().deleteOnExit();
+            script2.getWorkingDirectory().deleteOnExit();
             assertEquals(script1.hashCode(), script2.hashCode());
         }
     }
@@ -77,6 +85,8 @@ public class CommandInvocationContextProviderTests {
         @DisplayName("Baseline yields to different script instances when all parameters are annotated")
         void baselineTest1(@Baseline(Scenario.INITIAL_COMMIT) Script script1, @Baseline(Scenario.INITIAL_COMMIT) Script script2)
             throws Exception {
+            script1.getWorkingDirectory().deleteOnExit();
+            script2.getWorkingDirectory().deleteOnExit();
             assertNotEquals(script1.hashCode(), script2.hashCode());
         }
 
@@ -86,6 +96,8 @@ public class CommandInvocationContextProviderTests {
         @Baseline(Scenario.INITIAL_COMMIT)
         void baselineTest2(@Baseline(Scenario.INITIAL_COMMIT) Script script1, @Baseline(Scenario.INITIAL_COMMIT) Script script2)
             throws Exception {
+            script1.getWorkingDirectory().deleteOnExit();
+            script2.getWorkingDirectory().deleteOnExit();
             assertNotEquals(script1.hashCode(), script2.hashCode());
         }
 
@@ -95,6 +107,8 @@ public class CommandInvocationContextProviderTests {
         @Baseline(Scenario.INITIAL_COMMIT)
         void baselineTest3(@Baseline(Scenario.INITIAL_COMMIT) Script script1, Script script2)
             throws Exception {
+            script1.getWorkingDirectory().deleteOnExit();
+            script2.getWorkingDirectory().deleteOnExit();
             assertNotEquals(script1.hashCode(), script2.hashCode());
         }
 
@@ -104,6 +118,8 @@ public class CommandInvocationContextProviderTests {
         @Baseline(Scenario.INITIAL_COMMIT)
         void baselineTest4(Script script1, Script script2)
             throws Exception {
+            script1.getWorkingDirectory().deleteOnExit();
+            script2.getWorkingDirectory().deleteOnExit();
             assertEquals(script1.hashCode(), script2.hashCode());
         }
     }
@@ -116,6 +132,8 @@ public class CommandInvocationContextProviderTests {
         @DisplayName("Baseline yields to different workbench instances when all parameters are annotated")
         void baselineTest1(@Baseline(Scenario.INITIAL_COMMIT) Workbench workbench1, @Baseline(Scenario.INITIAL_COMMIT) Workbench workbench2)
             throws Exception {
+            workbench1.getWorkingDirectory().deleteOnExit();
+            workbench2.getWorkingDirectory().deleteOnExit();
             assertNotEquals(workbench1.hashCode(), workbench2.hashCode());
         }
 
@@ -124,6 +142,8 @@ public class CommandInvocationContextProviderTests {
         @Baseline(Scenario.INITIAL_COMMIT)
         void baselineTest2(@Baseline(Scenario.INITIAL_COMMIT) Workbench workbench1, @Baseline(Scenario.INITIAL_COMMIT) Workbench workbench2)
             throws Exception {
+            workbench1.getWorkingDirectory().deleteOnExit();
+            workbench2.getWorkingDirectory().deleteOnExit();
             assertNotEquals(workbench1.hashCode(), workbench2.hashCode());
         }
 
@@ -132,6 +152,8 @@ public class CommandInvocationContextProviderTests {
         @Baseline(Scenario.INITIAL_COMMIT)
         void baselineTest3(@Baseline(Scenario.INITIAL_COMMIT) Workbench workbench1, Workbench workbench2)
             throws Exception {
+            workbench1.getWorkingDirectory().deleteOnExit();
+            workbench2.getWorkingDirectory().deleteOnExit();
             assertNotEquals(workbench1.hashCode(), workbench2.hashCode());
         }
 
@@ -140,6 +162,8 @@ public class CommandInvocationContextProviderTests {
         @Baseline(Scenario.INITIAL_COMMIT)
         void baselineTest4(Workbench workbench1, Workbench workbench2)
             throws Exception {
+            workbench1.getWorkingDirectory().deleteOnExit();
+            workbench2.getWorkingDirectory().deleteOnExit();
             assertEquals(workbench1.hashCode(), workbench2.hashCode());
         }
     }
@@ -152,6 +176,8 @@ public class CommandInvocationContextProviderTests {
         @DisplayName("Baseline yields to different workbench instances when all parameters are annotated")
         void baselineTest1(@Baseline(Scenario.INITIAL_COMMIT) Workbench workbench1, @Baseline(Scenario.INITIAL_COMMIT) Workbench workbench2)
             throws Exception {
+            workbench1.getWorkingDirectory().deleteOnExit();
+            workbench2.getWorkingDirectory().deleteOnExit();
             assertNotEquals(workbench1.hashCode(), workbench2.hashCode());
         }
 
@@ -161,6 +187,8 @@ public class CommandInvocationContextProviderTests {
         @Baseline(Scenario.INITIAL_COMMIT)
         void baselineTest2(@Baseline(Scenario.INITIAL_COMMIT) Workbench workbench1, @Baseline(Scenario.INITIAL_COMMIT) Workbench workbench2)
             throws Exception {
+            workbench1.getWorkingDirectory().deleteOnExit();
+            workbench2.getWorkingDirectory().deleteOnExit();
             assertNotEquals(workbench1.hashCode(), workbench2.hashCode());
         }
 
@@ -170,6 +198,8 @@ public class CommandInvocationContextProviderTests {
         @Baseline(Scenario.INITIAL_COMMIT)
         void baselineTest3(@Baseline(Scenario.INITIAL_COMMIT) Workbench workbench1, Workbench workbench2)
             throws Exception {
+            workbench1.getWorkingDirectory().deleteOnExit();
+            workbench2.getWorkingDirectory().deleteOnExit();
             assertNotEquals(workbench1.hashCode(), workbench2.hashCode());
         }
 
@@ -179,6 +209,8 @@ public class CommandInvocationContextProviderTests {
         @Baseline(Scenario.INITIAL_COMMIT)
         void baselineTest4(Workbench workbench1, Workbench workbench2)
             throws Exception {
+            workbench1.getWorkingDirectory().deleteOnExit();
+            workbench2.getWorkingDirectory().deleteOnExit();
             assertEquals(workbench1.hashCode(), workbench2.hashCode());
         }
     }

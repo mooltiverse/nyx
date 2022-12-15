@@ -15,87 +15,78 @@
  */
 package com.mooltiverse.oss.nyx.services.github;
 
+import java.io.IOException;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import org.kohsuke.github.GHAsset;
+import org.kohsuke.github.GHRelease;
+import org.kohsuke.github.PagedIterable;
+
 import com.mooltiverse.oss.nyx.entities.Attachment;
+import com.mooltiverse.oss.nyx.io.TransportException;
 import com.mooltiverse.oss.nyx.services.Release;
 
 /**
  * A GitHub release.
  */
-public class GitHubRelease extends GitHubEntity implements Release {
+public class GitHubRelease extends GitHubEntity  implements Release {
+    /**
+     * The release title
+     */
+    private final String title;
+
+    /**
+     * The release tag
+     */
+    private final String tag;
+
     /**
      * The internal set of release assets
      */
-    private Set<Attachment> assets = null;
+    private final Set<Attachment> assets;
 
     /**
-     * Creates the user object modelled by the given attributes.
+     * Creates the user object modelled by the given reference.
      * 
-     * @param api the reference to the API used to communicate with the remote end. Can't be {@code null}
-     * @param attributes the map of attributes for this object. Can't be {@code null}
+     * @param release the reference to the backing object. Can't be {@code null}
      * 
-     * @throws NullPointerException if the given attributes map is {@code null}
-     * @throws IllegalArgumentException if the map of attributes is empty
+     * @throws NullPointerException if the given reference is {@code null}
+     * @throws TransportException if the given reference can't be read for some reasons
      */
-    GitHubRelease(API api, Map<String, Object> attributes) {
-        super(api, attributes);
+    GitHubRelease(GHRelease release)
+        throws TransportException {
+        super(release);
+        Objects.requireNonNull(release, "The release reference cannot be null");
+        this.title = release.getName();
+        this.tag = release.getTagName();
+        this.assets = parseAssets(release);
     }
 
     /**
-     * Creates the user object modelled by the given attributes.
+     * Parse the GitHub release assets and returns them as a set of attachments.
      * 
-     * @param api the reference to the API used to communicate with the remote end. Can't be {@code null}
-     * @param attributes the map of attributes for this object. Can't be {@code null}
-     * @param assets the set of assets attached to this release. It may be {@code null}
+     * @param release the reference to the backing object. Can't be {@code null}
      * 
-     * @throws NullPointerException if the given attributes map is {@code null}
-     * @throws IllegalArgumentException if the map of attributes is empty
+     * @return the set of attachments parsed from the release assets.
+     * 
+     * @throws TransportException if the given reference can't be read for some reasons
      */
-    GitHubRelease(API api, Map<String, Object> attributes, Set<Attachment> assets) {
-        super(api, attributes);
-        this.assets = assets;
-    }
+    private static Set<Attachment> parseAssets(GHRelease release)
+        throws TransportException {
+        Set<Attachment> assets = new HashSet<Attachment>();
 
-    /**
-     * Adds the given asset to the internal set of assets. The internal set of assets is initialized
-     * in case it was still {@code null}.
-     * 
-     * @param asset the asset to add
-     * 
-     * @return this same object reference
-     */
-    public GitHubRelease addAsset(Attachment asset) {
-        if (!Objects.isNull(asset)) {
-            if (Objects.isNull(assets)) {
-                assets = new HashSet<Attachment>();
+        try {
+            for (GHAsset ghAsset: release.listAssets().toList()) {
+                assets.add(new Attachment(ghAsset.getName(), ghAsset.getLabel(), ghAsset.getContentType(), ghAsset.getBrowserDownloadUrl()));
             }
-            assets.add(asset);
         }
-            
-        return this;
-    }
+        catch (IOException ioe) {
+            throw new TransportException(String.format("Unable to retrieve the release asset"), ioe);
+        }
 
-    /**
-     * Adds the given assets to the internal set of assets. The internal set of assets is initialized
-     * in case it was still {@code null}.
-     * 
-     * @param assets the assets to add
-     * 
-     * @return this same object reference
-     */
-    public GitHubRelease addAssets(Set<Attachment> assets) {
-        if (!Objects.isNull(assets)) {
-            if (Objects.isNull(this.assets)) {
-                this.assets = new HashSet<Attachment>();
-            }
-            this.assets.addAll(assets);
-        }
-            
-        return this;
+        return assets;
     }
 
     /**
@@ -111,7 +102,7 @@ public class GitHubRelease extends GitHubEntity implements Release {
      */
     @Override
     public String getTitle() {
-        return getAttributes().get("name").toString();
+        return title;
     }
 
     /**
@@ -119,6 +110,6 @@ public class GitHubRelease extends GitHubEntity implements Release {
      */
     @Override
     public String getTag() {
-        return getAttributes().get("tag_name").toString();
+        return tag;
     }
 }

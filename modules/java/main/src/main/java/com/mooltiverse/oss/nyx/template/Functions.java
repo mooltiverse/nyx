@@ -56,6 +56,13 @@ class Functions {
             put(TimestampISO8601.NAME,        new TimestampISO8601());
             put(TimestampYYYYMMDDHHMMSS.NAME, new TimestampYYYYMMDDHHMMSS());
 
+            put(EnvironmentUser.NAME,         new EnvironmentUser());
+            put(EnvironmentVariable.NAME,     new EnvironmentVariable());
+
+            put(FileContent.NAME,             new FileContent());
+            put(FileExists.NAME,              new FileExists());
+
+            // TODO: remove the next 4 functions starting from release 2.0.0 or more as they are deprecated. Use the camel case names (above) instead
             put(Environment.User.NAME,        new Environment.User());
             put(Environment.Variable.NAME,    new Environment.Variable());
 
@@ -95,6 +102,13 @@ class Functions {
         registry.registerHelper(TimestampISO8601.NAME,        new TimestampISO8601());
         registry.registerHelper(TimestampYYYYMMDDHHMMSS.NAME, new TimestampYYYYMMDDHHMMSS());
 
+        registry.registerHelper(EnvironmentUser.NAME,         new EnvironmentUser());
+        registry.registerHelper(EnvironmentVariable.NAME,     new EnvironmentVariable());
+
+        registry.registerHelper(FileContent.NAME,             new FileContent());
+        registry.registerHelper(FileExists.NAME,              new FileExists());
+
+        // TODO: remove the next 4 functions starting from release 2.0.0 or more as they are deprecated. Use the camel case names (above) instead
         registry.registerHelper(Environment.User.NAME,        new Environment.User());
         registry.registerHelper(Environment.Variable.NAME,    new Environment.Variable());
 
@@ -596,8 +610,122 @@ class Functions {
     }
 
     /**
+     * This function returns the value of the environment variable with the given name, if any.
+     */
+    public static class EnvironmentVariable extends AbstractFunction {
+        /**
+         * The name to use for this function.
+         */
+        public static final String NAME = "environmentVariable";
+
+        /**
+         * This method returns the value of the environment variable with the given name, if any.
+         * 
+         * @param name the name of the requested variable. If {@code null} an empty string is returned.
+         * 
+         * @return the value of the environment variable with the given name, if any.
+         */ 
+        public String apply(String name) {
+            if (Objects.isNull(name))
+                return "";
+
+            String res = System.getenv(name);
+            return Objects.isNull(res) ? "" : res;
+        }
+    }
+
+    /**
+     * This function returns the current user name. The input parameter is ignored.
+     */
+    public static class EnvironmentUser extends AbstractFunction {
+        /**
+         * The name to use for this function.
+         */
+        public static final String NAME = "environmentUser";
+
+        /**
+         * This method returns the current user name.
+         * 
+         * @param name ignored.
+         * 
+         * @return the current user name.
+         */ 
+        public String apply(String name) {
+            return System.getProperty("user.name");
+        }
+    }
+
+    /**
+     * This function returns the content of the given file, if any.
+     */
+    public static class FileContent extends AbstractFunction {
+        /**
+         * The name to use for this function.
+         */
+        public static final String NAME = "fileContent";
+
+        /**
+         * This method returns the content of the given file, if any.
+         * 
+         * @param path the path of file to get the content from. When a relative path is used it's resolved
+         * against the system current directory (configured directories are ignored here).
+         * 
+         * @return the content of the given file, if any.
+         */ 
+        public String apply(String path) {
+            if (Objects.isNull(path))
+                return "";
+            
+            try {
+                java.io.File f = new java.io.File(path);
+                logger.trace(TEMPLATE, "Trying to read contents from file '{}' ('{}')", path, f.getAbsolutePath());
+                FileReader reader = new FileReader(f);
+                StringWriter writer = new StringWriter();
+                reader.transferTo(writer);
+                reader.close();
+                writer.flush();
+                return writer.toString();
+            }
+            catch (IOException ioe) {
+                logger.error(TEMPLATE, "Unable to read from file '{}': '{}'", path, ioe.getMessage());
+                logger.trace(TEMPLATE, "Unable to read from file", ioe);
+                return "";
+            }
+        }
+    }
+
+    /**
+     * This function returns {@code true} if the file with the given name exists, {@code false} otherwise.
+     */
+    public static class FileExists extends AbstractFunction {
+        /**
+         * The name to use for this function.
+         */
+        public static final String NAME = "fileExists";
+
+        /**
+         * This method returns {@code true} if the file with the given name exists, {@code false} otherwise.
+         * 
+         * @param path the path of file to check. When a relative path is used it's resolved against the system
+         * current directory (configured directories are ignored here).
+         * 
+         * @return {@code true} if the file with the given name exists, {@code false} otherwise.
+         */ 
+        public String apply(String path) {
+            if (Objects.isNull(path))
+                return Boolean.FALSE.toString();
+
+            java.io.File f = new java.io.File(path);
+            logger.trace(TEMPLATE, "Checking whether file '{}' ('{}') exists", path, f.getAbsolutePath());
+            return Boolean.toString(f.exists() && f.isFile());
+        }
+    }
+
+    // TODO: remove this method as per release 2.0.0 or more
+    /**
      * The class enclosing environment related functions.
      */
+    @Deprecated(since="1.1.0", forRemoval=true) //The dotted name is deprecated and will be removed in future releases. Use the camel case name instead. See the user manual for more."
     public static class Environment {
         /**
          * The prefix to use for functions within this class.
@@ -621,11 +749,7 @@ class Functions {
              * @return the value of the environment variable with the given name, if any.
              */ 
             public String apply(String name) {
-                if (Objects.isNull(name))
-                    return "";
-
-                String res = System.getenv(name);
-                return Objects.isNull(res) ? "" : res;
+                return new EnvironmentVariable().apply(name);
             }
         }
 
@@ -646,7 +770,7 @@ class Functions {
              * @return the current user name.
              */ 
             public String apply(String name) {
-                return System.getProperty("user.name");
+                return new EnvironmentUser().apply(name);
             }
         }
     }
@@ -654,6 +778,8 @@ class Functions {
     /**
      * The class enclosing file related functions.
      */
+    // TODO: remove this method as per release 2.0.0 or more
+    @Deprecated(since="1.1.0", forRemoval=true) //The dotted name is deprecated and will be removed in future releases. Use the camel case name instead. See the user manual for more."
     public static class File {
         /**
          * The prefix to use for functions within this class.
@@ -678,24 +804,7 @@ class Functions {
              * @return the content of the given file, if any.
              */ 
             public String apply(String path) {
-                if (Objects.isNull(path))
-                    return "";
-                
-                try {
-                    java.io.File f = new java.io.File(path);
-                    logger.trace(TEMPLATE, "Trying to read contents from file '{}' ('{}')", path, f.getAbsolutePath());
-                    FileReader reader = new FileReader(f);
-                    StringWriter writer = new StringWriter();
-                    reader.transferTo(writer);
-                    reader.close();
-                    writer.flush();
-                    return writer.toString();
-                }
-                catch (IOException ioe) {
-                    logger.error(TEMPLATE, "Unable to read from file '{}': '{}'", path, ioe.getMessage());
-                    logger.trace(TEMPLATE, "Unable to read from file", ioe);
-                    return "";
-                }
+                return new FileContent().apply(path);
             }
         }
 
@@ -717,12 +826,7 @@ class Functions {
              * @return {@code true} if the file with the given name exists, {@code false} otherwise.
              */ 
             public String apply(String path) {
-                if (Objects.isNull(path))
-                    return Boolean.FALSE.toString();
-
-                java.io.File f = new java.io.File(path);
-                logger.trace(TEMPLATE, "Checking whether file '{}' ('{}') exists", path, f.getAbsolutePath());
-                return Boolean.toString(f.exists() && f.isFile());
+                return new FileExists().apply(path);
             }
         }
     }

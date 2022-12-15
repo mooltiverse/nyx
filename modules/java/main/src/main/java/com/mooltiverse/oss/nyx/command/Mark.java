@@ -24,7 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mooltiverse.oss.nyx.ReleaseException;
-import com.mooltiverse.oss.nyx.configuration.Defaults;
+import com.mooltiverse.oss.nyx.entities.Defaults;
 import com.mooltiverse.oss.nyx.entities.IllegalPropertyException;
 import com.mooltiverse.oss.nyx.entities.git.Commit;
 import com.mooltiverse.oss.nyx.git.GitException;
@@ -355,7 +355,7 @@ public class Mark extends AbstractCommand {
             }
             else logger.warn(COMMAND, "No release type available. Nothing to release.");
         }
-        else logger.info(COMMAND, "No version change detected. Nothing to release.");
+        else logger.debug(COMMAND, "No version change detected. Nothing to release.");
 
         storeStatusInternalAttributes();
         

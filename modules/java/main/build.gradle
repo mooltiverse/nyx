@@ -15,11 +15,12 @@ description = 'The Nyx main library and entry point.'
   Configurations
 */
 configurations {
-  // Create a new configuration used by other projects to use classes from this project.
+  // Create new configurations used by other projects to use classes from this project.
   // In particular we need the Git scripts (in the test source set) to be available for other projects.
   // This is actually not trivial and we had to follow directions from this post:
   // - https://softnoise.wordpress.com/2014/09/07/gradle-sub-project-test-dependencies-in-multi-project-builds/
   integrationTestExport.extendsFrom(integrationTestRuntimeOnly)
+  functionalTestExport.extendsFrom(functionalTestRuntimeOnly)
 }
 
 /*------------------------------------------------------------------------------
@@ -35,14 +36,16 @@ dependencies {
   implementation        'com.fasterxml.jackson.core:jackson-annotations:2.13.4'                    // Jackson JSON library (https://github.com/FasterXML/jackson)
   implementation        'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.13.4'          // Jackson YAML library (https://github.com/FasterXML/jackson-dataformats-text/tree/master/yaml)
   implementation        'com.github.jknack:handlebars:4.3.0'                                       // Handlebars library (https://github.com/jknack/handlebars.java)
+  implementation        'org.kohsuke:github-api:1.313'                                             // GitHub API client Java library (https://github-api.kohsuke.org/)
 
   // The SLF4J framework that prints all test output to System err
   // See http://www.slf4j.org/apidocs/org/slf4j/impl/SimpleLogger.html for the system properties available to change verbosity levels
   testImplementation            'org.slf4j:slf4j-simple:2.0.2'
   integrationTestImplementation 'org.slf4j:slf4j-simple:2.0.2'
 
-  // See the 'integrationTestExport' about this
+  // See the 'integrationTestExport' and 'functionalTestExport' about this
   integrationTestExport  sourceSets.integrationTest.output
+  functionalTestExport   sourceSets.functionalTest.output
 }
 
 test {
@@ -64,6 +67,17 @@ integrationTest {
   // properties defined
   systemProperty 'gitHubTestUserToken', findProperty("gitHubTestUserToken")
   systemProperty 'gitLabTestUserToken', findProperty("gitLabTestUserToken")
+}
+
+functionalTest {
+  // Pass the credentials to test suites as per https://github.com/mooltiverse/nyx/blob/master/CONTRIBUTING.md#contributing-code
+  // Suggestion is to set the $GRADLE_USER_HOME environment variable and create a gradle.properties therein, with these
+  // properties defined
+  systemProperty 'gitHubTestUserToken', findProperty("gitHubTestUserToken")
+  systemProperty 'gitLabTestUserToken', findProperty("gitLabTestUserToken")
+  
+  // Pass the 'quickTests' property (if declared by user, i.e. running ''./gradlew -PquickTests=true') to reduce the number of tests
+  systemProperty 'quickTests', findProperty("quickTests")
 }
 
 /*------------------------------------------------------------------------------

@@ -41,8 +41,8 @@ import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
 import com.mooltiverse.oss.nyx.entities.Changelog.Release;
 import com.mooltiverse.oss.nyx.git.GitException;
-import com.mooltiverse.oss.nyx.git.Scenario;
-import com.mooltiverse.oss.nyx.git.Script;
+import com.mooltiverse.oss.nyx.git.tools.Scenario;
+import com.mooltiverse.oss.nyx.git.tools.Script;
 
 @DisplayName("Make")
 public class MakeTestTemplates {
@@ -93,8 +93,9 @@ public class MakeTestTemplates {
         @TestTemplate
         @DisplayName("Make()")
         @Baseline(Scenario.FROM_SCRATCH)
-        void constructorTest(@CommandSelector(Commands.MAKE) CommandProxy command)
+        void constructorTest(@CommandSelector(Commands.MAKE) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             assertNotNull(command);
         }
     }
@@ -109,8 +110,9 @@ public class MakeTestTemplates {
         @TestTemplate
         @DisplayName("Make.state()")
         @Baseline(Scenario.FROM_SCRATCH)
-        void stateTest(@CommandSelector(Commands.MAKE) CommandProxy command)
+        void stateTest(@CommandSelector(Commands.MAKE) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             assertNotNull(command.state());
         }
     }
@@ -128,6 +130,7 @@ public class MakeTestTemplates {
         @Baseline(Scenario.FROM_SCRATCH)
         void isUpToDateTest(@CommandSelector(Commands.MAKE) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             assertFalse(command.isUpToDate());
 
             // running in an empty repository, with no commits, throws an exception
@@ -160,8 +163,10 @@ public class MakeTestTemplates {
         @Baseline(Scenario.ONE_BRANCH_SHORT_CONVENTIONAL_COMMITS)
         void isUpToDateTestWithMissingChangelogFile(@CommandSelector(Commands.MAKE) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             // first create the temporary directory and the abstract destination file
             File destinationDir = Files.createTempDirectory("nyx-test-make-test-").toFile();
+            destinationDir.deleteOnExit();
             File changelogFile = new File(destinationDir, "CHANGELOG.md");
 
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
@@ -208,8 +213,10 @@ public class MakeTestTemplates {
         @Baseline(Scenario.ONE_BRANCH_SHORT_CONVENTIONAL_COMMITS)
         void idempotencyWithCommitMessageConvention(@CommandSelector(Commands.MAKE) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             // first create the temporary directory and the abstract destination file
             File destinationDir = Files.createTempDirectory("nyx-test-make-test-").toFile();
+            destinationDir.deleteOnExit();
             File changelogFile = new File(destinationDir, "CHANGELOG.md");
 
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
@@ -258,7 +265,7 @@ public class MakeTestTemplates {
                 command.run();
                 assertTrue(command.isUpToDate());
 
-                // chech that some values have changed
+                // check that some values have changed
                 assertNull(command.state().getChangelog()); // the internal changelog is now null because there is no new version and the changelog hasn't been recreated
                 assertNotEquals(newVersion, command.state().getNewVersion());
                 assertNotEquals(version, command.state().getVersion());
@@ -298,8 +305,10 @@ public class MakeTestTemplates {
         @Baseline(Scenario.ONE_BRANCH_SHORT_CONVENTIONAL_COMMITS)
         void idempotencyWithoutCommitMessageConvention(@CommandSelector(Commands.MAKE) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             // first create the temporary directory and the abstract destination file
             File destinationDir = Files.createTempDirectory("nyx-test-make-test-").toFile();
+            destinationDir.deleteOnExit();
             File changelogFile = new File(destinationDir, "CHANGELOG.md");
 
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
@@ -334,7 +343,7 @@ public class MakeTestTemplates {
                 command.run();
                 assertTrue(command.isUpToDate());
 
-                // chech that some values have changed
+                // check that some values have changed
                 assertNull(command.state().getChangelog()); // the internal changelog is still null because there is no new version and the changelog hasn't been recreated
                 assertEquals(newVersion, command.state().getNewVersion());
                 assertNotEquals(version, command.state().getVersion());
@@ -372,8 +381,10 @@ public class MakeTestTemplates {
         @Baseline(Scenario.ONE_BRANCH_SHORT_CONVENTIONAL_COMMITS)
         void idempotencyInDirtyRepository(@CommandSelector(Commands.MAKE) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             // first create the temporary directory and the abstract destination file
             File destinationDir = Files.createTempDirectory("nyx-test-make-test-").toFile();
+            destinationDir.deleteOnExit();
             File changelogFile = new File(destinationDir, "CHANGELOG.md");
 
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
@@ -425,7 +436,7 @@ public class MakeTestTemplates {
                 command.run();
                 assertTrue(command.isUpToDate());
 
-                // chech that some values have changed
+                // check that some values have changed
                 assertNull(command.state().getChangelog()); // the internal changelog is now null because there is no new version and the changelog hasn't been recreated
                 assertNotEquals(newVersion, command.state().getNewVersion());
                 assertNotEquals(version, command.state().getVersion());
@@ -465,8 +476,9 @@ public class MakeTestTemplates {
         @TestTemplate
         @DisplayName("Make.run() with no destination file > yield to no changelog because there is no destination file")
         @Baseline(Scenario.ONE_BRANCH_SHORT_CONVENTIONAL_COMMITS)
-        void runTestWithNoDestinationFile(@CommandSelector(Commands.MAKE) CommandProxy command)
+        void runTestWithNoDestinationFile(@CommandSelector(Commands.MAKE) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             // add the conventional commits convention
             configurationLayerMock.setCommitMessageConventions(
@@ -487,10 +499,12 @@ public class MakeTestTemplates {
         @TestTemplate
         @DisplayName("Make.run() with no commit message convention > yield to no changelog because no new version is generated")
         @Baseline(Scenario.ONE_BRANCH_SHORT_CONVENTIONAL_COMMITS)
-        void runTestWithNoCommitConvention(@CommandSelector(Commands.MAKE) CommandProxy command)
+        void runTestWithNoCommitConvention(@CommandSelector(Commands.MAKE) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             // first create the temporary directory and the abstract destination file
             File destinationDir = Files.createTempDirectory("nyx-test-make-test-").toFile();
+            destinationDir.deleteOnExit();
             File changelogFile = new File(destinationDir, "CHANGELOG.md");
 
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
@@ -512,10 +526,12 @@ public class MakeTestTemplates {
         @TestTemplate
         @DisplayName("Make.run() with conventional commit message convention and without sections > yield to changelog where sections are commit types")
         @Baseline(Scenario.ONE_BRANCH_SHORT_CONVENTIONAL_COMMITS)
-        void runTestWithConventionalCommitsConventionAndWithoutSections(@CommandSelector(Commands.MAKE) CommandProxy command)
+        void runTestWithConventionalCommitsConventionAndWithoutSections(@CommandSelector(Commands.MAKE) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             // first create the temporary directory and the abstract destination file
             File destinationDir = Files.createTempDirectory("nyx-test-make-test-").toFile();
+            destinationDir.deleteOnExit();
             File changelogFile = new File(destinationDir, "CHANGELOG.md");
 
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
@@ -567,10 +583,12 @@ public class MakeTestTemplates {
         @TestTemplate
         @DisplayName("Make.run() with conventional commit message convention and with custom sections > yield to changelog where sections have been remapped")
         @Baseline(Scenario.ONE_BRANCH_SHORT_CONVENTIONAL_COMMITS)
-        void runTestWithConventionalCommitsConventionAndWithCustomSections(@CommandSelector(Commands.MAKE) CommandProxy command)
+        void runTestWithConventionalCommitsConventionAndWithCustomSections(@CommandSelector(Commands.MAKE) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             // first create the temporary directory and the abstract destination file
             File destinationDir = Files.createTempDirectory("nyx-test-make-test-").toFile();
+            destinationDir.deleteOnExit();
             File changelogFile = new File(destinationDir, "CHANGELOG.md");
 
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
@@ -627,10 +645,12 @@ public class MakeTestTemplates {
         @TestTemplate
         @DisplayName("Make.run() with conventional commit message convention and with custom sections and substitutions > yield to changelog where sections have been remapped and substitutions applied")
         @Baseline(Scenario.ONE_BRANCH_SHORT_CONVENTIONAL_COMMITS)
-        void runTestWithConventionalCommitsConventionAndWithCustomSectionsAndSubstitutions(@CommandSelector(Commands.MAKE) CommandProxy command)
+        void runTestWithConventionalCommitsConventionAndWithCustomSectionsAndSubstitutions(@CommandSelector(Commands.MAKE) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             // first create the temporary directory and the abstract destination file
             File destinationDir = Files.createTempDirectory("nyx-test-make-test-").toFile();
+            destinationDir.deleteOnExit();
             File changelogFile = new File(destinationDir, "CHANGELOG.md");
 
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
@@ -693,10 +713,12 @@ public class MakeTestTemplates {
         @TestTemplate
         @DisplayName("Make.run() with custom template > yield to custom changelog")
         @Baseline(Scenario.ONE_BRANCH_SHORT_CONVENTIONAL_COMMITS)
-        void runTestWithCustomTemplate(@CommandSelector(Commands.MAKE) CommandProxy command)
+        void runTestWithCustomTemplate(@CommandSelector(Commands.MAKE) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             // first create the temporary directory and the abstract destination file
             File destinationDir = Files.createTempDirectory("nyx-test-make-test-").toFile();
+            destinationDir.deleteOnExit();
             // create the custom template, with simple strings used as markers
             File templateFile = new File(destinationDir, "template.tpl");
             writeFile(templateFile, "# This is a custom changelog\n            {{#releases}}\n            ## {{name}} ({{date}})\n            {{/releases}}\n");

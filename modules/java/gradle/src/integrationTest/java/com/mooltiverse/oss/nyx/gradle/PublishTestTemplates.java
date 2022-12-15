@@ -29,8 +29,8 @@ import com.mooltiverse.oss.nyx.command.Commands;
 import com.mooltiverse.oss.nyx.command.template.Baseline;
 import com.mooltiverse.oss.nyx.command.template.CommandProxy;
 import com.mooltiverse.oss.nyx.command.template.CommandSelector;
-import com.mooltiverse.oss.nyx.git.Scenario;
-import com.mooltiverse.oss.nyx.git.Script;
+import com.mooltiverse.oss.nyx.git.tools.Scenario;
+import com.mooltiverse.oss.nyx.git.tools.Script;
 import com.mooltiverse.oss.nyx.gradle.template.GradleCommandInvocationContextProvider;
 import com.mooltiverse.oss.nyx.state.State;
 
@@ -82,7 +82,8 @@ public class PublishTestTemplates {
         @DisplayName("PublishTask.getActions().execute() doesn't throw exceptions without a valid Git repository in custom directory")
         @Baseline(Scenario.INITIAL_COMMIT)
         void noExceptionOnExecuteWithValidGitRepositoryInCustomDirectoryTest(Project project, @CommandSelector(Commands.PUBLISH) CommandProxy command, Script script)
-        throws Exception {
+            throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             //make sure the Gradle working directory and the Git repository directory are not the same
             assertFalse(project.getBuildDir().equals(script.getWorkingDirectory()));
             assertFalse(project.getBuildDir().getAbsolutePath().equals(script.getWorkingDirectory().getAbsolutePath()));
@@ -96,16 +97,18 @@ public class PublishTestTemplates {
         @TestTemplate
         @DisplayName("PublishTask.getActions().execute() doesn't throw exceptions without a valid Git repository in working directory")
         @Baseline(Scenario.INITIAL_COMMIT)
-        void noExceptionOnExecuteWithValidGitRepositoryInWorkingDirectoryTest(@CommandSelector(Commands.PUBLISH) CommandProxy command)
+        void noExceptionOnExecuteWithValidGitRepositoryInWorkingDirectoryTest(@CommandSelector(Commands.PUBLISH) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             assertDoesNotThrow(() -> command.run());
         }
 
         @TestTemplate
         @DisplayName("PublishTask.getActions().execute() feeds the nyxState extra property")
         @Baseline(Scenario.INITIAL_COMMIT)
-        void nyxStateExtraProperty(Project project, @CommandSelector(Commands.PUBLISH) CommandProxy command)
+        void nyxStateExtraProperty(Project project, @CommandSelector(Commands.PUBLISH) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             assertNull(project.findProperty("nyxState"));
 
             // after running the command the extra property must be available

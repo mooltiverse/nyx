@@ -48,7 +48,7 @@ import com.mooltiverse.oss.nyx.state.State;
  */
 public class Nyx {
     /**
-     * The private logger instance
+     * The private logger instance.
      */
     private static final Logger logger = LoggerFactory.getLogger(Nyx.class);
 
@@ -237,11 +237,11 @@ public class Nyx {
         throws DataAccessException, IllegalPropertyException, GitException {
         logger.debug(MAIN, "Looking up command instance '{}' from cache", command);
         if (commands.containsKey(command)) {
-            logger.debug(MAIN, "Command instance '{}' found in cache cache", command);
+            logger.debug(MAIN, "Command instance '{}' found in cache", command);
             return commands.get(command);
         }
         else {
-            logger.debug(MAIN, "No command instance '{}' found in cache cache", command);
+            logger.debug(MAIN, "No command instance '{}' found in cache", command);
         }
         
         Command res = newCommandInstance(command);
@@ -277,8 +277,12 @@ public class Nyx {
 
             // optionally save the state file
             if (saveState && !Objects.isNull(configuration().getStateFile())) {
+                File stateFile = new File(configuration().getStateFile());
+                // if the file path is relative make it relative to the configured directory
+                if (!stateFile.isAbsolute())
+                    stateFile = new File(configuration().getDirectory(), configuration().getStateFile());
                 logger.debug(MAIN, "Storing the state to '{}'", configuration().getStateFile());
-                FileMapper.save(configuration().getStateFile(), state());
+                FileMapper.save(stateFile.getAbsolutePath(), state());
                 logger.debug(MAIN, "State stored to to '{}'", configuration().getStateFile());
             }
         }

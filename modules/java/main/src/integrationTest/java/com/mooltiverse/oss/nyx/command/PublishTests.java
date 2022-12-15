@@ -32,13 +32,13 @@ import com.mooltiverse.oss.nyx.entities.Attachment;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
 import com.mooltiverse.oss.nyx.entities.GitRemoteConfiguration;
+import com.mooltiverse.oss.nyx.entities.Provider;
 import com.mooltiverse.oss.nyx.entities.ReleaseType;
 import com.mooltiverse.oss.nyx.entities.ReleaseTypes;
 import com.mooltiverse.oss.nyx.entities.ServiceConfiguration;
-import com.mooltiverse.oss.nyx.git.Scenario;
-import com.mooltiverse.oss.nyx.git.Script;
+import com.mooltiverse.oss.nyx.git.tools.Scenario;
+import com.mooltiverse.oss.nyx.git.tools.Script;
 import com.mooltiverse.oss.nyx.git.util.RandomUtil;
-import com.mooltiverse.oss.nyx.services.Provider;
 import com.mooltiverse.oss.nyx.services.github.GitHub;
 import com.mooltiverse.oss.nyx.services.github.GitHubRepository;
 import com.mooltiverse.oss.nyx.services.github.GitHubRelease;
@@ -63,15 +63,18 @@ public class PublishTests {
             GitHubUser user = gitHub.getAuthenticatedUser();
             GitHubRepository gitHubRepository = gitHub.createGitRepository(randomID, "Test repository "+randomID, false, true);
 
-            Path assetPath1 = Files.createTempFile("nyx-test-githun-release-test-", ".txt");
+            Path assetPath1 = Files.createTempFile("nyx-test-github-release-test-", ".txt");
+            assetPath1.toFile().deleteOnExit();
             Files.write(assetPath1, "content1".getBytes());
             Path assetPath2 = Files.createTempFile("nyx-test-github-release-test-", ".bin");
+            assetPath2.toFile().deleteOnExit();
             Files.write(assetPath2, "content2".getBytes());
 
             // if we clone too quickly next calls may fail
-            Thread.sleep(2000);
+            Thread.sleep(4000);
 
             Script script = Scenario.ONE_BRANCH_SHORT.applyOnClone(gitHubRepository.getHTTPURL(), System.getProperty("gitHubTestUserToken"), "");
+            script.getWorkingDirectory().deleteOnExit();
             script.push(System.getProperty("gitHubTestUserToken"), "");
 
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
@@ -144,7 +147,7 @@ public class PublishTests {
                 assertTrue(asset.getFileName().equals("asset1.txt") || asset.getFileName().equals("asset2.bin"));
                 assertTrue(asset.getDescription().equals("Text asset") || asset.getDescription().equals("Binary asset"));
                 assertTrue(asset.getType().equals("text/plain") || asset.getType().equals("application/octet-stream"));
-                assertTrue(asset.getPath().startsWith("https://api.github.com/repos/"));
+                //assertTrue(asset.getPath().startsWith("https://api.github.com/repos/")); // The path may start with https://api.github.com/repos/ or https://github.com/
             }
         
             // if we delete too quickly we often get a 404 from the server so let's wait a short while
@@ -164,7 +167,7 @@ public class PublishTests {
                 assertTrue(asset.getFileName().equals("asset1.txt") || asset.getFileName().equals("asset2.bin"));
                 assertTrue(asset.getDescription().equals("Text asset") || asset.getDescription().equals("Binary asset"));
                 assertTrue(asset.getType().equals("text/plain") || asset.getType().equals("application/octet-stream"));
-                assertTrue(asset.getPath().startsWith("https://api.github.com/repos/"));
+                //assertTrue(asset.getPath().startsWith("https://api.github.com/repos/")); // The path may start with https://api.github.com/repos/ or https://github.com/
             }
 
             // now delete it
@@ -181,15 +184,18 @@ public class PublishTests {
             GitHubUser user = gitHub.getAuthenticatedUser();
             GitHubRepository gitHubRepository = gitHub.createGitRepository(randomID, "Test repository "+randomID, false, true);
 
-            Path assetPath1 = Files.createTempFile("nyx-test-githun-release-test-", ".txt");
+            Path assetPath1 = Files.createTempFile("nyx-test-github-release-test-", ".txt");
+            assetPath1.toFile().deleteOnExit();
             Files.write(assetPath1, "content1".getBytes());
             Path assetPath2 = Files.createTempFile("nyx-test-github-release-test-", ".bin");
+            assetPath2.toFile().deleteOnExit();
             Files.write(assetPath2, "content2".getBytes());
 
             // if we clone too quickly next calls may fail
-            Thread.sleep(2000);
+            Thread.sleep(4000);
 
             Script script = Scenario.ONE_BRANCH_SHORT.applyOnClone(gitHubRepository.getHTTPURL(), System.getProperty("gitHubTestUserToken"), "");
+            script.getWorkingDirectory().deleteOnExit();
             script.push(System.getProperty("gitHubTestUserToken"), "");
 
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
@@ -263,7 +269,7 @@ public class PublishTests {
                 assertEquals("asset1.txt", asset.getFileName());
                 assertEquals("Text asset", asset.getDescription());
                 assertEquals("text/plain", asset.getType());
-                assertTrue(asset.getPath().startsWith("https://api.github.com/repos/"));
+                //assertTrue(asset.getPath().startsWith("https://api.github.com/repos/")); // The path may start with https://api.github.com/repos/ or https://github.com/
             }
         
             // if we delete too quickly we often get a 404 from the server so let's wait a short while
@@ -283,7 +289,7 @@ public class PublishTests {
                 assertEquals("asset1.txt", asset.getFileName());
                 assertEquals("Text asset", asset.getDescription());
                 assertEquals("text/plain", asset.getType());
-                assertTrue(asset.getPath().startsWith("https://api.github.com/repos/"));
+                //assertTrue(asset.getPath().startsWith("https://api.github.com/repos/")); // The path may start with https://api.github.com/repos/ or https://github.com/
             }
 
             // now delete it
@@ -301,16 +307,19 @@ public class PublishTests {
             GitLabRepository gitLabRepository = gitLab.createGitRepository(randomID, "Test repository "+randomID, false, true);
 
             Path assetPath1 = Files.createTempFile("nyx-test-gitlab-release-test-", ".txt");
+            assetPath1.toFile().deleteOnExit();
             Files.write(assetPath1, "content1".getBytes());
             Path assetPath2 = Files.createTempFile("nyx-test-gitlab-release-test-", ".bin");
+            assetPath2.toFile().deleteOnExit();
             Files.write(assetPath2, "content2".getBytes());
 
             // if we clone too quickly next calls may fail
-            Thread.sleep(2000);
+            Thread.sleep(4000);
 
             // when a token for user and password authentication for plain Git operations against a GitLab repository,
             // the user is the "PRIVATE-TOKEN" string and the password is the token
             Script script = Scenario.ONE_BRANCH_SHORT.applyOnClone(gitLabRepository.getHTTPURL(), "PRIVATE-TOKEN", System.getProperty("gitLabTestUserToken"));
+            script.getWorkingDirectory().deleteOnExit();
             script.push("PRIVATE-TOKEN", System.getProperty("gitLabTestUserToken"));
 
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
@@ -421,16 +430,19 @@ public class PublishTests {
             GitLabRepository gitLabRepository = gitLab.createGitRepository(randomID, "Test repository "+randomID, false, true);
 
             Path assetPath1 = Files.createTempFile("nyx-test-gitlab-release-test-", ".txt");
+            assetPath1.toFile().deleteOnExit();
             Files.write(assetPath1, "content1".getBytes());
             Path assetPath2 = Files.createTempFile("nyx-test-gitlab-release-test-", ".bin");
+            assetPath2.toFile().deleteOnExit();
             Files.write(assetPath2, "content2".getBytes());
 
             // if we clone too quickly next calls may fail
-            Thread.sleep(2000);
+            Thread.sleep(4000);
 
             // when a token for user and password authentication for plain Git operations against a GitLab repository,
             // the user is the "PRIVATE-TOKEN" string and the password is the token
             Script script = Scenario.ONE_BRANCH_SHORT.applyOnClone(gitLabRepository.getHTTPURL(), "PRIVATE-TOKEN", System.getProperty("gitLabTestUserToken"));
+            script.getWorkingDirectory().deleteOnExit();
             script.push("PRIVATE-TOKEN", System.getProperty("gitLabTestUserToken"));
 
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();

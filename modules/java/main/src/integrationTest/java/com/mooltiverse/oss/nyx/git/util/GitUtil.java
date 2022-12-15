@@ -40,10 +40,8 @@ public class GitUtil {
      * @param marker an optional string that can be used as a marker in the separator, to make
      * it easier to jump to one dumo or the other when the output contains a lot of dumps.
      * If {@code null} a default marker is printed.
-     * @param start prints different characters if this flac is {@code true} or {@code false}
+     * @param start prints different characters if this flag is {@code true} or {@code false}
      * improving readability.
-     * 
-     * @return
      */
     private static void printSeparator(PrintStream out, String marker, boolean start) {
         String ch = start ? ">" : "<";

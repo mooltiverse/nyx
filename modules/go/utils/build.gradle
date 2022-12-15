@@ -1,0 +1,40 @@
+/*------------------------------------------------------------------------------
+  Plugins DSL block
+  https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
+------------------------------------------------------------------------------*/
+plugins {
+}
+
+/*------------------------------------------------------------------------------
+  Local sub-project properties
+------------------------------------------------------------------------------*/
+description = 'The Nyx Go library providing simple utilities used throughout the project.'
+ext { 
+  modulePath = 'github.com/mooltiverse/nyx/modules/go/utils'
+}
+
+/*------------------------------------------------------------------------------
+  Configurations
+------------------------------------------------------------------------------*/
+configurations {
+}
+
+/*------------------------------------------------------------------------------
+  Repositories and dependencies
+  https://docs.gradle.org/current/userguide/dependency_management_for_java_projects.html
+*/
+dependencies {
+}
+
+/*------------------------------------------------------------------------------
+  Additional tasks
+------------------------------------------------------------------------------*/
+task publish(group: 'publishing', description: 'Publishes the module') {
+    // This task is actually empty as it's just needed for task dependency consistency
+
+    dependsOn goPublish
+}
+
+/*------------------------------------------------------------------------------
+  Additional task dependencies
+------------------------------------------------------------------------------*/

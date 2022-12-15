@@ -17,8 +17,6 @@ package com.mooltiverse.oss.nyx.entities;
 
 import java.util.Map;
 
-import com.mooltiverse.oss.nyx.services.Provider;
-
 /**
  * This object models the fields used to configure a generic service.
  */

@@ -25,17 +25,23 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullSource;
 
+import com.mooltiverse.oss.nyx.entities.Provider;
+import com.mooltiverse.oss.nyx.services.github.GitHub;
+import com.mooltiverse.oss.nyx.services.gitlab.GitLab;
+
 @DisplayName("ServiceFactory")
 public class ServiceFactoryTest {
     @Nested
     @DisplayName("ServiceFactory.gitHostingServiceInstance()")
     class GitHostingServiceInstanceTests {
-        @ParameterizedTest(name = "ServiceFactory.gitHostingServiceInstance(''{0}'', Map<String,Object>).getClass() == ''{0}''.getServiceClass()")
+        @ParameterizedTest(name = "ServiceFactory.gitHostingServiceInstance(''{0}'', Map<String,Object>).getClass() == ''{0}''")
         @EnumSource(Provider.class)
         void gitHostingServiceInstance(Provider provider)
             throws Exception {
-            if (provider.equals(Provider.GITHUB) || provider.equals(Provider.GITLAB))
-                assertEquals(provider.getServiceClass(), ServiceFactory.gitHostingServiceInstance(provider, Map.<String,String>of()).getClass());
+            if (provider.equals(Provider.GITHUB))
+                assertEquals(GitHub.class, ServiceFactory.gitHostingServiceInstance(provider, Map.<String,String>of()).getClass());
+            else if (provider.equals(Provider.GITLAB))
+                assertEquals(GitLab.class, ServiceFactory.gitHostingServiceInstance(provider, Map.<String,String>of()).getClass());
             else assertThrows(UnsupportedOperationException.class, () -> ServiceFactory.gitHostingServiceInstance(provider, Map.<String,String>of()));
         }
 
@@ -50,11 +56,15 @@ public class ServiceFactoryTest {
     @Nested
     @DisplayName("ServiceFactory.instance()")
     class InstanceTests {
-        @ParameterizedTest(name = "ServiceFactory.instance(''{0}'', Map<String,Object>).getClass() == ''{0}''.getServiceClass()")
+        @ParameterizedTest(name = "ServiceFactory.instance(''{0}'', Map<String,Object>).getClass() == ''{0}''")
         @EnumSource(Provider.class)
         void instance(Provider provider)
             throws Exception {
-            assertEquals(provider.getServiceClass(), ServiceFactory.instance(provider, Map.<String,String>of()).getClass());
+            if (provider.equals(Provider.GITHUB))
+                assertEquals(GitHub.class, ServiceFactory.instance(provider, Map.<String,String>of()).getClass());
+            else if (provider.equals(Provider.GITLAB))
+                assertEquals(GitLab.class, ServiceFactory.instance(provider, Map.<String,String>of()).getClass());
+            else assertThrows(UnsupportedOperationException.class, () -> ServiceFactory.instance(provider, Map.<String,String>of()));
         }
 
         @ParameterizedTest(name = "ServiceFactory.instance(null, Map<String,Object>).getClass() throws NullPointerException")
@@ -68,12 +78,14 @@ public class ServiceFactoryTest {
     @Nested
     @DisplayName("ServiceFactory.releaseServiceInstance()")
     class ReleaseServiceInstanceTests {
-        @ParameterizedTest(name = "ServiceFactory.releaseServiceInstance(''{0}'', Map<String,Object>).getClass() == ''{0}''.getServiceClass()")
+        @ParameterizedTest(name = "ServiceFactory.releaseServiceInstance(''{0}'', Map<String,Object>).getClass() == ''{0}''")
         @EnumSource(Provider.class)
         void releaseServiceInstance(Provider provider)
             throws Exception {
-            if (provider.equals(Provider.GITHUB) || provider.equals(Provider.GITLAB))
-                assertEquals(provider.getServiceClass(), ServiceFactory.releaseServiceInstance(provider, Map.<String,String>of()).getClass());
+            if (provider.equals(Provider.GITHUB))
+                assertEquals(GitHub.class, ServiceFactory.releaseServiceInstance(provider, Map.<String,String>of()).getClass());
+            else if (provider.equals(Provider.GITLAB))
+                assertEquals(GitLab.class, ServiceFactory.releaseServiceInstance(provider, Map.<String,String>of()).getClass());
             else assertThrows(UnsupportedOperationException.class, () -> ServiceFactory.releaseServiceInstance(provider, Map.<String,String>of()));
         }
 
@@ -88,12 +100,14 @@ public class ServiceFactoryTest {
     @Nested
     @DisplayName("ServiceFactory.userServiceInstance()")
     class UserServiceInstanceTests {
-        @ParameterizedTest(name = "ServiceFactory.userServiceInstance(''{0}'', Map<String,Object>).getClass() == ''{0}''.getServiceClass()")
+        @ParameterizedTest(name = "ServiceFactory.userServiceInstance(''{0}'', Map<String,Object>).getClass() == ''{0}''")
         @EnumSource(Provider.class)
         void userServiceInstance(Provider provider)
             throws Exception {
-            if (provider.equals(Provider.GITHUB) || provider.equals(Provider.GITLAB))
-                assertEquals(provider.getServiceClass(), ServiceFactory.userServiceInstance(provider, Map.<String,String>of()).getClass());
+            if (provider.equals(Provider.GITHUB))
+                assertEquals(GitHub.class, ServiceFactory.userServiceInstance(provider, Map.<String,String>of()).getClass());
+            else if (provider.equals(Provider.GITLAB))
+                assertEquals(GitLab.class, ServiceFactory.userServiceInstance(provider, Map.<String,String>of()).getClass());
             else assertThrows(UnsupportedOperationException.class, () -> ServiceFactory.userServiceInstance(provider, Map.<String,String>of()));
         }
 

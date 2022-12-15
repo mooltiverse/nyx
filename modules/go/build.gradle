@@ -1,0 +1,414 @@
+import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
+
+/*------------------------------------------------------------------------------
+  Plugins DSL block
+  https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
+------------------------------------------------------------------------------*/
+plugins {
+}
+
+/*------------------------------------------------------------------------------
+  Local sub-project properties
+------------------------------------------------------------------------------*/
+description = 'All the Nyx Go artifacts'
+
+/*------------------------------------------------------------------------------
+  This is the configuration for this project and all sub-projects
+------------------------------------------------------------------------------*/
+allprojects {    
+    /*------------------------------------------------------------------------------
+      Plugins DSL block
+      https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
+    ------------------------------------------------------------------------------*/
+    // this shouldn't be required as it's applied in the root build script for all projects
+    // but it seems it's lost here so we redeclare it
+    apply plugin: 'java'                                // See: https://docs.gradle.org/current/userguide/java_plugin.html
+}
+
+/*------------------------------------------------------------------------------
+  This is the configuration for all sub-projects, but not this project
+------------------------------------------------------------------------------*/
+subprojects {
+    // Define the value to use for the GOPATH variable so it's set locally to the project instead of globally
+    def goPath = file(rootProject.buildDir.path+'/go')
+    // Define the full path to the 'godoc' executable, depending on the platform (with or without the '.exe' extension)
+    def goDocExecutable = file(goPath.path+'/bin/godoc'+(DefaultNativePlatform.currentOperatingSystem.isWindows() ? '.exe' : ''))
+
+    /*
+     * Each sub project needs to define the 'modulePath' property with the module path like:
+     *      ext { 
+     *          modulePath = 'github.com/mooltiverse/nyx/modules/go/...'
+     *      }
+     */
+    ext {
+        // The module file
+        modFile = file('go.mod')
+    }
+
+    task goClean(group: 'build', description: 'Cleans Go object files and cached files') {
+        // Declare inputs and outputs of this task
+        inputs.dir(projectDir)
+        outputs.dir(projectDir)
+
+        doLast {
+            logger.info('Cleaning up Go artifacts')
+            exec {
+                logging.captureStandardOutput LogLevel.QUIET
+                logging.captureStandardError  LogLevel.ERROR
+                // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
+                commandLine 'go', 'clean', '-r', '-cache', '-testcache', '-modcache'
+            }
+        }
+    }
+
+    task goModInit(group: 'build', description: 'Initializes the go.mod file unless it aleady exists') {
+        // Run this task only if the module file doesn't exist (which might also be ignored by .gitignore although it shouldn't)
+        // Overwriting this file could be harmless as it could be generated again if it only contains dependencies that can be
+        // automatically inferred from sources but it may cause a loss of information and break the project when it also has
+        // extra directives like 'replace' (like in our case).
+        onlyIf { !modFile.exists() }
+
+        // Declare inputs and outputs of this task
+        inputs.files(fileTree(projectDir).filter { File f ->
+            f.name.endsWith(".go")
+        })
+        outputs.file(modFile)
+
+        doLast {
+            logger.info('Initializing the Go module '+modulePath+' file: '+modFile.path)
+            exec {
+                logging.captureStandardOutput LogLevel.QUIET
+                logging.captureStandardError  LogLevel.ERROR
+                // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
+                commandLine 'go', 'mod', 'init', modulePath
+            }
+        }
+    }
+
+    task goModUpdate(group: 'build', description: 'Updates the go.mod file by adding new dependencies or removing those unnecessary') {
+        // Task dependencies
+        dependsOn goModInit
+
+        // Declare inputs and outputs of this task
+        inputs.files(fileTree(projectDir).filter { File f ->
+            f.name.endsWith(".go")
+        })
+        outputs.file(modFile)
+
+        doLast {
+            logger.info('Updating the Go module '+modulePath+' file: '+modFile.path)
+            exec {
+                logging.captureStandardOutput LogLevel.QUIET
+                logging.captureStandardError  LogLevel.ERROR
+                // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
+                commandLine 'go', 'mod', 'tidy', '-v'
+            }
+        }
+    }
+
+    task goInit(group: 'build', description: 'Initializes the module') {
+        // Task dependencies
+        dependsOn goModInit, goModUpdate
+
+        // Declare inputs and outputs of this task
+        outputs.dir(file(buildDir.path+'/bin'))
+
+        doLast {
+            mkdir file(buildDir.path+'/bin')
+        }
+    }
+
+    task goDocInit(group: 'build', description: 'Initializes the godoc module') {
+        // Declare inputs and outputs of this task
+        outputs.file(goDocExecutable)
+
+        doLast {
+            logger.info('Installing the Godoc module')
+            exec {
+                logging.captureStandardOutput LogLevel.QUIET
+                logging.captureStandardError  LogLevel.ERROR
+                // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
+                commandLine 'go', 'install', 'golang.org/x/tools/cmd/godoc@latest'
+                // by setting the GOPATH explicitly we make sure the tool is installed there
+                environment 'GOPATH', goPath.path
+            }
+        }
+    }
+
+    task goDoc(group: 'build', description: 'Builds the source code documentation using godoc') {
+        // Task dependencies
+        dependsOn goDocInit
+
+        doLast {
+            logger.info('Running Godoc, listening on port 6060')
+            exec {
+                logging.captureStandardOutput LogLevel.QUIET
+                logging.captureStandardError  LogLevel.ERROR
+                commandLine goDocExecutable
+            }
+        }
+    }
+
+    task goTest(group: 'verification', description: 'Runs Go unit tests') {
+        // Task dependencies
+        dependsOn goInit
+
+        // Declare inputs and outputs of this task
+        inputs.files(fileTree(projectDir).filter { File f ->
+            f.name.endsWith(".go") || f.name.endsWith(".mod") || f.name.endsWith(".sum")
+        })
+        outputs.dir(buildDir.path+'/test-results/test/')
+        outputs.dir(buildDir.path+'/reports/tests/test/')
+
+        doLast {
+            // Pass the name of the configuration file examples to tests. These are passed as environment variables.
+            // We use the same files used for the documentation here.
+            def testEnvironmentVariables = [:]
+            testEnvironmentVariables['extendedJSONExampleConfigurationFile']=file("$rootDir/docs/_includes/.nyx-extended.json").absolutePath
+            testEnvironmentVariables['mediumJSONExampleConfigurationFile']=file("$rootDir/docs/_includes/.nyx-medium.json").absolutePath
+            testEnvironmentVariables['simpleJSONExampleConfigurationFile']=file("$rootDir/docs/_includes/.nyx-simple.json").absolutePath
+            testEnvironmentVariables['simplestJSONExampleConfigurationFile']=file("$rootDir/docs/_includes/.nyx-simplest.json").absolutePath
+            testEnvironmentVariables['extendedYAMLExampleConfigurationFile']=file("$rootDir/docs/_includes/.nyx-extended.yaml").absolutePath
+            testEnvironmentVariables['mediumYAMLExampleConfigurationFile']=file("$rootDir/docs/_includes/.nyx-medium.yaml").absolutePath
+            testEnvironmentVariables['simpleYAMLExampleConfigurationFile']=file("$rootDir/docs/_includes/.nyx-simple.yaml").absolutePath
+            testEnvironmentVariables['simplestYAMLExampleConfigurationFile']=file("$rootDir/docs/_includes/.nyx-simplest.yaml").absolutePath
+
+            logger.info('Unit testing Go module '+modulePath)
+            exec {
+                workingDir = projectDir
+                environment += testEnvironmentVariables
+                logging.captureStandardOutput LogLevel.QUIET
+                logging.captureStandardError  LogLevel.ERROR
+                // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
+                // note that with '--tags=unit' we only run tests declared in files with the '+build unit' directive on top
+                commandLine 'go', 'test', '--tags=unit', '-coverpkg=./...', '-coverprofile='+buildDir.path+'/test-results/test/test-coverprofile.out', '-v', './...'
+            }
+
+            logger.info('Rendering test coverage report for Go module '+modulePath)
+            exec {
+                workingDir = projectDir
+                logging.captureStandardOutput LogLevel.QUIET
+                logging.captureStandardError  LogLevel.ERROR
+                // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
+                commandLine 'go', 'tool', 'cover', '-html', buildDir.path+'/test-results/test/test-coverprofile.out', '-o', buildDir.path+'/reports/tests/test/test.html'
+            }
+        }
+    }
+
+    task goIntegrationTest(group: 'verification', description: 'Runs Go integration tests') {
+        // Task dependencies
+        dependsOn goInit
+
+        // Declare inputs and outputs of this task
+        inputs.files(fileTree(projectDir).filter { File f ->
+            f.name.endsWith(".go") || f.name.endsWith(".mod") || f.name.endsWith(".sum")
+        })
+        outputs.dir(buildDir.path+'/test-results/integrationTest/')
+        outputs.dir(buildDir.path+'/reports/tests/integrationTest/')
+
+        doLast {
+            // Pass the credentials to test suites as per https://github.com/mooltiverse/nyx/blob/master/CONTRIBUTING.md#contributing-code
+            // Suggestion is to set the $GRADLE_USER_HOME environment variable and create a gradle.properties therein, with these
+            // properties defined
+            def testEnvironmentVariables = [:]
+            testEnvironmentVariables['gitHubTestUserToken']=findProperty("gitHubTestUserToken")
+            testEnvironmentVariables['gitLabTestUserToken']=findProperty("gitLabTestUserToken")
+
+            logger.info('Integration testing Go module '+modulePath)
+            exec {
+                workingDir = projectDir
+                environment += testEnvironmentVariables
+                logging.captureStandardOutput LogLevel.QUIET
+                logging.captureStandardError  LogLevel.ERROR
+                // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
+                // note that with '--tags=integration' we only run tests declared in files with the '+build integration' directive on top
+                commandLine 'go', 'test', '--tags=integration', '-coverprofile='+buildDir.path+'/test-results/integrationTest/integrationTest-coverprofile.out', '-v', './...'
+            }
+
+            logger.info('Rendering integration test coverage report for Go module '+modulePath)
+            exec {
+                workingDir = projectDir
+                logging.captureStandardOutput LogLevel.QUIET
+                logging.captureStandardError  LogLevel.ERROR
+                // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
+                commandLine 'go', 'tool', 'cover', '-html', buildDir.path+'/test-results/integrationTest/integrationTest-coverprofile.out', '-o', buildDir.path+'/reports/tests/integrationTest/integrationTest.html'
+            }
+        }
+    }
+
+    task goFunctionalTest(group: 'verification', description: 'Runs Go functional tests') {
+        // Task dependencies
+        // we need the binary files to be available for these tests
+        // this builds all the binaries for all platforms but it could be improved by building only the binary for the current platform
+        //      i.e. dependsOn(':modules:go:nyx:goBuild-nyx-linux-amd64')
+        // but in order to do that we need access to the GOOS and GOARCH environment variables, which are not always available
+        dependsOn(':modules:go:nyx:goBuild')
+        
+        // Declare inputs and outputs of this task
+        inputs.files(fileTree(projectDir).filter { File f ->
+            f.name.endsWith(".go") || f.name.endsWith(".mod") || f.name.endsWith(".sum")
+        })
+        outputs.dir(buildDir.path+'/test-results/functionalTest/')
+        outputs.dir(buildDir.path+'/reports/tests/functionalTest/')
+
+        doLast {
+            // Pass the parameters to run functional tests
+            def testEnvironmentVariables = [:]
+            testEnvironmentVariables['nyxBinDir']=file(buildDir.path+'/bin/').absolutePath // the path to the binaries
+            testEnvironmentVariables['quickTests']=findProperty("quickTests") // the flag to narrow the number of tests, added on the command line using the -PquickTests=true option
+            testEnvironmentVariables['gitHubTestUserToken']=findProperty("gitHubTestUserToken")
+            testEnvironmentVariables['gitLabTestUserToken']=findProperty("gitLabTestUserToken")
+
+            logger.info('Functional testing Go module '+modulePath)
+            exec {
+                workingDir = projectDir
+                environment += testEnvironmentVariables
+                logging.captureStandardOutput LogLevel.QUIET
+                logging.captureStandardError  LogLevel.ERROR
+                // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
+                // note that with '--tags=functional' we only run tests declared in files with the '+build functional' directive on top
+                commandLine 'go', 'test', '--tags=functional', '-coverprofile='+buildDir.path+'/test-results/functionalTest/functionalTest-coverprofile.out', '-v', './...'
+            }
+            
+            logger.info('Rendering functional test coverage report for Go module '+modulePath)
+            exec {
+                workingDir = projectDir
+                logging.captureStandardOutput LogLevel.QUIET
+                logging.captureStandardError  LogLevel.ERROR
+                // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
+                commandLine 'go', 'tool', 'cover', '-html', buildDir.path+'/test-results/functionalTest/functionalTest-coverprofile.out', '-o', buildDir.path+'/reports/tests/functionalTest/functionalTest.html'
+            }
+        }
+    }
+
+    task goBuild(group: 'build', description: 'Builds the Go binaries') {
+        // Task dependencies
+        dependsOn goInit
+
+        // This is pretty much a lifecycle task that sub-projects need to add dependencies to
+    }
+
+    task goPublish(group: 'publishing', description: 'Lists the module to https://pkg.go.dev/') {
+        // Task dependencies
+        // nyxMark is required because the tag must already be available on GitHub when we run this task
+        dependsOn goBuild, rootProject.tasks.nyxMark
+
+        // The command only needs to run if a new release has been issued and already tagged by 'nyxMark'
+        // otherwise the 'go list' commands fails because there is no such tagged version to read the go.mod file from
+        onlyIf { rootProject.nyxState.newRelease }
+
+        // See https://go.dev/doc/modules/publishing
+        doLast {
+            def modulereference = modulePath+'@'+version
+
+            logger.info('Listing Go module '+modulereference+' to https://pkg.go.dev/')
+            exec {
+                //ignoreExitValue = true // TODO: remove this flag once the command is known to work
+                environment 'GOPROXY', 'proxy.golang.org'
+                workingDir = projectDir
+                logging.captureStandardOutput LogLevel.INFO
+                logging.captureStandardError  LogLevel.ERROR
+                // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
+                commandLine 'go', 'list', '-m', modulereference
+            }
+        }
+    }
+
+    /*------------------------------------------------------------------------------
+      Additional tasks
+    ------------------------------------------------------------------------------*/
+    /*task test(group: 'verification', description: 'Runs the unit tests') {
+        // Task dependencies
+        dependsOn goTest
+    }*/
+
+    task integrationTest(group: 'verification', description: 'Runs the integration tests') {
+        // Task dependencies
+        dependsOn goIntegrationTest
+    }
+
+    task functionalTest(group: 'verification', description: 'Runs the functional tests') {
+        // Task dependencies
+        dependsOn goFunctionalTest
+    }
+
+    /*------------------------------------------------------------------------------
+      Additional task dependencies
+    ------------------------------------------------------------------------------*/
+    tasks.clean.dependsOn tasks.goClean
+    tasks.assemble.dependsOn tasks.goBuild
+    tasks.test.dependsOn tasks.goTest
+    tasks.check.dependsOn tasks.test
+
+    afterEvaluate {
+        // Only perform publishing if the Nyx release type enables publishing
+        // Remember that setting the 'onlyIf' on a task does not prevent its dependencies
+        // to run so the tasks of the entire tree must be disabled
+        // This is why we set the onlyIf to all tasks in the Publish group
+        tasks.matching {
+            it.group.equals('publishing')
+        }.all {
+            it.onlyIf { rootProject.nyxState.newRelease }
+        }
+    }
+}
+
+/*------------------------------------------------------------------------------
+  Configurations
+------------------------------------------------------------------------------*/
+configurations {
+}
+
+/*------------------------------------------------------------------------------
+  Repositories and dependencies
+  https://docs.gradle.org/current/userguide/dependency_management_for_java_projects.html
+*/
+dependencies {
+}
+
+/*------------------------------------------------------------------------------
+  Additional tasks
+------------------------------------------------------------------------------*/
+// Create an overall Go unit test lifecycle task to trigger all unit tests in subprojects 
+/*task test() {
+    description 'Runs all Go unit tests and verification tasks'
+    group 'Verification'
+
+    dependsOn subprojects*.test
+}*/
+
+// Create an overall Go integration test lifecycle task to trigger all integration tests in subprojects 
+task integrationTest() {
+    description 'Runs all Go integration tests and verification tasks'
+    group 'Verification'
+
+    dependsOn subprojects*.integrationTest
+}
+
+// Create an overall Go functional test lifecycle task to trigger all intefunctionalgration tests in subprojects 
+task functionalTest() {
+    description 'Runs all Go functional tests and verification tasks'
+    group 'Verification'
+
+    dependsOn subprojects*.functionalTest
+}
+
+task testReport(group: 'verification', description: 'Produces Go test coverage reports') {
+    // Task dependencies
+    dependsOn subprojects*.goTest
+}
+
+tasks.check.finalizedBy tasks.testReport
+
+/*------------------------------------------------------------------------------
+  Additional task dependencies
+------------------------------------------------------------------------------*/
+// Make this overall assemble task dependent on subprojects assemble tasks
+tasks.assemble.dependsOn subprojects*.assemble
+
+// Make this overall check task dependent on subprojects check tasks
+tasks.check.dependsOn subprojects*.check
+
+// Make this overall Go unit test task dependent on subprojects unit test tasks
+// so that we can run all Go unit tests with one task
+tasks.test.dependsOn subprojects*.test

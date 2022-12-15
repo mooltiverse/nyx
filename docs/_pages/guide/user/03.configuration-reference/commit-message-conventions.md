@@ -39,7 +39,7 @@ The order in which convention are listed matters. The conventions listed first a
 
 Within the `commitMessageConventions` block you can define as many conventions as you want, each in its own separate block. The `name` identifies the convention so to define a brand new convention make sure you give it a `name` that was not already in use. If you use a `name` that was already defined for a convention then you are **overriding** an existing convention. Depending on the [configuration method]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}) you use the `name` property might be defined inside or outside the block that configures a single convention.
 
-Configuring conventions gives Nyx informations about:
+Configuring conventions gives Nyx information about:
 
 * which structured information to extract from commit messages
 * which version number to bump according to the commit message contents
@@ -77,7 +77,7 @@ The named capturing groups are:
 * `scope`: an optional short identifier of the scope of the commit contents
 * `title`: a short, single line statement of the commit contents and purpose
 
-All the capturing groups are optional as not all conventions support all of these fields. These groups are read by name when the regular expression is evaluated and their values are used as structured informations for various purposes by Nyx.
+All the capturing groups are optional as not all conventions support all of these fields. These groups are read by name when the regular expression is evaluated and their values are used as structured information for various purposes by Nyx.
 
 For example, the [Conventional Commits](https://www.conventionalcommits.org/) expression is `(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\((?<scope>[a-z ]+)\))?:( (?<title>.+))$(?s).*` and as you can see it has all the named capturing groups.
 

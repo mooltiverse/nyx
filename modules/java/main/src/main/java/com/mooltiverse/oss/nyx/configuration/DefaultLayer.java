@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import com.mooltiverse.oss.nyx.entities.Attachment;
 import com.mooltiverse.oss.nyx.entities.ChangelogConfiguration;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
+import com.mooltiverse.oss.nyx.entities.Defaults;
 import com.mooltiverse.oss.nyx.entities.GitConfiguration;
 import com.mooltiverse.oss.nyx.entities.IllegalPropertyException;
 import com.mooltiverse.oss.nyx.entities.ReleaseTypes;
@@ -250,7 +251,7 @@ class DefaultLayer implements ConfigurationLayer, Defaults {
     @Override
     public String getSharedConfigurationFile()
         throws DataAccessException, IllegalPropertyException {
-        logger.trace(DEFAULT, "Retrieving the default '{}' configuration option", "sharedConfigurationFile");
+        logger.trace(DEFAULT, "Retrieving the default '{}' configuration option: '{}'", "sharedConfigurationFile", SHARED_CONFIGURATION_FILE);
         return SHARED_CONFIGURATION_FILE;
     }
 

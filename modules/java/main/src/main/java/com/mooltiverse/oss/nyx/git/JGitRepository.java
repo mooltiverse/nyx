@@ -494,7 +494,7 @@ class JGitRepository implements Repository {
             }
         }
         catch (IOException e) {
-            throw new GitException("Cannot list repository tags");
+            throw new GitException("Cannot list repository tags", e);
         }
         return res;
     }

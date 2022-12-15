@@ -25,9 +25,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.mooltiverse.oss.nyx.entities.Identifier;
+import com.mooltiverse.oss.nyx.entities.Provider;
 import com.mooltiverse.oss.nyx.entities.Verbosity;
 import com.mooltiverse.oss.nyx.entities.WorkspaceStatus;
-import com.mooltiverse.oss.nyx.services.Provider;
 import com.mooltiverse.oss.nyx.version.Scheme;
 
 @DisplayName("EnvironmentConfigurationLayer")
@@ -152,6 +152,7 @@ public class EnvironmentConfigurationLayerTests {
         assertNull(environmentConfigurationLayer.getDirectory());
 
         File directory = Files.createTempDirectory(null).toFile();
+        directory.deleteOnExit();
         environmentConfigurationLayer.environment.put("NYX_DIRECTORY", directory.getAbsolutePath());
         assertEquals(directory.getAbsolutePath(), new File(environmentConfigurationLayer.getDirectory()).getAbsolutePath());
     }

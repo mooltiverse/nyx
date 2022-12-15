@@ -98,6 +98,9 @@ One way to work around this limitation and add links to the release is to custom
 
 Release assets whose [path]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-assets.md %}#path) cannot be resolved to a local file are skipped.
 
+Due to a limitation in the underlying library, the command line version does not support uploading the asset description. Only file names are uploaded and displayed.
+{: .notice--warning}
+
 ##### GitHub configuration options
 
 This service type supports the following [options](#options):

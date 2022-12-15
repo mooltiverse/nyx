@@ -357,38 +357,44 @@ Example inputs and corresponding outputs:
 | -------------------------- | -------------------------- |
 | `1608210396 `              | `20201217130636`           |
 
-#### `environment.user`
+#### `environmentUser`
 
 Returns the current system user name. Example:
 
 ```
-user = "{% raw %}{{environment.user}}{% endraw %}"
+user = "{% raw %}{{environmentUser}}{% endraw %}"
 ```
 
 or, if you prefer the open/close tags:
 
 ```
-user = "{% raw %}{{#environment.user}}{{/environment.user}}{% endraw %}"
+user = "{% raw %}{{#environmentUser}}{{/environmentUser}}{% endraw %}"
 ```
 
 In case you pass a value to this function it is ignored.
 
-#### `environment.variable`
+The Java version of Nyx, including Gradle, also supports the dotted notation for this function so you can use `environment.user` or `environmentUser`. However the dotted notation is deprecated and will be removed in future releases so use the camel case notation `environmentUser`.
+{: .notice--warning}
+
+#### `environmentVariable`
 
 Returns the value of the environment variable used as parameter, if any. Example:
 
 ```
-os = "{% raw %}{{#environment.variable}}OS{{/environment.variable}}{% endraw %}"
+os = "{% raw %}{{#environmentVariable}}OS{{/environmentVariable}}{% endraw %}"
 ```
 
 returns the value of the `OS` environment variable, if present, or an empty string.
 
-#### `file.content`
+The Java version of Nyx, including Gradle, also supports the dotted notation for this function so you can use `environment.variable` or `environmentVariable`. However the dotted notation is deprecated and will be removed in future releases so use the camel case notation `environmentVariable`.
+{: .notice--warning}
+
+#### `fileContent`
 
 Returns content of the given file, if it exists, or an empty string. Example:
 
 ```
-filecontent = "{% raw %}{{#file.content}}example.txt{{/file.content}}{% endraw %}"
+filecontent = "{% raw %}{{#fileContent}}example.txt{{/fileContent}}{% endraw %}"
 ```
 
 returns returns the **entire** content of the `example.txt` file (if it exists).
@@ -397,17 +403,23 @@ The file name can be a relative or an absolute path. Please note that when a rel
 
 Be careful with the file content type, which must be text, and its size.
 
-#### `file.exists`
+The Java version of Nyx, including Gradle, also supports the dotted notation for this function so you can use `file.content` or `fileContent`. However the dotted notation is deprecated and will be removed in future releases so use the camel case notation `fileContent`.
+{: .notice--warning}
+
+#### `fileExists`
 
 Returns the string representation of a boolean, depending on whether the the given file exists. Example:
 
 ```
-fileexists = "{% raw %}{{#file.exists}}example.txt{{/file.exists}}{% endraw %}"
+fileexists = "{% raw %}{{#fileExists}}example.txt{{/fileExists}}{% endraw %}"
 ```
 
 returns `true` if the `example.txt` file exists, `false` otherwise.
 
 The file name can be a relative or an absolute path. Please note that when a relative path is used, it's always resolved to the current working directory and other configured directories are ignored.
+
+The Java version of Nyx, including Gradle, also supports the dotted notation for this function so you can use `file.exists` or `fileExists`. However the dotted notation is deprecated and will be removed in future releases so use the camel case notation `fileExists`.
+{: .notice--warning}
 
 ## Example
 
@@ -419,8 +431,8 @@ Consider this template:
 {% raw %}Version: {{version}} (bumping '{{bump}}' on {{configuration.initialVersion}} using lenient ({{configuration.releaseLenient}}))
 Scheme: {{scheme}}
 Timestamp: {{timestamp}}
-OS: {{#environment.variable}}OS{{/environment.variable}}
-User: {{environment.user}}
+OS: {{#environmentVariable}}OS{{/environmentVariable}}
+User: {{environmentUser}}
 Previous Version: {{releaseScope.previousVersion}} at {{#short5}}{{releaseScope.previousVersionCommit}}{{/short5}}
 
 Commits:
@@ -450,7 +462,7 @@ As you can see there are state attributes like `version`, `bump`, `scheme` and `
 
 But since the resolved configuration is also available as a [nested state object]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#configuration), a couple of attributes are fetched from there, as you can see by `configuration.initialVersion` and `configuration.releaseLenient`.
 
-Some values are retrieved from the current environment: the `OS` environment variable is fetched by the `{% raw %}{{#environment.variable}}OS{{/environment.variable}}{% endraw %}` block (where the function parameter `OS` is the name of the variable to retrieve) and also the system user name is retrieved by `{% raw %}{{{environment.user}}{% endraw %}`.
+Some values are retrieved from the current environment: the `OS` environment variable is fetched by the `{% raw %}{{#environmentVariable}}OS{{/environmentVariable}}{% endraw %}` block (where the function parameter `OS` is the name of the variable to retrieve) and also the system user name is retrieved by `{% raw %}{{{environmentUser}}{% endraw %}`.
 
 Moreover, the [release scope]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}) is also used to get the `releaseScope.previousVersion` and `releaseScope.previousVersionCommit`. By pay attention here: the `previousVersionCommit` is not used as is but only the shortened SHA-1 is used, thanks to the [`short5`](#short5) function.
 

@@ -28,6 +28,7 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.time.ZoneOffset;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
@@ -143,7 +144,7 @@ public class Make extends AbstractCommand {
 
     /**
      * Returns a reader object that reads the template to be used for rendering.
-     * If the configuretion overrides the template then the reader will point to that
+     * If the configuration overrides the template then the reader will point to that
      * template otherwise the default template will be returned.
      * 
      * @return a reader object that reads the template to be used for rendering. Never {@code null}.
@@ -232,7 +233,8 @@ public class Make extends AbstractCommand {
                             }
                         }
                         catch (IllegalArgumentException iae) {
-                            throw new IllegalPropertyException(String.format("The regular expression '%s' defined for commit message convention '%s' does not define the 'type' named capturing group", cmcEntry.getValue().getExpression(), cmcEntry.getKey()), iae);
+                            // the regular expression doesn't match the name capturing group, no commit type is inferred
+                            //throw new IllegalPropertyException(String.format("The regular expression '%s' defined for commit message convention '%s' does not define the 'type' named capturing group", cmcEntry.getValue().getExpression(), cmcEntry.getKey()), iae);
                         }
                         catch (IllegalStateException ise) {
                             throw new ReleaseException(String.format("Cannot infer the commit type for commit '%s' match operation failed for the regular expression '%s' from commit message convention '%s'", commit.getSHA(), cmcEntry.getValue().getExpression(), cmcEntry.getKey()), ise);
@@ -289,7 +291,16 @@ public class Make extends AbstractCommand {
                             StringBuffer buffer = new StringBuffer();
                             while (substitutionMatcher.find()) {
                                 String substitutionValue = substitutionMatcher.group(1); // by the docs, only the group 1 is considered
-                                substitutionMatcher.appendReplacement(buffer, String.format(substitutionEntry.getValue(), substitutionValue, substitutionValue, substitutionValue, substitutionValue, substitutionValue)); // by the docs, the %s placeholder can be used up to 5 times
+                                // we need to detect the exact number of occurrences of '%s' and pass the Sprintf parameter that exact number of times
+                                // since we don't have a 'count'-like method in String we use the split method for that, and we know the number of occurrences
+                                // is the number of splits -1
+                                int occurrences = substitutionEntry.getValue().split("%s").length-1;
+                                if (occurrences < 0) {
+                                    occurrences = 0;
+                                }
+                                Object[] replacementOccurrences = new Object[occurrences];
+                                Arrays.fill(replacementOccurrences, substitutionValue);
+                                substitutionMatcher.appendReplacement(buffer, String.format(substitutionEntry.getValue(), replacementOccurrences));
                             }
                             substitutionMatcher.appendTail(buffer);
                             changelogBuffer = buffer.toString();
@@ -329,7 +340,7 @@ public class Make extends AbstractCommand {
     /**
      * Reset the attributes store by this command into the internal state object.
      * This is required before running the command in order to make sure that the new execution is not affected
-     * by a stala status coming from previous runs.
+     * by a stale status coming from previous runs.
      * 
      * @throws DataAccessException in case the configuration can't be loaded for some reason.
      * @throws IllegalPropertyException in case the configuration has some illegal options.

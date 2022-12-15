@@ -39,16 +39,17 @@ import com.mooltiverse.oss.nyx.entities.Attachment;
 import com.mooltiverse.oss.nyx.entities.ChangelogConfiguration;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
+import com.mooltiverse.oss.nyx.entities.Defaults;
 import com.mooltiverse.oss.nyx.entities.GitConfiguration;
 import com.mooltiverse.oss.nyx.entities.GitRemoteConfiguration;
 import com.mooltiverse.oss.nyx.entities.Identifier;
 import com.mooltiverse.oss.nyx.entities.IllegalPropertyException;
+import com.mooltiverse.oss.nyx.entities.Provider;
 import com.mooltiverse.oss.nyx.entities.ReleaseType;
 import com.mooltiverse.oss.nyx.entities.ReleaseTypes;
 import com.mooltiverse.oss.nyx.entities.ServiceConfiguration;
 import com.mooltiverse.oss.nyx.entities.Verbosity;
 import com.mooltiverse.oss.nyx.entities.WorkspaceStatus;
-import com.mooltiverse.oss.nyx.services.Provider;
 import com.mooltiverse.oss.nyx.version.Scheme;
 
 /**
@@ -613,19 +614,6 @@ class EnvironmentConfigurationLayer implements ConfigurationLayer {
     private static final String SERVICES_ITEM_NAME_REGEX = SERVICES_ENVVAR_NAME.concat("_(?<name>[a-zA-Z0-9]+)_([a-zA-Z0-9_]+)$");
 
     /**
-     * The parametrized name of the environment variable to read for the 'type' attribute of a
-     * service.
-     * This string is a {@link Formatter string} that contains a '%s' parameter for the service name
-     * and must be rendered using {@link String#format(String, Object...) String.format(SERVICES_ITEM_TYPE_FORMAT_STRING, name)}
-     * in order to get the actual name of environment variable that brings the value for the service type with the given {@code name}.
-     * Value: {@value}
-     * 
-     * @see Formatter
-     * @see String#format(String, Object...)
-     */
-    private static final String SERVICES_ITEM_TYPE_FORMAT_STRING = SERVICES_ENVVAR_NAME.concat("_%s_TYPE");
-
-    /**
      * The parametrized name of the environment variable to read for the 'options' attribute of a
      * service.
      * This string is a {@link Formatter string} that contains a '%s' parameter for the service name
@@ -637,6 +625,19 @@ class EnvironmentConfigurationLayer implements ConfigurationLayer {
      * @see String#format(String, Object...)
      */
     private static final String SERVICES_ITEM_OPTIONS_FORMAT_STRING = SERVICES_ENVVAR_NAME.concat("_%s_OPTIONS");
+
+    /**
+     * The parametrized name of the environment variable to read for the 'type' attribute of a
+     * service.
+     * This string is a {@link Formatter string} that contains a '%s' parameter for the service name
+     * and must be rendered using {@link String#format(String, Object...) String.format(SERVICES_ITEM_TYPE_FORMAT_STRING, name)}
+     * in order to get the actual name of environment variable that brings the value for the service type with the given {@code name}.
+     * Value: {@value}
+     * 
+     * @see Formatter
+     * @see String#format(String, Object...)
+     */
+    private static final String SERVICES_ITEM_TYPE_FORMAT_STRING = SERVICES_ENVVAR_NAME.concat("_%s_TYPE");
 
     /**
      * The name of the environment variable to read for this value. Value: {@value}
@@ -861,7 +862,7 @@ class EnvironmentConfigurationLayer implements ConfigurationLayer {
                                 throw new IllegalPropertyException(String.format("The environment variable '%s' has an illegal value '%s'", envVarName, mapItemValue), iae);
                             }
                             break;
-                        default: logger.warn(CONFIGURATION, "The environment variable '{}' defines an unrecognized identifier attribute '{}'", listItemNameComponents[1]);
+                        default: logger.warn(CONFIGURATION, "The environment variable '{}' defines an unrecognized identifier attribute '{}'", envVarName, listItemNameComponents[1]);
                     }
                 }
             }

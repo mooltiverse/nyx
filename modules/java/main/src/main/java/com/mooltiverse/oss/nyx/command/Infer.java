@@ -162,7 +162,7 @@ public class Infer extends AbstractCommand {
      *   {@link ReleaseType#getCollapseVersions() collapsed versioning})
      * - the commits within the release scope (the ones after the commit that brings the latest version tag)
      * - the significant commits since the previous version (and since the prime version, when the
-     *   {@link ReleaseType release type} is configured to use{@link ReleaseType#getCollapseVersions() collapsed versioning})
+     *   {@link ReleaseType release type} is configured to use {@link ReleaseType#getCollapseVersions() collapsed versioning})
      * - the identifiers that are supposed to be bumped based on the significant commits since the previous and prime version
      * <br><br>
      * To do so the commit message convention is used to decide whether a commit is significant or not.
@@ -224,9 +224,9 @@ public class Infer extends AbstractCommand {
         throws DataAccessException, IllegalPropertyException, GitException, ReleaseException {
         Objects.requireNonNull(scheme, "The scheme cannot be null");
         Objects.requireNonNull(previousSignificantCommits, "The list of previous significant commits cannot be null cannot be null");
-        Objects.requireNonNull(previousBumpIdentifiers, "The set of previous bumo identifiers cannot be null");
+        Objects.requireNonNull(previousBumpIdentifiers, "The set of previous bump identifiers cannot be null");
         Objects.requireNonNull(primeSignificantCommits, "The list of prime significant commits cannot be null cannot be null");
-        Objects.requireNonNull(primeBumpIdentifiers, "The set of previous bumo identifiers cannot be null");
+        Objects.requireNonNull(primeBumpIdentifiers, "The set of previous bump identifiers cannot be null");
 
         logger.debug(COMMAND, "Walking the commit history...");
         repository().walkHistory(null, null, c -> {
@@ -414,10 +414,12 @@ public class Infer extends AbstractCommand {
         Objects.requireNonNull(releaseType, "The release type cannot be null");
         Objects.requireNonNull(version, "The version cannot be null");
 
+        Version res = version;
+
         logger.debug(COMMAND, "Applying '{}' extra identifiers defined by the release type to version '{}'", releaseType.getIdentifiers().size(), version.toString());
 
         for (Identifier identifier: releaseType.getIdentifiers()) {
-            logger.debug(COMMAND, "Applying the '{}' extra identifier to version '{}'", identifier.getQualifier(), version.toString());
+            logger.debug(COMMAND, "Applying the '{}' extra identifier to version '{}'", identifier.getQualifier(), res.toString());
             if (Objects.isNull(identifier.getQualifier()) || identifier.getQualifier().isBlank())
                 throw new IllegalPropertyException(String.format("Identifiers must define a non blank qualifier"));
             
@@ -430,7 +432,7 @@ public class Infer extends AbstractCommand {
 
             // Semver is the only supported scheme so far...
             if (Scheme.SEMVER.equals(scheme)) {
-                SemanticVersion semanticVersion = SemanticVersion.valueOf(version.toString()); // faster and safer than casting...
+                SemanticVersion semanticVersion = SemanticVersion.valueOf(res.toString()); // faster and safer than casting...
 
                 if (Identifier.Position.PRE_RELEASE.equals(identifier.getPosition())) {
                     // the value must be converted to an Integer when using SemVer and the pre-release part
@@ -453,14 +455,14 @@ public class Infer extends AbstractCommand {
                 }
                 else throw new IllegalPropertyException(String.format("Illegal identifier position '%s' for identifier '%s'", identifier.getPosition(), identifier.getQualifier()));
 
-                version = semanticVersion;
+                res = semanticVersion;
 
                 logger.debug(COMMAND, "The version after applying the '{}' extra identifier is '{}'", identifier.getQualifier(), semanticVersion.toString());
             }
             else throw new IllegalPropertyException(String.format("Extra identifiers are supported for '%s' scheme only", Scheme.SEMVER));
         }
 
-        return version;
+        return res;
     }
 
     /**
@@ -513,13 +515,13 @@ public class Infer extends AbstractCommand {
         Objects.requireNonNull(scheme, "The scheme cannot be null");
         Objects.requireNonNull(releaseType, "The release type cannot be null");
         Objects.requireNonNull(scopeCommits, "The scope commits list cannot be null");
-        Objects.requireNonNull(previousVersion, "The previous cannot be null");
-        Objects.requireNonNull(primeVersion, "The prime cannot be null");
+        Objects.requireNonNull(previousVersion, "The previous version cannot be null");
+        Objects.requireNonNull(primeVersion, "The prime version cannot be null");
 
         if (Objects.isNull(bump)) {
             if (scopeCommits.isEmpty()) {
                 // there are no new commits in the release scope
-                logger.info(COMMAND, "The release scope does not contain any commit since the previous version, version remains unchanged: '{}'", previousVersion);
+                logger.debug(COMMAND, "The release scope does not contain any commit since the previous version, version remains unchanged: '{}'", previousVersion);
                 return previousVersion;
             }
             else {
@@ -543,13 +545,13 @@ public class Infer extends AbstractCommand {
                     Version primeVersionBumped = null;
                     if (Objects.isNull(bumpIdentifierOnPrimeVersion) || bumpIdentifierOnPrimeVersion.isBlank()) {
                         // bump only the collapsed identifier on the prime version
-                        logger.info(COMMAND, "The release scope does not contain any significant commit since the prime version, only collapsed identifier '{}' is bumped while core identifiers are not bumped on prime version: '{}'", collapsedVersionQualifier, primeVersion.toString());
+                        logger.debug(COMMAND, "The release scope does not contain any significant commit since the prime version, only collapsed identifier '{}' is bumped while core identifiers are not bumped on prime version: '{}'", collapsedVersionQualifier, primeVersion.toString());
                         primeVersionBumped = primeVersion.bump(collapsedVersionQualifier);
                         logger.debug(COMMAND, "Bumping qualifier '{}' on prime version '{}' yields to '{}'", collapsedVersionQualifier, primeVersion.toString(), primeVersionBumped.toString());
                     }
                     else {
                         // bump the two identifiers on the prime version
-                        logger.info(COMMAND, "The release scope contains significant commits since the prime version, core identifier '{}' and collapsed identifier '{}' are bumped on prime version: '{}'", bumpIdentifierOnPrimeVersion, collapsedVersionQualifier, primeVersion.toString());
+                        logger.debug(COMMAND, "The release scope contains significant commits since the prime version, core identifier '{}' and collapsed identifier '{}' are bumped on prime version: '{}'", bumpIdentifierOnPrimeVersion, collapsedVersionQualifier, primeVersion.toString());
                         primeVersionBumped = primeVersion.bump(bumpIdentifierOnPrimeVersion).bump(collapsedVersionQualifier);
                         logger.debug(COMMAND, "Bumping qualifiers '{}' and '{}' on prime version '{}' yields to '{}'", bumpIdentifierOnPrimeVersion, collapsedVersionQualifier, primeVersion.toString(), primeVersionBumped.toString());
                     }
@@ -558,15 +560,14 @@ public class Infer extends AbstractCommand {
                     Version previousVersionBumped = null;
                     if (Objects.isNull(bumpIdentifierOnPreviousVersion) || bumpIdentifierOnPreviousVersion.isBlank()) {
                         // do not bump anything on the previous version
-                        logger.info(COMMAND, "The release scope does not contain any significant commit since the previous version, identifiers are not bumped on previous version: '{}'", previousVersion.toString());
+                        logger.debug(COMMAND, "The release scope does not contain any significant commit since the previous version, identifiers are not bumped on previous version: '{}'", previousVersion.toString());
                         previousVersionBumped = previousVersion;
                     }
                     else {
                         // bump only the collapsed identifier on the previous version
-                        logger.info(COMMAND, "The release scope contains significant commits since the previous version, collapsed identifier '{}' is bumped on previous version: '{}'", collapsedVersionQualifier, previousVersion.toString());
+                        logger.debug(COMMAND, "The release scope contains significant commits since the previous version, collapsed identifier '{}' is bumped on previous version: '{}'", collapsedVersionQualifier, previousVersion.toString());
                         previousVersionBumped = previousVersion.bump(collapsedVersionQualifier);
                         logger.debug(COMMAND, "Bumping qualifier '{}' on previous version '{}' yields to '{}'", collapsedVersionQualifier, previousVersion.toString(), previousVersionBumped.toString());
-
                     }
 
                     // now compare the prime and previous version and see which one is greater
@@ -587,7 +588,7 @@ public class Infer extends AbstractCommand {
                 }
                 else {
                     if (Objects.isNull(bumpIdentifierOnPreviousVersion) || bumpIdentifierOnPreviousVersion.isBlank()) {
-                        logger.info(COMMAND, "The release scope does not contain any significant commit since the previous version, version remains unchanged: '{}'", previousVersion.toString());
+                        logger.debug(COMMAND, "The release scope does not contain any significant commit since the previous version, version remains unchanged: '{}'", previousVersion.toString());
                         version = previousVersion;
                     }
                     else {
@@ -660,7 +661,7 @@ public class Infer extends AbstractCommand {
      * @param branch the name of the branch used to infer the version range regular expression from. This is ignored
      * when {@code staticVersionRangeExpressionTemplate} is not {@code null} as static checking has priority over
      * dynamic checking. When {@code staticVersionRangeExpressionTemplate} is {@code null}, if {@code branch} is
-     * also null then no check is performed, otherwise the regular expression is inferred from the branch name.
+     * also {@code null} then no check is performed, otherwise the regular expression is inferred from the branch name.
      * 
      * @return {@code true} if the check was successfully performed, {@code false} if no check was performed
      * 
@@ -755,7 +756,7 @@ public class Infer extends AbstractCommand {
                 }
             }
             catch (PatternSyntaxException pse) {
-                throw new IllegalPropertyException(String.format("Cannot compile regular expression '%s' (evaluated by template '%s') ", state().getVersionRange(), staticVersionRangeExpressionTemplate), pse);
+                throw new IllegalPropertyException(String.format("Cannot compile regular expression '%s' (evaluated by template '%s')", state().getVersionRange(), staticVersionRangeExpressionTemplate), pse);
             }
         }
         else {
@@ -767,7 +768,7 @@ public class Infer extends AbstractCommand {
     /**
      * Reset the attributes store by this command into the internal state object.
      * This is required before running the command in order to make sure that the new execution is not affected
-     * by a stala status coming from previous runs.
+     * by a stale status coming from previous runs.
      * 
      * @throws DataAccessException in case the configuration can't be loaded for some reason.
      * @throws IllegalPropertyException in case the configuration has some illegal options.
@@ -904,7 +905,7 @@ public class Infer extends AbstractCommand {
         state().setReleaseType(resolveReleaseType());
 
         if (state().hasVersion() && !Objects.isNull(state().getConfiguration().getVersion()))
-            logger.info(COMMAND, "Version overridden by user: '{}'", state().getConfiguration().getVersion());
+            logger.debug(COMMAND, "Version overridden by user: '{}'", state().getConfiguration().getVersion());
         else {
             // The following collections are used to collect the significant commits and the identifiers to be
             // bumped since the prime version or since the previous version.
@@ -918,7 +919,7 @@ public class Infer extends AbstractCommand {
             Set<String> primeBumpIdentifiers = new HashSet<String>();
 
             // some state attributes must be set first as they're also used for template rendering afterwards
-            logger.debug(COMMAND, "Current Git branch is '{}'", repository().getCurrentBranch());
+            logger.debug(COMMAND, "Current Git branch is '{}'", getCurrentBranch());
             state().setBranch(repository().getCurrentBranch());
 
             // STEP 1: scan the Git repository to collect informations from the commit history

@@ -15,8 +15,13 @@
  */
 package com.mooltiverse.oss.nyx.services.github;
 
-import java.util.Map;
+import java.io.IOException;
 
+import java.util.Objects;
+
+import org.kohsuke.github.GHUser;
+
+import com.mooltiverse.oss.nyx.io.TransportException;
 import com.mooltiverse.oss.nyx.services.User;
 
 /**
@@ -24,24 +29,34 @@ import com.mooltiverse.oss.nyx.services.User;
  */
 public class GitHubUser extends GitHubEntity implements User {
     /**
-     * Creates the user object modelled by the given attributes.
-     * 
-     * @param api the reference to the API used to communicate with the remote end. Can't be {@code null}
-     * @param attributes the map of attributes for this object. Can't be {@code null}
-     * 
-     * @throws NullPointerException if the given attributes map is {@code null}
-     * @throws IllegalArgumentException if the map of attributes is empty
+     * The user name
      */
-    GitHubUser(API api, Map<String, Object> attributes) {
-        super(api, attributes);
-    }
+    private final String userName;
 
     /**
-     * {@inheritDoc}
+     * The user full name
      */
-    @Override
-    public String getID() {
-        return getAttributes().get("id").toString();
+    private final String fullName;
+
+    /**
+     * Creates the user object modelled by the given reference.
+     * 
+     * @param user the reference to the backing object. Can't be {@code null}
+     * 
+     * @throws NullPointerException if the given reference is {@code null}
+     * @throws TransportException if the given reference can't be read for some reasons
+     */
+    GitHubUser(GHUser user)
+        throws TransportException {
+        super(user);
+        Objects.requireNonNull(user, "The user reference cannot be null");
+        try {
+            this.userName = user.getLogin();
+            this.fullName = user.getName();
+        }
+        catch (IOException ioe) {
+            throw new TransportException(String.format("Unable to retrieve the user full name"), ioe);
+        }
     }
 
     /**
@@ -49,7 +64,7 @@ public class GitHubUser extends GitHubEntity implements User {
      */
     @Override
     public String getUserName() {
-        return getAttributes().get("login").toString();
+        return userName;
     }
 
     /**
@@ -57,8 +72,6 @@ public class GitHubUser extends GitHubEntity implements User {
      */
     @Override
     public String geFullName() {
-        // this is not a mandatory attribute so we need to check for nulls
-        Object res = getAttributes().get("name");
-        return res == null ? null : res.toString();
+        return fullName;
     }
 }

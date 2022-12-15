@@ -17,65 +17,14 @@ package com.mooltiverse.oss.nyx.io;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.io.File;
 import java.net.URL;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import com.mooltiverse.oss.nyx.configuration.Configuration;
-import com.mooltiverse.oss.nyx.state.State;
-
 @DisplayName("FileMapper")
 public class FileMapperTests {
-    @Nested
-    @DisplayName("StateFile")
-    public static class StateFileTests {
-        @Test
-        @DisplayName("FileMapper[state file] JSON")
-        void stateFileJSONTest()
-            throws Exception {
-            File savedFile = new File(System.getProperty("java.io.tmpdir"), "state"+this.hashCode()+".json");
-            savedFile.deleteOnExit();
-
-            State state = new State(new Configuration());
-            FileMapper.save(savedFile.getAbsolutePath(), state);
-
-            assertTrue(savedFile.exists());
-        }
-
-        @Test
-        @DisplayName("FileMapper[state file with no extension] JSON by default")
-        void stateFileNoExtensionTest()
-            throws Exception {
-            File savedFile = new File(System.getProperty("java.io.tmpdir"), "state"+this.hashCode());
-            savedFile.deleteOnExit();
-
-            assertFalse(savedFile.exists());
-
-            State state = new State(new Configuration());
-            FileMapper.save(savedFile.getAbsolutePath(), state);
-
-            assertTrue(savedFile.exists());
-        }
-
-        @Test
-        @DisplayName("FileMapper[state file] YAML")
-        void stateFileYAMLTest()
-            throws Exception {
-            File savedFile = new File(System.getProperty("java.io.tmpdir"), "state"+this.hashCode()+".yaml");
-            savedFile.deleteOnExit();
-
-            assertFalse(savedFile.exists());
-
-            State state = new State(new Configuration());
-            FileMapper.save(savedFile.getAbsolutePath(), state);
-
-            assertTrue(savedFile.exists());
-        }
-    }
-
     @Nested
     @DisplayName("Load from URL")
     public static class LoadFromURL {

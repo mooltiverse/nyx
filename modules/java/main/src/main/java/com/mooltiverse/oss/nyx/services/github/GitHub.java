@@ -17,12 +17,23 @@ package com.mooltiverse.oss.nyx.services.github;
 
 import static com.mooltiverse.oss.nyx.log.Markers.SERVICE;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+
+import org.kohsuke.github.GitHubBuilder;
+import org.kohsuke.github.GHAsset;
+import org.kohsuke.github.GHCreateRepositoryBuilder;
+import org.kohsuke.github.GHRelease;
+import org.kohsuke.github.GHRepository;
+import org.kohsuke.github.GHReleaseBuilder;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,9 +69,9 @@ public class GitHub implements GitHostingService, ReleaseService, UserService {
     static final Logger logger = LoggerFactory.getLogger(GitHub.class);
 
     /**
-     * The private API instance.
+     * The private API client instance.
      */
-    private final API api;
+    private final org.kohsuke.github.GitHub client;
 
     /**
      * The name of the option used to pass the base URI to this object instance.
@@ -111,7 +122,7 @@ public class GitHub implements GitHostingService, ReleaseService, UserService {
     /**
      * Builds an instance using the given API.
      * 
-     * @param api the API to be used internally. It can't be {@code null}
+     * @param client the API client to be used internally. It can't be {@code null}
      * If {@code null} the service will not be able to authenticate and perform any of the authentication protected operations.
      * @param repositoryOwner the name of the repository owner, used when using APIs that require the
      * name of the repository owner (individual or organization). It may be {@code null}, but some operations may fail
@@ -120,10 +131,10 @@ public class GitHub implements GitHostingService, ReleaseService, UserService {
      * 
      * @throws NullPointerException if the given API is {@code null}.
      */
-    private GitHub(API api, String repositoryOwner, String repositoryName) {
+    private GitHub(org.kohsuke.github.GitHub client, String repositoryOwner, String repositoryName) {
         super();
-        Objects.requireNonNull(api, "Can't create a new instance with a null API");
-        this.api = api;
+        Objects.requireNonNull(client, "Can't create a new instance with a null API client");
+        this.client = client;
         this.repositoryOwner = repositoryOwner;
         this.repositoryName = repositoryName;
     }
@@ -142,14 +153,10 @@ public class GitHub implements GitHostingService, ReleaseService, UserService {
     public static GitHub instance(Map<String,String> options) {
         Objects.requireNonNull(options, "Can't create a new instance with a null options map");
 
-        String uriString = Objects.isNull(options.get(BASE_URI_OPTION_NAME)) ? RESTv3.BASE_URI_DEFAULT_VALUE : options.get(BASE_URI_OPTION_NAME);
-        URI baseURI = null;
-        try {
-            baseURI = new URI(uriString);
-        }
-        catch (URISyntaxException use) {
-            throw new IllegalArgumentException(String.format("The given URI '%s' is not a valid URI", uriString), use);
-        }
+        String baseURI = null;
+        if (Objects.isNull(options.get(BASE_URI_OPTION_NAME)))
+            logger.debug(SERVICE, "No custom base URI passed to the '{}' service, service will use the default URI", GitHub.class.getSimpleName());
+        else baseURI = options.get(BASE_URI_OPTION_NAME);
 
         String authenticationToken = null;
         if (Objects.isNull(options.get(AUTHENTICATION_TOKEN_OPTION_NAME)))
@@ -165,12 +172,19 @@ public class GitHub implements GitHostingService, ReleaseService, UserService {
         if (Objects.isNull(options.get(REPOSITORY_OWNER_OPTION_NAME)))
             logger.warn(SERVICE, "No repository owner passed to the '{}' service, some features may not work. Use the '{}' option to set this value", GitHub.class.getSimpleName(), REPOSITORY_OWNER_OPTION_NAME);
         else repositoryOwner = options.get(REPOSITORY_OWNER_OPTION_NAME);
-        
-        logger.trace(SERVICE, "Instantiating new service using the base URI: '{}'", baseURI.toString());
 
-        // we have only one API and version so far so we just use that, otherwise we'd need to read additional
-        // options to understand which API and version to use
-        return new GitHub(new RESTv3(baseURI, authenticationToken), repositoryOwner, repositoryName);
+        GitHubBuilder ghBuilder = new GitHubBuilder();
+        if (!Objects.isNull(baseURI) && !baseURI.isBlank())
+            ghBuilder = ghBuilder.withEndpoint​(baseURI);
+        if (!Objects.isNull(authenticationToken) && !authenticationToken.isBlank())
+            ghBuilder = ghBuilder.withOAuthToken(authenticationToken);
+
+        try {
+            return new GitHub(ghBuilder.build(), repositoryOwner, repositoryName);
+        }
+        catch (IOException ioe) {
+            throw new IllegalArgumentException("Unable to build a GitHub client instance", ioe);
+        }
     }
 
     /**
@@ -179,7 +193,15 @@ public class GitHub implements GitHostingService, ReleaseService, UserService {
     @Override
     public GitHubRepository createGitRepository(String name, String description, boolean restricted, boolean initialize)
         throws SecurityException, TransportException {
-        return new GitHubRepository(api, api.createRepository(name, description, restricted, initialize));
+        try {
+            GHRepository ghRepository = client.createRepository(name).description​(description).autoInit​(initialize).visibility(restricted ? GHRepository.Visibility.PRIVATE : GHRepository.Visibility.PUBLIC).create();
+            // it looks like setting the visibility above against the builder doesn't work, so let's repeat it here
+            ghRepository.setVisibility​(restricted ? GHRepository.Visibility.PRIVATE : GHRepository.Visibility.PUBLIC);
+            return new GitHubRepository(ghRepository);
+        }
+        catch (IOException ioe) {
+            throw new TransportException(String.format("Unable to create the GitHub repository '%s'", name), ioe);
+        }
     }
 
     /**
@@ -188,7 +210,14 @@ public class GitHub implements GitHostingService, ReleaseService, UserService {
     @Override
     public void deleteGitRepository(String name)
         throws SecurityException, TransportException {
-        api.deleteRepository(name);
+        // the repository must be in the form owner/repo, and this method always deletes repositories for the currently authenticated user
+        String repoName = getAuthenticatedUser().getUserName().concat("/").concat(name);
+        try {
+            client.getRepository​(repoName).delete();
+        }
+        catch (IOException ioe) {
+            throw new TransportException(String.format("Unable to find or delete the GitHub repository '%s'", repoName), ioe);
+        }
     }
 
     /**
@@ -197,7 +226,47 @@ public class GitHub implements GitHostingService, ReleaseService, UserService {
     @Override
     public GitHubUser getAuthenticatedUser()
         throws TransportException, SecurityException {
-        return new GitHubUser(api, api.getUserAttributes(null));
+        try {
+            if (client.isAnonymous())
+                throw new SecurityException("The current session is not authenticated");
+            else return new GitHubUser(client.getMyself());
+        }
+        catch (IOException ioe) {
+            throw new TransportException(String.format("Unable to retrieve the authenticated user"), ioe);
+        }
+    }
+
+    /**
+     * Returns the repository with the given name and beloging to the optional owner.
+     * 
+     * @param owner the name of the repository owner to create the release for. It may be {@code null}, in which case,
+     * the repository owner must be passed as a service option (see services implementing this interface for more
+     * details on the options they accept). If not {@code null} this value overrides the option passed to the service.
+     * @param repositoryName the name of the repository to create the release for. It may be {@code null}, in which case,
+     * the repository name must be passed as a service option (see services implementing this interface for more
+     * details on the options they accept). If not {@code null} this value overrides the option passed to the service.
+     * 
+     * @return the repository with the given name and beloging to the optional owner.
+     * 
+     * @throws SecurityException if authentication or authorization fails
+     * @throws TransportException if communication to the remote endpoint fails
+     */
+    private GHRepository getRepository(String owner, String repository) 
+        throws SecurityException, TransportException {
+        String repoName = "";
+        if (Objects.isNull(owner) && Objects.isNull(repositoryOwner))
+            logger.warn(SERVICE, "The repository owner was not passed as a service option nor overridden as an argument, getting the release may fail. Use the '{}' option to set this option or override it when invoking this method.", REPOSITORY_OWNER_OPTION_NAME);
+        else repoName = Objects.isNull(owner) ? (Objects.isNull(repositoryOwner) ? "" : repositoryOwner) : owner;
+        if (Objects.isNull(repository) && Objects.isNull(repositoryName))
+            logger.warn(SERVICE, "The repository name was not passed as a service option nor overridden as an argument, getting the release may fail. Use the '{}' option to set this option or override it when invoking this method.", REPOSITORY_NAME_OPTION_NAME);
+        else repoName = Objects.isNull(repository) ? (Objects.isNull(repositoryName) ? repoName : repoName+"/"+repositoryName) : repoName+"/"+repository;
+
+        try {
+            return client.getRepository​(repoName);
+        }
+        catch (IOException ioe) {
+            throw new TransportException(String.format("Unable to retrieve the repository '%s'", repoName), ioe);
+        }
     }
 
     /**
@@ -206,12 +275,13 @@ public class GitHub implements GitHostingService, ReleaseService, UserService {
     @Override
     public GitHubRelease getReleaseByTag(String owner, String repository, String tag)
         throws SecurityException, TransportException {
-        if (Objects.isNull(owner) && Objects.isNull(repositoryOwner))
-            logger.warn(SERVICE, "The repository owner was not passed as a service option nor overridden as an argument, getting the release may fail. Use the '{}' option to set this option or override it when invoking this method.", REPOSITORY_OWNER_OPTION_NAME);
-        if (Objects.isNull(repository) && Objects.isNull(repositoryName))
-            logger.warn(SERVICE, "The repository name was not passed as a service option nor overridden as an argument, getting the release may fail. Use the '{}' option to set this option or override it when invoking this method.", REPOSITORY_NAME_OPTION_NAME);
-        Map<String, Object> releaseAttributes = api.getReleaseByTag(Objects.isNull(owner) ? repositoryOwner : owner, Objects.isNull(repository) ? this.repositoryName : repository, tag);
-        return Objects.isNull(releaseAttributes) ? null : new GitHubRelease(api, releaseAttributes, api.listReleaseAssets(owner, repository, releaseAttributes.get("id").toString()));
+        try {
+            GHRelease ghRelease = getRepository(owner, repository).getReleaseByTagName​(tag);
+            return Objects.isNull(ghRelease) ? null : new GitHubRelease(ghRelease);
+        }
+        catch (IOException ioe) {
+            throw new TransportException(String.format("Unable to retrieve the release '%s'", tag), ioe);
+        }
     }
 
     /**
@@ -220,11 +290,12 @@ public class GitHub implements GitHostingService, ReleaseService, UserService {
     @Override
     public GitHubRelease publishRelease(String owner, String repository, String title, String tag, String description)
         throws SecurityException, TransportException {
-        if (Objects.isNull(owner) && Objects.isNull(repositoryOwner))
-            logger.warn(SERVICE, "The repository owner was not passed as a service option nor overridden as an argument, creating the release may fail. Use the '{}' option to set this option or override it when invoking this method.", REPOSITORY_OWNER_OPTION_NAME);
-        if (Objects.isNull(repository) && Objects.isNull(repositoryName))
-            logger.warn(SERVICE, "The repository name was not passed as a service option nor overridden as an argument, creating the release may fail. Use the '{}' option to set this option or override it when invoking this method.", REPOSITORY_NAME_OPTION_NAME);
-        return new GitHubRelease(api, api.publishRelease(Objects.isNull(owner) ? repositoryOwner : owner, Objects.isNull(repository) ? this.repositoryName : repository, title, tag, description));
+        try {
+            return new GitHubRelease(getRepository(owner, repository).createRelease​(tag).name(title).body​(description).create());
+        }
+        catch (IOException ioe) {
+            throw new TransportException(String.format("Unable to publish the release '%s'", tag), ioe);
+        }
     }
 
     /**
@@ -234,24 +305,40 @@ public class GitHub implements GitHostingService, ReleaseService, UserService {
     public GitHubRelease publishReleaseAssets(String owner, String repository, Release release, Set<Attachment> assets)
         throws SecurityException, TransportException {
         Objects.requireNonNull(release);
-        if (Objects.isNull(owner) && Objects.isNull(repositoryOwner))
-            logger.warn(SERVICE, "The repository owner was not passed as a service option nor overridden as an argument, creating the release may fail. Use the '{}' option to set this option or override it when invoking this method.", REPOSITORY_OWNER_OPTION_NAME);
-        if (Objects.isNull(repository) && Objects.isNull(repositoryName))
-            logger.warn(SERVICE, "The repository name was not passed as a service option nor overridden as an argument, creating the release may fail. Use the '{}' option to set this option or override it when invoking this method.", REPOSITORY_NAME_OPTION_NAME);
+        if (Objects.isNull(assets) || assets.isEmpty()) {
+            try {
+                return GitHubRelease.class.cast(release);
+            }
+            catch (ClassCastException cce) {
+                throw new IllegalArgumentException("The given release was not created by this service", cce);
+            }
+        }
+
+        GHRelease ghRelease = null;
         try {
-            GitHubRelease ghRelease = GitHubRelease.class.cast(release);
-            if (Objects.isNull(assets) || assets.isEmpty())
-                return ghRelease;
-            // See: https://docs.github.com/en/rest/releases/releases#create-a-release
-            // The upload_url attribute is the one we need to upload assets
-            Object uploadURLObject = ghRelease.getAttributes().get("upload_url");
-            if (Objects.isNull(uploadURLObject))
-                throw new IllegalArgumentException(String.format("The given release does not have the '%s' attribute which is required to upload assets. Make sure it was created with this service", "upload_url"));
-            return new GitHubRelease(api, ghRelease.getAttributes(), api.publishReleaseAssets(Objects.isNull(owner) ? repositoryOwner : owner, Objects.isNull(repository) ? this.repositoryName : repository, uploadURLObject.toString(), assets));
+            ghRelease = getRepository(owner, repository).getReleaseByTagName​(release.getTag());
         }
-        catch (ClassCastException cce) {
-            throw new IllegalArgumentException("The given release was not created by this service", cce);
+        catch (IOException ioe) {
+            throw new TransportException(String.format("Unable to retrieve the release '%s'", release.getTag()), ioe);
         }
+
+        for (Attachment asset: assets) {
+            File assetFile = new File(asset.getPath());
+            if (assetFile.exists()) {
+                try {
+                    GHAsset ghAsset = ghRelease.uploadAsset​(asset.getFileName(), new FileInputStream(assetFile), asset.getType());
+                    ghAsset.setLabel​(asset.getDescription());
+                }
+                catch (IOException ioe) {
+                    throw new TransportException(String.format("Could not upload release asset '%s'", asset.getPath()), ioe);
+                }
+            }
+            else 
+            {
+                logger.warn(SERVICE, "The path '{}' for the asset '{}' cannot be resolved to a local file and will be skipped", asset.getPath(), asset.getFileName());
+            }
+        }
+        return new GitHubRelease(ghRelease);
     }
 
     /**

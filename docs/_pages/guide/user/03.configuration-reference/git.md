@@ -30,7 +30,7 @@ Hardcoding sensitive credentials into configuration files exposes your accounts 
 
 Within the `remotes` block you can define as many remote repositories as you want, each in its own separate block. The `name` identifies the remote repository as it is returned by running [`git remote`](https://git-scm.com/docs/git-remote) locally. If you use a `name` that was already defined for a remote then you are **overriding** an existing remote configuration. Depending on the [configuration method]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}) you use the `name` property might be defined inside or outside the block that configures a single remote.
 
-Configuring remotes gives Nyx informations about:
+Configuring remotes gives Nyx information about:
 
 * the configured remotes
 * the credentials to use when performing operations to and from remote repositories

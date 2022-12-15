@@ -91,7 +91,7 @@ class SemanticVersionPreReleaseIdentifier extends CompositeObjectIdentifier {
      * Creates a new identifier instance with the given identifiers. When elements of the given list are {@link Integer}
      * instances they are treated as numeric identifiers. All other object types are read using their {@link Object#toString()}
      * method. If the string returned by {@link Object#toString()} can be parsed to a positive integer then it is converted
-     * to a numeric identifier, otherwise it's used as a {@link String}.Items cannot be all {@code null}.
+     * to a numeric identifier, otherwise it's used as a {@link String}. Items cannot be all {@code null}.
      * String representations of objects must not be empty or contain illegal characters while {@link Integer} must be positive.
      *
      * @param multipleIdentifiers when {@code true} the given string is parsed as it (may) contain multiple
@@ -299,6 +299,9 @@ class SemanticVersionPreReleaseIdentifier extends CompositeObjectIdentifier {
      * the return value is {@code null}
      */
     SemanticVersionPreReleaseIdentifier removeAttribute(String name, boolean removeValue) {
+        if (Objects.isNull(name))
+            return this;
+
         if (!hasAttribute(name))
             return this;
 
@@ -319,7 +322,6 @@ class SemanticVersionPreReleaseIdentifier extends CompositeObjectIdentifier {
             else newValues.add(previousValue.toString());
         }
         
-       
         return newValues.isEmpty() ? null : valueOf(false, newValues.toArray());
     }
 }

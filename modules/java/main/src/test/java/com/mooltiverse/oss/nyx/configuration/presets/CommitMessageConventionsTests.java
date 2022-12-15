@@ -62,7 +62,7 @@ public class CommitMessageConventionsTests {
     }
 
     /**
-     * A {@link MethodSource} method that returns valid structured data to test commit messages using Conventional Commits.
+     * A {@link MethodSource} method that returns invalid structured data to test commit messages using Conventional Commits.
      * Each returned argument has one field with a commit message that doesn't match the Conventional Commits specification.
      */
     static Stream<Arguments> wellKnownInvalidConventionalCommitsMessages() {

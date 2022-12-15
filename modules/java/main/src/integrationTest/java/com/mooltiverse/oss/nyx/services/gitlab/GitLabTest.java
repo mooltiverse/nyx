@@ -32,8 +32,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
 import com.mooltiverse.oss.nyx.entities.Attachment;
-import com.mooltiverse.oss.nyx.git.Scenario;
-import com.mooltiverse.oss.nyx.git.Script;
+import com.mooltiverse.oss.nyx.git.tools.Scenario;
+import com.mooltiverse.oss.nyx.git.tools.Script;
 import com.mooltiverse.oss.nyx.git.util.RandomUtil;
 import com.mooltiverse.oss.nyx.services.Release;
 import com.mooltiverse.oss.nyx.services.Service;
@@ -89,8 +89,6 @@ public class GitLabTest {
             assertNotNull(user.getID());
             assertNotNull(user.getUserName());
             assertNotNull(user.geFullName());
-            assertNotNull(user.getAttributes());
-            assertFalse(user.getAttributes().isEmpty());
         }
     }
 
@@ -114,7 +112,7 @@ public class GitLabTest {
             assertEquals("https://gitlab.com/"+user.getUserName()+"/"+randomID+".git", gitLabRepository.getHTTPURL());
 
             // if we delete too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(2000);
+            Thread.sleep(4000);
 
             // now delete it
             gitLab.deleteGitRepository(gitLabRepository.getID());
@@ -137,11 +135,12 @@ public class GitLabTest {
             assertNull(gitLab.getReleaseByTag(user.getUserName(), gitLabRepository.getName(), "1.0.0-alpha.1"));
 
             // if we clone too quickly next calls may fail
-            Thread.sleep(2000);
+            Thread.sleep(4000);
 
             // when a token for user and password authentication for plain Git operations against a GitLab repository,
             // the user is the "PRIVATE-TOKEN" string and the password is the token
             Script script = Scenario.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED.applyOnClone(gitLabRepository.getHTTPURL(), "PRIVATE-TOKEN", System.getProperty("gitLabTestUserToken"));
+            script.getWorkingDirectory().deleteOnExit();
             script.push("PRIVATE-TOKEN", System.getProperty("gitLabTestUserToken"));
 
             // publish the release
@@ -157,8 +156,10 @@ public class GitLabTest {
             Thread.sleep(2000);
 
             Path assetPath1 = Files.createTempFile("nyx-test-gitlab-release-test-", ".txt");
+            assetPath1.toFile().deleteOnExit();
             Files.write(assetPath1, "content1".getBytes());
             Path assetPath2 = Files.createTempFile("nyx-test-gitlab-release-test-", ".bin");
+            assetPath2.toFile().deleteOnExit();
             Files.write(assetPath2, "content2".getBytes());
             Set<Attachment> assetsToUpload = new HashSet<Attachment>();
             assetsToUpload.add(new Attachment("asset1", "Text asset", "text/plain", assetPath1.toFile().getAbsolutePath()));

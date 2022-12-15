@@ -27,6 +27,8 @@ import com.mooltiverse.oss.nyx.entities.git.Identity;
 import com.mooltiverse.oss.nyx.entities.git.Message;
 import com.mooltiverse.oss.nyx.entities.git.Tag;
 import com.mooltiverse.oss.nyx.entities.git.TimeStamp;
+import com.mooltiverse.oss.nyx.git.tools.Scenario;
+import com.mooltiverse.oss.nyx.git.tools.Script;
 
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.revwalk.RevCommit;
@@ -118,6 +120,7 @@ public class ObjectFactoryTests {
             String fullCommitMessage = fullMessageStringWriter.toString();
 
             Script script = Scenario.FROM_SCRATCH.realize().andAddFiles();
+            script.getWorkingDirectory().deleteOnExit();
 
             // test with a message with just the simple message
             RevCommit commit = script.commit(messageHeader);
@@ -143,6 +146,7 @@ public class ObjectFactoryTests {
         public void tagFrom()
             throws Exception {
             Script script = Scenario.FROM_SCRATCH.realize().andAddFiles();
+            script.getWorkingDirectory().deleteOnExit();
 
             script.commit("Commit 1");
 
@@ -166,6 +170,7 @@ public class ObjectFactoryTests {
         public void commitFrom()
             throws Exception {
             Script script = Scenario.FROM_SCRATCH.realize().andAddFiles();
+            script.getWorkingDirectory().deleteOnExit();
 
             // test with a message with just the simple message
             RevCommit revCommit1 = script.commit("Commit 1");

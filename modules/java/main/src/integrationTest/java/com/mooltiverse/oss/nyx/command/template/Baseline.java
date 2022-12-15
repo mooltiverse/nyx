@@ -21,9 +21,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import com.mooltiverse.oss.nyx.git.Scenario;
-import com.mooltiverse.oss.nyx.git.Script;
-import com.mooltiverse.oss.nyx.git.Workbench;
+import com.mooltiverse.oss.nyx.git.tools.Scenario;
+import com.mooltiverse.oss.nyx.git.tools.Script;
+import com.mooltiverse.oss.nyx.git.tools.Workbench;
 
 /**
  * This annotation can be used to define a well known Git baseline to be realized in a Git repository when

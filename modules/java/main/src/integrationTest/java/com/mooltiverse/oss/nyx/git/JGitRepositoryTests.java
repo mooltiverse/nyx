@@ -37,6 +37,8 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import com.mooltiverse.oss.nyx.entities.git.Commit;
 import com.mooltiverse.oss.nyx.entities.git.Identity;
 import com.mooltiverse.oss.nyx.entities.git.Tag;
+import com.mooltiverse.oss.nyx.git.tools.Scenario;
+import com.mooltiverse.oss.nyx.git.tools.Script;
 import com.mooltiverse.oss.nyx.git.util.RandomUtil;
 import com.mooltiverse.oss.nyx.services.github.GitHub;
 import com.mooltiverse.oss.nyx.services.github.GitHubRepository;
@@ -75,14 +77,14 @@ public class JGitRepositoryTests {
 
         @DisplayName("JGitRepository.clone(String, String) throws GitException with non empty directory")
         @Test
-        public void exceptionWithNewEmptyDirectoryAsString()
+        public void exceptionWithNonEmptyDirectoryAsString()
             throws Exception {
             assertThrows(GitException.class, () -> JGitRepository.clone(Scenario.FROM_SCRATCH.realize().getWorkingDirectory().getAbsolutePath(), REMOTE_TEST_REPOSITORY));
         }
 
         @DisplayName("JGitRepository.clone(File, URI) throws GitException with non empty directory")
         @Test
-        public void exceptionWithNewEmptyDirectoryAsFile()
+        public void exceptionWithNonEmptyDirectoryAsFile()
             throws Exception {
             assertThrows(GitException.class, () -> JGitRepository.clone(Scenario.FROM_SCRATCH.realize().getWorkingDirectory(), URI.create(REMOTE_TEST_REPOSITORY)));
         }
@@ -180,7 +182,7 @@ public class JGitRepositoryTests {
             GitHubRepository gitHubRepository = gitHub.createGitRepository(randomID, "Test repository "+randomID, true, true);
 
             // if we read too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(2000);
+            Thread.sleep(4000);
 
             File directory = Files.createTempDirectory("nyx-test-git-clone-test-").toFile();
             directory.deleteOnExit();
@@ -201,7 +203,7 @@ public class JGitRepositoryTests {
             GitHubRepository gitHubRepository = gitHub.createGitRepository(randomID, "Test repository "+randomID, true, true);
 
             // if we read too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(2000);
+            Thread.sleep(4000);
 
             File directory = Files.createTempDirectory("nyx-test-git-clone-test-").toFile();
             directory.deleteOnExit();
@@ -222,7 +224,7 @@ public class JGitRepositoryTests {
             GitHubRepository gitHubRepository = gitHub.createGitRepository(randomID, "Test repository "+randomID, true, true);
 
             // if we read too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(2000);
+            Thread.sleep(4000);
 
             File directory = Files.createTempDirectory("nyx-test-git-clone-test-").toFile();
             directory.deleteOnExit();
@@ -245,7 +247,7 @@ public class JGitRepositoryTests {
             GitHubRepository gitHubRepository = gitHub.createGitRepository(randomID, "Test repository "+randomID, true, true);
 
             // if we read too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(2000);
+            Thread.sleep(4000);
 
             File directory = Files.createTempDirectory("nyx-test-git-clone-test-").toFile();
             directory.deleteOnExit();
@@ -350,6 +352,7 @@ public class JGitRepositoryTests {
         public void addTest()
             throws Exception {
             Script script = Scenario.INITIAL_COMMIT.realize();
+            script.getWorkingDirectory().deleteOnExit();
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
 
             // remember the cache count may increas of more than 1 for each added file
@@ -373,6 +376,7 @@ public class JGitRepositoryTests {
         public void exceptionWithNullMessageOn1Params()
             throws Exception {
             Script script = Scenario.FROM_SCRATCH.realize();
+            script.getWorkingDirectory().deleteOnExit();
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
 
             script.addRandomTextWorkbenchFiles(1);
@@ -384,6 +388,7 @@ public class JGitRepositoryTests {
         public void commit1Params()
             throws Exception {
             Script script = Scenario.INITIAL_COMMIT.realize();
+            script.getWorkingDirectory().deleteOnExit();
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
 
             RevCommit prevLastCommit = script.getLastCommit();
@@ -421,6 +426,7 @@ public class JGitRepositoryTests {
         public void exceptionWithNullMessageOn2Params()
             throws Exception {
             Script script = Scenario.FROM_SCRATCH.realize();
+            script.getWorkingDirectory().deleteOnExit();
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
 
             script.addRandomTextWorkbenchFiles(1);
@@ -432,6 +438,7 @@ public class JGitRepositoryTests {
         public void commit2Params()
             throws Exception {
             Script script = Scenario.INITIAL_COMMIT.realize();
+            script.getWorkingDirectory().deleteOnExit();
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
 
             RevCommit prevLastCommit = script.getLastCommit();
@@ -451,6 +458,7 @@ public class JGitRepositoryTests {
         public void exceptionWithNullMessageOn3Params()
             throws Exception {
             Script script = Scenario.FROM_SCRATCH.realize();
+            script.getWorkingDirectory().deleteOnExit();
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
 
             script.addRandomTextWorkbenchFiles(1);
@@ -462,6 +470,7 @@ public class JGitRepositoryTests {
         public void commit3Params()
             throws Exception {
             Script script = Scenario.INITIAL_COMMIT.realize();
+            script.getWorkingDirectory().deleteOnExit();
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
 
             RevCommit prevLastCommit = script.getLastCommit();
@@ -508,6 +517,7 @@ public class JGitRepositoryTests {
         public void exceptionWithNullMessageOn4Params()
             throws Exception {
             Script script = Scenario.FROM_SCRATCH.realize();
+            script.getWorkingDirectory().deleteOnExit();
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
             
             script.addRandomTextWorkbenchFiles(1);
@@ -519,6 +529,7 @@ public class JGitRepositoryTests {
         public void commit4Params()
             throws Exception {
             Script script = Scenario.INITIAL_COMMIT.realize();
+            script.getWorkingDirectory().deleteOnExit();
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
 
             RevCommit prevLastCommit = script.getLastCommit();
@@ -549,15 +560,18 @@ public class JGitRepositoryTests {
     class PushTests {
         @DisplayName("JGitRepository.push()")
         @Test
-        public void pushToRemoteTest()
+        public void pushTest()
             throws Exception {
             Script script = Scenario.INITIAL_COMMIT.realize();
+            script.getWorkingDirectory().deleteOnExit();
 
             // also create two new empty repositories to use as remotes
-            Script remote1script = Scenario.FROM_SCRATCH.realize();
-            Script remote2script = Scenario.FROM_SCRATCH.realize();
-            script.addRemote(remote1script.getGitDirectory(), "origin");
-            script.addRemote(remote2script.getGitDirectory(), "custom");
+            Script remote1script = Scenario.BARE.realize(true);
+            remote1script.getGitDirectory().deleteOnExit();
+            Script remote2script = Scenario.BARE.realize(true);
+            remote2script.getGitDirectory().deleteOnExit();
+            script.addRemote(remote1script.getGitDirectory(), "origin"); // use the GitDirectory as the WorkingDirectory is not available for bare repositories
+            script.addRemote(remote2script.getGitDirectory(), "custom"); // use the GitDirectory as the WorkingDirectory is not available for bare repositories
 
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
 
@@ -589,15 +603,18 @@ public class JGitRepositoryTests {
 
         @DisplayName("JGitRepository.push(String, String) with non required credentials")
         @Test
-        public void pushToRemoteWithNonRequiredCredentialsTest()
+        public void pushWithNonRequiredCredentialsTest()
             throws Exception {
             Script script = Scenario.INITIAL_COMMIT.realize();
+            script.getWorkingDirectory().deleteOnExit();
 
             // also create two new empty repositories to use as remotes
-            Script remote1script = Scenario.FROM_SCRATCH.realize();
-            Script remote2script = Scenario.FROM_SCRATCH.realize();
-            script.addRemote(remote1script.getGitDirectory(), "origin");
-            script.addRemote(remote2script.getGitDirectory(), "custom");
+            Script remote1script = Scenario.BARE.realize(true);
+            remote1script.getGitDirectory().deleteOnExit();
+            Script remote2script = Scenario.BARE.realize(true);
+            remote2script.getGitDirectory().deleteOnExit();
+            script.addRemote(remote1script.getGitDirectory(), "origin"); // use the GitDirectory as the WorkingDirectory is not available for bare repositories
+            script.addRemote(remote2script.getGitDirectory(), "custom"); // use the GitDirectory as the WorkingDirectory is not available for bare repositories
 
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
 
@@ -631,7 +648,7 @@ public class JGitRepositoryTests {
 
         @DisplayName("JGitRepository.push(String, String) without required credentials")
         @Test
-        public void pushsToRemoteWithoutRequiredCredentialsTest()
+        public void pushWithoutRequiredCredentialsTest()
             throws Exception {
             String randomID = RandomUtil.randomAlphabeticString(5);
             // the 'gitHubTestUserToken' system property is set by the build script, which in turn reads it from an environment variable
@@ -640,7 +657,7 @@ public class JGitRepositoryTests {
             GitHubRepository gitHubRepository = gitHub.createGitRepository(randomID, "Test repository "+randomID, true, true);
 
             // if we read too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(2000);
+            Thread.sleep(4000);
 
             File directory = Files.createTempDirectory("nyx-test-git-clone-test-").toFile();
             directory.deleteOnExit();
@@ -661,7 +678,7 @@ public class JGitRepositoryTests {
 
         @DisplayName("JGitRepository.push(String, String) with required credentials")
         @Test
-        public void pushToRemoteWithRequiredCredentialsTest()
+        public void pushWithRequiredCredentialsTest()
             throws Exception {
             String randomID = RandomUtil.randomAlphabeticString(5);
             // the 'gitHubTestUserToken' system property is set by the build script, which in turn reads it from an environment variable
@@ -670,7 +687,7 @@ public class JGitRepositoryTests {
             GitHubRepository gitHubRepository = gitHub.createGitRepository(randomID, "Test repository "+randomID, true, true);
 
             // if we read too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(2000);
+            Thread.sleep(4000);
 
             File directory = Files.createTempDirectory("nyx-test-git-clone-test-").toFile();
             directory.deleteOnExit();
@@ -691,15 +708,18 @@ public class JGitRepositoryTests {
 
         @DisplayName("JGitRepository.push(String)")
         @Test
-        public void pushTest()
+        public void pushToRemoteTest()
             throws Exception {
             Script script = Scenario.INITIAL_COMMIT.realize();
+            script.getWorkingDirectory().deleteOnExit();
 
             // also create two new empty repositories to use as remotes
-            Script remote1script = Scenario.FROM_SCRATCH.realize();
-            Script remote2script = Scenario.FROM_SCRATCH.realize();
-            script.addRemote(remote1script.getGitDirectory(), "origin");
-            script.addRemote(remote2script.getGitDirectory(), "custom");
+            Script remote1script = Scenario.BARE.realize(true);
+            remote1script.getGitDirectory().deleteOnExit();
+            Script remote2script = Scenario.BARE.realize(true);
+            remote2script.getGitDirectory().deleteOnExit();
+            script.addRemote(remote1script.getGitDirectory(), "origin"); // use the GitDirectory as the WorkingDirectory is not available for bare repositories
+            script.addRemote(remote2script.getGitDirectory(), "custom"); // use the GitDirectory as the WorkingDirectory is not available for bare repositories
 
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
 
@@ -731,15 +751,18 @@ public class JGitRepositoryTests {
 
         @DisplayName("JGitRepository.push(String, String, String) with non required credentials")
         @Test
-        public void pushWithNonRequiredCredentialsTest()
+        public void pushToRemoteWithNonRequiredCredentialsTest()
             throws Exception {
             Script script = Scenario.INITIAL_COMMIT.realize();
+            script.getWorkingDirectory().deleteOnExit();
 
             // also create two new empty repositories to use as remotes
-            Script remote1script = Scenario.FROM_SCRATCH.realize();
-            Script remote2script = Scenario.FROM_SCRATCH.realize();
-            script.addRemote(remote1script.getGitDirectory(), "origin");
-            script.addRemote(remote2script.getGitDirectory(), "custom");
+            Script remote1script = Scenario.BARE.realize(true);
+            remote1script.getGitDirectory().deleteOnExit();
+            Script remote2script = Scenario.BARE.realize(true);
+            remote2script.getGitDirectory().deleteOnExit();
+            script.addRemote(remote1script.getGitDirectory(), "origin"); // use the GitDirectory as the WorkingDirectory is not available for bare repositories
+            script.addRemote(remote2script.getGitDirectory(), "custom"); // use the GitDirectory as the WorkingDirectory is not available for bare repositories
 
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
 
@@ -773,7 +796,7 @@ public class JGitRepositoryTests {
 
         @DisplayName("JGitRepository.push(String, String, String) without required credentials")
         @Test
-        public void pushWithoutRequiredCredentialsTest()
+        public void pushToRemoteWithoutRequiredCredentialsTest()
             throws Exception {
             String randomID = RandomUtil.randomAlphabeticString(5);
             // the 'gitHubTestUserToken' system property is set by the build script, which in turn reads it from an environment variable
@@ -782,7 +805,7 @@ public class JGitRepositoryTests {
             GitHubRepository gitHubRepository = gitHub.createGitRepository(randomID, "Test repository "+randomID, true, true);
 
             // if we read too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(2000);
+            Thread.sleep(4000);
 
             File directory = Files.createTempDirectory("nyx-test-git-clone-test-").toFile();
             directory.deleteOnExit();
@@ -803,7 +826,7 @@ public class JGitRepositoryTests {
 
         @DisplayName("JGitRepository.push(String, String, String) with required credentials")
         @Test
-        public void pushWithRequiredCredentialsTest()
+        public void pushToRemoteWithRequiredCredentialsTest()
             throws Exception {
             String randomID = RandomUtil.randomAlphabeticString(5);
             // the 'gitHubTestUserToken' system property is set by the build script, which in turn reads it from an environment variable
@@ -812,7 +835,7 @@ public class JGitRepositoryTests {
             GitHubRepository gitHubRepository = gitHub.createGitRepository(randomID, "Test repository "+randomID, true, true);
 
             // if we read too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(2000);
+            Thread.sleep(4000);
 
             File directory = Files.createTempDirectory("nyx-test-git-clone-test-").toFile();
             directory.deleteOnExit();
@@ -836,12 +859,15 @@ public class JGitRepositoryTests {
         public void pushToRemotesTest()
             throws Exception {
             Script script = Scenario.INITIAL_COMMIT.realize();
+            script.getWorkingDirectory().deleteOnExit();
 
             // also create two new empty repositories to use as remotes
-            Script remote1script = Scenario.FROM_SCRATCH.realize();
-            Script remote2script = Scenario.FROM_SCRATCH.realize();
-            script.addRemote(remote1script.getGitDirectory(), "origin");
-            script.addRemote(remote2script.getGitDirectory(), "custom");
+            Script remote1script = Scenario.BARE.realize(true);
+            remote1script.getGitDirectory().deleteOnExit();
+            Script remote2script = Scenario.BARE.realize(true);
+            remote2script.getGitDirectory().deleteOnExit();
+            script.addRemote(remote1script.getGitDirectory(), "origin"); // use the GitDirectory as the WorkingDirectory is not available for bare repositories
+            script.addRemote(remote2script.getGitDirectory(), "custom"); // use the GitDirectory as the WorkingDirectory is not available for bare repositories
 
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
 
@@ -864,7 +890,7 @@ public class JGitRepositoryTests {
             assertNotEquals(script.getLastCommit().getId().getName(), remote1script.getLastCommit().getId().getName());
             assertNotEquals(script.getLastCommit().getId().getName(), remote2script.getLastCommit().getId().getName());
 
-            // now push (to the default 'origin') and see the changes reflected
+            // now push and see the changes reflected
             pushedRemotes = repository.push(List.<String>of("origin", "custom"));
 
             // changes are reflected to both remotes
@@ -880,12 +906,15 @@ public class JGitRepositoryTests {
         public void pushToRemotesWithNonRequiredCredentialsTest()
             throws Exception {
             Script script = Scenario.INITIAL_COMMIT.realize();
+            script.getWorkingDirectory().deleteOnExit();
 
             // also create two new empty repositories to use as remotes
-            Script remote1script = Scenario.FROM_SCRATCH.realize();
-            Script remote2script = Scenario.FROM_SCRATCH.realize();
-            script.addRemote(remote1script.getGitDirectory(), "origin");
-            script.addRemote(remote2script.getGitDirectory(), "custom");
+            Script remote1script = Scenario.BARE.realize(true);
+            remote1script.getGitDirectory().deleteOnExit();
+            Script remote2script = Scenario.BARE.realize(true);
+            remote2script.getGitDirectory().deleteOnExit();
+            script.addRemote(remote1script.getGitDirectory(), "origin"); // use the GitDirectory as the WorkingDirectory is not available for bare repositories
+            script.addRemote(remote2script.getGitDirectory(), "custom"); // use the GitDirectory as the WorkingDirectory is not available for bare repositories
 
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
 
@@ -909,7 +938,7 @@ public class JGitRepositoryTests {
             assertNotEquals(script.getLastCommit().getId().getName(), remote1script.getLastCommit().getId().getName());
             assertNotEquals(script.getLastCommit().getId().getName(), remote2script.getLastCommit().getId().getName());
 
-            // now push (to the default 'origin') and see the changes reflected
+            // now push and see the changes reflected
             // the 'gitHubTestUserToken' system property is set by the build script, which in turn reads it from an environment variable
             pushedRemotes = repository.push(List.<String>of("origin", "custom"), System.getProperty("gitHubTestUserToken"), System.getProperty("gitHubTestUserToken"));
 
@@ -932,7 +961,7 @@ public class JGitRepositoryTests {
             GitHubRepository gitHubRepository = gitHub.createGitRepository(randomID, "Test repository "+randomID, true, true);
 
             // if we read too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(2000);
+            Thread.sleep(4000);
 
             File directory = Files.createTempDirectory("nyx-test-git-clone-test-").toFile();
             directory.deleteOnExit();
@@ -962,7 +991,7 @@ public class JGitRepositoryTests {
             GitHubRepository gitHubRepository = gitHub.createGitRepository(randomID, "Test repository "+randomID, true, true);
 
             // if we read too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(2000);
+            Thread.sleep(4000);
 
             File directory = Files.createTempDirectory("nyx-test-git-clone-test-").toFile();
             directory.deleteOnExit();
@@ -987,9 +1016,10 @@ public class JGitRepositoryTests {
     class TagTests {
         @DisplayName("JGitRepository.tag(String, String)")
         @Test
-        public void tag1Test()
+        public void tagTest()
             throws Exception {
             Script script = Scenario.INITIAL_COMMIT.realize();
+            script.getWorkingDirectory().deleteOnExit();
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
 
             // make sure an exception is thrown when the tag name is null
@@ -1011,9 +1041,10 @@ public class JGitRepositoryTests {
 
         @DisplayName("JGitRepository.tag(String, String)")
         @Test
-        public void tag2Test()
+        public void tagWithMessageTest()
             throws Exception {
             Script script = Scenario.INITIAL_COMMIT.realize();
+            script.getWorkingDirectory().deleteOnExit();
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
 
             // make sure an exception is thrown when the tag name is null
@@ -1039,15 +1070,16 @@ public class JGitRepositoryTests {
             assertEquals(script.getCommitByTag("atag"), repository.getLatestCommit());
 
             // make sure an exception is thrown when the tag name is duplicated
-            assertThrows(GitException.class, () -> repository.tag("ltag", null));
+            assertThrows(GitException.class, () -> repository.tag("atag", null));
             assertThrows(GitException.class, () -> repository.tag("atag", "The tag message"));
         }
 
         @DisplayName("JGitRepository.tag(String, String, Identity)")
         @Test
-        public void tag3Test()
+        public void tagWithMessageAndIdentityTest()
             throws Exception {
             Script script = Scenario.INITIAL_COMMIT.realize();
+            script.getWorkingDirectory().deleteOnExit();
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
 
             // make sure an exception is thrown when the tag name is null
@@ -1079,9 +1111,10 @@ public class JGitRepositoryTests {
 
         @DisplayName("JGitRepository.tag(String, String, String, Identity)")
         @Test
-        public void tag4Test()
+        public void tagCommitWithMessageAndIdentityTest()
             throws Exception {
             Script script = Scenario.INITIAL_COMMIT.realize();
+            script.getWorkingDirectory().deleteOnExit();
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
 
             // make sure an exception is thrown when the tag name is null
@@ -1135,7 +1168,8 @@ public class JGitRepositoryTests {
         @Test
         public void getCurrentBranchTest()
             throws Exception {
-            Script script = Scenario.FROM_SCRATCH.realize();
+            Script script = Scenario.INITIAL_COMMIT.realize();
+            script.getWorkingDirectory().deleteOnExit();
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
 
             assertEquals("master", repository.getCurrentBranch());
@@ -1158,6 +1192,7 @@ public class JGitRepositoryTests {
         public void exceptionWithRepositoryWithNoCommits()
             throws Exception {
             Script script = Scenario.FROM_SCRATCH.realize();
+            script.getWorkingDirectory().deleteOnExit();
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
 
             assertThrows(GitException.class, () -> repository.getLatestCommit());
@@ -1176,6 +1211,7 @@ public class JGitRepositoryTests {
         public void getLatestCommitTest()
             throws Exception {
             Script script = Scenario.FROM_SCRATCH.realize();
+            script.getWorkingDirectory().deleteOnExit();
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
             
             // add and stage some files
@@ -1211,6 +1247,7 @@ public class JGitRepositoryTests {
         public void exceptionWithRepositoryWithNoCommits()
             throws Exception {
             Script script = Scenario.FROM_SCRATCH.realize();
+            script.getWorkingDirectory().deleteOnExit();
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
             
             assertThrows(GitException.class, () -> repository.getRootCommit());
@@ -1229,6 +1266,7 @@ public class JGitRepositoryTests {
         public void getRootCommitTest()
             throws Exception {
             Script script = Scenario.FROM_SCRATCH.realize();
+            script.getWorkingDirectory().deleteOnExit();
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
             
             // add and stage some files
@@ -1264,6 +1302,7 @@ public class JGitRepositoryTests {
         public void isCleanTest()
             throws Exception {
             Script script = Scenario.FROM_SCRATCH.realize();
+            script.getWorkingDirectory().deleteOnExit();
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
             assertTrue(repository.isClean());
             
@@ -1305,6 +1344,7 @@ public class JGitRepositoryTests {
         public void getCommitTagsTest()
             throws Exception {
             Script script = Scenario.FROM_SCRATCH.realize();
+            script.getWorkingDirectory().deleteOnExit();
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
 
             // add a commit
@@ -1334,6 +1374,7 @@ public class JGitRepositoryTests {
         public void getRemoteNamesWithNoRemotesTest()
             throws Exception {
             Script script = Scenario.FROM_SCRATCH.realize();
+            script.getWorkingDirectory().deleteOnExit();
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
 
             assertTrue(repository.getRemoteNames().isEmpty());
@@ -1357,11 +1398,10 @@ public class JGitRepositoryTests {
         @Test
         public void getRemoteNamesAfterAddingLocalRepositoryTest()
             throws Exception {
-            File directory = Files.createTempDirectory("nyx-test-git-remote-names-test-").toFile();
-            directory.deleteOnExit();
-
             Script script = Scenario.FROM_SCRATCH.realize();
+            script.getWorkingDirectory().deleteOnExit();
             Script localRepositoryScript = Scenario.FROM_SCRATCH.realize();
+            localRepositoryScript.getWorkingDirectory().deleteOnExit();
             script.addRemote(localRepositoryScript.getGitDirectory(), "local");
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
 
@@ -1379,8 +1419,10 @@ public class JGitRepositoryTests {
 
             Repository repository = Git.instance().clone(directory.getAbsolutePath(), REMOTE_TEST_REPOSITORY/*, System.getProperty("gitHubTestUserToken"), ""*/);
             Script script = new Script(directory);
+            script.getWorkingDirectory().deleteOnExit();
 
             Script localRepositoryScript = Scenario.FROM_SCRATCH.realize();
+            localRepositoryScript.getWorkingDirectory().deleteOnExit();
             script.addRemote(localRepositoryScript.getGitDirectory(), "local");
 
             assertFalse(repository.getRemoteNames().isEmpty());
@@ -1392,13 +1434,12 @@ public class JGitRepositoryTests {
 
     @Nested
     @DisplayName("JGitRepository.walkHistory")
-    class WalkhistoryTests {
+    class WalkHistoryTests {
         @DisplayName("JGitRepository.walkHistory(null, null, CommitVisitor)")
         @Test
         public void walkHistoryWithNoBoundariesTest()
             throws Exception {
             Repository repository = JGitRepository.open(Scenario.TWO_BRANCH_SHORT_MERGED.realize().getWorkingDirectory());
-
             // Keep track of the visited commits
             List<Commit> visitedCommits = new ArrayList<Commit>();
 
@@ -1428,7 +1469,6 @@ public class JGitRepositoryTests {
         public void walkHistoryWithVisitorStoppingBrowsingTest()
             throws Exception {
             Repository repository = JGitRepository.open(Scenario.TWO_BRANCH_SHORT_MERGED.realize().getWorkingDirectory());
-
             // Keep track of the visited commits
             List<Commit> visitedCommits = new ArrayList<Commit>();
 
@@ -1578,6 +1618,7 @@ public class JGitRepositoryTests {
         public void walkHistoryWithEndBoundaryOutOfScopeTest()
             throws Exception {
             Script script = Scenario.TWO_BRANCH_SHORT_UNMERGED.realize();
+            script.getWorkingDirectory().deleteOnExit();
             Repository repository = JGitRepository.open(script.getWorkingDirectory());
             // Keep track of the visited commits
             List<Commit> visitedCommitsWithoutBoundaries = new ArrayList<Commit>();

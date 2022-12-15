@@ -108,6 +108,8 @@ public class Publish extends AbstractCommand {
                 else {
                     try {
                         ReleaseService service = resolveReleaseService(serviceName);
+                        if (Objects.isNull(service))
+                            throw new IllegalPropertyException(String.format("The release type uses the '%s' publication service but no such service has been configured in the 'services' section", serviceName));
                         // The first two parameters here are null because the repository owner and name are expected to be passed
                         // along with service options. This is just a place where we could override them.
                         Release release = service.publishRelease(null, null, state().getVersion(), state().getVersion(), description);
@@ -208,7 +210,7 @@ public class Publish extends AbstractCommand {
             else logger.debug(COMMAND, "The release type has the publish flag disabled");
         }
         else {
-            logger.info(COMMAND, "No version change detected. Nothing to publish.");
+            logger.debug(COMMAND, "No version change detected. Nothing to publish.");
         }
 
         storeStatusInternalAttributes();

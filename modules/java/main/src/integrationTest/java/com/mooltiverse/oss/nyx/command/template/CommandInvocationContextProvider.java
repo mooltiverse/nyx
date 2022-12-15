@@ -40,8 +40,8 @@ import com.mooltiverse.oss.nyx.command.Mark;
 import com.mooltiverse.oss.nyx.command.Publish;
 import com.mooltiverse.oss.nyx.configuration.Configuration;
 import com.mooltiverse.oss.nyx.git.Git;
-import com.mooltiverse.oss.nyx.git.Script;
-import com.mooltiverse.oss.nyx.git.Workbench;
+import com.mooltiverse.oss.nyx.git.tools.Script;
+import com.mooltiverse.oss.nyx.git.tools.Workbench;
 import com.mooltiverse.oss.nyx.state.State;
 
 /**

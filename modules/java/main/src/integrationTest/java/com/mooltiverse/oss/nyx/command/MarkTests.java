@@ -29,13 +29,13 @@ import com.mooltiverse.oss.nyx.configuration.SimpleConfigurationLayer;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
 import com.mooltiverse.oss.nyx.entities.GitRemoteConfiguration;
+import com.mooltiverse.oss.nyx.entities.Provider;
 import com.mooltiverse.oss.nyx.entities.ReleaseType;
 import com.mooltiverse.oss.nyx.entities.ReleaseTypes;
 import com.mooltiverse.oss.nyx.entities.ServiceConfiguration;
-import com.mooltiverse.oss.nyx.git.Scenario;
-import com.mooltiverse.oss.nyx.git.Script;
+import com.mooltiverse.oss.nyx.git.tools.Scenario;
+import com.mooltiverse.oss.nyx.git.tools.Script;
 import com.mooltiverse.oss.nyx.git.util.RandomUtil;
-import com.mooltiverse.oss.nyx.services.Provider;
 import com.mooltiverse.oss.nyx.services.github.GitHub;
 import com.mooltiverse.oss.nyx.services.github.GitHubRepository;
 import com.mooltiverse.oss.nyx.services.gitlab.GitLab;
@@ -58,10 +58,12 @@ public class MarkTests {
             GitHubRepository gitHubRepository = gitHub.createGitRepository(randomID, "Test repository "+randomID, false, true);
 
             // if we clone too quickly next calls may fail
-            Thread.sleep(2000);
+            Thread.sleep(4000);
 
             Script replicaScript = Scenario.FROM_SCRATCH.realize();
+            replicaScript.getWorkingDirectory().deleteOnExit();
             Script script = Scenario.ONE_BRANCH_SHORT.applyOnClone(gitHubRepository.getHTTPURL(), System.getProperty("gitHubTestUserToken"), "");
+            script.getWorkingDirectory().deleteOnExit();
             script.addRemote(replicaScript.getGitDirectory(), "replica");
             
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
@@ -107,6 +109,7 @@ public class MarkTests {
 
             // clone the remote repo again into a a new directory and test
             Script remoteScript = Script.cloneFrom(gitHubRepository.getHTTPURL(), System.getProperty("gitHubTestUserToken"), "");
+            remoteScript.getWorkingDirectory().deleteOnExit();
 
             assertEquals("0.0.5", nyx.state().getVersion());
             assertEquals(script.getTags().size(), replicaScript.getTags().size());
@@ -137,10 +140,12 @@ public class MarkTests {
             GitLabRepository gitLabRepository = gitLab.createGitRepository(randomID, "Test repository "+randomID, false, true);
 
             // if we clone too quickly next calls may fail
-            Thread.sleep(2000);
+            Thread.sleep(4000);
 
             Script replicaScript = Scenario.FROM_SCRATCH.realize();
+            replicaScript.getWorkingDirectory().deleteOnExit();
             Script script = Scenario.ONE_BRANCH_SHORT.applyOnClone(gitLabRepository.getHTTPURL(), "PRIVATE-TOKEN", System.getProperty("gitLabTestUserToken"));
+            script.getWorkingDirectory().deleteOnExit();
             script.addRemote(replicaScript.getGitDirectory(), "replica");
             
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
@@ -186,6 +191,7 @@ public class MarkTests {
 
             // clone the remote repo again into a a new directory and test
             Script remoteScript = Script.cloneFrom(gitLabRepository.getHTTPURL(), "PRIVATE-TOKEN", System.getProperty("gitLabTestUserToken"));
+            remoteScript.getWorkingDirectory().deleteOnExit();
 
             assertEquals("0.0.5", nyx.state().getVersion());
             assertEquals(script.getTags().size(), replicaScript.getTags().size());

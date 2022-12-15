@@ -90,7 +90,7 @@ The replacement string must be coherent with the type of the rendered document. 
 
 Each entry in the map is made of a pair of strings: the entry name is a regular expression used to match the strings to be replaced, while the value is a *printf* format string used to generate the new string.
 
-The format string can thereby use the `%s` placeholder to insert the value captured by the regular expression in the new string. You may use the `%s` placeholder up to five times in the format string and all occurrences will be replaced by the same value captured by the regular expression. This sule is because the argument index in format strings is not portable so we need to use a standard placeholder definition.
+The format string can thereby use the `%s` placeholder to insert the value captured by the regular expression in the new string.
 
 The regular expression needs to have at least one (named or unnamed) capture group. In case more than one capture group is present, only the first one is considered (and used for the format string parameters).
 

@@ -27,7 +27,8 @@ import com.mooltiverse.oss.nyx.command.template.CommandInvocationContextProvider
 import com.mooltiverse.oss.nyx.command.template.CommandProxy;
 import com.mooltiverse.oss.nyx.command.template.CommandSelector;
 import com.mooltiverse.oss.nyx.command.template.StandaloneCommandProxy;
-import com.mooltiverse.oss.nyx.git.Scenario;
+import com.mooltiverse.oss.nyx.git.tools.Scenario;
+import com.mooltiverse.oss.nyx.git.tools.Script;
 
 @DisplayName("Publish")
 public class PublishTestTemplates {
@@ -42,8 +43,9 @@ public class PublishTestTemplates {
         @TestTemplate
         @DisplayName("Publish()")
         @Baseline(Scenario.FROM_SCRATCH)
-        void constructorTest(@CommandSelector(Commands.PUBLISH) CommandProxy command)
+        void constructorTest(@CommandSelector(Commands.PUBLISH) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             assertNotNull(command);
         }
     }
@@ -58,8 +60,9 @@ public class PublishTestTemplates {
         @TestTemplate
         @DisplayName("Publish.state()")
         @Baseline(Scenario.FROM_SCRATCH)
-        void stateTest(@CommandSelector(Commands.PUBLISH) CommandProxy command)
+        void stateTest(@CommandSelector(Commands.PUBLISH) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             assertNotNull(command.state());
         }
     }
@@ -75,8 +78,9 @@ public class PublishTestTemplates {
         @TestTemplate
         @DisplayName("Publish.isUpToDate()")
         @Baseline(Scenario.INITIAL_COMMIT)
-        void isUpToDateTest(@CommandSelector(Commands.PUBLISH) CommandProxy command)
+        void isUpToDateTest(@CommandSelector(Commands.PUBLISH) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             // simply test that running it twice returns false at the first run and true the second
             assertFalse(command.isUpToDate());
             command.run();
@@ -102,8 +106,9 @@ public class PublishTestTemplates {
         @TestTemplate
         @DisplayName("Publish idempotency")
         @Baseline(Scenario.INITIAL_COMMIT)
-        void idempotency(@CommandSelector(Commands.PUBLISH) CommandProxy command)
+        void idempotency(@CommandSelector(Commands.PUBLISH) CommandProxy command, Script script)
             throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
             // simply test that running it twice returns false at the first run and true the second
             assertFalse(command.isUpToDate());
             command.run();

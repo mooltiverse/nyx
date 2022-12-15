@@ -32,8 +32,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
 import com.mooltiverse.oss.nyx.entities.Attachment;
-import com.mooltiverse.oss.nyx.git.Scenario;
-import com.mooltiverse.oss.nyx.git.Script;
+import com.mooltiverse.oss.nyx.git.tools.Scenario;
+import com.mooltiverse.oss.nyx.git.tools.Script;
 import com.mooltiverse.oss.nyx.git.util.RandomUtil;
 import com.mooltiverse.oss.nyx.services.Release;
 import com.mooltiverse.oss.nyx.services.Service;
@@ -89,8 +89,6 @@ public class GitHubTest {
             assertNotNull(user.getID());
             assertNotNull(user.getUserName());
             assertNotNull(user.geFullName());
-            assertNotNull(user.getAttributes());
-            assertFalse(user.getAttributes().isEmpty());
         }
     }
 
@@ -114,7 +112,7 @@ public class GitHubTest {
             assertEquals("https://github.com/"+user.getUserName()+"/"+randomID+".git", gitHubRepository.getHTTPURL());
 
             // if we delete too quickly we often get a 404 from the server so let's wait a short while
-            Thread.sleep(2000);
+            Thread.sleep(4000);
 
             // now delete it
             gitHub.deleteGitRepository(randomID);
@@ -137,11 +135,12 @@ public class GitHubTest {
             assertNull(gitHub.getReleaseByTag(user.getUserName(), gitHubRepository.getName(), "1.0.0-alpha.1"));
 
             // if we clone too quickly next calls may fail
-            Thread.sleep(2000);
+            Thread.sleep(4000);
 
             // when a token for user and password authentication for plain Git operations against a GitHub repository,
             // the user is the token and the password is the empty string
             Script script = Scenario.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED.applyOnClone(gitHubRepository.getHTTPURL(), System.getProperty("gitHubTestUserToken"), "");
+            script.getWorkingDirectory().deleteOnExit();
             script.push(System.getProperty("gitHubTestUserToken"), "");
 
             // publish the release
@@ -157,8 +156,10 @@ public class GitHubTest {
             Thread.sleep(2000);
 
             Path assetPath1 = Files.createTempFile("nyx-test-github-release-test-", ".txt");
+            assetPath1.toFile().deleteOnExit();
             Files.write(assetPath1, "content1".getBytes());
             Path assetPath2 = Files.createTempFile("nyx-test-github-release-test-", ".bin");
+            assetPath2.toFile().deleteOnExit();
             Files.write(assetPath2, "content2".getBytes());
             Set<Attachment> assetsToUpload = new HashSet<Attachment>();
             assetsToUpload.add(new Attachment("asset1", "Text asset", "text/plain", assetPath1.toFile().getAbsolutePath()));
@@ -171,7 +172,7 @@ public class GitHubTest {
                 assertTrue(asset.getFileName().equals("asset1") || asset.getFileName().equals("asset2"));
                 assertTrue(asset.getDescription().equals("Text asset") || asset.getDescription().equals("Binary asset"));
                 assertTrue(asset.getType().equals("text/plain") || asset.getType().equals("application/octet-stream"));
-                assertTrue(asset.getPath().startsWith("https://api.github.com/repos/"));
+                //assertTrue(asset.getPath().startsWith("https://api.github.com/repos/")); // The path may start with https://api.github.com/repos/ or https://github.com/
             }
 
             // now test again the getReleaseByTag and also make sure it has the assets
@@ -183,7 +184,7 @@ public class GitHubTest {
                 assertTrue(asset.getFileName().equals("asset1") || asset.getFileName().equals("asset2"));
                 assertTrue(asset.getDescription().equals("Text asset") || asset.getDescription().equals("Binary asset"));
                 assertTrue(asset.getType().equals("text/plain") || asset.getType().equals("application/octet-stream"));
-                assertTrue(asset.getPath().startsWith("https://api.github.com/repos/"));
+                //assertTrue(asset.getPath().startsWith("https://api.github.com/repos/")); // The path may start with https://api.github.com/repos/ or https://github.com/
             }
 
             // now delete it

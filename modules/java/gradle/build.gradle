@@ -29,15 +29,18 @@ dependencies {
   // Add this dependency to use the Git scripts from the main subproject into this project tests
   integrationTestImplementation project(path: ':modules:java:main', configuration: 'integrationTestExport')
   functionalTestImplementation  project(path: ':modules:java:main', configuration: 'integrationTestExport')
+  functionalTestImplementation  project(path: ':modules:java:main', configuration: 'functionalTestExport')
 }
 
 functionalTest {
-  // Pass the name of the configuration file examples to tests.
-  // We use the same files used for the documentation here.
-  systemProperty 'extendedGROOVYExampleConfigurationFile', file("$rootDir/docs/_includes/.nyx-extended.groovy").absolutePath
-  systemProperty 'mediumGROOVYExampleConfigurationFile', file("$rootDir/docs/_includes/.nyx-medium.groovy").absolutePath
-  systemProperty 'simpleGROOVYExampleConfigurationFile', file("$rootDir/docs/_includes/.nyx-simple.groovy").absolutePath
-  systemProperty 'simplestGROOVYExampleConfigurationFile', file("$rootDir/docs/_includes/.nyx-simplest.groovy").absolutePath
+  // Pass the credentials to test suites as per https://github.com/mooltiverse/nyx/blob/master/CONTRIBUTING.md#contributing-code
+  // Suggestion is to set the $GRADLE_USER_HOME environment variable and create a gradle.properties therein, with these
+  // properties defined
+  systemProperty 'gitHubTestUserToken', findProperty("gitHubTestUserToken")
+  systemProperty 'gitLabTestUserToken', findProperty("gitLabTestUserToken")
+
+  // Pass the 'quickTests' property (if declared by user, i.e. running ''./gradlew -PquickTests=true') to reduce the number of tests
+  systemProperty 'quickTests', findProperty("quickTests")
 }
 
 /*------------------------------------------------------------------------------

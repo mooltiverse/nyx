@@ -17,8 +17,8 @@ package com.mooltiverse.oss.nyx.configuration.presets;
 
 import java.util.Map;
 
+import com.mooltiverse.oss.nyx.entities.Provider;
 import com.mooltiverse.oss.nyx.entities.ServiceConfiguration;
-import com.mooltiverse.oss.nyx.services.Provider;
 
 /**
  * This class provides reusable configuration chunks for service configurations.
@@ -30,7 +30,7 @@ public class ServiceConfigurations {
     public static final ServiceConfiguration GITHUB = new ServiceConfiguration() {
         {
             setType(Provider.GITHUB);
-            setOptions(Map.<String,String>of("AUTHENTICATION_TOKEN", "{{#environment.variable}}GITHUB_TOKEN{{/environment.variable}}"));
+            setOptions(Map.<String,String>of("AUTHENTICATION_TOKEN", "{{#environmentVariable}}GITHUB_TOKEN{{/environmentVariable}}"));
         }
     };
 
@@ -40,7 +40,7 @@ public class ServiceConfigurations {
     public static final ServiceConfiguration GITLAB = new ServiceConfiguration() {
         {
             setType(Provider.GITLAB);
-            setOptions(Map.<String,String>of("AUTHENTICATION_TOKEN", "{{#environment.variable}}GITLAB_TOKEN{{/environment.variable}}"));
+            setOptions(Map.<String,String>of("AUTHENTICATION_TOKEN", "{{#environmentVariable}}GITLAB_TOKEN{{/environmentVariable}}"));
         }
     };
 
