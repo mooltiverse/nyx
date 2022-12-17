@@ -81,6 +81,7 @@ Available for all platforms in the [latest release](https://github.com/mooltiver
   * [Godoc API](https://pkg.go.dev/search?q=mooltiverse%2Fnyx)
   * [Javadoc API](https://javadoc.io/doc/com.mooltiverse.oss.nyx/java)
 * Articles:
+  * [Nyx, the Semantic Release Automation Tool](https://levelup.gitconnected.com/nyx-the-semantic-release-automation-tool-4e2dfa949f38)
   * [Semantic Release Automation with Gradle using Nyx](https://levelup.gitconnected.com/semantic-release-automation-with-gradle-using-nyx-ba345235a365)
 * Deliverables:
   * [GitHub packages](https://github.com/mooltiverse/nyx/packages) and [GitHub container images](https://github.com/mooltiverse/nyx/pkgs/container/nyx)
