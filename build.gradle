@@ -172,6 +172,16 @@ task testClean() {
   dependsOn deleteTestDirectories, deleteGitHubTestProjects, deleteGitLabTestProjects
 }
 
+task testSSHKeys() {
+  description 'Prints the credentials for test purposes'
+  group 'Build'
+
+  logger.quiet "gitHubTestUserPublicKey: "+findProperty("gitHubTestUserPublicKey")
+  logger.quiet "gitHubTestUserPrivateKeyWithPassphrase: "+findProperty("gitHubTestUserPrivateKeyWithPassphrase")
+  logger.quiet "gitLabTestUserPublicKey: "+findProperty("gitLabTestUserPublicKey")
+  logger.quiet "gitLabTestUserPrivateKeyWithPassphrase: "+findProperty("gitLabTestUserPrivateKeyWithPassphrase")
+}
+
 /*------------------------------------------------------------------------------
   Extension configurations
 ------------------------------------------------------------------------------*/

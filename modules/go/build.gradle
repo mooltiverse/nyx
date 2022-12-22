@@ -212,7 +212,15 @@ subprojects {
             // properties defined
             def testEnvironmentVariables = [:]
             testEnvironmentVariables['gitHubTestUserToken']=findProperty("gitHubTestUserToken")
+            testEnvironmentVariables['gitHubTestUserPublicKey']=findProperty("gitHubTestUserPublicKey")
+            testEnvironmentVariables['gitHubTestUserPrivateKeyPassphrase']=findProperty("gitHubTestUserPrivateKeyPassphrase")
+            testEnvironmentVariables['gitHubTestUserPrivateKeyWithPassphrase']=findProperty("gitHubTestUserPrivateKeyWithPassphrase")
+            testEnvironmentVariables['gitHubTestUserPrivateKeyWithoutPassphrase']=findProperty("gitHubTestUserPrivateKeyWithoutPassphrase")
             testEnvironmentVariables['gitLabTestUserToken']=findProperty("gitLabTestUserToken")
+            testEnvironmentVariables['gitLabTestUserPublicKey']=findProperty("gitLabTestUserPublicKey")
+            testEnvironmentVariables['gitLabTestUserPrivateKeyPassphrase']=findProperty("gitLabTestUserPrivateKeyPassphrase")
+            testEnvironmentVariables['gitLabTestUserPrivateKeyWithPassphrase']=findProperty("gitLabTestUserPrivateKeyWithPassphrase")
+            testEnvironmentVariables['gitLabTestUserPrivateKeyWithoutPassphrase']=findProperty("gitLabTestUserPrivateKeyWithoutPassphrase")
 
             logger.info('Integration testing Go module '+modulePath)
             exec {
@@ -257,7 +265,15 @@ subprojects {
             testEnvironmentVariables['nyxBinDir']=file(buildDir.path+'/bin/').absolutePath // the path to the binaries
             testEnvironmentVariables['quickTests']=findProperty("quickTests") // the flag to narrow the number of tests, added on the command line using the -PquickTests=true option
             testEnvironmentVariables['gitHubTestUserToken']=findProperty("gitHubTestUserToken")
+            testEnvironmentVariables['gitHubTestUserPublicKey']=findProperty("gitHubTestUserPublicKey")
+            testEnvironmentVariables['gitHubTestUserPrivateKeyPassphrase']=findProperty("gitHubTestUserPrivateKeyPassphrase")
+            testEnvironmentVariables['gitHubTestUserPrivateKeyWithPassphrase']=findProperty("gitHubTestUserPrivateKeyWithPassphrase")
+            testEnvironmentVariables['gitHubTestUserPrivateKeyWithoutPassphrase']=findProperty("gitHubTestUserPrivateKeyWithoutPassphrase")
             testEnvironmentVariables['gitLabTestUserToken']=findProperty("gitLabTestUserToken")
+            testEnvironmentVariables['gitLabTestUserPublicKey']=findProperty("gitLabTestUserPublicKey")
+            testEnvironmentVariables['gitLabTestUserPrivateKeyPassphrase']=findProperty("gitLabTestUserPrivateKeyPassphrase")
+            testEnvironmentVariables['gitLabTestUserPrivateKeyWithPassphrase']=findProperty("gitLabTestUserPrivateKeyWithPassphrase")
+            testEnvironmentVariables['gitLabTestUserPrivateKeyWithoutPassphrase']=findProperty("gitLabTestUserPrivateKeyWithoutPassphrase")
 
             logger.info('Functional testing Go module '+modulePath)
             exec {
