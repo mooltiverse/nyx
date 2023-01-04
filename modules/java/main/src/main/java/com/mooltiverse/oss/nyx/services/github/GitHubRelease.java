@@ -22,7 +22,6 @@ import java.util.Set;
 
 import org.kohsuke.github.GHAsset;
 import org.kohsuke.github.GHRelease;
-import org.kohsuke.github.PagedIterable;
 
 import com.mooltiverse.oss.nyx.entities.Attachment;
 import com.mooltiverse.oss.nyx.io.TransportException;
