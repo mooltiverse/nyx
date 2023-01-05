@@ -33,17 +33,34 @@ func TestGitRemoteConfigurationNewGitRemoteConfiguration(t *testing.T) {
 	rgc := NewGitRemoteConfiguration()
 
 	// default constructor has its fields set to default values
+	assert.Nil(t, rgc.GetAuthenticationMethod())
 	assert.Nil(t, rgc.GetUser())
 	assert.Nil(t, rgc.GetPassword())
+	assert.Nil(t, rgc.GetPrivateKey())
+	assert.Nil(t, rgc.GetPassphrase())
 }
 
 func TestGitRemoteConfigurationNewGitRemoteConfigurationWith(t *testing.T) {
-	rgc := NewGitRemoteConfigurationWith(utl.PointerToString("u1"), utl.PointerToString("p1"))
+	rgc := NewGitRemoteConfigurationWith(PointerToAuthenticationMethod(USER_PASSWORD), utl.PointerToString("u1"), utl.PointerToString("p1"), utl.PointerToString("k1"), utl.PointerToString("h1"))
 
+	a := rgc.GetAuthenticationMethod()
+	assert.Equal(t, USER_PASSWORD, *a)
 	u := rgc.GetUser()
 	assert.Equal(t, "u1", *u)
-	p := rgc.GetPassword()
-	assert.Equal(t, "p1", *p)
+	psw := rgc.GetPassword()
+	assert.Equal(t, "p1", *psw)
+	pk := rgc.GetPrivateKey()
+	assert.Equal(t, "k1", *pk)
+	psp := rgc.GetPassphrase()
+	assert.Equal(t, "h1", *psp)
+}
+
+func TestGitRemoteConfigurationGetAuthenticationMethod(t *testing.T) {
+	remoteGitConfiguration := NewGitRemoteConfiguration()
+
+	remoteGitConfiguration.SetAuthenticationMethod(PointerToAuthenticationMethod(PUBLIC_KEY))
+	a := remoteGitConfiguration.GetAuthenticationMethod()
+	assert.Equal(t, PUBLIC_KEY, *a)
 }
 
 func TestGitRemoteConfigurationGetUser(t *testing.T) {
@@ -60,4 +77,20 @@ func TestGitRemoteConfigurationGetPassword(t *testing.T) {
 	remoteGitConfiguration.SetPassword(utl.PointerToString("p1"))
 	p := remoteGitConfiguration.GetPassword()
 	assert.Equal(t, "p1", *p)
+}
+
+func TestGitRemoteConfigurationGetPrivateKey(t *testing.T) {
+	remoteGitConfiguration := NewGitRemoteConfiguration()
+
+	remoteGitConfiguration.SetPrivateKey(utl.PointerToString("k1"))
+	p := remoteGitConfiguration.GetPrivateKey()
+	assert.Equal(t, "k1", *p)
+}
+
+func TestGitRemoteConfigurationGetPassphrased(t *testing.T) {
+	remoteGitConfiguration := NewGitRemoteConfiguration()
+
+	remoteGitConfiguration.SetPassphrase(utl.PointerToString("h1"))
+	p := remoteGitConfiguration.GetPassphrase()
+	assert.Equal(t, "h1", *p)
 }

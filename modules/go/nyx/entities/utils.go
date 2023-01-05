@@ -17,6 +17,15 @@
 package entities
 
 /*
+Returns a pointer to the authentication method passed as parameter.
+
+This is useful for inline assignment of a constant scheme value.
+*/
+func PointerToAuthenticationMethod(a AuthenticationMethod) *AuthenticationMethod {
+	return &a
+}
+
+/*
 Returns a pointer to the position passed as parameter.
 
 This is useful for inline assignment of a constant scheme value.

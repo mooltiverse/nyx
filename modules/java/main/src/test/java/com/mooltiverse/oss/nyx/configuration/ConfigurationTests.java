@@ -32,6 +32,7 @@ import org.junit.jupiter.api.Test;
 import com.mooltiverse.oss.nyx.configuration.presets.Extended;
 import com.mooltiverse.oss.nyx.configuration.presets.Simple;
 import com.mooltiverse.oss.nyx.entities.Attachment;
+import com.mooltiverse.oss.nyx.entities.AuthenticationMethod;
 import com.mooltiverse.oss.nyx.entities.ChangelogConfiguration;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
@@ -417,7 +418,7 @@ public class ConfigurationTests {
             Configuration configuration = new Configuration();
             configurationLayerMock.setGit(
                 new GitConfiguration(
-                    Map.<String,GitRemoteConfiguration>of("origin", new GitRemoteConfiguration("jdoe", "pwd"))
+                    Map.<String,GitRemoteConfiguration>of("origin", new GitRemoteConfiguration(AuthenticationMethod.PUBLIC_KEY, "jdoe", "pwd", "key", "passphrase"))
                 )
             );
 
@@ -435,8 +436,11 @@ public class ConfigurationTests {
 
             assertNotNull(configuration.getGit().getRemotes());
             assertEquals(1, configuration.getGit().getRemotes().size());
+            assertEquals(AuthenticationMethod.PUBLIC_KEY, configuration.getGit().getRemotes().get("origin").getAuthenticationMethod());
             assertEquals("pwd", configuration.getGit().getRemotes().get("origin").getPassword());
             assertEquals("jdoe", configuration.getGit().getRemotes().get("origin").getUser());
+            assertEquals("key", configuration.getGit().getRemotes().get("origin").getPrivateKey());
+            assertEquals("passphrase", configuration.getGit().getRemotes().get("origin").getPassphrase());
 
             // now remove the command line configuration and test that now default values are returned again
             configuration.withCommandLineConfiguration(null);
@@ -1041,7 +1045,7 @@ public class ConfigurationTests {
             Configuration configuration = new Configuration();
             configurationLayerMock.setGit(
                 new GitConfiguration(
-                    Map.<String,GitRemoteConfiguration>of("origin", new GitRemoteConfiguration("jdoe", "pwd"))
+                    Map.<String,GitRemoteConfiguration>of("origin", new GitRemoteConfiguration(AuthenticationMethod.PUBLIC_KEY, "jdoe", "pwd", "key", "passphrase"))
                 )
             );
 
@@ -1059,8 +1063,11 @@ public class ConfigurationTests {
 
             assertNotNull(configuration.getGit().getRemotes());
             assertEquals(1, configuration.getGit().getRemotes().size());
+            assertEquals(AuthenticationMethod.PUBLIC_KEY, configuration.getGit().getRemotes().get("origin").getAuthenticationMethod());
             assertEquals("pwd", configuration.getGit().getRemotes().get("origin").getPassword());
             assertEquals("jdoe", configuration.getGit().getRemotes().get("origin").getUser());
+            assertEquals("key", configuration.getGit().getRemotes().get("origin").getPrivateKey());
+            assertEquals("passphrase", configuration.getGit().getRemotes().get("origin").getPassphrase());
 
             // now remove the command line configuration and test that now default values are returned again
             configuration.withPluginConfiguration(null);
@@ -1653,7 +1660,7 @@ public class ConfigurationTests {
             Configuration configuration = new Configuration();
             configurationLayerMock.setGit(
                 new GitConfiguration(
-                    Map.<String,GitRemoteConfiguration>of("origin", new GitRemoteConfiguration("jdoe", "pwd"))
+                    Map.<String,GitRemoteConfiguration>of("origin", new GitRemoteConfiguration(AuthenticationMethod.PUBLIC_KEY, "jdoe", "pwd", "key", "passphrase"))
                 )
             );
 
@@ -1671,8 +1678,11 @@ public class ConfigurationTests {
 
             assertNotNull(configuration.getGit().getRemotes());
             assertEquals(1, configuration.getGit().getRemotes().size());
+            assertEquals(AuthenticationMethod.PUBLIC_KEY, configuration.getGit().getRemotes().get("origin").getAuthenticationMethod());
             assertEquals("pwd", configuration.getGit().getRemotes().get("origin").getPassword());
             assertEquals("jdoe", configuration.getGit().getRemotes().get("origin").getUser());
+            assertEquals("key", configuration.getGit().getRemotes().get("origin").getPrivateKey());
+            assertEquals("passphrase", configuration.getGit().getRemotes().get("origin").getPassphrase());
 
             // now remove the command line configuration and test that now default values are returned again
             configuration.withRuntimeConfiguration(null);
@@ -2249,17 +2259,17 @@ public class ConfigurationTests {
             Configuration configuration = new Configuration();
             lowPriorityConfigurationLayerMock.setGit(
                 new GitConfiguration(
-                    Map.<String,GitRemoteConfiguration>of("origin", new GitRemoteConfiguration("jdoe1", "pwd1"), "replica", new GitRemoteConfiguration("stiger1", "sec1"))
+                    Map.<String,GitRemoteConfiguration>of("origin", new GitRemoteConfiguration(null, "jdoe1", "pwd1", null, null), "replica", new GitRemoteConfiguration(null, "stiger1", "sec1", null, null))
                 )
             );
             mediumPriorityConfigurationLayerMock.setGit(
                 new GitConfiguration(
-                    Map.<String,GitRemoteConfiguration>of("origin", new GitRemoteConfiguration("jdoe2", "pwd2"), "clone", new GitRemoteConfiguration("stiger2", "sec2"))
+                    Map.<String,GitRemoteConfiguration>of("origin", new GitRemoteConfiguration(null, "jdoe2", "pwd2", null, null), "clone", new GitRemoteConfiguration(null, "stiger2", "sec2", null, null))
                 )
             );
             highPriorityConfigurationLayerMock.setGit(
                 new GitConfiguration(
-                    Map.<String,GitRemoteConfiguration>of("origin", new GitRemoteConfiguration("jdoe3", "pwd3"))
+                    Map.<String,GitRemoteConfiguration>of("origin", new GitRemoteConfiguration(AuthenticationMethod.PUBLIC_KEY, "jdoe3", "pwd3", "key3", "passphrase3"))
                 )
             );
             
@@ -2270,12 +2280,21 @@ public class ConfigurationTests {
 
             assertNotNull(configuration.getGit().getRemotes());
             assertEquals(3, configuration.getGit().getRemotes().size());
+            assertEquals(AuthenticationMethod.PUBLIC_KEY, configuration.getGit().getRemotes().get("origin").getAuthenticationMethod());
             assertEquals("pwd3", configuration.getGit().getRemotes().get("origin").getPassword());
             assertEquals("jdoe3", configuration.getGit().getRemotes().get("origin").getUser());
+            assertEquals("key3", configuration.getGit().getRemotes().get("origin").getPrivateKey());
+            assertEquals("passphrase3", configuration.getGit().getRemotes().get("origin").getPassphrase());
+            assertNull(configuration.getGit().getRemotes().get("replica").getAuthenticationMethod());
             assertEquals("sec1", configuration.getGit().getRemotes().get("replica").getPassword());
             assertEquals("stiger1", configuration.getGit().getRemotes().get("replica").getUser());
+            assertNull(configuration.getGit().getRemotes().get("replica").getPrivateKey());
+            assertNull(configuration.getGit().getRemotes().get("replica").getPassphrase());
+            assertNull(configuration.getGit().getRemotes().get("clone").getAuthenticationMethod());
             assertEquals("sec2", configuration.getGit().getRemotes().get("clone").getPassword());
             assertEquals("stiger2", configuration.getGit().getRemotes().get("clone").getUser());
+            assertNull(configuration.getGit().getRemotes().get("clone").getPrivateKey());
+            assertNull(configuration.getGit().getRemotes().get("clone").getPassphrase());
         }
 
         @Test

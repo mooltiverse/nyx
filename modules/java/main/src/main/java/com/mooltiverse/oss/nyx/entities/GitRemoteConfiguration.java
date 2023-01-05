@@ -20,6 +20,11 @@ package com.mooltiverse.oss.nyx.entities;
  */
 public class GitRemoteConfiguration {
     /**
+     * The authentication method.
+     */
+    private AuthenticationMethod authenticationMethod = null;
+
+    /**
      * The remote user name.
      */
     private String user = null;
@@ -28,6 +33,16 @@ public class GitRemoteConfiguration {
      * The remote password.
      */
     private String password = null;
+
+    /**
+     * The private key.
+     */
+    private String privateKey = null;
+
+    /**
+     * The passphrase for the private key.
+     */
+    private String passphrase = null;
 
     /**
      * Default constructor.
@@ -39,13 +54,37 @@ public class GitRemoteConfiguration {
     /**
      * Standard constructor.
      * 
+     * @param authenticationMethod the authentication method.
      * @param user the remote user name.
      * @param password the remote password.
+     * @param privateKey the private key.
+     * @param passphrase the passphrase for the private key.
      */
-    public GitRemoteConfiguration(String user, String password) {
+    public GitRemoteConfiguration(AuthenticationMethod authenticationMethod, String user, String password, String privateKey, String passphrase) {
         super();
+        this.authenticationMethod = authenticationMethod;
         this.user = user;
         this.password = password;
+        this.privateKey = privateKey;
+        this.passphrase = passphrase;
+    }
+
+    /**
+     * Returns the authentication method.
+     * 
+     * @return the authentication method.
+     */
+    public AuthenticationMethod getAuthenticationMethod() {
+        return authenticationMethod;
+    }
+
+    /**
+     * Sets the authentication method.
+     * 
+     * @param authenticationMethod the authentication method.
+     */
+    public void setAuthenticationMethod(AuthenticationMethod authenticationMethod) {
+        this.authenticationMethod = authenticationMethod;
     }
 
     /**
@@ -82,5 +121,41 @@ public class GitRemoteConfiguration {
      */
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    /**
+     * Returns the private key.
+     * 
+     * @return the private key.
+     */
+    public String getPrivateKey() {
+        return privateKey;
+    }
+
+    /**
+     * Sets the private key.
+     * 
+     * @param privateKey the private key.
+     */
+    public void setPrivateKey(String privateKey) {
+        this.privateKey = privateKey;
+    }
+
+    /**
+     * Returns the passphrase for the private key.
+     * 
+     * @return the passphrase for the private key.
+     */
+    public String getPassphrase() {
+        return passphrase;
+    }
+
+    /**
+     * Sets the passphrase for the private key.
+     * 
+     * @param passphrase the passphrase for the private key.
+     */
+    public void setPassphrase(String passphrase) {
+        this.passphrase = passphrase;
     }
 }

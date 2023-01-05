@@ -28,6 +28,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.mooltiverse.oss.nyx.entities.Attachment;
+import com.mooltiverse.oss.nyx.entities.AuthenticationMethod;
 import com.mooltiverse.oss.nyx.entities.ChangelogConfiguration;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
@@ -151,17 +152,23 @@ public class SimpleConfigurationLayerTests {
 
         simpleConfigurationLayer.setGit(
             new GitConfiguration(
-                Map.<String,GitRemoteConfiguration>of("origin1", new GitRemoteConfiguration("jdoe1", "pwd1"), "origin2", new GitRemoteConfiguration("jdoe2", "pwd2"))
+                Map.<String,GitRemoteConfiguration>of("origin1", new GitRemoteConfiguration(AuthenticationMethod.USER_PASSWORD, "jdoe1", "pwd1", "pk1", "pp1"), "origin2", new GitRemoteConfiguration(AuthenticationMethod.PUBLIC_KEY, "jdoe2", "pwd2", "pk2", "pp2"))
             )
         );
 
         assertEquals(2, simpleConfigurationLayer.getGit().getRemotes().size());
         assertNotNull(simpleConfigurationLayer.getGit().getRemotes().get("origin1"));
+        assertEquals(AuthenticationMethod.USER_PASSWORD, simpleConfigurationLayer.getGit().getRemotes().get("origin1").getAuthenticationMethod());
         assertEquals("pwd1", simpleConfigurationLayer.getGit().getRemotes().get("origin1").getPassword());
         assertEquals("jdoe1", simpleConfigurationLayer.getGit().getRemotes().get("origin1").getUser());
+        assertEquals("pk1", simpleConfigurationLayer.getGit().getRemotes().get("origin1").getPrivateKey());
+        assertEquals("pp1", simpleConfigurationLayer.getGit().getRemotes().get("origin1").getPassphrase());
         assertNotNull(simpleConfigurationLayer.getGit().getRemotes().get("origin2"));
+        assertEquals(AuthenticationMethod.PUBLIC_KEY, simpleConfigurationLayer.getGit().getRemotes().get("origin2").getAuthenticationMethod());
         assertEquals("pwd2", simpleConfigurationLayer.getGit().getRemotes().get("origin2").getPassword());
         assertEquals("jdoe2", simpleConfigurationLayer.getGit().getRemotes().get("origin2").getUser());
+        assertEquals("pk2", simpleConfigurationLayer.getGit().getRemotes().get("origin2").getPrivateKey());
+        assertEquals("pp2", simpleConfigurationLayer.getGit().getRemotes().get("origin2").getPassphrase());
     }
 
     @Test

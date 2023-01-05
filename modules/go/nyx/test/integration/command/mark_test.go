@@ -1362,7 +1362,7 @@ func TestMarkRunOnDirtyWorkspaceWithNewVersionOrNewReleaseWithCommitAndTagAndPus
 	log.SetLevel(logLevel) // restore the original logging level
 }
 
-func TestMarkRunOnGitHubClonedWorkspaceWithAdditionalRemoteWithNewVersionOrNewReleaseWithCommitAndTagAndPushEnabled(t *testing.T) {
+func TestMarkRunOnGitHubClonedWorkspaceWithAdditionalRemoteWithNewVersionOrNewReleaseWithCommitAndTagAndPushEnabledUsingUsernameAndPasswordCredentials(t *testing.T) {
 	logLevel := log.GetLevel()   // save the previous logging level
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 
@@ -1389,7 +1389,7 @@ func TestMarkRunOnGitHubClonedWorkspaceWithAdditionalRemoteWithNewVersionOrNewRe
 	// set up the Git remote credentials
 	gitConfiguration, _ := configurationLayerMock.GetGit()
 	gitConfiguration.SetRemotes(&map[string]*ent.GitRemoteConfiguration{
-		"origin": ent.NewGitRemoteConfigurationWith(utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString("")),
+		"origin": ent.NewGitRemoteConfigurationWith(ent.PointerToAuthenticationMethod(ent.USER_PASSWORD), utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(""), nil, nil),
 	})
 	// add a mock convention that accepts all non nil messages and dumps the minor identifier for each
 	commitMessageConventions, _ := ent.NewCommitMessageConventionsWith(&[]*string{utl.PointerToString("testConvention")},
@@ -1443,7 +1443,7 @@ func TestMarkRunOnGitHubClonedWorkspaceWithAdditionalRemoteWithNewVersionOrNewRe
 	log.SetLevel(logLevel) // restore the original logging level
 }
 
-func TestMarkRunOnGitLabClonedWorkspaceWithAdditionalRemoteWithNewVersionOrNewReleaseWithCommitAndTagAndPushEnabled(t *testing.T) {
+func TestMarkRunOnGitLabClonedWorkspaceWithAdditionalRemoteWithNewVersionOrNewReleaseWithCommitAndTagAndPushEnabledUsingUsernameAndPasswordCredentials(t *testing.T) {
 	logLevel := log.GetLevel()   // save the previous logging level
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 
@@ -1470,7 +1470,7 @@ func TestMarkRunOnGitLabClonedWorkspaceWithAdditionalRemoteWithNewVersionOrNewRe
 	// set up the Git remote credentials
 	gitConfiguration, _ := configurationLayerMock.GetGit()
 	gitConfiguration.SetRemotes(&map[string]*ent.GitRemoteConfiguration{
-		"origin": ent.NewGitRemoteConfigurationWith(utl.PointerToString("PRIVATE-TOKEN"), utl.PointerToString(os.Getenv("gitLabTestUserToken"))),
+		"origin": ent.NewGitRemoteConfigurationWith(ent.PointerToAuthenticationMethod(ent.USER_PASSWORD), utl.PointerToString("PRIVATE-TOKEN"), utl.PointerToString(os.Getenv("gitLabTestUserToken")), nil, nil),
 	})
 	// add a mock convention that accepts all non nil messages and dumps the minor identifier for each
 	commitMessageConventions, _ := ent.NewCommitMessageConventionsWith(&[]*string{utl.PointerToString("testConvention")},

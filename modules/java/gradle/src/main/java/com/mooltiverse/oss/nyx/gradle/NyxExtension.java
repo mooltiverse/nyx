@@ -887,6 +887,11 @@ public abstract class NyxExtension {
             private final String name;
 
             /**
+             * The remote authentication method property.
+             */
+            private final Property<String> authenticationMethod = getObjectfactory().property(String.class);
+
+            /**
              * The remote password property.
              */
             private final Property<String> password = getObjectfactory().property(String.class);
@@ -895,6 +900,16 @@ public abstract class NyxExtension {
              * The remote user property.
              */
             private final Property<String> user = getObjectfactory().property(String.class);
+
+            /**
+             * The remote private key property.
+             */
+            private final Property<String> privateKey = getObjectfactory().property(String.class);
+
+            /**
+             * The remote passphrase for the private key property.
+             */
+            private final Property<String> passphrase = getObjectfactory().property(String.class);
 
             /**
              * Returns an object factory instance.
@@ -933,6 +948,19 @@ public abstract class NyxExtension {
             }
 
             /**
+             * Returns the remote authentication method. When this is set by the user it overrides
+             * the inference performed by Nyx.
+             * 
+             * We provide an implementation of this method instead of using the abstract definition as it's
+             * safer for old Gradle versions we support.
+             * 
+             * @return the remote authentication method
+             */
+            public Property<String> getAuthenticationMethod() {
+                return authenticationMethod;
+            }
+
+            /**
              * Returns the remote password. When this is set by the user it overrides
              * the inference performed by Nyx.
              * 
@@ -956,6 +984,32 @@ public abstract class NyxExtension {
              */
             public Property<String> getUser() {
                 return user;
+            }
+
+            /**
+             * Returns the remote private key. When this is set by the user it overrides
+             * the inference performed by Nyx.
+             * 
+             * We provide an implementation of this method instead of using the abstract definition as it's
+             * safer for old Gradle versions we support.
+             * 
+             * @return the remote private key
+             */
+            public Property<String> getPrivateKey() {
+                return privateKey;
+            }
+
+            /**
+             * Returns the remote passphrase for the private key. When this is set by the user it overrides
+             * the inference performed by Nyx.
+             * 
+             * We provide an implementation of this method instead of using the abstract definition as it's
+             * safer for old Gradle versions we support.
+             * 
+             * @return the remote passphrase for the private key
+             */
+            public Property<String> getPassphrase() {
+                return passphrase;
             }
         }
     }

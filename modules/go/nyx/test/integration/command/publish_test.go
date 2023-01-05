@@ -204,7 +204,7 @@ func TestPublishRunWithNewReleaseAndGlobalAssetsOnGitHubRepository(t *testing.T)
 	// set up the Git remote credentials
 	gitConfiguration, _ := configurationLayerMock.GetGit()
 	gitConfiguration.SetRemotes(&map[string]*ent.GitRemoteConfiguration{
-		"origin": ent.NewGitRemoteConfigurationWith(utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString("")),
+		"origin": ent.NewGitRemoteConfigurationWith(ent.PointerToAuthenticationMethod(ent.USER_PASSWORD), utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(""), nil, nil),
 	})
 	// add a custom release type that always enables committing, tagging and pushing
 	// and all the publishing service enabled
@@ -341,7 +341,7 @@ func TestPublishRunWithNewReleaseAndFilteredAssetsOnGitHubRepository(t *testing.
 	// set up the Git remote credentials
 	gitConfiguration, _ := configurationLayerMock.GetGit()
 	gitConfiguration.SetRemotes(&map[string]*ent.GitRemoteConfiguration{
-		"origin": ent.NewGitRemoteConfigurationWith(utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString("")),
+		"origin": ent.NewGitRemoteConfigurationWith(ent.PointerToAuthenticationMethod(ent.USER_PASSWORD), utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(""), nil, nil),
 	})
 	// add a custom release type that always enables committing, tagging and pushing
 	// and all the publishing service enabled
@@ -481,7 +481,7 @@ func TestPublishRunWithNewReleaseAndGlobalAssetsOnGitLabRepository(t *testing.T)
 	// set up the Git remote credentials
 	gitConfiguration, _ := configurationLayerMock.GetGit()
 	gitConfiguration.SetRemotes(&map[string]*ent.GitRemoteConfiguration{
-		"origin": ent.NewGitRemoteConfigurationWith(utl.PointerToString("PRIVATE-TOKEN"), utl.PointerToString(os.Getenv("gitLabTestUserToken"))),
+		"origin": ent.NewGitRemoteConfigurationWith(ent.PointerToAuthenticationMethod(ent.USER_PASSWORD), utl.PointerToString("PRIVATE-TOKEN"), utl.PointerToString(os.Getenv("gitLabTestUserToken")), nil, nil),
 	})
 	// add a custom release type that always enables committing, tagging and pushing
 	// and all the publishing service enabled
@@ -616,7 +616,7 @@ func TestPublishRunWithNewReleaseAndFilteredAssetsOnGitLabRepository(t *testing.
 	// set up the Git remote credentials
 	gitConfiguration, _ := configurationLayerMock.GetGit()
 	gitConfiguration.SetRemotes(&map[string]*ent.GitRemoteConfiguration{
-		"origin": ent.NewGitRemoteConfigurationWith(utl.PointerToString("PRIVATE-TOKEN"), utl.PointerToString(os.Getenv("gitLabTestUserToken"))),
+		"origin": ent.NewGitRemoteConfigurationWith(ent.PointerToAuthenticationMethod(ent.USER_PASSWORD), utl.PointerToString("PRIVATE-TOKEN"), utl.PointerToString(os.Getenv("gitLabTestUserToken")), nil, nil),
 	})
 	// add a custom release type that always enables committing, tagging and pushing
 	// and all the publishing service enabled

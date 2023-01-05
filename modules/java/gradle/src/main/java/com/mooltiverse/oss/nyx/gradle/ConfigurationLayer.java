@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import com.mooltiverse.oss.nyx.entities.Attachment;
+import com.mooltiverse.oss.nyx.entities.AuthenticationMethod;
 import com.mooltiverse.oss.nyx.entities.ChangelogConfiguration;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
@@ -183,7 +184,7 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
             if (!extension.getGit().getRemotes().isEmpty()) {
                 for (NyxExtension.GitConfiguration.GitRemoteConfiguration remote: extension.getGit().getRemotes()) {
                     if (!remotes.containsKey(remote.getName())) {
-                        remotes.put(remote.getName(), new GitRemoteConfiguration(remote.getUser().get(), remote.getPassword().get()));
+                        remotes.put(remote.getName(), new GitRemoteConfiguration(remote.getAuthenticationMethod().isPresent() ? AuthenticationMethod.valueOf(remote.getAuthenticationMethod().get()) : null, remote.getUser().getOrNull(), remote.getPassword().getOrNull(), remote.getPrivateKey().getOrNull(), remote.getPassphrase().getOrNull()));
                     }
                 }
             }

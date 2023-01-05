@@ -487,8 +487,11 @@ func TestConfigurationWithCommandLineConfigurationGetGit(t *testing.T) {
 	configurationLayerMock := NewCommandLineConfigurationLayer()
 	configuration, _ := NewConfiguration()
 	configurationLayerMock.withArguments([]string{
+		"--git-remotes-origin-authenticationMethod=PUBLIC_KEY",
 		"--git-remotes-origin-user=jdoe",
 		"--git-remotes-origin-password=pwd",
+		"--git-remotes-origin-privateKey=key",
+		"--git-remotes-origin-passphrase=passphrase",
 	})
 
 	// in order to make the test meaningful, make sure the default and mock values are different
@@ -513,8 +516,11 @@ func TestConfigurationWithCommandLineConfigurationGetGit(t *testing.T) {
 	git2, _ = configuration.GetGit()
 	assert.NotNil(t, (*git2).GetRemotes())
 	assert.Equal(t, 1, len(*(*git2).GetRemotes()))
+	assert.Equal(t, ent.PUBLIC_KEY, *(*(*git2).GetRemotes())["origin"].GetAuthenticationMethod())
 	assert.Equal(t, "pwd", *(*(*git2).GetRemotes())["origin"].GetPassword())
 	assert.Equal(t, "jdoe", *(*(*git2).GetRemotes())["origin"].GetUser())
+	assert.Equal(t, "key", *(*(*git2).GetRemotes())["origin"].GetPrivateKey())
+	assert.Equal(t, "passphrase", *(*(*git2).GetRemotes())["origin"].GetPassphrase())
 
 	// now remove the command line configuration and test that now default values are returned again
 	configuration, _ = configuration.WithCommandLineConfiguration(nil)
@@ -1231,7 +1237,7 @@ func TestConfigurationWithPluginConfigurationGetDryRun(t *testing.T) {
 func TestConfigurationWithPluginConfigurationGetGit(t *testing.T) {
 	configurationLayerMock := NewSimpleConfigurationLayer()
 	configuration, _ := NewConfiguration()
-	gitConfiguration, _ := ent.NewGitConfigurationWith(&map[string]*ent.GitRemoteConfiguration{"origin": ent.NewGitRemoteConfigurationWith(utl.PointerToString("jdoe"), utl.PointerToString("pwd"))})
+	gitConfiguration, _ := ent.NewGitConfigurationWith(&map[string]*ent.GitRemoteConfiguration{"origin": ent.NewGitRemoteConfigurationWith(ent.PointerToAuthenticationMethod(ent.PUBLIC_KEY), utl.PointerToString("jdoe"), utl.PointerToString("pwd"), utl.PointerToString("key"), utl.PointerToString("passphrase"))})
 	configurationLayerMock.SetGit(gitConfiguration)
 
 	// in order to make the test meaningful, make sure the default and mock values are different
@@ -1256,8 +1262,11 @@ func TestConfigurationWithPluginConfigurationGetGit(t *testing.T) {
 	git2, _ = configuration.GetGit()
 	assert.NotNil(t, (*git2).GetRemotes())
 	assert.Equal(t, 1, len(*(*git2).GetRemotes()))
+	assert.Equal(t, ent.PUBLIC_KEY, *(*(*git2).GetRemotes())["origin"].GetAuthenticationMethod())
 	assert.Equal(t, "pwd", *(*(*git2).GetRemotes())["origin"].GetPassword())
 	assert.Equal(t, "jdoe", *(*(*git2).GetRemotes())["origin"].GetUser())
+	assert.Equal(t, "key", *(*(*git2).GetRemotes())["origin"].GetPrivateKey())
+	assert.Equal(t, "passphrase", *(*(*git2).GetRemotes())["origin"].GetPassphrase())
 
 	// now remove the command line configuration and test that now default values are returned again
 	configuration, _ = configuration.WithPluginConfiguration(nil)
@@ -1915,7 +1924,7 @@ func TestConfigurationWithRuntimeConfigurationGetDryRun(t *testing.T) {
 func TestConfigurationWithRuntimeConfigurationGetGit(t *testing.T) {
 	configurationLayerMock := NewSimpleConfigurationLayer()
 	configuration, _ := NewConfiguration()
-	gitConfiguration, _ := ent.NewGitConfigurationWith(&map[string]*ent.GitRemoteConfiguration{"origin": ent.NewGitRemoteConfigurationWith(utl.PointerToString("jdoe"), utl.PointerToString("pwd"))})
+	gitConfiguration, _ := ent.NewGitConfigurationWith(&map[string]*ent.GitRemoteConfiguration{"origin": ent.NewGitRemoteConfigurationWith(ent.PointerToAuthenticationMethod(ent.PUBLIC_KEY), utl.PointerToString("jdoe"), utl.PointerToString("pwd"), utl.PointerToString("key"), utl.PointerToString("passphrase"))})
 	configurationLayerMock.SetGit(gitConfiguration)
 
 	// in order to make the test meaningful, make sure the default and mock values are different
@@ -1940,8 +1949,11 @@ func TestConfigurationWithRuntimeConfigurationGetGit(t *testing.T) {
 	git2, _ = configuration.GetGit()
 	assert.NotNil(t, (*git2).GetRemotes())
 	assert.Equal(t, 1, len(*(*git2).GetRemotes()))
+	assert.Equal(t, ent.PUBLIC_KEY, *(*(*git2).GetRemotes())["origin"].GetAuthenticationMethod())
 	assert.Equal(t, "pwd", *(*(*git2).GetRemotes())["origin"].GetPassword())
 	assert.Equal(t, "jdoe", *(*(*git2).GetRemotes())["origin"].GetUser())
+	assert.Equal(t, "key", *(*(*git2).GetRemotes())["origin"].GetPrivateKey())
+	assert.Equal(t, "passphrase", *(*(*git2).GetRemotes())["origin"].GetPassphrase())
 
 	// now remove the command line configuration and test that now default values are returned again
 	configuration, _ = configuration.WithRuntimeConfiguration(nil)
@@ -2566,7 +2578,7 @@ func TestConfigurationWithMultipleConfigurationLayersGetGit(t *testing.T) {
 	mediumPriorityConfigurationLayerMock := NewCommandLineConfigurationLayer()
 	highPriorityConfigurationLayerMock := NewSimpleConfigurationLayer()
 	configuration, _ := NewConfiguration()
-	lpGitConfiguration, _ := ent.NewGitConfigurationWith(&map[string]*ent.GitRemoteConfiguration{"origin": ent.NewGitRemoteConfigurationWith(utl.PointerToString("jdoe1"), utl.PointerToString("pwd1")), "replica": ent.NewGitRemoteConfigurationWith(utl.PointerToString("stiger1"), utl.PointerToString("sec1"))})
+	lpGitConfiguration, _ := ent.NewGitConfigurationWith(&map[string]*ent.GitRemoteConfiguration{"origin": ent.NewGitRemoteConfigurationWith(nil, utl.PointerToString("jdoe1"), utl.PointerToString("pwd1"), nil, nil), "replica": ent.NewGitRemoteConfigurationWith(nil, utl.PointerToString("stiger1"), utl.PointerToString("sec1"), nil, nil)})
 	lowPriorityConfigurationLayerMock.SetGit(lpGitConfiguration)
 	mediumPriorityConfigurationLayerMock.withArguments([]string{
 		"--git-remotes-origin-user=jdoe2",
@@ -2574,7 +2586,7 @@ func TestConfigurationWithMultipleConfigurationLayersGetGit(t *testing.T) {
 		"--git-remotes-clone-user=stiger2",
 		"--git-remotes-clone-password=sec2",
 	})
-	hpGitConfiguration, _ := ent.NewGitConfigurationWith(&map[string]*ent.GitRemoteConfiguration{"origin": ent.NewGitRemoteConfigurationWith(utl.PointerToString("jdoe3"), utl.PointerToString("pwd3"))})
+	hpGitConfiguration, _ := ent.NewGitConfigurationWith(&map[string]*ent.GitRemoteConfiguration{"origin": ent.NewGitRemoteConfigurationWith(ent.PointerToAuthenticationMethod(ent.PUBLIC_KEY), utl.PointerToString("jdoe3"), utl.PointerToString("pwd3"), utl.PointerToString("key3"), utl.PointerToString("passphrase3"))})
 	highPriorityConfigurationLayerMock.SetGit(hpGitConfiguration)
 
 	// inject the command line configuration and test the new value is returned from that
@@ -2588,12 +2600,21 @@ func TestConfigurationWithMultipleConfigurationLayersGetGit(t *testing.T) {
 	git, _ := configuration.GetGit()
 	assert.NotNil(t, *git.GetRemotes())
 	assert.Equal(t, 3, len(*git.GetRemotes()))
+	assert.Equal(t, ent.PUBLIC_KEY, *(*(*git).GetRemotes())["origin"].GetAuthenticationMethod())
 	assert.Equal(t, "pwd3", *(*git.GetRemotes())["origin"].GetPassword())
 	assert.Equal(t, "jdoe3", *(*git.GetRemotes())["origin"].GetUser())
+	assert.Equal(t, "key3", *(*(*git).GetRemotes())["origin"].GetPrivateKey())
+	assert.Equal(t, "passphrase3", *(*(*git).GetRemotes())["origin"].GetPassphrase())
+	assert.Nil(t, (*(*git).GetRemotes())["replica"].GetAuthenticationMethod())
 	assert.Equal(t, "sec1", *(*git.GetRemotes())["replica"].GetPassword())
 	assert.Equal(t, "stiger1", *(*git.GetRemotes())["replica"].GetUser())
+	assert.Nil(t, (*(*git).GetRemotes())["replica"].GetPrivateKey())
+	assert.Nil(t, (*(*git).GetRemotes())["replica"].GetPassphrase())
+	assert.Nil(t, (*(*git).GetRemotes())["clone"].GetAuthenticationMethod())
 	assert.Equal(t, "sec2", *(*git.GetRemotes())["clone"].GetPassword())
 	assert.Equal(t, "stiger2", *(*git.GetRemotes())["clone"].GetUser())
+	assert.Nil(t, (*(*git).GetRemotes())["clone"].GetPrivateKey())
+	assert.Nil(t, (*(*git).GetRemotes())["clone"].GetPassphrase())
 }
 
 func TestConfigurationWithMultipleConfigurationLayersGetInitialVersion(t *testing.T) {
