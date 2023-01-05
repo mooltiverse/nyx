@@ -502,6 +502,7 @@ func (r goGitRepository) IsClean() (bool, error) {
 	if err != nil {
 		return false, &errs.GitError{Message: fmt.Sprintf("unable to get the repository worktree status"), Cause: err}
 	}
+	log.Debugf("repository clean status is: '%v'", status.IsClean())
 	return status.IsClean(), nil
 }
 
