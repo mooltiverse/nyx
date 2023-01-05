@@ -125,6 +125,7 @@ func TestGitLabHostingServiceCreateGitRepository(t *testing.T) {
 	assert.Equal(t, randomID, (*gitLabRepository).GetName())
 	assert.Equal(t, randomID, (*gitLabRepository).GetFullName())
 	assert.Equal(t, "https://gitlab.com/"+(*user).GetUserName()+"/"+randomID+".git", (*gitLabRepository).GetHTTPURL())
+	assert.Equal(t, "git@gitlab.com:"+(*user).GetUserName()+"/"+randomID+".git", (*gitLabRepository).GetSSHURL())
 
 	// if we delete too quickly we often get a 404 from the server so let's wait a short while
 	time.Sleep(4000 * time.Millisecond)

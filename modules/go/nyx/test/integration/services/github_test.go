@@ -126,6 +126,7 @@ func TestGitHubHostingServiceCreateGitRepository(t *testing.T) {
 	assert.Equal(t, randomID, (*gitHubRepository).GetName())
 	assert.Equal(t, (*user).GetUserName()+"/"+randomID, (*gitHubRepository).GetFullName())
 	assert.Equal(t, "https://github.com/"+(*user).GetUserName()+"/"+randomID+".git", (*gitHubRepository).GetHTTPURL())
+	assert.Equal(t, "git@github.com:"+(*user).GetUserName()+"/"+randomID+".git", (*gitHubRepository).GetSSHURL())
 
 	// if we delete too quickly we often get a 404 from the server so let's wait a short while
 	time.Sleep(4000 * time.Millisecond)
