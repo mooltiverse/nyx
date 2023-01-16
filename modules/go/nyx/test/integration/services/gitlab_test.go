@@ -164,7 +164,7 @@ func TestGitLabReleaseServiceCreateRelease(t *testing.T) {
 	// the user is the "PRIVATE-TOKEN" string and the password is the token
 	script := gittools.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED().ApplyOnCloneFromWithCredentials((*gitLabRepository).GetHTTPURL(), utl.PointerToString("PRIVATE-TOKEN"), utl.PointerToString(os.Getenv("gitLabTestUserToken")))
 	defer os.RemoveAll(script.GetWorkingDirectory())
-	script.PushWithCredentials(utl.PointerToString("PRIVATE-TOKEN"), utl.PointerToString(os.Getenv("gitLabTestUserToken")))
+	script.PushWithUserNameAndPassword(utl.PointerToString("PRIVATE-TOKEN"), utl.PointerToString(os.Getenv("gitLabTestUserToken")))
 
 	// publish the release
 	release, err = gitLab.PublishRelease(&ownerName, &repositoryName, utl.PointerToString("Release 1.0.0-alpha.1"), "1.0.0-alpha.1", utl.PointerToString("A test description for the release\non multiple lines\nlike these"))

@@ -176,7 +176,7 @@ func TestPublishRunWithNewReleaseAndGlobalAssetsOnGitHubRepository(t *testing.T)
 
 	script := gittools.ONE_BRANCH_SHORT().ApplyOnCloneFromWithCredentials((*gitHubRepository).GetHTTPURL(), utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(""))
 	defer os.RemoveAll(script.GetWorkingDirectory())
-	script.PushWithCredentials(utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(""))
+	script.PushWithUserNameAndPassword(utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(""))
 
 	configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 	// add release assets to the configuration and also use templates for asset options to make sure they are rendered
@@ -313,7 +313,7 @@ func TestPublishRunWithNewReleaseAndFilteredAssetsOnGitHubRepository(t *testing.
 
 	script := gittools.ONE_BRANCH_SHORT().ApplyOnCloneFromWithCredentials((*gitHubRepository).GetHTTPURL(), utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(""))
 	defer os.RemoveAll(script.GetWorkingDirectory())
-	script.PushWithCredentials(utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(""))
+	script.PushWithUserNameAndPassword(utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(""))
 
 	configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 	// add release assets to the configuration and also use templates for asset options to make sure they are rendered
@@ -453,7 +453,7 @@ func TestPublishRunWithNewReleaseAndGlobalAssetsOnGitLabRepository(t *testing.T)
 	// the user is the "PRIVATE-TOKEN" string and the password is the token
 	script := gittools.ONE_BRANCH_SHORT().ApplyOnCloneFromWithCredentials((*gitLabRepository).GetHTTPURL(), utl.PointerToString("PRIVATE-TOKEN"), utl.PointerToString(os.Getenv("gitLabTestUserToken")))
 	defer os.RemoveAll(script.GetWorkingDirectory())
-	script.PushWithCredentials(utl.PointerToString("PRIVATE-TOKEN"), utl.PointerToString(os.Getenv("gitLabTestUserToken")))
+	script.PushWithUserNameAndPassword(utl.PointerToString("PRIVATE-TOKEN"), utl.PointerToString(os.Getenv("gitLabTestUserToken")))
 
 	configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 	// add release assets to the configuration and also use templates for asset options to make sure they are rendered
@@ -588,7 +588,7 @@ func TestPublishRunWithNewReleaseAndFilteredAssetsOnGitLabRepository(t *testing.
 	// the user is the "PRIVATE-TOKEN" string and the password is the token
 	script := gittools.ONE_BRANCH_SHORT().ApplyOnCloneFromWithCredentials((*gitLabRepository).GetHTTPURL(), utl.PointerToString("PRIVATE-TOKEN"), utl.PointerToString(os.Getenv("gitLabTestUserToken")))
 	defer os.RemoveAll(script.GetWorkingDirectory())
-	script.PushWithCredentials(utl.PointerToString("PRIVATE-TOKEN"), utl.PointerToString(os.Getenv("gitLabTestUserToken")))
+	script.PushWithUserNameAndPassword(utl.PointerToString("PRIVATE-TOKEN"), utl.PointerToString(os.Getenv("gitLabTestUserToken")))
 
 	configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 	// add release assets to the configuration and also use templates for asset options to make sure they are rendered

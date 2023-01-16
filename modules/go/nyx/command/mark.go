@@ -287,7 +287,7 @@ func (c *Mark) push() error {
 			}
 
 			// finally push
-			_, err = (*c.Repository()).PushToRemoteWithCredentials(remote, user, password)
+			_, err = (*c.Repository()).PushToRemoteWithUserNameAndPassword(remote, user, password)
 			if err != nil {
 				return err
 			}

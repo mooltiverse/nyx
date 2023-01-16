@@ -176,17 +176,7 @@ type Repository interface {
 
 	/*
 	   Pushes local changes in the current branch to the default remote origin.
-
-	   Returns the local name of the remotes that has been pushed
-
-	   Errors can be:
-
-	   - GitError in case some problem is encountered with the underlying Git repository, preventing to push.
-	*/
-	Push() (string, error)
-
-	/*
-	   Pushes local changes in the current branch to the default remote origin.
+	   This method allows using user name and password authentication (also used for tokens).
 
 	   Returns the local name of the remotes that has been pushed.
 
@@ -203,25 +193,31 @@ type Repository interface {
 
 	   - GitError in case some problem is encountered with the underlying Git repository, preventing to push.
 	*/
-	PushWithCredentials(user *string, password *string) (string, error)
+	PushWithUserNameAndPassword(user *string, password *string) (string, error)
 
 	/*
-	   Pushes local changes in the current branch to the given remote.
+		Pushes local changes in the current branch to the default remote origin.
+		This method allows using SSH authentication.
 
-	   Returns the local name of the remotes that has been pushed.
+		Returns the local name of the remotes that has been pushed.
 
-	   Arguments are as follows:
+		Arguments are as follows:
 
-	   - remote the name of the remote to push to. If nil or empty the default remote name (origin) is used.
+		- privateKey the SSH private key. If nil the private key will be searched in its default location
+			(i.e. in the users' $HOME/.ssh directory).
+		- passphrase the optional password to use to open the private key, in case it's protected by a passphrase.
+			This is required when the private key is password protected as this implementation does not support prompting
+			the user interactively for entering the password.
 
-	   Errors can be:
+		Errors can be:
 
-	   - GitError in case some problem is encountered with the underlying Git repository, preventing to push.
+		- GitError in case some problem is encountered with the underlying Git repository, preventing to push.
 	*/
-	PushToRemote(remote *string) (string, error)
+	PushWithPublicKey(privateKey *string, passphrase *string) (string, error)
 
 	/*
 	   Pushes local changes in the current branch to the default remote origin.
+	   This method allows using user name and password authentication (also used for tokens).
 
 	   Returns the local name of the remotes that has been pushed.
 
@@ -239,25 +235,32 @@ type Repository interface {
 
 	   - GitError in case some problem is encountered with the underlying Git repository, preventing to push.
 	*/
-	PushToRemoteWithCredentials(remote *string, user *string, password *string) (string, error)
+	PushToRemoteWithUserNameAndPassword(remote *string, user *string, password *string) (string, error)
 
 	/*
-	   Pushes local changes in the current branch to the given remotes.
+		Pushes local changes in the current branch to the default remote origin.
+		This method allows using SSH authentication.
 
-	   Returns a collection with the local names of remotes that have been pushed.
+		Returns the local name of the remotes that has been pushed.
 
-	   Arguments are as follows:
+		Arguments are as follows:
 
-	   - remotes the names of remotes to push to. If nil or empty the default remote name (origin) is used.
+		- remote the name of the remote to push to. If nil or empty the default remote name (origin) is used.
+		- privateKey the SSH private key. If nil the private key will be searched in its default location
+			(i.e. in the users' $HOME/.ssh directory).
+		- passphrase the optional password to use to open the private key, in case it's protected by a passphrase.
+			This is required when the private key is password protected as this implementation does not support prompting
+			the user interactively for entering the password.
 
-	   Errors can be:
+		Errors can be:
 
-	   - GitError in case some problem is encountered with the underlying Git repository, preventing to push.
+		- GitError in case some problem is encountered with the underlying Git repository, preventing to push.
 	*/
-	PushToRemotes(remotes []string) ([]string, error)
+	PushToRemoteWithPublicKey(remote *string, privateKey *string, passphrase *string) (string, error)
 
 	/*
 	   Pushes local changes in the current branch to the given remotes.
+	   This method allows using user name and password authentication (also used for tokens).
 
 	   Returns a collection with the local names of remotes that have been pushed.
 
@@ -275,7 +278,28 @@ type Repository interface {
 
 	   - GitError in case some problem is encountered with the underlying Git repository, preventing to push.
 	*/
-	PushToRemotesWithCredentials(remotes []string, user *string, password *string) ([]string, error)
+	PushToRemotesWithUserNameAndPassword(remotes []string, user *string, password *string) ([]string, error)
+
+	/*
+		Pushes local changes in the current branch to the given remotes.
+		This method allows using SSH authentication.
+
+		Returns a collection with the local names of remotes that have been pushed.
+
+		Arguments are as follows:
+
+		- remotes remotes the names of remotes to push to. If nil or empty the default remote name (origin) is used.
+		- privateKey the SSH private key. If nil the private key will be searched in its default location
+			(i.e. in the users' $HOME/.ssh directory).
+		- passphrase the optional password to use to open the private key, in case it's protected by a passphrase.
+			This is required when the private key is password protected as this implementation does not support prompting
+			the user interactively for entering the password.
+
+		Errors can be:
+
+		- GitError in case some problem is encountered with the underlying Git repository, preventing to push.
+	*/
+	PushToRemotesWithPublicKey(remotes []string, privateKey *string, passphrase *string) ([]string, error)
 
 	/*
 	   Tags the latest commit in the current branch with a tag with the given name. The resulting tag is lightweight.

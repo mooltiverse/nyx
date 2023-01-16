@@ -19,6 +19,7 @@ require (
 	github.com/sirupsen/logrus v1.9.0
 	github.com/stretchr/testify v1.8.0
 	github.com/xanzy/go-gitlab v0.74.0
+	golang.org/x/crypto v0.1.0
 	golang.org/x/exp v0.0.0-20220823124025-807a23277127
 	golang.org/x/oauth2 v0.1.0
 	gopkg.in/yaml.v3 v3.0.1
@@ -43,7 +44,6 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/sergi/go-diff v1.2.0 // indirect
 	github.com/xanzy/ssh-agent v0.3.0 // indirect
-	golang.org/x/crypto v0.1.0 // indirect
 	golang.org/x/net v0.1.0 // indirect
 	golang.org/x/sys v0.1.0 // indirect
 	golang.org/x/time v0.0.0-20220722155302-e5dcc9cfc0b9 // indirect

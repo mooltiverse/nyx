@@ -33,7 +33,7 @@ Using public keys is encouraged for security reasons although it introduces some
 * the remote URL must be in the SSH form, i.e. `git@github.com:mooltiverse/nyx.git`; you can check your remote URL with `git remote -v`
 * although you can pass private keys as parameters along with optional passphrases, you should use keys from the standard locations (i.e. `~/.ssh` folder)
 * when private keys are passed as parameters, remote key fingerprint check is not performed
-* ssh-agent support is **experimental** to avoid entering the passphrase to private keys, when used
+* ssh-agent (including Pageant) support is **experimental** to avoid entering the passphrase to private keys, when used
 
 Not all algorithms are supported on all platforms so make sure your keys are supported. A few handy references:
 
@@ -75,7 +75,7 @@ The authentication metod to use. Available values are `USER_PASSWORD` (for user 
 
 When not specified and at least one between the [user](#user) and [password](#password) is set, then `USER_PASSWORD` is assumed.
 
-To use SSH keys, `PUBLIC_KEY` must be explicitly set. When using `PUBLIC_KEY` you can provide a [private key](#private-key) and an optional [passphrase](#passphrase) or, if you don't, public keys will be used from their standard locations (i.e. the `~/.ssh` folder) and if they require a passphrase Nyx can connect to the ssh-agent (**experimental**).
+To use SSH keys, `PUBLIC_KEY` must be explicitly set. When using `PUBLIC_KEY` you can provide a [private key](#private-key) and an optional [passphrase](#passphrase) or, if you don't, public keys will be used from their standard locations (i.e. the `~/.ssh` folder) and if they require a passphrase Nyx can connect to the ssh-agent or Pageant (**experimental**).
 
 #### Name
 
@@ -150,4 +150,4 @@ This value is only considered when the [authentication method](#authentication-m
 
 The passphrase to decrypt the [private key](#private-key) to use to connect to the remote repository using SSH authentication. Here you can pass a [template]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}) to [read from environment variables]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}#environmentvariable).
 
-This value is only considered when the [authentication method](#authentication-method) is `PUBLIC_KEY`. When [authentication method](#authentication-method) is `PUBLIC_KEY`, this value can pass a passphrase explicitly, otherwise, when not set, and in case the private key is passphrase-protected, Nyx will connect to the ssh-agent, if available.
+This value is only considered when the [authentication method](#authentication-method) is `PUBLIC_KEY`. When [authentication method](#authentication-method) is `PUBLIC_KEY`, this value can pass a passphrase explicitly, otherwise, when not set, and in case the private key is passphrase-protected, Nyx will connect to the ssh-agent (or Pageant), if available.

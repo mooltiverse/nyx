@@ -646,7 +646,7 @@ func (w Workbench) PrintInfo(out io.Writer) {
 Pushes all commits to the default remote repository using no credentials.
 */
 func (w Workbench) Push() {
-	w.PushWithCredentials(nil, nil)
+	w.PushWithUserNameAndPassword(nil, nil)
 }
 
 /*
@@ -657,7 +657,7 @@ Arguments are as follows:
 - user the optional user name to use when credentials are required.
 - password the optional password to use when credentials are required.
 */
-func (w Workbench) PushWithCredentials(user *string, password *string) {
+func (w Workbench) PushWithUserNameAndPassword(user *string, password *string) {
 	w.PushToWithCredentials("origin", user, password)
 }
 

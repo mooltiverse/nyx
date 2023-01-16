@@ -165,7 +165,7 @@ func TestGitHubReleaseServiceCreateRelease(t *testing.T) {
 	// the user is the token and the password is the empty string
 	script := gittools.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED().ApplyOnCloneFromWithCredentials((*gitHubRepository).GetHTTPURL(), utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(""))
 	defer os.RemoveAll(script.GetWorkingDirectory())
-	script.PushWithCredentials(utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(""))
+	script.PushWithUserNameAndPassword(utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(""))
 
 	// publish the release
 	release, err = gitHub.PublishRelease(&ownerName, &repositoryName, utl.PointerToString("Release 1.0.0-alpha.1"), "1.0.0-alpha.1", utl.PointerToString("A test description for the release\non multiple lines\nlike these"))
