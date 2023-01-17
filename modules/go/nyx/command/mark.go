@@ -257,8 +257,11 @@ func (c *Mark) push() error {
 			// Now we need to find the credentials by going through all the configured remotes and finding
 			// the one that supports the target remote.
 			log.Debugf("looking up credentials for remote '%s'", *remote)
+			var authenticationMethod *ent.AuthenticationMethod
 			var user *string
 			var password *string
+			var privateKey *string
+			var passphrase *string
 			gitConfiguration, err := c.State().GetConfiguration().GetGit()
 			if err != nil {
 				return err
@@ -269,6 +272,7 @@ func (c *Mark) push() error {
 				gitRemoteConfiguration, ok := (*gitConfiguration.GetRemotes())[*remote]
 				if ok {
 					log.Debugf("using configured credentials for remote '%s'", *remote)
+					authenticationMethod = gitRemoteConfiguration.GetAuthenticationMethod()
 					user, err = c.renderTemplate(gitRemoteConfiguration.GetUser())
 					if err != nil {
 						return err
@@ -277,19 +281,38 @@ func (c *Mark) push() error {
 					if err != nil {
 						return err
 					}
+					privateKey, err = c.renderTemplate(gitRemoteConfiguration.GetPrivateKey())
+					if err != nil {
+						return err
+					}
+					passphrase, err = c.renderTemplate(gitRemoteConfiguration.GetPassphrase())
+					if err != nil {
+						return err
+					}
 				} else {
 					log.Debugf("no configuration available for remote '%s'", *remote)
 				}
 			}
 
-			if user == nil && password == nil {
-				log.Debugf("no credentials were configured for remote '%s'. Attempting anonymous push.", *remote)
-			}
-
 			// finally push
-			_, err = (*c.Repository()).PushToRemoteWithUserNameAndPassword(remote, user, password)
-			if err != nil {
-				return err
+			if authenticationMethod != nil && ent.PUBLIC_KEY == *authenticationMethod {
+				log.Debugf("attempting push to '%s' using public key credentials.", *remote)
+
+				_, err = (*c.Repository()).PushToRemoteWithPublicKey(remote, privateKey, passphrase)
+				if err != nil {
+					return err
+				}
+			} else {
+				if user == nil && password == nil {
+					log.Debugf("no credentials were configured for remote '%s'. Attempting anonymous push.", *remote)
+				} else {
+					log.Debugf("attempting push to '%s' using user name and password credentials.", *remote)
+				}
+
+				_, err = (*c.Repository()).PushToRemoteWithUserNameAndPassword(remote, user, password)
+				if err != nil {
+					return err
+				}
 			}
 
 			log.Debugf("local changes pushed to remote '%s'", *remote)

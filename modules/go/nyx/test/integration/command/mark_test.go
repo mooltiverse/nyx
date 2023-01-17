@@ -1443,6 +1443,168 @@ func TestMarkRunOnGitHubClonedWorkspaceWithAdditionalRemoteWithNewVersionOrNewRe
 	log.SetLevel(logLevel) // restore the original logging level
 }
 
+func TestMarkRunOnGitHubClonedWorkspaceWithAdditionalRemoteWithNewVersionOrNewReleaseWithCommitAndTagAndPushEnabledUsingUnprotectedPrivateKeyCredentials(t *testing.T) {
+	logLevel := log.GetLevel()   // save the previous logging level
+	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
+
+	randomID := gitutil.RandomAlphabeticString(5, 103)
+	// the 'gitHubTestUserToken' environment variable is set by the build script
+	assert.NotEmpty(t, os.Getenv("gitHubTestUserToken"), "A GitHub authentication token must be passed to this test as an environment variable but it was not set")
+	gitHub, err := github.Instance(map[string]string{github.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitHubTestUserToken")})
+	gitHubRepository, err := gitHub.CreateGitRepository(randomID, utl.PointerToString("Test repository "+randomID), false, true)
+
+	// if we clone too quickly next calls may fail
+	time.Sleep(4000 * time.Millisecond)
+
+	replicaScript := gittools.FROM_SCRATCH().Realize()
+	defer os.RemoveAll(replicaScript.GetWorkingDirectory())
+	script := gittools.ONE_BRANCH_SHORT().ApplyOnCloneFromWithPublicKey((*gitHubRepository).GetSSHURL(), utl.PointerToString(os.Getenv("gitHubTestUserPrivateKeyWithoutPassphrase")), nil)
+	defer os.RemoveAll(script.GetWorkingDirectory())
+	script.AddRemote(replicaScript.GetGitDirectory(), "replica")
+
+	configurationLayerMock := cnf.NewSimpleConfigurationLayer()
+	// add a service configuration to pass the credentials required to push to the remote repository
+	configurationLayerMock.SetServices(&map[string]*ent.ServiceConfiguration{
+		"github": ent.NewServiceConfigurationWith(ent.PointerToProvider(ent.GITHUB), &map[string]string{github.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitHubTestUserToken")}),
+	})
+	// set up the Git remote credentials
+	gitConfiguration, _ := configurationLayerMock.GetGit()
+	gitConfiguration.SetRemotes(&map[string]*ent.GitRemoteConfiguration{
+		"origin": ent.NewGitRemoteConfigurationWith(ent.PointerToAuthenticationMethod(ent.PUBLIC_KEY), nil, nil, utl.PointerToString(os.Getenv("gitHubTestUserPrivateKeyWithoutPassphrase")), nil),
+	})
+	// add a mock convention that accepts all non nil messages and dumps the minor identifier for each
+	commitMessageConventions, _ := ent.NewCommitMessageConventionsWith(&[]*string{utl.PointerToString("testConvention")},
+		&map[string]*ent.CommitMessageConvention{"testConvention": ent.NewCommitMessageConventionWith(utl.PointerToString(".*"),
+			&map[string]string{"patch": ".*"})})
+	configurationLayerMock.SetCommitMessageConventions(commitMessageConventions)
+	// add a custom release type that always enables committing, tagging and pushing
+	releaseType := ent.NewReleaseType()
+	releaseType.SetGitCommit(utl.PointerToString("true"))
+	releaseType.SetGitPush(utl.PointerToString("true"))
+	releaseType.SetGitTag(utl.PointerToString("true"))
+	releaseTypes, _ := ent.NewReleaseTypesWith(&[]*string{utl.PointerToString("testReleaseType")},
+		&[]*string{}, &[]*string{utl.PointerToString("origin"), utl.PointerToString("replica")},
+		&map[string]*ent.ReleaseType{"testReleaseType": releaseType})
+	configurationLayerMock.SetReleaseTypes(releaseTypes)
+	nyx := nyx.NewNyxIn(script.GetWorkingDirectory())
+	nyxConfiguration, _ := nyx.Configuration()
+	var configurationLayer cnf.ConfigurationLayer
+	configurationLayer = configurationLayerMock
+	nyxConfiguration.WithRuntimeConfiguration(&configurationLayer)
+
+	state, err := nyx.Mark()
+	assert.NoError(t, err)
+
+	// if we read too quickly we often get a 404 from the server so let's wait a short while
+	time.Sleep(2000 * time.Millisecond)
+
+	// clone the remote repo again into a a new directory and test
+	remoteScript := gittools.CloneFromWithPublicKey((*gitHubRepository).GetSSHURL(), utl.PointerToString(os.Getenv("gitHubTestUserPrivateKeyWithoutPassphrase")), nil)
+	defer os.RemoveAll(remoteScript.GetWorkingDirectory())
+
+	version, _ := state.GetVersion()
+	assert.Equal(t, "0.0.5", *version)
+	assert.Equal(t, len(script.GetTags()), len(replicaScript.GetTags()))
+	assert.Equal(t, len(script.GetTags()), len(remoteScript.GetTags()))
+
+	// if we delete too quickly we often get a 404 from the server so let's wait a short while
+	time.Sleep(2000 * time.Millisecond)
+
+	// test for idempotency running the command again
+	state, err = nyx.Mark()
+	assert.NoError(t, err)
+	version, _ = state.GetVersion()
+	assert.Equal(t, "0.0.5", *version)
+	assert.Equal(t, len(script.GetTags()), len(replicaScript.GetTags()))
+	assert.Equal(t, len(script.GetTags()), len(remoteScript.GetTags()))
+
+	// now delete it
+	gitHub.DeleteGitRepository((*gitHubRepository).GetID())
+
+	log.SetLevel(logLevel) // restore the original logging level
+}
+
+func TestMarkRunOnGitHubClonedWorkspaceWithAdditionalRemoteWithNewVersionOrNewReleaseWithCommitAndTagAndPushEnabledUsingProtectedPrivateKeyCredentials(t *testing.T) {
+	logLevel := log.GetLevel()   // save the previous logging level
+	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
+
+	randomID := gitutil.RandomAlphabeticString(5, 103)
+	// the 'gitHubTestUserToken' environment variable is set by the build script
+	assert.NotEmpty(t, os.Getenv("gitHubTestUserToken"), "A GitHub authentication token must be passed to this test as an environment variable but it was not set")
+	gitHub, err := github.Instance(map[string]string{github.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitHubTestUserToken")})
+	gitHubRepository, err := gitHub.CreateGitRepository(randomID, utl.PointerToString("Test repository "+randomID), false, true)
+
+	// if we clone too quickly next calls may fail
+	time.Sleep(4000 * time.Millisecond)
+
+	replicaScript := gittools.FROM_SCRATCH().Realize()
+	defer os.RemoveAll(replicaScript.GetWorkingDirectory())
+	script := gittools.ONE_BRANCH_SHORT().ApplyOnCloneFromWithPublicKey((*gitHubRepository).GetSSHURL(), utl.PointerToString(os.Getenv("gitHubTestUserPrivateKeyWithoutPassphrase")), utl.PointerToString(os.Getenv("gitHubTestUserPrivateKeyPassphrase")))
+	defer os.RemoveAll(script.GetWorkingDirectory())
+	script.AddRemote(replicaScript.GetGitDirectory(), "replica")
+
+	configurationLayerMock := cnf.NewSimpleConfigurationLayer()
+	// add a service configuration to pass the credentials required to push to the remote repository
+	configurationLayerMock.SetServices(&map[string]*ent.ServiceConfiguration{
+		"github": ent.NewServiceConfigurationWith(ent.PointerToProvider(ent.GITHUB), &map[string]string{github.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitHubTestUserToken")}),
+	})
+	// set up the Git remote credentials
+	gitConfiguration, _ := configurationLayerMock.GetGit()
+	gitConfiguration.SetRemotes(&map[string]*ent.GitRemoteConfiguration{
+		"origin": ent.NewGitRemoteConfigurationWith(ent.PointerToAuthenticationMethod(ent.PUBLIC_KEY), nil, nil, utl.PointerToString(os.Getenv("gitHubTestUserPrivateKeyWithoutPassphrase")), utl.PointerToString(os.Getenv("gitHubTestUserPrivateKeyPassphrase"))),
+	})
+	// add a mock convention that accepts all non nil messages and dumps the minor identifier for each
+	commitMessageConventions, _ := ent.NewCommitMessageConventionsWith(&[]*string{utl.PointerToString("testConvention")},
+		&map[string]*ent.CommitMessageConvention{"testConvention": ent.NewCommitMessageConventionWith(utl.PointerToString(".*"),
+			&map[string]string{"patch": ".*"})})
+	configurationLayerMock.SetCommitMessageConventions(commitMessageConventions)
+	// add a custom release type that always enables committing, tagging and pushing
+	releaseType := ent.NewReleaseType()
+	releaseType.SetGitCommit(utl.PointerToString("true"))
+	releaseType.SetGitPush(utl.PointerToString("true"))
+	releaseType.SetGitTag(utl.PointerToString("true"))
+	releaseTypes, _ := ent.NewReleaseTypesWith(&[]*string{utl.PointerToString("testReleaseType")},
+		&[]*string{}, &[]*string{utl.PointerToString("origin"), utl.PointerToString("replica")},
+		&map[string]*ent.ReleaseType{"testReleaseType": releaseType})
+	configurationLayerMock.SetReleaseTypes(releaseTypes)
+	nyx := nyx.NewNyxIn(script.GetWorkingDirectory())
+	nyxConfiguration, _ := nyx.Configuration()
+	var configurationLayer cnf.ConfigurationLayer
+	configurationLayer = configurationLayerMock
+	nyxConfiguration.WithRuntimeConfiguration(&configurationLayer)
+
+	state, err := nyx.Mark()
+	assert.NoError(t, err)
+
+	// if we read too quickly we often get a 404 from the server so let's wait a short while
+	time.Sleep(2000 * time.Millisecond)
+
+	// clone the remote repo again into a a new directory and test
+	remoteScript := gittools.CloneFromWithPublicKey((*gitHubRepository).GetSSHURL(), utl.PointerToString(os.Getenv("gitHubTestUserPrivateKeyWithoutPassphrase")), utl.PointerToString(os.Getenv("gitHubTestUserPrivateKeyPassphrase")))
+	defer os.RemoveAll(remoteScript.GetWorkingDirectory())
+
+	version, _ := state.GetVersion()
+	assert.Equal(t, "0.0.5", *version)
+	assert.Equal(t, len(script.GetTags()), len(replicaScript.GetTags()))
+	assert.Equal(t, len(script.GetTags()), len(remoteScript.GetTags()))
+
+	// if we delete too quickly we often get a 404 from the server so let's wait a short while
+	time.Sleep(2000 * time.Millisecond)
+
+	// test for idempotency running the command again
+	state, err = nyx.Mark()
+	assert.NoError(t, err)
+	version, _ = state.GetVersion()
+	assert.Equal(t, "0.0.5", *version)
+	assert.Equal(t, len(script.GetTags()), len(replicaScript.GetTags()))
+	assert.Equal(t, len(script.GetTags()), len(remoteScript.GetTags()))
+
+	// now delete it
+	gitHub.DeleteGitRepository((*gitHubRepository).GetID())
+
+	log.SetLevel(logLevel) // restore the original logging level
+}
+
 func TestMarkRunOnGitLabClonedWorkspaceWithAdditionalRemoteWithNewVersionOrNewReleaseWithCommitAndTagAndPushEnabledUsingUsernameAndPasswordCredentials(t *testing.T) {
 	logLevel := log.GetLevel()   // save the previous logging level
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
@@ -1500,6 +1662,168 @@ func TestMarkRunOnGitLabClonedWorkspaceWithAdditionalRemoteWithNewVersionOrNewRe
 
 	// clone the remote repo again into a a new directory and test
 	remoteScript := gittools.CloneFromWithUserNameAndPassword((*gitLabRepository).GetHTTPURL(), utl.PointerToString("PRIVATE-TOKEN"), utl.PointerToString(os.Getenv("gitLabTestUserToken")))
+	defer os.RemoveAll(remoteScript.GetWorkingDirectory())
+
+	version, _ := state.GetVersion()
+	assert.Equal(t, "0.0.5", *version)
+	assert.Equal(t, len(script.GetTags()), len(replicaScript.GetTags()))
+	assert.Equal(t, len(script.GetTags()), len(remoteScript.GetTags()))
+
+	// if we delete too quickly we often get a 404 from the server so let's wait a short while
+	time.Sleep(2000 * time.Millisecond)
+
+	// test for idempotency running the command again
+	state, err = nyx.Mark()
+	assert.NoError(t, err)
+	version, _ = state.GetVersion()
+	assert.Equal(t, "0.0.5", *version)
+	assert.Equal(t, len(script.GetTags()), len(replicaScript.GetTags()))
+	assert.Equal(t, len(script.GetTags()), len(remoteScript.GetTags()))
+
+	// now delete it
+	gitLab.DeleteGitRepository((*gitLabRepository).GetID())
+
+	log.SetLevel(logLevel) // restore the original logging level
+}
+
+func TestMarkRunOnGitLabClonedWorkspaceWithAdditionalRemoteWithNewVersionOrNewReleaseWithCommitAndTagAndPushEnabledUsingUnprotectedPrivateKeyCredentials(t *testing.T) {
+	logLevel := log.GetLevel()   // save the previous logging level
+	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
+
+	randomID := gitutil.RandomAlphabeticString(5, 103)
+	// the 'gitLabTestUserToken' environment variable is set by the build script
+	assert.NotEmpty(t, os.Getenv("gitLabTestUserToken"), "A GitLab authentication token must be passed to this test as an environment variable but it was not set")
+	gitLab, err := gitlab.Instance(map[string]string{gitlab.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitLabTestUserToken")})
+	gitLabRepository, err := gitLab.CreateGitRepository(randomID, utl.PointerToString("Test repository "+randomID), false, true)
+
+	// if we clone too quickly next calls may fail
+	time.Sleep(4000 * time.Millisecond)
+
+	replicaScript := gittools.FROM_SCRATCH().Realize()
+	defer os.RemoveAll(replicaScript.GetWorkingDirectory())
+	script := gittools.ONE_BRANCH_SHORT().ApplyOnCloneFromWithPublicKey((*gitLabRepository).GetSSHURL(), utl.PointerToString(os.Getenv("gitLabTestUserPrivateKeyWithoutPassphrase")), nil)
+	defer os.RemoveAll(script.GetWorkingDirectory())
+	script.AddRemote(replicaScript.GetGitDirectory(), "replica")
+
+	configurationLayerMock := cnf.NewSimpleConfigurationLayer()
+	// add a service configuration to pass the credentials required to push to the remote repository
+	configurationLayerMock.SetServices(&map[string]*ent.ServiceConfiguration{
+		"gitlab": ent.NewServiceConfigurationWith(ent.PointerToProvider(ent.GITLAB), &map[string]string{gitlab.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitLabTestUserToken")}),
+	})
+	// set up the Git remote credentials
+	gitConfiguration, _ := configurationLayerMock.GetGit()
+	gitConfiguration.SetRemotes(&map[string]*ent.GitRemoteConfiguration{
+		"origin": ent.NewGitRemoteConfigurationWith(ent.PointerToAuthenticationMethod(ent.PUBLIC_KEY), nil, nil, utl.PointerToString(os.Getenv("gitLabTestUserPrivateKeyWithoutPassphrase")), nil),
+	})
+	// add a mock convention that accepts all non nil messages and dumps the minor identifier for each
+	commitMessageConventions, _ := ent.NewCommitMessageConventionsWith(&[]*string{utl.PointerToString("testConvention")},
+		&map[string]*ent.CommitMessageConvention{"testConvention": ent.NewCommitMessageConventionWith(utl.PointerToString(".*"),
+			&map[string]string{"patch": ".*"})})
+	configurationLayerMock.SetCommitMessageConventions(commitMessageConventions)
+	// add a custom release type that always enables committing, tagging and pushing
+	releaseType := ent.NewReleaseType()
+	releaseType.SetGitCommit(utl.PointerToString("true"))
+	releaseType.SetGitPush(utl.PointerToString("true"))
+	releaseType.SetGitTag(utl.PointerToString("true"))
+	releaseTypes, _ := ent.NewReleaseTypesWith(&[]*string{utl.PointerToString("testReleaseType")},
+		&[]*string{}, &[]*string{utl.PointerToString("origin"), utl.PointerToString("replica")},
+		&map[string]*ent.ReleaseType{"testReleaseType": releaseType})
+	configurationLayerMock.SetReleaseTypes(releaseTypes)
+	nyx := nyx.NewNyxIn(script.GetWorkingDirectory())
+	nyxConfiguration, _ := nyx.Configuration()
+	var configurationLayer cnf.ConfigurationLayer
+	configurationLayer = configurationLayerMock
+	nyxConfiguration.WithRuntimeConfiguration(&configurationLayer)
+
+	state, err := nyx.Mark()
+	assert.NoError(t, err)
+
+	// if we read too quickly we often get a 404 from the server so let's wait a short while
+	time.Sleep(2000 * time.Millisecond)
+
+	// clone the remote repo again into a a new directory and test
+	remoteScript := gittools.CloneFromWithPublicKey((*gitLabRepository).GetSSHURL(), utl.PointerToString(os.Getenv("gitLabTestUserPrivateKeyWithoutPassphrase")), nil)
+	defer os.RemoveAll(remoteScript.GetWorkingDirectory())
+
+	version, _ := state.GetVersion()
+	assert.Equal(t, "0.0.5", *version)
+	assert.Equal(t, len(script.GetTags()), len(replicaScript.GetTags()))
+	assert.Equal(t, len(script.GetTags()), len(remoteScript.GetTags()))
+
+	// if we delete too quickly we often get a 404 from the server so let's wait a short while
+	time.Sleep(2000 * time.Millisecond)
+
+	// test for idempotency running the command again
+	state, err = nyx.Mark()
+	assert.NoError(t, err)
+	version, _ = state.GetVersion()
+	assert.Equal(t, "0.0.5", *version)
+	assert.Equal(t, len(script.GetTags()), len(replicaScript.GetTags()))
+	assert.Equal(t, len(script.GetTags()), len(remoteScript.GetTags()))
+
+	// now delete it
+	gitLab.DeleteGitRepository((*gitLabRepository).GetID())
+
+	log.SetLevel(logLevel) // restore the original logging level
+}
+
+func TestMarkRunOnGitLabClonedWorkspaceWithAdditionalRemoteWithNewVersionOrNewReleaseWithCommitAndTagAndPushEnabledUsingProtectedPrivateKeyCredentials(t *testing.T) {
+	logLevel := log.GetLevel()   // save the previous logging level
+	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
+
+	randomID := gitutil.RandomAlphabeticString(5, 103)
+	// the 'gitLabTestUserToken' environment variable is set by the build script
+	assert.NotEmpty(t, os.Getenv("gitLabTestUserToken"), "A GitLab authentication token must be passed to this test as an environment variable but it was not set")
+	gitLab, err := gitlab.Instance(map[string]string{gitlab.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitLabTestUserToken")})
+	gitLabRepository, err := gitLab.CreateGitRepository(randomID, utl.PointerToString("Test repository "+randomID), false, true)
+
+	// if we clone too quickly next calls may fail
+	time.Sleep(4000 * time.Millisecond)
+
+	replicaScript := gittools.FROM_SCRATCH().Realize()
+	defer os.RemoveAll(replicaScript.GetWorkingDirectory())
+	script := gittools.ONE_BRANCH_SHORT().ApplyOnCloneFromWithPublicKey((*gitLabRepository).GetSSHURL(), utl.PointerToString(os.Getenv("gitLabTestUserPrivateKeyWithoutPassphrase")), utl.PointerToString(os.Getenv("gitLabTestUserPrivateKeyPassphrase")))
+	defer os.RemoveAll(script.GetWorkingDirectory())
+	script.AddRemote(replicaScript.GetGitDirectory(), "replica")
+
+	configurationLayerMock := cnf.NewSimpleConfigurationLayer()
+	// add a service configuration to pass the credentials required to push to the remote repository
+	configurationLayerMock.SetServices(&map[string]*ent.ServiceConfiguration{
+		"gitlab": ent.NewServiceConfigurationWith(ent.PointerToProvider(ent.GITLAB), &map[string]string{gitlab.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitLabTestUserToken")}),
+	})
+	// set up the Git remote credentials
+	gitConfiguration, _ := configurationLayerMock.GetGit()
+	gitConfiguration.SetRemotes(&map[string]*ent.GitRemoteConfiguration{
+		"origin": ent.NewGitRemoteConfigurationWith(ent.PointerToAuthenticationMethod(ent.PUBLIC_KEY), nil, nil, utl.PointerToString(os.Getenv("gitLabTestUserPrivateKeyWithoutPassphrase")), utl.PointerToString(os.Getenv("gitLabTestUserPrivateKeyPassphrase"))),
+	})
+	// add a mock convention that accepts all non nil messages and dumps the minor identifier for each
+	commitMessageConventions, _ := ent.NewCommitMessageConventionsWith(&[]*string{utl.PointerToString("testConvention")},
+		&map[string]*ent.CommitMessageConvention{"testConvention": ent.NewCommitMessageConventionWith(utl.PointerToString(".*"),
+			&map[string]string{"patch": ".*"})})
+	configurationLayerMock.SetCommitMessageConventions(commitMessageConventions)
+	// add a custom release type that always enables committing, tagging and pushing
+	releaseType := ent.NewReleaseType()
+	releaseType.SetGitCommit(utl.PointerToString("true"))
+	releaseType.SetGitPush(utl.PointerToString("true"))
+	releaseType.SetGitTag(utl.PointerToString("true"))
+	releaseTypes, _ := ent.NewReleaseTypesWith(&[]*string{utl.PointerToString("testReleaseType")},
+		&[]*string{}, &[]*string{utl.PointerToString("origin"), utl.PointerToString("replica")},
+		&map[string]*ent.ReleaseType{"testReleaseType": releaseType})
+	configurationLayerMock.SetReleaseTypes(releaseTypes)
+	nyx := nyx.NewNyxIn(script.GetWorkingDirectory())
+	nyxConfiguration, _ := nyx.Configuration()
+	var configurationLayer cnf.ConfigurationLayer
+	configurationLayer = configurationLayerMock
+	nyxConfiguration.WithRuntimeConfiguration(&configurationLayer)
+
+	state, err := nyx.Mark()
+	assert.NoError(t, err)
+
+	// if we read too quickly we often get a 404 from the server so let's wait a short while
+	time.Sleep(2000 * time.Millisecond)
+
+	// clone the remote repo again into a a new directory and test
+	remoteScript := gittools.CloneFromWithPublicKey((*gitLabRepository).GetSSHURL(), utl.PointerToString(os.Getenv("gitLabTestUserPrivateKeyWithoutPassphrase")), utl.PointerToString(os.Getenv("gitLabTestUserPrivateKeyPassphrase")))
 	defer os.RemoveAll(remoteScript.GetWorkingDirectory())
 
 	version, _ := state.GetVersion()
