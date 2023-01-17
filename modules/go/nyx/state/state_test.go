@@ -300,7 +300,7 @@ func TestStateGetTimestamp(t *testing.T) {
 	configuration, _ := cnf.NewConfiguration()
 	state, _ := NewStateWith(configuration)
 	timestamp, _ := state.GetTimestamp()
-	assert.True(t, time.Now().Unix() >= *timestamp)
+	assert.True(t, time.Now().UnixMilli() >= *timestamp)
 }
 
 func TestStateTouchTimestamp(t *testing.T) {
@@ -309,7 +309,7 @@ func TestStateTouchTimestamp(t *testing.T) {
 	state, _ := NewStateWith(configuration)
 
 	oldTimestamp, _ := state.GetTimestamp()
-	for ok := true; ok; ok = *oldTimestamp == time.Now().Unix() {
+	for ok := true; ok; ok = *oldTimestamp == time.Now().UnixMilli() {
 		// just do nothing and let at least 1 millisecond pass
 	}
 
