@@ -54,23 +54,7 @@ public class Script extends Workbench {
 
     /**
      * Returns a new script instance for a repository cloned from the given URI in a new temporary directory.
-     * No credendials are used for cloning.
-     * 
-     * @param uri the URI to clone from
-     * 
-     * @return the new instance
-     * 
-     * @throws Exception in case of any issue
-     * 
-     * @see #getWorkingDirectory() to get the repository directory
-     */
-    public static Script cloneFrom(String uri)
-        throws Exception {
-        return cloneFrom(uri, null, null);
-    }
-
-    /**
-     * Returns a new script instance for a repository cloned from the given URI in a new temporary directory.
+     * This method allows using user name and password authentication (also used for tokens).
      * 
      * @param uri the URI to clone from
      * @param user the optional user name to use when credentials are required.
@@ -89,11 +73,12 @@ public class Script extends Workbench {
     }
 
     /**
-     * Returns a new script instance for a repository cloned from the given URI in the given directory.
-     * No credendials are used for cloning.
+     * Returns a new script instance for a repository cloned from the given URI in a new temporary directory.
+     * This method allows using SSH authentication.
      * 
      * @param uri the URI to clone from
-     * @param directory the directory to clone to. It must exist and be empty
+     * @param privateKey the SSH private key.
+     * @param passphrase the optional password to use to open the private key, in case it's protected by a passphrase.
      * 
      * @return the new instance
      * 
@@ -101,13 +86,15 @@ public class Script extends Workbench {
      * 
      * @see #getWorkingDirectory() to get the repository directory
      */
-    public static Script cloneFrom(String uri, File directory)
+    public static Script cloneFrom(String uri, String privateKey, byte[] passphrase)
         throws Exception {
-        return cloneFrom(uri, directory, null, null);
+        File directory = FileSystemUtil.newTempDirectory(null, "nyx-test-script-");
+        return cloneFrom(uri, directory, privateKey, passphrase);
     }
 
     /**
      * Returns a new script instance for a repository cloned from the given URI in the given directory.
+     * This method allows using user name and password authentication (also used for tokens).
      * 
      * @param uri the URI to clone from
      * @param directory the directory to clone to. It must exist and be empty
@@ -123,6 +110,27 @@ public class Script extends Workbench {
     public static Script cloneFrom(String uri, File directory, String user, String password)
         throws Exception {
         cloneInto(uri, directory, user, password);
+        return new Script(directory);
+    }
+
+    /**
+     * Returns a new script instance for a repository cloned from the given URI in the given directory.
+     * This method allows using SSH authentication.
+     * 
+     * @param uri the URI to clone from
+     * @param directory the directory to clone to. It must exist and be empty
+     * @param privateKey the SSH private key.
+     * @param passphrase the optional password to use to open the private key, in case it's protected by a passphrase.
+     * 
+     * @return the new instance
+     * 
+     * @throws Exception in case of any issue
+     * 
+     * @see #getWorkingDirectory() to get the repository directory
+     */
+    public static Script cloneFrom(String uri, File directory, String privateKey, byte[] passphrase)
+        throws Exception {
+        cloneInto(uri, directory, privateKey, passphrase);
         return new Script(directory);
     }
 

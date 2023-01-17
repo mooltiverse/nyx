@@ -1377,7 +1377,7 @@ func TestMarkRunOnGitHubClonedWorkspaceWithAdditionalRemoteWithNewVersionOrNewRe
 
 	replicaScript := gittools.FROM_SCRATCH().Realize()
 	defer os.RemoveAll(replicaScript.GetWorkingDirectory())
-	script := gittools.ONE_BRANCH_SHORT().ApplyOnCloneFromWithCredentials((*gitHubRepository).GetHTTPURL(), utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(""))
+	script := gittools.ONE_BRANCH_SHORT().ApplyOnCloneFromWithUserNameAndPassword((*gitHubRepository).GetHTTPURL(), utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(""))
 	defer os.RemoveAll(script.GetWorkingDirectory())
 	script.AddRemote(replicaScript.GetGitDirectory(), "replica")
 
@@ -1418,7 +1418,7 @@ func TestMarkRunOnGitHubClonedWorkspaceWithAdditionalRemoteWithNewVersionOrNewRe
 	time.Sleep(2000 * time.Millisecond)
 
 	// clone the remote repo again into a a new directory and test
-	remoteScript := gittools.CloneFromWithCredentials((*gitHubRepository).GetHTTPURL(), utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(""))
+	remoteScript := gittools.CloneFromWithUserNameAndPassword((*gitHubRepository).GetHTTPURL(), utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(""))
 	defer os.RemoveAll(remoteScript.GetWorkingDirectory())
 
 	version, _ := state.GetVersion()
@@ -1458,7 +1458,7 @@ func TestMarkRunOnGitLabClonedWorkspaceWithAdditionalRemoteWithNewVersionOrNewRe
 
 	replicaScript := gittools.FROM_SCRATCH().Realize()
 	defer os.RemoveAll(replicaScript.GetWorkingDirectory())
-	script := gittools.ONE_BRANCH_SHORT().ApplyOnCloneFromWithCredentials((*gitLabRepository).GetHTTPURL(), utl.PointerToString("PRIVATE-TOKEN"), utl.PointerToString(os.Getenv("gitLabTestUserToken")))
+	script := gittools.ONE_BRANCH_SHORT().ApplyOnCloneFromWithUserNameAndPassword((*gitLabRepository).GetHTTPURL(), utl.PointerToString("PRIVATE-TOKEN"), utl.PointerToString(os.Getenv("gitLabTestUserToken")))
 	defer os.RemoveAll(script.GetWorkingDirectory())
 	script.AddRemote(replicaScript.GetGitDirectory(), "replica")
 
@@ -1499,7 +1499,7 @@ func TestMarkRunOnGitLabClonedWorkspaceWithAdditionalRemoteWithNewVersionOrNewRe
 	time.Sleep(2000 * time.Millisecond)
 
 	// clone the remote repo again into a a new directory and test
-	remoteScript := gittools.CloneFromWithCredentials((*gitLabRepository).GetHTTPURL(), utl.PointerToString("PRIVATE-TOKEN"), utl.PointerToString(os.Getenv("gitLabTestUserToken")))
+	remoteScript := gittools.CloneFromWithUserNameAndPassword((*gitLabRepository).GetHTTPURL(), utl.PointerToString("PRIVATE-TOKEN"), utl.PointerToString(os.Getenv("gitLabTestUserToken")))
 	defer os.RemoveAll(remoteScript.GetWorkingDirectory())
 
 	version, _ := state.GetVersion()
