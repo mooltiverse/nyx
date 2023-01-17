@@ -1,5 +1,25 @@
 # Nyx Release Notes
 
+## 1.3.1
+
+This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/1.3.1).
+
+### Upgrade instructions
+
+There are no actions to take for backward compatibility.
+
+### New features and improvements
+
+There are no new features or improvements in this release.
+
+### Fixed issues
+
+This release:
+
+* fixes bug [#131](https://github.com/mooltiverse/nyx/issues/131) about wrong dates and timestamps in generated changelogs and versions (Go)
+
+### Known issues
+
 ## 1.3.0
 
 This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/1.3.0).
