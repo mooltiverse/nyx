@@ -775,7 +775,7 @@ func (s *State) SetVersionRange(versionRange *string) error {
 Updates the current timestamp and returns the updated value.
 */
 func (s *State) TouchTimestamp() *int64 {
-	now := time.Now().Unix()
+	now := time.Now().UnixMilli()
 	s.Timestamp = &now
 	return &now
 }
