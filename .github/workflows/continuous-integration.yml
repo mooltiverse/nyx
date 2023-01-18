@@ -111,6 +111,13 @@ jobs:
       with:
         name: .nyx-state-${{ github.job }}.json
         path: build/.nyx-state.json
+    # TODO: DELETE FROM HERE
+    - name: Archive Files
+      uses: actions/upload-artifact@v3
+      with:
+        name: files
+        path: 'build/*.txt'
+    # TODO: DELETE TO HERE
 
 ###############################################################################################################################
 # BUILD
