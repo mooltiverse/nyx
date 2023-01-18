@@ -22,6 +22,9 @@
 package command_test
 
 import (
+	// TODO: DELETE FROM HERE
+	"fmt" // https://pkg.go.dev/fmt
+	// TODO: DELETE TO HERE
 	"os"      // https://pkg.go.dev/os
 	"testing" // https://pkg.go.dev/testing
 	"time"    // https://pkg.go.dev/time
@@ -1447,6 +1450,12 @@ func TestMarkRunOnGitHubClonedWorkspaceWithAdditionalRemoteWithNewVersionOrNewRe
 	logLevel := log.GetLevel()   // save the previous logging level
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 
+	// TODO: DELETE FROM HERE
+	fmt.Printf("------- PRIVATE KEY -------\n")
+	fmt.Printf("-----------------------------------------\n")
+	fmt.Printf(os.Getenv("gitHubTestUserPrivateKeyWithoutPassphrase"))
+	fmt.Printf("-----------------------------------------\n")
+	// TODO: DELETE TO HERE
 	randomID := gitutil.RandomAlphabeticString(5, 103)
 	// the 'gitHubTestUserToken' environment variable is set by the build script
 	assert.NotEmpty(t, os.Getenv("gitHubTestUserToken"), "A GitHub authentication token must be passed to this test as an environment variable but it was not set")

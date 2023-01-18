@@ -133,6 +133,13 @@ public class MarkTests {
         @DisplayName("Mark.run() on a cloned workspace from GitHub with an additional remote using a release type with Commit, Tag and Push enabled after Infer has generated a new Version, using unprotected private key credentials > yield to a new commit and a new tag, with changes pushed to all remotes")
         void runOnGitHubClonedWorkspaceWithAdditionalRemoteWithNewVersionOrNewReleaseWithCommitAndTagAndPushEnabledUsingUnprotectedPrivateKeyCredentialsTest()
             throws Exception {
+// TODO: DELETE FROM HERE
+System.out.println("------- PRIVATE KEY -------");
+System.out.println("-----------------------------------------");
+System.out.println(System.getProperty("gitHubTestUserPrivateKeyWithoutPassphrase"));
+System.out.println("-----------------------------------------");
+System.out.flush();
+// TODO: DELETE TO HERE
             String randomID = RandomUtil.randomAlphabeticString(5);
             // the 'gitHubTestUserToken' system property is set by the build script, which in turn reads it from an environment variable
             // when a token for user and password authentication for plain Git operations against a GitHub repository,
