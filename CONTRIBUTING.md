@@ -285,7 +285,7 @@ gitLabTestUserPrivateKeyWithoutPassphrase=<UNPROTECTED_PRIVATE_KEY>
 $ ./gradlew test
 ```
 
-Examples on how to use credentials passed as [secrets on GitHub Actions](https://docs.github.com/en/actions/security-guides/encrypted-secrets) see the `.github\workflows\continuous-integration.yml` file. Please note that multi-line secrets (like private keys) can be set as they are in the projects setting (in the *secrets* section) even if the build script will then pass them as environment variables.
+Examples on how to use credentials passed as [secrets on GitHub Actions](https://docs.github.com/en/actions/security-guides/encrypted-secrets) see the `.github\workflows\continuous-integration.yml` file. Please note that multi-line secrets (like private keys) can be set as they are in the GitHub projects setting (in the *secrets* section) even if the build script will then pass them as environment variables.
 
 For more on the above options see the [Gradle Build Environment](https://docs.gradle.org/current/userguide/build_environment.html). In any case, **never store your credentials along with the project files**.
 
