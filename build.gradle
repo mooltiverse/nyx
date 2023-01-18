@@ -174,32 +174,34 @@ task testClean() {
 
 // TODO: DELETE FROM HERE
 task checkKeys() {
-  project.logger.quiet('gitHubTestUserPublicKey:'+findProperty("gitHubTestUserPublicKey"))
-  project.logger.quiet('gitHubTestUserPrivateKeyPassphrase:'+findProperty("gitHubTestUserPrivateKeyPassphrase"))
-  project.logger.quiet('gitHubTestUserPrivateKeyWithPassphrase:'+findProperty("gitHubTestUserPrivateKeyWithPassphrase"))
-  project.logger.quiet('gitHubTestUserPrivateKeyWithoutPassphrase:'+findProperty("gitHubTestUserPrivateKeyWithoutPassphrase"))
-  project.logger.quiet('gitLabTestUserPublicKey:'+findProperty("gitLabTestUserPublicKey"))
-  project.logger.quiet('gitLabTestUserPrivateKeyPassphrase:'+findProperty("gitLabTestUserPrivateKeyPassphrase"))
-  project.logger.quiet('gitLabTestUserPrivateKeyWithPassphrase:'+findProperty("gitLabTestUserPrivateKeyWithPassphrase"))
-  project.logger.quiet('gitLabTestUserPrivateKeyWithoutPassphrase:'+findProperty("gitLabTestUserPrivateKeyWithoutPassphrase"))
+  doLast() {
+    project.logger.quiet('gitHubTestUserPublicKey:'+findProperty("gitHubTestUserPublicKey"))
+    project.logger.quiet('gitHubTestUserPrivateKeyPassphrase:'+findProperty("gitHubTestUserPrivateKeyPassphrase"))
+    project.logger.quiet('gitHubTestUserPrivateKeyWithPassphrase:'+findProperty("gitHubTestUserPrivateKeyWithPassphrase"))
+    project.logger.quiet('gitHubTestUserPrivateKeyWithoutPassphrase:'+findProperty("gitHubTestUserPrivateKeyWithoutPassphrase"))
+    project.logger.quiet('gitLabTestUserPublicKey:'+findProperty("gitLabTestUserPublicKey"))
+    project.logger.quiet('gitLabTestUserPrivateKeyPassphrase:'+findProperty("gitLabTestUserPrivateKeyPassphrase"))
+    project.logger.quiet('gitLabTestUserPrivateKeyWithPassphrase:'+findProperty("gitLabTestUserPrivateKeyWithPassphrase"))
+    project.logger.quiet('gitLabTestUserPrivateKeyWithoutPassphrase:'+findProperty("gitLabTestUserPrivateKeyWithoutPassphrase"))
 
-  def gitHubTestUserPublicKey = new File(buildDir, "gitHubTestUserPublicKey.txt")
-  gitHubTestUserPublicKey.text = findProperty("gitHubTestUserPublicKey")
-  def gitHubTestUserPrivateKeyPassphrase = new File(buildDir, "gitHubTestUserPrivateKeyPassphrase.txt")
-  gitHubTestUserPrivateKeyPassphrase.text = findProperty("gitHubTestUserPrivateKeyPassphrase")
-  def gitHubTestUserPrivateKeyWithPassphrase = new File(buildDir, "gitHubTestUserPrivateKeyWithPassphrase.txt")
-  gitHubTestUserPrivateKeyWithPassphrase.text = findProperty("gitHubTestUserPrivateKeyWithPassphrase")
-  def gitHubTestUserPrivateKeyWithoutPassphrase = new File(buildDir, "gitHubTestUserPrivateKeyWithoutPassphrase.txt")
-  gitHubTestUserPrivateKeyWithoutPassphrase.text = findProperty("gitHubTestUserPrivateKeyWithoutPassphrase")
+    def gitHubTestUserPublicKey = new File(buildDir, "gitHubTestUserPublicKey.txt")
+    gitHubTestUserPublicKey.text = findProperty("gitHubTestUserPublicKey")
+    def gitHubTestUserPrivateKeyPassphrase = new File(buildDir, "gitHubTestUserPrivateKeyPassphrase.txt")
+    gitHubTestUserPrivateKeyPassphrase.text = findProperty("gitHubTestUserPrivateKeyPassphrase")
+    def gitHubTestUserPrivateKeyWithPassphrase = new File(buildDir, "gitHubTestUserPrivateKeyWithPassphrase.txt")
+    gitHubTestUserPrivateKeyWithPassphrase.text = findProperty("gitHubTestUserPrivateKeyWithPassphrase")
+    def gitHubTestUserPrivateKeyWithoutPassphrase = new File(buildDir, "gitHubTestUserPrivateKeyWithoutPassphrase.txt")
+    gitHubTestUserPrivateKeyWithoutPassphrase.text = findProperty("gitHubTestUserPrivateKeyWithoutPassphrase")
 
-  def gitLabTestUserPublicKey = new File(buildDir, "gitLabTestUserPublicKey.txt")
-  gitLabTestUserPublicKey.text = findProperty("gitLabTestUserPublicKey")
-  def gitLabTestUserPrivateKeyPassphrase = new File(buildDir, "gitLabTestUserPrivateKeyPassphrase.txt")
-  gitLabTestUserPrivateKeyPassphrase.text = findProperty("gitLabTestUserPrivateKeyPassphrase")
-  def gitLabTestUserPrivateKeyWithPassphrase = new File(buildDir, "gitLabTestUserPrivateKeyWithPassphrase.txt")
-  gitLabTestUserPrivateKeyWithPassphrase.text = findProperty("gitLabTestUserPrivateKeyWithPassphrase")
-  def gitLabTestUserPrivateKeyWithoutPassphrase = new File(buildDir, "gitLabTestUserPrivateKeyWithoutPassphrase.txt")
-  gitLabTestUserPrivateKeyWithoutPassphrase.text = findProperty("gitLabTestUserPrivateKeyWithoutPassphrase")
+    def gitLabTestUserPublicKey = new File(buildDir, "gitLabTestUserPublicKey.txt")
+    gitLabTestUserPublicKey.text = findProperty("gitLabTestUserPublicKey")
+    def gitLabTestUserPrivateKeyPassphrase = new File(buildDir, "gitLabTestUserPrivateKeyPassphrase.txt")
+    gitLabTestUserPrivateKeyPassphrase.text = findProperty("gitLabTestUserPrivateKeyPassphrase")
+    def gitLabTestUserPrivateKeyWithPassphrase = new File(buildDir, "gitLabTestUserPrivateKeyWithPassphrase.txt")
+    gitLabTestUserPrivateKeyWithPassphrase.text = findProperty("gitLabTestUserPrivateKeyWithPassphrase")
+    def gitLabTestUserPrivateKeyWithoutPassphrase = new File(buildDir, "gitLabTestUserPrivateKeyWithoutPassphrase.txt")
+    gitLabTestUserPrivateKeyWithoutPassphrase.text = findProperty("gitLabTestUserPrivateKeyWithoutPassphrase")
+  }
 }
 // TODO: DELETE TO HERE
 
