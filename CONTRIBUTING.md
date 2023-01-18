@@ -216,7 +216,7 @@ The credentials use for test accounts are:
 
 * the user name
 * an authentication token (OAuth2, Personal Access Token)
-* an SSH key pair
+* an SSH key pair, with a public key and two versions of the private key: one is passphrase protected and the other is not protected
 * a passphrase for password protected private keys
 
 When testing locally you can still run tests by passing credentials for your own users (never use your personal accounts, create additional test users instead) and pass their credentials to Gradle scripts as environment variables or system properties. See the [Gradle Build Environment](https://docs.gradle.org/current/userguide/build_environment.html) for more.
@@ -284,6 +284,8 @@ gitLabTestUserPrivateKeyWithoutPassphrase=<UNPROTECTED_PRIVATE_KEY>
 # Run Gradle as normal
 $ ./gradlew test
 ```
+
+Examples on how to use credentials passed as [secrets on GitHub Actions](https://docs.github.com/en/actions/security-guides/encrypted-secrets) see the `.github\workflows\continuous-integration.yml` file. Please note that multi-line secrets (like private keys) can be set as they are in the projects setting (in the *secrets* section) even if the build script will then pass them as environment variables.
 
 For more on the above options see the [Gradle Build Environment](https://docs.gradle.org/current/userguide/build_environment.html). In any case, **never store your credentials along with the project files**.
 
