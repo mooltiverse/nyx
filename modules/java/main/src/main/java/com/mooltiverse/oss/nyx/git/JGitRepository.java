@@ -225,9 +225,7 @@ class JGitRepository implements Repository {
             @Override
             protected JSch createDefaultJSch(FS fs)
                 throws JSchException {
-                // TODO: DELETE FROM HERE
                 JSch.setLogger(new JschLogger());
-                // TODO: DELETE TO HERE
                 JSch defaultJSch = super.createDefaultJSch(fs);
                 defaultJSch.setConfig("PreferredAuthentications", "publickey");
                 if (!Objects.isNull(privateKey) && !privateKey.isEmpty()) {
@@ -277,10 +275,10 @@ class JGitRepository implements Repository {
          */
         static Map<Integer, Level> levelMapping = Map.of(
             Integer.valueOf(com.jcraft.jsch.Logger.DEBUG), Level.DEBUG,
-            Integer.valueOf(com.jcraft.jsch.Logger.INFO), Level.INFO,
+            Integer.valueOf(com.jcraft.jsch.Logger.INFO), Level.DEBUG, // map Jsch's INFO to DEBUG to avoid log churns
             Integer.valueOf(com.jcraft.jsch.Logger.WARN), Level.WARN,
             Integer.valueOf(com.jcraft.jsch.Logger.ERROR), Level.ERROR,
-            Integer.valueOf(com.jcraft.jsch.Logger.FATAL), Level.ERROR
+            Integer.valueOf(com.jcraft.jsch.Logger.FATAL), Level.ERROR // FATAL is not available in SLF4J
         );
 
         /**
