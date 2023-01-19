@@ -12,6 +12,7 @@ This release is available at [this link](https://github.com/mooltiverse/nyx/rele
 
 * replace usage of deprecated [template functions](https://mooltiverse.github.io/nyx/guide/user/configuration-reference/templates/#functions) `environment.user`, `environment.variable`, `file.content`, `file.exists` (with dots) with `environmentUser`, `environmentVariable`, `fileContent`, `fileExists` (camel case names) in the configuration
 * if you embedded Nyx in your code and used the `github.com/mooltiverse/nyx/modules/go/nyx/git` Go package or the `com.mooltiverse.oss.nyx.git` package, fix your code reflecting the changes made to the API
+* if you plan to use Git SSH authentication please refer to [the configuration reference](https://mooltiverse.github.io/nyx/guide/user/configuration-reference/git/) for the required configuration options
 
 ### New features and improvements
 

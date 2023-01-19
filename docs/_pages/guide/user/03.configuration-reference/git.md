@@ -12,6 +12,23 @@ The `git` *section* is where you can pass Git parameters to Nyx.
 When using multiple [configuration methods]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}) or customizing [presets]({{ site.baseurl }}{% link _pages/guide/user/04.configuration-presets/index.md %}), these values must be inherited or overridden as a whole. Overriding single values and inheriting others is not supported for this type of configuration option so when they are re-declared at one configuration level, all inherited values from those configuration methods with lower precedence are suppressed.
 {: .notice--warning}
 
+### Limitations
+
+Nyx uses external libraries to connect to remotes and so inherits their limitations. These libraries are:
+
+* [JSch (mwiede's fork)](https://github.com/mwiede/jsch) and [JGit](https://www.eclipse.org/jgit/) for the Java (Gradle) version
+* [go-git](https://github.com/go-git/go-git) and [ssh](https://pkg.go.dev/golang.org/x/crypto/ssh) for the Go (command line) version
+
+The limitations coming from those libraries may show up, for example:
+
+* in case of unsupported key algorithms and formats (when using SSH keys)
+* in case of unsupported JVM versions (for the Java version)
+* when files are not found at their usual locations (i.e. `~/.ssh`, when using SSH keys)
+
+Other limitations may be due to remote end services.
+
+In case you notice some errors or unexpected behavior please make sure it's not due to the above libraries.
+
 ### Credentials
 
 #### Using tokens
