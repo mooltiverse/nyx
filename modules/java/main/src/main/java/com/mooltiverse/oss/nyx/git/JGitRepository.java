@@ -223,6 +223,9 @@ class JGitRepository implements Repository {
             @Override
             protected JSch createDefaultJSch(FS fs)
                 throws JSchException {
+                // TODO: DELETE FROM HERE
+                JSch.setLogger(new JschDebugLogger());
+                // TODO: DELETE TO HERE
                 JSch defaultJSch = super.createDefaultJSch(fs);
                 defaultJSch.setConfig("PreferredAuthentications", "publickey");
                 if (!Objects.isNull(privateKey) && !privateKey.isEmpty()) {
@@ -262,6 +265,17 @@ class JGitRepository implements Repository {
             }
         };
     }
+
+    // TODO: DELETE FROM HERE
+    public static class JschDebugLogger implements com.jcraft.jsch.Logger {
+        public boolean isEnabled(int level){
+          return true;
+        }
+        public void log(int level, String message){
+          System.err.println("********************** JSCH: "+message);
+        }
+      }
+    // TODO: DELETE TO HERE
 
     /**
      * Returns a repository instance working in the given directory after cloning from the given URI.
