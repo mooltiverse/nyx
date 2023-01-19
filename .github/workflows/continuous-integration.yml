@@ -90,34 +90,13 @@ jobs:
           gradle-distribution-sha-256-sum-warning: false
     # This job only runs nyxInfer to produce the initial version and initializes the Gradle remote cache
     - name: Init with Gradle
-      # TODO: DELETE FROM HERE
-      env:
-        # See the top level https://github.com/mooltiverse/nyx/blob/master/CONTRIBUTING.md#contributing-code file for details about passing these values when testing locally
-        ORG_GRADLE_PROJECT_gitHubTestUserToken: ${{ secrets.TEST_GITHUB_USER_TOKEN }}                                                # The test user token to test Nyx GitHub features
-        ORG_GRADLE_PROJECT_gitHubTestUserPublicKey: ${{ secrets.TEST_GITHUB_USER_PUBLIC_KEY }}                                       # The test public key to test Nyx GitHub features
-        ORG_GRADLE_PROJECT_gitHubTestUserPrivateKeyPassphrase: ${{ secrets.TEST_GITHUB_USER_PASSPHRASE }}                            # The test private key passphrase to test Nyx GitHub features
-        ORG_GRADLE_PROJECT_gitHubTestUserPrivateKeyWithPassphrase: ${{ secrets.TEST_GITHUB_USER_PRIVATE_KEY_WITH_PASSPHRASE }}       # The test password protected private key to test Nyx GitHub features
-        ORG_GRADLE_PROJECT_gitHubTestUserPrivateKeyWithoutPassphrase: ${{ secrets.TEST_GITHUB_USER_PRIVATE_KEY_WITHOUT_PASSPHRASE }} # The test unprotected private key to test Nyx GitHub features
-        ORG_GRADLE_PROJECT_gitLabTestUserToken: ${{ secrets.TEST_GITLAB_USER_TOKEN }}                                                # The test user token to test Nyx GitLab features
-        ORG_GRADLE_PROJECT_gitLabTestUserPublicKey: ${{ secrets.TEST_GITLAB_USER_PUBLIC_KEY }}                                       # The test public key to test Nyx GitLab features
-        ORG_GRADLE_PROJECT_gitLabTestUserPrivateKeyPassphrase: ${{ secrets.TEST_GITLAB_USER_PASSPHRASE }}                            # The test private key passphrase to test Nyx GitLab features
-        ORG_GRADLE_PROJECT_gitLabTestUserPrivateKeyWithPassphrase: ${{ secrets.TEST_GITLAB_USER_PRIVATE_KEY_WITH_PASSPHRASE }}       # The test password protected private key to test Nyx GitHub features
-        ORG_GRADLE_PROJECT_gitLabTestUserPrivateKeyWithoutPassphrase: ${{ secrets.TEST_GITLAB_USER_PRIVATE_KEY_WITHOUT_PASSPHRASE }} # The test unprotected private key to test Nyx GitHub features
-        # TODO: DELETE TO HERE AND THE 'checkKeys' TASK BELOW
-      run: ./gradlew checkKeys nyxInfer --build-cache --stacktrace
+      run: ./gradlew nyxInfer --build-cache --stacktrace
     - name: Archive Nyx state file
       uses: actions/upload-artifact@v3
       if: ${{ always() }}
       with:
         name: .nyx-state-${{ github.job }}.json
         path: build/.nyx-state.json
-    # TODO: DELETE FROM HERE
-    - name: Archive Files
-      uses: actions/upload-artifact@v3
-      with:
-        name: files
-        path: 'build/*.txt'
-    # TODO: DELETE TO HERE
 
 ###############################################################################################################################
 # BUILD

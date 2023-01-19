@@ -304,9 +304,6 @@ class JGitRepository implements Repository {
         @Override
         public void log(int level, String message){
             logger.atLevel(levelMapping.get(Integer.valueOf(level))).addMarker(GIT).log(message);
-            // TODO: DELETE FROM HERE
-            System.err.println("********************** JSCH: "+message);System.err.flush();
-            // TODO: DELETE TO HERE
         }
     }
 
