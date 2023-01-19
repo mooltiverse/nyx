@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
@@ -73,6 +74,7 @@ import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.eclipse.jgit.transport.ssh.jsch.JschConfigSessionFactory;
 import org.eclipse.jgit.transport.ssh.jsch.OpenSshConfig.Host;
 import org.eclipse.jgit.util.FS;
+import org.slf4j.event.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -224,7 +226,7 @@ class JGitRepository implements Repository {
             protected JSch createDefaultJSch(FS fs)
                 throws JSchException {
                 // TODO: DELETE FROM HERE
-                JSch.setLogger(new JschDebugLogger());
+                JSch.setLogger(new JschLogger());
                 // TODO: DELETE TO HERE
                 JSch defaultJSch = super.createDefaultJSch(fs);
                 defaultJSch.setConfig("PreferredAuthentications", "publickey");
@@ -266,16 +268,49 @@ class JGitRepository implements Repository {
         };
     }
 
-    // TODO: DELETE FROM HERE
-    public static class JschDebugLogger implements com.jcraft.jsch.Logger {
+    /**
+     * The logger adapter class we use for Jsch in order to capture its logs and send them out to SLF4J.
+     */
+    public static class JschLogger implements com.jcraft.jsch.Logger {
+        /**
+         * A map mapping Jsch debug levels to SLF4J debug levels
+         */
+        static Map<Integer, Level> levelMapping = Map.of(
+            Integer.valueOf(com.jcraft.jsch.Logger.DEBUG), Level.DEBUG,
+            Integer.valueOf(com.jcraft.jsch.Logger.INFO), Level.INFO,
+            Integer.valueOf(com.jcraft.jsch.Logger.WARN), Level.WARN,
+            Integer.valueOf(com.jcraft.jsch.Logger.ERROR), Level.ERROR,
+            Integer.valueOf(com.jcraft.jsch.Logger.FATAL), Level.ERROR
+        );
+
+        /**
+         * Checks if logging of some level is actually enabled.
+         * This will be called by the library before each call to the {@link #log(int, String)} method.
+         * 
+         * @param level one of the log level constants DEBUG, INFO, WARN, ERROR and FATAL
+         * 
+         * @return {@code true} if the logging for the given level is enabled
+         */
+        @Override
         public boolean isEnabled(int level){
-          return true;
+            return logger.isEnabledForLevel(levelMapping.get(Integer.valueOf(level)));
         }
+
+        /**
+         * Logs the given message at the given level, relaying to SLF4J.
+         * 
+         * @param level one of the log level constants DEBUG, INFO, WARN, ERROR and FATAL
+         * 
+         * @return {@code true} if the logging for the given level is enabled
+         */
+        @Override
         public void log(int level, String message){
-          System.err.println("********************** JSCH: "+message);
+            logger.atLevel(levelMapping.get(Integer.valueOf(level))).addMarker(GIT).log(message);
+            // TODO: DELETE FROM HERE
+            System.err.println("********************** JSCH: "+message);System.err.flush();
+            // TODO: DELETE TO HERE
         }
-      }
-    // TODO: DELETE TO HERE
+    }
 
     /**
      * Returns a repository instance working in the given directory after cloning from the given URI.
