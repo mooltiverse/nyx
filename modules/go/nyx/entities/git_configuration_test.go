@@ -38,8 +38,8 @@ func TestGitConfigurationNewGitConfiguration(t *testing.T) {
 
 func TestGitConfigurationNewGitConfigurationWith(t *testing.T) {
 	remotes := make(map[string]*GitRemoteConfiguration)
-	remotes["r1"] = NewGitRemoteConfigurationWith(utl.PointerToString("u1"), utl.PointerToString("p1"))
-	remotes["r2"] = NewGitRemoteConfigurationWith(utl.PointerToString("u2"), utl.PointerToString("p2"))
+	remotes["r1"] = NewGitRemoteConfigurationWith(PointerToAuthenticationMethod(USER_PASSWORD), utl.PointerToString("u1"), utl.PointerToString("p1"), utl.PointerToString("k1"), utl.PointerToString("h1"))
+	remotes["r2"] = NewGitRemoteConfigurationWith(PointerToAuthenticationMethod(PUBLIC_KEY), utl.PointerToString("u2"), utl.PointerToString("p2"), utl.PointerToString("k2"), utl.PointerToString("h2"))
 
 	gitConfiguration, err := NewGitConfigurationWith(&remotes)
 	assert.NoError(t, err)
@@ -55,8 +55,8 @@ func TestGitConfigurationGetRemotes(t *testing.T) {
 	gitConfiguration := NewGitConfiguration()
 
 	remotes := make(map[string]*GitRemoteConfiguration)
-	remotes["r1"] = NewGitRemoteConfigurationWith(utl.PointerToString("u1"), utl.PointerToString("p1"))
-	remotes["r2"] = NewGitRemoteConfigurationWith(utl.PointerToString("u2"), utl.PointerToString("p2"))
+	remotes["r1"] = NewGitRemoteConfigurationWith(PointerToAuthenticationMethod(USER_PASSWORD), utl.PointerToString("u1"), utl.PointerToString("p1"), utl.PointerToString("k1"), utl.PointerToString("h1"))
+	remotes["r2"] = NewGitRemoteConfigurationWith(PointerToAuthenticationMethod(PUBLIC_KEY), utl.PointerToString("u2"), utl.PointerToString("p2"), utl.PointerToString("k2"), utl.PointerToString("h2"))
 
 	err := gitConfiguration.SetRemotes(&remotes)
 	assert.NoError(t, err)

@@ -27,8 +27,11 @@ import (
 	ggitconfig "github.com/go-git/go-git/v5/config"                // https://pkg.go.dev/github.com/go-git/go-git/v5
 	ggitplumbing "github.com/go-git/go-git/v5/plumbing"            // https://pkg.go.dev/github.com/go-git/go-git/v5
 	ggitobject "github.com/go-git/go-git/v5/plumbing/object"       // https://pkg.go.dev/github.com/go-git/go-git/v5
+	ggittransport "github.com/go-git/go-git/v5/plumbing/transport" // https://pkg.go.dev/github.com/go-git/go-git/v5
 	ggithttp "github.com/go-git/go-git/v5/plumbing/transport/http" // https://pkg.go.dev/github.com/go-git/go-git/v5
+	ggitssh "github.com/go-git/go-git/v5/plumbing/transport/ssh"   // https://pkg.go.dev/github.com/go-git/go-git/v5
 	log "github.com/sirupsen/logrus"                               // https://pkg.go.dev/github.com/sirupsen/logrus
+	ssh "golang.org/x/crypto/ssh"                                  // https://pkg.go.dev/golang.org/x/crypto/ssh
 
 	errs "github.com/mooltiverse/nyx/modules/go/errors"
 	gitent "github.com/mooltiverse/nyx/modules/go/nyx/entities/git"
@@ -67,7 +70,7 @@ Returns nil if both the given credentials are nil.
     When using single token authentication (i.e. OAuth or Personal Access Tokens)
     this value may be the token or something other than a token, depending on the remote provider.
 */
-func getBasicAuth(user *string, password *string) *ggithttp.BasicAuth {
+func getBasicAuth(user *string, password *string) ggittransport.AuthMethod {
 	if user == nil && password == nil {
 		return nil
 	} else if user != nil && password == nil {
@@ -76,6 +79,50 @@ func getBasicAuth(user *string, password *string) *ggithttp.BasicAuth {
 		return &ggithttp.BasicAuth{Password: *password}
 	} else {
 		return &ggithttp.BasicAuth{Username: *user, Password: *password}
+	}
+}
+
+/*
+Returns a new public key authentication method object using the given private key and passphrase.
+
+Returns nil if both the given credentials are nil.
+
+  - privateKey the SSH private key. If nil the private key will be searched in its default location
+    (i.e. in the users' $HOME/.ssh directory).
+  - passphrase the optional password to use to open the private key, in case it's protected by a passphrase.
+    This is required when the private key is password protected as this implementation does not support prompting
+    the user interactively for entering the password.
+*/
+func getPublicKeyAuth(privateKey *string, passphrase *string) ggittransport.AuthMethod {
+	if privateKey != nil && "" != *privateKey {
+		keyPassword := ""
+		if passphrase != nil {
+			keyPassword = *passphrase
+		}
+		// The key name is not relevant for us but it seems it must be 'git' for the underlying library,
+		// as per https://github.com/src-d/go-git/issues/637
+		publicKeys, err := ggitssh.NewPublicKeys("git", []byte(*privateKey), keyPassword)
+		if err != nil {
+			log.Errorf("cannot instantiate a PublicKeys object using the provided private key: %v", err)
+			return nil
+		}
+
+		// disable host key checking
+		publicKeys.HostKeyCallback = ssh.InsecureIgnoreHostKey()
+
+		return publicKeys
+	} else {
+		// If no private key is passed just return a default auth method so that go-git will just load keys from their default
+		// location (~/.ssh) and connect to ssh-agent (if available) by simply recognizing the remote repository
+		// URL format (which must be SSH). See https://github.com/src-d/go-git/issues/550#issuecomment-323078245
+		// Some other sources sugges to just return nil for using the default SSH client and settings
+		log.Debugf("trying to instantiate a DefaultAuthBuilder for public key authentication, connecting to ssh-agent/Pageant")
+		authBuilder, err := ggitssh.DefaultAuthBuilder("keymaster")
+		if err != nil {
+			log.Debugf("cannot instantiate a DefaultAuthBuilder for public key authentication, probably due to the service not being available: %v", err)
+			return nil
+		}
+		return authBuilder
 	}
 }
 
@@ -94,7 +141,28 @@ Errors can be:
 - GitError in case the operation fails for some reason, including when authentication fails
 */
 func clone(directory *string, uri *string) (goGitRepository, error) {
-	return cloneWithCredentials(directory, uri, nil, nil)
+	if directory == nil {
+		return goGitRepository{}, &errs.NilPointerError{Message: "can't clone a repository instance with a null directory"}
+	}
+	if uri == nil {
+		return goGitRepository{}, &errs.NilPointerError{Message: "can't clone a repository instance with a null URI"}
+	}
+	if "" == strings.TrimSpace(*directory) {
+		return goGitRepository{}, &errs.IllegalArgumentError{Message: "can't create a repository instance with a blank directory"}
+	}
+	if "" == strings.TrimSpace(*uri) {
+		return goGitRepository{}, &errs.IllegalArgumentError{Message: "can't create a repository instance with a blank URI"}
+	}
+
+	log.Debugf("cloning repository in directory '%s' from URI '%s'", *directory, *uri)
+
+	options := &ggit.CloneOptions{URL: *uri}
+	repository, err := ggit.PlainClone(*directory, false, options)
+	if err != nil {
+		return goGitRepository{}, &errs.GitError{Message: fmt.Sprintf("unable to clone the '%s' repository into '%s'", *uri, *directory), Cause: err}
+	}
+
+	return newGoGitRepository(repository)
 }
 
 /*
@@ -117,7 +185,7 @@ Errors can be:
 - IllegalArgumentError if the given object is illegal for some reason, like referring to an illegal repository
 - GitError in case the operation fails for some reason, including when authentication fails
 */
-func cloneWithCredentials(directory *string, uri *string, user *string, password *string) (goGitRepository, error) {
+func cloneWithUserNameAndPassword(directory *string, uri *string, user *string, password *string) (goGitRepository, error) {
 	if directory == nil {
 		return goGitRepository{}, &errs.NilPointerError{Message: "can't clone a repository instance with a null directory"}
 	}
@@ -131,9 +199,68 @@ func cloneWithCredentials(directory *string, uri *string, user *string, password
 		return goGitRepository{}, &errs.IllegalArgumentError{Message: "can't create a repository instance with a blank URI"}
 	}
 
-	log.Debugf("cloning repository in directory '%s' from URI '%s'", *directory, *uri)
+	log.Debugf("cloning repository in directory '%s' from URI '%s' using username and password", *directory, *uri)
 
-	repository, err := ggit.PlainClone(*directory, false, &ggit.CloneOptions{URL: *uri, Auth: getBasicAuth(user, password)})
+	options := &ggit.CloneOptions{URL: *uri}
+	auth := getBasicAuth(user, password)
+	if auth != nil {
+		log.Debugf("username and password authentication will use custom authentication options")
+		options.Auth = auth
+	} else {
+		log.Debugf("username and password authentication will not use any custom authentication options")
+	}
+	repository, err := ggit.PlainClone(*directory, false, options)
+	if err != nil {
+		return goGitRepository{}, &errs.GitError{Message: fmt.Sprintf("unable to clone the '%s' repository into '%s'", *uri, *directory), Cause: err}
+	}
+
+	return newGoGitRepository(repository)
+}
+
+/*
+Returns a repository instance working in the given directory after cloning from the given URI.
+
+Arguments are as follows:
+
+  - directory the directory where the repository has to be cloned. It is created if it doesn't exist.
+  - uri the URI of the remote repository to clone.
+  - privateKey the SSH private key. If nil the private key will be searched in its default location
+    (i.e. in the users' $HOME/.ssh directory).
+  - passphrase the optional password to use to open the private key, in case it's protected by a passphrase.
+    This is required when the private key is password protected as this implementation does not support prompting
+    the user interactively for entering the password.
+
+Errors can be:
+
+- NilPointerError if any of the given objects is nil
+- IllegalArgumentError if the given object is illegal for some reason, like referring to an illegal repository
+- GitError in case the operation fails for some reason, including when authentication fails
+*/
+func cloneWithPublicKey(directory *string, uri *string, privateKey *string, passphrase *string) (goGitRepository, error) {
+	if directory == nil {
+		return goGitRepository{}, &errs.NilPointerError{Message: "can't clone a repository instance with a null directory"}
+	}
+	if uri == nil {
+		return goGitRepository{}, &errs.NilPointerError{Message: "can't clone a repository instance with a null URI"}
+	}
+	if "" == strings.TrimSpace(*directory) {
+		return goGitRepository{}, &errs.IllegalArgumentError{Message: "can't create a repository instance with a blank directory"}
+	}
+	if "" == strings.TrimSpace(*uri) {
+		return goGitRepository{}, &errs.IllegalArgumentError{Message: "can't create a repository instance with a blank URI"}
+	}
+
+	log.Debugf("cloning repository in directory '%s' from URI '%s' using public key (SSH) authentication", *directory, *uri)
+
+	options := &ggit.CloneOptions{URL: *uri}
+	auth := getPublicKeyAuth(privateKey, passphrase)
+	if auth != nil {
+		log.Debugf("public key (SSH) authentication will use custom authentication options")
+		options.Auth = auth
+	} else {
+		log.Debugf("public key (SSH) authentication will not use any custom authentication options")
+	}
+	repository, err := ggit.PlainClone(*directory, false, options)
 	if err != nil {
 		return goGitRepository{}, &errs.GitError{Message: fmt.Sprintf("unable to clone the '%s' repository into '%s'", *uri, *directory), Cause: err}
 	}
@@ -507,19 +634,7 @@ func (r goGitRepository) IsClean() (bool, error) {
 
 /*
 Pushes local changes in the current branch to the default remote origin.
-
-# Returns the local name of the remotes that has been pushed
-
-Errors can be:
-
-- GitError in case some problem is encountered with the underlying Git repository, preventing to push.
-*/
-func (r goGitRepository) Push() (string, error) {
-	return r.PushWithCredentials(nil, nil)
-}
-
-/*
-Pushes local changes in the current branch to the default remote origin.
+This method allows using user name and password authentication (also used for tokens).
 
 Returns the local name of the remotes that has been pushed.
 
@@ -536,30 +651,37 @@ Errors can be:
 
 - GitError in case some problem is encountered with the underlying Git repository, preventing to push.
 */
-func (r goGitRepository) PushWithCredentials(user *string, password *string) (string, error) {
+func (r goGitRepository) PushWithUserNameAndPassword(user *string, password *string) (string, error) {
 	s := DEFAULT_REMOTE_NAME
-	return r.PushToRemoteWithCredentials(&s, user, password)
+	return r.PushToRemoteWithUserNameAndPassword(&s, user, password)
 }
 
 /*
-Pushes local changes in the current branch to the given remote.
+Pushes local changes in the current branch to the default remote origin.
+This method allows using SSH authentication.
 
 Returns the local name of the remotes that has been pushed.
 
 Arguments are as follows:
 
-- remote the name of the remote to push to. If nil or empty the default remote name (origin) is used.
+  - privateKey the SSH private key. If nil the private key will be searched in its default location
+    (i.e. in the users' $HOME/.ssh directory).
+  - passphrase the optional password to use to open the private key, in case it's protected by a passphrase.
+    This is required when the private key is password protected as this implementation does not support prompting
+    the user interactively for entering the password.
 
 Errors can be:
 
 - GitError in case some problem is encountered with the underlying Git repository, preventing to push.
 */
-func (r goGitRepository) PushToRemote(remote *string) (string, error) {
-	return r.PushToRemoteWithCredentials(remote, nil, nil)
+func (r goGitRepository) PushWithPublicKey(privateKey *string, passphrase *string) (string, error) {
+	s := DEFAULT_REMOTE_NAME
+	return r.PushToRemoteWithPublicKey(&s, privateKey, passphrase)
 }
 
 /*
 Pushes local changes in the current branch to the default remote origin.
+This method allows using user name and password authentication (also used for tokens).
 
 Returns the local name of the remotes that has been pushed.
 
@@ -577,12 +699,12 @@ Errors can be:
 
 - GitError in case some problem is encountered with the underlying Git repository, preventing to push.
 */
-func (r goGitRepository) PushToRemoteWithCredentials(remote *string, user *string, password *string) (string, error) {
+func (r goGitRepository) PushToRemoteWithUserNameAndPassword(remote *string, user *string, password *string) (string, error) {
 	remoteString := ""
 	if remote != nil {
 		remoteString = *remote
 	}
-	log.Debugf("pushing changes to remote repository '%s'", remoteString)
+	log.Debugf("pushing changes to remote repository '%s' using username and password", remoteString)
 
 	// get the current branch name
 	ref, err := r.repository.Head()
@@ -594,7 +716,68 @@ func (r goGitRepository) PushToRemoteWithCredentials(remote *string, user *strin
 	branchRefSpec := ggitconfig.RefSpec(currentBranchRef + ":" + currentBranchRef)
 	tagsRefSpec := ggitconfig.RefSpec("refs/tags/*:refs/tags/*") // this is required to also push tags
 
-	err = r.repository.Push(&ggit.PushOptions{RemoteName: remoteString, RefSpecs: []ggitconfig.RefSpec{branchRefSpec, tagsRefSpec}, Auth: getBasicAuth(user, password)})
+	options := &ggit.PushOptions{RemoteName: remoteString, RefSpecs: []ggitconfig.RefSpec{branchRefSpec, tagsRefSpec}}
+	auth := getBasicAuth(user, password)
+	if auth != nil {
+		log.Debugf("username and password authentication will use custom authentication options")
+		options.Auth = auth
+	} else {
+		log.Debugf("username and password authentication will not use any custom authentication options")
+	}
+
+	err = r.repository.Push(options)
+	if err != nil {
+		return "", &errs.GitError{Message: fmt.Sprintf("an error occurred when trying to push"), Cause: err}
+	}
+	return remoteString, nil
+}
+
+/*
+Pushes local changes in the current branch to the default remote origin.
+This method allows using SSH authentication.
+
+Returns the local name of the remotes that has been pushed.
+
+Arguments are as follows:
+
+  - remote the name of the remote to push to. If nil or empty the default remote name (origin) is used.
+  - privateKey the SSH private key. If nil the private key will be searched in its default location
+    (i.e. in the users' $HOME/.ssh directory).
+  - passphrase the optional password to use to open the private key, in case it's protected by a passphrase.
+    This is required when the private key is password protected as this implementation does not support prompting
+    the user interactively for entering the password.
+
+Errors can be:
+
+- GitError in case some problem is encountered with the underlying Git repository, preventing to push.
+*/
+func (r goGitRepository) PushToRemoteWithPublicKey(remote *string, privateKey *string, passphrase *string) (string, error) {
+	remoteString := ""
+	if remote != nil {
+		remoteString = *remote
+	}
+	log.Debugf("pushing changes to remote repository '%s' using public key (SSH) authentication", remoteString)
+
+	// get the current branch name
+	ref, err := r.repository.Head()
+	if err != nil {
+		return "", &errs.GitError{Message: fmt.Sprintf("unable to resolve reference to HEAD"), Cause: err}
+	}
+	currentBranchRef := ref.Name()
+	// the refspec is in the localBranch:remoteBranch form, and we assume they both have the same name here
+	branchRefSpec := ggitconfig.RefSpec(currentBranchRef + ":" + currentBranchRef)
+	tagsRefSpec := ggitconfig.RefSpec("refs/tags/*:refs/tags/*") // this is required to also push tags
+
+	options := &ggit.PushOptions{RemoteName: remoteString, RefSpecs: []ggitconfig.RefSpec{branchRefSpec, tagsRefSpec}}
+	auth := getPublicKeyAuth(privateKey, passphrase)
+	if auth != nil {
+		log.Debugf("public key (SSH) authentication will use custom authentication options")
+		options.Auth = auth
+	} else {
+		log.Debugf("public key (SSH) authentication will not use any custom authentication options")
+	}
+
+	err = r.repository.Push(options)
 	if err != nil {
 		return "", &errs.GitError{Message: fmt.Sprintf("an error occurred when trying to push"), Cause: err}
 	}
@@ -603,23 +786,7 @@ func (r goGitRepository) PushToRemoteWithCredentials(remote *string, user *strin
 
 /*
 Pushes local changes in the current branch to the given remotes.
-
-Returns a collection with the local names of remotes that have been pushed.
-
-Arguments are as follows:
-
-- remotes the names of remotes to push to. If nil or empty the default remote name (origin) is used.
-
-Errors can be:
-
-- GitError in case some problem is encountered with the underlying Git repository, preventing to push.
-*/
-func (r goGitRepository) PushToRemotes(remotes []string) ([]string, error) {
-	return r.PushToRemotesWithCredentials(remotes, nil, nil)
-}
-
-/*
-Pushes local changes in the current branch to the given remotes.
+This method allows using user name and password authentication (also used for tokens).
 
 Returns a collection with the local names of remotes that have been pushed.
 
@@ -637,11 +804,43 @@ Errors can be:
 
 - GitError in case some problem is encountered with the underlying Git repository, preventing to push.
 */
-func (r goGitRepository) PushToRemotesWithCredentials(remotes []string, user *string, password *string) ([]string, error) {
-	log.Debugf("pushing changes to '%d' remote repositories", len(remotes))
+func (r goGitRepository) PushToRemotesWithUserNameAndPassword(remotes []string, user *string, password *string) ([]string, error) {
+	log.Debugf("pushing changes to '%d' remote repositories using username and password", len(remotes))
 	var res []string
 	for _, remote := range remotes {
-		r, err := r.PushToRemoteWithCredentials(&remote, user, password)
+		r, err := r.PushToRemoteWithUserNameAndPassword(&remote, user, password)
+		if err != nil {
+			return nil, err
+		}
+		res = append(res, r)
+	}
+	return res, nil
+}
+
+/*
+Pushes local changes in the current branch to the given remotes.
+This method allows using SSH authentication.
+
+Returns a collection with the local names of remotes that have been pushed.
+
+Arguments are as follows:
+
+  - remotes remotes the names of remotes to push to. If nil or empty the default remote name (origin) is used.
+  - privateKey the SSH private key. If nil the private key will be searched in its default location
+    (i.e. in the users' $HOME/.ssh directory).
+  - passphrase the optional password to use to open the private key, in case it's protected by a passphrase.
+    This is required when the private key is password protected as this implementation does not support prompting
+    the user interactively for entering the password.
+
+Errors can be:
+
+- GitError in case some problem is encountered with the underlying Git repository, preventing to push.
+*/
+func (r goGitRepository) PushToRemotesWithPublicKey(remotes []string, privateKey *string, passphrase *string) ([]string, error) {
+	log.Debugf("pushing changes to '%d' remote repositories using public key (SSH) authentication", len(remotes))
+	var res []string
+	for _, remote := range remotes {
+		r, err := r.PushToRemoteWithPublicKey(&remote, privateKey, passphrase)
 		if err != nil {
 			return nil, err
 		}

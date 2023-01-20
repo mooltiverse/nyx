@@ -29,6 +29,7 @@ import org.junit.jupiter.api.Test;
 import com.mooltiverse.oss.nyx.Nyx;
 import com.mooltiverse.oss.nyx.configuration.SimpleConfigurationLayer;
 import com.mooltiverse.oss.nyx.entities.Attachment;
+import com.mooltiverse.oss.nyx.entities.AuthenticationMethod;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
 import com.mooltiverse.oss.nyx.entities.GitRemoteConfiguration;
@@ -103,7 +104,7 @@ public class PublishTests {
             ));
             // set up the Git remote credentials
             configurationLayerMock.getGit().setRemotes(Map.<String,GitRemoteConfiguration>of(
-                "origin", new GitRemoteConfiguration(System.getProperty("gitHubTestUserToken"), ""))
+                "origin", new GitRemoteConfiguration(AuthenticationMethod.USER_PASSWORD, System.getProperty("gitHubTestUserToken"), "", null, null))
             );
             // add a custom release type that always enables committing, tagging and pushing
             // and all the publishing service enabled
@@ -224,7 +225,7 @@ public class PublishTests {
             ));
             // set up the Git remote credentials
             configurationLayerMock.getGit().setRemotes(Map.<String,GitRemoteConfiguration>of(
-                "origin", new GitRemoteConfiguration(System.getProperty("gitHubTestUserToken"), ""))
+                "origin", new GitRemoteConfiguration(AuthenticationMethod.USER_PASSWORD, System.getProperty("gitHubTestUserToken"), "", null, null))
             );
             // add a custom release type that always enables committing, tagging and pushing
             // and all the publishing service enabled
@@ -348,7 +349,7 @@ public class PublishTests {
             ));
             // set up the Git remote credentials
             configurationLayerMock.getGit().setRemotes(Map.<String,GitRemoteConfiguration>of(
-                "origin", new GitRemoteConfiguration("PRIVATE-TOKEN", System.getProperty("gitLabTestUserToken")))
+                "origin", new GitRemoteConfiguration(AuthenticationMethod.USER_PASSWORD, "PRIVATE-TOKEN", System.getProperty("gitLabTestUserToken"), null, null))
             );
             // add a custom release type that always enables committing, tagging and pushing
             // and all the publishing service enabled
@@ -471,7 +472,7 @@ public class PublishTests {
             ));
             // set up the Git remote credentials
             configurationLayerMock.getGit().setRemotes(Map.<String,GitRemoteConfiguration>of(
-                "origin", new GitRemoteConfiguration("PRIVATE-TOKEN", System.getProperty("gitLabTestUserToken")))
+                "origin", new GitRemoteConfiguration(AuthenticationMethod.USER_PASSWORD, "PRIVATE-TOKEN", System.getProperty("gitLabTestUserToken"), null, null))
             );
             // add a custom release type that always enables committing, tagging and pushing
             // and all the publishing service enabled

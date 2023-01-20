@@ -133,8 +133,8 @@ func TestSimpleConfigurationLayerGetGit(t *testing.T) {
 	assert.NotNil(t, git)
 
 	remotes := make(map[string]*ent.GitRemoteConfiguration)
-	remotes["origin1"] = ent.NewGitRemoteConfigurationWith(utl.PointerToString("jdoe1"), utl.PointerToString("pwd1"))
-	remotes["origin2"] = ent.NewGitRemoteConfigurationWith(utl.PointerToString("jdoe2"), utl.PointerToString("pwd2"))
+	remotes["origin1"] = ent.NewGitRemoteConfigurationWith(ent.PointerToAuthenticationMethod(ent.USER_PASSWORD), utl.PointerToString("jdoe1"), utl.PointerToString("pwd1"), utl.PointerToString("pk1"), utl.PointerToString("pp1"))
+	remotes["origin2"] = ent.NewGitRemoteConfigurationWith(ent.PointerToAuthenticationMethod(ent.PUBLIC_KEY), utl.PointerToString("jdoe2"), utl.PointerToString("pwd2"), utl.PointerToString("pk2"), utl.PointerToString("pp2"))
 
 	gitParam, _ := ent.NewGitConfigurationWith(&remotes)
 
@@ -143,7 +143,19 @@ func TestSimpleConfigurationLayerGetGit(t *testing.T) {
 	assert.NoError(t, error)
 	assert.Equal(t, *gitParam, *git)
 
+	remotes = *git.GetRemotes()
+
 	assert.Equal(t, 2, len(*git.GetRemotes()))
+	assert.Equal(t, ent.USER_PASSWORD, *remotes["origin1"].GetAuthenticationMethod())
+	assert.Equal(t, "pwd1", *remotes["origin1"].GetPassword())
+	assert.Equal(t, "jdoe1", *remotes["origin1"].GetUser())
+	assert.Equal(t, "pk1", *remotes["origin1"].GetPrivateKey())
+	assert.Equal(t, "pp1", *remotes["origin1"].GetPassphrase())
+	assert.Equal(t, ent.PUBLIC_KEY, *remotes["origin2"].GetAuthenticationMethod())
+	assert.Equal(t, "pwd2", *remotes["origin2"].GetPassword())
+	assert.Equal(t, "jdoe2", *remotes["origin2"].GetUser())
+	assert.Equal(t, "pk2", *remotes["origin2"].GetPrivateKey())
+	assert.Equal(t, "pp2", *remotes["origin2"].GetPassphrase())
 }
 
 func TestSimpleConfigurationLayerGetInitialVersion(t *testing.T) {

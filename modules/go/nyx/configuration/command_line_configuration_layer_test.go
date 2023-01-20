@@ -351,20 +351,32 @@ func TestCommandLineConfigurationLayerGetGit(t *testing.T) {
 	// get a new instance or a stale set of arguments is still in the configuration layer
 	commandLineConfigurationLayer = CommandLineConfigurationLayer{}
 	commandLineConfigurationLayer.withArguments([]string{
+		"--git-remotes-one-authenticationMethod=USER_PASSWORD",
 		"--git-remotes-one-user=jdoe",
 		"--git-remotes-one-password=pwd",
+		"--git-remotes-one-privateKey=pk1",
+		"--git-remotes-one-passphrase=pp1",
+		"--git-remotes-two-authenticationMethod=PUBLIC_KEY",
 		"--git-remotes-two-user=stiger",
 		"--git-remotes-two-password=sct",
+		"--git-remotes-two-privateKey=pk2",
+		"--git-remotes-two-passphrase=pp2",
 	})
 
 	git, err = commandLineConfigurationLayer.GetGit()
 	remotes = *git.GetRemotes()
 
 	assert.Equal(t, 2, len(*git.GetRemotes()))
+	assert.Equal(t, ent.USER_PASSWORD, *remotes["one"].GetAuthenticationMethod())
 	assert.Equal(t, "pwd", *remotes["one"].GetPassword())
 	assert.Equal(t, "jdoe", *remotes["one"].GetUser())
+	assert.Equal(t, "pk1", *remotes["one"].GetPrivateKey())
+	assert.Equal(t, "pp1", *remotes["one"].GetPassphrase())
+	assert.Equal(t, ent.PUBLIC_KEY, *remotes["two"].GetAuthenticationMethod())
 	assert.Equal(t, "sct", *remotes["two"].GetPassword())
 	assert.Equal(t, "stiger", *remotes["two"].GetUser())
+	assert.Equal(t, "pk2", *remotes["two"].GetPrivateKey())
+	assert.Equal(t, "pp2", *remotes["two"].GetPassphrase())
 }
 
 func TestCommandLineConfigurationLayerGetInitialVersion(t *testing.T) {

@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mooltiverse.oss.nyx.ReleaseException;
+import com.mooltiverse.oss.nyx.entities.AuthenticationMethod;
 import com.mooltiverse.oss.nyx.entities.Defaults;
 import com.mooltiverse.oss.nyx.entities.IllegalPropertyException;
 import com.mooltiverse.oss.nyx.entities.git.Commit;
@@ -206,26 +207,40 @@ public class Mark extends AbstractCommand {
                 // Now we need to find the credentials by going through all the configured remotes and finding
                 // the one that supports the target remote.
                 logger.debug(COMMAND, "Looking up credentials for remote '{}'", remote);
+                AuthenticationMethod authenticationMethod = null;
                 String user = null;
                 String password = null;
+                String privateKey = null;
+                byte[] passphrase = null;
                 if (Objects.isNull(state().getConfiguration().getGit()) || Objects.isNull(state().getConfiguration().getGit().getRemotes())) 
                     logger.debug(COMMAND, "No Git remote repository has been configured");
                 else {
                     if (state().getConfiguration().getGit().getRemotes().containsKey(remote)) {
                         logger.debug(COMMAND, "Using configured credentials for remote '{}'", remote);
+                        authenticationMethod = state().getConfiguration().getGit().getRemotes().get(remote).getAuthenticationMethod();
                         user = renderTemplate(state().getConfiguration().getGit().getRemotes().get(remote).getUser());
                         password = renderTemplate(state().getConfiguration().getGit().getRemotes().get(remote).getPassword());
+                        privateKey = renderTemplate(state().getConfiguration().getGit().getRemotes().get(remote).getPrivateKey());
+                        String passphraseString = renderTemplate(state().getConfiguration().getGit().getRemotes().get(remote).getPassphrase());
+                        if (!Objects.isNull(passphraseString))
+                            passphrase = passphraseString.getBytes();
                     }
                     else {
                         logger.debug(COMMAND, "No configuration available for remote '{}'", remote);
                     }
                 }
 
-                if (Objects.isNull(user) && Objects.isNull(password))
-                    logger.debug(COMMAND, "No credentials were configured for remote '{}'. Attempting anonymous push.", remote);
-
                 // finally push
-                repository().push(remote, user, password);
+                if (AuthenticationMethod.PUBLIC_KEY.equals(authenticationMethod)) {
+                    logger.debug(COMMAND, "Attempting push to '{}' using public key credentials.", remote);
+                    repository().push(remote, privateKey, passphrase);
+                }
+                else {
+                    if (Objects.isNull(user) && Objects.isNull(password))
+                        logger.debug(COMMAND, "No credentials were configured for remote '{}'. Attempting anonymous push.", remote);
+                    else logger.debug(COMMAND, "Attempting push to '{}' using user name and password credentials.", remote);
+                    repository().push(remote, user, password);
+                }
 
                 logger.debug(COMMAND, "Local changes pushed to remote '{}'", remote);
             }

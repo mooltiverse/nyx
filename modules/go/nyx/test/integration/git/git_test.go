@@ -40,7 +40,10 @@ import (
 
 const (
 	// Use this own project repo as the repository to clone for tests
-	REMOTE_TEST_REPOSITORY = "https://github.com/mooltiverse/nyx.git"
+	REMOTE_TEST_REPOSITORY_HTTP_URL = "https://github.com/mooltiverse/nyx.git"
+
+	// Use this own project repo as the repository to clone for tests
+	REMOTE_TEST_REPOSITORY_SSH_URL = "git@github.com:mooltiverse/nyx.git"
 )
 
 func TestGitInstance(t *testing.T) {
@@ -49,13 +52,13 @@ func TestGitInstance(t *testing.T) {
 }
 
 func TestGitCloneErrorWithNilDirectory(t *testing.T) {
-	tr := REMOTE_TEST_REPOSITORY
+	tr := REMOTE_TEST_REPOSITORY_HTTP_URL
 	_, err := GitInstance().Clone(nil, &tr)
 	assert.Error(t, err)
 }
 
 func TestGitCloneErrorWithEmptyDirectory(t *testing.T) {
-	tr := REMOTE_TEST_REPOSITORY
+	tr := REMOTE_TEST_REPOSITORY_HTTP_URL
 	es := ""
 	_, err := GitInstance().Clone(&es, &tr)
 	assert.Error(t, err)
@@ -67,7 +70,7 @@ func TestGitCloneErrorWithEmptyDirectory(t *testing.T) {
 func TestGitCloneErrorWithNonEmptyDirectory(t *testing.T) {
 	script := gittools.FROM_SCRATCH().Realize()
 	defer os.RemoveAll(script.GetWorkingDirectory())
-	tr := REMOTE_TEST_REPOSITORY
+	tr := REMOTE_TEST_REPOSITORY_HTTP_URL
 	dir := script.GetWorkingDirectory()
 	_, err := GitInstance().Clone(&dir, &tr)
 	assert.Error(t, err)
@@ -100,7 +103,7 @@ func TestGitCloneErrorWithNonExistingURI(t *testing.T) {
 }
 
 func TestGitClone(t *testing.T) {
-	tr := REMOTE_TEST_REPOSITORY
+	tr := REMOTE_TEST_REPOSITORY_HTTP_URL
 	dir := "nyx-test-git-clone-test-"
 	directory := gitutil.NewTempDirectory("", &dir)
 	defer os.RemoveAll(directory)
@@ -115,8 +118,8 @@ func TestGitClone(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-func TestGitCloneWithNonRequiredCredentials(t *testing.T) {
-	tr := REMOTE_TEST_REPOSITORY
+func TestGitCloneWithNonRequiredUserAndPasswordCredentials(t *testing.T) {
+	tr := REMOTE_TEST_REPOSITORY_HTTP_URL
 	dir := "nyx-test-git-clone-test-"
 	directory := gitutil.NewTempDirectory("", &dir)
 	defer os.RemoveAll(directory)
@@ -129,14 +132,33 @@ func TestGitCloneWithNonRequiredCredentials(t *testing.T) {
 	password := os.Getenv("gitHubTestUserToken")
 	user = strings.Replace(user, "\"", "", -1)
 	password = strings.Replace(password, "\"", "", -1)
-	_, err = GitInstance().CloneWithCredentials(&directory, &tr, &user, &password)
+	_, err = GitInstance().CloneWithUserNameAndPassword(&directory, &tr, &user, &password)
 	assert.NoError(t, err)
 
 	_, err = os.Stat(filepath.Join(directory, "README.md"))
 	assert.NoError(t, err)
 }
 
-func TestGitCloneWithoutRequiredCredentials(t *testing.T) {
+func TestGitCloneWithNonRequiredSSHCredentials(t *testing.T) {
+	tr := REMOTE_TEST_REPOSITORY_SSH_URL
+	dir := "nyx-test-git-clone-test-"
+	directory := gitutil.NewTempDirectory("", &dir)
+	defer os.RemoveAll(directory)
+
+	_, err := os.Stat(filepath.Join(directory, "README.md"))
+	assert.Error(t, err)
+
+	// the 'gitHubTestUserPrivateKeyWithoutPassphrase' and 'gitHubTestUserPrivateKeyWithoutPassphrase' environment variables are set by the build script
+	privateKey := os.Getenv("gitHubTestUserPrivateKeyWithoutPassphrase")
+	privateKey = strings.Replace(privateKey, "\"", "", -1)
+	_, err = GitInstance().CloneWithPublicKey(&directory, &tr, &privateKey, nil)
+	assert.NoError(t, err)
+
+	_, err = os.Stat(filepath.Join(directory, "README.md"))
+	assert.NoError(t, err)
+}
+
+func TestGitCloneWithoutRequiredUserAndPasswordCredentials(t *testing.T) {
 	logLevel := log.GetLevel()   // save the previous logging level
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 
@@ -154,7 +176,7 @@ func TestGitCloneWithoutRequiredCredentials(t *testing.T) {
 
 	directory, err := os.MkdirTemp("", "nyx-test-git-clone-test-")
 	defer os.RemoveAll(directory)
-	_, err = GitInstance().CloneWithCredentials(&directory, utl.PointerToString((*gitHubRepository).GetHTTPURL()), nil, nil)
+	_, err = GitInstance().CloneWithUserNameAndPassword(&directory, utl.PointerToString((*gitHubRepository).GetHTTPURL()), nil, nil)
 	assert.Error(t, err)
 
 	// now delete it
@@ -164,7 +186,35 @@ func TestGitCloneWithoutRequiredCredentials(t *testing.T) {
 	log.SetLevel(logLevel) // restore the original logging level
 }
 
-func TestGitCloneWithRequiredCredentials(t *testing.T) {
+func TestGitCloneWithoutRequiredSSHCredentials(t *testing.T) {
+	logLevel := log.GetLevel()   // save the previous logging level
+	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
+
+	randomID := gitutil.RandomAlphabeticString(5, 91)
+
+	// the 'gitHubTestUserToken' environment variable is set by the build script
+	assert.NotEmpty(t, os.Getenv("gitHubTestUserToken"), "A GitHub authentication token must be passed to this test as an environment variable but it was not set")
+	gitHub, err := github.Instance(map[string]string{github.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitHubTestUserToken")})
+	assert.NoError(t, err)
+	// create a brand new test repository for this purpose
+	gitHubRepository, err := gitHub.CreateGitRepository(randomID, utl.PointerToString("Test repository "+randomID), true, true)
+
+	// if we read too quickly we often get a 404 from the server so let's wait a short while
+	time.Sleep(4000 * time.Millisecond)
+
+	directory, err := os.MkdirTemp("", "nyx-test-git-clone-test-")
+	defer os.RemoveAll(directory)
+	_, err = GitInstance().CloneWithPublicKey(&directory, utl.PointerToString((*gitHubRepository).GetSSHURL()), nil, nil)
+	assert.Error(t, err)
+
+	// now delete it
+	err = gitHub.DeleteGitRepository(randomID)
+	assert.NoError(t, err)
+
+	log.SetLevel(logLevel) // restore the original logging level
+}
+
+func TestGitCloneWithRequiredUserAndPasswordCredentials(t *testing.T) {
 	logLevel := log.GetLevel()   // save the previous logging level
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 
@@ -182,7 +232,67 @@ func TestGitCloneWithRequiredCredentials(t *testing.T) {
 
 	directory, err := os.MkdirTemp("", "nyx-test-git-clone-test-")
 	defer os.RemoveAll(directory)
-	_, err = GitInstance().CloneWithCredentials(&directory, utl.PointerToString((*gitHubRepository).GetHTTPURL()), utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(os.Getenv("gitHubTestUserToken")))
+	_, err = GitInstance().CloneWithUserNameAndPassword(&directory, utl.PointerToString((*gitHubRepository).GetHTTPURL()), utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(os.Getenv("gitHubTestUserToken")))
+	assert.NoError(t, err)
+
+	// now delete it
+	err = gitHub.DeleteGitRepository(randomID)
+	assert.NoError(t, err)
+
+	log.SetLevel(logLevel) // restore the original logging level
+}
+
+func TestGitCloneWithRequiredSSHUnprotectedCredentials(t *testing.T) {
+	logLevel := log.GetLevel()   // save the previous logging level
+	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
+
+	randomID := gitutil.RandomAlphabeticString(5, 93)
+
+	// the 'gitHubTestUserToken' environment variable is set by the build script
+	assert.NotEmpty(t, os.Getenv("gitHubTestUserToken"), "A GitHub authentication token must be passed to this test as an environment variable but it was not set")
+	gitHub, err := github.Instance(map[string]string{github.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitHubTestUserToken")})
+	assert.NoError(t, err)
+	// create a brand new test repository for this purpose
+	gitHubRepository, err := gitHub.CreateGitRepository(randomID, utl.PointerToString("Test repository "+randomID), true, true)
+
+	// if we read too quickly we often get a 404 from the server so let's wait a short while
+	time.Sleep(4000 * time.Millisecond)
+
+	directory, err := os.MkdirTemp("", "nyx-test-git-clone-test-")
+	defer os.RemoveAll(directory)
+	// the 'gitHubTestUserPrivateKeyWithoutPassphrase' environment variable is set by the build script
+	assert.NotEmpty(t, os.Getenv("gitHubTestUserPrivateKeyWithoutPassphrase"), "A GitHub private key must be passed to this test as an environment variable but it was not set")
+	_, err = GitInstance().CloneWithPublicKey(&directory, utl.PointerToString((*gitHubRepository).GetSSHURL()), utl.PointerToString(os.Getenv("gitHubTestUserPrivateKeyWithoutPassphrase")), nil)
+	assert.NoError(t, err)
+
+	// now delete it
+	err = gitHub.DeleteGitRepository(randomID)
+	assert.NoError(t, err)
+
+	log.SetLevel(logLevel) // restore the original logging level
+}
+
+func TestGitCloneWithRequiredSSHProtectedCredentials(t *testing.T) {
+	logLevel := log.GetLevel()   // save the previous logging level
+	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
+
+	randomID := gitutil.RandomAlphabeticString(5, 93)
+
+	// the 'gitHubTestUserToken' environment variable is set by the build script
+	assert.NotEmpty(t, os.Getenv("gitHubTestUserToken"), "A GitHub authentication token must be passed to this test as an environment variable but it was not set")
+	gitHub, err := github.Instance(map[string]string{github.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitHubTestUserToken")})
+	assert.NoError(t, err)
+	// create a brand new test repository for this purpose
+	gitHubRepository, err := gitHub.CreateGitRepository(randomID, utl.PointerToString("Test repository "+randomID), true, true)
+
+	// if we read too quickly we often get a 404 from the server so let's wait a short while
+	time.Sleep(4000 * time.Millisecond)
+
+	directory, err := os.MkdirTemp("", "nyx-test-git-clone-test-")
+	defer os.RemoveAll(directory)
+	// the 'gitHubTestUserPrivateKeyWithPassphrase' environment variable is set by the build script
+	assert.NotEmpty(t, os.Getenv("gitHubTestUserPrivateKeyWithPassphrase"), "A GitHub private key must be passed to this test as an environment variable but it was not set")
+	_, err = GitInstance().CloneWithPublicKey(&directory, utl.PointerToString((*gitHubRepository).GetSSHURL()), utl.PointerToString(os.Getenv("gitHubTestUserPrivateKeyWithPassphrase")), utl.PointerToString(os.Getenv("gitHubTestUserPrivateKeyPassphrase")))
 	assert.NoError(t, err)
 
 	// now delete it

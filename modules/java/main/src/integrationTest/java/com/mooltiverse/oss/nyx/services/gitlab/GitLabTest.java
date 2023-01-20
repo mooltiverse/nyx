@@ -110,6 +110,7 @@ public class GitLabTest {
             assertEquals(randomID, gitLabRepository.getName());
             assertEquals(randomID, gitLabRepository.getFullName());
             assertEquals("https://gitlab.com/"+user.getUserName()+"/"+randomID+".git", gitLabRepository.getHTTPURL());
+            assertEquals("git@gitlab.com:"+user.getUserName()+"/"+randomID+".git", gitLabRepository.getSSHURL());
 
             // if we delete too quickly we often get a 404 from the server so let's wait a short while
             Thread.sleep(4000);

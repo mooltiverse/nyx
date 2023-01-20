@@ -27,7 +27,10 @@ import (
 	ggitconfig "github.com/go-git/go-git/v5/config"                // https://pkg.go.dev/github.com/go-git/go-git/v5
 	ggitplumbing "github.com/go-git/go-git/v5/plumbing"            // https://pkg.go.dev/github.com/go-git/go-git/v5
 	ggitobject "github.com/go-git/go-git/v5/plumbing/object"       // https://pkg.go.dev/github.com/go-git/go-git/v5
+	ggittransport "github.com/go-git/go-git/v5/plumbing/transport" // https://pkg.go.dev/github.com/go-git/go-git/v5
 	ggithttp "github.com/go-git/go-git/v5/plumbing/transport/http" // https://pkg.go.dev/github.com/go-git/go-git/v5
+	ggitssh "github.com/go-git/go-git/v5/plumbing/transport/ssh"   // https://pkg.go.dev/github.com/go-git/go-git/v5
+	ssh "golang.org/x/crypto/ssh"                                  // https://pkg.go.dev/golang.org/x/crypto/ssh
 
 	gitutil "github.com/mooltiverse/nyx/modules/go/nyx/test/integration/git/util"
 )
@@ -165,7 +168,7 @@ Returns nil if both the given credentials are nil.
     When using single token authentication (i.e. OAuth or Personal Access Tokens)
     this value may be the token or something other than a token, depending on the remote provider.
 */
-func getBasicAuth(user *string, password *string) *ggithttp.BasicAuth {
+func getBasicAuth(user *string, password *string) ggittransport.AuthMethod {
 	if user == nil && password == nil {
 		return nil
 	} else if user != nil && password == nil {
@@ -178,27 +181,97 @@ func getBasicAuth(user *string, password *string) *ggithttp.BasicAuth {
 }
 
 /*
-Clones the repository at the given URI into the given directory. No credendials are used for cloning.
+Returns a new public key authentication method object using the given private key and passphrase.
 
-Arguments are as follows:
+Returns nil if both the given credentials are nil.
 
-- uri the URI of the repository to clone from
-- directory the directory to clone the repository in
+  - privateKey the SSH private key. If nil the private key will be searched in its default location
+    (i.e. in the users' $HOME/.ssh directory).
+  - passphrase the optional password to use to open the private key, in case it's protected by a passphrase.
+    This is required when the private key is password protected as this implementation does not support prompting
+    the user interactively for entering the password.
 */
-func CloneInto(uri string, directory string) Workbench {
-	return CloneIntoWithCredentials(uri, directory, nil, nil)
+func getPublicKeyAuth(privateKey *string, passphrase *string) ggittransport.AuthMethod {
+	if privateKey != nil && "" != *privateKey {
+		keyPassword := ""
+		if passphrase != nil {
+			keyPassword = *passphrase
+		}
+		// The key name is not relevant for us but it seems it must be 'git' for the underlying library,
+		// as per https://github.com/src-d/go-git/issues/637
+		publicKeys, err := ggitssh.NewPublicKeys("git", []byte(*privateKey), keyPassword)
+		if err != nil {
+			return nil
+		}
+
+		// disable host key checking
+		publicKeys.HostKeyCallback = ssh.InsecureIgnoreHostKey()
+
+		return publicKeys
+	} else {
+		// If no private key is passed just return a default auth method so that go-git will just load keys from their default
+		// location (~/.ssh) and connect to ssh-agent (if available) by simply recognizing the remote repository
+		// URL format (which must be SSH). See https://github.com/src-d/go-git/issues/550#issuecomment-323078245
+		// Some other sources sugges to just return nil for using the default SSH client and settings
+		authBuilder, err := ggitssh.DefaultAuthBuilder("keymaster")
+		if err != nil {
+			return nil
+		}
+		return authBuilder
+	}
 }
 
 /*
-Clones the repository at the given URI into the given directory. No credendials are used for cloning.
+Clones the repository at the given URI into the given directory.
+This method allows using user name and password authentication (also used for tokens).
 
 Arguments are as follows:
 
-- uri the URI of the repository to clone from
-- directory the directory to clone the repository in
+  - uri the URI of the repository to clone from
+  - directory the directory to clone the repository in
+  - user the user name to create when credentials are required. If this and password are both nil
+    then no credentials is used. When using single token authentication (i.e. OAuth or Personal Access Tokens)
+    this value may be the token or something other than a token, depending on the remote provider.
+  - password the password to create when credentials are required. If this and user are both nil
+    then no credentials is used. When using single token authentication (i.e. OAuth or Personal Access Tokens)
+    this value may be the token or something other than a token, depending on the remote provider.
 */
-func CloneIntoWithCredentials(uri string, directory string, user *string, password *string) Workbench {
-	repo, err := ggit.PlainClone(directory, false, &ggit.CloneOptions{URL: uri, Auth: getBasicAuth(user, password)})
+func CloneIntoWithUserNameAndPassword(uri string, directory string, user *string, password *string) Workbench {
+	options := &ggit.CloneOptions{URL: uri}
+	auth := getBasicAuth(user, password)
+	if auth != nil {
+		options.Auth = auth
+	}
+
+	repo, err := ggit.PlainClone(directory, false, options)
+	if err != nil {
+		panic(err)
+	}
+	return newWorkbenchUsing(directory, *repo)
+}
+
+/*
+Clones the repository at the given URI into the given directory.
+This method allows using SSH authentication.
+
+Arguments are as follows:
+
+  - uri the URI of the repository to clone from
+  - directory the directory to clone the repository in
+  - privateKey the SSH private key. If nil the private key will be searched in its default location
+    (i.e. in the users' $HOME/.ssh directory).
+  - passphrase the optional password to use to open the private key, in case it's protected by a passphrase.
+    This is required when the private key is password protected as this implementation does not support prompting
+    the user interactively for entering the password.
+*/
+func CloneIntoWithPublicKey(uri string, directory string, privateKey *string, passphrase *string) Workbench {
+	options := &ggit.CloneOptions{URL: uri}
+	auth := getPublicKeyAuth(privateKey, passphrase)
+	if auth != nil {
+		options.Auth = auth
+	}
+
+	repo, err := ggit.PlainClone(directory, false, options)
 	if err != nil {
 		panic(err)
 	}
@@ -646,7 +719,7 @@ func (w Workbench) PrintInfo(out io.Writer) {
 Pushes all commits to the default remote repository using no credentials.
 */
 func (w Workbench) Push() {
-	w.PushWithCredentials(nil, nil)
+	w.PushWithUserNameAndPassword(nil, nil)
 }
 
 /*
@@ -657,7 +730,7 @@ Arguments are as follows:
 - user the optional user name to use when credentials are required.
 - password the optional password to use when credentials are required.
 */
-func (w Workbench) PushWithCredentials(user *string, password *string) {
+func (w Workbench) PushWithUserNameAndPassword(user *string, password *string) {
 	w.PushToWithCredentials("origin", user, password)
 }
 

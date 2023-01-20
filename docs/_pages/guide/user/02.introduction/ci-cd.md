@@ -39,3 +39,21 @@ release:
           GH_TOKEN: {% raw %}${{ secrets.GITHUB_TOKEN }}{% endraw %}
         run: ./gradlew release
 ```
+
+## [GitLab CI](https://docs.gitlab.com/ee/ci/)
+
+When running pipelines on GitLab CI you need to override some defaults to make Nyx work correctly. In particular you need to set the values for the [`GIT_STRATEGY`](https://docs.gitlab.com/ee/ci/runners/configure_runners.html#git-strategy) and [`GIT_DEPTH`](https://docs.gitlab.com/ee/ci/runners/configure_runners.html#shallow-cloning) variables to `clone` and `0` respectively,  so that the entire repository is checked out, like:
+
+```yaml
+variables:
+  GIT_STRATEGY: clone
+  GIT_DEPTH: "0"
+```
+
+If you don't override these variables the local repository will only have a shallow copy, which does not contain the information Nyx requires in order to infer the version. In other words, it's very likely that the inferred version will always be the [initial version]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#initial-version) (i.e. `0.1.0`) as further illustrated [here]({{ site.baseurl }}{% link _posts/2020-01-01-wrong-version-is-inferred-on-ci-cd-platform.md %}).
+
+### Credentials
+
+When configuring the [GitLab service]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}#gitlab) to [publish releases]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#publication-services) you need to pass credentials to Nyx.
+
+When running GitLab pipelines and you want Nyx to push Git changes or publish releases on your behalf you need to pass a [token](https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html) with `api`, `read_user`, `read_api`, `write_repository` and `write_registry` scope as a [variable](https://docs.gitlab.com/ee/ci/variables/) (say `GITLAB_TOKEN`) and use this environment variable in Nyx configuration in [GitLab configuration]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}#gitlab-configuration-options).

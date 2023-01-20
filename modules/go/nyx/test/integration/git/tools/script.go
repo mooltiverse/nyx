@@ -76,46 +76,42 @@ func NewScriptWithInitializationAndSettings(directory string, bare bool, initial
 
 /*
 Returns a new script instance for a repository cloned from the given URI in a new temporary directory.
-No credendials are used for cloning.
+This method allows using user name and password authentication (also used for tokens).
 
 Arguments are as follows:
 
 - uri the URI to clone from
+- user the optional user name to use when credentials are required.
+- password the optional password to use when credentials are required.
 */
-func CloneFrom(uri string) Script {
-	return CloneFromWithCredentials(uri, nil, nil)
+func CloneFromWithUserNameAndPassword(uri string, user *string, password *string) Script {
+	prefix := "nyx-test-script-"
+	directory := gitutil.NewTempDirectory("", &prefix)
+	return CloneFromToWithUserNameAndPassword(uri, directory, user, password)
 }
 
 /*
 Returns a new script instance for a repository cloned from the given URI in a new temporary directory.
+This method allows using SSH authentication.
 
 Arguments are as follows:
 
-- uri the URI to clone from
-- user the optional user name to use when credentials are required.
-- password the optional password to use when credentials are required.
+  - uri the URI to clone from
+  - privateKey the SSH private key. If nil the private key will be searched in its default location
+    (i.e. in the users' $HOME/.ssh directory).
+  - passphrase the optional password to use to open the private key, in case it's protected by a passphrase.
+    This is required when the private key is password protected as this implementation does not support prompting
+    the user interactively for entering the password.
 */
-func CloneFromWithCredentials(uri string, user *string, password *string) Script {
+func CloneFromWithPublicKey(uri string, privateKey *string, passphrase *string) Script {
 	prefix := "nyx-test-script-"
 	directory := gitutil.NewTempDirectory("", &prefix)
-	return CloneFromToWithCredentials(uri, directory, user, password)
+	return CloneFromToWithPublicKey(uri, directory, privateKey, passphrase)
 }
 
 /*
 Returns a new script instance for a repository cloned from the given URI in the given directory.
-No credendials are used for cloning.
-
-Arguments are as follows:
-
-- uri the URI to clone from
-- directory the directory to clone to. It must exist and be empty
-*/
-func CloneFromTo(uri string, directory string) Script {
-	return CloneFromToWithCredentials(uri, directory, nil, nil)
-}
-
-/*
-Returns a new script instance for a repository cloned from the given URI in the given directory.
+This method allows using user name and password authentication (also used for tokens).
 
 Arguments are as follows:
 
@@ -124,8 +120,27 @@ Arguments are as follows:
 - user the optional user name to use when credentials are required.
 - password the optional password to use when credentials are required.
 */
-func CloneFromToWithCredentials(uri string, directory string, user *string, password *string) Script {
-	CloneIntoWithCredentials(uri, directory, user, password)
+func CloneFromToWithUserNameAndPassword(uri string, directory string, user *string, password *string) Script {
+	CloneIntoWithUserNameAndPassword(uri, directory, user, password)
+	return NewScriptIn(directory)
+}
+
+/*
+Returns a new script instance for a repository cloned from the given URI in the given directory.
+This method allows using SSH authentication.
+
+Arguments are as follows:
+
+  - uri the URI to clone from
+  - directory the directory to clone to. It must exist and be empty
+  - privateKey the SSH private key. If nil the private key will be searched in its default location
+    (i.e. in the users' $HOME/.ssh directory).
+  - passphrase the optional password to use to open the private key, in case it's protected by a passphrase.
+    This is required when the private key is password protected as this implementation does not support prompting
+    the user interactively for entering the password.
+*/
+func CloneFromToWithPublicKey(uri string, directory string, privateKey *string, passphrase *string) Script {
+	CloneIntoWithPublicKey(uri, directory, privateKey, passphrase)
 	return NewScriptIn(directory)
 }
 

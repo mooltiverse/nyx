@@ -20,7 +20,6 @@ import java.util.Objects;
 import org.kohsuke.github.GHObject;
 
 import com.mooltiverse.oss.nyx.io.TransportException;
-import com.mooltiverse.oss.nyx.services.User;
 
 /**
  * An abstract base class for GitHub entities.

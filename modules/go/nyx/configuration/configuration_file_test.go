@@ -260,8 +260,11 @@ func TestSaveAndLoadJSON(t *testing.T) {
 			for sGitRemotesItemKey, _ := range *sGit.GetRemotes() {
 				assert.NotNil(t, (*tGit.GetRemotes())[sGitRemotesItemKey])
 				assert.Equal(t, (*sGit.GetRemotes())[sGitRemotesItemKey], (*tGit.GetRemotes())[sGitRemotesItemKey])
+				assert.Equal(t, (*(*sGit.GetRemotes())[sGitRemotesItemKey]).GetAuthenticationMethod(), (*(*tGit.GetRemotes())[sGitRemotesItemKey]).GetAuthenticationMethod())
 				assert.Equal(t, (*(*sGit.GetRemotes())[sGitRemotesItemKey]).GetPassword(), (*(*tGit.GetRemotes())[sGitRemotesItemKey]).GetPassword())
 				assert.Equal(t, (*(*sGit.GetRemotes())[sGitRemotesItemKey]).GetUser(), (*(*tGit.GetRemotes())[sGitRemotesItemKey]).GetUser())
+				assert.Equal(t, (*(*sGit.GetRemotes())[sGitRemotesItemKey]).GetPrivateKey(), (*(*tGit.GetRemotes())[sGitRemotesItemKey]).GetPrivateKey())
+				assert.Equal(t, (*(*sGit.GetRemotes())[sGitRemotesItemKey]).GetPassphrase(), (*(*tGit.GetRemotes())[sGitRemotesItemKey]).GetPassphrase())
 			}
 		}
 	}
@@ -595,8 +598,11 @@ func TestSaveAndLoadYAML(t *testing.T) {
 			for sGitRemotesItemKey, _ := range *sGit.GetRemotes() {
 				assert.NotNil(t, (*tGit.GetRemotes())[sGitRemotesItemKey])
 				assert.Equal(t, (*sGit.GetRemotes())[sGitRemotesItemKey], (*tGit.GetRemotes())[sGitRemotesItemKey])
+				assert.Equal(t, (*(*sGit.GetRemotes())[sGitRemotesItemKey]).GetAuthenticationMethod(), (*(*tGit.GetRemotes())[sGitRemotesItemKey]).GetAuthenticationMethod())
 				assert.Equal(t, (*(*sGit.GetRemotes())[sGitRemotesItemKey]).GetPassword(), (*(*tGit.GetRemotes())[sGitRemotesItemKey]).GetPassword())
 				assert.Equal(t, (*(*sGit.GetRemotes())[sGitRemotesItemKey]).GetUser(), (*(*tGit.GetRemotes())[sGitRemotesItemKey]).GetUser())
+				assert.Equal(t, (*(*sGit.GetRemotes())[sGitRemotesItemKey]).GetPrivateKey(), (*(*tGit.GetRemotes())[sGitRemotesItemKey]).GetPrivateKey())
+				assert.Equal(t, (*(*sGit.GetRemotes())[sGitRemotesItemKey]).GetPassphrase(), (*(*tGit.GetRemotes())[sGitRemotesItemKey]).GetPassphrase())
 			}
 		}
 	}
@@ -750,11 +756,11 @@ func TestSerializationWithMultipleConfigurationLayersJSON(t *testing.T) {
 	mediumPriorityConfigurationLayerMock.SetDryRun(utl.PointerToBoolean(true))
 	highPriorityConfigurationLayerMock.SetDryRun(utl.PointerToBoolean(false))
 
-	lpGitConfiguration, _ := ent.NewGitConfigurationWith(&map[string]*ent.GitRemoteConfiguration{"origin": ent.NewGitRemoteConfigurationWith(utl.PointerToString("jdoe1"), utl.PointerToString("pwd1")), "replica": ent.NewGitRemoteConfigurationWith(utl.PointerToString("stiger1"), utl.PointerToString("sec1"))})
+	lpGitConfiguration, _ := ent.NewGitConfigurationWith(&map[string]*ent.GitRemoteConfiguration{"origin": ent.NewGitRemoteConfigurationWith(nil, utl.PointerToString("jdoe1"), utl.PointerToString("pwd1"), nil, nil), "replica": ent.NewGitRemoteConfigurationWith(nil, utl.PointerToString("stiger1"), utl.PointerToString("sec1"), nil, nil)})
 	lowPriorityConfigurationLayerMock.SetGit(lpGitConfiguration)
-	mpGitConfiguration, _ := ent.NewGitConfigurationWith(&map[string]*ent.GitRemoteConfiguration{"origin": ent.NewGitRemoteConfigurationWith(utl.PointerToString("jdoe2"), utl.PointerToString("pwd2")), "clone": ent.NewGitRemoteConfigurationWith(utl.PointerToString("stiger2"), utl.PointerToString("sec2"))})
+	mpGitConfiguration, _ := ent.NewGitConfigurationWith(&map[string]*ent.GitRemoteConfiguration{"origin": ent.NewGitRemoteConfigurationWith(nil, utl.PointerToString("jdoe2"), utl.PointerToString("pwd2"), nil, nil), "clone": ent.NewGitRemoteConfigurationWith(nil, utl.PointerToString("stiger2"), utl.PointerToString("sec2"), nil, nil)})
 	mediumPriorityConfigurationLayerMock.SetGit(mpGitConfiguration)
-	hpGitConfiguration, _ := ent.NewGitConfigurationWith(&map[string]*ent.GitRemoteConfiguration{"origin": ent.NewGitRemoteConfigurationWith(utl.PointerToString("jdoe3"), utl.PointerToString("pwd3"))})
+	hpGitConfiguration, _ := ent.NewGitConfigurationWith(&map[string]*ent.GitRemoteConfiguration{"origin": ent.NewGitRemoteConfigurationWith(ent.PointerToAuthenticationMethod(ent.PUBLIC_KEY), utl.PointerToString("jdoe3"), utl.PointerToString("pwd3"), utl.PointerToString("key3"), utl.PointerToString("passphrase3"))})
 	highPriorityConfigurationLayerMock.SetGit(hpGitConfiguration)
 
 	lowPriorityConfigurationLayerMock.SetInitialVersion(utl.PointerToString("9.9.9"))
@@ -863,12 +869,21 @@ func TestSerializationWithMultipleConfigurationLayersJSON(t *testing.T) {
 	mpGit, _ := mediumPriorityConfigurationLayerMock.GetGit()
 	hpGit, _ := highPriorityConfigurationLayerMock.GetGit()
 	git, _ := deserializedConfigurationLayer.GetGit()
+	assert.Equal(t, (*hpGit.GetRemotes())["origin"].GetAuthenticationMethod(), (*git.GetRemotes())["origin"].GetAuthenticationMethod())
 	assert.Equal(t, *(*hpGit.GetRemotes())["origin"].GetPassword(), *(*git.GetRemotes())["origin"].GetPassword())
 	assert.Equal(t, *(*hpGit.GetRemotes())["origin"].GetUser(), *(*git.GetRemotes())["origin"].GetUser())
+	assert.Equal(t, (*hpGit.GetRemotes())["origin"].GetPrivateKey(), (*git.GetRemotes())["origin"].GetPrivateKey())
+	assert.Equal(t, (*hpGit.GetRemotes())["origin"].GetPassphrase(), (*git.GetRemotes())["origin"].GetPassphrase())
+	assert.Equal(t, (*lpGit.GetRemotes())["replica"].GetAuthenticationMethod(), (*git.GetRemotes())["replica"].GetAuthenticationMethod())
 	assert.Equal(t, *(*lpGit.GetRemotes())["replica"].GetPassword(), *(*git.GetRemotes())["replica"].GetPassword())
 	assert.Equal(t, *(*lpGit.GetRemotes())["replica"].GetUser(), *(*git.GetRemotes())["replica"].GetUser())
+	assert.Equal(t, (*lpGit.GetRemotes())["replica"].GetPrivateKey(), (*git.GetRemotes())["replica"].GetPrivateKey())
+	assert.Equal(t, (*lpGit.GetRemotes())["replica"].GetPassphrase(), (*git.GetRemotes())["replica"].GetPassphrase())
+	assert.Equal(t, (*mpGit.GetRemotes())["clone"].GetAuthenticationMethod(), (*git.GetRemotes())["clone"].GetAuthenticationMethod())
 	assert.Equal(t, *(*mpGit.GetRemotes())["clone"].GetPassword(), *(*git.GetRemotes())["clone"].GetPassword())
 	assert.Equal(t, *(*mpGit.GetRemotes())["clone"].GetUser(), *(*git.GetRemotes())["clone"].GetUser())
+	assert.Equal(t, (*mpGit.GetRemotes())["clone"].GetPrivateKey(), (*git.GetRemotes())["clone"].GetPrivateKey())
+	assert.Equal(t, (*mpGit.GetRemotes())["clone"].GetPassphrase(), (*git.GetRemotes())["clone"].GetPassphrase())
 
 	hpInitialVersion, _ := highPriorityConfigurationLayerMock.GetInitialVersion()
 	initialVersion, _ := deserializedConfigurationLayer.GetInitialVersion()
@@ -993,11 +1008,11 @@ func TestSerializationWithMultipleConfigurationLayersYAML(t *testing.T) {
 	mediumPriorityConfigurationLayerMock.SetDryRun(utl.PointerToBoolean(true))
 	highPriorityConfigurationLayerMock.SetDryRun(utl.PointerToBoolean(false))
 
-	lpGitConfiguration, _ := ent.NewGitConfigurationWith(&map[string]*ent.GitRemoteConfiguration{"origin": ent.NewGitRemoteConfigurationWith(utl.PointerToString("jdoe1"), utl.PointerToString("pwd1")), "replica": ent.NewGitRemoteConfigurationWith(utl.PointerToString("stiger1"), utl.PointerToString("sec1"))})
+	lpGitConfiguration, _ := ent.NewGitConfigurationWith(&map[string]*ent.GitRemoteConfiguration{"origin": ent.NewGitRemoteConfigurationWith(nil, utl.PointerToString("jdoe1"), utl.PointerToString("pwd1"), nil, nil), "replica": ent.NewGitRemoteConfigurationWith(nil, utl.PointerToString("stiger1"), utl.PointerToString("sec1"), nil, nil)})
 	lowPriorityConfigurationLayerMock.SetGit(lpGitConfiguration)
-	mpGitConfiguration, _ := ent.NewGitConfigurationWith(&map[string]*ent.GitRemoteConfiguration{"origin": ent.NewGitRemoteConfigurationWith(utl.PointerToString("jdoe2"), utl.PointerToString("pwd2")), "clone": ent.NewGitRemoteConfigurationWith(utl.PointerToString("stiger2"), utl.PointerToString("sec2"))})
+	mpGitConfiguration, _ := ent.NewGitConfigurationWith(&map[string]*ent.GitRemoteConfiguration{"origin": ent.NewGitRemoteConfigurationWith(nil, utl.PointerToString("jdoe2"), utl.PointerToString("pwd2"), nil, nil), "clone": ent.NewGitRemoteConfigurationWith(nil, utl.PointerToString("stiger2"), utl.PointerToString("sec2"), nil, nil)})
 	mediumPriorityConfigurationLayerMock.SetGit(mpGitConfiguration)
-	hpGitConfiguration, _ := ent.NewGitConfigurationWith(&map[string]*ent.GitRemoteConfiguration{"origin": ent.NewGitRemoteConfigurationWith(utl.PointerToString("jdoe3"), utl.PointerToString("pwd3"))})
+	hpGitConfiguration, _ := ent.NewGitConfigurationWith(&map[string]*ent.GitRemoteConfiguration{"origin": ent.NewGitRemoteConfigurationWith(ent.PointerToAuthenticationMethod(ent.PUBLIC_KEY), utl.PointerToString("jdoe3"), utl.PointerToString("pwd3"), utl.PointerToString("key3"), utl.PointerToString("passphrase3"))})
 	highPriorityConfigurationLayerMock.SetGit(hpGitConfiguration)
 
 	lowPriorityConfigurationLayerMock.SetInitialVersion(utl.PointerToString("9.9.9"))
@@ -1106,12 +1121,21 @@ func TestSerializationWithMultipleConfigurationLayersYAML(t *testing.T) {
 	mpGit, _ := mediumPriorityConfigurationLayerMock.GetGit()
 	hpGit, _ := highPriorityConfigurationLayerMock.GetGit()
 	git, _ := deserializedConfigurationLayer.GetGit()
+	assert.Equal(t, (*hpGit.GetRemotes())["origin"].GetAuthenticationMethod(), (*git.GetRemotes())["origin"].GetAuthenticationMethod())
 	assert.Equal(t, *(*hpGit.GetRemotes())["origin"].GetPassword(), *(*git.GetRemotes())["origin"].GetPassword())
 	assert.Equal(t, *(*hpGit.GetRemotes())["origin"].GetUser(), *(*git.GetRemotes())["origin"].GetUser())
+	assert.Equal(t, (*hpGit.GetRemotes())["origin"].GetPrivateKey(), (*git.GetRemotes())["origin"].GetPrivateKey())
+	assert.Equal(t, (*hpGit.GetRemotes())["origin"].GetPassphrase(), (*git.GetRemotes())["origin"].GetPassphrase())
+	assert.Equal(t, (*lpGit.GetRemotes())["replica"].GetAuthenticationMethod(), (*git.GetRemotes())["replica"].GetAuthenticationMethod())
 	assert.Equal(t, *(*lpGit.GetRemotes())["replica"].GetPassword(), *(*git.GetRemotes())["replica"].GetPassword())
 	assert.Equal(t, *(*lpGit.GetRemotes())["replica"].GetUser(), *(*git.GetRemotes())["replica"].GetUser())
+	assert.Equal(t, (*lpGit.GetRemotes())["replica"].GetPrivateKey(), (*git.GetRemotes())["replica"].GetPrivateKey())
+	assert.Equal(t, (*lpGit.GetRemotes())["replica"].GetPassphrase(), (*git.GetRemotes())["replica"].GetPassphrase())
+	assert.Equal(t, (*mpGit.GetRemotes())["clone"].GetAuthenticationMethod(), (*git.GetRemotes())["clone"].GetAuthenticationMethod())
 	assert.Equal(t, *(*mpGit.GetRemotes())["clone"].GetPassword(), *(*git.GetRemotes())["clone"].GetPassword())
 	assert.Equal(t, *(*mpGit.GetRemotes())["clone"].GetUser(), *(*git.GetRemotes())["clone"].GetUser())
+	assert.Equal(t, (*mpGit.GetRemotes())["clone"].GetPrivateKey(), (*git.GetRemotes())["clone"].GetPrivateKey())
+	assert.Equal(t, (*mpGit.GetRemotes())["clone"].GetPassphrase(), (*git.GetRemotes())["clone"].GetPassphrase())
 
 	hpInitialVersion, _ := highPriorityConfigurationLayerMock.GetInitialVersion()
 	initialVersion, _ := deserializedConfigurationLayer.GetInitialVersion()

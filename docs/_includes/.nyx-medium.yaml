@@ -20,6 +20,7 @@ dryRun: false
 git:
   remotes:
     origin:
+      authenticationMethod: USER_PASSWORD
       user: jdoe
       password: somepassword
 initialVersion: "0.1.0"

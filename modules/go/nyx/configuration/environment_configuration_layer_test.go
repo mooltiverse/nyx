@@ -267,20 +267,32 @@ func TestEnvironmentConfigurationLayerGetGit(t *testing.T) {
 	// get a new instance or a stale set of environment variables is still in the configuration layer
 	environmentConfigurationLayer = EnvironmentConfigurationLayer{}
 	environmentConfigurationLayer.withEnvironmentVariables([]string{
+		"NYX_GIT_REMOTES_one_AUTHENTICATION_METHOD=USER_PASSWORD",
 		"NYX_GIT_REMOTES_one_USER=jdoe",
 		"NYX_GIT_REMOTES_one_PASSWORD=pwd",
+		"NYX_GIT_REMOTES_one_PRIVATE_KEY=pk1",
+		"NYX_GIT_REMOTES_one_PASSPHRASE=pp1",
+		"NYX_GIT_REMOTES_two_AUTHENTICATION_METHOD=PUBLIC_KEY",
 		"NYX_GIT_REMOTES_two_USER=stiger",
 		"NYX_GIT_REMOTES_two_PASSWORD=sct",
+		"NYX_GIT_REMOTES_two_PRIVATE_KEY=pk2",
+		"NYX_GIT_REMOTES_two_PASSPHRASE=pp2",
 	})
 
 	git, err = environmentConfigurationLayer.GetGit()
 	remotes = *git.GetRemotes()
 
 	assert.Equal(t, 2, len(*git.GetRemotes()))
+	assert.Equal(t, ent.USER_PASSWORD, *remotes["one"].GetAuthenticationMethod())
 	assert.Equal(t, "pwd", *remotes["one"].GetPassword())
 	assert.Equal(t, "jdoe", *remotes["one"].GetUser())
+	assert.Equal(t, "pk1", *remotes["one"].GetPrivateKey())
+	assert.Equal(t, "pp1", *remotes["one"].GetPassphrase())
+	assert.Equal(t, ent.PUBLIC_KEY, *remotes["two"].GetAuthenticationMethod())
 	assert.Equal(t, "sct", *remotes["two"].GetPassword())
 	assert.Equal(t, "stiger", *remotes["two"].GetUser())
+	assert.Equal(t, "pk2", *remotes["two"].GetPrivateKey())
+	assert.Equal(t, "pp2", *remotes["two"].GetPassphrase())
 }
 
 func TestEnvironmentConfigurationLayerGetInitialVersion(t *testing.T) {

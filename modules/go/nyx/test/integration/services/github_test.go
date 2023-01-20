@@ -126,6 +126,7 @@ func TestGitHubHostingServiceCreateGitRepository(t *testing.T) {
 	assert.Equal(t, randomID, (*gitHubRepository).GetName())
 	assert.Equal(t, (*user).GetUserName()+"/"+randomID, (*gitHubRepository).GetFullName())
 	assert.Equal(t, "https://github.com/"+(*user).GetUserName()+"/"+randomID+".git", (*gitHubRepository).GetHTTPURL())
+	assert.Equal(t, "git@github.com:"+(*user).GetUserName()+"/"+randomID+".git", (*gitHubRepository).GetSSHURL())
 
 	// if we delete too quickly we often get a 404 from the server so let's wait a short while
 	time.Sleep(4000 * time.Millisecond)
@@ -162,9 +163,9 @@ func TestGitHubReleaseServiceCreateRelease(t *testing.T) {
 
 	// when a token for user and password authentication for plain Git operations against a GitHub repository,
 	// the user is the token and the password is the empty string
-	script := gittools.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED().ApplyOnCloneFromWithCredentials((*gitHubRepository).GetHTTPURL(), utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(""))
+	script := gittools.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED().ApplyOnCloneFromWithUserNameAndPassword((*gitHubRepository).GetHTTPURL(), utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(""))
 	defer os.RemoveAll(script.GetWorkingDirectory())
-	script.PushWithCredentials(utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(""))
+	script.PushWithUserNameAndPassword(utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(""))
 
 	// publish the release
 	release, err = gitHub.PublishRelease(&ownerName, &repositoryName, utl.PointerToString("Release 1.0.0-alpha.1"), "1.0.0-alpha.1", utl.PointerToString("A test description for the release\non multiple lines\nlike these"))
