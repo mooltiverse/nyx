@@ -152,13 +152,15 @@ where the main tasks are:
 
 * `clean` to restore the entire project directory to its initial state
 * `assemble` to build the project artifacts
-* `test` to run unit tests
-* `check` to run all tests (unit, integration and functional)
+* `test` to run unit tests, `integrationTest` for itegration tests tests, `functionalTest` for functional tests tests
+* `check` to run all tests (unit, integration and functional) and `verify` to run all tests and other verification tasks like linting
 * `build` to build the entire project and run all tests
 * `publish` to publish project outcomes to distribution services
 * `release` to tag the current version and publish it as a release
 
 The `publish` and `release` tasks can only be executed on the CI/CD platform.
+
+Use the most recent [Gradle release](https://gradle.org/releases/), at least version `7.0`. The JDK must be at least version `15`, but consider that newer versions may cause errors like `unsupported class file major version XY` when running Gradle functional tests (due to [Gradle TestKit](https://docs.gradle.org/current/userguide/test_kit.html) when testing simulating older versions of Gradle).
 
 ### Contributing Documentation
 
