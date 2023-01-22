@@ -1335,8 +1335,7 @@ public class JGitRepositoryTests {
             // repository status and also to execute the Git commands to build the test repository.
             Script script = Scenario.FROM_SCRATCH.realize();
             script.getWorkingDirectory().deleteOnExit();
-            Repository repository = JGitRepository.open(script.getWorkingDirectory());
-            assertTrue(repository.isClean());
+            assertTrue(JGitRepository.open(script.getWorkingDirectory()).isClean());
             
             // add one file with a LF and a CRLF and test
             File f = new File(script.getWorkingDirectory(), "README.txt");
@@ -1347,16 +1346,16 @@ public class JGitRepositoryTests {
             fw.write("\r\n");
             fw.flush();
             fw.close();
-            assertFalse(repository.isClean());
+            assertFalse(JGitRepository.open(script.getWorkingDirectory()).isClean());
 
             // stage the files without committing
             script.andStage();
-            assertFalse(repository.isClean());
+            assertFalse(JGitRepository.open(script.getWorkingDirectory()).isClean());
 
             // commit the files, now we're supposed to be clean again but when the bug is present we're not
             script.andCommit();
             // when the bug is present, this call to IsClean() returns false even if it's supposed to return true
-            assertTrue(repository.isClean());
+            assertTrue(JGitRepository.open(script.getWorkingDirectory()).isClean());
         }
 
         @DisplayName("JGitRepository.isClean() with a test file containing linefeeds using the git command")
@@ -1378,8 +1377,7 @@ public class JGitRepositoryTests {
             p.waitFor();
             p.destroy();
 
-            Repository repository = JGitRepository.open(repoDirectory);
-            assertTrue(repository.isClean());
+            assertTrue(JGitRepository.open(repoDirectory).isClean());
             
             // add one file with a LF and a CRLF and test
             File f = new File(repoDirectory, "README.txt");
@@ -1390,20 +1388,20 @@ public class JGitRepositoryTests {
             fw.write("\r\n");
             fw.flush();
             fw.close();
-            assertFalse(repository.isClean());
+            assertFalse(JGitRepository.open(repoDirectory).isClean());
 
             // stage the files without committing
             p = new ProcessBuilder(new String[]{"git", "add", "."}).directory(repoDirectory).redirectErrorStream(true).start();
             p.waitFor();
             p.destroy();
-            assertFalse(repository.isClean());
+            assertFalse(JGitRepository.open(repoDirectory).isClean());
 
             // commit the files, now we're supposed to be clean again but when the bug is present we're not
             p = new ProcessBuilder(new String[]{"git", "commit", "-m", "\"commit\""}).directory(repoDirectory).redirectErrorStream(true).start();
             p.waitFor();
             p.destroy();
             // when the bug is present, this call to IsClean() returns false even if it's supposed to return true
-            assertTrue(repository.isClean());
+            assertTrue(JGitRepository.open(repoDirectory).isClean());
         }
     }
 

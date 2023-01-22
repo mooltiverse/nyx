@@ -1416,7 +1416,6 @@ func TestGoGitRepositoryIsCleanWithTextFileContainingLineFeedsUsingEmbeddedLibra
 	dir := script.GetWorkingDirectory()
 	repository, err := GitInstance().Open(dir)
 	assert.NoError(t, err)
-
 	clean, err := repository.IsClean()
 	assert.NoError(t, err)
 	assert.True(t, clean)
@@ -1429,12 +1428,16 @@ func TestGoGitRepositoryIsCleanWithTextFileContainingLineFeedsUsingEmbeddedLibra
 	err = os.WriteFile(fileName, []byte("\r\n"), 0644)
 	assert.NoError(t, err)
 
+	repository, err = GitInstance().Open(dir)
+	assert.NoError(t, err)
 	clean, err = repository.IsClean()
 	assert.NoError(t, err)
 	assert.False(t, clean)
 
 	// stage the files without committing
 	script.AndStage()
+	repository, err = GitInstance().Open(dir)
+	assert.NoError(t, err)
 	clean, err = repository.IsClean()
 	assert.NoError(t, err)
 	assert.False(t, clean)
@@ -1442,6 +1445,8 @@ func TestGoGitRepositoryIsCleanWithTextFileContainingLineFeedsUsingEmbeddedLibra
 	// commit the files, now we're supposed to be clean again but when the bug is present we're not
 	script.AndCommit()
 	// when the bug is present, this call to IsClean() returns false even if it's supposed to return true
+	repository, err = GitInstance().Open(dir)
+	assert.NoError(t, err)
 	clean, err = repository.IsClean()
 	assert.NoError(t, err)
 	assert.True(t, clean)
@@ -1472,7 +1477,6 @@ func TestGoGitRepositoryIsCleanWithTextFileContainingLineFeedsUsingGitCommand(t 
 
 	repository, err := GitInstance().Open(repoDirectory)
 	assert.NoError(t, err)
-
 	clean, err := repository.IsClean()
 	assert.NoError(t, err)
 	assert.True(t, clean)
@@ -1485,6 +1489,8 @@ func TestGoGitRepositoryIsCleanWithTextFileContainingLineFeedsUsingGitCommand(t 
 	err = os.WriteFile(fileName, []byte("\r\n"), 0644)
 	assert.NoError(t, err)
 
+	repository, err = GitInstance().Open(repoDirectory)
+	assert.NoError(t, err)
 	clean, err = repository.IsClean()
 	assert.NoError(t, err)
 	assert.False(t, clean)
@@ -1497,6 +1503,8 @@ func TestGoGitRepositoryIsCleanWithTextFileContainingLineFeedsUsingGitCommand(t 
 		fmt.Printf("command '%v' resulted in an error and its output is:\n", cmd.String())
 		fmt.Printf("%v\n", out.String())
 	}
+	assert.NoError(t, err)
+	repository, err = GitInstance().Open(repoDirectory)
 	assert.NoError(t, err)
 	clean, err = repository.IsClean()
 	assert.NoError(t, err)
@@ -1512,6 +1520,8 @@ func TestGoGitRepositoryIsCleanWithTextFileContainingLineFeedsUsingGitCommand(t 
 	}
 	assert.NoError(t, err)
 	// when the bug is present, this call to IsClean() returns false even if it's supposed to return true
+	repository, err = GitInstance().Open(repoDirectory)
+	assert.NoError(t, err)
 	clean, err = repository.IsClean()
 	assert.NoError(t, err)
 	assert.True(t, clean)
