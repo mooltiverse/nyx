@@ -1383,14 +1383,14 @@ public class JGitRepositoryTests {
             assertTrue(JGitRepository.open(repoDirectory).isClean());
 
             // Give the local repository an identity or some further steps may fail
-            p = new ProcessBuilder(new String[]{"git", "config ", "user.email", "\"jdoe@example.com\""}).directory(repoDirectory).redirectErrorStream(true).start();
+            p = new ProcessBuilder(new String[]{"git", "config", "user.email", "\"jdoe@example.com\""}).directory(repoDirectory).redirectErrorStream(true).start();
             p.waitFor();
             System.out.println("Output from 'git config user.email \"jdoe@example.com\"' is:");
             System.out.write(p.getInputStream().readAllBytes());
             System.out.println();
             System.out.flush();
             p.destroy();
-            p = new ProcessBuilder(new String[]{"git", "config ", "user.name", "\"John Doe\""}).directory(repoDirectory).redirectErrorStream(true).start();
+            p = new ProcessBuilder(new String[]{"git", "config", "user.name", "\"John Doe\""}).directory(repoDirectory).redirectErrorStream(true).start();
             p.waitFor();
             System.out.println("Output from 'git config user.name \"John Doe\"' is:");
             System.out.write(p.getInputStream().readAllBytes());
