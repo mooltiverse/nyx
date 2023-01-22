@@ -1470,7 +1470,7 @@ func TestGoGitRepositoryIsCleanWithTextFileContainingLineFeedsUsingGitCommand(t 
 	cmd := &exec.Cmd{Path: commandPath, Dir: testDirectory, Env: os.Environ(), Args: []string{"git", "init", "testrepo"}, Stdout: out, Stderr: out}
 	err = cmd.Run()
 	if err != nil {
-		fmt.Printf("command '%v' resulted in an error and its output is:\n", cmd.String())
+		fmt.Printf("output from '%v' is:\n", cmd.String())
 		fmt.Printf("%v\n", out.String())
 	}
 	assert.NoError(t, err)
@@ -1500,7 +1500,7 @@ func TestGoGitRepositoryIsCleanWithTextFileContainingLineFeedsUsingGitCommand(t 
 	cmd = &exec.Cmd{Path: commandPath, Dir: repoDirectory, Env: os.Environ(), Args: []string{"git", "add", "."}, Stdout: out, Stderr: out}
 	err = cmd.Run()
 	if err != nil {
-		fmt.Printf("command '%v' resulted in an error and its output is:\n", cmd.String())
+		fmt.Printf("output from '%v' is:\n", cmd.String())
 		fmt.Printf("%v\n", out.String())
 	}
 	assert.NoError(t, err)
@@ -1515,7 +1515,7 @@ func TestGoGitRepositoryIsCleanWithTextFileContainingLineFeedsUsingGitCommand(t 
 	cmd = &exec.Cmd{Path: commandPath, Dir: repoDirectory, Env: os.Environ(), Args: []string{"git", "commit", "-m", "\"commit\""}, Stdout: out, Stderr: out}
 	err = cmd.Run()
 	if err != nil {
-		fmt.Printf("command '%v' resulted in an error and its output is:\n", cmd.String())
+		fmt.Printf("output from '%v' is:\n", cmd.String())
 		fmt.Printf("%v\n", out.String())
 	}
 	assert.NoError(t, err)

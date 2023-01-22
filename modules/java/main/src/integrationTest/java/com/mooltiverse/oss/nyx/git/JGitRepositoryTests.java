@@ -1375,6 +1375,10 @@ public class JGitRepositoryTests {
             File repoDirectory = new File(testDirectory, "testrepo");
             Process p = new ProcessBuilder(new String[]{"git", "init", "testrepo"}).directory(testDirectory).redirectErrorStream(true).start();
             p.waitFor();
+            System.out.println("Output from 'git init testrepo' is:");
+            System.out.write(p.getInputStream().readAllBytes());
+            System.out.println();
+            System.out.flush();
             p.destroy();
 
             assertTrue(JGitRepository.open(repoDirectory).isClean());
@@ -1393,12 +1397,20 @@ public class JGitRepositoryTests {
             // stage the files without committing
             p = new ProcessBuilder(new String[]{"git", "add", "."}).directory(repoDirectory).redirectErrorStream(true).start();
             p.waitFor();
+            System.out.println("Output from 'git add .' is:");
+            System.out.write(p.getInputStream().readAllBytes());
+            System.out.println();
+            System.out.flush();
             p.destroy();
             assertFalse(JGitRepository.open(repoDirectory).isClean());
 
             // commit the files, now we're supposed to be clean again but when the bug is present we're not
             p = new ProcessBuilder(new String[]{"git", "commit", "-m", "\"commit\""}).directory(repoDirectory).redirectErrorStream(true).start();
             p.waitFor();
+            System.out.println("Output from 'git commit -m \"commit\"' is:");
+            System.out.write(p.getInputStream().readAllBytes());
+            System.out.println();
+            System.out.flush();
             p.destroy();
             // when the bug is present, this call to IsClean() returns false even if it's supposed to return true
             assertTrue(JGitRepository.open(repoDirectory).isClean());
