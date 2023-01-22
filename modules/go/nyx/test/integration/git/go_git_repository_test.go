@@ -22,7 +22,10 @@
 package git_test
 
 import (
+	"bytes"         // https://pkg.go.dev/bytes
+	"fmt"           // https://pkg.go.dev/fmt
 	"os"            // https://pkg.go.dev/os
+	"os/exec"       // https://pkg.go.dev/os/exec
 	"path/filepath" // https://pkg.go.dev/path/filepath
 	"testing"       // https://pkg.go.dev/testing
 	"time"          // https://pkg.go.dev/time
@@ -1393,6 +1396,122 @@ func TestGoGitRepositoryIsClean(t *testing.T) {
 
 	// commit the files, now we're clean again
 	script.AndCommit()
+	clean, err = repository.IsClean()
+	assert.NoError(t, err)
+	assert.True(t, clean)
+}
+
+func TestGoGitRepositoryIsCleanWithTextFileContainingLineFeedsUsingEmbeddedLibrary(t *testing.T) {
+	// This test reproduces bugs:
+	// - https://github.com/mooltiverse/nyx/issues/130
+	// - https://github.com/mooltiverse/nyx/issues/129
+	// The use case for the bug is when a commit with a simple change that adds a LF or CRLF in some text file
+	// makes isClean() return false (even after the change has been commited) when it's supposed to return true.
+	// The difference between this test and the below test is that here we use the internal library both to check the
+	// repository status and also to execute the Git commands to build the test repository.
+
+	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
+	script := gittools.FROM_SCRATCH().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
+	dir := script.GetWorkingDirectory()
+	repository, err := GitInstance().Open(dir)
+	assert.NoError(t, err)
+
+	clean, err := repository.IsClean()
+	assert.NoError(t, err)
+	assert.True(t, clean)
+
+	// add one file with a LF and a CRLF and test
+	fileName := filepath.Join(script.GetWorkingDirectory(), "README.txt")
+	err = os.WriteFile(fileName, []byte("one"), 0644)
+	err = os.WriteFile(fileName, []byte("\n"), 0644)
+	err = os.WriteFile(fileName, []byte("two"), 0644)
+	err = os.WriteFile(fileName, []byte("\r\n"), 0644)
+	assert.NoError(t, err)
+
+	clean, err = repository.IsClean()
+	assert.NoError(t, err)
+	assert.False(t, clean)
+
+	// stage the files without committing
+	script.AndStage()
+	clean, err = repository.IsClean()
+	assert.NoError(t, err)
+	assert.False(t, clean)
+
+	// commit the files, now we're supposed to be clean again but when the bug is present we're not
+	script.AndCommit()
+	// when the bug is present, this call to IsClean() returns false even if it's supposed to return true
+	clean, err = repository.IsClean()
+	assert.NoError(t, err)
+	assert.True(t, clean)
+}
+
+func TestGoGitRepositoryIsCleanWithTextFileContainingLineFeedsUsingGitCommand(t *testing.T) {
+	// This test reproduces bugs:
+	// - https://github.com/mooltiverse/nyx/issues/130
+	// - https://github.com/mooltiverse/nyx/issues/129
+	// The use case for the bug is when a commit with a simple change that adds a LF or CRLF in some text file
+	// makes isClean() return false (even after the change has been commited) when it's supposed to return true.
+	// The difference between this test and the above test is that here we use the internal library just to check the
+	// repository status, while Git commands to build the test repository are executed using the external executable Git command.
+	prefix := "nyx-test-script-"
+	testDirectory := gitutil.NewTempDirectory("", &prefix)
+	defer os.RemoveAll(testDirectory)
+	repoDirectory := filepath.Join(testDirectory, "testrepo")
+	commandPath, err := exec.LookPath("git")
+	assert.NoError(t, err)
+	out := new(bytes.Buffer)
+	cmd := &exec.Cmd{Path: commandPath, Dir: testDirectory, Env: os.Environ(), Args: []string{"git", "init", "testrepo"}, Stdout: out, Stderr: out}
+	err = cmd.Run()
+	if err != nil {
+		fmt.Printf("command '%v' resulted in an error and its output is:\n", cmd.String())
+		fmt.Printf("%v\n", out.String())
+	}
+	assert.NoError(t, err)
+
+	repository, err := GitInstance().Open(repoDirectory)
+	assert.NoError(t, err)
+
+	clean, err := repository.IsClean()
+	assert.NoError(t, err)
+	assert.True(t, clean)
+
+	// add one file with a LF and a CRLF and test
+	fileName := filepath.Join(repoDirectory, "README.txt")
+	err = os.WriteFile(fileName, []byte("one"), 0644)
+	err = os.WriteFile(fileName, []byte("\n"), 0644)
+	err = os.WriteFile(fileName, []byte("two"), 0644)
+	err = os.WriteFile(fileName, []byte("\r\n"), 0644)
+	assert.NoError(t, err)
+
+	clean, err = repository.IsClean()
+	assert.NoError(t, err)
+	assert.False(t, clean)
+
+	// stage the files without committing
+	out = new(bytes.Buffer)
+	cmd = &exec.Cmd{Path: commandPath, Dir: repoDirectory, Env: os.Environ(), Args: []string{"git", "add", "."}, Stdout: out, Stderr: out}
+	err = cmd.Run()
+	if err != nil {
+		fmt.Printf("command '%v' resulted in an error and its output is:\n", cmd.String())
+		fmt.Printf("%v\n", out.String())
+	}
+	assert.NoError(t, err)
+	clean, err = repository.IsClean()
+	assert.NoError(t, err)
+	assert.False(t, clean)
+
+	// commit the files, now we're supposed to be clean again but when the bug is present we're not
+	out = new(bytes.Buffer)
+	cmd = &exec.Cmd{Path: commandPath, Dir: repoDirectory, Env: os.Environ(), Args: []string{"git", "commit", "-m", "\"commit\""}, Stdout: out, Stderr: out}
+	err = cmd.Run()
+	if err != nil {
+		fmt.Printf("command '%v' resulted in an error and its output is:\n", cmd.String())
+		fmt.Printf("%v\n", out.String())
+	}
+	assert.NoError(t, err)
+	// when the bug is present, this call to IsClean() returns false even if it's supposed to return true
 	clean, err = repository.IsClean()
 	assert.NoError(t, err)
 	assert.True(t, clean)
