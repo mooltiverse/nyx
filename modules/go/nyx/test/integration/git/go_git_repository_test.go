@@ -1483,7 +1483,7 @@ func TestGoGitRepositoryIsCleanWithTextFileContainingLineFeedsUsingGitCommand(t 
 
 	// Give the local repository an identity or some further steps may fail
 	out = new(bytes.Buffer)
-	cmd = &exec.Cmd{Path: commandPath, Dir: repoDirectory, Env: os.Environ(), Args: []string{"git", "config ", "user.email", "\"jdoe@example.com\""}, Stdout: out, Stderr: out}
+	cmd = &exec.Cmd{Path: commandPath, Dir: repoDirectory, Env: os.Environ(), Args: []string{"git", "config", "user.email", "\"jdoe@example.com\""}, Stdout: out, Stderr: out}
 	err = cmd.Run()
 	if err != nil {
 		fmt.Printf("output from '%v' is:\n", cmd.String())
@@ -1491,7 +1491,7 @@ func TestGoGitRepositoryIsCleanWithTextFileContainingLineFeedsUsingGitCommand(t 
 	}
 	assert.NoError(t, err)
 	out = new(bytes.Buffer)
-	cmd = &exec.Cmd{Path: commandPath, Dir: repoDirectory, Env: os.Environ(), Args: []string{"git", "config ", "user.name", "\"John Doe\""}, Stdout: out, Stderr: out}
+	cmd = &exec.Cmd{Path: commandPath, Dir: repoDirectory, Env: os.Environ(), Args: []string{"git", "config", "user.name", "\"John Doe\""}, Stdout: out, Stderr: out}
 	err = cmd.Run()
 	if err != nil {
 		fmt.Printf("output from '%v' is:\n", cmd.String())
