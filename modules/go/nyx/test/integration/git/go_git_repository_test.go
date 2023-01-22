@@ -1481,6 +1481,24 @@ func TestGoGitRepositoryIsCleanWithTextFileContainingLineFeedsUsingGitCommand(t 
 	assert.NoError(t, err)
 	assert.True(t, clean)
 
+	// Give the local repository an identity or some further steps may fail
+	out = new(bytes.Buffer)
+	cmd = &exec.Cmd{Path: commandPath, Dir: repoDirectory, Env: os.Environ(), Args: []string{"git", "config ", "user.email", "\"jdoe@example.com\""}, Stdout: out, Stderr: out}
+	err = cmd.Run()
+	if err != nil {
+		fmt.Printf("output from '%v' is:\n", cmd.String())
+		fmt.Printf("%v\n", out.String())
+	}
+	assert.NoError(t, err)
+	out = new(bytes.Buffer)
+	cmd = &exec.Cmd{Path: commandPath, Dir: repoDirectory, Env: os.Environ(), Args: []string{"git", "config ", "user.name", "\"John Doe\""}, Stdout: out, Stderr: out}
+	err = cmd.Run()
+	if err != nil {
+		fmt.Printf("output from '%v' is:\n", cmd.String())
+		fmt.Printf("%v\n", out.String())
+	}
+	assert.NoError(t, err)
+
 	// add one file with a LF and a CRLF and test
 	fileName := filepath.Join(repoDirectory, "README.txt")
 	err = os.WriteFile(fileName, []byte("one"), 0644)
