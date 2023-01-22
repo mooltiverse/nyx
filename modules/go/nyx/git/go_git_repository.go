@@ -20,7 +20,10 @@ This is the Git package for Nyx, encapsulating the underlying Git implementation
 package git
 
 import (
+	"bytes"   // https://pkg.go.dev/bytes
 	"fmt"     // https://pkg.go.dev/fmt
+	"os"      // https://pkg.go.dev/os
+	"os/exec" // https://pkg.go.dev/os/exec
 	"strings" // https://pkg.go.dev/strings
 
 	ggit "github.com/go-git/go-git/v5"                             // https://pkg.go.dev/github.com/go-git/go-git/v5
@@ -34,10 +37,23 @@ import (
 	gitent "github.com/mooltiverse/nyx/modules/go/nyx/entities/git"
 )
 
+var (
+	// This flag tells if we already emitted the warning about the workaround documented at https://github.com/mooltiverse/nyx/issues/130
+	// This warning is only needed for the workaround at https://github.com/mooltiverse/nyx/issues/130 so this variable can be
+	// removed when the workaround is no longer needed.
+	// TODO: remove this variable when https://github.com/mooltiverse/nyx/issues/130 is fixed
+	workaround130WarningsEmitted = false
+)
+
 /*
 A local repository implementation that encapsulates the backing go-git (https://pkg.go.dev/github.com/go-git/go-git/v5) library.
 */
 type goGitRepository struct {
+	// The directory of backing Git repository. We need to store this as the Git implementation doesn't expose methods to retrieve it.
+	// This attribute is only needed for the workaround #130 (see the IsClean() method) and can be removed once the workaround is no longer needed.
+	// TODO: remove the 'directory' attribute when https://github.com/mooltiverse/nyx/issues/130 is fixed
+	directory string
+
 	// The private instance of the underlying Git object.
 	repository *ggit.Repository
 }
@@ -45,12 +61,14 @@ type goGitRepository struct {
 /*
 Builds the instance using the given backing object.
 */
-func newGoGitRepository(repository *ggit.Repository) (goGitRepository, error) {
+// TODO: remove the 'directory' attribute when https://github.com/mooltiverse/nyx/issues/130 is fixed
+func newGoGitRepository(directory string, repository *ggit.Repository) (goGitRepository, error) {
 	if repository == nil {
 		return goGitRepository{}, &errs.NilPointerError{Message: fmt.Sprintf("nil pointer '%s'", "repository")}
 	}
 
 	gitRepository := goGitRepository{}
+	gitRepository.directory = directory
 	gitRepository.repository = repository
 	return gitRepository, nil
 }
@@ -138,7 +156,8 @@ func cloneWithCredentials(directory *string, uri *string, user *string, password
 		return goGitRepository{}, &errs.GitError{Message: fmt.Sprintf("unable to clone the '%s' repository into '%s'", *uri, *directory), Cause: err}
 	}
 
-	return newGoGitRepository(repository)
+	// TODO: remove the 'directory' attribute when https://github.com/mooltiverse/nyx/issues/130 is fixed
+	return newGoGitRepository(*directory, repository)
 }
 
 /*
@@ -161,7 +180,8 @@ func open(directory string) (goGitRepository, error) {
 	if err != nil {
 		return goGitRepository{}, &errs.IllegalArgumentError{Message: fmt.Sprintf("unable to open Git repository in directory '%s'", directory), Cause: err}
 	}
-	return newGoGitRepository(repository)
+	// TODO: remove the 'directory' attribute when https://github.com/mooltiverse/nyx/issues/130 is fixed
+	return newGoGitRepository(directory, repository)
 }
 
 /*
@@ -502,8 +522,59 @@ func (r goGitRepository) IsClean() (bool, error) {
 	if err != nil {
 		return false, &errs.GitError{Message: fmt.Sprintf("unable to get the repository worktree status"), Cause: err}
 	}
-	log.Debugf("repository clean status is: '%v'", status.IsClean())
-	return status.IsClean(), nil
+	log.Debugf("repository clean status is: '%v' ('%v')", status.IsClean(), status.String())
+	for fileName, fileStatus := range status {
+		log.Tracef("repository status for '%v' is: untracked='%v', staging='%v', worktree='%v', extra='%v', ", fileName, status.IsUntracked(fileName), string((*fileStatus).Staging), string((*fileStatus).Worktree), (*fileStatus).Extra)
+	}
+	log.Tracef("repository status flags are: Unmodified = ' ', Untracked = '?', Modified = 'M', Added = 'A', Deleted = 'D', Renamed = 'R', Copied = 'C', UpdatedButUnmerged = 'U'")
+
+	// TODO: remove this workaround (within the 'if' statement) when https://github.com/mooltiverse/nyx/issues/130 is fixed
+	// The go-git library has a bug that sometimes makes it return 'false' from status.IsClean() (meaning the repository is
+	// DIRTY, with uncommitted changes) even when it's clean (proven by using git on the command line).
+	// As per my tests, the bug occurs when the repository has text files with CR or CRLF (line endings), but is probably
+	// also connected to repositories with LFS and maybe others.
+	// This workaround is here to cope with:
+	// - https://github.com/mooltiverse/nyx/issues/130
+	// - https://github.com/mooltiverse/nyx/issues/129
+	// as long as the go-git library doesn't fix the bug. Bugs to keep an eye on for a fix are:
+	// - https://github.com/go-git/go-git/issues/500
+	// - https://github.com/go-git/go-git/issues/436
+	// - https://github.com/go-git/go-git/issues/227
+	// - https://github.com/go-git/go-git/issues/91
+	clean := status.IsClean()
+	if !clean {
+		// When the repository return false (which may be wrong), double check by running the git executable.
+		log.Debugf("workaround #130: go-git returned 'false' when the repository status was checked to see whether it was clean or not, this means it considers the repository in a DIRTY state. However, go-git has a bug which sometimes returns 'false' even when the Git command returns true so now the 'git' command, if available, will be executed to double check, and its output will be considered the only one reliable, overcoming the result provided by the go-git library")
+		commandPath, err := exec.LookPath("git")
+		if err != nil {
+			log.Debugf("workaround #130: an error was returned when looking for the 'git' command in the local PATH, so the 'git' command will not be executed and the workaround cannot proceed. The error is: %v", err)
+			if !workaround130WarningsEmitted {
+				log.Warnf("workaround #130: the 'git' command wasn't found in the current PATH so the workaround documented at https://github.com/mooltiverse/nyx/issues/130 is disabled and the current Git repository status (CLEAN or DIRTY) may be wrong due to a bug in the underlying go-git library; disregard this message if you are not relying on the repository status in your release types configuration or you don't notice any suspect behavior that may be due to the repository status being wrongly detected")
+				// make sure we emit this warning only once
+				workaround130WarningsEmitted = true
+			}
+			return clean, nil
+		}
+		out := new(bytes.Buffer)
+		cmd := &exec.Cmd{Path: commandPath, Dir: r.directory, Env: os.Environ(), Args: []string{"git", "status", "--porcelain"}, Stdout: out, Stderr: out}
+		log.Debugf("workaround #130: running the 'git' executable '%s' in directory '%s': %s", commandPath, r.directory, cmd.String())
+		err = cmd.Run()
+		if err != nil {
+			log.Debugf("workaround #130: an error was returned when running the 'git' command so the workaround cannot proceed. The error is: '%v' and the command output is '%s'", err, out.String())
+			return clean, nil
+		}
+		log.Debugf("workaround #130: the 'git status' command returned (empty means the repository is clean): '%v'", out.String())
+		// if the output is the empty string the repository is clean
+		if "" == strings.TrimSpace(out.String()) {
+			log.Debugf("workaround #130: the 'git status' command returned an empty output so the repository is clean")
+			clean = true
+		} else {
+			log.Debugf("workaround #130: the 'git status' command returned a non-empty output so the repository is dirty")
+			clean = false
+		}
+	}
+
+	return clean, nil
 }
 
 /*
