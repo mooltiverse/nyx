@@ -567,7 +567,7 @@ func (r goGitRepository) IsClean() (bool, error) {
 		// if the output is the empty string the repository is clean
 		if "" == strings.TrimSpace(out.String()) {
 			log.Debugf("workaround #130: the 'git status' command returned an empty output so the repository is clean")
-			//clean = true
+			clean = true
 		} else {
 			log.Debugf("workaround #130: the 'git status' command returned a non-empty output so the repository is dirty")
 			clean = false
