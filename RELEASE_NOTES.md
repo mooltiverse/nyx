@@ -2,23 +2,32 @@
 
 ## 2.0.0
 
+* when using the Java (Gradle) version, the minimum Java version is now `15` and the minimum Gradle version is `7.0` (see [here](https://mooltiverse.github.io/nyx/guide/user/introduction/usage/#requisites-1) and [here](https://docs.gradle.org/current/userguide/compatibility.html)); Gradle versions from `6.7` on should still work but they are no longer tested
+* the public key (SSH) authentication method is now supported for Git ([#94](https://github.com/mooltiverse/nyx/issues/94))
+* the Git internal library (`github.com/mooltiverse/nyx/modules/go/nyx/git` package for Go, `com.mooltiverse.oss.nyx.git` package for Java) has been refactored in order to support multiple authentication mechanisms (with the new SSH method) and some methods have been replaced while others have been added
 * support for deprecated [template functions](https://mooltiverse.github.io/nyx/guide/user/configuration-reference/templates/#functions) `environment.user`, `environment.variable`, `file.content`, `file.exists` has been removed, replaced by `environmentUser`, `environmentVariable`, `fileContent`, `fileExists`
+* Java template functions in `com.mooltiverse.oss.nyx.template.Functions.java` no longer implement the `java.util.function.Function` interface which was provided for backward compatibility; from now on they only implement the `com.github.jknack.handlebars.Helper` interface provided by [Handlebars](https://github.com/jknack/handlebars.java)
 
 This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/2.0.0).
 
 ### Upgrade instructions
 
+* if you are using the Java (Gradle) version make sure you run Java `15` and Gradle `7.0` or newer
+* if you embedded Nyx in your code and used the `github.com/mooltiverse/nyx/modules/go/nyx/git` Go package or the `com.mooltiverse.oss.nyx.git` package, fix your code reflecting the changes made to the API
+* if you plan to use Git SSH authentication please refer to [the configuration reference](https://mooltiverse.github.io/nyx/guide/user/configuration-reference/git/) for the required configuration options
 * replace usage of deprecated [template functions](https://mooltiverse.github.io/nyx/guide/user/configuration-reference/templates/#functions) `environment.user`, `environment.variable`, `file.content`, `file.exists` (with dots) with `environmentUser`, `environmentVariable`, `fileContent`, `fileExists` (camel case names) in the configuration
 
 ### New features and improvements
 
-There are no new features or improvements in this release.
+* the public key (SSH) authentication method is now supported for Git ([#94](https://github.com/mooltiverse/nyx/issues/94))
 
 ### Fixed issues
 
 There are no fixes in this release.
 
 ### Known issues
+
+There are no known issues in this release.
 
 There are no known issues in this release.
 

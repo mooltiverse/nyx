@@ -41,15 +41,6 @@ public class FunctionsTests {
             assertEquals("lower", new Functions.Lower().apply("lower"));
             assertEquals("upper", new Functions.Lower().apply("upper"));
             assertEquals("mixed", new Functions.Lower().apply("mIxEd"));
-
-            // also run the same tests by selecting the function by name, as the template engine does
-            assertEquals("", Functions.FUNCTIONS.get("lower").apply(null));
-            assertEquals("", Functions.FUNCTIONS.get("lower").apply(""));
-            assertEquals("0", Functions.FUNCTIONS.get("lower").apply("0"));
-            assertEquals("01234", Functions.FUNCTIONS.get("lower").apply("01234"));
-            assertEquals("lower", Functions.FUNCTIONS.get("lower").apply("lower"));
-            assertEquals("upper", Functions.FUNCTIONS.get("lower").apply("upper"));
-            assertEquals("mixed", Functions.FUNCTIONS.get("lower").apply("mIxEd"));
         }
     }
 
@@ -67,15 +58,6 @@ public class FunctionsTests {
             assertEquals("LOWER", new Functions.Upper().apply("lower"));
             assertEquals("UPPER", new Functions.Upper().apply("upper"));
             assertEquals("MIXED", new Functions.Upper().apply("mIxEd"));
-
-            // also run the same tests by selecting the function by name, as the template engine does
-            assertEquals("", Functions.FUNCTIONS.get("upper").apply(null));
-            assertEquals("", Functions.FUNCTIONS.get("upper").apply(""));
-            assertEquals("0", Functions.FUNCTIONS.get("upper").apply("0"));
-            assertEquals("01234", Functions.FUNCTIONS.get("upper").apply("01234"));
-            assertEquals("LOWER", Functions.FUNCTIONS.get("upper").apply("lower"));
-            assertEquals("UPPER", Functions.FUNCTIONS.get("upper").apply("upper"));
-            assertEquals("MIXED", Functions.FUNCTIONS.get("upper").apply("mIxEd"));
         }
     }
 
@@ -90,12 +72,6 @@ public class FunctionsTests {
             assertEquals("", new Functions.Trim().apply(""));
             assertEquals("0", new Functions.Trim().apply("0"));
             assertEquals("01  234", new Functions.Trim().apply("   01  234   "));
-
-            // also run the same tests by selecting the function by name, as the template engine does
-            assertEquals("", Functions.FUNCTIONS.get("trim").apply(null));
-            assertEquals("", Functions.FUNCTIONS.get("trim").apply(""));
-            assertEquals("0", Functions.FUNCTIONS.get("trim").apply("0"));
-            assertEquals("01  234", Functions.FUNCTIONS.get("trim").apply("   01  234   "));
         }
     }
 
@@ -112,14 +88,6 @@ public class FunctionsTests {
             assertEquals("", new Functions.First().apply(" aB1 "));
             assertEquals("", new Functions.First().apply("!£$%&b2/()=?'^ì*+§°#@.;c3"));
             assertEquals("a1", new Functions.First().apply("a1!£$%&b2/()=?'^ì*+§°#@.;c3"));
-
-            // also run the same tests by selecting the function by name, as the template engine does
-            assertEquals("", Functions.FUNCTIONS.get("first").apply(null));
-            assertEquals("", Functions.FUNCTIONS.get("first").apply(""));
-            assertEquals("aB1", Functions.FUNCTIONS.get("first").apply("aB1"));
-            assertEquals("", Functions.FUNCTIONS.get("first").apply(" aB1 "));
-            assertEquals("", Functions.FUNCTIONS.get("first").apply("!£$%&b2/()=?'^ì*+§°#@.;c3"));
-            assertEquals("a1", Functions.FUNCTIONS.get("first").apply("a1!£$%&b2/()=?'^ì*+§°#@.;c3"));
         }
     }
 
@@ -136,14 +104,6 @@ public class FunctionsTests {
             assertEquals("", new Functions.FirstLower().apply(" aB1 "));
             assertEquals("", new Functions.FirstLower().apply("!£$%&b2/()=?'^ì*+§°#@.;c3"));
             assertEquals("ab1", new Functions.FirstLower().apply("aB1!£$%&b2/()=?'^ì*+§°#@.;c3"));
-
-            // also run the same tests by selecting the function by name, as the template engine does
-            assertEquals("", Functions.FUNCTIONS.get("firstLower").apply(null));
-            assertEquals("", Functions.FUNCTIONS.get("firstLower").apply(""));
-            assertEquals("ab1", Functions.FUNCTIONS.get("firstLower").apply("aB1"));
-            assertEquals("", Functions.FUNCTIONS.get("firstLower").apply(" aB1 "));
-            assertEquals("", Functions.FUNCTIONS.get("firstLower").apply("!£$%&b2/()=?'^ì*+§°#@.;c3"));
-            assertEquals("ab1", Functions.FUNCTIONS.get("firstLower").apply("aB1!£$%&b2/()=?'^ì*+§°#@.;c3"));
         }
     }
 
@@ -160,14 +120,6 @@ public class FunctionsTests {
             assertEquals("", new Functions.FirstUpper().apply(" aB1 "));
             assertEquals("", new Functions.FirstUpper().apply("!£$%&b2/()=?'^ì*+§°#@.;c3"));
             assertEquals("AB1", new Functions.FirstUpper().apply("aB1!£$%&b2/()=?'^ì*+§°#@.;c3"));
-
-            // also run the same tests by selecting the function by name, as the template engine does
-            assertEquals("", Functions.FUNCTIONS.get("firstUpper").apply(null));
-            assertEquals("", Functions.FUNCTIONS.get("firstUpper").apply(""));
-            assertEquals("AB1", Functions.FUNCTIONS.get("firstUpper").apply("aB1"));
-            assertEquals("", Functions.FUNCTIONS.get("firstUpper").apply(" aB1 "));
-            assertEquals("", Functions.FUNCTIONS.get("firstUpper").apply("!£$%&b2/()=?'^ì*+§°#@.;c3"));
-            assertEquals("AB1", Functions.FUNCTIONS.get("firstUpper").apply("aB1!£$%&b2/()=?'^ì*+§°#@.;c3"));
         }
     }
 
@@ -184,14 +136,6 @@ public class FunctionsTests {
             assertEquals("", new Functions.Last().apply(" aB1 "));
             assertEquals("", new Functions.Last().apply("a1!£$%&b2/()=?'^ì*+§°#@.;"));
             assertEquals("c3", new Functions.Last().apply("a1!£$%&b2/()=?'^ì*+§°#@.;c3"));
-
-            // also run the same tests by selecting the function by name, as the template engine does
-            assertEquals("", Functions.FUNCTIONS.get("last").apply(null));
-            assertEquals("", Functions.FUNCTIONS.get("last").apply(""));
-            assertEquals("aB1", Functions.FUNCTIONS.get("last").apply("aB1"));
-            assertEquals("", Functions.FUNCTIONS.get("last").apply(" aB1 "));
-            assertEquals("", Functions.FUNCTIONS.get("last").apply("a1!£$%&b2/()=?'^ì*+§°#@.;"));
-            assertEquals("c3", Functions.FUNCTIONS.get("last").apply("a1!£$%&b2/()=?'^ì*+§°#@.;c3"));
         }
     }
 
@@ -208,14 +152,6 @@ public class FunctionsTests {
             assertEquals("", new Functions.LastLower().apply(" aB1 "));
             assertEquals("", new Functions.LastLower().apply("a1!£$%&b2/()=?'^ì*+§°#@.;"));
             assertEquals("cd3", new Functions.LastLower().apply("a1!£$%&b2/()=?'^ì*+§°#@.;cD3"));
-
-            // also run the same tests by selecting the function by name, as the template engine does
-            assertEquals("", Functions.FUNCTIONS.get("lastLower").apply(null));
-            assertEquals("", Functions.FUNCTIONS.get("lastLower").apply(""));
-            assertEquals("ab1", Functions.FUNCTIONS.get("lastLower").apply("aB1"));
-            assertEquals("", Functions.FUNCTIONS.get("lastLower").apply(" aB1 "));
-            assertEquals("", Functions.FUNCTIONS.get("lastLower").apply("a1!£$%&b2/()=?'^ì*+§°#@.;"));
-            assertEquals("cd3", Functions.FUNCTIONS.get("lastLower").apply("a1!£$%&b2/()=?'^ì*+§°#@.;cD3"));
         }
     }
 
@@ -232,14 +168,6 @@ public class FunctionsTests {
             assertEquals("", new Functions.LastUpper().apply(" aB1 "));
             assertEquals("", new Functions.LastUpper().apply("a1!£$%&b2/()=?'^ì*+§°#@.;"));
             assertEquals("CD3", new Functions.LastUpper().apply("a1!£$%&b2/()=?'^ì*+§°#@.;cD3"));
-
-            // also run the same tests by selecting the function by name, as the template engine does
-            assertEquals("", Functions.FUNCTIONS.get("lastUpper").apply(null));
-            assertEquals("", Functions.FUNCTIONS.get("lastUpper").apply(""));
-            assertEquals("AB1", Functions.FUNCTIONS.get("lastUpper").apply("aB1"));
-            assertEquals("", Functions.FUNCTIONS.get("lastUpper").apply(" aB1 "));
-            assertEquals("", Functions.FUNCTIONS.get("lastUpper").apply("a1!£$%&b2/()=?'^ì*+§°#@.;"));
-            assertEquals("CD3", Functions.FUNCTIONS.get("lastUpper").apply("a1!£$%&b2/()=?'^ì*+§°#@.;cD3"));
         }
     }
 
@@ -255,13 +183,6 @@ public class FunctionsTests {
             assertEquals("aB1", new Functions.Sanitize().apply("aB1"));
             assertEquals("aB1", new Functions.Sanitize().apply(" aB1 "));
             assertEquals("abc123", new Functions.Sanitize().apply("\\!£$%&abc123/()=?'^ì*+§°#@.;"));
-
-            // also run the same tests by selecting the function by name, as the template engine does
-            assertEquals("", Functions.FUNCTIONS.get("sanitize").apply(null));
-            assertEquals("", Functions.FUNCTIONS.get("sanitize").apply(""));
-            assertEquals("aB1", Functions.FUNCTIONS.get("sanitize").apply("aB1"));
-            assertEquals("aB1", Functions.FUNCTIONS.get("sanitize").apply(" aB1 "));
-            assertEquals("abc123", Functions.FUNCTIONS.get("sanitize").apply("\\!£$%&abc123/()=?'^ì*+§°#@.;"));
         }
     }
 
@@ -277,13 +198,6 @@ public class FunctionsTests {
             assertEquals("ab1", new Functions.SanitizeLower().apply("aB1"));
             assertEquals("ab1", new Functions.SanitizeLower().apply(" aB1 "));
             assertEquals("abc123", new Functions.SanitizeLower().apply("\\!£$%&aBc123/()=?'^ì*+§°#@.;"));
-
-            // also run the same tests by selecting the function by name, as the template engine does
-            assertEquals("", Functions.FUNCTIONS.get("sanitizeLower").apply(null));
-            assertEquals("", Functions.FUNCTIONS.get("sanitizeLower").apply(""));
-            assertEquals("ab1", Functions.FUNCTIONS.get("sanitizeLower").apply("aB1"));
-            assertEquals("ab1", Functions.FUNCTIONS.get("sanitizeLower").apply(" aB1 "));
-            assertEquals("abc123", Functions.FUNCTIONS.get("sanitizeLower").apply("\\!£$%&aBc123/()=?'^ì*+§°#@.;"));
         }
     }
 
@@ -299,13 +213,6 @@ public class FunctionsTests {
             assertEquals("AB1", new Functions.SanitizeUpper().apply("aB1"));
             assertEquals("AB1", new Functions.SanitizeUpper().apply(" aB1 "));
             assertEquals("ABC123", new Functions.SanitizeUpper().apply("\\!£$%&aBc123/()=?'^ì*+§°#@.;"));
-
-            // also run the same tests by selecting the function by name, as the template engine does
-            assertEquals("", Functions.FUNCTIONS.get("sanitizeUpper").apply(null));
-            assertEquals("", Functions.FUNCTIONS.get("sanitizeUpper").apply(""));
-            assertEquals("AB1", Functions.FUNCTIONS.get("sanitizeUpper").apply("aB1"));
-            assertEquals("AB1", Functions.FUNCTIONS.get("sanitizeUpper").apply(" aB1 "));
-            assertEquals("ABC123", Functions.FUNCTIONS.get("sanitizeUpper").apply("\\!£$%&aBc123/()=?'^ì*+§°#@.;"));
         }
     }
 
@@ -322,14 +229,6 @@ public class FunctionsTests {
             assertEquals("01234", new Functions.Short5().apply("01234"));
             assertEquals("01234", new Functions.Short5().apply("012345"));
             assertEquals("01234", new Functions.Short5().apply("0123456789"));
-
-            // also run the same tests by selecting the function by name, as the template engine does
-            assertEquals("", Functions.FUNCTIONS.get("short5").apply(null));
-            assertEquals("", Functions.FUNCTIONS.get("short5").apply(""));
-            assertEquals("0", Functions.FUNCTIONS.get("short5").apply("0"));
-            assertEquals("01234", Functions.FUNCTIONS.get("short5").apply("01234"));
-            assertEquals("01234", Functions.FUNCTIONS.get("short5").apply("012345"));
-            assertEquals("01234", Functions.FUNCTIONS.get("short5").apply("0123456789"));
         }
     }
 
@@ -348,16 +247,6 @@ public class FunctionsTests {
             assertEquals("012345", new Functions.Short6().apply("0123456"));
             assertEquals("012345", new Functions.Short6().apply("01234567"));
             assertEquals("012345", new Functions.Short6().apply("0123456789"));
-
-            // also run the same tests by selecting the function by name, as the template engine does
-            assertEquals("", Functions.FUNCTIONS.get("short6").apply(null));
-            assertEquals("", Functions.FUNCTIONS.get("short6").apply(""));
-            assertEquals("0", Functions.FUNCTIONS.get("short6").apply("0"));
-            assertEquals("01234", Functions.FUNCTIONS.get("short6").apply("01234"));
-            assertEquals("012345", Functions.FUNCTIONS.get("short6").apply("012345"));
-            assertEquals("012345", Functions.FUNCTIONS.get("short6").apply("0123456"));
-            assertEquals("012345", Functions.FUNCTIONS.get("short6").apply("01234567"));
-            assertEquals("012345", Functions.FUNCTIONS.get("short6").apply("0123456789"));
         }
     }
 
@@ -376,16 +265,6 @@ public class FunctionsTests {
             assertEquals("0123456", new Functions.Short7().apply("0123456"));
             assertEquals("0123456", new Functions.Short7().apply("01234567"));
             assertEquals("0123456", new Functions.Short7().apply("0123456789"));
-
-            // also run the same tests by selecting the function by name, as the template engine does
-            assertEquals("", Functions.FUNCTIONS.get("short7").apply(null));
-            assertEquals("", Functions.FUNCTIONS.get("short7").apply(""));
-            assertEquals("0", Functions.FUNCTIONS.get("short7").apply("0"));
-            assertEquals("01234", Functions.FUNCTIONS.get("short7").apply("01234"));
-            assertEquals("012345", Functions.FUNCTIONS.get("short7").apply("012345"));
-            assertEquals("0123456", Functions.FUNCTIONS.get("short7").apply("0123456"));
-            assertEquals("0123456", Functions.FUNCTIONS.get("short7").apply("01234567"));
-            assertEquals("0123456", Functions.FUNCTIONS.get("short7").apply("0123456789"));
         }
     }
 
@@ -399,11 +278,6 @@ public class FunctionsTests {
             assertEquals("", new Functions.TimestampISO8601().apply(null));
             assertEquals("1970-01-01T00:00:00", new Functions.TimestampISO8601().apply("0"));
             assertEquals("2020-01-01T12:00:00", new Functions.TimestampISO8601().apply("1577880000000"));
-
-            // also run the same tests by selecting the function by name, as the template engine does
-            assertEquals("", Functions.FUNCTIONS.get("timestampISO8601").apply(null));
-            assertEquals("1970-01-01T00:00:00", Functions.FUNCTIONS.get("timestampISO8601").apply("0"));
-            assertEquals("2020-01-01T12:00:00", Functions.FUNCTIONS.get("timestampISO8601").apply("1577880000000"));
         }
     }
 
@@ -417,11 +291,6 @@ public class FunctionsTests {
             assertEquals("", new Functions.TimestampYYYYMMDDHHMMSS().apply(null));
             assertEquals("19700101000000", new Functions.TimestampYYYYMMDDHHMMSS().apply("0"));
             assertEquals("20200101120000", new Functions.TimestampYYYYMMDDHHMMSS().apply("1577880000000"));
-
-            // also run the same tests by selecting the function by name, as the template engine does
-            assertEquals("", Functions.FUNCTIONS.get("timestampYYYYMMDDHHMMSS").apply(null));
-            assertEquals("19700101000000", Functions.FUNCTIONS.get("timestampYYYYMMDDHHMMSS").apply("0"));
-            assertEquals("20200101120000", Functions.FUNCTIONS.get("timestampYYYYMMDDHHMMSS").apply("1577880000000"));
         }
     }
 
@@ -436,18 +305,10 @@ public class FunctionsTests {
             if (Objects.isNull(System.getenv("OS"))) {
                 assertEquals("", new Functions.EnvironmentVariable().apply(null));
                 assertEquals("", new Functions.EnvironmentVariable().apply("OS"));
-
-                // also run the same tests by selecting the function by name, as the template engine does
-                assertEquals("", Functions.FUNCTIONS.get("environmentVariable").apply(null));
-                assertEquals("", Functions.FUNCTIONS.get("environmentVariable").apply("OS"));
             }
             else {
                 assertEquals("", new Functions.EnvironmentVariable().apply(null));
                 assertEquals(System.getenv("OS"), new Functions.EnvironmentVariable().apply("OS"));
-
-                // also run the same tests by selecting the function by name, as the template engine does
-                assertEquals("", Functions.FUNCTIONS.get("environmentVariable").apply(null));
-                assertEquals(System.getenv("OS"), Functions.FUNCTIONS.get("environmentVariable").apply("OS"));
             }
         }
     }
@@ -462,10 +323,6 @@ public class FunctionsTests {
             // the input value is ignored by this function, it always returns the system user name
             assertEquals(System.getProperty("user.name"), new Functions.EnvironmentUser().apply(null));
             assertEquals(System.getProperty("user.name"), new Functions.EnvironmentUser().apply("any"));
-
-            // also run the same tests by selecting the function by name, as the template engine does
-            assertEquals(System.getProperty("user.name"), Functions.FUNCTIONS.get("environmentUser").apply(null));
-            assertEquals(System.getProperty("user.name"), Functions.FUNCTIONS.get("environmentUser").apply("any"));
         }
     }
 
@@ -488,11 +345,6 @@ public class FunctionsTests {
             assertEquals("", new Functions.FileContent().apply(null));
             assertEquals("", new Functions.FileContent().apply("afilethatdoesnotexists"));
             assertEquals(FILE_CONTENT, new Functions.FileContent().apply(f.getAbsolutePath()));
-
-            // also run the same tests by selecting the function by name, as the template engine does
-            assertEquals("", Functions.FUNCTIONS.get("fileContent").apply(null));
-            assertEquals("", Functions.FUNCTIONS.get("fileContent").apply("afilethatdoesnotexists"));
-            assertEquals(FILE_CONTENT, Functions.FUNCTIONS.get("fileContent").apply(f.getAbsolutePath()));
         }
     }
 
@@ -509,11 +361,6 @@ public class FunctionsTests {
             assertEquals("false", new Functions.FileExists().apply(null));
             assertEquals("false", new Functions.FileExists().apply("afilethatdoesnotexists"));
             assertEquals("true", new Functions.FileExists().apply(f.getAbsolutePath()));
-
-            // also run the same tests by selecting the function by name, as the template engine does
-            assertEquals("false", Functions.FUNCTIONS.get("fileExists").apply(null));
-            assertEquals("false", Functions.FUNCTIONS.get("fileExists").apply("afilethatdoesnotexists"));
-            assertEquals("true", Functions.FUNCTIONS.get("fileExists").apply(f.getAbsolutePath()));
         }
     }
 }

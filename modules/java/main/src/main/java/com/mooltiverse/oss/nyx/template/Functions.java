@@ -11,7 +11,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.Function;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,10 +32,10 @@ class Functions {
     private static final Logger logger = LoggerFactory.getLogger(Functions.class);
 
     /**
-     * The map of all available functions, where keys are function names to be used in various contexts,
+     * The map of all available helpers, where keys are function names to be used in various contexts,
      * and values are function implementations.
      */
-    public static Map<String,Function<String,String>> FUNCTIONS = new HashMap<String,Function<String,String>>(){
+    public static Map<String,Helper<Object>> FUNCTIONS = new HashMap<String,Helper<Object>>(){
         {
             put(Lower.NAME,                   new Lower());
             put(Upper.NAME,                   new Upper());
@@ -103,27 +102,38 @@ class Functions {
     }
 
     /**
-     * This class provides basic features for functions.
+     * This is the superclass for all template functions.
      * 
      * In particular this class offers the {@link Helper} implementation as an adapter method
      * used by Handlebars to invoke the actual business method of the function.
      */
-    static abstract class AbstractFunction implements Function<String,String>, Helper<Object> {
+    static abstract class AbstractFunction implements Helper<Object> {
+    }
+
+    /**
+     * This class provides basic features for functions without options (parameters).
+     * This kind of function only has a name (the function name) and one input which is the text from the template.
+     */
+    static abstract class AbstractSimpleFunction extends AbstractFunction{
         /**
          * {@inheritDoc}}
          */
         @Override
         public Object apply(Object context, Options options)
             throws IOException {
-            // The docs are poorly documented by all examples show that options.fn(this) is the only way to have the block resolved
+            // The docs are poorly documented by all examples show that options.fn(this)
+            // is the only way to have the block resolved
             return (Objects.isNull(options) ? "" : apply(options.fn(this).toString()));
         }
+
+
+        public abstract String apply(String input);
     }
 
     /**
      * This function returns the lower case representation of the input string.
      */
-    public static class Lower extends AbstractFunction {
+    public static class Lower extends AbstractSimpleFunction {
         /**
          * The name to use for this function.
          */
@@ -136,6 +146,7 @@ class Functions {
          * 
          * @return the lower case representation of the input string.
          */ 
+        @Override
         public String apply(String input) {
             if (Objects.isNull(input))
                 return "";
@@ -147,7 +158,7 @@ class Functions {
     /**
      * This function returns the trimmed case representation of the input string.
      */
-    public static class Trim extends AbstractFunction {
+    public static class Trim extends AbstractSimpleFunction {
         /**
          * The name to use for this function.
          */
@@ -159,7 +170,8 @@ class Functions {
          * @param input the input string. If {@code null} an empty string is returned.
          * 
          * @return the trimmed case representation of the input string.
-         */ 
+         */
+        @Override
         public String apply(String input) {
             if (Objects.isNull(input))
                 return "";
@@ -171,7 +183,7 @@ class Functions {
     /**
      * This function returns the upper case representation of the input string.
      */
-    public static class Upper extends AbstractFunction {
+    public static class Upper extends AbstractSimpleFunction {
         /**
          * The name to use for this function.
          */
@@ -183,7 +195,8 @@ class Functions {
          * @param input the input string. If {@code null} an empty string is returned.
          * 
          * @return the upper case representation of the input string.
-         */ 
+         */
+        @Override
         public String apply(String input) {
             if (Objects.isNull(input))
                 return "";
@@ -196,7 +209,7 @@ class Functions {
      * This function returns the input string with everything from the first occurrence of a character other
      * than letters and positive digits discarded.
      */
-    public static class First extends AbstractFunction {
+    public static class First extends AbstractSimpleFunction {
         /**
          * The name to use for this function.
          */
@@ -210,7 +223,8 @@ class Functions {
          * 
          * @return the input string with everything from the first occurrence of a character other
          * than letters and positive digits discarded.
-         */ 
+         */
+        @Override
         public String apply(String input) {
             if (Objects.isNull(input))
                 return "";
@@ -224,7 +238,7 @@ class Functions {
      * This function returns the input string with everything from the first occurrence of a character other
      * than letters and positive digits discarded and the remainder transformed to lower case.
      */
-    public static class FirstLower extends AbstractFunction {
+    public static class FirstLower extends AbstractSimpleFunction {
         /**
          * The name to use for this function.
          */
@@ -238,7 +252,8 @@ class Functions {
          * 
          * @return the input string with everything other than letters and positive digits discarded
          * and the remainder transformed to lower case.
-         */ 
+         */
+        @Override
         public String apply(String input) {
             if (Objects.isNull(input))
                 return "";
@@ -251,7 +266,7 @@ class Functions {
      * This function returns the input string with everything from the first occurrence of a character other
      * than letters and positive digits discarded and the remainder transformed to upper case.
      */
-    public static class FirstUpper extends AbstractFunction {
+    public static class FirstUpper extends AbstractSimpleFunction {
         /**
          * The name to use for this function.
          */
@@ -265,7 +280,8 @@ class Functions {
          * 
          * @return the input string with everything other than letters and positive digits discarded
          * and the remainder transformed to upper case.
-         */ 
+         */
+        @Override
         public String apply(String input) {
             if (Objects.isNull(input))
                 return "";
@@ -278,7 +294,7 @@ class Functions {
      * This function returns the last part of the input string that does not contains characters other than
      * letters and positive digits.
      */
-    public static class Last extends AbstractFunction {
+    public static class Last extends AbstractSimpleFunction {
         /**
          * The name to use for this function.
          */
@@ -292,7 +308,8 @@ class Functions {
          * 
          * @return the last part of the input string that does not contains characters other than.
          * letters and positive digits.
-         */ 
+         */
+        @Override
         public String apply(String input) {
             if (Objects.isNull(input))
                 return "";
@@ -306,7 +323,7 @@ class Functions {
      * This function returns the last part of the input string that does not contains characters other than
      * letters and positive digits and the remainder transformed to lower case.
      */
-    public static class LastLower extends AbstractFunction {
+    public static class LastLower extends AbstractSimpleFunction {
         /**
          * The name to use for this function.
          */
@@ -320,7 +337,8 @@ class Functions {
          * 
          * @return the last part of the input string that does not contains characters other than
          * letters and positive digits and the remainder transformed to lower case.
-         */ 
+         */
+        @Override
         public String apply(String input) {
             if (Objects.isNull(input))
                 return "";
@@ -333,7 +351,7 @@ class Functions {
      * This function returns the last part of the input string that does not contains characters other than
      * letters and positive digits and the remainder transformed to upper case.
      */
-    public static class LastUpper extends AbstractFunction {
+    public static class LastUpper extends AbstractSimpleFunction {
         /**
          * The name to use for this function.
          */
@@ -347,7 +365,8 @@ class Functions {
          * 
          * @return the last part of the input string that does not contains characters other than
          * letters and positive digits and the remainder transformed to upper case.
-         */ 
+         */
+        @Override
         public String apply(String input) {
             if (Objects.isNull(input))
                 return "";
@@ -359,7 +378,7 @@ class Functions {
     /**
      * This function returns the input string with everything other than letters and positive digits discarded.
      */
-    public static class Sanitize extends AbstractFunction {
+    public static class Sanitize extends AbstractSimpleFunction {
         /**
          * The name to use for this function.
          */
@@ -371,7 +390,8 @@ class Functions {
          * @param input the input string. If {@code null} an empty string is returned.
          * 
          * @return the input string with everything other than letters and positive digits discarded.
-         */ 
+         */
+        @Override
         public String apply(String input) {
             if (Objects.isNull(input))
                 return "";
@@ -384,7 +404,7 @@ class Functions {
      * This function returns the input string with everything other than letters and positive digits discarded
      * and the remainder transformed to lower case.
      */
-    public static class SanitizeLower extends AbstractFunction {
+    public static class SanitizeLower extends AbstractSimpleFunction {
         /**
          * The name to use for this function.
          */
@@ -398,7 +418,8 @@ class Functions {
          * 
          * @return the input string with everything other than letters and positive digits discarded
          * and the remainder transformed to lower case.
-         */ 
+         */
+        @Override
         public String apply(String input) {
             if (Objects.isNull(input))
                 return "";
@@ -411,7 +432,7 @@ class Functions {
      * This function returns the input string with everything other than letters and positive digits discarded
      * and the remainder transformed to upper case.
      */
-    public static class SanitizeUpper extends AbstractFunction {
+    public static class SanitizeUpper extends AbstractSimpleFunction {
         /**
          * The name to use for this function.
          */
@@ -425,7 +446,8 @@ class Functions {
          * 
          * @return the input string with everything other than letters and positive digits discarded
          * and the remainder transformed to upper case.
-         */ 
+         */
+        @Override
         public String apply(String input) {
             if (Objects.isNull(input))
                 return "";
@@ -438,7 +460,7 @@ class Functions {
      * This function returns the first 5 characters of the input string, if it's longer than 5 characters,
      * otherwise returns the input string.
      */
-    public static class Short5 extends AbstractFunction {
+    public static class Short5 extends AbstractSimpleFunction {
         /**
          * The name to use for this function.
          */
@@ -452,7 +474,8 @@ class Functions {
          * 
          * @return the first 5 characters of the input string, if it's longer than 5 characters,
          * otherwise returns the input string.
-         */ 
+         */
+        @Override
         public String apply(String input) {
             if (Objects.isNull(input))
                 return "";
@@ -465,7 +488,7 @@ class Functions {
      * This function returns the first 6 characters of the input string, if it's longer than 6 characters,
      * otherwise returns the input string.
      */
-    public static class Short6 extends AbstractFunction {
+    public static class Short6 extends AbstractSimpleFunction {
         /**
          * The name to use for this function.
          */
@@ -479,7 +502,8 @@ class Functions {
          * 
          * @return the first 6 characters of the input string, if it's longer than 6 characters,
          * otherwise returns the input string.
-         */ 
+         */
+        @Override
         public String apply(String input) {
             if (Objects.isNull(input))
                 return "";
@@ -492,7 +516,7 @@ class Functions {
      * This function returns the first 7 characters of the input string, if it's longer than 7 characters,
      * otherwise returns the input string.
      */
-    public static class Short7 extends AbstractFunction {
+    public static class Short7 extends AbstractSimpleFunction {
         /**
          * The name to use for this function.
          */
@@ -506,7 +530,8 @@ class Functions {
          * 
          * @return the first 7 characters of the input string, if it's longer than 7 characters,
          * otherwise returns the input string.
-         */ 
+         */
+        @Override
         public String apply(String input) {
             if (Objects.isNull(input))
                 return "";
@@ -520,7 +545,7 @@ class Functions {
      * <a href="https://www.unixtimestamp.com/">unix format</a> and returns it formatted as
      * <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO 8601</a> UTC timestamp.
      */
-    public static class TimestampISO8601 extends AbstractFunction {
+    public static class TimestampISO8601 extends AbstractSimpleFunction {
         /**
          * The name to use for this function.
          */
@@ -537,7 +562,8 @@ class Functions {
          * 
          * @return the ISO 8601 representation of the input timestamp, or an empty string if parsing the input
          * fails for any reson.
-         */ 
+         */
+        @Override
         public String apply(String input) {
             if (Objects.isNull(input))
                 return "";
@@ -560,7 +586,7 @@ class Functions {
      * <a href="https://www.unixtimestamp.com/">unix format</a> and returns it formatted as
      * {@code YYYYMMDDHHMMSS} UTC.
      */
-    public static class TimestampYYYYMMDDHHMMSS extends AbstractFunction {
+    public static class TimestampYYYYMMDDHHMMSS extends AbstractSimpleFunction {
         /**
          * The name to use for this function.
          */
@@ -577,7 +603,8 @@ class Functions {
          * 
          * @return the ISO 8601 representation of the input timestamp, or an empty string if parsing the input
          * fails for any reson.
-         */ 
+         */
+        @Override
         public String apply(String input) {
             if (Objects.isNull(input))
                 return "";
@@ -598,7 +625,7 @@ class Functions {
     /**
      * This function returns the value of the environment variable with the given name, if any.
      */
-    public static class EnvironmentVariable extends AbstractFunction {
+    public static class EnvironmentVariable extends AbstractSimpleFunction {
         /**
          * The name to use for this function.
          */
@@ -610,7 +637,8 @@ class Functions {
          * @param name the name of the requested variable. If {@code null} an empty string is returned.
          * 
          * @return the value of the environment variable with the given name, if any.
-         */ 
+         */
+        @Override
         public String apply(String name) {
             if (Objects.isNull(name))
                 return "";
@@ -623,7 +651,7 @@ class Functions {
     /**
      * This function returns the current user name. The input parameter is ignored.
      */
-    public static class EnvironmentUser extends AbstractFunction {
+    public static class EnvironmentUser extends AbstractSimpleFunction {
         /**
          * The name to use for this function.
          */
@@ -635,7 +663,8 @@ class Functions {
          * @param name ignored.
          * 
          * @return the current user name.
-         */ 
+         */
+        @Override
         public String apply(String name) {
             return System.getProperty("user.name");
         }
@@ -644,7 +673,7 @@ class Functions {
     /**
      * This function returns the content of the given file, if any.
      */
-    public static class FileContent extends AbstractFunction {
+    public static class FileContent extends AbstractSimpleFunction {
         /**
          * The name to use for this function.
          */
@@ -657,7 +686,8 @@ class Functions {
          * against the system current directory (configured directories are ignored here).
          * 
          * @return the content of the given file, if any.
-         */ 
+         */
+        @Override
         public String apply(String path) {
             if (Objects.isNull(path))
                 return "";
@@ -683,7 +713,7 @@ class Functions {
     /**
      * This function returns {@code true} if the file with the given name exists, {@code false} otherwise.
      */
-    public static class FileExists extends AbstractFunction {
+    public static class FileExists extends AbstractSimpleFunction {
         /**
          * The name to use for this function.
          */
@@ -696,7 +726,8 @@ class Functions {
          * current directory (configured directories are ignored here).
          * 
          * @return {@code true} if the file with the given name exists, {@code false} otherwise.
-         */ 
+         */
+        @Override
         public String apply(String path) {
             if (Objects.isNull(path))
                 return Boolean.FALSE.toString();
