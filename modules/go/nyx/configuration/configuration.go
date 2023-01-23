@@ -111,12 +111,15 @@ Initializes the internal array of layers.
 The only layers that are initialized (so non nil) are the default one and the environment variables layer.
 */
 func (c *Configuration) initializeStandardConfigurationLayers() {
+	log.Debugf("initializing the default configuration layer")
 	var dl ConfigurationLayer = GetDefaultLayerInstance()
 	c.layers[DEFAULT] = &dl
 
+	log.Debugf("initializing the environment configuration layer")
 	var ecl ConfigurationLayer = GetEnvironmentConfigurationLayerInstance()
 	c.layers[ENVIRONMENT] = &ecl
 
+	log.Debugf("initializing the command line configuration layer")
 	var clcl ConfigurationLayer = GetCommandLineConfigurationLayerInstance()
 	c.layers[COMMAND_LINE] = &clcl
 }
@@ -199,11 +202,9 @@ func (c *Configuration) loadStandardConfigurationFileLayers() error {
 			log.Debugf("standard shared configuration file '%s' not found.", file)
 		}
 	}
-	if c.layers[STANDARD_LOCAL_FILE] != nil || c.layers[STANDARD_SHARED_FILE] != nil {
-		err := c.updateConfiguredConfigurationLayers()
-		if err != nil {
-			return err
-		}
+	err := c.updateConfiguredConfigurationLayers()
+	if err != nil {
+		return err
 	}
 
 	return nil

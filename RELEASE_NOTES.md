@@ -22,6 +22,24 @@ There are no fixes in this release.
 
 There are no known issues in this release.
 
+## 1.3.2
+
+This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/1.3.2).
+
+### Upgrade instructions
+
+There are no actions to take for backward compatibility.
+
+### New features and improvements
+
+There are no new features or improvements in this release.
+
+### Fixed issues
+
+This release:
+
+* fixes bug [#132](https://github.com/mooltiverse/nyx/issues/132) about the preset configuration layer not being loaded unless configuration files are provided (Go)
+
 ## 1.3.1
 
 This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/1.3.1).
