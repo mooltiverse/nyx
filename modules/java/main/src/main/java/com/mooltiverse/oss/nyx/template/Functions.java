@@ -8,8 +8,6 @@ import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.time.ZoneOffset;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
@@ -30,38 +28,6 @@ class Functions {
      * The private logger instance
      */
     private static final Logger logger = LoggerFactory.getLogger(Functions.class);
-
-    /**
-     * The map of all available helpers, where keys are function names to be used in various contexts,
-     * and values are function implementations.
-     */
-    public static Map<String,Helper<Object>> FUNCTIONS = new HashMap<String,Helper<Object>>(){
-        {
-            put(Lower.NAME,                   new Lower());
-            put(Upper.NAME,                   new Upper());
-            put(Trim.NAME,                    new Trim());
-            put(First.NAME,                   new First());
-            put(FirstLower.NAME,              new FirstLower());
-            put(FirstUpper.NAME,              new FirstUpper());
-            put(Last.NAME,                    new Last());
-            put(LastLower.NAME,               new LastLower());
-            put(LastUpper.NAME,               new LastUpper());
-            put(Sanitize.NAME,                new Sanitize());
-            put(SanitizeLower.NAME,           new SanitizeLower());
-            put(SanitizeUpper.NAME,           new SanitizeUpper());
-            put(Short5.NAME,                  new Short5());
-            put(Short6.NAME,                  new Short6());
-            put(Short7.NAME,                  new Short7());
-            put(TimestampISO8601.NAME,        new TimestampISO8601());
-            put(TimestampYYYYMMDDHHMMSS.NAME, new TimestampYYYYMMDDHHMMSS());
-
-            put(EnvironmentUser.NAME,         new EnvironmentUser());
-            put(EnvironmentVariable.NAME,     new EnvironmentVariable());
-
-            put(FileContent.NAME,             new FileContent());
-            put(FileExists.NAME,              new FileExists());
-        }
-    };
 
     /**
      * Default constructor is private on purpose.
