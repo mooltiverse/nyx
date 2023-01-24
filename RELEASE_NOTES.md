@@ -31,8 +31,6 @@ There are no fixes in this release.
 
 There are no known issues in this release.
 
-There are no known issues in this release.
-
 ## 1.3.3
 
 This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/1.3.3).
@@ -51,6 +49,10 @@ This release:
 
 * fixes bug [#130](https://github.com/mooltiverse/nyx/issues/130) about Git repository status being wrongly detected in some circumstances; a workaround has been applied using the local `git` executable (if available in the local `PATH`) (Go)
 
+### Known issues
+
+There are no known issues in this release.
+
 ## 1.3.2
 
 This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/1.3.2).
@@ -68,6 +70,10 @@ There are no new features or improvements in this release.
 This release:
 
 * fixes bug [#132](https://github.com/mooltiverse/nyx/issues/132) about the preset configuration layer not being loaded unless configuration files are provided (Go)
+
+### Known issues
+
+There are no known issues in this release.
 
 ## 1.3.1
 
@@ -88,6 +94,8 @@ This release:
 * fixes bug [#131](https://github.com/mooltiverse/nyx/issues/131) about wrong dates and timestamps in generated changelogs and versions (Go)
 
 ### Known issues
+
+There are no known issues in this release.
 
 ## 1.3.0
 
