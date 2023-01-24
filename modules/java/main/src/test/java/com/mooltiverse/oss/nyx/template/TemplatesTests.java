@@ -496,4 +496,15 @@ public class TemplatesTests {
             assertEquals(TEMPLATE_OUTPUT, output.toString());
         }
     }
+
+    @Nested
+    @DisplayName("Templates.render with nested functions")
+    class RenderWithNestedFunctionsTests {
+        @Test
+        @DisplayName("Templates.render(String, Object)")
+        void renderWithMockTest1()
+            throws Exception {
+            assertEquals("7B9DA5286D4724DD7385", Templates.render("{{#upper}}{{#cutRight length=\"20\"}}7b9da5286d4724dd7385bb80639a08841fa26606{{/cutRight}}{{/upper}}", null));
+        }
+    }
 }

@@ -79,6 +79,12 @@ Here `upper` is a function accepting one parameter (`attribute`) and returning t
 The underlying [Handlebars](https://handlebarsjs.com/) template engine also provides an powerful set of built-in functions to handle conditionals, loops, lookups and log messages. Those functions (a.k.a. *helpers*) can be freely used in templates but they are not officially supported by Nyx. For more on those helpers see [Built-in Helpers](https://handlebarsjs.com/guide/builtin-helpers.html).
 {: .notice--info}
 
+Functions can be nested for combined output. This example is valid and shows how to take the first 20 characters from the given `{{ attribute }}` and transform it to upper case:
+
+```
+option = "{% raw %}{{#upper}}{{#cutRight length="20"}}{{ attribute }}{{/cutRight}}{{/upper}}{% endraw %}"
+```
+
 ### The functions library
 
 #### `lower`

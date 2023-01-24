@@ -310,3 +310,12 @@ func TestTemplatesRenderWithMock(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, TEMPLATE_WITH_MOCK_SCOPE_OUTPUT, output)
 }
+
+/*
+Render with nested functions
+*/
+func TestTemplatesRenderWithNestedFunctions(t *testing.T) {
+	output, err := Render("{{#upper}}{{#cutRight length=\"20\"}}7b9da5286d4724dd7385bb80639a08841fa26606{{/cutRight}}{{/upper}}", nil)
+	assert.NoError(t, err)
+	assert.Equal(t, "7B9DA5286D4724DD7385", output)
+}
