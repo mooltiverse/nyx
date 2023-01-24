@@ -180,7 +180,7 @@ func clone(directory *string, uri *string) (goGitRepository, error) {
 		return goGitRepository{}, &errs.GitError{Message: fmt.Sprintf("unable to clone the '%s' repository into '%s'", *uri, *directory), Cause: err}
 	}
 
-	return newGoGitRepository(repository)
+	return newGoGitRepository(*directory, repository)
 }
 
 /*
@@ -232,7 +232,7 @@ func cloneWithUserNameAndPassword(directory *string, uri *string, user *string, 
 		return goGitRepository{}, &errs.GitError{Message: fmt.Sprintf("unable to clone the '%s' repository into '%s'", *uri, *directory), Cause: err}
 	}
 
-	return newGoGitRepository(repository)
+	return newGoGitRepository(*directory, repository)
 }
 
 /*
