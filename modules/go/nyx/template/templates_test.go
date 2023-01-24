@@ -259,6 +259,21 @@ func TestTemplatesRenderFileExists(t *testing.T) {
 	assert.Equal(t, "true", output)
 }
 
+func TestTemplatesRenderCutLeft(t *testing.T) {
+	output, _ := Render("{{#cutLeft length=\"3\"}}1234567890{{/cutLeft}}", nil)
+	assert.Equal(t, "890", output)
+}
+
+func TestTemplatesRenderCutRight(t *testing.T) {
+	output, _ := Render("{{#cutRight length=\"3\"}}1234567890{{/cutRight}}", nil)
+	assert.Equal(t, "123", output)
+}
+
+func TestTemplatesRenderTimestamp(t *testing.T) {
+	output, _ := Render("{{#timestamp format=\"20060102\"}}1577880000000{{/timestamp}}", nil)
+	assert.Equal(t, "20200101", output)
+}
+
 /*
 Render with nil scope
 */

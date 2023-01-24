@@ -280,6 +280,38 @@ Example inputs and corresponding outputs:
 | `12345`                    | `12345`                    |
 | `feature/XX-12345`         | `FEATUREXX12345`           |
 
+#### `cutLeft`
+
+Returns only the last N characters of the input, where N is an arbitrary positive integer represented by the `length` option. If the input is shorter than N characters it's returned untouched. This is often useful to shorten SHAs. Example:
+
+```
+output = "{% raw %}{{#cutLeft length="3"}}{{input}}{{/cutLeft}}{% endraw %}"
+```
+
+Example inputs and corresponding outputs:
+
+| Input                                      | Options    | Output     |
+| ------------------------------------------ | ---------- | ---------- |
+| `7b9da5286d4724dd7385bb80639a08841fa26606` | `length=3` | `606`      |
+| `7b9da`                                    | `length=3` | `9da`      |
+| `7b`                                       | `length=3` | `7b`       |
+
+#### `cutRight`
+
+Returns only the first N characters of the input, where N is an arbitrary positive integer represented by the `length` option. If the input is shorter than N characters it's returned untouched. This is often useful to shorten SHAs. Example:
+
+```
+output = "{% raw %}{{#cutRight length="3"}}{{input}}{{/cutRight}}{% endraw %}"
+```
+
+Example inputs and corresponding outputs:
+
+| Input                                      | Options    | Output      |
+| ------------------------------------------ | ---------- | ----------- |
+| `7b9da5286d4724dd7385bb80639a08841fa26606` | `length=3` | `7b9`       |
+| `7b9da`                                    | `length=3` | `7b9`       |
+| `7b`                                       | `length=3` | `7b`        |
+
 #### `short5`
 
 Returns only the first 5 characters of the input. If the input is shorter than 5 characters it's returned untouched. This is often useful to shorten SHAs. Example:
@@ -290,11 +322,13 @@ output = "{% raw %}{{#short5}}{{input}}{{/short5}}{% endraw %}"
 
 Example inputs and corresponding outputs:
 
-| Input                      | Output                     |
-| -------------------------- | -------------------------- |
+| Input                                      | Output     |
+| ------------------------------------------ | ---------- |
 | `7b9da5286d4724dd7385bb80639a08841fa26606` | `7b9da`    |
 | `7b9da`                                    | `7b9da`    |
 | `7b`                                       | `7b`       |
+
+For arbitrary length strings see [`cutLeft`](#cutleft) and [`cutRight`](#cutright).
 
 #### `short6`
 
@@ -306,11 +340,13 @@ output = "{% raw %}{{#short6}}{{input}}{{/short6}}{% endraw %}"
 
 Example inputs and corresponding outputs:
 
-| Input                      | Output                     |
-| -------------------------- | -------------------------- |
+| Input                                      | Output     |
+| ------------------------------------------ | ---------- |
 | `7b9da5286d4724dd7385bb80639a08841fa26606` | `7b9da5`   |
 | `7b9da5`                                   | `7b9da5`   |
 | `7b`                                       | `7b`       |
+
+For arbitrary length strings see [`cutLeft`](#cutleft) and [`cutRight`](#cutright).
 
 #### `short7`
 
@@ -322,11 +358,45 @@ output = "{% raw %}{{#short7}}{{input}}{{/short7}}{% endraw %}"
 
 Example inputs and corresponding outputs:
 
-| Input                      | Output                     |
-| -------------------------- | -------------------------- |
+| Input                                      | Output     |
+| ------------------------------------------ | ---------- |
 | `7b9da5286d4724dd7385bb80639a08841fa26606` | `7b9da52`  |
 | `7b9da52`                                  | `7b9da52`  |
 | `7b`                                       | `7b`       |
+
+For arbitrary length strings see [`cutLeft`](#cutleft) and [`cutRight`](#cutright).
+
+
+#### `timestamp`
+
+Returns a timestamp formatted according to the given format string.
+
+The value for the timestamp is the current system time in milliseconds since January 1, 1970, 00:00:00 GMT unless a value is provided.
+
+The returned string is the timestamp as an integer value unless the `format` option is passed with a valid format string.
+
+Since the underlying frameworks have different behaviors, the output from this function may not be consistent between the command line version (written in Go) and the Gradle version (written in Java). The format string passd in the `format` option also depends on the implementation. Please see [here](https://docs.oracle.com/en/java/javase/15/docs/api/java.base/java/text/SimpleDateFormat.html) for the available patterns available in Java and [here](https://pkg.go.dev/time#example-Time.Format) and [here](https://pkg.go.dev/time#pkg-constants) for those available in Go. Moreover, when invalid patterns are passed in the `format` option, the behavior is different between the two implementations: the Java implementation returns and empty string (and logs an error), while the Go implementation just returns the plain value passed in the `format` option. For consistent behavior functions see [`timestampISO8601`](#timestampISO8601) and [`timestampYYYYMMDDHHMMSS`](#timestampYYYYMMDDHHMMSS).
+{: .notice--warning}
+
+Example inputs and corresponding outputs:
+
+```
+output = "{% raw %}{{#timestamp}}{{/timestamp}}{% endraw %}"
+output = "{% raw %}{{#timestamp}}{{timestamp}}{{/timestamp}}{% endraw %}"
+output = "{% raw %}{{#timestamp format="yyyyMMdd"}}{{/timestamp}}{% endraw %}"
+output = "{% raw %}{{#timestamp format="yyyyMMdd"}}{{timestamp}}{{/timestamp}}{% endraw %}"
+output = "{% raw %}{{#timestamp format="20060102"}}{{/timestamp}}{% endraw %}"
+output = "{% raw %}{{#timestamp format="20060102"}}{{timestamp}}{{/timestamp}}{% endraw %}"
+```
+
+Example inputs and corresponding outputs:
+
+| Input                                      | Options                                | Output                |
+| ------------------------------------------ | -------------------------------------- | --------------------- |
+|                                            |                                        | `1577880000000`       |
+|                                            | `format=yyyyMMdd` or `format=yyyyMMdd` | `20200101`            |
+| `1577880000000`                            |                                        | `1577880000000`       |
+| `1577880000000`                            | `format=yyyyMMdd` or `format=yyyyMMdd` | `20200101`            |
 
 #### `timestampISO8601`
 
@@ -340,8 +410,9 @@ Example inputs and corresponding outputs:
 
 | Input                      | Output                     |
 | -------------------------- | -------------------------- |
-| `1608210396 `              | `2020-12-17T13:06:36`      |
+| `1608210396`               | `2020-12-17T13:06:36`      |
 
+For arbitrary timestamp formats see [`timestamp`](#timestamp).
 
 #### `timestampYYYYMMDDHHMMSS`
 
@@ -356,6 +427,8 @@ Example inputs and corresponding outputs:
 | Input                      | Output                     |
 | -------------------------- | -------------------------- |
 | `1608210396 `              | `20201217130636`           |
+
+For arbitrary timestamp formats see [`timestamp`](#timestamp).
 
 #### `environmentUser`
 

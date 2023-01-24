@@ -8,6 +8,7 @@ import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.time.ZoneOffset;
 import java.util.Date;
+import java.util.Map;
 import java.util.Objects;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
@@ -65,6 +66,10 @@ class Functions {
 
         registry.registerHelper(FileContent.NAME,             new FileContent());
         registry.registerHelper(FileExists.NAME,              new FileExists());
+
+        registry.registerHelper(CutLeft.NAME,                 new CutLeft());
+        registry.registerHelper(CutRight.NAME,                new CutRight());
+        registry.registerHelper(Timestamp.NAME,               new Timestamp());
     }
 
     /**
@@ -77,12 +82,41 @@ class Functions {
     }
 
     /**
+     * This class provides basic features for functions with options (parameters).
+     * This kind of function has a name (the function name), one input which is the text from the template,
+     * and one or more parameters.
+     */
+    static abstract class AbstractParametricFunction extends AbstractFunction {
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Object apply(Object context, Options options)
+            throws IOException {
+            // The docs are poorly documented by all examples show that options.fn(this)
+            // is the only way to have the block resolved
+            return (Objects.isNull(options) ? "" : apply(options.fn(this).toString(), options.hash));
+        }
+
+        /**
+         * This method must be implemented by subclasses and will return the function specific output,
+         * provided the input and options.
+         * 
+         * @param input the function input
+         * @param options the function options
+         * 
+         * @return the function output
+         */
+        public abstract String apply(String input, Map<String,Object> options);
+    }
+
+    /**
      * This class provides basic features for functions without options (parameters).
      * This kind of function only has a name (the function name) and one input which is the text from the template.
      */
-    static abstract class AbstractSimpleFunction extends AbstractFunction{
+    static abstract class AbstractSimpleFunction extends AbstractFunction {
         /**
-         * {@inheritDoc}}
+         * {@inheritDoc}
          */
         @Override
         public Object apply(Object context, Options options)
@@ -92,7 +126,14 @@ class Functions {
             return (Objects.isNull(options) ? "" : apply(options.fn(this).toString()));
         }
 
-
+        /**
+         * This method must be implemented by subclasses and will return the function specific output,
+         * provided the input.
+         * 
+         * @param input the function input
+         * 
+         * @return the function output
+         */
         public abstract String apply(String input);
     }
 
@@ -434,7 +475,7 @@ class Functions {
 
         /**
          * This method returns the first 5 characters of the input string, if it's longer than 5 characters,
-         * otherwise returns the input string or the empty string if the input is {code null}.
+         * otherwise returns the input string or the empty string if the input is {@code null}.
          * 
          * @param input the input string. If {@code null} an empty string is returned.
          * 
@@ -462,7 +503,7 @@ class Functions {
 
         /**
          * This method returns the first 6 characters of the input string, if it's longer than 6 characters,
-         * otherwise returns the input string or the empty string if the input is {code null}.
+         * otherwise returns the input string or the empty string if the input is {@code null}.
          * 
          * @param input the input string. If {@code null} an empty string is returned.
          * 
@@ -490,7 +531,7 @@ class Functions {
 
         /**
          * This method returns the first 7 characters of the input string, if it's longer than 7 characters,
-         * otherwise returns the input string or the empty string if the input is {code null}.
+         * otherwise returns the input string or the empty string if the input is {@code null}.
          * 
          * @param input the input string. If {@code null} an empty string is returned.
          * 
@@ -701,6 +742,152 @@ class Functions {
             java.io.File f = new java.io.File(path);
             logger.trace(TEMPLATE, "Checking whether file '{}' ('{}') exists", path, f.getAbsolutePath());
             return Boolean.toString(f.exists() && f.isFile());
+        }
+    }
+
+    /**
+     * This function returns the last {@code N} characters of the input string, where {@code N} is the {@code length} option.
+     * If the input string is shorter or the same length than the parameter, the whole input string is returned unchanged.
+     * If the input is {@code null} an empty string is returned.
+     */
+    public static class CutLeft extends AbstractParametricFunction {
+        /**
+         * The name to use for this function.
+         */
+        public static final String NAME = "cutLeft";
+
+        /**
+         * This method returns the last {@code N} characters of the input string, where {@code N} is the {@code length} option.
+         * If the input string is shorter or the same length than the parameter, the whole input string is returned unchanged.
+         * If the input is {@code null} an empty string is returned.
+         * 
+         * @param input the function input
+         * @param options the function options, where the option named {@code length} determines the maximum length of the
+         * returned string. If there is no such option the same string given as input is returned
+         * 
+         * @return the function output
+         */
+        @Override
+        public String apply(String input, Map<String,Object> options) {
+            if (Objects.isNull(input))
+                return "";
+            if (options.containsKey("length")) {
+                String optionString = options.get("length").toString();
+                int length = 0;
+                try {
+                    length = Integer.valueOf(optionString).intValue();
+                }
+                catch (NumberFormatException nfe) {
+                    logger.error(TEMPLATE, "The '{}' option value '{}' for the '{}' function is not a valid integer", "length", optionString, NAME);
+                    return input;
+                }
+                if (length < 0) {
+                    logger.error(TEMPLATE, "The '{}' option value '{}' for the '{}' function cannot be negative", "length", optionString, NAME);
+                    return input;
+                }
+                return input.length() > length ? input.substring(input.length()-length, input.length()) : input;
+            }
+            else return input;
+        }
+    }
+
+    /**
+     * This function returns the first {@code N} characters of the input string, where {@code N} is the {@code length} option.
+     * If the input string is shorter or the same length than the parameter, the whole input string is returned unchanged.
+     * If the input is {@code null} an empty string is returned.
+     */
+    public static class CutRight extends AbstractParametricFunction {
+        /**
+         * The name to use for this function.
+         */
+        public static final String NAME = "cutRight";
+
+        /**
+         * This method returns the first {@code N} characters of the input string, where {@code N} is the {@code length} option.
+         * If the input string is shorter or the same length than the parameter, the whole input string is returned unchanged.
+         * If the input is {@code null} an empty string is returned.
+         * 
+         * @param input the function input
+         * @param options the function options, where the option named {@code length} determines the maximum length of the
+         * returned string. If there is no such option the same string given as input is returned
+         * 
+         * @return the function output
+         */
+        @Override
+        public String apply(String input, Map<String,Object> options) {
+            if (Objects.isNull(input))
+                return "";
+            if (options.containsKey("length")) {
+                String optionString = options.get("length").toString();
+                int length = 0;
+                try {
+                    length = Integer.valueOf(optionString).intValue();
+                }
+                catch (NumberFormatException nfe) {
+                    logger.error(TEMPLATE, "The '{}' option value '{}' for the '{}' function is not a valid integer", "length", optionString, NAME);
+                    return input;
+                }
+                if (length < 0) {
+                    logger.error(TEMPLATE, "The '{}' option value '{}' for the '{}' function cannot be negative", "length", optionString, NAME);
+                    return input;
+                }
+                return input.length() > length ? input.substring(0, length) : input;
+            }
+            else return input;
+        }
+    }
+
+    /**
+     * This function returns a time value (expressed in milliseconds) and is also able to format it according to an optional
+     * format string.
+     */
+    public static class Timestamp extends AbstractParametricFunction {
+        /**
+         * The name to use for this function.
+         */
+        public static final String NAME = "timestamp";
+
+        /**
+         * This method returns returns a time value (expressed in milliseconds) and is also able to format it according to an optional
+         * format string.
+         * 
+         * @param input the function input. This must be a long value representing a timestamp in milliseconds
+         * since January 1, 1970, 00:00:00 GMT. If this value is not provided, the system current timestamp is used.
+         * @param options the function options, where the option named {@code format} determines the string representation of the timestamp
+         * 
+         * @return the function output
+         */
+        @Override
+        public String apply(String input, Map<String,Object> options) {
+            long currentTime = System.currentTimeMillis();
+            if ((!Objects.isNull(input)) && !input.isBlank()) {
+                try {
+                    currentTime = Long.valueOf(input).longValue();
+                }
+                catch (NumberFormatException nfe) {
+                    logger.error(TEMPLATE, "The value '{}' for the '{}' function is not a valid long", input, NAME);
+                    return "";
+                }
+                if (currentTime < 0) {
+                    logger.error(TEMPLATE, "The value '{}' for the '{}' function cannot be negative", input, NAME);
+                    return "";
+                }
+            }
+
+            if (options.containsKey("format")) {
+                String formatString = options.get("format").toString();
+                try {
+                    Date date = new Date(Long.valueOf(currentTime).longValue());
+                    SimpleDateFormat dateFormat = new SimpleDateFormat(formatString);
+                    dateFormat.setTimeZone(TimeZone.getTimeZone(ZoneOffset.UTC));
+                    return dateFormat.format(date);
+                }
+                catch (IllegalArgumentException iae) {
+                    logger.error(TEMPLATE, "String '{}' does not represent a valid date format string", formatString);
+                    return "";
+                }
+            }
+            else return Long.valueOf(currentTime).toString();
         }
     }
 }

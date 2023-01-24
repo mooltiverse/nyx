@@ -19,7 +19,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.text.SimpleDateFormat;
+import java.time.ZoneOffset;
+import java.util.Date;
+import java.util.Map;
 import java.util.Objects;
+import java.util.TimeZone;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -361,6 +366,121 @@ public class FunctionsTests {
             assertEquals("false", new Functions.FileExists().apply(null));
             assertEquals("false", new Functions.FileExists().apply("afilethatdoesnotexists"));
             assertEquals("true", new Functions.FileExists().apply(f.getAbsolutePath()));
+        }
+    }
+
+    @Nested
+    @DisplayName("Functions.cutLeft")
+    class CutLeftTests {
+        @Test
+        @DisplayName("Functions.cutLeft.apply()")
+        void applyTest()
+            throws Exception {
+            assertEquals("", new Functions.CutLeft().apply(null, Map.<String,Object>of()));
+            assertEquals("", new Functions.CutLeft().apply("", Map.<String,Object>of()));
+            assertEquals("", new Functions.CutLeft().apply("", Map.<String,Object>of("length", "3")));
+            assertEquals("", new Functions.CutLeft().apply("", Map.<String,Object>of("length", "0")));
+            assertEquals("", new Functions.CutLeft().apply("", Map.<String,Object>of("length", "-3")));
+            assertEquals("", new Functions.CutLeft().apply("", Map.<String,Object>of("length", "not a number")));
+            assertEquals("0", new Functions.CutLeft().apply("0", Map.<String,Object>of()));
+            assertEquals("0", new Functions.CutLeft().apply("0", Map.<String,Object>of("length", "3")));
+            assertEquals("", new Functions.CutLeft().apply("0", Map.<String,Object>of("length", "0")));
+            assertEquals("0", new Functions.CutLeft().apply("0", Map.<String,Object>of("length", "-3")));
+            assertEquals("0", new Functions.CutLeft().apply("0", Map.<String,Object>of("length", "not a number")));
+            assertEquals("01234", new Functions.CutLeft().apply("01234", Map.<String,Object>of()));
+            assertEquals("234", new Functions.CutLeft().apply("01234", Map.<String,Object>of("length", "3")));
+            assertEquals("", new Functions.CutLeft().apply("01234", Map.<String,Object>of("length", "0")));
+            assertEquals("01234", new Functions.CutLeft().apply("01234", Map.<String,Object>of("length", "-3")));
+            assertEquals("01234", new Functions.CutLeft().apply("01234", Map.<String,Object>of("length", "not a number")));
+            assertEquals("012345", new Functions.CutLeft().apply("012345", Map.<String,Object>of()));
+            assertEquals("345", new Functions.CutLeft().apply("012345", Map.<String,Object>of("length", "3")));
+            assertEquals("", new Functions.CutLeft().apply("012345", Map.<String,Object>of("length", "0")));
+            assertEquals("012345", new Functions.CutLeft().apply("012345", Map.<String,Object>of("length", "-3")));
+            assertEquals("012345", new Functions.CutLeft().apply("012345", Map.<String,Object>of("length", "not a number")));
+            assertEquals("0123456789", new Functions.CutLeft().apply("0123456789", Map.<String,Object>of()));
+            assertEquals("789", new Functions.CutLeft().apply("0123456789", Map.<String,Object>of("length", "3")));
+            assertEquals("", new Functions.CutLeft().apply("0123456789", Map.<String,Object>of("length", "0")));
+            assertEquals("0123456789", new Functions.CutLeft().apply("0123456789", Map.<String,Object>of("length", "-3")));
+            assertEquals("0123456789", new Functions.CutLeft().apply("0123456789", Map.<String,Object>of("length", "not a number")));
+        }
+    }
+
+    @Nested
+    @DisplayName("Functions.cutRight")
+    class CutRightTests {
+        @Test
+        @DisplayName("Functions.cutRight.apply()")
+        void applyTest()
+            throws Exception {
+            assertEquals("", new Functions.CutRight().apply(null, Map.<String,Object>of()));
+            assertEquals("", new Functions.CutRight().apply("", Map.<String,Object>of()));
+            assertEquals("", new Functions.CutRight().apply("", Map.<String,Object>of("length", "3")));
+            assertEquals("", new Functions.CutRight().apply("", Map.<String,Object>of("length", "0")));
+            assertEquals("", new Functions.CutRight().apply("", Map.<String,Object>of("length", "-3")));
+            assertEquals("", new Functions.CutRight().apply("", Map.<String,Object>of("length", "not a number")));
+            assertEquals("0", new Functions.CutRight().apply("0", Map.<String,Object>of()));
+            assertEquals("0", new Functions.CutRight().apply("0", Map.<String,Object>of("length", "3")));
+            assertEquals("", new Functions.CutRight().apply("0", Map.<String,Object>of("length", "0")));
+            assertEquals("0", new Functions.CutRight().apply("0", Map.<String,Object>of("length", "-3")));
+            assertEquals("0", new Functions.CutRight().apply("0", Map.<String,Object>of("length", "not a number")));
+            assertEquals("012", new Functions.CutRight().apply("012", Map.<String,Object>of()));
+            assertEquals("012", new Functions.CutRight().apply("012", Map.<String,Object>of("length", "3")));
+            assertEquals("", new Functions.CutRight().apply("012", Map.<String,Object>of("length", "0")));
+            assertEquals("012", new Functions.CutRight().apply("012", Map.<String,Object>of("length", "-3")));
+            assertEquals("012", new Functions.CutRight().apply("012", Map.<String,Object>of("length", "not a number")));
+            assertEquals("012345", new Functions.CutRight().apply("012345", Map.<String,Object>of()));
+            assertEquals("012", new Functions.CutRight().apply("012345", Map.<String,Object>of("length", "3")));
+            assertEquals("", new Functions.CutRight().apply("012345", Map.<String,Object>of("length", "0")));
+            assertEquals("012345", new Functions.CutRight().apply("012345", Map.<String,Object>of("length", "-3")));
+            assertEquals("012345", new Functions.CutRight().apply("012345", Map.<String,Object>of("length", "not a number")));
+            assertEquals("0123456789", new Functions.CutRight().apply("0123456789", Map.<String,Object>of()));
+            assertEquals("012", new Functions.CutRight().apply("0123456789", Map.<String,Object>of("length", "3")));
+            assertEquals("", new Functions.CutRight().apply("0123456789", Map.<String,Object>of("length", "0")));
+            assertEquals("0123456789", new Functions.CutRight().apply("0123456789", Map.<String,Object>of("length", "-3")));
+            assertEquals("0123456789", new Functions.CutRight().apply("0123456789", Map.<String,Object>of("length", "not a number")));
+        }
+    }
+
+    @Nested
+    @DisplayName("Functions.timestamp")
+    class TimeTests {
+        @Test
+        @DisplayName("Functions.timestamp.apply()")
+        void applyTest()
+            throws Exception {
+            // these are the baseline values to test against
+            long currentTime = System.currentTimeMillis();
+            String timeString = Long.valueOf(currentTime).toString();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+            dateFormat.setTimeZone(TimeZone.getTimeZone(ZoneOffset.UTC));
+            String dateToCompare = dateFormat.format(new Date(currentTime));
+
+            // for timestamps in long format (unformatted) we just test the first 10 characters to avoid false positives in these tests
+            assertTrue(new Functions.Timestamp().apply(null, Map.<String,Object>of()).startsWith(timeString.substring(0, 10)));
+            assertTrue(new Functions.Timestamp().apply("", Map.<String,Object>of()).startsWith(timeString.substring(0, 10)));
+            assertEquals("", new Functions.Timestamp().apply("", Map.<String,Object>of("format", "")));
+            assertEquals(dateToCompare, new Functions.Timestamp().apply("", Map.<String,Object>of("format", "yyyyMMdd")));
+            assertEquals("", new Functions.Timestamp().apply("", Map.<String,Object>of("format", "not a format")));
+
+            assertTrue(new Functions.Timestamp().apply("  ", Map.<String,Object>of()).startsWith(timeString.substring(0, 10)));
+            assertEquals("", new Functions.Timestamp().apply("  ", Map.<String,Object>of("format", "")));
+            assertEquals(dateToCompare, new Functions.Timestamp().apply("  ", Map.<String,Object>of("format", "yyyyMMdd")));
+            assertEquals("", new Functions.Timestamp().apply("  ", Map.<String,Object>of("format", "not a format")));
+
+            assertEquals("", new Functions.Timestamp().apply("not a number", Map.<String,Object>of()));
+            assertEquals("", new Functions.Timestamp().apply("not a number", Map.<String,Object>of("format", "")));
+            assertEquals("", new Functions.Timestamp().apply("not a number", Map.<String,Object>of("format", "yyyyMMdd")));
+            assertEquals("", new Functions.Timestamp().apply("not a number", Map.<String,Object>of("format", "not a format")));
+
+            assertEquals("0", new Functions.Timestamp().apply("0", Map.<String,Object>of()));
+            assertEquals("", new Functions.Timestamp().apply("0", Map.<String,Object>of("format", "")));
+            assertEquals("19700101", new Functions.Timestamp().apply("0", Map.<String,Object>of("format", "yyyyMMdd")));
+            assertEquals("", new Functions.Timestamp().apply("0", Map.<String,Object>of("format", "not a format")));
+
+            assertEquals("1577880000000", new Functions.Timestamp().apply("1577880000000", Map.<String,Object>of()));
+            assertEquals("", new Functions.Timestamp().apply("1577880000000", Map.<String,Object>of("format", "")));
+            assertEquals("20200101", new Functions.Timestamp().apply("1577880000000", Map.<String,Object>of("format", "yyyyMMdd")));
+            assertEquals("", new Functions.Timestamp().apply("1577880000000", Map.<String,Object>of("format", "not a format")));
         }
     }
 }

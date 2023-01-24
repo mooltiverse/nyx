@@ -388,6 +388,39 @@ public class TemplatesTests {
                 assertEquals("true", Templates.render("{{#fileExists}}"+savedFile.getAbsolutePath()+"{{/fileExists}}", null));
             }
         }
+
+        @Nested
+        @DisplayName("Templates.render CutLeft function")
+        class RenderCutLeftFunctionTests {
+            @Test
+            @DisplayName("Templates.render(String, null)")
+            void renderCutLeft()
+                throws Exception {
+                assertEquals("890", Templates.render("{{#cutLeft length=\"3\"}}1234567890{{/cutLeft}}", null));
+            }
+        }
+
+        @Nested
+        @DisplayName("Templates.render CutRight function")
+        class RenderCutRightFunctionTests {
+            @Test
+            @DisplayName("Templates.render(String, null)")
+            void renderCutRight()
+                throws Exception {
+                assertEquals("123", Templates.render("{{#cutRight length=\"3\"}}1234567890{{/cutRight}}", null));
+            }
+        }
+
+        @Nested
+        @DisplayName("Templates.render Timestamp function")
+        class RenderTimestampFunctionTests {
+            @Test
+            @DisplayName("Templates.render(String, null)")
+            void renderTimestamp()
+                throws Exception {
+                assertEquals("20200101", Templates.render("{{#timestamp format=\"yyyyMMdd\"}}1577880000000{{/timestamp}}", null));
+            }
+        }
     }
 
     @Nested
