@@ -152,13 +152,15 @@ where the main tasks are:
 
 * `clean` to restore the entire project directory to its initial state
 * `assemble` to build the project artifacts
-* `test` to run unit tests
-* `check` to run all tests (unit, integration and functional)
+* `test` to run unit tests, `integrationTest` for itegration tests tests, `functionalTest` for functional tests tests
+* `check` to run all tests (unit, integration and functional) and `verify` to run all tests and other verification tasks like linting
 * `build` to build the entire project and run all tests
 * `publish` to publish project outcomes to distribution services
 * `release` to tag the current version and publish it as a release
 
 The `publish` and `release` tasks can only be executed on the CI/CD platform.
+
+Use the most recent [Gradle release](https://gradle.org/releases/), at least version `7.0`. The JDK must be at least version `15`, but consider that newer versions may cause errors like `unsupported class file major version XY` when running Gradle functional tests (due to [Gradle TestKit](https://docs.gradle.org/current/userguide/test_kit.html) when testing simulating older versions of Gradle).
 
 ### Contributing Documentation
 
@@ -201,18 +203,23 @@ To limit the number of tests to a smaller set you can run setting the `quickTest
 
 ##### Testing against remote repositories
 
-Since Nyx supports remote repositories and their extra features, tests must be provided against those features as well. To do so we need a test user on each platform along with its credentials:
+Since Nyx supports remote repositories with different authentication options and and their extra features, tests must cover those features as well. To do so we need a test user on each platform along with its credentials. These are the currently used test accounts:
 
 * [GitHub Nyx Test User](https://github.com/nyxtest20200701) for [GitHub](https://github.com/)
 * [GitLab Nyx Test User](https://gitlab.com/nyxtest20200701) for [GitLab](https://gitlab.com/)
 
-**Whenever possible use OAuth tokens or Personal Access Tokens instead of plain user name and passwords**.
-
-These accounts are used to to dynamically create repositories, fiddle with them and clean up at the end of a test run. Complete cleanup is performed at the end of tests so when tests complete successfully there should be no contents left on the above accounts. In case some tests fail some stale repository might remain and can be deleted manually from the UI once logged in as the test user.
+These accounts are used to to test multiple authentication options, dynamically create repositories, fiddle with them and clean up at the end of a test run. Complete cleanup is performed at the end of tests so when tests complete successfully there should be no contents left on the above accounts. In case some tests fail some stale repository might remain and can be deleted manually from the UI once logged in as the test user or just run `./gradlew testClean`.
 
 These users are not connected to any team or organization so they do not expose any sensitive information. In case they get compromised we can replace them with some new accounts at any time.
 
-Main credentials for these users are managed by Nyx project owners but they are also safely passed to [GitHub Actions jobs](.github/workflows/github-ci.yml) so that they can be used by CI/CD.
+Credentials for these users are managed by Nyx project owners but they are also safely passed to [GitHub Actions jobs](.github/workflows/github-ci.yml) so that they can be used by CI/CD.
+
+The credentials use for test accounts are:
+
+* the user name
+* an authentication token (OAuth2, Personal Access Token)
+* an SSH key pair, with a public key and two versions of the private key: one is passphrase protected and the other is not protected
+* a passphrase for password protected private keys
 
 When testing locally you can still run tests by passing credentials for your own users (never use your personal accounts, create additional test users instead) and pass their credentials to Gradle scripts as environment variables or system properties. See the [Gradle Build Environment](https://docs.gradle.org/current/userguide/build_environment.html) for more.
 
@@ -222,23 +229,39 @@ Example using a local `gradle.properties` file in the `GRADLE_USER_HOME` (which 
 # GitHub test user
 gitHubTestUserName=nyxtest20200701
 gitHubTestUserToken=<token goes here>
+gitHubTestUserPublicKey=<public key goes here>
+gitHubTestUserPrivateKeyPassphrase=<passphrase goes here>
+gitHubTestUserPrivateKeyWithPassphrase=<private key goes here>
+gitHubTestUserPrivateKeyWithoutPassphrase=<private key goes here>
 
 # GitLab test user
 gitLabTestUserName=nyxtest20200701
 gitLabTestUserToken=<token goes here>
+gitLabTestUserPublicKey=<public key goes here>
+gitLabTestUserPrivateKeyPassphrase=<passphrase goes here>
+gitLabTestUserPrivateKeyWithPassphrase=<private key goes here>
+gitLabTestUserPrivateKeyWithoutPassphrase=<private key goes here>
 ```
 
 Examples using the command line or environment variables:
 
 ```shell script
 # Example 1: pass the credentials as system properties on the Gradle command line
-$ ./gradlew -PgitHubTestUserToken=<GITHUB_TOKEN> -PgitLabTestUserToken=<GITLAB_TOKEN> test
+$ ./gradlew -PgitHubTestUserToken=<GITHUB_TOKEN> -PgitHubTestUserPublicKey=<PUBLIC_KEY> -PgitHubTestUserPrivateKeyPassphrase=<PRIVATE_KEY_PASSPHRASE> -PgitHubTestUserPrivateKeyWithPassphrase=<PASSPHRASE_PROTECTED_PRIVATE_KEY> -PgitHubTestUserPrivateKeyWithoutPassphrase=<UNPROTECTED_PRIVATE_KEY> -PgitLabTestUserToken=<GITLAB_TOKEN> -PgitLabTestUserPublicKey=<PUBLIC_KEY> -PgitLabTestUserPrivateKeyPassphrase=<PRIVATE_KEY_PASSPHRASE> -PgitLabTestUserPrivateKeyWithPassphrase=<PASSPHRASE_PROTECTED_PRIVATE_KEY> -PgitLabTestUserPrivateKeyWithoutPassphrase=<UNPROTECTED_PRIVATE_KEY> test
 ```
 
 ```shell script
 # Example 2: pass the credentials as environment variables
 export ORG_GRADLE_PROJECT_gitHubTestUserToken=<GITHUB_TOKEN>
+export ORG_GRADLE_PROJECT_gitHubTestUserPublicKey=<PUBLIC_KEY>
+export ORG_GRADLE_PROJECT_gitHubTestUserPrivateKeyPassphrase=<PRIVATE_KEY_PASSPHRASE>
+export ORG_GRADLE_PROJECT_gitHubTestUserPrivateKeyWithPassphrase=<PASSPHRASE_PROTECTED_PRIVATE_KEY>
+export ORG_GRADLE_PROJECT_gitHubTestUserPrivateKeyWithoutPassphrase=<UNPROTECTED_PRIVATE_KEY>
 export ORG_GRADLE_PROJECT_gitLabTestUserToken=<GITLAB_TOKEN>
+export ORG_GRADLE_PROJECT_gitLabTestUserPublicKey=<PUBLIC_KEY>
+export ORG_GRADLE_PROJECT_gitLabTestUserPrivateKeyPassphrase=<PRIVATE_KEY_PASSPHRASE>
+export ORG_GRADLE_PROJECT_gitLabTestUserPrivateKeyWithPassphrase=<PASSPHRASE_PROTECTED_PRIVATE_KEY>
+export ORG_GRADLE_PROJECT_gitLabTestUserPrivateKeyWithoutPassphrase=<UNPROTECTED_PRIVATE_KEY>
 $ ./gradlew test
 ```
 
@@ -250,13 +273,51 @@ export GRADLE_USER_HOME=~
 
 # Create or edit the $GRADLE_USER_HOME/gradle.properties with the properties like these
 gitHubTestUserToken=<GITHUB_TOKEN>
+gitHubTestUserPublicKey=<PUBLIC_KEY>
+gitHubTestUserPrivateKeyPassphrase=<PRIVATE_KEY_PASSPHRASE>
+gitHubTestUserPrivateKeyWithPassphrase=<PASSPHRASE_PROTECTED_PRIVATE_KEY>
+gitHubTestUserPrivateKeyWithoutPassphrase=<UNPROTECTED_PRIVATE_KEY>
 gitLabTestUserToken=<GITLAB_TOKEN>
+gitLabTestUserPublicKey=<PUBLIC_KEY>
+gitLabTestUserPrivateKeyPassphrase=<PRIVATE_KEY_PASSPHRASE>
+gitLabTestUserPrivateKeyWithPassphrase=<PASSPHRASE_PROTECTED_PRIVATE_KEY>
+gitLabTestUserPrivateKeyWithoutPassphrase=<UNPROTECTED_PRIVATE_KEY>
 
 # Run Gradle as normal
 $ ./gradlew test
 ```
 
+Examples on how to use credentials passed as [secrets on GitHub Actions](https://docs.github.com/en/actions/security-guides/encrypted-secrets) see the `.github\workflows\continuous-integration.yml` file. Please note that multi-line secrets (like private keys) can be set as they are in the GitHub projects setting (in the *secrets* section) even if the build script will then pass them as environment variables.
+
 For more on the above options see the [Gradle Build Environment](https://docs.gradle.org/current/userguide/build_environment.html). In any case, **never store your credentials along with the project files**.
+
+##### More on SSH keypairs
+
+Tests are executed also using SSH keypairs to authenticate to Git services. Private keys are tested in two ways:
+
+* password protected, using a passphrase to protect the local private key
+* not password protected, with the private key being unencrypted
+
+You can use the same keypair for both kinds of tests. This is actually suggested so you have the same public key to load on remote services like [GitHub](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account) and [GitLab](https://docs.gitlab.com/ee/user/ssh.html). You just need to have the private key in two versions: password protected and not protected.
+
+You can [generate a keypair](https://git-scm.com/book/en/v2/Git-on-the-Server-Generating-Your-SSH-Public-Key) with an unprotected private key by running `ssh-keygen -t ed25519` (to use the Ed25519 algorithm but you can use any other as long as it's supported locally and remotely). This will create the `~/.ssh/id_ed25519` file containing the private key and `~/.ssh/id_ed25519.pub` with the public key. Then you can make a copy of the `~/.ssh/id_ed25519` (let's say to `~/.ssh/id_ed25519.clear`) file and run `ssh-keygen -p -f ~/.ssh/id_ed25519` to create a new version of the `~/.ssh/id_ed25519`, protected by the passphrase you like.
+
+Now you have the two versions of the private keys in `~/.ssh/id_ed25519` and `~/.ssh/id_ed25519.clear`, password protected and unprotected, respectively, and you can copy their contents to the properties described above to make them available for testing.
+
+One caveat here: the contents of key files in `~/.ssh` is on multiple lines so when you have to pass their contents as properties or environment variables you need to transform them into single lines. However, line breaks matter so you just need to replace every line break with `\n`. For example, you can transform:
+
+```
+-----BEGIN OPENSSH PRIVATE KEY-----
+b3BlbnNzaC1rZXktdjEAAAAACmFlczI1Ni1jYmMAAAAGYmNyeXB0AAAAGAAAABBIR/mwmF
+cmpIQMAGXJaOTQAAAAEAAAAAEAAAAzAAAAC3NzaC1lZDI1NTE5AAAAIAEQ6MY269p/A+qF
+...
+```
+
+to:
+```
+-----BEGIN OPENSSH PRIVATE KEY-----\nb3BlbnNzaC1rZXktdjEAAAAACmFlczI1Ni1jYmMAAAAGYmNyeXB0AAAAGAAAABBIR/mwmF\ncmpIQMAGXJaOTQAAAAEAAAAAEAAAAzAAAAC3NzaC1lZDI1NTE5AAAAIAEQ6MY269p/A+qF
+...
+```
 
 ### Coding conventions
 

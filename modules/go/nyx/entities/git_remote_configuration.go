@@ -23,11 +23,20 @@ This structure is JSON and YAML aware so all objects are properly managed for ma
 as all internal fields must be exported (have the first capital letter in their names) or they can't be marshalled.
 */
 type GitRemoteConfiguration struct {
+	// The authentication method.
+	AuthenticationMethod *AuthenticationMethod `json:"authenticationMethod,omitempty" yaml:"authenticationMethod,omitempty"`
+
 	// The remote user name.
 	User *string `json:"user,omitempty" yaml:"user,omitempty"`
 
 	// The remote password.
 	Password *string `json:"password,omitempty" yaml:"password,omitempty"`
+
+	// The private key.
+	PrivateKey *string `json:"privateKey,omitempty" yaml:"privateKey,omitempty"`
+
+	// The passphrase for the private key.
+	Passphrase *string `json:"passphrase,omitempty" yaml:"passphrase,omitempty"`
 }
 
 /*
@@ -42,16 +51,36 @@ Standard constructor.
 
 Arguments are as follows:
 
+- authenticationMethod the authentication method.
 - user the remote user name.
 - password the remote password.
+- privateKey the private key.
+- passphrase the passphrase for the private key.
 */
-func NewGitRemoteConfigurationWith(user *string, password *string) *GitRemoteConfiguration {
+func NewGitRemoteConfigurationWith(authenticationMethod *AuthenticationMethod, user *string, password *string, privateKey *string, passphrase *string) *GitRemoteConfiguration {
 	grc := GitRemoteConfiguration{}
 
+	grc.AuthenticationMethod = authenticationMethod
 	grc.User = user
 	grc.Password = password
+	grc.PrivateKey = privateKey
+	grc.Passphrase = passphrase
 
 	return &grc
+}
+
+/*
+Returns the authentication method.
+*/
+func (grc *GitRemoteConfiguration) GetAuthenticationMethod() *AuthenticationMethod {
+	return grc.AuthenticationMethod
+}
+
+/*
+Sets the authentication method.
+*/
+func (grc *GitRemoteConfiguration) SetAuthenticationMethod(authenticationMethod *AuthenticationMethod) {
+	grc.AuthenticationMethod = authenticationMethod
 }
 
 /*
@@ -80,4 +109,32 @@ Sets the remote password.
 */
 func (grc *GitRemoteConfiguration) SetPassword(password *string) {
 	grc.Password = password
+}
+
+/*
+Returns the private key.
+*/
+func (grc *GitRemoteConfiguration) GetPrivateKey() *string {
+	return grc.PrivateKey
+}
+
+/*
+Sets the private key.
+*/
+func (grc *GitRemoteConfiguration) SetPrivateKey(privateKey *string) {
+	grc.PrivateKey = privateKey
+}
+
+/*
+Returns the passphrase for the private key.
+*/
+func (grc *GitRemoteConfiguration) GetPassphrase() *string {
+	return grc.Passphrase
+}
+
+/*
+Sets the passphrase for the private key.
+*/
+func (grc *GitRemoteConfiguration) SetPassphrase(passphrase *string) {
+	grc.Passphrase = passphrase
 }

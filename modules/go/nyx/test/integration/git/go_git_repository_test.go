@@ -22,7 +22,10 @@
 package git_test
 
 import (
+	"bytes"         // https://pkg.go.dev/bytes
+	"fmt"           // https://pkg.go.dev/fmt
 	"os"            // https://pkg.go.dev/os
+	"os/exec"       // https://pkg.go.dev/os/exec
 	"path/filepath" // https://pkg.go.dev/path/filepath
 	"testing"       // https://pkg.go.dev/testing
 	"time"          // https://pkg.go.dev/time
@@ -49,14 +52,14 @@ func contains(elems []string, v string) bool {
 
 func TestGoGitRepositoryCloneErrorWithNilDirectory(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
-	tr := REMOTE_TEST_REPOSITORY
+	tr := REMOTE_TEST_REPOSITORY_HTTP_URL
 	_, err := GitInstance().Clone(nil, &tr)
 	assert.Error(t, err)
 }
 
 func TestGoGitRepositoryCloneErrorWithEmptyDirectory(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
-	tr := REMOTE_TEST_REPOSITORY
+	tr := REMOTE_TEST_REPOSITORY_HTTP_URL
 	es := ""
 	_, err := GitInstance().Clone(&es, &tr)
 	assert.Error(t, err)
@@ -69,7 +72,7 @@ func TestGoGitRepositoryCloneErrorWithNonEmptyDirectory(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.FROM_SCRATCH().Realize()
 	defer os.RemoveAll(script.GetWorkingDirectory())
-	tr := REMOTE_TEST_REPOSITORY
+	tr := REMOTE_TEST_REPOSITORY_HTTP_URL
 	dir := script.GetWorkingDirectory()
 	_, err := GitInstance().Clone(&dir, &tr)
 	assert.Error(t, err)
@@ -106,7 +109,7 @@ func TestGoGitRepositoryCloneErrorWithNonExistingURI(t *testing.T) {
 
 func TestGoGitRepositoryClone(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
-	tr := REMOTE_TEST_REPOSITORY
+	tr := REMOTE_TEST_REPOSITORY_HTTP_URL
 	dir := "nyx-test-git-clone-test-"
 	directory := gitutil.NewTempDirectory("", &dir)
 	defer os.RemoveAll(directory)
@@ -121,9 +124,9 @@ func TestGoGitRepositoryClone(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-func TestGoGitRepositoryCloneWithNonRequiredCredentials(t *testing.T) {
+func TestGoGitRepositoryCloneWithNonRequiredUserAndPasswordCredentials(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
-	tr := REMOTE_TEST_REPOSITORY
+	tr := REMOTE_TEST_REPOSITORY_HTTP_URL
 	dir := "nyx-test-git-clone-test-"
 	directory := gitutil.NewTempDirectory("", &dir)
 	defer os.RemoveAll(directory)
@@ -134,14 +137,33 @@ func TestGoGitRepositoryCloneWithNonRequiredCredentials(t *testing.T) {
 	// the 'gitHubTestUserToken' and 'gitHubTestUserToken' environment variables are set by the build script
 	user := os.Getenv("gitHubTestUserToken")
 	password := os.Getenv("gitHubTestUserToken")
-	_, err = GitInstance().CloneWithCredentials(&directory, &tr, &user, &password)
+	_, err = GitInstance().CloneWithUserNameAndPassword(&directory, &tr, &user, &password)
 	assert.NoError(t, err)
 
 	_, err = os.Stat(filepath.Join(directory, "README.md"))
 	assert.NoError(t, err)
 }
 
-func TestGoGitRepositoryCloneWithoutRequiredCredentials(t *testing.T) {
+func TestGoGitRepositoryCloneWithNonRequiredSSHCredentials(t *testing.T) {
+	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
+	tr := REMOTE_TEST_REPOSITORY_SSH_URL
+	dir := "nyx-test-git-clone-test-"
+	directory := gitutil.NewTempDirectory("", &dir)
+	defer os.RemoveAll(directory)
+
+	_, err := os.Stat(filepath.Join(directory, "README.md"))
+	assert.Error(t, err)
+
+	// the 'gitHubTestUserPrivateKeyWithoutPassphrase' and 'gitHubTestUserPrivateKeyWithoutPassphrase' environment variables are set by the build script
+	privateKey := os.Getenv("gitHubTestUserPrivateKeyWithoutPassphrase")
+	_, err = GitInstance().CloneWithPublicKey(&directory, &tr, &privateKey, nil)
+	assert.NoError(t, err)
+
+	_, err = os.Stat(filepath.Join(directory, "README.md"))
+	assert.NoError(t, err)
+}
+
+func TestGoGitRepositoryCloneWithoutRequiredUserAndPasswordCredentials(t *testing.T) {
 	logLevel := log.GetLevel()   // save the previous logging level
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 
@@ -160,7 +182,7 @@ func TestGoGitRepositoryCloneWithoutRequiredCredentials(t *testing.T) {
 	directory, err := os.MkdirTemp("", "nyx-test-git-clone-test-")
 	defer os.RemoveAll(directory)
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
-	_, err = GitInstance().CloneWithCredentials(&directory, utl.PointerToString((*gitHubRepository).GetHTTPURL()), nil, nil)
+	_, err = GitInstance().CloneWithUserNameAndPassword(&directory, utl.PointerToString((*gitHubRepository).GetHTTPURL()), nil, nil)
 	assert.Error(t, err)
 
 	// now delete it
@@ -170,7 +192,36 @@ func TestGoGitRepositoryCloneWithoutRequiredCredentials(t *testing.T) {
 	log.SetLevel(logLevel) // restore the original logging level
 }
 
-func TestGoGitRepositoryCloneWithRequiredCredentials(t *testing.T) {
+func TestGoGitRepositoryCloneWithoutRequiredSSHCredentials(t *testing.T) {
+	logLevel := log.GetLevel()   // save the previous logging level
+	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
+
+	randomID := gitutil.RandomAlphabeticString(5, 95)
+
+	// the 'gitHubTestUserToken' environment variable is set by the build script
+	assert.NotEmpty(t, os.Getenv("gitHubTestUserToken"), "A GitHub authentication token must be passed to this test as an environment variable but it was not set")
+	gitHub, err := github.Instance(map[string]string{github.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitHubTestUserToken")})
+	assert.NoError(t, err)
+	// create a brand new test repository for this purpose
+	gitHubRepository, err := gitHub.CreateGitRepository(randomID, utl.PointerToString("Test repository "+randomID), true, true)
+
+	// if we read too quickly we often get a 404 from the server so let's wait a short while
+	time.Sleep(4000 * time.Millisecond)
+
+	directory, err := os.MkdirTemp("", "nyx-test-git-clone-test-")
+	defer os.RemoveAll(directory)
+	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
+	_, err = GitInstance().CloneWithPublicKey(&directory, utl.PointerToString((*gitHubRepository).GetSSHURL()), nil, nil)
+	assert.Error(t, err)
+
+	// now delete it
+	err = gitHub.DeleteGitRepository(randomID)
+	assert.NoError(t, err)
+
+	log.SetLevel(logLevel) // restore the original logging level
+}
+
+func TestGoGitRepositoryCloneWithRequiredUserAndPasswordCredentials(t *testing.T) {
 	logLevel := log.GetLevel()   // save the previous logging level
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 
@@ -189,7 +240,69 @@ func TestGoGitRepositoryCloneWithRequiredCredentials(t *testing.T) {
 	directory, err := os.MkdirTemp("", "nyx-test-git-clone-test-")
 	defer os.RemoveAll(directory)
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
-	_, err = GitInstance().CloneWithCredentials(&directory, utl.PointerToString((*gitHubRepository).GetHTTPURL()), utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(os.Getenv("gitHubTestUserToken")))
+	_, err = GitInstance().CloneWithUserNameAndPassword(&directory, utl.PointerToString((*gitHubRepository).GetHTTPURL()), utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(os.Getenv("gitHubTestUserToken")))
+	assert.NoError(t, err)
+
+	// now delete it
+	err = gitHub.DeleteGitRepository(randomID)
+	assert.NoError(t, err)
+
+	log.SetLevel(logLevel) // restore the original logging level
+}
+
+func TestGoGitRepositoryCloneWithRequiredSSHUnprotectedCredentials(t *testing.T) {
+	logLevel := log.GetLevel()   // save the previous logging level
+	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
+
+	randomID := gitutil.RandomAlphabeticString(5, 97)
+
+	// the 'gitHubTestUserToken' environment variable is set by the build script
+	assert.NotEmpty(t, os.Getenv("gitHubTestUserToken"), "A GitHub authentication token must be passed to this test as an environment variable but it was not set")
+	gitHub, err := github.Instance(map[string]string{github.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitHubTestUserToken")})
+	assert.NoError(t, err)
+	// create a brand new test repository for this purpose
+	gitHubRepository, err := gitHub.CreateGitRepository(randomID, utl.PointerToString("Test repository "+randomID), true, true)
+
+	// if we read too quickly we often get a 404 from the server so let's wait a short while
+	time.Sleep(4000 * time.Millisecond)
+
+	directory, err := os.MkdirTemp("", "nyx-test-git-clone-test-")
+	defer os.RemoveAll(directory)
+	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
+	// the 'gitHubTestUserPrivateKeyWithoutPassphrase' environment variable is set by the build script
+	assert.NotEmpty(t, os.Getenv("gitHubTestUserPrivateKeyWithoutPassphrase"), "A GitHub private key must be passed to this test as an environment variable but it was not set")
+	_, err = GitInstance().CloneWithPublicKey(&directory, utl.PointerToString((*gitHubRepository).GetSSHURL()), utl.PointerToString(os.Getenv("gitHubTestUserPrivateKeyWithoutPassphrase")), nil)
+	assert.NoError(t, err)
+
+	// now delete it
+	err = gitHub.DeleteGitRepository(randomID)
+	assert.NoError(t, err)
+
+	log.SetLevel(logLevel) // restore the original logging level
+}
+
+func TestGoGitRepositoryCloneWithRequiredSSHProtectedCredentials(t *testing.T) {
+	logLevel := log.GetLevel()   // save the previous logging level
+	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
+
+	randomID := gitutil.RandomAlphabeticString(5, 97)
+
+	// the 'gitHubTestUserToken' environment variable is set by the build script
+	assert.NotEmpty(t, os.Getenv("gitHubTestUserToken"), "A GitHub authentication token must be passed to this test as an environment variable but it was not set")
+	gitHub, err := github.Instance(map[string]string{github.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitHubTestUserToken")})
+	assert.NoError(t, err)
+	// create a brand new test repository for this purpose
+	gitHubRepository, err := gitHub.CreateGitRepository(randomID, utl.PointerToString("Test repository "+randomID), true, true)
+
+	// if we read too quickly we often get a 404 from the server so let's wait a short while
+	time.Sleep(4000 * time.Millisecond)
+
+	directory, err := os.MkdirTemp("", "nyx-test-git-clone-test-")
+	defer os.RemoveAll(directory)
+	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
+	// the 'gitHubTestUserPrivateKeyWithPassphrase' environment variable is set by the build script
+	assert.NotEmpty(t, os.Getenv("gitHubTestUserPrivateKeyWithPassphrase"), "A GitHub private key must be passed to this test as an environment variable but it was not set")
+	_, err = GitInstance().CloneWithPublicKey(&directory, utl.PointerToString((*gitHubRepository).GetSSHURL()), utl.PointerToString(os.Getenv("gitHubTestUserPrivateKeyWithPassphrase")), utl.PointerToString(os.Getenv("gitHubTestUserPrivateKeyPassphrase")))
 	assert.NoError(t, err)
 
 	// now delete it
@@ -477,53 +590,7 @@ func TestGoGitRepositoryCommit4Params(t *testing.T) {
 	assert.Equal(t, "A message", commit.GetMessage().GetFullMessage())
 }
 
-func TestGoGitRepositoryPush(t *testing.T) {
-	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
-	script := gittools.INITIAL_COMMIT().Realize()
-	defer os.RemoveAll(script.GetWorkingDirectory())
-
-	// also create two new empty repositories to use as remotes
-	remote1script := gittools.BARE().RealizeBare(true)
-	defer os.RemoveAll(remote1script.GetWorkingDirectory())
-	remote2script := gittools.BARE().RealizeBare(true)
-	defer os.RemoveAll(remote2script.GetWorkingDirectory())
-	script.AddRemote(remote1script.GetWorkingDirectory(), "origin") // use the GitDirectory even if it's a bare repository as it's managed internally and still points to the repo dir
-	script.AddRemote(remote2script.GetWorkingDirectory(), "custom") // use the GitDirectory even if it's a bare repository as it's managed internally and still points to the repo dir
-
-	dir := script.GetWorkingDirectory()
-	repository, err := GitInstance().Open(dir)
-	assert.NoError(t, err)
-
-	// remotes still have no commits
-	//assert.Nil(t, remote1script.GetLastCommit())
-	//assert.Nil(t, remote2script.GetLastCommit())
-
-	// make a first sync, just to have a starting commit in remotes as well
-	pushedRemote, err := repository.Push()
-	assert.NoError(t, err)
-
-	// now the default remote 'origin' has the first commit
-	assert.Equal(t, "origin", pushedRemote)
-	_ = remote1script.GetLastCommit()
-	//assert.Nil(t, remote2script.GetLastCommit())
-
-	// add a commit into the local repo and make sure it's not into the others
-	msg := "A commit message"
-	script.AndCommitWith(&msg)
-	assert.NotEqual(t, script.GetLastCommit().Hash.String(), remote1script.GetLastCommit().Hash.String())
-	//assert.Nil(t, remote2script.GetLastCommit())
-
-	// now push (to the default 'origin') and see the changes reflected
-	pushedRemote, err = repository.Push()
-	assert.NoError(t, err)
-
-	// changes are reflected to 'origin' only
-	assert.Equal(t, "origin", pushedRemote)
-	assert.Equal(t, script.GetLastCommit().Hash.String(), remote1script.GetLastCommit().Hash.String())
-	//assert.Nil(t, remote2script.GetLastCommit())
-}
-
-func TestGoGitRepositoryPushWithNonRequiredCredentials(t *testing.T) {
+func TestGoGitRepositoryPushWithNonRequiredUserAndPasswordCredentials(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.INITIAL_COMMIT().Realize()
 	defer os.RemoveAll(script.GetWorkingDirectory())
@@ -548,7 +615,7 @@ func TestGoGitRepositoryPushWithNonRequiredCredentials(t *testing.T) {
 	// the 'gitHubTestUserToken' and 'gitHubTestUserToken' environment variables are set by the build script
 	user := os.Getenv("gitHubTestUserToken")
 	password := os.Getenv("gitHubTestUserToken")
-	pushedRemote, err := repository.PushWithCredentials(&user, &password)
+	pushedRemote, err := repository.PushWithUserNameAndPassword(&user, &password)
 	assert.NoError(t, err)
 
 	// now the default remote 'origin' has the first commit
@@ -563,7 +630,7 @@ func TestGoGitRepositoryPushWithNonRequiredCredentials(t *testing.T) {
 	//assert.Nil(t, remote2script.GetLastCommit())
 
 	// now push (to the default 'origin') and see the changes reflected
-	pushedRemote, err = repository.PushWithCredentials(&user, &password)
+	pushedRemote, err = repository.PushWithUserNameAndPassword(&user, &password)
 	assert.NoError(t, err)
 
 	// changes are reflected to 'origin' only
@@ -572,83 +639,7 @@ func TestGoGitRepositoryPushWithNonRequiredCredentials(t *testing.T) {
 	//assert.Nil(t, remote2script.GetLastCommit())
 }
 
-func TestGoGitRepositoryPushWithoutRequiredCredentials(t *testing.T) {
-	logLevel := log.GetLevel()   // save the previous logging level
-	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
-
-	randomID := gitutil.RandomAlphabeticString(5, 95)
-
-	// the 'gitHubTestUserToken' environment variable is set by the build script
-	assert.NotEmpty(t, os.Getenv("gitHubTestUserToken"), "A GitHub authentication token must be passed to this test as an environment variable but it was not set")
-	gitHub, err := github.Instance(map[string]string{github.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitHubTestUserToken")})
-	assert.NoError(t, err)
-	// create a brand new test repository for this purpose
-	gitHubRepository, err := gitHub.CreateGitRepository(randomID, utl.PointerToString("Test repository "+randomID), true, true)
-
-	// if we read too quickly we often get a 404 from the server so let's wait a short while
-	time.Sleep(4000 * time.Millisecond)
-
-	directory, err := os.MkdirTemp("", "nyx-test-git-clone-test-")
-	defer os.RemoveAll(directory)
-	_, err = os.Stat(filepath.Join(directory, "README.md"))
-	assert.Error(t, err)
-	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
-	_, err = GitInstance().CloneWithCredentials(&directory, utl.PointerToString((*gitHubRepository).GetHTTPURL()), utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(os.Getenv("gitHubTestUserToken")))
-	assert.NoError(t, err)
-	_, err = os.Stat(filepath.Join(directory, "README.md"))
-	assert.NoError(t, err)
-
-	_ = gittools.ONE_BRANCH_SHORT().ApplyIn(directory)
-	repository, err := GitInstance().Open(directory)
-	_, err = repository.PushWithCredentials(nil, nil)
-	assert.Error(t, err)
-
-	// now delete it
-	err = gitHub.DeleteGitRepository(randomID)
-	assert.NoError(t, err)
-
-	log.SetLevel(logLevel) // restore the original logging level
-}
-
-func TestGoGitRepositoryPushWithRequiredCredentials(t *testing.T) {
-	logLevel := log.GetLevel()   // save the previous logging level
-	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
-
-	randomID := gitutil.RandomAlphabeticString(5, 97)
-
-	// the 'gitHubTestUserToken' environment variable is set by the build script
-	assert.NotEmpty(t, os.Getenv("gitHubTestUserToken"), "A GitHub authentication token must be passed to this test as an environment variable but it was not set")
-	gitHub, err := github.Instance(map[string]string{github.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitHubTestUserToken")})
-	assert.NoError(t, err)
-	// create a brand new test repository for this purpose
-	gitHubRepository, err := gitHub.CreateGitRepository(randomID, utl.PointerToString("Test repository "+randomID), true, true)
-
-	// if we read too quickly we often get a 404 from the server so let's wait a short while
-	time.Sleep(4000 * time.Millisecond)
-
-	directory, err := os.MkdirTemp("", "nyx-test-git-clone-test-")
-	defer os.RemoveAll(directory)
-	_, err = os.Stat(filepath.Join(directory, "README.md"))
-	assert.Error(t, err)
-	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
-	_, err = GitInstance().CloneWithCredentials(&directory, utl.PointerToString((*gitHubRepository).GetHTTPURL()), utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(os.Getenv("gitHubTestUserToken")))
-	assert.NoError(t, err)
-	_, err = os.Stat(filepath.Join(directory, "README.md"))
-	assert.NoError(t, err)
-
-	_ = gittools.ONE_BRANCH_SHORT().ApplyIn(directory)
-	repository, err := GitInstance().Open(directory)
-	_, err = repository.PushWithCredentials(utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(os.Getenv("gitHubTestUserToken")))
-	assert.NoError(t, err)
-
-	// now delete it
-	err = gitHub.DeleteGitRepository(randomID)
-	assert.NoError(t, err)
-
-	log.SetLevel(logLevel) // restore the original logging level
-}
-
-func TestGoGitRepositoryPushToRemote(t *testing.T) {
+func TestGoGitRepositoryPushWithNonRequiredSSHCredentials(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.INITIAL_COMMIT().Realize()
 	defer os.RemoveAll(script.GetWorkingDirectory())
@@ -670,32 +661,233 @@ func TestGoGitRepositoryPushToRemote(t *testing.T) {
 	//assert.Nil(t, remote2script.GetLastCommit())
 
 	// make a first sync, just to have a starting commit in remotes as well
-	remoteName := "custom"
-	pushedRemote, err := repository.PushToRemote(&remoteName)
+	// the 'gitHubTestUserPrivateKeyWithoutPassphrase' and 'gitHubTestUserPrivateKeyWithoutPassphrase' environment variables are set by the build script
+	privateKey := os.Getenv("gitHubTestUserPrivateKeyWithoutPassphrase")
+	pushedRemote, err := repository.PushWithUserNameAndPassword(&privateKey, nil)
 	assert.NoError(t, err)
 
 	// now the default remote 'origin' has the first commit
-	assert.Equal(t, "custom", pushedRemote)
-	//assert.Nil(t, remote1script.GetLastCommit())
-	_ = remote2script.GetLastCommit()
+	assert.Equal(t, "origin", pushedRemote)
+	_ = remote1script.GetLastCommit()
+	//assert.Nil(t, remote2script.GetLastCommit())
 
 	// add a commit into the local repo and make sure it's not into the others
 	msg := "A commit message"
 	script.AndCommitWith(&msg)
-	//assert.Nil(t, remote1script.GetLastCommit())
-	assert.NotEqual(t, script.GetLastCommit().Hash.String(), remote2script.GetLastCommit().Hash.String())
+	assert.NotEqual(t, script.GetLastCommit().Hash.String(), remote1script.GetLastCommit().Hash.String())
+	//assert.Nil(t, remote2script.GetLastCommit())
 
 	// now push (to the default 'origin') and see the changes reflected
-	pushedRemote, err = repository.PushToRemote(&remoteName)
+	pushedRemote, err = repository.PushWithPublicKey(&privateKey, nil)
 	assert.NoError(t, err)
 
 	// changes are reflected to 'origin' only
-	assert.Equal(t, "custom", pushedRemote)
-	//assert.Nil(t, remote1script.GetLastCommit())
-	assert.Equal(t, script.GetLastCommit().Hash.String(), remote2script.GetLastCommit().Hash.String())
+	assert.Equal(t, "origin", pushedRemote)
+	assert.Equal(t, script.GetLastCommit().Hash.String(), remote1script.GetLastCommit().Hash.String())
+	//assert.Nil(t, remote2script.GetLastCommit())
 }
 
-func TestGoGitRepositoryPushToRemoteWithNonRequiredCredentials(t *testing.T) {
+func TestGoGitRepositoryPushWithoutRequiredUserAndPasswordCredentials(t *testing.T) {
+	logLevel := log.GetLevel()   // save the previous logging level
+	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
+
+	randomID := gitutil.RandomAlphabeticString(5, 95)
+
+	// the 'gitHubTestUserToken' environment variable is set by the build script
+	assert.NotEmpty(t, os.Getenv("gitHubTestUserToken"), "A GitHub authentication token must be passed to this test as an environment variable but it was not set")
+	gitHub, err := github.Instance(map[string]string{github.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitHubTestUserToken")})
+	assert.NoError(t, err)
+	// create a brand new test repository for this purpose
+	gitHubRepository, err := gitHub.CreateGitRepository(randomID, utl.PointerToString("Test repository "+randomID), true, true)
+
+	// if we read too quickly we often get a 404 from the server so let's wait a short while
+	time.Sleep(4000 * time.Millisecond)
+
+	directory, err := os.MkdirTemp("", "nyx-test-git-clone-test-")
+	defer os.RemoveAll(directory)
+	_, err = os.Stat(filepath.Join(directory, "README.md"))
+	assert.Error(t, err)
+	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
+	_, err = GitInstance().CloneWithUserNameAndPassword(&directory, utl.PointerToString((*gitHubRepository).GetHTTPURL()), utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(os.Getenv("gitHubTestUserToken")))
+	assert.NoError(t, err)
+	_, err = os.Stat(filepath.Join(directory, "README.md"))
+	assert.NoError(t, err)
+
+	_ = gittools.ONE_BRANCH_SHORT().ApplyIn(directory)
+	repository, err := GitInstance().Open(directory)
+	_, err = repository.PushWithUserNameAndPassword(nil, nil)
+	assert.Error(t, err)
+
+	// now delete it
+	err = gitHub.DeleteGitRepository(randomID)
+	assert.NoError(t, err)
+
+	log.SetLevel(logLevel) // restore the original logging level
+}
+
+func TestGoGitRepositoryPushWithoutRequiredSSHCredentials(t *testing.T) {
+	logLevel := log.GetLevel()   // save the previous logging level
+	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
+
+	randomID := gitutil.RandomAlphabeticString(5, 95)
+
+	// the 'gitHubTestUserToken' environment variable is set by the build script
+	assert.NotEmpty(t, os.Getenv("gitHubTestUserToken"), "A GitHub authentication token must be passed to this test as an environment variable but it was not set")
+	gitHub, err := github.Instance(map[string]string{github.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitHubTestUserToken")})
+	assert.NoError(t, err)
+	// create a brand new test repository for this purpose
+	gitHubRepository, err := gitHub.CreateGitRepository(randomID, utl.PointerToString("Test repository "+randomID), true, true)
+
+	// if we read too quickly we often get a 404 from the server so let's wait a short while
+	time.Sleep(4000 * time.Millisecond)
+
+	directory, err := os.MkdirTemp("", "nyx-test-git-clone-test-")
+	defer os.RemoveAll(directory)
+	_, err = os.Stat(filepath.Join(directory, "README.md"))
+	assert.Error(t, err)
+	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
+	// the 'gitHubTestUserPrivateKeyWithoutPassphrase' environment variable is set by the build script
+	assert.NotEmpty(t, os.Getenv("gitHubTestUserPrivateKeyWithoutPassphrase"), "A GitHub private key must be passed to this test as an environment variable but it was not set")
+	_, err = GitInstance().CloneWithPublicKey(&directory, utl.PointerToString((*gitHubRepository).GetSSHURL()), utl.PointerToString(os.Getenv("gitHubTestUserPrivateKeyWithoutPassphrase")), nil)
+	assert.NoError(t, err)
+	_, err = os.Stat(filepath.Join(directory, "README.md"))
+	assert.NoError(t, err)
+
+	_ = gittools.ONE_BRANCH_SHORT().ApplyIn(directory)
+	repository, err := GitInstance().Open(directory)
+	_, err = repository.PushWithPublicKey(nil, nil)
+	assert.Error(t, err)
+
+	// now delete it
+	err = gitHub.DeleteGitRepository(randomID)
+	assert.NoError(t, err)
+
+	log.SetLevel(logLevel) // restore the original logging level
+}
+
+func TestGoGitRepositoryPushWithRequiredUserAndPasswordCredentials(t *testing.T) {
+	logLevel := log.GetLevel()   // save the previous logging level
+	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
+
+	randomID := gitutil.RandomAlphabeticString(5, 97)
+
+	// the 'gitHubTestUserToken' environment variable is set by the build script
+	assert.NotEmpty(t, os.Getenv("gitHubTestUserToken"), "A GitHub authentication token must be passed to this test as an environment variable but it was not set")
+	gitHub, err := github.Instance(map[string]string{github.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitHubTestUserToken")})
+	assert.NoError(t, err)
+	// create a brand new test repository for this purpose
+	gitHubRepository, err := gitHub.CreateGitRepository(randomID, utl.PointerToString("Test repository "+randomID), true, true)
+
+	// if we read too quickly we often get a 404 from the server so let's wait a short while
+	time.Sleep(4000 * time.Millisecond)
+
+	directory, err := os.MkdirTemp("", "nyx-test-git-clone-test-")
+	defer os.RemoveAll(directory)
+	_, err = os.Stat(filepath.Join(directory, "README.md"))
+	assert.Error(t, err)
+	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
+	_, err = GitInstance().CloneWithUserNameAndPassword(&directory, utl.PointerToString((*gitHubRepository).GetHTTPURL()), utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(os.Getenv("gitHubTestUserToken")))
+	assert.NoError(t, err)
+	_, err = os.Stat(filepath.Join(directory, "README.md"))
+	assert.NoError(t, err)
+
+	_ = gittools.ONE_BRANCH_SHORT().ApplyIn(directory)
+	repository, err := GitInstance().Open(directory)
+	_, err = repository.PushWithUserNameAndPassword(utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(os.Getenv("gitHubTestUserToken")))
+	assert.NoError(t, err)
+
+	// now delete it
+	err = gitHub.DeleteGitRepository(randomID)
+	assert.NoError(t, err)
+
+	log.SetLevel(logLevel) // restore the original logging level
+}
+
+func TestGoGitRepositoryPushWithRequiredSSHUnprotectedCredentials(t *testing.T) {
+	logLevel := log.GetLevel()   // save the previous logging level
+	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
+
+	randomID := gitutil.RandomAlphabeticString(5, 97)
+
+	// the 'gitHubTestUserToken' environment variable is set by the build script
+	assert.NotEmpty(t, os.Getenv("gitHubTestUserToken"), "A GitHub authentication token must be passed to this test as an environment variable but it was not set")
+	gitHub, err := github.Instance(map[string]string{github.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitHubTestUserToken")})
+	assert.NoError(t, err)
+	// create a brand new test repository for this purpose
+	gitHubRepository, err := gitHub.CreateGitRepository(randomID, utl.PointerToString("Test repository "+randomID), true, true)
+
+	// if we read too quickly we often get a 404 from the server so let's wait a short while
+	time.Sleep(4000 * time.Millisecond)
+
+	directory, err := os.MkdirTemp("", "nyx-test-git-clone-test-")
+	defer os.RemoveAll(directory)
+	_, err = os.Stat(filepath.Join(directory, "README.md"))
+	assert.Error(t, err)
+	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
+	// the 'gitHubTestUserPrivateKeyWithoutPassphrase' environment variable is set by the build script
+	assert.NotEmpty(t, os.Getenv("gitHubTestUserPrivateKeyWithoutPassphrase"), "A GitHub private key must be passed to this test as an environment variable but it was not set")
+	_, err = GitInstance().CloneWithPublicKey(&directory, utl.PointerToString((*gitHubRepository).GetSSHURL()), utl.PointerToString(os.Getenv("gitHubTestUserPrivateKeyWithoutPassphrase")), nil)
+	assert.NoError(t, err)
+	_, err = os.Stat(filepath.Join(directory, "README.md"))
+	assert.NoError(t, err)
+
+	_ = gittools.ONE_BRANCH_SHORT().ApplyIn(directory)
+	repository, err := GitInstance().Open(directory)
+	// the 'gitHubTestUserPrivateKeyWithoutPassphrase' environment variable is set by the build script
+	assert.NotEmpty(t, os.Getenv("gitHubTestUserPrivateKeyWithoutPassphrase"), "A GitHub private key must be passed to this test as an environment variable but it was not set")
+	_, err = repository.PushWithPublicKey(utl.PointerToString(os.Getenv("gitHubTestUserPrivateKeyWithoutPassphrase")), nil)
+	assert.NoError(t, err)
+
+	// now delete it
+	err = gitHub.DeleteGitRepository(randomID)
+	assert.NoError(t, err)
+
+	log.SetLevel(logLevel) // restore the original logging level
+}
+
+func TestGoGitRepositoryPushWithRequiredSSHProtectedCredentials(t *testing.T) {
+	logLevel := log.GetLevel()   // save the previous logging level
+	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
+
+	randomID := gitutil.RandomAlphabeticString(5, 97)
+
+	// the 'gitHubTestUserToken' environment variable is set by the build script
+	assert.NotEmpty(t, os.Getenv("gitHubTestUserToken"), "A GitHub authentication token must be passed to this test as an environment variable but it was not set")
+	gitHub, err := github.Instance(map[string]string{github.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitHubTestUserToken")})
+	assert.NoError(t, err)
+	// create a brand new test repository for this purpose
+	gitHubRepository, err := gitHub.CreateGitRepository(randomID, utl.PointerToString("Test repository "+randomID), true, true)
+
+	// if we read too quickly we often get a 404 from the server so let's wait a short while
+	time.Sleep(4000 * time.Millisecond)
+
+	directory, err := os.MkdirTemp("", "nyx-test-git-clone-test-")
+	defer os.RemoveAll(directory)
+	_, err = os.Stat(filepath.Join(directory, "README.md"))
+	assert.Error(t, err)
+	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
+	// the 'gitHubTestUserPrivateKeyWithoutPassphrase' environment variable is set by the build script
+	assert.NotEmpty(t, os.Getenv("gitHubTestUserPrivateKeyWithoutPassphrase"), "A GitHub private key must be passed to this test as an environment variable but it was not set")
+	_, err = GitInstance().CloneWithPublicKey(&directory, utl.PointerToString((*gitHubRepository).GetSSHURL()), utl.PointerToString(os.Getenv("gitHubTestUserPrivateKeyWithoutPassphrase")), nil)
+	assert.NoError(t, err)
+	_, err = os.Stat(filepath.Join(directory, "README.md"))
+	assert.NoError(t, err)
+
+	_ = gittools.ONE_BRANCH_SHORT().ApplyIn(directory)
+	repository, err := GitInstance().Open(directory)
+	// the 'gitHubTestUserPrivateKeyWithPassphrase' environment variable is set by the build script
+	assert.NotEmpty(t, os.Getenv("gitHubTestUserPrivateKeyWithPassphrase"), "A GitHub private key must be passed to this test as an environment variable but it was not set")
+	_, err = repository.PushWithPublicKey(utl.PointerToString(os.Getenv("gitHubTestUserPrivateKeyWithPassphrase")), utl.PointerToString(os.Getenv("gitHubTestUserPrivateKeyPassphrase")))
+	assert.NoError(t, err)
+
+	// now delete it
+	err = gitHub.DeleteGitRepository(randomID)
+	assert.NoError(t, err)
+
+	log.SetLevel(logLevel) // restore the original logging level
+}
+
+func TestGoGitRepositoryPushToRemoteWithNonRequiredUserAndPasswordCredentials(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.INITIAL_COMMIT().Realize()
 	defer os.RemoveAll(script.GetWorkingDirectory())
@@ -721,7 +913,7 @@ func TestGoGitRepositoryPushToRemoteWithNonRequiredCredentials(t *testing.T) {
 	user := os.Getenv("gitHubTestUserToken")
 	password := os.Getenv("gitHubTestUserToken")
 	remoteName := "custom"
-	pushedRemote, err := repository.PushToRemoteWithCredentials(&remoteName, &user, &password)
+	pushedRemote, err := repository.PushToRemoteWithUserNameAndPassword(&remoteName, &user, &password)
 	assert.NoError(t, err)
 
 	// now the default remote 'origin' has the first commit
@@ -736,7 +928,7 @@ func TestGoGitRepositoryPushToRemoteWithNonRequiredCredentials(t *testing.T) {
 	assert.NotEqual(t, script.GetLastCommit().Hash.String(), remote2script.GetLastCommit().Hash.String())
 
 	// now push (to the default 'origin') and see the changes reflected
-	pushedRemote, err = repository.PushToRemoteWithCredentials(&remoteName, &user, &password)
+	pushedRemote, err = repository.PushToRemoteWithUserNameAndPassword(&remoteName, &user, &password)
 	assert.NoError(t, err)
 
 	// changes are reflected to 'origin' only
@@ -745,83 +937,7 @@ func TestGoGitRepositoryPushToRemoteWithNonRequiredCredentials(t *testing.T) {
 	assert.Equal(t, script.GetLastCommit().Hash.String(), remote2script.GetLastCommit().Hash.String())
 }
 
-func TestGoGitRepositoryPushToRemoteWithoutRequiredCredentials(t *testing.T) {
-	logLevel := log.GetLevel()   // save the previous logging level
-	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
-
-	randomID := gitutil.RandomAlphabeticString(5, 95)
-
-	// the 'gitHubTestUserToken' environment variable is set by the build script
-	assert.NotEmpty(t, os.Getenv("gitHubTestUserToken"), "A GitHub authentication token must be passed to this test as an environment variable but it was not set")
-	gitHub, err := github.Instance(map[string]string{github.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitHubTestUserToken")})
-	assert.NoError(t, err)
-	// create a brand new test repository for this purpose
-	gitHubRepository, err := gitHub.CreateGitRepository(randomID, utl.PointerToString("Test repository "+randomID), true, true)
-
-	// if we read too quickly we often get a 404 from the server so let's wait a short while
-	time.Sleep(4000 * time.Millisecond)
-
-	directory, err := os.MkdirTemp("", "nyx-test-git-clone-test-")
-	defer os.RemoveAll(directory)
-	_, err = os.Stat(filepath.Join(directory, "README.md"))
-	assert.Error(t, err)
-	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
-	_, err = GitInstance().CloneWithCredentials(&directory, utl.PointerToString((*gitHubRepository).GetHTTPURL()), utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(os.Getenv("gitHubTestUserToken")))
-	assert.NoError(t, err)
-	_, err = os.Stat(filepath.Join(directory, "README.md"))
-	assert.NoError(t, err)
-
-	_ = gittools.ONE_BRANCH_SHORT().ApplyIn(directory)
-	repository, err := GitInstance().Open(directory)
-	_, err = repository.PushToRemoteWithCredentials(utl.PointerToString("origin"), nil, nil)
-	assert.Error(t, err)
-
-	// now delete it
-	err = gitHub.DeleteGitRepository(randomID)
-	assert.NoError(t, err)
-
-	log.SetLevel(logLevel) // restore the original logging level
-}
-
-func TestGoGitRepositoryPushToRemoteWithRequiredCredentials(t *testing.T) {
-	logLevel := log.GetLevel()   // save the previous logging level
-	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
-
-	randomID := gitutil.RandomAlphabeticString(5, 97)
-
-	// the 'gitHubTestUserToken' environment variable is set by the build script
-	assert.NotEmpty(t, os.Getenv("gitHubTestUserToken"), "A GitHub authentication token must be passed to this test as an environment variable but it was not set")
-	gitHub, err := github.Instance(map[string]string{github.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitHubTestUserToken")})
-	assert.NoError(t, err)
-	// create a brand new test repository for this purpose
-	gitHubRepository, err := gitHub.CreateGitRepository(randomID, utl.PointerToString("Test repository "+randomID), true, true)
-
-	// if we read too quickly we often get a 404 from the server so let's wait a short while
-	time.Sleep(4000 * time.Millisecond)
-
-	directory, err := os.MkdirTemp("", "nyx-test-git-clone-test-")
-	defer os.RemoveAll(directory)
-	_, err = os.Stat(filepath.Join(directory, "README.md"))
-	assert.Error(t, err)
-	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
-	_, err = GitInstance().CloneWithCredentials(&directory, utl.PointerToString((*gitHubRepository).GetHTTPURL()), utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(os.Getenv("gitHubTestUserToken")))
-	assert.NoError(t, err)
-	_, err = os.Stat(filepath.Join(directory, "README.md"))
-	assert.NoError(t, err)
-
-	_ = gittools.ONE_BRANCH_SHORT().ApplyIn(directory)
-	repository, err := GitInstance().Open(directory)
-	_, err = repository.PushToRemoteWithCredentials(utl.PointerToString("origin"), utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(os.Getenv("gitHubTestUserToken")))
-	assert.NoError(t, err)
-
-	// now delete it
-	err = gitHub.DeleteGitRepository(randomID)
-	assert.NoError(t, err)
-
-	log.SetLevel(logLevel) // restore the original logging level
-}
-
-func TestGoGitRepositoryPushToRemotes(t *testing.T) {
+func TestGoGitRepositoryPushToRemoteWithNonRequiredSSHCredentials(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.INITIAL_COMMIT().Realize()
 	defer os.RemoveAll(script.GetWorkingDirectory())
@@ -843,8 +959,260 @@ func TestGoGitRepositoryPushToRemotes(t *testing.T) {
 	//assert.Nil(t, remote2script.GetLastCommit())
 
 	// make a first sync, just to have a starting commit in remotes as well
+	// the 'gitHubTestUserPrivateKeyWithoutPassphrase' and 'gitHubTestUserPrivateKeyWithoutPassphrase' environment variables are set by the build script
+	privateKey := os.Getenv("gitHubTestUserPrivateKeyWithoutPassphrase")
+	remoteName := "custom"
+	pushedRemote, err := repository.PushToRemoteWithUserNameAndPassword(&remoteName, &privateKey, nil)
+	assert.NoError(t, err)
+
+	// now the default remote 'origin' has the first commit
+	assert.Equal(t, "custom", pushedRemote)
+	//assert.Nil(t, remote1script.GetLastCommit())
+	_ = remote2script.GetLastCommit()
+
+	// add a commit into the local repo and make sure it's not into the others
+	msg := "A commit message"
+	script.AndCommitWith(&msg)
+	//assert.Nil(t, remote1script.GetLastCommit())
+	assert.NotEqual(t, script.GetLastCommit().Hash.String(), remote2script.GetLastCommit().Hash.String())
+
+	// now push (to the default 'origin') and see the changes reflected
+	pushedRemote, err = repository.PushToRemoteWithPublicKey(&remoteName, &privateKey, nil)
+	assert.NoError(t, err)
+
+	// changes are reflected to 'origin' only
+	assert.Equal(t, "custom", pushedRemote)
+	//assert.Nil(t, remote1script.GetLastCommit())
+	assert.Equal(t, script.GetLastCommit().Hash.String(), remote2script.GetLastCommit().Hash.String())
+}
+
+func TestGoGitRepositoryPushToRemoteWithoutRequiredUserAndPasswordCredentials(t *testing.T) {
+	logLevel := log.GetLevel()   // save the previous logging level
+	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
+
+	randomID := gitutil.RandomAlphabeticString(5, 95)
+
+	// the 'gitHubTestUserToken' environment variable is set by the build script
+	assert.NotEmpty(t, os.Getenv("gitHubTestUserToken"), "A GitHub authentication token must be passed to this test as an environment variable but it was not set")
+	gitHub, err := github.Instance(map[string]string{github.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitHubTestUserToken")})
+	assert.NoError(t, err)
+	// create a brand new test repository for this purpose
+	gitHubRepository, err := gitHub.CreateGitRepository(randomID, utl.PointerToString("Test repository "+randomID), true, true)
+
+	// if we read too quickly we often get a 404 from the server so let's wait a short while
+	time.Sleep(4000 * time.Millisecond)
+
+	directory, err := os.MkdirTemp("", "nyx-test-git-clone-test-")
+	defer os.RemoveAll(directory)
+	_, err = os.Stat(filepath.Join(directory, "README.md"))
+	assert.Error(t, err)
+	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
+	_, err = GitInstance().CloneWithUserNameAndPassword(&directory, utl.PointerToString((*gitHubRepository).GetHTTPURL()), utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(os.Getenv("gitHubTestUserToken")))
+	assert.NoError(t, err)
+	_, err = os.Stat(filepath.Join(directory, "README.md"))
+	assert.NoError(t, err)
+
+	_ = gittools.ONE_BRANCH_SHORT().ApplyIn(directory)
+	repository, err := GitInstance().Open(directory)
+	_, err = repository.PushToRemoteWithUserNameAndPassword(utl.PointerToString("origin"), nil, nil)
+	assert.Error(t, err)
+
+	// now delete it
+	err = gitHub.DeleteGitRepository(randomID)
+	assert.NoError(t, err)
+
+	log.SetLevel(logLevel) // restore the original logging level
+}
+
+func TestGoGitRepositoryPushToRemoteWithoutRequiredSSHCredentials(t *testing.T) {
+	logLevel := log.GetLevel()   // save the previous logging level
+	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
+
+	randomID := gitutil.RandomAlphabeticString(5, 95)
+
+	// the 'gitHubTestUserToken' environment variable is set by the build script
+	assert.NotEmpty(t, os.Getenv("gitHubTestUserToken"), "A GitHub authentication token must be passed to this test as an environment variable but it was not set")
+	gitHub, err := github.Instance(map[string]string{github.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitHubTestUserToken")})
+	assert.NoError(t, err)
+	// create a brand new test repository for this purpose
+	gitHubRepository, err := gitHub.CreateGitRepository(randomID, utl.PointerToString("Test repository "+randomID), true, true)
+
+	// if we read too quickly we often get a 404 from the server so let's wait a short while
+	time.Sleep(4000 * time.Millisecond)
+
+	directory, err := os.MkdirTemp("", "nyx-test-git-clone-test-")
+	defer os.RemoveAll(directory)
+	_, err = os.Stat(filepath.Join(directory, "README.md"))
+	assert.Error(t, err)
+	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
+	// the 'gitHubTestUserPrivateKeyWithoutPassphrase' environment variable is set by the build script
+	assert.NotEmpty(t, os.Getenv("gitHubTestUserPrivateKeyWithoutPassphrase"), "A GitHub private key must be passed to this test as an environment variable but it was not set")
+	_, err = GitInstance().CloneWithPublicKey(&directory, utl.PointerToString((*gitHubRepository).GetSSHURL()), utl.PointerToString(os.Getenv("gitHubTestUserPrivateKeyWithoutPassphrase")), nil)
+	assert.NoError(t, err)
+	_, err = os.Stat(filepath.Join(directory, "README.md"))
+	assert.NoError(t, err)
+
+	_ = gittools.ONE_BRANCH_SHORT().ApplyIn(directory)
+	repository, err := GitInstance().Open(directory)
+	_, err = repository.PushToRemoteWithPublicKey(utl.PointerToString("origin"), nil, nil)
+	assert.Error(t, err)
+
+	// now delete it
+	err = gitHub.DeleteGitRepository(randomID)
+	assert.NoError(t, err)
+
+	log.SetLevel(logLevel) // restore the original logging level
+}
+
+func TestGoGitRepositoryPushToRemoteWithRequiredUserAndPasswordCredentials(t *testing.T) {
+	logLevel := log.GetLevel()   // save the previous logging level
+	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
+
+	randomID := gitutil.RandomAlphabeticString(5, 97)
+
+	// the 'gitHubTestUserToken' environment variable is set by the build script
+	assert.NotEmpty(t, os.Getenv("gitHubTestUserToken"), "A GitHub authentication token must be passed to this test as an environment variable but it was not set")
+	gitHub, err := github.Instance(map[string]string{github.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitHubTestUserToken")})
+	assert.NoError(t, err)
+	// create a brand new test repository for this purpose
+	gitHubRepository, err := gitHub.CreateGitRepository(randomID, utl.PointerToString("Test repository "+randomID), true, true)
+
+	// if we read too quickly we often get a 404 from the server so let's wait a short while
+	time.Sleep(4000 * time.Millisecond)
+
+	directory, err := os.MkdirTemp("", "nyx-test-git-clone-test-")
+	defer os.RemoveAll(directory)
+	_, err = os.Stat(filepath.Join(directory, "README.md"))
+	assert.Error(t, err)
+	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
+	_, err = GitInstance().CloneWithUserNameAndPassword(&directory, utl.PointerToString((*gitHubRepository).GetHTTPURL()), utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(os.Getenv("gitHubTestUserToken")))
+	assert.NoError(t, err)
+	_, err = os.Stat(filepath.Join(directory, "README.md"))
+	assert.NoError(t, err)
+
+	_ = gittools.ONE_BRANCH_SHORT().ApplyIn(directory)
+	repository, err := GitInstance().Open(directory)
+	_, err = repository.PushToRemoteWithUserNameAndPassword(utl.PointerToString("origin"), utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(os.Getenv("gitHubTestUserToken")))
+	assert.NoError(t, err)
+
+	// now delete it
+	err = gitHub.DeleteGitRepository(randomID)
+	assert.NoError(t, err)
+
+	log.SetLevel(logLevel) // restore the original logging level
+}
+
+func TestGoGitRepositoryPushToRemoteWithRequiredSSHUnprotectedCredentials(t *testing.T) {
+	logLevel := log.GetLevel()   // save the previous logging level
+	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
+
+	randomID := gitutil.RandomAlphabeticString(5, 97)
+
+	// the 'gitHubTestUserToken' environment variable is set by the build script
+	assert.NotEmpty(t, os.Getenv("gitHubTestUserToken"), "A GitHub authentication token must be passed to this test as an environment variable but it was not set")
+	gitHub, err := github.Instance(map[string]string{github.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitHubTestUserToken")})
+	assert.NoError(t, err)
+	// create a brand new test repository for this purpose
+	gitHubRepository, err := gitHub.CreateGitRepository(randomID, utl.PointerToString("Test repository "+randomID), true, true)
+
+	// if we read too quickly we often get a 404 from the server so let's wait a short while
+	time.Sleep(4000 * time.Millisecond)
+
+	directory, err := os.MkdirTemp("", "nyx-test-git-clone-test-")
+	defer os.RemoveAll(directory)
+	_, err = os.Stat(filepath.Join(directory, "README.md"))
+	assert.Error(t, err)
+	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
+	// the 'gitHubTestUserPrivateKeyWithoutPassphrase' environment variable is set by the build script
+	assert.NotEmpty(t, os.Getenv("gitHubTestUserPrivateKeyWithoutPassphrase"), "A GitHub private key must be passed to this test as an environment variable but it was not set")
+	_, err = GitInstance().CloneWithPublicKey(&directory, utl.PointerToString((*gitHubRepository).GetSSHURL()), utl.PointerToString(os.Getenv("gitHubTestUserPrivateKeyWithoutPassphrase")), nil)
+	assert.NoError(t, err)
+	_, err = os.Stat(filepath.Join(directory, "README.md"))
+	assert.NoError(t, err)
+
+	_ = gittools.ONE_BRANCH_SHORT().ApplyIn(directory)
+	repository, err := GitInstance().Open(directory)
+	// the 'gitHubTestUserPrivateKeyWithoutPassphrase' environment variable is set by the build script
+	assert.NotEmpty(t, os.Getenv("gitHubTestUserPrivateKeyWithoutPassphrase"), "A GitHub private key must be passed to this test as an environment variable but it was not set")
+	_, err = repository.PushToRemoteWithPublicKey(utl.PointerToString("origin"), utl.PointerToString(os.Getenv("gitHubTestUserPrivateKeyWithoutPassphrase")), nil)
+	assert.NoError(t, err)
+
+	// now delete it
+	err = gitHub.DeleteGitRepository(randomID)
+	assert.NoError(t, err)
+
+	log.SetLevel(logLevel) // restore the original logging level
+}
+
+func TestGoGitRepositoryPushToRemoteWithRequiredSSHProtectedCredentials(t *testing.T) {
+	logLevel := log.GetLevel()   // save the previous logging level
+	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
+
+	randomID := gitutil.RandomAlphabeticString(5, 97)
+
+	// the 'gitHubTestUserToken' environment variable is set by the build script
+	assert.NotEmpty(t, os.Getenv("gitHubTestUserToken"), "A GitHub authentication token must be passed to this test as an environment variable but it was not set")
+	gitHub, err := github.Instance(map[string]string{github.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitHubTestUserToken")})
+	assert.NoError(t, err)
+	// create a brand new test repository for this purpose
+	gitHubRepository, err := gitHub.CreateGitRepository(randomID, utl.PointerToString("Test repository "+randomID), true, true)
+
+	// if we read too quickly we often get a 404 from the server so let's wait a short while
+	time.Sleep(4000 * time.Millisecond)
+
+	directory, err := os.MkdirTemp("", "nyx-test-git-clone-test-")
+	defer os.RemoveAll(directory)
+	_, err = os.Stat(filepath.Join(directory, "README.md"))
+	assert.Error(t, err)
+	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
+	// the 'gitHubTestUserPrivateKeyWithoutPassphrase' environment variable is set by the build script
+	assert.NotEmpty(t, os.Getenv("gitHubTestUserPrivateKeyWithoutPassphrase"), "A GitHub private key must be passed to this test as an environment variable but it was not set")
+	_, err = GitInstance().CloneWithPublicKey(&directory, utl.PointerToString((*gitHubRepository).GetSSHURL()), utl.PointerToString(os.Getenv("gitHubTestUserPrivateKeyWithoutPassphrase")), nil)
+	assert.NoError(t, err)
+	_, err = os.Stat(filepath.Join(directory, "README.md"))
+	assert.NoError(t, err)
+
+	_ = gittools.ONE_BRANCH_SHORT().ApplyIn(directory)
+	repository, err := GitInstance().Open(directory)
+	// the 'gitHubTestUserPrivateKeyWithPassphrase' environment variable is set by the build script
+	assert.NotEmpty(t, os.Getenv("gitHubTestUserPrivateKeyWithPassphrase"), "A GitHub private key must be passed to this test as an environment variable but it was not set")
+	_, err = repository.PushToRemoteWithPublicKey(utl.PointerToString("origin"), utl.PointerToString(os.Getenv("gitHubTestUserPrivateKeyWithPassphrase")), utl.PointerToString(os.Getenv("gitHubTestUserPrivateKeyPassphrase")))
+	assert.NoError(t, err)
+
+	// now delete it
+	err = gitHub.DeleteGitRepository(randomID)
+	assert.NoError(t, err)
+
+	log.SetLevel(logLevel) // restore the original logging level
+}
+
+func TestGoGitRepositoryPushToRemotesWithNonRequiredUserAndPasswordCredentials(t *testing.T) {
+	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
+	script := gittools.INITIAL_COMMIT().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
+
+	// also create two new empty repositories to use as remotes
+	remote1script := gittools.BARE().RealizeBare(true)
+	defer os.RemoveAll(remote1script.GetWorkingDirectory())
+	remote2script := gittools.BARE().RealizeBare(true)
+	defer os.RemoveAll(remote2script.GetWorkingDirectory())
+	script.AddRemote(remote1script.GetWorkingDirectory(), "origin") // use the GitDirectory even if it's a bare repository as it's managed internally and still points to the repo dir
+	script.AddRemote(remote2script.GetWorkingDirectory(), "custom") // use the GitDirectory even if it's a bare repository as it's managed internally and still points to the repo dir
+
+	dir := script.GetWorkingDirectory()
+	repository, err := GitInstance().Open(dir)
+	assert.NoError(t, err)
+
+	// remotes still have no commits
+	//assert.Nil(t, remote1script.GetLastCommit())
+	//assert.Nil(t, remote2script.GetLastCommit())
+
+	// make a first sync, just to have a starting commit in remotes as well
+	// the 'gitHubTestUserToken' and 'gitHubTestUserToken' environment variables are set by the build script
+	user := os.Getenv("gitHubTestUserToken")
+	password := os.Getenv("gitHubTestUserToken")
 	remoteNames := []string{"origin", "custom"}
-	pushedRemotes, err := repository.PushToRemotes(remoteNames)
+	pushedRemotes, err := repository.PushToRemotesWithUserNameAndPassword(remoteNames, &user, &password)
 	assert.NoError(t, err)
 
 	// now the remotes have the first commit
@@ -860,7 +1228,7 @@ func TestGoGitRepositoryPushToRemotes(t *testing.T) {
 	assert.NotEqual(t, script.GetLastCommit().Hash.String(), remote2script.GetLastCommit().Hash.String())
 
 	// now push and see the changes reflected
-	pushedRemotes, err = repository.PushToRemotes(remoteNames)
+	pushedRemotes, err = repository.PushToRemotesWithUserNameAndPassword(remoteNames, &user, &password)
 	assert.NoError(t, err)
 
 	// changes are reflected to both remotes
@@ -870,7 +1238,7 @@ func TestGoGitRepositoryPushToRemotes(t *testing.T) {
 	assert.Equal(t, script.GetLastCommit().Hash.String(), remote2script.GetLastCommit().Hash.String())
 }
 
-func TestGoGitRepositoryPushToRemotesWithNonRequiredCredentials(t *testing.T) {
+func TestGoGitRepositoryPushToRemotesWithNonRequiredSSHCredentials(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.INITIAL_COMMIT().Realize()
 	defer os.RemoveAll(script.GetWorkingDirectory())
@@ -892,11 +1260,10 @@ func TestGoGitRepositoryPushToRemotesWithNonRequiredCredentials(t *testing.T) {
 	//assert.Nil(t, remote2script.GetLastCommit())
 
 	// make a first sync, just to have a starting commit in remotes as well
-	// the 'gitHubTestUserToken' and 'gitHubTestUserToken' environment variables are set by the build script
-	user := os.Getenv("gitHubTestUserToken")
-	password := os.Getenv("gitHubTestUserToken")
+	// the 'gitHubTestUserPrivateKeyWithoutPassphrase' and 'gitHubTestUserPrivateKeyWithoutPassphrase' environment variables are set by the build script
+	privateKey := os.Getenv("gitHubTestUserPrivateKeyWithoutPassphrase")
 	remoteNames := []string{"origin", "custom"}
-	pushedRemotes, err := repository.PushToRemotesWithCredentials(remoteNames, &user, &password)
+	pushedRemotes, err := repository.PushToRemotesWithUserNameAndPassword(remoteNames, &privateKey, nil)
 	assert.NoError(t, err)
 
 	// now the remotes have the first commit
@@ -912,7 +1279,7 @@ func TestGoGitRepositoryPushToRemotesWithNonRequiredCredentials(t *testing.T) {
 	assert.NotEqual(t, script.GetLastCommit().Hash.String(), remote2script.GetLastCommit().Hash.String())
 
 	// now push and see the changes reflected
-	pushedRemotes, err = repository.PushToRemotesWithCredentials(remoteNames, &user, &password)
+	pushedRemotes, err = repository.PushToRemotesWithPublicKey(remoteNames, &privateKey, nil)
 	assert.NoError(t, err)
 
 	// changes are reflected to both remotes
@@ -922,7 +1289,7 @@ func TestGoGitRepositoryPushToRemotesWithNonRequiredCredentials(t *testing.T) {
 	assert.Equal(t, script.GetLastCommit().Hash.String(), remote2script.GetLastCommit().Hash.String())
 }
 
-func TestGoGitRepositoryPushToRemotesWithoutRequiredCredentials(t *testing.T) {
+func TestGoGitRepositoryPushToRemotesWithoutRequiredUserAndPasswordCredentials(t *testing.T) {
 	logLevel := log.GetLevel()   // save the previous logging level
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 
@@ -943,14 +1310,14 @@ func TestGoGitRepositoryPushToRemotesWithoutRequiredCredentials(t *testing.T) {
 	_, err = os.Stat(filepath.Join(directory, "README.md"))
 	assert.Error(t, err)
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
-	_, err = GitInstance().CloneWithCredentials(&directory, utl.PointerToString((*gitHubRepository).GetHTTPURL()), utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(os.Getenv("gitHubTestUserToken")))
+	_, err = GitInstance().CloneWithUserNameAndPassword(&directory, utl.PointerToString((*gitHubRepository).GetHTTPURL()), utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(os.Getenv("gitHubTestUserToken")))
 	assert.NoError(t, err)
 	_, err = os.Stat(filepath.Join(directory, "README.md"))
 	assert.NoError(t, err)
 
 	_ = gittools.ONE_BRANCH_SHORT().ApplyIn(directory)
 	repository, err := GitInstance().Open(directory)
-	_, err = repository.PushToRemotesWithCredentials([]string{"origin"}, nil, nil)
+	_, err = repository.PushToRemotesWithUserNameAndPassword([]string{"origin"}, nil, nil)
 	assert.Error(t, err)
 
 	// now delete it
@@ -960,7 +1327,47 @@ func TestGoGitRepositoryPushToRemotesWithoutRequiredCredentials(t *testing.T) {
 	log.SetLevel(logLevel) // restore the original logging level
 }
 
-func TestGoGitRepositoryPushToRemotesWithRequiredCredentials(t *testing.T) {
+func TestGoGitRepositoryPushToRemotesWithoutRequiredSSHCredentials(t *testing.T) {
+	logLevel := log.GetLevel()   // save the previous logging level
+	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
+
+	randomID := gitutil.RandomAlphabeticString(5, 95)
+
+	// the 'gitHubTestUserToken' environment variable is set by the build script
+	assert.NotEmpty(t, os.Getenv("gitHubTestUserToken"), "A GitHub authentication token must be passed to this test as an environment variable but it was not set")
+	gitHub, err := github.Instance(map[string]string{github.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitHubTestUserToken")})
+	assert.NoError(t, err)
+	// create a brand new test repository for this purpose
+	gitHubRepository, err := gitHub.CreateGitRepository(randomID, utl.PointerToString("Test repository "+randomID), true, true)
+
+	// if we read too quickly we often get a 404 from the server so let's wait a short while
+	time.Sleep(4000 * time.Millisecond)
+
+	directory, err := os.MkdirTemp("", "nyx-test-git-clone-test-")
+	defer os.RemoveAll(directory)
+	_, err = os.Stat(filepath.Join(directory, "README.md"))
+	assert.Error(t, err)
+	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
+	// the 'gitHubTestUserPrivateKeyWithoutPassphrase' environment variable is set by the build script
+	assert.NotEmpty(t, os.Getenv("gitHubTestUserPrivateKeyWithoutPassphrase"), "A GitHub private key must be passed to this test as an environment variable but it was not set")
+	_, err = GitInstance().CloneWithPublicKey(&directory, utl.PointerToString((*gitHubRepository).GetSSHURL()), utl.PointerToString(os.Getenv("gitHubTestUserPrivateKeyWithoutPassphrase")), nil)
+	assert.NoError(t, err)
+	_, err = os.Stat(filepath.Join(directory, "README.md"))
+	assert.NoError(t, err)
+
+	_ = gittools.ONE_BRANCH_SHORT().ApplyIn(directory)
+	repository, err := GitInstance().Open(directory)
+	_, err = repository.PushToRemotesWithPublicKey([]string{"origin"}, nil, nil)
+	assert.Error(t, err)
+
+	// now delete it
+	err = gitHub.DeleteGitRepository(randomID)
+	assert.NoError(t, err)
+
+	log.SetLevel(logLevel) // restore the original logging level
+}
+
+func TestGoGitRepositoryPushToRemotesWithRequiredUserAndPasswordCredentials(t *testing.T) {
 	logLevel := log.GetLevel()   // save the previous logging level
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 
@@ -981,14 +1388,98 @@ func TestGoGitRepositoryPushToRemotesWithRequiredCredentials(t *testing.T) {
 	_, err = os.Stat(filepath.Join(directory, "README.md"))
 	assert.Error(t, err)
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
-	_, err = GitInstance().CloneWithCredentials(&directory, utl.PointerToString((*gitHubRepository).GetHTTPURL()), utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(os.Getenv("gitHubTestUserToken")))
+	_, err = GitInstance().CloneWithUserNameAndPassword(&directory, utl.PointerToString((*gitHubRepository).GetHTTPURL()), utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(os.Getenv("gitHubTestUserToken")))
 	assert.NoError(t, err)
 	_, err = os.Stat(filepath.Join(directory, "README.md"))
 	assert.NoError(t, err)
 
 	_ = gittools.ONE_BRANCH_SHORT().ApplyIn(directory)
 	repository, err := GitInstance().Open(directory)
-	_, err = repository.PushToRemotesWithCredentials([]string{"origin"}, utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(os.Getenv("gitHubTestUserToken")))
+	_, err = repository.PushToRemotesWithUserNameAndPassword([]string{"origin"}, utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(os.Getenv("gitHubTestUserToken")))
+	assert.NoError(t, err)
+
+	// now delete it
+	err = gitHub.DeleteGitRepository(randomID)
+	assert.NoError(t, err)
+
+	log.SetLevel(logLevel) // restore the original logging level
+}
+
+func TestGoGitRepositoryPushToRemotesWithRequiredSSHUnprotectedCredentials(t *testing.T) {
+	logLevel := log.GetLevel()   // save the previous logging level
+	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
+
+	randomID := gitutil.RandomAlphabeticString(5, 97)
+
+	// the 'gitHubTestUserToken' environment variable is set by the build script
+	assert.NotEmpty(t, os.Getenv("gitHubTestUserToken"), "A GitHub authentication token must be passed to this test as an environment variable but it was not set")
+	gitHub, err := github.Instance(map[string]string{github.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitHubTestUserToken")})
+	assert.NoError(t, err)
+	// create a brand new test repository for this purpose
+	gitHubRepository, err := gitHub.CreateGitRepository(randomID, utl.PointerToString("Test repository "+randomID), true, true)
+
+	// if we read too quickly we often get a 404 from the server so let's wait a short while
+	time.Sleep(4000 * time.Millisecond)
+
+	directory, err := os.MkdirTemp("", "nyx-test-git-clone-test-")
+	defer os.RemoveAll(directory)
+	_, err = os.Stat(filepath.Join(directory, "README.md"))
+	assert.Error(t, err)
+	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
+	// the 'gitHubTestUserPrivateKeyWithoutPassphrase' environment variable is set by the build script
+	assert.NotEmpty(t, os.Getenv("gitHubTestUserPrivateKeyWithoutPassphrase"), "A GitHub private key must be passed to this test as an environment variable but it was not set")
+	_, err = GitInstance().CloneWithPublicKey(&directory, utl.PointerToString((*gitHubRepository).GetSSHURL()), utl.PointerToString(os.Getenv("gitHubTestUserPrivateKeyWithoutPassphrase")), nil)
+	assert.NoError(t, err)
+	_, err = os.Stat(filepath.Join(directory, "README.md"))
+	assert.NoError(t, err)
+
+	_ = gittools.ONE_BRANCH_SHORT().ApplyIn(directory)
+	repository, err := GitInstance().Open(directory)
+	// the 'gitHubTestUserPrivateKeyWithoutPassphrase' environment variable is set by the build script
+	assert.NotEmpty(t, os.Getenv("gitHubTestUserPrivateKeyWithoutPassphrase"), "A GitHub private key must be passed to this test as an environment variable but it was not set")
+	_, err = repository.PushToRemotesWithPublicKey([]string{"origin"}, utl.PointerToString(os.Getenv("gitHubTestUserPrivateKeyWithoutPassphrase")), nil)
+	assert.NoError(t, err)
+
+	// now delete it
+	err = gitHub.DeleteGitRepository(randomID)
+	assert.NoError(t, err)
+
+	log.SetLevel(logLevel) // restore the original logging level
+}
+
+func TestGoGitRepositoryPushToRemotesWithRequiredSSHProtectedCredentials(t *testing.T) {
+	logLevel := log.GetLevel()   // save the previous logging level
+	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
+
+	randomID := gitutil.RandomAlphabeticString(5, 97)
+
+	// the 'gitHubTestUserToken' environment variable is set by the build script
+	assert.NotEmpty(t, os.Getenv("gitHubTestUserToken"), "A GitHub authentication token must be passed to this test as an environment variable but it was not set")
+	gitHub, err := github.Instance(map[string]string{github.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitHubTestUserToken")})
+	assert.NoError(t, err)
+	// create a brand new test repository for this purpose
+	gitHubRepository, err := gitHub.CreateGitRepository(randomID, utl.PointerToString("Test repository "+randomID), true, true)
+
+	// if we read too quickly we often get a 404 from the server so let's wait a short while
+	time.Sleep(4000 * time.Millisecond)
+
+	directory, err := os.MkdirTemp("", "nyx-test-git-clone-test-")
+	defer os.RemoveAll(directory)
+	_, err = os.Stat(filepath.Join(directory, "README.md"))
+	assert.Error(t, err)
+	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
+	// the 'gitHubTestUserPrivateKeyWithoutPassphrase' environment variable is set by the build script
+	assert.NotEmpty(t, os.Getenv("gitHubTestUserPrivateKeyWithoutPassphrase"), "A GitHub private key must be passed to this test as an environment variable but it was not set")
+	_, err = GitInstance().CloneWithPublicKey(&directory, utl.PointerToString((*gitHubRepository).GetSSHURL()), utl.PointerToString(os.Getenv("gitHubTestUserPrivateKeyWithoutPassphrase")), nil)
+	assert.NoError(t, err)
+	_, err = os.Stat(filepath.Join(directory, "README.md"))
+	assert.NoError(t, err)
+
+	_ = gittools.ONE_BRANCH_SHORT().ApplyIn(directory)
+	repository, err := GitInstance().Open(directory)
+	// the 'gitHubTestUserPrivateKeyWithPassphrase' environment variable is set by the build script
+	assert.NotEmpty(t, os.Getenv("gitHubTestUserPrivateKeyWithPassphrase"), "A GitHub private key must be passed to this test as an environment variable but it was not set")
+	_, err = repository.PushToRemotesWithPublicKey([]string{"origin"}, utl.PointerToString(os.Getenv("gitHubTestUserPrivateKeyWithPassphrase")), utl.PointerToString(os.Getenv("gitHubTestUserPrivateKeyPassphrase")))
 	assert.NoError(t, err)
 
 	// now delete it
@@ -1398,6 +1889,150 @@ func TestGoGitRepositoryIsClean(t *testing.T) {
 	assert.True(t, clean)
 }
 
+func TestGoGitRepositoryIsCleanWithTextFileContainingLineFeedsUsingEmbeddedLibrary(t *testing.T) {
+	// This test reproduces bugs:
+	// - https://github.com/mooltiverse/nyx/issues/130
+	// - https://github.com/mooltiverse/nyx/issues/129
+	// The use case for the bug is when a commit with a simple change that adds a LF or CRLF in some text file
+	// makes isClean() return false (even after the change has been commited) when it's supposed to return true.
+	// The difference between this test and the below test is that here we use the internal library both to check the
+	// repository status and also to execute the Git commands to build the test repository.
+
+	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
+	script := gittools.FROM_SCRATCH().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
+	dir := script.GetWorkingDirectory()
+	repository, err := GitInstance().Open(dir)
+	assert.NoError(t, err)
+	clean, err := repository.IsClean()
+	assert.NoError(t, err)
+	assert.True(t, clean)
+
+	// add one file with a LF and a CRLF and test
+	fileName := filepath.Join(script.GetWorkingDirectory(), "README.txt")
+	err = os.WriteFile(fileName, []byte("one"), 0644)
+	err = os.WriteFile(fileName, []byte("\n"), 0644)
+	err = os.WriteFile(fileName, []byte("two"), 0644)
+	err = os.WriteFile(fileName, []byte("\r\n"), 0644)
+	assert.NoError(t, err)
+
+	repository, err = GitInstance().Open(dir)
+	assert.NoError(t, err)
+	clean, err = repository.IsClean()
+	assert.NoError(t, err)
+	assert.False(t, clean)
+
+	// stage the files without committing
+	script.AndStage()
+	repository, err = GitInstance().Open(dir)
+	assert.NoError(t, err)
+	clean, err = repository.IsClean()
+	assert.NoError(t, err)
+	assert.False(t, clean)
+
+	// commit the files, now we're supposed to be clean again but when the bug is present we're not
+	script.AndCommit()
+	// when the bug is present, this call to IsClean() returns false even if it's supposed to return true
+	repository, err = GitInstance().Open(dir)
+	assert.NoError(t, err)
+	clean, err = repository.IsClean()
+	assert.NoError(t, err)
+	assert.True(t, clean)
+}
+
+func TestGoGitRepositoryIsCleanWithTextFileContainingLineFeedsUsingGitCommand(t *testing.T) {
+	// This test reproduces bugs:
+	// - https://github.com/mooltiverse/nyx/issues/130
+	// - https://github.com/mooltiverse/nyx/issues/129
+	// The use case for the bug is when a commit with a simple change that adds a LF or CRLF in some text file
+	// makes isClean() return false (even after the change has been commited) when it's supposed to return true.
+	// The difference between this test and the above test is that here we use the internal library just to check the
+	// repository status, while Git commands to build the test repository are executed using the external executable Git command.
+	prefix := "nyx-test-script-"
+	testDirectory := gitutil.NewTempDirectory("", &prefix)
+	defer os.RemoveAll(testDirectory)
+	repoDirectory := filepath.Join(testDirectory, "testrepo")
+	commandPath, err := exec.LookPath("git")
+	assert.NoError(t, err)
+	out := new(bytes.Buffer)
+	cmd := &exec.Cmd{Path: commandPath, Dir: testDirectory, Env: os.Environ(), Args: []string{"git", "init", "testrepo"}, Stdout: out, Stderr: out}
+	err = cmd.Run()
+	if err != nil {
+		fmt.Printf("output from '%v' is:\n", cmd.String())
+		fmt.Printf("%v\n", out.String())
+	}
+	assert.NoError(t, err)
+
+	repository, err := GitInstance().Open(repoDirectory)
+	assert.NoError(t, err)
+	clean, err := repository.IsClean()
+	assert.NoError(t, err)
+	assert.True(t, clean)
+
+	// Give the local repository an identity or some further steps may fail
+	out = new(bytes.Buffer)
+	cmd = &exec.Cmd{Path: commandPath, Dir: repoDirectory, Env: os.Environ(), Args: []string{"git", "config", "user.email", "\"jdoe@example.com\""}, Stdout: out, Stderr: out}
+	err = cmd.Run()
+	if err != nil {
+		fmt.Printf("output from '%v' is:\n", cmd.String())
+		fmt.Printf("%v\n", out.String())
+	}
+	assert.NoError(t, err)
+	out = new(bytes.Buffer)
+	cmd = &exec.Cmd{Path: commandPath, Dir: repoDirectory, Env: os.Environ(), Args: []string{"git", "config", "user.name", "\"John Doe\""}, Stdout: out, Stderr: out}
+	err = cmd.Run()
+	if err != nil {
+		fmt.Printf("output from '%v' is:\n", cmd.String())
+		fmt.Printf("%v\n", out.String())
+	}
+	assert.NoError(t, err)
+
+	// add one file with a LF and a CRLF and test
+	fileName := filepath.Join(repoDirectory, "README.txt")
+	err = os.WriteFile(fileName, []byte("one"), 0644)
+	err = os.WriteFile(fileName, []byte("\n"), 0644)
+	err = os.WriteFile(fileName, []byte("two"), 0644)
+	err = os.WriteFile(fileName, []byte("\r\n"), 0644)
+	assert.NoError(t, err)
+
+	repository, err = GitInstance().Open(repoDirectory)
+	assert.NoError(t, err)
+	clean, err = repository.IsClean()
+	assert.NoError(t, err)
+	assert.False(t, clean)
+
+	// stage the files without committing
+	out = new(bytes.Buffer)
+	cmd = &exec.Cmd{Path: commandPath, Dir: repoDirectory, Env: os.Environ(), Args: []string{"git", "add", "."}, Stdout: out, Stderr: out}
+	err = cmd.Run()
+	if err != nil {
+		fmt.Printf("output from '%v' is:\n", cmd.String())
+		fmt.Printf("%v\n", out.String())
+	}
+	assert.NoError(t, err)
+	repository, err = GitInstance().Open(repoDirectory)
+	assert.NoError(t, err)
+	clean, err = repository.IsClean()
+	assert.NoError(t, err)
+	assert.False(t, clean)
+
+	// commit the files, now we're supposed to be clean again but when the bug is present we're not
+	out = new(bytes.Buffer)
+	cmd = &exec.Cmd{Path: commandPath, Dir: repoDirectory, Env: os.Environ(), Args: []string{"git", "commit", "-m", "\"commit\""}, Stdout: out, Stderr: out}
+	err = cmd.Run()
+	if err != nil {
+		fmt.Printf("output from '%v' is:\n", cmd.String())
+		fmt.Printf("%v\n", out.String())
+	}
+	assert.NoError(t, err)
+	// when the bug is present, this call to IsClean() returns false even if it's supposed to return true
+	repository, err = GitInstance().Open(repoDirectory)
+	assert.NoError(t, err)
+	clean, err = repository.IsClean()
+	assert.NoError(t, err)
+	assert.True(t, clean)
+}
+
 func TestGoGitRepositoryGetCommitTagsReturnsEmptyResultWithRepositoryWithNoCommits(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.FROM_SCRATCH().Realize()
@@ -1460,7 +2095,7 @@ func TestGoGitRepositoryGetRemoteNamesAfterClone(t *testing.T) {
 	dir := "nyx-test-git-remote-names-test-"
 	dir = gitutil.NewTempDirectory("", &dir)
 	defer os.RemoveAll(dir)
-	tr := REMOTE_TEST_REPOSITORY
+	tr := REMOTE_TEST_REPOSITORY_HTTP_URL
 	repository, err := GitInstance().Clone(&dir, &tr)
 	assert.NoError(t, err)
 
@@ -1492,7 +2127,7 @@ func TestGoGitRepositoryGetRemoteNamesAfterCloneAndAddingLocalRepository(t *test
 	dir := "nyx-test-git-remote-names-test-"
 	dir = gitutil.NewTempDirectory("", &dir)
 	defer os.RemoveAll(dir)
-	tr := REMOTE_TEST_REPOSITORY
+	tr := REMOTE_TEST_REPOSITORY_HTTP_URL
 
 	repository, err := GitInstance().Clone(&dir, &tr)
 	assert.NoError(t, err)

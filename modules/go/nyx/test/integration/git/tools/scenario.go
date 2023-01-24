@@ -405,21 +405,9 @@ func (s Scenario) ApplyIn(directory string) Script {
 
 /*
 Applies the scenario in a new temporary directory after cloning the repository from the given URI
-and returns the script that was used. No credendials are used for cloning.
-The returned script can be used to inspect the repository or perform further actions.
-
-Arguments are as follows:
-
-- uri the URI to of the repository to clone from
-*/
-func (s Scenario) ApplyOnClone(uri string) Script {
-	return s.ApplyOnCloneFromWithCredentials(uri, nil, nil)
-}
-
-/*
-Applies the scenario in a new temporary directory after cloning the repository from the given URI
 and returns the script that was used.
 The returned script can be used to inspect the repository or perform further actions.
+This method allows using user name and password authentication (also used for tokens).
 
 Arguments are as follows:
 
@@ -427,29 +415,34 @@ Arguments are as follows:
 - user the optional user name to use when credentials are required.
 - password the optional password to use when credentials are required.
 */
-func (s Scenario) ApplyOnCloneFromWithCredentials(uri string, user *string, password *string) Script {
-	return s.ApplyOnCloneFromToWithCredentials(gitutil.NewTempDirectory("", utl.PointerToString("nyx-test-scenario-")), uri, user, password)
+func (s Scenario) ApplyOnCloneFromWithUserNameAndPassword(uri string, user *string, password *string) Script {
+	return s.ApplyOnCloneFromToWithUserNameAndPassword(gitutil.NewTempDirectory("", utl.PointerToString("nyx-test-scenario-")), uri, user, password)
 }
 
 /*
-Applies the scenario in the given directory after cloning the repository from the given URI
-and returns the script that was used. No credendials are used for cloning.
+Applies the scenario in a new temporary directory after cloning the repository from the given URI
+and returns the script that was used.
 The returned script can be used to inspect the repository or perform further actions.
+This method allows using SSH authentication.
 
 Arguments are as follows:
 
-  - directory the directory to apply the scenario in. It must exist and be empty.
-    The script is being applied starting from the current branch in the given repository.
   - uri the URI to of the repository to clone from
+  - privateKey the SSH private key. If nil the private key will be searched in its default location
+    (i.e. in the users' $HOME/.ssh directory).
+  - passphrase the optional password to use to open the private key, in case it's protected by a passphrase.
+    This is required when the private key is password protected as this implementation does not support prompting
+    the user interactively for entering the password.
 */
-func (s Scenario) ApplyOnCloneToWithCredentials(directory string, uri string) Script {
-	return s.ApplyOnCloneFromToWithCredentials(directory, uri, nil, nil)
+func (s Scenario) ApplyOnCloneFromWithPublicKey(uri string, privateKey *string, passphrase *string) Script {
+	return s.ApplyOnCloneFromToWithPublicKey(gitutil.NewTempDirectory("", utl.PointerToString("nyx-test-scenario-")), uri, privateKey, passphrase)
 }
 
 /*
 Applies the scenario in the given directory after cloning the repository from the given URI
 and returns the script that was used. No credendials are used for cloning.
 The returned script can be used to inspect the repository or perform further actions.
+This method allows using user name and password authentication (also used for tokens).
 
 Arguments are as follows:
 
@@ -459,8 +452,30 @@ Arguments are as follows:
   - user the optional user name to use when credentials are required.
   - password the optional password to use when credentials are required.
 */
-func (s Scenario) ApplyOnCloneFromToWithCredentials(directory string, uri string, user *string, password *string) Script {
-	CloneFromToWithCredentials(uri, directory, user, password)
+func (s Scenario) ApplyOnCloneFromToWithUserNameAndPassword(directory string, uri string, user *string, password *string) Script {
+	CloneFromToWithUserNameAndPassword(uri, directory, user, password)
+	return s.function(directory)
+}
+
+/*
+Applies the scenario in the given directory after cloning the repository from the given URI
+and returns the script that was used. No credendials are used for cloning.
+The returned script can be used to inspect the repository or perform further actions.
+This method allows using SSH authentication.
+
+Arguments are as follows:
+
+  - directory the directory to apply the scenario in. It must exist and be empty.
+    The script is being applied starting from the current branch in the given repository.
+  - uri the URI to of the repository to clone from
+  - privateKey the SSH private key. If nil the private key will be searched in its default location
+    (i.e. in the users' $HOME/.ssh directory).
+  - passphrase the optional password to use to open the private key, in case it's protected by a passphrase.
+    This is required when the private key is password protected as this implementation does not support prompting
+    the user interactively for entering the password.
+*/
+func (s Scenario) ApplyOnCloneFromToWithPublicKey(directory string, uri string, privateKey *string, passphrase *string) Script {
+	CloneFromToWithPublicKey(uri, directory, privateKey, passphrase)
 	return s.function(directory)
 }
 

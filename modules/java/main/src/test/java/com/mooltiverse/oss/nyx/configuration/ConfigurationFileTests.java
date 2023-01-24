@@ -31,6 +31,7 @@ import java.util.Map.Entry;
 
 import com.mooltiverse.oss.nyx.configuration.presets.Extended;
 import com.mooltiverse.oss.nyx.configuration.presets.Simple;
+import com.mooltiverse.oss.nyx.entities.AuthenticationMethod;
 import com.mooltiverse.oss.nyx.entities.ChangelogConfiguration;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
@@ -116,8 +117,11 @@ public class ConfigurationFileTests {
 
             assertEquals(source.getGit().getRemotes().keySet(), target.getGit().getRemotes().keySet());
             for (String item: source.getGit().getRemotes().keySet()) {
+                assertEquals(source.getGit().getRemotes().get(item).getAuthenticationMethod(), target.getGit().getRemotes().get(item).getAuthenticationMethod());
                 assertEquals(source.getGit().getRemotes().get(item).getPassword(), target.getGit().getRemotes().get(item).getPassword());
                 assertEquals(source.getGit().getRemotes().get(item).getUser(), target.getGit().getRemotes().get(item).getUser());
+                assertEquals(source.getGit().getRemotes().get(item).getPrivateKey(), target.getGit().getRemotes().get(item).getPrivateKey());
+                assertEquals(source.getGit().getRemotes().get(item).getPassphrase(), target.getGit().getRemotes().get(item).getPassphrase());
             }
             
             assertEquals(Objects.isNull(source.getReleaseTypes().getEnabled()) ? Defaults.RELEASE_TYPES.getEnabled() : source.getReleaseTypes().getEnabled(), target.getReleaseTypes().getEnabled());
@@ -247,8 +251,11 @@ public class ConfigurationFileTests {
 
             assertEquals(source.getGit().getRemotes().keySet(), target.getGit().getRemotes().keySet());
             for (String item: source.getGit().getRemotes().keySet()) {
+                assertEquals(source.getGit().getRemotes().get(item).getAuthenticationMethod(), target.getGit().getRemotes().get(item).getAuthenticationMethod());
                 assertEquals(source.getGit().getRemotes().get(item).getPassword(), target.getGit().getRemotes().get(item).getPassword());
                 assertEquals(source.getGit().getRemotes().get(item).getUser(), target.getGit().getRemotes().get(item).getUser());
+                assertEquals(source.getGit().getRemotes().get(item).getPrivateKey(), target.getGit().getRemotes().get(item).getPrivateKey());
+                assertEquals(source.getGit().getRemotes().get(item).getPassphrase(), target.getGit().getRemotes().get(item).getPassphrase());
             }
             
             assertEquals(Objects.isNull(source.getReleaseTypes().getEnabled()) ? Defaults.RELEASE_TYPES.getEnabled() : source.getReleaseTypes().getEnabled(), target.getReleaseTypes().getEnabled());
@@ -384,17 +391,17 @@ public class ConfigurationFileTests {
 
             lowPriorityConfigurationLayerMock.setGit(
                 new GitConfiguration(
-                    Map.<String,GitRemoteConfiguration>of("origin", new GitRemoteConfiguration("jdoe1", "pwd1"), "replica", new GitRemoteConfiguration("stiger1", "sec1"))
+                    Map.<String,GitRemoteConfiguration>of("origin", new GitRemoteConfiguration(null, "jdoe1", "pwd1", null, null), "replica", new GitRemoteConfiguration(null, "stiger1", "sec1", null, null))
                 )
             );
             mediumPriorityConfigurationLayerMock.setGit(
                 new GitConfiguration(
-                    Map.<String,GitRemoteConfiguration>of("origin", new GitRemoteConfiguration("jdoe2", "pwd2"), "clone", new GitRemoteConfiguration("stiger2", "sec2"))
+                    Map.<String,GitRemoteConfiguration>of("origin", new GitRemoteConfiguration(null, "jdoe2", "pwd2", null, null), "clone", new GitRemoteConfiguration(null, "stiger2", "sec2", null, null))
                 )
             );
             highPriorityConfigurationLayerMock.setGit(
                 new GitConfiguration(
-                    Map.<String,GitRemoteConfiguration>of("origin", new GitRemoteConfiguration("jdoe3", "pwd3"))
+                    Map.<String,GitRemoteConfiguration>of("origin", new GitRemoteConfiguration(AuthenticationMethod.PUBLIC_KEY, "jdoe3", "pwd3", "key3", "passphrase3"))
                 )
             );
 
@@ -531,13 +538,21 @@ public class ConfigurationFileTests {
             assertEquals(highPriorityConfigurationLayerMock.getConfigurationFile(), deserializedConfigurationLayer.getConfigurationFile());
             assertEquals(highPriorityConfigurationLayerMock.getDirectory(), deserializedConfigurationLayer.getDirectory());
             assertEquals(highPriorityConfigurationLayerMock.getDryRun(), deserializedConfigurationLayer.getDryRun());
-            assertEquals(highPriorityConfigurationLayerMock.getGit().getRemotes().get("origin").getPassword(), deserializedConfigurationLayer.getGit().getRemotes().get("origin").getPassword());
+            assertEquals(highPriorityConfigurationLayerMock.getGit().getRemotes().get("origin").getAuthenticationMethod(), deserializedConfigurationLayer.getGit().getRemotes().get("origin").getAuthenticationMethod());
             assertEquals(highPriorityConfigurationLayerMock.getGit().getRemotes().get("origin").getPassword(), deserializedConfigurationLayer.getGit().getRemotes().get("origin").getPassword());
             assertEquals(highPriorityConfigurationLayerMock.getGit().getRemotes().get("origin").getUser(), deserializedConfigurationLayer.getGit().getRemotes().get("origin").getUser());
+            assertEquals(highPriorityConfigurationLayerMock.getGit().getRemotes().get("origin").getPrivateKey(), deserializedConfigurationLayer.getGit().getRemotes().get("origin").getPrivateKey());
+            assertEquals(highPriorityConfigurationLayerMock.getGit().getRemotes().get("origin").getPassphrase(), deserializedConfigurationLayer.getGit().getRemotes().get("origin").getPassphrase());
+            assertEquals(lowPriorityConfigurationLayerMock.getGit().getRemotes().get("replica").getAuthenticationMethod(), deserializedConfigurationLayer.getGit().getRemotes().get("replica").getAuthenticationMethod());
             assertEquals(lowPriorityConfigurationLayerMock.getGit().getRemotes().get("replica").getPassword(), deserializedConfigurationLayer.getGit().getRemotes().get("replica").getPassword());
             assertEquals(lowPriorityConfigurationLayerMock.getGit().getRemotes().get("replica").getUser(), deserializedConfigurationLayer.getGit().getRemotes().get("replica").getUser());
+            assertEquals(lowPriorityConfigurationLayerMock.getGit().getRemotes().get("replica").getPrivateKey(), deserializedConfigurationLayer.getGit().getRemotes().get("replica").getPrivateKey());
+            assertEquals(lowPriorityConfigurationLayerMock.getGit().getRemotes().get("replica").getPassphrase(), deserializedConfigurationLayer.getGit().getRemotes().get("replica").getPassphrase());
+            assertEquals(mediumPriorityConfigurationLayerMock.getGit().getRemotes().get("clone").getAuthenticationMethod(), deserializedConfigurationLayer.getGit().getRemotes().get("clone").getAuthenticationMethod());
             assertEquals(mediumPriorityConfigurationLayerMock.getGit().getRemotes().get("clone").getPassword(), deserializedConfigurationLayer.getGit().getRemotes().get("clone").getPassword());
             assertEquals(mediumPriorityConfigurationLayerMock.getGit().getRemotes().get("clone").getUser(), deserializedConfigurationLayer.getGit().getRemotes().get("clone").getUser());
+            assertEquals(mediumPriorityConfigurationLayerMock.getGit().getRemotes().get("clone").getPrivateKey(), deserializedConfigurationLayer.getGit().getRemotes().get("clone").getPrivateKey());
+            assertEquals(mediumPriorityConfigurationLayerMock.getGit().getRemotes().get("clone").getPassphrase(), deserializedConfigurationLayer.getGit().getRemotes().get("clone").getPassphrase());
             assertEquals(highPriorityConfigurationLayerMock.getInitialVersion(), deserializedConfigurationLayer.getInitialVersion());
             assertEquals(highPriorityConfigurationLayerMock.getPreset(), deserializedConfigurationLayer.getPreset());
             assertEquals(highPriorityConfigurationLayerMock.getReleaseAssets(), deserializedConfigurationLayer.getReleaseAssets());
@@ -634,17 +649,17 @@ public class ConfigurationFileTests {
 
             lowPriorityConfigurationLayerMock.setGit(
                 new GitConfiguration(
-                    Map.<String,GitRemoteConfiguration>of("origin", new GitRemoteConfiguration("jdoe1", "pwd1"), "replica", new GitRemoteConfiguration("stiger1", "sec1"))
+                    Map.<String,GitRemoteConfiguration>of("origin", new GitRemoteConfiguration(null, "jdoe1", "pwd1", null, null), "replica", new GitRemoteConfiguration(null, "stiger1", "sec1", null, null))
                 )
             );
             mediumPriorityConfigurationLayerMock.setGit(
                 new GitConfiguration(
-                    Map.<String,GitRemoteConfiguration>of("origin", new GitRemoteConfiguration("jdoe2", "pwd2"), "clone", new GitRemoteConfiguration("stiger2", "sec2"))
+                    Map.<String,GitRemoteConfiguration>of("origin", new GitRemoteConfiguration(null, "jdoe2", "pwd2", null, null), "clone", new GitRemoteConfiguration(null, "stiger2", "sec2", null, null))
                 )
             );
             highPriorityConfigurationLayerMock.setGit(
                 new GitConfiguration(
-                    Map.<String,GitRemoteConfiguration>of("origin", new GitRemoteConfiguration("jdoe3", "pwd3"))
+                    Map.<String,GitRemoteConfiguration>of("origin", new GitRemoteConfiguration(AuthenticationMethod.PUBLIC_KEY, "jdoe3", "pwd3", "key3", "passphrase3"))
                 )
             );
 
@@ -781,13 +796,21 @@ public class ConfigurationFileTests {
             assertEquals(highPriorityConfigurationLayerMock.getConfigurationFile(), deserializedConfigurationLayer.getConfigurationFile());
             assertEquals(highPriorityConfigurationLayerMock.getDirectory(), deserializedConfigurationLayer.getDirectory());
             assertEquals(highPriorityConfigurationLayerMock.getDryRun(), deserializedConfigurationLayer.getDryRun());
-            assertEquals(highPriorityConfigurationLayerMock.getGit().getRemotes().get("origin").getPassword(), deserializedConfigurationLayer.getGit().getRemotes().get("origin").getPassword());
+            assertEquals(highPriorityConfigurationLayerMock.getGit().getRemotes().get("origin").getAuthenticationMethod(), deserializedConfigurationLayer.getGit().getRemotes().get("origin").getAuthenticationMethod());
             assertEquals(highPriorityConfigurationLayerMock.getGit().getRemotes().get("origin").getPassword(), deserializedConfigurationLayer.getGit().getRemotes().get("origin").getPassword());
             assertEquals(highPriorityConfigurationLayerMock.getGit().getRemotes().get("origin").getUser(), deserializedConfigurationLayer.getGit().getRemotes().get("origin").getUser());
+            assertEquals(highPriorityConfigurationLayerMock.getGit().getRemotes().get("origin").getPrivateKey(), deserializedConfigurationLayer.getGit().getRemotes().get("origin").getPrivateKey());
+            assertEquals(highPriorityConfigurationLayerMock.getGit().getRemotes().get("origin").getPassphrase(), deserializedConfigurationLayer.getGit().getRemotes().get("origin").getPassphrase());
+            assertEquals(lowPriorityConfigurationLayerMock.getGit().getRemotes().get("replica").getAuthenticationMethod(), deserializedConfigurationLayer.getGit().getRemotes().get("replica").getAuthenticationMethod());
             assertEquals(lowPriorityConfigurationLayerMock.getGit().getRemotes().get("replica").getPassword(), deserializedConfigurationLayer.getGit().getRemotes().get("replica").getPassword());
             assertEquals(lowPriorityConfigurationLayerMock.getGit().getRemotes().get("replica").getUser(), deserializedConfigurationLayer.getGit().getRemotes().get("replica").getUser());
+            assertEquals(lowPriorityConfigurationLayerMock.getGit().getRemotes().get("replica").getPrivateKey(), deserializedConfigurationLayer.getGit().getRemotes().get("replica").getPrivateKey());
+            assertEquals(lowPriorityConfigurationLayerMock.getGit().getRemotes().get("replica").getPassphrase(), deserializedConfigurationLayer.getGit().getRemotes().get("replica").getPassphrase());
+            assertEquals(mediumPriorityConfigurationLayerMock.getGit().getRemotes().get("clone").getAuthenticationMethod(), deserializedConfigurationLayer.getGit().getRemotes().get("clone").getAuthenticationMethod());
             assertEquals(mediumPriorityConfigurationLayerMock.getGit().getRemotes().get("clone").getPassword(), deserializedConfigurationLayer.getGit().getRemotes().get("clone").getPassword());
             assertEquals(mediumPriorityConfigurationLayerMock.getGit().getRemotes().get("clone").getUser(), deserializedConfigurationLayer.getGit().getRemotes().get("clone").getUser());
+            assertEquals(mediumPriorityConfigurationLayerMock.getGit().getRemotes().get("clone").getPrivateKey(), deserializedConfigurationLayer.getGit().getRemotes().get("clone").getPrivateKey());
+            assertEquals(mediumPriorityConfigurationLayerMock.getGit().getRemotes().get("clone").getPassphrase(), deserializedConfigurationLayer.getGit().getRemotes().get("clone").getPassphrase());
             assertEquals(highPriorityConfigurationLayerMock.getInitialVersion(), deserializedConfigurationLayer.getInitialVersion());
             assertEquals(highPriorityConfigurationLayerMock.getPreset(), deserializedConfigurationLayer.getPreset());
             assertEquals(highPriorityConfigurationLayerMock.getReleaseAssets(), deserializedConfigurationLayer.getReleaseAssets());

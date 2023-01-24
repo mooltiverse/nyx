@@ -50,6 +50,13 @@ public interface GitHostedRepository {
     public String getHTTPURL();
 
     /**
+     * Returns the repository SSH URL.
+     * 
+     * @return the repository SSH URL.
+     */
+    public String getSSHURL();
+
+    /**
      * Returns the repository ID.
      * 
      * @return the repository ID.

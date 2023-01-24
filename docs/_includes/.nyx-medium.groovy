@@ -26,6 +26,7 @@ nyx {
   git {
     remotes {
       origin {
+        authenticationMethod = 'USER_PASSWORD'
         user = 'jdoe'
         password = 'somepassword'
       }

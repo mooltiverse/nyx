@@ -20,24 +20,32 @@ import static com.mooltiverse.oss.nyx.log.Markers.GIT;
 import java.io.File;
 import java.io.IOException;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Properties;
 import java.util.Set;
 
 import com.mooltiverse.oss.nyx.entities.git.Commit;
 import com.mooltiverse.oss.nyx.entities.git.Identity;
 import com.mooltiverse.oss.nyx.entities.git.Tag;
 
+import com.jcraft.jsch.AgentIdentityRepository;
+import com.jcraft.jsch.AgentProxyException;
+import com.jcraft.jsch.IdentityRepository;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.Session;
+import com.jcraft.jsch.SSHAgentConnector;
+import com.jcraft.jsch.UserInfo;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.AddCommand;
 import org.eclipse.jgit.api.CommitCommand;
 import org.eclipse.jgit.api.PushCommand;
 import org.eclipse.jgit.api.TagCommand;
+import org.eclipse.jgit.api.TransportConfigCallback;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.JGitInternalException;
 import org.eclipse.jgit.errors.AmbiguousObjectException;
@@ -45,6 +53,8 @@ import org.eclipse.jgit.errors.MissingObjectException;
 import org.eclipse.jgit.errors.NoWorkTreeException;
 import org.eclipse.jgit.errors.RevisionSyntaxException;
 import org.eclipse.jgit.errors.RevWalkException;
+import org.eclipse.jgit.errors.UnsupportedCredentialItem;
+import org.eclipse.jgit.internal.transport.ssh.jsch.CredentialsProviderUserInfo;
 import org.eclipse.jgit.lib.AnyObjectId;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.ObjectId;
@@ -55,8 +65,16 @@ import org.eclipse.jgit.revwalk.RevSort;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.transport.CredentialsProvider;
+import org.eclipse.jgit.transport.CredentialItem;
 import org.eclipse.jgit.transport.RefSpec;
+import org.eclipse.jgit.transport.SshTransport;
+import org.eclipse.jgit.transport.Transport;
+import org.eclipse.jgit.transport.URIish;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+import org.eclipse.jgit.transport.ssh.jsch.JschConfigSessionFactory;
+import org.eclipse.jgit.transport.ssh.jsch.OpenSshConfig.Host;
+import org.eclipse.jgit.util.FS;
+import org.slf4j.event.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -108,6 +126,188 @@ class JGitRepository implements Repository {
     }
 
     /**
+     * Returns a new transport config callback to use when using Git SSH authentication.
+     * 
+     * @param privateKey the SSH private key. If {@code null} the private key will be searched in its default location
+     * (i.e. in the users' {@code $HOME/.ssh} directory).
+     * @param passphrase the optional password to use to open the private key, in case it's protected by a passphrase.
+     * This is required when the private key is password protected as this implementation does not support prompting
+     * the user interactively for entering the password.
+     * 
+     * @return the transport config callback built on the given credentials. It is {@code null} if both the given credentials
+     * are {@code null}.
+     * 
+     * @throws GitException in case the operation fails for some reason, including when authentication fails
+     */
+    private static TransportConfigCallback getTransportConfigCallback(String privateKey, byte[] passphrase) 
+        throws GitException {
+        // These code examples have been taken from
+        // - https://www.codeaffine.com/2014/12/09/jgit-authentication/ and then elaborated
+        // - https://stackoverflow.com/questions/31931574/java-sftp-client-that-takes-private-key-as-a-string
+        // - https://stackoverflow.com/questions/56758040/loading-private-key-from-string-or-resource-in-java-jsch-in-android-app
+        // - https://stackoverflow.com/questions/33637481/jsch-to-add-private-key-from-a-string
+        JschConfigSessionFactory sshSessionFactory = new JschConfigSessionFactory() {
+            // Override this method as per the Javadoc instructions
+            @Override
+            protected void configure(Host host, Session session) {
+                // Configure in order to use the passphrase (when using the private key from the default location,
+                // which means the user passed the passphrase but not the private key).
+                // When the private key is passed in memory instead of using the default location, the passphrase
+                // is passed along with it (see below in createDefaultJSch(FS fs)).
+                if ((Objects.isNull(privateKey) || privateKey.isEmpty()) && ((!Objects.isNull(passphrase)) && (passphrase.length > 0))) {
+                    // Implement an anonymous credentials provider to provide the passphrase when needed.
+                    // An alternative could be to just implement an anonymous UserInfo object and make its getPassphrase()
+                    // method return the passphrase.
+                    CredentialsProvider credentialsProvider = new CredentialsProvider() {
+                        /**
+                         * Ask for the credential items to be populated.
+                         * This method sets the passphrase for any given credential item, regardless the URI.
+                         * 
+                         * @param uri the URI of the remote resource that needs authentication.
+                         * @param items the items the application requires to complete authentication.
+                         * 
+                         * @return {@code true}
+                         */
+                        @Override
+                        public boolean get(URIish uri, CredentialItem... items)
+                            throws UnsupportedCredentialItem {
+                            for (CredentialItem item : items) {
+                                // set the value for string types and ignore others
+                                if (CredentialItem.StringType.class.isInstance(item)) {
+                                    CredentialItem.StringType.class.cast(item).setValue(new String(passphrase));
+                                }
+                            }
+                            return true;
+                        }
+
+                        /**
+                         * Check if the provider is interactive with the end-user.
+                         * An interactive provider may try to open a dialog box, or prompt for input on the terminal,
+                         * and will wait for a user response. A non-interactive provider will either populate CredentialItems, or fail.
+                         * 
+                         * @return {@code false}
+                         */
+                        @Override
+                        public boolean isInteractive() {
+                            return false;
+                        }
+
+                        /**
+                         * Check if the provider can supply the necessary CredentialItems.
+                         * 
+                         * This method always returns {@code true}
+                         * 
+                         * @param items the items the application requires to complete authentication.
+                         * 
+                         * @return {@code true} regardless the input
+                         */
+                        @Override
+                        public boolean supports(CredentialItem... items) {
+                            // just return true for any type of items, maybe this needs to be refined
+                            return true;
+                        }
+                    };
+                    UserInfo userInfo = new CredentialsProviderUserInfo(session, credentialsProvider);
+                    session.setUserInfo(userInfo);
+                }
+
+                Properties sessionProperties = new Properties();
+                //sessionProperties.put("PreferredAuthentications", "publickey");
+                if (!Objects.isNull(privateKey) && !privateKey.isEmpty()) {
+                    // disable host key checking if the in-memory key is used
+                    sessionProperties.put("StrictHostKeyChecking", "no");
+                }
+                session.setConfig(sessionProperties);
+            }
+
+            // Override this method in order to load the in-memory key, as the default one only loads them from
+            // default locations on the local filesystem
+            @Override
+            protected JSch createDefaultJSch(FS fs)
+                throws JSchException {
+                JSch.setLogger(new JschLogger());
+                JSch defaultJSch = super.createDefaultJSch(fs);
+                defaultJSch.setConfig("PreferredAuthentications", "publickey");
+                if (!Objects.isNull(privateKey) && !privateKey.isEmpty()) {
+                    logger.debug(GIT, "Git uses public key authentication (SSH) using a custom key");
+                    // the key name is not relevant
+                    // the public key is not required
+                    defaultJSch.addIdentity("git", privateKey.getBytes(), null, passphrase);
+
+                    // disable host key checking
+                    defaultJSch.setConfig("StrictHostKeyChecking", "no");
+                }
+                else logger.debug(GIT, "Git uses public key authentication (SSH) using keys from default locations");
+
+                if (Objects.isNull(passphrase) || passphrase.length == 0) {
+                    // In order to support the ssh-agent we can use: https://github.com/mwiede/jsch/blob/master/examples/JSchWithAgentProxy.java
+                    logger.debug(GIT, "No passphrase has been provided so Git uses ssh-agent for passphrase-protected private keys");
+                    try {
+                        IdentityRepository irepo = new AgentIdentityRepository(new SSHAgentConnector());
+                        defaultJSch.setIdentityRepository(irepo);
+                    } catch (AgentProxyException ape) {
+                        logger.error(GIT, "Attemp to attach to ssh-agent failed", ape);
+                        //throw new GitException("Failed to attach to ssh-agent", ape);
+                    }
+                } else logger.debug(GIT, "A passphrase has been provided so ssh-agent support is not enabled");
+
+                return defaultJSch;                  
+            }
+        };
+
+        return new TransportConfigCallback() {
+            @Override
+            public void configure(Transport transport) {
+                // How can we be sure the given Transport is an SshTransport? Docs don't explain...
+                if (SshTransport.class.isInstance(transport)) {
+                    SshTransport.class.cast(transport).setSshSessionFactory(sshSessionFactory);
+                } else logger.warn(GIT, "The transport object received to set up the Git SSH authentication is of type '{}' and can't be cast to '{}'", transport.getClass().getName(), SshTransport.class.getName());
+            }
+        };
+    }
+
+    /**
+     * The logger adapter class we use for Jsch in order to capture its logs and send them out to SLF4J.
+     */
+    public static class JschLogger implements com.jcraft.jsch.Logger {
+        /**
+         * A map mapping Jsch debug levels to SLF4J debug levels
+         */
+        static Map<Integer, Level> levelMapping = Map.of(
+            Integer.valueOf(com.jcraft.jsch.Logger.DEBUG), Level.DEBUG,
+            Integer.valueOf(com.jcraft.jsch.Logger.INFO), Level.DEBUG, // map Jsch's INFO to DEBUG to avoid log churns
+            Integer.valueOf(com.jcraft.jsch.Logger.WARN), Level.WARN,
+            Integer.valueOf(com.jcraft.jsch.Logger.ERROR), Level.ERROR,
+            Integer.valueOf(com.jcraft.jsch.Logger.FATAL), Level.ERROR // FATAL is not available in SLF4J
+        );
+
+        /**
+         * Checks if logging of some level is actually enabled.
+         * This will be called by the library before each call to the {@link #log(int, String)} method.
+         * 
+         * @param level one of the log level constants DEBUG, INFO, WARN, ERROR and FATAL
+         * 
+         * @return {@code true} if the logging for the given level is enabled
+         */
+        @Override
+        public boolean isEnabled(int level){
+            return logger.isEnabledForLevel(levelMapping.get(Integer.valueOf(level)));
+        }
+
+        /**
+         * Logs the given message at the given level, relaying to SLF4J.
+         * 
+         * @param level one of the log level constants DEBUG, INFO, WARN, ERROR and FATAL
+         * 
+         * @return {@code true} if the logging for the given level is enabled
+         */
+        @Override
+        public void log(int level, String message){
+            logger.atLevel(levelMapping.get(Integer.valueOf(level))).addMarker(GIT).log(message);
+        }
+    }
+
+    /**
      * Returns a repository instance working in the given directory after cloning from the given URI.
      * 
      * @param directory the directory where the repository has to be cloned. It is created if it doesn't exist.
@@ -119,9 +319,19 @@ class JGitRepository implements Repository {
      * @throws IllegalArgumentException if a given object is illegal for some reason, like referring to an illegal repository
      * @throws GitException in case the operation fails for some reason, including when authentication fails
      */
-    static JGitRepository clone(File directory, URI uri)
+    static JGitRepository clone(File directory, String uri)
         throws GitException {
-        return clone(directory, uri, null, null);
+        Objects.requireNonNull(directory, "Can't clone a repository instance with a null directory");
+        Objects.requireNonNull(uri, "Can't clone a repository instance from a null URI");
+
+        logger.debug(GIT, "Cloning repository in directory '{}' from URI '{}'", directory.getAbsolutePath(), uri);
+
+        try {
+            return new JGitRepository(Git.cloneRepository().setDirectory(directory).setURI(uri).call());
+        }
+        catch (IOException | GitAPIException | JGitInternalException e) {
+            throw new GitException(String.format("Unable to clone the '%s' repository into '%s'", uri, directory.getAbsolutePath()), e);
+        }
     }
 
     /**
@@ -142,18 +352,50 @@ class JGitRepository implements Repository {
      * @throws IllegalArgumentException if a given object is illegal for some reason, like referring to an illegal repository
      * @throws GitException in case the operation fails for some reason, including when authentication fails
      */
-    static JGitRepository clone(File directory, URI uri, String user, String password)
+    static JGitRepository clone(File directory, String uri, String user, String password)
         throws GitException {
         Objects.requireNonNull(directory, "Can't clone a repository instance with a null directory");
         Objects.requireNonNull(uri, "Can't clone a repository instance from a null URI");
 
-        logger.debug(GIT, "Cloning repository in directory '{}' from URI '{}'", directory.getAbsolutePath(), uri.toString());
+        logger.debug(GIT, "Cloning repository in directory '{}' from URI '{}' using username and password", directory.getAbsolutePath(), uri);
 
         try {
-            return new JGitRepository(Git.cloneRepository().setDirectory(directory).setURI(uri.toString()).setCredentialsProvider(getCredentialsProvider(user, password)).call());
+            return new JGitRepository(Git.cloneRepository().setDirectory(directory).setURI(uri).setCredentialsProvider(getCredentialsProvider(user, password)).call());
         }
         catch (IOException | GitAPIException | JGitInternalException e) {
-            throw new GitException(String.format("Unable to clone the '%s' repository into '%s'", uri.toString(), directory.getAbsolutePath()), e);
+            throw new GitException(String.format("Unable to clone the '%s' repository into '%s'", uri, directory.getAbsolutePath()), e);
+        }
+    }
+
+    /**
+     * Returns a repository instance working in the given directory after cloning from the given URI.
+     * 
+     * @param directory the directory where the repository has to be cloned. It is created if it doesn't exist.
+     * @param uri the URI of the remote repository to clone.
+     * @param privateKey the SSH private key. If {@code null} the private key will be searched in its default location
+     * (i.e. in the users' {@code $HOME/.ssh} directory).
+     * @param passphrase the optional password to use to open the private key, in case it's protected by a passphrase.
+     * This is required when the private key is password protected as this implementation does not support prompting
+     * the user interactively for entering the password.
+     * 
+     * @return the new repository object.
+     * 
+     * @throws NullPointerException if any of the given objects is {@code null}
+     * @throws IllegalArgumentException if a given object is illegal for some reason, like referring to an illegal repository
+     * @throws GitException in case the operation fails for some reason, including when authentication fails
+     */
+    static JGitRepository clone(File directory, String uri, String privateKey, byte[] passphrase)
+        throws GitException {
+        Objects.requireNonNull(directory, "Can't clone a repository instance with a null directory");
+        Objects.requireNonNull(uri, "Can't clone a repository instance from a null URI");
+
+        logger.debug(GIT, "Cloning repository in directory '{}' from URI '{}' using public key (SSH) authentication", directory.getAbsolutePath(), uri);
+
+        try {
+            return new JGitRepository(Git.cloneRepository().setDirectory(directory).setURI(uri).setTransportConfigCallback(getTransportConfigCallback(privateKey, passphrase)).call());
+        }
+        catch (IOException | GitAPIException | JGitInternalException e) {
+            throw new GitException(String.format("Unable to clone the '%s' repository into '%s'", uri, directory.getAbsolutePath()), e);
         }
     }
 
@@ -171,7 +413,14 @@ class JGitRepository implements Repository {
      */
     static JGitRepository clone(String directory, String uri) 
         throws GitException {
-        return clone(directory, uri, null, null);
+        Objects.requireNonNull(directory, "Can't clone a repository instance with a null directory");
+        Objects.requireNonNull(uri, "Can't clone a repository instance from a null URI");
+        if (directory.isBlank())
+            throw new IllegalArgumentException("Can't create a repository instance with a blank directory");
+        if (uri.isBlank())
+            throw new IllegalArgumentException("Can't create a repository instance with a blank URI");
+
+        return clone(new File(directory), uri);
     }
 
     /**
@@ -201,12 +450,36 @@ class JGitRepository implements Repository {
         if (uri.isBlank())
             throw new IllegalArgumentException("Can't create a repository instance with a blank URI");
 
-        try {
-            return clone(new File(directory), new URI(uri), user, password);
-        }
-        catch (URISyntaxException use) {
-            throw new IllegalArgumentException(String.format("Illegal URI '%s'", uri), use);
-        }
+        return clone(new File(directory), uri, user, password);
+    }
+
+    /**
+     * Returns a repository instance working in the given directory after cloning from the given URI.
+     * 
+     * @param directory the directory where the repository has to be cloned. It is created if it doesn't exist.
+     * @param uri the URI of the remote repository to clone.
+     * @param privateKey the SSH private key. If {@code null} the private key will be searched in its default location
+     * (i.e. in the users' {@code $HOME/.ssh} directory).
+     * @param passphrase the optional password to use to open the private key, in case it's protected by a passphrase.
+     * This is required when the private key is password protected as this implementation does not support prompting
+     * the user interactively for entering the password.
+     * 
+     * @return the new repository object.
+     * 
+     * @throws NullPointerException if any of the given objects is {@code null}
+     * @throws IllegalArgumentException if the given object is illegal for some reason, like referring to an illegal repository
+     * @throws GitException in case the operation fails for some reason, including when authentication fails
+     */
+    static JGitRepository clone(String directory, String uri, String privateKey, byte[] passphrase) 
+        throws GitException {
+        Objects.requireNonNull(directory, "Can't clone a repository instance with a null directory");
+        Objects.requireNonNull(uri, "Can't clone a repository instance from a null URI");
+        if (directory.isBlank())
+            throw new IllegalArgumentException("Can't create a repository instance with a blank directory");
+        if (uri.isBlank())
+            throw new IllegalArgumentException("Can't create a repository instance with a blank URI");
+
+        return clone(new File(directory), uri, privateKey, passphrase);
     }
 
     /**
@@ -564,15 +837,6 @@ class JGitRepository implements Repository {
      * {@inheritDoc}
      */
     @Override
-    public String push()
-        throws GitException {
-        return push(null, null);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public String push(String user, String password)
         throws GitException {
         return push(DEFAULT_REMOTE_NAME, user, password);
@@ -582,9 +846,9 @@ class JGitRepository implements Repository {
      * {@inheritDoc}
      */
     @Override
-    public String push(String remote)
+    public String push(String privateKey, byte[] passphrase)
         throws GitException {
-        return push(remote, null, null);
+        return push(DEFAULT_REMOTE_NAME, privateKey, passphrase);
     }
 
     /**
@@ -593,7 +857,7 @@ class JGitRepository implements Repository {
     @Override
     public String push(String remote, String user, String password)
         throws GitException {
-        logger.debug(GIT, "Pushing changes to remote repository '{}'", remote);
+        logger.debug(GIT, "Pushing changes to remote repository '{}' using username and password", remote);
         try {
             // get the current branch name
             String currentBranchRef = jGit.getRepository().getFullBranch();
@@ -616,9 +880,25 @@ class JGitRepository implements Repository {
      * {@inheritDoc}
      */
     @Override
-    public Set<String> push(Collection<String> remotes)
+    public String push(String remote, String privateKey, byte[] passphrase)
         throws GitException {
-        return push(remotes, null, null);
+        logger.debug(GIT, "Pushing changes to remote repository '{}' using public key (SSH) authentication", remote);
+        try {
+            // get the current branch name
+            String currentBranchRef = jGit.getRepository().getFullBranch();
+            // the refspec is in the localBranch:remoteBranch form, and we assume they both have the same name here
+            RefSpec refSpec = new RefSpec(currentBranchRef.concat(":").concat(currentBranchRef));
+            PushCommand pushCommand = jGit.push().setRefSpecs(refSpec);
+            if (!Objects.isNull(remote) && !remote.isBlank())
+                pushCommand.setRemote(remote);
+            pushCommand.setPushTags();
+            pushCommand.setTransportConfigCallback(getTransportConfigCallback(privateKey, passphrase));
+            pushCommand.call();
+            return pushCommand.getRemote();
+        }
+        catch (GitAPIException | IOException e) {
+            throw new GitException("An error occurred when trying to push", e);
+        }
     }
 
     /**
@@ -627,10 +907,24 @@ class JGitRepository implements Repository {
     @Override
     public Set<String> push(Collection<String> remotes, String user, String password)
         throws GitException {
-        logger.debug(GIT, "Pushing changes to '{}' remote repositories", remotes.size());
+        logger.debug(GIT, "Pushing changes to '{}' remote repositories using username and password", remotes.size());
         Set<String> res = new HashSet<String>();
         for (String remote: remotes) {
             res.add(push(remote, user, password));
+        }
+        return res;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Set<String> push(Collection<String> remotes, String privateKey, byte[] passphrase)
+        throws GitException {
+        logger.debug(GIT, "Pushing changes to '{}' remote repositories using public key (SSH) authentication", remotes.size());
+        Set<String> res = new HashSet<String>();
+        for (String remote: remotes) {
+            res.add(push(remote, privateKey, passphrase));
         }
         return res;
     }

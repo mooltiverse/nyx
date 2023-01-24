@@ -135,6 +135,13 @@ const (
 	// This expression uses the 'name' capturing group which returns the remote name, if detected.
 	GIT_CONFIGURATION_REMOTES_ARGUMENT_ITEM_NAME_REGEX = GIT_CONFIGURATION_REMOTES_ARGUMENT_NAME + "-(?<name>[a-zA-Z0-9]+)-([a-zA-Z0-9-]+)$"
 
+	// The parametrized name of the argument to read for the 'authenticationMethod' attribute of a
+	// Git remote configuration.
+	// This string is a prototype that contains a '%s' parameter for the remote name
+	// and must be rendered using fmt.Sprintf(GIT_CONFIGURATION_REMOTES_ARGUMENT_ITEM_AUTHENTICATION_METHOD_FORMAT_STRING, name)
+	// in order to get the actual name of the argument that brings the value for the remote with the given 'name'.
+	GIT_CONFIGURATION_REMOTES_ARGUMENT_ITEM_AUTHENTICATION_METHOD_FORMAT_STRING = GIT_CONFIGURATION_REMOTES_ARGUMENT_NAME + "-%s-authenticationMethod"
+
 	// The parametrized name of the argument to read for the 'password' attribute of a
 	// Git remote configuration.
 	// This string is a prototype that contains a '%s' parameter for the remote name
@@ -148,6 +155,20 @@ const (
 	// and must be rendered using fmt.Sprintf(GIT_CONFIGURATION_REMOTES_ARGUMENT_ITEM_USER_FORMAT_STRING, name)
 	// in order to get the actual name of the argument that brings the value for the remote with the given 'name'.
 	GIT_CONFIGURATION_REMOTES_ARGUMENT_ITEM_USER_FORMAT_STRING = GIT_CONFIGURATION_REMOTES_ARGUMENT_NAME + "-%s-user"
+
+	// The parametrized name of the argument to read for the 'privateKey' attribute of a
+	// Git remote configuration.
+	// This string is a prototype that contains a '%s' parameter for the remote name
+	// and must be rendered using fmt.Sprintf(GIT_CONFIGURATION_REMOTES_ARGUMENT_ITEM_PRIVATE_KEY_FORMAT_STRING, name)
+	// in order to get the actual name of the argument that brings the value for the remote with the given 'name'.
+	GIT_CONFIGURATION_REMOTES_ARGUMENT_ITEM_PRIVATE_KEY_FORMAT_STRING = GIT_CONFIGURATION_REMOTES_ARGUMENT_NAME + "-%s-privateKey"
+
+	// The parametrized name of the argument to read for the 'passphrase' attribute of a
+	// Git remote configuration.
+	// This string is a prototype that contains a '%s' parameter for the remote name
+	// and must be rendered using fmt.Sprintf(GIT_CONFIGURATION_REMOTES_ARGUMENT_ITEM_PASSPHRASE_FORMAT_STRING, name)
+	// in order to get the actual name of the argument that brings the value for the remote with the given 'name'.
+	GIT_CONFIGURATION_REMOTES_ARGUMENT_ITEM_PASSPHRASE_FORMAT_STRING = GIT_CONFIGURATION_REMOTES_ARGUMENT_NAME + "-%s-passphrase"
 
 	// The name of the argument to read for this value.
 	HELP_ARGUMENT_NAME = "--help"
@@ -938,13 +959,27 @@ func (clcl *CommandLineConfigurationLayer) GetGit() (*ent.GitConfiguration, erro
 		remotes := make(map[string]*ent.GitRemoteConfiguration)
 
 		itemNames, err := clcl.scanItemNamesInArguments("git", GIT_CONFIGURATION_REMOTES_ARGUMENT_ITEM_NAME_REGEX, nil)
+		if err != nil {
+			return nil, err
+		}
 		// now we have the set of all item names configured through arguments and we can
 		// query specific arguments
 		for _, itemName := range itemNames {
+			var authenticationMethod *ent.AuthenticationMethod = nil
+			authenticationMethodString := clcl.getArgument(fmt.Sprintf(GIT_CONFIGURATION_REMOTES_ARGUMENT_ITEM_AUTHENTICATION_METHOD_FORMAT_STRING, itemName))
+			if authenticationMethodString != nil {
+				am, err := ent.ValueOfAuthenticationMethod(*authenticationMethodString)
+				if err != nil {
+					return nil, &errs.IllegalPropertyError{Message: fmt.Sprintf("The argument '%s' has an illegal value '%s'", fmt.Sprintf(GIT_CONFIGURATION_REMOTES_ARGUMENT_ITEM_AUTHENTICATION_METHOD_FORMAT_STRING, itemName), *authenticationMethodString), Cause: err}
+				}
+				authenticationMethod = &am
+			}
 			password := clcl.getArgument(fmt.Sprintf(GIT_CONFIGURATION_REMOTES_ARGUMENT_ITEM_PASSWORD_FORMAT_STRING, itemName))
 			user := clcl.getArgument(fmt.Sprintf(GIT_CONFIGURATION_REMOTES_ARGUMENT_ITEM_USER_FORMAT_STRING, itemName))
+			privateKey := clcl.getArgument(fmt.Sprintf(GIT_CONFIGURATION_REMOTES_ARGUMENT_ITEM_PRIVATE_KEY_FORMAT_STRING, itemName))
+			passphrase := clcl.getArgument(fmt.Sprintf(GIT_CONFIGURATION_REMOTES_ARGUMENT_ITEM_PASSPHRASE_FORMAT_STRING, itemName))
 
-			remotes[itemName] = ent.NewGitRemoteConfigurationWith(user, password)
+			remotes[itemName] = ent.NewGitRemoteConfigurationWith(authenticationMethod, user, password, privateKey, passphrase)
 		}
 
 		clcl.git, err = ent.NewGitConfigurationWith(&remotes)

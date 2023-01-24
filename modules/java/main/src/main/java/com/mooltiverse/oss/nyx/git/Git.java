@@ -17,7 +17,6 @@ package com.mooltiverse.oss.nyx.git;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,16 +25,6 @@ import org.slf4j.LoggerFactory;
  * The entry point to the Git local and remote service. This is also the main entry point to retrieve {@link Repository} instances
  */
 public class Git {
-    /**
-     * The user name to authenticate to the remote service.
-     */
-    private String user = null;
-
-    /**
-     * The password to authenticate to the remote service.
-     */
-    private String password = null;
-
     /**
      * The logger instance.
      */
@@ -59,8 +48,7 @@ public class Git {
 
     /**
      * Returns a repository instance working in the given directory after cloning from the given URI.
-     * If the instance has some credentials set, those are used to perform the operation, otherwise
-     * anonymous access will be used.
+     * This method uses no authentication.
      * 
      * @param directory the directory where the repository has to be cloned. It is created if it doesn't exist.
      * @param uri the URI of the remote repository to clone.
@@ -71,9 +59,9 @@ public class Git {
      * @throws IllegalArgumentException if a given object is illegal for some reason, like referring to an illegal repository
      * @throws GitException in case the operation fails for some reason, including when authentication fails
      */
-    public Repository clone(File directory, URI uri)
+    public Repository clone(File directory, String uri)
         throws GitException {
-        return clone(directory, uri, getUser(), getPassword());
+            return JGitRepository.clone(directory, uri);
     }
 
     /**
@@ -94,15 +82,36 @@ public class Git {
      * @throws IllegalArgumentException if a given object is illegal for some reason, like referring to an illegal repository
      * @throws GitException in case the operation fails for some reason, including when authentication fails
      */
-    public Repository clone(File directory, URI uri, String user, String password)
+    public Repository clone(File directory, String uri, String user, String password)
         throws GitException {
         return JGitRepository.clone(directory, uri, user, password);
     }
 
     /**
      * Returns a repository instance working in the given directory after cloning from the given URI.
-     * If the instance has some credentials set, those are used to perform the operation, otherwise
-     * anonymous access will be used.
+     * 
+     * @param directory the directory where the repository has to be cloned. It is created if it doesn't exist.
+     * @param uri the URI of the remote repository to clone.
+     * @param privateKey the SSH private key. If {@code null} the private key will be searched in its default location
+     * (i.e. in the users' {@code $HOME/.ssh} directory).
+     * @param passphrase the optional password to use to open the private key, in case it's protected by a passphrase.
+     * This is required when the private key is password protected as this implementation does not support prompting
+     * the user interactively for entering the password.
+     * 
+     * @return the new repository object.
+     * 
+     * @throws NullPointerException if any of the given objects is {@code null}
+     * @throws IllegalArgumentException if a given object is illegal for some reason, like referring to an illegal repository
+     * @throws GitException in case the operation fails for some reason, including when authentication fails
+     */
+    public Repository clone(File directory, String uri, String privateKey, byte[] passphrase)
+        throws GitException {
+        return JGitRepository.clone(directory, uri, privateKey, passphrase);
+    }
+
+    /**
+     * Returns a repository instance working in the given directory after cloning from the given URI.
+     * This method uses no authentication.
      * 
      * @param directory the directory where the repository has to be cloned. It is created if it doesn't exist.
      * @param uri the URI of the remote repository to clone.
@@ -115,7 +124,7 @@ public class Git {
      */
     public Repository clone(String directory, String uri) 
         throws GitException {
-        return clone(directory, uri, getUser(), getPassword());
+        return JGitRepository.clone(directory, uri);
     }
 
     /**
@@ -142,25 +151,25 @@ public class Git {
     }
 
     /**
-     * Returns the user name to be used when connecting to remote repositories.
+     * Returns a repository instance working in the given directory after cloning from the given URI.
      * 
-     * @return the user name to be used when connecting to remote repositories.
-     * When {@code null} the remote repositories are meant to allow anonymous access and,
-     * in this case, also the {@link #getPassword() password} is {@code null}.
-     */
-    public String getUser() {
-        return user;
-    }
-
-    /**
-     * Returns the password to be used when connecting to remote repositories.
+     * @param directory the directory where the repository has to be cloned. It is created if it doesn't exist.
+     * @param uri the URI of the remote repository to clone.
+     * @param privateKey the SSH private key. If {@code null} the private key will be searched in its default location
+     * (i.e. in the users' {@code $HOME/.ssh} directory).
+     * @param passphrase the optional password to use to open the private key, in case it's protected by a passphrase.
+     * This is required when the private key is password protected as this implementation does not support prompting
+     * the user interactively for entering the password.
      * 
-     * @return the password to be used when connecting to remote repositories.
-     * When {@link #getUser()} returns {@code null} this method also returns
-     * {@code null} amd the remote repositories are meant to allow anonymous access.
+     * @return the new repository object.
+     * 
+     * @throws NullPointerException if any of the given objects is {@code null}
+     * @throws IllegalArgumentException if a given object is illegal for some reason, like referring to an illegal repository
+     * @throws GitException in case the operation fails for some reason, including when authentication fails
      */
-    public String getPassword() {
-        return password;
+    public Repository clone(String directory, String uri, String privateKey, byte[] passphrase) 
+        throws GitException {
+        return JGitRepository.clone(directory, uri, privateKey, passphrase);
     }
 
     /**
@@ -193,24 +202,5 @@ public class Git {
     public Repository open(String directory) 
         throws IOException {
         return JGitRepository.open(directory);
-    }
-
-    /**
-     * Sets the user name to be used when connecting to remote repositories.
-     * 
-     * @param user the user name to be used when connecting to remote repositories.
-     * When {@code null} the remote repositories are meant to allow anonymous access.
-     */
-    public void setUser(String user) {
-        this.user = user;
-    }
-
-    /**
-     * Sets the password to be used when connecting to remote repositories.
-     * 
-     * @param password the password to be used when connecting to remote repositories.
-     */
-    public void setPassword(String password) {
-        this.password = password;
     }
 }

@@ -36,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mooltiverse.oss.nyx.entities.Attachment;
+import com.mooltiverse.oss.nyx.entities.AuthenticationMethod;
 import com.mooltiverse.oss.nyx.entities.ChangelogConfiguration;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
@@ -228,6 +229,19 @@ class EnvironmentConfigurationLayer implements ConfigurationLayer {
     private static final String GIT_CONFIGURATION_REMOTES_ITEM_NAME_REGEX = GIT_CONFIGURATION_REMOTES_ENVVAR_NAME.concat("_(?<name>[a-zA-Z0-9]+)_([a-zA-Z0-9_]+)$");
 
     /**
+     * The parametrized name of the environment variable to read for the 'authenticationMethod' attribute of a
+     * Git remote configuration.
+     * This string is a {@link Formatter string} that contains a '%s' parameter for the remote name
+     * and must be rendered using {@link String#format(String, Object...) String.format(GIT_CONFIGURATION_REMOTES_ITEM_AUTHENTICATION_METHOD_FORMAT_STRING, name)}
+     * in order to get the actual name of environment variable that brings the value for the remote with the given {@code name}.
+     * Value: {@value}
+     * 
+     * @see Formatter
+     * @see String#format(String, Object...)
+     */
+    private static final String GIT_CONFIGURATION_REMOTES_ITEM_AUTHENTICATION_METHOD_FORMAT_STRING = GIT_CONFIGURATION_REMOTES_ENVVAR_NAME.concat("_%s_AUTHENTICATION_METHOD");
+
+    /**
      * The parametrized name of the environment variable to read for the 'password' attribute of a
      * Git remote configuration.
      * This string is a {@link Formatter string} that contains a '%s' parameter for the remote name
@@ -252,6 +266,32 @@ class EnvironmentConfigurationLayer implements ConfigurationLayer {
      * @see String#format(String, Object...)
      */
     private static final String GIT_CONFIGURATION_REMOTES_ITEM_USER_FORMAT_STRING = GIT_CONFIGURATION_REMOTES_ENVVAR_NAME.concat("_%s_USER");
+
+    /**
+     * The parametrized name of the environment variable to read for the 'privateKey' attribute of a
+     * Git remote configuration.
+     * This string is a {@link Formatter string} that contains a '%s' parameter for the remote name
+     * and must be rendered using {@link String#format(String, Object...) String.format(GIT_CONFIGURATION_REMOTES_ITEM_PRIVATE_KEY_FORMAT_STRING, name)}
+     * in order to get the actual name of environment variable that brings the value for the remote with the given {@code name}.
+     * Value: {@value}
+     * 
+     * @see Formatter
+     * @see String#format(String, Object...)
+     */
+    private static final String GIT_CONFIGURATION_REMOTES_ITEM_PRIVATE_KEY_FORMAT_STRING = GIT_CONFIGURATION_REMOTES_ENVVAR_NAME.concat("_%s_PRIVATE_KEY");
+
+    /**
+     * The parametrized name of the environment variable to read for the 'passphrase' attribute of a
+     * Git remote configuration.
+     * This string is a {@link Formatter string} that contains a '%s' parameter for the remote name
+     * and must be rendered using {@link String#format(String, Object...) String.format(GIT_CONFIGURATION_REMOTES_ITEM_PASSPHRASE_FORMAT_STRING, name)}
+     * in order to get the actual name of environment variable that brings the value for the remote with the given {@code name}.
+     * Value: {@value}
+     * 
+     * @see Formatter
+     * @see String#format(String, Object...)
+     */
+    private static final String GIT_CONFIGURATION_REMOTES_ITEM_PASSPHRASE_FORMAT_STRING = GIT_CONFIGURATION_REMOTES_ENVVAR_NAME.concat("_%s_PASSPHRASE");
 
     /**
      * The name of the environment variable to read for this value. Value: {@value}
@@ -1021,10 +1061,21 @@ class EnvironmentConfigurationLayer implements ConfigurationLayer {
             // now we have the set of all item names configured through environment variables and we can
             // query specific environment variables
             for (String itemName: itemNames) {
-                String password = getenv(String.format(GIT_CONFIGURATION_REMOTES_ITEM_PASSWORD_FORMAT_STRING, itemName));
-                String user = getenv(String.format(GIT_CONFIGURATION_REMOTES_ITEM_USER_FORMAT_STRING, itemName));
+                AuthenticationMethod authenticationMethod = null;
+                String authenticationMethodString         = getenv(String.format(GIT_CONFIGURATION_REMOTES_ITEM_AUTHENTICATION_METHOD_FORMAT_STRING, itemName));
+                try {
+                    if (!Objects.isNull(authenticationMethodString))
+                    authenticationMethod = AuthenticationMethod.valueOf(authenticationMethodString);
+                }
+                catch (IllegalArgumentException iae) {
+                    throw new IllegalPropertyException(String.format("The environment variable '%s' has an illegal value '%s'", String.format(GIT_CONFIGURATION_REMOTES_ITEM_AUTHENTICATION_METHOD_FORMAT_STRING, itemName), authenticationMethodString), iae);
+                }
+                String password                           = getenv(String.format(GIT_CONFIGURATION_REMOTES_ITEM_PASSWORD_FORMAT_STRING, itemName));
+                String user                               = getenv(String.format(GIT_CONFIGURATION_REMOTES_ITEM_USER_FORMAT_STRING, itemName));
+                String privateKey                         = getenv(String.format(GIT_CONFIGURATION_REMOTES_ITEM_PRIVATE_KEY_FORMAT_STRING, itemName));
+                String passphrase                         = getenv(String.format(GIT_CONFIGURATION_REMOTES_ITEM_PASSPHRASE_FORMAT_STRING, itemName));
                 
-                remotes.put(itemName, new GitRemoteConfiguration(user, password));
+                remotes.put(itemName, new GitRemoteConfiguration(authenticationMethod, user, password, privateKey, passphrase));
             }
 
             gitSection = new GitConfiguration(remotes);

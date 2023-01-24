@@ -613,24 +613,9 @@ public enum Scenario {
 
     /**
      * Applies the scenario in a new temporary directory after cloning the repository from the given URI
-     * and returns the script that was used. No credendials are used for cloning.
-     * The returned script can be used to inspect the repository or perform further actions.
-     * 
-     * @param uri the URI to of the repository to clone from
-     * 
-     * @return the script used to realize the scenario. It can be used for further operations.
-     * 
-     * @throws Exception in case of any issue.
-     */
-    public Script applyOnClone(String uri)
-        throws Exception {
-        return applyOnClone(uri, null, null);
-    }
-
-    /**
-     * Applies the scenario in a new temporary directory after cloning the repository from the given URI
      * and returns the script that was used.
      * The returned script can be used to inspect the repository or perform further actions.
+     * This method allows using user name and password authentication (also used for tokens).
      * 
      * @param uri the URI to of the repository to clone from
      * @param user the optional user name to use when credentials are required.
@@ -646,28 +631,29 @@ public enum Scenario {
     }
 
     /**
-     * Applies the scenario in the given directory after cloning the repository from the given URI
-     * and returns the script that was used. No credendials are used for cloning.
+     * Applies the scenario in a new temporary directory after cloning the repository from the given URI
+     * and returns the script that was used.
      * The returned script can be used to inspect the repository or perform further actions.
+     * This method allows using SSH authentication.
      * 
-     * @param directory the directory to apply the scenario in. It must be not {@code null}, it must exist
-     * and be empty.
-     * The script is being applied starting from the current branch in the given repository.
      * @param uri the URI to of the repository to clone from
+     * @param privateKey the SSH private key.
+     * @param passphrase the optional password to use to open the private key, in case it's protected by a passphrase.
      * 
      * @return the script used to realize the scenario. It can be used for further operations.
      * 
      * @throws Exception in case of any issue.
      */
-    public Script applyOnClone(File directory, String uri)
+    public Script applyOnClone(String uri, String privateKey, byte[] passphrase)
         throws Exception {
-        return applyOnClone(directory, uri, null, null);
+        return applyOnClone(FileSystemUtil.newTempDirectory(null, "nyx-test-scenario-"), uri, privateKey, passphrase);
     }
 
     /**
      * Applies the scenario in the given directory after cloning the repository from the given URI
      * and returns the script that was used. No credendials are used for cloning.
      * The returned script can be used to inspect the repository or perform further actions.
+     * This method allows using user name and password authentication (also used for tokens).
      * 
      * @param directory the directory to apply the scenario in. It must be not {@code null}, it must exist
      * and be empty.
@@ -683,6 +669,28 @@ public enum Scenario {
     public Script applyOnClone(File directory, String uri, String user, String password)
         throws Exception {
         return function.apply(Script.cloneFrom(uri, directory, user, password).getWorkingDirectory());
+    }
+
+    /**
+     * Applies the scenario in the given directory after cloning the repository from the given URI
+     * and returns the script that was used. No credendials are used for cloning.
+     * The returned script can be used to inspect the repository or perform further actions.
+     * This method allows using SSH authentication.
+     * 
+     * @param directory the directory to apply the scenario in. It must be not {@code null}, it must exist
+     * and be empty.
+     * The script is being applied starting from the current branch in the given repository.
+     * @param uri the URI to of the repository to clone from
+     * @param privateKey the SSH private key.
+     * @param passphrase the optional password to use to open the private key, in case it's protected by a passphrase.
+     * 
+     * @return the script used to realize the scenario. It can be used for further operations.
+     * 
+     * @throws Exception in case of any issue.
+     */
+    public Script applyOnClone(File directory, String uri, String privateKey, byte[] passphrase)
+        throws Exception {
+        return function.apply(Script.cloneFrom(uri, directory, privateKey, passphrase).getWorkingDirectory());
     }
 
     /**
