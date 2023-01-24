@@ -5873,7 +5873,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysNegativeCommitConventi
 	log.SetLevel(logLevel) // restore the original logging level
 }
 
-func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysPositiveCommitConventionInSomebranchBranch(t *testing.T) {
+func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysPositiveCommitConventionInSomeBranch(t *testing.T) {
 	logLevel := log.GetLevel()   // save the previous logging level
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED()) {
@@ -5953,7 +5953,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysPositiveCommitConventi
 	log.SetLevel(logLevel) // restore the original logging level
 }
 
-func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysNegativeCommitConventionInSomebranchBranch(t *testing.T) {
+func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysNegativeCommitConventionInSomeBranch(t *testing.T) {
 	logLevel := log.GetLevel()   // save the previous logging level
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED()) {
@@ -6031,7 +6031,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysNegativeCommitConventi
 	log.SetLevel(logLevel) // restore the original logging level
 }
 
-func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysPositiveCommitConventionInSomeotherbranchBranch(t *testing.T) {
+func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysPositiveCommitConventionInSomeotherBranch(t *testing.T) {
 	logLevel := log.GetLevel()   // save the previous logging level
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED()) {
@@ -6111,7 +6111,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysPositiveCommitConventi
 	log.SetLevel(logLevel) // restore the original logging level
 }
 
-func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysNegativeCommitConventionInSomeotherbranchBranch(t *testing.T) {
+func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysNegativeCommitConventionInSomeotherBranch(t *testing.T) {
 	logLevel := log.GetLevel()   // save the previous logging level
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.EXTENDED_PRESET_BRANCHES_SHORT_UNMERGED()) {

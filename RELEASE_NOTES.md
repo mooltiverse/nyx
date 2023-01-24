@@ -22,6 +22,24 @@ There are no fixes in this release.
 
 There are no known issues in this release.
 
+## 1.3.3
+
+This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/1.3.3).
+
+### Upgrade instructions
+
+Make sure the `git` executable must be available in the local `PATH` for the workaround to woork. If `git` is not available Nyx doesn't break but the workaround is not effective.
+
+### New features and improvements
+
+There are no new features or improvements in this release.
+
+### Fixed issues
+
+This release:
+
+* fixes bug [#130](https://github.com/mooltiverse/nyx/issues/130) about Git repository status being wrongly detected in some circumstances; a workaround has been applied using the local `git` executable (if available in the local `PATH`) (Go)
+
 ## 1.3.2
 
 This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/1.3.2).

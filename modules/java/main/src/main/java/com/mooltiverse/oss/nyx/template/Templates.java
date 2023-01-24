@@ -17,12 +17,8 @@ package com.mooltiverse.oss.nyx.template;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 import com.github.jknack.handlebars.Context;
 import com.github.jknack.handlebars.context.FieldValueResolver;

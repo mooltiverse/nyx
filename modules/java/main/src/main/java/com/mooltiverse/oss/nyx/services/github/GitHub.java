@@ -21,19 +21,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
 import org.kohsuke.github.GitHubBuilder;
 import org.kohsuke.github.GHAsset;
-import org.kohsuke.github.GHCreateRepositoryBuilder;
 import org.kohsuke.github.GHRelease;
 import org.kohsuke.github.GHRepository;
-import org.kohsuke.github.GHReleaseBuilder;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -175,7 +170,7 @@ public class GitHub implements GitHostingService, ReleaseService, UserService {
 
         GitHubBuilder ghBuilder = new GitHubBuilder();
         if (!Objects.isNull(baseURI) && !baseURI.isBlank())
-            ghBuilder = ghBuilder.withEndpoint​(baseURI);
+            ghBuilder = ghBuilder.withEndpoint(baseURI);
         if (!Objects.isNull(authenticationToken) && !authenticationToken.isBlank())
             ghBuilder = ghBuilder.withOAuthToken(authenticationToken);
 
@@ -194,9 +189,9 @@ public class GitHub implements GitHostingService, ReleaseService, UserService {
     public GitHubRepository createGitRepository(String name, String description, boolean restricted, boolean initialize)
         throws SecurityException, TransportException {
         try {
-            GHRepository ghRepository = client.createRepository(name).description​(description).autoInit​(initialize).visibility(restricted ? GHRepository.Visibility.PRIVATE : GHRepository.Visibility.PUBLIC).create();
+            GHRepository ghRepository = client.createRepository(name).description(description).autoInit(initialize).visibility(restricted ? GHRepository.Visibility.PRIVATE : GHRepository.Visibility.PUBLIC).create();
             // it looks like setting the visibility above against the builder doesn't work, so let's repeat it here
-            ghRepository.setVisibility​(restricted ? GHRepository.Visibility.PRIVATE : GHRepository.Visibility.PUBLIC);
+            ghRepository.setVisibility(restricted ? GHRepository.Visibility.PRIVATE : GHRepository.Visibility.PUBLIC);
             return new GitHubRepository(ghRepository);
         }
         catch (IOException ioe) {
@@ -213,7 +208,7 @@ public class GitHub implements GitHostingService, ReleaseService, UserService {
         // the repository must be in the form owner/repo, and this method always deletes repositories for the currently authenticated user
         String repoName = getAuthenticatedUser().getUserName().concat("/").concat(name);
         try {
-            client.getRepository​(repoName).delete();
+            client.getRepository(repoName).delete();
         }
         catch (IOException ioe) {
             throw new TransportException(String.format("Unable to find or delete the GitHub repository '%s'", repoName), ioe);
@@ -262,7 +257,7 @@ public class GitHub implements GitHostingService, ReleaseService, UserService {
         else repoName = Objects.isNull(repository) ? (Objects.isNull(repositoryName) ? repoName : repoName+"/"+repositoryName) : repoName+"/"+repository;
 
         try {
-            return client.getRepository​(repoName);
+            return client.getRepository(repoName);
         }
         catch (IOException ioe) {
             throw new TransportException(String.format("Unable to retrieve the repository '%s'", repoName), ioe);
@@ -276,7 +271,7 @@ public class GitHub implements GitHostingService, ReleaseService, UserService {
     public GitHubRelease getReleaseByTag(String owner, String repository, String tag)
         throws SecurityException, TransportException {
         try {
-            GHRelease ghRelease = getRepository(owner, repository).getReleaseByTagName​(tag);
+            GHRelease ghRelease = getRepository(owner, repository).getReleaseByTagName(tag);
             return Objects.isNull(ghRelease) ? null : new GitHubRelease(ghRelease);
         }
         catch (IOException ioe) {
@@ -291,7 +286,7 @@ public class GitHub implements GitHostingService, ReleaseService, UserService {
     public GitHubRelease publishRelease(String owner, String repository, String title, String tag, String description)
         throws SecurityException, TransportException {
         try {
-            return new GitHubRelease(getRepository(owner, repository).createRelease​(tag).name(title).body​(description).create());
+            return new GitHubRelease(getRepository(owner, repository).createRelease(tag).name(title).body(description).create());
         }
         catch (IOException ioe) {
             throw new TransportException(String.format("Unable to publish the release '%s'", tag), ioe);
@@ -316,7 +311,7 @@ public class GitHub implements GitHostingService, ReleaseService, UserService {
 
         GHRelease ghRelease = null;
         try {
-            ghRelease = getRepository(owner, repository).getReleaseByTagName​(release.getTag());
+            ghRelease = getRepository(owner, repository).getReleaseByTagName(release.getTag());
         }
         catch (IOException ioe) {
             throw new TransportException(String.format("Unable to retrieve the release '%s'", release.getTag()), ioe);
@@ -326,8 +321,8 @@ public class GitHub implements GitHostingService, ReleaseService, UserService {
             File assetFile = new File(asset.getPath());
             if (assetFile.exists()) {
                 try {
-                    GHAsset ghAsset = ghRelease.uploadAsset​(asset.getFileName(), new FileInputStream(assetFile), asset.getType());
-                    ghAsset.setLabel​(asset.getDescription());
+                    GHAsset ghAsset = ghRelease.uploadAsset(asset.getFileName(), new FileInputStream(assetFile), asset.getType());
+                    ghAsset.setLabel(asset.getDescription());
                 }
                 catch (IOException ioe) {
                     throw new TransportException(String.format("Could not upload release asset '%s'", asset.getPath()), ioe);

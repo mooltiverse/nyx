@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assumptions.*;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
@@ -39,6 +40,7 @@ import com.mooltiverse.oss.nyx.entities.git.Identity;
 import com.mooltiverse.oss.nyx.entities.git.Tag;
 import com.mooltiverse.oss.nyx.git.tools.Scenario;
 import com.mooltiverse.oss.nyx.git.tools.Script;
+import com.mooltiverse.oss.nyx.git.util.FileSystemUtil;
 import com.mooltiverse.oss.nyx.git.util.RandomUtil;
 import com.mooltiverse.oss.nyx.services.github.GitHub;
 import com.mooltiverse.oss.nyx.services.github.GitHubRepository;
@@ -1317,6 +1319,116 @@ public class JGitRepositoryTests {
             // commit the files, now we're clean again
             script.andCommit();
             assertTrue(repository.isClean());
+        }
+
+        @DisplayName("JGitRepository.isClean() with a test file containing linefeeds using the embedded library")
+        @Test
+        public void isCleanWithTextFileContainingLineFeedsUsingEmbeddedLibraryTest()
+            throws Exception {
+            // This test reproduces bugs:
+            // - https://github.com/mooltiverse/nyx/issues/130
+            // - https://github.com/mooltiverse/nyx/issues/129
+            // The use case for the bug is when a commit with a simple change that adds a LF or CRLF in some text file
+            // makes isClean() return false (even after the change has been commited) when it's supposed to return true.
+            // The bug actually does not affect the Java version, but is here to match with the tests for the Go version
+            // The difference between this test and the below test is that here we use the internal library both to check the
+            // repository status and also to execute the Git commands to build the test repository.
+            Script script = Scenario.FROM_SCRATCH.realize();
+            script.getWorkingDirectory().deleteOnExit();
+            assertTrue(JGitRepository.open(script.getWorkingDirectory()).isClean());
+            
+            // add one file with a LF and a CRLF and test
+            File f = new File(script.getWorkingDirectory(), "README.txt");
+            FileWriter fw = new FileWriter(f);
+            fw.write("one");
+            fw.write("\n");
+            fw.write("two");
+            fw.write("\r\n");
+            fw.flush();
+            fw.close();
+            assertFalse(JGitRepository.open(script.getWorkingDirectory()).isClean());
+
+            // stage the files without committing
+            script.andStage();
+            assertFalse(JGitRepository.open(script.getWorkingDirectory()).isClean());
+
+            // commit the files, now we're supposed to be clean again but when the bug is present we're not
+            script.andCommit();
+            // when the bug is present, this call to IsClean() returns false even if it's supposed to return true
+            assertTrue(JGitRepository.open(script.getWorkingDirectory()).isClean());
+        }
+
+        @DisplayName("JGitRepository.isClean() with a test file containing linefeeds using the git command")
+        @Test
+        public void isCleanWithTextFileContainingLineFeedsUsingGitCommandTest()
+            throws Exception {
+            // This test reproduces bugs:
+            // - https://github.com/mooltiverse/nyx/issues/130
+            // - https://github.com/mooltiverse/nyx/issues/129
+            // The use case for the bug is when a commit with a simple change that adds a LF or CRLF in some text file
+            // makes isClean() return false (even after the change has been commited) when it's supposed to return true.
+            // The bug actually does not affect the Java version, but is here to match with the tests for the Go version
+            // The difference between this test and the above test is that here we use the internal library just to check the
+            // repository status, while Git commands to build the test repository are executed using the external executable Git command.
+            File testDirectory = FileSystemUtil.newTempDirectory(null, "nyx-test-script-");
+            testDirectory.deleteOnExit();
+            File repoDirectory = new File(testDirectory, "testrepo");
+            Process p = new ProcessBuilder(new String[]{"git", "init", "testrepo"}).directory(testDirectory).redirectErrorStream(true).start();
+            p.waitFor();
+            System.out.println("Output from 'git init testrepo' is:");
+            System.out.write(p.getInputStream().readAllBytes());
+            System.out.println();
+            System.out.flush();
+            p.destroy();
+            assertTrue(JGitRepository.open(repoDirectory).isClean());
+
+            // Give the local repository an identity or some further steps may fail
+            p = new ProcessBuilder(new String[]{"git", "config", "user.email", "\"jdoe@example.com\""}).directory(repoDirectory).redirectErrorStream(true).start();
+            p.waitFor();
+            System.out.println("Output from 'git config user.email \"jdoe@example.com\"' is:");
+            System.out.write(p.getInputStream().readAllBytes());
+            System.out.println();
+            System.out.flush();
+            p.destroy();
+            p = new ProcessBuilder(new String[]{"git", "config", "user.name", "\"John Doe\""}).directory(repoDirectory).redirectErrorStream(true).start();
+            p.waitFor();
+            System.out.println("Output from 'git config user.name \"John Doe\"' is:");
+            System.out.write(p.getInputStream().readAllBytes());
+            System.out.println();
+            System.out.flush();
+            p.destroy();
+            
+            // add one file with a LF and a CRLF and test
+            File f = new File(repoDirectory, "README.txt");
+            FileWriter fw = new FileWriter(f);
+            fw.write("one");
+            fw.write("\n");
+            fw.write("two");
+            fw.write("\r\n");
+            fw.flush();
+            fw.close();
+            assertFalse(JGitRepository.open(repoDirectory).isClean());
+
+            // stage the files without committing
+            p = new ProcessBuilder(new String[]{"git", "add", "."}).directory(repoDirectory).redirectErrorStream(true).start();
+            p.waitFor();
+            System.out.println("Output from 'git add .' is:");
+            System.out.write(p.getInputStream().readAllBytes());
+            System.out.println();
+            System.out.flush();
+            p.destroy();
+            assertFalse(JGitRepository.open(repoDirectory).isClean());
+
+            // commit the files, now we're supposed to be clean again but when the bug is present we're not
+            p = new ProcessBuilder(new String[]{"git", "commit", "-m", "\"commit\""}).directory(repoDirectory).redirectErrorStream(true).start();
+            p.waitFor();
+            System.out.println("Output from 'git commit -m \"commit\"' is:");
+            System.out.write(p.getInputStream().readAllBytes());
+            System.out.println();
+            System.out.flush();
+            p.destroy();
+            // when the bug is present, this call to IsClean() returns false even if it's supposed to return true
+            assertTrue(JGitRepository.open(repoDirectory).isClean());
         }
     }
 
