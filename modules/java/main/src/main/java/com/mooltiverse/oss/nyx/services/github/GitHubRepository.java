@@ -52,6 +52,11 @@ public class GitHubRepository extends GitHubEntity implements GitHostedRepositor
     private final String httpUrl;
 
     /**
+     * The repository SSH URL
+     */
+    private final String sshUrl;
+
+    /**
      * Creates the repository object modelled by the given reference.
      * 
      * @param repo the reference to the backing object. Can't be {@code null}
@@ -68,6 +73,7 @@ public class GitHubRepository extends GitHubEntity implements GitHostedRepositor
         this.description = repo.getDescription();
         this.defaultBranch = repo.getDefaultBranch();
         this.httpUrl = repo.getHttpTransportUrl();
+        this.sshUrl = repo.getSshUrl();
     }
 
     /**
@@ -100,6 +106,14 @@ public class GitHubRepository extends GitHubEntity implements GitHostedRepositor
     @Override
     public String getHTTPURL() {
         return httpUrl;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getSSHURL() {
+        return sshUrl;
     }
 
     /**

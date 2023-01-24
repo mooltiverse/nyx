@@ -24,6 +24,7 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import com.mooltiverse.oss.nyx.entities.AuthenticationMethod;
 import com.mooltiverse.oss.nyx.entities.Identifier;
 import com.mooltiverse.oss.nyx.entities.Provider;
 import com.mooltiverse.oss.nyx.entities.Verbosity;
@@ -187,16 +188,28 @@ public class EnvironmentConfigurationLayerTests {
 
         // get a new instance or a stale object is returned by getGit()
         environmentConfigurationLayer = EnvironmentConfigurationLayerMock.getInstance();
+        environmentConfigurationLayer.environment.put("NYX_GIT_REMOTES_one_AUTHENTICATION_METHOD", "USER_PASSWORD");
         environmentConfigurationLayer.environment.put("NYX_GIT_REMOTES_one_USER", "jdoe");
         environmentConfigurationLayer.environment.put("NYX_GIT_REMOTES_one_PASSWORD", "pwd");
+        environmentConfigurationLayer.environment.put("NYX_GIT_REMOTES_one_PRIVATE_KEY", "pk1");
+        environmentConfigurationLayer.environment.put("NYX_GIT_REMOTES_one_PASSPHRASE", "pp1");
+        environmentConfigurationLayer.environment.put("NYX_GIT_REMOTES_two_AUTHENTICATION_METHOD", "PUBLIC_KEY");
         environmentConfigurationLayer.environment.put("NYX_GIT_REMOTES_two_USER", "stiger");
         environmentConfigurationLayer.environment.put("NYX_GIT_REMOTES_two_PASSWORD", "sct");
+        environmentConfigurationLayer.environment.put("NYX_GIT_REMOTES_two_PRIVATE_KEY", "pk2");
+        environmentConfigurationLayer.environment.put("NYX_GIT_REMOTES_two_PASSPHRASE", "pp2");
 
         assertEquals(2, environmentConfigurationLayer.getGit().getRemotes().size());
+        assertEquals(AuthenticationMethod.USER_PASSWORD, environmentConfigurationLayer.getGit().getRemotes().get("one").getAuthenticationMethod());
         assertEquals("pwd", environmentConfigurationLayer.getGit().getRemotes().get("one").getPassword());
         assertEquals("jdoe", environmentConfigurationLayer.getGit().getRemotes().get("one").getUser());
+        assertEquals("pk1", environmentConfigurationLayer.getGit().getRemotes().get("one").getPrivateKey());
+        assertEquals("pp1", environmentConfigurationLayer.getGit().getRemotes().get("one").getPassphrase());
+        assertEquals(AuthenticationMethod.PUBLIC_KEY, environmentConfigurationLayer.getGit().getRemotes().get("two").getAuthenticationMethod());
         assertEquals("sct", environmentConfigurationLayer.getGit().getRemotes().get("two").getPassword());
         assertEquals("stiger", environmentConfigurationLayer.getGit().getRemotes().get("two").getUser());
+        assertEquals("pk2", environmentConfigurationLayer.getGit().getRemotes().get("two").getPrivateKey());
+        assertEquals("pp2", environmentConfigurationLayer.getGit().getRemotes().get("two").getPassphrase());
     }
 
     @Test

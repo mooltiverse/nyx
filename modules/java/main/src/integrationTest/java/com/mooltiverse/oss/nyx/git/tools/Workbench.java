@@ -27,22 +27,41 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Properties;
 
 import com.mooltiverse.oss.nyx.git.util.FileSystemUtil;
 import com.mooltiverse.oss.nyx.git.util.GitUtil;
 import com.mooltiverse.oss.nyx.git.util.RandomUtil;
 
+import com.jcraft.jsch.AgentIdentityRepository;
+import com.jcraft.jsch.AgentProxyException;
+import com.jcraft.jsch.IdentityRepository;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.Session;
+import com.jcraft.jsch.SSHAgentConnector;
+import com.jcraft.jsch.UserInfo;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.TransportConfigCallback;
 import org.eclipse.jgit.api.errors.RefNotFoundException;
+import org.eclipse.jgit.errors.UnsupportedCredentialItem;
+import org.eclipse.jgit.internal.transport.ssh.jsch.CredentialsProviderUserInfo;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.RefDatabase;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevObject;
+import org.eclipse.jgit.transport.CredentialsProvider;
+import org.eclipse.jgit.transport.CredentialItem;
 import org.eclipse.jgit.transport.RefSpec;
+import org.eclipse.jgit.transport.SshTransport;
+import org.eclipse.jgit.transport.Transport;
 import org.eclipse.jgit.transport.URIish;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+import org.eclipse.jgit.transport.ssh.jsch.JschConfigSessionFactory;
+import org.eclipse.jgit.transport.ssh.jsch.OpenSshConfig.Host;
+import org.eclipse.jgit.util.FS;
 
 /**
  * A Git repository utility class used to test. This class is used to dynamically create a repository that can be used for tests
@@ -121,20 +140,103 @@ public class Workbench {
     }
 
     /**
-     * Clones the repository at the given URI into the given directory. No credendials are used for cloning.
+     * Returns a new transport config callback to use when using Git SSH authentication.
      * 
-     * @param uri the URI of the repository to clone from. It can't be {@code null}.
-     * @param directory the directory to clone the repository in. It can't be {@code null}.
+     * @param privateKey the SSH private key.
+     * @param passphrase the optional password to use to open the private key, in case it's protected by a passphrase.
      * 
-     * @throws Exception in case of any issue
+     * @return the transport config callback built on the given credentials.
      */
-    public static void cloneInto(String uri, File directory)
+    private static TransportConfigCallback getTransportConfigCallback(String privateKey, byte[] passphrase) 
         throws Exception {
-        cloneInto(uri, directory, null, null);
+        // These code examples have been taken from
+        // - https://www.codeaffine.com/2014/12/09/jgit-authentication/ and then elaborated
+        // - https://stackoverflow.com/questions/31931574/java-sftp-client-that-takes-private-key-as-a-string
+        // - https://stackoverflow.com/questions/56758040/loading-private-key-from-string-or-resource-in-java-jsch-in-android-app
+        // - https://stackoverflow.com/questions/33637481/jsch-to-add-private-key-from-a-string
+        JschConfigSessionFactory sshSessionFactory = new JschConfigSessionFactory() {
+            // Override this method as per the Javadoc instructions
+            @Override
+            protected void configure(Host host, Session session) {
+                // Configure in order to use the passphrase (when using the private key from the default location,
+                // which means the user passed the passphrase but not the private key).
+                // When the private key is passed in memory instead of using the default location, the passphrase
+                // is passed along with it (see below in createDefaultJSch(FS fs)).
+                if ((Objects.isNull(privateKey) || privateKey.isEmpty()) && ((!Objects.isNull(passphrase)) && (passphrase.length > 0))) {
+                    // Implement an anonymous credentials provider to provide the passphrase when needed.
+                    // An alternative could be to just implement an anonymous UserInfo object and make its getPassphrase()
+                    // method return the passphrase.
+                    CredentialsProvider credentialsProvider = new CredentialsProvider() {
+                        @Override
+                        public boolean get(URIish uri, CredentialItem... items)
+                            throws UnsupportedCredentialItem {
+                            for (CredentialItem item : items) {
+                                // set the value for string types and ignore others
+                                if (CredentialItem.StringType.class.isInstance(item)) {
+                                    CredentialItem.StringType.class.cast(item).setValue(new String(passphrase));
+                                }
+                            }
+                            return true;
+                        }
+
+                        @Override
+                        public boolean isInteractive() {
+                            return false;
+                        }
+
+                        @Override
+                        public boolean supports(CredentialItem... items) {
+                            // just return true for any type of items, maybe this needs to be refined
+                            return true;
+                        }
+                    };
+                    UserInfo userInfo = new CredentialsProviderUserInfo(session, credentialsProvider);
+                    session.setUserInfo(userInfo);
+                }
+
+                Properties sessionProperties = new Properties();
+                //sessionProperties.put("PreferredAuthentications", "publickey");
+                if (!Objects.isNull(privateKey) && !privateKey.isEmpty()) {
+                    // disable host key checking if the in-memory key is used
+                    sessionProperties.put("StrictHostKeyChecking", "no");
+                }
+                session.setConfig(sessionProperties);
+            }
+
+            // Override this method in order to load the in-memory key, as the default one only loads them from
+            // default locations on the local filesystem
+            @Override
+            protected JSch createDefaultJSch(FS fs)
+                throws JSchException {
+                JSch defaultJSch = super.createDefaultJSch(fs);
+                defaultJSch.setConfig("PreferredAuthentications", "publickey");
+                if (!Objects.isNull(privateKey) && !privateKey.isEmpty()) {
+                    // the key name is not relevant
+                    // the public key is not required
+                    defaultJSch.addIdentity("nyxUserKey", privateKey.getBytes(), null, passphrase);
+
+                    // disable host key checking
+                    defaultJSch.setConfig("StrictHostKeyChecking", "no");
+                }
+
+                return defaultJSch;                  
+            }
+        };
+
+        return new TransportConfigCallback() {
+            @Override
+            public void configure(Transport transport) {
+                // How can we be sure the given Transport is an SshTransport? Docs don't explain...
+                if (SshTransport.class.isInstance(transport)) {
+                    SshTransport.class.cast(transport).setSshSessionFactory(sshSessionFactory);
+                }
+            }
+        };
     }
 
     /**
      * Clones the repository at the given URI into the given directory.
+     * This method allows using user name and password authentication (also used for tokens).
      * 
      * @param uri the URI of the repository to clone from. It can't be {@code null}.
      * @param directory the directory to clone the repository in. It can't be {@code null}.
@@ -146,6 +248,22 @@ public class Workbench {
     public static void cloneInto(String uri, File directory, String user, String password)
         throws Exception {
         Git.cloneRepository().setDirectory(directory).setURI(uri).setCredentialsProvider((Objects.isNull(user) && Objects.isNull(password)) ? null : new UsernamePasswordCredentialsProvider(user, password)).call();
+    }
+
+    /**
+     * Clones the repository at the given URI into the given directory.
+     * This method allows using SSH authentication.
+     * 
+     * @param uri the URI of the repository to clone from. It can't be {@code null}.
+     * @param directory the directory to clone the repository in. It can't be {@code null}.
+     * @param privateKey the SSH private key.
+     * @param passphrase the optional password to use to open the private key, in case it's protected by a passphrase.
+     * 
+     * @throws Exception in case of any issue
+     */
+    public static void cloneInto(String uri, File directory, String privateKey, byte[] passphrase)
+        throws Exception {
+        Git.cloneRepository().setDirectory(directory).setURI(uri).setTransportConfigCallback(getTransportConfigCallback(privateKey, passphrase)).call();
     }
 
     /**

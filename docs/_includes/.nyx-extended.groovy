@@ -27,12 +27,14 @@ nyx {
   git {
     remotes {
       origin {
+        authenticationMethod = 'USER_PASSWORD'
         user = 'jdoe'
         password = 'somepassword'
       }
       replica {
-        user = 'stiger'
-        password = 'somesecret'
+        authenticationMethod = 'PUBLIC_KEY'
+        privateKey = '{{#fileContent}}.ssh/id_ed25519{{/fileContent}}'
+        passphrase = 'somesecretpassphrase'
       }
     }
   }

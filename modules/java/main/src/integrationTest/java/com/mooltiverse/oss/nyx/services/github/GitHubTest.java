@@ -110,6 +110,7 @@ public class GitHubTest {
             assertEquals(randomID, gitHubRepository.getName());
             assertEquals(user.getUserName()+"/"+randomID, gitHubRepository.getFullName());
             assertEquals("https://github.com/"+user.getUserName()+"/"+randomID+".git", gitHubRepository.getHTTPURL());
+            assertEquals("git@github.com:"+user.getUserName()+"/"+randomID+".git", gitHubRepository.getSSHURL());
 
             // if we delete too quickly we often get a 404 from the server so let's wait a short while
             Thread.sleep(4000);

@@ -232,8 +232,8 @@ Some extra information on the Gradle Plugin internals is available [here]({{ sit
 
 In order to run the Gradle plugin you need:
 
-* Java release `11` or later
-* Gradle release `6.0` or later. Tests have been successfully executed up to release `7.6`. [Here](https://gradle.org/releases/) you can find the list of available releases.
+* Java release `15` or later
+* Gradle release `7.0` or later. Tests have been successfully executed up to release `7.6`. [Here](https://gradle.org/releases/) you can find the list of available releases and [here](https://docs.gradle.org/current/userguide/compatibility.html) is the Gradle compatibility matrix. Gradle versions from `6.7` should still work but are no longer tested
 
 ### Apply the plugin
 

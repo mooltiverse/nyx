@@ -125,6 +125,7 @@ func TestGitLabHostingServiceCreateGitRepository(t *testing.T) {
 	assert.Equal(t, randomID, (*gitLabRepository).GetName())
 	assert.Equal(t, randomID, (*gitLabRepository).GetFullName())
 	assert.Equal(t, "https://gitlab.com/"+(*user).GetUserName()+"/"+randomID+".git", (*gitLabRepository).GetHTTPURL())
+	assert.Equal(t, "git@gitlab.com:"+(*user).GetUserName()+"/"+randomID+".git", (*gitLabRepository).GetSSHURL())
 
 	// if we delete too quickly we often get a 404 from the server so let's wait a short while
 	time.Sleep(4000 * time.Millisecond)
@@ -161,9 +162,9 @@ func TestGitLabReleaseServiceCreateRelease(t *testing.T) {
 
 	// when a token for user and password authentication for plain Git operations against a GitLab repository,
 	// the user is the "PRIVATE-TOKEN" string and the password is the token
-	script := gittools.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED().ApplyOnCloneFromWithCredentials((*gitLabRepository).GetHTTPURL(), utl.PointerToString("PRIVATE-TOKEN"), utl.PointerToString(os.Getenv("gitLabTestUserToken")))
+	script := gittools.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED().ApplyOnCloneFromWithUserNameAndPassword((*gitLabRepository).GetHTTPURL(), utl.PointerToString("PRIVATE-TOKEN"), utl.PointerToString(os.Getenv("gitLabTestUserToken")))
 	defer os.RemoveAll(script.GetWorkingDirectory())
-	script.PushWithCredentials(utl.PointerToString("PRIVATE-TOKEN"), utl.PointerToString(os.Getenv("gitLabTestUserToken")))
+	script.PushWithUserNameAndPassword(utl.PointerToString("PRIVATE-TOKEN"), utl.PointerToString(os.Getenv("gitLabTestUserToken")))
 
 	// publish the release
 	release, err = gitLab.PublishRelease(&ownerName, &repositoryName, utl.PointerToString("Release 1.0.0-alpha.1"), "1.0.0-alpha.1", utl.PointerToString("A test description for the release\non multiple lines\nlike these"))

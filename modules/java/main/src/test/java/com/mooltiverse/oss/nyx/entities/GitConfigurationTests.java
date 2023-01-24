@@ -28,9 +28,12 @@ public class GitConfigurationTests {
     @DisplayName("GitConfiguration()")
     void constructorTest()
         throws Exception {
-        assertEquals(1, new GitConfiguration(Map.<String,GitRemoteConfiguration>of("r1", new GitRemoteConfiguration("u1", "p1"))).getRemotes().size());
-        assertTrue(new GitConfiguration(Map.<String,GitRemoteConfiguration>of("r1", new GitRemoteConfiguration("u1", "p1"))).getRemotes().containsKey("r1"));
-        assertEquals("p1", new GitConfiguration(Map.<String,GitRemoteConfiguration>of("r1", new GitRemoteConfiguration("u1", "p1"))).getRemotes().get("r1").getPassword());
-        assertEquals("u1", new GitConfiguration(Map.<String,GitRemoteConfiguration>of("r1", new GitRemoteConfiguration("u1", "p1"))).getRemotes().get("r1").getUser());
+        assertEquals(1, new GitConfiguration(Map.<String,GitRemoteConfiguration>of("r1", new GitRemoteConfiguration(AuthenticationMethod.USER_PASSWORD, "u1", "p1", "k1", "p2"))).getRemotes().size());
+        assertTrue(new GitConfiguration(Map.<String,GitRemoteConfiguration>of("r1", new GitRemoteConfiguration(AuthenticationMethod.USER_PASSWORD, "u1", "p1", "k1", "p2"))).getRemotes().containsKey("r1"));
+        assertEquals(AuthenticationMethod.USER_PASSWORD, new GitConfiguration(Map.<String,GitRemoteConfiguration>of("r1", new GitRemoteConfiguration(AuthenticationMethod.USER_PASSWORD, "u1", "p1", "k1", "p2"))).getRemotes().get("r1").getAuthenticationMethod());
+        assertEquals("p1", new GitConfiguration(Map.<String,GitRemoteConfiguration>of("r1", new GitRemoteConfiguration(AuthenticationMethod.USER_PASSWORD, "u1", "p1", "k1", "p2"))).getRemotes().get("r1").getPassword());
+        assertEquals("u1", new GitConfiguration(Map.<String,GitRemoteConfiguration>of("r1", new GitRemoteConfiguration(AuthenticationMethod.USER_PASSWORD, "u1", "p1", "k1", "p2"))).getRemotes().get("r1").getUser());
+        assertEquals("k1", new GitConfiguration(Map.<String,GitRemoteConfiguration>of("r1", new GitRemoteConfiguration(AuthenticationMethod.USER_PASSWORD, "u1", "p1", "k1", "p2"))).getRemotes().get("r1").getPrivateKey());
+        assertEquals("p2", new GitConfiguration(Map.<String,GitRemoteConfiguration>of("r1", new GitRemoteConfiguration(AuthenticationMethod.USER_PASSWORD, "u1", "p1", "k1", "p2"))).getRemotes().get("r1").getPassphrase());
     }
 }

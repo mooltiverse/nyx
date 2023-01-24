@@ -26,6 +26,7 @@ import org.junit.jupiter.api.Test;
 
 import com.mooltiverse.oss.nyx.Nyx;
 import com.mooltiverse.oss.nyx.configuration.SimpleConfigurationLayer;
+import com.mooltiverse.oss.nyx.entities.AuthenticationMethod;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
 import com.mooltiverse.oss.nyx.entities.GitRemoteConfiguration;
@@ -47,8 +48,8 @@ public class MarkTests {
     @DisplayName("Mark run")
     public static class UpToDateTests {
         @Test
-        @DisplayName("Mark.run() on a cloned workspace from GitHub with an additional remote using a release type with Commit, Tag and Push enabled after Infer has generated a new Version > yield to a new commit and a new tag, with changes pushed to all remotes")
-        void runOnGitHubClonedWorkspaceWithAdditionalRemoteWithNewVersionOrNewReleaseWithCommitAndTagAndPushEnabledTest()
+        @DisplayName("Mark.run() on a cloned workspace from GitHub with an additional remote using a release type with Commit, Tag and Push enabled after Infer has generated a new Version, using user name and password credentials > yield to a new commit and a new tag, with changes pushed to all remotes")
+        void runOnGitHubClonedWorkspaceWithAdditionalRemoteWithNewVersionOrNewReleaseWithCommitAndTagAndPushEnabledUsingUsernameAndPasswordCredentialsTest()
             throws Exception {
             String randomID = RandomUtil.randomAlphabeticString(5);
             // the 'gitHubTestUserToken' system property is set by the build script, which in turn reads it from an environment variable
@@ -74,7 +75,7 @@ public class MarkTests {
             );
             // set up the Git remote credentials
             configurationLayerMock.getGit().setRemotes(Map.<String,GitRemoteConfiguration>of(
-                "origin", new GitRemoteConfiguration(System.getProperty("gitHubTestUserToken"), ""))
+                "origin", new GitRemoteConfiguration(AuthenticationMethod.USER_PASSWORD, System.getProperty("gitHubTestUserToken"), "", null, null))
             );
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
             configurationLayerMock.setCommitMessageConventions(
@@ -129,8 +130,172 @@ public class MarkTests {
         }
 
         @Test
-        @DisplayName("Mark.run() on a cloned workspace from GitLab with an additional remote using a release type with Commit, Tag and Push enabled after Infer has generated a new Version > yield to a new commit and a new tag, with changes pushed to all remotes")
-        void runOnGitLabClonedWorkspaceWithAdditionalRemoteWithNewVersionOrNewReleaseWithCommitAndTagAndPushEnabledTest()
+        @DisplayName("Mark.run() on a cloned workspace from GitHub with an additional remote using a release type with Commit, Tag and Push enabled after Infer has generated a new Version, using unprotected private key credentials > yield to a new commit and a new tag, with changes pushed to all remotes")
+        void runOnGitHubClonedWorkspaceWithAdditionalRemoteWithNewVersionOrNewReleaseWithCommitAndTagAndPushEnabledUsingUnprotectedPrivateKeyCredentialsTest()
+            throws Exception {
+            String randomID = RandomUtil.randomAlphabeticString(5);
+            // the 'gitHubTestUserToken' system property is set by the build script, which in turn reads it from an environment variable
+            // when a token for user and password authentication for plain Git operations against a GitHub repository,
+            // the user is the token and the password is the empty string
+            GitHub gitHub = GitHub.instance(Map.<String,String>of(GitHub.AUTHENTICATION_TOKEN_OPTION_NAME, System.getProperty("gitHubTestUserToken")));
+            GitHubRepository gitHubRepository = gitHub.createGitRepository(randomID, "Test repository "+randomID, false, true);
+
+            // if we clone too quickly next calls may fail
+            Thread.sleep(4000);
+
+            Script replicaScript = Scenario.FROM_SCRATCH.realize();
+            replicaScript.getWorkingDirectory().deleteOnExit();
+            Script script = Scenario.ONE_BRANCH_SHORT.applyOnClone(gitHubRepository.getSSHURL(), System.getProperty("gitHubTestUserPrivateKeyWithoutPassphrase"), (byte[])null);
+            script.getWorkingDirectory().deleteOnExit();
+            script.addRemote(replicaScript.getGitDirectory(), "replica");
+            
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            // add a service configuration to pass the credentials required to push to the remote repository
+            configurationLayerMock.setServices(Map.<String,ServiceConfiguration>of(
+                    "github", new ServiceConfiguration(Provider.GITHUB, Map.<String,String>of(GitHub.AUTHENTICATION_TOKEN_OPTION_NAME, System.getProperty("gitHubTestUserToken")))
+                )
+            );
+            // set up the Git remote credentials
+            configurationLayerMock.getGit().setRemotes(Map.<String,GitRemoteConfiguration>of(
+                "origin", new GitRemoteConfiguration(AuthenticationMethod.PUBLIC_KEY, null, null, System.getProperty("gitHubTestUserPrivateKeyWithoutPassphrase"), null))
+            );
+            // add a mock convention that accepts all non null messages and dumps the minor identifier for each
+            configurationLayerMock.setCommitMessageConventions(
+                new CommitMessageConventions(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*")))
+                )
+            );
+            // add a custom release type that always enables committing, tagging and pushing
+            configurationLayerMock.setReleaseTypes(
+                new ReleaseTypes(
+                    List.<String>of("testReleaseType"),
+                    List.<String>of(),
+                    List.<String>of("origin", "replica"),
+                    Map.<String,ReleaseType>of("testReleaseType", new ReleaseType() {
+                        {
+                            setGitCommit(Boolean.TRUE.toString());
+                            setGitPush(Boolean.TRUE.toString());
+                            setGitTag(Boolean.TRUE.toString());
+                        }}
+                    )
+                )
+            );
+            
+            Nyx nyx = new Nyx(script.getWorkingDirectory());
+            nyx.configuration().withRuntimeConfiguration(configurationLayerMock);
+
+            nyx.mark();
+
+            // if we read too quickly we often get a 404 from the server so let's wait a short while
+            Thread.sleep(2000);
+
+            // clone the remote repo again into a a new directory and test
+            Script remoteScript = Script.cloneFrom(gitHubRepository.getSSHURL(), System.getProperty("gitHubTestUserPrivateKeyWithoutPassphrase"), (byte[])null);
+            remoteScript.getWorkingDirectory().deleteOnExit();
+
+            assertEquals("0.0.5", nyx.state().getVersion());
+            assertEquals(script.getTags().size(), replicaScript.getTags().size());
+            assertEquals(script.getTags().size(), remoteScript.getTags().size());
+
+            // if we delete too quickly we often get a 404 from the server so let's wait a short while
+            Thread.sleep(2000);
+
+            // test for idempotency running the command again
+            nyx.mark();
+            assertEquals("0.0.5", nyx.state().getVersion());
+            assertEquals(script.getTags().size(), replicaScript.getTags().size());
+            assertEquals(script.getTags().size(), remoteScript.getTags().size());
+
+            // now delete it
+            gitHub.deleteGitRepository(randomID);
+        }
+
+        @Test
+        @DisplayName("Mark.run() on a cloned workspace from GitHub with an additional remote using a release type with Commit, Tag and Push enabled after Infer has generated a new Version, using protected private key credentials > yield to a new commit and a new tag, with changes pushed to all remotes")
+        void runOnGitHubClonedWorkspaceWithAdditionalRemoteWithNewVersionOrNewReleaseWithCommitAndTagAndPushEnabledUsingProtectedPrivateKeyCredentialsTest()
+            throws Exception {
+            String randomID = RandomUtil.randomAlphabeticString(5);
+            // the 'gitHubTestUserToken' system property is set by the build script, which in turn reads it from an environment variable
+            // when a token for user and password authentication for plain Git operations against a GitHub repository,
+            // the user is the token and the password is the empty string
+            GitHub gitHub = GitHub.instance(Map.<String,String>of(GitHub.AUTHENTICATION_TOKEN_OPTION_NAME, System.getProperty("gitHubTestUserToken")));
+            GitHubRepository gitHubRepository = gitHub.createGitRepository(randomID, "Test repository "+randomID, false, true);
+
+            // if we clone too quickly next calls may fail
+            Thread.sleep(4000);
+
+            Script replicaScript = Scenario.FROM_SCRATCH.realize();
+            replicaScript.getWorkingDirectory().deleteOnExit();
+            Script script = Scenario.ONE_BRANCH_SHORT.applyOnClone(gitHubRepository.getSSHURL(), System.getProperty("gitHubTestUserPrivateKeyWithPassphrase"), System.getProperty("gitHubTestUserPrivateKeyPassphrase").getBytes());
+            script.getWorkingDirectory().deleteOnExit();
+            script.addRemote(replicaScript.getGitDirectory(), "replica");
+            
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            // add a service configuration to pass the credentials required to push to the remote repository
+            configurationLayerMock.setServices(Map.<String,ServiceConfiguration>of(
+                    "github", new ServiceConfiguration(Provider.GITHUB, Map.<String,String>of(GitHub.AUTHENTICATION_TOKEN_OPTION_NAME, System.getProperty("gitHubTestUserToken")))
+                )
+            );
+            // set up the Git remote credentials
+            configurationLayerMock.getGit().setRemotes(Map.<String,GitRemoteConfiguration>of(
+                "origin", new GitRemoteConfiguration(AuthenticationMethod.PUBLIC_KEY, null, null, System.getProperty("gitHubTestUserPrivateKeyWithPassphrase"), System.getProperty("gitHubTestUserPrivateKeyPassphrase")))
+            );
+            // add a mock convention that accepts all non null messages and dumps the minor identifier for each
+            configurationLayerMock.setCommitMessageConventions(
+                new CommitMessageConventions(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*")))
+                )
+            );
+            // add a custom release type that always enables committing, tagging and pushing
+            configurationLayerMock.setReleaseTypes(
+                new ReleaseTypes(
+                    List.<String>of("testReleaseType"),
+                    List.<String>of(),
+                    List.<String>of("origin", "replica"),
+                    Map.<String,ReleaseType>of("testReleaseType", new ReleaseType() {
+                        {
+                            setGitCommit(Boolean.TRUE.toString());
+                            setGitPush(Boolean.TRUE.toString());
+                            setGitTag(Boolean.TRUE.toString());
+                        }}
+                    )
+                )
+            );
+            
+            Nyx nyx = new Nyx(script.getWorkingDirectory());
+            nyx.configuration().withRuntimeConfiguration(configurationLayerMock);
+
+            nyx.mark();
+
+            // if we read too quickly we often get a 404 from the server so let's wait a short while
+            Thread.sleep(2000);
+
+            // clone the remote repo again into a a new directory and test
+            Script remoteScript = Script.cloneFrom(gitHubRepository.getSSHURL(), System.getProperty("gitHubTestUserPrivateKeyWithPassphrase"), System.getProperty("gitHubTestUserPrivateKeyPassphrase").getBytes());
+            remoteScript.getWorkingDirectory().deleteOnExit();
+
+            assertEquals("0.0.5", nyx.state().getVersion());
+            assertEquals(script.getTags().size(), replicaScript.getTags().size());
+            assertEquals(script.getTags().size(), remoteScript.getTags().size());
+
+            // if we delete too quickly we often get a 404 from the server so let's wait a short while
+            Thread.sleep(2000);
+
+            // test for idempotency running the command again
+            nyx.mark();
+            assertEquals("0.0.5", nyx.state().getVersion());
+            assertEquals(script.getTags().size(), replicaScript.getTags().size());
+            assertEquals(script.getTags().size(), remoteScript.getTags().size());
+
+            // now delete it
+            gitHub.deleteGitRepository(randomID);
+        }
+
+        @Test
+        @DisplayName("Mark.run() on a cloned workspace from GitLab with an additional remote using a release type with Commit, Tag and Push enabled after Infer has generated a new Version, using user name and password credentials > yield to a new commit and a new tag, with changes pushed to all remotes")
+        void runOnGitLabClonedWorkspaceWithAdditionalRemoteWithNewVersionOrNewReleaseWithCommitAndTagAndPushEnabledUsingUsernameAndPasswordCredentialsTest()
             throws Exception {
             String randomID = RandomUtil.randomAlphabeticString(5);
             // the 'gitLabTestUserToken' system property is set by the build script, which in turn reads it from an environment variable
@@ -156,7 +321,7 @@ public class MarkTests {
             );
             // set up the Git remote credentials
             configurationLayerMock.getGit().setRemotes(Map.<String,GitRemoteConfiguration>of(
-                "origin", new GitRemoteConfiguration("PRIVATE-TOKEN", System.getProperty("gitLabTestUserToken")))
+                "origin", new GitRemoteConfiguration(AuthenticationMethod.USER_PASSWORD, "PRIVATE-TOKEN", System.getProperty("gitLabTestUserToken"), null, null))
             );
             // add a mock convention that accepts all non null messages and dumps the minor identifier for each
             configurationLayerMock.setCommitMessageConventions(
@@ -191,6 +356,170 @@ public class MarkTests {
 
             // clone the remote repo again into a a new directory and test
             Script remoteScript = Script.cloneFrom(gitLabRepository.getHTTPURL(), "PRIVATE-TOKEN", System.getProperty("gitLabTestUserToken"));
+            remoteScript.getWorkingDirectory().deleteOnExit();
+
+            assertEquals("0.0.5", nyx.state().getVersion());
+            assertEquals(script.getTags().size(), replicaScript.getTags().size());
+            assertEquals(script.getTags().size(), remoteScript.getTags().size());
+
+            // if we delete too quickly we often get a 404 from the server so let's wait a short while
+            Thread.sleep(2000);
+
+            // test for idempotency running the command again
+            nyx.mark();
+            assertEquals("0.0.5", nyx.state().getVersion());
+            assertEquals(script.getTags().size(), replicaScript.getTags().size());
+            assertEquals(script.getTags().size(), remoteScript.getTags().size());
+
+            // now delete it
+            gitLab.deleteGitRepository(gitLabRepository.getID());
+        }
+
+        @Test
+        @DisplayName("Mark.run() on a cloned workspace from GitLab with an additional remote using a release type with Commit, Tag and Push enabled after Infer has generated a new Version, using unprotected private key credentials > yield to a new commit and a new tag, with changes pushed to all remotes")
+        void runOnGitLabClonedWorkspaceWithAdditionalRemoteWithNewVersionOrNewReleaseWithCommitAndTagAndPushEnabledUsingUnprotectedPrivateKeyCredentialsTest()
+            throws Exception {
+            String randomID = RandomUtil.randomAlphabeticString(5);
+            // the 'gitLabTestUserToken' system property is set by the build script, which in turn reads it from an environment variable
+            // when a token for user and password authentication for plain Git operations against a GitLab repository,
+            // the user is the "PRIVATE-TOKEN" string and the password is the token
+            GitLab gitLab = GitLab.instance(Map.<String,String>of(GitLab.AUTHENTICATION_TOKEN_OPTION_NAME, System.getProperty("gitLabTestUserToken")));
+            GitLabRepository gitLabRepository = gitLab.createGitRepository(randomID, "Test repository "+randomID, false, true);
+
+            // if we clone too quickly next calls may fail
+            Thread.sleep(4000);
+
+            Script replicaScript = Scenario.FROM_SCRATCH.realize();
+            replicaScript.getWorkingDirectory().deleteOnExit();
+            Script script = Scenario.ONE_BRANCH_SHORT.applyOnClone(gitLabRepository.getSSHURL(), System.getProperty("gitLabTestUserPrivateKeyWithoutPassphrase"), (byte[])null);
+            script.getWorkingDirectory().deleteOnExit();
+            script.addRemote(replicaScript.getGitDirectory(), "replica");
+            
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            // add a service configuration to pass the credentials required to push to the remote repository
+            configurationLayerMock.setServices(Map.<String,ServiceConfiguration>of(
+                    "gitlab", new ServiceConfiguration(Provider.GITLAB, Map.<String,String>of(GitLab.AUTHENTICATION_TOKEN_OPTION_NAME, System.getProperty("gitLabTestUserToken")))
+                )
+            );
+            // set up the Git remote credentials
+            configurationLayerMock.getGit().setRemotes(Map.<String,GitRemoteConfiguration>of(
+                "origin", new GitRemoteConfiguration(AuthenticationMethod.PUBLIC_KEY, null, null, System.getProperty("gitLabTestUserPrivateKeyWithoutPassphrase"), null))
+            );
+            // add a mock convention that accepts all non null messages and dumps the minor identifier for each
+            configurationLayerMock.setCommitMessageConventions(
+                new CommitMessageConventions(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*")))
+                )
+            );
+            // add a custom release type that always enables committing, tagging and pushing
+            configurationLayerMock.setReleaseTypes(
+                new ReleaseTypes(
+                    List.<String>of("testReleaseType"),
+                    List.<String>of(),
+                    List.<String>of("origin", "replica"),
+                    Map.<String,ReleaseType>of("testReleaseType", new ReleaseType() {
+                        {
+                            setGitCommit(Boolean.TRUE.toString());
+                            setGitPush(Boolean.TRUE.toString());
+                            setGitTag(Boolean.TRUE.toString());
+                        }}
+                    )
+                )
+            );
+            
+            Nyx nyx = new Nyx(script.getWorkingDirectory());
+            nyx.configuration().withRuntimeConfiguration(configurationLayerMock);
+
+            nyx.mark();
+
+            // if we read too quickly we often get a 404 from the server so let's wait a short while
+            Thread.sleep(2000);
+
+            // clone the remote repo again into a a new directory and test
+            Script remoteScript = Script.cloneFrom(gitLabRepository.getSSHURL(), System.getProperty("gitLabTestUserPrivateKeyWithoutPassphrase"), (byte[])null);
+            remoteScript.getWorkingDirectory().deleteOnExit();
+
+            assertEquals("0.0.5", nyx.state().getVersion());
+            assertEquals(script.getTags().size(), replicaScript.getTags().size());
+            assertEquals(script.getTags().size(), remoteScript.getTags().size());
+
+            // if we delete too quickly we often get a 404 from the server so let's wait a short while
+            Thread.sleep(2000);
+
+            // test for idempotency running the command again
+            nyx.mark();
+            assertEquals("0.0.5", nyx.state().getVersion());
+            assertEquals(script.getTags().size(), replicaScript.getTags().size());
+            assertEquals(script.getTags().size(), remoteScript.getTags().size());
+
+            // now delete it
+            gitLab.deleteGitRepository(gitLabRepository.getID());
+        }
+
+        @Test
+        @DisplayName("Mark.run() on a cloned workspace from GitLab with an additional remote using a release type with Commit, Tag and Push enabled after Infer has generated a new Version, using protected private key credentials > yield to a new commit and a new tag, with changes pushed to all remotes")
+        void runOnGitLabClonedWorkspaceWithAdditionalRemoteWithNewVersionOrNewReleaseWithCommitAndTagAndPushEnabledUsingProtectedPrivateKeyCredentialsTest()
+            throws Exception {
+            String randomID = RandomUtil.randomAlphabeticString(5);
+            // the 'gitLabTestUserToken' system property is set by the build script, which in turn reads it from an environment variable
+            // when a token for user and password authentication for plain Git operations against a GitLab repository,
+            // the user is the "PRIVATE-TOKEN" string and the password is the token
+            GitLab gitLab = GitLab.instance(Map.<String,String>of(GitLab.AUTHENTICATION_TOKEN_OPTION_NAME, System.getProperty("gitLabTestUserToken")));
+            GitLabRepository gitLabRepository = gitLab.createGitRepository(randomID, "Test repository "+randomID, false, true);
+
+            // if we clone too quickly next calls may fail
+            Thread.sleep(4000);
+
+            Script replicaScript = Scenario.FROM_SCRATCH.realize();
+            replicaScript.getWorkingDirectory().deleteOnExit();
+            Script script = Scenario.ONE_BRANCH_SHORT.applyOnClone(gitLabRepository.getSSHURL(), System.getProperty("gitLabTestUserPrivateKeyWithPassphrase"), System.getProperty("gitLabTestUserPrivateKeyPassphrase").getBytes());
+            script.getWorkingDirectory().deleteOnExit();
+            script.addRemote(replicaScript.getGitDirectory(), "replica");
+            
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            // add a service configuration to pass the credentials required to push to the remote repository
+            configurationLayerMock.setServices(Map.<String,ServiceConfiguration>of(
+                    "gitlab", new ServiceConfiguration(Provider.GITLAB, Map.<String,String>of(GitLab.AUTHENTICATION_TOKEN_OPTION_NAME, System.getProperty("gitLabTestUserToken")))
+                )
+            );
+            // set up the Git remote credentials
+            configurationLayerMock.getGit().setRemotes(Map.<String,GitRemoteConfiguration>of(
+                "origin", new GitRemoteConfiguration(AuthenticationMethod.PUBLIC_KEY, null, null, System.getProperty("gitLabTestUserPrivateKeyWithPassphrase"), System.getProperty("gitLabTestUserPrivateKeyPassphrase")))
+            );
+            // add a mock convention that accepts all non null messages and dumps the minor identifier for each
+            configurationLayerMock.setCommitMessageConventions(
+                new CommitMessageConventions(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*")))
+                )
+            );
+            // add a custom release type that always enables committing, tagging and pushing
+            configurationLayerMock.setReleaseTypes(
+                new ReleaseTypes(
+                    List.<String>of("testReleaseType"),
+                    List.<String>of(),
+                    List.<String>of("origin", "replica"),
+                    Map.<String,ReleaseType>of("testReleaseType", new ReleaseType() {
+                        {
+                            setGitCommit(Boolean.TRUE.toString());
+                            setGitPush(Boolean.TRUE.toString());
+                            setGitTag(Boolean.TRUE.toString());
+                        }}
+                    )
+                )
+            );
+            
+            Nyx nyx = new Nyx(script.getWorkingDirectory());
+            nyx.configuration().withRuntimeConfiguration(configurationLayerMock);
+
+            nyx.mark();
+
+            // if we read too quickly we often get a 404 from the server so let's wait a short while
+            Thread.sleep(2000);
+
+            // clone the remote repo again into a a new directory and test
+            Script remoteScript = Script.cloneFrom(gitLabRepository.getSSHURL(), System.getProperty("gitLabTestUserPrivateKeyWithPassphrase"), System.getProperty("gitLabTestUserPrivateKeyPassphrase").getBytes());
             remoteScript.getWorkingDirectory().deleteOnExit();
 
             assertEquals("0.0.5", nyx.state().getVersion());

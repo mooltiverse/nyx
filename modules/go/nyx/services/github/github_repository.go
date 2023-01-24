@@ -38,6 +38,9 @@ type GitHubRepository struct {
 	// The repository HTTP URL.
 	httpURL string
 
+	// The repository SSH URL.
+	sshURL string
+
 	// The repository ID.
 	id string
 
@@ -58,6 +61,7 @@ func newGitHubRepository(repository gh.Repository) *GitHubRepository {
 	res.description = *repository.Description
 	res.fullName = *repository.FullName
 	res.httpURL = *repository.CloneURL
+	res.sshURL = *repository.SSHURL
 	res.id = strconv.FormatInt(*repository.ID, 10)
 	res.name = *repository.Name
 	return res
@@ -89,6 +93,13 @@ Returns the repository HTTP URL.
 */
 func (r *GitHubRepository) GetHTTPURL() string {
 	return r.httpURL
+}
+
+/*
+Returns the repository SSH URL.
+*/
+func (r *GitHubRepository) GetSSHURL() string {
+	return r.sshURL
 }
 
 /*
