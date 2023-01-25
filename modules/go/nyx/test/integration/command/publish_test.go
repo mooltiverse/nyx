@@ -524,7 +524,7 @@ func TestPublishRunWithNewReleaseAndGlobalAssetsOnGitLabRepository(t *testing.T)
 	// the release assets must contain the two existing files and the remote URL, but not the non existing file
 	assert.Equal(t, 3, len((*gitLabRelease).GetAssets()))
 	for _, asset := range (*gitLabRelease).GetAssets() {
-		assert.True(t, *asset.GetFileName() == "asset1.txt" || *asset.GetFileName() == "asset2.bin" || *asset.GetFileName() == "remote1")
+		assert.True(t, *asset.GetFileName() == "Text asset" || *asset.GetFileName() == "Binary asset" || *asset.GetFileName() == "Remote link asset")
 		//assert.True(t, *asset.GetDescription() == "Text asset" || *asset.GetDescription() == "Binary asset" || *asset.GetDescription() == "Remote link asset") // the description is not available via this API
 		//assert.True(t, *asset.GetType() == "text/plain" || *asset.GetType() == "application/octet-stream") // the content type is not available via this API
 		//assert.True(t, strings.HasPrefix(*asset.GetPath(), "https://api.github.com/repos/")) // as of now these URLS are like https://storage.googleapis.com...
@@ -547,7 +547,7 @@ func TestPublishRunWithNewReleaseAndGlobalAssetsOnGitLabRepository(t *testing.T)
 	// the release assets must contain the two existing files and the remote URL, but not the non existing file
 	assert.Equal(t, 3, len((*gitLabRelease).GetAssets()))
 	for _, asset := range (*gitLabRelease).GetAssets() {
-		assert.True(t, *asset.GetFileName() == "asset1.txt" || *asset.GetFileName() == "asset2.bin" || *asset.GetFileName() == "remote1")
+		assert.True(t, *asset.GetFileName() == "Text asset" || *asset.GetFileName() == "Binary asset" || *asset.GetFileName() == "Remote link asset")
 		//assert.True(t, *asset.GetDescription() == "Text asset" || *asset.GetDescription() == "Binary asset" || *asset.GetDescription() == "Remote link asset") // the description is not available via this API
 		//assert.True(t, *asset.GetType() == "text/plain" || *asset.GetType() == "application/octet-stream") // the content type is not available via this API
 		//assert.True(t, strings.HasPrefix(*asset.GetPath(), "https://api.github.com/repos/")) // as of now these URLS are like https://storage.googleapis.com...
@@ -660,7 +660,7 @@ func TestPublishRunWithNewReleaseAndFilteredAssetsOnGitLabRepository(t *testing.
 	// the release assets must contain only the 'asset1' as it was filtered by the release type
 	assert.Equal(t, 1, len((*gitLabRelease).GetAssets()))
 	for _, asset := range (*gitLabRelease).GetAssets() {
-		assert.Equal(t, "asset1.txt", *asset.GetFileName())
+		assert.Equal(t, "Text asset", *asset.GetFileName())
 		//assert.Equal(t, "Text asset", *asset.GetDescription()) // the description is not available via this API
 		//assert.Equal(t, "text/plain", *asset.GetType()) // the content type is not available via this API
 		//assert.True(t, strings.HasPrefix(*asset.GetPath(), "https://api.github.com/repos/")) // as of now these URLS are like https://storage.googleapis.com...
@@ -683,7 +683,7 @@ func TestPublishRunWithNewReleaseAndFilteredAssetsOnGitLabRepository(t *testing.
 	// the release assets must contain only the 'asset1' as it was filtered by the release type
 	assert.Equal(t, 1, len((*gitLabRelease).GetAssets()))
 	for _, asset := range (*gitLabRelease).GetAssets() {
-		assert.Equal(t, "asset1.txt", *asset.GetFileName())
+		assert.Equal(t, "Text asset", *asset.GetFileName())
 		//assert.Equal(t, "Text asset", *asset.GetDescription()) // the description is not available via this API
 		//assert.Equal(t, "text/plain", *asset.GetType()) // the content type is not available via this API
 		//assert.True(t, strings.HasPrefix(*asset.GetPath(), "https://api.github.com/repos/")) // as of now these URLS are like https://storage.googleapis.com...

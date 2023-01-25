@@ -209,7 +209,7 @@ func TestGitLabReleaseServiceCreateRelease(t *testing.T) {
 	assert.Equal(t, "1.0.0-alpha.1", (*releaseWithAssets).GetTag())
 	assert.Equal(t, 3, len((*releaseWithAssets).GetAssets()))
 	for _, asset := range (*releaseWithAssets).GetAssets() {
-		assert.True(t, *asset.GetFileName() == "asset1" || *asset.GetFileName() == "asset2" || *asset.GetFileName() == "remote1")
+		assert.True(t, *asset.GetFileName() == "Text asset" || *asset.GetFileName() == "Binary asset" || *asset.GetFileName() == "Remote link asset") // the description is not available via this API
 		//assert.True(t, *asset.GetDescription() == "Text asset" || *asset.GetDescription() == "Binary asset" || *asset.GetDescription() == "Remote link asset") // the description is not available via this API
 		//assert.True(t, *asset.GetType() == "text/plain" || *asset.GetType() == "application/octet-stream") // the content type is not available via this API
 		//assert.True(t, strings.HasPrefix(*asset.GetPath(), "https://api.github.com/repos/")) // as of now these URLS are like https://storage.googleapis.com...
