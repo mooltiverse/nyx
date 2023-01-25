@@ -6,7 +6,7 @@
 * the public key (SSH) authentication method is now supported for Git ([#94](https://github.com/mooltiverse/nyx/issues/94))
 * the Git internal library (`github.com/mooltiverse/nyx/modules/go/nyx/git` package for Go, `com.mooltiverse.oss.nyx.git` package for Java) has been refactored in order to support multiple authentication mechanisms (with the new SSH method) and some methods have been replaced while others have been added
 * support for deprecated [template functions](https://mooltiverse.github.io/nyx/guide/user/configuration-reference/templates/#functions) `environment.user`, `environment.variable`, `file.content`, `file.exists` has been removed, replaced by `environmentUser`, `environmentVariable`, `fileContent`, `fileExists`
-* new parametric [template functions](https://mooltiverse.github.io/nyx/guide/user/configuration-reference/templates/) are now available: `cutLeft`, `cutRight`, `timestamp`
+* new parametric [template functions](https://mooltiverse.github.io/nyx/guide/user/configuration-reference/templates/) are now available: `capture`, `cutLeft`, `cutRight`, `replace`, `timeFormat`
 * Java template functions in `com.mooltiverse.oss.nyx.template.Functions.java` no longer implement the `java.util.function.Function` interface which was provided for backward compatibility; from now on they only implement the `com.github.jknack.handlebars.Helper` interface provided by [Handlebars](https://github.com/jknack/handlebars.java)
 
 This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/2.0.0).
@@ -21,7 +21,7 @@ This release is available at [this link](https://github.com/mooltiverse/nyx/rele
 ### New features and improvements
 
 * the public key (SSH) authentication method is now supported for Git ([#94](https://github.com/mooltiverse/nyx/issues/94))
-* new parametric [template functions](https://mooltiverse.github.io/nyx/guide/user/configuration-reference/templates/) are now available: `cutLeft`, `cutRight`, `timestamp`
+* new parametric [template functions](https://mooltiverse.github.io/nyx/guide/user/configuration-reference/templates/) are now available: `capture`, `cutLeft`, `cutRight`, `replace`, `timeFormat`
 
 ### Fixed issues
 

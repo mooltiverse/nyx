@@ -67,9 +67,11 @@ class Functions {
         registry.registerHelper(FileContent.NAME,             new FileContent());
         registry.registerHelper(FileExists.NAME,              new FileExists());
 
+        registry.registerHelper(Capture.NAME,                 new Capture());
         registry.registerHelper(CutLeft.NAME,                 new CutLeft());
         registry.registerHelper(CutRight.NAME,                new CutRight());
-        registry.registerHelper(Timestamp.NAME,               new Timestamp());
+        registry.registerHelper(Replace.NAME,                 new Replace());
+        registry.registerHelper(TimeFormat.NAME,              new TimeFormat());
     }
 
     /**
@@ -746,6 +748,80 @@ class Functions {
     }
 
     /**
+     * This function uses a given regular expression to match the string input and uses the given (named) group
+     * value as a return value.
+     */
+    public static class Capture extends AbstractParametricFunction {
+        /**
+         * The name to use for this function.
+         */
+        public static final String NAME = "capture";
+
+        /**
+         * This method uses a given regular expression to match the string input and uses the given (named) group
+         * value as a return value. The {@code expression} option gives the regular expression to use, while the
+         * {@code group} option tells which group to return (if it's an integer it will be interpreded as a group index,
+         * otherwise a group name). Remember that group {@code 0} returns the whole string. If the regular expression
+         * doesn't even match the input string then an empty string is returned.
+         * 
+         * @param input the function input
+         * @param options the function options, where the option named {@code expression} gives the regular expression to use,
+         * while the {@code group} option tells which group to return (if it's an integer it will be interpreded as a group index,
+         * otherwise a group name)
+         * 
+         * @return the function output
+         */
+        @Override
+        public String apply(String input, Map<String,Object> options) {
+            if (Objects.isNull(input))
+                return "";
+            if (options.containsKey("expression")) {
+                String expression = options.get("expression").toString();
+                Matcher m = Pattern.compile(expression).matcher(input);
+                m.find();
+
+                if (options.containsKey("group")) {
+                    if (options.containsKey("group")) {
+                        String groupName = options.get("group").toString();
+                        try {
+                            int groupIndex = Integer.parseUnsignedInt(groupName);
+                            // The 'group' is an index
+                            try {
+                                return m.group(groupIndex);
+                            }
+                            catch (IllegalStateException ise) {
+                                logger.debug(TEMPLATE, "The '{}' expression doesn't match '{}'", expression, input);
+                                return "";
+                            }
+                            catch (IndexOutOfBoundsException ioobe) {
+                                logger.debug(TEMPLATE, "The '{}' expression doesn't return any group with index '{}' from string '{}'", expression, groupIndex, input);
+                                return "";
+                            }
+                        }
+                        catch (NumberFormatException nfe) {
+                            // The 'group' is a name
+                            try {
+                                return m.group(groupName);
+                            }
+                            catch (IllegalStateException ise) {
+                                logger.debug(TEMPLATE, "The '{}' expression doesn't match '{}'", expression, input);
+                                return "";
+                            }
+                            catch (IllegalArgumentException iae) {
+                                logger.debug(TEMPLATE, "The '{}' expression doesn't return any group with name '{}' from string '{}'", expression, groupName, input);
+                                return "";
+                            }
+                        }
+                    }
+                    else return input;
+                }
+                else return input;
+            }
+            else return input;
+        }
+    }
+
+    /**
      * This function returns the last {@code N} characters of the input string, where {@code N} is the {@code length} option.
      * If the input string is shorter or the same length than the parameter, the whole input string is returned unchanged.
      * If the input is {@code null} an empty string is returned.
@@ -838,14 +914,48 @@ class Functions {
     }
 
     /**
-     * This function returns a time value (expressed in milliseconds) and is also able to format it according to an optional
-     * format string.
+     * This function replaces the given character sequences from the input string with the given replacement.
      */
-    public static class Timestamp extends AbstractParametricFunction {
+    public static class Replace extends AbstractParametricFunction {
         /**
          * The name to use for this function.
          */
-        public static final String NAME = "timestamp";
+        public static final String NAME = "replace";
+
+        /**
+         * This method replaces the given character sequences from the input string with the given replacement.
+         * 
+         * @param input the function input
+         * @param options the function options, where the option named {@code from} determines the character sequence to be replaced,
+         * {@code to} determines the character sequence to be used for replacement
+         * 
+         * @return the function output
+         */
+        @Override
+        public String apply(String input, Map<String,Object> options) {
+            if (Objects.isNull(input))
+                return "";
+            if (options.containsKey("from")) {
+                String fromString = options.get("from").toString();
+                String toString = "";
+                if (options.containsKey("to")) {
+                    toString = options.get("to").toString();
+                }
+                return input.replace(fromString, toString);
+            }
+            else return input;
+        }
+    }
+
+    /**
+     * This function returns a time value (expressed in milliseconds) and is also able to format it according to an optional
+     * format string.
+     */
+    public static class TimeFormat extends AbstractParametricFunction {
+        /**
+         * The name to use for this function.
+         */
+        public static final String NAME = "timeFormat";
 
         /**
          * This method returns returns a time value (expressed in milliseconds) and is also able to format it according to an optional

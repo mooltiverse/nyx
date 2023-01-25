@@ -370,6 +370,29 @@ public class FunctionsTests {
     }
 
     @Nested
+    @DisplayName("Functions.capture")
+    class CaptureTests {
+        @Test
+        @DisplayName("Functions.capture.apply()")
+        void applyTest()
+            throws Exception {
+            assertEquals("", new Functions.Capture().apply(null, Map.<String,Object>of()));
+            assertEquals("", new Functions.Capture().apply("", Map.<String,Object>of()));
+            assertEquals("  ", new Functions.Capture().apply("  ", Map.<String,Object>of()));
+            assertEquals("mytype(myscope): mytitle", new Functions.Capture().apply("mytype(myscope): mytitle", Map.<String,Object>of("expression", "(?<type>[a-zA-Z0-9_]+)(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))")));
+            assertEquals("mytype", new Functions.Capture().apply("mytype(myscope): mytitle", Map.<String,Object>of("expression", "(?<type>[a-zA-Z0-9_]+)(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))", "group", "type")));
+            assertEquals("myscope", new Functions.Capture().apply("mytype(myscope): mytitle", Map.<String,Object>of("expression", "(?<type>[a-zA-Z0-9_]+)(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))", "group", "scope")));
+            assertEquals("mytitle", new Functions.Capture().apply("mytype(myscope): mytitle", Map.<String,Object>of("expression", "(?<type>[a-zA-Z0-9_]+)(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))", "group", "title")));
+            assertEquals("", new Functions.Capture().apply("mytype(myscope): mytitle", Map.<String,Object>of("expression", "(?<type>[a-zA-Z0-9_]+)(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))", "group", "unknowngroup")));
+            assertEquals("mytype(myscope): mytitle", new Functions.Capture().apply("mytype(myscope): mytitle", Map.<String,Object>of("expression", "(?<type>[a-zA-Z0-9_]+)(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))", "group", "0")));
+            assertEquals("mytype", new Functions.Capture().apply("mytype(myscope): mytitle", Map.<String,Object>of("expression", "(?<type>[a-zA-Z0-9_]+)(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))", "group", "1")));
+            assertEquals("(myscope)", new Functions.Capture().apply("mytype(myscope): mytitle", Map.<String,Object>of("expression", "(?<type>[a-zA-Z0-9_]+)(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))", "group", "2")));
+            assertEquals(" mytitle", new Functions.Capture().apply("mytype(myscope): mytitle", Map.<String,Object>of("expression", "(?<type>[a-zA-Z0-9_]+)(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))", "group", "4")));
+            assertEquals("", new Functions.Capture().apply("mytype(myscope): mytitle", Map.<String,Object>of("expression", "(?<type>[a-zA-Z0-9_]+)(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))", "group", "9")));
+        }
+    }
+
+    @Nested
     @DisplayName("Functions.cutLeft")
     class CutLeftTests {
         @Test
@@ -442,10 +465,27 @@ public class FunctionsTests {
     }
 
     @Nested
-    @DisplayName("Functions.timestamp")
+    @DisplayName("Functions.replace")
+    class ReplaceTests {
+        @Test
+        @DisplayName("Functions.replace.apply()")
+        void applyTest()
+            throws Exception {
+            assertEquals("", new Functions.Replace().apply(null, Map.<String,Object>of()));
+            assertEquals("", new Functions.Replace().apply("", Map.<String,Object>of()));
+            assertEquals("  ", new Functions.Replace().apply("  ", Map.<String,Object>of()));
+            assertEquals("001002003004005", new Functions.Replace().apply("001002003004005", Map.<String,Object>of("from", "", "to", "")));
+            assertEquals("12345", new Functions.Replace().apply("001002003004005", Map.<String,Object>of("from", "0", "to", "")));
+            assertEquals("  1  2  3  4  5", new Functions.Replace().apply("001002003004005", Map.<String,Object>of("from", "0", "to", " ")));
+            assertEquals("erased1erased2erased3erased4erased5", new Functions.Replace().apply("001002003004005", Map.<String,Object>of("from", "00", "to", "erased")));
+        }
+    }
+
+    @Nested
+    @DisplayName("Functions.timeFormat")
     class TimeTests {
         @Test
-        @DisplayName("Functions.timestamp.apply()")
+        @DisplayName("Functions.timeFormat.apply()")
         void applyTest()
             throws Exception {
             // these are the baseline values to test against
@@ -456,31 +496,31 @@ public class FunctionsTests {
             String dateToCompare = dateFormat.format(new Date(currentTime));
 
             // for timestamps in long format (unformatted) we just test the first 10 characters to avoid false positives in these tests
-            assertTrue(new Functions.Timestamp().apply(null, Map.<String,Object>of()).startsWith(timeString.substring(0, 10)));
-            assertTrue(new Functions.Timestamp().apply("", Map.<String,Object>of()).startsWith(timeString.substring(0, 10)));
-            assertEquals("", new Functions.Timestamp().apply("", Map.<String,Object>of("format", "")));
-            assertEquals(dateToCompare, new Functions.Timestamp().apply("", Map.<String,Object>of("format", "yyyyMMdd")));
-            assertEquals("", new Functions.Timestamp().apply("", Map.<String,Object>of("format", "not a format")));
+            assertTrue(new Functions.TimeFormat().apply(null, Map.<String,Object>of()).startsWith(timeString.substring(0, 10)));
+            assertTrue(new Functions.TimeFormat().apply("", Map.<String,Object>of()).startsWith(timeString.substring(0, 10)));
+            assertEquals("", new Functions.TimeFormat().apply("", Map.<String,Object>of("format", "")));
+            assertEquals(dateToCompare, new Functions.TimeFormat().apply("", Map.<String,Object>of("format", "yyyyMMdd")));
+            assertEquals("", new Functions.TimeFormat().apply("", Map.<String,Object>of("format", "not a format")));
 
-            assertTrue(new Functions.Timestamp().apply("  ", Map.<String,Object>of()).startsWith(timeString.substring(0, 10)));
-            assertEquals("", new Functions.Timestamp().apply("  ", Map.<String,Object>of("format", "")));
-            assertEquals(dateToCompare, new Functions.Timestamp().apply("  ", Map.<String,Object>of("format", "yyyyMMdd")));
-            assertEquals("", new Functions.Timestamp().apply("  ", Map.<String,Object>of("format", "not a format")));
+            assertTrue(new Functions.TimeFormat().apply("  ", Map.<String,Object>of()).startsWith(timeString.substring(0, 10)));
+            assertEquals("", new Functions.TimeFormat().apply("  ", Map.<String,Object>of("format", "")));
+            assertEquals(dateToCompare, new Functions.TimeFormat().apply("  ", Map.<String,Object>of("format", "yyyyMMdd")));
+            assertEquals("", new Functions.TimeFormat().apply("  ", Map.<String,Object>of("format", "not a format")));
 
-            assertEquals("", new Functions.Timestamp().apply("not a number", Map.<String,Object>of()));
-            assertEquals("", new Functions.Timestamp().apply("not a number", Map.<String,Object>of("format", "")));
-            assertEquals("", new Functions.Timestamp().apply("not a number", Map.<String,Object>of("format", "yyyyMMdd")));
-            assertEquals("", new Functions.Timestamp().apply("not a number", Map.<String,Object>of("format", "not a format")));
+            assertEquals("", new Functions.TimeFormat().apply("not a number", Map.<String,Object>of()));
+            assertEquals("", new Functions.TimeFormat().apply("not a number", Map.<String,Object>of("format", "")));
+            assertEquals("", new Functions.TimeFormat().apply("not a number", Map.<String,Object>of("format", "yyyyMMdd")));
+            assertEquals("", new Functions.TimeFormat().apply("not a number", Map.<String,Object>of("format", "not a format")));
 
-            assertEquals("0", new Functions.Timestamp().apply("0", Map.<String,Object>of()));
-            assertEquals("", new Functions.Timestamp().apply("0", Map.<String,Object>of("format", "")));
-            assertEquals("19700101", new Functions.Timestamp().apply("0", Map.<String,Object>of("format", "yyyyMMdd")));
-            assertEquals("", new Functions.Timestamp().apply("0", Map.<String,Object>of("format", "not a format")));
+            assertEquals("0", new Functions.TimeFormat().apply("0", Map.<String,Object>of()));
+            assertEquals("", new Functions.TimeFormat().apply("0", Map.<String,Object>of("format", "")));
+            assertEquals("19700101", new Functions.TimeFormat().apply("0", Map.<String,Object>of("format", "yyyyMMdd")));
+            assertEquals("", new Functions.TimeFormat().apply("0", Map.<String,Object>of("format", "not a format")));
 
-            assertEquals("1577880000000", new Functions.Timestamp().apply("1577880000000", Map.<String,Object>of()));
-            assertEquals("", new Functions.Timestamp().apply("1577880000000", Map.<String,Object>of("format", "")));
-            assertEquals("20200101", new Functions.Timestamp().apply("1577880000000", Map.<String,Object>of("format", "yyyyMMdd")));
-            assertEquals("", new Functions.Timestamp().apply("1577880000000", Map.<String,Object>of("format", "not a format")));
+            assertEquals("1577880000000", new Functions.TimeFormat().apply("1577880000000", Map.<String,Object>of()));
+            assertEquals("", new Functions.TimeFormat().apply("1577880000000", Map.<String,Object>of("format", "")));
+            assertEquals("20200101", new Functions.TimeFormat().apply("1577880000000", Map.<String,Object>of("format", "yyyyMMdd")));
+            assertEquals("", new Functions.TimeFormat().apply("1577880000000", Map.<String,Object>of("format", "not a format")));
         }
     }
 }

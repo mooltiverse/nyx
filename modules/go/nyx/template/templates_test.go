@@ -259,6 +259,10 @@ func TestTemplatesRenderFileExists(t *testing.T) {
 	assert.Equal(t, "true", output)
 }
 
+func TestTemplatesRenderCapture(t *testing.T) {
+	output, _ := Render("{{#capture expression=\"(?<type>[a-zA-Z0-9_]+)(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))\" group=\"type\"}}mytype(myscope): mytitle{{/capture}}", nil)
+	assert.Equal(t, "mytype", output)
+}
 func TestTemplatesRenderCutLeft(t *testing.T) {
 	output, _ := Render("{{#cutLeft length=\"3\"}}1234567890{{/cutLeft}}", nil)
 	assert.Equal(t, "890", output)
@@ -269,8 +273,13 @@ func TestTemplatesRenderCutRight(t *testing.T) {
 	assert.Equal(t, "123", output)
 }
 
-func TestTemplatesRenderTimestamp(t *testing.T) {
-	output, _ := Render("{{#timestamp format=\"20060102\"}}1577880000000{{/timestamp}}", nil)
+func TestTemplatesRenderReplace(t *testing.T) {
+	output, _ := Render("{{#replace from=\"0\" to=\"X\"}}01234567890{{/replace}}", nil)
+	assert.Equal(t, "X123456789X", output)
+}
+
+func TestTemplatesRenderTimeFormat(t *testing.T) {
+	output, _ := Render("{{#timeFormat format=\"20060102\"}}1577880000000{{/timeFormat}}", nil)
 	assert.Equal(t, "20200101", output)
 }
 

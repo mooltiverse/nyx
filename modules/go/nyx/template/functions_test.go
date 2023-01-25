@@ -204,6 +204,27 @@ func TestFunctionsFileExists(t *testing.T) {
 	assert.Equal(t, "true", fileExists(fileName))
 }
 
+func TestFunctionsCapture(t *testing.T) {
+	logLevel := log.GetLevel()   // save the previous logging level
+	log.SetLevel(log.FatalLevel) // set the logging level to filter out warnings produced during tests
+
+	assert.Equal(t, "", capture("", map[string]interface{}{}))
+	assert.Equal(t, "  ", capture("  ", map[string]interface{}{}))
+
+	assert.Equal(t, "mytype(myscope): mytitle", capture("mytype(myscope): mytitle", map[string]interface{}{"expression": "(?<type>[a-zA-Z0-9_]+)(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))"}))
+	assert.Equal(t, "mytype", capture("mytype(myscope): mytitle", map[string]interface{}{"expression": "(?<type>[a-zA-Z0-9_]+)(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))", "group": "type"}))
+	assert.Equal(t, "myscope", capture("mytype(myscope): mytitle", map[string]interface{}{"expression": "(?<type>[a-zA-Z0-9_]+)(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))", "group": "scope"}))
+	assert.Equal(t, "mytitle", capture("mytype(myscope): mytitle", map[string]interface{}{"expression": "(?<type>[a-zA-Z0-9_]+)(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))", "group": "title"}))
+	assert.Equal(t, "", capture("mytype(myscope): mytitle", map[string]interface{}{"expression": "(?<type>[a-zA-Z0-9_]+)(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))", "group": "unknowngroup"}))
+	assert.Equal(t, "mytype(myscope): mytitle", capture("mytype(myscope): mytitle", map[string]interface{}{"expression": "(?<type>[a-zA-Z0-9_]+)(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))", "group": "0"}))
+	assert.Equal(t, "mytype", capture("mytype(myscope): mytitle", map[string]interface{}{"expression": "(?<type>[a-zA-Z0-9_]+)(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))", "group": "3"}))
+	assert.Equal(t, "(myscope)", capture("mytype(myscope): mytitle", map[string]interface{}{"expression": "(?<type>[a-zA-Z0-9_]+)(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))", "group": "1"}))
+	assert.Equal(t, "mytitle", capture("mytype(myscope): mytitle", map[string]interface{}{"expression": "(?<type>[a-zA-Z0-9_]+)(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))", "group": "5"}))
+	assert.Equal(t, "", capture("mytype(myscope): mytitle", map[string]interface{}{"expression": "(?<type>[a-zA-Z0-9_]+)(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))", "group": "9"}))
+
+	log.SetLevel(logLevel) // restore the original logging level
+}
+
 func TestFunctionsCutLeft(t *testing.T) {
 	logLevel := log.GetLevel()   // save the previous logging level
 	log.SetLevel(log.FatalLevel) // set the logging level to filter out warnings produced during tests
@@ -270,7 +291,21 @@ func TestFunctionsCutRight(t *testing.T) {
 	log.SetLevel(logLevel) // restore the original logging level
 }
 
-func TestFunctionsTimestamp(t *testing.T) {
+func TestFunctionsReplace(t *testing.T) {
+	logLevel := log.GetLevel()   // save the previous logging level
+	log.SetLevel(log.FatalLevel) // set the logging level to filter out warnings produced during tests
+
+	assert.Equal(t, "", replace("", map[string]interface{}{}))
+	assert.Equal(t, "  ", replace("  ", map[string]interface{}{}))
+	assert.Equal(t, "001002003004005", replace("001002003004005", map[string]interface{}{"from": "", "to": ""}))
+	assert.Equal(t, "12345", replace("001002003004005", map[string]interface{}{"from": "0", "to": ""}))
+	assert.Equal(t, "  1  2  3  4  5", replace("001002003004005", map[string]interface{}{"from": "0", "to": " "}))
+	assert.Equal(t, "erased1erased2erased3erased4erased5", replace("001002003004005", map[string]interface{}{"from": "00", "to": "erased"}))
+
+	log.SetLevel(logLevel) // restore the original logging level
+}
+
+func TestFunctionsTimeFormat(t *testing.T) {
 	logLevel := log.GetLevel()   // save the previous logging level
 	log.SetLevel(log.FatalLevel) // set the logging level to filter out warnings produced during tests
 
@@ -280,30 +315,30 @@ func TestFunctionsTimestamp(t *testing.T) {
 	dateToCompare := time.UnixMilli(currentTime).UTC().Format("20060102")
 
 	// for timestamps in long format (unformatted) we just test the first 10 characters to avoid false positives in these tests
-	assert.True(t, strings.HasPrefix(timestamp("", map[string]interface{}{}), timeString[0:10]))
-	assert.Equal(t, "", timestamp("", map[string]interface{}{"format": ""}))
-	assert.Equal(t, dateToCompare, timestamp("", map[string]interface{}{"format": "20060102" /*"yyyyMMdd"*/}))
-	assert.Equal(t, "not a format", timestamp("", map[string]interface{}{"format": "not a format"})) // this is peculiar to Go, as it returns the format string when it doesn't make sese
+	assert.True(t, strings.HasPrefix(timeFormat("", map[string]interface{}{}), timeString[0:10]))
+	assert.Equal(t, "", timeFormat("", map[string]interface{}{"format": ""}))
+	assert.Equal(t, dateToCompare, timeFormat("", map[string]interface{}{"format": "20060102" /*"yyyyMMdd"*/}))
+	assert.Equal(t, "not a format", timeFormat("", map[string]interface{}{"format": "not a format"})) // this is peculiar to Go, as it returns the format string when it doesn't make sese
 
-	assert.True(t, strings.HasPrefix(timestamp("  ", map[string]interface{}{}), timeString[0:10]))
-	assert.Equal(t, "", timestamp("  ", map[string]interface{}{"format": ""}))
-	assert.Equal(t, dateToCompare, timestamp("  ", map[string]interface{}{"format": "20060102" /*"yyyyMMdd"*/}))
-	assert.Equal(t, "not a format", timestamp("  ", map[string]interface{}{"format": "not a format"})) // this is peculiar to Go, as it returns the format string when it doesn't make sese
+	assert.True(t, strings.HasPrefix(timeFormat("  ", map[string]interface{}{}), timeString[0:10]))
+	assert.Equal(t, "", timeFormat("  ", map[string]interface{}{"format": ""}))
+	assert.Equal(t, dateToCompare, timeFormat("  ", map[string]interface{}{"format": "20060102" /*"yyyyMMdd"*/}))
+	assert.Equal(t, "not a format", timeFormat("  ", map[string]interface{}{"format": "not a format"})) // this is peculiar to Go, as it returns the format string when it doesn't make sese
 
-	assert.Equal(t, "", timestamp("not a number", map[string]interface{}{}))
-	assert.Equal(t, "", timestamp("not a number", map[string]interface{}{"format": ""}))
-	assert.Equal(t, "", timestamp("not a number", map[string]interface{}{"format": "20060102" /*"yyyyMMdd"*/}))
-	assert.Equal(t, "", timestamp("not a number", map[string]interface{}{"format": "not a format"})) // this is peculiar to Go, as it returns the format string when it doesn't make sese
+	assert.Equal(t, "", timeFormat("not a number", map[string]interface{}{}))
+	assert.Equal(t, "", timeFormat("not a number", map[string]interface{}{"format": ""}))
+	assert.Equal(t, "", timeFormat("not a number", map[string]interface{}{"format": "20060102" /*"yyyyMMdd"*/}))
+	assert.Equal(t, "", timeFormat("not a number", map[string]interface{}{"format": "not a format"})) // this is peculiar to Go, as it returns the format string when it doesn't make sese
 
-	assert.Equal(t, "0", timestamp("0", map[string]interface{}{}))
-	assert.Equal(t, "", timestamp("0", map[string]interface{}{"format": ""}))
-	assert.Equal(t, "19700101", timestamp("0", map[string]interface{}{"format": "20060102" /*"yyyyMMdd"*/}))
-	assert.Equal(t, "not a format", timestamp("0", map[string]interface{}{"format": "not a format"})) // this is peculiar to Go, as it returns the format string when it doesn't make sese
+	assert.Equal(t, "0", timeFormat("0", map[string]interface{}{}))
+	assert.Equal(t, "", timeFormat("0", map[string]interface{}{"format": ""}))
+	assert.Equal(t, "19700101", timeFormat("0", map[string]interface{}{"format": "20060102" /*"yyyyMMdd"*/}))
+	assert.Equal(t, "not a format", timeFormat("0", map[string]interface{}{"format": "not a format"})) // this is peculiar to Go, as it returns the format string when it doesn't make sese
 
-	assert.Equal(t, "1577880000000", timestamp("1577880000000", map[string]interface{}{}))
-	assert.Equal(t, "", timestamp("1577880000000", map[string]interface{}{"format": ""}))
-	assert.Equal(t, "20200101", timestamp("1577880000000", map[string]interface{}{"format": "20060102" /*"yyyyMMdd"*/}))
-	assert.Equal(t, "not a format", timestamp("1577880000000", map[string]interface{}{"format": "not a format"})) // this is peculiar to Go, as it returns the format string when it doesn't make sese
+	assert.Equal(t, "1577880000000", timeFormat("1577880000000", map[string]interface{}{}))
+	assert.Equal(t, "", timeFormat("1577880000000", map[string]interface{}{"format": ""}))
+	assert.Equal(t, "20200101", timeFormat("1577880000000", map[string]interface{}{"format": "20060102" /*"yyyyMMdd"*/}))
+	assert.Equal(t, "not a format", timeFormat("1577880000000", map[string]interface{}{"format": "not a format"})) // this is peculiar to Go, as it returns the format string when it doesn't make sese
 
 	log.SetLevel(logLevel) // restore the original logging level
 }
