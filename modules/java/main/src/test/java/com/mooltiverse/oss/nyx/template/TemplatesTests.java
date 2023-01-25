@@ -388,6 +388,61 @@ public class TemplatesTests {
                 assertEquals("true", Templates.render("{{#fileExists}}"+savedFile.getAbsolutePath()+"{{/fileExists}}", null));
             }
         }
+
+        @Nested
+        @DisplayName("Templates.render Capture function")
+        class RenderCaptureFunctionTests {
+            @Test
+            @DisplayName("Templates.render(String, null)")
+            void renderCapture()
+                throws Exception {
+                assertEquals("mytype", Templates.render("{{#capture expression=\"(?<type>[a-zA-Z0-9_]+)(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))\" group=\"type\"}}mytype(myscope): mytitle{{/capture}}", null));
+            }
+        }
+
+        @Nested
+        @DisplayName("Templates.render CutLeft function")
+        class RenderCutLeftFunctionTests {
+            @Test
+            @DisplayName("Templates.render(String, null)")
+            void renderCutLeft()
+                throws Exception {
+                assertEquals("890", Templates.render("{{#cutLeft length=\"3\"}}1234567890{{/cutLeft}}", null));
+            }
+        }
+
+        @Nested
+        @DisplayName("Templates.render CutRight function")
+        class RenderCutRightFunctionTests {
+            @Test
+            @DisplayName("Templates.render(String, null)")
+            void renderCutRight()
+                throws Exception {
+                assertEquals("123", Templates.render("{{#cutRight length=\"3\"}}1234567890{{/cutRight}}", null));
+            }
+        }
+
+        @Nested
+        @DisplayName("Templates.render Replace function")
+        class RenderReplaceFunctionTests {
+            @Test
+            @DisplayName("Templates.render(String, null)")
+            void renderReplace()
+                throws Exception {
+                assertEquals("X123456789X", Templates.render("{{#replace from=\"0\" to=\"X\"}}01234567890{{/replace}}", null));
+            }
+        }
+
+        @Nested
+        @DisplayName("Templates.render TimeFormat function")
+        class RenderTimeFormatFunctionTests {
+            @Test
+            @DisplayName("Templates.render(String, null)")
+            void renderTimeFormat()
+                throws Exception {
+                assertEquals("20200101", Templates.render("{{#timeFormat format=\"yyyyMMdd\"}}1577880000000{{/timeFormat}}", null));
+            }
+        }
     }
 
     @Nested
@@ -461,6 +516,17 @@ public class TemplatesTests {
             StringWriter output = new StringWriter();
             Templates.render(new StringReader(TEMPLATE), new TestScope(), output);
             assertEquals(TEMPLATE_OUTPUT, output.toString());
+        }
+    }
+
+    @Nested
+    @DisplayName("Templates.render with nested functions")
+    class RenderWithNestedFunctionsTests {
+        @Test
+        @DisplayName("Templates.render(String, Object)")
+        void renderWithMockTest1()
+            throws Exception {
+            assertEquals("7B9DA5286D4724DD7385", Templates.render("{{#upper}}{{#cutRight length=\"20\"}}7b9da5286d4724dd7385bb80639a08841fa26606{{/cutRight}}{{/upper}}", null));
         }
     }
 }

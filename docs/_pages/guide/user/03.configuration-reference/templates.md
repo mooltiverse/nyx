@@ -79,7 +79,32 @@ Here `upper` is a function accepting one parameter (`attribute`) and returning t
 The underlying [Handlebars](https://handlebarsjs.com/) template engine also provides an powerful set of built-in functions to handle conditionals, loops, lookups and log messages. Those functions (a.k.a. *helpers*) can be freely used in templates but they are not officially supported by Nyx. For more on those helpers see [Built-in Helpers](https://handlebarsjs.com/guide/builtin-helpers.html).
 {: .notice--info}
 
+Functions can be nested for combined output. This example is valid and shows how to take the first 20 characters from the given `{{ attribute }}` and transform it to upper case:
+
+```
+option = "{% raw %}{{#upper}}{{#cutRight length="20"}}{{ attribute }}{{/cutRight}}{{/upper}}{% endraw %}"
+```
+
 ### The functions library
+
+#### `replace`
+
+Replaces all occurrences of a given character sequence with another character sequence in the input string. The `from` option defines the sequence to be replaced while the `to` option defines the sequence to use for replacement.
+
+Example:
+
+```
+output = "{% raw %}{{#replace from="X" to="Y"}}{{input}}{{/replace}}{% endraw %}"
+```
+
+Example inputs and corresponding outputs:
+
+| Input                                      | Options             | Output             |
+| ------------------------------------------ | ------------------- | ------------------ |
+| `01234567890`                              | `from="0"`          | `123456789`        |
+| `01234567890`                              | `from="0" to=""`    | `123456789`        |
+| `01234567890`                              | `from="0" to="X"`   | `X123456789X`      |
+| `01234567890`                              | `from="45" to="_"`  | `0123_67890`       |
 
 #### `lower`
 
@@ -280,6 +305,63 @@ Example inputs and corresponding outputs:
 | `12345`                    | `12345`                    |
 | `feature/XX-12345`         | `FEATUREXX12345`           |
 
+#### `capture`
+
+Matches a regular expression against the input value and extracts a portion of it. The portion to be extracted must be a capturing group (identified by its index or *named*) defined in the regular expression. Remember that when using indexes, `0` is the group that returns the whole string.
+
+The `expression` option defines the regular expression, while the `group` option can be either a positive integer (in which case the group will be extracted by its index) or a string (to extract the capturing group by its name).
+
+Use of *named capturing group* is recommended in place of using groups by their index as it's consistent between the Java (Gradle) and Go (command line) implementations. Retrieving groups by index may lead to different outcomes as the two underlying frameworks use a different numbering for groups.
+{: .notice--info}
+
+Example:
+
+```
+output = "{% raw %}{{#capture expression="(?<type>[a-zA-Z0-9_]+)(\((?<scope>[a-z ]+)\))?:( (?<title>.+))" group="type"}}{{input}}{{/capture}}{% endraw %}"
+```
+
+Example inputs and corresponding outputs:
+
+| Input                                      | Options                                                                                               | Output             |
+| ------------------------------------------ | ----------------------------------------------------------------------------------------------------- | ------------------ |
+| `mytype(myscope): mytitle`                 | `expression="(?<type>[a-zA-Z0-9_]+)(\((?<scope>[a-z ]+)\))?:( (?<title>.+))" group="1"`               | `mytype`           |
+| `mytype(myscope): mytitle`                 | `expression="(?<type>[a-zA-Z0-9_]+)(\((?<scope>[a-z ]+)\))?:( (?<title>.+))" group="type"`            | `mytype`           |
+
+Use tools like [regular expressions 101](https://regex101.com/) to write and test your regular expressions.
+{: .notice--info}
+
+#### `cutLeft`
+
+Returns only the last N characters of the input, where N is an arbitrary positive integer represented by the `length` option. If the input is shorter than N characters it's returned untouched. This is often useful to shorten SHAs. Example:
+
+```
+output = "{% raw %}{{#cutLeft length="3"}}{{input}}{{/cutLeft}}{% endraw %}"
+```
+
+Example inputs and corresponding outputs:
+
+| Input                                      | Options    | Output     |
+| ------------------------------------------ | ---------- | ---------- |
+| `7b9da5286d4724dd7385bb80639a08841fa26606` | `length=3` | `606`      |
+| `7b9da`                                    | `length=3` | `9da`      |
+| `7b`                                       | `length=3` | `7b`       |
+
+#### `cutRight`
+
+Returns only the first N characters of the input, where N is an arbitrary positive integer represented by the `length` option. If the input is shorter than N characters it's returned untouched. This is often useful to shorten SHAs. Example:
+
+```
+output = "{% raw %}{{#cutRight length="3"}}{{input}}{{/cutRight}}{% endraw %}"
+```
+
+Example inputs and corresponding outputs:
+
+| Input                                      | Options    | Output      |
+| ------------------------------------------ | ---------- | ----------- |
+| `7b9da5286d4724dd7385bb80639a08841fa26606` | `length=3` | `7b9`       |
+| `7b9da`                                    | `length=3` | `7b9`       |
+| `7b`                                       | `length=3` | `7b`        |
+
 #### `short5`
 
 Returns only the first 5 characters of the input. If the input is shorter than 5 characters it's returned untouched. This is often useful to shorten SHAs. Example:
@@ -290,11 +372,13 @@ output = "{% raw %}{{#short5}}{{input}}{{/short5}}{% endraw %}"
 
 Example inputs and corresponding outputs:
 
-| Input                      | Output                     |
-| -------------------------- | -------------------------- |
+| Input                                      | Output     |
+| ------------------------------------------ | ---------- |
 | `7b9da5286d4724dd7385bb80639a08841fa26606` | `7b9da`    |
 | `7b9da`                                    | `7b9da`    |
 | `7b`                                       | `7b`       |
+
+For arbitrary length strings see [`cutLeft`](#cutleft) and [`cutRight`](#cutright).
 
 #### `short6`
 
@@ -306,11 +390,13 @@ output = "{% raw %}{{#short6}}{{input}}{{/short6}}{% endraw %}"
 
 Example inputs and corresponding outputs:
 
-| Input                      | Output                     |
-| -------------------------- | -------------------------- |
+| Input                                      | Output     |
+| ------------------------------------------ | ---------- |
 | `7b9da5286d4724dd7385bb80639a08841fa26606` | `7b9da5`   |
 | `7b9da5`                                   | `7b9da5`   |
 | `7b`                                       | `7b`       |
+
+For arbitrary length strings see [`cutLeft`](#cutleft) and [`cutRight`](#cutright).
 
 #### `short7`
 
@@ -322,11 +408,45 @@ output = "{% raw %}{{#short7}}{{input}}{{/short7}}{% endraw %}"
 
 Example inputs and corresponding outputs:
 
-| Input                      | Output                     |
-| -------------------------- | -------------------------- |
+| Input                                      | Output     |
+| ------------------------------------------ | ---------- |
 | `7b9da5286d4724dd7385bb80639a08841fa26606` | `7b9da52`  |
 | `7b9da52`                                  | `7b9da52`  |
 | `7b`                                       | `7b`       |
+
+For arbitrary length strings see [`cutLeft`](#cutleft) and [`cutRight`](#cutright).
+
+
+#### `timeFormat`
+
+Returns a timestamp formatted according to the given format string.
+
+The value for the timestamp is the current system time in milliseconds since January 1, 1970, 00:00:00 GMT unless a value is provided.
+
+The returned string is the timestamp as an integer value unless the `format` option is passed with a valid format string.
+
+Since the underlying frameworks have different behaviors, the output from this function may not be consistent between the command line version (written in Go) and the Gradle version (written in Java). The format string passd in the `format` option also depends on the implementation. Please see [here](https://docs.oracle.com/en/java/javase/15/docs/api/java.base/java/text/SimpleDateFormat.html) for the available patterns available in Java and [here](https://pkg.go.dev/time#example-Time.Format) and [here](https://pkg.go.dev/time#pkg-constants) for those available in Go. Moreover, when invalid patterns are passed in the `format` option, the behavior is different between the two implementations: the Java implementation returns and empty string (and logs an error), while the Go implementation just returns the plain value passed in the `format` option. For consistent behavior functions see [`timestampISO8601`](#timestampISO8601) and [`timestampYYYYMMDDHHMMSS`](#timestampYYYYMMDDHHMMSS).
+{: .notice--warning}
+
+Example inputs and corresponding outputs:
+
+```
+output = "{% raw %}{{#timeFormat}}{{/timeFormat}}{% endraw %}"
+output = "{% raw %}{{#timeFormat}}{{timestamp}}{{/timeFormat}}{% endraw %}"
+output = "{% raw %}{{#timeFormat format="yyyyMMdd"}}{{/timeFormat}}{% endraw %}"
+output = "{% raw %}{{#timeFormat format="yyyyMMdd"}}{{timestamp}}{{/timeFormat}}{% endraw %}"
+output = "{% raw %}{{#timeFormat format="20060102"}}{{/timeFormat}}{% endraw %}"
+output = "{% raw %}{{#timeFormat format="20060102"}}{{timestamp}}{{/timeFormat}}{% endraw %}"
+```
+
+Example inputs and corresponding outputs:
+
+| Input                                      | Options                                | Output                |
+| ------------------------------------------ | -------------------------------------- | --------------------- |
+|                                            |                                        | `1577880000000`       |
+|                                            | `format=yyyyMMdd` or `format=yyyyMMdd` | `20200101`            |
+| `1577880000000`                            |                                        | `1577880000000`       |
+| `1577880000000`                            | `format=yyyyMMdd` or `format=yyyyMMdd` | `20200101`            |
 
 #### `timestampISO8601`
 
@@ -340,8 +460,9 @@ Example inputs and corresponding outputs:
 
 | Input                      | Output                     |
 | -------------------------- | -------------------------- |
-| `1608210396 `              | `2020-12-17T13:06:36`      |
+| `1608210396`               | `2020-12-17T13:06:36`      |
 
+For arbitrary timestamp formats see [`timeFormat`](#timeformat).
 
 #### `timestampYYYYMMDDHHMMSS`
 
@@ -356,6 +477,8 @@ Example inputs and corresponding outputs:
 | Input                      | Output                     |
 | -------------------------- | -------------------------- |
 | `1608210396 `              | `20201217130636`           |
+
+For arbitrary timestamp formats see [`timeFormat`](#timeformat).
 
 #### `environmentUser`
 
