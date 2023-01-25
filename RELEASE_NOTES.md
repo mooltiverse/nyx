@@ -8,6 +8,7 @@
 * support for deprecated [template functions](https://mooltiverse.github.io/nyx/guide/user/configuration-reference/templates/#functions) `environment.user`, `environment.variable`, `file.content`, `file.exists` has been removed, replaced by `environmentUser`, `environmentVariable`, `fileContent`, `fileExists`
 * new parametric [template functions](https://mooltiverse.github.io/nyx/guide/user/configuration-reference/templates/) are now available: `capture`, `cutLeft`, `cutRight`, `replace`, `timeFormat`
 * Java template functions in `com.mooltiverse.oss.nyx.template.Functions.java` no longer implement the `java.util.function.Function` interface which was provided for backward compatibility; from now on they only implement the `com.github.jknack.handlebars.Helper` interface provided by [Handlebars](https://github.com/jknack/handlebars.java)
+* release assets published to GitLab now show their Description instead of the File Name
 
 This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/2.0.0).
 

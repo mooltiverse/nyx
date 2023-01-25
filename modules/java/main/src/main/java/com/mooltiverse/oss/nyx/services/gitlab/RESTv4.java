@@ -409,7 +409,7 @@ class RESTv4 extends API {
 
             Map<String,Object> requestParameters = new HashMap<String,Object>();
             //requestParameters.put("name", asset.getName());
-            requestParameters.put("name", asset.getFileName()); // maybe the description could be used here?
+            requestParameters.put("name", asset.getDescription());
             requestParameters.put("url", asset.getPath());
 
             HttpResponse<String> response = null;
