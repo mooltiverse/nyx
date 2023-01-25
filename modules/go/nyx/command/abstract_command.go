@@ -185,7 +185,11 @@ func (ac *abstractCommand) renderTemplate(template *string) (*string, error) {
 	if "" == strings.TrimSpace(*template) {
 		return template, nil
 	} else {
-		res, err := tpl.Render(*template, ac.state)
+		flatState, err := ac.state.Flatten()
+		if err != nil {
+			return nil, &errs.IllegalStateError{Message: fmt.Sprintf("the internal state cannot be flattened for rendering"), Cause: err}
+		}
+		res, err := tpl.Render(*template, flatState)
 		if err != nil {
 			return nil, &errs.IllegalPropertyError{Message: fmt.Sprintf("template '%s' cannot be rendered using the current state", *template), Cause: err}
 		}
