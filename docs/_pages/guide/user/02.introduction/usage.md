@@ -220,7 +220,7 @@ The one caveat abous passing configuration as [environment variables]({{ site.ba
 
 ## Using the Gradle plugin
 
-When using Gradle, the native Nyx plugin is the easiest and most effective way of using Nyx.
+When using Gradle, the native Nyx plugin is the easiest and most effective way of using Nyx. The plugin can be used with the Groovy or the Kotlin syntax, although this documentation always refers to Groovy unless otherwise specified.
 
 All the examples in this page assume you're using the plain `gradle` command. If you're using the (recommended) [wrapper](https://docs.gradle.org/current/userguide/gradle_wrapper.html) just change instances of the `gradle` command with `./gradlew`.
 {: .notice--info}
@@ -239,7 +239,7 @@ In order to run the Gradle plugin you need:
 
 You can apply the [plugin](https://plugins.gradle.org/plugin/com.mooltiverse.oss.nyx) as a *project plugin* or as a *settings plugin*. You're suggested to use the *settings plugin* to make sure you have properties are evaluated early in the build lifecycle as detailed in [this post]({{ site.baseurl }}{% link _posts/2020-01-01-the-gradle-version-project-property-is-unspecified.md %}).
 
-In both cases you can use the same [plugin DSL](https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block):
+When using Groovy you can use the same [plugin DSL](https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block) in both cases:
 
 ```groovy
 plugins {
@@ -248,6 +248,14 @@ plugins {
 ```
 
 Add the above definition to the `settings.gradle` file to deploy the plugin as a *settings plugin* (suggested) or to the `build.gradle` file to deploy the plugin as a *project plugin*.
+
+If you're using Kotlin you can use this example for your `build.gradle.kts` or `settings.gradle.kts` when applying the *project plugin* or *settings plugin*, respectively:
+
+```kotlin
+plugins {
+  id("com.mooltiverse.oss.nyx") version "{{ site.data.nyx.version }}"
+}
+```
 
 ### Configure the plugin
 
@@ -262,7 +270,9 @@ Examples of different configuration files are available [here]({{ site.baseurl }
 
 #### Using the extension
 
-The easier way to configure Nyx is via a Gradle *extension*, which is a configuration block named `nyx` you add inside your `settings.gradle` or `build.gradle` script (depending on where you applied the plugin), like this:
+The easier way to configure Nyx is via a Gradle *extension*.
+
+When using Groovy the extension is a configuration block named `nyx` you add inside your `settings.gradle` or `build.gradle` script (depending on where and how you applied the plugin, as a *settings plugin* or *project plugin*, respectively), like this:
 
 ```groovy
 plugins {
@@ -270,11 +280,51 @@ plugins {
 }
 
 nyx {
-  // configuration block
+  // a few examples
+  dryRun = false
+  resume = false
+  stateFile = '.nyx-state.yml'
+  verbosity = "INFO"
 }
 ```
 
 The *configuration block* shown above is where you can place configuration options defined in the [configuration reference]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/index.md %}) using the [Gradle]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}#gradle) syntax.
+
+When using Kotlin you still have a configuration block very similar to the one above but with some differences.
+
+Configuring the *project plugin* using Kotlin you add something like this to your `build.gradle.kts`:
+
+```kotlin
+plugins {
+  id("com.mooltiverse.oss.nyx") version "{{ site.data.nyx.version }}"
+}
+
+nyx {
+  // a few examples
+  dryRun.set(false)
+  resume.set(false)
+  stateFile.set(".nyx-state.yml")
+  verbosity.set("DEBUG")
+}
+```
+
+As you can see Kotlin uses a different way to set values. If, instead, you're configuring the *settings plugin* in Kotlin your `settings.gradle.kts` file looks like:
+
+```kotlin
+plugins {
+  id("com.mooltiverse.oss.nyx") version "{{ site.data.nyx.version }}"
+}
+
+configure<com.mooltiverse.oss.nyx.gradle.NyxExtension> {
+  // a few examples
+  dryRun.set(false)
+  resume.set(false)
+  stateFile.set(".nyx-state.yml")
+  verbosity.set("DEBUG")
+}
+```
+
+So, when using Kotlin, the difference between configuring the *project plugin* or *settings plugin* is in the way the configuration block starts.
 
 #### Using configuration files
 
