@@ -208,6 +208,93 @@ public class Suites {
                 hostedReleaseTags = Set.<String>of(); // not using hosting services for this suite
             }},
 
+            // This suite runs Nyx Infer using a common configuration (using the regular Kotlin Gradle plugin)
+            new TestSuite(){{
+                name        = "Infer [Kotlin Regular Plugin]";
+                args        = new String[]{"--info", "--stacktrace"}; // these are command line arguments for Gradle, not the Nyx plugin
+                tasks       = new String[]{"nyxInfer"};
+                scenario    = Scenario.ONE_BRANCH_SHORT_CONVENTIONAL_COMMITS;
+                env         = Map.<String,String>of(
+                                "NYX_PRESET", "extended"
+                );
+                files       = Map.<String,String>of(
+                    // the .gitignore file, required to avoid conflicts due to locked files (i.e. 'The process cannot access the file because another process has locked a portion of the file') etc
+                    ".gitignore", ".gitignore".concat(newLine)
+                        .concat(".gradle").concat(newLine)
+                        .concat("build.gradle.kts").concat(newLine)
+                        .concat("settings.gradle.kts").concat(newLine)
+                        .concat(".nyx-state.yml").concat(newLine),
+                    // the Gradle build script
+                    "build.gradle.kts", "".concat(newLine)
+                        .concat("plugins {").concat(newLine)
+                        .concat("    id(\"com.mooltiverse.oss.nyx\")").concat(newLine)
+                        .concat("}").concat(newLine)
+                        .concat(newLine)
+                        .concat("nyx {").concat(newLine)
+                        .concat("    dryRun.set(false)").concat(newLine)
+                        .concat("    resume.set(false)").concat(newLine)
+                        .concat("    stateFile.set(\".nyx-state.yml\")").concat(newLine)
+                        .concat("    verbosity.set(\"DEBUG\")").concat(newLine)
+                        .concat("}").concat(newLine),
+                    // the Gradle settings file
+                    "settings.gradle.kts", "".concat(newLine)
+                        .concat("rootProject.name = \"nyx-gradle-plugin-test\"").concat(newLine),
+                    // the .nyx-shared.yaml is the standard shared configuration file
+                    ".nyx-shared.yaml", "---".concat(newLine)
+                        .concat("commitMessageConventions:").concat(newLine)
+                        .concat("  enabled:").concat(newLine)
+                        .concat("    - conventionalCommits").concat(newLine)
+                        .concat("  items:").concat(newLine)
+                        .concat("    conventionalCommits:").concat(newLine)
+                        .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\\\((?<scope>[a-z ]+)\\\\))?:( (?<title>.+))$(?s).*\"").concat(newLine)
+                        .concat("      bumpExpressions:").concat(newLine)
+                        .concat("        major: \"(?s)(?m)^[a-zA-Z0-9_]+(!|.*^(BREAKING( |-)CHANGE: )).*\"").concat(newLine)
+                        .concat("        minor: \"(?s)(?m)^feat(?!!|.*^(BREAKING( |-)CHANGE: )).*\"").concat(newLine)
+                        .concat("        patch: \"(?s)(?m)^fix(?!!|.*^(BREAKING( |-)CHANGE: )).*\"").concat(newLine)
+                        .concat("initialVersion: \"1.0.0\"").concat(newLine)
+                        .concat("releaseLenient: true").concat(newLine)
+                        .concat("releasePrefix: v").concat(newLine)
+                        .concat("scheme: SEMVER").concat(newLine),
+                    // the .nyx.json is the standard configuration file
+				    ".nyx.json", "{".concat(newLine)
+                        .concat("    \"releaseTypes\": {").concat(newLine)
+                        .concat("        \"items\": {").concat(newLine)
+                        .concat("            \"mainline\": {").concat(newLine)
+                        .concat("                \"collapseVersions\":false,").concat(newLine)
+                        .concat("                \"filterTags\":\"^({{configuration.releasePrefix}})?([0-9]\\\\d*)\\\\.([0-9]\\\\d*)\\\\.([0-9]\\\\d*)$\",").concat(newLine)
+                        .concat("                \"gitCommit\":\"true\",").concat(newLine)
+                        .concat("                \"gitCommitMessage\":\"Release version {{version}}\",").concat(newLine)
+                        .concat("                \"gitPush\":\"false\",").concat(newLine)
+                        .concat("                \"gitTag\":\"true\",").concat(newLine)
+                        .concat("                \"gitTagMessage\":\"Tag version {{version}}\",").concat(newLine)
+                        .concat("                \"matchBranches\":\"^(master|main)$\",").concat(newLine)
+                        .concat("                \"publish\":\"true\"").concat(newLine)
+                        .concat("            }").concat(newLine)
+                        .concat("        }").concat(newLine)
+                        .concat("    }").concat(newLine)
+                        .concat("}")
+                );
+                remoteRepoName  = null;
+                hostingRepoService = null;
+                fileContentChecks = Map.<String,Set<String>>of(
+                    ".nyx-state.yml", Set.<String>of(
+                        "bump: \"minor\"",
+                        "initialVersion: \"1.0.0\"",
+                        "preset: \"extended\"",
+                        "releaseLenient: true",
+                        "releasePrefix: \"v\"",
+                        "newVersion: true",
+                        "newRelease: true",
+                        "previousVersion: \"0.0.4\"",
+                        "primeVersion: \"0.0.4\"",
+                        "version: \"v0.1.0\""
+                    )
+                );
+                repositoryTags = Set.<String>of(); // no new tag is created by Infer
+                remoteRepositoryTags = Set.<String>of(); // not using remotes for this suite
+                hostedReleaseTags = Set.<String>of(); // not using hosting services for this suite
+            }},
+
             // This suite runs Nyx Infer using a common configuration (using the settings Groovy Gradle plugin)
             new TestSuite(){{
                 name        = "Infer [Groovy Settings Plugin]";
@@ -241,6 +328,96 @@ public class Suites {
                         .concat("    resume = false").concat(newLine)
                         .concat("    stateFile = '.nyx-state.yml'").concat(newLine)
                         .concat("    verbosity = \"DEBUG\"").concat(newLine)
+                        .concat("}").concat(newLine),
+                    // the .nyx-shared.yaml is the standard shared configuration file
+                    ".nyx-shared.yaml", "---".concat(newLine)
+                        .concat("commitMessageConventions:").concat(newLine)
+                        .concat("  enabled:").concat(newLine)
+                        .concat("    - conventionalCommits").concat(newLine)
+                        .concat("  items:").concat(newLine)
+                        .concat("    conventionalCommits:").concat(newLine)
+                        .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\\\((?<scope>[a-z ]+)\\\\))?:( (?<title>.+))$(?s).*\"").concat(newLine)
+                        .concat("      bumpExpressions:").concat(newLine)
+                        .concat("        major: \"(?s)(?m)^[a-zA-Z0-9_]+(!|.*^(BREAKING( |-)CHANGE: )).*\"").concat(newLine)
+                        .concat("        minor: \"(?s)(?m)^feat(?!!|.*^(BREAKING( |-)CHANGE: )).*\"").concat(newLine)
+                        .concat("        patch: \"(?s)(?m)^fix(?!!|.*^(BREAKING( |-)CHANGE: )).*\"").concat(newLine)
+                        .concat("initialVersion: \"1.0.0\"").concat(newLine)
+                        .concat("releaseLenient: true").concat(newLine)
+                        .concat("releasePrefix: v").concat(newLine)
+                        .concat("scheme: SEMVER").concat(newLine),
+                    // the .nyx.json is the standard configuration file
+				    ".nyx.json", "{".concat(newLine)
+                        .concat("    \"releaseTypes\": {").concat(newLine)
+                        .concat("        \"items\": {").concat(newLine)
+                        .concat("            \"mainline\": {").concat(newLine)
+                        .concat("                \"collapseVersions\":false,").concat(newLine)
+                        .concat("                \"filterTags\":\"^({{configuration.releasePrefix}})?([0-9]\\\\d*)\\\\.([0-9]\\\\d*)\\\\.([0-9]\\\\d*)$\",").concat(newLine)
+                        .concat("                \"gitCommit\":\"true\",").concat(newLine)
+                        .concat("                \"gitCommitMessage\":\"Release version {{version}}\",").concat(newLine)
+                        .concat("                \"gitPush\":\"false\",").concat(newLine)
+                        .concat("                \"gitTag\":\"true\",").concat(newLine)
+                        .concat("                \"gitTagMessage\":\"Tag version {{version}}\",").concat(newLine)
+                        .concat("                \"matchBranches\":\"^(master|main)$\",").concat(newLine)
+                        .concat("                \"publish\":\"true\"").concat(newLine)
+                        .concat("            }").concat(newLine)
+                        .concat("        }").concat(newLine)
+                        .concat("    }").concat(newLine)
+                        .concat("}")
+                );
+                remoteRepoName  = null;
+                hostingRepoService = null;
+                fileContentChecks = Map.<String,Set<String>>of(
+                    ".nyx-state.yml", Set.<String>of(
+                        "bump: \"minor\"",
+                        "initialVersion: \"1.0.0\"",
+                        "preset: \"extended\"",
+                        "releaseLenient: true",
+                        "releasePrefix: \"v\"",
+                        "newVersion: true",
+                        "newRelease: true",
+                        "previousVersion: \"0.0.4\"",
+                        "primeVersion: \"0.0.4\"",
+                        "version: \"v0.1.0\""
+                    )
+                );
+                repositoryTags = Set.<String>of(); // no new tag is created by Infer
+                remoteRepositoryTags = Set.<String>of(); // not using remotes for this suite
+                hostedReleaseTags = Set.<String>of(); // not using hosting services for this suite
+            }},
+
+            // This suite runs Nyx Infer using a common configuration (using the settings Kotlin Gradle plugin)
+            new TestSuite(){{
+                name        = "Infer [Kotlin Settings Plugin]";
+                args        = new String[]{"--info", "--stacktrace"}; // these are command line arguments for Gradle, not the Nyx plugin
+                tasks       = new String[]{"nyxInfer"};
+                scenario    = Scenario.ONE_BRANCH_SHORT_CONVENTIONAL_COMMITS;
+                env         = Map.<String,String>of(
+                                "NYX_PRESET", "extended"
+                );
+                files       = Map.<String,String>of(
+                    // the .gitignore file, required to avoid conflicts due to locked files (i.e. 'The process cannot access the file because another process has locked a portion of the file') etc
+                    ".gitignore", ".gitignore".concat(newLine)
+                        .concat(".gradle").concat(newLine)
+                        .concat("build.gradle.kts").concat(newLine)
+                        .concat("settings.gradle.kts").concat(newLine)
+                        .concat(".nyx-state.yml").concat(newLine),
+                    // the Gradle build script
+                    "build.gradle.kts", "".concat(newLine)
+                        .concat("tasks.register(\"dummy\") {").concat(newLine)
+                        .concat("}").concat(newLine),
+                    // the Gradle settings file
+                    "settings.gradle.kts", "".concat(newLine)
+                        .concat("plugins {").concat(newLine)
+                        .concat("    id(\"com.mooltiverse.oss.nyx\")").concat(newLine)
+                        .concat("}").concat(newLine)
+                        .concat(newLine)
+                        .concat("rootProject.name = \"nyx-gradle-plugin-test\"").concat(newLine)
+                        .concat(newLine)
+                        .concat("configure<com.mooltiverse.oss.nyx.gradle.NyxExtension> {").concat(newLine)
+                        .concat("    dryRun.set(false)").concat(newLine)
+                        .concat("    resume.set(false)").concat(newLine)
+                        .concat("    stateFile.set(\".nyx-state.yml\")").concat(newLine)
+                        .concat("    verbosity.set(\"DEBUG\")").concat(newLine)
                         .concat("}").concat(newLine),
                     // the .nyx-shared.yaml is the standard shared configuration file
                     ".nyx-shared.yaml", "---".concat(newLine)
