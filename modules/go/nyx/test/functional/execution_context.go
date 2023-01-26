@@ -14,9 +14,6 @@
  * limitations under the License.
  */
 
-/*
-This package provides functional tests.
-*/
 package functional_test
 
 import (

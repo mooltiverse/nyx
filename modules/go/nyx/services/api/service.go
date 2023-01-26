@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
+/*
+This is the services API package for Nyx, providing interfaces and service-independent classes to
+work with remote services (i.e. Git Hosting).
+*/
 package api
 
 /*

@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
+/*
+This is the version package for Nyx, providing classes required to manage the supported versioning schemes
+(i.e. SemVer and Maven).
+*/
 package version
 
 import (

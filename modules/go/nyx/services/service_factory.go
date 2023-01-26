@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+/*
+This is the services package for Nyx, providing classes needed to work with remote services (i.e. Git Hosting).
+*/
 package services
 
 import (

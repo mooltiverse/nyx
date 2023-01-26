@@ -15,7 +15,7 @@
  */
 
 /*
-This package provides common errors used within the project.
+This package provides common errors used within the Nyx project.
 */
 package errors
 

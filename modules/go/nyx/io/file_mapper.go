@@ -16,8 +16,6 @@
 
 /*
 This is the package that provides I/O capabilities to Nyx, including marshalling and unmarshalling to/from common file formats.
-
-See https://mooltiverse.github.io/nyx/guide/developer/go/ for the developer's guide.
 */
 package io
 
