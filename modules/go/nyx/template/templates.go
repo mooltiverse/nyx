@@ -76,6 +76,12 @@ func Render(template string, scope interface{}) (string, error) {
 	if err != nil {
 		return "", &errs.IOError{Message: fmt.Sprintf("unable to render the template using the given values"), Cause: err}
 	}
+
+	// The rendering engine doesn't cope well with nil values returned from the scope objects and renders them
+	// as '%!s(*string=&lt;nil&gt;'. The enine doesn't expose any means to control its behavior when a nil is encountered
+	// so the quick and dirty workaround here is to just replace all of those rubbish strings with an empty string
+	output = strings.ReplaceAll(output, "%!s(*string=&lt;nil&gt;)", "")
+
 	return output, nil
 
 }
