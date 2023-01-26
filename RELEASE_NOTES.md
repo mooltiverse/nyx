@@ -32,6 +32,24 @@ There are no fixes in this release.
 
 There are no known issues in this release.
 
+## 1.3.4
+
+This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/1.3.4).
+
+### Upgrade instructions
+
+There are no actions to take for backward compatibility.
+
+### New features and improvements
+
+There are no new features or improvements in this release.
+
+### Fixed issues
+
+This release:
+
+* fixes bug [#141](https://github.com/mooltiverse/nyx/issues/141) about confured templates not being rendered correctly when they use transient objects from the State like, for example, the `configuration` tree (Go)
+
 ## 1.3.3
 
 This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/1.3.3).
