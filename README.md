@@ -1,9 +1,10 @@
 [![.github/workflows/continuous-integration.yml](https://github.com/mooltiverse/nyx/actions/workflows/continuous-integration.yml/badge.svg?branch=master)](https://github.com/mooltiverse/nyx/actions/workflows/continuous-integration.yml) 
 [![Javadoc](https://javadoc.io/badge2/com.mooltiverse.oss.nyx/java/Javadoc.svg)](https://javadoc.io/doc/com.mooltiverse.oss.nyx/java) 
+[![Go Documentation](https://godocs.io/github.com/mooltiverse/nyx/modules/go/nyx?status.svg)](https://godocs.io/github.com/mooltiverse/nyx/modules/go/nyx)
 [![](https://img.shields.io/badge/powered%20by-Nyx-blue)](https://github.com/mooltiverse/nyx) 
 [![License](https://img.shields.io/badge/License-Apache%202.0-grey.svg)](LICENSE.md) [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-grey.svg)](CODE_OF_CONDUCT.md)
 
-Nyx is a powerful, flexible and extremely configurable **semantic release** tool. You can put release management on *auto pilot* regardless of the kind of project, languages, tools and technologies or you can control any aspect of release management manually. Preset configuration values let you get started in minutes without digging into detailed settings.
+[Nyx](https://github.com/mooltiverse/nyx) is a powerful, flexible and extremely configurable **semantic release** tool. You can put release management on *auto pilot* regardless of the kind of project, languages, tools and technologies or you can control any aspect of release management manually. Preset configuration values let you get started in minutes without digging into detailed settings.
 
 Nyx is the *all in one* tool that gives you integrated support for:
 
@@ -46,7 +47,7 @@ From here:
 
 ## Downloads and availability
 
-### Binary distributions
+### Binaries
 
 Available for all platforms in the [latest release](https://github.com/mooltiverse/nyx/releases/latest) assets.
 
@@ -55,7 +56,7 @@ Available for all platforms in the [latest release](https://github.com/mooltiver
 * on [Docker Hub](https://hub.docker.com/repository/docker/mooltiverse/nyx)
 * on [GitHub container registry](https://github.com/mooltiverse/nyx/pkgs/container/nyx)
 
-### Build tools
+### Build tools plugin
 
 * [Gradle plug-in](https://plugins.gradle.org/plugin/com.mooltiverse.oss.nyx)
 
@@ -68,25 +69,17 @@ Available for all platforms in the [latest release](https://github.com/mooltiver
   * [for Go](https://mooltiverse.github.io/nyx/guide/developer/java/semantic-version/)
   * [for Java](https://mooltiverse.github.io/nyx/guide/developer/java/semantic-version/)
 
-## Quick Links
+## Documentation
 
-* Project:
-  * [repository](https://github.com/mooltiverse/nyx)
-  * [issues](https://github.com/mooltiverse/nyx/issues)
-  * [releases](https://github.com/mooltiverse/nyx/releases)
-* Documentation:
-  * [Nyx documentation](https://mooltiverse.github.io/nyx/)
-    * [user guide](https://mooltiverse.github.io/nyx/guide/user/)
-    * [developer guide](https://mooltiverse.github.io/nyx/guide/developer/)
-  * [Godoc API](https://pkg.go.dev/search?q=mooltiverse%2Fnyx)
-  * [Javadoc API](https://javadoc.io/doc/com.mooltiverse.oss.nyx/java)
-* Articles:
-  * [Nyx, the Semantic Release Automation Tool](https://levelup.gitconnected.com/nyx-the-semantic-release-automation-tool-4e2dfa949f38)
-  * [Semantic Release Automation with Gradle using Nyx](https://levelup.gitconnected.com/semantic-release-automation-with-gradle-using-nyx-ba345235a365)
-* Deliverables:
-  * [GitHub packages](https://github.com/mooltiverse/nyx/packages) and [GitHub container images](https://github.com/mooltiverse/nyx/pkgs/container/nyx)
-  * [Maven repository](https://search.maven.org/search?q=g:com.mooltiverse.oss.nyx) ([raw version](https://repo.maven.apache.org/maven2/com/mooltiverse/oss/nyx/))
-  * [Gradle plugin](https://plugins.gradle.org/plugin/com.mooltiverse.oss.nyx)
+* [Main Nyx documentation](https://mooltiverse.github.io/nyx/)
+  * [user guide](https://mooltiverse.github.io/nyx/guide/user/)
+  * [developer guide](https://mooltiverse.github.io/nyx/guide/developer/)
+* [Godoc API](https://godocs.io/github.com/mooltiverse/nyx/modules/go/nyx)
+* [Javadoc API](https://javadoc.io/doc/com.mooltiverse.oss.nyx/java)
+  
+### Articles:
+* [Nyx, the Semantic Release Automation Tool](https://levelup.gitconnected.com/nyx-the-semantic-release-automation-tool-4e2dfa949f38)
+* [Semantic Release Automation with Gradle using Nyx](https://levelup.gitconnected.com/semantic-release-automation-with-gradle-using-nyx-ba345235a365)
 
 ## Badge
 
@@ -95,4 +88,3 @@ If you like Nyx please consider showing the badge [![](https://img.shields.io/ba
 ```md
 [![](https://img.shields.io/badge/powered%20by-Nyx-blue)](https://github.com/mooltiverse/nyx)
 ```
-
