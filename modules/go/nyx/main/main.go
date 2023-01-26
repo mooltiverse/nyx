@@ -15,7 +15,7 @@
  */
 
 /*
-This is the main package for Nyx, also providing the entry point.
+This package provides the command line entry point for Nyx.
 
 See https://mooltiverse.github.io/nyx/guide/developer/go/ for the developer's guide.
 */

@@ -14,9 +14,6 @@
  * limitations under the License.
  */
 
-/*
-This is the Git package for Nyx, encapsulating the underlying Git implementation.
-*/
 package git
 
 import (

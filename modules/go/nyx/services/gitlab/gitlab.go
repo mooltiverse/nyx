@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+/*
+This is the GitLab package for Nyx, providing services to work with the GitLab service.
+*/
 package gitlab
 
 import (

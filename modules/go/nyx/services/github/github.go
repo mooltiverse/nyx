@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+/*
+This is the GitHub package for Nyx, providing services to work with the GitHub service.
+*/
 package github
 
 import (
