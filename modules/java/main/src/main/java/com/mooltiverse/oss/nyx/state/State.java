@@ -397,9 +397,9 @@ public class State {
     }
 
     /**
-     * Returns {@code true} if the scope has a non {@code null} {@linl #getLatestVersion()} flag.
+     * Returns {@code true} if the scope has a non {@code null} {@link #getLatestVersion()} flag.
      * 
-     * @return {@code true} if the scope has a non {@code null} {@linl #getLatestVersion()} flag.
+     * @return {@code true} if the scope has a non {@code null} {@link #getLatestVersion()} flag.
      * 
      * @throws DataAccessException in case the attribute cannot be read or accessed.
      * @throws IllegalPropertyException in case the attribute has been defined but has incorrect values or it can't be resolved.
