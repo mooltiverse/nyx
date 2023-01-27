@@ -39,6 +39,7 @@ import com.mooltiverse.oss.nyx.io.DataAccessException;
 import com.mooltiverse.oss.nyx.io.FileMapper;
 import com.mooltiverse.oss.nyx.template.Templates;
 import com.mooltiverse.oss.nyx.version.Scheme;
+import com.mooltiverse.oss.nyx.version.Versions;
 
 /**
  * The State class holds a number of attributes resulting from the execution of one or more command and so represents
@@ -78,7 +79,13 @@ public class State {
     /**
      * The map containing the internal attributes.
      */
-    private  Map<String, String> internals = new HashMap<String, String>();
+    private Map<String, String> internals = new HashMap<String, String>();
+
+    /**
+     * The flag indicating if the {@link #version} is the latest in the repository,
+     * according to the {@link #getScheme() scheme}.
+     */
+    private Boolean latestVersion = null;
 
     /**
      * The list containing the released assets.
@@ -318,6 +325,27 @@ public class State {
     }
 
     /**
+     * Returns {@code true} if the version ({@link #getVersion()}) only brings core identifiers (according to the
+     * {@link #getScheme() scheme}), usually meaning it is an official version. This mehod also takes into account
+     * whether the {@link #getConfiguration() configuration} requires {@link Configuration#getReleaseLenient() leniency}
+     * or it has a {@link Configuration#getReleasePrefix() prefix} configured.
+     * 
+     * @return {@code true} if the version only brings core identifiers. If this state has no {@link #hasVersion() version}
+     * then {@code false} is returned.
+     * 
+     * @throws DataAccessException in case the attribute cannot be read or accessed.
+     * @throws IllegalPropertyException in case the attribute has been defined but has incorrect values or it can't be resolved.
+     * 
+     * @see #getVersion()
+     * @see #getScheme()
+     * @see Configuration#getVersion()
+     */
+    public Boolean getCoreVersion()
+        throws DataAccessException, IllegalPropertyException {
+        return hasVersion() ? Boolean.valueOf(getConfiguration().getReleaseLenient() ? Versions.isCore(getScheme(), getVersion(), getConfiguration().getReleaseLenient()) : Versions.isCore(getScheme(), getVersion(), getConfiguration().getReleasePrefix())) : null;
+    }
+
+    /**
      * Returns the directory used as the working directory as it's defined by the configuration.
      * 
      * @return the current value for this attribute.
@@ -351,6 +379,48 @@ public class State {
      */
     public Map<String, String> getInternals() {
         return internals;
+    }
+
+    /**
+     * Returns the flag indicating if the {@link #getVersion() version} is the latest in the repository,
+     * according to the {@link #getScheme() scheme}.
+     * 
+     * @return the flag indicating if the {@link #getVersion()} is the latest in the repository,
+     * according to the {@link #getScheme() scheme}. This is also {@code null} until this state has a {@link #hasVersion() version} set.
+     * 
+     * @throws DataAccessException in case the attribute cannot be read or accessed.
+     * @throws IllegalPropertyException in case the attribute has been defined but has incorrect values or it can't be resolved.
+     */
+    public Boolean getLatestVersion()
+        throws DataAccessException, IllegalPropertyException {
+        return hasVersion() ? latestVersion : null;
+    }
+
+    /**
+     * Returns {@code true} if the scope has a non {@code null} {@link #getLatestVersion()} flag.
+     * 
+     * @return {@code true} if the scope has a non {@code null} {@link #getLatestVersion()} flag.
+     * 
+     * @throws DataAccessException in case the attribute cannot be read or accessed.
+     * @throws IllegalPropertyException in case the attribute has been defined but has incorrect values or it can't be resolved.
+     */
+    public boolean hasLatestVersion()
+        throws DataAccessException, IllegalPropertyException {
+        return !Objects.isNull(getLatestVersion());
+    }
+
+    /**
+     * Sets the flag indicating if the {@link #getVersion() version} is the latest in the repository,
+     * according to the {@link #getScheme() scheme}.
+     * 
+     * @param latestVersion the flag indicating if the {@link #getVersion()} is the latest in the repository.
+     * 
+     * @throws DataAccessException in case the attribute cannot be written or accessed.
+     * @throws IllegalPropertyException in case the attribute has incorrect values or it can't be resolved.
+     */
+    public void setLatestVersion(Boolean latestVersion)
+        throws DataAccessException, IllegalPropertyException {
+        this.latestVersion = latestVersion;
     }
 
     /**

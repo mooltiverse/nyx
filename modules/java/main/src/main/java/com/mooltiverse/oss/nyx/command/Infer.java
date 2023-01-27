@@ -766,6 +766,45 @@ public class Infer extends AbstractCommand {
     }
 
     /**
+     * Checks if the given version is the latest in the repository, according to the scheme.
+     * To run this check the given version is checked against all tags in the repository (ignoring those not
+     * complying with the given scheme) and only if the given version is to be considered newer or equal to any
+     * other version tag {@code true} is returned.
+     * 
+     * @param scheme the versioning scheme in use. It can't be {@code null}
+     * @param version the version to check. It can't be {@code null}
+     * @param releaseLenient when {@code true} prefixes, even others than the {@code releasePrefix},
+     * are tolerated when parsing and comparing
+     * @param releasePrefix the release prefix that has been configured. This is considered when parsing and comparing versions.
+     * It may be {@code null} or empty
+     * 
+     * @return {@code true} if the given version is newer or equal to any other tag in the repository
+     * 
+     * @throws DataAccessException in case the configuration can't be loaded for some reason.
+     * @throws IllegalPropertyException in case the configuration has some illegal options.
+     * @throws GitException in case of unexpected issues when accessing the Git repository.
+     * @throws ReleaseException if the task is unable to complete for reasons due to the release process.
+     */
+    private boolean checkLatestVersion(Scheme scheme, String version, boolean releaseLenient, String releasePrefix)
+        throws DataAccessException, IllegalPropertyException, GitException, ReleaseException {
+        logger.debug(COMMAND, "Checking if version '{}' is the latest in the repository", version);
+        for (Tag tag: repository().getTags()) {
+            logger.trace(COMMAND, "Checking against tag '{}'", tag.getName());
+            if (releaseLenient ? Versions.isLegal(scheme, tag.getName(), releaseLenient) : Versions.isLegal(scheme, tag.getName(), releasePrefix)) {
+                logger.trace(COMMAND, "Tag '{}' is a legal version according to '{}'", tag.getName(), scheme.toString());
+                if ((releaseLenient ? Versions.compare(scheme, version, tag.getName(), releaseLenient) : Versions.compare(scheme, version, tag.getName(), releasePrefix)) < 0) {
+                    logger.debug(COMMAND, "Tag '{}' is greater than '{}' according to '{}' so '{}' is not the latest version", tag.getName(), version, scheme.toString(), version);
+                    return false;
+                }
+                else logger.trace(COMMAND, "Tag '{}' is less or equal than '{}' according to '{}' so next tags will be tested (if any)", tag.getName(), version, scheme.toString());
+            }
+            else logger.trace(COMMAND, "Tag '{}' is not a legal version according to '{}' and will be ignored", tag.getName(), scheme.toString());
+        }
+        logger.debug(COMMAND, "Version '{}' is the latest in the repository since no newer version has been found", version);
+        return true;
+    }
+
+    /**
      * Reset the attributes store by this command into the internal state object.
      * This is required before running the command in order to make sure that the new execution is not affected
      * by a stale status coming from previous runs.
@@ -793,6 +832,7 @@ public class Infer extends AbstractCommand {
         // the version attribute can only be set (or reset) when the used didn't override the value from the configuration
         if (Objects.isNull(state().getConfiguration().getVersion()))
             state().setVersion(null);
+        state().setLatestVersion(null);
         state().setVersionRange(null);
     }
 
@@ -948,6 +988,8 @@ public class Infer extends AbstractCommand {
             // STEP 5: store values to the state object            
             state().setVersion(stringVersion);
         }
+        // check if the state version, regardless whether it was inferred or overridden, is the latest
+        state().setLatestVersion(Boolean.valueOf(checkLatestVersion(state().getScheme(), state().getVersion(), state().getConfiguration().getReleaseLenient().booleanValue(), state().getConfiguration().getReleasePrefix())));
 
         storeStatusInternalAttributes();
         

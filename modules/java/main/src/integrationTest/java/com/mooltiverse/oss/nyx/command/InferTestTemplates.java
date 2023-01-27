@@ -503,6 +503,8 @@ public class InferTestTemplates {
             // collect its state values
             String branch = command.state().getBranch();
             String bump = command.state().getBump();
+            Boolean coreVersion = command.state().getCoreVersion();
+            Boolean latestVersion = command.state().getLatestVersion();
             Boolean newRelease = command.state().getNewRelease();
             Boolean newVersion = command.state().getNewVersion();
             List<Commit> commits = List.<Commit>copyOf(command.state().getReleaseScope().getCommits());
@@ -527,6 +529,8 @@ public class InferTestTemplates {
 
             assertEquals(branch, command.state().getBranch());
             assertEquals(bump, command.state().getBump());
+            assertEquals(coreVersion, command.state().getCoreVersion());
+            assertEquals(latestVersion, command.state().getLatestVersion());
             assertEquals(newRelease, command.state().getNewRelease());
             assertEquals(newVersion, command.state().getNewVersion());
             assertEquals(commits, command.state().getReleaseScope().getCommits());
@@ -563,6 +567,8 @@ public class InferTestTemplates {
             // collect state values again
             branch = command.state().getBranch();
             bump = command.state().getBump();
+            coreVersion = command.state().getCoreVersion();
+            latestVersion = command.state().getLatestVersion();
             newRelease = command.state().getNewRelease();
             newVersion = command.state().getNewVersion();
             commits = List.<Commit>copyOf(command.state().getReleaseScope().getCommits());
@@ -588,6 +594,8 @@ public class InferTestTemplates {
 
             assertEquals(branch, command.state().getBranch());
             assertEquals(bump, command.state().getBump());
+            assertEquals(coreVersion, command.state().getCoreVersion());
+            assertEquals(latestVersion, command.state().getLatestVersion());
             assertEquals(newRelease, command.state().getNewRelease());
             assertEquals(newVersion, command.state().getNewVersion());
             assertEquals(commits, command.state().getReleaseScope().getCommits());
@@ -610,6 +618,8 @@ public class InferTestTemplates {
 
             assertEquals(branch, command.state().getBranch());
             assertEquals(bump, command.state().getBump());
+            assertEquals(coreVersion, command.state().getCoreVersion());
+            assertEquals(latestVersion, command.state().getLatestVersion());
             assertEquals(newRelease, command.state().getNewRelease());
             assertEquals(newVersion, command.state().getNewVersion());
             assertEquals(commits, command.state().getReleaseScope().getCommits());
@@ -642,6 +652,8 @@ public class InferTestTemplates {
             // collect its state values
             String branch = command.state().getBranch();
             String bump = command.state().getBump();
+            Boolean coreVersion = command.state().getCoreVersion();
+            Boolean latestVersion = command.state().getLatestVersion();
             Boolean newRelease = command.state().getNewRelease();
             Boolean newVersion = command.state().getNewVersion();
             List<Commit> commits = List.<Commit>copyOf(command.state().getReleaseScope().getCommits());
@@ -666,6 +678,8 @@ public class InferTestTemplates {
 
             assertEquals(branch, command.state().getBranch());
             assertEquals(bump, command.state().getBump());
+            assertEquals(coreVersion, command.state().getCoreVersion());
+            assertEquals(latestVersion, command.state().getLatestVersion());
             assertEquals(newRelease, command.state().getNewRelease());
             assertEquals(newVersion, command.state().getNewVersion());
             assertEquals(commits, command.state().getReleaseScope().getCommits());
@@ -702,6 +716,8 @@ public class InferTestTemplates {
             // collect state values again
             branch = command.state().getBranch();
             bump = command.state().getBump();
+            coreVersion = command.state().getCoreVersion();
+            latestVersion = command.state().getLatestVersion();
             newRelease = command.state().getNewRelease();
             newVersion = command.state().getNewVersion();
             commits = List.<Commit>copyOf(command.state().getReleaseScope().getCommits());
@@ -727,6 +743,8 @@ public class InferTestTemplates {
 
             assertEquals(branch, command.state().getBranch());
             assertEquals(bump, command.state().getBump());
+            assertEquals(coreVersion, command.state().getCoreVersion());
+            assertEquals(latestVersion, command.state().getLatestVersion());
             assertEquals(newRelease, command.state().getNewRelease());
             assertEquals(newVersion, command.state().getNewVersion());
             assertEquals(commits, command.state().getReleaseScope().getCommits());
@@ -749,6 +767,8 @@ public class InferTestTemplates {
 
             assertEquals(branch, command.state().getBranch());
             assertEquals(bump, command.state().getBump());
+            assertEquals(coreVersion, command.state().getCoreVersion());
+            assertEquals(latestVersion, command.state().getLatestVersion());
             assertEquals(newRelease, command.state().getNewRelease());
             assertEquals(newVersion, command.state().getNewVersion());
             assertEquals(commits, command.state().getReleaseScope().getCommits());
@@ -781,6 +801,8 @@ public class InferTestTemplates {
             // collect its state values
             String branch = command.state().getBranch();
             String bump = command.state().getBump();
+            Boolean coreVersion = command.state().getCoreVersion();
+            Boolean latestVersion = command.state().getLatestVersion();
             Boolean newRelease = command.state().getNewRelease();
             Boolean newVersion = command.state().getNewVersion();
             List<Commit> commits = List.<Commit>copyOf(command.state().getReleaseScope().getCommits());
@@ -808,6 +830,8 @@ public class InferTestTemplates {
 
             assertEquals(branch, command.state().getBranch());
             assertEquals(bump, command.state().getBump());
+            assertEquals(coreVersion, command.state().getCoreVersion());
+            assertEquals(latestVersion, command.state().getLatestVersion());
             assertEquals(newRelease, command.state().getNewRelease());
             assertEquals(newVersion, command.state().getNewVersion());
             assertEquals(commits, command.state().getReleaseScope().getCommits());
@@ -844,6 +868,8 @@ public class InferTestTemplates {
             // collect state values again
             branch = command.state().getBranch();
             bump = command.state().getBump();
+            coreVersion = command.state().getCoreVersion();
+            latestVersion = command.state().getLatestVersion();
             newRelease = command.state().getNewRelease();
             newVersion = command.state().getNewVersion();
             commits = List.<Commit>copyOf(command.state().getReleaseScope().getCommits());
@@ -872,6 +898,8 @@ public class InferTestTemplates {
 
             assertEquals(branch, command.state().getBranch());
             assertEquals(bump, command.state().getBump());
+            assertEquals(coreVersion, command.state().getCoreVersion());
+            assertEquals(latestVersion, command.state().getLatestVersion());
             assertEquals(newRelease, command.state().getNewRelease());
             assertEquals(newVersion, command.state().getNewVersion());
             assertEquals(commits, command.state().getReleaseScope().getCommits());
@@ -897,6 +925,8 @@ public class InferTestTemplates {
 
             assertEquals(branch, command.state().getBranch());
             assertEquals(bump, command.state().getBump());
+            assertEquals(coreVersion, command.state().getCoreVersion());
+            assertEquals(latestVersion, command.state().getLatestVersion());
             assertEquals(newRelease, command.state().getNewRelease());
             assertEquals(newVersion, command.state().getNewVersion());
             assertEquals(commits, command.state().getReleaseScope().getCommits());
@@ -1794,6 +1824,8 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertTrue(command.state().getCoreVersion());
+            assertTrue(command.state().getLatestVersion());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals(Defaults.INITIAL_VERSION.toString(), command.state().getVersion());
@@ -1848,6 +1880,8 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertTrue(command.state().getCoreVersion());
+            assertTrue(command.state().getLatestVersion());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals(CUSTOM_INITIAL_VERSION, command.state().getVersion());
@@ -1902,6 +1936,8 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertTrue(command.state().getCoreVersion());
+            assertTrue(command.state().getLatestVersion());
             assertTrue(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals(CUSTOM_VERSION, command.state().getVersion());
@@ -1956,6 +1992,8 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertTrue(command.state().getCoreVersion());
+            assertTrue(command.state().getLatestVersion());
             assertTrue(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("1.0.0", command.state().getVersion());
@@ -2010,6 +2048,8 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertTrue(command.state().getCoreVersion());
+            assertTrue(command.state().getLatestVersion());
             assertTrue(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.2.0", command.state().getVersion());
@@ -2064,6 +2104,8 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertTrue(command.state().getCoreVersion());
+            assertTrue(command.state().getLatestVersion());
             assertTrue(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.1.1", command.state().getVersion());
@@ -2118,6 +2160,8 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertFalse(command.state().getCoreVersion());
+            assertTrue(command.state().getLatestVersion());
             assertTrue(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.1.0-alpha.1", command.state().getVersion());
@@ -2172,6 +2216,8 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertTrue(command.state().getCoreVersion());
+            assertTrue(command.state().getLatestVersion());
             assertTrue(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("1.0.0", command.state().getVersion());
@@ -2226,6 +2272,8 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertTrue(command.state().getCoreVersion());
+            assertTrue(command.state().getLatestVersion());
             assertTrue(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.2.0", command.state().getVersion());
@@ -2280,6 +2328,8 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertTrue(command.state().getCoreVersion());
+            assertTrue(command.state().getLatestVersion());
             assertTrue(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.1.1", command.state().getVersion());
@@ -2334,6 +2384,8 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertFalse(command.state().getCoreVersion());
+            assertFalse(command.state().getLatestVersion());
             assertTrue(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.1.0-alpha.1", command.state().getVersion());
@@ -2388,6 +2440,8 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertTrue(command.state().getCoreVersion());
+            assertTrue(command.state().getLatestVersion());
             assertTrue(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("2.2.2", command.state().getVersion());
@@ -2442,6 +2496,8 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertTrue(command.state().getCoreVersion());
+            assertTrue(command.state().getLatestVersion());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals(Defaults.INITIAL_VERSION, command.state().getVersion());
@@ -2497,6 +2553,8 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertTrue(command.state().getCoreVersion());
+            assertTrue(command.state().getLatestVersion());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("release-2.2.2", command.state().getVersion());
@@ -2547,6 +2605,8 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertTrue(command.state().getCoreVersion());
+            assertTrue(command.state().getLatestVersion());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.0.4", command.state().getVersion());
@@ -2600,6 +2660,8 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertTrue(command.state().getCoreVersion());
+            assertTrue(command.state().getLatestVersion());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.0.4", command.state().getVersion());
@@ -2653,6 +2715,8 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertTrue(command.state().getCoreVersion());
+            assertTrue(command.state().getLatestVersion());
             assertTrue(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("1.2.3", command.state().getVersion());
@@ -2707,6 +2771,8 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertTrue(command.state().getCoreVersion());
+            assertTrue(command.state().getLatestVersion());
             assertTrue(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("1.0.0", command.state().getVersion());
@@ -2761,6 +2827,8 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertTrue(command.state().getCoreVersion());
+            assertTrue(command.state().getLatestVersion());
             assertTrue(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.1.0", command.state().getVersion());
@@ -2815,6 +2883,8 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertTrue(command.state().getCoreVersion());
+            assertTrue(command.state().getLatestVersion());
             assertTrue(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.0.5", command.state().getVersion());
@@ -2869,6 +2939,8 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertFalse(command.state().getCoreVersion());
+            assertFalse(command.state().getLatestVersion());
             assertTrue(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.0.4-alpha.1", command.state().getVersion());
@@ -2923,6 +2995,8 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertTrue(command.state().getCoreVersion());
+            assertTrue(command.state().getLatestVersion());
             assertTrue(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("2.2.2", command.state().getVersion());
@@ -2977,6 +3051,8 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertTrue(command.state().getCoreVersion());
+            assertTrue(command.state().getLatestVersion());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.0.4", command.state().getVersion());
@@ -3032,6 +3108,8 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertTrue(command.state().getCoreVersion());
+            assertTrue(command.state().getLatestVersion());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("release-2.2.2", command.state().getVersion());
@@ -3086,6 +3164,8 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertTrue(command.state().getCoreVersion());
+            assertTrue(command.state().getLatestVersion());
             assertTrue(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.0.7", command.state().getVersion());
@@ -3147,6 +3227,8 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertTrue(command.state().getCoreVersion());
+            assertTrue(command.state().getLatestVersion());
             assertTrue(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.1.0", command.state().getVersion());
@@ -3206,6 +3288,8 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertTrue(command.state().getCoreVersion());
+            assertTrue(command.state().getLatestVersion());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.0.4", command.state().getVersion());
@@ -3271,6 +3355,8 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertTrue(command.state().getCoreVersion());
+            assertFalse(command.state().getLatestVersion());
             assertTrue(command.state().getNewVersion());
             assertTrue(command.state().getNewRelease());
             assertEquals("0.0.6", command.state().getVersion());
@@ -3336,6 +3422,8 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertTrue(command.state().getCoreVersion());
+            assertFalse(command.state().getLatestVersion());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.0.5", command.state().getVersion());
@@ -3401,6 +3489,8 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertTrue(command.state().getCoreVersion());
+            assertTrue(command.state().getLatestVersion());
             assertTrue(command.state().getNewVersion());
             assertTrue(command.state().getNewRelease());
             assertEquals("0.1.1", command.state().getVersion());
@@ -3466,6 +3556,8 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertTrue(command.state().getCoreVersion());
+            assertTrue(command.state().getLatestVersion());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.1.0", command.state().getVersion());
@@ -3531,6 +3623,8 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertFalse(command.state().getCoreVersion());
+            assertFalse(command.state().getLatestVersion());
             assertTrue(command.state().getNewVersion());
             assertTrue(command.state().getNewRelease());
             assertEquals("0.0.6-integration.3", command.state().getVersion());
@@ -3596,6 +3690,8 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertFalse(command.state().getCoreVersion());
+            assertFalse(command.state().getLatestVersion());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.0.6-integration.2", command.state().getVersion());
@@ -3661,6 +3757,8 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertFalse(command.state().getCoreVersion());
+            assertTrue(command.state().getLatestVersion());
             assertTrue(command.state().getNewVersion());
             assertTrue(command.state().getNewRelease());
             assertEquals("0.1.1-development.1", command.state().getVersion());
@@ -3726,6 +3824,8 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertTrue(command.state().getCoreVersion());
+            assertTrue(command.state().getLatestVersion());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.1.0", command.state().getVersion());
@@ -3791,6 +3891,8 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertFalse(command.state().getCoreVersion());
+            assertFalse(command.state().getLatestVersion());
             assertTrue(command.state().getNewVersion());
             assertTrue(command.state().getNewRelease());
             assertEquals("0.0.6-alpha.3", command.state().getVersion());
@@ -3856,6 +3958,8 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertFalse(command.state().getCoreVersion());
+            assertFalse(command.state().getLatestVersion());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.0.6-alpha.2", command.state().getVersion());
@@ -3921,6 +4025,8 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertFalse(command.state().getCoreVersion());
+            assertFalse(command.state().getLatestVersion());
             assertTrue(command.state().getNewVersion());
             assertTrue(command.state().getNewRelease());
             assertEquals("0.0.6-beta.3", command.state().getVersion());
@@ -3986,6 +4092,8 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertFalse(command.state().getCoreVersion());
+            assertFalse(command.state().getLatestVersion());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.0.6-beta.2", command.state().getVersion());
@@ -4051,6 +4159,8 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertFalse(command.state().getCoreVersion());
+            assertFalse(command.state().getLatestVersion());
             assertTrue(command.state().getNewVersion());
             assertTrue(command.state().getNewRelease());
             assertEquals("0.0.6-gamma.1", command.state().getVersion());
@@ -4116,6 +4226,8 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertTrue(command.state().getCoreVersion());
+            assertFalse(command.state().getLatestVersion());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.0.5", command.state().getVersion());
@@ -4181,6 +4293,8 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertTrue(command.state().getCoreVersion());
+            assertTrue(command.state().getLatestVersion());
             assertTrue(command.state().getNewVersion());
             assertTrue(command.state().getNewRelease());
             assertEquals("0.0.8", command.state().getVersion());
@@ -4246,6 +4360,8 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertTrue(command.state().getCoreVersion());
+            assertFalse(command.state().getLatestVersion());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.0.7", command.state().getVersion());
@@ -4336,6 +4452,8 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertFalse(command.state().getCoreVersion());
+            assertFalse(command.state().getLatestVersion());
             assertTrue(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.0.6-rel.3", command.state().getVersion());
@@ -4401,6 +4519,8 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertFalse(command.state().getCoreVersion());
+            assertFalse(command.state().getLatestVersion());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.0.6-rel.2", command.state().getVersion());
@@ -4491,6 +4611,8 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertFalse(command.state().getCoreVersion());
+            assertFalse(command.state().getLatestVersion());
             assertTrue(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.0.6-featuresso.3", command.state().getVersion());
@@ -4556,6 +4678,8 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertFalse(command.state().getCoreVersion());
+            assertFalse(command.state().getLatestVersion());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.0.6-featuresso.2", command.state().getVersion());
@@ -4621,6 +4745,8 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertFalse(command.state().getCoreVersion());
+            assertFalse(command.state().getLatestVersion());
             assertTrue(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.0.6-featurein12345.1", command.state().getVersion());
@@ -4686,6 +4812,8 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertTrue(command.state().getCoreVersion());
+            assertFalse(command.state().getLatestVersion());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.0.5", command.state().getVersion());
@@ -4751,6 +4879,8 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertFalse(command.state().getCoreVersion());
+            assertTrue(command.state().getLatestVersion());
             assertTrue(command.state().getNewVersion());
             assertTrue(command.state().getNewRelease());
             assertEquals("0.0.8-hotfix98765.3", command.state().getVersion());
@@ -4816,6 +4946,8 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertFalse(command.state().getCoreVersion());
+            assertTrue(command.state().getLatestVersion());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.0.8-hotfix98765.2", command.state().getVersion());
@@ -4881,6 +5013,8 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertFalse(command.state().getCoreVersion());
+            assertFalse(command.state().getLatestVersion());
             assertTrue(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             // the version contains the timestamp which is variable so let's test the start string and the overall length
@@ -4948,6 +5082,8 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertFalse(command.state().getCoreVersion());
+            assertFalse(command.state().getLatestVersion());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.0.6-internal.1+timestamp.003", command.state().getVersion());
@@ -5013,6 +5149,8 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertFalse(command.state().getCoreVersion());
+            assertFalse(command.state().getLatestVersion());
             assertTrue(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             // the version contains the timestamp which is variable so let's test the start string and the overall length
@@ -5080,6 +5218,8 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertFalse(command.state().getCoreVersion());
+            assertFalse(command.state().getLatestVersion());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.0.6-integration.2", command.state().getVersion());
@@ -5145,6 +5285,8 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertFalse(command.state().getCoreVersion());
+            assertFalse(command.state().getLatestVersion());
             assertTrue(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             // the version contains the timestamp which is variable so let's test the start string and the overall length
@@ -5212,6 +5354,8 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getPublish(), command.state().getReleaseType().getPublish());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRange(), command.state().getReleaseType().getVersionRange());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getVersionRangeFromBranchName(), command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertFalse(command.state().getCoreVersion());
+            assertFalse(command.state().getLatestVersion());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.0.6-integration.1", command.state().getVersion());
@@ -5288,6 +5432,8 @@ public class InferTestTemplates {
             assertEquals(Boolean.TRUE.toString(), command.state().getReleaseType().getPublish());
             assertNull(command.state().getReleaseType().getVersionRange());
             assertFalse(command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertFalse(command.state().getCoreVersion());
+            assertFalse(command.state().getLatestVersion());
             assertTrue(command.state().getNewVersion());
             assertTrue(command.state().getNewRelease());
             assertEquals("0.0.6-internal.2.customId.999+timestamp.003", command.state().getVersion());
@@ -5364,6 +5510,8 @@ public class InferTestTemplates {
             assertEquals(Boolean.TRUE.toString(), command.state().getReleaseType().getPublish());
             assertNull(command.state().getReleaseType().getVersionRange());
             assertFalse(command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertFalse(command.state().getCoreVersion());
+            assertFalse(command.state().getLatestVersion());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.0.6-internal.1+timestamp.003", command.state().getVersion());
@@ -5430,6 +5578,8 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertTrue(command.state().getCoreVersion());
+            assertFalse(command.state().getLatestVersion());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.0.1", command.state().getVersion());
@@ -5495,6 +5645,8 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertTrue(command.state().getCoreVersion());
+            assertFalse(command.state().getLatestVersion());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.2.3", command.state().getVersion());
@@ -5560,6 +5712,8 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertTrue(command.state().getCoreVersion());
+            assertTrue(command.state().getLatestVersion());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.3.3", command.state().getVersion());
@@ -5625,6 +5779,8 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertTrue(command.state().getCoreVersion());
+            assertFalse(command.state().getLatestVersion());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.0.1", command.state().getVersion());
@@ -5690,6 +5846,8 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertTrue(command.state().getCoreVersion());
+            assertFalse(command.state().getLatestVersion());
             assertTrue(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.1.0", command.state().getVersion());
@@ -5762,6 +5920,8 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertTrue(command.state().getCoreVersion());
+            assertFalse(command.state().getLatestVersion());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.0.1", command.state().getVersion());
@@ -5834,6 +5994,8 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertFalse(command.state().getCoreVersion());
+            assertFalse(command.state().getLatestVersion());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("1.0.0-alpha.3", command.state().getVersion());
@@ -5906,6 +6068,8 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertFalse(command.state().getCoreVersion());
+            assertFalse(command.state().getLatestVersion());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("1.0.0-beta.3", command.state().getVersion());
@@ -5978,6 +6142,8 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertTrue(command.state().getCoreVersion());
+            assertFalse(command.state().getLatestVersion());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.0.1", command.state().getVersion());
@@ -6050,6 +6216,8 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertFalse(command.state().getCoreVersion());
+            assertFalse(command.state().getLatestVersion());
             assertTrue(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.1.0-delta.1", command.state().getVersion());
@@ -6122,6 +6290,8 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertFalse(command.state().getCoreVersion());
+            assertFalse(command.state().getLatestVersion());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("1.0.0-epsilon.3", command.state().getVersion());
@@ -6194,6 +6364,8 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertFalse(command.state().getCoreVersion());
+            assertTrue(command.state().getLatestVersion());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("1.0.0-zeta.4", command.state().getVersion());
@@ -6266,6 +6438,8 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertFalse(command.state().getCoreVersion());
+            assertFalse(command.state().getLatestVersion());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("1.0.0-eta.3", command.state().getVersion());
@@ -6338,6 +6512,8 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertFalse(command.state().getCoreVersion());
+            assertFalse(command.state().getLatestVersion());
             assertTrue(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.1.0-theta.1", command.state().getVersion());
@@ -6404,6 +6580,8 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertTrue(command.state().getCoreVersion());
+            assertFalse(command.state().getLatestVersion());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.0.1", command.state().getVersion());
@@ -6470,6 +6648,8 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertTrue(command.state().getCoreVersion());
+            assertFalse(command.state().getLatestVersion());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.2.3", command.state().getVersion());
@@ -6536,6 +6716,8 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertTrue(command.state().getCoreVersion());
+            assertTrue(command.state().getLatestVersion());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.3.3", command.state().getVersion());
@@ -6602,6 +6784,8 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertTrue(command.state().getCoreVersion());
+            assertFalse(command.state().getLatestVersion());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.0.1", command.state().getVersion());
@@ -6668,6 +6852,8 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertFalse(command.state().getCoreVersion());
+            assertFalse(command.state().getLatestVersion());
             assertTrue(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.1.0-extra.5", command.state().getVersion());
@@ -6741,6 +6927,8 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertTrue(command.state().getCoreVersion());
+            assertFalse(command.state().getLatestVersion());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.0.1", command.state().getVersion());
@@ -6814,6 +7002,8 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertFalse(command.state().getCoreVersion());
+            assertFalse(command.state().getLatestVersion());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("1.0.0-alpha.3", command.state().getVersion());
@@ -6887,6 +7077,8 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertFalse(command.state().getCoreVersion());
+            assertFalse(command.state().getLatestVersion());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("1.0.0-beta.3", command.state().getVersion());
@@ -6960,6 +7152,8 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertTrue(command.state().getCoreVersion());
+            assertFalse(command.state().getLatestVersion());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.0.1", command.state().getVersion());
@@ -7033,6 +7227,8 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertFalse(command.state().getCoreVersion());
+            assertFalse(command.state().getLatestVersion());
             assertTrue(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.1.0-number.1", command.state().getVersion());
@@ -7106,6 +7302,8 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertFalse(command.state().getCoreVersion());
+            assertFalse(command.state().getLatestVersion());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("1.0.0-epsilon.3", command.state().getVersion());
@@ -7179,6 +7377,8 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertFalse(command.state().getCoreVersion());
+            assertTrue(command.state().getLatestVersion());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("1.0.0-zeta.4", command.state().getVersion());
@@ -7252,6 +7452,8 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertFalse(command.state().getCoreVersion());
+            assertFalse(command.state().getLatestVersion());
             assertFalse(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("1.0.0-eta.3", command.state().getVersion());
@@ -7325,6 +7527,8 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.PUBLISH, command.state().getReleaseType().getPublish());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE, command.state().getReleaseType().getVersionRange());
             assertEquals(Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME, command.state().getReleaseType().getVersionRangeFromBranchName());
+            assertFalse(command.state().getCoreVersion());
+            assertFalse(command.state().getLatestVersion());
             assertTrue(command.state().getNewVersion());
             assertFalse(command.state().getNewRelease());
             assertEquals("0.1.0-number.1", command.state().getVersion());

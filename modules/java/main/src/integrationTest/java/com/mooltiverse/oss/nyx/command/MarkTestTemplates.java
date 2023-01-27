@@ -191,6 +191,8 @@ public class MarkTestTemplates {
                 // collect its state values
                 String branch = command.state().getBranch();
                 String bump = command.state().getBump();
+                Boolean coreVersion = command.state().getCoreVersion();
+                Boolean latestVersion = command.state().getLatestVersion();
                 Boolean newRelease = command.state().getNewRelease();
                 Boolean newVersion = command.state().getNewVersion();
                 List<Commit> commits = List.<Commit>copyOf(command.state().getReleaseScope().getCommits());
@@ -215,6 +217,8 @@ public class MarkTestTemplates {
 
                 assertEquals(branch, command.state().getBranch());
                 assertEquals(bump, command.state().getBump());
+                assertEquals(coreVersion, command.state().getCoreVersion());
+                assertEquals(latestVersion, command.state().getLatestVersion());
                 assertEquals(newRelease, command.state().getNewRelease());
                 assertEquals(newVersion, command.state().getNewVersion());
                 assertEquals(commits, command.state().getReleaseScope().getCommits());
@@ -251,6 +255,8 @@ public class MarkTestTemplates {
                 // collect state values again
                 branch = command.state().getBranch();
                 bump = command.state().getBump();
+                coreVersion = command.state().getCoreVersion();
+                latestVersion = command.state().getLatestVersion();
                 newRelease = command.state().getNewRelease();
                 newVersion = command.state().getNewVersion();
                 commits = List.<Commit>copyOf(command.state().getReleaseScope().getCommits());
@@ -276,6 +282,8 @@ public class MarkTestTemplates {
 
                 assertEquals(branch, command.state().getBranch());
                 assertEquals(bump, command.state().getBump());
+                assertEquals(coreVersion, command.state().getCoreVersion());
+                assertEquals(latestVersion, command.state().getLatestVersion());
                 assertEquals(newRelease, command.state().getNewRelease());
                 assertEquals(newVersion, command.state().getNewVersion());
                 assertEquals(commits, command.state().getReleaseScope().getCommits());
@@ -298,6 +306,8 @@ public class MarkTestTemplates {
 
                 assertEquals(branch, command.state().getBranch());
                 assertEquals(bump, command.state().getBump());
+                assertEquals(coreVersion, command.state().getCoreVersion());
+                assertEquals(latestVersion, command.state().getLatestVersion());
                 assertEquals(newRelease, command.state().getNewRelease());
                 assertEquals(newVersion, command.state().getNewVersion());
                 assertEquals(commits, command.state().getReleaseScope().getCommits());
@@ -333,6 +343,8 @@ public class MarkTestTemplates {
                 // collect its state values
                 String branch = command.state().getBranch();
                 String bump = command.state().getBump();
+                Boolean coreVersion = command.state().getCoreVersion();
+                Boolean latestVersion = command.state().getLatestVersion();
                 Boolean newRelease = command.state().getNewRelease();
                 Boolean newVersion = command.state().getNewVersion();
                 List<Commit> commits = List.<Commit>copyOf(command.state().getReleaseScope().getCommits());
@@ -356,6 +368,8 @@ public class MarkTestTemplates {
 
                 assertEquals(branch, command.state().getBranch());
                 assertEquals(bump, command.state().getBump());
+                assertEquals(coreVersion, command.state().getCoreVersion());
+                assertEquals(latestVersion, command.state().getLatestVersion());
                 assertEquals(newRelease, command.state().getNewRelease());
                 assertEquals(newVersion, command.state().getNewVersion());
                 assertEquals(commits, command.state().getReleaseScope().getCommits());
@@ -391,6 +405,8 @@ public class MarkTestTemplates {
                 // collect state values again
                 branch = command.state().getBranch();
                 bump = command.state().getBump();
+                coreVersion = command.state().getCoreVersion();
+                latestVersion = command.state().getLatestVersion();
                 newRelease = command.state().getNewRelease();
                 newVersion = command.state().getNewVersion();
                 commits = List.<Commit>copyOf(command.state().getReleaseScope().getCommits());
@@ -415,6 +431,8 @@ public class MarkTestTemplates {
 
                 assertEquals(branch, command.state().getBranch());
                 assertEquals(bump, command.state().getBump());
+                assertEquals(coreVersion, command.state().getCoreVersion());
+                assertEquals(latestVersion, command.state().getLatestVersion());
                 assertEquals(newRelease, command.state().getNewRelease());
                 assertEquals(newVersion, command.state().getNewVersion());
                 assertEquals(commits, command.state().getReleaseScope().getCommits());
@@ -436,6 +454,8 @@ public class MarkTestTemplates {
 
                 assertEquals(branch, command.state().getBranch());
                 assertEquals(bump, command.state().getBump());
+                assertEquals(coreVersion, command.state().getCoreVersion());
+                assertEquals(latestVersion, command.state().getLatestVersion());
                 assertEquals(newRelease, command.state().getNewRelease());
                 assertEquals(newVersion, command.state().getNewVersion());
                 assertEquals(commits, command.state().getReleaseScope().getCommits());
@@ -469,6 +489,8 @@ public class MarkTestTemplates {
                 // collect its state values
                 String branch = command.state().getBranch();
                 String bump = command.state().getBump();
+                Boolean coreVersion = command.state().getCoreVersion();
+                Boolean latestVersion = command.state().getLatestVersion();
                 Boolean newRelease = command.state().getNewRelease();
                 Boolean newVersion = command.state().getNewVersion();
                 List<Commit> commits = List.<Commit>copyOf(command.state().getReleaseScope().getCommits());
@@ -495,6 +517,8 @@ public class MarkTestTemplates {
 
                 assertEquals(branch, command.state().getBranch());
                 assertEquals(bump, command.state().getBump());
+                assertEquals(coreVersion, command.state().getCoreVersion());
+                assertEquals(latestVersion, command.state().getLatestVersion());
                 assertEquals(newRelease, command.state().getNewRelease());
                 assertEquals(newVersion, command.state().getNewVersion());
                 assertEquals(commits, command.state().getReleaseScope().getCommits());
@@ -530,6 +554,8 @@ public class MarkTestTemplates {
                 // collect state values again
                 branch = command.state().getBranch();
                 bump = command.state().getBump();
+                coreVersion = command.state().getCoreVersion();
+                latestVersion = command.state().getLatestVersion();
                 newRelease = command.state().getNewRelease();
                 newVersion = command.state().getNewVersion();
                 commits = List.<Commit>copyOf(command.state().getReleaseScope().getCommits());
@@ -557,6 +583,8 @@ public class MarkTestTemplates {
 
                 assertEquals(branch, command.state().getBranch());
                 assertEquals(bump, command.state().getBump());
+                assertEquals(coreVersion, command.state().getCoreVersion());
+                assertEquals(latestVersion, command.state().getLatestVersion());
                 assertEquals(newRelease, command.state().getNewRelease());
                 assertEquals(newVersion, command.state().getNewVersion());
                 assertEquals(commits, command.state().getReleaseScope().getCommits());
@@ -581,6 +609,8 @@ public class MarkTestTemplates {
 
                 assertEquals(branch, command.state().getBranch());
                 assertEquals(bump, command.state().getBump());
+                assertEquals(coreVersion, command.state().getCoreVersion());
+                assertEquals(latestVersion, command.state().getLatestVersion());
                 assertEquals(newRelease, command.state().getNewRelease());
                 assertEquals(newVersion, command.state().getNewVersion());
                 assertEquals(commits, command.state().getReleaseScope().getCommits());

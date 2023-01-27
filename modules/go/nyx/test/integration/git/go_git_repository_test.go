@@ -2144,6 +2144,52 @@ func TestGoGitRepositoryGetRemoteNamesAfterCloneAndAddingLocalRepository(t *test
 	assert.True(t, contains(remoteNames, "local"))
 }
 
+func TestGoGitRepositoryGetTagsReturnsEmptyResultWithRepositoryWithNoCommits(t *testing.T) {
+	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
+	script := gittools.FROM_SCRATCH().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
+	dir := script.GetWorkingDirectory()
+	repository, err := GitInstance().Open(dir)
+	assert.NoError(t, err)
+
+	tags, err := repository.GetTags()
+	assert.NoError(t, err)
+	assert.Equal(t, 0, len(tags))
+}
+
+func TestGoGitRepositoryGetTags(t *testing.T) {
+	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
+	script := gittools.FROM_SCRATCH().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
+	dir := script.GetWorkingDirectory()
+	repository, err := GitInstance().Open(dir)
+	assert.NoError(t, err)
+
+	// add a commit
+	script.AndAddFiles().AndStage()
+	script.Commit("A message")
+
+	// test with no tags
+	tags, err := repository.GetTags()
+	assert.NoError(t, err)
+	assert.Equal(t, 0, len(tags))
+
+	// test with one lightweight tag
+	script.Tag("t1", nil)
+	tags, err = repository.GetTags()
+	assert.NoError(t, err)
+	assert.Equal(t, 1, len(tags))
+	assert.Equal(t, "t1", tags[0].GetName())
+	assert.False(t, tags[0].IsAnnotated())
+
+	// test with one more tag
+	tagMessage := "Tag message"
+	script.Tag("a1", &tagMessage)
+	tags, err = repository.GetTags()
+	assert.NoError(t, err)
+	assert.Equal(t, 2, len(tags))
+}
+
 func TestGoGitRepositoryWalkHistoryWithNoBoundaries(t *testing.T) {
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.TWO_BRANCH_SHORT_MERGED().Realize()

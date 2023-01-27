@@ -1886,6 +1886,44 @@ public class JGitRepositoryTests {
     }
 
     @Nested
+    @DisplayName("JGitRepository.getTags")
+    class GetTagsTests {
+        @DisplayName("JGitRepository.getTags() returns empty without commits")
+        @Test
+        public void getTagsReturnsEmptyResultWithNullTest()
+            throws Exception {
+            Repository repository = JGitRepository.open(Scenario.FROM_SCRATCH.realize().getWorkingDirectory());
+            assertEquals(0, repository.getTags().size());
+        }
+
+        @DisplayName("JGitRepository.getTags()")
+        @Test
+        public void getTagsTest()
+            throws Exception {
+            Script script = Scenario.FROM_SCRATCH.realize();
+            script.getWorkingDirectory().deleteOnExit();
+            Repository repository = JGitRepository.open(script.getWorkingDirectory());
+
+            // add a commit
+            script.andAddFiles().andStage();
+            script.commit("A message");
+            
+            // test with no tags
+            assertEquals(0, repository.getTags().size());
+
+            // test with one lightweight tag
+            script.tag("l1", null);
+            assertEquals(1, repository.getTags().size());
+            assertEquals("l1", repository.getTags().iterator().next().getName());
+            assertFalse(repository.getTags().iterator().next().isAnnotated());
+
+            // test with one more tag
+            script.tag("a1", "Tag message");
+            assertEquals(2, repository.getTags().size());
+        }
+    }
+
+    @Nested
     @DisplayName("JGitRepository.walkHistory")
     class WalkHistoryTests {
         @DisplayName("JGitRepository.walkHistory(null, null, CommitVisitor)")

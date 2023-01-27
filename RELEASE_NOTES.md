@@ -6,9 +6,10 @@
 * the public key (SSH) authentication method is now supported for Git ([#94](https://github.com/mooltiverse/nyx/issues/94))
 * the Git internal library (`github.com/mooltiverse/nyx/modules/go/nyx/git` package for Go, `com.mooltiverse.oss.nyx.git` package for Java) has been refactored in order to support multiple authentication mechanisms (with the new SSH method) and some methods have been replaced while others have been added
 * support for deprecated [template functions](https://mooltiverse.github.io/nyx/guide/user/configuration-reference/templates/#functions) `environment.user`, `environment.variable`, `file.content`, `file.exists` has been removed, replaced by `environmentUser`, `environmentVariable`, `fileContent`, `fileExists`
-* new parametric [template functions](https://mooltiverse.github.io/nyx/guide/user/configuration-reference/templates/) are now available: `capture`, `cutLeft`, `cutRight`, `replace`, `timeFormat`
+* new parametric [template functions](https://mooltiverse.github.io/nyx/guide/user/configuration-reference/templates/) are now available: `capture`, `cutLeft`, `cutRight`, `replace`, `timeFormat` ([#104](https://github.com/mooltiverse/nyx/issues/104), ([#119](https://github.com/mooltiverse/nyx/issues/119)))
 * Java template functions in `com.mooltiverse.oss.nyx.template.Functions.java` no longer implement the `java.util.function.Function` interface which was provided for backward compatibility; from now on they only implement the `com.github.jknack.handlebars.Helper` interface provided by [Handlebars](https://github.com/jknack/handlebars.java)
-* release assets published to GitLab now show their Description instead of the File Name
+* release assets published to GitLab now show their Description instead of the File Name ([#128](https://github.com/mooltiverse/nyx/issues/128))
+* the [state](https://mooltiverse.github.io/nyx/guide/user/state-reference/global-attributes/) now has two additional boolean attributes: `coreVersion` and `latestVersion`, telling if the current version is a *core* version (using only core identifiers) and if it is the latest version (compared to all tags in the repository) ([#105](https://github.com/mooltiverse/nyx/issues/105))
 
 This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/2.0.0).
 

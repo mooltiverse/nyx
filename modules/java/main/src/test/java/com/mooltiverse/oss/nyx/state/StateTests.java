@@ -191,6 +191,127 @@ public class StateTests {
         }
 
         @Test
+        @DisplayName("State.getCoreVersion()")
+        void getCoreVersionTest()
+            throws Exception {
+            Configuration configuration = new Configuration();
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            configurationLayerMock.setReleaseLenient(Boolean.FALSE);
+            configurationLayerMock.setReleasePrefix(null);
+            configuration.withRuntimeConfiguration(configurationLayerMock);
+            State state = new State(configuration);
+
+            // try with no leniency or prefix
+            state.setVersion("1.2.3");
+            assertTrue(state.getCoreVersion());
+
+            state.setVersion("v1.2.3");
+            assertFalse(state.getCoreVersion());
+
+            state.setVersion("rel-1.2.3");
+            assertFalse(state.getCoreVersion());
+
+            state.setVersion("1.2.3-1");
+            assertFalse(state.getCoreVersion());
+
+            state.setVersion("1.2.3-alpha");
+            assertFalse(state.getCoreVersion());
+
+            state.setVersion("1.2.3-alpha+build");
+            assertFalse(state.getCoreVersion());
+
+            state.setVersion("1.2.3+build");
+            assertFalse(state.getCoreVersion());
+
+            // try with leniency but no prefix
+            configuration = new Configuration();
+            configurationLayerMock = new SimpleConfigurationLayer();
+            configurationLayerMock.setReleaseLenient(Boolean.TRUE);
+            configurationLayerMock.setReleasePrefix(null);
+            configuration.withRuntimeConfiguration(configurationLayerMock);
+            state = new State(configuration);
+
+            state.setVersion("1.2.3");
+            assertTrue(state.getCoreVersion());
+
+            state.setVersion("v1.2.3");
+            assertTrue(state.getCoreVersion());
+
+            state.setVersion("rel-1.2.3");
+            assertTrue(state.getCoreVersion());
+
+            state.setVersion("1.2.3-1");
+            assertFalse(state.getCoreVersion());
+
+            state.setVersion("1.2.3-alpha");
+            assertFalse(state.getCoreVersion());
+
+            state.setVersion("1.2.3-alpha+build");
+            assertFalse(state.getCoreVersion());
+
+            state.setVersion("1.2.3+build");
+            assertFalse(state.getCoreVersion());
+
+            // try with no leniency but a prefix
+            configuration = new Configuration();
+            configurationLayerMock = new SimpleConfigurationLayer();
+            configurationLayerMock.setReleaseLenient(Boolean.FALSE);
+            configurationLayerMock.setReleasePrefix("v");
+            configuration.withRuntimeConfiguration(configurationLayerMock);
+            state = new State(configuration);
+
+            state.setVersion("1.2.3");
+            assertTrue(state.getCoreVersion());
+
+            state.setVersion("v1.2.3");
+            assertTrue(state.getCoreVersion());
+
+            state.setVersion("rel-1.2.3");
+            assertFalse(state.getCoreVersion());
+
+            state.setVersion("1.2.3-1");
+            assertFalse(state.getCoreVersion());
+
+            state.setVersion("1.2.3-alpha");
+            assertFalse(state.getCoreVersion());
+
+            state.setVersion("1.2.3-alpha+build");
+            assertFalse(state.getCoreVersion());
+
+            state.setVersion("1.2.3+build");
+            assertFalse(state.getCoreVersion());
+
+            // try with leniency and a prefix
+            configuration = new Configuration();
+            configurationLayerMock = new SimpleConfigurationLayer();
+            configurationLayerMock.setReleaseLenient(Boolean.TRUE);
+            configurationLayerMock.setReleasePrefix("v");
+            configuration.withRuntimeConfiguration(configurationLayerMock);
+            state = new State(configuration);
+
+            state.setVersion("1.2.3");
+            assertTrue(state.getCoreVersion());
+
+            state.setVersion("v1.2.3");
+            assertTrue(state.getCoreVersion());
+
+            state.setVersion("rel-1.2.3");
+            assertTrue(state.getCoreVersion());
+
+            state.setVersion("1.2.3-1");
+            assertFalse(state.getCoreVersion());
+
+            state.setVersion("1.2.3-alpha");
+            assertFalse(state.getCoreVersion());
+
+            state.setVersion("1.2.3-alpha+build");
+            assertFalse(state.getCoreVersion());
+
+            state.setVersion("1.2.3+build");
+            assertFalse(state.getCoreVersion());
+        }
+
+        @Test
         @DisplayName("State.getDirectory()")
         void getDirectoryTest()
             throws Exception {
@@ -208,6 +329,37 @@ public class StateTests {
             // make sure the initial internals is never null and empty
             assertNotNull(state.getInternals());
             assertTrue(state.getInternals().isEmpty());
+        }
+
+        @Test
+        @DisplayName("State.getLatestVersion()")
+        void getLatestVersionTest()
+            throws Exception {
+            State state = new State(new Configuration());
+
+            // nomatter what we set, the latest version is always null until we set a version on the state
+            assertNull(state.getLatestVersion());
+
+            state.setLatestVersion(Boolean.TRUE);
+            assertNull(state.getLatestVersion());
+
+            state.setLatestVersion(Boolean.FALSE);
+            assertNull(state.getLatestVersion());
+
+            // try again, with a version set on the state
+            state = new State(new Configuration());
+            state.setVersion("1.2.3");
+
+            assertNull(state.getLatestVersion());
+
+            state.setLatestVersion(Boolean.TRUE);
+            assertTrue(state.getLatestVersion());
+
+            state.setLatestVersion(Boolean.FALSE);
+            assertFalse(state.getLatestVersion());
+
+            state.setLatestVersion(null);
+            assertNull(state.getLatestVersion());
         }
 
         @Test
@@ -516,6 +668,8 @@ public class StateTests {
 
             // finally also test transient attributes, which should render to the same value even if they are computed on the fly
             assertEquals(oldState.getDirectory(), resumedState.getDirectory());
+            assertEquals(oldState.getCoreVersion(), resumedState.getCoreVersion());
+            assertEquals(oldState.getLatestVersion(), resumedState.getLatestVersion());
             assertEquals(oldState.getNewVersion(), resumedState.getNewVersion());
             assertEquals(oldState.getNewRelease(), resumedState.getNewRelease());
             assertEquals(oldState.getScheme(), resumedState.getScheme());
@@ -635,6 +789,8 @@ public class StateTests {
 
             // finally also test transient attributes, which should render to the same value even if they are computed on the fly
             assertEquals(oldState.getDirectory(), resumedState.getDirectory());
+            assertEquals(oldState.getCoreVersion(), resumedState.getCoreVersion());
+            assertEquals(oldState.getLatestVersion(), resumedState.getLatestVersion());
             assertEquals(oldState.getNewVersion(), resumedState.getNewVersion());
             assertEquals(oldState.getNewRelease(), resumedState.getNewRelease());
             assertEquals(oldState.getScheme(), resumedState.getScheme());

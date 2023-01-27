@@ -15,8 +15,10 @@ The following attributes are at the top of the hierarchy:
 | [`bump`](#bump)                           | string  | The bumped version identifier               |
 | [`changelog`](#changelog)                 | object  | The changelog data model                    |
 | [`configuration`](#configuration)         | object  | The resolved configuration                  |
+| [`coreVersion`](#core-version)            | boolean | `true` if version is *core*                 |
 | [`directory`](#directory)                 | string  | Directory path                              |
 | [`internals`](#internals)                 | map     | Name-Value pairs                            |
+| [`latestVersion`](#latest-version)        | boolean | `true` if version is the latest             |
 | [`newRelease`](#new-release)              | boolean | `true` if a new release has to be issued    |
 | [`newVersion`](#new-version)              | boolean | `true` if a new version has been generated  |
 | [`releaseScope`](#release-scope)          | object  | The release scope attributes                |
@@ -80,6 +82,18 @@ Please note that the `changelog` object is only present when the changelog gener
 
 This object holds a copy of the [entire configuration]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/index.md %}) **resolved** according to the [evaluation order]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}#evaluation-order).
 
+### Core version
+
+| ----------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                          | `coreVersion`                                                                            |
+| Type                          | boolean                                                                                  |
+| Related configuration options | [scheme]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#scheme){: .btn .btn--success .btn--small} [version]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#version){: .btn .btn--success .btn--small} |
+| Initialized by task           | [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer){: .btn .btn--small} |
+
+This value is `true` when the [`version`](#version) only uses *core* identifiers (i.e. is not a pre-release) according to the [scheme](#scheme).
+
+This attribute is not available until [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer) has run.
+
 ### Directory
 
 | ----------------------------- | ---------------------------------------------------------------------------------------- |
@@ -102,6 +116,21 @@ A map of attributes for internal use only.
 
 Using the attributes in this section is not supported. You should never rely on the attributes in this block as they may change at any time without any notice.
 {: .notice--warning}
+
+### Latest version
+
+| ----------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                          | `latestVersion`                                                                            |
+| Type                          | boolean                                                                                  |
+| Related configuration options | [scheme]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#scheme){: .btn .btn--success .btn--small} [version]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#version){: .btn .btn--success .btn--small} |
+| Initialized by task           | [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer){: .btn .btn--small} |
+
+This value is `true` when the [`version`](#version) is the latest in the repository, meaning that, according to the [scheme](#scheme), there are no other tags in the Git repository representing any version greater than [`version`](#version).
+
+Remember that when inspecting all the tags in te current repository Nyx needs to have access to all of them. It's a common practice for CI/CD platform to only check out the latest commit or, in general, reduce the size of the local repository by not fetching all informations. If that's the case, this attribute may give incorrect results just because Nyx just can't *see* all the tags in the repository. See [here]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/ci-cd.md %}) for more on how to make sure the whole repository is available when cloned.
+{: .notice--info}
+
+This attribute is not available until [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer) has run.
 
 ### New release
 

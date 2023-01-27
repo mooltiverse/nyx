@@ -223,6 +223,8 @@ func TestMarkIdempotencyWithCommitMessageConvention(t *testing.T) {
 				// collect its state values
 				branch, _ := (*command).State().GetBranch()
 				bump, _ := (*command).State().GetBump()
+				coreVersion, _ := (*command).State().GetCoreVersion()
+				latestVersion, _ := (*command).State().GetLatestVersion()
 				newRelease, _ := (*command).State().GetNewRelease()
 				newVersion, _ := (*command).State().GetNewVersion()
 				releaseScope, _ := (*command).State().GetReleaseScope()
@@ -253,6 +255,8 @@ func TestMarkIdempotencyWithCommitMessageConvention(t *testing.T) {
 				// collect state values for comparison
 				branch2, _ := (*command).State().GetBranch()
 				bump2, _ := (*command).State().GetBump()
+				coreVersion2, _ := (*command).State().GetCoreVersion()
+				latestVersion2, _ := (*command).State().GetLatestVersion()
 				newRelease2, _ := (*command).State().GetNewRelease()
 				newVersion2, _ := (*command).State().GetNewVersion()
 				releaseScope2, _ := (*command).State().GetReleaseScope()
@@ -275,6 +279,8 @@ func TestMarkIdempotencyWithCommitMessageConvention(t *testing.T) {
 
 				assert.Equal(t, branch, branch2)
 				assert.Equal(t, bump, bump2)
+				assert.Equal(t, coreVersion, coreVersion2)
+				assert.Equal(t, latestVersion, latestVersion2)
 				assert.Equal(t, newRelease, newRelease2)
 				assert.Equal(t, newVersion, newVersion2)
 				assert.Equal(t, commits, commits2)
@@ -305,6 +311,8 @@ func TestMarkIdempotencyWithCommitMessageConvention(t *testing.T) {
 				// collect state values again
 				branch2, _ = (*command).State().GetBranch()
 				bump2, _ = (*command).State().GetBump()
+				coreVersion2, _ = (*command).State().GetCoreVersion()
+				latestVersion2, _ = (*command).State().GetLatestVersion()
 				newRelease2, _ = (*command).State().GetNewRelease()
 				newVersion2, _ = (*command).State().GetNewVersion()
 				releaseScope2, _ = (*command).State().GetReleaseScope()
@@ -339,6 +347,8 @@ func TestMarkIdempotencyWithCommitMessageConvention(t *testing.T) {
 				// collect its state values again
 				branch, _ = (*command).State().GetBranch()
 				bump, _ = (*command).State().GetBump()
+				coreVersion, _ = (*command).State().GetCoreVersion()
+				latestVersion, _ = (*command).State().GetLatestVersion()
 				newRelease, _ = (*command).State().GetNewRelease()
 				newVersion, _ = (*command).State().GetNewVersion()
 				releaseScope, _ = (*command).State().GetReleaseScope()
@@ -372,6 +382,8 @@ func TestMarkIdempotencyWithCommitMessageConvention(t *testing.T) {
 				// collect state values again
 				branch2, _ = (*command).State().GetBranch()
 				bump2, _ = (*command).State().GetBump()
+				coreVersion2, _ = (*command).State().GetCoreVersion()
+				latestVersion2, _ = (*command).State().GetLatestVersion()
 				newRelease2, _ = (*command).State().GetNewRelease()
 				newVersion2, _ = (*command).State().GetNewVersion()
 				releaseScope2, _ = (*command).State().GetReleaseScope()
@@ -394,6 +406,8 @@ func TestMarkIdempotencyWithCommitMessageConvention(t *testing.T) {
 
 				assert.Equal(t, branch, branch2)
 				assert.Equal(t, bump, bump2)
+				assert.Equal(t, coreVersion, coreVersion2)
+				assert.Equal(t, latestVersion, latestVersion2)
 				assert.Equal(t, newRelease, newRelease2)
 				assert.Equal(t, newVersion, newVersion2)
 				assert.Equal(t, commits, commits2)
@@ -420,6 +434,8 @@ func TestMarkIdempotencyWithCommitMessageConvention(t *testing.T) {
 				// collect state values again
 				branch2, _ = (*command).State().GetBranch()
 				bump2, _ = (*command).State().GetBump()
+				coreVersion2, _ = (*command).State().GetCoreVersion()
+				latestVersion2, _ = (*command).State().GetLatestVersion()
 				newRelease2, _ = (*command).State().GetNewRelease()
 				newVersion2, _ = (*command).State().GetNewVersion()
 				releaseScope2, _ = (*command).State().GetReleaseScope()
@@ -442,6 +458,8 @@ func TestMarkIdempotencyWithCommitMessageConvention(t *testing.T) {
 
 				assert.Equal(t, branch, branch2)
 				assert.Equal(t, bump, bump2)
+				assert.Equal(t, coreVersion, coreVersion2)
+				assert.Equal(t, latestVersion, latestVersion2)
 				assert.Equal(t, newRelease, newRelease2)
 				assert.Equal(t, newVersion, newVersion2)
 				assert.Equal(t, commits, commits2)
@@ -481,6 +499,8 @@ func TestMarkIdempotencyWithoutCommitMessageConvention(t *testing.T) {
 				// collect its state values
 				branch, _ := (*command).State().GetBranch()
 				bump, _ := (*command).State().GetBump()
+				coreVersion, _ := (*command).State().GetCoreVersion()
+				latestVersion, _ := (*command).State().GetLatestVersion()
 				newRelease, _ := (*command).State().GetNewRelease()
 				newVersion, _ := (*command).State().GetNewVersion()
 				releaseScope, _ := (*command).State().GetReleaseScope()
@@ -509,6 +529,8 @@ func TestMarkIdempotencyWithoutCommitMessageConvention(t *testing.T) {
 				// collect state values for comparison
 				branch2, _ := (*command).State().GetBranch()
 				bump2, _ := (*command).State().GetBump()
+				coreVersion2, _ := (*command).State().GetCoreVersion()
+				latestVersion2, _ := (*command).State().GetLatestVersion()
 				newRelease2, _ := (*command).State().GetNewRelease()
 				newVersion2, _ := (*command).State().GetNewVersion()
 				releaseScope2, _ := (*command).State().GetReleaseScope()
@@ -529,6 +551,8 @@ func TestMarkIdempotencyWithoutCommitMessageConvention(t *testing.T) {
 
 				assert.Equal(t, branch, branch2)
 				assert.Equal(t, bump, bump2)
+				assert.Equal(t, coreVersion, coreVersion2)
+				assert.Equal(t, latestVersion, latestVersion2)
 				assert.Equal(t, newRelease, newRelease2)
 				assert.Equal(t, newVersion, newVersion2)
 				assert.Equal(t, commits, commits2)
@@ -558,6 +582,8 @@ func TestMarkIdempotencyWithoutCommitMessageConvention(t *testing.T) {
 				// collect state values again
 				branch2, _ = (*command).State().GetBranch()
 				bump2, _ = (*command).State().GetBump()
+				coreVersion2, _ = (*command).State().GetCoreVersion()
+				latestVersion2, _ = (*command).State().GetLatestVersion()
 				newRelease2, _ = (*command).State().GetNewRelease()
 				newVersion2, _ = (*command).State().GetNewVersion()
 				releaseScope2, _ = (*command).State().GetReleaseScope()
@@ -590,6 +616,8 @@ func TestMarkIdempotencyWithoutCommitMessageConvention(t *testing.T) {
 				// collect its state values again
 				branch, _ = (*command).State().GetBranch()
 				bump, _ = (*command).State().GetBump()
+				coreVersion, _ = (*command).State().GetCoreVersion()
+				latestVersion, _ = (*command).State().GetLatestVersion()
 				newRelease, _ = (*command).State().GetNewRelease()
 				newVersion, _ = (*command).State().GetNewVersion()
 				releaseScope, _ = (*command).State().GetReleaseScope()
@@ -621,6 +649,8 @@ func TestMarkIdempotencyWithoutCommitMessageConvention(t *testing.T) {
 				// collect state values again
 				branch2, _ = (*command).State().GetBranch()
 				bump2, _ = (*command).State().GetBump()
+				coreVersion2, _ = (*command).State().GetCoreVersion()
+				latestVersion2, _ = (*command).State().GetLatestVersion()
 				newRelease2, _ = (*command).State().GetNewRelease()
 				newVersion2, _ = (*command).State().GetNewVersion()
 				releaseScope2, _ = (*command).State().GetReleaseScope()
@@ -641,6 +671,8 @@ func TestMarkIdempotencyWithoutCommitMessageConvention(t *testing.T) {
 
 				assert.Equal(t, branch, branch2)
 				assert.Equal(t, bump, bump2)
+				assert.Equal(t, coreVersion, coreVersion2)
+				assert.Equal(t, latestVersion, latestVersion2)
 				assert.Equal(t, newRelease, newRelease2)
 				assert.Equal(t, newVersion, newVersion2)
 				assert.Equal(t, commits, commits2)
@@ -666,6 +698,8 @@ func TestMarkIdempotencyWithoutCommitMessageConvention(t *testing.T) {
 				// collect state values again
 				branch2, _ = (*command).State().GetBranch()
 				bump2, _ = (*command).State().GetBump()
+				coreVersion2, _ = (*command).State().GetCoreVersion()
+				latestVersion2, _ = (*command).State().GetLatestVersion()
 				newRelease2, _ = (*command).State().GetNewRelease()
 				newVersion2, _ = (*command).State().GetNewVersion()
 				releaseScope2, _ = (*command).State().GetReleaseScope()
@@ -686,6 +720,8 @@ func TestMarkIdempotencyWithoutCommitMessageConvention(t *testing.T) {
 
 				assert.Equal(t, branch, branch2)
 				assert.Equal(t, bump, bump2)
+				assert.Equal(t, coreVersion, coreVersion2)
+				assert.Equal(t, latestVersion, latestVersion2)
 				assert.Equal(t, newRelease, newRelease2)
 				assert.Equal(t, newVersion, newVersion2)
 				assert.Equal(t, commits, commits2)
@@ -723,6 +759,8 @@ func TestMarkIdempotencyInDirtyRepository(t *testing.T) {
 				// collect its state values
 				branch, _ := (*command).State().GetBranch()
 				bump, _ := (*command).State().GetBump()
+				coreVersion, _ := (*command).State().GetCoreVersion()
+				latestVersion, _ := (*command).State().GetLatestVersion()
 				newRelease, _ := (*command).State().GetNewRelease()
 				newVersion, _ := (*command).State().GetNewVersion()
 				releaseScope, _ := (*command).State().GetReleaseScope()
@@ -754,6 +792,8 @@ func TestMarkIdempotencyInDirtyRepository(t *testing.T) {
 				// collect state values for comparison
 				branch2, _ := (*command).State().GetBranch()
 				bump2, _ := (*command).State().GetBump()
+				coreVersion2, _ := (*command).State().GetCoreVersion()
+				latestVersion2, _ := (*command).State().GetLatestVersion()
 				newRelease2, _ := (*command).State().GetNewRelease()
 				newVersion2, _ := (*command).State().GetNewVersion()
 				releaseScope2, _ := (*command).State().GetReleaseScope()
@@ -774,6 +814,8 @@ func TestMarkIdempotencyInDirtyRepository(t *testing.T) {
 
 				assert.Equal(t, branch, branch2)
 				assert.Equal(t, bump, bump2)
+				assert.Equal(t, coreVersion, coreVersion2)
+				assert.Equal(t, latestVersion, latestVersion2)
 				assert.Equal(t, newRelease, newRelease2)
 				assert.Equal(t, newVersion, newVersion2)
 				assert.Equal(t, commits, commits2)
@@ -803,6 +845,8 @@ func TestMarkIdempotencyInDirtyRepository(t *testing.T) {
 				// collect state values again
 				branch2, _ = (*command).State().GetBranch()
 				bump2, _ = (*command).State().GetBump()
+				coreVersion2, _ = (*command).State().GetCoreVersion()
+				latestVersion2, _ = (*command).State().GetLatestVersion()
 				newRelease2, _ = (*command).State().GetNewRelease()
 				newVersion2, _ = (*command).State().GetNewVersion()
 				releaseScope2, _ = (*command).State().GetReleaseScope()
@@ -835,6 +879,8 @@ func TestMarkIdempotencyInDirtyRepository(t *testing.T) {
 				// collect state values again
 				branch, _ = (*command).State().GetBranch()
 				bump, _ = (*command).State().GetBump()
+				coreVersion, _ = (*command).State().GetCoreVersion()
+				latestVersion, _ = (*command).State().GetLatestVersion()
 				newRelease, _ = (*command).State().GetNewRelease()
 				newVersion, _ = (*command).State().GetNewVersion()
 				releaseScope, _ = (*command).State().GetReleaseScope()
@@ -869,6 +915,8 @@ func TestMarkIdempotencyInDirtyRepository(t *testing.T) {
 				// collect state values again
 				branch2, _ = (*command).State().GetBranch()
 				bump2, _ = (*command).State().GetBump()
+				coreVersion2, _ = (*command).State().GetCoreVersion()
+				latestVersion2, _ = (*command).State().GetLatestVersion()
 				newRelease2, _ = (*command).State().GetNewRelease()
 				newVersion2, _ = (*command).State().GetNewVersion()
 				releaseScope2, _ = (*command).State().GetReleaseScope()
@@ -889,6 +937,8 @@ func TestMarkIdempotencyInDirtyRepository(t *testing.T) {
 
 				assert.Equal(t, branch, branch2)
 				assert.Equal(t, bump, bump2)
+				assert.Equal(t, coreVersion, coreVersion2)
+				assert.Equal(t, latestVersion, latestVersion2)
 				assert.Equal(t, newRelease, newRelease2)
 				assert.Equal(t, newVersion, newVersion2)
 				assert.Equal(t, commits, commits2)
@@ -917,6 +967,8 @@ func TestMarkIdempotencyInDirtyRepository(t *testing.T) {
 				// collect state values again
 				branch2, _ = (*command).State().GetBranch()
 				bump2, _ = (*command).State().GetBump()
+				coreVersion2, _ = (*command).State().GetCoreVersion()
+				latestVersion2, _ = (*command).State().GetLatestVersion()
 				newRelease2, _ = (*command).State().GetNewRelease()
 				newVersion2, _ = (*command).State().GetNewVersion()
 				releaseScope2, _ = (*command).State().GetReleaseScope()
@@ -937,6 +989,8 @@ func TestMarkIdempotencyInDirtyRepository(t *testing.T) {
 
 				assert.Equal(t, branch, branch2)
 				assert.Equal(t, bump, bump2)
+				assert.Equal(t, coreVersion, coreVersion2)
+				assert.Equal(t, latestVersion, latestVersion2)
 				assert.Equal(t, newRelease, newRelease2)
 				assert.Equal(t, newVersion, newVersion2)
 				assert.Equal(t, commits, commits2)
