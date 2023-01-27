@@ -181,6 +181,184 @@ func TestStateGetConfiguration(t *testing.T) {
 	assert.Equal(t, configuration, state.GetConfiguration())
 }
 
+func TestStateGetCoreVersion(t *testing.T) {
+	configuration, _ := cnf.NewConfiguration()
+	configurationLayerMock := cnf.NewSimpleConfigurationLayer()
+	configurationLayerMock.SetReleaseLenient(utl.PointerToBoolean(false))
+	configurationLayerMock.SetReleasePrefix(nil)
+	var cl cnf.ConfigurationLayer = configurationLayerMock
+	configuration.WithRuntimeConfiguration(&cl)
+	state, _ := NewStateWith(configuration)
+
+	// try with no leniency or prefix
+	state.SetVersion(utl.PointerToString("1.2.3"))
+	coreVersion, err := state.GetCoreVersion()
+	assert.NoError(t, err)
+	assert.True(t, coreVersion)
+
+	state.SetVersion(utl.PointerToString("v1.2.3"))
+	coreVersion, err = state.GetCoreVersion()
+	assert.NoError(t, err)
+	assert.False(t, coreVersion)
+
+	state.SetVersion(utl.PointerToString("rel-1.2.3"))
+	coreVersion, err = state.GetCoreVersion()
+	assert.NoError(t, err)
+	assert.False(t, coreVersion)
+
+	state.SetVersion(utl.PointerToString("1.2.3-1"))
+	coreVersion, err = state.GetCoreVersion()
+	assert.NoError(t, err)
+	assert.False(t, coreVersion)
+
+	state.SetVersion(utl.PointerToString("1.2.3-alpha"))
+	coreVersion, err = state.GetCoreVersion()
+	assert.NoError(t, err)
+	assert.False(t, coreVersion)
+
+	state.SetVersion(utl.PointerToString("1.2.3-alpha+build"))
+	coreVersion, err = state.GetCoreVersion()
+	assert.NoError(t, err)
+	assert.False(t, coreVersion)
+
+	state.SetVersion(utl.PointerToString("1.2.3+build"))
+	coreVersion, err = state.GetCoreVersion()
+	assert.NoError(t, err)
+	assert.False(t, coreVersion)
+
+	// try with leniency but no prefix
+	configuration, _ = cnf.NewConfiguration()
+	configurationLayerMock = cnf.NewSimpleConfigurationLayer()
+	configurationLayerMock.SetReleaseLenient(utl.PointerToBoolean(true))
+	configurationLayerMock.SetReleasePrefix(nil)
+	cl = configurationLayerMock
+	configuration.WithRuntimeConfiguration(&cl)
+	state, _ = NewStateWith(configuration)
+
+	state.SetVersion(utl.PointerToString("1.2.3"))
+	coreVersion, err = state.GetCoreVersion()
+	assert.NoError(t, err)
+	assert.True(t, coreVersion)
+
+	state.SetVersion(utl.PointerToString("v1.2.3"))
+	coreVersion, err = state.GetCoreVersion()
+	assert.NoError(t, err)
+	assert.True(t, coreVersion)
+
+	state.SetVersion(utl.PointerToString("rel-1.2.3"))
+	coreVersion, err = state.GetCoreVersion()
+	assert.NoError(t, err)
+	assert.True(t, coreVersion)
+
+	state.SetVersion(utl.PointerToString("1.2.3-1"))
+	coreVersion, err = state.GetCoreVersion()
+	assert.NoError(t, err)
+	assert.False(t, coreVersion)
+
+	state.SetVersion(utl.PointerToString("1.2.3-alpha"))
+	coreVersion, err = state.GetCoreVersion()
+	assert.NoError(t, err)
+	assert.False(t, coreVersion)
+
+	state.SetVersion(utl.PointerToString("1.2.3-alpha+build"))
+	coreVersion, err = state.GetCoreVersion()
+	assert.NoError(t, err)
+	assert.False(t, coreVersion)
+
+	state.SetVersion(utl.PointerToString("1.2.3+build"))
+	coreVersion, err = state.GetCoreVersion()
+	assert.NoError(t, err)
+	assert.False(t, coreVersion)
+
+	// try with no leniency but a prefix
+	configuration, _ = cnf.NewConfiguration()
+	configurationLayerMock = cnf.NewSimpleConfigurationLayer()
+	configurationLayerMock.SetReleaseLenient(utl.PointerToBoolean(false))
+	configurationLayerMock.SetReleasePrefix(utl.PointerToString("v"))
+	cl = configurationLayerMock
+	configuration.WithRuntimeConfiguration(&cl)
+	state, _ = NewStateWith(configuration)
+
+	state.SetVersion(utl.PointerToString("1.2.3"))
+	coreVersion, err = state.GetCoreVersion()
+	assert.NoError(t, err)
+	assert.True(t, coreVersion)
+
+	state.SetVersion(utl.PointerToString("v1.2.3"))
+	coreVersion, err = state.GetCoreVersion()
+	assert.NoError(t, err)
+	assert.True(t, coreVersion)
+
+	state.SetVersion(utl.PointerToString("rel-1.2.3"))
+	coreVersion, err = state.GetCoreVersion()
+	assert.NoError(t, err)
+	assert.False(t, coreVersion)
+
+	state.SetVersion(utl.PointerToString("1.2.3-1"))
+	coreVersion, err = state.GetCoreVersion()
+	assert.NoError(t, err)
+	assert.False(t, coreVersion)
+
+	state.SetVersion(utl.PointerToString("1.2.3-alpha"))
+	coreVersion, err = state.GetCoreVersion()
+	assert.NoError(t, err)
+	assert.False(t, coreVersion)
+
+	state.SetVersion(utl.PointerToString("1.2.3-alpha+build"))
+	coreVersion, err = state.GetCoreVersion()
+	assert.NoError(t, err)
+	assert.False(t, coreVersion)
+
+	state.SetVersion(utl.PointerToString("1.2.3+build"))
+	coreVersion, err = state.GetCoreVersion()
+	assert.NoError(t, err)
+	assert.False(t, coreVersion)
+
+	// try with leniency and a prefix
+	configuration, _ = cnf.NewConfiguration()
+	configurationLayerMock = cnf.NewSimpleConfigurationLayer()
+	configurationLayerMock.SetReleaseLenient(utl.PointerToBoolean(true))
+	configurationLayerMock.SetReleasePrefix(utl.PointerToString("v"))
+	cl = configurationLayerMock
+	configuration.WithRuntimeConfiguration(&cl)
+	state, _ = NewStateWith(configuration)
+
+	state.SetVersion(utl.PointerToString("1.2.3"))
+	coreVersion, err = state.GetCoreVersion()
+	assert.NoError(t, err)
+	assert.True(t, coreVersion)
+
+	state.SetVersion(utl.PointerToString("v1.2.3"))
+	coreVersion, err = state.GetCoreVersion()
+	assert.NoError(t, err)
+	assert.True(t, coreVersion)
+
+	state.SetVersion(utl.PointerToString("rel-1.2.3"))
+	coreVersion, err = state.GetCoreVersion()
+	assert.NoError(t, err)
+	assert.True(t, coreVersion)
+
+	state.SetVersion(utl.PointerToString("1.2.3-1"))
+	coreVersion, err = state.GetCoreVersion()
+	assert.NoError(t, err)
+	assert.False(t, coreVersion)
+
+	state.SetVersion(utl.PointerToString("1.2.3-alpha"))
+	coreVersion, err = state.GetCoreVersion()
+	assert.NoError(t, err)
+	assert.False(t, coreVersion)
+
+	state.SetVersion(utl.PointerToString("1.2.3-alpha+build"))
+	coreVersion, err = state.GetCoreVersion()
+	assert.NoError(t, err)
+	assert.False(t, coreVersion)
+
+	state.SetVersion(utl.PointerToString("1.2.3+build"))
+	coreVersion, err = state.GetCoreVersion()
+	assert.NoError(t, err)
+	assert.False(t, coreVersion)
+}
+
 func TestStateGetDirectory(t *testing.T) {
 	configuration, _ := cnf.NewConfiguration()
 	state, _ := NewStateWith(configuration)
@@ -200,6 +378,49 @@ func TestStateGetInternals(t *testing.T) {
 	internals, _ := state.GetInternals()
 	assert.NotNil(t, internals)
 	assert.Equal(t, 0, len(*internals))
+}
+
+func TestStateGetLatestVersion(t *testing.T) {
+	configuration, _ := cnf.NewConfiguration()
+	state, _ := NewStateWith(configuration)
+
+	// nomatter what we set, the latest version is always null until we set a version on the state
+	latestVersion, err := state.GetLatestVersion()
+	assert.NoError(t, err)
+	assert.Nil(t, latestVersion)
+
+	state.SetLatestVersion(utl.PointerToBoolean(true))
+	latestVersion, err = state.GetLatestVersion()
+	assert.NoError(t, err)
+	assert.Nil(t, latestVersion)
+
+	state.SetLatestVersion(utl.PointerToBoolean(false))
+	latestVersion, err = state.GetLatestVersion()
+	assert.NoError(t, err)
+	assert.Nil(t, latestVersion)
+
+	// try again, with a version set on the state
+	state, _ = NewStateWith(configuration)
+	state.SetVersion(utl.PointerToString("1.2.3"))
+
+	latestVersion, err = state.GetLatestVersion()
+	assert.NoError(t, err)
+	assert.Nil(t, latestVersion)
+
+	state.SetLatestVersion(utl.PointerToBoolean(true))
+	latestVersion, err = state.GetLatestVersion()
+	assert.NoError(t, err)
+	assert.True(t, *latestVersion)
+
+	state.SetLatestVersion(utl.PointerToBoolean(false))
+	latestVersion, err = state.GetLatestVersion()
+	assert.NoError(t, err)
+	assert.False(t, *latestVersion)
+
+	state.SetLatestVersion(nil)
+	latestVersion, err = state.GetLatestVersion()
+	assert.NoError(t, err)
+	assert.Nil(t, latestVersion)
 }
 
 func TestStateGetNewRelease(t *testing.T) {
@@ -546,6 +767,14 @@ func TestStateSaveAndResumeJSON(t *testing.T) {
 	directory2, _ := resumedState.GetDirectory()
 	assert.Equal(t, *directory1, *directory2)
 
+	coreVersion1, _ := oldState.GetCoreVersion()
+	coreVersion2, _ := resumedState.GetCoreVersion()
+	assert.Equal(t, coreVersion1, coreVersion2)
+
+	latestVersion1, _ := oldState.GetLatestVersion()
+	latestVersion2, _ := resumedState.GetLatestVersion()
+	assert.Equal(t, latestVersion1, latestVersion2)
+
 	newVersion1, _ := oldState.GetNewVersion()
 	newVersion2, _ := resumedState.GetNewVersion()
 	assert.Equal(t, newVersion1, newVersion2)
@@ -704,6 +933,14 @@ func TestStateSaveAndResumeYAML(t *testing.T) {
 	directory1, _ := oldState.GetDirectory()
 	directory2, _ := resumedState.GetDirectory()
 	assert.Equal(t, *directory1, *directory2)
+
+	coreVersion1, _ := oldState.GetCoreVersion()
+	coreVersion2, _ := resumedState.GetCoreVersion()
+	assert.Equal(t, coreVersion1, coreVersion2)
+
+	latestVersion1, _ := oldState.GetLatestVersion()
+	latestVersion2, _ := resumedState.GetLatestVersion()
+	assert.Equal(t, latestVersion1, latestVersion2)
 
 	newVersion1, _ := oldState.GetNewVersion()
 	newVersion2, _ := resumedState.GetNewVersion()
