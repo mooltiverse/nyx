@@ -1008,6 +1008,68 @@ func (c *Infer) checkVersionRange(scheme *ver.Scheme, version *ver.Version, stat
 }
 
 /*
+Checks if the given version is the latest in the repository, according to the scheme.
+To run this check the given version is checked against all tags in the repository (ignoring those not
+complying with the given scheme) and only if the given version is to be considered newer or equal to any
+other version tag true is returned.
+
+Arguments are as follows:
+
+  - scheme the versioning scheme in use
+  - version the version to check
+  - releaseLenient when true prefixes, even others than the releasePrefix, are tolerated when parsing and comparing versions
+  - releasePrefix the release prefix that has been configured. This is considered when parsing and comparing versions. It may be nil or empty
+
+Error is:
+
+- DataAccessError in case the configuration can't be loaded for some reason.
+- IllegalPropertyError in case the configuration has some illegal options.
+- GitError in case of unexpected issues when accessing the Git repository.
+- ReleaseError if the task is unable to complete for reasons due to the release process.
+*/
+func (c *Infer) checkLatestVersion(scheme ver.Scheme, version string, releaseLenient *bool, releasePrefix *string) (bool, error) {
+	log.Debugf("checking if version '%s' is the latest in the repository", version)
+
+	tags, err := (*c.Repository()).GetTags()
+	if err != nil {
+		return false, err
+	}
+
+	for _, tag := range tags {
+		tagName := tag.GetName()
+		log.Tracef("checking against tag '%s'", tagName)
+		var isLegal bool
+		if releaseLenient != nil && *releaseLenient {
+			isLegal = ver.IsLegalWithLenience(scheme, tagName, *releaseLenient)
+		} else {
+			isLegal = ver.IsLegalWithPrefix(scheme, tagName, releasePrefix)
+		}
+		if isLegal {
+			log.Tracef("tag '%s' is a legal version according to '%s'", tagName, scheme.String())
+			if releaseLenient != nil && *releaseLenient {
+				if ver.CompareWithSanitization(scheme, &version, &tagName, *releaseLenient) < 0 {
+					log.Debugf("tag '%s' is greater than '%s' according to '%s' so '%s' is not the latest version", tagName, version, scheme.String(), version)
+					return false, nil
+				} else {
+					log.Tracef("tag '%s' is less or equal than '%s' according to '%s' so next tags will be tested (if any)", tagName, version, scheme.String())
+				}
+			} else {
+				if ver.CompareWithPrefix(scheme, &version, &tagName, releasePrefix) < 0 {
+					log.Debugf("tag '%s' is greater than '%s' according to '%s' so '%s' is not the latest version", tagName, version, scheme.String(), version)
+					return false, nil
+				} else {
+					log.Tracef("tag '%s' is less or equal than '%s' according to '%s' so next tags will be tested (if any)", tagName, version, scheme.String())
+				}
+			}
+		} else {
+			log.Tracef("tag '%s' is not a legal version according to '%s' and will be ignored", tagName, scheme.String())
+		}
+	}
+	log.Debugf("version '%s' is the latest in the repository since no newer version has been found", version)
+	return true, nil
+}
+
+/*
 Reset the attributes store by this command into the internal state object.
 This is required before running the command in order to make sure that the new execution is not affected
 by a stale status coming from previous runs.
@@ -1342,6 +1404,18 @@ func (c *Infer) Run() (*stt.State, error) {
 		return nil, err
 	}
 
+	scheme, err := c.State().GetScheme()
+	if err != nil {
+		return nil, err
+	}
+	releaseLenient, err := c.State().GetConfiguration().GetReleaseLenient()
+	if err != nil {
+		return nil, err
+	}
+	releasePrefix, err := c.State().GetConfiguration().GetReleasePrefix()
+	if err != nil {
+		return nil, err
+	}
 	configurationVersion, err := c.State().GetConfiguration().GetVersion()
 	if err != nil {
 		return nil, err
@@ -1370,19 +1444,7 @@ func (c *Infer) Run() (*stt.State, error) {
 		c.State().SetBranch(&currentBranch)
 
 		// STEP 1: scan the Git repository to collect informations from the commit history
-		scheme, err := c.State().GetScheme()
-		if err != nil {
-			return nil, err
-		}
 		bump, err := c.State().GetBump()
-		if err != nil {
-			return nil, err
-		}
-		releaseLenient, err := c.State().GetConfiguration().GetReleaseLenient()
-		if err != nil {
-			return nil, err
-		}
-		releasePrefix, err := c.State().GetConfiguration().GetReleasePrefix()
 		if err != nil {
 			return nil, err
 		}
@@ -1483,6 +1545,16 @@ func (c *Infer) Run() (*stt.State, error) {
 		// STEP 5: store values to the state object
 		c.State().SetVersion(&stringVersion)
 	}
+	stringVersion, err := c.State().GetVersion()
+	if err != nil {
+		return nil, err
+	}
+	// check if the state version, regardless whether it was inferred or overridden, is the latest
+	latestVersion, err := c.checkLatestVersion(*scheme, *stringVersion, releaseLenient, releasePrefix)
+	if err != nil {
+		return nil, err
+	}
+	c.State().SetLatestVersion(&latestVersion)
 
 	err = c.storeStatusInternalAttributes()
 	if err != nil {
