@@ -111,7 +111,7 @@ type Repository interface {
 	CommitPathsWithMessageAndIdentities(paths []string, message *string, author *gitent.Identity, committer *gitent.Identity) (gitent.Commit, error)
 
 	/*
-	   Returns a set of abjects representing all the tags for the given commit.
+	   Returns a set of objects representing all the tags for the given commit.
 
 	   Arguments are as follows:
 
@@ -162,6 +162,15 @@ type Repository interface {
 	     the repository has no commits yet or is in the 'detached HEAD' state.
 	*/
 	GetRootCommit() (string, error)
+
+	/*
+	   Returns a set of objects representing all the tags for the repository.
+
+	   Errors can be:
+
+	   - GitError in case some problem is encountered with the underlying Git repository.
+	*/
+	GetTags() ([]gitent.Tag, error)
 
 	/*
 	   Returns true if the repository is clean, which is when no differences exist between the working tree, the index,

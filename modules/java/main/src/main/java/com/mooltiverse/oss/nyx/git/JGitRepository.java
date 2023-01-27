@@ -822,6 +822,28 @@ class JGitRepository implements Repository {
      * {@inheritDoc}
      */
     @Override
+    public Set<Tag> getTags()
+        throws GitException {
+        logger.debug(GIT, "Retrieving all tags");
+        Set<Tag> res = new HashSet<Tag>();
+        try {
+            RefDatabase refDatabase = jGit.getRepository().getRefDatabase();
+            for (Ref tagRef: refDatabase.getRefsByPrefix(Constants.R_TAGS)) {
+                // refs must be peeled in order to see if they're annoteted or lightweight
+                tagRef = refDatabase.peel(tagRef);
+                res.add(ObjectFactory.tagFrom(tagRef));
+            }
+        }
+        catch (IOException e) {
+            throw new GitException("Cannot list repository tags", e);
+        }
+        return res;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean isClean()
         throws GitException {
         logger.debug(GIT, "Checking repository clean status");

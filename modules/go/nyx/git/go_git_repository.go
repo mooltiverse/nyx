@@ -499,7 +499,7 @@ func (r goGitRepository) CommitPathsWithMessageAndIdentities(paths []string, mes
 }
 
 /*
-Returns a set of abjects representing all the tags for the given commit.
+Returns a set of objects representing all the tags for the given commit.
 
 Arguments are as follows:
 
@@ -605,6 +605,39 @@ func (r goGitRepository) GetRootCommit() (string, error) {
 	commitSHA := commit.Hash.String()
 	log.Debugf("repository latest commit in HEAD branch is '%s'", commitSHA)
 	return commitSHA, nil
+}
+
+/*
+Returns a set of objects representing all the tags for the repository.
+
+Errors can be:
+
+- GitError in case some problem is encountered with the underlying Git repository.
+*/
+func (r goGitRepository) GetTags() ([]gitent.Tag, error) {
+	log.Debugf("retrieving all tags")
+	var res []gitent.Tag
+	tagsIterator, err := r.repository.Tags()
+	if err != nil {
+		return nil, &errs.GitError{Message: fmt.Sprintf("cannot list repository tags"), Cause: err}
+	}
+	if err := tagsIterator.ForEach(func(ref *ggitplumbing.Reference) error {
+		switch err {
+		case nil:
+			// it's an annotated tag
+			res = append(res, TagFrom(r.repository, *ref))
+		case ggitplumbing.ErrObjectNotFound:
+			// it's a lightweight tag
+			res = append(res, TagFrom(r.repository, *ref))
+		default:
+			// Some other error occurred
+			return &errs.GitError{Message: fmt.Sprintf("error while listing repository tags"), Cause: err}
+		}
+		return nil
+	}); err != nil {
+		return nil, &errs.GitError{Message: fmt.Sprintf("error while listing repository tags"), Cause: err}
+	}
+	return res, nil
 }
 
 /*

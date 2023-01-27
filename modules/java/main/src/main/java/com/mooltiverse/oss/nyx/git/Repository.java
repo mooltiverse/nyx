@@ -116,11 +116,11 @@ public interface Repository {
         throws GitException;
 
     /**
-     * Returns a set of abjects representing all the tags for the given commit.
+     * Returns a set of objects representing all the tags for the given commit.
      * 
      * @param commit the SHA-1 identifier of the commit to get the tags for. It can be a full or abbreviated SHA-1.
      * 
-     * @return the set of abjects representing all the tags for the given commit.
+     * @return the set of objects representing all the tags for the given commit.
      * 
      * @throws GitException in case some problem is encountered with the underlying Git repository.
      */
@@ -169,6 +169,16 @@ public interface Repository {
      * the repository has no commits yet or is in the 'detached HEAD' state.
      */
     public String getRootCommit()
+        throws GitException;
+
+    /**
+     * Returns a set of objects representing all the tags for the repository.
+     * 
+     * @return the set of objects representing all the tags for the repository.
+     * 
+     * @throws GitException in case some problem is encountered with the underlying Git repository.
+     */
+    public Set<Tag> getTags()
         throws GitException;
 
     /**
