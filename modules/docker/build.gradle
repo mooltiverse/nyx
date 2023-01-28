@@ -37,7 +37,7 @@ def registries = [ 'DockerHub':"${nyxOrganizationID}/${rootProject.name}",
 
 // The list of labels to publish with. The 'latest' label is only added if we are publishing an official version (like x.y.z, without extra identifiers)
 def labels = [ sanitizedVersion ]
-if (java.util.regex.Pattern.matches("^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\$", rootProject.version)) {
+if (rootProject.nyxState.newRelease && rootProject.nyxState.coreVersion && rootProject.nyxState.latestVersion) {
     labels.add('latest')
 }
 
