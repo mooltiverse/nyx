@@ -61,6 +61,9 @@ type State struct {
 	// The map containing the internal attributes.
 	Internals *map[string]string `json:"internals,omitempty" yaml:"internals,omitempty" handlebars:"internals"`
 
+	// The flag indicating if the version is the latest in the repository, according to the scheme.
+	LatestVersion *bool `json:"latestVersion,omitempty" yaml:"latestVersion,omitempty" handlebars:"latestVersion"`
+
 	// The list containing the released assets.
 	ReleaseAssets *[]ent.Attachment `json:"releaseAssets,omitempty" yaml:"releaseAssets,omitempty" handlebars:"releaseAssets"`
 
@@ -108,11 +111,17 @@ type FlatState struct {
 	// The private instance of the configuration.
 	Configuration *cnf.SimpleConfigurationLayer `json:"configuration,omitempty" yaml:"configuration,omitempty" handlebars:"configuration"`
 
+	// The cached value for the coreVersion attribute. It's required to cache this value or marshalling/unmarshalling won't work
+	CoreVersionCache *bool `json:"coreVersion,omitempty" yaml:"coreVersion,omitempty" handlebars:"coreVersion"`
+
 	// The directory cached from the configuration. It's required to cache this value or marshalling/unmarshalling won't work
 	DirectoryCache *string `json:"directory,omitempty" yaml:"directory,omitempty" handlebars:"directory"`
 
 	// The map containing the internal attributes.
 	Internals *map[string]string `json:"internals,omitempty" yaml:"internals,omitempty" handlebars:"internals"`
+
+	// The flag indicating if the version is the latest in the repository, according to the scheme.
+	LatestVersion *bool `json:"latestVersion,omitempty" yaml:"latestVersion,omitempty" handlebars:"latestVersion"`
 
 	// The cached value for the newVersion attribute. It's required to cache this value or marshalling/unmarshalling won't work
 	NewVersionCache *bool `json:"newVersion,omitempty" yaml:"newVersion,omitempty" handlebars:"newVersion"`
@@ -232,6 +241,13 @@ func (s *State) Flatten() (*FlatState, error) {
 			return nil, &errs.DataAccessError{Message: fmt.Sprintf("unable to flatten configuration option '%s'", "configuration"), Cause: err}
 		}
 	}
+	// Booleans cause issues when 'omitempty' as when they are false they are assumed empty and not rendered.
+	// To work around this we need to convert to a pointer.
+	cVersion, err := s.GetCoreVersion()
+	if err != nil {
+		return nil, &errs.DataAccessError{Message: fmt.Sprintf("unable to resolve configuration option '%s'", "coreVersion"), Cause: err}
+	}
+	resolvedState.CoreVersionCache = &cVersion
 	resolvedState.DirectoryCache, err = s.GetDirectory()
 	if err != nil {
 		return nil, &errs.DataAccessError{Message: fmt.Sprintf("unable to resolve configuration option '%s'", "directory"), Cause: err}
@@ -239,6 +255,10 @@ func (s *State) Flatten() (*FlatState, error) {
 	resolvedState.Internals, err = s.GetInternals()
 	if err != nil {
 		return nil, &errs.DataAccessError{Message: fmt.Sprintf("unable to resolve configuration option '%s'", "internals"), Cause: err}
+	}
+	resolvedState.LatestVersion, err = s.GetLatestVersion()
+	if err != nil {
+		return nil, &errs.DataAccessError{Message: fmt.Sprintf("unable to resolve configuration option '%s'", "latestVersion"), Cause: err}
 	}
 	// Booleans cause issues when 'omitempty' as when they are false they are assumed empty and not rendered.
 	// To work around this we need to convert to a pointer.
@@ -469,6 +489,42 @@ func (s *State) GetConfiguration() *cnf.Configuration {
 }
 
 /*
+Returns true if the version only brings core identifiers (according to the scheme), usually meaning it is an official version.
+This mehod also takes into account whether the configuration requires leniency or it has a prefix configured.
+
+Error is:
+- DataAccessError: in case the attribute cannot be read or accessed.
+- IllegalPropertyError: in case the attribute has been defined but has incorrect values or it can't be resolved.
+*/
+func (s *State) GetCoreVersion() (bool, error) {
+	if s.HasVersion() {
+		version, err := s.GetVersion()
+		if err != nil {
+			return false, err
+		}
+		scheme, err := s.GetScheme()
+		if err != nil {
+			return false, err
+		}
+		releaseLenient, err := s.GetConfiguration().GetReleaseLenient()
+		if err != nil {
+			return false, err
+		}
+		if releaseLenient != nil && *releaseLenient {
+			return ver.IsCoreWithLenience(*scheme, *version, *releaseLenient), nil
+		} else {
+			releasePrefix, err := s.GetConfiguration().GetReleasePrefix()
+			if err != nil {
+				return false, err
+			}
+			return ver.IsCoreWithPrefix(*scheme, *version, releasePrefix), nil
+		}
+	} else {
+		return false, nil
+	}
+}
+
+/*
 Returns the directory used as the working directory as it's defined by the configuration.
 
 Error is:
@@ -496,6 +552,49 @@ to files.
 */
 func (s *State) GetInternals() (*map[string]string, error) {
 	return s.Internals, nil
+}
+
+/*
+Returns the flag indicating if the version is the latest in the repository, according to the scheme.
+
+Error is:
+- DataAccessError: in case the attribute cannot be written or accessed.
+- IllegalPropertyError: in case the attribute has incorrect values or it can't be resolved.
+*/
+func (s *State) GetLatestVersion() (*bool, error) {
+	if s.HasVersion() {
+		return s.LatestVersion, nil
+	} else {
+		return nil, nil
+	}
+}
+
+/*
+Returns true if the scope has a non nil latest version flag.
+
+Error is:
+- DataAccessError: in case the attribute cannot be written or accessed.
+- IllegalPropertyError: in case the attribute has incorrect values or it can't be resolved.
+*/
+func (s *State) HasLatestVersion() bool {
+	latestVersion, err := s.GetLatestVersion()
+	if err != nil {
+		return false
+	}
+	return latestVersion != nil
+}
+
+/*
+Sets the flag indicating if the version is the latest in the repository, according to the scheme.
+
+Error is:
+- DataAccessError: in case the attribute cannot be written or accessed.
+- IllegalPropertyError: in case the attribute has incorrect values or it can't be resolved.
+- IllegalStateError: if the configuration already has a value for the bump attribute.
+*/
+func (s *State) SetLatestVersion(latestVersion *bool) error {
+	s.LatestVersion = latestVersion
+	return nil
 }
 
 /*
@@ -692,10 +791,10 @@ func (s *State) GetVersion() (*string, error) {
 /*
 Returns true if the scope has a non nil version.
 
-@return true if the scope has a non nil version.
+Error is:
 
-@throws DataAccessError in case the attribute cannot be read or accessed.
-@throws IllegalPropertyError in case the attribute has been defined but has incorrect values or it can't be resolved.
+- DataAccessError: in case the attribute cannot be written or accessed.
+- IllegalPropertyError: in case the attribute has incorrect values or it can't be resolved.
 */
 func (s *State) HasVersion() bool {
 	version, err := s.GetVersion()

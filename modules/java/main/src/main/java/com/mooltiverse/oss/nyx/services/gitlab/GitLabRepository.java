@@ -72,6 +72,14 @@ public class GitLabRepository extends GitLabEntity implements GitHostedRepositor
      * {@inheritDoc}
      */
     @Override
+    public String getSSHURL() {
+        return getAttributes().get("ssh_url_to_repo").toString();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String getID() {
         return getAttributes().get("id").toString();
     }

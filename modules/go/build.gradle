@@ -22,7 +22,7 @@ allprojects {
     ------------------------------------------------------------------------------*/
     // this shouldn't be required as it's applied in the root build script for all projects
     // but it seems it's lost here so we redeclare it
-    apply plugin: 'java'                                // See: https://docs.gradle.org/current/userguide/java_plugin.html
+    apply plugin: 'java'                                  // See: https://docs.gradle.org/current/userguide/java_plugin.html
 }
 
 /*------------------------------------------------------------------------------
@@ -212,7 +212,15 @@ subprojects {
             // properties defined
             def testEnvironmentVariables = [:]
             testEnvironmentVariables['gitHubTestUserToken']=findProperty("gitHubTestUserToken")
+            testEnvironmentVariables['gitHubTestUserPublicKey']=findProperty("gitHubTestUserPublicKey")
+            testEnvironmentVariables['gitHubTestUserPrivateKeyPassphrase']=findProperty("gitHubTestUserPrivateKeyPassphrase")
+            testEnvironmentVariables['gitHubTestUserPrivateKeyWithPassphrase']=findProperty("gitHubTestUserPrivateKeyWithPassphrase")
+            testEnvironmentVariables['gitHubTestUserPrivateKeyWithoutPassphrase']=findProperty("gitHubTestUserPrivateKeyWithoutPassphrase")
             testEnvironmentVariables['gitLabTestUserToken']=findProperty("gitLabTestUserToken")
+            testEnvironmentVariables['gitLabTestUserPublicKey']=findProperty("gitLabTestUserPublicKey")
+            testEnvironmentVariables['gitLabTestUserPrivateKeyPassphrase']=findProperty("gitLabTestUserPrivateKeyPassphrase")
+            testEnvironmentVariables['gitLabTestUserPrivateKeyWithPassphrase']=findProperty("gitLabTestUserPrivateKeyWithPassphrase")
+            testEnvironmentVariables['gitLabTestUserPrivateKeyWithoutPassphrase']=findProperty("gitLabTestUserPrivateKeyWithoutPassphrase")
 
             logger.info('Integration testing Go module '+modulePath)
             exec {
@@ -257,7 +265,15 @@ subprojects {
             testEnvironmentVariables['nyxBinDir']=file(buildDir.path+'/bin/').absolutePath // the path to the binaries
             testEnvironmentVariables['quickTests']=findProperty("quickTests") // the flag to narrow the number of tests, added on the command line using the -PquickTests=true option
             testEnvironmentVariables['gitHubTestUserToken']=findProperty("gitHubTestUserToken")
+            testEnvironmentVariables['gitHubTestUserPublicKey']=findProperty("gitHubTestUserPublicKey")
+            testEnvironmentVariables['gitHubTestUserPrivateKeyPassphrase']=findProperty("gitHubTestUserPrivateKeyPassphrase")
+            testEnvironmentVariables['gitHubTestUserPrivateKeyWithPassphrase']=findProperty("gitHubTestUserPrivateKeyWithPassphrase")
+            testEnvironmentVariables['gitHubTestUserPrivateKeyWithoutPassphrase']=findProperty("gitHubTestUserPrivateKeyWithoutPassphrase")
             testEnvironmentVariables['gitLabTestUserToken']=findProperty("gitLabTestUserToken")
+            testEnvironmentVariables['gitLabTestUserPublicKey']=findProperty("gitLabTestUserPublicKey")
+            testEnvironmentVariables['gitLabTestUserPrivateKeyPassphrase']=findProperty("gitLabTestUserPrivateKeyPassphrase")
+            testEnvironmentVariables['gitLabTestUserPrivateKeyWithPassphrase']=findProperty("gitLabTestUserPrivateKeyWithPassphrase")
+            testEnvironmentVariables['gitLabTestUserPrivateKeyWithoutPassphrase']=findProperty("gitLabTestUserPrivateKeyWithoutPassphrase")
 
             logger.info('Functional testing Go module '+modulePath)
             exec {
@@ -288,7 +304,7 @@ subprojects {
         // This is pretty much a lifecycle task that sub-projects need to add dependencies to
     }
 
-    task goPublish(group: 'publishing', description: 'Lists the module to https://pkg.go.dev/') {
+    task goPublishToGoPkg(group: 'publishing', description: 'Lists the module to https://pkg.go.dev/') {
         // Task dependencies
         // nyxMark is required because the tag must already be available on GitHub when we run this task
         dependsOn goBuild, rootProject.tasks.nyxMark
@@ -299,9 +315,9 @@ subprojects {
 
         // See https://go.dev/doc/modules/publishing
         doLast {
-            def modulereference = modulePath+'@'+version
+            def moduleReference = modulePath+'@'+version
 
-            logger.info('Listing Go module '+modulereference+' to https://pkg.go.dev/')
+            logger.info('Listing Go module '+moduleReference+' to https://pkg.go.dev/')
             exec {
                 ignoreExitValue = true // sometimes response is too slow to come and results in a timeout error
                 environment 'GOPROXY', 'proxy.golang.org'
@@ -309,9 +325,35 @@ subprojects {
                 logging.captureStandardOutput LogLevel.INFO
                 logging.captureStandardError  LogLevel.ERROR
                 // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
-                commandLine 'go', 'list', '-m', modulereference
+                commandLine 'go', 'list', '-m', moduleReference
             }
         }
+    }
+
+    task goPublishToGoDocs(group: 'publishing', description: 'Lists the module to https://godocs.io/') {
+        // Task dependencies
+        // nyxMark is required because the tag must already be available on GitHub when we run this task
+        dependsOn goBuild, rootProject.tasks.nyxMark
+
+        // The command only needs to run if a new release has been issued and already tagged by 'nyxMark'
+        // otherwise the 'go list' commands fails because there is no such tagged version to read the go.mod file from
+        onlyIf { rootProject.nyxState.newRelease }
+
+        // See https://godocs.io/-/about
+        doLast {
+            def moduleHTTPURL = "https://godocs.io/"+modulePath
+
+            logger.info('Listing Go module '+modulePath+' to https://godocs.io/')
+            URL moduleURL = new URL(moduleHTTPURL)
+            HttpURLConnection urlConnection = (HttpURLConnection)moduleURL.openConnection()
+            logger.debug "Status code: ${urlConnection.getResponseCode()}"
+        }
+    }
+
+    task goPublish(group: 'publishing', description: 'Lists the module to https://pkg.go.dev/') {
+        // Task dependencies
+        // This is pretty much a lifecycle taks that only depends on other tasks
+        dependsOn goPublishToGoPkg, goPublishToGoDocs
     }
 
     /*------------------------------------------------------------------------------

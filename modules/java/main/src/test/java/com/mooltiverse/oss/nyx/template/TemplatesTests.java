@@ -339,21 +339,6 @@ public class TemplatesTests {
             }
         }
 
-        // TODO: remove this method as per release 2.0.0 or more
-        @Nested
-        @DisplayName("Templates.render Environment.Variable function (deprecated dotted name)")
-        @Deprecated(since="1.1.0", forRemoval=true) //The dotted name is deprecated and will be removed in future releases. Use the camel case name instead. See the user manual for more."
-        class RenderEnvironmentVariableFunctionDeprecatedDottedNameTests {
-            @Test
-            @DisplayName("Templates.render(String, null) (deprecated dotted name)")
-            @Deprecated(since="1.1.0", forRemoval=true) //The dotted name is deprecated and will be removed in future releases. Use the camel case name instead. See the user manual for more."
-            void renderEnvironmentVariableDeprecatedDottedName()
-                throws Exception {
-                // just test it's not empty as it changes depending on the runtime environment
-                assertFalse(Templates.render("{{#environment.variable}}PATH{{/environment.variable}}", null).isBlank());
-            }
-        }
-
         @Nested
         @DisplayName("Templates.render EnvironmentUser function")
         class RenderEnvironmentUserFunctionTests {
@@ -364,22 +349,6 @@ public class TemplatesTests {
                 // just test it's not empty as it changes depending on the runtime environment
                 assertFalse(Templates.render("{{environmentUser}}", null).isBlank());
                 assertFalse(Templates.render("{{#environmentUser}}{{/environmentUser}}", null).isBlank());
-            }
-        }
-
-        // TODO: remove this method as per release 2.0.0 or more
-        @Nested
-        @DisplayName("Templates.render Environment.User function (deprecated dotted name)")
-        @Deprecated(since="1.1.0", forRemoval=true) //The dotted name is deprecated and will be removed in future releases. Use the camel case name instead. See the user manual for more."
-        class RenderEnvironmentUserFunctionDeprecatedDottedNameTests {
-            @Test
-            @DisplayName("Templates.render(String, null) (deprecated dotted name)")
-            @Deprecated(since="1.1.0", forRemoval=true) //The dotted name is deprecated and will be removed in future releases. Use the camel case name instead. See the user manual for more."
-            void renderEnvironmentUserDeprecatedDottedName()
-                throws Exception {
-                // just test it's not empty as it changes depending on the runtime environment
-                assertFalse(Templates.render("{{environment.user}}", null).isBlank());
-                assertFalse(Templates.render("{{#environment.user}}{{/environment.user}}", null).isBlank());
             }
         }
 
@@ -398,27 +367,6 @@ public class TemplatesTests {
                 savedFileWriter.flush();
                 savedFileWriter.close();
                 assertEquals("test12345", Templates.render("{{#fileContent}}"+savedFile.getAbsolutePath()+"{{/fileContent}}", null));
-            }
-        }
-
-        // TODO: remove this method as per release 2.0.0 or more
-        @Nested
-        @DisplayName("Templates.render File.Content function (deprecated dotted name)")
-        @Deprecated(since="1.1.0", forRemoval=true) //The dotted name is deprecated and will be removed in future releases. Use the camel case name instead. See the user manual for more."
-        class RenderFileContentFunctionDeprecatedDottedNameTests {
-            @Test
-            @DisplayName("Templates.render(String, null) (deprecated dotted name)")
-            @Deprecated(since="1.1.0", forRemoval=true) //The dotted name is deprecated and will be removed in future releases. Use the camel case name instead. See the user manual for more."
-            void renderFileDeprecatedDottedNameContent()
-                throws Exception {
-                String hashCode = Integer.toString(this.hashCode());
-                File savedFile = new File(System.getProperty("java.io.tmpdir"), "templates2"+hashCode+".txt");
-                savedFile.deleteOnExit();
-                FileWriter savedFileWriter = new FileWriter(savedFile);
-                savedFileWriter.write("test12345");
-                savedFileWriter.flush();
-                savedFileWriter.close();
-                assertEquals("test12345", Templates.render("{{#file.content}}"+savedFile.getAbsolutePath()+"{{/file.content}}", null));
             }
         }
 
@@ -441,25 +389,58 @@ public class TemplatesTests {
             }
         }
 
-        // TODO: remove this method as per release 2.0.0 or more
         @Nested
-        @DisplayName("Templates.render File.Exists function (deprecated dotted name)")
-        @Deprecated(since="1.1.0", forRemoval=true) //The dotted name is deprecated and will be removed in future releases. Use the camel case name instead. See the user manual for more."
-        class RenderFileExistsFunctionDeprecatedDottedNameTests {
+        @DisplayName("Templates.render Capture function")
+        class RenderCaptureFunctionTests {
             @Test
-            @DisplayName("Templates.render(String, null) (deprecated dotted name)")
-            @Deprecated(since="1.1.0", forRemoval=true) //The dotted name is deprecated and will be removed in future releases. Use the camel case name instead. See the user manual for more."
-            void renderFileExistsDeprecatedDottedName()
+            @DisplayName("Templates.render(String, null)")
+            void renderCapture()
                 throws Exception {
-                String hashCode = Integer.toString(this.hashCode());
-                File savedFile = new File(System.getProperty("java.io.tmpdir"), "templates4"+hashCode+".txt");
-                savedFile.deleteOnExit();
-                assertEquals("false", Templates.render("{{#file.exists}}"+savedFile.getAbsolutePath()+"{{/file.exists}}", null));
-                FileWriter savedFileWriter = new FileWriter(savedFile);
-                savedFileWriter.write("test12345");
-                savedFileWriter.flush();
-                savedFileWriter.close();
-                assertEquals("true", Templates.render("{{#file.exists}}"+savedFile.getAbsolutePath()+"{{/file.exists}}", null));
+                assertEquals("mytype", Templates.render("{{#capture expression=\"(?<type>[a-zA-Z0-9_]+)(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))\" group=\"type\"}}mytype(myscope): mytitle{{/capture}}", null));
+            }
+        }
+
+        @Nested
+        @DisplayName("Templates.render CutLeft function")
+        class RenderCutLeftFunctionTests {
+            @Test
+            @DisplayName("Templates.render(String, null)")
+            void renderCutLeft()
+                throws Exception {
+                assertEquals("890", Templates.render("{{#cutLeft length=\"3\"}}1234567890{{/cutLeft}}", null));
+            }
+        }
+
+        @Nested
+        @DisplayName("Templates.render CutRight function")
+        class RenderCutRightFunctionTests {
+            @Test
+            @DisplayName("Templates.render(String, null)")
+            void renderCutRight()
+                throws Exception {
+                assertEquals("123", Templates.render("{{#cutRight length=\"3\"}}1234567890{{/cutRight}}", null));
+            }
+        }
+
+        @Nested
+        @DisplayName("Templates.render Replace function")
+        class RenderReplaceFunctionTests {
+            @Test
+            @DisplayName("Templates.render(String, null)")
+            void renderReplace()
+                throws Exception {
+                assertEquals("X123456789X", Templates.render("{{#replace from=\"0\" to=\"X\"}}01234567890{{/replace}}", null));
+            }
+        }
+
+        @Nested
+        @DisplayName("Templates.render TimeFormat function")
+        class RenderTimeFormatFunctionTests {
+            @Test
+            @DisplayName("Templates.render(String, null)")
+            void renderTimeFormat()
+                throws Exception {
+                assertEquals("20200101", Templates.render("{{#timeFormat format=\"yyyyMMdd\"}}1577880000000{{/timeFormat}}", null));
             }
         }
     }
@@ -535,6 +516,17 @@ public class TemplatesTests {
             StringWriter output = new StringWriter();
             Templates.render(new StringReader(TEMPLATE), new TestScope(), output);
             assertEquals(TEMPLATE_OUTPUT, output.toString());
+        }
+    }
+
+    @Nested
+    @DisplayName("Templates.render with nested functions")
+    class RenderWithNestedFunctionsTests {
+        @Test
+        @DisplayName("Templates.render(String, Object)")
+        void renderWithMockTest1()
+            throws Exception {
+            assertEquals("7B9DA5286D4724DD7385", Templates.render("{{#upper}}{{#cutRight length=\"20\"}}7b9da5286d4724dd7385bb80639a08841fa26606{{/cutRight}}{{/upper}}", null));
         }
     }
 }

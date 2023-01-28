@@ -127,6 +127,13 @@ const (
 	// This expression uses the 'name' capturing group which returns the remote name, if detected.
 	GIT_CONFIGURATION_REMOTES_ENVVAR_ITEM_NAME_REGEX = GIT_CONFIGURATION_REMOTES_ENVVAR_NAME + "_(?<name>[a-zA-Z0-9]+)_([a-zA-Z0-9_]+)$"
 
+	// The parametrized name of the environment variable to read for the 'authenticationMethod' attribute of a
+	// Git remote configuration.
+	// This string is a prototype that contains a '%s' parameter for the remote name
+	// and must be rendered using fmt.Sprintf(GIT_CONFIGURATION_REMOTES_ENVVAR_ITEM_AUTHENTICATION_METHOD_FORMAT_STRING, name)
+	// in order to get the actual name of the environment variable that brings the value for the remote with the given 'name'.
+	GIT_CONFIGURATION_REMOTES_ENVVAR_ITEM_AUTHENTICATION_METHOD_FORMAT_STRING = GIT_CONFIGURATION_REMOTES_ENVVAR_NAME + "_%s_AUTHENTICATION_METHOD"
+
 	// The parametrized name of the environment variable to read for the 'password' attribute of a
 	// Git remote configuration.
 	// This string is a prototype that contains a '%s' parameter for the remote name
@@ -140,6 +147,20 @@ const (
 	// and must be rendered using fmt.Sprintf(GIT_CONFIGURATION_REMOTES_ENVVAR_ITEM_USER_FORMAT_STRING, name)
 	// in order to get the actual name of the environment variable that brings the value for the remote with the given 'name'.
 	GIT_CONFIGURATION_REMOTES_ENVVAR_ITEM_USER_FORMAT_STRING = GIT_CONFIGURATION_REMOTES_ENVVAR_NAME + "_%s_USER"
+
+	// The parametrized name of the environment variable to read for the 'privateKey' attribute of a
+	// Git remote configuration.
+	// This string is a prototype that contains a '%s' parameter for the remote name
+	// and must be rendered using fmt.Sprintf(GIT_CONFIGURATION_REMOTES_ENVVAR_ITEM_PRIVATE_KEY_FORMAT_STRING, name)
+	// in order to get the actual name of the environment variable that brings the value for the remote with the given 'name'.
+	GIT_CONFIGURATION_REMOTES_ENVVAR_ITEM_PRIVATE_KEY_FORMAT_STRING = GIT_CONFIGURATION_REMOTES_ENVVAR_NAME + "_%s_PRIVATE_KEY"
+
+	// The parametrized name of the environment variable to read for the 'passphrase' attribute of a
+	// Git remote configuration.
+	// This string is a prototype that contains a '%s' parameter for the remote name
+	// and must be rendered using fmt.Sprintf(GIT_CONFIGURATION_REMOTES_ENVVAR_ITEM_PASSPHRASE_FORMAT_STRING, name)
+	// in order to get the actual name of the environment variable that brings the value for the remote with the given 'name'.
+	GIT_CONFIGURATION_REMOTES_ENVVAR_ITEM_PASSPHRASE_FORMAT_STRING = GIT_CONFIGURATION_REMOTES_ENVVAR_NAME + "_%s_PASSPHRASE"
 
 	// The name of the environment variable to read for this value.
 	INITIAL_VERSION_ENVVAR_NAME = ENVVAR_NAME_GLOBAL_PREFIX + "INITIAL_VERSION"
@@ -852,13 +873,27 @@ func (ecl *EnvironmentConfigurationLayer) GetGit() (*ent.GitConfiguration, error
 		remotes := make(map[string]*ent.GitRemoteConfiguration)
 
 		itemNames, err := ecl.scanItemNamesInEnvironmentVariables("git", GIT_CONFIGURATION_REMOTES_ENVVAR_ITEM_NAME_REGEX, nil)
+		if err != nil {
+			return nil, err
+		}
 		// now we have the set of all item names configured through environment variables and we can
 		// query specific environment variables
 		for _, itemName := range itemNames {
+			var authenticationMethod *ent.AuthenticationMethod = nil
+			authenticationMethodString := ecl.getEnvVar(fmt.Sprintf(GIT_CONFIGURATION_REMOTES_ENVVAR_ITEM_AUTHENTICATION_METHOD_FORMAT_STRING, itemName))
+			if authenticationMethodString != nil {
+				am, err := ent.ValueOfAuthenticationMethod(*authenticationMethodString)
+				if err != nil {
+					return nil, &errs.IllegalPropertyError{Message: fmt.Sprintf("The argument '%s' has an illegal value '%s'", fmt.Sprintf(GIT_CONFIGURATION_REMOTES_ENVVAR_ITEM_AUTHENTICATION_METHOD_FORMAT_STRING, itemName), *authenticationMethodString), Cause: err}
+				}
+				authenticationMethod = &am
+			}
 			password := ecl.getEnvVar(fmt.Sprintf(GIT_CONFIGURATION_REMOTES_ENVVAR_ITEM_PASSWORD_FORMAT_STRING, itemName))
 			user := ecl.getEnvVar(fmt.Sprintf(GIT_CONFIGURATION_REMOTES_ENVVAR_ITEM_USER_FORMAT_STRING, itemName))
+			privateKey := ecl.getEnvVar(fmt.Sprintf(GIT_CONFIGURATION_REMOTES_ENVVAR_ITEM_PRIVATE_KEY_FORMAT_STRING, itemName))
+			passphrase := ecl.getEnvVar(fmt.Sprintf(GIT_CONFIGURATION_REMOTES_ENVVAR_ITEM_PASSPHRASE_FORMAT_STRING, itemName))
 
-			remotes[itemName] = ent.NewGitRemoteConfigurationWith(user, password)
+			remotes[itemName] = ent.NewGitRemoteConfigurationWith(authenticationMethod, user, password, privateKey, passphrase)
 		}
 
 		ecl.git, err = ent.NewGitConfigurationWith(&remotes)

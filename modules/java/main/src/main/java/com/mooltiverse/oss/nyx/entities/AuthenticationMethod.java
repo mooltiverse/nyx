@@ -1,8 +1,3 @@
-//go:build integration
-// +build integration
-
-// Only run these tests as part of the integration test suite, when the 'integration' build flag is passed (i.e. running go test --tags=integration)
-
 /*
  * Copyright 2020 Mooltiverse
  *
@@ -18,5 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.mooltiverse.oss.nyx.entities;
 
-package integration_test
+/**
+ * This class maps allowed values for autentication methods.
+ */
+public enum AuthenticationMethod {
+    /**
+     * Public key authentication (SSH).
+     */
+    PUBLIC_KEY(),
+
+    /**
+     * User name and password.
+     */
+    USER_PASSWORD();
+}

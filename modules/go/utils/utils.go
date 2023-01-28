@@ -15,7 +15,7 @@
  */
 
 /*
-This package provides simple utils used as code and time savers within the project.
+This package provides simple utils used as code and time savers within the Nyx project.
 */
 package utils
 

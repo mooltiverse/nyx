@@ -259,6 +259,30 @@ func TestTemplatesRenderFileExists(t *testing.T) {
 	assert.Equal(t, "true", output)
 }
 
+func TestTemplatesRenderCapture(t *testing.T) {
+	output, _ := Render("{{#capture expression=\"(?<type>[a-zA-Z0-9_]+)(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))\" group=\"type\"}}mytype(myscope): mytitle{{/capture}}", nil)
+	assert.Equal(t, "mytype", output)
+}
+func TestTemplatesRenderCutLeft(t *testing.T) {
+	output, _ := Render("{{#cutLeft length=\"3\"}}1234567890{{/cutLeft}}", nil)
+	assert.Equal(t, "890", output)
+}
+
+func TestTemplatesRenderCutRight(t *testing.T) {
+	output, _ := Render("{{#cutRight length=\"3\"}}1234567890{{/cutRight}}", nil)
+	assert.Equal(t, "123", output)
+}
+
+func TestTemplatesRenderReplace(t *testing.T) {
+	output, _ := Render("{{#replace from=\"0\" to=\"X\"}}01234567890{{/replace}}", nil)
+	assert.Equal(t, "X123456789X", output)
+}
+
+func TestTemplatesRenderTimeFormat(t *testing.T) {
+	output, _ := Render("{{#timeFormat format=\"20060102\"}}1577880000000{{/timeFormat}}", nil)
+	assert.Equal(t, "20200101", output)
+}
+
 /*
 Render with nil scope
 */
@@ -294,4 +318,13 @@ func TestTemplatesRenderWithMock(t *testing.T) {
 	output, err := Render(TEMPLATE_WITH_MOCK_SCOPE, testScope1)
 	assert.NoError(t, err)
 	assert.Equal(t, TEMPLATE_WITH_MOCK_SCOPE_OUTPUT, output)
+}
+
+/*
+Render with nested functions
+*/
+func TestTemplatesRenderWithNestedFunctions(t *testing.T) {
+	output, err := Render("{{#upper}}{{#cutRight length=\"20\"}}7b9da5286d4724dd7385bb80639a08841fa26606{{/cutRight}}{{/upper}}", nil)
+	assert.NoError(t, err)
+	assert.Equal(t, "7B9DA5286D4724DD7385", output)
 }

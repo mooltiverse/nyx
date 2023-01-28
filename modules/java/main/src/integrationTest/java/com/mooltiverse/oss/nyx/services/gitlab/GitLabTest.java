@@ -110,6 +110,7 @@ public class GitLabTest {
             assertEquals(randomID, gitLabRepository.getName());
             assertEquals(randomID, gitLabRepository.getFullName());
             assertEquals("https://gitlab.com/"+user.getUserName()+"/"+randomID+".git", gitLabRepository.getHTTPURL());
+            assertEquals("git@gitlab.com:"+user.getUserName()+"/"+randomID+".git", gitLabRepository.getSSHURL());
 
             // if we delete too quickly we often get a 404 from the server so let's wait a short while
             Thread.sleep(4000);
@@ -181,7 +182,7 @@ public class GitLabTest {
             assertEquals("1.0.0-alpha.1", release.getTag());
             assertEquals(3, release.getAssets().size());
             for (Attachment asset: release.getAssets()) {
-                assertTrue(asset.getFileName().equals("asset1") || asset.getFileName().equals("asset2") || asset.getFileName().equals("remote1"));
+                assertTrue(asset.getFileName().equals("Text asset") || asset.getFileName().equals("Binary asset") || asset.getFileName().equals("Remote link asset"));
                 //assertTrue(asset.getDescription().equals("Text asset") || asset.getDescription().equals("Binary asset") || asset.getDescription().equals("Remote link asset")); // the description is not available via this API
                 //assertTrue(asset.getType().equals("text/plain") || asset.getType().equals("application/octet-stream")); // the content type is not available via this API
                 //assertTrue(asset.getPath().startsWith("https://api.github.com/repos/")); // as of now these URLS are like https://storage.googleapis.com...

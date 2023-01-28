@@ -42,6 +42,11 @@ type GitHostedRepository interface {
 	GetHTTPURL() string
 
 	/*
+		Returns the repository SSH URL.
+	*/
+	GetSSHURL() string
+
+	/*
 		Returns the repository ID.
 	*/
 	GetID() string

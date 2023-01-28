@@ -14,9 +14,6 @@
  * limitations under the License.
  */
 
-/*
-This package provides functional tests.
-*/
 package functional_test
 
 import (
@@ -180,12 +177,12 @@ func (ts *TestSuite) Test(t *testing.T, context ExecutionContext) error {
 		case ent.GITHUB:
 			// the 'gitHubTestUserToken' environment variable is set by the build script
 			assert.NotEmpty(t, os.Getenv("gitHubTestUserToken"), "A GitHub authentication token must be passed to this test as an environment variable but it was not set")
-			s := ts.Scenario.ApplyOnCloneFromWithCredentials((*gitHostedRepository).GetHTTPURL(), utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(""))
+			s := ts.Scenario.ApplyOnCloneFromWithUserNameAndPassword((*gitHostedRepository).GetHTTPURL(), utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(""))
 			script = &s
 		case ent.GITLAB:
 			// the 'gitLabTestUserToken' environment variable is set by the build script
 			assert.NotEmpty(t, os.Getenv("gitLabTestUserToken"), "A GitLab authentication token must be passed to this test as an environment variable but it was not set")
-			s := ts.Scenario.ApplyOnCloneFromWithCredentials((*gitHostedRepository).GetHTTPURL(), utl.PointerToString("PRIVATE-TOKEN"), utl.PointerToString(os.Getenv("gitLabTestUserToken")))
+			s := ts.Scenario.ApplyOnCloneFromWithUserNameAndPassword((*gitHostedRepository).GetHTTPURL(), utl.PointerToString("PRIVATE-TOKEN"), utl.PointerToString(os.Getenv("gitLabTestUserToken")))
 			script = &s
 		default:
 			panic("unknown provider")

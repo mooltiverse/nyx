@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+/*
+This is the GitLab package for Nyx, providing services to work with the GitLab service.
+*/
 package gitlab
 
 import (
@@ -667,7 +670,7 @@ func (s GitLab) publishReleaseAssets(owner *string, repository *string, release 
 	for _, asset := range result {
 		log.Debugf("updating release '%s' with asset '%s' (description: '%s', type: '%s', path: '%s')", release.GetTag(), *asset.GetFileName(), *asset.GetDescription(), *asset.GetType(), *asset.GetPath())
 
-		_, _, err := s.client.ReleaseLinks.CreateReleaseLink(requestOwner+"/"+requestRepository, release.GetTag(), &gl.CreateReleaseLinkOptions{Name: /*asset.GetName()*/ asset.GetFileName(), URL: asset.GetPath()})
+		_, _, err := s.client.ReleaseLinks.CreateReleaseLink(requestOwner+"/"+requestRepository, release.GetTag(), &gl.CreateReleaseLinkOptions{Name: /*asset.GetName()*/ asset.GetDescription(), URL: asset.GetPath()})
 		if err != nil {
 			log.Debugf("an error occurred while updating GitLab asset '%s': %v", *asset.GetFileName(), err)
 			return nil, errs.TransportError{Message: fmt.Sprintf("could not update GitLab asset '%s'", *asset.GetFileName()), Cause: err}

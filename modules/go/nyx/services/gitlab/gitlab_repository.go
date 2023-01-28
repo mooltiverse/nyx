@@ -38,6 +38,9 @@ type GitLabRepository struct {
 	// The repository HTTP URL.
 	httpURL string
 
+	// The repository SSH URL.
+	sshURL string
+
 	// The repository ID.
 	id string
 
@@ -58,6 +61,7 @@ func newGitLabRepository(repository gl.Project) *GitLabRepository {
 	res.description = repository.Description
 	res.fullName = repository.Name
 	res.httpURL = repository.HTTPURLToRepo
+	res.sshURL = repository.SSHURLToRepo
 	res.id = strconv.Itoa(repository.ID)
 	res.name = repository.Path
 	return res
@@ -89,6 +93,13 @@ Returns the repository HTTP URL.
 */
 func (r *GitLabRepository) GetHTTPURL() string {
 	return r.httpURL
+}
+
+/*
+Returns the repository SSH URL.
+*/
+func (r *GitLabRepository) GetSSHURL() string {
+	return r.sshURL
 }
 
 /*

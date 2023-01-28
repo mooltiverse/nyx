@@ -1,8 +1,3 @@
-//go:build integration
-// +build integration
-
-// Only run these tests as part of the integration test suite, when the 'integration' build flag is passed (i.e. running go test --tags=integration)
-
 /*
  * Copyright 2020 Mooltiverse
  *
@@ -19,4 +14,7 @@
  * limitations under the License.
  */
 
-package integration_test
+/*
+This is the Git entities package for Nyx, providing objects modelling all the Git entities used throughout the project.
+*/
+package git

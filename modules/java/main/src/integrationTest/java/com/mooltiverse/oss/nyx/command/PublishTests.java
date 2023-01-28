@@ -29,6 +29,7 @@ import org.junit.jupiter.api.Test;
 import com.mooltiverse.oss.nyx.Nyx;
 import com.mooltiverse.oss.nyx.configuration.SimpleConfigurationLayer;
 import com.mooltiverse.oss.nyx.entities.Attachment;
+import com.mooltiverse.oss.nyx.entities.AuthenticationMethod;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
 import com.mooltiverse.oss.nyx.entities.GitRemoteConfiguration;
@@ -103,7 +104,7 @@ public class PublishTests {
             ));
             // set up the Git remote credentials
             configurationLayerMock.getGit().setRemotes(Map.<String,GitRemoteConfiguration>of(
-                "origin", new GitRemoteConfiguration(System.getProperty("gitHubTestUserToken"), ""))
+                "origin", new GitRemoteConfiguration(AuthenticationMethod.USER_PASSWORD, System.getProperty("gitHubTestUserToken"), "", null, null))
             );
             // add a custom release type that always enables committing, tagging and pushing
             // and all the publishing service enabled
@@ -224,7 +225,7 @@ public class PublishTests {
             ));
             // set up the Git remote credentials
             configurationLayerMock.getGit().setRemotes(Map.<String,GitRemoteConfiguration>of(
-                "origin", new GitRemoteConfiguration(System.getProperty("gitHubTestUserToken"), ""))
+                "origin", new GitRemoteConfiguration(AuthenticationMethod.USER_PASSWORD, System.getProperty("gitHubTestUserToken"), "", null, null))
             );
             // add a custom release type that always enables committing, tagging and pushing
             // and all the publishing service enabled
@@ -348,7 +349,7 @@ public class PublishTests {
             ));
             // set up the Git remote credentials
             configurationLayerMock.getGit().setRemotes(Map.<String,GitRemoteConfiguration>of(
-                "origin", new GitRemoteConfiguration("PRIVATE-TOKEN", System.getProperty("gitLabTestUserToken")))
+                "origin", new GitRemoteConfiguration(AuthenticationMethod.USER_PASSWORD, "PRIVATE-TOKEN", System.getProperty("gitLabTestUserToken"), null, null))
             );
             // add a custom release type that always enables committing, tagging and pushing
             // and all the publishing service enabled
@@ -389,7 +390,7 @@ public class PublishTests {
             // the release assets must contain the two existing files and the remote URL, but not the non existing file
             assertEquals(3, gitLabRelease.getAssets().size());
             for (Attachment asset: gitLabRelease.getAssets()) {
-                assertTrue(asset.getFileName().equals("asset1.txt") || asset.getFileName().equals("asset2.bin") || asset.getFileName().equals("remote1"));
+                assertTrue(asset.getFileName().equals("Text asset") || asset.getFileName().equals("Binary asset") || asset.getFileName().equals("Remote link asset"));
                 //assertTrue(asset.getDescription().equals("Text asset") || asset.getDescription().equals("Binary asset") || asset.getDescription().equals("Remote link asset")); // the description is not available via this API
                 //assertTrue(asset.getType().equals("text/plain") || asset.getType().equals("application/octet-stream")); // the content type is not available via this API
                 //assertTrue(asset.getPath().startsWith("https://api.github.com/repos/")); // as of now these URLS are like https://storage.googleapis.com...
@@ -409,7 +410,7 @@ public class PublishTests {
             // the release assets must contain the two existing files and the remote URL, but not the non existing file
             assertEquals(3, gitLabRelease.getAssets().size());
             for (Attachment asset: gitLabRelease.getAssets()) {
-                assertTrue(asset.getFileName().equals("asset1.txt") || asset.getFileName().equals("asset2.bin") || asset.getFileName().equals("remote1"));
+                assertTrue(asset.getFileName().equals("Text asset") || asset.getFileName().equals("Binary asset") || asset.getFileName().equals("Remote link asset"));
                 //assertTrue(asset.getDescription().equals("Text asset") || asset.getDescription().equals("Binary asset") || asset.getDescription().equals("Remote link asset")); // the description is not available via this API
                 //assertTrue(asset.getType().equals("text/plain") || asset.getType().equals("application/octet-stream")); // the content type is not available via this API
                 //assertTrue(asset.getPath().startsWith("https://api.github.com/repos/")); // as of now these URLS are like https://storage.googleapis.com...
@@ -471,7 +472,7 @@ public class PublishTests {
             ));
             // set up the Git remote credentials
             configurationLayerMock.getGit().setRemotes(Map.<String,GitRemoteConfiguration>of(
-                "origin", new GitRemoteConfiguration("PRIVATE-TOKEN", System.getProperty("gitLabTestUserToken")))
+                "origin", new GitRemoteConfiguration(AuthenticationMethod.USER_PASSWORD, "PRIVATE-TOKEN", System.getProperty("gitLabTestUserToken"), null, null))
             );
             // add a custom release type that always enables committing, tagging and pushing
             // and all the publishing service enabled
@@ -513,7 +514,7 @@ public class PublishTests {
             // the release assets must contain only the 'asset1' as it was filtered by the release type
             assertEquals(1, gitLabRelease.getAssets().size());
             for (Attachment asset: gitLabRelease.getAssets()) {
-                assertEquals("asset1.txt", asset.getFileName());
+                assertEquals("Text asset", asset.getFileName());
                 //assertEquals("Text asset", asset.getDescription()); // the description is not available via this API
                 //assertEquals("text/plain", asset.getType()); // the content type is not available via this API
                 //assertTrue(asset.getPath().startsWith("https://api.github.com/repos/")); // as of now these URLS are like https://storage.googleapis.com...
@@ -533,7 +534,7 @@ public class PublishTests {
             // the release assets must contain only the 'asset1' as it was filtered by the release type
             assertEquals(1, gitLabRelease.getAssets().size());
             for (Attachment asset: gitLabRelease.getAssets()) {
-                assertEquals("asset1.txt", asset.getFileName());
+                assertEquals("Text asset", asset.getFileName());
                 //assertEquals("Text asset", asset.getDescription()); // the description is not available via this API
                 //assertEquals("text/plain", asset.getType()); // the content type is not available via this API
                 //assertTrue(asset.getPath().startsWith("https://api.github.com/repos/")); // as of now these URLS are like https://storage.googleapis.com...

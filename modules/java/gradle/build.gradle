@@ -37,7 +37,15 @@ functionalTest {
   // Suggestion is to set the $GRADLE_USER_HOME environment variable and create a gradle.properties therein, with these
   // properties defined
   systemProperty 'gitHubTestUserToken', findProperty("gitHubTestUserToken")
+  systemProperty 'gitHubTestUserPublicKey', findProperty("gitHubTestUserPublicKey")
+  systemProperty 'gitHubTestUserPrivateKeyPassphrase', findProperty("gitHubTestUserPrivateKeyPassphrase")
+  systemProperty 'gitHubTestUserPrivateKeyWithPassphrase', findProperty("gitHubTestUserPrivateKeyWithPassphrase")
+  systemProperty 'gitHubTestUserPrivateKeyWithoutPassphrase', findProperty("gitHubTestUserPrivateKeyWithoutPassphrase")
   systemProperty 'gitLabTestUserToken', findProperty("gitLabTestUserToken")
+  systemProperty 'gitLabTestUserPublicKey', findProperty("gitLabTestUserPublicKey")
+  systemProperty 'gitLabTestUserPrivateKeyPassphrase', findProperty("gitLabTestUserPrivateKeyPassphrase")
+  systemProperty 'gitLabTestUserPrivateKeyWithPassphrase', findProperty("gitLabTestUserPrivateKeyWithPassphrase")
+  systemProperty 'gitLabTestUserPrivateKeyWithoutPassphrase', findProperty("gitLabTestUserPrivateKeyWithoutPassphrase")
 
   // Pass the 'quickTests' property (if declared by user, i.e. running ''./gradlew -PquickTests=true') to reduce the number of tests
   systemProperty 'quickTests', findProperty("quickTests")

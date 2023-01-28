@@ -19,7 +19,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.text.SimpleDateFormat;
+import java.time.ZoneOffset;
+import java.util.Date;
+import java.util.Map;
 import java.util.Objects;
+import java.util.TimeZone;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -41,15 +46,6 @@ public class FunctionsTests {
             assertEquals("lower", new Functions.Lower().apply("lower"));
             assertEquals("upper", new Functions.Lower().apply("upper"));
             assertEquals("mixed", new Functions.Lower().apply("mIxEd"));
-
-            // also run the same tests by selecting the function by name, as the template engine does
-            assertEquals("", Functions.FUNCTIONS.get("lower").apply(null));
-            assertEquals("", Functions.FUNCTIONS.get("lower").apply(""));
-            assertEquals("0", Functions.FUNCTIONS.get("lower").apply("0"));
-            assertEquals("01234", Functions.FUNCTIONS.get("lower").apply("01234"));
-            assertEquals("lower", Functions.FUNCTIONS.get("lower").apply("lower"));
-            assertEquals("upper", Functions.FUNCTIONS.get("lower").apply("upper"));
-            assertEquals("mixed", Functions.FUNCTIONS.get("lower").apply("mIxEd"));
         }
     }
 
@@ -67,15 +63,6 @@ public class FunctionsTests {
             assertEquals("LOWER", new Functions.Upper().apply("lower"));
             assertEquals("UPPER", new Functions.Upper().apply("upper"));
             assertEquals("MIXED", new Functions.Upper().apply("mIxEd"));
-
-            // also run the same tests by selecting the function by name, as the template engine does
-            assertEquals("", Functions.FUNCTIONS.get("upper").apply(null));
-            assertEquals("", Functions.FUNCTIONS.get("upper").apply(""));
-            assertEquals("0", Functions.FUNCTIONS.get("upper").apply("0"));
-            assertEquals("01234", Functions.FUNCTIONS.get("upper").apply("01234"));
-            assertEquals("LOWER", Functions.FUNCTIONS.get("upper").apply("lower"));
-            assertEquals("UPPER", Functions.FUNCTIONS.get("upper").apply("upper"));
-            assertEquals("MIXED", Functions.FUNCTIONS.get("upper").apply("mIxEd"));
         }
     }
 
@@ -90,12 +77,6 @@ public class FunctionsTests {
             assertEquals("", new Functions.Trim().apply(""));
             assertEquals("0", new Functions.Trim().apply("0"));
             assertEquals("01  234", new Functions.Trim().apply("   01  234   "));
-
-            // also run the same tests by selecting the function by name, as the template engine does
-            assertEquals("", Functions.FUNCTIONS.get("trim").apply(null));
-            assertEquals("", Functions.FUNCTIONS.get("trim").apply(""));
-            assertEquals("0", Functions.FUNCTIONS.get("trim").apply("0"));
-            assertEquals("01  234", Functions.FUNCTIONS.get("trim").apply("   01  234   "));
         }
     }
 
@@ -112,14 +93,6 @@ public class FunctionsTests {
             assertEquals("", new Functions.First().apply(" aB1 "));
             assertEquals("", new Functions.First().apply("!£$%&b2/()=?'^ì*+§°#@.;c3"));
             assertEquals("a1", new Functions.First().apply("a1!£$%&b2/()=?'^ì*+§°#@.;c3"));
-
-            // also run the same tests by selecting the function by name, as the template engine does
-            assertEquals("", Functions.FUNCTIONS.get("first").apply(null));
-            assertEquals("", Functions.FUNCTIONS.get("first").apply(""));
-            assertEquals("aB1", Functions.FUNCTIONS.get("first").apply("aB1"));
-            assertEquals("", Functions.FUNCTIONS.get("first").apply(" aB1 "));
-            assertEquals("", Functions.FUNCTIONS.get("first").apply("!£$%&b2/()=?'^ì*+§°#@.;c3"));
-            assertEquals("a1", Functions.FUNCTIONS.get("first").apply("a1!£$%&b2/()=?'^ì*+§°#@.;c3"));
         }
     }
 
@@ -136,14 +109,6 @@ public class FunctionsTests {
             assertEquals("", new Functions.FirstLower().apply(" aB1 "));
             assertEquals("", new Functions.FirstLower().apply("!£$%&b2/()=?'^ì*+§°#@.;c3"));
             assertEquals("ab1", new Functions.FirstLower().apply("aB1!£$%&b2/()=?'^ì*+§°#@.;c3"));
-
-            // also run the same tests by selecting the function by name, as the template engine does
-            assertEquals("", Functions.FUNCTIONS.get("firstLower").apply(null));
-            assertEquals("", Functions.FUNCTIONS.get("firstLower").apply(""));
-            assertEquals("ab1", Functions.FUNCTIONS.get("firstLower").apply("aB1"));
-            assertEquals("", Functions.FUNCTIONS.get("firstLower").apply(" aB1 "));
-            assertEquals("", Functions.FUNCTIONS.get("firstLower").apply("!£$%&b2/()=?'^ì*+§°#@.;c3"));
-            assertEquals("ab1", Functions.FUNCTIONS.get("firstLower").apply("aB1!£$%&b2/()=?'^ì*+§°#@.;c3"));
         }
     }
 
@@ -160,14 +125,6 @@ public class FunctionsTests {
             assertEquals("", new Functions.FirstUpper().apply(" aB1 "));
             assertEquals("", new Functions.FirstUpper().apply("!£$%&b2/()=?'^ì*+§°#@.;c3"));
             assertEquals("AB1", new Functions.FirstUpper().apply("aB1!£$%&b2/()=?'^ì*+§°#@.;c3"));
-
-            // also run the same tests by selecting the function by name, as the template engine does
-            assertEquals("", Functions.FUNCTIONS.get("firstUpper").apply(null));
-            assertEquals("", Functions.FUNCTIONS.get("firstUpper").apply(""));
-            assertEquals("AB1", Functions.FUNCTIONS.get("firstUpper").apply("aB1"));
-            assertEquals("", Functions.FUNCTIONS.get("firstUpper").apply(" aB1 "));
-            assertEquals("", Functions.FUNCTIONS.get("firstUpper").apply("!£$%&b2/()=?'^ì*+§°#@.;c3"));
-            assertEquals("AB1", Functions.FUNCTIONS.get("firstUpper").apply("aB1!£$%&b2/()=?'^ì*+§°#@.;c3"));
         }
     }
 
@@ -184,14 +141,6 @@ public class FunctionsTests {
             assertEquals("", new Functions.Last().apply(" aB1 "));
             assertEquals("", new Functions.Last().apply("a1!£$%&b2/()=?'^ì*+§°#@.;"));
             assertEquals("c3", new Functions.Last().apply("a1!£$%&b2/()=?'^ì*+§°#@.;c3"));
-
-            // also run the same tests by selecting the function by name, as the template engine does
-            assertEquals("", Functions.FUNCTIONS.get("last").apply(null));
-            assertEquals("", Functions.FUNCTIONS.get("last").apply(""));
-            assertEquals("aB1", Functions.FUNCTIONS.get("last").apply("aB1"));
-            assertEquals("", Functions.FUNCTIONS.get("last").apply(" aB1 "));
-            assertEquals("", Functions.FUNCTIONS.get("last").apply("a1!£$%&b2/()=?'^ì*+§°#@.;"));
-            assertEquals("c3", Functions.FUNCTIONS.get("last").apply("a1!£$%&b2/()=?'^ì*+§°#@.;c3"));
         }
     }
 
@@ -208,14 +157,6 @@ public class FunctionsTests {
             assertEquals("", new Functions.LastLower().apply(" aB1 "));
             assertEquals("", new Functions.LastLower().apply("a1!£$%&b2/()=?'^ì*+§°#@.;"));
             assertEquals("cd3", new Functions.LastLower().apply("a1!£$%&b2/()=?'^ì*+§°#@.;cD3"));
-
-            // also run the same tests by selecting the function by name, as the template engine does
-            assertEquals("", Functions.FUNCTIONS.get("lastLower").apply(null));
-            assertEquals("", Functions.FUNCTIONS.get("lastLower").apply(""));
-            assertEquals("ab1", Functions.FUNCTIONS.get("lastLower").apply("aB1"));
-            assertEquals("", Functions.FUNCTIONS.get("lastLower").apply(" aB1 "));
-            assertEquals("", Functions.FUNCTIONS.get("lastLower").apply("a1!£$%&b2/()=?'^ì*+§°#@.;"));
-            assertEquals("cd3", Functions.FUNCTIONS.get("lastLower").apply("a1!£$%&b2/()=?'^ì*+§°#@.;cD3"));
         }
     }
 
@@ -232,14 +173,6 @@ public class FunctionsTests {
             assertEquals("", new Functions.LastUpper().apply(" aB1 "));
             assertEquals("", new Functions.LastUpper().apply("a1!£$%&b2/()=?'^ì*+§°#@.;"));
             assertEquals("CD3", new Functions.LastUpper().apply("a1!£$%&b2/()=?'^ì*+§°#@.;cD3"));
-
-            // also run the same tests by selecting the function by name, as the template engine does
-            assertEquals("", Functions.FUNCTIONS.get("lastUpper").apply(null));
-            assertEquals("", Functions.FUNCTIONS.get("lastUpper").apply(""));
-            assertEquals("AB1", Functions.FUNCTIONS.get("lastUpper").apply("aB1"));
-            assertEquals("", Functions.FUNCTIONS.get("lastUpper").apply(" aB1 "));
-            assertEquals("", Functions.FUNCTIONS.get("lastUpper").apply("a1!£$%&b2/()=?'^ì*+§°#@.;"));
-            assertEquals("CD3", Functions.FUNCTIONS.get("lastUpper").apply("a1!£$%&b2/()=?'^ì*+§°#@.;cD3"));
         }
     }
 
@@ -255,13 +188,6 @@ public class FunctionsTests {
             assertEquals("aB1", new Functions.Sanitize().apply("aB1"));
             assertEquals("aB1", new Functions.Sanitize().apply(" aB1 "));
             assertEquals("abc123", new Functions.Sanitize().apply("\\!£$%&abc123/()=?'^ì*+§°#@.;"));
-
-            // also run the same tests by selecting the function by name, as the template engine does
-            assertEquals("", Functions.FUNCTIONS.get("sanitize").apply(null));
-            assertEquals("", Functions.FUNCTIONS.get("sanitize").apply(""));
-            assertEquals("aB1", Functions.FUNCTIONS.get("sanitize").apply("aB1"));
-            assertEquals("aB1", Functions.FUNCTIONS.get("sanitize").apply(" aB1 "));
-            assertEquals("abc123", Functions.FUNCTIONS.get("sanitize").apply("\\!£$%&abc123/()=?'^ì*+§°#@.;"));
         }
     }
 
@@ -277,13 +203,6 @@ public class FunctionsTests {
             assertEquals("ab1", new Functions.SanitizeLower().apply("aB1"));
             assertEquals("ab1", new Functions.SanitizeLower().apply(" aB1 "));
             assertEquals("abc123", new Functions.SanitizeLower().apply("\\!£$%&aBc123/()=?'^ì*+§°#@.;"));
-
-            // also run the same tests by selecting the function by name, as the template engine does
-            assertEquals("", Functions.FUNCTIONS.get("sanitizeLower").apply(null));
-            assertEquals("", Functions.FUNCTIONS.get("sanitizeLower").apply(""));
-            assertEquals("ab1", Functions.FUNCTIONS.get("sanitizeLower").apply("aB1"));
-            assertEquals("ab1", Functions.FUNCTIONS.get("sanitizeLower").apply(" aB1 "));
-            assertEquals("abc123", Functions.FUNCTIONS.get("sanitizeLower").apply("\\!£$%&aBc123/()=?'^ì*+§°#@.;"));
         }
     }
 
@@ -299,13 +218,6 @@ public class FunctionsTests {
             assertEquals("AB1", new Functions.SanitizeUpper().apply("aB1"));
             assertEquals("AB1", new Functions.SanitizeUpper().apply(" aB1 "));
             assertEquals("ABC123", new Functions.SanitizeUpper().apply("\\!£$%&aBc123/()=?'^ì*+§°#@.;"));
-
-            // also run the same tests by selecting the function by name, as the template engine does
-            assertEquals("", Functions.FUNCTIONS.get("sanitizeUpper").apply(null));
-            assertEquals("", Functions.FUNCTIONS.get("sanitizeUpper").apply(""));
-            assertEquals("AB1", Functions.FUNCTIONS.get("sanitizeUpper").apply("aB1"));
-            assertEquals("AB1", Functions.FUNCTIONS.get("sanitizeUpper").apply(" aB1 "));
-            assertEquals("ABC123", Functions.FUNCTIONS.get("sanitizeUpper").apply("\\!£$%&aBc123/()=?'^ì*+§°#@.;"));
         }
     }
 
@@ -322,14 +234,6 @@ public class FunctionsTests {
             assertEquals("01234", new Functions.Short5().apply("01234"));
             assertEquals("01234", new Functions.Short5().apply("012345"));
             assertEquals("01234", new Functions.Short5().apply("0123456789"));
-
-            // also run the same tests by selecting the function by name, as the template engine does
-            assertEquals("", Functions.FUNCTIONS.get("short5").apply(null));
-            assertEquals("", Functions.FUNCTIONS.get("short5").apply(""));
-            assertEquals("0", Functions.FUNCTIONS.get("short5").apply("0"));
-            assertEquals("01234", Functions.FUNCTIONS.get("short5").apply("01234"));
-            assertEquals("01234", Functions.FUNCTIONS.get("short5").apply("012345"));
-            assertEquals("01234", Functions.FUNCTIONS.get("short5").apply("0123456789"));
         }
     }
 
@@ -348,16 +252,6 @@ public class FunctionsTests {
             assertEquals("012345", new Functions.Short6().apply("0123456"));
             assertEquals("012345", new Functions.Short6().apply("01234567"));
             assertEquals("012345", new Functions.Short6().apply("0123456789"));
-
-            // also run the same tests by selecting the function by name, as the template engine does
-            assertEquals("", Functions.FUNCTIONS.get("short6").apply(null));
-            assertEquals("", Functions.FUNCTIONS.get("short6").apply(""));
-            assertEquals("0", Functions.FUNCTIONS.get("short6").apply("0"));
-            assertEquals("01234", Functions.FUNCTIONS.get("short6").apply("01234"));
-            assertEquals("012345", Functions.FUNCTIONS.get("short6").apply("012345"));
-            assertEquals("012345", Functions.FUNCTIONS.get("short6").apply("0123456"));
-            assertEquals("012345", Functions.FUNCTIONS.get("short6").apply("01234567"));
-            assertEquals("012345", Functions.FUNCTIONS.get("short6").apply("0123456789"));
         }
     }
 
@@ -376,16 +270,6 @@ public class FunctionsTests {
             assertEquals("0123456", new Functions.Short7().apply("0123456"));
             assertEquals("0123456", new Functions.Short7().apply("01234567"));
             assertEquals("0123456", new Functions.Short7().apply("0123456789"));
-
-            // also run the same tests by selecting the function by name, as the template engine does
-            assertEquals("", Functions.FUNCTIONS.get("short7").apply(null));
-            assertEquals("", Functions.FUNCTIONS.get("short7").apply(""));
-            assertEquals("0", Functions.FUNCTIONS.get("short7").apply("0"));
-            assertEquals("01234", Functions.FUNCTIONS.get("short7").apply("01234"));
-            assertEquals("012345", Functions.FUNCTIONS.get("short7").apply("012345"));
-            assertEquals("0123456", Functions.FUNCTIONS.get("short7").apply("0123456"));
-            assertEquals("0123456", Functions.FUNCTIONS.get("short7").apply("01234567"));
-            assertEquals("0123456", Functions.FUNCTIONS.get("short7").apply("0123456789"));
         }
     }
 
@@ -399,11 +283,6 @@ public class FunctionsTests {
             assertEquals("", new Functions.TimestampISO8601().apply(null));
             assertEquals("1970-01-01T00:00:00", new Functions.TimestampISO8601().apply("0"));
             assertEquals("2020-01-01T12:00:00", new Functions.TimestampISO8601().apply("1577880000000"));
-
-            // also run the same tests by selecting the function by name, as the template engine does
-            assertEquals("", Functions.FUNCTIONS.get("timestampISO8601").apply(null));
-            assertEquals("1970-01-01T00:00:00", Functions.FUNCTIONS.get("timestampISO8601").apply("0"));
-            assertEquals("2020-01-01T12:00:00", Functions.FUNCTIONS.get("timestampISO8601").apply("1577880000000"));
         }
     }
 
@@ -417,11 +296,6 @@ public class FunctionsTests {
             assertEquals("", new Functions.TimestampYYYYMMDDHHMMSS().apply(null));
             assertEquals("19700101000000", new Functions.TimestampYYYYMMDDHHMMSS().apply("0"));
             assertEquals("20200101120000", new Functions.TimestampYYYYMMDDHHMMSS().apply("1577880000000"));
-
-            // also run the same tests by selecting the function by name, as the template engine does
-            assertEquals("", Functions.FUNCTIONS.get("timestampYYYYMMDDHHMMSS").apply(null));
-            assertEquals("19700101000000", Functions.FUNCTIONS.get("timestampYYYYMMDDHHMMSS").apply("0"));
-            assertEquals("20200101120000", Functions.FUNCTIONS.get("timestampYYYYMMDDHHMMSS").apply("1577880000000"));
         }
     }
 
@@ -436,48 +310,10 @@ public class FunctionsTests {
             if (Objects.isNull(System.getenv("OS"))) {
                 assertEquals("", new Functions.EnvironmentVariable().apply(null));
                 assertEquals("", new Functions.EnvironmentVariable().apply("OS"));
-
-                // also run the same tests by selecting the function by name, as the template engine does
-                assertEquals("", Functions.FUNCTIONS.get("environmentVariable").apply(null));
-                assertEquals("", Functions.FUNCTIONS.get("environmentVariable").apply("OS"));
             }
             else {
                 assertEquals("", new Functions.EnvironmentVariable().apply(null));
                 assertEquals(System.getenv("OS"), new Functions.EnvironmentVariable().apply("OS"));
-
-                // also run the same tests by selecting the function by name, as the template engine does
-                assertEquals("", Functions.FUNCTIONS.get("environmentVariable").apply(null));
-                assertEquals(System.getenv("OS"), Functions.FUNCTIONS.get("environmentVariable").apply("OS"));
-            }
-        }
-    }
-
-    // TODO: remove this method as per release 2.0.0 or more
-    @Nested
-    @DisplayName("Functions.environment.variable (deprecated dotted name)")
-    @Deprecated(since="1.1.0", forRemoval=true) //The dotted name is deprecated and will be removed in future releases. Use the camel case name instead. See the user manual for more."
-    class EnvironmentVariableDeprecatedDottedNameTests {
-        @Test
-        @DisplayName("Functions.environment.variable.apply() (deprecated dotted name)")
-        @Deprecated(since="1.1.0", forRemoval=true) //The dotted name is deprecated and will be removed in future releases. Use the camel case name instead. See the user manual for more."
-        void applyDeprecatedDottedNameTest()
-            throws Exception {
-            // on CI platforms the OS variable may not be defined, causing this test to fail, so let's make it conditional
-            if (Objects.isNull(System.getenv("OS"))) {
-                assertEquals("", new Functions.Environment.Variable().apply(null));
-                assertEquals("", new Functions.Environment.Variable().apply("OS"));
-
-                // also run the same tests by selecting the function by name, as the template engine does
-                assertEquals("", Functions.FUNCTIONS.get("environment.variable").apply(null));
-                assertEquals("", Functions.FUNCTIONS.get("environment.variable").apply("OS"));
-            }
-            else {
-                assertEquals("", new Functions.Environment.Variable().apply(null));
-                assertEquals(System.getenv("OS"), new Functions.Environment.Variable().apply("OS"));
-
-                // also run the same tests by selecting the function by name, as the template engine does
-                assertEquals("", Functions.FUNCTIONS.get("environment.variable").apply(null));
-                assertEquals(System.getenv("OS"), Functions.FUNCTIONS.get("environment.variable").apply("OS"));
             }
         }
     }
@@ -492,30 +328,6 @@ public class FunctionsTests {
             // the input value is ignored by this function, it always returns the system user name
             assertEquals(System.getProperty("user.name"), new Functions.EnvironmentUser().apply(null));
             assertEquals(System.getProperty("user.name"), new Functions.EnvironmentUser().apply("any"));
-
-            // also run the same tests by selecting the function by name, as the template engine does
-            assertEquals(System.getProperty("user.name"), Functions.FUNCTIONS.get("environmentUser").apply(null));
-            assertEquals(System.getProperty("user.name"), Functions.FUNCTIONS.get("environmentUser").apply("any"));
-        }
-    }
-
-    // TODO: remove this method as per release 2.0.0 or more
-    @Nested
-    @DisplayName("Functions.environment.user (deprecated dotted name)")
-    @Deprecated(since="1.1.0", forRemoval=true) //The dotted name is deprecated and will be removed in future releases. Use the camel case name instead. See the user manual for more."
-    class EnvironmentUserDeprecatedDottedNameTests {
-        @Test
-        @DisplayName("Functions.environment.user.apply() (deprecated dotted name)")
-        @Deprecated(since="1.1.0", forRemoval=true) //The dotted name is deprecated and will be removed in future releases. Use the camel case name instead. See the user manual for more."
-        void applyDeprecatedDottedNameTest()
-            throws Exception {
-            // the input value is ignored by this function, it always returns the system user name
-            assertEquals(System.getProperty("user.name"), new Functions.Environment.User().apply(null));
-            assertEquals(System.getProperty("user.name"), new Functions.Environment.User().apply("any"));
-
-            // also run the same tests by selecting the function by name, as the template engine does
-            assertEquals(System.getProperty("user.name"), Functions.FUNCTIONS.get("environment.user").apply(null));
-            assertEquals(System.getProperty("user.name"), Functions.FUNCTIONS.get("environment.user").apply("any"));
         }
     }
 
@@ -538,41 +350,6 @@ public class FunctionsTests {
             assertEquals("", new Functions.FileContent().apply(null));
             assertEquals("", new Functions.FileContent().apply("afilethatdoesnotexists"));
             assertEquals(FILE_CONTENT, new Functions.FileContent().apply(f.getAbsolutePath()));
-
-            // also run the same tests by selecting the function by name, as the template engine does
-            assertEquals("", Functions.FUNCTIONS.get("fileContent").apply(null));
-            assertEquals("", Functions.FUNCTIONS.get("fileContent").apply("afilethatdoesnotexists"));
-            assertEquals(FILE_CONTENT, Functions.FUNCTIONS.get("fileContent").apply(f.getAbsolutePath()));
-        }
-    }
-
-    // TODO: remove this method as per release 2.0.0 or more
-    @Nested
-    @DisplayName("Functions.file.content (deprecated dotted name)")
-    @Deprecated(since="1.1.0", forRemoval=true) //The dotted name is deprecated and will be removed in future releases. Use the camel case name instead. See the user manual for more."
-    class FileContentDeprecatedDottedNameTests {
-        @Test
-        @DisplayName("Functions.file.content.apply() (deprecated dotted name)")
-        @Deprecated(since="1.1.0", forRemoval=true) //The dotted name is deprecated and will be removed in future releases. Use the camel case name instead. See the user manual for more."
-        void applyDeprecatedDottedNameTest()
-            throws Exception {
-            final String FILE_CONTENT = "file content to test";
-
-            File f = File.createTempFile("filecontenttest", "file", new File(System.getProperty("java.io.tmpdir")));
-            f.deleteOnExit();
-            FileWriter w = new FileWriter(f);
-            w.write(FILE_CONTENT);
-            w.flush();
-            w.close();
-
-            assertEquals("", new Functions.File.Content().apply(null));
-            assertEquals("", new Functions.File.Content().apply("afilethatdoesnotexists"));
-            assertEquals(FILE_CONTENT, new Functions.File.Content().apply(f.getAbsolutePath()));
-
-            // also run the same tests by selecting the function by name, as the template engine does
-            assertEquals("", Functions.FUNCTIONS.get("file.content").apply(null));
-            assertEquals("", Functions.FUNCTIONS.get("file.content").apply("afilethatdoesnotexists"));
-            assertEquals(FILE_CONTENT, Functions.FUNCTIONS.get("file.content").apply(f.getAbsolutePath()));
         }
     }
 
@@ -589,35 +366,161 @@ public class FunctionsTests {
             assertEquals("false", new Functions.FileExists().apply(null));
             assertEquals("false", new Functions.FileExists().apply("afilethatdoesnotexists"));
             assertEquals("true", new Functions.FileExists().apply(f.getAbsolutePath()));
-
-            // also run the same tests by selecting the function by name, as the template engine does
-            assertEquals("false", Functions.FUNCTIONS.get("fileExists").apply(null));
-            assertEquals("false", Functions.FUNCTIONS.get("fileExists").apply("afilethatdoesnotexists"));
-            assertEquals("true", Functions.FUNCTIONS.get("fileExists").apply(f.getAbsolutePath()));
         }
     }
 
-    // TODO: remove this method as per release 2.0.0 or more
     @Nested
-    @DisplayName("Functions.file.exists (deprecated dotted name)")
-    @Deprecated(since="1.1.0", forRemoval=true) //The dotted name is deprecated and will be removed in future releases. Use the camel case name instead. See the user manual for more."
-    class FileExistsDeprecatedDottedNameTests {
+    @DisplayName("Functions.capture")
+    class CaptureTests {
         @Test
-        @DisplayName("Functions.file.exists.apply() (deprecated dotted name)")
-        @Deprecated(since="1.1.0", forRemoval=true) //The dotted name is deprecated and will be removed in future releases. Use the camel case name instead. See the user manual for more."
-        void applyDeprecatedDottedNameTest()
+        @DisplayName("Functions.capture.apply()")
+        void applyTest()
             throws Exception {
-            File f = File.createTempFile("fileexiststest", "file", new File(System.getProperty("java.io.tmpdir")));
-            f.deleteOnExit();
+            assertEquals("", new Functions.Capture().apply(null, Map.<String,Object>of()));
+            assertEquals("", new Functions.Capture().apply("", Map.<String,Object>of()));
+            assertEquals("  ", new Functions.Capture().apply("  ", Map.<String,Object>of()));
+            assertEquals("mytype(myscope): mytitle", new Functions.Capture().apply("mytype(myscope): mytitle", Map.<String,Object>of("expression", "(?<type>[a-zA-Z0-9_]+)(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))")));
+            assertEquals("mytype", new Functions.Capture().apply("mytype(myscope): mytitle", Map.<String,Object>of("expression", "(?<type>[a-zA-Z0-9_]+)(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))", "group", "type")));
+            assertEquals("myscope", new Functions.Capture().apply("mytype(myscope): mytitle", Map.<String,Object>of("expression", "(?<type>[a-zA-Z0-9_]+)(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))", "group", "scope")));
+            assertEquals("mytitle", new Functions.Capture().apply("mytype(myscope): mytitle", Map.<String,Object>of("expression", "(?<type>[a-zA-Z0-9_]+)(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))", "group", "title")));
+            assertEquals("", new Functions.Capture().apply("mytype(myscope): mytitle", Map.<String,Object>of("expression", "(?<type>[a-zA-Z0-9_]+)(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))", "group", "unknowngroup")));
+            assertEquals("mytype(myscope): mytitle", new Functions.Capture().apply("mytype(myscope): mytitle", Map.<String,Object>of("expression", "(?<type>[a-zA-Z0-9_]+)(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))", "group", "0")));
+            assertEquals("mytype", new Functions.Capture().apply("mytype(myscope): mytitle", Map.<String,Object>of("expression", "(?<type>[a-zA-Z0-9_]+)(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))", "group", "1")));
+            assertEquals("(myscope)", new Functions.Capture().apply("mytype(myscope): mytitle", Map.<String,Object>of("expression", "(?<type>[a-zA-Z0-9_]+)(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))", "group", "2")));
+            assertEquals(" mytitle", new Functions.Capture().apply("mytype(myscope): mytitle", Map.<String,Object>of("expression", "(?<type>[a-zA-Z0-9_]+)(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))", "group", "4")));
+            assertEquals("", new Functions.Capture().apply("mytype(myscope): mytitle", Map.<String,Object>of("expression", "(?<type>[a-zA-Z0-9_]+)(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))", "group", "9")));
+        }
+    }
 
-            assertEquals("false", new Functions.File.Exists().apply(null));
-            assertEquals("false", new Functions.File.Exists().apply("afilethatdoesnotexists"));
-            assertEquals("true", new Functions.File.Exists().apply(f.getAbsolutePath()));
+    @Nested
+    @DisplayName("Functions.cutLeft")
+    class CutLeftTests {
+        @Test
+        @DisplayName("Functions.cutLeft.apply()")
+        void applyTest()
+            throws Exception {
+            assertEquals("", new Functions.CutLeft().apply(null, Map.<String,Object>of()));
+            assertEquals("", new Functions.CutLeft().apply("", Map.<String,Object>of()));
+            assertEquals("", new Functions.CutLeft().apply("", Map.<String,Object>of("length", "3")));
+            assertEquals("", new Functions.CutLeft().apply("", Map.<String,Object>of("length", "0")));
+            assertEquals("", new Functions.CutLeft().apply("", Map.<String,Object>of("length", "-3")));
+            assertEquals("", new Functions.CutLeft().apply("", Map.<String,Object>of("length", "not a number")));
+            assertEquals("0", new Functions.CutLeft().apply("0", Map.<String,Object>of()));
+            assertEquals("0", new Functions.CutLeft().apply("0", Map.<String,Object>of("length", "3")));
+            assertEquals("", new Functions.CutLeft().apply("0", Map.<String,Object>of("length", "0")));
+            assertEquals("0", new Functions.CutLeft().apply("0", Map.<String,Object>of("length", "-3")));
+            assertEquals("0", new Functions.CutLeft().apply("0", Map.<String,Object>of("length", "not a number")));
+            assertEquals("01234", new Functions.CutLeft().apply("01234", Map.<String,Object>of()));
+            assertEquals("234", new Functions.CutLeft().apply("01234", Map.<String,Object>of("length", "3")));
+            assertEquals("", new Functions.CutLeft().apply("01234", Map.<String,Object>of("length", "0")));
+            assertEquals("01234", new Functions.CutLeft().apply("01234", Map.<String,Object>of("length", "-3")));
+            assertEquals("01234", new Functions.CutLeft().apply("01234", Map.<String,Object>of("length", "not a number")));
+            assertEquals("012345", new Functions.CutLeft().apply("012345", Map.<String,Object>of()));
+            assertEquals("345", new Functions.CutLeft().apply("012345", Map.<String,Object>of("length", "3")));
+            assertEquals("", new Functions.CutLeft().apply("012345", Map.<String,Object>of("length", "0")));
+            assertEquals("012345", new Functions.CutLeft().apply("012345", Map.<String,Object>of("length", "-3")));
+            assertEquals("012345", new Functions.CutLeft().apply("012345", Map.<String,Object>of("length", "not a number")));
+            assertEquals("0123456789", new Functions.CutLeft().apply("0123456789", Map.<String,Object>of()));
+            assertEquals("789", new Functions.CutLeft().apply("0123456789", Map.<String,Object>of("length", "3")));
+            assertEquals("", new Functions.CutLeft().apply("0123456789", Map.<String,Object>of("length", "0")));
+            assertEquals("0123456789", new Functions.CutLeft().apply("0123456789", Map.<String,Object>of("length", "-3")));
+            assertEquals("0123456789", new Functions.CutLeft().apply("0123456789", Map.<String,Object>of("length", "not a number")));
+        }
+    }
 
-            // also run the same tests by selecting the function by name, as the template engine does
-            assertEquals("false", Functions.FUNCTIONS.get("file.exists").apply(null));
-            assertEquals("false", Functions.FUNCTIONS.get("file.exists").apply("afilethatdoesnotexists"));
-            assertEquals("true", Functions.FUNCTIONS.get("file.exists").apply(f.getAbsolutePath()));
+    @Nested
+    @DisplayName("Functions.cutRight")
+    class CutRightTests {
+        @Test
+        @DisplayName("Functions.cutRight.apply()")
+        void applyTest()
+            throws Exception {
+            assertEquals("", new Functions.CutRight().apply(null, Map.<String,Object>of()));
+            assertEquals("", new Functions.CutRight().apply("", Map.<String,Object>of()));
+            assertEquals("", new Functions.CutRight().apply("", Map.<String,Object>of("length", "3")));
+            assertEquals("", new Functions.CutRight().apply("", Map.<String,Object>of("length", "0")));
+            assertEquals("", new Functions.CutRight().apply("", Map.<String,Object>of("length", "-3")));
+            assertEquals("", new Functions.CutRight().apply("", Map.<String,Object>of("length", "not a number")));
+            assertEquals("0", new Functions.CutRight().apply("0", Map.<String,Object>of()));
+            assertEquals("0", new Functions.CutRight().apply("0", Map.<String,Object>of("length", "3")));
+            assertEquals("", new Functions.CutRight().apply("0", Map.<String,Object>of("length", "0")));
+            assertEquals("0", new Functions.CutRight().apply("0", Map.<String,Object>of("length", "-3")));
+            assertEquals("0", new Functions.CutRight().apply("0", Map.<String,Object>of("length", "not a number")));
+            assertEquals("012", new Functions.CutRight().apply("012", Map.<String,Object>of()));
+            assertEquals("012", new Functions.CutRight().apply("012", Map.<String,Object>of("length", "3")));
+            assertEquals("", new Functions.CutRight().apply("012", Map.<String,Object>of("length", "0")));
+            assertEquals("012", new Functions.CutRight().apply("012", Map.<String,Object>of("length", "-3")));
+            assertEquals("012", new Functions.CutRight().apply("012", Map.<String,Object>of("length", "not a number")));
+            assertEquals("012345", new Functions.CutRight().apply("012345", Map.<String,Object>of()));
+            assertEquals("012", new Functions.CutRight().apply("012345", Map.<String,Object>of("length", "3")));
+            assertEquals("", new Functions.CutRight().apply("012345", Map.<String,Object>of("length", "0")));
+            assertEquals("012345", new Functions.CutRight().apply("012345", Map.<String,Object>of("length", "-3")));
+            assertEquals("012345", new Functions.CutRight().apply("012345", Map.<String,Object>of("length", "not a number")));
+            assertEquals("0123456789", new Functions.CutRight().apply("0123456789", Map.<String,Object>of()));
+            assertEquals("012", new Functions.CutRight().apply("0123456789", Map.<String,Object>of("length", "3")));
+            assertEquals("", new Functions.CutRight().apply("0123456789", Map.<String,Object>of("length", "0")));
+            assertEquals("0123456789", new Functions.CutRight().apply("0123456789", Map.<String,Object>of("length", "-3")));
+            assertEquals("0123456789", new Functions.CutRight().apply("0123456789", Map.<String,Object>of("length", "not a number")));
+        }
+    }
+
+    @Nested
+    @DisplayName("Functions.replace")
+    class ReplaceTests {
+        @Test
+        @DisplayName("Functions.replace.apply()")
+        void applyTest()
+            throws Exception {
+            assertEquals("", new Functions.Replace().apply(null, Map.<String,Object>of()));
+            assertEquals("", new Functions.Replace().apply("", Map.<String,Object>of()));
+            assertEquals("  ", new Functions.Replace().apply("  ", Map.<String,Object>of()));
+            assertEquals("001002003004005", new Functions.Replace().apply("001002003004005", Map.<String,Object>of("from", "", "to", "")));
+            assertEquals("12345", new Functions.Replace().apply("001002003004005", Map.<String,Object>of("from", "0", "to", "")));
+            assertEquals("  1  2  3  4  5", new Functions.Replace().apply("001002003004005", Map.<String,Object>of("from", "0", "to", " ")));
+            assertEquals("erased1erased2erased3erased4erased5", new Functions.Replace().apply("001002003004005", Map.<String,Object>of("from", "00", "to", "erased")));
+        }
+    }
+
+    @Nested
+    @DisplayName("Functions.timeFormat")
+    class TimeTests {
+        @Test
+        @DisplayName("Functions.timeFormat.apply()")
+        void applyTest()
+            throws Exception {
+            // these are the baseline values to test against
+            long currentTime = System.currentTimeMillis();
+            String timeString = Long.valueOf(currentTime).toString();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+            dateFormat.setTimeZone(TimeZone.getTimeZone(ZoneOffset.UTC));
+            String dateToCompare = dateFormat.format(new Date(currentTime));
+
+            // for timestamps in long format (unformatted) we just test the first 10 characters to avoid false positives in these tests
+            assertTrue(new Functions.TimeFormat().apply(null, Map.<String,Object>of()).startsWith(timeString.substring(0, 10)));
+            assertTrue(new Functions.TimeFormat().apply("", Map.<String,Object>of()).startsWith(timeString.substring(0, 10)));
+            assertEquals("", new Functions.TimeFormat().apply("", Map.<String,Object>of("format", "")));
+            assertEquals(dateToCompare, new Functions.TimeFormat().apply("", Map.<String,Object>of("format", "yyyyMMdd")));
+            assertEquals("", new Functions.TimeFormat().apply("", Map.<String,Object>of("format", "not a format")));
+
+            assertTrue(new Functions.TimeFormat().apply("  ", Map.<String,Object>of()).startsWith(timeString.substring(0, 10)));
+            assertEquals("", new Functions.TimeFormat().apply("  ", Map.<String,Object>of("format", "")));
+            assertEquals(dateToCompare, new Functions.TimeFormat().apply("  ", Map.<String,Object>of("format", "yyyyMMdd")));
+            assertEquals("", new Functions.TimeFormat().apply("  ", Map.<String,Object>of("format", "not a format")));
+
+            assertEquals("", new Functions.TimeFormat().apply("not a number", Map.<String,Object>of()));
+            assertEquals("", new Functions.TimeFormat().apply("not a number", Map.<String,Object>of("format", "")));
+            assertEquals("", new Functions.TimeFormat().apply("not a number", Map.<String,Object>of("format", "yyyyMMdd")));
+            assertEquals("", new Functions.TimeFormat().apply("not a number", Map.<String,Object>of("format", "not a format")));
+
+            assertEquals("0", new Functions.TimeFormat().apply("0", Map.<String,Object>of()));
+            assertEquals("", new Functions.TimeFormat().apply("0", Map.<String,Object>of("format", "")));
+            assertEquals("19700101", new Functions.TimeFormat().apply("0", Map.<String,Object>of("format", "yyyyMMdd")));
+            assertEquals("", new Functions.TimeFormat().apply("0", Map.<String,Object>of("format", "not a format")));
+
+            assertEquals("1577880000000", new Functions.TimeFormat().apply("1577880000000", Map.<String,Object>of()));
+            assertEquals("", new Functions.TimeFormat().apply("1577880000000", Map.<String,Object>of("format", "")));
+            assertEquals("20200101", new Functions.TimeFormat().apply("1577880000000", Map.<String,Object>of("format", "yyyyMMdd")));
+            assertEquals("", new Functions.TimeFormat().apply("1577880000000", Map.<String,Object>of("format", "not a format")));
         }
     }
 }

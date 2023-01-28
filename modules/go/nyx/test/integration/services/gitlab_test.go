@@ -125,6 +125,7 @@ func TestGitLabHostingServiceCreateGitRepository(t *testing.T) {
 	assert.Equal(t, randomID, (*gitLabRepository).GetName())
 	assert.Equal(t, randomID, (*gitLabRepository).GetFullName())
 	assert.Equal(t, "https://gitlab.com/"+(*user).GetUserName()+"/"+randomID+".git", (*gitLabRepository).GetHTTPURL())
+	assert.Equal(t, "git@gitlab.com:"+(*user).GetUserName()+"/"+randomID+".git", (*gitLabRepository).GetSSHURL())
 
 	// if we delete too quickly we often get a 404 from the server so let's wait a short while
 	time.Sleep(4000 * time.Millisecond)
@@ -161,9 +162,9 @@ func TestGitLabReleaseServiceCreateRelease(t *testing.T) {
 
 	// when a token for user and password authentication for plain Git operations against a GitLab repository,
 	// the user is the "PRIVATE-TOKEN" string and the password is the token
-	script := gittools.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED().ApplyOnCloneFromWithCredentials((*gitLabRepository).GetHTTPURL(), utl.PointerToString("PRIVATE-TOKEN"), utl.PointerToString(os.Getenv("gitLabTestUserToken")))
+	script := gittools.FIVE_BRANCH_UNMERGED_BUMPING_COLLAPSED().ApplyOnCloneFromWithUserNameAndPassword((*gitLabRepository).GetHTTPURL(), utl.PointerToString("PRIVATE-TOKEN"), utl.PointerToString(os.Getenv("gitLabTestUserToken")))
 	defer os.RemoveAll(script.GetWorkingDirectory())
-	script.PushWithCredentials(utl.PointerToString("PRIVATE-TOKEN"), utl.PointerToString(os.Getenv("gitLabTestUserToken")))
+	script.PushWithUserNameAndPassword(utl.PointerToString("PRIVATE-TOKEN"), utl.PointerToString(os.Getenv("gitLabTestUserToken")))
 
 	// publish the release
 	release, err = gitLab.PublishRelease(&ownerName, &repositoryName, utl.PointerToString("Release 1.0.0-alpha.1"), "1.0.0-alpha.1", utl.PointerToString("A test description for the release\non multiple lines\nlike these"))
@@ -208,7 +209,7 @@ func TestGitLabReleaseServiceCreateRelease(t *testing.T) {
 	assert.Equal(t, "1.0.0-alpha.1", (*releaseWithAssets).GetTag())
 	assert.Equal(t, 3, len((*releaseWithAssets).GetAssets()))
 	for _, asset := range (*releaseWithAssets).GetAssets() {
-		assert.True(t, *asset.GetFileName() == "asset1" || *asset.GetFileName() == "asset2" || *asset.GetFileName() == "remote1")
+		assert.True(t, *asset.GetFileName() == "Text asset" || *asset.GetFileName() == "Binary asset" || *asset.GetFileName() == "Remote link asset") // the description is not available via this API
 		//assert.True(t, *asset.GetDescription() == "Text asset" || *asset.GetDescription() == "Binary asset" || *asset.GetDescription() == "Remote link asset") // the description is not available via this API
 		//assert.True(t, *asset.GetType() == "text/plain" || *asset.GetType() == "application/octet-stream") // the content type is not available via this API
 		//assert.True(t, strings.HasPrefix(*asset.GetPath(), "https://api.github.com/repos/")) // as of now these URLS are like https://storage.googleapis.com...

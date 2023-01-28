@@ -116,11 +116,11 @@ public interface Repository {
         throws GitException;
 
     /**
-     * Returns a set of abjects representing all the tags for the given commit.
+     * Returns a set of objects representing all the tags for the given commit.
      * 
      * @param commit the SHA-1 identifier of the commit to get the tags for. It can be a full or abbreviated SHA-1.
      * 
-     * @return the set of abjects representing all the tags for the given commit.
+     * @return the set of objects representing all the tags for the given commit.
      * 
      * @throws GitException in case some problem is encountered with the underlying Git repository.
      */
@@ -172,6 +172,16 @@ public interface Repository {
         throws GitException;
 
     /**
+     * Returns a set of objects representing all the tags for the repository.
+     * 
+     * @return the set of objects representing all the tags for the repository.
+     * 
+     * @throws GitException in case some problem is encountered with the underlying Git repository.
+     */
+    public Set<Tag> getTags()
+        throws GitException;
+
+    /**
      * Returns {@code true} if the repository is clean, which is when no differences exist between the working tree, the index,
      * and the current {@code HEAD}.
      * 
@@ -185,18 +195,7 @@ public interface Repository {
 
     /**
      * Pushes local changes in the current branch to the default remote {@code origin}.
-     * 
-     * @return the local name of the remotes that has been pushed
-     * 
-     * @throws GitException in case some problem is encountered with the underlying Git repository, preventing to push.
-     * 
-     * @see #DEFAULT_REMOTE_NAME
-     */
-    public String push()
-        throws GitException;
-
-    /**
-     * Pushes local changes in the current branch to the default remote {@code origin}.
+     * This method allows using user name and password authentication (also used for tokens).
      * 
      * @param user the user name to create when credentials are required. If this and {@code password} are both {@code null}
      * then no credentials is used. When using single token authentication (i.e. OAuth or Personal Access Tokens)
@@ -215,10 +214,14 @@ public interface Repository {
         throws GitException;
 
     /**
-     * Pushes local changes in the current branch to the given remote.
+     * Pushes local changes in the current branch to the default remote {@code origin}.
+     * This method allows using SSH authentication.
      * 
-     * @param remote the name of the remote to push to. If {@code null} or empty the default remote name ({@code origin})
-     * is used.
+     * @param privateKey the SSH private key. If {@code null} the private key will be searched in its default location
+     * (i.e. in the users' {@code $HOME/.ssh} directory).
+     * @param passphrase the optional password to use to open the private key, in case it's protected by a passphrase.
+     * This is required when the private key is password protected as this implementation does not support prompting
+     * the user interactively for entering the password.
      * 
      * @return the local name of the remotes that has been pushed
      * 
@@ -226,11 +229,12 @@ public interface Repository {
      * 
      * @see #DEFAULT_REMOTE_NAME
      */
-    public String push(String remote)
+    public String push(String privateKey, byte[] passphrase)
         throws GitException;
     
     /**
-     * Pushes local changes in the current branch to the given remote using no authentication.
+     * Pushes local changes in the current branch to the given remote.
+     * This method allows using user name and password authentication (also used for tokens).
      * 
      * @param remote the name of the remote to push to. If {@code null} or empty the default remote name ({@code origin})
      * is used.
@@ -249,22 +253,31 @@ public interface Repository {
      */
     public String push(String remote, String user, String password)
         throws GitException;
-
+    
     /**
-     * Pushes local changes in the current branch to the given remotes.
+     * Pushes local changes in the current branch to the given remote using no authentication.
+     * This method allows using SSH authentication.
      * 
-     * @param remotes the names of remotes to push to. If {@code null} or empty the default remote name ({@code origin})
+     * @param remote the name of the remote to push to. If {@code null} or empty the default remote name ({@code origin})
      * is used.
+     * @param privateKey the SSH private key. If {@code null} the private key will be searched in its default location
+     * (i.e. in the users' {@code $HOME/.ssh} directory).
+     * @param passphrase the optional password to use to open the private key, in case it's protected by a passphrase.
+     * This is required when the private key is password protected as this implementation does not support prompting
+     * the user interactively for entering the password.
      * 
-     * @return a collection with the local names of remotes that have been pushed
+     * @return the local name of the remotes that has been pushed
      * 
      * @throws GitException in case some problem is encountered with the underlying Git repository, preventing to push.
+     * 
+     * @see #DEFAULT_REMOTE_NAME
      */
-    public Set<String> push(Collection<String> remotes)
+    public String push(String remote, String privateKey, byte[] passphrase)
         throws GitException;
 
     /**
-     * Pushes local changes in the current branch to the given remotes using no authentication.
+     * Pushes local changes in the current branch to the given remotes.
+     * This method allows using user name and password authentication (also used for tokens).
      * 
      * @param remotes the names of remotes to push to. If {@code null} or empty the default remote name ({@code origin})
      * is used.
@@ -280,6 +293,25 @@ public interface Repository {
      * @throws GitException in case some problem is encountered with the underlying Git repository, preventing to push.
      */
     public Set<String> push(Collection<String> remotes, String user, String password)
+        throws GitException;
+
+    /**
+     * Pushes local changes in the current branch to the given remotes.
+     * This method allows using SSH authentication.
+     * 
+     * @param remotes the names of remotes to push to. If {@code null} or empty the default remote name ({@code origin})
+     * is used.
+     * @param privateKey the SSH private key. If {@code null} the private key will be searched in its default location
+     * (i.e. in the users' {@code $HOME/.ssh} directory).
+     * @param passphrase the optional password to use to open the private key, in case it's protected by a passphrase.
+     * This is required when the private key is password protected as this implementation does not support prompting
+     * the user interactively for entering the password.
+     * 
+     * @return a collection with the local names of remotes that have been pushed
+     * 
+     * @throws GitException in case some problem is encountered with the underlying Git repository, preventing to push.
+     */
+    public Set<String> push(Collection<String> remotes, String privateKey, byte[] passphrase)
         throws GitException;
 
     /**

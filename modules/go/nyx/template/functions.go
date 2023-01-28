@@ -109,6 +109,22 @@ func registerHelpers() {
 		raymond.RegisterHelper("fileExists", func(options *raymond.Options) raymond.SafeString {
 			return raymond.SafeString(fileExists(options.Fn()))
 		})
+
+		raymond.RegisterHelper("capture", func(options *raymond.Options) raymond.SafeString {
+			return raymond.SafeString(capture(options.Fn(), options.Hash()))
+		})
+		raymond.RegisterHelper("cutLeft", func(options *raymond.Options) raymond.SafeString {
+			return raymond.SafeString(cutLeft(options.Fn(), options.Hash()))
+		})
+		raymond.RegisterHelper("cutRight", func(options *raymond.Options) raymond.SafeString {
+			return raymond.SafeString(cutRight(options.Fn(), options.Hash()))
+		})
+		raymond.RegisterHelper("replace", func(options *raymond.Options) raymond.SafeString {
+			return raymond.SafeString(replace(options.Fn(), options.Hash()))
+		})
+		raymond.RegisterHelper("timeFormat", func(options *raymond.Options) raymond.SafeString {
+			return raymond.SafeString(timeFormat(options.Fn(), options.Hash()))
+		})
 	}
 	helpersRegistered = true
 }
@@ -357,5 +373,161 @@ func fileExists(input string) string {
 		return "true"
 	} else {
 		return "false"
+	}
+}
+
+/*
+This method uses a given regular expression to match the string input and uses the given (named) group
+value as a return value. The 'expression' option gives the regular expression to use, while the
+'group option tells which group to return (if it's an integer it will be interpreded as a group index,
+otherwise a group name). Remember that group '0' returns the whole string. If the regular expression
+doesn't even match the input string then an empty string is returned.
+*/
+func capture(input string, options map[string]interface{}) string {
+	expressionString, found := options["expression"]
+	if found {
+		expression := fmt.Sprintf("%v", expressionString)
+		re, err := regexp2.Compile(expression, 0)
+		if err != nil {
+			log.Errorf("cannot compile regular expression '%s': %v", expression, err)
+			return ""
+		}
+		m, err := re.FindStringMatch(input)
+		if err != nil {
+			log.Errorf("regular expression '%s' can't be matched: %v", expression, err)
+			return ""
+		}
+		if m == nil { // when this is nil it means no match was found
+			log.Errorf("input '%s' doesn't seem to contain a parseable group", input)
+			return ""
+		} else {
+			groupNameString, found := options["group"]
+			if found {
+				groupName := fmt.Sprintf("%v", groupNameString)
+				groupIndex, err := strconv.Atoi(groupName)
+				if err == nil {
+					// The 'group' is an index
+					group := m.GroupByNumber(groupIndex)
+					if group != nil && len(group.Captures) > 0 {
+						return group.Captures[0].String()
+					} else {
+						return ""
+					}
+				} else {
+					// The 'group' is a name
+					group := m.GroupByName(groupName)
+					if group != nil && len(group.Captures) > 0 {
+						return group.Captures[0].String()
+					} else {
+						return ""
+					}
+				}
+			} else {
+				return input
+			}
+		}
+	} else {
+		return input
+	}
+}
+
+/*
+This method returns the last N characters of the input string, where N is the length option.
+If the input string is shorter or the same length than the parameter, the whole input string is returned unchanged.
+If the input is nil an empty string is returned.
+*/
+func cutLeft(input string, options map[string]interface{}) string {
+	optionString, found := options["length"]
+	if found {
+		length, err := strconv.Atoi(fmt.Sprintf("%v", optionString))
+		if err != nil {
+			log.Errorf("the '%s' option value '%s' for the '%s' function is not a valid integer", "length", fmt.Sprintf("%v", optionString), "cutLeft")
+			return input
+		}
+		if length < 0 {
+			log.Errorf("the '%s' option value '%s' for the '%s' function cannot be negative", "length", fmt.Sprintf("%v", optionString), "cutLeft")
+			return input
+		}
+		if len(input) > length {
+			return input[len(input)-length : len(input)]
+		} else {
+			return input
+		}
+	} else {
+		return input
+	}
+}
+
+/*
+This method returns the first N characters of the input string, where N is the length option.
+If the input string is shorter or the same length than the parameter, the whole input string is returned unchanged.
+If the input is nil an empty string is returned.
+*/
+func cutRight(input string, options map[string]interface{}) string {
+	optionString, found := options["length"]
+	if found {
+		length, err := strconv.Atoi(fmt.Sprintf("%v", optionString))
+		if err != nil {
+			log.Errorf("the '%s' option value '%s' for the '%s' function is not a valid integer", "length", fmt.Sprintf("%v", optionString), "cutRight")
+			return input
+		}
+		if length < 0 {
+			log.Errorf("the '%s' option value '%s' for the '%s' function cannot be negative", "length", fmt.Sprintf("%v", optionString), "cutRight")
+			return input
+		}
+		if len(input) > length {
+			return input[0:length]
+		} else {
+			return input
+		}
+	} else {
+		return input
+	}
+}
+
+/*
+This method replaces the given character sequences from the input string with the given replacement.
+*/
+func replace(input string, options map[string]interface{}) string {
+	fromStringInterface, found := options["from"]
+	if found {
+		fromString := fmt.Sprintf("%v", fromStringInterface)
+		toStringInterface, found := options["to"]
+		toString := ""
+		if found {
+			toString = fmt.Sprintf("%v", toStringInterface)
+		}
+
+		return strings.ReplaceAll(input, fromString, toString)
+	} else {
+		return input
+	}
+}
+
+/*
+This method returns a time value (expressed in milliseconds) and is also able to format it according to an optional
+format string.
+*/
+func timeFormat(input string, options map[string]interface{}) string {
+	currentTime := time.Now().UnixMilli()
+	var err error
+	if "" != strings.TrimSpace(input) {
+		currentTime, err = strconv.ParseInt(input, 10, 64)
+		if err != nil {
+			log.Errorf("the value '%s' for the '%s' function is not a valid integer", input, "timeFormat")
+			return ""
+		}
+		if currentTime < 0 {
+			log.Errorf("the value '%s' for the '%s' function cannot be negative", input, "timeFormat")
+			return input
+		}
+	}
+
+	formatString, found := options["format"]
+	if found {
+		t := time.UnixMilli(currentTime).UTC()
+		return t.Format(fmt.Sprintf("%v", formatString))
+	} else {
+		return strconv.FormatInt(currentTime, 10)
 	}
 }

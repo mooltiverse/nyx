@@ -14,6 +14,11 @@
  * limitations under the License.
  */
 
+/*
+This package provides the implementation for all the commands (or tasks) provided by Nyx.
+
+This package actually holds all the Nyx core business logic.
+*/
 package command
 
 import (

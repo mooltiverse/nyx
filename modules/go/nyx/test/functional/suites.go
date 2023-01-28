@@ -14,9 +14,6 @@
  * limitations under the License.
  */
 
-/*
-This package provides functional tests.
-*/
 package functional_test
 
 import (
@@ -105,6 +102,7 @@ scheme: SEMVER
 					"preset: extended",
 					"releaseLenient: true",
 					"releasePrefix: v",
+					"coreVersion: true",
 					"newVersion: true",
 					"newRelease: true",
 					"previousVersion: 0.0.4",
@@ -195,6 +193,7 @@ scheme: SEMVER
 					"preset: extended",
 					"releaseLenient: true",
 					"releasePrefix: v",
+					"coreVersion: true",
 					"newVersion: true",
 					"newRelease: true",
 					"previousVersion: 0.0.4",
@@ -295,6 +294,7 @@ scheme: SEMVER
 					"preset: extended",
 					"releaseLenient: true",
 					"releasePrefix: v",
+					"coreVersion: true",
 					"newVersion: true",
 					"newRelease: true",
 					"previousVersion: 0.0.4",
@@ -394,6 +394,7 @@ commitMessageConventions:
 					"bump: patch",
 					"initialVersion: 0.1.0",
 					"preset: extended",
+					"coreVersion: true",
 					"newVersion: true",
 					"newRelease: true",
 					"previousVersion: 0.0.5",
@@ -502,6 +503,7 @@ scheme: SEMVER
 					"preset: extended",
 					"releaseLenient: true",
 					"releasePrefix: v",
+					"coreVersion: true",
 					"newVersion: true",
 					"newRelease: true",
 					"previousVersion: 0.0.4",
@@ -613,6 +615,7 @@ scheme: SEMVER
 					"preset: extended",
 					"releaseLenient: true",
 					"releasePrefix: v",
+					"coreVersion: true",
 					"newVersion: true",
 					"newRelease: true",
 					"previousVersion: 0.0.4",

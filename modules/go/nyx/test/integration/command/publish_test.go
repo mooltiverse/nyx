@@ -174,9 +174,9 @@ func TestPublishRunWithNewReleaseAndGlobalAssetsOnGitHubRepository(t *testing.T)
 	// if we clone too quickly next calls may fail
 	time.Sleep(4000 * time.Millisecond)
 
-	script := gittools.ONE_BRANCH_SHORT().ApplyOnCloneFromWithCredentials((*gitHubRepository).GetHTTPURL(), utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(""))
+	script := gittools.ONE_BRANCH_SHORT().ApplyOnCloneFromWithUserNameAndPassword((*gitHubRepository).GetHTTPURL(), utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(""))
 	defer os.RemoveAll(script.GetWorkingDirectory())
-	script.PushWithCredentials(utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(""))
+	script.PushWithUserNameAndPassword(utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(""))
 
 	configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 	// add release assets to the configuration and also use templates for asset options to make sure they are rendered
@@ -204,7 +204,7 @@ func TestPublishRunWithNewReleaseAndGlobalAssetsOnGitHubRepository(t *testing.T)
 	// set up the Git remote credentials
 	gitConfiguration, _ := configurationLayerMock.GetGit()
 	gitConfiguration.SetRemotes(&map[string]*ent.GitRemoteConfiguration{
-		"origin": ent.NewGitRemoteConfigurationWith(utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString("")),
+		"origin": ent.NewGitRemoteConfigurationWith(ent.PointerToAuthenticationMethod(ent.USER_PASSWORD), utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(""), nil, nil),
 	})
 	// add a custom release type that always enables committing, tagging and pushing
 	// and all the publishing service enabled
@@ -311,9 +311,9 @@ func TestPublishRunWithNewReleaseAndFilteredAssetsOnGitHubRepository(t *testing.
 	// if we clone too quickly next calls may fail
 	time.Sleep(4000 * time.Millisecond)
 
-	script := gittools.ONE_BRANCH_SHORT().ApplyOnCloneFromWithCredentials((*gitHubRepository).GetHTTPURL(), utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(""))
+	script := gittools.ONE_BRANCH_SHORT().ApplyOnCloneFromWithUserNameAndPassword((*gitHubRepository).GetHTTPURL(), utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(""))
 	defer os.RemoveAll(script.GetWorkingDirectory())
-	script.PushWithCredentials(utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(""))
+	script.PushWithUserNameAndPassword(utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(""))
 
 	configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 	// add release assets to the configuration and also use templates for asset options to make sure they are rendered
@@ -341,7 +341,7 @@ func TestPublishRunWithNewReleaseAndFilteredAssetsOnGitHubRepository(t *testing.
 	// set up the Git remote credentials
 	gitConfiguration, _ := configurationLayerMock.GetGit()
 	gitConfiguration.SetRemotes(&map[string]*ent.GitRemoteConfiguration{
-		"origin": ent.NewGitRemoteConfigurationWith(utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString("")),
+		"origin": ent.NewGitRemoteConfigurationWith(ent.PointerToAuthenticationMethod(ent.USER_PASSWORD), utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(""), nil, nil),
 	})
 	// add a custom release type that always enables committing, tagging and pushing
 	// and all the publishing service enabled
@@ -451,9 +451,9 @@ func TestPublishRunWithNewReleaseAndGlobalAssetsOnGitLabRepository(t *testing.T)
 
 	// when a token for user and password authentication for plain Git operations against a GitLab repository,
 	// the user is the "PRIVATE-TOKEN" string and the password is the token
-	script := gittools.ONE_BRANCH_SHORT().ApplyOnCloneFromWithCredentials((*gitLabRepository).GetHTTPURL(), utl.PointerToString("PRIVATE-TOKEN"), utl.PointerToString(os.Getenv("gitLabTestUserToken")))
+	script := gittools.ONE_BRANCH_SHORT().ApplyOnCloneFromWithUserNameAndPassword((*gitLabRepository).GetHTTPURL(), utl.PointerToString("PRIVATE-TOKEN"), utl.PointerToString(os.Getenv("gitLabTestUserToken")))
 	defer os.RemoveAll(script.GetWorkingDirectory())
-	script.PushWithCredentials(utl.PointerToString("PRIVATE-TOKEN"), utl.PointerToString(os.Getenv("gitLabTestUserToken")))
+	script.PushWithUserNameAndPassword(utl.PointerToString("PRIVATE-TOKEN"), utl.PointerToString(os.Getenv("gitLabTestUserToken")))
 
 	configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 	// add release assets to the configuration and also use templates for asset options to make sure they are rendered
@@ -481,7 +481,7 @@ func TestPublishRunWithNewReleaseAndGlobalAssetsOnGitLabRepository(t *testing.T)
 	// set up the Git remote credentials
 	gitConfiguration, _ := configurationLayerMock.GetGit()
 	gitConfiguration.SetRemotes(&map[string]*ent.GitRemoteConfiguration{
-		"origin": ent.NewGitRemoteConfigurationWith(utl.PointerToString("PRIVATE-TOKEN"), utl.PointerToString(os.Getenv("gitLabTestUserToken"))),
+		"origin": ent.NewGitRemoteConfigurationWith(ent.PointerToAuthenticationMethod(ent.USER_PASSWORD), utl.PointerToString("PRIVATE-TOKEN"), utl.PointerToString(os.Getenv("gitLabTestUserToken")), nil, nil),
 	})
 	// add a custom release type that always enables committing, tagging and pushing
 	// and all the publishing service enabled
@@ -524,7 +524,7 @@ func TestPublishRunWithNewReleaseAndGlobalAssetsOnGitLabRepository(t *testing.T)
 	// the release assets must contain the two existing files and the remote URL, but not the non existing file
 	assert.Equal(t, 3, len((*gitLabRelease).GetAssets()))
 	for _, asset := range (*gitLabRelease).GetAssets() {
-		assert.True(t, *asset.GetFileName() == "asset1.txt" || *asset.GetFileName() == "asset2.bin" || *asset.GetFileName() == "remote1")
+		assert.True(t, *asset.GetFileName() == "Text asset" || *asset.GetFileName() == "Binary asset" || *asset.GetFileName() == "Remote link asset")
 		//assert.True(t, *asset.GetDescription() == "Text asset" || *asset.GetDescription() == "Binary asset" || *asset.GetDescription() == "Remote link asset") // the description is not available via this API
 		//assert.True(t, *asset.GetType() == "text/plain" || *asset.GetType() == "application/octet-stream") // the content type is not available via this API
 		//assert.True(t, strings.HasPrefix(*asset.GetPath(), "https://api.github.com/repos/")) // as of now these URLS are like https://storage.googleapis.com...
@@ -547,7 +547,7 @@ func TestPublishRunWithNewReleaseAndGlobalAssetsOnGitLabRepository(t *testing.T)
 	// the release assets must contain the two existing files and the remote URL, but not the non existing file
 	assert.Equal(t, 3, len((*gitLabRelease).GetAssets()))
 	for _, asset := range (*gitLabRelease).GetAssets() {
-		assert.True(t, *asset.GetFileName() == "asset1.txt" || *asset.GetFileName() == "asset2.bin" || *asset.GetFileName() == "remote1")
+		assert.True(t, *asset.GetFileName() == "Text asset" || *asset.GetFileName() == "Binary asset" || *asset.GetFileName() == "Remote link asset")
 		//assert.True(t, *asset.GetDescription() == "Text asset" || *asset.GetDescription() == "Binary asset" || *asset.GetDescription() == "Remote link asset") // the description is not available via this API
 		//assert.True(t, *asset.GetType() == "text/plain" || *asset.GetType() == "application/octet-stream") // the content type is not available via this API
 		//assert.True(t, strings.HasPrefix(*asset.GetPath(), "https://api.github.com/repos/")) // as of now these URLS are like https://storage.googleapis.com...
@@ -586,9 +586,9 @@ func TestPublishRunWithNewReleaseAndFilteredAssetsOnGitLabRepository(t *testing.
 
 	// when a token for user and password authentication for plain Git operations against a GitLab repository,
 	// the user is the "PRIVATE-TOKEN" string and the password is the token
-	script := gittools.ONE_BRANCH_SHORT().ApplyOnCloneFromWithCredentials((*gitLabRepository).GetHTTPURL(), utl.PointerToString("PRIVATE-TOKEN"), utl.PointerToString(os.Getenv("gitLabTestUserToken")))
+	script := gittools.ONE_BRANCH_SHORT().ApplyOnCloneFromWithUserNameAndPassword((*gitLabRepository).GetHTTPURL(), utl.PointerToString("PRIVATE-TOKEN"), utl.PointerToString(os.Getenv("gitLabTestUserToken")))
 	defer os.RemoveAll(script.GetWorkingDirectory())
-	script.PushWithCredentials(utl.PointerToString("PRIVATE-TOKEN"), utl.PointerToString(os.Getenv("gitLabTestUserToken")))
+	script.PushWithUserNameAndPassword(utl.PointerToString("PRIVATE-TOKEN"), utl.PointerToString(os.Getenv("gitLabTestUserToken")))
 
 	configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 	// add release assets to the configuration and also use templates for asset options to make sure they are rendered
@@ -616,7 +616,7 @@ func TestPublishRunWithNewReleaseAndFilteredAssetsOnGitLabRepository(t *testing.
 	// set up the Git remote credentials
 	gitConfiguration, _ := configurationLayerMock.GetGit()
 	gitConfiguration.SetRemotes(&map[string]*ent.GitRemoteConfiguration{
-		"origin": ent.NewGitRemoteConfigurationWith(utl.PointerToString("PRIVATE-TOKEN"), utl.PointerToString(os.Getenv("gitLabTestUserToken"))),
+		"origin": ent.NewGitRemoteConfigurationWith(ent.PointerToAuthenticationMethod(ent.USER_PASSWORD), utl.PointerToString("PRIVATE-TOKEN"), utl.PointerToString(os.Getenv("gitLabTestUserToken")), nil, nil),
 	})
 	// add a custom release type that always enables committing, tagging and pushing
 	// and all the publishing service enabled
@@ -660,7 +660,7 @@ func TestPublishRunWithNewReleaseAndFilteredAssetsOnGitLabRepository(t *testing.
 	// the release assets must contain only the 'asset1' as it was filtered by the release type
 	assert.Equal(t, 1, len((*gitLabRelease).GetAssets()))
 	for _, asset := range (*gitLabRelease).GetAssets() {
-		assert.Equal(t, "asset1.txt", *asset.GetFileName())
+		assert.Equal(t, "Text asset", *asset.GetFileName())
 		//assert.Equal(t, "Text asset", *asset.GetDescription()) // the description is not available via this API
 		//assert.Equal(t, "text/plain", *asset.GetType()) // the content type is not available via this API
 		//assert.True(t, strings.HasPrefix(*asset.GetPath(), "https://api.github.com/repos/")) // as of now these URLS are like https://storage.googleapis.com...
@@ -683,7 +683,7 @@ func TestPublishRunWithNewReleaseAndFilteredAssetsOnGitLabRepository(t *testing.
 	// the release assets must contain only the 'asset1' as it was filtered by the release type
 	assert.Equal(t, 1, len((*gitLabRelease).GetAssets()))
 	for _, asset := range (*gitLabRelease).GetAssets() {
-		assert.Equal(t, "asset1.txt", *asset.GetFileName())
+		assert.Equal(t, "Text asset", *asset.GetFileName())
 		//assert.Equal(t, "Text asset", *asset.GetDescription()) // the description is not available via this API
 		//assert.Equal(t, "text/plain", *asset.GetType()) // the content type is not available via this API
 		//assert.True(t, strings.HasPrefix(*asset.GetPath(), "https://api.github.com/repos/")) // as of now these URLS are like https://storage.googleapis.com...
