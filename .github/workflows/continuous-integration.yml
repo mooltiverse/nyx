@@ -382,8 +382,7 @@ jobs:
       with:
         name: Nyx Java unit tests
         #token: // not required as it's an open source project
-        #files: ./modules/java/main/build/reports/jacoco/test/jacocoTestReport.xml,./modules/java/version/build/reports/jacoco/test/jacocoTestReport.xml
-        files: ./modules/java/*/build/reports/jacoco/test/jacocoTestReport.xml
+        iles: ./modules/java/main/build/reports/jacoco/test/jacocoTestReport.xml,./modules/java/version/build/reports/jacoco/test/jacocoTestReport.xml
         flags: java,unit
         fail_ci_if_error: false
         verbose: true
