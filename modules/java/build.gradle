@@ -256,7 +256,7 @@ subprojects {
       Additional task dependencies
     ------------------------------------------------------------------------------*/
     tasks.jacocoTestReport.dependsOn tasks.test
-    tasks.check.finalizedBy tasks.jacocoTestReport
+    tasks.check.dependsOn tasks.jacocoTestReport
 }
 
 /*------------------------------------------------------------------------------
@@ -276,12 +276,14 @@ sourcesJar.from(subprojects.collect { it.sourceSets.main.allJava })
 // (https://docs.gradle.org/7.4/userguide/test_report_aggregation_plugin.html)
 // as per https://docs.gradle.org/7.4/release-notes.html#new-features-and-usability-improvements
 task testReport(type: TestReport) {
+    dependsOn subprojects*.jacocoTestReport
+
     destinationDir = file("$buildDir/reports/tests/all")
     // Include the results from the "test" task in all subprojects
     // Be careful as including report sets implicitly makes the task dependent on the tasks producing those reports
     reportOn subprojects*.test//, subprojects*.integrationTest, subprojects*.functionalTest
 }
-tasks.check.finalizedBy tasks.testReport
+tasks.check.dependsOn tasks.testReport
 
 /*------------------------------------------------------------------------------
   Publications

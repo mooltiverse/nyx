@@ -377,21 +377,13 @@ jobs:
           gradle-distribution-sha-256-sum-warning: false
     - name: Run Java Unit Tests with Gradle
       run: ./gradlew modules:java:check --build-cache --stacktrace
-    - name: Upload Java Version code coverage statistics to Codecov
+    - name: Upload Java code coverage statistics to Codecov
       uses: codecov/codecov-action@v3
       with:
-        name: Nyx Java Version unit tests
+        name: Nyx Java unit tests
         #token: // not required as it's an open source project
-        files: ./modules/java/version/build/reports/jacoco/test/jacocoTestReport.xml
-        flags: java,unit
-        fail_ci_if_error: false
-        verbose: true
-    - name: Upload Java Main code coverage statistics to Codecov
-      uses: codecov/codecov-action@v3
-      with:
-        name: Nyx Java Main unit tests
-        #token: // not required as it's an open source project
-        files: ./modules/java/main/build/reports/jacoco/test/jacocoTestReport.xml
+        #files: ./modules/java/main/build/reports/jacoco/test/jacocoTestReport.xml,./modules/java/version/build/reports/jacoco/test/jacocoTestReport.xml
+        files: ./modules/java/*/build/reports/jacoco/test/jacocoTestReport.xml
         flags: java,unit
         fail_ci_if_error: false
         verbose: true
@@ -408,6 +400,7 @@ jobs:
         name: java-unit-test-reports
         path: |
           modules/java/**/build/jacoco/
+          modules/java/**/build/reports/jacoco
           modules/java/**/build/reports/tests/test/
           modules/java/**/build/test-results/test/
   
@@ -482,6 +475,7 @@ jobs:
         name: java-integration-test-reports
         path: |
           modules/java/**/build/jacoco/
+          modules/java/**/build/reports/jacoco
           modules/java/**/build/reports/tests/integrationTest/
           modules/java/**/build/test-results/integrationTest/
   
@@ -557,6 +551,7 @@ jobs:
         name: java-functional-test-reports
         path: |
           modules/java/**/build/jacoco/
+          modules/java/**/build/reports/jacoco
           modules/java/**/build/reports/tests/functionalTest/
           modules/java/**/build/test-results/functionalTest/
 
