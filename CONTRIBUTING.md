@@ -332,6 +332,8 @@ Publishing build scan...
 https://gradle.com/s/ac7cj7nadxrmm
 ```
 
+Gradle scans are configured in the [`settings.gradle`](https://github.com/mooltiverse/nyx/blob/master/settings.gradle) file.
+
 ### Coding conventions
 
 This is open source software. Consider the people who will read your code, and make it look nice for them.
