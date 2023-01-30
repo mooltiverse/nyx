@@ -224,6 +224,7 @@ jobs:
 
   build-docker:
     name: Build - Docker
+    if: ${{ false }} # TODO: remove this line as it's only needed to skip expensive jobs while testing Codecov
     needs: build-go
     runs-on: ubuntu-latest
     steps:
@@ -283,6 +284,7 @@ jobs:
   # Here we import the caches from specific language build jobs into one 
   build-merge:
     name: Merge Builds
+    if: ${{ false }} # TODO: remove this line as it's only needed to skip expensive jobs while testing Codecov
     needs: [build-java,build-go,build-docker]
     runs-on: ubuntu-latest
     steps:
@@ -414,6 +416,7 @@ jobs:
   # may fail to store at the end (but this won't affect other jobs).
   java-integration-test:
     name: Test (Integration) - Java
+    if: ${{ false }} # TODO: remove this line as it's only needed to skip expensive jobs while testing Codecov
     needs: java-unit-test
     runs-on: ubuntu-latest
     steps:
@@ -487,6 +490,7 @@ jobs:
   # may fail to store at the end (but this won't affect other jobs).
   java-functional-test:
     name: Test (Functional) - Java
+    if: ${{ false }} # TODO: remove this line as it's only needed to skip expensive jobs while testing Codecov
     needs: java-integration-test
     runs-on: ubuntu-latest
     steps:
@@ -663,6 +667,7 @@ jobs:
   # may fail to store at the end (but this won't affect other jobs).
   go-integration-test:
     name: Test (Integration) - Go
+    if: ${{ false }} # TODO: remove this line as it's only needed to skip expensive jobs while testing Codecov
     needs: go-unit-test
     strategy:
       matrix:
@@ -744,6 +749,7 @@ jobs:
   # may fail to store at the end (but this won't affect other jobs).
   go-functional-test:
     name: Test (Functional) - Go
+    if: ${{ false }} # TODO: remove this line as it's only needed to skip expensive jobs while testing Codecov
     needs: go-integration-test
     strategy:
       matrix:
@@ -826,6 +832,7 @@ jobs:
   # may fail to store at the end (but this won't affect other jobs).
   docker-functional-test:
     name: Test (Functional) - Docker
+    if: ${{ false }} # TODO: remove this line as it's only needed to skip expensive jobs while testing Codecov
     needs: build-docker
     runs-on: ubuntu-latest
     steps:
@@ -899,6 +906,7 @@ jobs:
 
   publish:
     name: Publish
+    if: ${{ false }} # TODO: remove this line as it's only needed to skip expensive jobs while testing Codecov
     needs: [build-merge,java-unit-test,java-integration-test,java-functional-test,go-unit-test,go-integration-test,go-functional-test,docker-functional-test]
     runs-on: ubuntu-latest
     steps:
@@ -975,6 +983,7 @@ jobs:
 
   release:
     name: Release
+    if: ${{ false }} # TODO: remove this line as it's only needed to skip expensive jobs while testing Codecov
     needs: publish
     runs-on: ubuntu-latest
     steps:
