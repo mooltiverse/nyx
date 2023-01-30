@@ -379,7 +379,8 @@ jobs:
       uses: codecov/codecov-action@v3
       with:
         name: Nyx Java Version unit tests
-        directory: modules/java/version/build/reports/jacoco/test
+        #token: // not required as it's an open source project
+        files: modules/java/version/build/reports/jacoco/test/jacocoTestReport.xml
         flags: java,unit
         fail_ci_if_error: false
         verbose: true
@@ -387,7 +388,8 @@ jobs:
       uses: codecov/codecov-action@v3
       with:
         name: Nyx Java Main unit tests
-        directory: modules/java/main/build/reports/jacoco/test
+        #token: // not required as it's an open source project
+        files: modules/java/main/build/reports/jacoco/test/jacocoTestReport.xml
         flags: java,unit
         fail_ci_if_error: false
         verbose: true
@@ -609,6 +611,7 @@ jobs:
       uses: codecov/codecov-action@v3
       with:
         name: Nyx Go Errors unit tests
+        #token: // not required as it's an open source project
         files: modules/go/errors/build/test-results/test/test-coverprofile.out
         flags: go,unit
         fail_ci_if_error: false
@@ -617,6 +620,7 @@ jobs:
       uses: codecov/codecov-action@v3
       with:
         name: Nyx Go Utils unit tests
+        #token: // not required as it's an open source project
         files: modules/go/utils/build/test-results/test/test-coverprofile.out
         flags: go,unit
         fail_ci_if_error: false
@@ -625,6 +629,7 @@ jobs:
       uses: codecov/codecov-action@v3
       with:
         name: Nyx Go Version unit tests
+        #token: // not required as it's an open source project
         files: modules/go/version/build/test-results/test/test-coverprofile.out
         flags: go,unit
         fail_ci_if_error: false
@@ -633,6 +638,7 @@ jobs:
       uses: codecov/codecov-action@v3
       with:
         name: Nyx Go Main unit tests
+        #token: // not required as it's an open source project
         files: modules/go/nyx/build/test-results/test/test-coverprofile.out
         flags: go,unit
         fail_ci_if_error: false
