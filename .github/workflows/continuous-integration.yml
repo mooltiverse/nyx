@@ -605,9 +605,9 @@ jobs:
       run: ./gradlew modules:go:test --build-cache --stacktrace
     - name: Upload code coverage statistics to Codecov
       uses: codecov/codecov-action@v3
-      if: ${{ matrix.os }} == 'ubuntu-latest' # Avoid uploading the same code coverage metrix for all platforms as it's useless, just upload them from the Linux tests
+      if: ${{ matrix.os == 'ubuntu-latest' }} # Avoid uploading the same code coverage metrix for all platforms as it's useless, just upload them from the Linux tests
       with:
-        name: Nyx Go unit tests ${{ matrix.os }}
+        name: Nyx Go unit tests
         #token: // not required as it's an open source project, but the Codecov App must be installed for the repository (https://github.com/apps/codecov)
         files: ./modules/go/nyx/build/test-results/test/test-coverprofile.out,./modules/go/version/build/test-results/test/test-coverprofile.out,./modules/go/errors/build/test-results/test/test-coverprofile.out,./modules/go/utils/build/test-results/test/test-coverprofile.out
         flags: go,unit
@@ -696,7 +696,7 @@ jobs:
       run: ./gradlew modules:go:integrationTest --build-cache --stacktrace
     - name: Upload code coverage statistics to Codecov
       uses: codecov/codecov-action@v3
-      if: ${{ matrix.os }} == 'ubuntu-latest' # Avoid uploading the same code coverage metrix for all platforms as it's useless, just upload them from the Linux tests
+      if: ${{ matrix.os == 'ubuntu-latest' }} # Avoid uploading the same code coverage metrix for all platforms as it's useless, just upload them from the Linux tests
       with:
         name: Nyx Go integration tests
         #token: // not required as it's an open source project, but the Codecov App must be installed for the repository (https://github.com/apps/codecov)
@@ -788,7 +788,7 @@ jobs:
       run: ./gradlew modules:go:functionalTest --build-cache --stacktrace
     - name: Upload code coverage statistics to Codecov
       uses: codecov/codecov-action@v3
-      if: ${{ matrix.os }} == 'ubuntu-latest' # Avoid uploading the same code coverage metrix for all platforms as it's useless, just upload them from the Linux tests
+      if: ${{ matrix.os == 'ubuntu-latest' }} # Avoid uploading the same code coverage metrix for all platforms as it's useless, just upload them from the Linux tests
       with:
         name: Nyx Go functional tests
         #token: // not required as it's an open source project, but the Codecov App must be installed for the repository (https://github.com/apps/codecov)
