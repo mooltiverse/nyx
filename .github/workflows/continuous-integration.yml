@@ -374,12 +374,12 @@ jobs:
           # Disable warning about missing distributionSha256Sum property in gradle-wrapper.properties
           gradle-distribution-sha-256-sum-warning: false
     - name: Run Java Unit Tests with Gradle
-      run: ./gradlew modules:java:test --build-cache --stacktrace
+      run: ./gradlew modules:java:check --build-cache --stacktrace
     - name: Upload Java Version code coverage statistics to Codecov
       uses: codecov/codecov-action@v3
       with:
         name: Nyx Java Version unit tests
-        directory: modules/java/version/build/test-results/test
+        directory: modules/java/version/build/reports/jacoco/test
         flags: java,unit
         fail_ci_if_error: false
         verbose: true
@@ -387,7 +387,7 @@ jobs:
       uses: codecov/codecov-action@v3
       with:
         name: Nyx Java Main unit tests
-        directory: modules/java/main/build/test-results/test
+        directory: modules/java/main/build/reports/jacoco/test
         flags: java,unit
         fail_ci_if_error: false
         verbose: true
@@ -609,7 +609,7 @@ jobs:
       uses: codecov/codecov-action@v3
       with:
         name: Nyx Go Errors unit tests
-        directory: modules/go/errors/build/test-results/test
+        files: modules/go/errors/build/test-results/test/test-coverprofile.out
         flags: go,unit
         fail_ci_if_error: false
         verbose: true
@@ -617,7 +617,7 @@ jobs:
       uses: codecov/codecov-action@v3
       with:
         name: Nyx Go Utils unit tests
-        directory: modules/go/utils/build/test-results/test
+        files: modules/go/utils/build/test-results/test/test-coverprofile.out
         flags: go,unit
         fail_ci_if_error: false
         verbose: true
@@ -625,7 +625,7 @@ jobs:
       uses: codecov/codecov-action@v3
       with:
         name: Nyx Go Version unit tests
-        directory: modules/go/version/build/test-results/test
+        files: modules/go/version/build/test-results/test/test-coverprofile.out
         flags: go,unit
         fail_ci_if_error: false
         verbose: true
@@ -633,7 +633,7 @@ jobs:
       uses: codecov/codecov-action@v3
       with:
         name: Nyx Go Main unit tests
-        directory: modules/go/nyx/build/test-results/test
+        files: modules/go/nyx/build/test-results/test/test-coverprofile.out
         flags: go,unit
         fail_ci_if_error: false
         verbose: true

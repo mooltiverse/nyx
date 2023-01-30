@@ -255,6 +255,7 @@ subprojects {
     /*------------------------------------------------------------------------------
       Additional task dependencies
     ------------------------------------------------------------------------------*/
+    tasks.jacocoTestReport.dependsOn tasks.test
     tasks.check.finalizedBy tasks.jacocoTestReport
 }
 
