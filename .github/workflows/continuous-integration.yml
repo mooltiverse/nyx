@@ -375,6 +375,22 @@ jobs:
           gradle-distribution-sha-256-sum-warning: false
     - name: Run Java Unit Tests with Gradle
       run: ./gradlew modules:java:test --build-cache --stacktrace
+    - name: Upload Java Version code coverage statistics to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        name: Nyx Java Version unit tests
+        directory: modules/java/version/build/test-results/test
+        flags: java,unit
+        fail_ci_if_error: false
+        verbose: true
+    - name: Upload Java Main code coverage statistics to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        name: Nyx Java Main unit tests
+        directory: modules/java/main/build/test-results/test
+        flags: java,unit
+        fail_ci_if_error: false
+        verbose: true
     - name: Archive Nyx state file
       uses: actions/upload-artifact@v3
       if: ${{ always() }}
@@ -589,6 +605,38 @@ jobs:
           gradle-distribution-sha-256-sum-warning: false
     - name: Run Go Unit Tests with Gradle
       run: ./gradlew modules:go:test --build-cache --stacktrace
+    - name: Upload Go Errors code coverage statistics to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        name: Nyx Go Errors unit tests
+        directory: modules/go/errors/build/test-results/test
+        flags: go,unit
+        fail_ci_if_error: false
+        verbose: true
+    - name: Upload Go Utils code coverage statistics to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        name: Nyx Go Utils unit tests
+        directory: modules/go/utils/build/test-results/test
+        flags: go,unit
+        fail_ci_if_error: false
+        verbose: true
+    - name: Upload Go Version code coverage statistics to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        name: Nyx Go Version unit tests
+        directory: modules/go/version/build/test-results/test
+        flags: go,unit
+        fail_ci_if_error: false
+        verbose: true
+    - name: Upload Go Main code coverage statistics to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        name: Nyx Go Main unit tests
+        directory: modules/go/nyx/build/test-results/test
+        flags: go,unit
+        fail_ci_if_error: false
+        verbose: true
     - name: Archive Nyx state file
       uses: actions/upload-artifact@v3
       if: ${{ always() }}
