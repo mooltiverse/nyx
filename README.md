@@ -1,6 +1,7 @@
 [![.github/workflows/continuous-integration.yml](https://github.com/mooltiverse/nyx/actions/workflows/continuous-integration.yml/badge.svg?branch=master)](https://github.com/mooltiverse/nyx/actions/workflows/continuous-integration.yml) 
+[![codecov](https://codecov.io/gh/mooltiverse/nyx/branch/main/graph/badge.svg)](https://codecov.io/gh/mooltiverse/nyx) 
 [![Javadoc](https://javadoc.io/badge2/com.mooltiverse.oss.nyx/java/Javadoc.svg)](https://javadoc.io/doc/com.mooltiverse.oss.nyx/java) 
-[![Go Documentation](https://godocs.io/github.com/mooltiverse/nyx/modules/go/nyx?status.svg)](https://godocs.io/github.com/mooltiverse/nyx/modules/go/nyx)
+[![Go Documentation](https://godocs.io/github.com/mooltiverse/nyx/modules/go/nyx?status.svg)](https://godocs.io/github.com/mooltiverse/nyx/modules/go/nyx) 
 [![](https://img.shields.io/badge/powered%20by-Nyx-blue)](https://github.com/mooltiverse/nyx) 
 [![License](https://img.shields.io/badge/License-Apache%202.0-grey.svg)](LICENSE.md) [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-grey.svg)](CODE_OF_CONDUCT.md)
 
@@ -78,8 +79,13 @@ Available for all platforms in the [latest release](https://github.com/mooltiver
 * [Javadoc API](https://javadoc.io/doc/com.mooltiverse.oss.nyx/java)
   
 ### Articles:
+
 * [Nyx, the Semantic Release Automation Tool](https://levelup.gitconnected.com/nyx-the-semantic-release-automation-tool-4e2dfa949f38)
 * [Semantic Release Automation with Gradle using Nyx](https://levelup.gitconnected.com/semantic-release-automation-with-gradle-using-nyx-ba345235a365)
+
+### Statistics
+
+* [Codecov coverage](https://codecov.io/gh/mooltiverse/nyx)
 
 ## Badge
 

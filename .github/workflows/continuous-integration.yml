@@ -377,7 +377,7 @@ jobs:
           gradle-distribution-sha-256-sum-warning: false
     - name: Run Java Unit Tests with Gradle
       run: ./gradlew modules:java:check --build-cache --stacktrace
-    - name: Upload Java code coverage statistics to Codecov
+    - name: Upload code coverage statistics to Codecov
       uses: codecov/codecov-action@v3
       with:
         name: Nyx Java unit tests
@@ -605,7 +605,7 @@ jobs:
           gradle-distribution-sha-256-sum-warning: false
     - name: Run Go Unit Tests with Gradle
       run: ./gradlew modules:go:test --build-cache --stacktrace
-    - name: Upload Go code coverage statistics to Codecov
+    - name: Upload code coverage statistics to Codecov
       uses: codecov/codecov-action@v3
       with:
         name: Nyx Go unit tests
