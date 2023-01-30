@@ -382,7 +382,7 @@ jobs:
       with:
         name: Nyx Java Version unit tests
         #token: // not required as it's an open source project
-        files: modules/java/version/build/reports/jacoco/test/jacocoTestReport.xml
+        files: ./modules/java/version/build/reports/jacoco/test/jacocoTestReport.xml
         flags: java,unit
         fail_ci_if_error: false
         verbose: true
@@ -391,7 +391,7 @@ jobs:
       with:
         name: Nyx Java Main unit tests
         #token: // not required as it's an open source project
-        files: modules/java/main/build/reports/jacoco/test/jacocoTestReport.xml
+        files: ./modules/java/main/build/reports/jacoco/test/jacocoTestReport.xml
         flags: java,unit
         fail_ci_if_error: false
         verbose: true
@@ -616,7 +616,7 @@ jobs:
       with:
         name: Nyx Go Errors unit tests
         #token: // not required as it's an open source project
-        files: modules/go/errors/build/test-results/test/test-coverprofile.out
+        files: ./modules/go/errors/build/test-results/test/test-coverprofile.out
         flags: go,unit
         fail_ci_if_error: false
         verbose: true
@@ -625,7 +625,7 @@ jobs:
       with:
         name: Nyx Go Utils unit tests
         #token: // not required as it's an open source project
-        files: modules/go/utils/build/test-results/test/test-coverprofile.out
+        files: ./modules/go/utils/build/test-results/test/test-coverprofile.out
         flags: go,unit
         fail_ci_if_error: false
         verbose: true
@@ -634,7 +634,7 @@ jobs:
       with:
         name: Nyx Go Version unit tests
         #token: // not required as it's an open source project
-        files: modules/go/version/build/test-results/test/test-coverprofile.out
+        files: ./modules/go/version/build/test-results/test/test-coverprofile.out
         flags: go,unit
         fail_ci_if_error: false
         verbose: true
@@ -643,7 +643,7 @@ jobs:
       with:
         name: Nyx Go Main unit tests
         #token: // not required as it's an open source project
-        files: modules/go/nyx/build/test-results/test/test-coverprofile.out
+        files: ./modules/go/nyx/build/test-results/test/test-coverprofile.out
         flags: go,unit
         fail_ci_if_error: false
         verbose: true
