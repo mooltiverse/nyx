@@ -319,6 +319,21 @@ to:
 ...
 ```
 
+### Build statistics
+
+#### Gradle scans
+
+[Gradle scans](https://scans.gradle.com/) are published by any Gradle execution on the CI servers, while if running locally they must be explicitly enabled by adding `--scan` to the Gradle arguments, like `./gradlew testClean --scan`.
+
+To retrieve the URL for a Gradle scan just look at the end of the console output from Gradle for a row like:
+
+```
+Publishing build scan...
+https://gradle.com/s/ac7cj7nadxrmm
+```
+
+Gradle scans are configured in the [`settings.gradle`](https://github.com/mooltiverse/nyx/blob/master/settings.gradle) file.
+
 ### Coding conventions
 
 This is open source software. Consider the people who will read your code, and make it look nice for them.

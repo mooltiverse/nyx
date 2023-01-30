@@ -5,6 +5,9 @@
 plugins {
   // use our own plugin
   id "com.mooltiverse.oss.nyx" version "2.0.0"
+
+  // Gradle Enterprise plugin (used for build scans)
+  id "com.gradle.enterprise" version "3.12.2"
 }
 
 /*------------------------------------------------------------------------------
@@ -27,6 +30,60 @@ include 'modules:java:gradle'
 /*------------------------------------------------------------------------------
   Extension configurations
 ------------------------------------------------------------------------------*/
+// Configure Gradle build scans
+// See https://docs.gradle.com/enterprise/gradle-plugin/#using_build_scans
+gradleEnterprise {
+  buildScan {
+    if (System.getenv("CI")) { // when running on a CI server
+      // always publish 
+      publishAlways()
+
+      // apply these tags when running on CI servers
+      tag "CI"
+
+      if (System.getenv("GITHUB_ACTIONS")) { // when running specifically on GitHub Actions
+        tag "GitHub"
+
+        // link the scan to the pipeline
+        link "Pipeline", "$nyxHomeURL/actions/runs/${System.getProperty("GITHUB_RUN_ID")}"
+      }
+
+      // do not exit unit upload has finished
+      uploadInBackground = false
+    } else {
+      // apply these tags when not running on CI servers
+      tag "local"
+    }
+
+    // add the git commit reference to the scan
+    def commitId = 'git rev-parse --verify HEAD'.execute().text.trim()
+    if (commitId) {
+        buildScan.value 'Git Commit ID', commitId
+        buildScan.link 'Source', "$nyxHomeURL/commit/$commitId"
+    }
+    // add the git branch reference to the scan
+    def branchName = 'git rev-parse --abbrev-ref HEAD'.execute().text.trim()
+    if (branchName) {
+        buildScan.value 'Git Branch Name', branchName
+        buildScan.link 'Source', "$nyxHomeURL/tree/$branchName"
+    }
+    // add the clean/dirty tag and values to the scan
+    def status = 'git status --porcelain'.execute().text
+    if (status) {
+        buildScan.tag 'dirty'
+        buildScan.value 'Git Status', 'dirty'
+    } else {
+        buildScan.tag 'clean'
+        buildScan.value 'Git Status', 'clean'
+    }
+
+    // accept the agreement so it doesn't propt during the build
+    termsOfServiceUrl = "https://gradle.com/terms-of-service"
+    termsOfServiceAgree = "yes"
+  }
+}
+
+// Configure Nyx
 nyx {
   // starting from the 'simple' preset gives us:
   // - the Conventional Commits convention
