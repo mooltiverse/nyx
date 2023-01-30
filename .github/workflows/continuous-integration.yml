@@ -381,7 +381,7 @@ jobs:
       uses: codecov/codecov-action@v3
       with:
         name: Nyx Java unit tests
-        #token: // not required as it's an open source project
+        #token: // not required as it's an open source project, but the Codecov App must be installed for the repository (https://github.com/apps/codecov)
         iles: ./modules/java/main/build/reports/jacoco/test/jacocoTestReport.xml,./modules/java/version/build/reports/jacoco/test/jacocoTestReport.xml
         flags: java,unit
         fail_ci_if_error: false
@@ -605,39 +605,12 @@ jobs:
           gradle-distribution-sha-256-sum-warning: false
     - name: Run Go Unit Tests with Gradle
       run: ./gradlew modules:go:test --build-cache --stacktrace
-    - name: Upload Go Errors code coverage statistics to Codecov
+    - name: Upload Go code coverage statistics to Codecov
       uses: codecov/codecov-action@v3
       with:
-        name: Nyx Go Errors unit tests
-        #token: // not required as it's an open source project
-        files: ./modules/go/errors/build/test-results/test/test-coverprofile.out
-        flags: go,unit
-        fail_ci_if_error: false
-        verbose: true
-    - name: Upload Go Utils code coverage statistics to Codecov
-      uses: codecov/codecov-action@v3
-      with:
-        name: Nyx Go Utils unit tests
-        #token: // not required as it's an open source project
-        files: ./modules/go/utils/build/test-results/test/test-coverprofile.out
-        flags: go,unit
-        fail_ci_if_error: false
-        verbose: true
-    - name: Upload Go Version code coverage statistics to Codecov
-      uses: codecov/codecov-action@v3
-      with:
-        name: Nyx Go Version unit tests
-        #token: // not required as it's an open source project
-        files: ./modules/go/version/build/test-results/test/test-coverprofile.out
-        flags: go,unit
-        fail_ci_if_error: false
-        verbose: true
-    - name: Upload Go Main code coverage statistics to Codecov
-      uses: codecov/codecov-action@v3
-      with:
-        name: Nyx Go Main unit tests
-        #token: // not required as it's an open source project
-        files: ./modules/go/nyx/build/test-results/test/test-coverprofile.out
+        name: Nyx Go unit tests
+        #token: // not required as it's an open source project, but the Codecov App must be installed for the repository (https://github.com/apps/codecov)
+        files: ./modules/go/nyx/build/test-results/test/test-coverprofile.out,./modules/go/version/build/test-results/test/test-coverprofile.out,./modules/go/errors/build/test-results/test/test-coverprofile.out,./modules/go/utils/build/test-results/test/test-coverprofile.out
         flags: go,unit
         fail_ci_if_error: false
         verbose: true
