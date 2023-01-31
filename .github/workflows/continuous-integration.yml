@@ -382,7 +382,7 @@ jobs:
         #token: // not required as it's an open source project, but the Codecov App must be installed for the repository (https://github.com/apps/codecov)
         files: ./modules/java/main/build/reports/jacoco/test/jacocoTestReport.xml,./modules/java/version/build/reports/jacoco/test/jacocoTestReport.xml
         flags: java,unit
-        fail_ci_if_error: false
+        fail_ci_if_error: true
         verbose: true
     - name: Archive Nyx state file
       uses: actions/upload-artifact@v3
@@ -611,7 +611,7 @@ jobs:
         #token: // not required as it's an open source project, but the Codecov App must be installed for the repository (https://github.com/apps/codecov)
         files: ./modules/go/nyx/build/test-results/test/test-coverprofile.out,./modules/go/version/build/test-results/test/test-coverprofile.out,./modules/go/errors/build/test-results/test/test-coverprofile.out,./modules/go/utils/build/test-results/test/test-coverprofile.out
         flags: go,unit
-        fail_ci_if_error: false
+        fail_ci_if_error: true
         verbose: true
     - name: Archive Nyx state file
       uses: actions/upload-artifact@v3
@@ -702,7 +702,7 @@ jobs:
         #token: // not required as it's an open source project, but the Codecov App must be installed for the repository (https://github.com/apps/codecov)
         files: ./modules/go/nyx/build/test-results/integrationTest/integrationTest-coverprofile.out,./modules/go/version/build/test-results/integrationTest/integrationTest-coverprofile.out,./modules/go/errors/build/test-results/integrationTest/integrationTest-coverprofile.out,./modules/go/utils/build/test-results/integrationTest/integrationTest-coverprofile.out
         flags: go,integration
-        fail_ci_if_error: false
+        fail_ci_if_error: true
         verbose: true
     - name: Archive Nyx state file
       uses: actions/upload-artifact@v3
@@ -794,7 +794,7 @@ jobs:
         #token: // not required as it's an open source project, but the Codecov App must be installed for the repository (https://github.com/apps/codecov)
         files: ./modules/go/nyx/build/test-results/functionalTest/functionalTest-coverprofile.out,./modules/go/version/build/test-results/functionalTest/functionalTest-coverprofile.out,./modules/go/errors/build/test-results/functionalTest/functionalTest-coverprofile.out,./modules/go/utils/build/test-results/functionalTest/functionalTest-coverprofile.out
         flags: go,integration
-        fail_ci_if_error: false
+        fail_ci_if_error: true
         verbose: true
     - name: Archive Nyx state file
       uses: actions/upload-artifact@v3
@@ -875,6 +875,15 @@ jobs:
         ORG_GRADLE_PROJECT_gitLabTestUserPrivateKeyWithPassphrase: ${{ secrets.TEST_GITLAB_USER_PRIVATE_KEY_WITH_PASSPHRASE }}       # The test password protected private key to test Nyx GitHub features
         ORG_GRADLE_PROJECT_gitLabTestUserPrivateKeyWithoutPassphrase: ${{ secrets.TEST_GITLAB_USER_PRIVATE_KEY_WITHOUT_PASSPHRASE }} # The test unprotected private key to test Nyx GitHub features
       run: ./gradlew modules:docker:functionalTest --build-cache --stacktrace
+    - name: Upload code coverage statistics to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        name: Nyx Docker functional tests
+        #token: // not required as it's an open source project, but the Codecov App must be installed for the repository (https://github.com/apps/codecov)
+        files: ./modules/docker/build/test-results/functionalTest/functionalTest-coverprofile.out
+        flags: go,integration
+        fail_ci_if_error: true
+        verbose: true
     - name: Archive Nyx state file
       uses: actions/upload-artifact@v3
       if: ${{ always() }}
