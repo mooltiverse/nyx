@@ -16,6 +16,8 @@ description = 'The Nyx Gradle plugin automates the sematic release process for G
   Configurations
 */
 configurations {
+  // this shouldn't be required but without this the plugin metadata is not available in the functional test classpath
+  functionalTestRuntimeOnly.extendsFrom testRuntimeClasspath
 }
 
 /*------------------------------------------------------------------------------
@@ -32,28 +34,32 @@ dependencies {
   functionalTestImplementation  project(path: ':modules:java:main', configuration: 'functionalTestExport')
 }
 
-functionalTest {
-  // Pass the credentials to test suites as per https://github.com/mooltiverse/nyx/blob/master/CONTRIBUTING.md#contributing-code
-  // Suggestion is to set the $GRADLE_USER_HOME environment variable and create a gradle.properties therein, with these
-  // properties defined
-  systemProperty 'gitHubTestUserToken', findProperty("gitHubTestUserToken")
-  systemProperty 'gitHubTestUserPublicKey', findProperty("gitHubTestUserPublicKey")
-  systemProperty 'gitHubTestUserPrivateKeyPassphrase', findProperty("gitHubTestUserPrivateKeyPassphrase")
-  systemProperty 'gitHubTestUserPrivateKeyWithPassphrase', findProperty("gitHubTestUserPrivateKeyWithPassphrase")
-  systemProperty 'gitHubTestUserPrivateKeyWithoutPassphrase', findProperty("gitHubTestUserPrivateKeyWithoutPassphrase")
-  systemProperty 'gitLabTestUserToken', findProperty("gitLabTestUserToken")
-  systemProperty 'gitLabTestUserPublicKey', findProperty("gitLabTestUserPublicKey")
-  systemProperty 'gitLabTestUserPrivateKeyPassphrase', findProperty("gitLabTestUserPrivateKeyPassphrase")
-  systemProperty 'gitLabTestUserPrivateKeyWithPassphrase', findProperty("gitLabTestUserPrivateKeyWithPassphrase")
-  systemProperty 'gitLabTestUserPrivateKeyWithoutPassphrase', findProperty("gitLabTestUserPrivateKeyWithoutPassphrase")
-
-  // Pass the 'quickTests' property (if declared by user, i.e. running ''./gradlew -PquickTests=true') to reduce the number of tests
-  systemProperty 'quickTests', findProperty("quickTests")
-}
 
 /*------------------------------------------------------------------------------
   Extension configurations
 ------------------------------------------------------------------------------*/
+// Additional test sets created using the 'jvm-test-suite'
+// These tests are better isolated from unit tests (in the src/test directory of each sub project)
+// as they may take longer.
+testing {
+    suites {
+        // This is the built-in suite
+        test {
+            // Here we can configure additional dependencies, properties and options for these tests
+        }
+
+        // Integration tests can be implemented in the directory src/integrationTest/[java|groovy]
+        integrationTest(JvmTestSuite) {
+            // Here we can configure additional dependencies, properties and options for these tests
+        }
+
+        // Functional tests can be implemented in the directory src/functionalTest/[java|groovy]
+        functionalTest(JvmTestSuite) {
+            // Here we can configure additional dependencies, properties and options for these tests
+        }
+    }
+}
+
 gradlePlugin {
     plugins {
         nyxPlugin {
