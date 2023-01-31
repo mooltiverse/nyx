@@ -64,9 +64,6 @@ coverage:
 flag_management:
   default_rules:
     carryforward: false
-    target: 80%
-    threshold: 80% # this threshold is so high for the reasons on top of this file
-    informational: true
 
 # This block configures the comment that will appear in GitHub's pull requests
 comment:
