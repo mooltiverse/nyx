@@ -881,7 +881,7 @@ jobs:
         name: Nyx Docker functional tests
         #token: // not required as it's an open source project, but the Codecov App must be installed for the repository (https://github.com/apps/codecov)
         files: ./modules/docker/build/test-results/functionalTest/functionalTest-coverprofile.out
-        flags: go,integration
+        flags: docker,functional
         fail_ci_if_error: true
         verbose: true
     - name: Archive Nyx state file
