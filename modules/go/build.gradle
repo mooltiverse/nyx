@@ -16,13 +16,6 @@ description = 'All the Nyx Go artifacts'
   This is the configuration for this project and all sub-projects
 ------------------------------------------------------------------------------*/
 allprojects {    
-    /*------------------------------------------------------------------------------
-      Plugins DSL block
-      https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
-    ------------------------------------------------------------------------------*/
-    // this shouldn't be required as it's applied in the root build script for all projects
-    // but it seems it's lost here so we redeclare it
-    apply plugin: 'java'                                  // See: https://docs.gradle.org/current/userguide/java_plugin.html
 }
 
 /*------------------------------------------------------------------------------
@@ -359,10 +352,10 @@ subprojects {
     /*------------------------------------------------------------------------------
       Additional tasks
     ------------------------------------------------------------------------------*/
-    /*task test(group: 'verification', description: 'Runs the unit tests') {
+    task test(group: 'verification', description: 'Runs the unit tests') {
         // Task dependencies
         dependsOn goTest
-    }*/
+    }
 
     task integrationTest(group: 'verification', description: 'Runs the integration tests') {
         // Task dependencies
@@ -417,12 +410,12 @@ dependencies {
   Additional tasks
 ------------------------------------------------------------------------------*/
 // Create an overall Go unit test lifecycle task to trigger all unit tests in subprojects 
-/*task test() {
+task test() {
     description 'Runs all Go unit tests and verification tasks'
     group 'Verification'
 
     dependsOn subprojects*.test
-}*/
+}
 
 // Create an overall Go integration test lifecycle task to trigger all integration tests in subprojects 
 task integrationTest() {
