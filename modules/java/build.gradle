@@ -97,6 +97,10 @@ allprojects {
     apply plugin: 'java'                                // See: https://docs.gradle.org/current/userguide/java_plugin.html
     apply plugin: 'eclipse'                             // See: https://docs.gradle.org/current/userguide/eclipse_plugin.html
 
+    // This plugin applied also to the global Java project makes available the 'testCodeCoverageReport'
+    // to aggregate all JaCoCo metrics from subprojects into one.
+    apply plugin: 'jacoco-report-aggregation'           // See: https://docs.gradle.org/current/userguide/jacoco_report_aggregation_plugin.html
+
     /*------------------------------------------------------------------------------
       Repositories and dependencies
       https://docs.gradle.org/current/userguide/dependency_management_for_java_projects.html
@@ -107,6 +111,24 @@ allprojects {
             name = "mavenDir"
             // This repository is useful to check artifacts and their layout before they are published
             url = "file://${buildDir}/maven"
+        }
+    }
+
+    dependencies {
+        // This lets the JaCoCo aggregator know which subprojects to aggregate from
+        jacocoAggregation subprojects.findAll()
+    }
+    reporting {
+        reports {
+            testCodeCoverageReport(JacocoCoverageReport) { 
+                // It looks there is no way to select all test types here,
+                // only one value is allowed and when empty the UNIT_TEST is assumed by default
+                /*
+                testType = TestSuiteType.UNIT_TEST
+                testType = TestSuiteType.INTEGRATION_TEST
+                testType = TestSuiteType.FUNCTIONAL_TEST
+                */
+            }
         }
     }
 
@@ -189,6 +211,7 @@ subprojects {
       https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
     ------------------------------------------------------------------------------*/
     apply plugin: 'jacoco'                              // See: https://docs.gradle.org/current/userguide/jacoco_plugin.html
+    //apply plugin: 'jacoco-report-aggregation'           // See: https://docs.gradle.org/current/userguide/jacoco_report_aggregation_plugin.html
 
     //apply plugin: 'checkstyle'                        // See: https://docs.gradle.org/current/userguide/checkstyle_plugin.html
     //apply plugin: 'pmd'                               // See: https://docs.gradle.org/current/userguide/pmd_plugin.html
@@ -312,8 +335,10 @@ subprojects {
     /*------------------------------------------------------------------------------
       Additional task dependencies
     ------------------------------------------------------------------------------*/
-    tasks.jacocoTestReport.dependsOn tasks.test
-    tasks.check.dependsOn tasks.jacocoTestReport
+    // Make sure all tests are finalized with the generation of JaCoCo coverave reports
+    tasks.test.finalizedBy tasks.jacocoTestReport
+    tasks.integrationTest.finalizedBy tasks.integrationTestCodeCoverageReport
+    tasks.functionalTest.finalizedBy tasks.functionalTestCodeCoverageReport
 }
 
 /*------------------------------------------------------------------------------
@@ -559,14 +584,15 @@ task functionalTest() {
     dependsOn subprojects*.functionalTest
 }
 
-// Aggregate all JaCoCo reports from sub projects into one
+// Aggregate all JUnit reports from sub projects into one
 task testReport(type: TestReport) {
-    dependsOn subprojects*.jacocoTestReport
+    description 'Aggregates all JUnit test reports into one'
+    group 'Verification'
 
     destinationDir = file("$buildDir/reports/tests/all")
     // Include the results from the "test" task in all subprojects
     // Be careful as including report sets implicitly makes the task dependent on the tasks producing those reports
-    reportOn subprojects*.test//, subprojects*.integrationTest, subprojects*.functionalTest
+    reportOn subprojects*.test, subprojects*.integrationTest, subprojects*.functionalTest
 }
 
 /*------------------------------------------------------------------------------
