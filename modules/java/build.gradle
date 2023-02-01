@@ -97,24 +97,6 @@ allprojects {
     apply plugin: 'java'                                // See: https://docs.gradle.org/current/userguide/java_plugin.html
     apply plugin: 'eclipse'                             // See: https://docs.gradle.org/current/userguide/eclipse_plugin.html
 
-    // The Eclipse plugin is also used for VSCode.
-    // This plugin generates .project and .classpath files used by Eclipse and/or VSCode based on the Gradle configurations.
-    // There's still an issue caused by Buildship that always overwrites the generated .classpath with its own but at least
-    // it does so by taking into account also the values defined here.
-    // To clean and generate new .project and .classpath files run ./gradlew cleanEclipse eclipse
-    eclipse {
-        // control how the .project files are generated
-        //project {}
-        // control how the .classpath files are generated
-        classpath {
-            // the default output directory for java .class files
-            defaultOutputDir = file('build/classes')
-            // this is supposed to prevent Buildship to overwrite the .classpath file, according to
-            // https://stackoverflow.com/questions/49068870/buildship-keeps-overwriting-classpath
-            containers 'org.eclipse.buildship.core.gradleclasspathcontainer'
-        }
-    }
-
     /*------------------------------------------------------------------------------
       Repositories and dependencies
       https://docs.gradle.org/current/userguide/dependency_management_for_java_projects.html
@@ -150,6 +132,24 @@ allprojects {
         withJavadocJar()
     }
 
+    jar {
+        manifest {
+            attributes(
+                'Specification-Title'       : "${nyxID} ${project.name}",
+                'Specification-Version'     : rootProject.version,
+                'Specification-Vendor'      : nyxOrganizationName,
+                'Implementation-Title'      : "${nyxID} ${project.name} java",
+                'Implementation-Version'    : rootProject.version,
+                'Implementation-Vendor'     : nyxOrganizationName,
+                'Build-Timestamp'           : new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").format(new Date()),
+                'Build-Revision'            : rootProject.version,
+                'Created-By'                : "Gradle ${gradle.gradleVersion}",
+                'Build-Jdk'                 : "${System.properties['java.version']} (${System.properties['java.vendor']} ${System.properties['java.vm.version']})",
+                'Build-OS'                  : "${System.properties['os.name']} ${System.properties['os.arch']} ${System.properties['os.version']}"
+            )
+        }
+    }
+
     javadoc {
         options {
             // Link generated javadocs to external docs
@@ -158,6 +158,24 @@ allprojects {
             links 'https://docs.gradle.org/current/javadoc/'
             links 'https://junit.org/junit5/docs/current/api/'
             links 'https://docs.oracle.com/en/java/javase/15/docs/api/'
+        }
+    }
+
+    // The Eclipse plugin is also used for VSCode.
+    // This plugin generates .project and .classpath files used by Eclipse and/or VSCode based on the Gradle configurations.
+    // There's still an issue caused by Buildship that always overwrites the generated .classpath with its own but at least
+    // it does so by taking into account also the values defined here.
+    // To clean and generate new .project and .classpath files run ./gradlew cleanEclipse eclipse
+    eclipse {
+        // control how the .project files are generated
+        //project {}
+        // control how the .classpath files are generated
+        classpath {
+            // the default output directory for java .class files
+            defaultOutputDir = file('build/classes')
+            // this is supposed to prevent Buildship to overwrite the .classpath file, according to
+            // https://stackoverflow.com/questions/49068870/buildship-keeps-overwriting-classpath
+            containers 'org.eclipse.buildship.core.gradleclasspathcontainer'
         }
     }
 }
@@ -284,28 +302,6 @@ subprojects {
         functionalTestRuntime.extendsFrom testRuntime
     }
 
-    // Set jar manifest properties
-    jar {
-        manifest {
-            attributes(
-                'Specification-Title'       : "${nyxID} ${project.name}",
-                'Specification-Version'     : rootProject.version,
-                'Specification-Vendor'      : nyxOrganizationName,
-                'Implementation-Title'      : "${nyxID} ${project.name} java",
-                'Implementation-Version'    : rootProject.version,
-                'Implementation-Vendor'     : nyxOrganizationName,
-                'Build-Timestamp'           : new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").format(new Date()),
-                'Build-Revision'            : rootProject.version,
-                'Created-By'                : "Gradle ${gradle.gradleVersion}",
-                'Build-Jdk'                 : "${System.properties['java.version']} (${System.properties['java.vendor']} ${System.properties['java.vm.version']})",
-                'Build-OS'                  : "${System.properties['os.name']} ${System.properties['os.arch']} ${System.properties['os.version']}"
-            )
-        }
-    }
-
-    // TODO: aggregate JaCoCo reports among sub-projects into one using the JaCoCo Report Aggregation Plugin
-    // (https://docs.gradle.org/7.4/userguide/jacoco_report_aggregation_plugin.html)
-    // as per https://docs.gradle.org/7.4/release-notes.html#new-features-and-usability-improvements
     jacocoTestReport {
         reports {
             html.enabled true
@@ -329,22 +325,6 @@ subprojects {
 javadoc.source(subprojects.collect { it.sourceSets.main.allJava })
 javadoc.classpath = files(subprojects.collect { it.sourceSets.main.compileClasspath })
 sourcesJar.from(subprojects.collect { it.sourceSets.main.allJava })
-
-/*------------------------------------------------------------------------------
-  Test reports
-------------------------------------------------------------------------------*/
-// TODO: aggregate test reports among sub-projects into one using the Test Report Aggregation Plugin
-// (https://docs.gradle.org/7.4/userguide/test_report_aggregation_plugin.html)
-// as per https://docs.gradle.org/7.4/release-notes.html#new-features-and-usability-improvements
-task testReport(type: TestReport) {
-    dependsOn subprojects*.jacocoTestReport
-
-    destinationDir = file("$buildDir/reports/tests/all")
-    // Include the results from the "test" task in all subprojects
-    // Be careful as including report sets implicitly makes the task dependent on the tasks producing those reports
-    reportOn subprojects*.test//, subprojects*.integrationTest, subprojects*.functionalTest
-}
-tasks.check.dependsOn tasks.testReport
 
 /*------------------------------------------------------------------------------
   Publications
@@ -579,11 +559,24 @@ task functionalTest() {
     dependsOn subprojects*.functionalTest
 }
 
+// Aggregate all JaCoCo reports from sub projects into one
+task testReport(type: TestReport) {
+    dependsOn subprojects*.jacocoTestReport
+
+    destinationDir = file("$buildDir/reports/tests/all")
+    // Include the results from the "test" task in all subprojects
+    // Be careful as including report sets implicitly makes the task dependent on the tasks producing those reports
+    reportOn subprojects*.test//, subprojects*.integrationTest, subprojects*.functionalTest
+}
+
 /*------------------------------------------------------------------------------
   Additional task dependencies
 ------------------------------------------------------------------------------*/
 // Make this overall assemble task dependent on subprojects assemble tasks
 tasks.assemble.dependsOn subprojects*.assemble
+
+// Make the aggregated check task also depend on the aggregated test reports
+tasks.check.dependsOn tasks.testReport
 
 // Make this overall Java unit test task dependent on subprojects unit test tasks
 // so that we can run all Java unit tests with one task
