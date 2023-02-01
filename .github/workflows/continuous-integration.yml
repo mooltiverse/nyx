@@ -382,7 +382,7 @@ jobs:
         #token: // not required as it's an open source project, but the Codecov App must be installed for the repository (https://github.com/apps/codecov)
         files: ./modules/java/main/build/reports/jacoco/test/jacocoTestReport.xml,./modules/java/version/build/reports/jacoco/test/jacocoTestReport.xml
         flags: java,unit
-        fail_ci_if_error: true
+        fail_ci_if_error: false # Codecov upload intermittently fails so setting this to false is the only way to avoid it breaking our builds. Codecov's bug is https://github.com/codecov/codecov-action/issues/557
         verbose: true
     - name: Archive Nyx state file
       uses: actions/upload-artifact@v3
@@ -466,7 +466,7 @@ jobs:
     #    #token: // not required as it's an open source project, but the Codecov App must be installed for the repository (https://github.com/apps/codecov)
     #    files: ./modules/java/main/build/reports/jacoco/test/jacocoTestReport.xml,./modules/java/version/build/reports/jacoco/test/jacocoTestReport.xml
     #    flags: java,integration
-    #    fail_ci_if_error: true
+    #    fail_ci_if_error: false # Codecov upload intermittently fails so setting this to false is the only way to avoid it breaking our builds. Codecov's bug is https://github.com/codecov/codecov-action/issues/557
     #    verbose: true
     - name: Archive Nyx state file
       uses: actions/upload-artifact@v3
@@ -551,7 +551,7 @@ jobs:
     #    #token: // not required as it's an open source project, but the Codecov App must be installed for the repository (https://github.com/apps/codecov)
     #    files: ./modules/java/main/build/reports/jacoco/test/jacocoTestReport.xml,./modules/java/version/build/reports/jacoco/test/jacocoTestReport.xml
     #    flags: java,functional
-    #    fail_ci_if_error: true
+    #    fail_ci_if_error: false # Codecov upload intermittently fails so setting this to false is the only way to avoid it breaking our builds. Codecov's bug is https://github.com/codecov/codecov-action/issues/557
     #    verbose: true
     - name: Archive Nyx state file
       uses: actions/upload-artifact@v3
@@ -629,7 +629,7 @@ jobs:
         #token: // not required as it's an open source project, but the Codecov App must be installed for the repository (https://github.com/apps/codecov)
         files: ./modules/go/nyx/build/test-results/test/test-coverprofile.out,./modules/go/version/build/test-results/test/test-coverprofile.out,./modules/go/errors/build/test-results/test/test-coverprofile.out,./modules/go/utils/build/test-results/test/test-coverprofile.out
         flags: go,unit
-        fail_ci_if_error: true
+        fail_ci_if_error: false # Codecov upload intermittently fails so setting this to false is the only way to avoid it breaking our builds. Codecov's bug is https://github.com/codecov/codecov-action/issues/557
         verbose: true
     - name: Archive Nyx state file
       uses: actions/upload-artifact@v3
@@ -720,7 +720,7 @@ jobs:
         #token: // not required as it's an open source project, but the Codecov App must be installed for the repository (https://github.com/apps/codecov)
         files: ./modules/go/nyx/build/test-results/integrationTest/integrationTest-coverprofile.out,./modules/go/version/build/test-results/integrationTest/integrationTest-coverprofile.out,./modules/go/errors/build/test-results/integrationTest/integrationTest-coverprofile.out,./modules/go/utils/build/test-results/integrationTest/integrationTest-coverprofile.out
         flags: go,integration
-        fail_ci_if_error: true
+        fail_ci_if_error: false # Codecov upload intermittently fails so setting this to false is the only way to avoid it breaking our builds. Codecov's bug is https://github.com/codecov/codecov-action/issues/557
         verbose: true
     - name: Archive Nyx state file
       uses: actions/upload-artifact@v3
@@ -812,7 +812,7 @@ jobs:
         #token: // not required as it's an open source project, but the Codecov App must be installed for the repository (https://github.com/apps/codecov)
         files: ./modules/go/nyx/build/test-results/functionalTest/functionalTest-coverprofile.out,./modules/go/version/build/test-results/functionalTest/functionalTest-coverprofile.out,./modules/go/errors/build/test-results/functionalTest/functionalTest-coverprofile.out,./modules/go/utils/build/test-results/functionalTest/functionalTest-coverprofile.out
         flags: go,integration
-        fail_ci_if_error: true
+        fail_ci_if_error: false # Codecov upload intermittently fails so setting this to false is the only way to avoid it breaking our builds. Codecov's bug is https://github.com/codecov/codecov-action/issues/557
         verbose: true
     - name: Archive Nyx state file
       uses: actions/upload-artifact@v3
@@ -900,7 +900,7 @@ jobs:
         #token: // not required as it's an open source project, but the Codecov App must be installed for the repository (https://github.com/apps/codecov)
         files: ./modules/docker/build/test-results/functionalTest/functionalTest-coverprofile.out
         flags: docker,functional
-        fail_ci_if_error: true
+        fail_ci_if_error: false # Codecov upload intermittently fails so setting this to false is the only way to avoid it breaking our builds. Codecov's bug is https://github.com/codecov/codecov-action/issues/557
         verbose: true
     - name: Archive Nyx state file
       uses: actions/upload-artifact@v3
