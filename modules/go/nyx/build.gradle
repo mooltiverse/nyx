@@ -58,6 +58,18 @@ dependencies {
 }
 
 /*------------------------------------------------------------------------------
+  Extension configurations
+------------------------------------------------------------------------------*/
+// Configure SonarSource
+// See: https://docs.sonarcloud.io/advanced-setup/ci-based-analysis/sonarscanner-for-gradle/
+sonarqube {
+    properties {
+        property "sonar.projectKey", "mooltiverse_nyx_go_nyx"
+        property "sonar.go.coverage.reportPaths", "$buildDir/test-results/test/test-coverprofile.out,$buildDir/test-results/integrationTest/integrationTest-coverprofile.out,$buildDir/test-results/functionalTest/functionalTest-coverprofile.out"
+    }
+}
+
+/*------------------------------------------------------------------------------
   Additional tasks
 ------------------------------------------------------------------------------*/
 // Create a build task for the specific binary for each target platform

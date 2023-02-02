@@ -84,3 +84,13 @@ testing {
         }
     }
 }
+
+// Configure SonarSource
+// See: https://docs.sonarcloud.io/advanced-setup/ci-based-analysis/sonarscanner-for-gradle/
+sonarqube {
+    properties {
+        property "sonar.projectKey", "mooltiverse_nyx_java_main"
+        property "sonar.junit.reportPaths", "$buildDir/test-results/test/*.xml,$buildDir/test-results/integrationTest/*.xml,$buildDir/test-results/functionalTest/*.xml"
+        property "sonar.coverage.jacoco.xmlReportPaths", "$buildDir/reports/jacoco/test/jacocoTestReport.xml,$buildDir/reports/jacoco/integrationTestCodeCoverageReport/integrationTestCodeCoverageReport.xml,$buildDir/reports/jacoco/functionalTestCodeCoverageReport/functionalTestCodeCoverageReport.xml"
+    }
+}
