@@ -409,7 +409,7 @@ dependencies {
 /*------------------------------------------------------------------------------
   Extension configurations
 ------------------------------------------------------------------------------*/
-// Configure SonarSource
+// Configure SonarCloud
 // See: https://docs.sonarcloud.io/advanced-setup/ci-based-analysis/sonarscanner-for-gradle/
 sonarqube {
     properties {
