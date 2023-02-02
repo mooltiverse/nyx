@@ -462,7 +462,6 @@ jobs:
   # may fail to store at the end (but this won't affect other jobs).
   java-integration-test:
     name: Test (Integration) - Java
-    if: ${{ false }} # TODO: remove this line as it just skips expensive steps while testing SonarCloud
     needs: java-unit-test
     runs-on: ubuntu-latest
     steps:
@@ -558,7 +557,6 @@ jobs:
   # may fail to store at the end (but this won't affect other jobs).
   java-functional-test:
     name: Test (Functional) - Java
-    if: ${{ false }} # TODO: remove this line as it just skips expensive steps while testing SonarCloud
     needs: java-integration-test
     runs-on: ubuntu-latest
     steps:
@@ -743,7 +741,6 @@ jobs:
   # may fail to store at the end (but this won't affect other jobs).
   go-integration-test:
     name: Test (Integration) - Go
-    if: ${{ false }} # TODO: remove this line as it just skips expensive steps while testing SonarCloud
     needs: go-unit-test
     strategy:
       matrix:
@@ -847,7 +844,6 @@ jobs:
   # may fail to store at the end (but this won't affect other jobs).
   go-functional-test:
     name: Test (Functional) - Go
-    if: ${{ false }} # TODO: remove this line as it just skips expensive steps while testing SonarCloud
     needs: go-integration-test
     strategy:
       matrix:
@@ -952,7 +948,6 @@ jobs:
   # may fail to store at the end (but this won't affect other jobs).
   docker-functional-test:
     name: Test (Functional) - Docker
-    if: ${{ false }} # TODO: remove this line as it just skips expensive steps while testing SonarCloud
     needs: build-docker
     runs-on: ubuntu-latest
     steps:
@@ -1047,7 +1042,6 @@ jobs:
 
   publish:
     name: Publish
-    if: ${{ false }} # TODO: remove this line as it just skips expensive steps while testing SonarCloud
     needs: [build-merge,java-unit-test,java-integration-test,java-functional-test,go-unit-test,go-integration-test,go-functional-test,docker-functional-test]
     runs-on: ubuntu-latest
     steps:
@@ -1124,7 +1118,6 @@ jobs:
 
   release:
     name: Release
-    if: ${{ false }} # TODO: remove this line as it just skips expensive steps while testing SonarCloud
     needs: publish
     runs-on: ubuntu-latest
     steps:
