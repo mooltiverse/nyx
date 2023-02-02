@@ -246,12 +246,12 @@ subprojects {
                 testType = TestSuiteType.UNIT_TEST
                 dependencies {
                     // plug the Logback SLF4J implementation when testing so we can get log messages logged to the standard output
-                    runtimeOnly    'ch.qos.logback:logback-core:1.4.1'
-                    runtimeOnly    'ch.qos.logback:logback-classic:1.4.1'
+                    runtimeOnly    'ch.qos.logback:logback-core:1.4.5'
+                    runtimeOnly    'ch.qos.logback:logback-classic:1.4.5'
 
                     // The SLF4J framework that prints all test output to System err
                     // See http://www.slf4j.org/apidocs/org/slf4j/impl/SimpleLogger.html for the system properties available to change verbosity levels
-                    runtimeOnly    'org.slf4j:slf4j-simple:2.0.2'
+                    runtimeOnly    'org.slf4j:slf4j-simple:2.0.6'
                 }
             }
 

@@ -30,14 +30,14 @@ configurations {
 dependencies {
   // Import dependencies from other modules of this project
   api                   project(':modules:java:version')
-  implementation        'org.slf4j:slf4j-api:2.0.2'                                                // SLF4J API (http://www.slf4j.org/)
+  implementation        'org.slf4j:slf4j-api:2.0.6'                                                // SLF4J API (http://www.slf4j.org/)
   implementation        'org.eclipse.jgit:org.eclipse.jgit:6.4.0.202211300538-r'                   // JGit (https://www.eclipse.org/jgit/)
   implementation        'org.eclipse.jgit:org.eclipse.jgit.ssh.jsch:6.4.0.202211300538-r'          // JGit JSch extension (https://www.eclipse.org/jgit/)
-  implementation        'com.github.mwiede:jsch:0.2.6'                                             // JSch SSH2 Java library (https://github.com/mwiede/jsch)
+  implementation        'com.github.mwiede:jsch:0.2.7'                                             // JSch SSH2 Java library (https://github.com/mwiede/jsch)
   implementation        'com.fasterxml.jackson.core:jackson-databind:2.13.4'                       // Jackson JSON library (https://github.com/FasterXML/jackson)
   implementation        'com.fasterxml.jackson.core:jackson-annotations:2.13.4'                    // Jackson JSON library (https://github.com/FasterXML/jackson)
   implementation        'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.13.4'          // Jackson YAML library (https://github.com/FasterXML/jackson-dataformats-text/tree/master/yaml)
-  implementation        'com.github.jknack:handlebars:4.3.0'                                       // Handlebars library (https://github.com/jknack/handlebars.java)
+  implementation        'com.github.jknack:handlebars:4.3.1'                                       // Handlebars library (https://github.com/jknack/handlebars.java)
   implementation        'org.kohsuke:github-api:1.313'                                             // GitHub API client Java library (https://github-api.kohsuke.org/)
 
   // See the 'integrationTestExport' and 'functionalTestExport' above about this

@@ -4,7 +4,7 @@
 ------------------------------------------------------------------------------*/
 plugins {
     id 'java-gradle-plugin'                             // See: https://docs.gradle.org/current/userguide/java_gradle_plugin.html
-    id 'com.gradle.plugin-publish' version '1.0.0'      // See: https://guides.gradle.org/publishing-plugins-to-gradle-plugin-portal/ and https://plugins.gradle.org/docs/publish-plugin
+    id 'com.gradle.plugin-publish' version '1.1.0'      // See: https://guides.gradle.org/publishing-plugins-to-gradle-plugin-portal/ and https://plugins.gradle.org/docs/publish-plugin
 }
 
 /*------------------------------------------------------------------------------
