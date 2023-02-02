@@ -30,6 +30,7 @@
 # The caches we use in the pipeline are:
 # - the pipeline cache (using key pipeline-${{ github.run_id }}-[JOB_ID]) that brings
 #   some pipeline overall artifacts like the Nyx state
+# - the SonarCloud cache (using key sonar-${{ github.run_id }}-[JOB_ID])
 # - the Java cache (using key java-${{ github.run_id }}--[JOB_ID]) that brings
 #   Java specific artifacts from the assemble tasks up to tests
 # - the Go cache (using key go-${{ github.run_id }}--[JOB_ID]) that brings
@@ -82,6 +83,13 @@ jobs:
           build/
         key: pipeline-${{ github.run_id }}-${{ github.job }}
         #restore-keys: not used here, start from scratch
+    # Bootstrap (no restore-keys) the SonarCloud cache
+    - name: Set up the SonarCloud cache
+      uses: actions/cache@v1
+      with:
+        path: ~/.sonar/cache
+        key: sonar-${{ github.run_id }}-${{ github.job }}
+        #restore-keys: sonar-${{ github.run_id }}-${{ github.job }}
     # Running the gradle-cache-action with no arguments makes it run just as a remote cache and not as a wrapper
     - name: Enable the Gradle remote cache
       uses: burrunan/gradle-cache-action@v1
@@ -130,6 +138,13 @@ jobs:
         key: pipeline-${{ github.run_id }}-${{ github.job }}
         restore-keys: |
           pipeline-${{ github.run_id }}-init
+    # Set up the SonarCloud cache
+    - name: Set up the SonarCloud cache
+      uses: actions/cache@v1
+      with:
+        path: ~/.sonar/cache
+        key: sonar-${{ github.run_id }}-${{ github.job }}
+        restore-keys: sonar-${{ github.run_id }}-${{ github.job }}
     # Bootstrap (no restore-keys) the Java cache and store it as -build-java
     - name: Set up the Java cache bringing Java artifacts
       uses: actions/cache@v3
@@ -145,6 +160,11 @@ jobs:
           gradle-distribution-sha-256-sum-warning: false
     - name: Assemble with Gradle
       run: ./gradlew modules:java:assemble --build-cache --stacktrace
+    - name: Scan with SonarCloud
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: ./gradlew sonar --build-cache --stacktrace --info
     - name: Archive Nyx state file
       uses: actions/upload-artifact@v3
       if: ${{ always() }}
@@ -193,6 +213,13 @@ jobs:
         key: pipeline-${{ github.run_id }}-${{ github.job }}
         restore-keys: |
           pipeline-${{ github.run_id }}-init
+    # Set up the SonarCloud cache
+    - name: Set up the SonarCloud cache
+      uses: actions/cache@v1
+      with:
+        path: ~/.sonar/cache
+        key: sonar-${{ github.run_id }}-${{ github.job }}
+        restore-keys: sonar-${{ github.run_id }}-${{ github.job }}
     # Bootstrap (no restore-keys) the Go cache and store it as -build-go
     - name: Set up the Go cache bringing Go artifacts
       uses: actions/cache@v3
@@ -210,6 +237,11 @@ jobs:
           gradle-distribution-sha-256-sum-warning: false
     - name: Assemble with Gradle
       run: ./gradlew modules:go:assemble --build-cache --stacktrace
+    - name: Scan with SonarCloud
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: ./gradlew sonar --build-cache --stacktrace --info
     - name: Archive Nyx state file
       uses: actions/upload-artifact@v3
       if: ${{ always() }}
@@ -253,6 +285,13 @@ jobs:
         key: pipeline-${{ github.run_id }}-${{ github.job }}
         restore-keys: |
           pipeline-${{ github.run_id }}-init
+    # Set up the SonarCloud cache
+    - name: Set up the SonarCloud cache
+      uses: actions/cache@v1
+      with:
+        path: ~/.sonar/cache
+        key: sonar-${{ github.run_id }}-${{ github.job }}
+        restore-keys: sonar-${{ github.run_id }}-${{ github.job }}
     # Bootstrap (no restore-keys) the Docker cache starting from the -build-go (to get binaries) and store it as -build-docker
     - name: Set up the Go cache bringing Go artifacts
       uses: actions/cache@v3
@@ -272,6 +311,11 @@ jobs:
           gradle-distribution-sha-256-sum-warning: false
     - name: Assemble with Gradle
       run: ./gradlew modules:docker:assemble --build-cache --stacktrace
+    - name: Scan with SonarCloud
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: ./gradlew sonar --build-cache --stacktrace --info
     - name: Archive Nyx state file
       uses: actions/upload-artifact@v3
       if: ${{ always() }}
@@ -358,6 +402,13 @@ jobs:
         path: |
           build/
         key: pipeline-${{ github.run_id }}-build-java
+    # Set up the SonarCloud cache
+    - name: Set up the SonarCloud cache
+      uses: actions/cache@v1
+      with:
+        path: ~/.sonar/cache
+        key: sonar-${{ github.run_id }}-${{ github.job }}
+        restore-keys: sonar-${{ github.run_id }}-${{ github.job }}
     # Start from the -build-java cache and save the job output cache as -java-unit-test
     - name: Set up the Java cache bringing Java artifacts
       uses: actions/cache@v3
@@ -384,6 +435,11 @@ jobs:
         flags: java,unit
         fail_ci_if_error: false # Codecov upload intermittently fails so setting this to false is the only way to avoid it breaking our builds. Codecov's bug is https://github.com/codecov/codecov-action/issues/557
         verbose: true
+    - name: Scan test reports and metrics with SonarCloud
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: ./gradlew sonar --build-cache --stacktrace --info
     - name: Archive Nyx state file
       uses: actions/upload-artifact@v3
       if: ${{ always() }}
@@ -429,6 +485,13 @@ jobs:
         path: |
           build/
         key: pipeline-${{ github.run_id }}-build-java
+    # Set up the SonarCloud cache
+    - name: Set up the SonarCloud cache
+      uses: actions/cache@v1
+      with:
+        path: ~/.sonar/cache
+        key: sonar-${{ github.run_id }}-${{ github.job }}
+        restore-keys: sonar-${{ github.run_id }}-${{ github.job }}
     # Start from the -java-unit-test cache and save the job output cache as -java-integration-test
     - name: Set up the Java cache bringing Java artifacts
       uses: actions/cache@v3
@@ -467,6 +530,11 @@ jobs:
         flags: java,integration
         fail_ci_if_error: false # Codecov upload intermittently fails so setting this to false is the only way to avoid it breaking our builds. Codecov's bug is https://github.com/codecov/codecov-action/issues/557
         verbose: true
+    - name: Scan test reports and metrics with SonarCloud
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: ./gradlew sonar --build-cache --stacktrace --info
     - name: Archive Nyx state file
       uses: actions/upload-artifact@v3
       if: ${{ always() }}
@@ -512,6 +580,13 @@ jobs:
         path: |
           build/
         key: pipeline-${{ github.run_id }}-build-java
+    # Set up the SonarCloud cache
+    - name: Set up the SonarCloud cache
+      uses: actions/cache@v1
+      with:
+        path: ~/.sonar/cache
+        key: sonar-${{ github.run_id }}-${{ github.job }}
+        restore-keys: sonar-${{ github.run_id }}-${{ github.job }}
     # Start from the -java-integration-test cache and save the job output cache as -java-functional-test
     - name: Set up the Java cache bringing Java artifacts
       uses: actions/cache@v3
@@ -551,6 +626,11 @@ jobs:
         flags: java,functional
         fail_ci_if_error: false # Codecov upload intermittently fails so setting this to false is the only way to avoid it breaking our builds. Codecov's bug is https://github.com/codecov/codecov-action/issues/557
         verbose: true
+    - name: Scan test reports and metrics with SonarCloud
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: ./gradlew sonar --build-cache --stacktrace --info
     - name: Archive Nyx state file
       uses: actions/upload-artifact@v3
       if: ${{ always() }}
@@ -600,6 +680,13 @@ jobs:
         path: |
           build/
         key: pipeline-${{ github.run_id }}-build-java
+    # Set up the SonarCloud cache
+    - name: Set up the SonarCloud cache
+      uses: actions/cache@v1
+      with:
+        path: ~/.sonar/cache
+        key: sonar-${{ github.run_id }}-${{ github.job }}
+        restore-keys: sonar-${{ github.run_id }}-${{ github.job }}
     # Start from the -build-go cache and save the job output cache as -go-unit-test
     - name: Set up the Go cache bringing Go artifacts
       uses: actions/cache@v3
@@ -629,6 +716,11 @@ jobs:
         flags: go,unit
         fail_ci_if_error: false # Codecov upload intermittently fails so setting this to false is the only way to avoid it breaking our builds. Codecov's bug is https://github.com/codecov/codecov-action/issues/557
         verbose: true
+    - name: Scan test reports and metrics with SonarCloud
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: ./gradlew sonar --build-cache --stacktrace --info
     - name: Archive Nyx state file
       uses: actions/upload-artifact@v3
       if: ${{ always() }}
@@ -679,6 +771,13 @@ jobs:
         path: |
           build/
         key: pipeline-${{ github.run_id }}-build-java
+    # Set up the SonarCloud cache
+    - name: Set up the SonarCloud cache
+      uses: actions/cache@v1
+      with:
+        path: ~/.sonar/cache
+        key: sonar-${{ github.run_id }}-${{ github.job }}
+        restore-keys: sonar-${{ github.run_id }}-${{ github.job }}
     # Start from the -go-unit-test cache and save the job output cache as -go-integration-test
     - name: Set up the Go cache bringing Go artifacts
       uses: actions/cache@v3
@@ -720,6 +819,11 @@ jobs:
         flags: go,integration
         fail_ci_if_error: false # Codecov upload intermittently fails so setting this to false is the only way to avoid it breaking our builds. Codecov's bug is https://github.com/codecov/codecov-action/issues/557
         verbose: true
+    - name: Scan test reports and metrics with SonarCloud
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: ./gradlew sonar --build-cache --stacktrace --info
     - name: Archive Nyx state file
       uses: actions/upload-artifact@v3
       if: ${{ always() }}
@@ -770,6 +874,13 @@ jobs:
         path: |
           build/
         key: pipeline-${{ github.run_id }}-build-java
+    # Set up the SonarCloud cache
+    - name: Set up the SonarCloud cache
+      uses: actions/cache@v1
+      with:
+        path: ~/.sonar/cache
+        key: sonar-${{ github.run_id }}-${{ github.job }}
+        restore-keys: sonar-${{ github.run_id }}-${{ github.job }}
     # Start from the -go-integration-test cache and save the job output cache as -go-functional-test
     - name: Set up the Go cache bringing Go artifacts
       uses: actions/cache@v3
@@ -812,6 +923,11 @@ jobs:
         flags: go,integration
         fail_ci_if_error: false # Codecov upload intermittently fails so setting this to false is the only way to avoid it breaking our builds. Codecov's bug is https://github.com/codecov/codecov-action/issues/557
         verbose: true
+    - name: Scan test reports and metrics with SonarCloud
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: ./gradlew sonar --build-cache --stacktrace --info
     - name: Archive Nyx state file
       uses: actions/upload-artifact@v3
       if: ${{ always() }}
@@ -859,6 +975,13 @@ jobs:
         path: |
           build/
         key: pipeline-${{ github.run_id }}-build-java
+    # Set up the SonarCloud cache
+    - name: Set up the SonarCloud cache
+      uses: actions/cache@v1
+      with:
+        path: ~/.sonar/cache
+        key: sonar-${{ github.run_id }}-${{ github.job }}
+        restore-keys: sonar-${{ github.run_id }}-${{ github.job }}
     # Start from the -build-docker cache and save the job output cache as -docker-functional-test
     - name: Set up the Go cache bringing Go artifacts
       uses: actions/cache@v3
@@ -900,6 +1023,11 @@ jobs:
         flags: docker,functional
         fail_ci_if_error: false # Codecov upload intermittently fails so setting this to false is the only way to avoid it breaking our builds. Codecov's bug is https://github.com/codecov/codecov-action/issues/557
         verbose: true
+    - name: Scan test reports and metrics with SonarCloud
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: ./gradlew sonar --build-cache --stacktrace --info
     - name: Archive Nyx state file
       uses: actions/upload-artifact@v3
       if: ${{ always() }}

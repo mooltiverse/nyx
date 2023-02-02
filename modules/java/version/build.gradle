@@ -23,3 +23,20 @@ configurations {
 */
 dependencies {
 }
+
+/*------------------------------------------------------------------------------
+  Extension configurations
+------------------------------------------------------------------------------*/
+// Configure SonarCloud
+// See: https://docs.sonarcloud.io/advanced-setup/ci-based-analysis/sonarscanner-for-gradle/
+sonarqube {
+    properties {
+        property "sonar.projectKey", "mooltiverse_nyx_java_version"
+        property "sonar.java.file.suffixes", ".java"
+        property "sonar.sources", "src/main/"
+        property "sonar.tests", "src/test/"      // only unit tests here
+        property "sonar.exclusions", "src/test/" // only unit tests here
+        property "sonar.junit.reportPaths", "$buildDir/test-results/test/*.xml,$buildDir/test-results/integrationTest/*.xml,$buildDir/test-results/functionalTest/*.xml"
+        property "sonar.coverage.jacoco.xmlReportPaths", "$buildDir/reports/jacoco/test/jacocoTestReport.xml,$buildDir/reports/jacoco/integrationTestCodeCoverageReport/integrationTestCodeCoverageReport.xml,$buildDir/reports/jacoco/functionalTestCodeCoverageReport/functionalTestCodeCoverageReport.xml"
+    }
+}
