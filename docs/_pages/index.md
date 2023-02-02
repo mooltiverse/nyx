@@ -83,9 +83,11 @@ Available for all platforms in the [latest release](https://github.com/mooltiver
 * [Nyx, the Semantic Release Automation Tool](https://levelup.gitconnected.com/nyx-the-semantic-release-automation-tool-4e2dfa949f38)
 * [Semantic Release Automation with Gradle using Nyx](https://levelup.gitconnected.com/semantic-release-automation-with-gradle-using-nyx-ba345235a365)
 
-### Reports
+### Reports and metrics
 
-* [Codecov coverage](https://codecov.io/gh/mooltiverse/nyx)
+* security: [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=mooltiverse_nyx&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=mooltiverse_nyx), [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=mooltiverse_nyx&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=mooltiverse_nyx)
+* code quality: [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=mooltiverse_nyx&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=mooltiverse_nyx), [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=mooltiverse_nyx&metric=bugs)](https://sonarcloud.io/summary/new_code?id=mooltiverse_nyx), [![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=mooltiverse_nyx&metric=sqale_index)](https://sonarcloud.io/summary/new_code?id=mooltiverse_nyx), [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=mooltiverse_nyx&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=mooltiverse_nyx)
+* code coverage: [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=mooltiverse_nyx&metric=coverage)](https://sonarcloud.io/summary/new_code?id=mooltiverse_nyx), [![Codecov](https://codecov.io/gh/mooltiverse/nyx/branch/main/graph/badge.svg)](https://codecov.io/gh/mooltiverse/nyx) [flaky](https://github.com/mooltiverse/nyx/issues/151)
 
 ## Badge
 
