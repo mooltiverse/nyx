@@ -145,6 +145,13 @@ jobs:
           gradle-distribution-sha-256-sum-warning: false
     - name: Assemble with Gradle
       run: ./gradlew modules:java:assemble --build-cache --stacktrace
+    - name: Scan with SonarCloud
+      uses: sonarsource/sonarcloud-github-action@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      with:
+        projectBaseDir: modules/java/main
     - name: Archive Nyx state file
       uses: actions/upload-artifact@v3
       if: ${{ always() }}
@@ -210,6 +217,13 @@ jobs:
           gradle-distribution-sha-256-sum-warning: false
     - name: Assemble with Gradle
       run: ./gradlew modules:go:assemble --build-cache --stacktrace
+    - name: Scan with SonarCloud
+      uses: sonarsource/sonarcloud-github-action@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      with:
+        projectBaseDir: modules/go/nyx
     - name: Archive Nyx state file
       uses: actions/upload-artifact@v3
       if: ${{ always() }}
@@ -224,6 +238,7 @@ jobs:
 
   build-docker:
     name: Build - Docker
+    if: ${{ false }} # TODO: remove this line as it just skips expensive steps while testing SonarCloud
     needs: build-go
     runs-on: ubuntu-latest
     steps:
@@ -406,6 +421,7 @@ jobs:
   # may fail to store at the end (but this won't affect other jobs).
   java-integration-test:
     name: Test (Integration) - Java
+    if: ${{ false }} # TODO: remove this line as it just skips expensive steps while testing SonarCloud
     needs: java-unit-test
     runs-on: ubuntu-latest
     steps:
@@ -489,6 +505,7 @@ jobs:
   # may fail to store at the end (but this won't affect other jobs).
   java-functional-test:
     name: Test (Functional) - Java
+    if: ${{ false }} # TODO: remove this line as it just skips expensive steps while testing SonarCloud
     needs: java-integration-test
     runs-on: ubuntu-latest
     steps:
@@ -649,6 +666,7 @@ jobs:
   # may fail to store at the end (but this won't affect other jobs).
   go-integration-test:
     name: Test (Integration) - Go
+    if: ${{ false }} # TODO: remove this line as it just skips expensive steps while testing SonarCloud
     needs: go-unit-test
     strategy:
       matrix:
@@ -740,6 +758,7 @@ jobs:
   # may fail to store at the end (but this won't affect other jobs).
   go-functional-test:
     name: Test (Functional) - Go
+    if: ${{ false }} # TODO: remove this line as it just skips expensive steps while testing SonarCloud
     needs: go-integration-test
     strategy:
       matrix:
@@ -832,6 +851,7 @@ jobs:
   # may fail to store at the end (but this won't affect other jobs).
   docker-functional-test:
     name: Test (Functional) - Docker
+    if: ${{ false }} # TODO: remove this line as it just skips expensive steps while testing SonarCloud
     needs: build-docker
     runs-on: ubuntu-latest
     steps:
@@ -914,6 +934,7 @@ jobs:
 
   publish:
     name: Publish
+    if: ${{ false }} # TODO: remove this line as it just skips expensive steps while testing SonarCloud
     needs: [build-merge,java-unit-test,java-integration-test,java-functional-test,go-unit-test,go-integration-test,go-functional-test,docker-functional-test]
     runs-on: ubuntu-latest
     steps:
@@ -990,6 +1011,7 @@ jobs:
 
   release:
     name: Release
+    if: ${{ false }} # TODO: remove this line as it just skips expensive steps while testing SonarCloud
     needs: publish
     runs-on: ubuntu-latest
     steps:

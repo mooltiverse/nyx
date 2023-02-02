@@ -3,10 +3,6 @@
   https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
 ------------------------------------------------------------------------------*/
 plugins {
-    // Sonarcloud
-    // See: https://docs.sonarcloud.io/advanced-setup/ci-based-analysis/sonarscanner-for-gradle/
-    id "org.sonarqube" version "3.5.0.2730"
-
     // Builds a dependency tree of Gradle tasks, i.e. 'gradle <task> taskTree'
     // (at times it doesn't work when using the ./gradlew wrapper).
     // This plugin can be commented out and used only when needed.
@@ -70,9 +66,6 @@ subprojects {
 /*------------------------------------------------------------------------------
   Extension configurations
 ------------------------------------------------------------------------------*/
-sonarqube {
-    // Properties defined in the gradle.properties file
-}
 
 /*------------------------------------------------------------------------------
   This is the configuration for the top level project
