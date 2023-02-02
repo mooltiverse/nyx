@@ -79,11 +79,6 @@ plugins {
     id 'signing'                                                  // See: https://docs.gradle.org/current/userguide/signing_plugin.html
     id 'de.marcphilipp.nexus-publish' version '0.4.0'             // See: https://github.com/marcphilipp/nexus-publish-plugin/
     id 'io.codearte.nexus-staging' version '0.30.0'               // See: https://github.com/Codearte/gradle-nexus-staging-plugin/
-    
-    // This plugin allows to have additional test sets, configured in a testSets block, like integrationTest and functionalTest.
-    // This is applied to subprojects only.
-    // TODO: replace this plugin with Gradle's core plugin 'jvm-test-suite' when stable. See https://docs.gradle.org/current/userguide/jvm_test_suite_plugin.html
-    id 'org.unbroken-dome.test-sets' version '4.0.0' apply false  // See: https://github.com/unbroken-dome/gradle-testsets-plugin
 }
 
 /*------------------------------------------------------------------------------
@@ -102,23 +97,9 @@ allprojects {
     apply plugin: 'java'                                // See: https://docs.gradle.org/current/userguide/java_plugin.html
     apply plugin: 'eclipse'                             // See: https://docs.gradle.org/current/userguide/eclipse_plugin.html
 
-    // The Eclipse plugin is also used for VSCode.
-    // This plugin generates .project and .classpath files used by Eclipse and/or VSCode based on the Gradle configurations.
-    // There's still an issue caused by Buildship that always overwrites the generated .classpath with its own but at least
-    // it does so by taking into account also the values defined here.
-    // To clean and generate new .project and .classpath files run ./gradlew cleanEclipse eclipse
-    eclipse {
-        // control how the .project files are generated
-        //project {}
-        // control how the .classpath files are generated
-        classpath {
-            // the default output directory for java .class files
-            defaultOutputDir = file('build/classes')
-            // this is supposed to prevent Buildship to overwrite the .classpath file, according to
-            // https://stackoverflow.com/questions/49068870/buildship-keeps-overwriting-classpath
-            containers 'org.eclipse.buildship.core.gradleclasspathcontainer'
-        }
-    }
+    // This plugin applied also to the global Java project makes available the 'testCodeCoverageReport'
+    // to aggregate all JaCoCo metrics from subprojects into one.
+    apply plugin: 'jacoco-report-aggregation'           // See: https://docs.gradle.org/current/userguide/jacoco_report_aggregation_plugin.html
 
     /*------------------------------------------------------------------------------
       Repositories and dependencies
@@ -132,13 +113,23 @@ allprojects {
             url = "file://${buildDir}/maven"
         }
     }
-    dependencies {
-        testImplementation 'org.junit.jupiter:junit-jupiter:5.9.1'
-        testRuntimeOnly    'org.junit.jupiter:junit-jupiter-engine'
 
-        // plug the Logback SLF4J implementation when testing so we can get log messages logged to the standard output
-        testRuntimeOnly    'ch.qos.logback:logback-core:1.4.1'
-        testRuntimeOnly    'ch.qos.logback:logback-classic:1.4.1'
+    dependencies {
+        // This lets the JaCoCo aggregator know which subprojects to aggregate from
+        jacocoAggregation subprojects.findAll()
+    }
+    reporting {
+        reports {
+            testCodeCoverageReport(JacocoCoverageReport) { 
+                // It looks there is no way to select all test types here,
+                // only one value is allowed and when empty the UNIT_TEST is assumed by default
+                /*
+                testType = TestSuiteType.UNIT_TEST
+                testType = TestSuiteType.INTEGRATION_TEST
+                testType = TestSuiteType.FUNCTIONAL_TEST
+                */
+            }
+        }
     }
 
     /*------------------------------------------------------------------------------
@@ -163,56 +154,6 @@ allprojects {
         withJavadocJar()
     }
 
-    javadoc {
-        options {
-            // Link generated javadocs to external docs
-            links 'https://download.eclipse.org/jgit/site/6.4.0.202211300538-r/apidocs/'
-            links 'https://www.slf4j.org/apidocs/'
-            links 'https://docs.gradle.org/current/javadoc/'
-            links 'https://junit.org/junit5/docs/current/api/'
-            links 'https://docs.oracle.com/en/java/javase/13/docs/api/'
-        }
-    }
-}
-
-/*------------------------------------------------------------------------------
-  This is the configuration for all sub-projects, but not this project
-------------------------------------------------------------------------------*/
-subprojects {
-    /*------------------------------------------------------------------------------
-      Plugins DSL block
-      https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
-    ------------------------------------------------------------------------------*/
-    apply plugin: 'jacoco'                              // See: https://docs.gradle.org/current/userguide/jacoco_plugin.html
-
-    //apply plugin: 'checkstyle'                        // See: https://docs.gradle.org/current/userguide/checkstyle_plugin.html
-    //apply plugin: 'pmd'                               // See: https://docs.gradle.org/current/userguide/pmd_plugin.html
-
-    // This plugin allows to have additional test sets, configured in a testSets block (see below)
-    apply plugin:  'org.unbroken-dome.test-sets'        // See: https://github.com/unbroken-dome/gradle-testsets-plugin
-
-    /*------------------------------------------------------------------------------
-      Extension configurations
-    ------------------------------------------------------------------------------*/
-    // Additional test sets available through the 'org.unbroken-dome.test-sets'
-    // These tests are better isolated from unit tests (in the src/test directory of each sub project)
-    // as they may take longer.
-    testSets {
-        // Integration tests can be implemented in the directory src/integrationTest/[java|groovy]
-        integrationTest
-
-        // Functional tests can be implemented in the directory src/functionalTest/[java|groovy]
-        functionalTest
-    }
-
-    configurations {
-        // make integrations tests extend other tests
-        //integrationTestImplementation.extendsFrom testImplementation
-        // make functional tests extend other tests
-        //functionalTestImplementation.extendsFrom testImplementation
-    }
-
-    // Set jar manifest properties
     jar {
         manifest {
             attributes(
@@ -231,20 +172,159 @@ subprojects {
         }
     }
 
-    // This includes all test sets like regular unit tests, integration and functional tests
-    tasks.withType(Test) {
-        useJUnitPlatform()
-        testLogging {
-            events "passed", "skipped", "failed"
+    javadoc {
+        options {
+            // Link generated javadocs to external docs
+            links 'https://download.eclipse.org/jgit/site/6.4.0.202211300538-r/apidocs/'
+            links 'https://www.slf4j.org/apidocs/'
+            links 'https://docs.gradle.org/current/javadoc/'
+            links 'https://junit.org/junit5/docs/current/api/'
+            links 'https://docs.oracle.com/en/java/javase/15/docs/api/'
         }
-
-        //minHeapSize = "128m"
-        maxHeapSize = "1024m"
     }
 
-    // TODO: aggregate JaCoCo reports among sub-projects into one using the JaCoCo Report Aggregation Plugin
-    // (https://docs.gradle.org/7.4/userguide/jacoco_report_aggregation_plugin.html)
-    // as per https://docs.gradle.org/7.4/release-notes.html#new-features-and-usability-improvements
+    // The Eclipse plugin is also used for VSCode.
+    // This plugin generates .project and .classpath files used by Eclipse and/or VSCode based on the Gradle configurations.
+    // There's still an issue caused by Buildship that always overwrites the generated .classpath with its own but at least
+    // it does so by taking into account also the values defined here.
+    // To clean and generate new .project and .classpath files run ./gradlew cleanEclipse eclipse
+    eclipse {
+        // control how the .project files are generated
+        //project {}
+        // control how the .classpath files are generated
+        classpath {
+            // the default output directory for java .class files
+            defaultOutputDir = file('build/classes')
+            // this is supposed to prevent Buildship to overwrite the .classpath file, according to
+            // https://stackoverflow.com/questions/49068870/buildship-keeps-overwriting-classpath
+            containers 'org.eclipse.buildship.core.gradleclasspathcontainer'
+        }
+    }
+}
+
+/*------------------------------------------------------------------------------
+  This is the configuration for all sub-projects, but not this project
+------------------------------------------------------------------------------*/
+subprojects {
+    /*------------------------------------------------------------------------------
+      Plugins DSL block
+      https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
+    ------------------------------------------------------------------------------*/
+    apply plugin: 'jacoco'                              // See: https://docs.gradle.org/current/userguide/jacoco_plugin.html
+    //apply plugin: 'jacoco-report-aggregation'           // See: https://docs.gradle.org/current/userguide/jacoco_report_aggregation_plugin.html
+
+    //apply plugin: 'checkstyle'                        // See: https://docs.gradle.org/current/userguide/checkstyle_plugin.html
+    //apply plugin: 'pmd'                               // See: https://docs.gradle.org/current/userguide/pmd_plugin.html
+
+    // This plugin allows to have additional test sets, configured in a 'testing' block (see below)
+    apply plugin: 'jvm-test-suite'                      // See: https://docs.gradle.org/current/userguide/jvm_test_suite_plugin.html
+
+    /*------------------------------------------------------------------------------
+      Extension configurations
+    ------------------------------------------------------------------------------*/
+    // Additional test sets created using the 'jvm-test-suite'
+    // These tests are better isolated from unit tests (in the src/test directory of each sub project)
+    // as they may take longer.
+    testing {
+        suites {
+            // This configuration is common to all test suites
+            configureEach { 
+                useJUnitJupiter() //useJUnitPlatform()
+                targets {
+                    all { 
+                        testTask.configure {
+                            maxHeapSize = '1024m' 
+                            testLogging {
+                                events "passed", "skipped", "failed"
+                            }
+                        }
+                    }
+                }
+            }
+            // This is the built-in suite
+            test {
+                testType = TestSuiteType.UNIT_TEST
+                dependencies {
+                    // plug the Logback SLF4J implementation when testing so we can get log messages logged to the standard output
+                    runtimeOnly    'ch.qos.logback:logback-core:1.4.1'
+                    runtimeOnly    'ch.qos.logback:logback-classic:1.4.1'
+
+                    // The SLF4J framework that prints all test output to System err
+                    // See http://www.slf4j.org/apidocs/org/slf4j/impl/SimpleLogger.html for the system properties available to change verbosity levels
+                    runtimeOnly    'org.slf4j:slf4j-simple:2.0.2'
+                }
+            }
+
+            // Integration tests can be implemented in the directory src/integrationTest/[java|groovy]
+            integrationTest(JvmTestSuite) {
+                testType = TestSuiteType.INTEGRATION_TEST
+                dependencies {
+                    // allow production code to be added to the test dependencies
+                    implementation project()
+                }
+                targets {
+                    all { 
+                        testTask.configure {
+                            // Pass the credentials to test suites as per https://github.com/mooltiverse/nyx/blob/master/CONTRIBUTING.md#contributing-code
+                            // Suggestion is to set the $GRADLE_USER_HOME environment variable and create a gradle.properties therein, with these
+                            // properties defined
+                            systemProperty 'gitHubTestUserToken', findProperty("gitHubTestUserToken")
+                            systemProperty 'gitHubTestUserPublicKey', findProperty("gitHubTestUserPublicKey")
+                            systemProperty 'gitHubTestUserPrivateKeyPassphrase', findProperty("gitHubTestUserPrivateKeyPassphrase")
+                            systemProperty 'gitHubTestUserPrivateKeyWithPassphrase', findProperty("gitHubTestUserPrivateKeyWithPassphrase")
+                            systemProperty 'gitHubTestUserPrivateKeyWithoutPassphrase', findProperty("gitHubTestUserPrivateKeyWithoutPassphrase")
+                            systemProperty 'gitLabTestUserToken', findProperty("gitLabTestUserToken")
+                            systemProperty 'gitLabTestUserPublicKey', findProperty("gitLabTestUserPublicKey")
+                            systemProperty 'gitLabTestUserPrivateKeyPassphrase', findProperty("gitLabTestUserPrivateKeyPassphrase")
+                            systemProperty 'gitLabTestUserPrivateKeyWithPassphrase', findProperty("gitLabTestUserPrivateKeyWithPassphrase")
+                            systemProperty 'gitLabTestUserPrivateKeyWithoutPassphrase', findProperty("gitLabTestUserPrivateKeyWithoutPassphrase")
+                        }
+                    }
+                }
+            }
+
+            // Functional tests can be implemented in the directory src/functionalTest/[java|groovy]
+            functionalTest(JvmTestSuite) {
+                testType = TestSuiteType.FUNCTIONAL_TEST
+                dependencies {
+                    // allow production code to be added to the test dependencies
+                    implementation project()
+                }
+                targets {
+                    all { 
+                        testTask.configure {
+                            // Pass the credentials to test suites as per https://github.com/mooltiverse/nyx/blob/master/CONTRIBUTING.md#contributing-code
+                            // Suggestion is to set the $GRADLE_USER_HOME environment variable and create a gradle.properties therein, with these
+                            // properties defined
+                            systemProperty 'gitHubTestUserToken', findProperty("gitHubTestUserToken")
+                            systemProperty 'gitHubTestUserPublicKey', findProperty("gitHubTestUserPublicKey")
+                            systemProperty 'gitHubTestUserPrivateKeyPassphrase', findProperty("gitHubTestUserPrivateKeyPassphrase")
+                            systemProperty 'gitHubTestUserPrivateKeyWithPassphrase', findProperty("gitHubTestUserPrivateKeyWithPassphrase")
+                            systemProperty 'gitHubTestUserPrivateKeyWithoutPassphrase', findProperty("gitHubTestUserPrivateKeyWithoutPassphrase")
+                            systemProperty 'gitLabTestUserToken', findProperty("gitLabTestUserToken")
+                            systemProperty 'gitLabTestUserPublicKey', findProperty("gitLabTestUserPublicKey")
+                            systemProperty 'gitLabTestUserPrivateKeyPassphrase', findProperty("gitLabTestUserPrivateKeyPassphrase")
+                            systemProperty 'gitLabTestUserPrivateKeyWithPassphrase', findProperty("gitLabTestUserPrivateKeyWithPassphrase")
+                            systemProperty 'gitLabTestUserPrivateKeyWithoutPassphrase', findProperty("gitLabTestUserPrivateKeyWithoutPassphrase")
+
+                            // Pass the 'quickTests' property (if declared by user, i.e. running ''./gradlew -PquickTests=true') to reduce the number of tests
+                            systemProperty 'quickTests', findProperty("quickTests")
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    configurations {
+        // make integrations tests configuration extend others
+        integrationTestImplementation.extendsFrom testImplementation
+        integrationTestRuntime.extendsFrom testRuntime
+        // make functional tests configuration extend others
+        functionalTestImplementation.extendsFrom testImplementation
+        functionalTestRuntime.extendsFrom testRuntime
+    }
+
     jacocoTestReport {
         reports {
             html.enabled true
@@ -255,7 +335,10 @@ subprojects {
     /*------------------------------------------------------------------------------
       Additional task dependencies
     ------------------------------------------------------------------------------*/
-    tasks.check.finalizedBy tasks.jacocoTestReport
+    // Make sure all tests are finalized with the generation of JaCoCo coverave reports
+    tasks.test.finalizedBy tasks.jacocoTestReport
+    tasks.integrationTest.finalizedBy tasks.integrationTestCodeCoverageReport
+    tasks.functionalTest.finalizedBy tasks.functionalTestCodeCoverageReport
 }
 
 /*------------------------------------------------------------------------------
@@ -267,20 +350,6 @@ subprojects {
 javadoc.source(subprojects.collect { it.sourceSets.main.allJava })
 javadoc.classpath = files(subprojects.collect { it.sourceSets.main.compileClasspath })
 sourcesJar.from(subprojects.collect { it.sourceSets.main.allJava })
-
-/*------------------------------------------------------------------------------
-  Test reports
-------------------------------------------------------------------------------*/
-// TODO: aggregate test reports among sub-projects into one using the Test Report Aggregation Plugin
-// (https://docs.gradle.org/7.4/userguide/test_report_aggregation_plugin.html)
-// as per https://docs.gradle.org/7.4/release-notes.html#new-features-and-usability-improvements
-task testReport(type: TestReport) {
-    destinationDir = file("$buildDir/reports/tests/all")
-    // Include the results from the "test" task in all subprojects
-    // Be careful as including report sets implicitly makes the task dependent on the tasks producing those reports
-    reportOn subprojects*.test//, subprojects*.integrationTest, subprojects*.functionalTest
-}
-tasks.check.finalizedBy tasks.testReport
 
 /*------------------------------------------------------------------------------
   Publications
@@ -515,11 +584,25 @@ task functionalTest() {
     dependsOn subprojects*.functionalTest
 }
 
+// Aggregate all JUnit reports from sub projects into one
+task testReport(type: TestReport) {
+    description 'Aggregates all JUnit test reports into one'
+    group 'Verification'
+
+    destinationDir = file("$buildDir/reports/tests/all")
+    // Include the results from the "test" task in all subprojects
+    // Be careful as including report sets implicitly makes the task dependent on the tasks producing those reports
+    reportOn subprojects*.test, subprojects*.integrationTest, subprojects*.functionalTest
+}
+
 /*------------------------------------------------------------------------------
   Additional task dependencies
 ------------------------------------------------------------------------------*/
 // Make this overall assemble task dependent on subprojects assemble tasks
 tasks.assemble.dependsOn subprojects*.assemble
+
+// Make the aggregated check task also depend on the aggregated test reports
+tasks.check.dependsOn tasks.testReport
 
 // Make this overall Java unit test task dependent on subprojects unit test tasks
 // so that we can run all Java unit tests with one task

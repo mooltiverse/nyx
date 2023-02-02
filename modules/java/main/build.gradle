@@ -40,64 +40,47 @@ dependencies {
   implementation        'com.github.jknack:handlebars:4.3.0'                                       // Handlebars library (https://github.com/jknack/handlebars.java)
   implementation        'org.kohsuke:github-api:1.313'                                             // GitHub API client Java library (https://github-api.kohsuke.org/)
 
-  // The SLF4J framework that prints all test output to System err
-  // See http://www.slf4j.org/apidocs/org/slf4j/impl/SimpleLogger.html for the system properties available to change verbosity levels
-  testImplementation            'org.slf4j:slf4j-simple:2.0.2'
-  integrationTestImplementation 'org.slf4j:slf4j-simple:2.0.2'
-
-  // See the 'integrationTestExport' and 'functionalTestExport' about this
+  // See the 'integrationTestExport' and 'functionalTestExport' above about this
   integrationTestExport  sourceSets.integrationTest.output
   functionalTestExport   sourceSets.functionalTest.output
 }
 
-test {
-  // Pass the name of the configuration file examples to tests.
-  // We use the same files used for the documentation here.
-  systemProperty 'extendedJSONExampleConfigurationFile', file("$rootDir/docs/_includes/.nyx-extended.json").absolutePath
-  systemProperty 'mediumJSONExampleConfigurationFile', file("$rootDir/docs/_includes/.nyx-medium.json").absolutePath
-  systemProperty 'simpleJSONExampleConfigurationFile', file("$rootDir/docs/_includes/.nyx-simple.json").absolutePath
-  systemProperty 'simplestJSONExampleConfigurationFile', file("$rootDir/docs/_includes/.nyx-simplest.json").absolutePath
-  systemProperty 'extendedYAMLExampleConfigurationFile', file("$rootDir/docs/_includes/.nyx-extended.yaml").absolutePath
-  systemProperty 'mediumYAMLExampleConfigurationFile', file("$rootDir/docs/_includes/.nyx-medium.yaml").absolutePath
-  systemProperty 'simpleYAMLExampleConfigurationFile', file("$rootDir/docs/_includes/.nyx-simple.yaml").absolutePath
-  systemProperty 'simplestYAMLExampleConfigurationFile', file("$rootDir/docs/_includes/.nyx-simplest.yaml").absolutePath
-}
-
-integrationTest {
-  // Pass the credentials to test suites as per https://github.com/mooltiverse/nyx/blob/master/CONTRIBUTING.md#contributing-code
-  // Suggestion is to set the $GRADLE_USER_HOME environment variable and create a gradle.properties therein, with these
-  // properties defined
-  systemProperty 'gitHubTestUserToken', findProperty("gitHubTestUserToken")
-  systemProperty 'gitHubTestUserPublicKey', findProperty("gitHubTestUserPublicKey")
-  systemProperty 'gitHubTestUserPrivateKeyPassphrase', findProperty("gitHubTestUserPrivateKeyPassphrase")
-  systemProperty 'gitHubTestUserPrivateKeyWithPassphrase', findProperty("gitHubTestUserPrivateKeyWithPassphrase")
-  systemProperty 'gitHubTestUserPrivateKeyWithoutPassphrase', findProperty("gitHubTestUserPrivateKeyWithoutPassphrase")
-  systemProperty 'gitLabTestUserToken', findProperty("gitLabTestUserToken")
-  systemProperty 'gitLabTestUserPublicKey', findProperty("gitLabTestUserPublicKey")
-  systemProperty 'gitLabTestUserPrivateKeyPassphrase', findProperty("gitLabTestUserPrivateKeyPassphrase")
-  systemProperty 'gitLabTestUserPrivateKeyWithPassphrase', findProperty("gitLabTestUserPrivateKeyWithPassphrase")
-  systemProperty 'gitLabTestUserPrivateKeyWithoutPassphrase', findProperty("gitLabTestUserPrivateKeyWithoutPassphrase")
-}
-
-functionalTest {
-  // Pass the credentials to test suites as per https://github.com/mooltiverse/nyx/blob/master/CONTRIBUTING.md#contributing-code
-  // Suggestion is to set the $GRADLE_USER_HOME environment variable and create a gradle.properties therein, with these
-  // properties defined
-  systemProperty 'gitHubTestUserToken', findProperty("gitHubTestUserToken")
-  systemProperty 'gitHubTestUserPublicKey', findProperty("gitHubTestUserPublicKey")
-  systemProperty 'gitHubTestUserPrivateKeyPassphrase', findProperty("gitHubTestUserPrivateKeyPassphrase")
-  systemProperty 'gitHubTestUserPrivateKeyWithPassphrase', findProperty("gitHubTestUserPrivateKeyWithPassphrase")
-  systemProperty 'gitHubTestUserPrivateKeyWithoutPassphrase', findProperty("gitHubTestUserPrivateKeyWithoutPassphrase")
-  systemProperty 'gitLabTestUserToken', findProperty("gitLabTestUserToken")
-  systemProperty 'gitLabTestUserPublicKey', findProperty("gitLabTestUserPublicKey")
-  systemProperty 'gitLabTestUserPrivateKeyPassphrase', findProperty("gitLabTestUserPrivateKeyPassphrase")
-  systemProperty 'gitLabTestUserPrivateKeyWithPassphrase', findProperty("gitLabTestUserPrivateKeyWithPassphrase")
-  systemProperty 'gitLabTestUserPrivateKeyWithoutPassphrase', findProperty("gitLabTestUserPrivateKeyWithoutPassphrase")
-  
-  // Pass the 'quickTests' property (if declared by user, i.e. running ''./gradlew -PquickTests=true') to reduce the number of tests
-  systemProperty 'quickTests', findProperty("quickTests")
-}
-
 /*------------------------------------------------------------------------------
-  Additional task dependencies
+  Extension configurations
 ------------------------------------------------------------------------------*/
+// Additional test sets created using the 'jvm-test-suite'
+// These tests are better isolated from unit tests (in the src/test directory of each sub project)
+// as they may take longer.
+testing {
+    suites {
+        // This is the built-in suite
+        test {
+            targets {
+                all { 
+                    testTask.configure {
+                        // Pass the name of the configuration file examples to tests.
+                        // We use the same files used for the documentation here.
+                        systemProperty 'extendedJSONExampleConfigurationFile', file("$rootDir/docs/_includes/.nyx-extended.json").absolutePath
+                        systemProperty 'mediumJSONExampleConfigurationFile', file("$rootDir/docs/_includes/.nyx-medium.json").absolutePath
+                        systemProperty 'simpleJSONExampleConfigurationFile', file("$rootDir/docs/_includes/.nyx-simple.json").absolutePath
+                        systemProperty 'simplestJSONExampleConfigurationFile', file("$rootDir/docs/_includes/.nyx-simplest.json").absolutePath
+                        systemProperty 'extendedYAMLExampleConfigurationFile', file("$rootDir/docs/_includes/.nyx-extended.yaml").absolutePath
+                        systemProperty 'mediumYAMLExampleConfigurationFile', file("$rootDir/docs/_includes/.nyx-medium.yaml").absolutePath
+                        systemProperty 'simpleYAMLExampleConfigurationFile', file("$rootDir/docs/_includes/.nyx-simple.yaml").absolutePath
+                        systemProperty 'simplestYAMLExampleConfigurationFile', file("$rootDir/docs/_includes/.nyx-simplest.yaml").absolutePath
+                    }
+                }
+            }
+        }
+
+        // Integration tests can be implemented in the directory src/integrationTest/[java|groovy]
+        integrationTest(JvmTestSuite) {
+            // Here we can configure additional dependencies, properties and options for these tests
+        }
+
+        // Functional tests can be implemented in the directory src/functionalTest/[java|groovy]
+        functionalTest(JvmTestSuite) {
+            // Here we can configure additional dependencies, properties and options for these tests
+        }
+    }
+}
