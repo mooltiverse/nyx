@@ -16,6 +16,8 @@
 package com.mooltiverse.oss.nyx.gradle;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -37,7 +39,8 @@ public class Suites {
     private static final String newLine = System.getProperty("line.separator");
 
     /**
-     * Returns array of Gradle versions to succesfully test against.
+     * Returns array of Gradle versions to succesfully test against. The returned array also takes into account
+     * the JVM version so it returns only Gradle versions compatible thìith the JVM.
      * 
      * The list is taken from https://gradle.org/releases/.
      * 
@@ -47,68 +50,211 @@ public class Suites {
      * @return a new array of test suites
      */
     public static String[] wellKnownWorkingGradleVersions(boolean quickTestsOnly) {
-        String[] versions = new String[] {
-            // Versions that are known to work
-            "7.6", "7.5.1", "7.5", "7.4.2", "7.4.1", "7.4", "7.3.3", "7.3.2", "7.3.1", "7.3", "7.2", "7.1.1", "7.1", "7.0.2", "7.0.1", "7.0",
+        // Get the current Java version from the system properties
+        String javaVersionString = System.getProperty("java.specification.version");
+        if (Objects.isNull(javaVersionString) || javaVersionString.isBlank())
+            throw new java.lang.RuntimeException(String.format("Unable to inspect the current Java version. The system property '%s' valueis '%s'", "java.specification.version", javaVersionString));
+        int javaVersion = 0;
+        try {
+            javaVersion = Integer.parseInt(javaVersionString);
+        } catch (NumberFormatException nfe) {
+            throw new java.lang.RuntimeException(String.format("Unable to inspect the current Java version. The system property '%s' value is '%s' and acnnot be parsed to a valid integer", "java.specification.version", javaVersionString), nfe);
+        }
+        if (javaVersion < 11)
+            throw new java.lang.RuntimeException(String.format("Java version '%d' is not supported by the Gradle versions supported by Nyx", javaVersion));
 
-            // These versions are supposed to work but are no longer tested
-            //"6.9.3", "6.9.2", "6.9.1", "6.9", "6.8.3", "6.8.2", "6.8.1", "6.8", "6.7.1", "6.7",
-            
-            // We need at least Java 15 and as per the Gradle compatibility matrix (https://docs.gradle.org/current/userguide/compatibility.html) versions
-            // prior than 6.7 do not support it. Running against those versions would raise errors like 'Unsupported class file major version XX'
-            // - version "6.5" has a bug (https://github.com/gradle/gradle/issues/13367) that prevents us to test, fixed in "6.5.1"
-            //"6.6.1", "6.6", "6.5.1", /*"6.5",*/ "6.4.1", "6.4", "6.3", "6.2.2", "6.2.1", "6.2", "6.1.1", "6.1", "6.0.1", "6.0",
+        // Now, with the runtime Java version we can determine the Gradle versions we can test, according to https://docs.gradle.org/current/userguide/compatibility.html
+        // These values are important because if we test a Gradle version (by simulating it with TestKit) that doesn't support a certan Java version (because it's too
+        // new compared to gradle, usually because it was released after a given Gradle version), we get errors like like 'Unsupported class file major version XX'.
+        // The following are modelled respecting the above compatibility matrix.
 
-            /* Gradle versions prior than 6.0 fails to test with an exception like:
-                    > Could not find method services() for arguments [build_4o3mdmvy94ykemibox706yopu$_run_closure1$_closure2@18c3fdb5] on object of type com.mooltiverse.oss.nyx.gradle.NyxExtension.
+        // We use two separate collections here, one with the versions to test even when 'quick' tests are selected (the minimum set of significant versions),
+        // and the other with versions to be tested when we run extensive tests (not just the 'quick' ones).
+        List<String> quickTestVersions = new ArrayList<String>();
+        List<String> extensiveTestVersions = new ArrayList<String>();
 
-            This means it has a different method for setting nested blocks into the extension object.
-            If support for these versions is strongly needed we may find a workaround but it's worthless so far. */
-            //"5.6.4", "5.6.3", "5.6.2", "5.6.1", "5.6", "5.5.1", "5.5"
-            
-            /* Gradle versions prior than 5.5 do not support ObjectFactory.domainObjectContainer​(Class<T> elementType), indeed introduced in version 5.5,
-            which is used for example in NyxExtension.
-            If support for these versions is strongly needed we may find a workaround but it's worthless so far. */
-            //"5.4.1", "5.4", "5.3.1", "5.3", "5.2.1", "5.2"
-            
-            /* Gradle versions from 4.9 to 5.1.1 fail to test with an exception like:
-                    > Could not create an instance of type com.mooltiverse.oss.nyx.gradle.NyxExtension_Decorated.
-                        > Could not find any public constructor for class com.mooltiverse.oss.nyx.gradle.NyxExtension_Decorated which accepts parameters [].
+        // Java versions >= 15 are recommended
+        // Gradle versions from 7.0 on are recommended
+        if (javaVersion <= 19) {
+            // the latest version is always among the 'quick' tests
+            quickTestVersions.add("7.6");
+        }
+        if (javaVersion <= 18) {
+            extensiveTestVersions.add("7.5.1");
+            extensiveTestVersions.add("7.5");
+        }
+        if (javaVersion <= 17) {
+            extensiveTestVersions.add("7.4.2");
+            extensiveTestVersions.add("7.4.1");
+            extensiveTestVersions.add("7.4");
+            extensiveTestVersions.add("7.3.3");
+            extensiveTestVersions.add("7.3.2");
+            extensiveTestVersions.add("7.3.1");
+            extensiveTestVersions.add("7.3");
+        }
+        if (javaVersion <= 16) {
+            extensiveTestVersions.add("7.2");
+            extensiveTestVersions.add("7.1.1");
+            extensiveTestVersions.add("7.1");
+            extensiveTestVersions.add("7.0.2");
+            extensiveTestVersions.add("7.0.1");
+            extensiveTestVersions.add("7.0");
+        }
+        // Gradle versions between 6.0 and 7.0 (excluded) are not recommended but still supported for backward compatibility
+        if (javaVersion <= 15) {
+            extensiveTestVersions.add("6.9.3");
+            extensiveTestVersions.add("6.9.2");
+            extensiveTestVersions.add("6.9.1");
+            extensiveTestVersions.add("6.9");
+            extensiveTestVersions.add("6.8.3");
+            extensiveTestVersions.add("6.8.2");
+            extensiveTestVersions.add("6.8.1");
+            extensiveTestVersions.add("6.8");
+            extensiveTestVersions.add("6.7.1");
+            quickTestVersions.add("6.7"); // 6.7 is the minimum supported version so we keep it in the 'quick' tests
+        }
+        // Java versions between 11 and 14 are not recommended but still supported for backward compatibility
+        if (javaVersion <= 14) {
+            extensiveTestVersions.add("6.6.1");
+            extensiveTestVersions.add("6.6");
+            extensiveTestVersions.add("6.5.1");
+            //extensiveTestVersions.add("6.5"); // - version "6.5" has a bug (https://github.com/gradle/gradle/issues/13367) that prevents us to test, fixed in "6.5.1"
+            extensiveTestVersions.add("6.4.1");
+            extensiveTestVersions.add("6.4");
+            extensiveTestVersions.add("6.3");
+        }
+        if (javaVersion <= 13) {
+            extensiveTestVersions.add("6.2.2");
+            extensiveTestVersions.add("6.2.1");
+            extensiveTestVersions.add("6.2");
+            extensiveTestVersions.add("6.1.1");
+            extensiveTestVersions.add("6.1");
+            extensiveTestVersions.add("6.0.1");
+            extensiveTestVersions.add("6.0");
+        }
+        /* Gradle versions prior than 6.0 fails to test with an exception like:
+                > Could not find method services() for arguments [build_4o3mdmvy94ykemibox706yopu$_run_closure1$_closure2@18c3fdb5] on object of type com.mooltiverse.oss.nyx.gradle.NyxExtension.
+           This means it has a different method for setting nested blocks into the extension object.
+           If support for these versions is strongly needed we may find a workaround but it's worthless so far.
 
-            This has to deal with the injection of the ObjectFactory in constructors (i.e. in the NyxExtension) and is solved by adding another
-            constructor with no parameters, which in turn implies another workaround to get an ObjectFactory.
-            If support for these versions is strongly needed we may find a workaround but it's worthless so far. */
-            //"5.1.1", "5.1", "5.0", "4.10.3", "4.10.2", "4.10.1", "4.10", "4.9"
-            
-            /* Gradle versions prior than 4.9 do not support Conviguration Avoidance API (https://docs.gradle.org/current/userguide/task_configuration_avoidance.html)*/
-            //"4.8.1", "4.8"
+           Gradle versions prior than 5.5 do not support ObjectFactory.domainObjectContainer​(Class<T> elementType), indeed introduced in version 5.5,
+           which is used in NyxExtension.*/
+        /*if (javaVersion <= 12) {
+            extensiveTestVersions.add("5.6.4");
+            extensiveTestVersions.add("5.6.3");
+            extensiveTestVersions.add("5.6.2");
+            extensiveTestVersions.add("5.6.1");
+            extensiveTestVersions.add("5.6");
+            extensiveTestVersions.add("5.5.1");
+            extensiveTestVersions.add("5.5");
+            extensiveTestVersions.add("5.4.1");
+            extensiveTestVersions.add("5.4");
+        }*/
+        /*if (javaVersion <= 11) {
+            extensiveTestVersions.add("5.3.1");
+            extensiveTestVersions.add("5.3");
+            extensiveTestVersions.add("5.2.1");
+            extensiveTestVersions.add("5.2");
+            extensiveTestVersions.add("5.1.1");
+            extensiveTestVersions.add("5.1");
+            extensiveTestVersions.add("5.0");
+        }*/
+        /* Gradle versions from 4.9 to 5.1.1 fail to test with an exception like:
+                > Could not create an instance of type com.mooltiverse.oss.nyx.gradle.NyxExtension_Decorated.
+                    > Could not find any public constructor for class com.mooltiverse.oss.nyx.gradle.NyxExtension_Decorated which accepts parameters [].
 
-            /* Gradle version 4.7 fails to test with an exception like:
-                    Could not create service of type ScriptPluginFactory using BuildScopeServices.createScriptPluginFactory().
-                    > Could not create service of type PluginResolutionStrategyInternal using BuildScopeServices.createPluginResolutionStrategy().
+           This has to deal with the injection of the ObjectFactory in constructors (i.e. in the NyxExtension) and is solved by adding another
+           constructor with no parameters, which in turn implies another workaround to get an ObjectFactory.
 
-            We're not investigating any further unless some user needs support for that version, which is quite outdated*/
-            //"4.7",
-            
-            /* Gradle versions prior between 2.6 and 4.6 fail to test with an exception like:
-                    org.gradle.api.GradleException: Unable to start the daemon process.
-                    ...
-                    Could not create service of type DaemonContext using DaemonServices.createDaemonContext().
+           Gradle versions prior than 4.9 do not support Conviguration Avoidance API (https://docs.gradle.org/current/userguide/task_configuration_avoidance.html)
 
-            We're not investigating any further unless some user needs support for those versions, which are quite outdated*/
-            //"4.7", "4.6", "4.5.1", "4.5", "4.4.1", "4.4", "4.3.1", "4.3", "4.2.1", "4.2", "4.1", "4.0.2", "4.0.1", "4.0", 
-            //"3.5.1", "3.5", "3.4.1", "3.4", "3.3", "3.2.1", "3.2", "3.1", "3.0",
-            //"2.14.1", "2.14", "2.13", "2.12", "2.11", "2.10", "2.9", "2.8", "2.7", "2.6"
-            
-            /* Gradle versions prior than 2.6 are not supported by Testkit
-            See: https://docs.gradle.org/current/userguide/test_kit.html#sub:test-kit-compatibility*/
-            //"2.5", "2.4", "2.3", "2.2.1", "2.2", "2.1", "2.0",
-            //"1.12", "1.11", "1.10", "1.9", "1.8", "1.7", "1.6", "1.5", "1.4", "1.3", "1.2", "1.1", "1.0",
-            //"0.9.2", "0.9.1", "0.9", "0.8", "0.7",
-        };
+           Gradle version 4.7 fails to test with an exception like:
+                Could not create service of type ScriptPluginFactory using BuildScopeServices.createScriptPluginFactory().
+                > Could not create service of type PluginResolutionStrategyInternal using BuildScopeServices.createPluginResolutionStrategy().
+           
+           */
+        /*if (javaVersion <= 10) {
+            extensiveTestVersions.add("4.10.3");
+            extensiveTestVersions.add("4.10.2");
+            extensiveTestVersions.add("4.10.1");
+            extensiveTestVersions.add("4.10");
+            extensiveTestVersions.add("4.9");
+            extensiveTestVersions.add("4.8.1");
+            extensiveTestVersions.add("4.8");
+            extensiveTestVersions.add("4.7");
+        }*/
+        /* Gradle versions prior between 2.6 and 4.6 fail to test with an exception like:
+                org.gradle.api.GradleException: Unable to start the daemon process.
+                ...
+                Could not create service of type DaemonContext using DaemonServices.createDaemonContext().*/
+        /*if (javaVersion <= 9) {
+            extensiveTestVersions.add("4.6");
+            extensiveTestVersions.add("4.5.1");
+            extensiveTestVersions.add("4.5");
+            extensiveTestVersions.add("4.4.1");
+            extensiveTestVersions.add("4.4");
+            extensiveTestVersions.add("4.3.1");
+            extensiveTestVersions.add("4.3");
+        }*/
+        /* Gradle versions prior than 2.6 are not supported by Testkit
+                See: https://docs.gradle.org/current/userguide/test_kit.html#sub:test-kit-compatibility*/
+        /*if (javaVersion <= 8) {
+            extensiveTestVersions.add("4.2.1");
+            extensiveTestVersions.add("4.2");
+            extensiveTestVersions.add("4.1");
+            extensiveTestVersions.add("4.0.2");
+            extensiveTestVersions.add("4.0.1");
+            extensiveTestVersions.add("4.0");
+            extensiveTestVersions.add("3.5.1");
+            extensiveTestVersions.add("3.5");
+            extensiveTestVersions.add("3.4.1");
+            extensiveTestVersions.add("3.4");
+            extensiveTestVersions.add("3.3");
+            extensiveTestVersions.add("3.2.1");
+            extensiveTestVersions.add("3.2");
+            extensiveTestVersions.add("3.1");
+            extensiveTestVersions.add("3.0");
+            extensiveTestVersions.add("2.14.1");
+            extensiveTestVersions.add("2.14");
+            extensiveTestVersions.add("2.13");
+            extensiveTestVersions.add("2.12");
+            extensiveTestVersions.add("2.11");
+            extensiveTestVersions.add("2.10");
+            extensiveTestVersions.add("2.9");
+            extensiveTestVersions.add("2.8");
+            extensiveTestVersions.add("2.7");
+            extensiveTestVersions.add("2.6");
+            extensiveTestVersions.add("2.5");
+            extensiveTestVersions.add("2.4");
+            extensiveTestVersions.add("2.3");
+            extensiveTestVersions.add("2.2.1");
+            extensiveTestVersions.add("2.2");
+            extensiveTestVersions.add("2.1");
+            extensiveTestVersions.add("2.0");
+        }*/
 
-        // if quick tests are requested, just return the latest version (the first in the array)
-        return quickTestsOnly ? new String[]{versions[0]} : versions;
+        List<String> allSupportedVersions = new ArrayList<String>(quickTestVersions);
+        allSupportedVersions.addAll(extensiveTestVersions);
+        Collections.sort(allSupportedVersions, Collections.reverseOrder());
+
+        System.out.println("********************************************************************************************************");System.out.flush();
+        System.out.println("ATTENTION: JVM and Gradle versions");System.out.flush();
+        System.out.println("The current JVM version is "+javaVersionString+" and the list of Gradle versions supported by Testkit");System.out.flush();
+        System.out.println("for this version has been narrowed to compatible ones, according to the Gradle compatibility matrix at:");System.out.flush();
+        System.out.println("    https://docs.gradle.org/current/userguide/compatibility.html");System.out.flush();
+        System.out.println("Namely, the list of supported Gradle versions for this VM is:");System.out.flush();
+        System.out.println("    "+String.join(", ", allSupportedVersions));System.out.flush();
+        System.out.println("Where the ones always tested, even when the 'quick' tests only are executed, are:");System.out.flush();
+        System.out.println("    "+String.join(", ", quickTestVersions));System.out.flush();
+        System.out.println("and those tested only for extended tests are:");System.out.flush();
+        System.out.println("    "+String.join(", ", extensiveTestVersions));System.out.flush();
+        System.out.println("Running these tests with a lower JVM version extends the set of Gradle versions compatible for testing");System.out.flush();
+        System.out.println("so if you're trying to test against a version not listed here you may just need to run on an older JVM,");System.out.flush();
+        System.out.println("as long as it's supported (11 or above).");System.out.flush();
+        System.out.println("********************************************************************************************************");System.out.flush();
+
+        // if quick tests are requested, just return the smallest significant versions, otherwise return the union between the two lists
+        return quickTestsOnly ? quickTestVersions.toArray(new String[0]) : allSupportedVersions.toArray(new String[0]);
     }
 
     /**

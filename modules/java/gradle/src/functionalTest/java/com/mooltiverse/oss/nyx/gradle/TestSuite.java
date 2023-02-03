@@ -150,7 +150,7 @@ public class TestSuite {
 	 * Returns a string description of the test suite.
 	 */
 	public String toString() {
-		return "Gradle"+(Objects.isNull(gradleVersion) ? " " : " "+gradleVersion+" ")+"Plugin"+(Objects.isNull(name) ? " (anonymous) " : " ("+name+") ");
+		return "Gradle "+(Objects.isNull(gradleVersion) ? "" : gradleVersion)+" Plugin "+(Objects.isNull(name) ? "(anonymous)" : "("+name+")"+" (JVM "+System.getProperty("java.specification.version")+")");
 	}
 
 	/**

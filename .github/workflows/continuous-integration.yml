@@ -378,19 +378,25 @@ jobs:
 ###############################################################################################################################
   
   java-unit-test:
-    name: Test (Unit) - Java
+    name: Test (Unit) - Java ${{ matrix.Java }}
     needs: build-java
+    # The recommended JDK version is 15 or above but since we need to test for backward compatibility to JVMs 11 or newer we
+    # need a matrix here. Depending on the JDK version the set of Gradle version that the tests run on will change, according
+    # to the Gradle compatibility matrix. See CONTRIBUTING.md in the root directory or the Gradle functional test suites for more.
+    strategy:
+      matrix:
+        java: [ '11', '16' ]
     runs-on: ubuntu-latest
     steps:
     - name: Git checkout
       uses: actions/checkout@v3
       with:
         fetch-depth: 0
-    - name: Set up JDK 16
+    - name: Set up JDK ${{ matrix.Java }}
       uses: actions/setup-java@v3
       with:
         distribution: 'temurin'
-        java-version: 16
+        java-version: ${{ matrix.Java }}
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Make Git ignore execute permission changes in files (like gradlew)
@@ -461,19 +467,25 @@ jobs:
   # limit defined by GitHub Actions. This is why they are in a separate job and the output cache
   # may fail to store at the end (but this won't affect other jobs).
   java-integration-test:
-    name: Test (Integration) - Java
+    name: Test (Integration) - Java ${{ matrix.Java }}
     needs: java-unit-test
+    # The recommended JDK version is 15 or above but since we need to test for backward compatibility to JVMs 11 or newer we
+    # need a matrix here. Depending on the JDK version the set of Gradle version that the tests run on will change, according
+    # to the Gradle compatibility matrix. See CONTRIBUTING.md in the root directory or the Gradle functional test suites for more.
+    strategy:
+      matrix:
+        java: [ '11', '16' ]
     runs-on: ubuntu-latest
     steps:
     - name: Git checkout
       uses: actions/checkout@v3
       with:
         fetch-depth: 0
-    - name: Set up JDK 16
+    - name: Set up JDK ${{ matrix.Java }}
       uses: actions/setup-java@v3
       with:
         distribution: 'temurin'
-        java-version: 16
+        java-version: ${{ matrix.Java }}
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Make Git ignore execute permission changes in files (like gradlew)
@@ -556,19 +568,25 @@ jobs:
   # limit defined by GitHub Actions. This is why they are in a separate job and the output cache
   # may fail to store at the end (but this won't affect other jobs).
   java-functional-test:
-    name: Test (Functional) - Java
+    name: Test (Functional) - Java ${{ matrix.Java }}
     needs: java-integration-test
+    # The recommended JDK version is 15 or above but since we need to test for backward compatibility to JVMs 11 or newer we
+    # need a matrix here. Depending on the JDK version the set of Gradle version that the tests run on will change, according
+    # to the Gradle compatibility matrix. See CONTRIBUTING.md in the root directory or the Gradle functional test suites for more.
+    strategy:
+      matrix:
+        java: [ '11', '16' ]
     runs-on: ubuntu-latest
     steps:
     - name: Git checkout
       uses: actions/checkout@v3
       with:
         fetch-depth: 0
-    - name: Set up JDK 16
+    - name: Set up JDK ${{ matrix.Java }}
       uses: actions/setup-java@v3
       with:
         distribution: 'temurin'
-        java-version: 16
+        java-version: ${{ matrix.Java }}
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Make Git ignore execute permission changes in files (like gradlew)

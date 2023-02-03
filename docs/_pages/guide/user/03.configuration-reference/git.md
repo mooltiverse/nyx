@@ -21,7 +21,7 @@ Nyx uses external libraries to connect to remotes and so inherits their limitati
 
 The limitations coming from those libraries may show up, for example:
 
-* in case of unsupported key algorithms and formats (when using SSH keys)
+* in case of unsupported key algorithms and formats (when using SSH authentication to remote repositories)
 * in case of unsupported JVM versions (for the Java version)
 * when files are not found at their usual locations (i.e. `~/.ssh`, when using SSH keys)
 
@@ -52,7 +52,7 @@ Using public keys is encouraged for security reasons although it introduces some
 * when private keys are passed as parameters, remote key fingerprint check is not performed
 * ssh-agent (including Pageant) support is **experimental** to avoid entering the passphrase to private keys, when used
 
-Not all algorithms are supported on all platforms so make sure your keys are supported. A few handy references:
+Support for key algorithms depends on the platform and the remote service. A few handy references:
 
 * [Adding a new SSH key to your GitHub account](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account) shows instructions on how to set up SSH keys on GitHub along with supported key types
 * [Use SSH keys to communicate with GitLab](https://docs.gitlab.com/ee/user/ssh.html) shows instructions on how to set up SSH keys on GitLab along with supported key types
