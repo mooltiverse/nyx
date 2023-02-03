@@ -230,13 +230,10 @@ Some extra information on the Gradle Plugin internals is available [here]({{ sit
 
 ### Requisites
 
-The recommended runtime to run the Gradle plugin is Gradle `7.0` or newer and Java VM `15` or newer.
+In order to run the Gradle plugin you need:
 
-Although you may encounter some limitations (i.e. about support for some encryption or hashing algorithms when using SSH authentication), older versions are also supported. Specifically, Java VM `11` or newer are supported and Gradle version `6.0` is supported.
-
-Java VMs older than `11` and Gradle versions older than `6.0` are not supported.
-
-[Here](https://gradle.org/releases/) you can find the list of available releases and [here](https://docs.gradle.org/current/userguide/compatibility.html) is the Gradle compatibility matrix.
+* Java release `15` or later
+* Gradle release `6.7` or later. Tests have been successfully executed up to release `7.6`. [Here](https://gradle.org/releases/) you can find the list of available releases and [here](https://docs.gradle.org/current/userguide/compatibility.html) is the Gradle compatibility matrix
 
 ### Apply the plugin
 

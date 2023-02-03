@@ -10,12 +10,7 @@ There are no actions to take for backward compatibility.
 
 ### New features and improvements
 
-This release:
-
-* this release extends backward compatibility for the Java version (the command line version is not affected), in details:
-  * the recommended JVM version is `15` or newer and the recommended Gradle version is `7.0` or newer
-  * older Java versions are supported starting from `11` and older Gradle versions are supported starting from `6.0`)
-  * JVM versions older than `11` and Gradle versions older than `6.0` are not supported
+There are no new features but a few improvements in the build process and an upgrade of all the plugins, tools and libraries used in the project.
 
 ### Fixed issues
 
