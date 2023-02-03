@@ -378,25 +378,26 @@ jobs:
 ###############################################################################################################################
   
   java-unit-test:
-    name: Test (Unit) - Java ${{ matrix.Java }}
+    name: Test (Unit) - Java # TODO: uncomment the following: ${{ matrix.java }}
     needs: build-java
     # The recommended JDK version is 15 or above but since we need to test for backward compatibility to JVMs 11 or newer we
     # need a matrix here. Depending on the JDK version the set of Gradle version that the tests run on will change, according
     # to the Gradle compatibility matrix. See CONTRIBUTING.md in the root directory or the Gradle functional test suites for more.
-    strategy:
-      matrix:
-        java: [ '11', '16' ]
+    # TODO: uncomment the following lines
+    #strategy:
+    #  matrix:
+    #    java: [ '11', '16' ]
     runs-on: ubuntu-latest
     steps:
     - name: Git checkout
       uses: actions/checkout@v3
       with:
         fetch-depth: 0
-    - name: Set up JDK ${{ matrix.Java }}
+    - name: Set up JDK 16 # TODO: replace with the following: - name: Set up JDK ${{ matrix.java }}
       uses: actions/setup-java@v3
       with:
         distribution: 'temurin'
-        java-version: ${{ matrix.Java }}
+        java-version: 16 # TODO: replace with the following: java-version: ${{ matrix.java }}
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Make Git ignore execute permission changes in files (like gradlew)
@@ -450,13 +451,13 @@ jobs:
       uses: actions/upload-artifact@v3
       if: ${{ always() }}
       with:
-        name: .nyx-state-${{ github.job }}.json
+        name: .nyx-state-${{ github.job }}.json # TODO: replace with the following: name: .nyx-state-${{ github.job }}-${{ matrix.java }}.json
         path: build/.nyx-state.json
     - name: Archive Test Outputs
       uses: actions/upload-artifact@v3
       if: ${{ always() }}
       with:
-        name: java-unit-test-reports
+        name: java-unit-test-reports # TODO: replace with the following: name: java-${{ matrix.java }}-unit-test-reports
         path: |
           modules/java/**/build/jacoco/
           modules/java/**/build/reports/jacoco
@@ -467,25 +468,26 @@ jobs:
   # limit defined by GitHub Actions. This is why they are in a separate job and the output cache
   # may fail to store at the end (but this won't affect other jobs).
   java-integration-test:
-    name: Test (Integration) - Java ${{ matrix.Java }}
+    name: Test (Integration) - Java # TODO: uncomment the following: ${{ matrix.java }}
     needs: java-unit-test
     # The recommended JDK version is 15 or above but since we need to test for backward compatibility to JVMs 11 or newer we
     # need a matrix here. Depending on the JDK version the set of Gradle version that the tests run on will change, according
     # to the Gradle compatibility matrix. See CONTRIBUTING.md in the root directory or the Gradle functional test suites for more.
-    strategy:
-      matrix:
-        java: [ '11', '16' ]
+    # TODO: uncomment the following lines
+    #strategy:
+    #  matrix:
+    #    java: [ '11', '16' ]
     runs-on: ubuntu-latest
     steps:
     - name: Git checkout
       uses: actions/checkout@v3
       with:
         fetch-depth: 0
-    - name: Set up JDK ${{ matrix.Java }}
+    - name: Set up JDK 16 # TODO: replace with the following: - name: Set up JDK ${{ matrix.java }}
       uses: actions/setup-java@v3
       with:
         distribution: 'temurin'
-        java-version: ${{ matrix.Java }}
+        java-version: 16 # TODO: replace with the following: java-version: ${{ matrix.java }}
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Make Git ignore execute permission changes in files (like gradlew)
@@ -551,13 +553,13 @@ jobs:
       uses: actions/upload-artifact@v3
       if: ${{ always() }}
       with:
-        name: .nyx-state-${{ github.job }}.json
+        name: .nyx-state-${{ github.job }}.json # TODO: replace with the following: name: .nyx-state-${{ github.job }}-${{ matrix.java }}.json
         path: build/.nyx-state.json
     - name: Archive Test Outputs
       uses: actions/upload-artifact@v3
       if: ${{ always() }}
       with:
-        name: java-integration-test-reports
+        name: java-integration-test-reports # TODO: replace with the following: name: java-${{ matrix.java }}-integration-test-reports
         path: |
           modules/java/**/build/jacoco/
           modules/java/**/build/reports/jacoco
@@ -568,25 +570,26 @@ jobs:
   # limit defined by GitHub Actions. This is why they are in a separate job and the output cache
   # may fail to store at the end (but this won't affect other jobs).
   java-functional-test:
-    name: Test (Functional) - Java ${{ matrix.Java }}
+    name: Test (Functional) - Java # TODO: uncomment the following: ${{ matrix.java }}
     needs: java-integration-test
     # The recommended JDK version is 15 or above but since we need to test for backward compatibility to JVMs 11 or newer we
     # need a matrix here. Depending on the JDK version the set of Gradle version that the tests run on will change, according
     # to the Gradle compatibility matrix. See CONTRIBUTING.md in the root directory or the Gradle functional test suites for more.
-    strategy:
-      matrix:
-        java: [ '11', '16' ]
+    # TODO: uncomment the following lines
+    #strategy:
+    #  matrix:
+    #    java: [ '11', '16' ]
     runs-on: ubuntu-latest
     steps:
     - name: Git checkout
       uses: actions/checkout@v3
       with:
         fetch-depth: 0
-    - name: Set up JDK ${{ matrix.Java }}
+    - name: Set up JDK 16 # TODO: replace with the following: - name: Set up JDK ${{ matrix.java }}
       uses: actions/setup-java@v3
       with:
         distribution: 'temurin'
-        java-version: ${{ matrix.Java }}
+        java-version: 16 # TODO: replace with the following: java-version: ${{ matrix.java }}
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Make Git ignore execute permission changes in files (like gradlew)
@@ -653,13 +656,13 @@ jobs:
       uses: actions/upload-artifact@v3
       if: ${{ always() }}
       with:
-        name: .nyx-state-${{ github.job }}.json
+        name: .nyx-state-${{ github.job }}.json # TODO: replace with the following: name: .nyx-state-${{ github.job }}-${{ matrix.java }}.json
         path: build/.nyx-state.json
     - name: Archive Test Outputs
       uses: actions/upload-artifact@v3
       if: ${{ always() }}
       with:
-        name: java-functional-test-reports
+        name: java-functional-test-reports # TODO: replace with the following: name: java-${{ matrix.java }}-functional-test-reports
         path: |
           modules/java/**/build/jacoco/
           modules/java/**/build/reports/jacoco
@@ -743,13 +746,13 @@ jobs:
       uses: actions/upload-artifact@v3
       if: ${{ always() }}
       with:
-        name: .nyx-state-${{ github.job }}.json
+        name: .nyx-state-${{ github.job }}-${{ matrix.os }}.json
         path: build/.nyx-state.json
     - name: Archive Test Outputs
       uses: actions/upload-artifact@v3
       if: ${{ always() }}
       with:
-        name: go-unit-test-reports
+        name: go-${{ matrix.os }}-unit-test-reports
         path: |
           modules/go/**/build/reports/tests/test/
           modules/go/**/build/test-results/test/
@@ -846,13 +849,13 @@ jobs:
       uses: actions/upload-artifact@v3
       if: ${{ always() }}
       with:
-        name: .nyx-state-${{ github.job }}.json
+        name: .nyx-state-${{ github.job }}-${{ matrix.os }}.json
         path: build/.nyx-state.json
     - name: Archive Test Outputs
       uses: actions/upload-artifact@v3
       if: ${{ always() }}
       with:
-        name: go-integration-test-reports
+        name: go-${{ matrix.os }}-integration-test-reports
         path: |
           modules/go/**/build/reports/tests/integrationTest/
           modules/go/**/build/test-results/integrationTest/
@@ -950,13 +953,13 @@ jobs:
       uses: actions/upload-artifact@v3
       if: ${{ always() }}
       with:
-        name: .nyx-state-${{ github.job }}.json
+        name: .nyx-state-${{ github.job }}-${{ matrix.os }}.json
         path: build/.nyx-state.json
     - name: Archive Test Outputs
       uses: actions/upload-artifact@v3
       if: ${{ always() }}
       with:
-        name: go-functional-test-reports
+        name: go-${{ matrix.os }}-functional-test-reports
         path: |
           modules/go/**/build/reports/tests/functionalTest/
           modules/go/**/build/test-results/functionalTest/
