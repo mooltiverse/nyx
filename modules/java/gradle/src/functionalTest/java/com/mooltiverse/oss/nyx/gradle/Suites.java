@@ -60,7 +60,7 @@ public class Suites {
         } catch (NumberFormatException nfe) {
             throw new java.lang.RuntimeException(String.format("Unable to inspect the current Java version. The system property '%s' value is '%s' and acnnot be parsed to a valid integer", "java.specification.version", javaVersionString), nfe);
         }
-        if (javaVersion < 15)
+        if (javaVersion < 11)
             throw new java.lang.RuntimeException(String.format("Java version '%d' is not supported by the Gradle versions supported by Nyx", javaVersion));
 
         // Now, with the runtime Java version we can determine the Gradle versions we can test, according to https://docs.gradle.org/current/userguide/compatibility.html
@@ -73,8 +73,8 @@ public class Suites {
         List<String> quickTestVersions = new ArrayList<String>();
         List<String> extensiveTestVersions = new ArrayList<String>();
 
-        // Java versions >= 15 are required
-        // Gradle versions from 7.0 on are recommended, while 6.7 is the minimum required
+        // Java versions >= 15 are recommended
+        // Gradle versions from 7.0 on are recommended
         if (javaVersion <= 19) {
             // the latest version is always among the 'quick' tests
             quickTestVersions.add("7.6");
@@ -130,7 +130,7 @@ public class Suites {
             extensiveTestVersions.add("6.4");
             extensiveTestVersions.add("6.3");
         }
-        /*if (javaVersion <= 13) {
+        if (javaVersion <= 13) {
             extensiveTestVersions.add("6.2.2");
             extensiveTestVersions.add("6.2.1");
             extensiveTestVersions.add("6.2");
@@ -138,7 +138,7 @@ public class Suites {
             extensiveTestVersions.add("6.1");
             extensiveTestVersions.add("6.0.1");
             extensiveTestVersions.add("6.0");
-        }*/
+        }
         /* Gradle versions prior than 6.0 fails to test with an exception like:
                 > Could not find method services() for arguments [build_4o3mdmvy94ykemibox706yopu$_run_closure1$_closure2@18c3fdb5] on object of type com.mooltiverse.oss.nyx.gradle.NyxExtension.
            This means it has a different method for setting nested blocks into the extension object.
@@ -257,7 +257,7 @@ public class Suites {
         System.out.println("    "+String.join(", ", extensiveTestVersions));System.out.flush();
         System.out.println("Running these tests with a lower JVM version extends the set of Gradle versions compatible for testing");System.out.flush();
         System.out.println("so if you're trying to test against a version not listed here you may just need to run on an older JVM,");System.out.flush();
-        System.out.println("as long as it's supported (15 or above).");System.out.flush();
+        System.out.println("as long as it's supported (11 or above).");System.out.flush();
         System.out.println("********************************************************************************************************");System.out.flush();
 
         // if quick tests are requested, just return the smallest significant versions, otherwise return the union between the two lists
