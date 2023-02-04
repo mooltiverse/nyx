@@ -228,16 +228,6 @@ All the examples in this page assume you're using the plain `gradle` command. If
 Some extra information on the Gradle Plugin internals is available [here]({{ site.baseurl }}{% link _pages/guide/user/07.in-depth/gradle-plugin.md %}).
 {: .notice--info}
 
-### Requisites
-
-The recommended runtime to run the Gradle plugin is Gradle `7.0` or newer and Java VM `15` or newer.
-
-Although you may encounter some limitations (i.e. about support for some encryption or hashing algorithms when using SSH authentication), older versions are also supported. Specifically, Java VM `11` or newer are supported and Gradle version `6.0` is supported.
-
-Java VMs older than `11` and Gradle versions older than `6.0` are not supported.
-
-[Here](https://gradle.org/releases/) you can find the list of available releases and [here](https://docs.gradle.org/current/userguide/compatibility.html) is the Gradle compatibility matrix.
-
 ### Apply the plugin
 
 You can apply the [plugin](https://plugins.gradle.org/plugin/com.mooltiverse.oss.nyx) as a *project plugin* or as a *settings plugin*. You're suggested to use the *settings plugin* to make sure you have properties are evaluated early in the build lifecycle as detailed in [this post]({{ site.baseurl }}{% link _posts/2020-01-01-the-gradle-version-project-property-is-unspecified.md %}).
