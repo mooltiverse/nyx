@@ -129,7 +129,7 @@ public class Suites {
             extensiveTestVersions.add("6.4.1");
             extensiveTestVersions.add("6.4");
             extensiveTestVersions.add("6.3");
-        }*/
+        }
         /*if (javaVersion <= 13) {
             extensiveTestVersions.add("6.2.2");
             extensiveTestVersions.add("6.2.1");
