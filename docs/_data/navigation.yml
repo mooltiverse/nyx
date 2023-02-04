@@ -59,6 +59,8 @@ nav-user-guide:
     children:
       - title: "How Nyx Works"
         url: /guide/user/introduction/how-nyx-works/
+      - title: "Requirements"
+        url: /guide/user/introduction/requirements/
       - title: "Usage"
         url: /guide/user/introduction/usage/
       - title: "Combined Release Process"

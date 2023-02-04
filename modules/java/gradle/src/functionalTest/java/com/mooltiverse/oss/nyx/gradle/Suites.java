@@ -100,8 +100,11 @@ public class Suites {
             extensiveTestVersions.add("7.0.1");
             extensiveTestVersions.add("7.0");
         }
-        // Gradle versions between 6.7 and 7.0 (excluded) are not recommended but still supported
+        // Gradle versions between 6.0 and 7.0 (excluded) are not recommended but still supported for backward compatibility,
+        // with exceptions as per https://github.com/mooltiverse/nyx/issues/153
         if (javaVersion <= 15) {
+            // these versions are not supported due to the ASM version it uses, see https://github.com/mooltiverse/nyx/issues/153
+            /*
             extensiveTestVersions.add("6.9.3");
             extensiveTestVersions.add("6.9.2");
             extensiveTestVersions.add("6.9.1");
@@ -112,13 +115,17 @@ public class Suites {
             extensiveTestVersions.add("6.8");
             extensiveTestVersions.add("6.7.1");
             quickTestVersions.add("6.7"); // 6.7 is the minimum supported version so we keep it in the 'quick' tests
+            */
         }
-        // JVM prior than 15 are not supported so also Gradle versions not supporting JVMs from 15 on are not supported
-        /*if (javaVersion <= 14) {
+        // Java versions between 11 and 14 are not recommended but still supported for backward compatibility
+        if (javaVersion <= 14) {
+            // these versions are not supported due to the ASM version it uses, see https://github.com/mooltiverse/nyx/issues/153
+            /*
             extensiveTestVersions.add("6.6.1");
             extensiveTestVersions.add("6.6");
             extensiveTestVersions.add("6.5.1");
-            //extensiveTestVersions.add("6.5"); // - version "6.5" has a bug (https://github.com/gradle/gradle/issues/13367) that prevents us to test, fixed in "6.5.1"
+            //extensiveTestVersions.add("6.5"); // - this version has a bug (https://github.com/gradle/gradle/issues/13367) that prevents us to test, fixed in "6.5.1"
+            */
             extensiveTestVersions.add("6.4.1");
             extensiveTestVersions.add("6.4");
             extensiveTestVersions.add("6.3");

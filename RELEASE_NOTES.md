@@ -10,7 +10,12 @@ There are no actions to take for backward compatibility.
 
 ### New features and improvements
 
-There are no new features but a few improvements in the build process and an upgrade of all the plugins, tools and libraries used in the project.
+This release:
+
+* this release extends backward compatibility for the Java version (the command line version is not affected) ([#153](https://github.com/mooltiverse/nyx/issues/153)), in details:
+  * the recommended JVM version is `15` or newer and the recommended Gradle version is `7.0` or newer
+  * older Java versions starting from `11` and older Gradle versions starting from `6.0` are supported with the exception of Gradle versions between `6.5` and `6.9.3` (see [#153](https://github.com/mooltiverse/nyx/issues/153#issuecomment-1416732299))
+  * JVM versions older than `11` and Gradle versions older than `6.0` are not supported
 
 ### Fixed issues
 
