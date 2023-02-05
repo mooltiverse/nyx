@@ -15,8 +15,6 @@
  */
 package com.mooltiverse.oss.nyx.gradle;
 
-import java.io.File;
-
 import org.gradle.testkit.runner.BuildResult;
 import org.gradle.testkit.runner.GradleRunner;
 

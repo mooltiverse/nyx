@@ -160,7 +160,9 @@ where the main tasks are:
 
 The `publish` and `release` tasks can only be executed on the CI/CD platform.
 
-Use the most recent [Gradle release](https://gradle.org/releases/), at least version `7.0`. The JDK must be at least version `15`, but consider that newer versions may cause errors like `unsupported class file major version XY` when running Gradle functional tests (due to [Gradle TestKit](https://docs.gradle.org/current/userguide/test_kit.html) when testing simulating older versions of Gradle).
+The recommended JDK version is `15` or newer. JDK version older than `11` is not supported.
+
+The JDK version affects the number of functional tests excuted for the Gradle plugin, according to the [Gradle compatibility matrix](https://docs.gradle.org/current/userguide/compatibility.html). This means that newer JDKs will run functional tests against a reduced set of Gradle versions because [TestKit](https://docs.gradle.org/current/userguide/test_kit.html) uses the original Java binaries for each tested Gradle release and Java classes compiled for JVM versions published after the Gradle release would raise an exception like `unsupported class file major version XY`. You don't need to worry about this (as it's already taken care of in the functional test suites) unless you need to run functional tests against a specific gradle version that is not covered by the tests due to the JDK version you're using.
 
 ### Contributing Documentation
 

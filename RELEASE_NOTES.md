@@ -1,5 +1,26 @@
 # Nyx Release Notes
 
+## 2.1.0
+
+This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/2.1.0).
+
+### Upgrade instructions
+
+There are no actions to take for backward compatibility.
+
+### New features and improvements
+
+This release:
+
+* this release extends backward compatibility for the Java version (the command line version is not affected) ([#153](https://github.com/mooltiverse/nyx/issues/153)), in details:
+  * the recommended JVM version is `15` or newer and the recommended Gradle version is `7.0` or newer
+  * older Java versions starting from `11` and older Gradle versions starting from `6.0` are supported with the exception of Gradle versions between `6.5` and `6.9.3` (see [#153](https://github.com/mooltiverse/nyx/issues/153#issuecomment-1416732299))
+  * JVM versions older than `11` and Gradle versions older than `6.0` are not supported
+
+### Fixed issues
+
+There are no fixes in this release.
+
 ## 2.0.0
 
 * when using the Java (Gradle) version, the minimum Java version is now `15` and the minimum Gradle version is `7.0` (see [here](https://mooltiverse.github.io/nyx/guide/user/introduction/usage/#requisites-1) and [here](https://docs.gradle.org/current/userguide/compatibility.html)); Gradle versions from `6.7` on should still work but they are no longer tested
