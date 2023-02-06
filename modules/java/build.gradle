@@ -265,7 +265,7 @@ subprojects {
                 targets {
                     all { 
                         testTask.configure {
-                            // Pass the credentials to test suites as per https://github.com/mooltiverse/nyx/blob/master/CONTRIBUTING.md#contributing-code
+                            // Pass the credentials to test suites as per https://github.com/mooltiverse/nyx/blob/main/CONTRIBUTING.md#contributing-code
                             // Suggestion is to set the $GRADLE_USER_HOME environment variable and create a gradle.properties therein, with these
                             // properties defined
                             systemProperty 'gitHubTestUserToken', findProperty("gitHubTestUserToken")
@@ -293,7 +293,7 @@ subprojects {
                 targets {
                     all { 
                         testTask.configure {
-                            // Pass the credentials to test suites as per https://github.com/mooltiverse/nyx/blob/master/CONTRIBUTING.md#contributing-code
+                            // Pass the credentials to test suites as per https://github.com/mooltiverse/nyx/blob/main/CONTRIBUTING.md#contributing-code
                             // Suggestion is to set the $GRADLE_USER_HOME environment variable and create a gradle.properties therein, with these
                             // properties defined
                             systemProperty 'gitHubTestUserToken', findProperty("gitHubTestUserToken")

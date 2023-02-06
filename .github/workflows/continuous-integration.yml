@@ -521,7 +521,7 @@ jobs:
           gradle-distribution-sha-256-sum-warning: false
     - name: Run Java Integration Tests with Gradle
       env:
-        # See the top level https://github.com/mooltiverse/nyx/blob/master/CONTRIBUTING.md#contributing-code file for details about passing these values when testing locally
+        # See the top level https://github.com/mooltiverse/nyx/blob/main/CONTRIBUTING.md#contributing-code file for details about passing these values when testing locally
         ORG_GRADLE_PROJECT_gitHubTestUserToken: ${{ secrets.TEST_GITHUB_USER_TOKEN }}                                                # The test user token to test Nyx GitHub features
         ORG_GRADLE_PROJECT_gitHubTestUserPublicKey: ${{ secrets.TEST_GITHUB_USER_PUBLIC_KEY }}                                       # The test public key to test Nyx GitHub features
         ORG_GRADLE_PROJECT_gitHubTestUserPrivateKeyPassphrase: ${{ secrets.TEST_GITHUB_USER_PASSPHRASE }}                            # The test private key passphrase to test Nyx GitHub features
@@ -623,7 +623,7 @@ jobs:
     # Add the -PquickTests=true option to the Gradle command line to narrow the number of tests
     - name: Run Java Functional Tests with Gradle
       env:
-        # See the top level https://github.com/mooltiverse/nyx/blob/master/CONTRIBUTING.md#contributing-code file for details about passing these values when testing locally
+        # See the top level https://github.com/mooltiverse/nyx/blob/main/CONTRIBUTING.md#contributing-code file for details about passing these values when testing locally
         ORG_GRADLE_PROJECT_gitHubTestUserToken: ${{ secrets.TEST_GITHUB_USER_TOKEN }}                                                # The test user token to test Nyx GitHub features
         ORG_GRADLE_PROJECT_gitHubTestUserPublicKey: ${{ secrets.TEST_GITHUB_USER_PUBLIC_KEY }}                                       # The test public key to test Nyx GitHub features
         ORG_GRADLE_PROJECT_gitHubTestUserPrivateKeyPassphrase: ${{ secrets.TEST_GITHUB_USER_PASSPHRASE }}                            # The test private key passphrase to test Nyx GitHub features
@@ -815,7 +815,7 @@ jobs:
           gradle-distribution-sha-256-sum-warning: false
     - name: Run Go Integration Tests with Gradle
       env:
-        # See the top level https://github.com/mooltiverse/nyx/blob/master/CONTRIBUTING.md#contributing-code file for details about passing these values when testing locally
+        # See the top level https://github.com/mooltiverse/nyx/blob/main/CONTRIBUTING.md#contributing-code file for details about passing these values when testing locally
         ORG_GRADLE_PROJECT_gitHubTestUserToken: ${{ secrets.TEST_GITHUB_USER_TOKEN }}                                                # The test user token to test Nyx GitHub features
         ORG_GRADLE_PROJECT_gitHubTestUserPublicKey: ${{ secrets.TEST_GITHUB_USER_PUBLIC_KEY }}                                       # The test public key to test Nyx GitHub features
         ORG_GRADLE_PROJECT_gitHubTestUserPrivateKeyPassphrase: ${{ secrets.TEST_GITHUB_USER_PASSPHRASE }}                            # The test private key passphrase to test Nyx GitHub features
@@ -919,7 +919,7 @@ jobs:
     # Add the -PquickTests=true option to the Gradle command line to narrow the number of tests
     - name: Run Go Functional Tests with Gradle
       env:
-        # See the top level https://github.com/mooltiverse/nyx/blob/master/CONTRIBUTING.md#contributing-code file for details about passing these values when testing locally
+        # See the top level https://github.com/mooltiverse/nyx/blob/main/CONTRIBUTING.md#contributing-code file for details about passing these values when testing locally
         ORG_GRADLE_PROJECT_gitHubTestUserToken: ${{ secrets.TEST_GITHUB_USER_TOKEN }}                                                # The test user token to test Nyx GitHub features
         ORG_GRADLE_PROJECT_gitHubTestUserPublicKey: ${{ secrets.TEST_GITHUB_USER_PUBLIC_KEY }}                                       # The test public key to test Nyx GitHub features
         ORG_GRADLE_PROJECT_gitHubTestUserPrivateKeyPassphrase: ${{ secrets.TEST_GITHUB_USER_PASSPHRASE }}                            # The test private key passphrase to test Nyx GitHub features
@@ -1020,7 +1020,7 @@ jobs:
     # Add the -PquickTests=true option to the Gradle command line to narrow the number of tests
     - name: Run Docker Functional Tests with Gradle
       env:
-        # See the top level https://github.com/mooltiverse/nyx/blob/master/CONTRIBUTING.md#contributing-code file for details about passing these values when testing locally
+        # See the top level https://github.com/mooltiverse/nyx/blob/main/CONTRIBUTING.md#contributing-code file for details about passing these values when testing locally
         ORG_GRADLE_PROJECT_gitHubTestUserToken: ${{ secrets.TEST_GITHUB_USER_TOKEN }}                                                # The test user token to test Nyx GitHub features
         ORG_GRADLE_PROJECT_gitHubTestUserPublicKey: ${{ secrets.TEST_GITHUB_USER_PUBLIC_KEY }}                                       # The test public key to test Nyx GitHub features
         ORG_GRADLE_PROJECT_gitHubTestUserPrivateKeyPassphrase: ${{ secrets.TEST_GITHUB_USER_PASSPHRASE }}                            # The test private key passphrase to test Nyx GitHub features
@@ -1114,7 +1114,7 @@ jobs:
           # - the 'secrets' Context:  https://docs.github.com/en/actions/learn-github-actions/contexts
           # - the Default Environment Variables: https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables
           # - enabling GITHUB_TOKEN to publish packages: https://docs.github.com/en/packages/managing-github-packages-using-github-actions-workflows/publishing-and-installing-a-package-with-github-actions#upgrading-a-workflow-that-accesses-ghcrio
-          # See the top level https://github.com/mooltiverse/nyx/blob/master/CONTRIBUTING.md#contributing-code file for details about passing these values when testing locally
+          # See the top level https://github.com/mooltiverse/nyx/blob/main/CONTRIBUTING.md#contributing-code file for details about passing these values when testing locally
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ORG_GRADLE_PROJECT_gitHubUser: ${{ github.actor }}
           ORG_GRADLE_PROJECT_gitHubToken: ${{ secrets.GITHUB_TOKEN }}
@@ -1190,7 +1190,7 @@ jobs:
           # - the 'secrets' Context:  https://docs.github.com/en/actions/learn-github-actions/contexts
           # - the Default Environment Variables: https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables
           # - GITHUB_TOKEN permissions for repository: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository#setting-the-permissions-of-the-github_token-for-your-repository
-          # See the top level https://github.com/mooltiverse/nyx/blob/master/CONTRIBUTING.md#contributing-code file for details about passing these values when testing locally
+          # See the top level https://github.com/mooltiverse/nyx/blob/main/CONTRIBUTING.md#contributing-code file for details about passing these values when testing locally
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ORG_GRADLE_PROJECT_gitHubUser: ${{ github.actor }}
           ORG_GRADLE_PROJECT_gitHubToken: ${{ secrets.GITHUB_TOKEN }}

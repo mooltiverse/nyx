@@ -14,5 +14,5 @@ You can find support for Nyx by:
 When posting issues please:
 
 * provide detailed information to help us reproduce errors
-* respect our [code of conduct](https://github.com/mooltiverse/nyx/blob/master/CODE_OF_CONDUCT.md)
+* respect our [code of conduct](https://github.com/mooltiverse/nyx/blob/main/CODE_OF_CONDUCT.md)
 * make it valuable for others that may find the same issue after you

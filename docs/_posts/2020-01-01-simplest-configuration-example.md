@@ -17,7 +17,7 @@ This configuration is the bare minimum and just uses the [*simple* preset]({{ si
 {% include .nyx-simplest.json %}
 ```
 
-Source code for this file is available [here](https://raw.githubusercontent.com/mooltiverse/nyx/master/docs/_includes/.nyx-simplest.json){:target="_blank"}.
+Source code for this file is available [here](https://raw.githubusercontent.com/mooltiverse/nyx/main/docs/_includes/.nyx-simplest.json){:target="_blank"}.
 
 ## YAML
 
@@ -25,7 +25,7 @@ Source code for this file is available [here](https://raw.githubusercontent.com/
 {% include .nyx-simplest.yaml %}
 ```
 
-Source code for this file is available [here](https://raw.githubusercontent.com/mooltiverse/nyx/master/docs/_includes/.nyx-simplest.yaml){:target="_blank"}.
+Source code for this file is available [here](https://raw.githubusercontent.com/mooltiverse/nyx/main/docs/_includes/.nyx-simplest.yaml){:target="_blank"}.
 
 ## Groovy (Gradle)
 
@@ -33,4 +33,4 @@ Source code for this file is available [here](https://raw.githubusercontent.com/
 {% include .nyx-simplest.groovy %}
 ```
 
-Source code for this file is available [here](https://raw.githubusercontent.com/mooltiverse/nyx/master/docs/_includes/.nyx-simplest.groovy){:target="_blank"}.
+Source code for this file is available [here](https://raw.githubusercontent.com/mooltiverse/nyx/main/docs/_includes/.nyx-simplest.groovy){:target="_blank"}.

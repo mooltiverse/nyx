@@ -33,13 +33,13 @@ nav-main:
       - title: "Releases & Changelog"
         url: https://github.com/mooltiverse/nyx/releases
       - title: "Release Notes"
-        url: https://github.com/mooltiverse/nyx/blob/master/RELEASE_NOTES.md
+        url: https://github.com/mooltiverse/nyx/blob/main/RELEASE_NOTES.md
       - title: "Code of Conduct"
-        url: https://github.com/mooltiverse/nyx/blob/master/CODE_OF_CONDUCT.md
+        url: https://github.com/mooltiverse/nyx/blob/main/CODE_OF_CONDUCT.md
       - title: "Contributing"
-        url: https://github.com/mooltiverse/nyx/blob/master/CONTRIBUTING.md
+        url: https://github.com/mooltiverse/nyx/blob/main/CONTRIBUTING.md
       - title: "License"
-        url: https://github.com/mooltiverse/nyx/blob/master/LICENSE.md
+        url: https://github.com/mooltiverse/nyx/blob/main/LICENSE.md
       - title: "Sponsor"
         url: /meta/sponsor/
 
@@ -138,13 +138,13 @@ nav-user-guide:
       - title: "Releases & Changelog"
         url: https://github.com/mooltiverse/nyx/releases
       - title: "Release Notes"
-        url: https://github.com/mooltiverse/nyx/blob/master/RELEASE_NOTES.md
+        url: https://github.com/mooltiverse/nyx/blob/main/RELEASE_NOTES.md
       - title: "Code of Conduct"
-        url: https://github.com/mooltiverse/nyx/blob/master/CODE_OF_CONDUCT.md
+        url: https://github.com/mooltiverse/nyx/blob/main/CODE_OF_CONDUCT.md
       - title: "Contributing"
-        url: https://github.com/mooltiverse/nyx/blob/master/CONTRIBUTING.md
+        url: https://github.com/mooltiverse/nyx/blob/main/CONTRIBUTING.md
       - title: "License"
-        url: https://github.com/mooltiverse/nyx/blob/master/LICENSE.md
+        url: https://github.com/mooltiverse/nyx/blob/main/LICENSE.md
       - title: "Sponsor"
         url: /meta/sponsor/
 
@@ -180,12 +180,12 @@ nav-developer-guide:
       - title: "Releases & Changelog"
         url: https://github.com/mooltiverse/nyx/releases
       - title: "Release Notes"
-        url: https://github.com/mooltiverse/nyx/blob/master/RELEASE_NOTES.md
+        url: https://github.com/mooltiverse/nyx/blob/main/RELEASE_NOTES.md
       - title: "Code of Conduct"
-        url: https://github.com/mooltiverse/nyx/blob/master/CODE_OF_CONDUCT.md
+        url: https://github.com/mooltiverse/nyx/blob/main/CODE_OF_CONDUCT.md
       - title: "Contributing"
-        url: https://github.com/mooltiverse/nyx/blob/master/CONTRIBUTING.md
+        url: https://github.com/mooltiverse/nyx/blob/main/CONTRIBUTING.md
       - title: "License"
-        url: https://github.com/mooltiverse/nyx/blob/master/LICENSE.md
+        url: https://github.com/mooltiverse/nyx/blob/main/LICENSE.md
       - title: "Sponsor"
         url: /meta/sponsor/

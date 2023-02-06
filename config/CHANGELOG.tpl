@@ -22,4 +22,4 @@ No changes.
 No releases.
 {{/releases}}
 
-Also check out the [release notes](https://github.com/mooltiverse/nyx/blob/master/RELEASE_NOTES.md#{{name}}) for this release.
+Also check out the [release notes](https://github.com/mooltiverse/nyx/blob/main/RELEASE_NOTES.md#{{name}}) for this release.

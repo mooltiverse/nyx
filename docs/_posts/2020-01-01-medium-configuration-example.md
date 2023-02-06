@@ -20,7 +20,7 @@ Configuration options using [templates]({{ site.baseurl }}{% link _pages/guide/u
 {% include .nyx-medium.json %}
 ```
 
-Source code for this file is available [here](https://raw.githubusercontent.com/mooltiverse/nyx/master/docs/_includes/.nyx-medium.json){:target="_blank"}.
+Source code for this file is available [here](https://raw.githubusercontent.com/mooltiverse/nyx/main/docs/_includes/.nyx-medium.json){:target="_blank"}.
 
 ## YAML
 
@@ -28,7 +28,7 @@ Source code for this file is available [here](https://raw.githubusercontent.com/
 {% include .nyx-medium.yaml %}
 ```
 
-Source code for this file is available [here](https://raw.githubusercontent.com/mooltiverse/nyx/master/docs/_includes/.nyx-medium.yaml){:target="_blank"}.
+Source code for this file is available [here](https://raw.githubusercontent.com/mooltiverse/nyx/main/docs/_includes/.nyx-medium.yaml){:target="_blank"}.
 
 ## Groovy (Gradle)
 
@@ -36,4 +36,4 @@ Source code for this file is available [here](https://raw.githubusercontent.com/
 {% include .nyx-medium.groovy %}
 ```
 
-Source code for this file is available [here](https://raw.githubusercontent.com/mooltiverse/nyx/master/docs/_includes/.nyx-medium.groovy){:target="_blank"}.
+Source code for this file is available [here](https://raw.githubusercontent.com/mooltiverse/nyx/main/docs/_includes/.nyx-medium.groovy){:target="_blank"}.

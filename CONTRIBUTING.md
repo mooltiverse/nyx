@@ -334,7 +334,7 @@ Publishing build scan...
 https://gradle.com/s/ac7cj7nadxrmm
 ```
 
-Gradle scans are configured in the [`settings.gradle`](https://github.com/mooltiverse/nyx/blob/master/settings.gradle) file.
+Gradle scans are configured in the [`settings.gradle`](https://github.com/mooltiverse/nyx/blob/main/settings.gradle) file.
 
 ### Coding conventions
 
