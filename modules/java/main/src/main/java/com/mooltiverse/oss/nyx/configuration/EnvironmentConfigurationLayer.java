@@ -687,6 +687,16 @@ class EnvironmentConfigurationLayer implements ConfigurationLayer {
     /**
      * The name of the environment variable to read for this value. Value: {@value}
      */
+    private static final String SUMMARY_ENVVAR_NAME = ENVVAR_NAME_GLOBAL_PREFIX.concat("SUMMARY");
+
+    /**
+     * The name of the environment variable to read for this value. Value: {@value}
+     */
+    private static final String SUMMARY_FILE_ENVVAR_NAME = ENVVAR_NAME_GLOBAL_PREFIX.concat("SUMMARY_FILE");
+    
+    /**
+     * The name of the environment variable to read for this value. Value: {@value}
+     */
     private static final String STATE_FILE_ENVVAR_NAME = ENVVAR_NAME_GLOBAL_PREFIX.concat("STATE_FILE");
 
     /**
@@ -1286,6 +1296,28 @@ class EnvironmentConfigurationLayer implements ConfigurationLayer {
     @Override
     public String getSharedConfigurationFile() {
         return getenv(SHARED_CONFIGURATION_FILE_ENVVAR_NAME);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Boolean getSummary()
+        throws IllegalPropertyException {
+        try {
+            return Objects.isNull(getenv(SUMMARY_ENVVAR_NAME)) ? null : Boolean.valueOf(getenv(SUMMARY_ENVVAR_NAME));
+        }
+        catch (IllegalArgumentException iae) {
+            throw new IllegalPropertyException(String.format("The environment variable '%s' has an illegal value '%s'", SUMMARY_ENVVAR_NAME, getenv(SUMMARY_ENVVAR_NAME)), iae);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getSummaryFile() {
+        return getenv(SUMMARY_FILE_ENVVAR_NAME);
     }
 
     /**

@@ -28,6 +28,8 @@ These are the top level options in the configuration:
 | [`services`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}) | object  | See [Services]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}) | See [Services]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}) | N/A      |
 | [`sharedConfigurationFile`](#shared-configuration-file)   | string  | `--shared-configuration-file=<PATH>`                      | `NYX_SHARED_CONFIGURATION_FILE=<PATH>`                        | N/A      |
 | [`stateFile`](#state-file)                                | string  | `--state-file=<PATH>`                                     | `NYX_STATE_FILE=<PATH>`                                       | N/A      |
+| [`summary`](#summary)                                     | string  | `--summary`, `summary=true|false`                         | `NYX_SUMMARY=true|false`                                      | `false`  |
+| [`summaryFile`](#summary-file)                            | string  | `--summary-file=<PATH>`                                   | `NYX_SUMMARY_FILE=<PATH>`                                     | N/A      |
 | [`verbosity`](#verbosity)                                 | string  | `--verbosity=<LEVEL>`, `--fatal`, `--error`, `--warning`, `--info`, `--debug`, `--trace` | `NYX_VERBOSITY=<LEVEL>`        | `WARNING`|
 | [`version`](#version)                                     | string  | `-v=<VERSION>`, `--version=<VERSION>`                     | `NYX_VERSION=<VERSION>`                                       | N/A      |
 
@@ -295,9 +297,68 @@ The value passed here can be:
 Nyx will infer the format of the file by the extension, where available ones are [`.yaml`](https://yaml.org/) (or `.yml`), [`.json`](https://www.json.org/). When unable to infer the format by the extension JSON is assumed by default. This way, if you need to read the file for your own purposes, you can have it in the format that is more accessible to you.
 
 The suggested name for the file, when used, is `.nyx-state.<EXT>` (so `.nyx-state.yaml`, `.nyx-state.yml` or `.nyx-state.json`). It's recommended to let Git [ignore](https://git-scm.com/docs/gitignore) this file.
-{: .notice--primary}
+{: .notice--info}
 
 This option can also be used in conjunction with [`resume`](#resume) in case you wish to suspend the execution and resume from where you left at any other time.
+
+Also see [`summaryFile`](#summary-file) in case you're interested in a smaller but easily parseable subset of information.
+
+### Summary
+
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `summary`                                                                                |
+| Type                      | boolean                                                                                  |
+| Default                   | `false`                                                                                  |
+| Command Line Option       | `--summary`, `--summary=true|false`                                                      |
+| Environment Variable      | `NYX_SUMMARY=true|false`                                                                 |
+| Configuration File Option | `summary`                                                                                |
+| Related state attributes  | [branch]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#branch){: .btn .btn--info .btn--small} [bump]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#bump){: .btn .btn--info .btn--small} [coreVersion]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#core-version){: .btn .btn--info .btn--small} [latestVersion]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#latest-version){: .btn .btn--info .btn--small} [newRelease]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#new-release){: .btn .btn--info .btn--small} [newVersion]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#new-version){: .btn .btn--info .btn--small} [scheme]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#scheme){: .btn .btn--info .btn--small} [timestamp]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#timestamp){: .btn .btn--info .btn--small} [version]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#version){: .btn .btn--info .btn--small} [previousVersion]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#previous-version){: .btn .btn--info .btn--small} [primeVersion]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#prime-version){: .btn .btn--info .btn--small} |
+
+When this flag is set to `true` a short summary containing relevant information from the [internal state]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/index.md %}). The output is the same as the [summary file](#summary-file) but is printed to the standard output (regardless of the [verbosity](#verbosity)).
+
+When used with no value on the command line (i.e. `--summary` alone) `true` is assumed.
+
+This option is only available on the command line.
+
+### Summary file
+
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `summaryFile`                                                                            |
+| Type                      | string                                                                                   |
+| Default                   | N/A                                                                                      |
+| Command Line Option       | `--summary-file=<PATH>`                                                                  |
+| Environment Variable      | `NYX_SUMMARY_FILE=<PATH>`                                                                |
+| Configuration File Option | `summaryFile`                                                                            |
+| Related state attributes  | [branch]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#branch){: .btn .btn--info .btn--small} [bump]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#bump){: .btn .btn--info .btn--small} [coreVersion]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#core-version){: .btn .btn--info .btn--small} [latestVersion]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#latest-version){: .btn .btn--info .btn--small} [newRelease]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#new-release){: .btn .btn--info .btn--small} [newVersion]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#new-version){: .btn .btn--info .btn--small} [scheme]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#scheme){: .btn .btn--info .btn--small} [timestamp]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#timestamp){: .btn .btn--info .btn--small} [version]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#version){: .btn .btn--info .btn--small} [previousVersion]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#previous-version){: .btn .btn--info .btn--small} [primeVersion]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#prime-version){: .btn .btn--info .btn--small} |
+
+Enables the creation of the summary file where Nyx saves a subset of relevant information from the [internal state]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/index.md %}) as name value pairs, easy to parse.
+
+An example of the file content is:
+
+```
+branch           = main
+bump             = minor
+core version     = true
+latest version   = true
+new release      = true
+new version      = true
+scheme           = SEMVER
+timestamp        = 1591802533
+current version  = 1.2.3
+previous version = 1.2.2
+prime version    = 1.2.2
+```
+
+The value passed here can be:
+
+* a simple file name that will be interpred as local to the current working directory
+* a relative path that will be interpreted as relative to the current working directory
+* an absolute file name
+
+The output is a simple text file and an example is `.nyx-summary.txt`.
+
+When parsing the file you can rely on labels (on the left of the `=` sign) to be consistent and the presence of the `=` sign itself as a separator. Do not rely on the order of rows or the alignment and justification as they may change so you should always find values by *grepping* the line by the label and trim values.
+{: .notice--info}
 
 ### Verbosity
 

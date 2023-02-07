@@ -367,6 +367,22 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
      * {@inheritDoc}
      */
     @Override
+    public Boolean getSummary() {
+        return extension.getSummary().getOrNull();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getSummaryFile() {
+        return extension.getSummaryFile().isPresent() ? extension.getSummaryFile().get() : null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String getStateFile() {
         return extension.getStateFile().isPresent() ? extension.getStateFile().get() : null;
     }

@@ -743,6 +743,40 @@ public class Configuration implements ConfigurationRoot {
      * {@inheritDoc}
      */
     @Override
+    public Boolean getSummary()
+        throws DataAccessException, IllegalPropertyException {
+        logger.trace(CONFIGURATION, "Retrieving the '{}' configuration option", "summary");
+        for (ConfigurationLayer layer: layers.values()) {
+            Boolean summary = layer.getSummary();
+            if (!Objects.isNull(summary)) {
+                logger.trace(CONFIGURATION, "The '{}' configuration option value is: '{}'", "summary", summary);
+                return summary;
+            }
+        }
+        return DefaultLayer.getInstance().getSummary();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getSummaryFile()
+        throws DataAccessException, IllegalPropertyException {
+        logger.trace(CONFIGURATION, "Retrieving the '{}' configuration option", "summaryFile");
+        for (ConfigurationLayer layer: layers.values()) {
+            String summaryFile = layer.getSummaryFile();
+            if (!Objects.isNull(summaryFile)) {
+                logger.trace(CONFIGURATION, "The '{}' configuration option value is: '{}'", "summaryFile", summaryFile);
+                return summaryFile;
+            }
+        }
+        return DefaultLayer.getInstance().getSummaryFile();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String getStateFile()
         throws DataAccessException, IllegalPropertyException {
         logger.trace(CONFIGURATION, "Retrieving the '{}' configuration option", "stateFile");

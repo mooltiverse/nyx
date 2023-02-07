@@ -128,7 +128,7 @@ You've just been introduced to an extremely powerful feature in Nyx: [templates]
 
 Let's resume from the tasks available from the Nyx plugin. The *release* task is a [*lifecycle task*](https://docs.gradle.org/current/userguide/more_about_tasks.html#sec:lifecycle_tasks) that is only configured if no other task with the same name already exists and is a shorthand for running all the other *core* tasks (except *nyxClean*).
 
-The *nyxClean* task deletes the local artifacts (like a changelog file) that might have been created by Nyx in previous runs, otherwise it does nothing. If you have a global *clean* task, it's a good idea to make it dependent on *nyxClean*, like:
+The *nyxClean* task deletes the local artifacts (like a changelog or the summary file) that might have been created by Nyx in previous runs, otherwise it does nothing. If you have a global *clean* task, it's a good idea to make it dependent on *nyxClean*, like:
 
 ```groovy
 tasks.clean.dependsOn tasks.nyxClean

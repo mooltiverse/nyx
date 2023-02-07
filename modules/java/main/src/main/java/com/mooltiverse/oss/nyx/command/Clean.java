@@ -64,16 +64,44 @@ public class Clean extends AbstractCommand {
 
         // Check if there a State file
         String stateFilePath = state().getConfiguration().getStateFile();
-        if (!Objects.isNull(stateFilePath) && !stateFilePath.isBlank() && new File(stateFilePath).exists()) {
-            logger.debug(COMMAND, "The Clean command is not up to date because the state file has been configured ('{}') and is present on the file system so it can be deleted", stateFilePath);
-            return false;
+        if (!Objects.isNull(stateFilePath) && !stateFilePath.isBlank()) {
+            // if the file path is relative make it relative to the configured directory
+            File stateFile = new File(stateFilePath);
+            if (!stateFile.isAbsolute())
+                stateFile = new File(state().getConfiguration().getDirectory(), state().getConfiguration().getStateFile());
+
+            if (stateFile.exists()) {
+                logger.debug(COMMAND, "The Clean command is not up to date because the state file has been configured ('{}') and is present on the file system so it can be deleted", stateFilePath);
+                return false;
+            }
+        }
+
+        // Check if there a summary file
+        String summaryFilePath = state().getConfiguration().getSummaryFile();
+        if (!Objects.isNull(summaryFilePath) && !summaryFilePath.isBlank()) {
+            // if the file path is relative make it relative to the configured directory
+            File summaryFile = new File(summaryFilePath);
+            if (!summaryFile.isAbsolute())
+                summaryFile = new File(state().getConfiguration().getDirectory(), state().getConfiguration().getSummaryFile());
+
+            if (summaryFile.exists()) {
+                logger.debug(COMMAND, "The Clean command is not up to date because the summary file has been configured ('{}') and is present on the file system so it can be deleted", summaryFilePath);
+                return false;
+            }
         }
 
         // Check if there a Changelog file
         String changelogFilePath = state().getConfiguration().getChangelog().getPath();
-        if (!Objects.isNull(changelogFilePath) && !changelogFilePath.isBlank() && new File(changelogFilePath).exists()) {
-            logger.debug(COMMAND, "The Clean command is not up to date because the changelog file has been configured ('{}') and is present on the file system so it can be deleted", changelogFilePath);
-            return false;
+        if (!Objects.isNull(changelogFilePath) && !changelogFilePath.isBlank()) {
+            // if the file path is relative make it relative to the configured directory
+            File changelogFile = new File(changelogFilePath);
+            if (!changelogFile.isAbsolute())
+                changelogFile = new File(state().getConfiguration().getDirectory(), state().getConfiguration().getChangelog().getPath());
+
+            if (changelogFile.exists()) {
+                logger.debug(COMMAND, "The Clean command is not up to date because the changelog file has been configured ('{}') and is present on the file system so it can be deleted", changelogFilePath);
+                return false;
+            }
         }
 
         // Otherwise return true
@@ -96,8 +124,24 @@ public class Clean extends AbstractCommand {
         if (!Objects.isNull(stateFilePath) && !stateFilePath.isBlank()) {
             logger.debug(COMMAND, "Deleting state file '{}', if present", stateFilePath);
             File stateFile = new File(stateFilePath);
+            // if the file path is relative make it relative to the configured directory
+            if (!stateFile.isAbsolute())
+                stateFile = new File(state().getConfiguration().getDirectory(), state().getConfiguration().getStateFile());
             if (stateFile.exists()) {
                 stateFile.delete();
+            }
+        }
+
+        // Delete the summary file, if any
+        String summaryFilePath = state().getConfiguration().getSummaryFile();
+        if (!Objects.isNull(summaryFilePath) && !summaryFilePath.isBlank()) {
+            logger.debug(COMMAND, "Deleting summary file '{}', if present", summaryFilePath);
+            File summaryFile = new File(summaryFilePath);
+            // if the file path is relative make it relative to the configured directory
+            if (!summaryFile.isAbsolute())
+                summaryFile = new File(state().getConfiguration().getDirectory(), state().getConfiguration().getSummaryFile());
+            if (summaryFile.exists()) {
+                summaryFile.delete();
             }
         }
 
@@ -106,6 +150,9 @@ public class Clean extends AbstractCommand {
         if (!Objects.isNull(changelogFilePath) && !changelogFilePath.isBlank()) {
             logger.debug(COMMAND, "Deleting changelog file '{}', if present", changelogFilePath);
             File changelogFile = new File(changelogFilePath);
+            // if the file path is relative make it relative to the configured directory
+            if (!changelogFile.isAbsolute())
+                changelogFile = new File(state().getConfiguration().getDirectory(), state().getConfiguration().getChangelog().getPath());
             if (changelogFile.exists()) {
                 changelogFile.delete();
             }

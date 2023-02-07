@@ -102,6 +102,7 @@ public class CleanTestTemplates {
             script.getWorkingDirectory().deleteOnExit();
             String stateFilePath = "state-file.txt";
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            configurationLayerMock.setDirectory(script.getWorkingDirectory().getAbsolutePath());
             configurationLayerMock.setStateFile(stateFilePath);
             command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
@@ -109,7 +110,7 @@ public class CleanTestTemplates {
             command.run();
             assertTrue(command.isUpToDate());
 
-            File stateFile = new File(stateFilePath);
+            File stateFile = new File(script.getWorkingDirectory().getAbsolutePath(), stateFilePath);
             stateFile.deleteOnExit();
             stateFile.createNewFile();
 
@@ -125,6 +126,40 @@ public class CleanTestTemplates {
         }
 
         /**
+         * Check that the isUpToDate() returns {@code false} when there's a summary file
+         */
+        @TestTemplate
+        @DisplayName("Clean.isUpToDate() with summary file")
+        @Baseline(Scenario.INITIAL_COMMIT)
+        void isUpToDateWithSummaryFileTest(@CommandSelector(Commands.CLEAN) CommandProxy command, Script script)
+            throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
+            String summaryFilePath = "summary-file.txt";
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            configurationLayerMock.setDirectory(script.getWorkingDirectory().getAbsolutePath());
+            configurationLayerMock.setSummaryFile(summaryFilePath);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
+
+            // run once, to start
+            command.run();
+            assertTrue(command.isUpToDate());
+
+            File summaryFile = new File(script.getWorkingDirectory().getAbsolutePath(), summaryFilePath);
+            summaryFile.deleteOnExit();
+            summaryFile.createNewFile();
+
+            // now it's not up do date anymore
+            assertTrue(summaryFile.exists());
+            assertFalse(command.isUpToDate());
+
+            command.run();
+
+            // now it's up do date again
+            assertFalse(summaryFile.exists());
+            assertTrue(command.isUpToDate());
+        }
+
+        /**
          * Check that the isUpToDate() returns {@code false} when there's a changelog file
          */
         @TestTemplate
@@ -135,6 +170,7 @@ public class CleanTestTemplates {
             script.getWorkingDirectory().deleteOnExit();
             String changelogFilePath = "changelog-file.txt";
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            configurationLayerMock.setDirectory(script.getWorkingDirectory().getAbsolutePath());
             configurationLayerMock.getChangelog().setPath(changelogFilePath);
             command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
@@ -142,7 +178,7 @@ public class CleanTestTemplates {
             command.run();
             assertTrue(command.isUpToDate());
 
-            File changelogFile = new File(changelogFilePath);
+            File changelogFile = new File(script.getWorkingDirectory().getAbsolutePath(), changelogFilePath);
             changelogFile.deleteOnExit();
             changelogFile.createNewFile();
 
@@ -172,9 +208,12 @@ public class CleanTestTemplates {
             throws Exception {
             script.getWorkingDirectory().deleteOnExit();
             String stateFilePath = "state-file.txt";
+            String summaryFilePath = "summary-file.txt";
             String changelogFilePath = "changelog-file.txt";
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            configurationLayerMock.setDirectory(script.getWorkingDirectory().getAbsolutePath());
             configurationLayerMock.setStateFile(stateFilePath);
+            configurationLayerMock.setSummaryFile(summaryFilePath);
             configurationLayerMock.getChangelog().setPath(changelogFilePath);
             command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
@@ -182,15 +221,19 @@ public class CleanTestTemplates {
             command.run();
             assertTrue(command.isUpToDate());
 
-            File stateFile = new File(stateFilePath);
+            File stateFile = new File(script.getWorkingDirectory().getAbsolutePath(), stateFilePath);
             stateFile.deleteOnExit();
             stateFile.createNewFile();
-            File changelogFile = new File(changelogFilePath);
+            File summaryFile = new File(script.getWorkingDirectory().getAbsolutePath(), summaryFilePath);
+            summaryFile.deleteOnExit();
+            summaryFile.createNewFile();
+            File changelogFile = new File(script.getWorkingDirectory().getAbsolutePath(), changelogFilePath);
             changelogFile.deleteOnExit();
             changelogFile.createNewFile();
 
             // now it's not up do date anymore
             assertTrue(stateFile.exists());
+            assertTrue(summaryFile.exists());
             assertTrue(changelogFile.exists());
             assertFalse(command.isUpToDate());
 
@@ -198,6 +241,7 @@ public class CleanTestTemplates {
 
             // now it's up do date again
             assertFalse(stateFile.exists());
+            assertFalse(summaryFile.exists());
             assertFalse(changelogFile.exists());
             assertTrue(command.isUpToDate());
 
@@ -206,6 +250,7 @@ public class CleanTestTemplates {
 
             // now it's not up do date again
             assertFalse(stateFile.exists());
+            assertFalse(summaryFile.exists());
             assertFalse(changelogFile.exists());
             assertTrue(command.isUpToDate());
         }
@@ -223,13 +268,14 @@ public class CleanTestTemplates {
             script.getWorkingDirectory().deleteOnExit();
             String stateFilePath = "state-file.txt";
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            configurationLayerMock.setDirectory(script.getWorkingDirectory().getAbsolutePath());
             configurationLayerMock.setStateFile(stateFilePath);
             command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             // run once, to start
             command.run();
 
-            File stateFile = new File(stateFilePath);
+            File stateFile = new File(script.getWorkingDirectory().getAbsolutePath(), stateFilePath);
             stateFile.deleteOnExit();
             stateFile.createNewFile();
             assertTrue(stateFile.exists());
@@ -244,6 +290,35 @@ public class CleanTestTemplates {
         }
 
         @TestTemplate
+        @DisplayName("Clean.run() deletes summary file")
+        @Baseline(Scenario.FROM_SCRATCH)
+        void deleteSummaryFileTest(@CommandSelector(Commands.CLEAN) CommandProxy command, Script script)
+            throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
+            String summaryFilePath = "summary-file.txt";
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            configurationLayerMock.setDirectory(script.getWorkingDirectory().getAbsolutePath());
+            configurationLayerMock.setSummaryFile(summaryFilePath);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
+
+            // run once, to start
+            command.run();
+
+            File summaryFile = new File(script.getWorkingDirectory().getAbsolutePath(), summaryFilePath);
+            summaryFile.deleteOnExit();
+            summaryFile.createNewFile();
+            assertTrue(summaryFile.exists());
+
+            // now running the clean must delete the file
+            command.run();
+            assertFalse(summaryFile.exists());
+
+            // run again and test for idempotency
+            command.run();
+            assertFalse(summaryFile.exists());
+        }
+
+        @TestTemplate
         @DisplayName("Clean.run() deletes changelog file")
         @Baseline(Scenario.FROM_SCRATCH)
         void deleteChangelogFileTest(@CommandSelector(Commands.CLEAN) CommandProxy command, Script script)
@@ -251,13 +326,14 @@ public class CleanTestTemplates {
             script.getWorkingDirectory().deleteOnExit();
             String changelogFilePath = "changelog-file.txt";
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            configurationLayerMock.setDirectory(script.getWorkingDirectory().getAbsolutePath());
             configurationLayerMock.getChangelog().setPath(changelogFilePath);
             command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             // run once, to start
             command.run();
 
-            File changelogFile = new File(changelogFilePath);
+            File changelogFile = new File(script.getWorkingDirectory().getAbsolutePath(), changelogFilePath);
             changelogFile.deleteOnExit();
             changelogFile.createNewFile();
             assertTrue(changelogFile.exists());

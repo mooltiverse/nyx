@@ -519,6 +519,28 @@ public class EnvironmentConfigurationLayerTests {
     }
 
     @Test
+    @DisplayName("EnvironmentConfigurationLayer.getSummary()")
+    void getSummaryTest()
+        throws Exception {
+        EnvironmentConfigurationLayerMock environmentConfigurationLayer = EnvironmentConfigurationLayerMock.getInstance();
+        assertNull(environmentConfigurationLayer.getSummary());
+
+        environmentConfigurationLayer.environment.put("NYX_SUMMARY", "true");
+        assertEquals(Boolean.TRUE, environmentConfigurationLayer.getSummary());
+    }
+
+    @Test
+    @DisplayName("EnvironmentConfigurationLayer.getSummaryFile()")
+    void getSummaryFileTest()
+        throws Exception {
+        EnvironmentConfigurationLayerMock environmentConfigurationLayer = EnvironmentConfigurationLayerMock.getInstance();
+        assertNull(environmentConfigurationLayer.getSummaryFile());
+
+        environmentConfigurationLayer.environment.put("NYX_SUMMARY_FILE", "summary.txt");
+        assertEquals("summary.txt", environmentConfigurationLayer.getSummaryFile());
+    }
+
+    @Test
     @DisplayName("EnvironmentConfigurationLayer.getStateFile()")
     void getStateFileTest()
         throws Exception {

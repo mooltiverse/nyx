@@ -18,6 +18,7 @@ package com.mooltiverse.oss.nyx;
 import static com.mooltiverse.oss.nyx.log.Markers.MAIN;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.EnumMap;
@@ -253,15 +254,16 @@ public class Nyx {
      * Runs the given command through its {@link Command#run()}.
      * 
      * @param command the command to run
-     * @@param saveState a boolean that, when {@code true} saves the {@link State} to the configured state file
-     * ({@link Configuration#getStateFile()}), if not {@code null}
+     * @@param saveStateAndSummary a boolean that, when {@code true} saves the {@link State} to the configured state file
+     * ({@link Configuration#getStateFile()}), if not {@code null}, and the summary to the configured summary file
+     * ({@link Configuration#getSummaryFile()}), if not {@code null}
      * 
      * @throws DataAccessException in case the configuration can't be loaded for some reason.
      * @throws IllegalPropertyException in case the configuration has some illegal options.
      * @throws GitException in case of unexpected issues when accessing the Git repository.
      * @throws ReleaseException if the task is unable to complete for reasons due to the release process.
      */
-    private void runCommand(Commands command, boolean saveState)
+    private void runCommand(Commands command, boolean saveStateAndSummary)
         throws DataAccessException, IllegalPropertyException, GitException, ReleaseException {
         Objects.requireNonNull(command, "Cannot run a null command");
 
@@ -276,7 +278,7 @@ public class Nyx {
             logger.debug(MAIN, "Command '{}' finished.", command.toString());
 
             // optionally save the state file
-            if (saveState && !Objects.isNull(configuration().getStateFile())) {
+            if (saveStateAndSummary && !Objects.isNull(configuration().getStateFile())) {
                 File stateFile = new File(configuration().getStateFile());
                 // if the file path is relative make it relative to the configured directory
                 if (!stateFile.isAbsolute())
@@ -284,6 +286,26 @@ public class Nyx {
                 logger.debug(MAIN, "Storing the state to '{}'", configuration().getStateFile());
                 FileMapper.save(stateFile.getAbsolutePath(), state());
                 logger.debug(MAIN, "State stored to to '{}'", configuration().getStateFile());
+            }
+
+            // optionally save the summary file
+            if (saveStateAndSummary && !Objects.isNull(configuration().getSummaryFile())) {
+                File summaryFile = new File(configuration().getSummaryFile());
+                // if the file path is relative make it relative to the configured directory
+                if (!summaryFile.isAbsolute())
+                summaryFile = new File(configuration().getDirectory(), configuration().getSummaryFile());
+                logger.debug(MAIN, "Storing the summary to '{}'", configuration().getSummaryFile());
+                try {
+                    FileOutputStream fos = new FileOutputStream(summaryFile);
+                    fos.write(state().summary().getBytes());
+                    fos.flush();
+                    fos.close();
+                }
+                catch (IOException ioe) {
+                    throw new DataAccessException(String.format("Unable to write the summary file '%s'", configuration().getSummaryFile()), ioe);
+                }
+
+                logger.debug(MAIN, "Summary stored to to '{}'", configuration().getSummaryFile());
             }
         }
     }

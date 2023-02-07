@@ -796,4 +796,50 @@ public class StateTests {
             assertEquals(oldState.getScheme(), resumedState.getScheme());
         }
     }
+
+    @Nested
+    @DisplayName("Summary")
+    class SummaryTests {
+        @Test
+        @DisplayName("Render the summary")
+        void summaryTest()
+            throws Exception {
+            State state = new State(new Configuration());
+
+            // set a few values to use later on for comparison
+            state.setBranch("master");
+            state.setBump("minor");
+            //state.setCoreVersion(); // no setter for this attribute as it's dynamically computed
+            state.setLatestVersion(Boolean.TRUE);
+            //state.setNewRelease(); // no setter for this attribute as it's dynamically computed
+            //state.setNewVersion(); // no setter for this attribute as it's dynamically computed
+            //state.setScheme(); // no setter for this attribute as it's dynamically computed
+            //state.setTimestamp(); // no setter for this attribute as it's dynamically computed
+            state.setVersion("3.5.7");
+            state.getReleaseScope().setPreviousVersion("4.5.6");
+            state.getReleaseScope().setPrimeVersion("1.0.0");
+         
+            String summary = state.summary();
+
+            // print the file to standard output for inspection purpose
+            System.out.println("-------- SUMMARY --------");
+            System.out.println("-----------------------------------------");
+            System.out.println(summary);
+            System.out.println("-----------------------------------------");
+            System.out.flush();
+
+            // now we are ready to check the summary contents
+            assertTrue(summary.contains("branch           = "+state.getBranch()));
+            assertTrue(summary.contains("bump             = "+state.getBump()));
+            assertTrue(summary.contains("core version     = "+state.getCoreVersion().booleanValue()));
+            assertTrue(summary.contains("latest version   = "+state.getLatestVersion().booleanValue()));
+            assertTrue(summary.contains("new release      = "+state.getNewRelease().booleanValue()));
+            assertTrue(summary.contains("new version      = "+state.getNewVersion().booleanValue()));
+            assertTrue(summary.contains("scheme           = "+state.getScheme().toString()));
+            assertTrue(summary.contains("timestamp        = "+state.getTimestamp().longValue()));
+            assertTrue(summary.contains("current version  = "+state.getVersion()));
+            assertTrue(summary.contains("previous version = "+state.getReleaseScope().getPreviousVersion()));
+            assertTrue(summary.contains("prime version    = "+state.getReleaseScope().getPrimeVersion()));
+        }
+    }
 }

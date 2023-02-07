@@ -24,6 +24,8 @@ import (
 	"fmt"           // https://pkg.go.dev/fmt
 	"os"            // https://pkg.go.dev/os
 	"path/filepath" // https://pkg.go.dev/path/filepath
+	"strconv"       // https://pkg.go.dev/strconv
+	"strings"       // https://pkg.go.dev/strings
 	"testing"       // https://pkg.go.dev/testing
 	"time"          // https://pkg.go.dev/time
 
@@ -953,4 +955,56 @@ func TestStateSaveAndResumeYAML(t *testing.T) {
 	scheme1, _ := oldState.GetScheme()
 	scheme2, _ := resumedState.GetScheme()
 	assert.Equal(t, *scheme1, *scheme2)
+}
+
+func TestSummary(t *testing.T) {
+	configuration, _ := cnf.NewConfiguration()
+	state, _ := NewStateWith(configuration)
+
+	// set a few values to use later on for comparison
+	state.SetBranch(utl.PointerToString("master"))
+	state.SetBump(utl.PointerToString("minor"))
+	//state.SetCoreVersion() // no setter for this attribute as it's dynamically computed
+	state.SetLatestVersion(utl.PointerToBoolean(true))
+	//state.SetNewRelease() // no setter for this attribute as it's dynamically computed
+	//state.SetNewVersion() // no setter for this attribute as it's dynamically computed
+	//state.SetScheme() // no setter for this attribute as it's dynamically computed
+	//state.SetTimestamp() // no setter for this attribute as it's dynamically computed
+	state.SetVersion(utl.PointerToString("3.5.7"))
+	releaseScope, err := state.GetReleaseScope()
+	assert.NoError(t, err)
+	releaseScope.SetPreviousVersion(utl.PointerToString("4.5.6"))
+	releaseScope.SetPrimeVersion(utl.PointerToString("1.0.0"))
+
+	summary, err := state.Summary()
+	assert.NoError(t, err)
+
+	// print the file to standard output for inspection purpose
+	//fmt.Println("-------- SUMMARY --------")
+	//fmt.Println("-----------------------------------------")
+	//fmt.Println(summary)
+	//fmt.Println("-----------------------------------------")
+
+	// now we are ready to check the summary contents
+	branch, _ := state.GetBranch()
+	assert.True(t, strings.Contains(summary, "branch           = "+*branch))
+	bump, _ := state.GetBump()
+	assert.True(t, strings.Contains(summary, "bump             = "+*bump))
+	coreVersion, _ := state.GetCoreVersion()
+	assert.True(t, strings.Contains(summary, "core version     = "+strconv.FormatBool(coreVersion)))
+	latestVersion, _ := state.GetLatestVersion()
+	assert.True(t, strings.Contains(summary, "latest version   = "+strconv.FormatBool(*latestVersion)))
+	newRelease, _ := state.GetNewRelease()
+	assert.True(t, strings.Contains(summary, "new release      = "+strconv.FormatBool(newRelease)))
+	newVersion, _ := state.GetNewVersion()
+	assert.True(t, strings.Contains(summary, "new version      = "+strconv.FormatBool(newVersion)))
+	scheme, _ := state.GetScheme()
+	assert.True(t, strings.Contains(summary, "scheme           = "+(*scheme).String()))
+	timestamp, _ := state.GetTimestamp()
+	assert.True(t, strings.Contains(summary, "timestamp        = "+strconv.FormatInt(*timestamp, 10)))
+	version, _ := state.GetVersion()
+	assert.True(t, strings.Contains(summary, "current version  = "+*version))
+	releaseScope, _ = state.GetReleaseScope()
+	assert.True(t, strings.Contains(summary, "previous version = "+*releaseScope.GetPreviousVersion()))
+	assert.True(t, strings.Contains(summary, "prime version    = "+*releaseScope.GetPrimeVersion()))
 }

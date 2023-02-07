@@ -289,6 +289,7 @@ public class Suites {
                         .concat(".gradle").concat(newLine)
                         .concat("build.gradle").concat(newLine)
                         .concat("settings.gradle").concat(newLine)
+                        .concat(".nyx-summary.txt").concat(newLine)
                         .concat(".nyx-state.yml").concat(newLine),
                     // the Gradle build script
                     "build.gradle", "".concat(newLine)
@@ -299,6 +300,7 @@ public class Suites {
                         .concat("nyx {").concat(newLine)
                         .concat("    dryRun = false").concat(newLine)
                         .concat("    resume = false").concat(newLine)
+                        .concat("    summaryFile = '.nyx-summary.txt'").concat(newLine)
                         .concat("    stateFile = '.nyx-state.yml'").concat(newLine)
                         .concat("    verbosity = \"DEBUG\"").concat(newLine)
                         .concat("}").concat(newLine),
@@ -355,6 +357,17 @@ public class Suites {
                         "previousVersion: \"0.0.4\"",
                         "primeVersion: \"0.0.4\"",
                         "version: \"v0.1.0\""
+                    ),
+                    ".nyx-summary.txt", Set.<String>of(
+                        "bump             = minor",
+                        "core version     = true",
+                        "new release      = true",
+                        "new version      = true",
+                        "scheme           = SEMVER",
+                        "timestamp        = ", // we don't need to test for the timestamp value here
+                        "current version  = v0.1.0",
+                        "previous version = 0.0.4",
+                        "prime version    = 0.0.4"
                     )
                 );
                 repositoryTags = Set.<String>of(); // no new tag is created by Infer
@@ -377,6 +390,7 @@ public class Suites {
                         .concat(".gradle").concat(newLine)
                         .concat("build.gradle.kts").concat(newLine)
                         .concat("settings.gradle.kts").concat(newLine)
+                        .concat(".nyx-summary.txt").concat(newLine)
                         .concat(".nyx-state.yml").concat(newLine),
                     // the Gradle build script
                     "build.gradle.kts", "".concat(newLine)
@@ -387,6 +401,7 @@ public class Suites {
                         .concat("nyx {").concat(newLine)
                         .concat("    dryRun.set(false)").concat(newLine)
                         .concat("    resume.set(false)").concat(newLine)
+                        .concat("    summaryFile.set(\".nyx-summary.txt\")").concat(newLine)
                         .concat("    stateFile.set(\".nyx-state.yml\")").concat(newLine)
                         .concat("    verbosity.set(\"DEBUG\")").concat(newLine)
                         .concat("}").concat(newLine),
@@ -442,6 +457,17 @@ public class Suites {
                         "previousVersion: \"0.0.4\"",
                         "primeVersion: \"0.0.4\"",
                         "version: \"v0.1.0\""
+                    ),
+                    ".nyx-summary.txt", Set.<String>of(
+                        "bump             = minor",
+                        "core version     = true",
+                        "new release      = true",
+                        "new version      = true",
+                        "scheme           = SEMVER",
+                        "timestamp        = ", // we don't need to test for the timestamp value here
+                        "current version  = v0.1.0",
+                        "previous version = 0.0.4",
+                        "prime version    = 0.0.4"
                     )
                 );
                 repositoryTags = Set.<String>of(); // no new tag is created by Infer
@@ -464,6 +490,7 @@ public class Suites {
                         .concat(".gradle").concat(newLine)
                         .concat("build.gradle").concat(newLine)
                         .concat("settings.gradle").concat(newLine)
+                        .concat(".nyx-summary.txt").concat(newLine)
                         .concat(".nyx-state.yml").concat(newLine),
                     // the Gradle build script
                     "build.gradle", "".concat(newLine)
@@ -480,6 +507,7 @@ public class Suites {
                         .concat("nyx {").concat(newLine)
                         .concat("    dryRun = false").concat(newLine)
                         .concat("    resume = false").concat(newLine)
+                        .concat("    summaryFile = '.nyx-summary.txt'").concat(newLine)
                         .concat("    stateFile = '.nyx-state.yml'").concat(newLine)
                         .concat("    verbosity = \"DEBUG\"").concat(newLine)
                         .concat("}").concat(newLine),
@@ -533,6 +561,17 @@ public class Suites {
                         "previousVersion: \"0.0.4\"",
                         "primeVersion: \"0.0.4\"",
                         "version: \"v0.1.0\""
+                    ),
+                    ".nyx-summary.txt", Set.<String>of(
+                        "bump             = minor",
+                        "core version     = true",
+                        "new release      = true",
+                        "new version      = true",
+                        "scheme           = SEMVER",
+                        "timestamp        = ", // we don't need to test for the timestamp value here
+                        "current version  = v0.1.0",
+                        "previous version = 0.0.4",
+                        "prime version    = 0.0.4"
                     )
                 );
                 repositoryTags = Set.<String>of(); // no new tag is created by Infer
@@ -555,6 +594,7 @@ public class Suites {
                         .concat(".gradle").concat(newLine)
                         .concat("build.gradle.kts").concat(newLine)
                         .concat("settings.gradle.kts").concat(newLine)
+                        .concat(".nyx-summary.txt").concat(newLine)
                         .concat(".nyx-state.yml").concat(newLine),
                     // the Gradle build script
                     "build.gradle.kts", "".concat(newLine)
@@ -571,6 +611,7 @@ public class Suites {
                         .concat("configure<com.mooltiverse.oss.nyx.gradle.NyxExtension> {").concat(newLine)
                         .concat("    dryRun.set(false)").concat(newLine)
                         .concat("    resume.set(false)").concat(newLine)
+                        .concat("    summaryFile.set(\".nyx-summary.txt\")").concat(newLine)
                         .concat("    stateFile.set(\".nyx-state.yml\")").concat(newLine)
                         .concat("    verbosity.set(\"DEBUG\")").concat(newLine)
                         .concat("}").concat(newLine),
@@ -623,6 +664,17 @@ public class Suites {
                         "previousVersion: \"0.0.4\"",
                         "primeVersion: \"0.0.4\"",
                         "version: \"v0.1.0\""
+                    ),
+                    ".nyx-summary.txt", Set.<String>of(
+                        "bump             = minor",
+                        "core version     = true",
+                        "new release      = true",
+                        "new version      = true",
+                        "scheme           = SEMVER",
+                        "timestamp        = ", // we don't need to test for the timestamp value here
+                        "current version  = v0.1.0",
+                        "previous version = 0.0.4",
+                        "prime version    = 0.0.4"
                     )
                 );
                 repositoryTags = Set.<String>of(); // no new tag is created by Infer
@@ -646,6 +698,7 @@ public class Suites {
                         .concat(".gradle").concat(newLine)
                         .concat("build.gradle").concat(newLine)
                         .concat("settings.gradle").concat(newLine)
+                        .concat(".nyx-summary.txt").concat(newLine)
                         .concat(".nyx-state.yml").concat(newLine),
                     // the Gradle build script
                     "build.gradle", "".concat(newLine)
@@ -662,6 +715,7 @@ public class Suites {
                         .concat("nyx {").concat(newLine)
                         .concat("    dryRun = false").concat(newLine)
                         .concat("    resume = false").concat(newLine)
+                        .concat("    summaryFile = '.nyx-summary.txt'").concat(newLine)
                         .concat("    stateFile = '.nyx-state.yml'").concat(newLine)
                         .concat("    verbosity = \"DEBUG\"").concat(newLine)
                         .concat("}").concat(newLine),
@@ -715,6 +769,17 @@ public class Suites {
                         "previousVersion: \"0.0.4\"",
                         "primeVersion: \"0.0.4\"",
                         "version: \"v0.1.0\""
+                    ),
+                    ".nyx-summary.txt", Set.<String>of(
+                        "bump             = minor",
+                        "core version     = true",
+                        "new release      = true",
+                        "new version      = true",
+                        "scheme           = SEMVER",
+                        "timestamp        = ", // we don't need to test for the timestamp value here
+                        "current version  = v0.1.0",
+                        "previous version = 0.0.4",
+                        "prime version    = 0.0.4"
                     )
                 );
                 repositoryTags = Set.<String>of(); // no new tag is created by Infer
@@ -740,6 +805,7 @@ public class Suites {
                         .concat(".gradle").concat(newLine)
                         .concat("build.gradle").concat(newLine)
                         .concat("settings.gradle").concat(newLine)
+                        .concat(".nyx-summary.txt").concat(newLine)
                         .concat(".nyx-state.yml").concat(newLine),
                     // the Gradle build script
                     "build.gradle", "".concat(newLine)
@@ -750,6 +816,7 @@ public class Suites {
                         .concat("nyx {").concat(newLine)
                         .concat("    dryRun = false").concat(newLine)
                         .concat("    resume = false").concat(newLine)
+                        .concat("    summaryFile = '.nyx-summary.txt'").concat(newLine)
                         .concat("    stateFile = '.nyx-state.yml'").concat(newLine)
                         .concat("    verbosity = \"DEBUG\"").concat(newLine)
                         .concat("}").concat(newLine),
@@ -806,6 +873,17 @@ public class Suites {
                         "previousVersion: \"0.0.4\"",
                         "primeVersion: \"0.0.4\"",
                         "version: \"v0.1.0\""
+                    ),
+                    ".nyx-summary.txt", Set.<String>of(
+                        "bump             = minor",
+                        "core version     = true",
+                        "new release      = true",
+                        "new version      = true",
+                        "scheme           = SEMVER",
+                        "timestamp        = ", // we don't need to test for the timestamp value here
+                        "current version  = v0.1.0",
+                        "previous version = 0.0.4",
+                        "prime version    = 0.0.4"
                     )
                 );
                 repositoryTags = Set.<String>of(); // no new tag is created by Infer
@@ -831,6 +909,7 @@ public class Suites {
                         .concat(".gradle").concat(newLine)
                         .concat("build.gradle").concat(newLine)
                         .concat("settings.gradle").concat(newLine)
+                        .concat(".nyx-summary.txt").concat(newLine)
                         .concat(".nyx-state.yml").concat(newLine),
                     // the Gradle build script
                     "build.gradle", "".concat(newLine)
@@ -847,6 +926,7 @@ public class Suites {
                         .concat("nyx {").concat(newLine)
                         .concat("    dryRun = false").concat(newLine)
                         .concat("    resume = false").concat(newLine)
+                        .concat("    summaryFile = '.nyx-summary.txt'").concat(newLine)
                         .concat("    stateFile = '.nyx-state.yml'").concat(newLine)
                         .concat("    verbosity = \"DEBUG\"").concat(newLine)
                         .concat("}").concat(newLine),
@@ -900,6 +980,17 @@ public class Suites {
                         "previousVersion: \"0.0.4\"",
                         "primeVersion: \"0.0.4\"",
                         "version: \"v0.1.0\""
+                    ),
+                    ".nyx-summary.txt", Set.<String>of(
+                        "bump             = minor",
+                        "core version     = true",
+                        "new release      = true",
+                        "new version      = true",
+                        "scheme           = SEMVER",
+                        "timestamp        = ", // we don't need to test for the timestamp value here
+                        "current version  = v0.1.0",
+                        "previous version = 0.0.4",
+                        "prime version    = 0.0.4"
                     )
                 );
                 repositoryTags = Set.<String>of(); // no new tag is created by Infer
@@ -926,6 +1017,7 @@ public class Suites {
                         .concat(".gradle").concat(newLine)
                         .concat("build.gradle").concat(newLine)
                         .concat("settings.gradle").concat(newLine)
+                        .concat(".nyx-summary.txt").concat(newLine)
                         .concat(".nyx-state.yml").concat(newLine),
                     // the Gradle build script
                     "build.gradle", "".concat(newLine)
@@ -942,6 +1034,7 @@ public class Suites {
                         .concat("nyx {").concat(newLine)
                         .concat("    dryRun = false").concat(newLine)
                         .concat("    resume = false").concat(newLine)
+                        .concat("    summaryFile = '.nyx-summary.txt'").concat(newLine)
                         .concat("    stateFile = '.nyx-state.yml'").concat(newLine)
                         .concat("    verbosity = \"DEBUG\"").concat(newLine)
                         .concat("}").concat(newLine),
@@ -995,6 +1088,17 @@ public class Suites {
                         "previousVersion: \"0.0.4\"",
                         "primeVersion: \"0.0.4\"",
                         "version: \"v0.1.0\""
+                    ),
+                    ".nyx-summary.txt", Set.<String>of(
+                        "bump             = minor",
+                        "core version     = true",
+                        "new release      = true",
+                        "new version      = true",
+                        "scheme           = SEMVER",
+                        "timestamp        = ", // we don't need to test for the timestamp value here
+                        "current version  = v0.1.0",
+                        "previous version = 0.0.4",
+                        "prime version    = 0.0.4"
                     )
                 );
                 repositoryTags = Set.<String>of(); // no new tag is created by Infer
@@ -1017,6 +1121,7 @@ public class Suites {
                         .concat(".gradle").concat(newLine)
                         .concat("build.gradle").concat(newLine)
                         .concat("settings.gradle").concat(newLine)
+                        .concat(".nyx-summary.txt").concat(newLine)
                         .concat(".nyx-state.yml").concat(newLine),
                     // the Gradle build script
                     "build.gradle", "".concat(newLine)
@@ -1027,6 +1132,7 @@ public class Suites {
                         .concat("nyx {").concat(newLine)
                         .concat("    dryRun = false").concat(newLine)
                         .concat("    resume = false").concat(newLine)
+                        .concat("    summaryFile = '.nyx-summary.txt'").concat(newLine)
                         .concat("    stateFile = '.nyx-state.yml'").concat(newLine)
                         .concat("    verbosity = \"DEBUG\"").concat(newLine)
                         .concat("}").concat(newLine),
@@ -1093,6 +1199,17 @@ public class Suites {
                         "previousVersion: \"0.0.4\"",
                         "primeVersion: \"0.0.4\"",
                         "version: \"v0.1.0\""
+                    ),
+                    ".nyx-summary.txt", Set.<String>of(
+                        "bump             = minor",
+                        "core version     = true",
+                        "new release      = true",
+                        "new version      = true",
+                        "scheme           = SEMVER",
+                        "timestamp        = ", // we don't need to test for the timestamp value here
+                        "current version  = v0.1.0",
+                        "previous version = 0.0.4",
+                        "prime version    = 0.0.4"
                     ),
                     "CHANGELOG.md", Set.<String>of(
                         "## v0.1.0",
@@ -1122,6 +1239,7 @@ public class Suites {
                         .concat(".gradle").concat(newLine)
                         .concat("build.gradle").concat(newLine)
                         .concat("settings.gradle").concat(newLine)
+                        .concat(".nyx-summary.txt").concat(newLine)
                         .concat(".nyx-state.yml").concat(newLine),
                     // the Gradle build script
                     "build.gradle", "".concat(newLine)
@@ -1138,6 +1256,7 @@ public class Suites {
                         .concat("nyx {").concat(newLine)
                         .concat("    dryRun = false").concat(newLine)
                         .concat("    resume = false").concat(newLine)
+                        .concat("    summaryFile = '.nyx-summary.txt'").concat(newLine)
                         .concat("    stateFile = '.nyx-state.yml'").concat(newLine)
                         .concat("    verbosity = \"DEBUG\"").concat(newLine)
                         .concat("}").concat(newLine),
@@ -1202,6 +1321,17 @@ public class Suites {
                         "primeVersion: \"0.0.4\"",
                         "version: \"v0.1.0\""
                     ),
+                    ".nyx-summary.txt", Set.<String>of(
+                        "bump             = minor",
+                        "core version     = true",
+                        "new release      = true",
+                        "new version      = true",
+                        "scheme           = SEMVER",
+                        "timestamp        = ", // we don't need to test for the timestamp value here
+                        "current version  = v0.1.0",
+                        "previous version = 0.0.4",
+                        "prime version    = 0.0.4"
+                    ),
                     "CHANGELOG.md", Set.<String>of(
                         "## v0.1.0",
                         "### Added",
@@ -1230,6 +1360,7 @@ public class Suites {
                         .concat(".gradle").concat(newLine)
                         .concat("build.gradle").concat(newLine)
                         .concat("settings.gradle").concat(newLine)
+                        .concat(".nyx-summary.txt").concat(newLine)
                         .concat(".nyx-state.yml").concat(newLine),
                     // the Gradle build script
                     "build.gradle", "".concat(newLine)
@@ -1240,6 +1371,7 @@ public class Suites {
                         .concat("nyx {").concat(newLine)
                         .concat("    dryRun = false").concat(newLine)
                         .concat("    resume = false").concat(newLine)
+                        .concat("    summaryFile = '.nyx-summary.txt'").concat(newLine)
                         .concat("    stateFile = '.nyx-state.yml'").concat(newLine)
                         .concat("    verbosity = \"DEBUG\"").concat(newLine)
                         .concat("}").concat(newLine),
@@ -1310,6 +1442,17 @@ public class Suites {
                         "primeVersion: \"0.0.4\"",
                         "version: \"v0.1.0\""
                     ),
+                    ".nyx-summary.txt", Set.<String>of(
+                        "bump             = minor",
+                        "core version     = true",
+                        "new release      = true",
+                        "new version      = true",
+                        "scheme           = SEMVER",
+                        "timestamp        = ", // we don't need to test for the timestamp value here
+                        "current version  = v0.1.0",
+                        "previous version = 0.0.4",
+                        "prime version    = 0.0.4"
+                    ),
                     "CHANGELOG.md", Set.<String>of(
                         "## v0.1.0",
                         "### Added",
@@ -1338,6 +1481,7 @@ public class Suites {
                         .concat(".gradle").concat(newLine)
                         .concat("build.gradle").concat(newLine)
                         .concat("settings.gradle").concat(newLine)
+                        .concat(".nyx-summary.txt").concat(newLine)
                         .concat(".nyx-state.yml").concat(newLine),
                     // the Gradle build script
                     "build.gradle", "".concat(newLine)
@@ -1354,6 +1498,7 @@ public class Suites {
                         .concat("nyx {").concat(newLine)
                         .concat("    dryRun = false").concat(newLine)
                         .concat("    resume = false").concat(newLine)
+                        .concat("    summaryFile = '.nyx-summary.txt'").concat(newLine)
                         .concat("    stateFile = '.nyx-state.yml'").concat(newLine)
                         .concat("    verbosity = \"DEBUG\"").concat(newLine)
                         .concat("}").concat(newLine),
@@ -1420,6 +1565,17 @@ public class Suites {
                         "previousVersion: \"0.0.4\"",
                         "primeVersion: \"0.0.4\"",
                         "version: \"v0.1.0\""
+                    ),
+                    ".nyx-summary.txt", Set.<String>of(
+                        "bump             = minor",
+                        "core version     = true",
+                        "new release      = true",
+                        "new version      = true",
+                        "scheme           = SEMVER",
+                        "timestamp        = ", // we don't need to test for the timestamp value here
+                        "current version  = v0.1.0",
+                        "previous version = 0.0.4",
+                        "prime version    = 0.0.4"
                     ),
                     "CHANGELOG.md", Set.<String>of(
                         "## v0.1.0",
@@ -1451,6 +1607,7 @@ public class Suites {
                         .concat(".gradle").concat(newLine)
                         .concat("build.gradle").concat(newLine)
                         .concat("settings.gradle").concat(newLine)
+                        .concat(".nyx-summary.txt").concat(newLine)
                         .concat(".nyx-state.yml").concat(newLine),
                     // the Gradle build script
                     "build.gradle", "".concat(newLine)
@@ -1461,6 +1618,7 @@ public class Suites {
                         .concat("nyx {").concat(newLine)
                         .concat("    dryRun = false").concat(newLine)
                         .concat("    resume = false").concat(newLine)
+                        .concat("    summaryFile = '.nyx-summary.txt'").concat(newLine)
                         .concat("    stateFile = '.nyx-state.yml'").concat(newLine)
                         .concat("    verbosity = \"DEBUG\"").concat(newLine)
                         .concat("}").concat(newLine),
@@ -1524,6 +1682,17 @@ public class Suites {
                         "primeVersion: \"0.0.5\"",
                         "version: \"0.0.6\""
                     ),
+                    ".nyx-summary.txt", Set.<String>of(
+                        "bump             = patch",
+                        "core version     = true",
+                        "new release      = true",
+                        "new version      = true",
+                        "scheme           = SEMVER",
+                        "timestamp        = ", // we don't need to test for the timestamp value here
+                        "current version  = 0.0.6",
+                        "previous version = 0.0.5",
+                        "prime version    = 0.0.5"
+                    ),
                     "CHANGELOG.md", Set.<String>of(
                         "## 0.0.6",
 					    "No changes."
@@ -1549,6 +1718,7 @@ public class Suites {
                         .concat(".gradle").concat(newLine)
                         .concat("build.gradle").concat(newLine)
                         .concat("settings.gradle").concat(newLine)
+                        .concat(".nyx-summary.txt").concat(newLine)
                         .concat(".nyx-state.yml").concat(newLine),
                     // the Gradle build script
                     "build.gradle", "".concat(newLine)
@@ -1565,6 +1735,7 @@ public class Suites {
                         .concat("nyx {").concat(newLine)
                         .concat("    dryRun = false").concat(newLine)
                         .concat("    resume = false").concat(newLine)
+                        .concat("    summaryFile = '.nyx-summary.txt'").concat(newLine)
                         .concat("    stateFile = '.nyx-state.yml'").concat(newLine)
                         .concat("    verbosity = \"DEBUG\"").concat(newLine)
                         .concat("}").concat(newLine),
@@ -1625,6 +1796,17 @@ public class Suites {
                         "primeVersion: \"0.0.5\"",
                         "version: \"0.0.6\""
                     ),
+                    ".nyx-summary.txt", Set.<String>of(
+                        "bump             = patch",
+                        "core version     = true",
+                        "new release      = true",
+                        "new version      = true",
+                        "scheme           = SEMVER",
+                        "timestamp        = ", // we don't need to test for the timestamp value here
+                        "current version  = 0.0.6",
+                        "previous version = 0.0.5",
+                        "prime version    = 0.0.5"
+                    ),
                     "CHANGELOG.md", Set.<String>of(
                         "## 0.0.6",
 					    "No changes."
@@ -1653,6 +1835,7 @@ public class Suites {
                         .concat(".gradle").concat(newLine)
                         .concat("build.gradle").concat(newLine)
                         .concat("settings.gradle").concat(newLine)
+                        .concat(".nyx-summary.txt").concat(newLine)
                         .concat(".nyx-state.yml").concat(newLine),
                     // the Gradle build script
                     "build.gradle", "".concat(newLine)
@@ -1663,6 +1846,7 @@ public class Suites {
                         .concat("nyx {").concat(newLine)
                         .concat("    dryRun = false").concat(newLine)
                         .concat("    resume = false").concat(newLine)
+                        .concat("    summaryFile = '.nyx-summary.txt'").concat(newLine)
                         .concat("    stateFile = '.nyx-state.yml'").concat(newLine)
                         .concat("    verbosity = \"DEBUG\"").concat(newLine)
                         .concat("}").concat(newLine),
@@ -1740,6 +1924,17 @@ public class Suites {
                         "previousVersion: \"0.0.4\"",
                         "primeVersion: \"0.0.4\"",
                         "version: \"v0.1.0\""
+                    ),
+                    ".nyx-summary.txt", Set.<String>of(
+                        "bump             = minor",
+                        "core version     = true",
+                        "new release      = true",
+                        "new version      = true",
+                        "scheme           = SEMVER",
+                        "timestamp        = ", // we don't need to test for the timestamp value here
+                        "current version  = v0.1.0",
+                        "previous version = 0.0.4",
+                        "prime version    = 0.0.4"
                     ),
                     "CHANGELOG.md", Set.<String>of(
                         "## v0.1.0",
@@ -1772,6 +1967,7 @@ public class Suites {
                         .concat(".gradle").concat(newLine)
                         .concat("build.gradle").concat(newLine)
                         .concat("settings.gradle").concat(newLine)
+                        .concat(".nyx-summary.txt").concat(newLine)
                         .concat(".nyx-state.yml").concat(newLine),
                     // the Gradle build script
                     "build.gradle", "".concat(newLine)
@@ -1788,6 +1984,7 @@ public class Suites {
                         .concat("nyx {").concat(newLine)
                         .concat("    dryRun = false").concat(newLine)
                         .concat("    resume = false").concat(newLine)
+                        .concat("    summaryFile = '.nyx-summary.txt'").concat(newLine)
                         .concat("    stateFile = '.nyx-state.yml'").concat(newLine)
                         .concat("    verbosity = \"DEBUG\"").concat(newLine)
                         .concat("}").concat(newLine),
@@ -1863,6 +2060,17 @@ public class Suites {
                         "primeVersion: \"0.0.4\"",
                         "version: \"v0.1.0\""
                     ),
+                    ".nyx-summary.txt", Set.<String>of(
+                        "bump             = minor",
+                        "core version     = true",
+                        "new release      = true",
+                        "new version      = true",
+                        "scheme           = SEMVER",
+                        "timestamp        = ", // we don't need to test for the timestamp value here
+                        "current version  = v0.1.0",
+                        "previous version = 0.0.4",
+                        "prime version    = 0.0.4"
+                    ),
                     "CHANGELOG.md", Set.<String>of(
                         "## v0.1.0",
                         "### Added",
@@ -1894,6 +2102,7 @@ public class Suites {
                         .concat(".gradle").concat(newLine)
                         .concat("build.gradle").concat(newLine)
                         .concat("settings.gradle").concat(newLine)
+                        .concat(".nyx-summary.txt").concat(newLine)
                         .concat(".nyx-state.yml").concat(newLine),
                     // the Gradle build script
                     "build.gradle", "".concat(newLine)
@@ -1904,6 +2113,7 @@ public class Suites {
                         .concat("nyx {").concat(newLine)
                         .concat("    dryRun = false").concat(newLine)
                         .concat("    resume = false").concat(newLine)
+                        .concat("    summaryFile = '.nyx-summary.txt'").concat(newLine)
                         .concat("    stateFile = '.nyx-state.yml'").concat(newLine)
                         .concat("    verbosity = \"DEBUG\"").concat(newLine)
                         .concat("}").concat(newLine),
@@ -1982,6 +2192,17 @@ public class Suites {
                         "primeVersion: \"0.0.4\"",
                         "version: \"v0.1.0\""
                     ),
+                    ".nyx-summary.txt", Set.<String>of(
+                        "bump             = minor",
+                        "core version     = true",
+                        "new release      = true",
+                        "new version      = true",
+                        "scheme           = SEMVER",
+                        "timestamp        = ", // we don't need to test for the timestamp value here
+                        "current version  = v0.1.0",
+                        "previous version = 0.0.4",
+                        "prime version    = 0.0.4"
+                    ),
                     "CHANGELOG.md", Set.<String>of(
                         "## v0.1.0",
                         "### Added",
@@ -2013,6 +2234,7 @@ public class Suites {
                         .concat(".gradle").concat(newLine)
                         .concat("build.gradle").concat(newLine)
                         .concat("settings.gradle").concat(newLine)
+                        .concat(".nyx-summary.txt").concat(newLine)
                         .concat(".nyx-state.yml").concat(newLine),
                     // the Gradle build script
                     "build.gradle", "".concat(newLine)
@@ -2029,6 +2251,7 @@ public class Suites {
                         .concat("nyx {").concat(newLine)
                         .concat("    dryRun = false").concat(newLine)
                         .concat("    resume = false").concat(newLine)
+                        .concat("    summaryFile = '.nyx-summary.txt'").concat(newLine)
                         .concat("    stateFile = '.nyx-state.yml'").concat(newLine)
                         .concat("    verbosity = \"DEBUG\"").concat(newLine)
                         .concat("}").concat(newLine),
@@ -2103,6 +2326,17 @@ public class Suites {
                         "previousVersion: \"0.0.4\"",
                         "primeVersion: \"0.0.4\"",
                         "version: \"v0.1.0\""
+                    ),
+                    ".nyx-summary.txt", Set.<String>of(
+                        "bump             = minor",
+                        "core version     = true",
+                        "new release      = true",
+                        "new version      = true",
+                        "scheme           = SEMVER",
+                        "timestamp        = ", // we don't need to test for the timestamp value here
+                        "current version  = v0.1.0",
+                        "previous version = 0.0.4",
+                        "prime version    = 0.0.4"
                     ),
                     "CHANGELOG.md", Set.<String>of(
                         "## v0.1.0",

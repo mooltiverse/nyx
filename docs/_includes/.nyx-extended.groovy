@@ -210,6 +210,8 @@ nyx {
     }
   }
   sharedConfigurationFile = 'example-shared.config.json'
+  summary = true
+  summaryFile = '.nyx-summary.txt'
   stateFile = '.nyx-state.yml'
   verbosity = 'INFO'
   version = '1.8.12'

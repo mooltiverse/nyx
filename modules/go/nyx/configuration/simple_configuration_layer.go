@@ -80,6 +80,12 @@ type SimpleConfigurationLayer struct {
 	// The path to a custom shared configuration file as it's defined by this configuration. A nil value means undefined.
 	SharedConfigurationFile *string `json:"sharedConfigurationFile,omitempty" yaml:"sharedConfigurationFile,omitempty" handlebars:"sharedConfigurationFile"`
 
+	// The value of the summary flag as it's defined by this configuration. A nil value means undefined.
+	Summary *bool `json:"summary,omitempty" yaml:"summary,omitempty" handlebars:"summary"`
+
+	// The path to the file where the Nyx summary must be saved as it's defined by this configuration. A nil value means undefined.
+	SummaryFile *string `json:"summaryFile,omitempty" yaml:"summaryFile,omitempty" handlebars:"summaryFile"`
+
 	// The path to the file where the Nyx State must be saved as it's defined by this configuration. A nil value means undefined.
 	StateFile *string `json:"stateFile,omitempty" yaml:"stateFile,omitempty" handlebars:"stateFile"`
 
@@ -419,6 +425,42 @@ Sets the path to a custom shared configuration file as it's defined by this conf
 */
 func (scl *SimpleConfigurationLayer) SetSharedConfigurationFile(sharedConfigurationFile *string) {
 	scl.SharedConfigurationFile = sharedConfigurationFile
+}
+
+/*
+Returns the value of the summary flag as it's defined by this configuration. A nil value means undefined.
+
+Error is:
+- DataAccessError: in case the option cannot be read or accessed.
+- IllegalPropertyError: in case the option has been defined but has incorrect values or it can't be resolved.
+*/
+func (scl *SimpleConfigurationLayer) GetSummary() (*bool, error) {
+	return scl.Summary, nil
+}
+
+/*
+Sets the value of the summary flag as it's defined by this configuration. A nil value means undefined.
+*/
+func (scl *SimpleConfigurationLayer) SetSummary(summary *bool) {
+	scl.Summary = summary
+}
+
+/*
+Returns the path to the file where the Nyx summary must be saved as it's defined by this configuration. A nil value means undefined.
+
+Error is:
+- DataAccessError: in case the option cannot be read or accessed.
+- IllegalPropertyError: in case the option has been defined but has incorrect values or it can't be resolved.
+*/
+func (scl *SimpleConfigurationLayer) GetSummaryFile() (*string, error) {
+	return scl.SummaryFile, nil
+}
+
+/*
+Sets the path to the file where the Nyx summary must be saved as it's defined by this configuration. A nil value means undefined.
+*/
+func (scl *SimpleConfigurationLayer) SetSummaryFile(summaryFile *string) {
+	scl.SummaryFile = summaryFile
 }
 
 /*
