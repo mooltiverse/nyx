@@ -22,8 +22,9 @@
 package command_test
 
 import (
-	"os"      // https://pkg.go.dev/os
-	"testing" // https://pkg.go.dev/testing
+	"os"            // https://pkg.go.dev/os
+	"path/filepath" // https://pkg.go.dev/path/filepath
+	"testing"       // https://pkg.go.dev/testing
 
 	assert "github.com/stretchr/testify/assert" // https://pkg.go.dev/github.com/stretchr/testify/assert
 
@@ -31,6 +32,7 @@ import (
 	cnf "github.com/mooltiverse/nyx/modules/go/nyx/configuration"
 	cmdtpl "github.com/mooltiverse/nyx/modules/go/nyx/test/integration/command/template"
 	gittools "github.com/mooltiverse/nyx/modules/go/nyx/test/integration/git/tools"
+	utl "github.com/mooltiverse/nyx/modules/go/utils"
 )
 
 func TestCleanConstructor(t *testing.T) {
@@ -74,6 +76,7 @@ func TestCleanIsUpToDateWithStateFile(t *testing.T) {
 			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			stateFilePath := "state-file.txt"
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
+			configurationLayerMock.SetDirectory(utl.PointerToString((*command).Script().GetWorkingDirectory()))
 			configurationLayerMock.SetStateFile(&stateFilePath)
 			var configurationLayer cnf.ConfigurationLayer
 			configurationLayer = configurationLayerMock
@@ -86,7 +89,7 @@ func TestCleanIsUpToDateWithStateFile(t *testing.T) {
 			assert.NoError(t, err)
 			assert.True(t, upToDate)
 
-			stateFile, err := os.Create(stateFilePath)
+			stateFile, err := os.Create(filepath.Join((*command).Script().GetWorkingDirectory(), stateFilePath))
 			assert.NoError(t, err)
 
 			// now it's not up do date anymore
@@ -116,6 +119,7 @@ func TestCleanIsUpToDateWithSummaryFile(t *testing.T) {
 			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			summaryFilePath := "summary-file.txt"
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
+			configurationLayerMock.SetDirectory(utl.PointerToString((*command).Script().GetWorkingDirectory()))
 			configurationLayerMock.SetSummaryFile(&summaryFilePath)
 			var configurationLayer cnf.ConfigurationLayer
 			configurationLayer = configurationLayerMock
@@ -128,7 +132,7 @@ func TestCleanIsUpToDateWithSummaryFile(t *testing.T) {
 			assert.NoError(t, err)
 			assert.True(t, upToDate)
 
-			summaryFile, err := os.Create(summaryFilePath)
+			summaryFile, err := os.Create(filepath.Join((*command).Script().GetWorkingDirectory(), summaryFilePath))
 			assert.NoError(t, err)
 
 			// now it's not up do date anymore
@@ -158,6 +162,7 @@ func TestCleanIsUpToDateWithChangelogFile(t *testing.T) {
 			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			changelogFilePath := "changelog-file.txt"
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
+			configurationLayerMock.SetDirectory(utl.PointerToString((*command).Script().GetWorkingDirectory()))
 			changelogConfiguration, _ := configurationLayerMock.GetChangelog()
 			changelogConfiguration.SetPath(&changelogFilePath)
 			var configurationLayer cnf.ConfigurationLayer
@@ -170,7 +175,7 @@ func TestCleanIsUpToDateWithChangelogFile(t *testing.T) {
 			upToDate, err := (*command).IsUpToDate()
 			assert.True(t, upToDate)
 
-			changelogFile, err := os.Create(changelogFilePath)
+			changelogFile, err := os.Create(filepath.Join((*command).Script().GetWorkingDirectory(), changelogFilePath))
 			assert.NoError(t, err)
 
 			// now it's not up do date anymore
@@ -200,7 +205,9 @@ func TestCleanIdempotency(t *testing.T) {
 			summaryFilePath := "summary-file.txt"
 			changelogFilePath := "changelog-file.txt"
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
+			configurationLayerMock.SetDirectory(utl.PointerToString((*command).Script().GetWorkingDirectory()))
 			configurationLayerMock.SetStateFile(&stateFilePath)
+			configurationLayerMock.SetSummaryFile(&summaryFilePath)
 			changelogConfiguration, _ := configurationLayerMock.GetChangelog()
 			changelogConfiguration.SetPath(&changelogFilePath)
 			var configurationLayer cnf.ConfigurationLayer
@@ -213,11 +220,11 @@ func TestCleanIdempotency(t *testing.T) {
 			upToDate, err := (*command).IsUpToDate()
 			assert.True(t, upToDate)
 
-			stateFile, err := os.Create(stateFilePath)
+			stateFile, err := os.Create(filepath.Join((*command).Script().GetWorkingDirectory(), stateFilePath))
 			assert.NoError(t, err)
-			summaryFile, err := os.Create(summaryFilePath)
+			summaryFile, err := os.Create(filepath.Join((*command).Script().GetWorkingDirectory(), summaryFilePath))
 			assert.NoError(t, err)
-			changelogFile, err := os.Create(changelogFilePath)
+			changelogFile, err := os.Create(filepath.Join((*command).Script().GetWorkingDirectory(), changelogFilePath))
 			assert.NoError(t, err)
 
 			// now it's not up do date anymore
@@ -237,11 +244,11 @@ func TestCleanIdempotency(t *testing.T) {
 			assert.NoError(t, err)
 
 			// now it's up do date again
-			_, err = os.Stat(stateFilePath)
+			_, err = os.Stat(filepath.Join((*command).Script().GetWorkingDirectory(), stateFilePath))
 			assert.Error(t, err)
-			_, err = os.Stat(summaryFilePath)
+			_, err = os.Stat(filepath.Join((*command).Script().GetWorkingDirectory(), summaryFilePath))
 			assert.Error(t, err)
-			_, err = os.Stat(changelogFilePath)
+			_, err = os.Stat(filepath.Join((*command).Script().GetWorkingDirectory(), changelogFilePath))
 			assert.Error(t, err)
 			upToDate, err = (*command).IsUpToDate()
 			assert.True(t, upToDate)
@@ -267,6 +274,7 @@ func TestCleanRunDeleteStateFile(t *testing.T) {
 			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			stateFilePath := "state-file.txt"
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
+			configurationLayerMock.SetDirectory(utl.PointerToString((*command).Script().GetWorkingDirectory()))
 			configurationLayerMock.SetStateFile(&stateFilePath)
 			var configurationLayer cnf.ConfigurationLayer
 			configurationLayer = configurationLayerMock
@@ -276,7 +284,7 @@ func TestCleanRunDeleteStateFile(t *testing.T) {
 			_, err := (*command).Run()
 			assert.NoError(t, err)
 
-			stateFile, err := os.Create(stateFilePath)
+			stateFile, err := os.Create(filepath.Join((*command).Script().GetWorkingDirectory(), stateFilePath))
 			assert.NoError(t, err)
 
 			_, err = stateFile.Stat()
@@ -304,6 +312,7 @@ func TestCleanRunDeleteSummaryFile(t *testing.T) {
 			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			summaryFilePath := "summary-file.txt"
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
+			configurationLayerMock.SetDirectory(utl.PointerToString((*command).Script().GetWorkingDirectory()))
 			configurationLayerMock.SetSummaryFile(&summaryFilePath)
 			var configurationLayer cnf.ConfigurationLayer
 			configurationLayer = configurationLayerMock
@@ -313,7 +322,7 @@ func TestCleanRunDeleteSummaryFile(t *testing.T) {
 			_, err := (*command).Run()
 			assert.NoError(t, err)
 
-			summaryFile, err := os.Create(summaryFilePath)
+			summaryFile, err := os.Create(filepath.Join((*command).Script().GetWorkingDirectory(), summaryFilePath))
 			assert.NoError(t, err)
 
 			_, err = summaryFile.Stat()
@@ -341,6 +350,7 @@ func TestCleanRunDeleteChangelogFile(t *testing.T) {
 			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			changelogFilePath := "changelog-file.txt"
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
+			configurationLayerMock.SetDirectory(utl.PointerToString((*command).Script().GetWorkingDirectory()))
 			changelogConfiguration, _ := configurationLayerMock.GetChangelog()
 			changelogConfiguration.SetPath(&changelogFilePath)
 			var configurationLayer cnf.ConfigurationLayer
@@ -351,7 +361,7 @@ func TestCleanRunDeleteChangelogFile(t *testing.T) {
 			_, err := (*command).Run()
 			assert.NoError(t, err)
 
-			changelogFile, err := os.Create(changelogFilePath)
+			changelogFile, err := os.Create(filepath.Join((*command).Script().GetWorkingDirectory(), changelogFilePath))
 			assert.NoError(t, err)
 
 			_, err = changelogFile.Stat()

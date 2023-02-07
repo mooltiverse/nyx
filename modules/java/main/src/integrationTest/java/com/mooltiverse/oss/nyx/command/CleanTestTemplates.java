@@ -102,6 +102,7 @@ public class CleanTestTemplates {
             script.getWorkingDirectory().deleteOnExit();
             String stateFilePath = "state-file.txt";
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            configurationLayerMock.setDirectory(script.getWorkingDirectory().getAbsolutePath());
             configurationLayerMock.setStateFile(stateFilePath);
             command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
@@ -109,7 +110,7 @@ public class CleanTestTemplates {
             command.run();
             assertTrue(command.isUpToDate());
 
-            File stateFile = new File(stateFilePath);
+            File stateFile = new File(script.getWorkingDirectory().getAbsolutePath(), stateFilePath);
             stateFile.deleteOnExit();
             stateFile.createNewFile();
 
@@ -135,6 +136,7 @@ public class CleanTestTemplates {
             script.getWorkingDirectory().deleteOnExit();
             String summaryFilePath = "summary-file.txt";
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            configurationLayerMock.setDirectory(script.getWorkingDirectory().getAbsolutePath());
             configurationLayerMock.setSummaryFile(summaryFilePath);
             command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
@@ -142,7 +144,7 @@ public class CleanTestTemplates {
             command.run();
             assertTrue(command.isUpToDate());
 
-            File summaryFile = new File(summaryFilePath);
+            File summaryFile = new File(script.getWorkingDirectory().getAbsolutePath(), summaryFilePath);
             summaryFile.deleteOnExit();
             summaryFile.createNewFile();
 
@@ -168,6 +170,7 @@ public class CleanTestTemplates {
             script.getWorkingDirectory().deleteOnExit();
             String changelogFilePath = "changelog-file.txt";
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            configurationLayerMock.setDirectory(script.getWorkingDirectory().getAbsolutePath());
             configurationLayerMock.getChangelog().setPath(changelogFilePath);
             command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
@@ -175,7 +178,7 @@ public class CleanTestTemplates {
             command.run();
             assertTrue(command.isUpToDate());
 
-            File changelogFile = new File(changelogFilePath);
+            File changelogFile = new File(script.getWorkingDirectory().getAbsolutePath(), changelogFilePath);
             changelogFile.deleteOnExit();
             changelogFile.createNewFile();
 
@@ -208,7 +211,9 @@ public class CleanTestTemplates {
             String summaryFilePath = "summary-file.txt";
             String changelogFilePath = "changelog-file.txt";
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            configurationLayerMock.setDirectory(script.getWorkingDirectory().getAbsolutePath());
             configurationLayerMock.setStateFile(stateFilePath);
+            configurationLayerMock.setSummaryFile(summaryFilePath);
             configurationLayerMock.getChangelog().setPath(changelogFilePath);
             command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
@@ -216,13 +221,13 @@ public class CleanTestTemplates {
             command.run();
             assertTrue(command.isUpToDate());
 
-            File stateFile = new File(stateFilePath);
+            File stateFile = new File(script.getWorkingDirectory().getAbsolutePath(), stateFilePath);
             stateFile.deleteOnExit();
             stateFile.createNewFile();
-            File summaryFile = new File(summaryFilePath);
+            File summaryFile = new File(script.getWorkingDirectory().getAbsolutePath(), summaryFilePath);
             summaryFile.deleteOnExit();
             summaryFile.createNewFile();
-            File changelogFile = new File(changelogFilePath);
+            File changelogFile = new File(script.getWorkingDirectory().getAbsolutePath(), changelogFilePath);
             changelogFile.deleteOnExit();
             changelogFile.createNewFile();
 
@@ -263,13 +268,14 @@ public class CleanTestTemplates {
             script.getWorkingDirectory().deleteOnExit();
             String stateFilePath = "state-file.txt";
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            configurationLayerMock.setDirectory(script.getWorkingDirectory().getAbsolutePath());
             configurationLayerMock.setStateFile(stateFilePath);
             command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             // run once, to start
             command.run();
 
-            File stateFile = new File(stateFilePath);
+            File stateFile = new File(script.getWorkingDirectory().getAbsolutePath(), stateFilePath);
             stateFile.deleteOnExit();
             stateFile.createNewFile();
             assertTrue(stateFile.exists());
@@ -291,13 +297,14 @@ public class CleanTestTemplates {
             script.getWorkingDirectory().deleteOnExit();
             String summaryFilePath = "summary-file.txt";
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            configurationLayerMock.setDirectory(script.getWorkingDirectory().getAbsolutePath());
             configurationLayerMock.setSummaryFile(summaryFilePath);
             command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             // run once, to start
             command.run();
 
-            File summaryFile = new File(summaryFilePath);
+            File summaryFile = new File(script.getWorkingDirectory().getAbsolutePath(), summaryFilePath);
             summaryFile.deleteOnExit();
             summaryFile.createNewFile();
             assertTrue(summaryFile.exists());
@@ -319,13 +326,14 @@ public class CleanTestTemplates {
             script.getWorkingDirectory().deleteOnExit();
             String changelogFilePath = "changelog-file.txt";
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            configurationLayerMock.setDirectory(script.getWorkingDirectory().getAbsolutePath());
             configurationLayerMock.getChangelog().setPath(changelogFilePath);
             command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
 
             // run once, to start
             command.run();
 
-            File changelogFile = new File(changelogFilePath);
+            File changelogFile = new File(script.getWorkingDirectory().getAbsolutePath(), changelogFilePath);
             changelogFile.deleteOnExit();
             changelogFile.createNewFile();
             assertTrue(changelogFile.exists());
