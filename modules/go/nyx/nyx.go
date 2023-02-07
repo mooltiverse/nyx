@@ -341,7 +341,7 @@ func (n *Nyx) runCommand(command cmd.Commands, saveStateAndSummary bool) error {
 			return err
 		}
 		// if the file path is relative make it relative to the configured directory
-		if !filepath.IsAbs(*stateFile) {
+		if stateFile != nil && !filepath.IsAbs(*stateFile) {
 			configuration, err := n.Configuration()
 			if err != nil {
 				return err
@@ -371,7 +371,7 @@ func (n *Nyx) runCommand(command cmd.Commands, saveStateAndSummary bool) error {
 			return err
 		}
 		// if the file path is relative make it relative to the configured directory
-		if !filepath.IsAbs(*summaryFile) {
+		if summaryFile != nil && !filepath.IsAbs(*summaryFile) {
 			configuration, err := n.Configuration()
 			if err != nil {
 				return err

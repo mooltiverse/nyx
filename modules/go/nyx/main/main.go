@@ -123,5 +123,24 @@ func main() {
 		os.Exit(1)
 	}
 
+	summary, err := configuration.GetSummary()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	if summary != nil && *summary {
+		state, err := nyx.State()
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		summary, err := state.Summary()
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		fmt.Println(summary)
+	}
+
 	os.Exit(0)
 }
