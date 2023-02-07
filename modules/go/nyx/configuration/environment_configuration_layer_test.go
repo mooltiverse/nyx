@@ -682,6 +682,42 @@ func TestEnvironmentConfigurationLayerGetSharedConfigurationFile(t *testing.T) {
 	assert.Equal(t, "config.yml", *sharedConfigurationFile)
 }
 
+func TestEnvironmentConfigurationLayerGetSummary(t *testing.T) {
+	environmentConfigurationLayer := EnvironmentConfigurationLayer{}
+
+	summary, err := environmentConfigurationLayer.GetSummary()
+	assert.NoError(t, err)
+	assert.Nil(t, summary)
+
+	// get a new instance or a stale set of environment variables is still in the configuration layer
+	environmentConfigurationLayer = EnvironmentConfigurationLayer{}
+	environmentConfigurationLayer.withEnvironmentVariables([]string{
+		"NYX_SUMMARY=true",
+	})
+
+	summary, err = environmentConfigurationLayer.GetSummary()
+	assert.NoError(t, err)
+	assert.Equal(t, true, *summary)
+}
+
+func TestEnvironmentConfigurationLayerGetSummaryFile(t *testing.T) {
+	environmentConfigurationLayer := EnvironmentConfigurationLayer{}
+
+	summaryFile, err := environmentConfigurationLayer.GetSummaryFile()
+	assert.NoError(t, err)
+	assert.Nil(t, summaryFile)
+
+	// get a new instance or a stale set of environment variables is still in the configuration layer
+	environmentConfigurationLayer = EnvironmentConfigurationLayer{}
+	environmentConfigurationLayer.withEnvironmentVariables([]string{
+		"NYX_SUMMARY_FILE=summary.txt",
+	})
+
+	summaryFile, err = environmentConfigurationLayer.GetSummaryFile()
+	assert.NoError(t, err)
+	assert.Equal(t, "summary.txt", *summaryFile)
+}
+
 func TestEnvironmentConfigurationLayerGetStateFile(t *testing.T) {
 	environmentConfigurationLayer := EnvironmentConfigurationLayer{}
 

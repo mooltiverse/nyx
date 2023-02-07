@@ -166,6 +166,22 @@ func TestSaveAndLoadJSON(t *testing.T) {
 		assert.Equal(t, *sSharedConfigurationFile, *tSharedConfigurationFile)
 	}
 
+	sSummary, _ := source.GetSummary()
+	tSummary, _ := target.GetSummary()
+	if sSummary == nil {
+		assert.Equal(t, ent.SUMMARY, tSummary)
+	} else {
+		assert.Equal(t, *sSummary, *tSummary)
+	}
+
+	sSummaryFile, _ := source.GetSummaryFile()
+	tSummaryFile, _ := target.GetSummaryFile()
+	if sSummaryFile == nil {
+		assert.Equal(t, ent.SUMMARY_FILE, tSummaryFile)
+	} else {
+		assert.Equal(t, *sSummaryFile, *tSummaryFile)
+	}
+
 	sStateFile, _ := source.GetStateFile()
 	tStateFile, _ := target.GetStateFile()
 	if sStateFile == nil {
@@ -504,6 +520,22 @@ func TestSaveAndLoadYAML(t *testing.T) {
 		assert.Equal(t, *sSharedConfigurationFile, *tSharedConfigurationFile)
 	}
 
+	sSummary, _ := source.GetSummary()
+	tSummary, _ := target.GetSummary()
+	if sSummary == nil {
+		assert.Equal(t, ent.SUMMARY, tSummary)
+	} else {
+		assert.Equal(t, *sSummary, *tSummary)
+	}
+
+	sSummaryFile, _ := source.GetSummaryFile()
+	tSummaryFile, _ := target.GetSummaryFile()
+	if sSummaryFile == nil {
+		assert.Equal(t, ent.SUMMARY_FILE, tSummaryFile)
+	} else {
+		assert.Equal(t, *sSummaryFile, *tSummaryFile)
+	}
+
 	sStateFile, _ := source.GetStateFile()
 	tStateFile, _ := target.GetStateFile()
 	if sStateFile == nil {
@@ -806,6 +838,14 @@ func TestSerializationWithMultipleConfigurationLayersJSON(t *testing.T) {
 	mediumPriorityConfigurationLayerMock.SetSharedConfigurationFile(utl.PointerToString(os.Getenv(SIMPLEST_JSON_EXAMPLE_CONFIGURATION_FILE_ENVIRONMENT_VARIABLE)))
 	highPriorityConfigurationLayerMock.SetSharedConfigurationFile(utl.PointerToString(os.Getenv(SIMPLEST_YAML_EXAMPLE_CONFIGURATION_FILE_ENVIRONMENT_VARIABLE)))
 
+	lowPriorityConfigurationLayerMock.SetSummary(utl.PointerToBoolean(true))
+	mediumPriorityConfigurationLayerMock.SetSummary(utl.PointerToBoolean(true))
+	highPriorityConfigurationLayerMock.SetSummary(utl.PointerToBoolean(false))
+
+	lowPriorityConfigurationLayerMock.SetSummaryFile(utl.PointerToString("summary.low"))
+	mediumPriorityConfigurationLayerMock.SetSummaryFile(utl.PointerToString("summary.medium"))
+	highPriorityConfigurationLayerMock.SetSummaryFile(utl.PointerToString("summary.high"))
+
 	lowPriorityConfigurationLayerMock.SetStateFile(utl.PointerToString("file.yaml"))
 	mediumPriorityConfigurationLayerMock.SetStateFile(utl.PointerToString("file.yaml"))
 	highPriorityConfigurationLayerMock.SetStateFile(utl.PointerToString("file.json"))
@@ -953,6 +993,14 @@ func TestSerializationWithMultipleConfigurationLayersJSON(t *testing.T) {
 	sharedConfigurationFile, _ := deserializedConfigurationLayer.GetSharedConfigurationFile()
 	assert.Equal(t, *hpSharedConfigurationFile, *sharedConfigurationFile)
 
+	hpSummary, _ := highPriorityConfigurationLayerMock.GetSummary()
+	summary, _ := deserializedConfigurationLayer.GetSummary()
+	assert.Equal(t, *hpSummary, *summary)
+
+	hpSummaryFile, _ := highPriorityConfigurationLayerMock.GetSummaryFile()
+	summaryFile, _ := deserializedConfigurationLayer.GetSummaryFile()
+	assert.Equal(t, *hpSummaryFile, *summaryFile)
+
 	hpStateFile, _ := highPriorityConfigurationLayerMock.GetStateFile()
 	stateFile, _ := deserializedConfigurationLayer.GetStateFile()
 	assert.Equal(t, *hpStateFile, *stateFile)
@@ -1057,6 +1105,14 @@ func TestSerializationWithMultipleConfigurationLayersYAML(t *testing.T) {
 	lowPriorityConfigurationLayerMock.SetSharedConfigurationFile(utl.PointerToString(os.Getenv(SIMPLEST_YAML_EXAMPLE_CONFIGURATION_FILE_ENVIRONMENT_VARIABLE)))
 	mediumPriorityConfigurationLayerMock.SetSharedConfigurationFile(utl.PointerToString(os.Getenv(SIMPLEST_YAML_EXAMPLE_CONFIGURATION_FILE_ENVIRONMENT_VARIABLE)))
 	highPriorityConfigurationLayerMock.SetSharedConfigurationFile(utl.PointerToString(os.Getenv(SIMPLEST_JSON_EXAMPLE_CONFIGURATION_FILE_ENVIRONMENT_VARIABLE)))
+
+	lowPriorityConfigurationLayerMock.SetSummary(utl.PointerToBoolean(true))
+	mediumPriorityConfigurationLayerMock.SetSummary(utl.PointerToBoolean(true))
+	highPriorityConfigurationLayerMock.SetSummary(utl.PointerToBoolean(false))
+
+	lowPriorityConfigurationLayerMock.SetSummaryFile(utl.PointerToString("summary.low"))
+	mediumPriorityConfigurationLayerMock.SetSummaryFile(utl.PointerToString("summary.medium"))
+	highPriorityConfigurationLayerMock.SetSummaryFile(utl.PointerToString("summary.high"))
 
 	lowPriorityConfigurationLayerMock.SetStateFile(utl.PointerToString("file.json"))
 	mediumPriorityConfigurationLayerMock.SetStateFile(utl.PointerToString("file.json"))
@@ -1204,6 +1260,14 @@ func TestSerializationWithMultipleConfigurationLayersYAML(t *testing.T) {
 	hpSharedConfigurationFile, _ := highPriorityConfigurationLayerMock.GetSharedConfigurationFile()
 	sharedConfigurationFile, _ := deserializedConfigurationLayer.GetSharedConfigurationFile()
 	assert.Equal(t, *hpSharedConfigurationFile, *sharedConfigurationFile)
+
+	hpSummary, _ := highPriorityConfigurationLayerMock.GetSummary()
+	summary, _ := deserializedConfigurationLayer.GetSummary()
+	assert.Equal(t, *hpSummary, *summary)
+
+	hpSummaryFile, _ := highPriorityConfigurationLayerMock.GetSummaryFile()
+	summaryFile, _ := deserializedConfigurationLayer.GetSummaryFile()
+	assert.Equal(t, *hpSummaryFile, *summaryFile)
 
 	hpStateFile, _ := highPriorityConfigurationLayerMock.GetStateFile()
 	stateFile, _ := deserializedConfigurationLayer.GetStateFile()

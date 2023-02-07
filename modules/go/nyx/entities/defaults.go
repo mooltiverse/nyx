@@ -131,6 +131,12 @@ var (
 	// The default shared custom configuration file path. Value: nil
 	SHARED_CONFIGURATION_FILE *string = nil
 
+	// The default flag that tells when to print a summary to the console. Value: false
+	SUMMARY *bool = utl.PointerToBoolean(false)
+
+	// The default path to the local summary file. Value: nil
+	SUMMARY_FILE *string = nil
+
 	// The default path to the local state file. Value: nil
 	STATE_FILE *string = nil
 

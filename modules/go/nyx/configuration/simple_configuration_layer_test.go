@@ -327,6 +327,32 @@ func TestSimpleConfigurationLayerGetSharedConfigurationFile(t *testing.T) {
 	assert.Equal(t, "config.yml", *sharedConfigurationFile)
 }
 
+func TestSimpleConfigurationLayerGetSummary(t *testing.T) {
+	simpleConfigurationLayer := NewSimpleConfigurationLayer()
+
+	summary, error := simpleConfigurationLayer.GetSummary()
+	assert.NoError(t, error)
+	assert.Nil(t, summary)
+
+	simpleConfigurationLayer.SetSummary(utl.PointerToBoolean(true))
+	summary, error = simpleConfigurationLayer.GetSummary()
+	assert.NoError(t, error)
+	assert.Equal(t, true, *summary)
+}
+
+func TestSimpleConfigurationLayerGetSummaryFile(t *testing.T) {
+	simpleConfigurationLayer := NewSimpleConfigurationLayer()
+
+	summaryFile, error := simpleConfigurationLayer.GetSummaryFile()
+	assert.NoError(t, error)
+	assert.Nil(t, summaryFile)
+
+	simpleConfigurationLayer.SetSummaryFile(utl.PointerToString("summary.txt"))
+	summaryFile, error = simpleConfigurationLayer.GetSummaryFile()
+	assert.NoError(t, error)
+	assert.Equal(t, "summary.txt", *summaryFile)
+}
+
 func TestSimpleConfigurationLayerGetStateFile(t *testing.T) {
 	simpleConfigurationLayer := NewSimpleConfigurationLayer()
 

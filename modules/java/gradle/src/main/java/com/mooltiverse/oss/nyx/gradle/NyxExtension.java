@@ -199,6 +199,16 @@ public abstract class NyxExtension {
     private final Property<String> sharedConfigurationFile = getObjectfactory().property(String.class);
 
     /**
+     * The 'summary' property.
+     */
+    private final Property<Boolean> summary = getObjectfactory().property(Boolean.class);
+
+    /**
+     * The 'summaryFile' property.
+     */
+    private final Property<String> summaryFile = getObjectfactory().property(String.class);
+
+    /**
      * The 'stateFile' property.
      */
     private final Property<String> stateFile = getObjectfactory().property(String.class);
@@ -544,6 +554,33 @@ public abstract class NyxExtension {
      */
     public Property<String> getSharedConfigurationFile() {
         return sharedConfigurationFile;
+    }
+
+    /**
+     * Returns the flag that, when {@code true}, prints a state summary to the console.
+     * 
+     * We provide an implementation of this method instead of using the abstract definition as it's
+     * safer for old Gradle versions we support.
+     * 
+     * @return the flag that, when {@code true}, prevents Nyx from applying any change to the repository or any
+     * other resource
+     * 
+     * @see Defaults#DRY_RUN
+     */
+    public Property<Boolean> getSummary() {
+        return summary;
+    }
+
+    /**
+     * Returns the optional path where to save the summary file.
+     * 
+     * We provide an implementation of this method instead of using the abstract definition as it's
+     * safer for old Gradle versions we support.
+     * 
+     * @return the directory to use as the base repository location
+     */
+    public Property<String> getSummaryFile() {
+        return summaryFile;
     }
 
     /**

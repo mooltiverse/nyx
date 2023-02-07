@@ -215,6 +215,16 @@ public interface Defaults {
     public static final String STATE_FILE = null;
 
     /**
+     * The default flag that tells when to print a summary to the console. Value: {@code false}
+     */
+    public static final Boolean SUMMARY = Boolean.FALSE;
+
+    /**
+     * The default path to the local summary file. Value: {@code null}
+     */
+    public static final String SUMMARY_FILE = null;
+
+    /**
      * The default logging level. Value: {@link Verbosity#WARNING}.
      * 
      * Please note that the verbosity option is actually ignored in this library implementation as the event filtering based

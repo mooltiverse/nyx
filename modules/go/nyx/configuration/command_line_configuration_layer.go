@@ -392,7 +392,13 @@ const (
 	SHARED_CONFIGURATION_FILE_ARGUMENT_NAME = "--shared-configuration-file"
 
 	// The name of the argument to read for this value.
+	SUMMARY_ARGUMENT_NAME = "--summary"
+
+	// The name of the argument to read for this value.
 	STATE_FILE_ARGUMENT_NAME = "--state-file"
+
+	// The name of the argument to read for this value.
+	SUMMARY_FILE_ARGUMENT_NAME = "--summary-file"
 
 	// The name of the argument to read for this value.
 	VERBOSITY_ARGUMENT_NAME = "--verbosity"
@@ -1264,6 +1270,38 @@ Error is:
 */
 func (clcl *CommandLineConfigurationLayer) GetSharedConfigurationFile() (*string, error) {
 	return clcl.getArgument(SHARED_CONFIGURATION_FILE_ARGUMENT_NAME), nil
+}
+
+/*
+Returns the value of the summary flag as it's defined by this configuration. A nil value means undefined.
+
+Error is:
+- DataAccessError: in case the option cannot be read or accessed.
+- IllegalPropertyError: in case the option has been defined but has incorrect values or it can't be resolved.
+*/
+func (clcl *CommandLineConfigurationLayer) GetSummary() (*bool, error) {
+	summaryString := clcl.getArgument(SUMMARY_ARGUMENT_NAME)
+	if summaryString == nil || *summaryString == "" {
+		if clcl.hasArgument(SUMMARY_ARGUMENT_NAME) {
+			// this is a flag so the value may not be passed
+			return utl.PointerToBoolean(true), nil
+		} else {
+			return nil, nil
+		}
+	}
+	summary, err := strconv.ParseBool(*summaryString)
+	return &summary, err
+}
+
+/*
+Returns the path to the file where the Nyx summary must be saved as it's defined by this configuration. A nil value means undefined.
+
+Error is:
+- DataAccessError: in case the option cannot be read or accessed.
+- IllegalPropertyError: in case the option has been defined but has incorrect values or it can't be resolved.
+*/
+func (clcl *CommandLineConfigurationLayer) GetSummaryFile() (*string, error) {
+	return clcl.getArgument(SUMMARY_FILE_ARGUMENT_NAME), nil
 }
 
 /*

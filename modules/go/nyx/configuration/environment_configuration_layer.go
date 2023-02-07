@@ -381,6 +381,12 @@ const (
 	SHARED_CONFIGURATION_FILE_ENVVAR_NAME = ENVVAR_NAME_GLOBAL_PREFIX + "SHARED_CONFIGURATION_FILE"
 
 	// The name of the environment variable to read for this value.
+	SUMMARY_ENVVAR_NAME = ENVVAR_NAME_GLOBAL_PREFIX + "SUMMARY"
+
+	// The name of the environment variable to read for this value.
+	SUMMARY_FILE_ENVVAR_NAME = ENVVAR_NAME_GLOBAL_PREFIX + "SUMMARY_FILE"
+
+	// The name of the environment variable to read for this value.
 	STATE_FILE_ENVVAR_NAME = ENVVAR_NAME_GLOBAL_PREFIX + "STATE_FILE"
 
 	// The name of the environment variable to read for this value.
@@ -1168,6 +1174,33 @@ Error is:
 */
 func (ecl *EnvironmentConfigurationLayer) GetSharedConfigurationFile() (*string, error) {
 	return ecl.getEnvVar(SHARED_CONFIGURATION_FILE_ENVVAR_NAME), nil
+}
+
+/*
+Returns the value of the summary flag as it's defined by this configuration. A nil value means undefined.
+
+Error is:
+- DataAccessError: in case the option cannot be read or accessed.
+- IllegalPropertyError: in case the option has been defined but has incorrect values or it can't be resolved.
+*/
+func (ecl *EnvironmentConfigurationLayer) GetSummary() (*bool, error) {
+	summaryString := ecl.getEnvVar(SUMMARY_ENVVAR_NAME)
+	if summaryString == nil {
+		return nil, nil
+	}
+	summary, err := strconv.ParseBool(*summaryString)
+	return &summary, err
+}
+
+/*
+Returns the path to the file where the Nyx summary must be saved as it's defined by this configuration. A nil value means undefined.
+
+Error is:
+- DataAccessError: in case the option cannot be read or accessed.
+- IllegalPropertyError: in case the option has been defined but has incorrect values or it can't be resolved.
+*/
+func (ecl *EnvironmentConfigurationLayer) GetSummaryFile() (*string, error) {
+	return ecl.getEnvVar(SUMMARY_FILE_ENVVAR_NAME), nil
 }
 
 /*

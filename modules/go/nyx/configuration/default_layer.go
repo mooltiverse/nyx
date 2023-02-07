@@ -221,6 +221,22 @@ func (dl *DefaultLayer) GetSharedConfigurationFile() (*string, error) {
 }
 
 /*
+Returns the default value of the summary flag. A nil value means undefined.
+*/
+func (dl *DefaultLayer) GetSummary() (*bool, error) {
+	log.Tracef("retrieving the default '%s' configuration option: '%v'", "summary", ent.SUMMARY)
+	return ent.SUMMARY, nil
+}
+
+/*
+Returns the default path to the file where the Nyx summary must be saved. A nil value means undefined.
+*/
+func (dl *DefaultLayer) GetSummaryFile() (*string, error) {
+	log.Tracef("retrieving the default '%s' configuration option: '%v'", "summaryFile", ent.SUMMARY_FILE)
+	return ent.SUMMARY_FILE, nil
+}
+
+/*
 Returns the default path to the file where the Nyx State must be saved. A nil value means undefined.
 */
 func (dl *DefaultLayer) GetStateFile() (*string, error) {

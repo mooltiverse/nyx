@@ -100,6 +100,8 @@ public class ConfigurationFileTests {
             assertEquals(Objects.isNull(source.getResume()) ? Defaults.RESUME : source.getResume(), target.getResume());
             assertEquals(Objects.isNull(source.getScheme()) ? Defaults.SCHEME : source.getScheme(), target.getScheme());
             assertEquals(Objects.isNull(source.getSharedConfigurationFile()) ? Defaults.SHARED_CONFIGURATION_FILE : source.getSharedConfigurationFile(), target.getSharedConfigurationFile());
+            assertEquals(Objects.isNull(source.getSummary()) ? Defaults.SUMMARY : source.getSummary(), target.getSummary());
+            assertEquals(Objects.isNull(source.getSummaryFile()) ? Defaults.SUMMARY_FILE : source.getSummaryFile(), target.getSummaryFile());
             assertEquals(Objects.isNull(source.getStateFile()) ? Defaults.STATE_FILE : source.getStateFile(), target.getStateFile());
             assertEquals(Objects.isNull(source.getVerbosity()) ? Defaults.VERBOSITY : source.getVerbosity(), target.getVerbosity());
             assertEquals(Objects.isNull(source.getVersion()) ? Defaults.VERSION : source.getVersion(), target.getVersion());
@@ -227,6 +229,8 @@ public class ConfigurationFileTests {
             assertEquals(Objects.isNull(source.getResume()) ? Defaults.RESUME : source.getResume(), target.getResume());
             assertEquals(Objects.isNull(source.getScheme()) ? Defaults.SCHEME : source.getScheme(), target.getScheme());
             assertEquals(Objects.isNull(source.getSharedConfigurationFile()) ? Defaults.SHARED_CONFIGURATION_FILE : source.getSharedConfigurationFile(), target.getSharedConfigurationFile());
+            assertEquals(Objects.isNull(source.getSummary()) ? Defaults.SUMMARY : source.getSummary(), target.getSummary());
+            assertEquals(Objects.isNull(source.getSummaryFile()) ? Defaults.SUMMARY_FILE : source.getSummaryFile(), target.getSummaryFile());
             assertEquals(Objects.isNull(source.getStateFile()) ? Defaults.STATE_FILE : source.getStateFile(), target.getStateFile());
             assertEquals(Objects.isNull(source.getVerbosity()) ? Defaults.VERBOSITY : source.getVerbosity(), target.getVerbosity());
             assertEquals(Objects.isNull(source.getVersion()) ? Defaults.VERSION : source.getVersion(), target.getVersion());
@@ -501,6 +505,14 @@ public class ConfigurationFileTests {
             mediumPriorityConfigurationLayerMock.setSharedConfigurationFile(System.getProperty(SIMPLEST_JSON_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY));
             highPriorityConfigurationLayerMock.setSharedConfigurationFile(System.getProperty(SIMPLEST_YAML_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY));
 
+            lowPriorityConfigurationLayerMock.setSummary(Boolean.TRUE);
+            mediumPriorityConfigurationLayerMock.setSummary(Boolean.TRUE);
+            highPriorityConfigurationLayerMock.setSummary(Boolean.FALSE);
+
+            lowPriorityConfigurationLayerMock.setSummaryFile("summary.low");
+            mediumPriorityConfigurationLayerMock.setSummaryFile("summary.medium");
+            highPriorityConfigurationLayerMock.setSummaryFile("summary.high");
+
             lowPriorityConfigurationLayerMock.setStateFile("file.yaml");
             mediumPriorityConfigurationLayerMock.setStateFile("file.yaml");
             highPriorityConfigurationLayerMock.setStateFile("file.json");
@@ -585,6 +597,8 @@ public class ConfigurationFileTests {
             assertEquals(highPriorityConfigurationLayerMock.getServices().get("gitlab").getOptions().get("REPOSITORY_NAME"), deserializedConfigurationLayer.getServices().get("gitlab").getOptions().get("REPOSITORY_NAME"));
             assertEquals(highPriorityConfigurationLayerMock.getServices().get("gitlab").getOptions().get("REPOSITORY_OWNER"), deserializedConfigurationLayer.getServices().get("gitlab").getOptions().get("REPOSITORY_OWNER"));
             assertEquals(highPriorityConfigurationLayerMock.getSharedConfigurationFile(), deserializedConfigurationLayer.getSharedConfigurationFile());
+            assertEquals(highPriorityConfigurationLayerMock.getSummary(), deserializedConfigurationLayer.getSummary());
+            assertEquals(highPriorityConfigurationLayerMock.getSummaryFile(), deserializedConfigurationLayer.getSummaryFile());
             assertEquals(highPriorityConfigurationLayerMock.getStateFile(), deserializedConfigurationLayer.getStateFile());
             assertEquals(highPriorityConfigurationLayerMock.getVerbosity(), deserializedConfigurationLayer.getVerbosity());
         }
@@ -759,6 +773,14 @@ public class ConfigurationFileTests {
             mediumPriorityConfigurationLayerMock.setSharedConfigurationFile(System.getProperty(SIMPLEST_YAML_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY));
             highPriorityConfigurationLayerMock.setSharedConfigurationFile(System.getProperty(SIMPLEST_JSON_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY));
 
+            lowPriorityConfigurationLayerMock.setSummary(Boolean.TRUE);
+            mediumPriorityConfigurationLayerMock.setSummary(Boolean.TRUE);
+            highPriorityConfigurationLayerMock.setSummary(Boolean.FALSE);
+
+            lowPriorityConfigurationLayerMock.setSummaryFile("summary.low");
+            mediumPriorityConfigurationLayerMock.setSummaryFile("summary.medium");
+            highPriorityConfigurationLayerMock.setSummaryFile("summary.high");
+
             lowPriorityConfigurationLayerMock.setStateFile("file.json");
             mediumPriorityConfigurationLayerMock.setStateFile("file.json");
             highPriorityConfigurationLayerMock.setStateFile("file.yaml");
@@ -843,6 +865,8 @@ public class ConfigurationFileTests {
             assertEquals(highPriorityConfigurationLayerMock.getServices().get("gitlab").getOptions().get("REPOSITORY_NAME"), deserializedConfigurationLayer.getServices().get("gitlab").getOptions().get("REPOSITORY_NAME"));
             assertEquals(highPriorityConfigurationLayerMock.getServices().get("gitlab").getOptions().get("REPOSITORY_OWNER"), deserializedConfigurationLayer.getServices().get("gitlab").getOptions().get("REPOSITORY_OWNER"));
             assertEquals(highPriorityConfigurationLayerMock.getSharedConfigurationFile(), deserializedConfigurationLayer.getSharedConfigurationFile());
+            assertEquals(highPriorityConfigurationLayerMock.getSummary(), deserializedConfigurationLayer.getSummary());
+            assertEquals(highPriorityConfigurationLayerMock.getSummaryFile(), deserializedConfigurationLayer.getSummaryFile());
             assertEquals(highPriorityConfigurationLayerMock.getStateFile(), deserializedConfigurationLayer.getStateFile());
             assertEquals(highPriorityConfigurationLayerMock.getVerbosity(), deserializedConfigurationLayer.getVerbosity());
         }

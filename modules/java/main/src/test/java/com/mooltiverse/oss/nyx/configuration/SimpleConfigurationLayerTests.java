@@ -347,6 +347,28 @@ public class SimpleConfigurationLayerTests {
     }
 
     @Test
+    @DisplayName("SimpleConfigurationLayer.getSummary()")
+    void getSummaryTest()
+        throws Exception {
+        SimpleConfigurationLayer simpleConfigurationLayer = new SimpleConfigurationLayer();
+        assertNull(simpleConfigurationLayer.getSummary());
+
+        simpleConfigurationLayer.setSummary(Boolean.TRUE);
+        assertEquals(Boolean.TRUE, simpleConfigurationLayer.getSummary());
+    }
+
+    @Test
+    @DisplayName("SimpleConfigurationLayer.getSummaryFile()")
+    void getSummaryFileTest()
+        throws Exception {
+        SimpleConfigurationLayer simpleConfigurationLayer = new SimpleConfigurationLayer();
+        assertNull(simpleConfigurationLayer.getSummaryFile());
+
+        simpleConfigurationLayer.setSummaryFile("summary.txt");
+        assertEquals("summary.txt", simpleConfigurationLayer.getSummaryFile());
+    }
+
+    @Test
     @DisplayName("SimpleConfigurationLayer.getStateFile()")
     void getStateFileTest()
         throws Exception {

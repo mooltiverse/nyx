@@ -269,6 +269,26 @@ class DefaultLayer implements ConfigurationLayer, Defaults {
      * {@inheritDoc}
      */
     @Override
+    public Boolean getSummary()
+        throws DataAccessException, IllegalPropertyException {
+        logger.trace(DEFAULT, "Retrieving the default '{}' configuration option: '{}'", "summary", SUMMARY);
+        return SUMMARY;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getSummaryFile()
+        throws DataAccessException, IllegalPropertyException {
+        logger.trace(DEFAULT, "Retrieving the default '{}' configuration option: '{}'", "summaryFile", SUMMARY_FILE);
+        return SUMMARY_FILE;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Verbosity getVerbosity()
         throws DataAccessException, IllegalPropertyException {
         logger.trace(DEFAULT, "Retrieving the default '{}' configuration option: '{}'", "verbosity", VERBOSITY);

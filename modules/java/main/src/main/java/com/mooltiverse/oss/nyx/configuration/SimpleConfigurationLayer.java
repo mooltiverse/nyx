@@ -119,6 +119,16 @@ public class SimpleConfigurationLayer implements ConfigurationLayer {
     /**
      * The value held by this object.
      */
+    private Boolean summary = null;
+
+    /**
+     * The value held by this object.
+     */
+    private String summaryFile = null;
+
+    /**
+     * The value held by this object.
+     */
     private String stateFile = null;
 
     /**
@@ -425,6 +435,40 @@ public class SimpleConfigurationLayer implements ConfigurationLayer {
      */
     public void setSharedConfigurationFile(String sharedConfigurationFile) {
         this.sharedConfigurationFile = sharedConfigurationFile;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Boolean getSummary() {
+        return summary;
+    }
+
+    /**
+     * Sets the value for this option.
+     * 
+     * @param summary the value for this option.
+     */
+    public void setSummary(Boolean summary) {
+        this.summary = summary;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getSummaryFile() {
+        return summaryFile;
+    }
+
+    /**
+     * Sets the value for this option.
+     * 
+     * @param summaryFile the value for this option.
+     */
+    public void setSummaryFile(String summaryFile) {
+        this.summaryFile = summaryFile;
     }
 
     /**

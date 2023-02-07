@@ -417,6 +417,14 @@ func (c *Configuration) Flatten() (*SimpleConfigurationLayer, error) {
 	if err != nil {
 		return nil, &errs.DataAccessError{Message: fmt.Sprintf("unable to resolve configuration option '%s'", "sharedConfigurationFile"), Cause: err}
 	}
+	summary, err := c.GetSummary()
+	if err != nil {
+		return nil, &errs.DataAccessError{Message: fmt.Sprintf("unable to resolve configuration option '%s'", "summary"), Cause: err}
+	}
+	summaryFile, err := c.GetSummaryFile()
+	if err != nil {
+		return nil, &errs.DataAccessError{Message: fmt.Sprintf("unable to resolve configuration option '%s'", "summaryFile"), Cause: err}
+	}
 	stateFile, err := c.GetStateFile()
 	if err != nil {
 		return nil, &errs.DataAccessError{Message: fmt.Sprintf("unable to resolve configuration option '%s'", "stateFile"), Cause: err}
@@ -448,6 +456,8 @@ func (c *Configuration) Flatten() (*SimpleConfigurationLayer, error) {
 		Scheme:                   scheme,
 		Services:                 services,
 		SharedConfigurationFile:  sharedConfigurationFile,
+		Summary:                  summary,
+		SummaryFile:              summaryFile,
 		StateFile:                stateFile,
 		Verbosity:                verbosity,
 		Version:                  version,
@@ -1153,6 +1163,54 @@ func (c *Configuration) GetSharedConfigurationFile() (*string, error) {
 		}
 	}
 	return GetDefaultLayerInstance().GetSharedConfigurationFile()
+}
+
+/*
+Returns the value of the summary flag as it's defined by this configuration.
+
+Error is:
+- DataAccessError: in case the option cannot be read or accessed.
+- IllegalPropertyError: in case the option has been defined but has incorrect values or it can't be resolved.
+*/
+func (c *Configuration) GetSummary() (*bool, error) {
+	log.Tracef("retrieving the '%s' configuration option", "summary")
+	for _, configurationLayer := range c.layers {
+		if configurationLayer != nil {
+			summary, err := (*configurationLayer).GetSummary()
+			if err != nil {
+				return nil, err
+			}
+			if summary != nil {
+				log.Tracef("the '%s' configuration option value is: '%v'", "summary", *summary)
+				return summary, nil
+			}
+		}
+	}
+	return GetDefaultLayerInstance().GetSummary()
+}
+
+/*
+Returns the path to the file where the Nyx summary must be saved as it's defined by this configuration.
+
+Error is:
+- DataAccessError: in case the option cannot be read or accessed.
+- IllegalPropertyError: in case the option has been defined but has incorrect values or it can't be resolved.
+*/
+func (c *Configuration) GetSummaryFile() (*string, error) {
+	log.Tracef("retrieving the '%s' configuration option", "summaryFile")
+	for _, configurationLayer := range c.layers {
+		if configurationLayer != nil {
+			summaryFile, err := (*configurationLayer).GetSummaryFile()
+			if err != nil {
+				return nil, err
+			}
+			if summaryFile != nil {
+				log.Tracef("the '%s' configuration option value is: '%s'", "summaryFile", *summaryFile)
+				return summaryFile, nil
+			}
+		}
+	}
+	return GetDefaultLayerInstance().GetSummaryFile()
 }
 
 /*

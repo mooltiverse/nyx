@@ -197,6 +197,20 @@ public class ConfigurationTests {
         }
 
         @Test
+        @DisplayName("Configuration.getSummary() == Defaults.SUMMARY")
+        void getSummaryTest()
+            throws Exception {
+            assertEquals(Defaults.SUMMARY, new Configuration().getSummary());
+        }
+
+        @Test
+        @DisplayName("Configuration.getSummaryFile() == Defaults.SUMMARY_FILE")
+        void getSummaryFileTest()
+            throws Exception {
+            assertEquals(Defaults.SUMMARY_FILE, new Configuration().getSummaryFile());
+        }
+
+        @Test
         @DisplayName("Configuration.getStateFile() == Defaults.STATE_FILE")
         void getStateFileTest()
             throws Exception {
@@ -778,6 +792,52 @@ public class ConfigurationTests {
 
             // now remove the command line configuration and test that now default values are returned again
             assertEquals(Defaults.SHARED_CONFIGURATION_FILE, configuration.withCommandLineConfiguration(null).getSharedConfigurationFile());
+        }
+
+        @Test
+        @DisplayName("Configuration.withCommandLineConfiguration(MOCK).getSummary() == MOCK.getSummary()")
+        void getSummaryTest()
+            throws Exception {
+            // this configuration layer must be replaced with the command line layer, once we have it
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            Configuration configuration = new Configuration();
+            configurationLayerMock.setSummary(Boolean.TRUE);
+
+            // in order to make the test meaningful, make sure the default and mock values are different
+            assertNotEquals(Defaults.SUMMARY, configurationLayerMock.getSummary());
+
+            // make sure the initial values come from defaults, until we inject the command line configuration
+            assertEquals(Defaults.SUMMARY, configuration.getSummary());
+            
+            // inject the command line configuration and test the new value is returned from that
+            configuration.withCommandLineConfiguration(configurationLayerMock);
+            assertEquals(configurationLayerMock.getSummary(), configuration.getSummary());
+
+            // now remove the command line configuration and test that now default values are returned again
+            assertEquals(Defaults.SUMMARY, configuration.withCommandLineConfiguration(null).getSummary());
+        }
+
+        @Test
+        @DisplayName("Configuration.withCommandLineConfiguration(MOCK).getSummaryFile() == MOCK.getSummaryFile()")
+        void getSummaryFileTest()
+            throws Exception {
+            // this configuration layer must be replaced with the command line layer, once we have it
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            Configuration configuration = new Configuration();
+            configurationLayerMock.setSummaryFile("summary.txt");
+
+            // in order to make the test meaningful, make sure the default and mock values are different
+            assertNotEquals(Defaults.SUMMARY_FILE, configurationLayerMock.getSummaryFile());
+
+            // make sure the initial values come from defaults, until we inject the command line configuration
+            assertEquals(Defaults.SUMMARY_FILE, configuration.getSummaryFile());
+            
+            // inject the command line configuration and test the new value is returned from that
+            configuration.withCommandLineConfiguration(configurationLayerMock);
+            assertEquals(configurationLayerMock.getSummaryFile(), configuration.getSummaryFile());
+
+            // now remove the command line configuration and test that now default values are returned again
+            assertEquals(Defaults.SUMMARY_FILE, configuration.withCommandLineConfiguration(null).getSummaryFile());
         }
 
         @Test
@@ -1399,6 +1459,50 @@ public class ConfigurationTests {
         }
 
         @Test
+        @DisplayName("Configuration.withPluginConfiguration(MOCK).getSummary() == MOCK.getSummary()")
+        void getSummaryTest()
+            throws Exception {
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            Configuration configuration = new Configuration();
+            configurationLayerMock.setSummary(Boolean.TRUE);
+
+            // in order to make the test meaningful, make sure the default and mock values are different
+            assertNotEquals(Defaults.SUMMARY, configurationLayerMock.getSummary());
+
+            // make sure the initial values come from defaults, until we inject the plugin configuration
+            assertEquals(Defaults.SUMMARY, configuration.getSummary());
+            
+            // inject the plugin configuration and test the new value is returned from that
+            configuration.withPluginConfiguration(configurationLayerMock);
+            assertEquals(configurationLayerMock.getSummary(), configuration.getSummary());
+
+            // now remove the plugin configuration and test that now default values are returned again
+            assertEquals(Defaults.SUMMARY, configuration.withPluginConfiguration(null).getSummary());
+        }
+
+        @Test
+        @DisplayName("Configuration.withPluginConfiguration(MOCK).getSummaryFile() == MOCK.getSummaryFile()")
+        void getSummaryFileTest()
+            throws Exception {
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            Configuration configuration = new Configuration();
+            configurationLayerMock.setSummaryFile("summary.txt");
+
+            // in order to make the test meaningful, make sure the default and mock values are different
+            assertNotEquals(Defaults.SUMMARY_FILE, configurationLayerMock.getSummaryFile());
+
+            // make sure the initial values come from defaults, until we inject the command line configuration
+            assertEquals(Defaults.SUMMARY_FILE, configuration.getSummaryFile());
+            
+            // inject the command line configuration and test the new value is returned from that
+            configuration.withPluginConfiguration(configurationLayerMock);
+            assertEquals(configurationLayerMock.getSummaryFile(), configuration.getSummaryFile());
+
+            // now remove the command line configuration and test that now default values are returned again
+            assertEquals(Defaults.SUMMARY_FILE, configuration.withPluginConfiguration(null).getSummaryFile());
+        }
+
+        @Test
         @DisplayName("Configuration.withPluginConfiguration(MOCK).getStateFile() == MOCK.getStateFile()")
         void getStateFileTest()
             throws Exception {
@@ -2011,6 +2115,50 @@ public class ConfigurationTests {
 
             // now remove the command line configuration and test that now default values are returned again
             assertEquals(Defaults.SHARED_CONFIGURATION_FILE, configuration.withRuntimeConfiguration(null).getSharedConfigurationFile());
+        }
+
+        @Test
+        @DisplayName("Configuration.withRuntimeConfiguration(MOCK).getSummary() == MOCK.getSummary()")
+        void getSummaryTest()
+            throws Exception {
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            Configuration configuration = new Configuration();
+            configurationLayerMock.setSummary(Boolean.TRUE);
+
+            // in order to make the test meaningful, make sure the default and mock values are different
+            assertNotEquals(Defaults.SUMMARY, configurationLayerMock.getSummary());
+
+            // make sure the initial values come from defaults, until we inject the command line configuration
+            assertEquals(Defaults.SUMMARY, configuration.getSummary());
+            
+            // inject the command line configuration and test the new value is returned from that
+            configuration.withRuntimeConfiguration(configurationLayerMock);
+            assertEquals(configurationLayerMock.getSummary(), configuration.getSummary());
+
+            // now remove the command line configuration and test that now default values are returned again
+            assertEquals(Defaults.SUMMARY, configuration.withRuntimeConfiguration(null).getSummary());
+        }
+
+        @Test
+        @DisplayName("Configuration.withRuntimeConfiguration(MOCK).getSummaryFile() == MOCK.getSummaryFile()")
+        void getSummaryFileTest()
+            throws Exception {
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            Configuration configuration = new Configuration();
+            configurationLayerMock.setSummaryFile("summary.txt");
+
+            // in order to make the test meaningful, make sure the default and mock values are different
+            assertNotEquals(Defaults.SUMMARY_FILE, configurationLayerMock.getSummaryFile());
+
+            // make sure the initial values come from defaults, until we inject the command line configuration
+            assertEquals(Defaults.SUMMARY_FILE, configuration.getSummaryFile());
+            
+            // inject the command line configuration and test the new value is returned from that
+            configuration.withRuntimeConfiguration(configurationLayerMock);
+            assertEquals(configurationLayerMock.getSummaryFile(), configuration.getSummaryFile());
+
+            // now remove the command line configuration and test that now default values are returned again
+            assertEquals(Defaults.SUMMARY_FILE, configuration.withRuntimeConfiguration(null).getSummaryFile());
         }
 
         @Test
@@ -2650,6 +2798,46 @@ public class ConfigurationTests {
             configuration.withCommandLineConfiguration(mediumPriorityConfigurationLayerMock);
             configuration.withRuntimeConfiguration(highPriorityConfigurationLayerMock);
             assertEquals(highPriorityConfigurationLayerMock.getSharedConfigurationFile(), configuration.getSharedConfigurationFile());
+        }
+
+        @Test
+        @DisplayName("Configuration[multiple layers].getSummary() == MOCK.getSummary()")
+        void getSummaryTest()
+            throws Exception {
+            SimpleConfigurationLayer lowPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
+            // this configuration layer must be replaced with the command line layer, once we have it
+            SimpleConfigurationLayer mediumPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
+            SimpleConfigurationLayer highPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
+            Configuration configuration = new Configuration();
+            lowPriorityConfigurationLayerMock.setSummary(Boolean.TRUE);
+            mediumPriorityConfigurationLayerMock.setSummary(Boolean.TRUE);
+            highPriorityConfigurationLayerMock.setSummary(Boolean.FALSE);
+            
+            // inject the plugin configuration and test the new value is returned from that
+            configuration.withPluginConfiguration(lowPriorityConfigurationLayerMock);
+            configuration.withCommandLineConfiguration(mediumPriorityConfigurationLayerMock);
+            configuration.withRuntimeConfiguration(highPriorityConfigurationLayerMock);
+            assertEquals(highPriorityConfigurationLayerMock.getSummary(), configuration.getSummary());
+        }
+
+        @Test
+        @DisplayName("Configuration[multiple layers].getSummaryFile() == MOCK.getSummaryFile()")
+        void getSummaryFileTest()
+            throws Exception {
+            SimpleConfigurationLayer lowPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
+            // this configuration layer must be replaced with the command line layer, once we have it
+            SimpleConfigurationLayer mediumPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
+            SimpleConfigurationLayer highPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
+            Configuration configuration = new Configuration();
+            lowPriorityConfigurationLayerMock.setSummaryFile("summary.low");
+            mediumPriorityConfigurationLayerMock.setSummaryFile("summary.medium");
+            highPriorityConfigurationLayerMock.setSummaryFile("summary.high");
+            
+            // inject the plugin configuration and test the new value is returned from that
+            configuration.withPluginConfiguration(lowPriorityConfigurationLayerMock);
+            configuration.withCommandLineConfiguration(mediumPriorityConfigurationLayerMock);
+            configuration.withRuntimeConfiguration(highPriorityConfigurationLayerMock);
+            assertEquals(highPriorityConfigurationLayerMock.getSummaryFile(), configuration.getSummaryFile());
         }
 
         @Test
