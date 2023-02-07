@@ -12,4 +12,6 @@ You can save the State by setting the [`stateFile`]({{ site.baseurl }}{% link _p
 You can access the State attributes directly from **Gradle** build scripts as explained [here]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#accessing-the-nyx-state-extra-project-property-from-build-scripts).
 {: .notice--info}
 
+If you need less informations but in an easily parseable for also consider using the [`summary`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#summary) or the [`summaryFile`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#summary-file).
+
 In this section you can find details about every value contained in the State file.
