@@ -11,7 +11,7 @@ In this page you can find the overall principles of the various Nyx phases and h
 
 In this phase, which must be invoked explicitly, the repository state is reverted to its initial state by removing all the files created during the other stages, if any.
 
-Nyx will only clean the artifacts created by its own release process (like the changelog file) while all others are ignored.
+Nyx will only clean the artifacts created by its own release process (like the changelog or the summary file) while all others are ignored.
 
 ## Infer
 

@@ -147,6 +147,22 @@ func (c *Clean) Run() (*stt.State, error) {
 		}
 	}
 
+	// Delete the summary file, if any
+	summaryFilePath, err := c.State().GetConfiguration().GetSummaryFile()
+	if err != nil {
+		return nil, err
+	}
+	if summaryFilePath != nil && "" != strings.TrimSpace(*summaryFilePath) {
+		log.Debugf("deleting summary file '%s', if present", *summaryFilePath)
+		_, err := os.Stat(*summaryFilePath)
+		if err == nil {
+			err = os.Remove(*summaryFilePath)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
 	// Delete the changelog file, if any
 	changelogConfiguration, err := c.State().GetConfiguration().GetChangelog()
 	if err != nil {

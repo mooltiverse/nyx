@@ -110,6 +110,48 @@ func TestCleanIsUpToDateWithStateFile(t *testing.T) {
 	}
 }
 
+func TestCleanIsUpToDateWithSummaryFile(t *testing.T) {
+	for _, command := range cmdtpl.CommandInvocationProxies(cmd.CLEAN, gittools.INITIAL_COMMIT()) {
+		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
+			summaryFilePath := "summary-file.txt"
+			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
+			configurationLayerMock.SetSummaryFile(&summaryFilePath)
+			var configurationLayer cnf.ConfigurationLayer
+			configurationLayer = configurationLayerMock
+			(*command).State().GetConfiguration().WithRuntimeConfiguration(&configurationLayer)
+
+			// run once, to start
+			_, err := (*command).Run()
+			assert.NoError(t, err)
+			upToDate, err := (*command).IsUpToDate()
+			assert.NoError(t, err)
+			assert.True(t, upToDate)
+
+			summaryFile, err := os.Create(summaryFilePath)
+			assert.NoError(t, err)
+
+			// now it's not up do date anymore
+			_, err = summaryFile.Stat()
+			assert.NoError(t, err)
+			upToDate, err = (*command).IsUpToDate()
+			assert.NoError(t, err)
+			assert.False(t, upToDate)
+			summaryFile.Close()
+
+			_, err = (*command).Run()
+			assert.NoError(t, err)
+
+			// now it's up do date again
+			_, err = summaryFile.Stat()
+			assert.Error(t, err)
+			upToDate, err = (*command).IsUpToDate()
+			assert.NoError(t, err)
+			assert.True(t, upToDate)
+		})
+	}
+}
+
 func TestCleanIsUpToDateWithChangelogFile(t *testing.T) {
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.CLEAN, gittools.INITIAL_COMMIT()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
@@ -155,6 +197,7 @@ func TestCleanIdempotency(t *testing.T) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
 			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
 			stateFilePath := "state-file.txt"
+			summaryFilePath := "summary-file.txt"
 			changelogFilePath := "changelog-file.txt"
 			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
 			configurationLayerMock.SetStateFile(&stateFilePath)
@@ -172,17 +215,22 @@ func TestCleanIdempotency(t *testing.T) {
 
 			stateFile, err := os.Create(stateFilePath)
 			assert.NoError(t, err)
+			summaryFile, err := os.Create(summaryFilePath)
+			assert.NoError(t, err)
 			changelogFile, err := os.Create(changelogFilePath)
 			assert.NoError(t, err)
 
 			// now it's not up do date anymore
 			_, err = stateFile.Stat()
 			assert.NoError(t, err)
+			_, err = summaryFile.Stat()
+			assert.NoError(t, err)
 			_, err = changelogFile.Stat()
 			assert.NoError(t, err)
 			upToDate, err = (*command).IsUpToDate()
 			assert.False(t, upToDate)
 			stateFile.Close()
+			summaryFile.Close()
 			changelogFile.Close()
 
 			_, err = (*command).Run()
@@ -190,6 +238,8 @@ func TestCleanIdempotency(t *testing.T) {
 
 			// now it's up do date again
 			_, err = os.Stat(stateFilePath)
+			assert.Error(t, err)
+			_, err = os.Stat(summaryFilePath)
 			assert.Error(t, err)
 			_, err = os.Stat(changelogFilePath)
 			assert.Error(t, err)
@@ -200,6 +250,8 @@ func TestCleanIdempotency(t *testing.T) {
 			_, err = (*command).Run()
 			assert.NoError(t, err)
 			_, err = os.Stat(stateFilePath)
+			assert.Error(t, err)
+			_, err = os.Stat(summaryFilePath)
 			assert.Error(t, err)
 			_, err = os.Stat(changelogFilePath)
 			assert.Error(t, err)
@@ -241,6 +293,43 @@ func TestCleanRunDeleteStateFile(t *testing.T) {
 			_, err = (*command).Run()
 			assert.NoError(t, err)
 			_, err = stateFile.Stat()
+			assert.Error(t, err)
+		})
+	}
+}
+
+func TestCleanRunDeleteSummaryFile(t *testing.T) {
+	for _, command := range cmdtpl.CommandInvocationProxies(cmd.CLEAN, gittools.INITIAL_COMMIT()) {
+		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
+			summaryFilePath := "summary-file.txt"
+			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
+			configurationLayerMock.SetSummaryFile(&summaryFilePath)
+			var configurationLayer cnf.ConfigurationLayer
+			configurationLayer = configurationLayerMock
+			(*command).State().GetConfiguration().WithRuntimeConfiguration(&configurationLayer)
+
+			// run once, to start
+			_, err := (*command).Run()
+			assert.NoError(t, err)
+
+			summaryFile, err := os.Create(summaryFilePath)
+			assert.NoError(t, err)
+
+			_, err = summaryFile.Stat()
+			assert.NoError(t, err)
+			summaryFile.Close()
+
+			// now running the clean must delete the file
+			_, err = (*command).Run()
+			assert.NoError(t, err)
+			_, err = summaryFile.Stat()
+			assert.Error(t, err)
+
+			// run again and test for idempotency
+			_, err = (*command).Run()
+			assert.NoError(t, err)
+			_, err = summaryFile.Stat()
 			assert.Error(t, err)
 		})
 	}

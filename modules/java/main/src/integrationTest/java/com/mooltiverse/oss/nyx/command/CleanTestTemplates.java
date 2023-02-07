@@ -125,6 +125,39 @@ public class CleanTestTemplates {
         }
 
         /**
+         * Check that the isUpToDate() returns {@code false} when there's a summary file
+         */
+        @TestTemplate
+        @DisplayName("Clean.isUpToDate() with summary file")
+        @Baseline(Scenario.INITIAL_COMMIT)
+        void isUpToDateWithSummaryFileTest(@CommandSelector(Commands.CLEAN) CommandProxy command, Script script)
+            throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
+            String summaryFilePath = "summary-file.txt";
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            configurationLayerMock.setSummaryFile(summaryFilePath);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
+
+            // run once, to start
+            command.run();
+            assertTrue(command.isUpToDate());
+
+            File summaryFile = new File(summaryFilePath);
+            summaryFile.deleteOnExit();
+            summaryFile.createNewFile();
+
+            // now it's not up do date anymore
+            assertTrue(summaryFile.exists());
+            assertFalse(command.isUpToDate());
+
+            command.run();
+
+            // now it's up do date again
+            assertFalse(summaryFile.exists());
+            assertTrue(command.isUpToDate());
+        }
+
+        /**
          * Check that the isUpToDate() returns {@code false} when there's a changelog file
          */
         @TestTemplate
@@ -172,6 +205,7 @@ public class CleanTestTemplates {
             throws Exception {
             script.getWorkingDirectory().deleteOnExit();
             String stateFilePath = "state-file.txt";
+            String summaryFilePath = "summary-file.txt";
             String changelogFilePath = "changelog-file.txt";
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             configurationLayerMock.setStateFile(stateFilePath);
@@ -185,12 +219,16 @@ public class CleanTestTemplates {
             File stateFile = new File(stateFilePath);
             stateFile.deleteOnExit();
             stateFile.createNewFile();
+            File summaryFile = new File(summaryFilePath);
+            summaryFile.deleteOnExit();
+            summaryFile.createNewFile();
             File changelogFile = new File(changelogFilePath);
             changelogFile.deleteOnExit();
             changelogFile.createNewFile();
 
             // now it's not up do date anymore
             assertTrue(stateFile.exists());
+            assertTrue(summaryFile.exists());
             assertTrue(changelogFile.exists());
             assertFalse(command.isUpToDate());
 
@@ -198,6 +236,7 @@ public class CleanTestTemplates {
 
             // now it's up do date again
             assertFalse(stateFile.exists());
+            assertFalse(summaryFile.exists());
             assertFalse(changelogFile.exists());
             assertTrue(command.isUpToDate());
 
@@ -206,6 +245,7 @@ public class CleanTestTemplates {
 
             // now it's not up do date again
             assertFalse(stateFile.exists());
+            assertFalse(summaryFile.exists());
             assertFalse(changelogFile.exists());
             assertTrue(command.isUpToDate());
         }
@@ -241,6 +281,34 @@ public class CleanTestTemplates {
             // run again and test for idempotency
             command.run();
             assertFalse(stateFile.exists());
+        }
+
+        @TestTemplate
+        @DisplayName("Clean.run() deletes summary file")
+        @Baseline(Scenario.FROM_SCRATCH)
+        void deleteSummaryFileTest(@CommandSelector(Commands.CLEAN) CommandProxy command, Script script)
+            throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
+            String summaryFilePath = "summary-file.txt";
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            configurationLayerMock.setSummaryFile(summaryFilePath);
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
+
+            // run once, to start
+            command.run();
+
+            File summaryFile = new File(summaryFilePath);
+            summaryFile.deleteOnExit();
+            summaryFile.createNewFile();
+            assertTrue(summaryFile.exists());
+
+            // now running the clean must delete the file
+            command.run();
+            assertFalse(summaryFile.exists());
+
+            // run again and test for idempotency
+            command.run();
+            assertFalse(summaryFile.exists());
         }
 
         @TestTemplate

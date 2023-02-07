@@ -101,7 +101,7 @@ Here we are still using the *simple* preset as a baseline, just extending it wit
 
 In the above example we didn't specify which command to run so Nyx runs the default [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer) command. To run a specific command just pass it on the command line after other arguments and flags.
 
-The *clean* command deletes the local artifacts (like a changelog file) that might have been created by Nyx in previous runs, otherwise it does nothing.
+The *clean* command deletes the local artifacts (like a changelog or the summary file) that might have been created by Nyx in previous runs, otherwise it does nothing.
 
 The other *core commands* (*infer*, *make*, *mark*, *publish*), instead, perform some actions incrementally, which means their dependencies are chained to make sure that *infer* is always executed first when the others run, *make* runs before *mark* and *publish* only runs after all the others have completed. On the other hand, they are all available as single commands so you can customize your build workflow to meet any needs (i.e. by performing other actions in between two Nyx commands).
 

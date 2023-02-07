@@ -101,6 +101,16 @@ public class Clean extends AbstractCommand {
             }
         }
 
+        // Delete the summary file, if any
+        String summaryFilePath = state().getConfiguration().getSummaryFile();
+        if (!Objects.isNull(summaryFilePath) && !summaryFilePath.isBlank()) {
+            logger.debug(COMMAND, "Deleting summary file '{}', if present", summaryFilePath);
+            File summaryFile = new File(summaryFilePath);
+            if (summaryFile.exists()) {
+                summaryFile.delete();
+            }
+        }
+
         // Delete the changelog file, if any
         String changelogFilePath = state().getConfiguration().getChangelog().getPath();
         if (!Objects.isNull(changelogFilePath) && !changelogFilePath.isBlank()) {
