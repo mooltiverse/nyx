@@ -1,5 +1,23 @@
 # Nyx Release Notes
 
+## 2.2.0
+
+This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/2.2.0).
+
+### Upgrade instructions
+
+There are no actions to take for backward compatibility.
+
+### New features and improvements
+
+This release:
+
+* this release adds support for the `summary` and `summaryFile` configuration options, for an easily parseable output from Nyx ([#156](https://github.com/mooltiverse/nyx/issues/156))
+
+### Fixed issues
+
+There are no fixes in this release.
+
 ## 2.1.0
 
 This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/2.1.0).
