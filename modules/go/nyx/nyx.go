@@ -301,8 +301,9 @@ Runs the given command through its Run() method.
 
 Arguments are as follows:
 
-- command the command
-- saveState a boolean that, when true saves the State to the configured state file if not nil
+  - command the command
+  - saveStateAndSummary a boolean that, when true saves the State to the configured state file if not nil,
+    and the summary to the configured summary file, if not nil
 
 Error is:
 - DataAccessError: in case the configuration can't be loaded for some reason.
@@ -310,7 +311,7 @@ Error is:
 - GitError: in case of unexpected issues when accessing the Git repository.
 - ReleaseError: if the task is unable to complete for reasons due to the release process.
 */
-func (n *Nyx) runCommand(command cmd.Commands, saveState bool) error {
+func (n *Nyx) runCommand(command cmd.Commands, saveStateAndSummary bool) error {
 	log.Debugf("running command '%s'", command.String())
 	commandInstance, err := n.getCommandInstance(command)
 	if err != nil {
@@ -330,16 +331,29 @@ func (n *Nyx) runCommand(command cmd.Commands, saveState bool) error {
 		}
 		log.Debugf("command '%s' finished.", command.String())
 
-		// optionally save the state file
 		configuration, err := n.Configuration()
 		if err != nil {
 			return err
 		}
+		// optionally save the state file
 		stateFile, err := configuration.GetStateFile()
 		if err != nil {
 			return err
 		}
-		if saveState && stateFile != nil {
+		// if the file path is relative make it relative to the configured directory
+		if !filepath.IsAbs(*stateFile) {
+			configuration, err := n.Configuration()
+			if err != nil {
+				return err
+			}
+			directory, err := configuration.GetDirectory()
+			if err != nil {
+				return err
+			}
+			stateFileAbsolutePath := filepath.Join(*directory, *stateFile)
+			stateFile = &stateFileAbsolutePath
+		}
+		if saveStateAndSummary && stateFile != nil {
 			log.Debugf("storing the state to '%s'", *stateFile)
 			state, err := n.State()
 			if err != nil {
@@ -350,6 +364,37 @@ func (n *Nyx) runCommand(command cmd.Commands, saveState bool) error {
 				return err
 			}
 			log.Debugf("state stored to to '%s'", *stateFile)
+		}
+		// optionally save the summary file
+		summaryFile, err := configuration.GetSummaryFile()
+		if err != nil {
+			return err
+		}
+		// if the file path is relative make it relative to the configured directory
+		if !filepath.IsAbs(*summaryFile) {
+			configuration, err := n.Configuration()
+			if err != nil {
+				return err
+			}
+			directory, err := configuration.GetDirectory()
+			if err != nil {
+				return err
+			}
+			summaryFileAbsolutePath := filepath.Join(*directory, *summaryFile)
+			summaryFile = &summaryFileAbsolutePath
+		}
+		if saveStateAndSummary && summaryFile != nil {
+			log.Debugf("storing the summary to '%s'", *summaryFile)
+			state, err := n.State()
+			if err != nil {
+				return err
+			}
+			summary, err := state.Summary()
+			err = os.WriteFile(*summaryFile, []byte(summary), 0644)
+			if err != nil {
+				return err
+			}
+			log.Debugf("summary stored to to '%s'", *summaryFile)
 		}
 	}
 	return nil

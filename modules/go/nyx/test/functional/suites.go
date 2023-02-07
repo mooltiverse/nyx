@@ -42,6 +42,7 @@ var (
 			Args: []string{
 				"--dry-run=false",
 				"--resume=false",
+				"--summary-file=.nyx-summary.txt",
 				"--state-file=.nyx-state.yml",
 				"--debug",
 			},
@@ -54,6 +55,7 @@ var (
 .gradle
 build.gradle
 settings.gradle
+.nyx-summary.txt
 .nyx-state.yml
 `,
 				// the .nyx-shared.yaml is the standard shared configuration file
@@ -109,6 +111,17 @@ scheme: SEMVER
 					"primeVersion: 0.0.4",
 					"version: v0.1.0",
 				},
+				".nyx-summary.txt": []string{
+					"bump             = minor",
+					"core version     = true",
+					"new release      = true",
+					"new version      = true",
+					"scheme           = SEMVER",
+					"timestamp        = ", // we don't need to test for the timestamp value here
+					"current version  = v0.1.0",
+					"previous version = 0.0.4",
+					"prime version    = 0.0.4",
+				},
 			},
 			RepositoryTags:       []string{}, // no new tag is created by Infer
 			RemoteRepositoryTags: []string{}, // not using remotes for this suite
@@ -123,6 +136,7 @@ scheme: SEMVER
 			Args: []string{
 				"--dry-run=false",
 				"--resume=false",
+				"--summary-file=.nyx-summary.txt",
 				"--state-file=.nyx-state.yml",
 				"--debug",
 			},
@@ -135,6 +149,7 @@ scheme: SEMVER
 .gradle
 build.gradle
 settings.gradle
+.nyx-summary.txt
 .nyx-state.yml
 `,
 				// the .nyx-shared.yaml is the standard shared configuration file
@@ -200,6 +215,17 @@ scheme: SEMVER
 					"primeVersion: 0.0.4",
 					"version: v0.1.0",
 				},
+				".nyx-summary.txt": []string{
+					"bump             = minor",
+					"core version     = true",
+					"new release      = true",
+					"new version      = true",
+					"scheme           = SEMVER",
+					"timestamp        = ", // we don't need to test for the timestamp value here
+					"current version  = v0.1.0",
+					"previous version = 0.0.4",
+					"prime version    = 0.0.4",
+				},
 				"CHANGELOG.md": []string{
 					"## v0.1.0",
 					"### Added",
@@ -221,6 +247,7 @@ scheme: SEMVER
 			Args: []string{
 				"--dry-run=false",
 				"--resume=false",
+				"--summary-file=.nyx-summary.txt",
 				"--state-file=.nyx-state.yml",
 				"--debug",
 			},
@@ -233,6 +260,7 @@ scheme: SEMVER
 .gradle
 build.gradle
 settings.gradle
+.nyx-summary.txt
 .nyx-state.yml
 `,
 				// the .nyx-shared.yaml is the standard shared configuration file
@@ -301,6 +329,17 @@ scheme: SEMVER
 					"primeVersion: 0.0.4",
 					"version: v0.1.0",
 				},
+				".nyx-summary.txt": []string{
+					"bump             = minor",
+					"core version     = true",
+					"new release      = true",
+					"new version      = true",
+					"scheme           = SEMVER",
+					"timestamp        = ", // we don't need to test for the timestamp value here
+					"current version  = v0.1.0",
+					"previous version = 0.0.4",
+					"prime version    = 0.0.4",
+				},
 				"CHANGELOG.md": []string{
 					"## v0.1.0",
 					"### Added",
@@ -328,6 +367,7 @@ scheme: SEMVER
 			Args: []string{
 				"--dry-run=false",
 				"--resume=false",
+				"--summary-file=.nyx-summary.txt",
 				"--state-file=.nyx-state.yml",
 				"--debug",
 			},
@@ -340,6 +380,7 @@ scheme: SEMVER
 .gradle
 build.gradle
 settings.gradle
+.nyx-summary.txt
 .nyx-state.yml
 `,
 				// the .nyx-shared.yaml is the standard shared configuration file
@@ -401,6 +442,17 @@ commitMessageConventions:
 					"primeVersion: 0.0.5",
 					"version: 0.0.6",
 				},
+				".nyx-summary.txt": []string{
+					"bump             = patch",
+					"core version     = true",
+					"new release      = true",
+					"new version      = true",
+					"scheme           = SEMVER",
+					"timestamp        = ", // we don't need to test for the timestamp value here
+					"current version  = 0.0.6",
+					"previous version = 0.0.5",
+					"prime version    = 0.0.5",
+				},
 				"CHANGELOG.md": []string{
 					"## 0.0.6",
 					"No changes.",
@@ -419,6 +471,7 @@ commitMessageConventions:
 			Args: []string{
 				"--dry-run=false",
 				"--resume=false",
+				"--summary-file=.nyx-summary.txt",
 				"--state-file=.nyx-state.yml",
 				"--debug",
 			},
@@ -434,6 +487,7 @@ commitMessageConventions:
 .gradle
 build.gradle
 settings.gradle
+.nyx-summary.txt
 .nyx-state.yml
 `,
 				// the .nyx-shared.yaml is the standard shared configuration file
@@ -510,6 +564,17 @@ scheme: SEMVER
 					"primeVersion: 0.0.4",
 					"version: v0.1.0",
 				},
+				".nyx-summary.txt": []string{
+					"bump             = minor",
+					"core version     = true",
+					"new release      = true",
+					"new version      = true",
+					"scheme           = SEMVER",
+					"timestamp        = ", // we don't need to test for the timestamp value here
+					"current version  = v0.1.0",
+					"previous version = 0.0.4",
+					"prime version    = 0.0.4",
+				},
 				"CHANGELOG.md": []string{
 					"## v0.1.0",
 					"### Added",
@@ -531,6 +596,7 @@ scheme: SEMVER
 			Args: []string{
 				"--dry-run=false",
 				"--resume=false",
+				"--summary-file=.nyx-summary.txt",
 				"--state-file=.nyx-state.yml",
 				"--debug",
 			},
@@ -546,6 +612,7 @@ scheme: SEMVER
 .gradle
 build.gradle
 settings.gradle
+.nyx-summary.txt
 .nyx-state.yml
 `,
 				// the .nyx-shared.yaml is the standard shared configuration file
@@ -621,6 +688,17 @@ scheme: SEMVER
 					"previousVersion: 0.0.4",
 					"primeVersion: 0.0.4",
 					"version: v0.1.0",
+				},
+				".nyx-summary.txt": []string{
+					"bump             = minor",
+					"core version     = true",
+					"new release      = true",
+					"new version      = true",
+					"scheme           = SEMVER",
+					"timestamp        = ", // we don't need to test for the timestamp value here
+					"current version  = v0.1.0",
+					"previous version = 0.0.4",
+					"prime version    = 0.0.4",
 				},
 				"CHANGELOG.md": []string{
 					"## v0.1.0",

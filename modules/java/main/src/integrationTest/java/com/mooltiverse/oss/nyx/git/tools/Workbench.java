@@ -33,13 +33,9 @@ import com.mooltiverse.oss.nyx.git.util.FileSystemUtil;
 import com.mooltiverse.oss.nyx.git.util.GitUtil;
 import com.mooltiverse.oss.nyx.git.util.RandomUtil;
 
-import com.jcraft.jsch.AgentIdentityRepository;
-import com.jcraft.jsch.AgentProxyException;
-import com.jcraft.jsch.IdentityRepository;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
-import com.jcraft.jsch.SSHAgentConnector;
 import com.jcraft.jsch.UserInfo;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.TransportConfigCallback;
@@ -209,14 +205,14 @@ public class Workbench {
             protected JSch createDefaultJSch(FS fs)
                 throws JSchException {
                 JSch defaultJSch = super.createDefaultJSch(fs);
-                defaultJSch.setConfig("PreferredAuthentications", "publickey");
+                JSch.setConfig("PreferredAuthentications", "publickey");
                 if (!Objects.isNull(privateKey) && !privateKey.isEmpty()) {
                     // the key name is not relevant
                     // the public key is not required
                     defaultJSch.addIdentity("nyxUserKey", privateKey.getBytes(), null, passphrase);
 
                     // disable host key checking
-                    defaultJSch.setConfig("StrictHostKeyChecking", "no");
+                    JSch.setConfig("StrictHostKeyChecking", "no");
                 }
 
                 return defaultJSch;                  

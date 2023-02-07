@@ -342,7 +342,6 @@ core version     = true
 latest version   = true
 new release      = true
 new version      = true
-release type     = mainline
 scheme           = SEMVER
 timestamp        = 1591802533
 current version  = 1.2.3

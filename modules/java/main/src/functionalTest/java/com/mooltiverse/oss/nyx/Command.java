@@ -15,8 +15,6 @@
  */
 package com.mooltiverse.oss.nyx;
 
-import java.io.File;
-
 /**
  * This interface models a command that allows running the Nyx executable from within a specific environment.
  *

@@ -17,8 +17,10 @@ package com.mooltiverse.oss.nyx.state;
 
 import static com.mooltiverse.oss.nyx.log.Markers.STATE;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
@@ -702,5 +704,39 @@ public class State {
     public Long touchTimestamp() {
         timestamp = Long.valueOf(System.currentTimeMillis());
         return timestamp;
+    }
+
+    /**
+     * Returns a multi-line summary of the most relevant attributes in the current state object.
+     * 
+     * @return a multi-line summary of the most relevant attributes in the current state object.
+     * 
+     * @throws DataAccessException in case the attribute cannot be written or accessed.
+     * @throws IllegalPropertyException in case the attribute has incorrect values or it can't be resolved.
+     */
+    public String summary()
+        throws DataAccessException, IllegalPropertyException {
+        StringWriter sw = new StringWriter();
+        BufferedWriter bw = new BufferedWriter(sw);
+        try {
+            bw.write(String.format("branch           = %s", hasBranch() ? getBranch() : "")); bw.newLine();
+            bw.write(String.format("bump             = %s", hasBump() ? getBump() : "")); bw.newLine();
+            bw.write(String.format("core version     = %b", getCoreVersion().booleanValue())); bw.newLine();
+            bw.write(String.format("latest version   = %b", hasLatestVersion() ? getLatestVersion().booleanValue() : false)); bw.newLine();
+            bw.write(String.format("new release      = %b", getNewRelease().booleanValue())); bw.newLine();
+            bw.write(String.format("new version      = %b", getNewVersion().booleanValue())); bw.newLine();
+            bw.write(String.format("scheme           = %s", getScheme().toString())); bw.newLine();
+            bw.write(String.format("timestamp        = %d", getTimestamp().longValue())); bw.newLine();
+            bw.write(String.format("current version  = %s", hasVersion() ? getVersion() : "")); bw.newLine();
+            bw.write(String.format("previous version = %s", Objects.isNull(getReleaseScope()) || !getReleaseScope().hasPreviousVersion() ? "" : getReleaseScope().getPreviousVersion())); bw.newLine();
+            bw.write(String.format("prime version    = %s", Objects.isNull(getReleaseScope()) || !getReleaseScope().hasPrimeVersion() ? "" : getReleaseScope().getPrimeVersion())); bw.newLine();
+
+            bw.flush();
+            sw.flush();
+        }
+        catch (IOException ioe) {
+            throw new DataAccessException("Unable to write the summary", ioe);
+        }
+        return sw.toString();
     }
 }

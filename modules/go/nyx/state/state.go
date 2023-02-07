@@ -22,6 +22,7 @@ See https://mooltiverse.github.io/nyx/guide/developer/go/ for the developer's gu
 package state
 
 import (
+	"bytes"         // https://pkg.go.dev/bytes
 	"encoding/json" // https://pkg.go.dev/encoding/json
 	"fmt"           // https://pkg.go.dev/fmt
 	"time"          // https://pkg.go.dev/time
@@ -877,4 +878,104 @@ func (s *State) TouchTimestamp() *int64 {
 	now := time.Now().UnixMilli()
 	s.Timestamp = &now
 	return &now
+}
+
+/*
+Returns a multi-line summary of the most relevant attributes in the current state object.
+
+Error is:
+- DataAccessError: in case the attribute cannot be read or accessed.
+- IllegalPropertyError: in case the attribute has been defined but has incorrect values or it can't be resolved.
+*/
+func (s *State) Summary() (string, error) {
+	var buf bytes.Buffer
+
+	if s.HasBranch() {
+		branch, err := s.GetBranch()
+		if err != nil {
+			return "", err
+		}
+		fmt.Fprintf(&buf, "branch           = %s\n", *branch)
+	} else {
+		fmt.Fprintf(&buf, "branch           = %s\n", "")
+	}
+
+	if s.HasBump() {
+		bump, err := s.GetBump()
+		if err != nil {
+			return "", err
+		}
+		fmt.Fprintf(&buf, "bump             = %s\n", *bump)
+	} else {
+		fmt.Fprintf(&buf, "bump             = %s\n", "")
+	}
+
+	coreVersion, err := s.GetCoreVersion()
+	if err != nil {
+		return "", err
+	}
+	fmt.Fprintf(&buf, "core version     = %t\n", coreVersion)
+
+	if s.HasLatestVersion() {
+		latestVersion, err := s.GetLatestVersion()
+		if err != nil {
+			return "", err
+		}
+		fmt.Fprintf(&buf, "latest version   = %t\n", *latestVersion)
+	} else {
+		fmt.Fprintf(&buf, "latest version   = %s\n", "")
+	}
+
+	newRelease, err := s.GetNewRelease()
+	if err != nil {
+		return "", err
+	}
+	fmt.Fprintf(&buf, "new release      = %t\n", newRelease)
+
+	newVersion, err := s.GetNewVersion()
+	if err != nil {
+		return "", err
+	}
+	fmt.Fprintf(&buf, "new version      = %t\n", newVersion)
+
+	scheme, err := s.GetScheme()
+	if err != nil {
+		return "", err
+	}
+	fmt.Fprintf(&buf, "scheme           = %s\n", (*scheme).String())
+
+	timestamp, err := s.GetTimestamp()
+	if err != nil {
+		return "", err
+	}
+	fmt.Fprintf(&buf, "timestamp        = %d\n", *timestamp)
+
+	version, err := s.GetVersion()
+	if err != nil {
+		return "", err
+	}
+	fmt.Fprintf(&buf, "current version  = %s\n", *version)
+
+	releaseScope, err := s.GetReleaseScope()
+	if err != nil {
+		return "", err
+	}
+	if releaseScope == nil {
+		fmt.Fprintf(&buf, "previous version = %s\n", "")
+		fmt.Fprintf(&buf, "prime version    = %s\n", "")
+	} else {
+		if releaseScope.HasPreviousVersion() {
+			fmt.Fprintf(&buf, "previous version = %s\n", *releaseScope.GetPreviousVersion())
+		} else {
+			fmt.Fprintf(&buf, "previous version = %s\n", "")
+		}
+
+		if releaseScope.HasPrimeVersion() {
+			fmt.Fprintf(&buf, "prime version    = %s\n", *releaseScope.GetPrimeVersion())
+		} else {
+			fmt.Fprintf(&buf, "prime version    = %s\n", "")
+		}
+	}
+
+	return buf.String(), nil
 }
