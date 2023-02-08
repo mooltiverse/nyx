@@ -469,6 +469,10 @@ jobs:
   java-integration-test:
     name: Test (Integration) - Java ${{ matrix.java }}
     needs: java-unit-test
+    # Avoid jobs invoking remote services to run in parallel to avoid throttling down by those services (with consequent test failures)
+    concurrency:
+      group: remote-services
+      cancel-in-progress: false
     # The recommended JDK version is 15 or above but since we need to test for backward compatibility to JVMs 11 or newer we
     # need a matrix here. Depending on the JDK version the set of Gradle version that the tests run on will change, according
     # to the Gradle compatibility matrix. See CONTRIBUTING.md in the root directory or the Gradle functional test suites for more.
@@ -570,6 +574,10 @@ jobs:
   java-functional-test:
     name: Test (Functional) - Java ${{ matrix.java }}
     needs: java-integration-test
+    # Avoid jobs invoking remote services to run in parallel to avoid throttling down by those services (with consequent test failures)
+    concurrency:
+      group: remote-services
+      cancel-in-progress: false
     # The recommended JDK version is 15 or above but since we need to test for backward compatibility to JVMs 11 or newer we
     # need a matrix here. Depending on the JDK version the set of Gradle version that the tests run on will change, according
     # to the Gradle compatibility matrix. See CONTRIBUTING.md in the root directory or the Gradle functional test suites for more.
@@ -760,6 +768,10 @@ jobs:
   go-integration-test:
     name: Test (Integration) - Go
     needs: go-unit-test
+    # Avoid jobs invoking remote services to run in parallel to avoid throttling down by those services (with consequent test failures)
+    concurrency:
+      group: remote-services
+      cancel-in-progress: false
     strategy:
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
@@ -863,6 +875,10 @@ jobs:
   go-functional-test:
     name: Test (Functional) - Go
     needs: go-integration-test
+    # Avoid jobs invoking remote services to run in parallel to avoid throttling down by those services (with consequent test failures)
+    concurrency:
+      group: remote-services
+      cancel-in-progress: false
     strategy:
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
@@ -967,6 +983,10 @@ jobs:
   docker-functional-test:
     name: Test (Functional) - Docker
     needs: build-docker
+    # Avoid jobs invoking remote services to run in parallel to avoid throttling down by those services (with consequent test failures)
+    concurrency:
+      group: remote-services
+      cancel-in-progress: false
     runs-on: ubuntu-latest
     steps:
     - name: Git checkout
