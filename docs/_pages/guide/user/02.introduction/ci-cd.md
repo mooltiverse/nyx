@@ -18,7 +18,7 @@ This prevents Nyx from inferring information from the commit history and you lik
 To work around this you just have to configure the checkout action to always fetch the entire commit history by setting the `fetch-depth` parameter to `0` as documented [here](https://github.com/actions/checkout#Fetch-all-history-for-all-tags-and-branches):
 
 ```yaml
-- uses: actions/checkout@v2
+- uses: actions/checkout@v3
   with:
     fetch-depth: 0
 ```
