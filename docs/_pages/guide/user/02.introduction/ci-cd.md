@@ -41,9 +41,9 @@ Running Nyx using the [GitHub Action](https://github.com/mooltiverse/nyx-github-
 release:
   steps:
     - name: Release
-      uses: actions/nyx-github-action@main
+      uses: mooltiverse/nyx-github-action@main
       env:
-        GITHUB_TOKEN: {% raw %}${{ secrets.GITHUB_TOKEN }}{% endraw %}
+        GH_TOKEN: {% raw %}${{ secrets.GITHUB_TOKEN }}{% endraw %}
       with:
         command: publish
 ```
@@ -55,7 +55,7 @@ release:
   steps:
     - name: Publish
       env:
-        GITHUB_TOKEN: {% raw %}${{ secrets.GITHUB_TOKEN }}{% endraw %}
+        GH_TOKEN: {% raw %}${{ secrets.GITHUB_TOKEN }}{% endraw %}
       run: ./gradlew nyxPublish
 ```
 
