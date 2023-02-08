@@ -85,7 +85,7 @@ jobs:
         #restore-keys: not used here, start from scratch
     # Bootstrap (no restore-keys) the SonarCloud cache
     - name: Set up the SonarCloud cache
-      uses: actions/cache@v1
+      uses: actions/cache@v3
       with:
         path: ~/.sonar/cache
         key: sonar-${{ github.run_id }}-${{ github.job }}
@@ -140,7 +140,7 @@ jobs:
           pipeline-${{ github.run_id }}-init
     # Set up the SonarCloud cache
     - name: Set up the SonarCloud cache
-      uses: actions/cache@v1
+      uses: actions/cache@v3
       with:
         path: ~/.sonar/cache
         key: sonar-${{ github.run_id }}-${{ github.job }}
@@ -215,7 +215,7 @@ jobs:
           pipeline-${{ github.run_id }}-init
     # Set up the SonarCloud cache
     - name: Set up the SonarCloud cache
-      uses: actions/cache@v1
+      uses: actions/cache@v3
       with:
         path: ~/.sonar/cache
         key: sonar-${{ github.run_id }}-${{ github.job }}
@@ -287,7 +287,7 @@ jobs:
           pipeline-${{ github.run_id }}-init
     # Set up the SonarCloud cache
     - name: Set up the SonarCloud cache
-      uses: actions/cache@v1
+      uses: actions/cache@v3
       with:
         path: ~/.sonar/cache
         key: sonar-${{ github.run_id }}-${{ github.job }}
@@ -410,7 +410,7 @@ jobs:
         key: pipeline-${{ github.run_id }}-build-java
     # Set up the SonarCloud cache
     - name: Set up the SonarCloud cache
-      uses: actions/cache@v1
+      uses: actions/cache@v3
       with:
         path: ~/.sonar/cache
         key: sonar-${{ github.run_id }}-${{ github.job }}
@@ -499,7 +499,7 @@ jobs:
         key: pipeline-${{ github.run_id }}-build-java
     # Set up the SonarCloud cache
     - name: Set up the SonarCloud cache
-      uses: actions/cache@v1
+      uses: actions/cache@v3
       with:
         path: ~/.sonar/cache
         key: sonar-${{ github.run_id }}-${{ github.job }}
@@ -600,7 +600,7 @@ jobs:
         key: pipeline-${{ github.run_id }}-build-java
     # Set up the SonarCloud cache
     - name: Set up the SonarCloud cache
-      uses: actions/cache@v1
+      uses: actions/cache@v3
       with:
         path: ~/.sonar/cache
         key: sonar-${{ github.run_id }}-${{ github.job }}
@@ -700,7 +700,7 @@ jobs:
         key: pipeline-${{ github.run_id }}-build-java
     # Set up the SonarCloud cache
     - name: Set up the SonarCloud cache
-      uses: actions/cache@v1
+      uses: actions/cache@v3
       with:
         path: ~/.sonar/cache
         key: sonar-${{ github.run_id }}-${{ github.job }}
@@ -791,7 +791,7 @@ jobs:
         key: pipeline-${{ github.run_id }}-build-java
     # Set up the SonarCloud cache
     - name: Set up the SonarCloud cache
-      uses: actions/cache@v1
+      uses: actions/cache@v3
       with:
         path: ~/.sonar/cache
         key: sonar-${{ github.run_id }}-${{ github.job }}
@@ -894,7 +894,7 @@ jobs:
         key: pipeline-${{ github.run_id }}-build-java
     # Set up the SonarCloud cache
     - name: Set up the SonarCloud cache
-      uses: actions/cache@v1
+      uses: actions/cache@v3
       with:
         path: ~/.sonar/cache
         key: sonar-${{ github.run_id }}-${{ github.job }}
@@ -995,7 +995,7 @@ jobs:
         key: pipeline-${{ github.run_id }}-build-java
     # Set up the SonarCloud cache
     - name: Set up the SonarCloud cache
-      uses: actions/cache@v1
+      uses: actions/cache@v3
       with:
         path: ~/.sonar/cache
         key: sonar-${{ github.run_id }}-${{ github.job }}
