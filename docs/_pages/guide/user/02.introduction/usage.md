@@ -454,3 +454,9 @@ task dumpSomeDiagnostics() {
 ```
 
 In this example `dumpSomeDiagnostics` represents some arbitrary task that depends on [`nyxInfer`](#nyxinfer) just to make sure the `nyxState` is available and is used to print a few attributes from the state.
+
+## Using the GitHub Action
+
+When using GitHub Actions, the [Nyx Action](https://github.com/mooltiverse/nyx-github-action) is the easiest and most effective way of using Nyx.
+
+Please refer to the [action page](https://github.com/mooltiverse/nyx-github-action) for instructions.

@@ -15,7 +15,7 @@ Nyx is the *all in one* tool that gives you integrated support for:
 * *conventional* specifications and best practices like [Conventional Commits](https://www.conventionalcommits.org/), [Keep a Changelog](https://keepachangelog.com/)
 * build tools like [Gradle](https://gradle.org/)
 * Git hosting services like [GitHub](https://github.com/) and [GitLab](https://gitlab.com/) and their extra features like [GitHub Releases](https://docs.github.com/en/github/administering-a-repository/about-releases) and [GitLab Releases](https://docs.gitlab.com/ee/user/project/releases/)
-* CI/CD platforms like [GitHub Actions](https://docs.github.com/en/free-pro-team@latest/actions/guides/about-continuous-integration) and [GitLab CI](https://docs.gitlab.com/ee/ci/)
+* CI/CD platforms like [GitHub Actions](https://github.com/mooltiverse/nyx-github-action) and [GitLab CI](https://docs.gitlab.com/ee/ci/)
 * custom or standard workflows (a.k.a. *branching models*) like [GitFlow](https://nvie.com/posts/a-successful-git-branching-model/), [GitHub Flow](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/github-flow), [GitLab Flow](https://docs.gitlab.com/ee/topics/gitlab_flow.html), [OneFlow](https://www.endoflineblog.com/oneflow-a-git-branching-model-and-workflow)
 * changelog generation
 * any (combination of) configuration means like command line arguments, local or remote files, environment variables and build tools extensions
@@ -62,6 +62,7 @@ Available for all platforms in the [latest release](https://github.com/mooltiver
 ### Build tools plugin
 
 * [Gradle plug-in](https://plugins.gradle.org/plugin/com.mooltiverse.oss.nyx)
+* [GitHub Action](https://github.com/mooltiverse/nyx-github-action)
 
 ### Libraries
 

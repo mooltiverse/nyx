@@ -54,6 +54,8 @@ nav-user-guide:
         url: /guide/user/quick-start/docker-container/
       - title: "Gradle Plugin"
         url: /guide/user/quick-start/gradle-plugin/
+      - title: "GitHub Action"
+        url: /guide/user/quick-start/github-action/
   - title: Introduction
     url: /guide/user/introduction/
     children:

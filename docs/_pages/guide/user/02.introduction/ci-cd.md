@@ -9,6 +9,10 @@ Nyx is perfectly suited for use in CI/CD platforms and leverage [automation]({{ 
 
 ## [GitHub Actions](https://docs.github.com/en/actions)
 
+### Using the official Nyx GitHub Action
+
+Please refer to the [GitHub Action home page](https://github.com/mooltiverse/nyx-github-action).
+
 ### Check out the entire repository when running jobs
 
 If you're running your pipelines on GitHub Actions you probably start your build jobs with the [checkout](https://github.com/actions/checkout) action, which, by default, only checks out the latest commit as the `fetch-depth` parameter defaults to `1`.
@@ -29,15 +33,30 @@ When configuring the [GitHub service]({{ site.baseurl }}{% link _pages/guide/use
 
 When running GitHub Actions pipelines you can take advantage of the [automatic token authentication](https://docs.github.com/en/actions/security-guides/automatic-token-authentication) that provides the `GITHUB_TOKEN` environment variable to GitHub Actions jobs so you don't need to generate a new [OAuth or Personal Access Token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) for this specific purpose. The same token is also available from within the [`secrets` context](https://docs.github.com/en/actions/learn-github-actions/contexts#github-context).
 
-As an example, to read the token and set it as the `GH_TOKEN` environment variable you can define your GitHub Actions job like:
+As an example, to read the token and set it as the `GH_TOKEN` environment variable you can define your GitHub Actions job like in the following snippets.
+
+Running Nyx using the [GitHub Action](https://github.com/mooltiverse/nyx-github-action#usage):
 
 ```yaml
 release:
-    steps:
-      - name: Release
-        env:
-          GH_TOKEN: {% raw %}${{ secrets.GITHUB_TOKEN }}{% endraw %}
-        run: ./gradlew release
+  steps:
+    - name: Release
+      uses: actions/nyx-github-action@main
+      env:
+        GITHUB_TOKEN: {% raw %}${{ secrets.GITHUB_TOKEN }}{% endraw %}
+      with:
+        command: publish
+```
+
+Running Nyx using the Gradle plugin:
+
+```yaml
+release:
+  steps:
+    - name: Publish
+      env:
+        GITHUB_TOKEN: {% raw %}${{ secrets.GITHUB_TOKEN }}{% endraw %}
+      run: ./gradlew nyxPublish
 ```
 
 ## [GitLab CI](https://docs.gitlab.com/ee/ci/)

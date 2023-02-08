@@ -53,3 +53,9 @@ Although you may encounter some limitations (i.e. about support for some encrypt
 Java VMs older than `11` and Gradle versions older than `6.0` are not supported.
 
 [Here](https://gradle.org/releases/) you can find the list of available releases and [here](https://docs.gradle.org/current/userguide/compatibility.html) is the Gradle compatibility matrix.
+
+### GitHub Action
+
+This is a [Docker Action](https://docs.github.com/en/actions/creating-actions/about-custom-actions#types-of-actions) so it's only available for Linux runners.
+
+Please refer to the [GitHub Action home page](https://github.com/mooltiverse/nyx-github-action).
