@@ -278,32 +278,55 @@ nyx {
       mainline {
         description = '{{#fileContent}}build/CHANGELOG.md{{/fileContent}}'
         filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$'
-        gitPush = '{{#environmentVariable}}CI{{/environmentVariable}}' // only when running on CI servers
-        gitTag = '{{#environmentVariable}}CI{{/environmentVariable}}' // only when running on CI servers
+        gitPush = 'true'
+        gitTag = 'true'
         matchBranches = '^(master|main)$'
-        matchWorkspaceStatus = 'CLEAN'
-        publish = '{{#environmentVariable}}CI{{/environmentVariable}}' // only when running on CI servers
+        matchEnvironmentVariables {
+          CI = '^true$'                 // only match this release type when running on CI servers
+        }
+        matchWorkspaceStatus = 'CLEAN'  // only match this release type when the repository is clean
+        publish = 'true'
       }
       maturity {
         description = '{{#fileContent}}build/CHANGELOG.md{{/fileContent}}'
         collapseVersions = true
         collapsedVersionQualifier = '{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}'
         filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(\\.([0-9]\\d*))?)?$'
-        gitPush = '{{#environmentVariable}}CI{{/environmentVariable}}' // only when running on CI servers
-        gitTag = '{{#environmentVariable}}CI{{/environmentVariable}}' // only when running on CI servers
+        gitPush = 'true'
+        gitTag = 'true'
         matchBranches = '^(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)$'
-        matchWorkspaceStatus = 'CLEAN'
-        publish = '{{#environmentVariable}}CI{{/environmentVariable}}' // only when running on CI servers
+        matchEnvironmentVariables {
+          CI = '^true$'                 // only match this release type when running on CI servers
+        }
+        matchWorkspaceStatus = 'CLEAN'  // only match this release type when the repository is clean
+        publish = 'true'
       }
       integration {
         description = '{{#fileContent}}build/CHANGELOG.md{{/fileContent}}'
         collapseVersions = true
         collapsedVersionQualifier = '{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}'
         filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(develop|development|integration|latest)(\\.([0-9]\\d*))?)$'
-        gitPush = '{{#environmentVariable}}CI{{/environmentVariable}}' // only when running on CI servers
-        gitTag = '{{#environmentVariable}}CI{{/environmentVariable}}' // only when running on CI servers
+        gitPush = 'true'
+        gitTag = 'true'
         matchBranches = '^(develop|development|integration|latest)$'
-        matchWorkspaceStatus = 'CLEAN'
+        matchEnvironmentVariables {
+          CI = '^true$'                 // only match this release type when running on CI servers
+        }
+        matchWorkspaceStatus = 'CLEAN'  // only match this release type when the repository is clean
+        publish = 'true'
+      }
+      feature {
+        description = '{{#fileContent}}build/CHANGELOG.md{{/fileContent}}'
+        collapseVersions = true
+        collapsedVersionQualifier = '{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}'
+        filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(feat|feature)(([0-9a-zA-Z]*)(\\.([0-9]\\d*))?)?)$'
+        gitPush = 'true'
+        gitTag = 'true'
+        matchBranches = '^(feat|feature)((-|\\/)[0-9a-zA-Z-_]+)?$'
+        matchEnvironmentVariables {
+          CI = '^true$'                 // only match this release type when running on CI servers
+        }
+        matchWorkspaceStatus = 'CLEAN'  // only match this release type when the repository is clean
         publish = 'false'
       }
       fix {
@@ -311,10 +334,13 @@ nyx {
         collapseVersions = true
         collapsedVersionQualifier = '{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}'
         filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-fix(([0-9a-zA-Z]*)(\\.([0-9]\\d*))?)?)$'
-        gitPush = '{{#environmentVariable}}CI{{/environmentVariable}}' // only when running on CI servers
-        gitTag = '{{#environmentVariable}}CI{{/environmentVariable}}' // only when running on CI servers
+        gitPush = 'true'
+        gitTag = 'true'
         matchBranches = '^fix((-|\\/)[0-9a-zA-Z-_]+)?$'
-        matchWorkspaceStatus = 'CLEAN'
+        matchEnvironmentVariables {
+          CI = '^true$'                 // only match this release type when running on CI servers
+        }
+        matchWorkspaceStatus = 'CLEAN'  // only match this release type when the repository is clean
         publish = 'false'
       }
       hotfix {
@@ -322,43 +348,41 @@ nyx {
         collapseVersions = true
         collapsedVersionQualifier = '{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}'
         filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-hotfix(([0-9a-zA-Z]*)(\\.([0-9]\\d*))?)?)$'
-        gitPush = '{{#environmentVariable}}CI{{/environmentVariable}}' // only when running on CI servers
-        gitTag = '{{#environmentVariable}}CI{{/environmentVariable}}' // only when running on CI servers
+        gitPush = 'true'
+        gitTag = 'true'
         matchBranches = '^hotfix((-|\\/)[0-9a-zA-Z-_]+)?$'
-        matchWorkspaceStatus = 'CLEAN'
-        publish = '{{#environmentVariable}}CI{{/environmentVariable}}' // only when running on CI servers
-      }
-      feature {
-        description = '{{#fileContent}}build/CHANGELOG.md{{/fileContent}}'
-        collapseVersions = true
-        collapsedVersionQualifier = '{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}'
-        filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(feat|feature)(([0-9a-zA-Z]*)(\\.([0-9]\\d*))?)?)$'
-        gitPush = '{{#environmentVariable}}CI{{/environmentVariable}}' // only when running on CI servers
-        gitTag = '{{#environmentVariable}}CI{{/environmentVariable}}' // only when running on CI servers
-        matchBranches = '^(feat|feature)((-|\\/)[0-9a-zA-Z-_]+)?$'
-        matchWorkspaceStatus = 'CLEAN'
-        publish = 'false'
+        matchEnvironmentVariables {
+          CI = '^true$'                 // only match this release type when running on CI servers
+        }
+        matchWorkspaceStatus = 'CLEAN'  // only match this release type when the repository is clean
+        publish = 'true'
       }
       release {
         description = '{{#fileContent}}build/CHANGELOG.md{{/fileContent}}'
         collapseVersions = true
         collapsedVersionQualifier = '{{#firstLower}}{{branch}}{{/firstLower}}'
         filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(rel|release)((\\.([0-9]\\d*))?)?)$'
-        gitPush = '{{#environmentVariable}}CI{{/environmentVariable}}' // only when running on CI servers
-        gitTag = '{{#environmentVariable}}CI{{/environmentVariable}}' // only when running on CI servers
+        gitPush = 'true'
+        gitTag = 'true'
         matchBranches = '^(rel|release)(-|\\/)({{configuration.releasePrefix}})?([0-9|x]\\d*)(\\.([0-9|x]\\d*)(\\.([0-9|x]\\d*))?)?$'
-        matchWorkspaceStatus = 'CLEAN'
+        matchEnvironmentVariables {
+          CI = '^true$'                 // only match this release type when running on CI servers
+        }
+        matchWorkspaceStatus = 'CLEAN'  // only match this release type when the repository is clean
         publish = 'false'
         versionRangeFromBranchName = true
       }
       maintenance {
         description = '{{#fileContent}}build/CHANGELOG.md{{/fileContent}}'
         filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$'
-        gitPush = '{{#environmentVariable}}CI{{/environmentVariable}}' // only when running on CI servers
-        gitTag = '{{#environmentVariable}}CI{{/environmentVariable}}' // only when running on CI servers
+        gitPush = 'true'
+        gitTag = 'true'
         matchBranches = '^[a-zA-Z]*([0-9|x]\\d*)(\\.([0-9|x]\\d*)(\\.([0-9|x]\\d*))?)?$'
-        matchWorkspaceStatus = 'CLEAN'
-        publish = '{{#environmentVariable}}CI{{/environmentVariable}}' // only when running on CI servers
+        matchEnvironmentVariables {
+          CI = '^true$'                 // only match this release type when running on CI servers
+        }
+        matchWorkspaceStatus = 'CLEAN'  // only match this release type when the repository is clean
+        publish = 'true'
         versionRangeFromBranchName = true
       }
       // 'internal' overrides the release type with the same name from the preset adding some qualifiers and is the global fallback for all release types

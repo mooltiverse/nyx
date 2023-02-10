@@ -104,6 +104,18 @@ nyx {
         publish = 'true'
         versionRangeFromBranchName = false
       }
+      feature {
+        collapseVersions = true
+        collapsedVersionQualifier = '{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}'
+        description = 'Feature release {{version}}'
+        filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(feat|feature)(([0-9a-zA-Z]*)(\\.([0-9]\\d*))?)?)$'
+        gitCommit = 'false'
+        gitPush = 'false'
+        gitTag = 'false'
+        matchBranches = '^(feat|feature)((-|\\/)[0-9a-zA-Z-_]+)?$'
+        publish = 'false'
+        versionRangeFromBranchName = false
+      }
       hotfix {
         assets = "asset1"
         collapseVersions = true
@@ -116,18 +128,6 @@ nyx {
         matchBranches = '^(fix|hotfix)((-|\\/)[0-9a-zA-Z-_]+)?$'
         matchWorkspaceStatus = 'CLEAN'
         publish = 'true'
-        versionRangeFromBranchName = false
-      }
-      feature {
-        collapseVersions = true
-        collapsedVersionQualifier = '{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}'
-        description = 'Feature release {{version}}'
-        filterTags = '^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)(-(feat|feature)(([0-9a-zA-Z]*)(\\.([0-9]\\d*))?)?)$'
-        gitCommit = 'false'
-        gitPush = 'false'
-        gitTag = 'false'
-        matchBranches = '^(feat|feature)((-|\\/)[0-9a-zA-Z-_]+)?$'
-        publish = 'false'
         versionRangeFromBranchName = false
       }
       release {
