@@ -26,6 +26,8 @@ import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringWriter;
+import java.net.URL;
+import java.net.MalformedURLException;
 import java.text.SimpleDateFormat;
 import java.time.ZoneOffset;
 import java.util.Arrays;
@@ -167,11 +169,25 @@ public class Make extends AbstractCommand {
             }
         }
         else {
+            String templatePath = state().getConfiguration().getChangelog().getTemplate();
             try {
-                return new FileReader(state().getConfiguration().getChangelog().getTemplate());
+                // try loading the file as an URL
+                URL templateURL = new URL(templatePath);
+                try {
+                    return new InputStreamReader(templateURL.openStream());
+                }
+                catch (IOException ioe) {
+                    throw new DataAccessException(String.format("Unable to load the configured changelog template file from URL '%s'", templatePath), ioe);
+                }
             }
-            catch (FileNotFoundException fnfe) {
-                throw new DataAccessException(String.format("Unable to load the configured changelog template file from '%s'", state().getConfiguration().getChangelog().getTemplate()), fnfe);
+            catch (MalformedURLException mue) {
+                // it's a local file, not an URL, so load it as such
+                try {
+                    return new FileReader(templatePath);
+                }
+                catch (FileNotFoundException fnfe) {
+                    throw new DataAccessException(String.format("Unable to load the configured changelog template file from '%s'", templatePath), fnfe);
+                }
             }
         }
     }

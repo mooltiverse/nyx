@@ -82,6 +82,7 @@ The short option name `-c=<PATH>` has priority over the extended `--configuratio
 ### Changelog
 
 See [Changelog]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/changelog.md %}).
+
 ### Commit message conventions
 
 See [Commit Message Conventions]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/commit-message-conventions.md %}).

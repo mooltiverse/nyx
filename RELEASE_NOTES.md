@@ -1,5 +1,23 @@
 # Nyx Release Notes
 
+## 2.3.0
+
+This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/2.3.0).
+
+### Upgrade instructions
+
+There are no actions to take for backward compatibility.
+
+### New features and improvements
+
+This release:
+
+* this release adds support for remote [changelog templates](https://mooltiverse.github.io/nyx/guide/user/configuration-reference/changelog/#template) ([#158](https://github.com/mooltiverse/nyx/issues/158))
+
+### Fixed issues
+
+There are no fixes in this release.
+
 ## 2.2.0
 
 This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/2.2.0).
