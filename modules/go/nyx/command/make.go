@@ -19,6 +19,9 @@ package command
 import (
 	_ "embed"       // https://pkg.go.dev/embed
 	"fmt"           // https://pkg.go.dev/fmt
+	"io/ioutil"     // https://pkg.go.dev/io/ioutil
+	"net/http"      // https://pkg.go.dev/net/http
+	"net/url"       // https://pkg.go.dev/net/url
 	"os"            // https://pkg.go.dev/os
 	"path/filepath" // https://pkg.go.dev/path/filepath
 	"strconv"       // https://pkg.go.dev/strconv
@@ -161,11 +164,29 @@ func (c *Make) getChangelogTemplate() (string, error) {
 		// pick the embedded standard template
 		return defaultTemplate, nil
 	} else {
-		templateBytes, err := os.ReadFile(*changelogConfiguration.GetTemplate())
-		if err != nil {
-			return "", &errs.DataAccessError{Message: fmt.Sprintf("unable to load the configured changelog template file from '%s'", *changelogConfiguration.GetTemplate()), Cause: err}
+		templatePath := *changelogConfiguration.GetTemplate()
+		templateURL, err := url.Parse(templatePath)
+		// The URL parses for local paths also, so to distinguish between a local path and an actual URL we also check for the Host part
+		if err == nil && "" != strings.TrimSpace(templateURL.Host) {
+			// try loading the file as an URL
+			response, err := http.Get(templateURL.String())
+			if err != nil {
+				return "", &errs.DataAccessError{Message: fmt.Sprintf("unable to load the configured changelog template file from URL '%s'", templatePath), Cause: err}
+			}
+			defer response.Body.Close()
+			templateBytes, err := ioutil.ReadAll(response.Body)
+			if err != nil {
+				return "", &errs.DataAccessError{Message: fmt.Sprintf("unable to load the configured changelog template file from URL '%s'", templatePath), Cause: err}
+			}
+			return string(templateBytes), nil
+		} else {
+			// it's a local file, not an URL, so load it as such
+			templateBytes, err := os.ReadFile(templatePath)
+			if err != nil {
+				return "", &errs.DataAccessError{Message: fmt.Sprintf("unable to load the configured changelog template file from '%s'", templatePath), Cause: err}
+			}
+			return string(templateBytes), nil
 		}
-		return string(templateBytes), nil
 	}
 }
 
