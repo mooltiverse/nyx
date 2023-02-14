@@ -124,7 +124,9 @@ nyx
 +-- modules                         # Project sub-modules
 |   +--- docker                     # Docker image sub module
 |   \--- go                         # Go sub modules
-|        +--- main                  # Go Main library sub module
+|        +--- errors                # Go errors sub module
+|        +--- nyx                   # Go Main library sub module
+|        +--- utils                 # Go utilities sub module
 |        \--- version               # Go Version library sub module
 |   \--- java                       # Java sub modules
 |        +--- gradle                # Gradle plugin sub module

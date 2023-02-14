@@ -60,7 +60,7 @@ public class InferTestTemplates {
     @ExtendWith(GradleCommandInvocationContextProvider.class)
     static class StateTests extends com.mooltiverse.oss.nyx.command.InferTestTemplates.StateTests {}
 
-    @Disabled("TODO: re-enable this test when working on https://github.com/mooltiverse/nyx/issues/40")
+    @Disabled("Nyx tasks perform theit up-to-date check internally")
     @Nested
     @DisplayName("Infer isUpToDate")
     @ExtendWith(GradleCommandInvocationContextProvider.class)

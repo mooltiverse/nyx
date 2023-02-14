@@ -12,7 +12,8 @@ There are no actions to take for backward compatibility.
 
 This release:
 
-* this release adds support for remote [changelog templates](https://mooltiverse.github.io/nyx/guide/user/configuration-reference/changelog/#template) ([#158](https://github.com/mooltiverse/nyx/issues/158))
+* adds support for remote [changelog templates](https://mooltiverse.github.io/nyx/guide/user/configuration-reference/changelog/#template) ([#158](https://github.com/mooltiverse/nyx/issues/158))
+* adds support for Gradle 8.0 ([#162](https://github.com/mooltiverse/nyx/issues/162)), while backward compatibility doesn't change
 
 ### Fixed issues
 

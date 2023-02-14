@@ -60,7 +60,7 @@ public class MakeTestTemplates {
     @ExtendWith(GradleCommandInvocationContextProvider.class)
     static class StateTests extends com.mooltiverse.oss.nyx.command.MakeTestTemplates.StateTests {}
 
-    @Disabled("TODO: re-enable this test when working on https://github.com/mooltiverse/nyx/issues/40")
+    @Disabled("Nyx tasks perform theit up-to-date check internally")
     @Nested
     @DisplayName("Make isUpToDate")
     @ExtendWith(GradleCommandInvocationContextProvider.class)
