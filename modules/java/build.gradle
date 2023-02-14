@@ -325,13 +325,6 @@ subprojects {
         functionalTestRuntime.extendsFrom testRuntime
     }
 
-    jacocoTestReport {
-        reports {
-            html.enabled true
-            xml.enabled true
-        }
-    }
-
     /*------------------------------------------------------------------------------
       Additional task dependencies
     ------------------------------------------------------------------------------*/
