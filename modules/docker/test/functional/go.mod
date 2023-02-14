@@ -1,6 +1,6 @@
 module github.com/mooltiverse/nyx/modules/docker/test/functional
 
-go 1.19
+go 1.20
 
 replace github.com/mooltiverse/nyx/modules/go/nyx => ../../../go/nyx
 
