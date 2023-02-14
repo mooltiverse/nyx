@@ -91,7 +91,7 @@ You can work on the project on any platform (Linux, Windows, Mac). You need to h
 * [Git](https://git-scm.com/)
 * [Go](https://go.dev/) 1.17 or above
 * Java JDK or JRE version 8 or above, either from [Oracle](https://www.oracle.com/java/technologies/javase-downloads.html) or [OpenJDK](https://openjdk.java.net/install/)
-* [Gradle](https://gradle.org/install/) 7.x or above
+* [Gradle](https://gradle.org/install/) 8.x or above
 * [Docker CE](https://docs.docker.com/install/)
 * [Jekyll](https://jekyllrb.com/docs/installation/) 4.2.0 or above (also requires [Ruby](https://www.ruby-lang.org/en/downloads/) 2.4.0 or above)
 
