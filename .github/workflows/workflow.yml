@@ -48,7 +48,7 @@
 # - the above rules mean that a certain set of files/directories must always follow the same cache as
 # they can't be mixed up. On the other hand, each job may use/store multiple caches
 
-name: Nyx
+name: Nyx workflow
 on: [push]
 # Avoid running multiple pipelines concurrently to avoid overlapping releases and tags
 concurrency:
