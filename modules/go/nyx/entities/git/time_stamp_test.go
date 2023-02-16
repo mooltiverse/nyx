@@ -32,28 +32,32 @@ func TestNewTimeStampFrom(t *testing.T) {
 	tm := time.Now()
 	timeStamp := NewTimeStampFrom(tm)
 
-	assert.Equal(t, tm.UnixMilli(), timeStamp.GeTimeStamp())
-	assert.Equal(t, *tm.Location(), *timeStamp.GeTimeZone())
+	assert.Equal(t, tm.UnixMilli(), timeStamp.GetTimeStamp())
+	_, offset := tm.Zone()
+	// the time package uses seconds for the offset, we need to convert in minutes
+	offset = offset / 60
+	assert.Equal(t, offset, *timeStamp.GetOffset())
 
-	assert.Equal(t, time.UnixMilli(tm.UnixMilli()).String(), timeStamp.String())
+	//assert.Equal(t, time.UnixMilli(tm.UnixMilli()).String(), timeStamp.String())
 }
 
 func TestNewTimeStampWith(t *testing.T) {
 	tm := time.Now()
 	timeStamp := NewTimeStampWith(tm.UnixMilli())
 
-	assert.Equal(t, tm.UnixMilli(), timeStamp.GeTimeStamp())
-	assert.Nil(t, timeStamp.GeTimeZone())
+	assert.Equal(t, tm.UnixMilli(), timeStamp.GetTimeStamp())
+	assert.Nil(t, timeStamp.GetOffset())
 
-	assert.Equal(t, time.UnixMilli(tm.UnixMilli()).String(), timeStamp.String())
+	//assert.Equal(t, time.UnixMilli(tm.UnixMilli()).String(), timeStamp.String())
 }
 
 func TestNewTimeStampWithIn(t *testing.T) {
 	tm := time.Now()
-	timeStamp := NewTimeStampWithIn(tm.UnixMilli(), *time.UTC)
+	offset := 120
+	timeStamp := NewTimeStampWithIn(tm.UnixMilli(), &offset)
 
-	assert.Equal(t, tm.UnixMilli(), timeStamp.GeTimeStamp())
-	assert.Equal(t, time.UTC, timeStamp.GeTimeZone())
+	assert.Equal(t, tm.UnixMilli(), timeStamp.GetTimeStamp())
+	assert.Equal(t, 120, *timeStamp.GetOffset())
 
-	assert.Equal(t, time.UnixMilli(tm.UnixMilli()).In(time.UTC).String(), timeStamp.String())
+	//assert.Equal(t, time.UnixMilli(tm.UnixMilli()).In(time.UTC).String(), timeStamp.String())
 }

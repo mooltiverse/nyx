@@ -35,7 +35,7 @@ func TestNewMessageWith(t *testing.T) {
 
 	assert.Equal(t, "short", message.GetShortMessage())
 
-	assert.Equal(t, m, message.GeFooters())
+	assert.Equal(t, m, message.GetFooters())
 
 	assert.Equal(t, "short ...", message.String())
 }

@@ -55,7 +55,7 @@ func NewMessageWith(fullMessage string, shortMessage string, footers map[string]
 /*
 Returns the immutable list of footers, where keys are names and values are values.
 */
-func (m Message) GeFooters() map[string]string {
+func (m Message) GetFooters() map[string]string {
 	return m.Footers
 }
 

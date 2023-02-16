@@ -124,6 +124,6 @@ class ObjectFactory {
      * @return the value object.
      */
     static TimeStamp timeStampFrom(PersonIdent personIdent) {
-        return new TimeStamp(personIdent.getWhen(), personIdent.getTimeZone());
+        return new TimeStamp(personIdent.getWhen(), personIdent.getTimeZoneOffset());
     }
 }

@@ -18,7 +18,6 @@ package com.mooltiverse.oss.nyx.entities.git;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
-import java.util.TimeZone;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -33,22 +32,22 @@ public class TimeStamp implements Comparable<TimeStamp>, Cloneable, Serializable
     private final Date timeStamp;
 
     /**
-     * The time zone.
+     * The time zone offset in minutes relative to UTC.
      */
-    private final TimeZone timeZone;
+    private final Integer offset;
 
     /**
      * Constructor.
      * 
      * @param timeStamp the time stamp. Cannot be {@code null}
-     * @param timeZone the time zone. May be {@code null}
+     * @param offset the time zone offset in minutes relative to UTC. May be {@code null}
      */
     @JsonCreator
-    public TimeStamp(@JsonProperty("timeStamp") Date timeStamp, @JsonProperty("timeZone") TimeZone timeZone) {
+    public TimeStamp(@JsonProperty("timeStamp") Date timeStamp, @JsonProperty("offset") Integer offset) {
         super();
         Objects.requireNonNull(timeStamp);
         this.timeStamp = timeStamp;
-        this.timeZone = timeZone;
+        this.offset = offset;
     }
 
     /**
@@ -56,7 +55,7 @@ public class TimeStamp implements Comparable<TimeStamp>, Cloneable, Serializable
      */
     @Override
     public int hashCode() {
-        return 97 * timeStamp.hashCode() * (timeZone == null ? 1 : 89 * timeZone.hashCode());
+        return 97 * timeStamp.hashCode() * (offset == null ? 1 : 89 * offset.hashCode());
     }
 
     /**
@@ -72,7 +71,7 @@ public class TimeStamp implements Comparable<TimeStamp>, Cloneable, Serializable
             return false;
 
         TimeStamp other = TimeStamp.class.cast(obj);
-        return getTimeStamp().equals(other.getTimeStamp()) && Objects.isNull(getTimeZone()) ? Objects.isNull(other.getTimeZone()) : getTimeZone().equals(other.getTimeZone());
+        return getTimeStamp().equals(other.getTimeStamp()) && Objects.isNull(getOffset()) ? Objects.isNull(other.getOffset()) : getOffset().equals(other.getOffset());
     }
 
     /**
@@ -96,12 +95,12 @@ public class TimeStamp implements Comparable<TimeStamp>, Cloneable, Serializable
     }
 
     /**
-     * Returns the time zone.
+     * Returns the time zone offset in minutes relative to UTC.
      * 
-     * @return the time zone. May be {@code null}.
+     * @return the time zone offset in minutes relative to UTC. May be {@code null}.
      */
-    public TimeZone getTimeZone() {
-        return timeZone;
+    public Integer getOffset() {
+        return offset;
     }
 
     /**
@@ -109,6 +108,6 @@ public class TimeStamp implements Comparable<TimeStamp>, Cloneable, Serializable
      */
     @Override
     public String toString() {
-        return timeStamp.toString().concat(Objects.isNull(timeZone) ? "" : " ".concat(timeZone.getDisplayName()));
+        return timeStamp.toString().concat(Objects.isNull(offset) ? "" : " ".concat(offset.toString()));
     }
 }
