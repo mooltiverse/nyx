@@ -21,7 +21,7 @@ import groovy.json.JsonOutput
 /*------------------------------------------------------------------------------
   Root project properties
 ------------------------------------------------------------------------------*/
-description = 'Nyx is a portable and flexible semantic release tool.'
+project.description = 'Nyx is a portable and flexible semantic release tool.'
 
 /*------------------------------------------------------------------------------
   This is the configuration for this project and all sub-projects
