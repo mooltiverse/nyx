@@ -6,7 +6,7 @@ This release is available at [this link](https://github.com/mooltiverse/nyx/rele
 
 ### Upgrade instructions
 
-There are no actions to take for backward compatibility.
+* existing State files must be generated again due to the change of the format of timestamp offsets for Git commits
 
 ### New features and improvements
 
@@ -17,7 +17,9 @@ This release:
 
 ### Fixed issues
 
-There are no fixes in this release.
+This release:
+
+* fixes a bug that prevented State files serialized with one version of the tool (Go or Java) to be deserialized with another version, due to the format used to serialize the Git author action or commit action timestamp offets ([#170](https://github.com/mooltiverse/nyx/issues/170)). Now offsets are stored as simple signed integers. With more details, Git author actions and commot actions had their timestamps with a string representing the offset to UTC. That format was not portable so now they are stored as positive or negative integers, representing the offset in minutes from UTC. The field name within the `timeStamp` structure has changed from `timeZone` to `offset`.
 
 ## 2.2.0
 

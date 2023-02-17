@@ -42,7 +42,10 @@ func TestObjectFactoryActionFrom(t *testing.T) {
 	assert.Equal(t, commit.Author.Email, action.Identity.Email)
 
 	assert.Equal(t, commit.Committer.When.UnixMilli(), action.TimeStamp.TimeStamp)
-	assert.Equal(t, commit.Committer.When.Location(), action.TimeStamp.TimeZone)
+	_, offset := commit.Committer.When.Zone()
+	// the time package uses seconds for the offset, we need to convert in minutes
+	offset = offset / 60
+	assert.Equal(t, offset, *action.TimeStamp.Offset)
 }
 
 func TestObjectFactoryTimeStampFrom(t *testing.T) {
@@ -52,7 +55,10 @@ func TestObjectFactoryTimeStampFrom(t *testing.T) {
 	timestamp := TimeStampFrom(commit.Committer)
 
 	assert.Equal(t, commit.Committer.When.UnixMilli(), timestamp.TimeStamp)
-	assert.Equal(t, commit.Committer.When.Location(), timestamp.TimeZone)
+	_, offset := commit.Committer.When.Zone()
+	// the time package uses seconds for the offset, we need to convert in minutes
+	offset = offset / 60
+	assert.Equal(t, offset, *timestamp.Offset)
 }
 
 func TestObjectFactoryIdentityFrom(t *testing.T) {

@@ -18,8 +18,6 @@ package com.mooltiverse.oss.nyx.entities.git;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Date;
-import java.util.SimpleTimeZone;
-import java.util.TimeZone;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,15 +29,15 @@ public class TimeStampTests {
     void constructorTest()
         throws Exception {
         Date date = new Date();
-        TimeZone zone = new SimpleTimeZone(SimpleTimeZone.UTC_TIME, "UTC");
+        Integer offset = Integer.valueOf(0);
         
-        TimeStamp timeStamp = new TimeStamp(date, zone);
+        TimeStamp timeStamp = new TimeStamp(date, offset);
         assertEquals(date, timeStamp.getTimeStamp());
-        assertEquals(zone, timeStamp.getTimeZone());
+        assertEquals(offset, timeStamp.getOffset());
 
         // test with null values
         assertThrows(NullPointerException.class, () -> new TimeStamp(null, null));
-        assertThrows(NullPointerException.class, () -> new TimeStamp(null, zone));
+        assertThrows(NullPointerException.class, () -> new TimeStamp(null, offset));
         assertDoesNotThrow(() -> new TimeStamp(date, null));
     }
 }

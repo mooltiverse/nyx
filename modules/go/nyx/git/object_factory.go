@@ -145,5 +145,5 @@ Arguments are as follows:
 - signature the git reference to get the data from.
 */
 func TimeStampFrom(signature ggitobject.Signature) gitent.TimeStamp {
-	return gitent.TimeStamp{signature.When.UnixMilli(), signature.When.Location()}
+	return *gitent.NewTimeStampFrom(signature.When)
 }
