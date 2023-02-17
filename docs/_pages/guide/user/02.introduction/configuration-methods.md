@@ -38,6 +38,9 @@ This means that command line options have priority over all others while default
 
 Please note that Nyx searches configuration files at standard locations using default names `.nyx.yaml` (or `.nyx.yml`), `.nyx.json`, `.nyx-shared.yaml` (or `.nyx-shared.yml`), `.nyx-shared.json` (pay attention to the leading `.`) so as long as you use one of these file names and the file is available in the current working directory you don't need to use the [`configurationFile`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#configuration-file) option. The file extension reflects the grammar the file must be authored with and if none is available among the ones listed above JSON is assumed by default. If more than one default file is present, they will be evaluated following the above order (`.nyx.yaml` takes precedence over `.nyx.json`, while `.nyx-shared.yaml` takes precedence over `.nyx-shared.json`).
 
+Since configuration files and environment variables are platform and flavor agnostic they are the suggested way to configure Nyx so that configurations are portable and even usable in [combined release processes]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/combined-release-process.md %}).
+{: .notice--success}
+
 As a rule of thumb, consider using default values and [presets]({{ site.baseurl }}{% link _pages/guide/user/04.configuration-presets/index.md %}) before customizing. Defaults are provided for almost all available options and they are engineered to suit the majority of cases. Moreover, there are many entities already modelled as presets (commit message conventions, environments, extra identifiers, release types, services) that you can enable by just using the [`preset`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#preset) option and may spare you a lot of work.
 {: .notice--success}
 
