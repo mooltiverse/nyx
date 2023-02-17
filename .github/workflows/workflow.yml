@@ -79,7 +79,7 @@ jobs:
       uses: dorny/paths-filter@v2
       id: changes
       with:
-        base: HEAD
+        base: ${{ github.ref }}
         filters: |
           dockerChanged:
             - 'modules/docker/**'
