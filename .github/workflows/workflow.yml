@@ -143,7 +143,7 @@ jobs:
     # This job is time consuming so only run it if:
     # - the Java files have changed
     # - a new release must be issued (this flag is inferred by Nyx), in which case we rebuild and test everything
-    if: ${{ needs.init.outputs.javaChanged || needs.init.outputs.newRelease }}
+    if: needs.init.outputs.javaChanged || needs.init.outputs.newRelease
     runs-on: ubuntu-latest
     steps:
     - name: DEBUG 1
@@ -152,6 +152,8 @@ jobs:
       run: echo ${{ needs.init.outputs.newRelease }}
     - name: DEBUG 3
       run: echo ${{ needs.init.outputs.javaChanged || needs.init.outputs.newRelease }}
+    - name: DEBUG 4
+      run: echo ${{ needs.init.outputs.javaChanged == 'true' || needs.init.outputs.newRelease == 'true' }}
     - name: Git checkout
       uses: actions/checkout@v3
       with:
@@ -224,7 +226,7 @@ jobs:
     # This job is time consuming so only run it if:
     # - the Go files have changed
     # - a new release must be issued (this flag is inferred by Nyx), in which case we rebuild and test everything
-    if: ${{ needs.init.outputs.goChanged || needs.init.outputs.newRelease }}
+    if: needs.init.outputs.javaChanged == 'true' || needs.init.outputs.newRelease == 'true'
     runs-on: ubuntu-latest
     steps:
     - name: Git checkout
