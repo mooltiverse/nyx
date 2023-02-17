@@ -146,6 +146,12 @@ jobs:
     if: ${{ needs.init.outputs.javaChanged || needs.init.outputs.newRelease }}
     runs-on: ubuntu-latest
     steps:
+    - name: DEBUG 1
+      run: echo ${{ needs.init.outputs.javaChanged }}
+    - name: DEBUG 2
+      run: echo ${{ needs.init.outputs.newRelease }}
+    - name: DEBUG 3
+      run: echo ${{ needs.init.outputs.javaChanged || needs.init.outputs.newRelease }}
     - name: Git checkout
       uses: actions/checkout@v3
       with:
