@@ -1,4 +1,4 @@
-[![.github/workflows/continuous-integration.yml](https://github.com/mooltiverse/nyx/actions/workflows/continuous-integration.yml/badge.svg?branch=main)](https://github.com/mooltiverse/nyx/actions/workflows/continuous-integration.yml) 
+[![.github/workflows/workflow.yml](https://github.com/mooltiverse/nyx/actions/workflows/workflow.yml/badge.svg?branch=main)](https://github.com/mooltiverse/nyx/actions/workflows/workflow.yml) 
 [![Javadoc](https://javadoc.io/badge2/com.mooltiverse.oss.nyx/java/Javadoc.svg)](https://javadoc.io/doc/com.mooltiverse.oss.nyx/java) 
 [![Go Documentation](https://godocs.io/github.com/mooltiverse/nyx/modules/go/nyx?status.svg)](https://godocs.io/github.com/mooltiverse/nyx/modules/go/nyx) 
 [![](https://img.shields.io/badge/powered%20by-Nyx-blue)](https://github.com/mooltiverse/nyx) 
