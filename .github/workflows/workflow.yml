@@ -143,17 +143,9 @@ jobs:
     # This job is time consuming so only run it if:
     # - the Java files have changed
     # - a new release must be issued (this flag is inferred by Nyx), in which case we rebuild and test everything
-    if: needs.init.outputs.javaChanged || needs.init.outputs.newRelease
+    if: needs.init.outputs.javaChanged == 'true' || needs.init.outputs.newRelease == 'true'
     runs-on: ubuntu-latest
     steps:
-    - name: DEBUG 1
-      run: echo ${{ needs.init.outputs.javaChanged }}
-    - name: DEBUG 2
-      run: echo ${{ needs.init.outputs.newRelease }}
-    - name: DEBUG 3
-      run: echo ${{ needs.init.outputs.javaChanged || needs.init.outputs.newRelease }}
-    - name: DEBUG 4
-      run: echo ${{ needs.init.outputs.javaChanged == 'true' || needs.init.outputs.newRelease == 'true' }}
     - name: Git checkout
       uses: actions/checkout@v3
       with:
@@ -226,7 +218,7 @@ jobs:
     # This job is time consuming so only run it if:
     # - the Go files have changed
     # - a new release must be issued (this flag is inferred by Nyx), in which case we rebuild and test everything
-    if: needs.init.outputs.javaChanged == 'true' || needs.init.outputs.newRelease == 'true'
+    if: needs.init.outputs.goChanged == 'true' || needs.init.outputs.newRelease == 'true'
     runs-on: ubuntu-latest
     steps:
     - name: Git checkout
@@ -302,7 +294,7 @@ jobs:
     # This job is time consuming so only run it if:
     # - the Docker files have changed
     # - a new release must be issued (this flag is inferred by Nyx), in which case we rebuild and test everything
-    if: ${{ needs.init.outputs.dockerChanged || needs.init.outputs.newRelease }}
+    if: needs.init.outputs.dockerChanged == 'true' || needs.init.outputs.newRelease == 'true'
     runs-on: ubuntu-latest
     steps:
     - name: Git checkout
@@ -377,7 +369,7 @@ jobs:
     # This job is time consuming so only run it if:
     # - the Docker, Java or Go files have changed
     # - a new release must be issued (this flag is inferred by Nyx), in which case we rebuild and test everything
-    if: ${{ needs.init.outputs.dockerChanged || needs.init.outputs.goChanged || needs.init.outputs.javaChanged || needs.init.outputs.newRelease }}
+    if: needs.init.outputs.dockerChanged == 'true' || needs.init.outputs.goChanged == 'true' || needs.init.outputs.javaChanged == 'true' || needs.init.outputs.newRelease == 'true'
     runs-on: ubuntu-latest
     steps:
     # Pull the -build-docker cache (read only). This will be used in the next steps to create a new cache that merges this one and others
@@ -433,7 +425,7 @@ jobs:
     # This job is time consuming so only run it if:
     # - the Java files have changed
     # - a new release must be issued (this flag is inferred by Nyx), in which case we rebuild and test everything
-    if: ${{ needs.init.outputs.javaChanged || needs.init.outputs.newRelease }}
+    if: needs.init.outputs.javaChanged == 'true' || needs.init.outputs.newRelease == 'true'
     # The recommended JDK version is 15 or above but since we need to test for backward compatibility to JVMs 11 or newer we
     # need a matrix here. Depending on the JDK version the set of Gradle version that the tests run on will change, according
     # to the Gradle compatibility matrix. See CONTRIBUTING.md in the root directory or the Gradle functional test suites for more.
@@ -526,7 +518,7 @@ jobs:
     # This job is time consuming so only run it if:
     # - the Java files have changed
     # - a new release must be issued (this flag is inferred by Nyx), in which case we rebuild and test everything
-    if: ${{ needs.init.outputs.javaChanged || needs.init.outputs.newRelease }}
+    if: needs.init.outputs.javaChanged == 'true' || needs.init.outputs.newRelease == 'true'
     # Avoid jobs invoking remote services to run in parallel to avoid throttling down by those services (with consequent test failures)
     concurrency:
       group: remote-services
@@ -635,7 +627,7 @@ jobs:
     # This job is time consuming so only run it if:
     # - the Java files have changed
     # - a new release must be issued (this flag is inferred by Nyx), in which case we rebuild and test everything
-    if: ${{ needs.init.outputs.javaChanged || needs.init.outputs.newRelease }}
+    if: needs.init.outputs.javaChanged == 'true' || needs.init.outputs.newRelease == 'true'
     # Avoid jobs invoking remote services to run in parallel to avoid throttling down by those services (with consequent test failures)
     concurrency:
       group: remote-services
@@ -742,7 +734,7 @@ jobs:
     # This job is time consuming so only run it if:
     # - the Go files have changed
     # - a new release must be issued (this flag is inferred by Nyx), in which case we rebuild and test everything
-    if: ${{ needs.init.outputs.goChanged || needs.init.outputs.newRelease }}
+    if: needs.init.outputs.goChanged == 'true' || needs.init.outputs.newRelease == 'true'
     strategy:
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
@@ -837,7 +829,7 @@ jobs:
     # This job is time consuming so only run it if:
     # - the Go files have changed
     # - a new release must be issued (this flag is inferred by Nyx), in which case we rebuild and test everything
-    if: ${{ needs.init.outputs.goChanged || needs.init.outputs.newRelease }}
+    if: needs.init.outputs.goChanged == 'true' || needs.init.outputs.newRelease == 'true'
     # Avoid jobs invoking remote services to run in parallel to avoid throttling down by those services (with consequent test failures)
     concurrency:
       group: remote-services
@@ -948,7 +940,7 @@ jobs:
     # This job is time consuming so only run it if:
     # - the Go files have changed
     # - a new release must be issued (this flag is inferred by Nyx), in which case we rebuild and test everything
-    if: ${{ needs.init.outputs.goChanged || needs.init.outputs.newRelease }}
+    if: needs.init.outputs.goChanged == 'true' || needs.init.outputs.newRelease == 'true'
     # Avoid jobs invoking remote services to run in parallel to avoid throttling down by those services (with consequent test failures)
     concurrency:
       group: remote-services
@@ -1060,7 +1052,7 @@ jobs:
     # This job is time consuming so only run it if:
     # - the Docker files have changed
     # - a new release must be issued (this flag is inferred by Nyx), in which case we rebuild and test everything
-    if: ${{ needs.init.outputs.dockerChanged || needs.init.outputs.newRelease }}
+    if: needs.init.outputs.dockerChanged == 'true' || needs.init.outputs.newRelease == 'true'
     # Avoid jobs invoking remote services to run in parallel to avoid throttling down by those services (with consequent test failures)
     concurrency:
       group: remote-services
@@ -1162,7 +1154,7 @@ jobs:
     # Run this job only if:
     # - the Docker, Java or Go files have changed
     # - a new release must be issued (this flag is inferred by Nyx), in which case we rebuild and test everything
-    if: ${{ needs.init.outputs.dockerChanged || needs.init.outputs.goChanged || needs.init.outputs.javaChanged || needs.init.outputs.newRelease }}
+    if: needs.init.outputs.dockerChanged == 'true' || needs.init.outputs.goChanged == 'true' || needs.init.outputs.javaChanged == 'true' || needs.init.outputs.newRelease == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Git checkout
@@ -1242,7 +1234,7 @@ jobs:
     # Run this job only if:
     # - the Docker, Java or Go files have changed
     # - a new release must be issued (this flag is inferred by Nyx), in which case we rebuild and test everything
-    if: ${{ needs.init.outputs.dockerChanged || needs.init.outputs.goChanged || needs.init.outputs.javaChanged || needs.init.outputs.newRelease }}
+    if: needs.init.outputs.dockerChanged == 'true' || needs.init.outputs.goChanged == 'true' || needs.init.outputs.javaChanged == 'true' || needs.init.outputs.newRelease == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Git checkout
