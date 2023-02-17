@@ -294,7 +294,7 @@ jobs:
     # This job is time consuming so only run it if:
     # - the Docker files have changed
     # - a new release must be issued (this flag is inferred by Nyx), in which case we rebuild and test everything
-    if: needs.init.outputs.dockerChanged == 'true' || needs.init.outputs.newRelease == 'true'
+    if: needs.init.outputs.dockerChanged == 'true' || needs.init.outputs.goChanged == 'true' || needs.init.outputs.newRelease == 'true'
     runs-on: ubuntu-latest
     steps:
     - name: Git checkout
@@ -1052,7 +1052,7 @@ jobs:
     # This job is time consuming so only run it if:
     # - the Docker files have changed
     # - a new release must be issued (this flag is inferred by Nyx), in which case we rebuild and test everything
-    if: needs.init.outputs.dockerChanged == 'true' || needs.init.outputs.newRelease == 'true'
+    if: needs.init.outputs.dockerChanged == 'true' || needs.init.outputs.goChanged == 'true' || needs.init.outputs.newRelease == 'true'
     # Avoid jobs invoking remote services to run in parallel to avoid throttling down by those services (with consequent test failures)
     concurrency:
       group: remote-services
