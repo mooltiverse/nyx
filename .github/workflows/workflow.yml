@@ -49,7 +49,6 @@
 # they can't be mixed up. On the other hand, each job may use/store multiple caches
 
 name: Nyx workflow
-name: Nyx workflow
 on: [push]
 # Avoid running multiple pipelines concurrently to avoid overlapping releases and tags
 concurrency:
@@ -92,7 +91,6 @@ jobs:
       uses: actions/setup-java@v3
       with:
         distribution: 'temurin'
-        java-version: 19
         java-version: 19
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
@@ -153,11 +151,9 @@ jobs:
       with:
         fetch-depth: 0
     - name: Set up JDK 19
-    - name: Set up JDK 19
       uses: actions/setup-java@v3
       with:
         distribution: 'temurin'
-        java-version: 19
         java-version: 19
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
@@ -230,21 +226,17 @@ jobs:
       with:
         fetch-depth: 0
     - name: Set up JDK 19
-    - name: Set up JDK 19
       uses: actions/setup-java@v3
       with:
         distribution: 'temurin'
-        java-version: 19
         java-version: 19
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Make Git ignore execute permission changes in files (like gradlew)
       run: git config core.fileMode false
     - name: Set up Go 1.20.1
-    - name: Set up Go 1.20.1
       uses: actions/setup-go@v3
       with:
-        go-version: 1.20.1
         go-version: 1.20.1
     # Start from the -init pipeline cache and save the job output pipeline cache as -build-go
     - name: Set up the pipeline cache bringing the Nyx state
@@ -310,21 +302,17 @@ jobs:
       with:
         fetch-depth: 0
     - name: Set up JDK 19
-    - name: Set up JDK 19
       uses: actions/setup-java@v3
       with:
         distribution: 'temurin'
-        java-version: 19
         java-version: 19
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Make Git ignore execute permission changes in files (like gradlew)
       run: git config core.fileMode false
     - name: Set up Go 1.20.1
-    - name: Set up Go 1.20.1
       uses: actions/setup-go@v3
       with:
-        go-version: 1.20.1
         go-version: 1.20.1
     # Start from the -init pipeline cache and save the job output pipeline cache as -build-docker
     - name: Set up the pipeline cache bringing the Nyx state
@@ -444,7 +432,6 @@ jobs:
     strategy:
       matrix:
         java: [ '11', '19' ]
-        java: [ '11', '19' ]
     runs-on: ubuntu-latest
     steps:
     - name: Git checkout
@@ -541,7 +528,6 @@ jobs:
     # to the Gradle compatibility matrix. See CONTRIBUTING.md in the root directory or the Gradle functional test suites for more.
     strategy:
       matrix:
-        java: [ '11', '19' ]
         java: [ '11', '19' ]
     runs-on: ubuntu-latest
     steps:
@@ -652,7 +638,6 @@ jobs:
     strategy:
       matrix:
         java: [ '11', '19' ]
-        java: [ '11', '19' ]
     runs-on: ubuntu-latest
     steps:
     - name: Git checkout
@@ -760,21 +745,17 @@ jobs:
       with:
         fetch-depth: 0
     - name: Set up JDK 19
-    - name: Set up JDK 19
       uses: actions/setup-java@v3
       with:
         distribution: 'temurin'
-        java-version: 19
         java-version: 19
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Make Git ignore execute permission changes in files (like gradlew)
       run: git config core.fileMode false
     - name: Set up Go 1.20.1
-    - name: Set up Go 1.20.1
       uses: actions/setup-go@v3
       with:
-        go-version: 1.20.1
         go-version: 1.20.1
     # Pull the the -init pipeline cache (read only)
     - name: Set up the pipeline cache bringing the Nyx state
@@ -863,21 +844,17 @@ jobs:
       with:
         fetch-depth: 0
     - name: Set up JDK 19
-    - name: Set up JDK 19
       uses: actions/setup-java@v3
       with:
         distribution: 'temurin'
-        java-version: 19
         java-version: 19
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Make Git ignore execute permission changes in files (like gradlew)
       run: git config core.fileMode false
     - name: Set up Go 1.20.1
-    - name: Set up Go 1.20.1
       uses: actions/setup-go@v3
       with:
-        go-version: 1.20.1
         go-version: 1.20.1
     # Pull the the -init pipeline cache (read only)
     - name: Set up the pipeline cache bringing the Nyx state
@@ -978,21 +955,17 @@ jobs:
       with:
         fetch-depth: 0
     - name: Set up JDK 19
-    - name: Set up JDK 19
       uses: actions/setup-java@v3
       with:
         distribution: 'temurin'
-        java-version: 19
         java-version: 19
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Make Git ignore execute permission changes in files (like gradlew)
       run: git config core.fileMode false
     - name: Set up Go 1.20.1
-    - name: Set up Go 1.20.1
       uses: actions/setup-go@v3
       with:
-        go-version: 1.20.1
         go-version: 1.20.1
     # Pull the the -init pipeline cache (read only)
     - name: Set up the pipeline cache bringing the Nyx state
@@ -1091,21 +1064,17 @@ jobs:
       with:
         fetch-depth: 0
     - name: Set up JDK 19
-    - name: Set up JDK 19
       uses: actions/setup-java@v3
       with:
         distribution: 'temurin'
-        java-version: 19
         java-version: 19
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Make Git ignore execute permission changes in files (like gradlew)
       run: git config core.fileMode false
     - name: Set up Go 1.20.1
-    - name: Set up Go 1.20.1
       uses: actions/setup-go@v3
       with:
-        go-version: 1.20.1
         go-version: 1.20.1
     # Pull the the -init pipeline cache (read only)
     - name: Set up the pipeline cache bringing the Nyx state
@@ -1193,21 +1162,17 @@ jobs:
         with:
           fetch-depth: 0
       - name: Set up JDK 19
-      - name: Set up JDK 19
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
-          java-version: 19
           java-version: 19
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Make Git ignore execute permission changes in files (like gradlew)
         run: git config core.fileMode false
       - name: Set up Go 1.20.1
-      - name: Set up Go 1.20.1
         uses: actions/setup-go@v3
         with:
-          go-version: 1.20.1
           go-version: 1.20.1
       # Start from the -init pipeline cache and save the job output pipeline cache as -publish
       - name: Set up the pipeline cache bringing the Nyx state
@@ -1276,7 +1241,6 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: Set up JDK 19
       - name: Set up JDK 19
         uses: actions/setup-java@v3
         with:
