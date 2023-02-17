@@ -54,7 +54,7 @@ public class ObjectFactoryTests {
             assertEquals(commit.getAuthorIdent().getEmailAddress(), action.getIdentity().getEmail());
 
             assertEquals(commit.getAuthorIdent().getWhen(), action.getTimeStamp().getTimeStamp());
-            assertEquals(commit.getAuthorIdent().getTimeZone(), action.getTimeStamp().getTimeZone());
+            assertEquals(commit.getAuthorIdent().getTimeZoneOffset(), action.getTimeStamp().getOffset());
         }
 
         @DisplayName("ObjectFactory.timeStampFrom(PersonIdent)")
@@ -66,7 +66,7 @@ public class ObjectFactoryTests {
             TimeStamp timeStamp = ObjectFactory.timeStampFrom(commit.getAuthorIdent());
 
             assertEquals(commit.getAuthorIdent().getWhen(), timeStamp.getTimeStamp());
-            assertEquals(commit.getAuthorIdent().getTimeZone(), timeStamp.getTimeZone());
+            assertEquals(commit.getAuthorIdent().getTimeZoneOffset(), timeStamp.getOffset());
         }
 
         @DisplayName("ObjectFactory.identityFrom(PersonIdent)")

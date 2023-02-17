@@ -30,8 +30,8 @@ type TimeStamp struct {
 	// The time stamp.
 	TimeStamp int64 `json:"timeStamp,omitempty" yaml:"timeStamp,omitempty"`
 
-	// The time zone.
-	TimeZone *time.Location `json:"timeZone,omitempty" yaml:"timeZone,omitempty"`
+	// The time zone offset in minutes relative to UTC.
+	Offset *int `json:"offset,omitempty" yaml:"offset,omitempty"`
 }
 
 /*
@@ -45,7 +45,10 @@ func NewTimeStampFrom(tm time.Time) *TimeStamp {
 	t := TimeStamp{}
 
 	t.TimeStamp = tm.UnixMilli()
-	t.TimeZone = tm.Location()
+	_, offset := tm.Zone()
+	// the time package uses seconds for the offset, we need to convert in minutes
+	offset = offset / 60
+	t.Offset = &offset
 
 	return &t
 }
@@ -71,13 +74,13 @@ Standard constructor.
 Arguments are as follows:
 
 - timeStamp the time stamp
-- timeZone yhe time zone
+- offset the time zone offset in minutes relative to UTC. It may be nil.
 */
-func NewTimeStampWithIn(timeStamp int64, timeZone time.Location) *TimeStamp {
+func NewTimeStampWithIn(timeStamp int64, offset *int) *TimeStamp {
 	t := TimeStamp{}
 
 	t.TimeStamp = timeStamp
-	t.TimeZone = &timeZone
+	t.Offset = offset
 
 	return &t
 }
@@ -85,15 +88,15 @@ func NewTimeStampWithIn(timeStamp int64, timeZone time.Location) *TimeStamp {
 /*
 Returns the time stamp.
 */
-func (t TimeStamp) GeTimeStamp() int64 {
+func (t TimeStamp) GetTimeStamp() int64 {
 	return t.TimeStamp
 }
 
 /*
 Returns the time zone. It may be nil.
 */
-func (t TimeStamp) GeTimeZone() *time.Location {
-	return t.TimeZone
+func (t TimeStamp) GetOffset() *int {
+	return t.Offset
 }
 
 /*
@@ -108,9 +111,10 @@ Returns the Go Time representation of this object.
 */
 func (t TimeStamp) ToTime() time.Time {
 	res := time.UnixMilli(t.TimeStamp)
-	if t.TimeZone == nil {
-		return res
+	if t.Offset == nil {
+		return res.UTC()
 	} else {
-		return res.In(t.TimeZone)
+		// "UTC" here may be replaced by an empty string? It looks we have no way to create a zone with just the offset, without the name
+		return res.UTC().In(time.FixedZone("UTC", *t.Offset))
 	}
 }

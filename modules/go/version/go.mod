@@ -1,6 +1,6 @@
 module github.com/mooltiverse/nyx/modules/go/version
 
-go 1.19
+go 1.20
 
 require (
 	github.com/dlclark/regexp2 v1.7.0

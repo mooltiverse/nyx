@@ -394,23 +394,15 @@ nyx {
         gitTag = 'false'
         identifiers {
           '0' {
-            qualifier = 'branch'
-            value = '{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}'
+            qualifier = '{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}'
             position = 'BUILD'
           }
           '1' {
-            qualifier = 'commit'
-            value = '{{#short7}}{{releaseScope.finalCommit}}{{/short7}}'
+            qualifier = '{{#short5}}{{releaseScope.finalCommit}}{{/short5}}'
             position = 'BUILD'
           }
           '2' {
-            qualifier = 'user'
-            value = '{{#sanitizeLower}}{{environmentUser}}{{/sanitizeLower}}'
-            position = 'BUILD'
-          }
-          '3' {
-            qualifier = 'timestamp'
-            value = '{{#timestampYYYYMMDDHHMMSS}}{{timestamp}}{{/timestampYYYYMMDDHHMMSS}}'
+            qualifier = '{{#timestampYYYYMMDDHHMMSS}}{{timestamp}}{{/timestampYYYYMMDDHHMMSS}}'
             position = 'BUILD'
           }
         }

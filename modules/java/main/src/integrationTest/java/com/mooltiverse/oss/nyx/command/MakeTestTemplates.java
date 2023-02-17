@@ -711,9 +711,9 @@ public class MakeTestTemplates {
         }
 
         @TestTemplate
-        @DisplayName("Make.run() with custom template > yield to custom changelog")
+        @DisplayName("Make.run() with custom template from a local file > yield to custom changelog")
         @Baseline(Scenario.ONE_BRANCH_SHORT_CONVENTIONAL_COMMITS)
-        void runTestWithCustomTemplate(@CommandSelector(Commands.MAKE) CommandProxy command, Script script)
+        void runTestWithCustomTemplateFromLocalFile(@CommandSelector(Commands.MAKE) CommandProxy command, Script script)
             throws Exception {
             script.getWorkingDirectory().deleteOnExit();
             // first create the temporary directory and the abstract destination file
@@ -763,6 +763,65 @@ public class MakeTestTemplates {
                 // test the rendered file
                 String fileContent = readFile(changelogFile);
                 assertTrue(fileContent.startsWith("# This is a custom changelog"));  // title header check
+                assertTrue(fileContent.contains("## 0.1.0 "));      // release header check
+            }
+        }
+
+        @TestTemplate
+        @DisplayName("Make.run() with custom template from a remote URL > yield to custom changelog")
+        @Baseline(Scenario.ONE_BRANCH_SHORT_CONVENTIONAL_COMMITS)
+        void runTestWithCustomTemplateFromURL(@CommandSelector(Commands.MAKE) CommandProxy command, Script script)
+            throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
+            // first create the temporary directory and the abstract destination file
+            File destinationDir = Files.createTempDirectory("nyx-test-make-test-").toFile();
+            destinationDir.deleteOnExit();
+            File changelogFile = new File(destinationDir, "CHANGELOG.md");
+
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            configurationLayerMock.getChangelog().setPath(changelogFile.getAbsolutePath());
+            // add the substitution rules to replace issue IDs with links
+            configurationLayerMock.getChangelog().setSubstitutions(Map.<String,String>of(
+                "(?m)#([0-9]+)(?s)", "[#%s](https://example.com/issues/%s)"
+            ));
+            // load the preconfigured from the Nyx repository, getting the raw content, just to have it loaded from a remote URL
+            configurationLayerMock.getChangelog().setTemplate("https://raw.githubusercontent.com/mooltiverse/nyx/main/modules/go/nyx/command/template/changelog.tpl");
+            // add the conventional commits convention
+            configurationLayerMock.setCommitMessageConventions(
+                new CommitMessageConventions(
+                    List.<String>of("conventionalCommits"),
+                    Map.<String,CommitMessageConvention>of("conventionalCommits", CONVENTIONAL_COMMITS))
+            );
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
+
+            assertFalse(changelogFile.exists());
+
+            command.run();
+
+            // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
+            if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
+                assertTrue(changelogFile.exists());
+
+                // print the file to standard output for inspection purpose
+                System.out.println("------- CHANGELOG -------");
+                System.out.println("Loading from: "+changelogFile.getAbsolutePath());
+                System.out.println("-----------------------------------------");
+                System.out.println(readFile(changelogFile));
+                System.out.println("-----------------------------------------");
+                System.out.flush();
+
+                // test the data model
+                assertEquals(1, command.state().getChangelog().getReleases().size());
+                assertEquals("0.1.0", command.state().getChangelog().getReleases().get(0).getName());
+                assertEquals(2, command.state().getChangelog().getReleases().get(0).getSections().size());
+                assertEquals("feat", command.state().getChangelog().getReleases().get(0).getSections().get(0).getName());
+                assertEquals(1, command.state().getChangelog().getReleases().get(0).getSections().get(0).getCommits().size());
+                assertEquals("fix", command.state().getChangelog().getReleases().get(0).getSections().get(1).getName());
+                assertEquals(1, command.state().getChangelog().getReleases().get(0).getSections().get(1).getCommits().size());
+
+                // test the rendered file
+                String fileContent = readFile(changelogFile);
+                assertTrue(fileContent.startsWith("# Changelog"));  // title header check
                 assertTrue(fileContent.contains("## 0.1.0 "));      // release header check
             }
         }

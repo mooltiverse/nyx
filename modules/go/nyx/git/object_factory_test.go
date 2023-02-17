@@ -35,7 +35,7 @@ line 3`
 	message := messageFromString(messageString)
 	assert.Equal(t, "subject line", message.GetShortMessage())
 	assert.Equal(t, messageString, message.GetFullMessage())
-	assert.Equal(t, 0, len(message.GeFooters()))
+	assert.Equal(t, 0, len(message.GetFooters()))
 }
 
 func TestMessageFromStringWithoutFooters2(t *testing.T) {
@@ -47,7 +47,7 @@ line 3`
 	message := messageFromString(messageString)
 	assert.Equal(t, "subject line", message.GetShortMessage())
 	assert.Equal(t, messageString, message.GetFullMessage())
-	assert.Equal(t, 0, len(message.GeFooters()))
+	assert.Equal(t, 0, len(message.GetFooters()))
 }
 
 func TestMessageFromStringWithoutFooters3(t *testing.T) {
@@ -60,7 +60,7 @@ line 3
 	message := messageFromString(messageString)
 	assert.Equal(t, "subject line", message.GetShortMessage())
 	assert.Equal(t, messageString, message.GetFullMessage())
-	assert.Equal(t, 0, len(message.GeFooters()))
+	assert.Equal(t, 0, len(message.GetFooters()))
 }
 
 func TestMessageFromStringWithoutFooters4(t *testing.T) {
@@ -73,7 +73,7 @@ line 3
 	message := messageFromString(messageString)
 	assert.Equal(t, "subject line", message.GetShortMessage())
 	assert.Equal(t, messageString, message.GetFullMessage())
-	assert.Equal(t, 0, len(message.GeFooters()))
+	assert.Equal(t, 0, len(message.GetFooters()))
 }
 
 func TestMessageFromStringWithoutFooters5(t *testing.T) {
@@ -85,7 +85,7 @@ func TestMessageFromStringWithoutFooters5(t *testing.T) {
 	message := messageFromString(messageString)
 	assert.Equal(t, "subject line", message.GetShortMessage())
 	assert.Equal(t, messageString, message.GetFullMessage())
-	assert.Equal(t, 0, len(message.GeFooters()))
+	assert.Equal(t, 0, len(message.GetFooters()))
 }
 
 func TestMessageFromStringWithFooters1(t *testing.T) {
@@ -97,8 +97,8 @@ k1: v1
 	message := messageFromString(messageString)
 	assert.Equal(t, "subject line", message.GetShortMessage())
 	assert.Equal(t, messageString, message.GetFullMessage())
-	assert.Equal(t, 1, len(message.GeFooters()))
-	assert.Equal(t, "v1", message.GeFooters()["k1"])
+	assert.Equal(t, 1, len(message.GetFooters()))
+	assert.Equal(t, "v1", message.GetFooters()["k1"])
 }
 
 func TestMessageFromStringWithFooters2(t *testing.T) {
@@ -112,10 +112,10 @@ k3: v3
 	message := messageFromString(messageString)
 	assert.Equal(t, "subject line", message.GetShortMessage())
 	assert.Equal(t, messageString, message.GetFullMessage())
-	assert.Equal(t, 3, len(message.GeFooters()))
-	assert.Equal(t, "v1", message.GeFooters()["k1"])
-	assert.Equal(t, "v2", message.GeFooters()["k2"])
-	assert.Equal(t, "v3", message.GeFooters()["k3"])
+	assert.Equal(t, 3, len(message.GetFooters()))
+	assert.Equal(t, "v1", message.GetFooters()["k1"])
+	assert.Equal(t, "v2", message.GetFooters()["k2"])
+	assert.Equal(t, "v3", message.GetFooters()["k3"])
 }
 
 func TestMessageFromStringWithFooters3(t *testing.T) {
@@ -129,10 +129,10 @@ k3: v3 and something
 	message := messageFromString(messageString)
 	assert.Equal(t, "subject line", message.GetShortMessage())
 	assert.Equal(t, messageString, message.GetFullMessage())
-	assert.Equal(t, 3, len(message.GeFooters()))
-	assert.Equal(t, "v1", message.GeFooters()["k1 and more"])
-	assert.Equal(t, "v2: vvv", message.GeFooters()["k2"])
-	assert.Equal(t, "v3 and something", message.GeFooters()["k3"])
+	assert.Equal(t, 3, len(message.GetFooters()))
+	assert.Equal(t, "v1", message.GetFooters()["k1 and more"])
+	assert.Equal(t, "v2: vvv", message.GetFooters()["k2"])
+	assert.Equal(t, "v3 and something", message.GetFooters()["k3"])
 }
 
 func TestMessageFromStringWithWrongFooters1(t *testing.T) {
@@ -145,5 +145,5 @@ k3: v3 and something
 	message := messageFromString(messageString)
 	assert.Equal(t, "subject line", message.GetShortMessage())
 	assert.Equal(t, messageString, message.GetFullMessage())
-	assert.Equal(t, 0, len(message.GeFooters()))
+	assert.Equal(t, 0, len(message.GetFooters()))
 }
