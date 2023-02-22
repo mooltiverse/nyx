@@ -7,6 +7,8 @@
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=mooltiverse_nyx&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=mooltiverse_nyx) [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=mooltiverse_nyx&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=mooltiverse_nyx)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=mooltiverse_nyx&metric=coverage)](https://sonarcloud.io/summary/new_code?id=mooltiverse_nyx) [![Codecov](https://codecov.io/gh/mooltiverse/nyx/branch/main/graph/badge.svg)](https://codecov.io/gh/mooltiverse/nyx) [![Sonatype Lift](https://lift.sonatype.com/api/badge/github.com/mooltiverse/nyx)](https://lift.sonatype.com/results/github.com/mooltiverse/nyx)
 
+[![Documentation](https://img.shields.io/static/v1?label=read%20the&message=documentation&color=blue&style=for-the-badge)](https://github.com/mooltiverse/nyx)
+
 [Nyx](https://github.com/mooltiverse/nyx) is a powerful, flexible and extremely configurable **semantic release** tool. You can put release management on *auto pilot* regardless of the kind of project, languages, tools and technologies or you can control any aspect of release management manually. Preset configuration values let you get started in minutes without digging into detailed settings.
 
 Nyx is the *all in one* tool that gives you integrated support for:
