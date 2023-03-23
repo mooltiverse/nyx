@@ -292,7 +292,11 @@ func (ac *abstractCommand) resolveReleaseService(name string) (*svcapi.ReleaseSe
 	log.Debugf("resolving the service configuration among available ones: '%v'", *services)
 	if serviceConfiguration, ok := (*services)[name]; ok {
 		log.Debugf("instantiating service '%s' of type '%s' with '%d' options", name, serviceConfiguration.GetType().String(), len(*serviceConfiguration.GetOptions()))
-		serviceInstance, err := svc.ReleaseServiceInstance(*serviceConfiguration.GetType(), *serviceConfiguration.GetOptions())
+		resolvedOptions, err := ac.resolveServiceOptions(*serviceConfiguration.GetOptions())
+		if err != nil {
+			return nil, err
+		}
+		serviceInstance, err := svc.ReleaseServiceInstance(*serviceConfiguration.GetType(), resolvedOptions)
 		if err != nil {
 			return nil, err
 		}
