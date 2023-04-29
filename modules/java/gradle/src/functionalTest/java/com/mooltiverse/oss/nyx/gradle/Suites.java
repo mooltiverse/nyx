@@ -75,12 +75,20 @@ public class Suites {
 
         // Java versions >= 15 are recommended
         // Gradle versions from 7.0 on are recommended
+        if (javaVersion <= 20) {
+            // the latest version is always among the 'quick' tests
+            quickTestVersions.add("8.1.1");
+            extensiveTestVersions.add("8.1");
+        }
         if (javaVersion <= 19) {
             // the latest version is always among the 'quick' tests
-            quickTestVersions.add("8.0");
-            
+            extensiveTestVersions.add("8.0.2");
+            extensiveTestVersions.add("8.0.1");
+            extensiveTestVersions.add("8.0");
+
             // the previous major version is in the 'quick' tests
-            quickTestVersions.add("7.6");
+            quickTestVersions.add("7.6.1");
+            extensiveTestVersions.add("7.6");
         }
         if (javaVersion <= 18) {
             extensiveTestVersions.add("7.5.1");
@@ -108,6 +116,7 @@ public class Suites {
         if (javaVersion <= 15) {
             // these versions are not supported due to the ASM version it uses, see https://github.com/mooltiverse/nyx/issues/153
             /*
+            extensiveTestVersions.add("6.9.4");
             extensiveTestVersions.add("6.9.3");
             extensiveTestVersions.add("6.9.2");
             extensiveTestVersions.add("6.9.1");

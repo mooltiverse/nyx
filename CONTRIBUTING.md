@@ -202,7 +202,7 @@ Some tests, specifically among functional tests, are very extensive and may take
 To limit the number of tests to a smaller set you can run setting the `quickTests` property to `true` when launching the Gradle script, like:
 
 ```shell script
-./gradlew -PquickTests=true functionaltest
+./gradlew -PquickTests=true functionalTest
 ```
 
 ##### Testing against remote repositories
