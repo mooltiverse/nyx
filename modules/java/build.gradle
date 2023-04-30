@@ -175,7 +175,7 @@ allprojects {
     javadoc {
         options {
             // Link generated javadocs to external docs
-            links 'https://download.eclipse.org/jgit/site/6.5.0.202303070854-r/apidocs/'
+            links 'https://download.eclipse.org/jgit/site/6.4.0.202211300538-r/apidocs/' // TODO: Update this link to https://download.eclipse.org/jgit/site/6.4.0.202211300538-r/apidocs/ when available (as of this writing it's not)
             links 'https://www.slf4j.org/apidocs/'
             links 'https://docs.gradle.org/current/javadoc/'
             links 'https://junit.org/junit5/docs/current/api/'
