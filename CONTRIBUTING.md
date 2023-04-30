@@ -202,7 +202,7 @@ Some tests, specifically among functional tests, are very extensive and may take
 To limit the number of tests to a smaller set you can run setting the `quickTests` property to `true` when launching the Gradle script, like:
 
 ```shell script
-./gradlew -PquickTests=true functionaltest
+./gradlew -PquickTests=true functionalTest
 ```
 
 ##### Testing against remote repositories
@@ -304,7 +304,7 @@ Tests are executed also using SSH keypairs to authenticate to Git services. Priv
 
 You can use the same keypair for both kinds of tests. This is actually suggested so you have the same public key to load on remote services like [GitHub](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account) and [GitLab](https://docs.gitlab.com/ee/user/ssh.html). You just need to have the private key in two versions: password protected and not protected.
 
-You can [generate a keypair](https://git-scm.com/book/en/v2/Git-on-the-Server-Generating-Your-SSH-Public-Key) with an unprotected private key by running `ssh-keygen -t ed25519` (to use the Ed25519 algorithm but you can use any other as long as it's supported locally and remotely). This will create the `~/.ssh/id_ed25519` file containing the private key and `~/.ssh/id_ed25519.pub` with the public key. Then you can make a copy of the `~/.ssh/id_ed25519` (let's say to `~/.ssh/id_ed25519.clear`) file and run `ssh-keygen -p -f ~/.ssh/id_ed25519` to create a new version of the `~/.ssh/id_ed25519`, protected by the passphrase you like.
+You can [generate a keypair](https://git-scm.com/book/en/v2/Git-on-the-Server-Generating-Your-SSH-Public-Key) with an unprotected private key by running `ssh-keygen -t ed25519` (just press ENTER when prompted for the passphrase, to use the Ed25519 algorithm but you can use any other as long as it's supported locally and remotely). This will create the `~/.ssh/id_ed25519` file containing the private key and `~/.ssh/id_ed25519.pub` with the public key. Then you can make a copy of the `~/.ssh/id_ed25519` (let's say to `~/.ssh/id_ed25519.clear`) file and run `ssh-keygen -p -f ~/.ssh/id_ed25519` to create a new version of the `~/.ssh/id_ed25519`, protected by the passphrase you like.
 
 Now you have the two versions of the private keys in `~/.ssh/id_ed25519` and `~/.ssh/id_ed25519.clear`, password protected and unprotected, respectively, and you can copy their contents to the properties described above to make them available for testing.
 
@@ -322,6 +322,12 @@ to:
 -----BEGIN OPENSSH PRIVATE KEY-----\nb3BlbnNzaC1rZXktdjEAAAAACmFlczI1Ni1jYmMAAAAGYmNyeXB0AAAAGAAAABBIR/mwmF\ncmpIQMAGXJaOTQAAAAEAAAAAEAAAAzAAAAC3NzaC1lZDI1NTE5AAAAIAEQ6MY269p/A+qF
 ...
 ```
+
+###### Troubleshooting SSH authentication
+
+You can get the list of algorithms supported by the remote server running `nmap --script ssh2-enum-algos -sV -p <REMOTE_SERVER_PORT> <REMOTE_SERVER_ADDRESS>`.
+
+[JSch](https://github.com/mwiede/jsch) sometimes shows inconsistent behavior when running on Windows or Linux so if you can't get it runnin on one, try the other one. An issue has been created [here](https://github.com/mwiede/jsch/issues/316).
 
 ### Build statistics
 
