@@ -286,7 +286,7 @@ func (c *Infer) scanRepository(scheme *ver.Scheme, bump *string, releaseLenient 
 					}
 				}
 
-				if *collapsedVersioning {
+				if collapsedVersioning != nil && *collapsedVersioning {
 					log.Debugf("evaluating tag '%s': the selected release type uses collapsed versioning so the tag will be passed to the next evaluation steps to check if it's a valid primeVersion. The tag is applied to commit '%s'", tag.GetName(), cc.GetSHA())
 
 					if (*releaseLenient && ver.IsCoreWithLenience(*scheme, tag.GetName(), *releaseLenient)) || (!*releaseLenient && ver.IsCoreWithPrefix(*scheme, tag.GetName(), releasePrefix)) {
