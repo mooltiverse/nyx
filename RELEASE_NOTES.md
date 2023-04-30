@@ -1,5 +1,7 @@
 # Nyx Release Notes
 
+There are no fixes in this release.
+
 ## 2.3.1
 
 This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/2.3.1).
@@ -9,8 +11,6 @@ This release is available at [this link](https://github.com/mooltiverse/nyx/rele
 There are no actions to take for backward compatibility.
 
 ### New features and improvements
-
-This release:
 
 There are no new features or improvements in this release.
 

@@ -175,7 +175,7 @@ allprojects {
     javadoc {
         options {
             // Link generated javadocs to external docs
-            links 'https://download.eclipse.org/jgit/site/6.4.0.202211300538-r/apidocs/'
+            links 'https://download.eclipse.org/jgit/site/6.4.0.202211300538-r/apidocs/' // TODO: Update this link to https://download.eclipse.org/jgit/site/6.4.0.202211300538-r/apidocs/ when available (as of this writing it's not)
             links 'https://www.slf4j.org/apidocs/'
             links 'https://docs.gradle.org/current/javadoc/'
             links 'https://junit.org/junit5/docs/current/api/'
@@ -246,12 +246,12 @@ subprojects {
                 testType = TestSuiteType.UNIT_TEST
                 dependencies {
                     // plug the Logback SLF4J implementation when testing so we can get log messages logged to the standard output
-                    runtimeOnly    'ch.qos.logback:logback-core:1.4.5'
-                    runtimeOnly    'ch.qos.logback:logback-classic:1.4.5'
+                    runtimeOnly    'ch.qos.logback:logback-core:1.4.7'
+                    runtimeOnly    'ch.qos.logback:logback-classic:1.4.7'
 
                     // The SLF4J framework that prints all test output to System err
                     // See http://www.slf4j.org/apidocs/org/slf4j/impl/SimpleLogger.html for the system properties available to change verbosity levels
-                    runtimeOnly    'org.slf4j:slf4j-simple:2.0.6'
+                    runtimeOnly    'org.slf4j:slf4j-simple:2.0.7'
                 }
             }
 
