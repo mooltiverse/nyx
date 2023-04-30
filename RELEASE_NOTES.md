@@ -1,21 +1,5 @@
 # Nyx Release Notes
 
-## 2.3.2
-
-This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/2.3.2).
-
-### Upgrade instructions
-
-There are no actions to take for backward compatibility.
-
-### New features and improvements
-
-This release:
-
-* adds support for Gradle up to 8.1.1, while backward compatibility doesn't change.
-
-### Fixed issues
-
 There are no fixes in this release.
 
 ## 2.3.1
