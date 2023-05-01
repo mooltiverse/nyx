@@ -18,8 +18,6 @@ This release:
 
 * fixes a bug in the command line version that caused a segment violation error when the `collapsedVersioning` configuration attribute is not set ([#196](https://github.com/mooltiverse/nyx/issues/196))
 
-There are no fixes in this release.
-
 ## 2.3.1
 
 This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/2.3.1).
