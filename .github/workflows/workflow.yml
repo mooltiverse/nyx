@@ -1220,7 +1220,7 @@ jobs:
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.GPC_PASSPHRASE }}
           ORG_GRADLE_PROJECT_gradlePublishKey: ${{ secrets.GRADLE_PLUGIN_PUBLISH_KEY }}
           ORG_GRADLE_PROJECT_gradlePublishSecret: ${{ secrets.GRADLE_PLUGIN_PUBLISH_SECRET }}
-        run: ./gradlew nyxMake nyxMark nyxPublish publish --build-cache --stacktrace
+        run: ./gradlew nyxMake nyxMark nyxPublish publish --build-cache --stacktrace --debug
       - name: Archive Nyx state file
         uses: actions/upload-artifact@v3
         if: ${{ always() }}
