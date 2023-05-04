@@ -795,7 +795,6 @@ jobs:
       with:
           # Disable warning about missing distributionSha256Sum property in gradle-wrapper.properties
           gradle-distribution-sha-256-sum-warning: false
-
     - name: Run Go Unit Tests with Gradle
       run: ./gradlew modules:go:test --build-cache --stacktrace
     - name: Upload code coverage statistics to Codecov
@@ -892,6 +891,7 @@ jobs:
           # Disable warning about missing distributionSha256Sum property in gradle-wrapper.properties
           gradle-distribution-sha-256-sum-warning: false
     - name: Show current GitHub rate limits for test user nyxtest20200701
+      if: ${{ matrix.os == 'ubuntu-latest' }} # This command is only supported on Linux
       run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
     - name: Run Go Integration Tests with Gradle
       env:
@@ -908,7 +908,7 @@ jobs:
         ORG_GRADLE_PROJECT_gitLabTestUserPrivateKeyWithoutPassphrase: ${{ secrets.TEST_GITLAB_USER_PRIVATE_KEY_WITHOUT_PASSPHRASE }} # The test unprotected private key to test Nyx GitHub features
       run: ./gradlew modules:go:integrationTest --build-cache --stacktrace
     - name: Show current GitHub rate limits for test user nyxtest20200701
-      if: ${{ always() }}
+      if: ${{ matrix.os == 'ubuntu-latest' && always() }} # This command is only supported on Linux and needs to run even if previous jobs have failed
       run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
     - name: Upload code coverage statistics to Codecov
       uses: codecov/codecov-action@v3
@@ -1009,6 +1009,7 @@ jobs:
           # Disable warning about missing distributionSha256Sum property in gradle-wrapper.properties
           gradle-distribution-sha-256-sum-warning: false
     - name: Show current GitHub rate limits for test user nyxtest20200701
+      if: ${{ matrix.os == 'ubuntu-latest' }} # This command is only supported on Linux
       run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
     # Add the -PquickTests=true option to the Gradle command line to narrow the number of tests
     - name: Run Go Functional Tests with Gradle
@@ -1026,7 +1027,7 @@ jobs:
         ORG_GRADLE_PROJECT_gitLabTestUserPrivateKeyWithoutPassphrase: ${{ secrets.TEST_GITLAB_USER_PRIVATE_KEY_WITHOUT_PASSPHRASE }} # The test unprotected private key to test Nyx GitHub features
       run: ./gradlew modules:go:functionalTest --build-cache --stacktrace
     - name: Show current GitHub rate limits for test user nyxtest20200701
-      if: ${{ always() }}
+      if: ${{ matrix.os == 'ubuntu-latest' && always() }} # This command is only supported on Linux and needs to run even if previous jobs have failed
       run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
     - name: Upload code coverage statistics to Codecov
       uses: codecov/codecov-action@v3
@@ -1243,7 +1244,7 @@ jobs:
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.GPC_PASSPHRASE }}
           ORG_GRADLE_PROJECT_gradlePublishKey: ${{ secrets.GRADLE_PLUGIN_PUBLISH_KEY }}
           ORG_GRADLE_PROJECT_gradlePublishSecret: ${{ secrets.GRADLE_PLUGIN_PUBLISH_SECRET }}
-        run: ./gradlew nyxMake nyxMark nyxPublish publish --build-cache --stacktrace --debug
+        run: ./gradlew nyxMake nyxMark nyxPublish publish --build-cache --stacktrace
       - name: Show current GitHub rate limits for test user nyxtest20200701
         if: ${{ always() }}
         run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
