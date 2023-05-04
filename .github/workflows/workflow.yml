@@ -519,10 +519,6 @@ jobs:
     # - the Java files have changed
     # - a new release must be issued (this flag is inferred by Nyx), in which case we rebuild and test everything
     if: needs.init.outputs.javaChanged == 'true' || needs.init.outputs.newRelease == 'true'
-    # Avoid jobs invoking remote services to run in parallel to avoid throttling down by those services (with consequent test failures)
-    concurrency:
-      group: remote-services
-      cancel-in-progress: false
     # The recommended JDK version is 15 or above but since we need to test for backward compatibility to JVMs 11 or newer we
     # need a matrix here. Depending on the JDK version the set of Gradle version that the tests run on will change, according
     # to the Gradle compatibility matrix. See CONTRIBUTING.md in the root directory or the Gradle functional test suites for more.
@@ -573,6 +569,8 @@ jobs:
       with:
           # Disable warning about missing distributionSha256Sum property in gradle-wrapper.properties
           gradle-distribution-sha-256-sum-warning: false
+    - name: Show current GitHub rate limits for test user nyxtest20200701
+      run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
     - name: Run Java Integration Tests with Gradle
       env:
         # See the top level https://github.com/mooltiverse/nyx/blob/main/CONTRIBUTING.md#contributing-code file for details about passing these values when testing locally
@@ -587,6 +585,9 @@ jobs:
         ORG_GRADLE_PROJECT_gitLabTestUserPrivateKeyWithPassphrase: ${{ secrets.TEST_GITLAB_USER_PRIVATE_KEY_WITH_PASSPHRASE }}       # The test password protected private key to test Nyx GitHub features
         ORG_GRADLE_PROJECT_gitLabTestUserPrivateKeyWithoutPassphrase: ${{ secrets.TEST_GITLAB_USER_PRIVATE_KEY_WITHOUT_PASSPHRASE }} # The test unprotected private key to test Nyx GitHub features
       run: ./gradlew modules:java:integrationTest --build-cache --stacktrace
+    - name: Show current GitHub rate limits for test user nyxtest20200701
+      if: ${{ always() }}
+      run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
     - name: Upload code coverage statistics to Codecov
       uses: codecov/codecov-action@v3
       with:
@@ -628,9 +629,10 @@ jobs:
     # - the Java files have changed
     # - a new release must be issued (this flag is inferred by Nyx), in which case we rebuild and test everything
     if: needs.init.outputs.javaChanged == 'true' || needs.init.outputs.newRelease == 'true'
-    # Avoid jobs invoking remote services to run in parallel to avoid throttling down by those services (with consequent test failures)
+    # Avoid jobs invoking remote services to run in parallel to avoid throttling down by those services (with consequent test failures).
+    # See https://github.com/mooltiverse/nyx/issues/206 for more
     concurrency:
-      group: remote-services
+      group: rate-limited-remote-services
       cancel-in-progress: false
     # The recommended JDK version is 15 or above but since we need to test for backward compatibility to JVMs 11 or newer we
     # need a matrix here. Depending on the JDK version the set of Gradle version that the tests run on will change, according
@@ -682,6 +684,8 @@ jobs:
       with:
           # Disable warning about missing distributionSha256Sum property in gradle-wrapper.properties
           gradle-distribution-sha-256-sum-warning: false
+    - name: Show current GitHub rate limits for test user nyxtest20200701
+      run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
     # Add the -PquickTests=true option to the Gradle command line to narrow the number of tests
     - name: Run Java Functional Tests with Gradle
       env:
@@ -697,6 +701,9 @@ jobs:
         ORG_GRADLE_PROJECT_gitLabTestUserPrivateKeyWithPassphrase: ${{ secrets.TEST_GITLAB_USER_PRIVATE_KEY_WITH_PASSPHRASE }}       # The test password protected private key to test Nyx GitHub features
         ORG_GRADLE_PROJECT_gitLabTestUserPrivateKeyWithoutPassphrase: ${{ secrets.TEST_GITLAB_USER_PRIVATE_KEY_WITHOUT_PASSPHRASE }} # The test unprotected private key to test Nyx GitHub features
       run: ./gradlew modules:java:functionalTest --build-cache --stacktrace
+    - name: Show current GitHub rate limits for test user nyxtest20200701
+      if: ${{ always() }}
+      run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
     - name: Upload code coverage statistics to Codecov
       uses: codecov/codecov-action@v3
       with:
@@ -830,10 +837,6 @@ jobs:
     # - the Go files have changed
     # - a new release must be issued (this flag is inferred by Nyx), in which case we rebuild and test everything
     if: needs.init.outputs.goChanged == 'true' || needs.init.outputs.newRelease == 'true'
-    # Avoid jobs invoking remote services to run in parallel to avoid throttling down by those services (with consequent test failures)
-    concurrency:
-      group: remote-services
-      cancel-in-progress: false
     strategy:
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
@@ -887,6 +890,9 @@ jobs:
       with:
           # Disable warning about missing distributionSha256Sum property in gradle-wrapper.properties
           gradle-distribution-sha-256-sum-warning: false
+    - name: Show current GitHub rate limits for test user nyxtest20200701
+      if: ${{ matrix.os == 'ubuntu-latest' }} # This command is only supported on Linux
+      run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
     - name: Run Go Integration Tests with Gradle
       env:
         # See the top level https://github.com/mooltiverse/nyx/blob/main/CONTRIBUTING.md#contributing-code file for details about passing these values when testing locally
@@ -901,6 +907,9 @@ jobs:
         ORG_GRADLE_PROJECT_gitLabTestUserPrivateKeyWithPassphrase: ${{ secrets.TEST_GITLAB_USER_PRIVATE_KEY_WITH_PASSPHRASE }}       # The test password protected private key to test Nyx GitHub features
         ORG_GRADLE_PROJECT_gitLabTestUserPrivateKeyWithoutPassphrase: ${{ secrets.TEST_GITLAB_USER_PRIVATE_KEY_WITHOUT_PASSPHRASE }} # The test unprotected private key to test Nyx GitHub features
       run: ./gradlew modules:go:integrationTest --build-cache --stacktrace
+    - name: Show current GitHub rate limits for test user nyxtest20200701
+      if: ${{ matrix.os == 'ubuntu-latest' && always() }} # This command is only supported on Linux and needs to run even if previous jobs have failed
+      run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
     - name: Upload code coverage statistics to Codecov
       uses: codecov/codecov-action@v3
       if: ${{ matrix.os == 'ubuntu-latest' }} # Avoid uploading the same code coverage metrix for all platforms as it's useless, just upload them from the Linux tests
@@ -941,9 +950,10 @@ jobs:
     # - the Go files have changed
     # - a new release must be issued (this flag is inferred by Nyx), in which case we rebuild and test everything
     if: needs.init.outputs.goChanged == 'true' || needs.init.outputs.newRelease == 'true'
-    # Avoid jobs invoking remote services to run in parallel to avoid throttling down by those services (with consequent test failures)
+    # Avoid jobs invoking remote services to run in parallel to avoid throttling down by those services (with consequent test failures).
+    # See https://github.com/mooltiverse/nyx/issues/206 for more
     concurrency:
-      group: remote-services
+      group: rate-limited-remote-services
       cancel-in-progress: false
     strategy:
       matrix:
@@ -998,6 +1008,9 @@ jobs:
       with:
           # Disable warning about missing distributionSha256Sum property in gradle-wrapper.properties
           gradle-distribution-sha-256-sum-warning: false
+    - name: Show current GitHub rate limits for test user nyxtest20200701
+      if: ${{ matrix.os == 'ubuntu-latest' }} # This command is only supported on Linux
+      run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
     # Add the -PquickTests=true option to the Gradle command line to narrow the number of tests
     - name: Run Go Functional Tests with Gradle
       env:
@@ -1013,6 +1026,9 @@ jobs:
         ORG_GRADLE_PROJECT_gitLabTestUserPrivateKeyWithPassphrase: ${{ secrets.TEST_GITLAB_USER_PRIVATE_KEY_WITH_PASSPHRASE }}       # The test password protected private key to test Nyx GitHub features
         ORG_GRADLE_PROJECT_gitLabTestUserPrivateKeyWithoutPassphrase: ${{ secrets.TEST_GITLAB_USER_PRIVATE_KEY_WITHOUT_PASSPHRASE }} # The test unprotected private key to test Nyx GitHub features
       run: ./gradlew modules:go:functionalTest --build-cache --stacktrace
+    - name: Show current GitHub rate limits for test user nyxtest20200701
+      if: ${{ matrix.os == 'ubuntu-latest' && always() }} # This command is only supported on Linux and needs to run even if previous jobs have failed
+      run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
     - name: Upload code coverage statistics to Codecov
       uses: codecov/codecov-action@v3
       if: ${{ matrix.os == 'ubuntu-latest' }} # Avoid uploading the same code coverage metrix for all platforms as it's useless, just upload them from the Linux tests
@@ -1053,9 +1069,10 @@ jobs:
     # - the Docker files have changed
     # - a new release must be issued (this flag is inferred by Nyx), in which case we rebuild and test everything
     if: needs.init.outputs.dockerChanged == 'true' || needs.init.outputs.goChanged == 'true' || needs.init.outputs.newRelease == 'true'
-    # Avoid jobs invoking remote services to run in parallel to avoid throttling down by those services (with consequent test failures)
+    # Avoid jobs invoking remote services to run in parallel to avoid throttling down by those services (with consequent test failures).
+    # See https://github.com/mooltiverse/nyx/issues/206 for more
     concurrency:
-      group: remote-services
+      group: rate-limited-remote-services
       cancel-in-progress: false
     runs-on: ubuntu-latest
     steps:
@@ -1107,6 +1124,8 @@ jobs:
       with:
           # Disable warning about missing distributionSha256Sum property in gradle-wrapper.properties
           gradle-distribution-sha-256-sum-warning: false
+    - name: Show current GitHub rate limits for test user nyxtest20200701
+      run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
     # Add the -PquickTests=true option to the Gradle command line to narrow the number of tests
     - name: Run Docker Functional Tests with Gradle
       env:
@@ -1122,6 +1141,9 @@ jobs:
         ORG_GRADLE_PROJECT_gitLabTestUserPrivateKeyWithPassphrase: ${{ secrets.TEST_GITLAB_USER_PRIVATE_KEY_WITH_PASSPHRASE }}       # The test password protected private key to test Nyx GitHub features
         ORG_GRADLE_PROJECT_gitLabTestUserPrivateKeyWithoutPassphrase: ${{ secrets.TEST_GITLAB_USER_PRIVATE_KEY_WITHOUT_PASSPHRASE }} # The test unprotected private key to test Nyx GitHub features
       run: ./gradlew modules:docker:functionalTest --build-cache --stacktrace
+    - name: Show current GitHub rate limits for test user nyxtest20200701
+      if: ${{ always() }}
+      run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
     - name: Upload code coverage statistics to Codecov
       uses: codecov/codecov-action@v3
       with:
@@ -1198,6 +1220,8 @@ jobs:
         with:
           # Disable warning about missing distributionSha256Sum property in gradle-wrapper.properties
           gradle-distribution-sha-256-sum-warning: false
+      - name: Show current GitHub rate limits for test user nyxtest20200701
+        run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
       - name: Publish with Gradle
         env:
           # The 'gitHubUser' and 'gitHubToken' variables are passed as credentials to publish packages to the GitHub Packages repository, see: https://docs.github.com/en/actions/publishing-packages/publishing-java-packages-with-gradle#publishing-packages-to-github-packages.
@@ -1221,6 +1245,9 @@ jobs:
           ORG_GRADLE_PROJECT_gradlePublishKey: ${{ secrets.GRADLE_PLUGIN_PUBLISH_KEY }}
           ORG_GRADLE_PROJECT_gradlePublishSecret: ${{ secrets.GRADLE_PLUGIN_PUBLISH_SECRET }}
         run: ./gradlew nyxMake nyxMark nyxPublish publish --build-cache --stacktrace
+      - name: Show current GitHub rate limits for test user nyxtest20200701
+        if: ${{ always() }}
+        run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
       - name: Archive Nyx state file
         uses: actions/upload-artifact@v3
         if: ${{ always() }}
@@ -1278,6 +1305,8 @@ jobs:
         with:
           # Disable warning about missing distributionSha256Sum property in gradle-wrapper.properties
           gradle-distribution-sha-256-sum-warning: false
+      - name: Show current GitHub rate limits for test user nyxtest20200701
+        run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
       - name: Release with Gradle
         env:
           # The 'gitHubUser' and 'gitHubToken' variables are passed as credentials to publish packages to the GitHub Packages repository, see: https://docs.github.com/en/actions/publishing-packages/publishing-java-packages-with-gradle#publishing-packages-to-github-packages.
@@ -1293,6 +1322,9 @@ jobs:
           ORG_GRADLE_PROJECT_gitHubUser: ${{ github.actor }}
           ORG_GRADLE_PROJECT_gitHubToken: ${{ secrets.GITHUB_TOKEN }}
         run: ./gradlew release --build-cache --stacktrace
+      - name: Show current GitHub rate limits for test user nyxtest20200701
+        if: ${{ always() }}
+        run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
       - name: Archive Nyx state file
         uses: actions/upload-artifact@v3
         if: ${{ always() }}

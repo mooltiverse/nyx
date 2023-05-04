@@ -106,8 +106,13 @@ task deleteTestDirectories() {
     String tmpdir = System.getProperty("java.io.tmpdir")
     Arrays.stream(new File(System.getProperty("java.io.tmpdir")).list()).forEach {
       d -> if (d.startsWith("nyx-test-")) {
-        println tmpdir+d
-        delete tmpdir+d
+        if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
+          println tmpdir+d
+          delete tmpdir+d
+        } else {
+          println tmpdir+"/"+d
+          delete tmpdir+"/"+d
+        }
       }
     }
   }
