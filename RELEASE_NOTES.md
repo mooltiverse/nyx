@@ -1,6 +1,22 @@
 # Nyx Release Notes
 
-There are no fixes in this release.
+## 2.3.2
+
+This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/2.3.2).
+
+### Upgrade instructions
+
+There are no actions to take for backward compatibility.
+
+### New features and improvements
+
+There are no new features or improvements in this release.
+
+### Fixed issues
+
+This release:
+
+* fixes a bug in the command line version that caused a segment violation error when the `collapsedVersioning` configuration attribute is not set ([#196](https://github.com/mooltiverse/nyx/issues/196))
 
 ## 2.3.1
 
