@@ -226,8 +226,8 @@ class JGitRepository implements Repository {
             protected JSch createDefaultJSch(FS fs)
                 throws JSchException {
                 JSch.setLogger(new JschLogger());
+                JSch.setConfig("PreferredAuthentications", "publickey");
                 JSch defaultJSch = super.createDefaultJSch(fs);
-                defaultJSch.setConfig("PreferredAuthentications", "publickey");
                 if (!Objects.isNull(privateKey) && !privateKey.isEmpty()) {
                     logger.debug(GIT, "Git uses public key authentication (SSH) using a custom key");
                     // the key name is not relevant
@@ -235,21 +235,23 @@ class JGitRepository implements Repository {
                     defaultJSch.addIdentity("git", privateKey.getBytes(), null, passphrase);
 
                     // disable host key checking
-                    defaultJSch.setConfig("StrictHostKeyChecking", "no");
+                    JSch.setConfig("StrictHostKeyChecking", "no");
                 }
-                else logger.debug(GIT, "Git uses public key authentication (SSH) using keys from default locations");
-
-                if (Objects.isNull(passphrase) || passphrase.length == 0) {
-                    // In order to support the ssh-agent we can use: https://github.com/mwiede/jsch/blob/master/examples/JSchWithAgentProxy.java
-                    logger.debug(GIT, "No passphrase has been provided so Git uses ssh-agent for passphrase-protected private keys");
-                    try {
-                        IdentityRepository irepo = new AgentIdentityRepository(new SSHAgentConnector());
-                        defaultJSch.setIdentityRepository(irepo);
-                    } catch (AgentProxyException ape) {
-                        logger.error(GIT, "Attemp to attach to ssh-agent failed", ape);
-                        //throw new GitException("Failed to attach to ssh-agent", ape);
-                    }
-                } else logger.debug(GIT, "A passphrase has been provided so ssh-agent support is not enabled");
+                else {
+                    logger.debug(GIT, "Git uses public key authentication (SSH) using keys from default locations");
+                
+                    if (Objects.isNull(passphrase) || passphrase.length == 0) {
+                        // In order to support the ssh-agent we can use: https://github.com/mwiede/jsch/blob/master/examples/JSchWithAgentProxy.java
+                        logger.debug(GIT, "No passphrase has been provided so Git uses ssh-agent for passphrase-protected private keys");
+                        try {
+                            IdentityRepository irepo = new AgentIdentityRepository(new SSHAgentConnector());
+                            defaultJSch.setIdentityRepository(irepo);
+                        } catch (AgentProxyException ape) {
+                            logger.error(GIT, "Attemp to attach to ssh-agent failed", ape);
+                            //throw new GitException("Failed to attach to ssh-agent", ape);
+                        }
+                    } else logger.debug(GIT, "A passphrase has been provided so ssh-agent support is not enabled");
+                }
 
                 return defaultJSch;                  
             }

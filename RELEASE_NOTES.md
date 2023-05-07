@@ -1,5 +1,23 @@
 # Nyx Release Notes
 
+## 2.3.4
+
+This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/2.3.4).
+
+### Upgrade instructions
+
+There are no actions to take for backward compatibility.
+
+### New features and improvements
+
+There are no new features or improvements in this release.
+
+### Fixed issues
+
+This release:
+
+* fixes a bug in the Java version prevents SSH authentication to complete with private keys passed as strings due to the SSH-agent misuse ([#201](https://github.com/mooltiverse/nyx/issues/201))
+
 ## 2.3.3
 
 This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/2.3.3).
