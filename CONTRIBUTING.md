@@ -327,8 +327,6 @@ to:
 
 You can get the list of algorithms supported by the remote server running `nmap --script ssh2-enum-algos -sV -p <REMOTE_SERVER_PORT> <REMOTE_SERVER_ADDRESS>`.
 
-[JSch](https://github.com/mwiede/jsch) sometimes shows inconsistent behavior when running on Windows or Linux so if you can't get it running on one, try the other one. An issue has been created [here](https://github.com/mooltiverse/nyx/issues/201).
-
 ### Build statistics
 
 #### Gradle scans
