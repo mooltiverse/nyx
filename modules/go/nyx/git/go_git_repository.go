@@ -829,7 +829,11 @@ func (r goGitRepository) PushToRemoteWithUserNameAndPassword(remote *string, use
 
 	err = r.repository.Push(options)
 	if err != nil {
-		return "", &errs.GitError{Message: fmt.Sprintf("an error occurred when trying to push"), Cause: err}
+		if err == ggit.NoErrAlreadyUpToDate {
+			log.Debugf("remote repository was already up-to-date")
+		} else {
+			return "", &errs.GitError{Message: fmt.Sprintf("an error occurred when trying to push"), Cause: err}
+		}
 	}
 	return remoteString, nil
 }
@@ -881,7 +885,11 @@ func (r goGitRepository) PushToRemoteWithPublicKey(remote *string, privateKey *s
 
 	err = r.repository.Push(options)
 	if err != nil {
-		return "", &errs.GitError{Message: fmt.Sprintf("an error occurred when trying to push"), Cause: err}
+		if err == ggit.NoErrAlreadyUpToDate {
+			log.Debugf("remote repository was already up-to-date")
+		} else {
+			return "", &errs.GitError{Message: fmt.Sprintf("an error occurred when trying to push"), Cause: err}
+		}
 	}
 	return remoteString, nil
 }
