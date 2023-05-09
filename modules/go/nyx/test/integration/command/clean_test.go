@@ -173,6 +173,7 @@ func TestCleanIsUpToDateWithChangelogFile(t *testing.T) {
 			_, err := (*command).Run()
 			assert.NoError(t, err)
 			upToDate, err := (*command).IsUpToDate()
+			assert.NoError(t, err)
 			assert.True(t, upToDate)
 
 			changelogFile, err := os.Create(filepath.Join((*command).Script().GetWorkingDirectory(), changelogFilePath))
@@ -182,6 +183,7 @@ func TestCleanIsUpToDateWithChangelogFile(t *testing.T) {
 			_, err = changelogFile.Stat()
 			assert.NoError(t, err)
 			upToDate, err = (*command).IsUpToDate()
+			assert.NoError(t, err)
 			assert.False(t, upToDate)
 			changelogFile.Close()
 
@@ -192,6 +194,7 @@ func TestCleanIsUpToDateWithChangelogFile(t *testing.T) {
 			_, err = changelogFile.Stat()
 			assert.Error(t, err)
 			upToDate, err = (*command).IsUpToDate()
+			assert.NoError(t, err)
 			assert.True(t, upToDate)
 		})
 	}
@@ -218,6 +221,7 @@ func TestCleanIdempotency(t *testing.T) {
 			_, err := (*command).Run()
 			assert.NoError(t, err)
 			upToDate, err := (*command).IsUpToDate()
+			assert.NoError(t, err)
 			assert.True(t, upToDate)
 
 			stateFile, err := os.Create(filepath.Join((*command).Script().GetWorkingDirectory(), stateFilePath))
@@ -235,6 +239,7 @@ func TestCleanIdempotency(t *testing.T) {
 			_, err = changelogFile.Stat()
 			assert.NoError(t, err)
 			upToDate, err = (*command).IsUpToDate()
+			assert.NoError(t, err)
 			assert.False(t, upToDate)
 			stateFile.Close()
 			summaryFile.Close()
@@ -251,6 +256,7 @@ func TestCleanIdempotency(t *testing.T) {
 			_, err = os.Stat(filepath.Join((*command).Script().GetWorkingDirectory(), changelogFilePath))
 			assert.Error(t, err)
 			upToDate, err = (*command).IsUpToDate()
+			assert.NoError(t, err)
 			assert.True(t, upToDate)
 
 			// run again and test for idempotency
@@ -263,6 +269,7 @@ func TestCleanIdempotency(t *testing.T) {
 			_, err = os.Stat(changelogFilePath)
 			assert.Error(t, err)
 			upToDate, err = (*command).IsUpToDate()
+			assert.NoError(t, err)
 			assert.True(t, upToDate)
 		})
 	}

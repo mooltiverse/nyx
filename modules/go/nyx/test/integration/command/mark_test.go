@@ -1424,7 +1424,9 @@ func TestMarkRunOnGitHubClonedWorkspaceWithAdditionalRemoteWithNewVersionOrNewRe
 	// the 'gitHubTestUserToken' environment variable is set by the build script
 	assert.NotEmpty(t, os.Getenv("gitHubTestUserToken"), "A GitHub authentication token must be passed to this test as an environment variable but it was not set")
 	gitHub, err := github.Instance(map[string]string{github.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitHubTestUserToken")})
+	assert.NoError(t, err)
 	gitHubRepository, err := gitHub.CreateGitRepository(randomID, utl.PointerToString("Test repository "+randomID), false, true)
+	assert.NoError(t, err)
 
 	// if we clone too quickly next calls may fail
 	time.Sleep(4000 * time.Millisecond)
@@ -1505,7 +1507,9 @@ func TestMarkRunOnGitHubClonedWorkspaceWithAdditionalRemoteWithNewVersionOrNewRe
 	// the 'gitHubTestUserToken' environment variable is set by the build script
 	assert.NotEmpty(t, os.Getenv("gitHubTestUserToken"), "A GitHub authentication token must be passed to this test as an environment variable but it was not set")
 	gitHub, err := github.Instance(map[string]string{github.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitHubTestUserToken")})
+	assert.NoError(t, err)
 	gitHubRepository, err := gitHub.CreateGitRepository(randomID, utl.PointerToString("Test repository "+randomID), false, true)
+	assert.NoError(t, err)
 
 	// if we clone too quickly next calls may fail
 	time.Sleep(4000 * time.Millisecond)
@@ -1586,7 +1590,9 @@ func TestMarkRunOnGitHubClonedWorkspaceWithAdditionalRemoteWithNewVersionOrNewRe
 	// the 'gitHubTestUserToken' environment variable is set by the build script
 	assert.NotEmpty(t, os.Getenv("gitHubTestUserToken"), "A GitHub authentication token must be passed to this test as an environment variable but it was not set")
 	gitHub, err := github.Instance(map[string]string{github.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitHubTestUserToken")})
+	assert.NoError(t, err)
 	gitHubRepository, err := gitHub.CreateGitRepository(randomID, utl.PointerToString("Test repository "+randomID), false, true)
+	assert.NoError(t, err)
 
 	// if we clone too quickly next calls may fail
 	time.Sleep(4000 * time.Millisecond)
@@ -1667,7 +1673,9 @@ func TestMarkRunOnGitLabClonedWorkspaceWithAdditionalRemoteWithNewVersionOrNewRe
 	// the 'gitLabTestUserToken' environment variable is set by the build script
 	assert.NotEmpty(t, os.Getenv("gitLabTestUserToken"), "A GitLab authentication token must be passed to this test as an environment variable but it was not set")
 	gitLab, err := gitlab.Instance(map[string]string{gitlab.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitLabTestUserToken")})
+	assert.NoError(t, err)
 	gitLabRepository, err := gitLab.CreateGitRepository(randomID, utl.PointerToString("Test repository "+randomID), false, true)
+	assert.NoError(t, err)
 
 	// if we clone too quickly next calls may fail
 	time.Sleep(4000 * time.Millisecond)
@@ -1748,7 +1756,9 @@ func TestMarkRunOnGitLabClonedWorkspaceWithAdditionalRemoteWithNewVersionOrNewRe
 	// the 'gitLabTestUserToken' environment variable is set by the build script
 	assert.NotEmpty(t, os.Getenv("gitLabTestUserToken"), "A GitLab authentication token must be passed to this test as an environment variable but it was not set")
 	gitLab, err := gitlab.Instance(map[string]string{gitlab.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitLabTestUserToken")})
+	assert.NoError(t, err)
 	gitLabRepository, err := gitLab.CreateGitRepository(randomID, utl.PointerToString("Test repository "+randomID), false, true)
+	assert.NoError(t, err)
 
 	// if we clone too quickly next calls may fail
 	time.Sleep(4000 * time.Millisecond)
@@ -1829,7 +1839,9 @@ func TestMarkRunOnGitLabClonedWorkspaceWithAdditionalRemoteWithNewVersionOrNewRe
 	// the 'gitLabTestUserToken' environment variable is set by the build script
 	assert.NotEmpty(t, os.Getenv("gitLabTestUserToken"), "A GitLab authentication token must be passed to this test as an environment variable but it was not set")
 	gitLab, err := gitlab.Instance(map[string]string{gitlab.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitLabTestUserToken")})
+	assert.NoError(t, err)
 	gitLabRepository, err := gitLab.CreateGitRepository(randomID, utl.PointerToString("Test repository "+randomID), false, true)
+	assert.NoError(t, err)
 
 	// if we clone too quickly next calls may fail
 	time.Sleep(4000 * time.Millisecond)
