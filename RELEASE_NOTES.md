@@ -1,5 +1,23 @@
 # Nyx Release Notes
 
+## 2.3.5
+
+This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/2.3.5).
+
+### Upgrade instructions
+
+There are no actions to take for backward compatibility.
+
+### New features and improvements
+
+There are no new features or improvements in this release.
+
+### Fixed issues
+
+This release:
+
+* fixes a bug in the command line version that caused a segment violation error when running the `clean` command when no previous state is found and so the current version hasn't been initialized yet ([#217](https://github.com/mooltiverse/nyx/issues/217))
+
 ## 2.3.4
 
 This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/2.3.4).
