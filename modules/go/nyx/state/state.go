@@ -950,11 +950,15 @@ func (s *State) Summary() (string, error) {
 	}
 	fmt.Fprintf(&buf, "timestamp        = %d\n", *timestamp)
 
-	version, err := s.GetVersion()
-	if err != nil {
-		return "", err
+	if s.HasVersion() {
+		version, err := s.GetVersion()
+		if err != nil {
+			return "", err
+		}
+		fmt.Fprintf(&buf, "current version  = %s\n", *version)
+	} else {
+		fmt.Fprintf(&buf, "current version   = %s\n", "")
 	}
-	fmt.Fprintf(&buf, "current version  = %s\n", *version)
 
 	releaseScope, err := s.GetReleaseScope()
 	if err != nil {
