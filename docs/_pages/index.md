@@ -54,6 +54,7 @@ Available for all platforms in the [latest release](https://github.com/mooltiver
 
 ### Docker images
 
+* on [Docker Hub](https://hub.docker.com/repository/docker/mooltiverse/nyx)
 * on [GitHub container registry](https://github.com/mooltiverse/nyx/pkgs/container/nyx)
 
 ### Build tools plugin

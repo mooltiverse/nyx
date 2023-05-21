@@ -136,11 +136,13 @@ Nyx always returns 0 as the exit code unless some error occured, in which case 1
 
 Many teams prefer using Docker containers for their CI/CD and local development environments. If that's your case you can use the Docker container that comes out of the box with Nyx.
 
-The Docker images are published onto the [GitHub Container Registry](https://github.com/mooltiverse/nyx/pkgs/container/nyx).
+The Docker images are published onto the two main registries:
+* [Docker Hub](https://hub.docker.com/repository/docker/mooltiverse/nyx) (the default)
+* [GitHub Container Registry](https://github.com/mooltiverse/nyx/pkgs/container/nyx)
 
 Nyx' Docker image has a small footprint (less than 10Mb) and uses [Alpine Linux](https://www.alpinelinux.org/) as the base image.
 
-All the examples in this page assume you're making an ephemeral use of the container (you run it and dispose it every time). In case you need advanced use cases other than these please refer to the official [Docker Documentation](https://docs.docker.com/).
+All the examples in this page assume you're using the `latest` image pulling it from [Docker Hub](https://hub.docker.com/repository/docker/mooltiverse/nyx). They also assume you're making an ephemeral use of the container (you run it and dispose it every time). In case you need advanced use cases other than these please refer to the official [Docker Documentation](https://docs.docker.com/).
 {: .notice--info}
 
 ### Requisites
@@ -152,15 +154,12 @@ All you need is a recent version of [Docker](https://www.docker.com/) installed 
 Let's start by pulling the image from the public registry. Open a shell and run:
 
 ```bash
-$ docker login ghcr.io
-...
-Login Succeeded
-$ docker pull ghcr.io/mooltiverse/nyx:latest
-latest: Pulling from ghcr.io/mooltiverse/nyx
+$ docker pull mooltiverse/nyx:latest
+latest: Pulling from mooltiverse/nyx
 ab6db1bc80d0: Pull complete
 [...]
 Digest: sha256:976f4821d643e02fc55c884cd6c9af5e958011132145150b7dd97e01d71ba055
-Status: Downloaded newer image for ghcr.io/mooltiverse/nyx/latest
+Status: Downloaded newer image for mooltiverse/latest
 mooltiverse/latest
 ```
 
@@ -169,7 +168,7 @@ and make sure the new image is there:
 ```bash
 $ docker image ls
 REPOSITORY                                            TAG                 IMAGE ID       CREATED        SIZE
-ghcr.io/mooltiverse/nyx                               latest              a14cbc284e81   2 days ago     7.35MB
+mooltiverse/nyx                                       latest              a14cbc284e81   2 days ago     7.35MB
 ```
 
 ### Run the container
@@ -177,13 +176,13 @@ ghcr.io/mooltiverse/nyx                               latest              a14cbc
 To run the container you simply run a command like:
 
 ```bash
-$ docker run -it --rm -v /local/path/to/project:/project ghcr.io/mooltiverse/nyx:latest
+$ docker run -it --rm -v /local/path/to/project:/project mooltiverse/nyx:latest
 ```
 
 A few things to note here:
 
 1. there is no explicit command executed within the container because [`nyx infer`]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer) is executed by default. This will generate and display the latest version for the project but will not change anything in the project directory. To run other commands you can specify them explicitly, as shown below
-2. a local folder (`/local/path/to/project`) is mounted from the host into the container at the default location `/project`. You need to change `/local/path/to/project` to whatever path is hosting your Git repository, or mount a Docker volume hosting the Git repository in case you already have one (in this case, pass your volume name to the command line like `docker run -it --rm -v project-volume:/project ghcr.io/mooltiverse/nyx:latest [...]`, where `project-volume` has to be changed to your volume name)
+2. a local folder (`/local/path/to/project`) is mounted from the host into the container at the default location `/project`. You need to change `/local/path/to/project` to whatever path is hosting your Git repository, or mount a Docker volume hosting the Git repository in case you already have one (in this case, pass your volume name to the command line like `docker run -it --rm -v project-volume:/project mooltiverse/nyx:latest [...]`, where `project-volume` has to be changed to your volume name)
 3. Nyx is using the default configuration means ([configuration files]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}#supported-file-grammars) available in the project directory at standard locations)
 
 When running on Linux or Mac hosts you may also want to map the host user ID to the container user in order to avoid issue with file permissions. You can do this by adding this option to the command line: `-u $(id -u):$(id -g)`. See the [Docker run reference](https://docs.docker.com/engine/reference/run/) for more.
@@ -194,13 +193,13 @@ When running on Linux or Mac hosts you may also want to map the host user ID to 
 In order to run a specific command you need to pass it on the command line, like:
 
 ```bash
-$ docker run -it --rm -v /local/path/to/project:/project ghcr.io/mooltiverse/nyx:latest <COMMAND>
+$ docker run -it --rm -v /local/path/to/project:/project mooltiverse/nyx:latest <COMMAND>
 ```
 
 So if you need to run the [publish]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#publish) command, run the container as:
 
 ```bash
-$ docker run -it --rm -v /local/path/to/project:/project ghcr.io/mooltiverse/nyx:latest publish
+$ docker run -it --rm -v /local/path/to/project:/project mooltiverse/nyx:latest publish
 ```
 
 #### Mounting the project volume or folder

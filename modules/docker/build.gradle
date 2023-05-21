@@ -26,14 +26,13 @@ def dockerContextDir = file(buildDir.path+'/docker')
 
 // The map of registries to publish the image to
 // About DockerHub:
-// - THE DOCKER HUB REPOSITORY HAS BEEN DISMISSED WHEN DOCKER HUB REMOVED FREE ORGANIZATION ACCOUNTS
 // - the repository 'mooltiverse/nyx' had to be created manually beforehand and permissions to write the repo had to be assigned to the service user.
 // - images are published to: https://hub.docker.com/repository/docker/mooltiverse/nyx
 // About GitHubContainerRegistry:
 // - in order to use the GITHUB_TOKEN issued by GitHub Actions, a first image must be published by hand and permissions set giving access to the repository
 //   according to https://docs.github.com/en/packages/managing-github-packages-using-github-actions-workflows/publishing-and-installing-a-package-with-github-actions#upgrading-a-workflow-that-accesses-ghcrio
 // - images are published to: https://github.com/orgs/mooltiverse/packages/container/package/nyx
-def registries = [ /*'DockerHub':"${nyxOrganizationID}/${rootProject.name}",*/
+def registries = [ 'DockerHub':"${nyxOrganizationID}/${rootProject.name}",
                    'GitHubContainerRegistry':"ghcr.io/${nyxOrganizationID}/${rootProject.name}" ]
 
 // The list of labels to publish with. The 'latest' label is only added if we are publishing an official version (like x.y.z, without extra identifiers)
@@ -206,7 +205,7 @@ registries.each { registry ->
                     // The actual environment variable names are 'ORG_GRADLE_PROJECT_dockerHubUser', 'ORG_GRADLE_PROJECT_dockerHubToken',
                     // 'ORG_GRADLE_PROJECT_gitHubUser' and 'ORG_GRADLE_PROJECT_gitHubToken'
                     // See the GitHub Actions definition for more.
-                    /*if ('DockerHub'.equals(registry.key)) {
+                    if ('DockerHub'.equals(registry.key)) {
                         logger.info('Logging into Docker Hub')
 
                         if( !findProperty("dockerHubUser") || !findProperty("dockerHubToken"))
@@ -225,7 +224,7 @@ registries.each { registry ->
                             commandLine 'docker', 'login', 'docker.io', '--username', findProperty("dockerHubUser"), '--password', findProperty("dockerHubToken")
                         }
                     }
-                    else*/ if ('GitHubContainerRegistry'.equals(registry.key)) {
+                    else if ('GitHubContainerRegistry'.equals(registry.key)) {
                         logger.info('Logging into GitHub Container Registry')
 
                         if( !findProperty("gitHubUser") || !findProperty("gitHubToken"))

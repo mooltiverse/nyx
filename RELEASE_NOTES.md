@@ -1,5 +1,21 @@
 # Nyx Release Notes
 
+## 2.4.0
+
+This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/2.4.0).
+
+### Upgrade instructions
+
+There are no actions to take for backward compatibility.
+
+### New features and improvements
+
+The Docker image is now published (again) to [Docker Hub](https://hub.docker.com/repository/docker/mooltiverse/nyx) after Docker Hub decided [not to sunset](https://www.docker.com/blog/no-longer-sunsetting-the-free-team-plan/) support for free organizations ([#184](https://github.com/mooltiverse/nyx/issues/184)).
+
+### Fixed issues
+
+There are no fixes in this release.
+
 ## 2.3.5
 
 This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/2.3.5).
