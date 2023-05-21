@@ -35,7 +35,7 @@ In case you notice some errors or unexpected behavior please make sure it's not 
 
 Many Git hosting services encourage to use tokens (Personal Access Tokens, OAuth Tokens etc) to log in as they are more secure and they allow tokens to be issued and revoked independently from the user accounts. However Git does not support (so far) authentication using a single token and it still needs credentials to be passed as a user name and password pair. In order to cope with this you can map the token to user names and passwords by following known rules for remote services. Here is the list of known services and the mapping:
 
-* when configuring a remote repository hosted on [GitHub](https://github.com/) pass the [OAuth or Personal Access Token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) as the [`user`](#user) name and an empty string as the [`password`](#password)
+* when configuring a remote repository hosted on [GitHub](https://github.com/) pass the [OAuth or Personal Access Token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) as the [`user`](#user) name and as the [`password`](#password)
 * when configuring a remote repository hosted on [GitLab](https://gitlab.com/) pass the fixed string `PRIVATE-TOKEN` as the [`user`](#user) name and the [OAuth2, Personal or Project Access Token](https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html) as the [`password`](#password)
 
 A fallback rule for many remote services not listed here is to pass the token for both the user name and the password.
