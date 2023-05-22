@@ -349,7 +349,7 @@ func (c *Infer) scanRepository(scheme *ver.Scheme, bump *string, releaseLenient 
 				// Let's find the identifier to bump (unless the bump was overridden by user).
 				// We need to consider all commits within the scope and, when using collapsed versioning,
 				// also those between the primeVersionCommit and the finalCommit
-				if (!(releaseScope.HasPreviousVersion() && releaseScope.HasPreviousVersionCommit())) || (*collapsedVersioning && (!(releaseScope.HasPrimeVersion() && releaseScope.HasPrimeVersionCommit()))) {
+				if (!(releaseScope.HasPreviousVersion() && releaseScope.HasPreviousVersionCommit())) || (collapsedVersioning != nil && *collapsedVersioning && (!(releaseScope.HasPrimeVersion() && releaseScope.HasPrimeVersionCommit()))) {
 					log.Debugf("trying to infer the identifier to bump based on the commit message of commit '%s'", cc.GetSHA())
 					for cmcEntryKey, cmcEntryValue := range commitMessageConventions {
 						log.Debugf("evaluating commit '%s' against message convention '%s'", cc.GetSHA(), cmcEntryKey)
@@ -403,7 +403,7 @@ func (c *Infer) scanRepository(scheme *ver.Scheme, bump *string, releaseLenient 
 	})
 
 	log.Debugf("walking the commit history finished. The release scope contains %d commits.", len(releaseScope.GetCommits()))
-	if *collapsedVersioning {
+	if collapsedVersioning != nil && *collapsedVersioning {
 		if releaseScope.GetPreviousVersion() == nil {
 			if releaseScope.GetPrimeVersion() == nil {
 				log.Debugf("after scanning the commit history the previousVersion is '%s' and the primeVersion is '%s'", "null", "null")
