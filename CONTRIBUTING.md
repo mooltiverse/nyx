@@ -166,6 +166,29 @@ The recommended JDK version is `19` or newer. JDK version older than `11` is not
 
 The JDK version affects the number of functional tests excuted for the Gradle plugin, according to the [Gradle compatibility matrix](https://docs.gradle.org/current/userguide/compatibility.html). This means that newer JDKs will run functional tests against a reduced set of Gradle versions because [TestKit](https://docs.gradle.org/current/userguide/test_kit.html) uses the original Java binaries for each tested Gradle release and Java classes compiled for JVM versions published after the Gradle release would raise an exception like `unsupported class file major version XY`. You don't need to worry about this (as it's already taken care of in the functional test suites) unless you need to run functional tests against a specific gradle version that is not covered by the tests due to the JDK version you're using.
 
+#### CI/CD
+
+CI/CD is configured using [GitHub Actions](https://github.com/mooltiverse/nyx/actions) pipelines.
+
+##### Troubleshooting GitHub Actions pipelines
+
+Sometimes the build brakes for reasons that are not related to code. Most frequent reasons for failure are:
+
+* tests hit [GitHub rate limits](https://github.com/mooltiverse/nyx/issues/206) because they are very request intensive and when this happens all requests performed during tests fail until the rate limit is reset by GitHub
+* the [Nexus Server](https://oss.sonatype.org/) used to publish Java artifacts sometimes breaks connections
+
+When tests fail because of the above reasons they can be easily relaunched. To do so, just click on the failed job in the [GitHub Actions](https://github.com/mooltiverse/nyx/actions) page and re-run.
+
+When the *Publish* job fails there are a few cleaning steps to take before relaunching because the tasks performed in that job are not repeatable. Before re-running the job, using administrative credentials, you need to:
+
+1. connect to the [Nexus repository](https://oss.sonatype.org/) and delete all stale Staging Repositories, if any
+2. delete the [GitHub Release](https://github.com/mooltiverse/nyx/releases) that was already published by the job, if any
+3. delete the [GitHub tag](https://github.com/mooltiverse/nyx/tags) that was already published by the job, if any
+4. delete the [GitHub packages](https://github.com/orgs/mooltiverse/packages?repo_name=nyx) that were already published by the job, if any; for each package click on *Package Settings*, in the bottom right, then *Manage Versions*, and delete the specific version
+5. delete the [Gradle plugin](https://plugins.gradle.org/plugin/com.mooltiverse.oss.nyx) that was already published by the job, if any
+
+After the above cleaning has been done the *Release* job can be re-launched from the [GitHub Actions](https://github.com/mooltiverse/nyx/actions) page.
+
 ### Contributing Documentation
 
 The documentation is under the `docs` directory and uses [GitHub Pages](https://help.github.com/en/github/working-with-github-pages/about-github-pages) for rendering. The documentation is a micro site written in [Markdown](https://en.wikipedia.org/wiki/Markdown) files and rendered using [Jekyll](https://jekyllrb.com/), the static web site generator supported by GitHub pages out of the box, along with the [Minimal Mistakes](https://mmistakes.github.io/minimal-mistakes/) theme. The site is available at [https://mooltiverse.github.io/nyx/](https://mooltiverse.github.io/nyx/).
