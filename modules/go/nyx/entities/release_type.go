@@ -168,7 +168,7 @@ func (rt *ReleaseType) GetAssets() *[]*string {
 }
 
 /*
-Sets the identifiers configuration block. Elements of this list must be of type Identifier. A nil value means undefined.
+Sets the assets configuration block. Elements of this list must be of type Identifier. A nil value means undefined.
 */
 func (rt *ReleaseType) SetAssets(assets *[]*string) {
 	rt.Assets = assets
