@@ -35,6 +35,9 @@ Often times you just need to use a simple value from the [Nyx state]({{ site.bas
 
 This is fairly simple as you just need to wrap the name of the [state]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/index.md %}) attribute with double curly braces, like `{% raw %}{{attribute}}{% endraw %}`. This is the simplest form of a [Handlebars expression](https://handlebarsjs.com/guide/#simple-expressions) (and yes, the double curly brances are the *handlebars*, or *mustaches*).
 
+Please note that only **simple** attributes from the [state]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/index.md %}) can be rendered this way, while complex objects like [changelog]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#changelog), [configuration]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#configuration) and [releaseScope]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#release-scope) cannot be rendered as a whole. Instead, their children can be rendered as simple attributes.
+{: .notice--info}
+
 So if we want to set our configuration `option` to the current value of the `version` attribute from the [state]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/index.md %}) our definition will look like:
 
 ```
