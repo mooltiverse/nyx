@@ -1,5 +1,23 @@
 # Nyx Release Notes
 
+## 2.4.1
+
+This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/2.4.1).
+
+### Upgrade instructions
+
+There are no actions to take for backward compatibility.
+
+### New features and improvements
+
+There are no new features or improvements in this release.
+
+### Fixed issues
+
+This release:
+
+* fixes a bug in the command line version that caused a segment violation error when running the `infer` command when the `collapsedVersioning` attribute is not defined in the configuration ([#221](https://github.com/mooltiverse/nyx/issues/221))
+
 ## 2.4.0
 
 This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/2.4.0).

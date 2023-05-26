@@ -349,7 +349,7 @@ func (c *Infer) scanRepository(scheme *ver.Scheme, bump *string, releaseLenient 
 				// Let's find the identifier to bump (unless the bump was overridden by user).
 				// We need to consider all commits within the scope and, when using collapsed versioning,
 				// also those between the primeVersionCommit and the finalCommit
-				if (!(releaseScope.HasPreviousVersion() && releaseScope.HasPreviousVersionCommit())) || (*collapsedVersioning && (!(releaseScope.HasPrimeVersion() && releaseScope.HasPrimeVersionCommit()))) {
+				if (!(releaseScope.HasPreviousVersion() && releaseScope.HasPreviousVersionCommit())) || (collapsedVersioning != nil && *collapsedVersioning && (!(releaseScope.HasPrimeVersion() && releaseScope.HasPrimeVersionCommit()))) {
 					log.Debugf("trying to infer the identifier to bump based on the commit message of commit '%s'", cc.GetSHA())
 					for cmcEntryKey, cmcEntryValue := range commitMessageConventions {
 						log.Debugf("evaluating commit '%s' against message convention '%s'", cc.GetSHA(), cmcEntryKey)
@@ -403,7 +403,7 @@ func (c *Infer) scanRepository(scheme *ver.Scheme, bump *string, releaseLenient 
 	})
 
 	log.Debugf("walking the commit history finished. The release scope contains %d commits.", len(releaseScope.GetCommits()))
-	if *collapsedVersioning {
+	if collapsedVersioning != nil && *collapsedVersioning {
 		if releaseScope.GetPreviousVersion() == nil {
 			if releaseScope.GetPrimeVersion() == nil {
 				log.Debugf("after scanning the commit history the previousVersion is '%s' and the primeVersion is '%s'", "null", "null")
@@ -467,7 +467,7 @@ func (c *Infer) fillStateMissingValuesWithDefaults(releaseType *ent.ReleaseType)
 	}
 	// if we couldn't infer the prime version and its commit, set the state attributes to the configured initial values
 	if !releaseScope.HasPrimeVersion() || !releaseScope.HasPrimeVersionCommit() {
-		if *releaseType.GetCollapseVersions() {
+		if releaseType.GetCollapseVersions() != nil && *releaseType.GetCollapseVersions() {
 			initialVersion, err := c.State().GetConfiguration().GetInitialVersion()
 			if err != nil {
 				return err
@@ -517,82 +517,84 @@ func (c *Infer) applyExtraIdentifiers(scheme *ver.Scheme, releaseType *ent.Relea
 
 	log.Debugf("applying '%d' extra identifiers defined by the release type to version '%s'", len(*(*releaseType).GetIdentifiers()), res.String())
 
-	for _, identifier := range *(*releaseType).GetIdentifiers() {
-		if (*identifier).GetQualifier() == nil {
-			log.Debugf("applying the '%s' extra identifier to version '%s'", "nil", res.String())
-		} else {
-			log.Debugf("applying the '%s' extra identifier to version '%s'", *(*identifier).GetQualifier(), res.String())
-		}
-		if (*identifier).GetQualifier() == nil || "" == strings.TrimSpace(*(*identifier).GetQualifier()) {
-			return nil, &errs.IllegalPropertyError{Message: fmt.Sprintf("identifiers must define a non blank qualifier")}
-		}
+	if (*releaseType).GetIdentifiers() != nil {
+		for _, identifier := range *(*releaseType).GetIdentifiers() {
+			if (*identifier).GetQualifier() == nil {
+				log.Debugf("applying the '%s' extra identifier to version '%s'", "nil", res.String())
+			} else {
+				log.Debugf("applying the '%s' extra identifier to version '%s'", *(*identifier).GetQualifier(), res.String())
+			}
+			if (*identifier).GetQualifier() == nil || "" == strings.TrimSpace(*(*identifier).GetQualifier()) {
+				return nil, &errs.IllegalPropertyError{Message: fmt.Sprintf("identifiers must define a non blank qualifier")}
+			}
 
-		identifierQualifier, err := c.renderTemplate((*identifier).GetQualifier())
-		if err != nil {
-			return nil, err
-		}
-		if identifierQualifier == nil || "" == *identifierQualifier {
-			return nil, &errs.IllegalPropertyError{Message: fmt.Sprintf("the identifier qualifier must evaluate to a non empty string. Configured value is '%s', rendered string is '%s'", *(*identifier).GetQualifier(), *identifierQualifier)}
-		}
-
-		identifierValue, err := c.renderTemplate((*identifier).GetValue())
-		if err != nil {
-			return nil, err
-		}
-		if identifierValue == nil {
-			log.Debugf("the extra identifier is defined by qualifier='%s' and value='%s', which are resolved to qualifier='%s' and value='%s'", *(*identifier).GetQualifier(), "nil", *identifierQualifier, "nil")
-		} else {
-			log.Debugf("the extra identifier is defined by qualifier='%s' and value='%s', which are resolved to qualifier='%s' and value='%s'", *(*identifier).GetQualifier(), *(*identifier).GetValue(), *identifierQualifier, *identifierValue)
-		}
-
-		// Semver is the only supported scheme so far...
-		if ver.SEMVER == *scheme {
-			semanticVersion, err := ver.ValueOfSemanticVersion(res.String()) // faster and safer than casting...
+			identifierQualifier, err := c.renderTemplate((*identifier).GetQualifier())
 			if err != nil {
 				return nil, err
 			}
-
-			if (*identifier).GetPosition() != nil && ent.PRE_RELEASE == *(*identifier).GetPosition() {
-				// the value must be converted to an Integer when using SemVer and the pre-release part
-				var identifierValueAsInteger *int
-
-				if !(identifierValue == nil || "" == *identifierValue) {
-					i, err := strconv.Atoi(*identifierValue)
-					if err != nil {
-						return nil, &errs.IllegalPropertyError{Message: fmt.Sprintf("invalid integer value '%s' for identifier '%s'. Semantic versioning requires integer numbers as values for identifiers in the pre release part.", *identifierValue, *(*identifier).GetQualifier())}
-					}
-					identifierValueAsInteger = &i
-				} else {
-					identifierValueAsInteger = nil
-				}
-
-				if identifierValueAsInteger == nil {
-					semanticVersion, err = semanticVersion.SetPrereleaseAttributeWith(*identifierQualifier, nil)
-				} else {
-					semanticVersion, err = semanticVersion.SetPrereleaseAttributeWith(*identifierQualifier, identifierValueAsInteger)
-				}
-				if err != nil {
-					return nil, err
-				}
-			} else if (*identifier).GetPosition() == nil || ent.BUILD == *(*identifier).GetPosition() {
-				// BUILD is the default if no position is set
-				if identifierValue == nil || "" == strings.TrimSpace(*identifierValue) {
-					semanticVersion, err = semanticVersion.SetBuildAttributeWith(*identifierQualifier, nil)
-				} else {
-					semanticVersion, err = semanticVersion.SetBuildAttributeWith(*identifierQualifier, identifierValue)
-				}
-				if err != nil {
-					return nil, err
-				}
-			} else {
-				return nil, &errs.IllegalPropertyError{Message: fmt.Sprintf("illegal identifier position '%s' for identifier '%s'", *(*identifier).GetPosition(), *(*identifier).GetQualifier())}
+			if identifierQualifier == nil || "" == *identifierQualifier {
+				return nil, &errs.IllegalPropertyError{Message: fmt.Sprintf("the identifier qualifier must evaluate to a non empty string. Configured value is '%s', rendered string is '%s'", *(*identifier).GetQualifier(), *identifierQualifier)}
 			}
 
-			res = semanticVersion
+			identifierValue, err := c.renderTemplate((*identifier).GetValue())
+			if err != nil {
+				return nil, err
+			}
+			if identifierValue == nil {
+				log.Debugf("the extra identifier is defined by qualifier='%s' and value='%s', which are resolved to qualifier='%s' and value='%s'", *(*identifier).GetQualifier(), "nil", *identifierQualifier, "nil")
+			} else {
+				log.Debugf("the extra identifier is defined by qualifier='%s' and value='%s', which are resolved to qualifier='%s' and value='%s'", *(*identifier).GetQualifier(), *(*identifier).GetValue(), *identifierQualifier, *identifierValue)
+			}
 
-			log.Debugf("the version after applying the '%s' extra identifier is '%s'", *(*identifier).GetQualifier(), semanticVersion.String())
-		} else {
-			return nil, &errs.IllegalPropertyError{Message: fmt.Sprintf("extra identifiers are supported for '%s' scheme only", ver.SEMVER)}
+			// Semver is the only supported scheme so far...
+			if ver.SEMVER == *scheme {
+				semanticVersion, err := ver.ValueOfSemanticVersion(res.String()) // faster and safer than casting...
+				if err != nil {
+					return nil, err
+				}
+
+				if (*identifier).GetPosition() != nil && ent.PRE_RELEASE == *(*identifier).GetPosition() {
+					// the value must be converted to an Integer when using SemVer and the pre-release part
+					var identifierValueAsInteger *int
+
+					if !(identifierValue == nil || "" == *identifierValue) {
+						i, err := strconv.Atoi(*identifierValue)
+						if err != nil {
+							return nil, &errs.IllegalPropertyError{Message: fmt.Sprintf("invalid integer value '%s' for identifier '%s'. Semantic versioning requires integer numbers as values for identifiers in the pre release part.", *identifierValue, *(*identifier).GetQualifier())}
+						}
+						identifierValueAsInteger = &i
+					} else {
+						identifierValueAsInteger = nil
+					}
+
+					if identifierValueAsInteger == nil {
+						semanticVersion, err = semanticVersion.SetPrereleaseAttributeWith(*identifierQualifier, nil)
+					} else {
+						semanticVersion, err = semanticVersion.SetPrereleaseAttributeWith(*identifierQualifier, identifierValueAsInteger)
+					}
+					if err != nil {
+						return nil, err
+					}
+				} else if (*identifier).GetPosition() == nil || ent.BUILD == *(*identifier).GetPosition() {
+					// BUILD is the default if no position is set
+					if identifierValue == nil || "" == strings.TrimSpace(*identifierValue) {
+						semanticVersion, err = semanticVersion.SetBuildAttributeWith(*identifierQualifier, nil)
+					} else {
+						semanticVersion, err = semanticVersion.SetBuildAttributeWith(*identifierQualifier, identifierValue)
+					}
+					if err != nil {
+						return nil, err
+					}
+				} else {
+					return nil, &errs.IllegalPropertyError{Message: fmt.Sprintf("illegal identifier position '%s' for identifier '%s'", *(*identifier).GetPosition(), *(*identifier).GetQualifier())}
+				}
+
+				res = semanticVersion
+
+				log.Debugf("the version after applying the '%s' extra identifier is '%s'", *(*identifier).GetQualifier(), semanticVersion.String())
+			} else {
+				return nil, &errs.IllegalPropertyError{Message: fmt.Sprintf("extra identifiers are supported for '%s' scheme only", ver.SEMVER)}
+			}
 		}
 	}
 
@@ -678,7 +680,7 @@ func (c *Infer) computeVersion(scheme *ver.Scheme, bump *string, releaseLenient 
 			//   (only if we have significant commits since the primeVersion), then bumped with the pre-release identifier
 			// - the previousVersion bumped with the pre-release identifier (only if we have significant commits since the previousVersion)
 			//   while the core identifiers are never bumped (as it's done by the prime version)
-			if *(*releaseType).GetCollapseVersions() {
+			if (*releaseType).GetCollapseVersions() != nil && *(*releaseType).GetCollapseVersions() {
 				if (*releaseType).GetCollapsedVersionQualifier() == nil || "" == strings.TrimSpace(*(*releaseType).GetCollapsedVersionQualifier()) {
 					return nil, &errs.ReleaseError{Message: fmt.Sprintf("the releaseType.collapsedVersionQualifier must have a value when using collapsed versioning")}
 				}
