@@ -811,7 +811,7 @@ func (c *Infer) computeVersion(scheme *ver.Scheme, bump *string, releaseLenient 
 
 			// apply extra identifiers if there are significant commits
 			if (bumpIdentifierOnPreviousVersion != nil && "" != strings.TrimSpace(*bumpIdentifierOnPreviousVersion)) ||
-				(*(*releaseType).GetCollapseVersions() && bumpIdentifierOnPrimeVersion != nil && "" != strings.TrimSpace(*bumpIdentifierOnPrimeVersion)) {
+				(*releaseType).GetCollapseVersions() != nil && (*(*releaseType).GetCollapseVersions() && bumpIdentifierOnPrimeVersion != nil && "" != strings.TrimSpace(*bumpIdentifierOnPrimeVersion)) {
 				// apply extra identifiers, if any has been configured for the release type
 				if (*releaseType).GetIdentifiers() == nil || len(*(*releaseType).GetIdentifiers()) == 0 {
 					log.Debugf("the release type does not define any (enabled) extra identifiers so none is applied")
