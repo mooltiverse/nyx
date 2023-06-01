@@ -1,8 +1,8 @@
 # Nyx Release Notes
 
-## 2.4.2
+## 2.4.3
 
-This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/2.4.2).
+This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/2.4.3).
 
 ### Upgrade instructions
 
