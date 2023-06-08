@@ -278,7 +278,7 @@ public class Nyx {
             logger.debug(MAIN, "Command '{}' finished.", command.toString());
 
             // optionally save the state file
-            if (saveStateAndSummary && !Objects.isNull(configuration().getStateFile())) {
+            if (saveStateAndSummary && !Objects.isNull(configuration().getStateFile()) && !configuration().getStateFile().isBlank()) {
                 File stateFile = new File(configuration().getStateFile());
                 // if the file path is relative make it relative to the configured directory
                 if (!stateFile.isAbsolute())
@@ -289,7 +289,7 @@ public class Nyx {
             }
 
             // optionally save the summary file
-            if (saveStateAndSummary && !Objects.isNull(configuration().getSummaryFile())) {
+            if (saveStateAndSummary && !Objects.isNull(configuration().getSummaryFile()) && !configuration().getSummaryFile().isBlank()) {
                 File summaryFile = new File(configuration().getSummaryFile());
                 // if the file path is relative make it relative to the configured directory
                 if (!summaryFile.isAbsolute())
