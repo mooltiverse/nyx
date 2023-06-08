@@ -1,5 +1,23 @@
 # Nyx Release Notes
 
+## 2.4.4
+
+This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/2.4.4).
+
+### Upgrade instructions
+
+There are no actions to take for backward compatibility.
+
+### New features and improvements
+
+There are no new features or improvements in this release.
+
+### Fixed issues
+
+This release:
+
+* fixes a bug in the command line version that does not comply with `.gitignore` ([#219](https://github.com/mooltiverse/nyx/issues/219)). The issue is inherited by [go-git](https://github.com/go-git/go-git) that just [fixed it](https://github.com/go-git/go-git/issues/500)
+
 ## 2.4.3
 
 This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/2.4.3).
