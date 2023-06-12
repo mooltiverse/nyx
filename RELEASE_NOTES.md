@@ -1,5 +1,24 @@
 # Nyx Release Notes
 
+## 2.4.4
+
+This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/2.4.4).
+
+### Upgrade instructions
+
+There are no actions to take for backward compatibility.
+
+### New features and improvements
+
+There are no new features or improvements in this release.
+
+### Fixed issues
+
+This release:
+
+* fixes a bug in the command line version that does not comply with `.gitignore` ([#219](https://github.com/mooltiverse/nyx/issues/219)). The issue is inherited by [go-git](https://github.com/go-git/go-git) (see [here](https://github.com/go-git/go-git/issues/597) for an example). The issue is worked around by programmatically adding each pattern from the `.gitignore` to the Git worktree excludes. Only the `.gitignore` file in the repo root directory is read
+* fixes a bug in the command line version that does not allow to disable the generation of the state file ([#230](https://github.com/mooltiverse/nyx/issues/230))
+
 ## 2.4.3
 
 This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/2.4.3).

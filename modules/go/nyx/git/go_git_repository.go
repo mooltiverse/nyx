@@ -17,21 +17,24 @@
 package git
 
 import (
-	"bytes"   // https://pkg.go.dev/bytes
-	"fmt"     // https://pkg.go.dev/fmt
-	"os"      // https://pkg.go.dev/os
-	"os/exec" // https://pkg.go.dev/os/exec
-	"strings" // https://pkg.go.dev/strings
+	"bufio"         // https://pkg.go.dev/bufio
+	"bytes"         // https://pkg.go.dev/bytes
+	"fmt"           // https://pkg.go.dev/fmt
+	"os"            // https://pkg.go.dev/os
+	"os/exec"       // https://pkg.go.dev/os/exec
+	"path/filepath" // https://pkg.go.dev/filepath
+	"strings"       // https://pkg.go.dev/strings
 
-	ggit "github.com/go-git/go-git/v5"                             // https://pkg.go.dev/github.com/go-git/go-git/v5
-	ggitconfig "github.com/go-git/go-git/v5/config"                // https://pkg.go.dev/github.com/go-git/go-git/v5
-	ggitplumbing "github.com/go-git/go-git/v5/plumbing"            // https://pkg.go.dev/github.com/go-git/go-git/v5
-	ggitobject "github.com/go-git/go-git/v5/plumbing/object"       // https://pkg.go.dev/github.com/go-git/go-git/v5
-	ggittransport "github.com/go-git/go-git/v5/plumbing/transport" // https://pkg.go.dev/github.com/go-git/go-git/v5
-	ggithttp "github.com/go-git/go-git/v5/plumbing/transport/http" // https://pkg.go.dev/github.com/go-git/go-git/v5
-	ggitssh "github.com/go-git/go-git/v5/plumbing/transport/ssh"   // https://pkg.go.dev/github.com/go-git/go-git/v5
-	log "github.com/sirupsen/logrus"                               // https://pkg.go.dev/github.com/sirupsen/logrus
-	ssh "golang.org/x/crypto/ssh"                                  // https://pkg.go.dev/golang.org/x/crypto/ssh
+	ggit "github.com/go-git/go-git/v5"                                // https://pkg.go.dev/github.com/go-git/go-git/v5
+	ggitconfig "github.com/go-git/go-git/v5/config"                   // https://pkg.go.dev/github.com/go-git/go-git/v5
+	ggitplumbing "github.com/go-git/go-git/v5/plumbing"               // https://pkg.go.dev/github.com/go-git/go-git/v5
+	gitignore "github.com/go-git/go-git/v5/plumbing/format/gitignore" // https://pkg.go.dev/github.com/go-git/go-git/v5
+	ggitobject "github.com/go-git/go-git/v5/plumbing/object"          // https://pkg.go.dev/github.com/go-git/go-git/v5
+	ggittransport "github.com/go-git/go-git/v5/plumbing/transport"    // https://pkg.go.dev/github.com/go-git/go-git/v5
+	ggithttp "github.com/go-git/go-git/v5/plumbing/transport/http"    // https://pkg.go.dev/github.com/go-git/go-git/v5
+	ggitssh "github.com/go-git/go-git/v5/plumbing/transport/ssh"      // https://pkg.go.dev/github.com/go-git/go-git/v5
+	log "github.com/sirupsen/logrus"                                  // https://pkg.go.dev/github.com/sirupsen/logrus
+	ssh "golang.org/x/crypto/ssh"                                     // https://pkg.go.dev/golang.org/x/crypto/ssh
 
 	errs "github.com/mooltiverse/nyx/modules/go/errors"
 	gitent "github.com/mooltiverse/nyx/modules/go/nyx/entities/git"
@@ -43,6 +46,12 @@ var (
 	// removed when the workaround is no longer needed.
 	// TODO: remove this variable when https://github.com/mooltiverse/nyx/issues/130 is fixed
 	workaround130WarningsEmitted = false
+
+	// This flag tells if we already emitted the warning about the workaround documented at https://github.com/mooltiverse/nyx/pull/231
+	// This warning is only needed for the workaround at https://github.com/mooltiverse/nyx/pull/231 so this variable can be
+	// removed when the workaround is no longer needed.
+	// TODO: remove this variable when https://github.com/mooltiverse/nyx/pull/231 is fixed
+	workaround231WarningsEmitted = false
 )
 
 /*
@@ -383,8 +392,38 @@ func (r goGitRepository) Add(paths []string) error {
 	if err != nil {
 		return &errs.GitError{Message: fmt.Sprintf("an error occurred when getting the current worktree for the repository"), Cause: err}
 	}
+	// TODO: remove this workaround (before the 'for' statement) when https://github.com/mooltiverse/nyx/issues/219 is fixed
+	// The go-git library has a bug that sometimes does not obey with the .gitignore file so we use the
+	// workaround suggested here: https://github.com/go-git/go-git/issues/597#issuecomment-1301637889
+	// to read the .gitignore and programmatically add the paths to the Worktree Excludes.
+	// This workaround is here to cope with:
+	// - https://github.com/mooltiverse/nyx/issues/219
+	// as long as the go-git library doesn't fix the bug. Bugs to keep an eye on for a fix are:
+	// - https://github.com/go-git/go-git/issues/597
+	if _, err := os.Stat(filepath.Join(r.directory, ".gitignore")); err == nil {
+		if !workaround231WarningsEmitted {
+			log.Warnf("workaround #231: due to the underlying go-git library not obeying to the .gitignore files the .gitignore content is read and each item passed to the Worktree Excludes. For more see https://github.com/mooltiverse/nyx/issues/219")
+			// make sure we emit this warning only once
+			workaround231WarningsEmitted = true
+		}
+		gitIgnoreFile, err := os.Open(filepath.Join(r.directory, ".gitignore"))
+		defer gitIgnoreFile.Close()
+		if err != nil {
+			return &errs.GitError{Message: fmt.Sprintf("unable to read .gitignore (needed for workaround https://github.com/mooltiverse/nyx/issues/219)"), Cause: err}
+		}
+		gitIgnoreFileScanner := bufio.NewScanner(gitIgnoreFile)
+		gitIgnoreFileScanner.Split(bufio.ScanLines)
+		for gitIgnoreFileScanner.Scan() {
+			ignorePattern := gitIgnoreFileScanner.Text()
+			if !workaround231WarningsEmitted {
+				log.Debugf("add %s from .gitignore to ignore list (needed for workaround https://github.com/mooltiverse/nyx/issues/219)", ignorePattern)
+			}
+			worktree.Excludes = append(worktree.Excludes, gitignore.ParsePattern(ignorePattern, nil))
+		}
+		// End of the workaround
+	}
 	for _, path := range paths {
-		err := worktree.AddWithOptions(&ggit.AddOptions{All: false, Path: "", Glob: path})
+		err := worktree.AddWithOptions(&ggit.AddOptions{All: true, Path: "", Glob: path})
 		if err != nil {
 			return &errs.GitError{Message: fmt.Sprintf("an error occurred when trying to add paths to the staging area"), Cause: err}
 		}

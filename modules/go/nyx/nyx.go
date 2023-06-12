@@ -25,6 +25,7 @@ import (
 	"fmt"           // https://pkg.go.dev/fmt
 	"os"            // https://pkg.go.dev/os
 	"path/filepath" // https://pkg.go.dev/path/filepath
+	"strings"       // https://pkg.go.dev/strings
 
 	log "github.com/sirupsen/logrus" // https://pkg.go.dev/github.com/sirupsen/logrus
 
@@ -341,7 +342,7 @@ func (n *Nyx) runCommand(command cmd.Commands, saveStateAndSummary bool) error {
 			return err
 		}
 		// if the file path is relative make it relative to the configured directory
-		if stateFile != nil && !filepath.IsAbs(*stateFile) {
+		if stateFile != nil && "" != strings.TrimSpace(*stateFile) && !filepath.IsAbs(*stateFile) {
 			configuration, err := n.Configuration()
 			if err != nil {
 				return err
@@ -353,7 +354,7 @@ func (n *Nyx) runCommand(command cmd.Commands, saveStateAndSummary bool) error {
 			stateFileAbsolutePath := filepath.Join(*directory, *stateFile)
 			stateFile = &stateFileAbsolutePath
 		}
-		if saveStateAndSummary && stateFile != nil {
+		if saveStateAndSummary && stateFile != nil && "" != strings.TrimSpace(*stateFile) {
 			log.Debugf("storing the state to '%s'", *stateFile)
 			state, err := n.State()
 			if err != nil {
@@ -371,7 +372,7 @@ func (n *Nyx) runCommand(command cmd.Commands, saveStateAndSummary bool) error {
 			return err
 		}
 		// if the file path is relative make it relative to the configured directory
-		if summaryFile != nil && !filepath.IsAbs(*summaryFile) {
+		if summaryFile != nil && "" != strings.TrimSpace(*summaryFile) && !filepath.IsAbs(*summaryFile) {
 			configuration, err := n.Configuration()
 			if err != nil {
 				return err
@@ -383,7 +384,7 @@ func (n *Nyx) runCommand(command cmd.Commands, saveStateAndSummary bool) error {
 			summaryFileAbsolutePath := filepath.Join(*directory, *summaryFile)
 			summaryFile = &summaryFileAbsolutePath
 		}
-		if saveStateAndSummary && summaryFile != nil {
+		if saveStateAndSummary && summaryFile != nil && "" != strings.TrimSpace(*summaryFile) {
 			log.Debugf("storing the summary to '%s'", *summaryFile)
 			state, err := n.State()
 			if err != nil {
