@@ -293,7 +293,12 @@ class JGitRepository implements Repository {
          */
         @Override
         public boolean isEnabled(int level){
-            return logger.isEnabledForLevel(levelMapping.get(Integer.valueOf(level)));
+            // Commented due to issue at https://github.com/mooltiverse/nyx/issues/236
+            // This will cause some extra calls to log(int level, String message), but no big deal,
+            // as unnecessary log lines will be filtered out in there.
+            // This line can be uncommented when Gradle's logger supports isEnabledForLevel
+            //return logger.isEnabledForLevel(levelMapping.get(Integer.valueOf(level)));
+            return true;
         }
 
         /**
