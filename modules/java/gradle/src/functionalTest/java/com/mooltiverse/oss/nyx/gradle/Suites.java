@@ -80,14 +80,16 @@ public class Suites {
         }
         if (javaVersion <= 19) {
             // the latest version is always among the 'quick' tests
-            quickTestVersions.add("8.1.1");
+            quickTestVersions.add("8.2");
+            extensiveTestVersions.add("8.1.1");
             extensiveTestVersions.add("8.1");
             extensiveTestVersions.add("8.0.2");
             extensiveTestVersions.add("8.0.1");
             extensiveTestVersions.add("8.0");
 
             // the previous major version is in the 'quick' tests
-            quickTestVersions.add("7.6.1");
+            quickTestVersions.add("7.6.2");
+            extensiveTestVersions.add("7.6.1");
             extensiveTestVersions.add("7.6");
         }
         if (javaVersion <= 18) {
