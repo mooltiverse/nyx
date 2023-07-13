@@ -1,5 +1,23 @@
 # Nyx Release Notes
 
+## 2.4.6
+
+This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/2.4.6).
+
+### Upgrade instructions
+
+There are no actions to take for backward compatibility.
+
+### New features and improvements
+
+There are no new features or improvements in this release.
+
+### Fixed issues
+
+This release:
+
+* fixes a bug in the Java version ([#236](https://github.com/mooltiverse/nyx/issues/236)) due to a misalignment of Gradle logger API
+
 ## 2.4.5
 
 This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/2.4.5).

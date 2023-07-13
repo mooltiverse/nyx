@@ -294,11 +294,24 @@ class JGitRepository implements Repository {
         @Override
         public boolean isEnabled(int level){
             // Commented due to issue at https://github.com/mooltiverse/nyx/issues/236
-            // This will cause some extra calls to log(int level, String message), but no big deal,
-            // as unnecessary log lines will be filtered out in there.
-            // This line can be uncommented when Gradle's logger supports isEnabledForLevel
+            // What follows is a workaround
+            // Thanks n8ebel (https://github.com/n8ebel) for the hint
             //return logger.isEnabledForLevel(levelMapping.get(Integer.valueOf(level)));
-            return true;
+            Level logLevel = levelMapping.get(Integer.valueOf(level));
+            switch (logLevel) {
+                case ERROR:
+                    return logger.isErrorEnabled();
+                case WARN:
+                    return logger.isWarnEnabled();
+                case INFO:
+                    return logger.isInfoEnabled();
+                case DEBUG:
+                    return logger.isDebugEnabled();
+                case TRACE:
+                    return logger.isTraceEnabled();
+            }
+
+            return false;
         }
 
         /**
@@ -310,7 +323,28 @@ class JGitRepository implements Repository {
          */
         @Override
         public void log(int level, String message){
-            logger.atLevel(levelMapping.get(Integer.valueOf(level))).addMarker(GIT).log(message);
+            // Commented due to issue at https://github.com/mooltiverse/nyx/issues/236
+            // What follows is a workaround
+            // Thanks n8ebel (https://github.com/n8ebel) for the hint
+            //logger.atLevel(levelMapping.get(Integer.valueOf(level))).addMarker(GIT).log(message);
+            Level logLevel = levelMapping.get(Integer.valueOf(level));
+            switch (logLevel) {
+                case ERROR:
+                    logger.error(message);
+                    break;
+                case WARN:
+                    logger.warn(message);
+                    break;
+                case INFO:
+                    logger.info(message);
+                    break;
+                case DEBUG:
+                    logger.debug(message);
+                    break;
+                case TRACE:
+                    logger.trace(message);
+                    break;
+            }
         }
     }
 
