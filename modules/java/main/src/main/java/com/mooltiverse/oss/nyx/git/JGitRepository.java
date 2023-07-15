@@ -293,10 +293,6 @@ class JGitRepository implements Repository {
          */
         @Override
         public boolean isEnabled(int level){
-            // Commented due to issue at https://github.com/mooltiverse/nyx/issues/236
-            // What follows is a workaround
-            // Thanks n8ebel (https://github.com/n8ebel) for the hint
-            //return logger.isEnabledForLevel(levelMapping.get(Integer.valueOf(level)));
             Level logLevel = levelMapping.get(Integer.valueOf(level));
             switch (logLevel) {
                 case ERROR:
@@ -323,10 +319,6 @@ class JGitRepository implements Repository {
          */
         @Override
         public void log(int level, String message){
-            // Commented due to issue at https://github.com/mooltiverse/nyx/issues/236
-            // What follows is a workaround
-            // Thanks n8ebel (https://github.com/n8ebel) for the hint
-            //logger.atLevel(levelMapping.get(Integer.valueOf(level))).addMarker(GIT).log(message);
             Level logLevel = levelMapping.get(Integer.valueOf(level));
             switch (logLevel) {
                 case ERROR:
