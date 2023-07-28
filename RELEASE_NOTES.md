@@ -1,5 +1,23 @@
 # Nyx Release Notes
 
+## 2.4.7
+
+This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/2.4.7).
+
+### Upgrade instructions
+
+There are no actions to take for backward compatibility.
+
+### New features and improvements
+
+There are no new features or improvements in this release.
+
+### Fixed issues
+
+This release:
+
+* fixes a typo Java Gradle interfaces ([#240](https://github.com/mooltiverse/nyx/issues/240))
+
 ## 2.4.6
 
 This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/2.4.6).

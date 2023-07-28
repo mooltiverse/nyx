@@ -1837,7 +1837,7 @@ public abstract class NyxExtension {
          * 
          * @return the map of service options.
          */
-        public MapProperty<String,String> geOptions() {
+        public MapProperty<String,String> getOptions() {
             return options;
         }
         
