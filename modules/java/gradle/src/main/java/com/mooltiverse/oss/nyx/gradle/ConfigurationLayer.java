@@ -346,7 +346,7 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
                             throw new IllegalPropertyException(String.format("Service '%s' has no type", service.getName()));
                         servicesSection.put(service.getName(), new ServiceConfiguration(
                             Provider.valueOf(service.getType().get()),
-                            service.geOptions().isPresent() ? service.geOptions().get() : Map.<String,String>of()
+                            service.getOptions().isPresent() ? service.getOptions().get() : Map.<String,String>of()
                         ));
                     }
                 }
