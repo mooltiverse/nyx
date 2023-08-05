@@ -46,7 +46,7 @@ There are no known incompatibilities for the Docker image therefore it is compat
 
 ### Java and Gradle
 
-The recommended runtime is Java VM `15` or newer and Gradle `7.0` or newer. Tests are conducted up to Java VM `19` and Gradle versions up to `8.2`.
+The recommended runtime is Java VM `15` or newer and Gradle `7.0` or newer. Tests are conducted up to Java VM `19` and Gradle versions up to `8.2.1`.
 
 Although you may encounter some limitations (i.e. about support for some encryption or hashing algorithms when using SSH authentication), older versions are also supported. Specifically, Java VM `11` or newer are supported and Gradle version `6.0` and later is supported with the exception of versions from `6.5.x` to `6.9`.x (due to the [ASM](https://asm.ow2.io/index.html) version used by Gradle).
 

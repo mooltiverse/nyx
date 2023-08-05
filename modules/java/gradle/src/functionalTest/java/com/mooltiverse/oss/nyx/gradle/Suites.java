@@ -80,7 +80,8 @@ public class Suites {
         }
         if (javaVersion <= 19) {
             // the latest version is always among the 'quick' tests
-            quickTestVersions.add("8.2");
+            quickTestVersions.add("8.2.1");
+            extensiveTestVersions.add("8.2");
             extensiveTestVersions.add("8.1.1");
             extensiveTestVersions.add("8.1");
             extensiveTestVersions.add("8.0.2");
