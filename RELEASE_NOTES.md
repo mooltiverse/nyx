@@ -12,13 +12,12 @@ There are no actions to take for backward compatibility.
 
 This release:
 
+* adds support for arbitrary [substitutions](https://mooltiverse.github.io/nyx/guide/user/configuration-reference/substitutions/) in text files within the project using dynamic values from the [State](https://mooltiverse.github.io/nyx/guide/user/state-reference/) ([#182](https://github.com/mooltiverse/nyx/issues/182)) ([#223](https://github.com/mooltiverse/nyx/issues/223))
 * adds support for Gradle `8.2.1`.
 
 ### Fixed issues
 
-This release:
-
-* 
+There are no fixes in this release.
 
 ## 2.4.7
 
