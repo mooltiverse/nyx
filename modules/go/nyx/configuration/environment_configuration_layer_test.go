@@ -682,6 +682,100 @@ func TestEnvironmentConfigurationLayerGetSharedConfigurationFile(t *testing.T) {
 	assert.Equal(t, "config.yml", *sharedConfigurationFile)
 }
 
+func TestEnvironmentConfigurationLayerGetStateFile(t *testing.T) {
+	environmentConfigurationLayer := EnvironmentConfigurationLayer{}
+
+	stateFile, err := environmentConfigurationLayer.GetStateFile()
+	assert.NoError(t, err)
+	assert.Nil(t, stateFile)
+
+	// get a new instance or a stale set of environment variables is still in the configuration layer
+	environmentConfigurationLayer = EnvironmentConfigurationLayer{}
+	environmentConfigurationLayer.withEnvironmentVariables([]string{
+		"NYX_STATE_FILE=state.yml",
+	})
+
+	stateFile, err = environmentConfigurationLayer.GetStateFile()
+	assert.NoError(t, err)
+	assert.Equal(t, "state.yml", *stateFile)
+}
+
+func TestEnvironmentConfigurationLayerGetSubstitutions(t *testing.T) {
+	environmentConfigurationLayer := EnvironmentConfigurationLayer{}
+
+	substitutions, err := environmentConfigurationLayer.GetSubstitutions()
+	assert.NoError(t, err)
+	assert.NotNil(t, substitutions)
+	assert.Equal(t, 0, len(*substitutions.GetEnabled()))
+	assert.Equal(t, 0, len(*substitutions.GetItems()))
+
+	// get a new instance or a stale set of environment variables is still in the configuration layer
+	environmentConfigurationLayer = EnvironmentConfigurationLayer{}
+	environmentConfigurationLayer.withEnvironmentVariables([]string{
+		"NYX_SUBSTITUTIONS_ENABLED=one,two",
+	})
+
+	substitutions, err = environmentConfigurationLayer.GetSubstitutions()
+	assert.NoError(t, err)
+	assert.NotNil(t, substitutions)
+
+	enabled := *substitutions.GetEnabled()
+	items := *substitutions.GetItems()
+	assert.Equal(t, 2, len(enabled))
+	assert.Equal(t, *enabled[0], "one")
+	assert.Equal(t, *enabled[1], "two")
+	assert.Equal(t, 0, len(items))
+
+	// get a new instance or a stale set of environment variables is still in the configuration layer
+	environmentConfigurationLayer = EnvironmentConfigurationLayer{}
+	environmentConfigurationLayer.withEnvironmentVariables([]string{
+		"NYX_SUBSTITUTIONS_ENABLED=one,two",
+		"NYX_SUBSTITUTIONS_one_FILES=",
+		"NYX_SUBSTITUTIONS_two_FILES=",
+	})
+
+	substitutions, err = environmentConfigurationLayer.GetSubstitutions()
+	assert.NoError(t, err)
+	assert.NotNil(t, substitutions)
+
+	enabled = *substitutions.GetEnabled()
+	items = *substitutions.GetItems()
+	assert.Equal(t, 2, len(enabled))
+	assert.Equal(t, *enabled[0], "one")
+	assert.Equal(t, *enabled[1], "two")
+	assert.Equal(t, 2, len(*substitutions.GetItems()))
+	assert.NotNil(t, *items["one"])
+	assert.NotNil(t, *items["two"])
+
+	// get a new instance or a stale set of environment variables is still in the configuration layer
+	environmentConfigurationLayer = EnvironmentConfigurationLayer{}
+	environmentConfigurationLayer.withEnvironmentVariables([]string{
+		"NYX_SUBSTITUTIONS_ENABLED=one,two",
+		"NYX_SUBSTITUTIONS_one_FILES=*.json",
+		"NYX_SUBSTITUTIONS_one_MATCH=version: 1.2.3",
+		"NYX_SUBSTITUTIONS_two_FILES=*.toml",
+		"NYX_SUBSTITUTIONS_two_MATCH=version: 4.5.6",
+		"NYX_SUBSTITUTIONS_two_REPLACE=version: 7.8.9",
+	})
+
+	substitutions, err = environmentConfigurationLayer.GetSubstitutions()
+	assert.NoError(t, err)
+	assert.NotNil(t, substitutions)
+
+	enabled = *substitutions.GetEnabled()
+	items = *substitutions.GetItems()
+	assert.Equal(t, 2, len(enabled))
+	assert.Equal(t, *enabled[0], "one")
+	assert.Equal(t, *enabled[1], "two")
+	assert.Equal(t, 2, len(items))
+	assert.Equal(t, "*.json", *items["one"].GetFiles())
+	assert.Equal(t, "version: 1.2.3", *items["one"].GetMatch())
+	assert.Nil(t, items["one"].GetReplace())
+	assert.Equal(t, "*.toml", *items["two"].GetFiles())
+	assert.Equal(t, "version: 4.5.6", *items["two"].GetMatch())
+	assert.Equal(t, "version: 7.8.9", *items["two"].GetReplace())
+}
+
 func TestEnvironmentConfigurationLayerGetSummary(t *testing.T) {
 	environmentConfigurationLayer := EnvironmentConfigurationLayer{}
 
@@ -716,24 +810,6 @@ func TestEnvironmentConfigurationLayerGetSummaryFile(t *testing.T) {
 	summaryFile, err = environmentConfigurationLayer.GetSummaryFile()
 	assert.NoError(t, err)
 	assert.Equal(t, "summary.txt", *summaryFile)
-}
-
-func TestEnvironmentConfigurationLayerGetStateFile(t *testing.T) {
-	environmentConfigurationLayer := EnvironmentConfigurationLayer{}
-
-	stateFile, err := environmentConfigurationLayer.GetStateFile()
-	assert.NoError(t, err)
-	assert.Nil(t, stateFile)
-
-	// get a new instance or a stale set of environment variables is still in the configuration layer
-	environmentConfigurationLayer = EnvironmentConfigurationLayer{}
-	environmentConfigurationLayer.withEnvironmentVariables([]string{
-		"NYX_STATE_FILE=state.yml",
-	})
-
-	stateFile, err = environmentConfigurationLayer.GetStateFile()
-	assert.NoError(t, err)
-	assert.Equal(t, "state.yml", *stateFile)
 }
 
 func TestEnvironmentConfigurationLayerGetVerbosity(t *testing.T) {

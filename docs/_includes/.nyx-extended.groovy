@@ -213,6 +213,21 @@ nyx {
   summary = true
   summaryFile = '.nyx-summary.txt'
   stateFile = '.nyx-state.yml'
+  substitutions {
+    enabled = [ 'npm', 'rust' ]
+    items {
+      npm {
+        files = 'package.json'
+        match = '"version": "([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?"'
+        replace = '"version": "{{version}}"'
+      }
+      rust {
+        files = 'Cargo.toml'
+        match = 'version = "([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?"'
+        replace = 'version = "{{version}}"'
+      }
+    }
+  }
   verbosity = 'INFO'
   version = '1.8.12'
 }

@@ -327,6 +327,43 @@ func TestSimpleConfigurationLayerGetSharedConfigurationFile(t *testing.T) {
 	assert.Equal(t, "config.yml", *sharedConfigurationFile)
 }
 
+func TestSimpleConfigurationLayerGetStateFile(t *testing.T) {
+	simpleConfigurationLayer := NewSimpleConfigurationLayer()
+
+	stateFile, error := simpleConfigurationLayer.GetStateFile()
+	assert.NoError(t, error)
+	assert.Nil(t, stateFile)
+
+	simpleConfigurationLayer.SetStateFile(utl.PointerToString("state.yml"))
+	stateFile, error = simpleConfigurationLayer.GetStateFile()
+	assert.NoError(t, error)
+	assert.Equal(t, "state.yml", *stateFile)
+}
+
+func TestSimpleConfigurationLayerGetSubstitutions(t *testing.T) {
+	simpleConfigurationLayer := NewSimpleConfigurationLayer()
+
+	cmc, error := simpleConfigurationLayer.GetSubstitutions()
+	assert.NoError(t, error)
+	assert.NotNil(t, cmc)
+
+	items := make(map[string]*ent.Substitution)
+	items["one"] = ent.NewSubstitution()
+	items["two"] = ent.NewSubstitution()
+
+	enabled := []*string{utl.PointerToString("one"), utl.PointerToString("two")}
+
+	cmcParam, _ := ent.NewSubstitutionsWith(&enabled, &items)
+
+	simpleConfigurationLayer.SetSubstitutions(cmcParam)
+	cmc, error = simpleConfigurationLayer.GetSubstitutions()
+	assert.NoError(t, error)
+	assert.Equal(t, *cmcParam, *cmc)
+
+	assert.Equal(t, 2, len(*cmc.GetEnabled()))
+	assert.Equal(t, 2, len(*cmc.GetItems()))
+}
+
 func TestSimpleConfigurationLayerGetSummary(t *testing.T) {
 	simpleConfigurationLayer := NewSimpleConfigurationLayer()
 
@@ -351,19 +388,6 @@ func TestSimpleConfigurationLayerGetSummaryFile(t *testing.T) {
 	summaryFile, error = simpleConfigurationLayer.GetSummaryFile()
 	assert.NoError(t, error)
 	assert.Equal(t, "summary.txt", *summaryFile)
-}
-
-func TestSimpleConfigurationLayerGetStateFile(t *testing.T) {
-	simpleConfigurationLayer := NewSimpleConfigurationLayer()
-
-	stateFile, error := simpleConfigurationLayer.GetStateFile()
-	assert.NoError(t, error)
-	assert.Nil(t, stateFile)
-
-	simpleConfigurationLayer.SetStateFile(utl.PointerToString("state.yml"))
-	stateFile, error = simpleConfigurationLayer.GetStateFile()
-	assert.NoError(t, error)
-	assert.Equal(t, "state.yml", *stateFile)
 }
 
 func TestSimpleConfigurationLayerGetVerbosity(t *testing.T) {

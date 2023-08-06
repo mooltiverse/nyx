@@ -392,10 +392,43 @@ const (
 	SHARED_CONFIGURATION_FILE_ARGUMENT_NAME = "--shared-configuration-file"
 
 	// The name of the argument to read for this value.
-	SUMMARY_ARGUMENT_NAME = "--summary"
+	STATE_FILE_ARGUMENT_NAME = "--state-file"
 
 	// The name of the argument to read for this value.
-	STATE_FILE_ARGUMENT_NAME = "--state-file"
+	SUBSTITUTIONS_ARGUMENT_NAME = "--substitutions"
+
+	// The name of the argument to read for this value.
+	SUBSTITUTIONS_ENABLED_ARGUMENT_NAME = SUBSTITUTIONS_ARGUMENT_NAME + "-enabled"
+
+	// The regular expression used to scan the name of a substitution from an argument
+	// name. This expression is used to detect if an argument is used to define
+	// a substitution.
+	// This expression uses the 'name' capturing group which returns the substitution name, if detected.
+	SUBSTITUTIONS_ARGUMENT_ITEM_NAME_REGEX = SUBSTITUTIONS_ARGUMENT_NAME + "-(?<name>[a-zA-Z0-9]+)-([a-zA-Z0-9-]+)$"
+
+	// The parametrized name of the argument to read for the 'files' attribute of a
+	// substitution.
+	// This string is a prototype that contains a '%s' parameter for the commit substitution name
+	// and must be rendered using fmt.Sprintf(SUBSTITUTIONS_ARGUMENT_ITEM_FILES_FORMAT_STRING, name)
+	// in order to get the actual name of the argument that brings the value for the substitution with the given 'name'.
+	SUBSTITUTIONS_ARGUMENT_ITEM_FILES_FORMAT_STRING = SUBSTITUTIONS_ARGUMENT_NAME + "-%s-files"
+
+	// The parametrized name of the argument to read for the 'match' attribute of a
+	// substitution.
+	// This string is a prototype that contains a '%s' parameter for the commit substitution name
+	// and must be rendered using fmt.Sprintf(SUBSTITUTIONS_ARGUMENT_ITEM_MATCH_FORMAT_STRING, name)
+	// in order to get the actual name of the argument that brings the value for the substitution with the given 'name'.
+	SUBSTITUTIONS_ARGUMENT_ITEM_MATCH_FORMAT_STRING = SUBSTITUTIONS_ARGUMENT_NAME + "-%s-match"
+
+	// The parametrized name of the argument to read for the 'replace' attribute of a
+	// substitution.
+	// This string is a prototype that contains a '%s' parameter for the commit substitution name
+	// and must be rendered using fmt.Sprintf(SUBSTITUTIONS_ARGUMENT_ITEM_REPLACE_FORMAT_STRING, name)
+	// in order to get the actual name of the argument that brings the value for the substitution with the given 'name'.
+	SUBSTITUTIONS_ARGUMENT_ITEM_REPLACE_FORMAT_STRING = SUBSTITUTIONS_ARGUMENT_NAME + "-%s-replace"
+
+	// The name of the argument to read for this value.
+	SUMMARY_ARGUMENT_NAME = "--summary"
 
 	// The name of the argument to read for this value.
 	SUMMARY_FILE_ARGUMENT_NAME = "--summary-file"
@@ -465,6 +498,9 @@ type CommandLineConfigurationLayer struct {
 
 	// The services configuration section
 	services *map[string]*ent.ServiceConfiguration
+
+	// The substitutions configuration section.
+	substitutions *ent.Substitutions
 }
 
 /*
@@ -1273,6 +1309,54 @@ func (clcl *CommandLineConfigurationLayer) GetSharedConfigurationFile() (*string
 }
 
 /*
+Returns the path to the file where the Nyx State must be saved as it's defined by this configuration. A nil value means undefined.
+
+Error is:
+- DataAccessError: in case the option cannot be read or accessed.
+- IllegalPropertyError: in case the option has been defined but has incorrect values or it can't be resolved.
+*/
+func (clcl *CommandLineConfigurationLayer) GetStateFile() (*string, error) {
+	return clcl.getArgument(STATE_FILE_ARGUMENT_NAME), nil
+}
+
+/*
+Returns the substitutions configuration section.
+
+Error is:
+- DataAccessError: in case the option cannot be read or accessed.
+- IllegalPropertyError: in case the option has been defined but has incorrect values or it can't be resolved.
+*/
+func (clcl *CommandLineConfigurationLayer) GetSubstitutions() (*ent.Substitutions, error) {
+	if clcl.substitutions == nil {
+		// parse the 'enabled' items list
+		enabled := clcl.getItemNamesListFromArgument("substitutions", "enabled", SUBSTITUTIONS_ENABLED_ARGUMENT_NAME)
+
+		// parse the 'items' map
+		items := make(map[string]*ent.Substitution)
+
+		itemNames, err := clcl.scanItemNamesInArguments("substitutions", SUBSTITUTIONS_ARGUMENT_ITEM_NAME_REGEX, nil)
+		if err != nil {
+			return nil, err
+		}
+		// now we have the set of all item names configured through arguments and we can
+		// query specific arguments
+		for _, itemName := range itemNames {
+			files := clcl.getArgument(fmt.Sprintf(SUBSTITUTIONS_ARGUMENT_ITEM_FILES_FORMAT_STRING, itemName))
+			match := clcl.getArgument(fmt.Sprintf(SUBSTITUTIONS_ARGUMENT_ITEM_MATCH_FORMAT_STRING, itemName))
+			replace := clcl.getArgument(fmt.Sprintf(SUBSTITUTIONS_ARGUMENT_ITEM_REPLACE_FORMAT_STRING, itemName))
+
+			items[itemName] = ent.NewSubstitutionWith(files, match, replace)
+		}
+		enabledPointers := clcl.toSliceOfStringPointers(enabled)
+		clcl.substitutions, err = ent.NewSubstitutionsWith(&enabledPointers, &items)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return clcl.substitutions, nil
+}
+
+/*
 Returns the value of the summary flag as it's defined by this configuration. A nil value means undefined.
 
 Error is:
@@ -1302,17 +1386,6 @@ Error is:
 */
 func (clcl *CommandLineConfigurationLayer) GetSummaryFile() (*string, error) {
 	return clcl.getArgument(SUMMARY_FILE_ARGUMENT_NAME), nil
-}
-
-/*
-Returns the path to the file where the Nyx State must be saved as it's defined by this configuration. A nil value means undefined.
-
-Error is:
-- DataAccessError: in case the option cannot be read or accessed.
-- IllegalPropertyError: in case the option has been defined but has incorrect values or it can't be resolved.
-*/
-func (clcl *CommandLineConfigurationLayer) GetStateFile() (*string, error) {
-	return clcl.getArgument(STATE_FILE_ARGUMENT_NAME), nil
 }
 
 /*

@@ -215,6 +215,11 @@ public interface Defaults {
     public static final String STATE_FILE = null;
 
     /**
+     * The default substitutions block.
+     */
+    public static final Substitutions SUBSTITUTIONS = new Substitutions(List.<String>of(), Map.<String,Substitution>of());
+
+    /**
      * The default flag that tells when to print a summary to the console. Value: {@code false}
      */
     public static final Boolean SUMMARY = Boolean.FALSE;

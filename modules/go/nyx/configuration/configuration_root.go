@@ -180,6 +180,24 @@ type ConfigurationRoot interface {
 	GetSharedConfigurationFile() (*string, error)
 
 	/*
+		Returns the path to the file where the Nyx State must be saved as it's defined by this configuration.
+
+		Error is:
+		- DataAccessError: in case the option cannot be read or accessed.
+		- IllegalPropertyError: in case the option has been defined but has incorrect values or it can't be resolved.
+	*/
+	GetStateFile() (*string, error)
+
+	/*
+		Returns the substitutions configuration section.
+
+		Error is:
+		- DataAccessError: in case the option cannot be read or accessed.
+		- IllegalPropertyError: in case the option has been defined but has incorrect values or it can't be resolved.
+	*/
+	GetSubstitutions() (*ent.Substitutions, error)
+
+	/*
 		Returns the value of the summary flag as it's defined by this configuration.
 
 		Error is:
@@ -196,15 +214,6 @@ type ConfigurationRoot interface {
 		- IllegalPropertyError: in case the option has been defined but has incorrect values or it can't be resolved.
 	*/
 	GetSummaryFile() (*string, error)
-
-	/*
-		Returns the path to the file where the Nyx State must be saved as it's defined by this configuration.
-
-		Error is:
-		- DataAccessError: in case the option cannot be read or accessed.
-		- IllegalPropertyError: in case the option has been defined but has incorrect values or it can't be resolved.
-	*/
-	GetStateFile() (*string, error)
 
 	/*
 		Returns the logging verbosity level as it's defined by this configuration.

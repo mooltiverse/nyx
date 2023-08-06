@@ -11,7 +11,7 @@ Substitutions are configured with rules where each rule:
 
 * defines the file paths where replacements must occur; file paths are defined as [globs](https://en.wikipedia.org/wiki/Glob_(programming)) so you can match multiple files with a single rule
 * defines the token to be replaced using [regular expressions](https://en.wikipedia.org/wiki/Regular_expression) to give you complete freedom on the selection
-* defines the content to use when replacing the content as a static string or a [template]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}) so you can use any value from the internal [State]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/index.md %})
+* defines the content to use when replacing the content as a static string or a [template]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}) so you can use any attribute from the internal [State]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/index.md %})
 
 A common use case for substitutions is replacing the version attribute into platform-specific files so you can bridge the version detection and generation performed by Nyx with any language-specific artifact. For example, if you're woking on a Node project you can replace the value of the `version` attribute in the [`package.json`](https://docs.npmjs.com/cli/v9/configuring-npm/package-json#version) using the [`version`]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md%}#version) attribute from the [State]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/index.md %}) to make sure the Node version is always in synch with Nyx.
 
@@ -61,7 +61,7 @@ Each substitution has the following attributes:
 | ---------------------------------------------------------------------- | ------- | ----------------------------------------------------------- | -------------------------------------------------------------- | ------------------------------------------ |
 | [`substitutions/<NAME>/files`](#files)                                 | string  | `--substitutions-<NAME>-files=<GLOB>`                       | `NYX_SUBSTITUTIONS_<NAME>_FILES=<GLOB>`                        | N/A                                        |
 | [`substitutions/<NAME>/match`](#match)                                 | string  | `--substitutions-<NAME>-match=<REGEX>`                      | `NYX_SUBSTITUTIONS_<NAME>_MATCH=<REGEX>`                       | N/A                                        |
-| [`substitutions/<NAME>/value`](#value)                                 | string  | `--substitutions-<NAME>-value=<TEMPLATE>`                   | `NYX_SUBSTITUTIONS_<NAME>_VALUE=<TEMPLATE>`                    | N/A                                        |
+| [`substitutions/<NAME>/replace`](#replace)                             | string  | `--substitutions-<NAME>-replace=<TEMPLATE>`                 | `NYX_SUBSTITUTIONS_<NAME>_REPLACE=<TEMPLATE>`                  | N/A                                        |
 
 When using multiple [configuration methods]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}) or customizing [presets]({{ site.baseurl }}{% link _pages/guide/user/04.configuration-presets/index.md %}), these values must be inherited or overridden as a whole. Overriding single values and inheriting others is not supported for this type of configuration option so when they are re-declared at one configuration level, all inherited values from those configuration methods with lower precedence are suppressed.
 {: .notice--warning}
@@ -90,23 +90,23 @@ The `files` is a glob that matches zero, one or multiple files to evaluate for s
 | Configuration File Option | `substitutions/items/<NAME>/match`                                                       |
 | Related state attributes  |                                                                                          |
 
-The `match` regular expression defines the tokens to be replaced as a whole using the [`value`](#value) configured for the rule. This expression can match zero, one or more text tokens. When multiple tokens are matched they are all replaced.
+The `match` regular expression defines the tokens to be replaced as a whole using the [`replace`](#replace) value configured for the rule. This expression can match zero, one or more text tokens. When multiple tokens are matched they are all replaced.
 
-Please note that the token is matched **as a whole** so, for example, if this expression matches `version: 1.2.3`, the [`value`](#value) must contain `{% raw %}version: {{version}}{% endraw %}`, not just `{% raw %}{{version}}{% endraw %}`, or the `version: ` part will disappear and subsequent substitutions won't work.
+Please note that the token is matched **as a whole** so, for example, if this expression matches `version: 1.2.3`, the [`replace`](#replace) option must contain `{% raw %}version: {{version}}{% endraw %}`, not just `{% raw %}{{version}}{% endraw %}`, or the `version: ` part will disappear and subsequent substitutions won't work.
 {: .notice--info}
 
 Use tools like [regular expressions 101](https://regex101.com/) to write and test your regular expressions.
 {: .notice--info}
 
-#### Value
+#### Replace
 
 | ------------------------- | ---------------------------------------------------------------------------------------- |
-| Name                      | `substitutions/<NAME>/value`                                                             |
+| Name                      | `substitutions/<NAME>/replace`                                                           |
 | Type                      | string                                                                                   |
 | Default                   | N/A                                                                                      |
-| Command Line Option       | `--substitutions-<NAME>-value=<TEMPLATE>`                                                |
-| Environment Variable      | `NYX_SUBSTITUTIONS_<NAME>_VALUE=<TEMPLATE>`                                              |
-| Configuration File Option | `substitutions/items/<NAME>/value`                                                       |
+| Command Line Option       | `--substitutions-<NAME>-replace=<TEMPLATE>`                                              |
+| Environment Variable      | `NYX_SUBSTITUTIONS_<NAME>_REPLACE=<TEMPLATE>`                                            |
+| Configuration File Option | `substitutions/items/<NAME>/replace`                                                     |
 | Related state attributes  | any                                                                                      |
 
 The text to replace the [matched tokens](#match), if any.

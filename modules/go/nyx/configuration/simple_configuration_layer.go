@@ -80,14 +80,17 @@ type SimpleConfigurationLayer struct {
 	// The path to a custom shared configuration file as it's defined by this configuration. A nil value means undefined.
 	SharedConfigurationFile *string `json:"sharedConfigurationFile,omitempty" yaml:"sharedConfigurationFile,omitempty" handlebars:"sharedConfigurationFile"`
 
+	// The path to the file where the Nyx State must be saved as it's defined by this configuration. A nil value means undefined.
+	StateFile *string `json:"stateFile,omitempty" yaml:"stateFile,omitempty" handlebars:"stateFile"`
+
+	// The substitutions configuration section.
+	Substitutions *ent.Substitutions `json:"substitutions,omitempty" yaml:"substitutions,omitempty" handlebars:"substitutions"`
+
 	// The value of the summary flag as it's defined by this configuration. A nil value means undefined.
 	Summary *bool `json:"summary,omitempty" yaml:"summary,omitempty" handlebars:"summary"`
 
 	// The path to the file where the Nyx summary must be saved as it's defined by this configuration. A nil value means undefined.
 	SummaryFile *string `json:"summaryFile,omitempty" yaml:"summaryFile,omitempty" handlebars:"summaryFile"`
-
-	// The path to the file where the Nyx State must be saved as it's defined by this configuration. A nil value means undefined.
-	StateFile *string `json:"stateFile,omitempty" yaml:"stateFile,omitempty" handlebars:"stateFile"`
 
 	// The verbosity defined by this configuration. A nil value means undefined.
 	Verbosity *ent.Verbosity `json:"verbosity,omitempty" yaml:"verbosity,omitempty" handlebars:"verbosity"`
@@ -117,6 +120,7 @@ func (scl *SimpleConfigurationLayer) setDefaults() {
 	scl.ReleaseTypes = ent.NewReleaseTypes()
 	svsc := make(map[string]*ent.ServiceConfiguration)
 	scl.Services = &svsc
+	scl.Substitutions = ent.NewSubstitutions()
 }
 
 /*
@@ -428,6 +432,42 @@ func (scl *SimpleConfigurationLayer) SetSharedConfigurationFile(sharedConfigurat
 }
 
 /*
+Returns the path to the file where the Nyx State must be saved as it's defined by this configuration. A nil value means undefined.
+
+Error is:
+- DataAccessError: in case the option cannot be read or accessed.
+- IllegalPropertyError: in case the option has been defined but has incorrect values or it can't be resolved.
+*/
+func (scl *SimpleConfigurationLayer) GetStateFile() (*string, error) {
+	return scl.StateFile, nil
+}
+
+/*
+Sets the path to the file where the Nyx State must be saved as it's defined by this configuration. A nil value means undefined.
+*/
+func (scl *SimpleConfigurationLayer) SetStateFile(stateFile *string) {
+	scl.StateFile = stateFile
+}
+
+/*
+Returns the substitutions configuration section.
+
+Error is:
+- DataAccessError: in case the option cannot be read or accessed.
+- IllegalPropertyError: in case the option has been defined but has incorrect values or it can't be resolved.
+*/
+func (scl *SimpleConfigurationLayer) GetSubstitutions() (*ent.Substitutions, error) {
+	return scl.Substitutions, nil
+}
+
+/*
+Sets the substitutions configuration section.
+*/
+func (scl *SimpleConfigurationLayer) SetSubstitutions(substitutions *ent.Substitutions) {
+	scl.Substitutions = substitutions
+}
+
+/*
 Returns the value of the summary flag as it's defined by this configuration. A nil value means undefined.
 
 Error is:
@@ -461,24 +501,6 @@ Sets the path to the file where the Nyx summary must be saved as it's defined by
 */
 func (scl *SimpleConfigurationLayer) SetSummaryFile(summaryFile *string) {
 	scl.SummaryFile = summaryFile
-}
-
-/*
-Returns the path to the file where the Nyx State must be saved as it's defined by this configuration. A nil value means undefined.
-
-Error is:
-- DataAccessError: in case the option cannot be read or accessed.
-- IllegalPropertyError: in case the option has been defined but has incorrect values or it can't be resolved.
-*/
-func (scl *SimpleConfigurationLayer) GetStateFile() (*string, error) {
-	return scl.StateFile, nil
-}
-
-/*
-Sets the path to the file where the Nyx State must be saved as it's defined by this configuration. A nil value means undefined.
-*/
-func (scl *SimpleConfigurationLayer) SetStateFile(stateFile *string) {
-	scl.StateFile = stateFile
 }
 
 /*

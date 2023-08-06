@@ -101,5 +101,15 @@ nyx {
       }
     }
   }
+  substitutions {
+    enabled = [ 'npm' ]
+    items {
+      npm {
+        files = 'package.json'
+        match = '"version": "([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?"'
+        replace = '"version": "{{version}}"'
+      }
+    }
+  }
   verbosity = 'INFO'
 }

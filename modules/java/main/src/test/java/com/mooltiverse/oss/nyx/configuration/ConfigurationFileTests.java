@@ -43,6 +43,8 @@ import com.mooltiverse.oss.nyx.entities.Provider;
 import com.mooltiverse.oss.nyx.entities.ReleaseType;
 import com.mooltiverse.oss.nyx.entities.ReleaseTypes;
 import com.mooltiverse.oss.nyx.entities.ServiceConfiguration;
+import com.mooltiverse.oss.nyx.entities.Substitution;
+import com.mooltiverse.oss.nyx.entities.Substitutions;
 import com.mooltiverse.oss.nyx.entities.Verbosity;
 import com.mooltiverse.oss.nyx.io.FileMapper;
 import com.mooltiverse.oss.nyx.version.Scheme;
@@ -117,6 +119,13 @@ public class ConfigurationFileTests {
             }
             assertEquals(source.getChangelog().getTemplate(), target.getChangelog().getTemplate());
 
+            assertEquals(Objects.isNull(source.getCommitMessageConventions().getEnabled()) ? Defaults.COMMIT_MESSAGE_CONVENTIONS.getEnabled() : source.getCommitMessageConventions().getEnabled(), target.getCommitMessageConventions().getEnabled());
+            assertEquals(source.getCommitMessageConventions().getItems().keySet(), target.getCommitMessageConventions().getItems().keySet());
+            for (String item: source.getCommitMessageConventions().getItems().keySet()) {
+                assertEquals(source.getCommitMessageConventions().getItems().get(item).getExpression(), target.getCommitMessageConventions().getItems().get(item).getExpression());
+                assertEquals(source.getCommitMessageConventions().getItems().get(item).getBumpExpressions(), target.getCommitMessageConventions().getItems().get(item).getBumpExpressions());
+            }
+
             assertEquals(source.getGit().getRemotes().keySet(), target.getGit().getRemotes().keySet());
             for (String item: source.getGit().getRemotes().keySet()) {
                 assertEquals(source.getGit().getRemotes().get(item).getAuthenticationMethod(), target.getGit().getRemotes().get(item).getAuthenticationMethod());
@@ -188,6 +197,14 @@ public class ConfigurationFileTests {
                         assertEquals(entry.getValue(), target.getServices().get(item).getOptions().get(entry.getKey()));
                     }
                 }
+            }
+
+            assertEquals(Objects.isNull(source.getSubstitutions().getEnabled()) ? Defaults.SUBSTITUTIONS.getEnabled() : source.getSubstitutions().getEnabled(), target.getSubstitutions().getEnabled());
+            assertEquals(source.getSubstitutions().getItems().keySet(), target.getSubstitutions().getItems().keySet());
+            for (String item: source.getSubstitutions().getItems().keySet()) {
+                assertEquals(source.getSubstitutions().getItems().get(item).getFiles(), target.getSubstitutions().getItems().get(item).getFiles());
+                assertEquals(source.getSubstitutions().getItems().get(item).getMatch(), target.getSubstitutions().getItems().get(item).getMatch());
+                assertEquals(source.getSubstitutions().getItems().get(item).getReplace(), target.getSubstitutions().getItems().get(item).getReplace());
             }
         }
 
@@ -324,6 +341,14 @@ public class ConfigurationFileTests {
                         assertEquals(entry.getValue(), target.getServices().get(item).getOptions().get(entry.getKey()));
                     }
                 }
+            }
+
+            assertEquals(Objects.isNull(source.getSubstitutions().getEnabled()) ? Defaults.SUBSTITUTIONS.getEnabled() : source.getSubstitutions().getEnabled(), target.getSubstitutions().getEnabled());
+            assertEquals(source.getSubstitutions().getItems().keySet(), target.getSubstitutions().getItems().keySet());
+            for (String item: source.getSubstitutions().getItems().keySet()) {
+                assertEquals(source.getSubstitutions().getItems().get(item).getFiles(), target.getSubstitutions().getItems().get(item).getFiles());
+                assertEquals(source.getSubstitutions().getItems().get(item).getMatch(), target.getSubstitutions().getItems().get(item).getMatch());
+                assertEquals(source.getSubstitutions().getItems().get(item).getReplace(), target.getSubstitutions().getItems().get(item).getReplace());
             }
         }
     }
@@ -505,6 +530,29 @@ public class ConfigurationFileTests {
             mediumPriorityConfigurationLayerMock.setSharedConfigurationFile(System.getProperty(SIMPLEST_JSON_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY));
             highPriorityConfigurationLayerMock.setSharedConfigurationFile(System.getProperty(SIMPLEST_YAML_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY));
 
+            lowPriorityConfigurationLayerMock.setStateFile("file.yaml");
+            mediumPriorityConfigurationLayerMock.setStateFile("file.yaml");
+            highPriorityConfigurationLayerMock.setStateFile("file.json");
+
+            lowPriorityConfigurationLayerMock.setSubstitutions(
+                new Substitutions(
+                    List.<String>of("substitution1"),
+                    Map.<String,Substitution>of("substitution1", new Substitution("glob1", "match1", "replace1"))
+                )
+            );
+            mediumPriorityConfigurationLayerMock.setSubstitutions(
+                new Substitutions(
+                    List.<String>of("substitution2"),
+                    Map.<String,Substitution>of("substitution2", new Substitution("glob2", "match2", "replace2"))
+                )
+            );
+            highPriorityConfigurationLayerMock.setSubstitutions(
+                new Substitutions(
+                    List.<String>of("substitution3"),
+                    Map.<String,Substitution>of("substitution3", new Substitution("glob3", "match3", "replace3"))
+                )
+            );
+
             lowPriorityConfigurationLayerMock.setSummary(Boolean.TRUE);
             mediumPriorityConfigurationLayerMock.setSummary(Boolean.TRUE);
             highPriorityConfigurationLayerMock.setSummary(Boolean.FALSE);
@@ -512,10 +560,6 @@ public class ConfigurationFileTests {
             lowPriorityConfigurationLayerMock.setSummaryFile("summary.low");
             mediumPriorityConfigurationLayerMock.setSummaryFile("summary.medium");
             highPriorityConfigurationLayerMock.setSummaryFile("summary.high");
-
-            lowPriorityConfigurationLayerMock.setStateFile("file.yaml");
-            mediumPriorityConfigurationLayerMock.setStateFile("file.yaml");
-            highPriorityConfigurationLayerMock.setStateFile("file.json");
 
             lowPriorityConfigurationLayerMock.setVerbosity(Verbosity.TRACE);
             mediumPriorityConfigurationLayerMock.setVerbosity(Verbosity.INFO);
@@ -597,9 +641,12 @@ public class ConfigurationFileTests {
             assertEquals(highPriorityConfigurationLayerMock.getServices().get("gitlab").getOptions().get("REPOSITORY_NAME"), deserializedConfigurationLayer.getServices().get("gitlab").getOptions().get("REPOSITORY_NAME"));
             assertEquals(highPriorityConfigurationLayerMock.getServices().get("gitlab").getOptions().get("REPOSITORY_OWNER"), deserializedConfigurationLayer.getServices().get("gitlab").getOptions().get("REPOSITORY_OWNER"));
             assertEquals(highPriorityConfigurationLayerMock.getSharedConfigurationFile(), deserializedConfigurationLayer.getSharedConfigurationFile());
+            assertEquals(highPriorityConfigurationLayerMock.getStateFile(), deserializedConfigurationLayer.getStateFile());
+            assertEquals(highPriorityConfigurationLayerMock.getSubstitutions().getItems().get("substitution3").getFiles(), deserializedConfigurationLayer.getSubstitutions().getItems().get("substitution3").getFiles());
+            assertEquals(highPriorityConfigurationLayerMock.getSubstitutions().getItems().get("substitution3").getMatch(), deserializedConfigurationLayer.getSubstitutions().getItems().get("substitution3").getMatch());
+            assertEquals(highPriorityConfigurationLayerMock.getSubstitutions().getItems().get("substitution3").getReplace(), deserializedConfigurationLayer.getSubstitutions().getItems().get("substitution3").getReplace());
             assertEquals(highPriorityConfigurationLayerMock.getSummary(), deserializedConfigurationLayer.getSummary());
             assertEquals(highPriorityConfigurationLayerMock.getSummaryFile(), deserializedConfigurationLayer.getSummaryFile());
-            assertEquals(highPriorityConfigurationLayerMock.getStateFile(), deserializedConfigurationLayer.getStateFile());
             assertEquals(highPriorityConfigurationLayerMock.getVerbosity(), deserializedConfigurationLayer.getVerbosity());
         }
 
@@ -777,13 +824,32 @@ public class ConfigurationFileTests {
             mediumPriorityConfigurationLayerMock.setSummary(Boolean.TRUE);
             highPriorityConfigurationLayerMock.setSummary(Boolean.FALSE);
 
-            lowPriorityConfigurationLayerMock.setSummaryFile("summary.low");
-            mediumPriorityConfigurationLayerMock.setSummaryFile("summary.medium");
-            highPriorityConfigurationLayerMock.setSummaryFile("summary.high");
-
             lowPriorityConfigurationLayerMock.setStateFile("file.json");
             mediumPriorityConfigurationLayerMock.setStateFile("file.json");
             highPriorityConfigurationLayerMock.setStateFile("file.yaml");
+
+            lowPriorityConfigurationLayerMock.setSubstitutions(
+                new Substitutions(
+                    List.<String>of("substitution1"),
+                    Map.<String,Substitution>of("substitution1", new Substitution("glob1", "match1", "replace1"))
+                )
+            );
+            mediumPriorityConfigurationLayerMock.setSubstitutions(
+                new Substitutions(
+                    List.<String>of("substitution2"),
+                    Map.<String,Substitution>of("substitution2", new Substitution("glob2", "match2", "replace2"))
+                )
+            );
+            highPriorityConfigurationLayerMock.setSubstitutions(
+                new Substitutions(
+                    List.<String>of("substitution3"),
+                    Map.<String,Substitution>of("substitution3", new Substitution("glob3", "match3", "replace3"))
+                )
+            );
+
+            lowPriorityConfigurationLayerMock.setSummaryFile("summary.low");
+            mediumPriorityConfigurationLayerMock.setSummaryFile("summary.medium");
+            highPriorityConfigurationLayerMock.setSummaryFile("summary.high");
 
             lowPriorityConfigurationLayerMock.setVerbosity(Verbosity.TRACE);
             mediumPriorityConfigurationLayerMock.setVerbosity(Verbosity.INFO);
@@ -865,9 +931,12 @@ public class ConfigurationFileTests {
             assertEquals(highPriorityConfigurationLayerMock.getServices().get("gitlab").getOptions().get("REPOSITORY_NAME"), deserializedConfigurationLayer.getServices().get("gitlab").getOptions().get("REPOSITORY_NAME"));
             assertEquals(highPriorityConfigurationLayerMock.getServices().get("gitlab").getOptions().get("REPOSITORY_OWNER"), deserializedConfigurationLayer.getServices().get("gitlab").getOptions().get("REPOSITORY_OWNER"));
             assertEquals(highPriorityConfigurationLayerMock.getSharedConfigurationFile(), deserializedConfigurationLayer.getSharedConfigurationFile());
+            assertEquals(highPriorityConfigurationLayerMock.getStateFile(), deserializedConfigurationLayer.getStateFile());
+            assertEquals(highPriorityConfigurationLayerMock.getSubstitutions().getItems().get("substitution3").getFiles(), deserializedConfigurationLayer.getSubstitutions().getItems().get("substitution3").getFiles());
+            assertEquals(highPriorityConfigurationLayerMock.getSubstitutions().getItems().get("substitution3").getMatch(), deserializedConfigurationLayer.getSubstitutions().getItems().get("substitution3").getMatch());
+            assertEquals(highPriorityConfigurationLayerMock.getSubstitutions().getItems().get("substitution3").getReplace(), deserializedConfigurationLayer.getSubstitutions().getItems().get("substitution3").getReplace());
             assertEquals(highPriorityConfigurationLayerMock.getSummary(), deserializedConfigurationLayer.getSummary());
             assertEquals(highPriorityConfigurationLayerMock.getSummaryFile(), deserializedConfigurationLayer.getSummaryFile());
-            assertEquals(highPriorityConfigurationLayerMock.getStateFile(), deserializedConfigurationLayer.getStateFile());
             assertEquals(highPriorityConfigurationLayerMock.getVerbosity(), deserializedConfigurationLayer.getVerbosity());
         }
     }
