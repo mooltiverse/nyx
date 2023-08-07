@@ -34,7 +34,7 @@ When merge commits are encountered scanning the commit history Nyx follows the [
 
 This is where the configured artifacts are built or modified by Nyx, when needed. More specifically:
 
-* [`substitutions`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/substitutions.md %}) are evaluated
+* [`substitutions`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/substitutions.md %}) are evaluated and text tokens are replaced in the configured files
 * the [`changelog`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/changelog.md %}) is built and rendered
 
 ## Mark

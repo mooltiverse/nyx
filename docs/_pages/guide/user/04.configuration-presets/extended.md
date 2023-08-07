@@ -218,3 +218,55 @@ This corresponds to the following configuration options:
 | [`services/gitlab/options/AUTHENTICATION_TOKEN`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}#options) | `{% raw %}"{{#environmentVariable}}GITLAB_TOKEN{{/environmentVariable}}"{% endraw %}` |
 | [`services/gitlab/options/REPOSITORY_NAME`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}#options) | Empty |
 | [`services/gitlab/options/REPOSITORY_OWNER`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}#options) | Empty |
+
+### Substitutions
+
+Substitutions for a commn set of technologies is provided with this preset (names are the rule names you can use to [enable]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/substitutions.md %}#enabled) the rules):
+
+* `cargo_version`: sets the version attribute in [`Cargo.toml`](https://doc.rust-lang.org/cargo/reference/manifest.html) files in the project directory, useful for Rust projects
+* `composer_version`: sets the version attribute in [`composer.json`](https://getcomposer.org/doc/01-basic-usage.md) files in the project directory, useful for PHP projects
+* `dart_version`: sets the version attribute in [`pubspec.yaml`](https://dart.dev/tools/pub/pubspec) files in the project directory, useful for Flutter and Dart projects
+* `elixir_version`: sets the version attribute in [`mix.exs`](https://elixir-lang.org/getting-started/mix-otp/introduction-to-mix.html) files in the project directory, useful for Elixir projects
+* `expo_version`: sets the version attribute in [`app.json` and `app.config.json`](https://docs.expo.dev/versions/latest/config/app/) files in the project directory, useful for React projects
+* `helm_version`: sets the version attribute in [`Chart.yaml`](https://v2.helm.sh/docs/developing_charts/#the-chart-yaml-file) files in the project directory, useful for Rust projects
+* `node_version`: sets the version attribute in [`package.json`](https://docs.npmjs.com/cli/v9/configuring-npm/package-json) files in the project directory, useful for Node projects
+* `text_version`: writes the version in `version.txt` files in the project directory, useful in many project automations
+
+All these presets replace the version number in files at any depth in the project layout so, for example, you can  have multiple `package.json` file in your project tree and they will all get the updated version number. If this behavior doesn't fit your needs you can just override the substitution rule and make the `files` attribute more specific (i.e. use `package.json` instead of `**/package.json` to just replace the version number in the `package.json` file in the root directory of your project).
+
+This corresponds to the following configuration options:
+
+| Name                                            | Value                                                                                    |
+| ----------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| [`substitutions/enabled`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/substitutions.md %}#enabled) | none |
+| [`substitutions/cargo_version/files`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/substitutions.md %}#files) | `{% raw %}**/Cargo.toml{% endraw %}` |
+| [`substitutions/cargo_version/match`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/substitutions.md %}#match) | `{% raw %}version(\\s)*=(\\s)*(\"|')?(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?(\"|')?{% endraw %}` |
+| [`substitutions/cargo_version/replace`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/substitutions.md %}#replace) | `{% raw %}version = \"{{version}}\"{% endraw %}` |
+
+| [`substitutions/composer_version/files`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/substitutions.md %}#files) | `{% raw %}**/composer.json{% endraw %}` |
+| [`substitutions/composer_version/match`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/substitutions.md %}#match) | `{% raw %}\"version\"(\\s)*:(\\s)*\"(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?\"{% endraw %}` |
+| [`substitutions/composer_version/replace`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/substitutions.md %}#replace) | `{% raw %}\"version\": \"{{version}}\"{% endraw %}` |
+
+| [`substitutions/dart_version/files`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/substitutions.md %}#files) | `{% raw %}**/pubspec.yaml{% endraw %}` |
+| [`substitutions/dart_version/match`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/substitutions.md %}#match) | `{% raw %}(\"|')?version(\"|')?(\\s)*:(\\s)*(\"|')?(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?(\"|')?{% endraw %}` |
+| [`substitutions/dart_version/replace`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/substitutions.md %}#replace) | `{% raw %}version: \"{{version}}\"{% endraw %}` |
+
+| [`substitutions/elixir_version/files`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/substitutions.md %}#files) | `{% raw %}**/mix.exs{% endraw %}` |
+| [`substitutions/elixir_version/match`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/substitutions.md %}#match) | `{% raw %}version(\\s)*:(\\s)*\"(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?\"{% endraw %}` |
+| [`substitutions/elixir_version/replace`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/substitutions.md %}#replace) | `{% raw %}version: \"{{version}}\"{% endraw %}` |
+
+| [`substitutions/expo_version/files`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/substitutions.md %}#files) | `{% raw %}**/@(app.json|app.config.json){% endraw %}` |
+| [`substitutions/expo_version/match`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/substitutions.md %}#match) | `{% raw %}\"version\"(\\s)*:(\\s)*\"(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?\"{% endraw %}` |
+| [`substitutions/expo_version/replace`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/substitutions.md %}#replace) | `{% raw %}\"version\": \"{{version}}\"{% endraw %}` |
+
+| [`substitutions/helm_version/files`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/substitutions.md %}#files) | `{% raw %}**/Chart.yaml{% endraw %}` |
+| [`substitutions/helm_version/match`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/substitutions.md %}#match) | `{% raw %}(\"|')?version(\"|')?(\\s)*:(\\s)*(\"|')?(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?(\"|')?{% endraw %}` |
+| [`substitutions/helm_version/replace`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/substitutions.md %}#replace) | `{% raw %}version: \"{{version}}\"{% endraw %}` |
+
+| [`substitutions/node_version/files`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/substitutions.md %}#files) | `{% raw %}**/package.json{% endraw %}` |
+| [`substitutions/node_version/match`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/substitutions.md %}#match) | `{% raw %}\"version\"(\\s)*:(\\s)*\"(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?\"{% endraw %}` |
+| [`substitutions/node_version/replace`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/substitutions.md %}#replace) | `{% raw %}\"version\": \"{{version}}\"{% endraw %}` |
+
+| [`substitutions/text_version/files`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/substitutions.md %}#files) | `{% raw %}**/version.txt{% endraw %}` |
+| [`substitutions/text_version/match`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/substitutions.md %}#match) | `{% raw %}.*{% endraw %}` |
+| [`substitutions/text_version/replace`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/substitutions.md %}#replace) | `{% raw %}{{version}}{% endraw %}` |

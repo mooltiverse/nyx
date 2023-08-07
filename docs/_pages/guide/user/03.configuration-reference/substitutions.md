@@ -10,8 +10,8 @@ Substitutions are used to replace arbitrary text tokens in any text file with st
 Substitutions are configured with rules where each rule:
 
 * defines the file paths where replacements must occur; file paths are defined as [globs](https://en.wikipedia.org/wiki/Glob_(programming)) so you can match multiple files with a single rule
-* defines the token to be replaced using [regular expressions](https://en.wikipedia.org/wiki/Regular_expression) to give you complete freedom on the selection
-* defines the content to use when replacing the content as a static string or a [template]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}) so you can use any attribute from the internal [State]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/index.md %})
+* defines the token to be replaced using [regular expressions](https://en.wikipedia.org/wiki/Regular_expression) to give you complete freedom on the selection, which may include dynamic values
+* defines the content to use when replacing the content as a static string or a [template]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}) so you can use static contents or any dynamic attribute from the internal [State]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/index.md %})
 
 A common use case for substitutions is replacing the version attribute into platform-specific files so you can bridge the version detection and generation performed by Nyx with any language-specific artifact. For example, if you're woking on a Node project you can replace the value of the `version` attribute in the [`package.json`](https://docs.npmjs.com/cli/v9/configuring-npm/package-json#version) using the [`version`]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md%}#version) attribute from the [State]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/index.md %}) to make sure the Node version is always in synch with Nyx.
 
@@ -20,6 +20,9 @@ Substitutions are configured within the `substitutions` *section*. The section a
 Substitutions are performed by the [Make]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#make) command.
 
 You can have as many substitutions as you want. You can use [presets]({{ site.baseurl }}{% link _pages/guide/user/04.configuration-presets/index.md %}) that come bundled with Nyx, override them or define your own from scratch.
+
+Substitutions for a widely used set of technologies and languages is provided as part of the [Extended preset]({{ site.baseurl }}{% link _pages/guide/user/04.configuration-presets/extended.md %}#substitutions). None of them is enabled by default but if you're using the Extended preset all you need to do is to [enable](#enabled) the ones you need.
+{: .notice--info}
 
 ### Substitutions overall options
 
