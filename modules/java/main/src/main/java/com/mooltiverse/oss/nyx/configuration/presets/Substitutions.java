@@ -28,7 +28,7 @@ public class Substitutions {
     public static final Substitution CARGO_VERSION = new Substitution() {
         {
             // Capture all Cargo.toml files in the project directory in any folder
-            setFiles("**/Cargo.toml");
+            setFiles("Cargo.toml");
             // Capture any string like version = "SEMANTIC_VERSION", tolerating extra spaces and using single or double quotes for the version value
             setMatch("version(\\s)*=(\\s)*(\"|')?(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?(\"|')?");
             // Replace with the current version
@@ -43,7 +43,7 @@ public class Substitutions {
     public static final Substitution COMPOSER_VERSION = new Substitution() {
         {
             // Capture all composer.json files in the project directory in any folder
-            setFiles("**/composer.json");
+            setFiles("composer.json");
             // Capture any string like "version": "SEMANTIC_VERSION", tolerating extra spaces
             setMatch("\"version\"(\\s)*:(\\s)*\"(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?\"");
             // Replace with the current version
@@ -58,7 +58,7 @@ public class Substitutions {
     public static final Substitution DART_VERSION = new Substitution() {
         {
             // Capture all pubspec.yaml files in the project directory in any folder
-            setFiles("**/pubspec.yaml");
+            setFiles("pubspec.yaml");
             // Capture any string like version = "SEMANTIC_VERSION", tolerating extra spaces and using single, double or no quotes for the the attribute name ("version") and the version value
             setMatch("(\"|')?version(\"|')?(\\s)*:(\\s)*(\"|')?(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?(\"|')?");
             // Replace with the current version
@@ -73,7 +73,7 @@ public class Substitutions {
     public static final Substitution ELIXIR_VERSION = new Substitution() {
         {
             // Capture all mix.exs files in the project directory in any folder
-            setFiles("**/mix.exs");
+            setFiles("mix.exs");
             // Capture any string like version: "SEMANTIC_VERSION", tolerating extra spaces
             setMatch("version(\\s)*:(\\s)*\"(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?\"");
             // Replace with the current version
@@ -88,7 +88,7 @@ public class Substitutions {
     public static final Substitution EXPO_VERSION = new Substitution() {
         {
             // Capture all app.json and app.config.json files in the project directory in any folder
-            setFiles("**/@(app.json|app.config.json)");
+            setFiles("{app,app.config}.json");
             // Capture any string like "version": "SEMANTIC_VERSION", tolerating extra spaces
             setMatch("\"version\"(\\s)*:(\\s)*\"(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?\"");
             // Replace with the current version
@@ -103,7 +103,7 @@ public class Substitutions {
     public static final Substitution HELM_VERSION = new Substitution() {
         {
             // Capture all Chart.yaml files in the project directory in any folder
-            setFiles("**/Chart.yaml");
+            setFiles("Chart.yaml");
             // Capture any string like version = "SEMANTIC_VERSION", tolerating extra spaces and using single, double or no quotes for the the attribute name ("version") and the version value
             setMatch("(\"|')?version(\"|')?(\\s)*:(\\s)*(\"|')?(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?(\"|')?");
             // Replace with the current version
@@ -118,7 +118,7 @@ public class Substitutions {
     public static final Substitution NODE_VERSION = new Substitution() {
         {
             // Capture all package.json files in the project directory in any folder
-            setFiles("**/package.json");
+            setFiles("package.json");
             // Capture any string like "version": "SEMANTIC_VERSION", tolerating extra spaces
             setMatch("\"version\"(\\s)*:(\\s)*\"(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?\"");
             // Replace with the current version
@@ -132,9 +132,9 @@ public class Substitutions {
     public static final Substitution TEXT_VERSION = new Substitution() {
         {
             // Capture all version.txt files in the project directory in any folder
-            setFiles("**/version.txt");
+            setFiles("version.txt");
             // Capture anything to replace the whole content
-            setMatch(".*");
+            setMatch("(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?");
             // Replace with the current version
             setReplace("{{version}}");
         }
