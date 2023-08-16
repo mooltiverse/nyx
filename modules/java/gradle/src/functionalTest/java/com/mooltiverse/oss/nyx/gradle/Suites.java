@@ -1196,8 +1196,13 @@ public class Suites {
                         .concat("                \"publish\":\"true\"").concat(newLine)
                         .concat("            }").concat(newLine)
                         .concat("        }").concat(newLine)
+                        .concat("    },").concat(newLine)
+                        .concat("    \"substitutions\":{").concat(newLine)
+                        .concat("        \"enabled\":[ \"node_version\", \"text_version\" ]").concat(newLine)
                         .concat("    }").concat(newLine)
-                        .concat("}")
+                        .concat("}"),
+                    // the version.txt file, used to test for substitutions, initialized with a fake version number to be replaced by Make
+                    "version.txt", "91.92.93"
                 );
                 remoteRepoName  = null;
                 hostingRepoService = null;
@@ -1232,6 +1237,9 @@ public class Suites {
                         "* [] feat: Untagged commit [#2](https://example.com/issues/2)",
                         "### Fixed",
                         "* [] fix: Untagged commit [#1](https://example.com/issues/1)"
+                    ),
+                    "version.txt", Set.<String>of(
+                        "v0.1.0"
                     )
                 );
                 repositoryTags = Set.<String>of("v0.1.0");
@@ -1317,8 +1325,13 @@ public class Suites {
                         .concat("                \"publish\":\"true\"").concat(newLine)
                         .concat("            }").concat(newLine)
                         .concat("        }").concat(newLine)
+                        .concat("    },").concat(newLine)
+                        .concat("    \"substitutions\":{").concat(newLine)
+                        .concat("        \"enabled\":[ \"node_version\", \"text_version\" ]").concat(newLine)
                         .concat("    }").concat(newLine)
-                        .concat("}")
+                        .concat("}"),
+                    // the version.txt file, used to test for substitutions, initialized with a fake version number to be replaced by Make
+                    "version.txt", "91.92.93"
                 );
                 remoteRepoName  = null;
                 hostingRepoService = null;
@@ -1353,6 +1366,9 @@ public class Suites {
                         "* [] feat: Untagged commit [#2](https://example.com/issues/2)",
                         "### Fixed",
                         "* [] fix: Untagged commit [#1](https://example.com/issues/1)"
+                    ),
+                    "version.txt", Set.<String>of(
+                        "v0.1.0"
                     )
                 );
                 repositoryTags = Set.<String>of("v0.1.0");
@@ -1438,8 +1454,13 @@ public class Suites {
                         .concat("                \"publish\":\"true\"").concat(newLine)
                         .concat("            }").concat(newLine)
                         .concat("        }").concat(newLine)
+                        .concat("    },").concat(newLine)
+                        .concat("    \"substitutions\":{").concat(newLine)
+                        .concat("        \"enabled\":[ \"node_version\", \"text_version\" ]").concat(newLine)
                         .concat("    }").concat(newLine)
-                        .concat("}")
+                        .concat("}"),
+                    // the version.txt file, used to test for substitutions, initialized with a fake version number to be replaced by Make
+                    "version.txt", "91.92.93"
                 );
                 remoteRepoName  = "replica";
                 hostingRepoService = null;
@@ -1474,6 +1495,9 @@ public class Suites {
                         "* [] feat: Untagged commit [#2](https://example.com/issues/2)",
                         "### Fixed",
                         "* [] fix: Untagged commit [#1](https://example.com/issues/1)"
+                    ),
+                    "version.txt", Set.<String>of(
+                        "v0.1.0"
                     )
                 );
                 repositoryTags = Set.<String>of("v0.1.0");
@@ -1562,8 +1586,13 @@ public class Suites {
                         .concat("                \"publish\":\"true\"").concat(newLine)
                         .concat("            }").concat(newLine)
                         .concat("        }").concat(newLine)
+                        .concat("    },").concat(newLine)
+                        .concat("    \"substitutions\":{").concat(newLine)
+                        .concat("        \"enabled\":[ \"node_version\", \"text_version\" ]").concat(newLine)
                         .concat("    }").concat(newLine)
-                        .concat("}")
+                        .concat("}"),
+                    // the version.txt file, used to test for substitutions, initialized with a fake version number to be replaced by Make
+                    "version.txt", "91.92.93"
                 );
                 remoteRepoName  = "replica";
                 hostingRepoService = null;
@@ -1598,6 +1627,9 @@ public class Suites {
                         "* [] feat: Untagged commit [#2](https://example.com/issues/2)",
                         "### Fixed",
                         "* [] fix: Untagged commit [#1](https://example.com/issues/1)"
+                    ),
+                    "version.txt", Set.<String>of(
+                        "v0.1.0"
                     )
                 );
                 repositoryTags = Set.<String>of("v0.1.0");
@@ -1679,8 +1711,13 @@ public class Suites {
                         .concat("                \"publish\":\"true\"").concat(newLine)
                         .concat("            }").concat(newLine)
                         .concat("        }").concat(newLine)
+                        .concat("    },").concat(newLine)
+                        .concat("    \"substitutions\":{").concat(newLine)
+                        .concat("        \"enabled\":[ \"node_version\", \"text_version\" ]").concat(newLine)
                         .concat("    }").concat(newLine)
-                        .concat("}")
+                        .concat("}"),
+                    // the version.txt file, used to test for substitutions, initialized with a fake version number to be replaced by Make
+                    "version.txt", "91.92.93"
                 );
                 remoteRepoName  = "replica";
                 hostingRepoService = null;
@@ -1711,6 +1748,9 @@ public class Suites {
                     "CHANGELOG.md", Set.<String>of(
                         "## 0.0.6",
 					    "No changes."
+                    ),
+                    "version.txt", Set.<String>of(
+                        "v0.1.0"
                     )
                 );
                 repositoryTags = Set.<String>of("0.0.6");
@@ -1793,8 +1833,13 @@ public class Suites {
                         .concat("                \"publish\":\"true\"").concat(newLine)
                         .concat("            }").concat(newLine)
                         .concat("        }").concat(newLine)
+                        .concat("    },").concat(newLine)
+                        .concat("    \"substitutions\":{").concat(newLine)
+                        .concat("        \"enabled\":[ \"node_version\", \"text_version\" ]").concat(newLine)
                         .concat("    }").concat(newLine)
-                        .concat("}")
+                        .concat("}"),
+                    // the version.txt file, used to test for substitutions, initialized with a fake version number to be replaced by Make
+                    "version.txt", "91.92.93"
                 );
                 remoteRepoName  = "replica";
                 hostingRepoService = null;
@@ -1825,6 +1870,9 @@ public class Suites {
                     "CHANGELOG.md", Set.<String>of(
                         "## 0.0.6",
 					    "No changes."
+                    ),
+                    "version.txt", Set.<String>of(
+                        "v0.1.0"
                     )
                 );
                 repositoryTags = Set.<String>of("0.0.6");
@@ -1921,8 +1969,13 @@ public class Suites {
                         .concat("                \"publish\":\"true\"").concat(newLine)
                         .concat("            }").concat(newLine)
                         .concat("        }").concat(newLine)
+                        .concat("    },").concat(newLine)
+                        .concat("    \"substitutions\":{").concat(newLine)
+                        .concat("        \"enabled\":[ \"node_version\", \"text_version\" ]").concat(newLine)
                         .concat("    }").concat(newLine)
-                        .concat("}")
+                        .concat("}"),
+                    // the version.txt file, used to test for substitutions, initialized with a fake version number to be replaced by Make
+                    "version.txt", "91.92.93"
                 );
                 remoteRepoName  = null; // use 'origin', from the cloned repository from the hosting service
                 hostingRepoService = "github";
@@ -1957,6 +2010,9 @@ public class Suites {
                         "* [] feat: Untagged commit [#2](https://example.com/issues/2)",
                         "### Fixed",
                         "* [] fix: Untagged commit [#1](https://example.com/issues/1)"
+                    ),
+                    "version.txt", Set.<String>of(
+                        "v0.1.0"
                     )
                 );
                 repositoryTags = Set.<String>of("v0.1.0");
@@ -2056,8 +2112,13 @@ public class Suites {
                         .concat("                \"publish\":\"true\"").concat(newLine)
                         .concat("            }").concat(newLine)
                         .concat("        }").concat(newLine)
+                        .concat("    },").concat(newLine)
+                        .concat("    \"substitutions\":{").concat(newLine)
+                        .concat("        \"enabled\":[ \"node_version\", \"text_version\" ]").concat(newLine)
                         .concat("    }").concat(newLine)
-                        .concat("}")
+                        .concat("}"),
+                    // the version.txt file, used to test for substitutions, initialized with a fake version number to be replaced by Make
+                    "version.txt", "91.92.93"
                 );
                 remoteRepoName  = null; // use 'origin', from the cloned repository from the hosting service
                 hostingRepoService = "github";
@@ -2092,6 +2153,9 @@ public class Suites {
                         "* [] feat: Untagged commit [#2](https://example.com/issues/2)",
                         "### Fixed",
                         "* [] fix: Untagged commit [#1](https://example.com/issues/1)"
+                    ),
+                    "version.txt", Set.<String>of(
+                        "v0.1.0"
                     )
                 );
                 repositoryTags = Set.<String>of("v0.1.0");
@@ -2188,8 +2252,13 @@ public class Suites {
                         .concat("                \"publish\":\"true\"").concat(newLine)
                         .concat("            }").concat(newLine)
                         .concat("        }").concat(newLine)
+                        .concat("    },").concat(newLine)
+                        .concat("    \"substitutions\":{").concat(newLine)
+                        .concat("        \"enabled\":[ \"node_version\", \"text_version\" ]").concat(newLine)
                         .concat("    }").concat(newLine)
-                        .concat("}")
+                        .concat("}"),
+                    // the version.txt file, used to test for substitutions, initialized with a fake version number to be replaced by Make
+                    "version.txt", "91.92.93"
                 );
                 remoteRepoName  = null; // use 'origin', from the cloned repository from the hosting service
                 hostingRepoService = "gitlab";
@@ -2224,6 +2293,9 @@ public class Suites {
                         "* [] feat: Untagged commit [#2](https://example.com/issues/2)",
                         "### Fixed",
                         "* [] fix: Untagged commit [#1](https://example.com/issues/1)"
+                    ),
+                    "version.txt", Set.<String>of(
+                        "v0.1.0"
                     )
                 );
                 repositoryTags = Set.<String>of("v0.1.0");
@@ -2323,8 +2395,13 @@ public class Suites {
                         .concat("                \"publish\":\"true\"").concat(newLine)
                         .concat("            }").concat(newLine)
                         .concat("        }").concat(newLine)
+                        .concat("    },").concat(newLine)
+                        .concat("    \"substitutions\":{").concat(newLine)
+                        .concat("        \"enabled\":[ \"node_version\", \"text_version\" ]").concat(newLine)
                         .concat("    }").concat(newLine)
-                        .concat("}")
+                        .concat("}"),
+                    // the version.txt file, used to test for substitutions, initialized with a fake version number to be replaced by Make
+                    "version.txt", "91.92.93"
                 );
                 remoteRepoName  = null; // use 'origin', from the cloned repository from the hosting service
                 hostingRepoService = "gitlab";
@@ -2359,6 +2436,9 @@ public class Suites {
                         "* [] feat: Untagged commit [#2](https://example.com/issues/2)",
                         "### Fixed",
                         "* [] fix: Untagged commit [#1](https://example.com/issues/1)"
+                    ),
+                    "version.txt", Set.<String>of(
+                        "v0.1.0"
                     )
                 );
                 repositoryTags = Set.<String>of("v0.1.0");

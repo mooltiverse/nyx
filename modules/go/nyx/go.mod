@@ -10,6 +10,7 @@ replace github.com/mooltiverse/nyx/modules/go/version => ../version
 
 require (
 	github.com/aymerick/raymond v2.0.2+incompatible
+	github.com/bmatcuk/doublestar/v4 v4.6.0
 	github.com/dlclark/regexp2 v1.7.0
 	github.com/go-git/go-git/v5 v5.4.2
 	github.com/google/go-github v17.0.0+incompatible

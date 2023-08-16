@@ -28,14 +28,16 @@ import (
 	"strings"       // https://pkg.go.dev/strings
 	"time"          // https://pkg.go.dev/time
 
-	regexp2 "github.com/dlclark/regexp2" // https://pkg.go.dev/github.com/dlclark/regexp2, we need to use this instead of the standard 'regexp' to have support for lookarounds (look ahead), even if this implementation is a little slower
-	log "github.com/sirupsen/logrus"     // https://pkg.go.dev/github.com/sirupsen/logrus
+	doublestar "github.com/bmatcuk/doublestar/v4" // https://github.com/bmatcuk/doublestar
+	regexp2 "github.com/dlclark/regexp2"          // https://pkg.go.dev/github.com/dlclark/regexp2, we need to use this instead of the standard 'regexp' to have support for lookarounds (look ahead), even if this implementation is a little slower
+	log "github.com/sirupsen/logrus"              // https://pkg.go.dev/github.com/sirupsen/logrus
 
 	errs "github.com/mooltiverse/nyx/modules/go/errors"
 	ent "github.com/mooltiverse/nyx/modules/go/nyx/entities"
 	git "github.com/mooltiverse/nyx/modules/go/nyx/git"
 	stt "github.com/mooltiverse/nyx/modules/go/nyx/state"
 	tpl "github.com/mooltiverse/nyx/modules/go/nyx/template"
+	utl "github.com/mooltiverse/nyx/modules/go/utils"
 )
 
 const (
@@ -414,6 +416,116 @@ func (c *Make) buildAssets() error {
 }
 
 /*
+Applies the configured substitutions to project files.
+
+Error is:
+
+- DataAccessError in case the configuration can't be loaded for some reason.
+- IllegalPropertyError in case the configuration has some illegal options.
+- GitError in case of unexpected issues when accessing the Git repository.
+- ReleaseError if the task is unable to complete for reasons due to the release process.
+*/
+func (c *Make) applySubstitutions() error {
+	log.Debugf("applying substitutions to project files...")
+	substitutions, err := c.State().GetConfiguration().GetSubstitutions()
+	if err != nil {
+		return &errs.IllegalPropertyError{Message: fmt.Sprintf("unable to read substitutions from configuration"), Cause: err}
+	}
+	if substitutions == nil || substitutions.GetEnabled() == nil || len(*substitutions.GetEnabled()) == 0 || substitutions.GetItems() == nil || len(*substitutions.GetItems()) == 0 {
+		log.Debugf("no substitutions have been configured or enabled.")
+		return nil
+	}
+
+	for _, ruleName := range *substitutions.GetEnabled() {
+		if ruleName != nil {
+			log.Debugf("applying substitution rule '%s' to project files...", *ruleName)
+			substitution, ok := (*substitutions.GetItems())[*ruleName]
+			if !ok {
+				return &errs.IllegalPropertyError{Message: fmt.Sprintf("substitution rule '%s' is enabled but not configured", *ruleName)}
+			}
+			if substitution.GetFiles() == nil || "" == strings.TrimSpace(*substitution.GetFiles()) || substitution.GetMatch() == nil || "" == strings.TrimSpace(*substitution.GetMatch()) || substitution.GetReplace() == nil {
+				return &errs.IllegalPropertyError{Message: fmt.Sprintf("substitution rule '%s' is enabled but not all of its required attributes have been set", *ruleName)}
+			}
+
+			// find files matching the glob
+			rootDirectory, err := os.Getwd()
+			if err != nil {
+				return &errs.DataAccessError{Message: fmt.Sprintf("unable to retrieve the current working directory"), Cause: err}
+			}
+			configurationRootDirectory, err := c.State().GetConfiguration().GetDirectory()
+			if err != nil {
+				return &errs.DataAccessError{Message: fmt.Sprintf("unable to retrieve the working directory from the configuration"), Cause: err}
+			}
+			if configurationRootDirectory != nil {
+				rootDirectory = *configurationRootDirectory
+			}
+			// filepath has a bug that doesn't support double stars ("**") as per this issue: https://github.com/golang/go/issues/11862
+			// so we use https://github.com/bmatcuk/doublestar as a drop-in replacement
+			//matches, err := filepath.Glob(rootDirectory + "/" + *substitution.GetFiles())
+			matches := []string{}
+			err = filepath.Walk(rootDirectory, func(path string, f os.FileInfo, err error) error {
+				//matched, err := filepath.Match(*substitution.GetFiles(), path)
+				matched, err := doublestar.PathMatch(*substitution.GetFiles(), path)
+				if err != nil {
+					return nil
+				}
+				if matched {
+					matches = append(matches, path)
+				}
+				return nil
+			})
+			if err != nil {
+				return &errs.DataAccessError{Message: fmt.Sprintf("unable to scan the '%s' directory to match files agaist glob '%s'", rootDirectory, *substitution.GetFiles()), Cause: err}
+			}
+
+			if len(matches) == 0 {
+				log.Debugf("glob pattern '%s' doesn't match any file in directory '%s'", *ruleName, rootDirectory)
+			} else {
+				for _, file := range matches {
+					// if the file path is relative make it relative to the configured directory
+					if !filepath.IsAbs(file) {
+						file = filepath.Join(rootDirectory, file)
+					}
+					log.Debugf("applying substitutions in file '%s'...", file)
+
+					binaryFileBuffer, err := ioutil.ReadFile(file)
+					if err != nil {
+						return &errs.DataAccessError{Message: fmt.Sprintf("unable to read file '%s'", file), Cause: err}
+					}
+					fileBuffer := string(binaryFileBuffer)
+
+					replacement, err := c.renderTemplate(substitution.GetReplace())
+					if err != nil {
+						return &errs.IllegalPropertyError{Message: fmt.Sprintf("unable to render the replacement string '%s'", *substitution.GetReplace()), Cause: err}
+					}
+					if replacement == nil {
+						replacement = utl.PointerToString("")
+					}
+					re, err := regexp2.Compile(*substitution.GetMatch(), 0)
+					if err != nil {
+						return &errs.IllegalPropertyError{Message: fmt.Sprintf("cannot compile regular expression '%s'", *substitution.GetMatch()), Cause: err}
+					}
+					fileBuffer, err = re.Replace(fileBuffer, *replacement, -1, -1)
+					if err != nil {
+						return &errs.IllegalPropertyError{Message: fmt.Sprintf("unable to replace '%s' in file '%s'", *substitution.GetMatch(), file), Cause: err}
+					}
+
+					err = os.WriteFile(file, []byte(fileBuffer), 0644)
+					if err != nil {
+						return &errs.DataAccessError{Message: fmt.Sprintf("unable to write file '%s'", file), Cause: err}
+					}
+
+					log.Debugf("substitutions have been applied in file '%s'.", file)
+				}
+			}
+
+			log.Debugf("substitution rule '%s' applied to project files.", *ruleName)
+		}
+	}
+	return nil
+}
+
+/*
 Reset the attributes store by this command into the internal state object.
 This is required before running the command in order to make sure that the new execution is not affected by a stale status coming from previous runs.
 
@@ -648,6 +760,11 @@ func (c *Make) Run() (*stt.State, error) {
 	}
 
 	err = c.buildAssets()
+	if err != nil {
+		return nil, err
+	}
+
+	err = c.applySubstitutions()
 	if err != nil {
 		return nil, err
 	}
