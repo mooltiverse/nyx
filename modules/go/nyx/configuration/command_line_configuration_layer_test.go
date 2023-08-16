@@ -22,9 +22,8 @@
 package configuration
 
 import (
-	"io/ioutil" // https://pkg.go.dev/io/ioutil
-	"os"        // https://pkg.go.dev/os
-	"testing"   // https://pkg.go.dev/testing
+	"os"      // https://pkg.go.dev/os
+	"testing" // https://pkg.go.dev/testing
 
 	assert "github.com/stretchr/testify/assert" // https://pkg.go.dev/github.com/stretchr/testify/assert
 
@@ -251,9 +250,9 @@ func TestCommandLineConfigurationLayerGetDirectory(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Nil(t, directory)
 
-	dir1, err := ioutil.TempDir("", "1")
+	dir1, err := os.MkdirTemp("", "1")
 	assert.NoError(t, err)
-	dir2, err := ioutil.TempDir("", "2")
+	dir2, err := os.MkdirTemp("", "2")
 	assert.NoError(t, err)
 
 	// Test the extended version

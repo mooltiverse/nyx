@@ -19,7 +19,7 @@ package command
 import (
 	_ "embed"       // https://pkg.go.dev/embed
 	"fmt"           // https://pkg.go.dev/fmt
-	"io/ioutil"     // https://pkg.go.dev/io/ioutil
+	"io"            // https://pkg.go.dev/io
 	"net/http"      // https://pkg.go.dev/net/http
 	"net/url"       // https://pkg.go.dev/net/url
 	"os"            // https://pkg.go.dev/os
@@ -176,7 +176,7 @@ func (c *Make) getChangelogTemplate() (string, error) {
 				return "", &errs.DataAccessError{Message: fmt.Sprintf("unable to load the configured changelog template file from URL '%s'", templatePath), Cause: err}
 			}
 			defer response.Body.Close()
-			templateBytes, err := ioutil.ReadAll(response.Body)
+			templateBytes, err := io.ReadAll(response.Body)
 			if err != nil {
 				return "", &errs.DataAccessError{Message: fmt.Sprintf("unable to load the configured changelog template file from URL '%s'", templatePath), Cause: err}
 			}
@@ -488,7 +488,7 @@ func (c *Make) applySubstitutions() error {
 					}
 					log.Debugf("applying substitutions in file '%s'...", file)
 
-					binaryFileBuffer, err := ioutil.ReadFile(file)
+					binaryFileBuffer, err := os.ReadFile(file)
 					if err != nil {
 						return &errs.DataAccessError{Message: fmt.Sprintf("unable to read file '%s'", file), Cause: err}
 					}

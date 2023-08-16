@@ -22,9 +22,8 @@
 package configuration
 
 import (
-	"io/ioutil" // https://pkg.go.dev/io/ioutil
-	"os"        // https://pkg.go.dev/os
-	"testing"   // https://pkg.go.dev/testing
+	"os"      // https://pkg.go.dev/os
+	"testing" // https://pkg.go.dev/testing
 
 	assert "github.com/stretchr/testify/assert" // https://pkg.go.dev/github.com/stretchr/testify/assert
 
@@ -206,7 +205,7 @@ func TestEnvironmentConfigurationLayerGetDirectory(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Nil(t, directory)
 
-	dir, err := ioutil.TempDir("", "")
+	dir, err := os.MkdirTemp("", "")
 	assert.NoError(t, err)
 
 	// get a new instance or a stale set of environment variables is still in the configuration layer
