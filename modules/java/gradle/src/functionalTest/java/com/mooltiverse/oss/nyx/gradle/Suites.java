@@ -1750,7 +1750,7 @@ public class Suites {
 					    "No changes."
                     ),
                     "version.txt", Set.<String>of(
-                        "v0.1.0"
+                        "0.0.6"
                     )
                 );
                 repositoryTags = Set.<String>of("0.0.6");
@@ -1872,7 +1872,7 @@ public class Suites {
 					    "No changes."
                     ),
                     "version.txt", Set.<String>of(
-                        "v0.1.0"
+                        "0.0.6"
                     )
                 );
                 repositoryTags = Set.<String>of("0.0.6");
