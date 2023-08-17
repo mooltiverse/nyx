@@ -488,7 +488,7 @@ commitMessageConventions:
 					"No changes.",
 				},
 				"version.txt": []string{
-					"v0.1.0",
+					"0.0.6",
 				},
 			},
 			RepositoryTags:       []string{"0.0.6"},
