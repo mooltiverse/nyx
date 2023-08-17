@@ -22,6 +22,7 @@
 package command_test
 
 import (
+	"fmt"
 	"os"            // https://pkg.go.dev/os
 	"path/filepath" // https://pkg.go.dev/path/filepath
 	"strings"       // https://pkg.go.dev/strings
@@ -1023,8 +1024,9 @@ func TestMakeRunWithCustomTemplateFromURL(t *testing.T) {
 }
 
 func TestMakeRunWithSubstitutionsUsingCargoVersionPreset(t *testing.T) {
-	logLevel := log.GetLevel()   // save the previous logging level
-	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
+	logLevel := log.GetLevel() // save the previous logging level
+	//log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
+	log.SetLevel(log.DebugLevel) // set the logging level to filter out warnings produced during tests
 	for _, command := range cmdtpl.CommandInvocationProxies(cmd.MAKE, gittools.INITIAL_COMMIT()) {
 		t.Run((*command).GetContextName(), func(t *testing.T) {
 			// first create the temporary directory and a subdirectory
@@ -1050,7 +1052,7 @@ func TestMakeRunWithSubstitutionsUsingCargoVersionPreset(t *testing.T) {
 			cargoFileInSubDirectory := filepath.Join(destinationSubDir, "Cargo.toml")
 			otherFileInRootDirectory := filepath.Join(destinationDir, "other.txt")
 			otherFileInSubDirectory := filepath.Join(destinationSubDir, "other.txt")
-			//files := []string{cargoFileInRootDirectory, cargoFileInSubDirectory, otherFileInRootDirectory, otherFileInSubDirectory}
+			files := []string{cargoFileInRootDirectory, cargoFileInSubDirectory, otherFileInRootDirectory, otherFileInSubDirectory}
 
 			writeFile(cargoFileInRootDirectory, "[package]\nname = \"hello_world\" # the name of the package\nversion = \"91.92.93\" # the current version, obeying semver\nauthors = [\"Alice <a@example.com>\", \"Bob <b@example.com>\"]\n")
 			writeFile(cargoFileInSubDirectory, "[package]\nname = \"hello_world\" # the name of the package\n   version   =     \"91.92.93\" # the current version, obeying semver\nauthors = [\"Alice <a@example.com>\", \"Bob <b@example.com>\"]\n")
@@ -1064,12 +1066,12 @@ func TestMakeRunWithSubstitutionsUsingCargoVersionPreset(t *testing.T) {
 			// when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
 			if (*command).GetContextName() != cmdtpl.STANDALONE_CONTEXT_NAME {
 				// print the files to standard output for inspection purpose
-				//for _, f := range files {
-				//	fmt.Printf("--------------------- " + f + " ---------------------\n")
-				//	fmt.Printf(readFile(f))
-				//	fmt.Println()
-				//	fmt.Printf("-----------------------------------------\n")
-				//}
+				for _, f := range files {
+					fmt.Printf("--------------------- " + f + " ---------------------\n")
+					fmt.Printf(readFile(f))
+					fmt.Println()
+					fmt.Printf("-----------------------------------------\n")
+				}
 
 				// test the rendered files
 				fileContent := readFile(cargoFileInRootDirectory)
