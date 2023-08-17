@@ -465,7 +465,7 @@ func (c *Make) applySubstitutions() error {
 			matches := []string{}
 			err = filepath.Walk(rootDirectory, func(path string, f os.FileInfo, err error) error {
 				//matched, err := filepath.Match(*substitution.GetFiles(), path)
-				matched, err := doublestar.PathMatch(*substitution.GetFiles(), path)
+				matched, err := doublestar.Match(filepath.ToSlash(*substitution.GetFiles()), filepath.ToSlash(path))
 				if err != nil {
 					return nil
 				}
@@ -479,7 +479,7 @@ func (c *Make) applySubstitutions() error {
 			}
 
 			if len(matches) == 0 {
-				log.Debugf("glob pattern '%s' doesn't match any file in directory '%s'", *ruleName, rootDirectory)
+				log.Debugf("glob pattern '%s' doesn't match any file in directory '%s'", *substitution.GetFiles(), rootDirectory)
 			} else {
 				for _, file := range matches {
 					// if the file path is relative make it relative to the configured directory
