@@ -104,6 +104,7 @@ Each release type has the following attributes:
 | [`releaseTypes/<NAME>/gitPush`](#git-push)                                                 | string  | `--release-types-<NAME>-git-push=<TEMPLATE>`                          | `NYX_RELEASE_TYPES_<NAME>_GIT_PUSH=<TEMPLATE>`                          | `false`                                              |
 | [`releaseTypes/<NAME>/gitTag`](#git-tag)                                                   | string  | `--release-types-<NAME>-git-tag=<TEMPLATE>`                           | `NYX_RELEASE_TYPES_<NAME>_GIT_TAG=<TEMPLATE>`                           | `false`                                              |
 | [`releaseTypes/<NAME>/gitTagMessage`](#git-tag-message)                                    | string  | `--release-types-<NAME>-git-tag-message=<TEMPLATE>`                   | `NYX_RELEASE_TYPES_<NAME>_GIT_TAG_MESSAGE=<TEMPLATE>`                   | Empty                                                |
+| [`releaseTypes/<NAME>/gitTagNames`](#git-tag-names)                                        | list    | `--release-types-<NAME>-git-tag-names=<TEMPLATES>`                    | `NYX_RELEASE_TYPES_<NAME>_GIT_TAG_NAMES=<TEMPLATES>`                    | [ `{% raw %}{{version}}{% endraw %}` ]                                    |
 | [`releaseTypes/<NAME>/identifiers`](#identifiers)                                          | [list]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}#collections-of-objects) | `--release-types-<NAME>-identifiers-<#>=<ID_ATTRIBUTE>` | `NYX_RELEASE_TYPES_<NAME>_IDENTIFIERS_<#>=<ID_ATTRIBUTE>` | Empty |
 | [`releaseTypes/<NAME>/matchBranches`](#match-branches)                                     | string  | `--release-types-<NAME>-match-branches=<TEMPLATE>`                    | `NYX_RELEASE_TYPES_<NAME>_MATCH_BRANCHES=<TEMPLATE>`                    | Empty                                                |
 | [`releaseTypes/<NAME>/matchEnvironmentVariables`](#match-environment-variables)            | [map]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}#collections-of-objects) | `--release-types-<NAME>-match-environment-variables-<VARNAME>=<VALUE>` | `NYX_RELEASE_TYPES_<NAME>_MATCH_ENVIRONMENT_VARIABLES_<VARNAME>=<VALUE>` | Empty |
@@ -320,7 +321,7 @@ When this flag is enabled changes are pushed to the default `origin` remote by d
 | Configuration File Option | `releaseTypes/items/<NAME>/gitTag`                                                       |
 | Related state attributes  |                                                                                          |
 
-When `true` Nyx will tag the current commit with the new release version.
+When `true` Nyx will tag the current commit with the new release version. Tags to be applied are defined by the [`gitTagNames`](#git-tag-names) option.
 
 Here you can define a [template]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}) that is [evaluated as a boolean]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}#type-conversions) at runtime to make this decision dynamic.
 
@@ -335,9 +336,28 @@ Here you can define a [template]({{ site.baseurl }}{% link _pages/guide/user/03.
 | Configuration File Option | `releaseTypes/items/<NAME>/gitTagMessage`                                                |
 | Related state attributes  |                                                                                          |
 
-This is a short [template]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}) that, once rendered, is used as the message of annotated tags when [`gitTag`](#git-tag) is `true`.
+This is a short [template]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}) that, once rendered, is used as the message of annotated tags when [`gitTag`](#git-tag) is `true`. This option affects all [tag names](#git-tag-names).
 
 If this template is null or empty (the default) then Nyx will create [lightweight](https://git-scm.com/book/en/v2/Git-Basics-Tagging) tags instead of [annotated](https://git-scm.com/book/en/v2/Git-Basics-Tagging).
+
+This option is ignored when [`gitTag`](#git-tag) is `false`.
+
+#### Git tag names
+
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `releaseTypes/<NAME>/gitTagNames`                                                        |
+| Type                      | list                                                                                     |
+| Default                   | [ `{% raw %}{{version}}{% endraw %}` ]                                                   |
+| Command Line Option       | `--release-types-<NAME>-git-tag-names=<TEMPLATES>`                                       |
+| Environment Variable      | `NYX_RELEASE_TYPES_<NAME>_GIT_TAG_NAMES=<TEMPLATES>`                                     |
+| Configuration File Option | `releaseTypes/items/<NAME>/gitTagNames`                                                  |
+| Related state attributes  | [version]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#version){: .btn .btn--info .btn--small} |
+
+The comma separated list of Git tag [names](https://git-scm.com/docs/git-tag) to be applied when tagging a new release with this release type configuration. These names can be plain strings or [templates]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}) that, once rendered, are used for tag values.
+
+By default a single tag name is applied using the [version]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#version) name. You can add as many tag names as you wish in order to add additional tags or aliases.
+
+If a tag already exists in the repository it is replaced (moved to the current commit).
 
 This option is ignored when [`gitTag`](#git-tag) is `false`.
 

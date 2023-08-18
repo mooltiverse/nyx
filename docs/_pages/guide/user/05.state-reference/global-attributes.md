@@ -9,24 +9,29 @@ permalink: /guide/user/state-reference/global-attributes/
 
 The following attributes are at the top of the hierarchy:
 
-| Name                                      | Type    | Values                                      |
-| ----------------------------------------- | ------- | ------------------------------------------- |
-| [`branch`](#branch)                       | string  | The current Git branch                      |
-| [`bump`](#bump)                           | string  | The bumped version identifier               |
-| [`changelog`](#changelog)                 | object  | The changelog data model                    |
-| [`configuration`](#configuration)         | object  | The resolved configuration                  |
-| [`coreVersion`](#core-version)            | boolean | `true` if version is *core*                 |
-| [`directory`](#directory)                 | string  | Directory path                              |
-| [`internals`](#internals)                 | map     | Name-Value pairs                            |
-| [`latestVersion`](#latest-version)        | boolean | `true` if version is the latest             |
-| [`newRelease`](#new-release)              | boolean | `true` if a new release has to be issued    |
-| [`newVersion`](#new-version)              | boolean | `true` if a new version has been generated  |
-| [`releaseScope`](#release-scope)          | object  | The release scope attributes                |
-| [`releaseType`](#release-type)            | string  | The selected release type                   |
-| [`scheme`](#scheme)                       | string  | `SEMVER`                                    |
-| [`timestamp`](#timestamp)                 | integer | A positive integer                          |
-| [`version`](#version)                     | string  | The current version                         |
-| [`versionRange`](#version-range)          | string  | The version range regular expression        |
+| Name                                                             | Type    | Values                                      |
+| ---------------------------------------------------------------- | ------- | ------------------------------------------- |
+| [`branch`](#branch)                                              | string  | The current Git branch                      |
+| [`bump`](#bump)                                                  | string  | The bumped version identifier               |
+| [`changelog`](#changelog)                                        | object  | The changelog data model                    |
+| [`configuration`](#configuration)                                | object  | The resolved configuration                  |
+| [`coreVersion`](#core-version)                                   | boolean | `true` if version is *core*                 |
+| [`directory`](#directory)                                        | string  | Directory path                              |
+| [`internals`](#internals)                                        | map     | Name-Value pairs                            |
+| [`latestVersion`](#latest-version)                               | boolean | `true` if version is the latest             |
+| [`newRelease`](#new-release)                                     | boolean | `true` if a new release has to be issued    |
+| [`newVersion`](#new-version)                                     | boolean | `true` if a new version has been generated  |
+| [`releaseScope`](#release-scope)                                 | object  | The release scope attributes                |
+| [`releaseType`](#release-type)                                   | string  | The selected release type                   |
+| [`scheme`](#scheme)                                              | string  | `SEMVER`                                    |
+| [`timestamp`](#timestamp)                                        | integer | A positive integer                          |
+| [`version`](#version)                                            | string  | The current version                         |
+| [`versionBuildMetadata`](#version-build-metadata)                | string  | The version build metadata                  |
+| [`versionMajorNumber`](#version-major-number)                    | string  | The version major number                    |
+| [`versionMinorNumber`](#version-minor-number)                    | string  | The version minor number                    |
+| [`versionPatchNumber`](#version-patch-number)                    | string  | The version patch number                    |
+| [`versionPreReleaseIdentifier`](#version-pre-release-identifier) | string  | The version pre-release identifier          |
+| [`versionRange`](#version-range)                                 | string  | The version range regular expression        |
 
 ### Branch
 
@@ -217,6 +222,66 @@ If this is not used as the sole timestamp you may see a skew due to when the sys
 The version that was [inferred]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer), unless the [`version`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#version) configuration option was passed to override inference. When the version is not overridden or inferred the [`initialVersion`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#initial-version) is used.
 
 Please note that this version might be the same as the [`releaseScope/previousVersion`]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#previous-version) found in the Git commit history (or the [`initialVersion`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#initial-version) if the commit history does not contain any previous version) if the [release scope]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}) has no [significant changes]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#significant-commits). To know whether this is a new version or not you should check [`newVersion`](#new-version).
+
+This attribute is not available until [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer) has run.
+
+### Version build metadata
+
+| ----------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                          | `versionBuildMetadata`                                                                   |
+| Type                          | string                                                                                   |
+| Related configuration options | [version]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#version){: .btn .btn--success .btn--small} |
+| Initialized by task           | [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer){: .btn .btn--small} |
+
+The [`version`](#version) [*build* metadata](https://semver.org/), if present in the [`version`](#version). This attribute is only available when the configured [version scheme]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/version-schemes.md %}) is [`SEMVER`]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/version-schemes.md %}#semantic-versioning-semver).
+
+This attribute is not available until [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer) has run.
+
+### Version major number
+
+| ----------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                          | `versionMajorNumber`                                                                     |
+| Type                          | string                                                                                   |
+| Related configuration options | [version]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#version){: .btn .btn--success .btn--small} |
+| Initialized by task           | [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer){: .btn .btn--small} |
+
+The [`version`](#version) [*major* number](https://semver.org/). This attribute is only available when the configured [version scheme]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/version-schemes.md %}) is [`SEMVER`]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/version-schemes.md %}#semantic-versioning-semver).
+
+This attribute is not available until [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer) has run.
+
+### Version minor number
+
+| ----------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                          | `versionMinorNumber`                                                                     |
+| Type                          | string                                                                                   |
+| Related configuration options | [version]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#version){: .btn .btn--success .btn--small} |
+| Initialized by task           | [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer){: .btn .btn--small} |
+
+The [`version`](#version) [*minor* number](https://semver.org/). This attribute is only available when the configured [version scheme]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/version-schemes.md %}) is [`SEMVER`]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/version-schemes.md %}#semantic-versioning-semver).
+
+This attribute is not available until [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer) has run.
+
+### Version patch number
+
+| ----------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                          | `versionPatchNumber`                                                                     |
+| Type                          | string                                                                                   |
+| Related configuration options | [version]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#version){: .btn .btn--success .btn--small} |
+| Initialized by task           | [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer){: .btn .btn--small} |
+
+The [`version`](#version) [*patch* number](https://semver.org/). This attribute is only available when the configured [version scheme]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/version-schemes.md %}) is [`SEMVER`]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/version-schemes.md %}#semantic-versioning-semver).
+
+This attribute is not available until [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer) has run.
+
+### Version pre-release identifier
+
+| ----------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                          | `versionPreReleaseIdentifier`                                                            |
+| Type                          | string                                                                                   |
+| Related configuration options | [version]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#version){: .btn .btn--success .btn--small} |
+| Initialized by task           | [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer){: .btn .btn--small} |
+
+The [`version`](#version) [*pre-release* identifier](https://semver.org/), if present in the [`version`](#version). This attribute is only available when the configured [version scheme]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/version-schemes.md %}) is [`SEMVER`]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/version-schemes.md %}#semantic-versioning-semver).
 
 This attribute is not available until [infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer) has run.
 
