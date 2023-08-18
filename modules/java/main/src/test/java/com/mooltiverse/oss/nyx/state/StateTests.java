@@ -367,7 +367,7 @@ public class StateTests {
             throws Exception {
             State state = new State(new Configuration());
             // inject a releaseType with the 'publish' flag to TRUE
-            state.setReleaseType(new ReleaseType(null, true, null, null, null, Boolean.FALSE.toString(), null, Boolean.FALSE.toString(), Boolean.FALSE.toString(), null, null, null, null, null, /*this is the 'publish' flag -> */ Boolean.TRUE.toString(), null, Boolean.FALSE));
+            state.setReleaseType(new ReleaseType(null, true, null, null, null, Boolean.FALSE.toString(), null, Boolean.FALSE.toString(), Boolean.FALSE.toString(), null, List.<String>of(), null, null, null, null, /*this is the 'publish' flag -> */ Boolean.TRUE.toString(), null, Boolean.FALSE));
             state.setVersion("1.2.3");
             state.getReleaseScope().setPreviousVersion("1.2.3");
             assertFalse(state.getNewVersion());
@@ -378,7 +378,7 @@ public class StateTests {
             assertTrue(state.getNewRelease());
 
             // now replace the releaseType with the 'publish' flag to FALSE
-            state.setReleaseType(new ReleaseType(null, true, null, null, null, Boolean.FALSE.toString(), null, Boolean.FALSE.toString(), Boolean.FALSE.toString(), null, null, null, null, null, /*this is the 'publish' flag -> */ Boolean.FALSE.toString(), null, Boolean.FALSE));
+            state.setReleaseType(new ReleaseType(null, true, null, null, null, Boolean.FALSE.toString(), null, Boolean.FALSE.toString(), Boolean.FALSE.toString(), null, List.<String>of(), null, null, null, null, /*this is the 'publish' flag -> */ Boolean.FALSE.toString(), null, Boolean.FALSE));
 
             state.getReleaseScope().setPreviousVersion("0.1.0");
             assertTrue(state.getNewVersion());
@@ -663,6 +663,7 @@ public class StateTests {
             oldState.getReleaseType().setGitPush(Boolean.TRUE.toString());
             oldState.getReleaseType().setGitTag(Boolean.TRUE.toString());
             oldState.getReleaseType().setGitTagMessage("Tag message");
+            oldState.getReleaseType().setGitTagNames(List.<String>of("one", "two", "three"));
             oldState.getReleaseType().setIdentifiers(List.<Identifier>of(new Identifier("b", "12", Identifier.Position.BUILD)));
             oldState.getReleaseType().setMatchBranches(".*");
             oldState.getReleaseType().setMatchEnvironmentVariables(Map.<String,String>of("USER", ".*", "PATH", ".*"));
@@ -803,6 +804,14 @@ public class StateTests {
             assertEquals(oldState.getReleaseType().getGitPush(), resumedState.getReleaseType().getGitPush());
             assertEquals(oldState.getReleaseType().getGitTag(), resumedState.getReleaseType().getGitTag());
             assertEquals(oldState.getReleaseType().getGitTagMessage(), resumedState.getReleaseType().getGitTagMessage());
+            if (Objects.isNull(oldState.getReleaseType().getGitTagNames())) {
+                assertEquals(oldState.getReleaseType().getGitTagNames(), resumedState.getReleaseType().getGitTagNames());
+            }
+            else {
+                for (int i=0; i<oldState.getReleaseType().getGitTagNames().size(); i++) {
+                    assertEquals(oldState.getReleaseType().getGitTagNames().get(i), resumedState.getReleaseType().getGitTagNames().get(i));
+                }
+            }
             if (Objects.isNull(oldState.getReleaseType().getIdentifiers())) {
                 assertEquals(oldState.getReleaseType().getIdentifiers(), resumedState.getReleaseType().getIdentifiers());
             }
@@ -872,6 +881,7 @@ public class StateTests {
             oldState.getReleaseType().setGitPush(Boolean.TRUE.toString());
             oldState.getReleaseType().setGitTag(Boolean.TRUE.toString());
             oldState.getReleaseType().setGitTagMessage("Tag message");
+            oldState.getReleaseType().setGitTagNames(List.<String>of("one", "two", "three"));
             oldState.getReleaseType().setIdentifiers(List.<Identifier>of(new Identifier("b", "12", Identifier.Position.BUILD)));
             oldState.getReleaseType().setMatchBranches(".*");
             oldState.getReleaseType().setMatchEnvironmentVariables(Map.<String,String>of("USER", ".*", "PATH", ".*"));
@@ -1013,6 +1023,14 @@ public class StateTests {
             assertEquals(oldState.getReleaseType().getGitPush(), resumedState.getReleaseType().getGitPush());
             assertEquals(oldState.getReleaseType().getGitTag(), resumedState.getReleaseType().getGitTag());
             assertEquals(oldState.getReleaseType().getGitTagMessage(), resumedState.getReleaseType().getGitTagMessage());
+            if (Objects.isNull(oldState.getReleaseType().getGitTagNames())) {
+                assertEquals(oldState.getReleaseType().getGitTagNames(), resumedState.getReleaseType().getGitTagNames());
+            }
+            else {
+                for (int i=0; i<oldState.getReleaseType().getGitTagNames().size(); i++) {
+                    assertEquals(oldState.getReleaseType().getGitTagNames().get(i), resumedState.getReleaseType().getGitTagNames().get(i));
+                }
+            }
             if (Objects.isNull(oldState.getReleaseType().getIdentifiers())) {
                 assertEquals(oldState.getReleaseType().getIdentifiers(), resumedState.getReleaseType().getIdentifiers());
             }

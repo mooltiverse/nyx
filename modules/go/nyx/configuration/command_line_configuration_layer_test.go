@@ -591,6 +591,7 @@ func TestCommandLineConfigurationLayerGetReleaseTypes(t *testing.T) {
 		"--release-types-two-git-push=false",
 		"--release-types-two-git-tag=false",
 		"--release-types-two-git-tag-message=Tag message",
+		"--release-types-two-git-tag-names=one,two,three",
 		"--release-types-two-identifiers-0-position=" + ent.PRE_RELEASE.String(),
 		"--release-types-two-identifiers-0-qualifier=q1",
 		"--release-types-two-identifiers-0-value=v1",
@@ -631,6 +632,7 @@ func TestCommandLineConfigurationLayerGetReleaseTypes(t *testing.T) {
 	assert.Nil(t, (*(*releaseTypes.GetItems())["one"]).GetGitCommitMessage())
 	assert.Equal(t, "true", *(*(*releaseTypes.GetItems())["one"]).GetGitTag())
 	assert.Nil(t, (*(*releaseTypes.GetItems())["one"]).GetGitTagMessage())
+	assert.Nil(t, (*(*releaseTypes.GetItems())["one"]).GetGitTagNames())
 	assert.Equal(t, "true", *(*(*releaseTypes.GetItems())["one"]).GetGitPush())
 	assert.Equal(t, 0, len(*(*(*releaseTypes.GetItems())["one"]).GetIdentifiers()))
 	assert.Equal(t, "alpha,beta", *(*(*releaseTypes.GetItems())["one"]).GetMatchBranches())
@@ -648,6 +650,10 @@ func TestCommandLineConfigurationLayerGetReleaseTypes(t *testing.T) {
 	assert.Equal(t, "Commit message", *(*(*releaseTypes.GetItems())["two"]).GetGitCommitMessage())
 	assert.Equal(t, "false", *(*(*releaseTypes.GetItems())["two"]).GetGitTag())
 	assert.Equal(t, "Tag message", *(*(*releaseTypes.GetItems())["two"]).GetGitTagMessage())
+	assert.Equal(t, 3, len(*(*(*releaseTypes.GetItems())["two"]).GetGitTagNames()))
+	assert.Equal(t, "one", *(*(*(*releaseTypes.GetItems())["two"]).GetGitTagNames())[0])
+	assert.Equal(t, "two", *(*(*(*releaseTypes.GetItems())["two"]).GetGitTagNames())[1])
+	assert.Equal(t, "three", *(*(*(*releaseTypes.GetItems())["two"]).GetGitTagNames())[2])
 	assert.Equal(t, "false", *(*(*releaseTypes.GetItems())["two"]).GetGitPush())
 	assert.Equal(t, 3, len(*(*(*releaseTypes.GetItems())["two"]).GetIdentifiers()))
 	assert.Equal(t, ent.PRE_RELEASE, *(*(*(*releaseTypes.GetItems())["two"]).GetIdentifiers())[0].GetPosition())

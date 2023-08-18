@@ -429,7 +429,7 @@ func TestStateGetNewRelease(t *testing.T) {
 	configuration, _ := cnf.NewConfiguration()
 	state, _ := NewStateWith(configuration)
 	// inject a releaseType with the 'publish' flag to TRUE
-	state.SetReleaseType(ent.NewReleaseTypeWith(nil, utl.PointerToBoolean(true), nil, nil, nil, utl.PointerToString("false"), nil, utl.PointerToString("false"), utl.PointerToString("false"), nil, nil, nil, nil, nil /*this is the 'publish' flag -> */, utl.PointerToString("true"), nil, utl.PointerToBoolean(false)))
+	state.SetReleaseType(ent.NewReleaseTypeWith(nil, utl.PointerToBoolean(true), nil, nil, nil, utl.PointerToString("false"), nil, utl.PointerToString("false"), utl.PointerToString("false"), nil, &[]*string{}, nil, nil, nil, nil /*this is the 'publish' flag -> */, utl.PointerToString("true"), nil, utl.PointerToBoolean(false)))
 	state.SetVersion(utl.PointerToString("1.2.3"))
 	releaseScope, _ := state.GetReleaseScope()
 	releaseScope.SetPreviousVersion(utl.PointerToString("1.2.3"))
@@ -446,7 +446,7 @@ func TestStateGetNewRelease(t *testing.T) {
 	assert.True(t, newRelease)
 
 	// now replace the releaseType with the 'publish' flag to FALSE
-	state.SetReleaseType(ent.NewReleaseTypeWith(nil, utl.PointerToBoolean(true), nil, nil, nil, utl.PointerToString("false"), nil, utl.PointerToString("false"), utl.PointerToString("false"), nil, nil, nil, nil, nil /*this is the 'publish' flag -> */, utl.PointerToString("false"), nil, utl.PointerToBoolean(false)))
+	state.SetReleaseType(ent.NewReleaseTypeWith(nil, utl.PointerToBoolean(true), nil, nil, nil, utl.PointerToString("false"), nil, utl.PointerToString("false"), utl.PointerToString("false"), nil, &[]*string{}, nil, nil, nil, nil /*this is the 'publish' flag -> */, utl.PointerToString("false"), nil, utl.PointerToBoolean(false)))
 
 	releaseScope, _ = state.GetReleaseScope()
 	releaseScope.SetPreviousVersion(utl.PointerToString("0.1.0"))
@@ -738,6 +738,7 @@ func TestStateSaveAndResumeJSON(t *testing.T) {
 	releaseType.SetGitPush(utl.PointerToString("true"))
 	releaseType.SetGitTag(utl.PointerToString("true"))
 	releaseType.SetGitTagMessage(utl.PointerToString("Tag message"))
+	releaseType.SetGitTagNames(&[]*string{utl.PointerToString("one"), utl.PointerToString("two"), utl.PointerToString("three")})
 	releaseType.SetIdentifiers(&[]*ent.Identifier{ent.NewIdentifierWith(utl.PointerToString("b"), utl.PointerToString("12"), ent.PointerToPosition(ent.BUILD))})
 	releaseType.SetMatchBranches(utl.PointerToString(".*"))
 	releaseType.SetMatchEnvironmentVariables(&map[string]string{"USER": ".*", "PATH": ".*"})
@@ -920,6 +921,13 @@ func TestStateSaveAndResumeJSON(t *testing.T) {
 	assert.Equal(t, *releaseType1.GetGitPush(), *releaseType2.GetGitPush())
 	assert.Equal(t, *releaseType1.GetGitTag(), *releaseType2.GetGitTag())
 	assert.Equal(t, *releaseType1.GetGitTagMessage(), *releaseType2.GetGitTagMessage())
+	if releaseType1.GetGitTagNames() == nil {
+		assert.Equal(t, *releaseType1.GetGitTagNames(), *releaseType2.GetGitTagNames())
+	} else {
+		for i, name := range *releaseType1.GetGitTagNames() {
+			assert.Equal(t, *name, *(*releaseType2.GetGitTagNames())[i])
+		}
+	}
 	if releaseType1.GetIdentifiers() == nil {
 		assert.Equal(t, *releaseType1.GetIdentifiers(), *releaseType2.GetIdentifiers())
 	} else {
@@ -1010,6 +1018,7 @@ func TestStateSaveAndResumeYAML(t *testing.T) {
 	releaseType.SetGitPush(utl.PointerToString("true"))
 	releaseType.SetGitTag(utl.PointerToString("true"))
 	releaseType.SetGitTagMessage(utl.PointerToString("Tag message"))
+	releaseType.SetGitTagNames(&[]*string{utl.PointerToString("one"), utl.PointerToString("two"), utl.PointerToString("three")})
 	releaseType.SetIdentifiers(&[]*ent.Identifier{ent.NewIdentifierWith(utl.PointerToString("b"), utl.PointerToString("12"), ent.PointerToPosition(ent.BUILD))})
 	releaseType.SetMatchBranches(utl.PointerToString(".*"))
 	releaseType.SetMatchEnvironmentVariables(&map[string]string{"USER": ".*", "PATH": ".*"})
@@ -1192,6 +1201,13 @@ func TestStateSaveAndResumeYAML(t *testing.T) {
 	assert.Equal(t, *releaseType1.GetGitPush(), *releaseType2.GetGitPush())
 	assert.Equal(t, *releaseType1.GetGitTag(), *releaseType2.GetGitTag())
 	assert.Equal(t, *releaseType1.GetGitTagMessage(), *releaseType2.GetGitTagMessage())
+	if releaseType1.GetGitTagNames() == nil {
+		assert.Equal(t, *releaseType1.GetGitTagNames(), *releaseType2.GetGitTagNames())
+	} else {
+		for i, name := range *releaseType1.GetGitTagNames() {
+			assert.Equal(t, *name, *(*releaseType2.GetGitTagNames())[i])
+		}
+	}
 	if releaseType1.GetIdentifiers() == nil {
 		assert.Equal(t, *releaseType1.GetIdentifiers(), *releaseType2.GetIdentifiers())
 	} else {

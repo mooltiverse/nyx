@@ -95,6 +95,9 @@ var (
 	// The optional string or the template to render to use as the tag message if a tag has to be made. Value: nil
 	RELEASE_TYPE_GIT_TAG_MESSAGE *string = nil
 
+	// The list of templates to use as tag names when tagging a commit. Value: [ {{version}} ]
+	RELEASE_TYPE_GIT_TAG_NAMES *[]*string = &[]*string{utl.PointerToString("{{version}}")}
+
 	// The identifiers configuration block. Elements of this list must be of type Identifier. Value: nil
 	RELEASE_TYPE_IDENTIFIERS *[]*Identifier = nil
 

@@ -649,7 +649,7 @@ public class State {
      * Returns the version build metadata inferred by Nyx, if any. If the configured version scheme is not {@code SEMVER}
      * this method always returns {@code null}.
      * 
-     * @return the version build metadata number inferred by Nyx. This is {@code null} if {@link Nyx#getVersion()} is {@code null} or
+     * @return the version build metadata number inferred by Nyx. This is {@code null} if {@link #getVersion()} is {@code null} or
      * the configured version scheme is not {@code SEMVER}.
      * 
      * @throws DataAccessException in case the attribute cannot be read or accessed.
@@ -671,7 +671,7 @@ public class State {
      * Returns the version major number inferred by Nyx, if any. If the configured version scheme is not {@code SEMVER}
      * this method always returns {@code null}.
      * 
-     * @return the version major number inferred by Nyx. This is {@code null} if {@link Nyx#getVersion()} is {@code null} or
+     * @return the version major number inferred by Nyx. This is {@code null} if {@link #getVersion()} is {@code null} or
      * the configured version scheme is not {@code SEMVER}.
      * 
      * @throws DataAccessException in case the attribute cannot be read or accessed.
@@ -693,7 +693,7 @@ public class State {
      * Returns the version minor number inferred by Nyx, if any. If the configured version scheme is not {@code SEMVER}
      * this method always returns {@code null}.
      * 
-     * @return the version minor number inferred by Nyx. This is {@code null} if {@link Nyx#getVersion()} is {@code null} or
+     * @return the version minor number inferred by Nyx. This is {@code null} if {@link #getVersion()} is {@code null} or
      * the configured version scheme is not {@code SEMVER}.
      * 
      * @throws DataAccessException in case the attribute cannot be read or accessed.
@@ -715,7 +715,7 @@ public class State {
      * Returns the version patch number inferred by Nyx, if any. If the configured version scheme is not {@code SEMVER}
      * this method always returns {@code null}.
      * 
-     * @return the version patch number inferred by Nyx. This is {@code null} if {@link Nyx#getVersion()} is {@code null} or
+     * @return the version patch number inferred by Nyx. This is {@code null} if {@link #getVersion()} is {@code null} or
      * the configured version scheme is not {@code SEMVER}.
      * 
      * @throws DataAccessException in case the attribute cannot be read or accessed.
@@ -737,7 +737,7 @@ public class State {
      * Returns the version pre-release identifier inferred by Nyx, if any. If the configured version scheme is not {@code SEMVER}
      * this method always returns {@code null}.
      * 
-     * @return the version pre-release identifier number inferred by Nyx. This is {@code null} if {@link Nyx#getVersion()} is {@code null} or
+     * @return the version pre-release identifier number inferred by Nyx. This is {@code null} if {@link #getVersion()} is {@code null} or
      * the configured version scheme is not {@code SEMVER}.
      * 
      * @throws DataAccessException in case the attribute cannot be read or accessed.

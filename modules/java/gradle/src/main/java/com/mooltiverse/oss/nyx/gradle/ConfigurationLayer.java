@@ -295,6 +295,7 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
                             type.getGitPush().isPresent() ? type.getGitPush().get() : Defaults.ReleaseType.GIT_PUSH,
                             type.getGitTag().isPresent() ? type.getGitTag().get() : Defaults.ReleaseType.GIT_TAG,
                             type.getGitTagMessage().isPresent() ? type.getGitTagMessage().get() : Defaults.ReleaseType.GIT_TAG_MESSAGE,
+                            type.getGitTagNames().isPresent() ? type.getGitTagNames().get() : Defaults.ReleaseType.GIT_TAG_NAMES,
                             identifiers,
                             type.getMatchBranches().isPresent() ? type.getMatchBranches().get() : Defaults.ReleaseType.MATCH_BRANCHES,
                             type.getMatchEnvironmentVariables().isPresent() ? type.getMatchEnvironmentVariables().get() : Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES,

@@ -76,6 +76,11 @@ public class ReleaseType {
     private String gitTagMessage = Defaults.ReleaseType.GIT_TAG_MESSAGE;
 
     /**
+     * The list of templates to use as tag names when tagging a commit.
+     */
+    private List<String> gitTagNames = Defaults.ReleaseType.GIT_TAG_NAMES;
+
+    /**
      * The identifiers configuration block.
      */
     private List<Identifier> identifiers = Defaults.ReleaseType.IDENTIFIERS;
@@ -144,6 +149,7 @@ public class ReleaseType {
      * @param gitTag the optional flag or the template to render indicating whether or not
      * a new tag must be generated.
      * @param gitTagMessage the optional identifiers configuration block.
+     * @param gitTagNames the list of templates to use as tag names when tagging a commit.
      * @param identifiers the optional nested map of the custom extra identifiers to be used in a
      * release type.
      * @param matchBranches the optional template to render as a regular expression used to
@@ -160,7 +166,7 @@ public class ReleaseType {
      * 
      * @see Defaults.ReleaseType
      */
-    public ReleaseType(List<String> assets, boolean collapseVersions, String collapsedVersionQualifier, String description, String filterTags, String gitCommit, String gitCommitMessage, String gitPush, String gitTag, String gitTagMessage, List<Identifier> identifiers, String matchBranches, Map<String,String> matchEnvironmentVariables, WorkspaceStatus matchWorkspaceStatus, String publish, String versionRange, Boolean versionRangeFromBranchName) {
+    public ReleaseType(List<String> assets, boolean collapseVersions, String collapsedVersionQualifier, String description, String filterTags, String gitCommit, String gitCommitMessage, String gitPush, String gitTag, String gitTagMessage, List<String> gitTagNames, List<Identifier> identifiers, String matchBranches, Map<String,String> matchEnvironmentVariables, WorkspaceStatus matchWorkspaceStatus, String publish, String versionRange, Boolean versionRangeFromBranchName) {
         super();
         this.assets = assets;
         this.collapseVersions = collapseVersions;
@@ -172,6 +178,7 @@ public class ReleaseType {
         this.gitPush = gitPush;
         this.gitTag = gitTag;
         this.gitTagMessage = gitTagMessage;
+        this.gitTagNames = gitTagNames;
         this.identifiers = identifiers;
         this.matchBranches = matchBranches;
         this.matchEnvironmentVariables = matchEnvironmentVariables;
@@ -407,6 +414,24 @@ public class ReleaseType {
      */
     public void setGitTagMessage(String gitTagMessage) {
         this.gitTagMessage = gitTagMessage;
+    }
+
+    /**
+     * Returns the list of templates to use as tag names when tagging a commit.
+     * 
+     * @return the list of templates to use as tag names when tagging a commit.
+     */
+    public List<String> getGitTagNames() {
+        return gitTagNames;
+    }
+
+    /**
+     * Sets the list of templates to use as tag names when tagging a commit.
+     * 
+     * @param gitTagNames the list of templates to use as tag names when tagging a commit.
+     */
+    public void setGitTagNames(List<String> gitTagNames) {
+        this.gitTagNames = gitTagNames;
     }
 
     /**

@@ -69,6 +69,7 @@ nyx {
         gitPush = 'true'
         gitTag = 'true'
         gitTagMessage = 'Tag version {{version}}'
+        gitTagNames = [ '{{version}}', 'stable', 'latest' ]
         matchBranches = '^(master|main)$'
         matchEnvironmentVariables {
           CI = '^true$'
@@ -85,6 +86,7 @@ nyx {
         gitCommit = 'false'
         gitPush = 'true'
         gitTag = 'true'
+        gitTagNames = [ '{{version}}' ]
         matchBranches = '^(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)$'
         matchWorkspaceStatus = 'CLEAN'
         publish = 'true'
@@ -99,6 +101,7 @@ nyx {
         gitCommit = 'false'
         gitPush = 'true'
         gitTag = 'true'
+        gitTagNames = [ '{{version}}' ]
         matchBranches = '^(develop|development|integration|latest)$'
         matchWorkspaceStatus = 'CLEAN'
         publish = 'true'
@@ -125,6 +128,7 @@ nyx {
         gitCommit = 'false'
         gitPush = 'true'
         gitTag = 'true'
+        gitTagNames = [ '{{version}}' ]
         matchBranches = '^(fix|hotfix)((-|\\/)[0-9a-zA-Z-_]+)?$'
         matchWorkspaceStatus = 'CLEAN'
         publish = 'true'
@@ -138,6 +142,7 @@ nyx {
         gitCommit = 'false'
         gitPush = 'true'
         gitTag = 'true'
+        gitTagNames = [ '{{version}}' ]
         matchBranches = '^(rel|release)(-|\\/)({{configuration.releasePrefix}})?([0-9|x]\\d*)(\\.([0-9|x]\\d*)(\\.([0-9|x]\\d*))?)?$'
         matchWorkspaceStatus = 'CLEAN'
         publish = 'false'
@@ -150,6 +155,7 @@ nyx {
         gitCommit = 'false'
         gitPush = 'true'
         gitTag = 'true'
+        gitTagNames = [ '{{version}}' ]
         matchBranches = '^[a-zA-Z]*([0-9|x]\\d*)(\\.([0-9|x]\\d*)(\\.([0-9|x]\\d*))?)?$'
         matchWorkspaceStatus = 'CLEAN'
         publish = 'true'

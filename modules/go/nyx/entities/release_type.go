@@ -56,6 +56,9 @@ type ReleaseType struct {
 	// The optional string or the template to render to use as the tag message if a tag has to be made. A nil value means undefined.
 	GitTagMessage *string `json:"gitTagMessage,omitempty" yaml:"gitTagMessage,omitempty"`
 
+	// The list of templates to use as tag names when tagging a commit.
+	GitTagNames *[]*string `json:"gitTagNames,omitempty" yaml:"gitTagNames,omitempty"`
+
 	// The identifiers configuration block. Elements of this list must be of type Identifier. A nil value means undefined.
 	Identifiers *[]*Identifier `json:"identifiers,omitempty" yaml:"identifiers,omitempty"`
 
@@ -102,6 +105,7 @@ Arguments are as follows:
 - gitPush the optional flag or the template to render indicating whether or not a new commit must be generated and pushed in case new artifacts are generated.
 - gitTag the optional flag or the template to render indicating whether or not a new tag must be generated.
 - gitTagMessage the optional identifiers configuration block.
+- gitTagNames the list of templates to use as tag names when tagging a commit.
 - identifiers the optional nested map of the custom extra identifiers to be used in a release type.
 - matchBranches the optional template to render as a regular expression used to match branch names.
 - matchEnvironmentVariables the map of the match environment variables items, where keys are environment variable names and values are regular expressions.
@@ -110,7 +114,7 @@ Arguments are as follows:
 - versionRange the optional regular expression used to constrain versions issued by this release type.
 - versionRangeFromBranchName the optional flag telling if the version range must be inferred from the branch name.
 */
-func NewReleaseTypeWith(assets *[]*string, collapseVersions *bool, collapsedVersionQualifier *string, description *string, filterTags *string, gitCommit *string, gitCommitMessage *string, gitPush *string, gitTag *string, gitTagMessage *string, identifiers *[]*Identifier, matchBranches *string, matchEnvironmentVariables *map[string]string, matchWorkspaceStatus *WorkspaceStatus, publish *string, versionRange *string, versionRangeFromBranchName *bool) *ReleaseType {
+func NewReleaseTypeWith(assets *[]*string, collapseVersions *bool, collapsedVersionQualifier *string, description *string, filterTags *string, gitCommit *string, gitCommitMessage *string, gitPush *string, gitTag *string, gitTagMessage *string, gitTagNames *[]*string, identifiers *[]*Identifier, matchBranches *string, matchEnvironmentVariables *map[string]string, matchWorkspaceStatus *WorkspaceStatus, publish *string, versionRange *string, versionRangeFromBranchName *bool) *ReleaseType {
 	rt := ReleaseType{}
 
 	rt.Assets = assets
@@ -123,6 +127,7 @@ func NewReleaseTypeWith(assets *[]*string, collapseVersions *bool, collapsedVers
 	rt.GitPush = gitPush
 	rt.GitTag = gitTag
 	rt.GitTagMessage = gitTagMessage
+	rt.GitTagNames = gitTagNames
 	rt.Identifiers = identifiers
 	rt.MatchBranches = matchBranches
 	rt.MatchEnvironmentVariables = matchEnvironmentVariables
@@ -148,6 +153,7 @@ func (rt *ReleaseType) setDefaults() {
 	rt.GitPush = RELEASE_TYPE_GIT_PUSH
 	rt.GitTag = RELEASE_TYPE_GIT_TAG
 	rt.GitTagMessage = RELEASE_TYPE_GIT_TAG_MESSAGE
+	rt.GitTagNames = RELEASE_TYPE_GIT_TAG_NAMES
 	rt.Identifiers = RELEASE_TYPE_IDENTIFIERS
 	rt.MatchBranches = RELEASE_TYPE_MATCH_BRANCHES
 	rt.MatchEnvironmentVariables = RELEASE_TYPE_MATCH_ENVIRONMENT_VARIABLES
@@ -298,6 +304,20 @@ Sets the optional string or the template to render to use as the tag message if 
 */
 func (rt *ReleaseType) SetGitTagMessage(gitTagMessage *string) {
 	rt.GitTagMessage = gitTagMessage
+}
+
+/*
+Returns the list of templates to use as tag names when tagging a commit. A nil value means undefined.
+*/
+func (rt *ReleaseType) GetGitTagNames() *[]*string {
+	return rt.GitTagNames
+}
+
+/*
+Sets the list of templates to use as tag names when tagging a commit. A nil value means undefined.
+*/
+func (rt *ReleaseType) SetGitTagNames(gitTagNames *[]*string) {
+	rt.GitTagNames = gitTagNames
 }
 
 /*

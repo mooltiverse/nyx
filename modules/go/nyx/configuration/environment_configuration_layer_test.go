@@ -493,6 +493,7 @@ func TestEnvironmentConfigurationLayerGetReleaseTypes(t *testing.T) {
 		"NYX_RELEASE_TYPES_two_GIT_PUSH=false",
 		"NYX_RELEASE_TYPES_two_GIT_TAG=false",
 		"NYX_RELEASE_TYPES_two_GIT_TAG_MESSAGE=Tag message",
+		"NYX_RELEASE_TYPES_two_GIT_TAG_NAMES=one,two,three",
 		"NYX_RELEASE_TYPES_two_IDENTIFIERS_0_POSITION=" + ent.PRE_RELEASE.String(),
 		"NYX_RELEASE_TYPES_two_IDENTIFIERS_0_QUALIFIER=q1",
 		"NYX_RELEASE_TYPES_two_IDENTIFIERS_0_VALUE=v1",
@@ -533,6 +534,7 @@ func TestEnvironmentConfigurationLayerGetReleaseTypes(t *testing.T) {
 	assert.Nil(t, (*(*releaseTypes.GetItems())["one"]).GetGitCommitMessage())
 	assert.Equal(t, "true", *(*(*releaseTypes.GetItems())["one"]).GetGitTag())
 	assert.Nil(t, (*(*releaseTypes.GetItems())["one"]).GetGitTagMessage())
+	assert.Nil(t, (*(*releaseTypes.GetItems())["one"]).GetGitTagNames())
 	assert.Equal(t, "true", *(*(*releaseTypes.GetItems())["one"]).GetGitPush())
 	assert.Equal(t, 0, len(*(*(*releaseTypes.GetItems())["one"]).GetIdentifiers()))
 	assert.Equal(t, "alpha,beta", *(*(*releaseTypes.GetItems())["one"]).GetMatchBranches())
@@ -550,6 +552,10 @@ func TestEnvironmentConfigurationLayerGetReleaseTypes(t *testing.T) {
 	assert.Equal(t, "Commit message", *(*(*releaseTypes.GetItems())["two"]).GetGitCommitMessage())
 	assert.Equal(t, "false", *(*(*releaseTypes.GetItems())["two"]).GetGitTag())
 	assert.Equal(t, "Tag message", *(*(*releaseTypes.GetItems())["two"]).GetGitTagMessage())
+	assert.Equal(t, 3, len(*(*(*releaseTypes.GetItems())["two"]).GetGitTagNames()))
+	assert.Equal(t, "one", *(*(*(*releaseTypes.GetItems())["two"]).GetGitTagNames())[0])
+	assert.Equal(t, "two", *(*(*(*releaseTypes.GetItems())["two"]).GetGitTagNames())[1])
+	assert.Equal(t, "three", *(*(*(*releaseTypes.GetItems())["two"]).GetGitTagNames())[2])
 	assert.Equal(t, "false", *(*(*releaseTypes.GetItems())["two"]).GetGitPush())
 	assert.Equal(t, 3, len(*(*(*releaseTypes.GetItems())["two"]).GetIdentifiers()))
 	assert.Equal(t, ent.PRE_RELEASE, *(*(*(*releaseTypes.GetItems())["two"]).GetIdentifiers())[0].GetPosition())
