@@ -1025,5 +1025,62 @@ public class MarkTestTemplates {
                 assertEquals(script.getTags().size(), remoteScript.getTags().size());
             }
         }
+
+        @TestTemplate
+        @DisplayName("Mark.run() on a clean workspace using a release type with Commit, Tag and Push enabled after Infer has generated a new Version using multiple tag names > yield to a new commit and multiple tags, with changes pushed to remote")
+        @Baseline(Scenario.ONE_BRANCH_SHORT)
+        void runOnCleanWorkspaceWithNewVersionOrNewReleaseWithCommitAndTagAndPushEnabledUsingMultipleTagnamesTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script)
+            throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
+            Script remoteScript = Scenario.BARE.realize(true);
+            remoteScript.getGitDirectory().deleteOnExit();
+            script.addRemote(remoteScript.getGitDirectory(), "replica");
+            String previousLastCommit = script.getLastCommitID();
+            List<String> previousCommits = script.getCommitIDs();
+            Map<String,String> previousTags = script.getTags();
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            // add a mock convention that accepts all non null messages and dumps the minor identifier for each
+            configurationLayerMock.setCommitMessageConventions(
+                new CommitMessageConventions(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("patch", ".*")))
+                )
+            );
+            // add a custom release type that always enables committing, tagging and pushing
+            configurationLayerMock.setReleaseTypes(
+                new ReleaseTypes(
+                    List.<String>of("testReleaseType"),
+                    List.<String>of(),
+                    List.<String>of("replica"),
+                    Map.<String,ReleaseType>of("testReleaseType", new ReleaseType() {
+                        {
+                            setGitCommit(Boolean.TRUE.toString());
+                            setGitPush(Boolean.TRUE.toString());
+                            setGitTag(Boolean.TRUE.toString());
+                            // here 0.0.1 is an existing tag so we test for rewriting
+                            setGitTagNames(List.<String>of("0.0.1", "{{version}}", "{{versionMajorNumber}}", "{{versionMajorNumber}}.{{versionMinorNumber}}"));
+                        }}
+                    )
+                )
+            );
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
+
+            command.run();
+
+            // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
+            if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
+                assertEquals("0.0.5", command.state().getVersion());
+                assertEquals(previousLastCommit, script.getLastCommitID());
+                assertEquals(previousCommits.size(), script.getCommitIDs().size());
+                assertEquals(previousTags.size()+3, script.getTags().size());
+                assertTrue(script.getTags().containsKey(command.state().getVersion()));
+                assertTrue(script.getTags().containsKey(command.state().getVersionMajorNumber()));
+                assertTrue(script.getTags().containsKey(command.state().getVersionMajorNumber()+"."+command.state().getVersionMinorNumber()));
+                assertEquals(script.getTags().size(), remoteScript.getTags().size());
+                assertTrue(remoteScript.getTags().containsKey(command.state().getVersion()));
+                assertTrue(remoteScript.getTags().containsKey(command.state().getVersionMajorNumber()));
+                assertTrue(remoteScript.getTags().containsKey(command.state().getVersionMajorNumber()+"."+command.state().getVersionMinorNumber()));
+            }
+        }
     }
 }
