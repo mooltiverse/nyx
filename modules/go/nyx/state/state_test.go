@@ -571,6 +571,74 @@ func TestStateGetVersionOverrideByConfiguration(t *testing.T) {
 	assert.Equal(t, "1.2.3", *version)
 }
 
+func TestStateGetVersionBuildMetadata(t *testing.T) {
+	configuration, _ := cnf.NewConfiguration()
+	configurationLayerMock := cnf.NewSimpleConfigurationLayer()
+	var cl cnf.ConfigurationLayer = configurationLayerMock
+	configuration.WithRuntimeConfiguration(&cl)
+	state, _ := NewStateWith(configuration)
+
+	configurationLayerMock.SetVersion(utl.PointerToString("1.2.3"))
+	versionBuildMetadata, _ := state.GetVersionBuildMetadata()
+	assert.Nil(t, versionBuildMetadata)
+
+	configurationLayerMock.SetVersion(utl.PointerToString("1.2.3-alpha.5+build.123"))
+	versionBuildMetadata, _ = state.GetVersionBuildMetadata()
+	assert.Equal(t, "build.123", *versionBuildMetadata)
+}
+
+func TestStateGetVersionMajorNumber(t *testing.T) {
+	configuration, _ := cnf.NewConfiguration()
+	configurationLayerMock := cnf.NewSimpleConfigurationLayer()
+	var cl cnf.ConfigurationLayer = configurationLayerMock
+	configuration.WithRuntimeConfiguration(&cl)
+	state, _ := NewStateWith(configuration)
+
+	configurationLayerMock.SetVersion(utl.PointerToString("1.2.3"))
+	versionMajorNumber, _ := state.GetVersionMajorNumber()
+	assert.Equal(t, "1", *versionMajorNumber)
+}
+
+func TestStateGetVersionMinorNumber(t *testing.T) {
+	configuration, _ := cnf.NewConfiguration()
+	configurationLayerMock := cnf.NewSimpleConfigurationLayer()
+	var cl cnf.ConfigurationLayer = configurationLayerMock
+	configuration.WithRuntimeConfiguration(&cl)
+	state, _ := NewStateWith(configuration)
+
+	configurationLayerMock.SetVersion(utl.PointerToString("1.2.3"))
+	versionMinorNumber, _ := state.GetVersionMinorNumber()
+	assert.Equal(t, "2", *versionMinorNumber)
+}
+
+func TestStateGetVersionPatchNumber(t *testing.T) {
+	configuration, _ := cnf.NewConfiguration()
+	configurationLayerMock := cnf.NewSimpleConfigurationLayer()
+	var cl cnf.ConfigurationLayer = configurationLayerMock
+	configuration.WithRuntimeConfiguration(&cl)
+	state, _ := NewStateWith(configuration)
+
+	configurationLayerMock.SetVersion(utl.PointerToString("1.2.3"))
+	versionPatchNumber, _ := state.GetVersionPatchNumber()
+	assert.Equal(t, "3", *versionPatchNumber)
+}
+
+func TestStateGetVersionPreReleaseIdentifier(t *testing.T) {
+	configuration, _ := cnf.NewConfiguration()
+	configurationLayerMock := cnf.NewSimpleConfigurationLayer()
+	var cl cnf.ConfigurationLayer = configurationLayerMock
+	configuration.WithRuntimeConfiguration(&cl)
+	state, _ := NewStateWith(configuration)
+
+	configurationLayerMock.SetVersion(utl.PointerToString("1.2.3"))
+	versionPreReleaseIdentifier, _ := state.GetVersionPreReleaseIdentifier()
+	assert.Nil(t, versionPreReleaseIdentifier)
+
+	configurationLayerMock.SetVersion(utl.PointerToString("1.2.3-alpha.5+build.123"))
+	versionPreReleaseIdentifier, _ = state.GetVersionPreReleaseIdentifier()
+	assert.Equal(t, "alpha.5", *versionPreReleaseIdentifier)
+}
+
 func TestStateSetVersion(t *testing.T) {
 	configuration, _ := cnf.NewConfiguration()
 	state, _ := NewStateWith(configuration)
@@ -815,6 +883,28 @@ func TestStateSaveAndResumeJSON(t *testing.T) {
 	version1, _ := oldState.GetVersion()
 	version2, _ := resumedState.GetVersion()
 	assert.Equal(t, *version1, *version2)
+
+	versionMajorNumber1, _ := oldState.GetVersionMajorNumber()
+	versionMajorNumber2, _ := resumedState.GetVersionMajorNumber()
+	assert.Equal(t, *versionMajorNumber1, *versionMajorNumber2)
+
+	versionMinorNumber1, _ := oldState.GetVersionMinorNumber()
+	versionMinorNumber2, _ := resumedState.GetVersionMinorNumber()
+	assert.Equal(t, *versionMinorNumber1, *versionMinorNumber2)
+
+	versionPatchNumber1, _ := oldState.GetVersionPatchNumber()
+	versionPatchNumber2, _ := resumedState.GetVersionPatchNumber()
+	assert.Equal(t, *versionPatchNumber1, *versionPatchNumber2)
+
+	versionBuildMetadata1, _ := oldState.GetVersionBuildMetadata()
+	versionBuildMetadata2, _ := resumedState.GetVersionBuildMetadata()
+	assert.Nil(t, versionBuildMetadata1)
+	assert.Nil(t, versionBuildMetadata2)
+
+	versionPreReleaseIdentifier1, _ := oldState.GetVersionPreReleaseIdentifier()
+	versionPreReleaseIdentifier2, _ := resumedState.GetVersionPreReleaseIdentifier()
+	assert.Nil(t, versionPreReleaseIdentifier1)
+	assert.Nil(t, versionPreReleaseIdentifier2)
 
 	versionRange1, _ := oldState.GetVersionRange()
 	versionRange2, _ := resumedState.GetVersionRange()
@@ -1065,6 +1155,28 @@ func TestStateSaveAndResumeYAML(t *testing.T) {
 	version1, _ := oldState.GetVersion()
 	version2, _ := resumedState.GetVersion()
 	assert.Equal(t, *version1, *version2)
+
+	versionMajorNumber1, _ := oldState.GetVersionMajorNumber()
+	versionMajorNumber2, _ := resumedState.GetVersionMajorNumber()
+	assert.Equal(t, *versionMajorNumber1, *versionMajorNumber2)
+
+	versionMinorNumber1, _ := oldState.GetVersionMinorNumber()
+	versionMinorNumber2, _ := resumedState.GetVersionMinorNumber()
+	assert.Equal(t, *versionMinorNumber1, *versionMinorNumber2)
+
+	versionPatchNumber1, _ := oldState.GetVersionPatchNumber()
+	versionPatchNumber2, _ := resumedState.GetVersionPatchNumber()
+	assert.Equal(t, *versionPatchNumber1, *versionPatchNumber2)
+
+	versionBuildMetadata1, _ := oldState.GetVersionBuildMetadata()
+	versionBuildMetadata2, _ := resumedState.GetVersionBuildMetadata()
+	assert.Nil(t, versionBuildMetadata1)
+	assert.Nil(t, versionBuildMetadata2)
+
+	versionPreReleaseIdentifier1, _ := oldState.GetVersionPreReleaseIdentifier()
+	versionPreReleaseIdentifier2, _ := resumedState.GetVersionPreReleaseIdentifier()
+	assert.Nil(t, versionPreReleaseIdentifier1)
+	assert.Nil(t, versionPreReleaseIdentifier2)
 
 	versionRange1, _ := oldState.GetVersionRange()
 	versionRange2, _ := resumedState.GetVersionRange()

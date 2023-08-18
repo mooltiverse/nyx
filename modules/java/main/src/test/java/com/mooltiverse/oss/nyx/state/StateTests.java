@@ -525,6 +525,72 @@ public class StateTests {
         }
 
         @Test
+        @DisplayName("State.getVersionBuildMetadata()")
+        void getVersionBuildMetadataTest()
+            throws Exception {
+            // make sure the version is null in the beginning (it's set only after the Infer task has run)
+            State state = new State(new Configuration());
+            assertNull(state.getVersionBuildMetadata());
+
+            state.setVersion("1.2.3");
+            assertNull(state.getVersionBuildMetadata());
+
+            state.setVersion("1.2.3-alpha.5+build.123");
+            assertEquals("build.123", state.getVersionBuildMetadata());
+        }
+
+        @Test
+        @DisplayName("State.getVersionMajorNumber()")
+        void getVersionMajorNumberTest()
+            throws Exception {
+            // make sure the version is null in the beginning (it's set only after the Infer task has run)
+            State state = new State(new Configuration());
+            assertNull(state.getVersionMajorNumber());
+
+            state.setVersion("1.2.3");
+            assertEquals("1", state.getVersionMajorNumber());
+        }
+
+        @Test
+        @DisplayName("State.getVersionMinorNumber()")
+        void getVersionMinorNumberTest()
+            throws Exception {
+            // make sure the version is null in the beginning (it's set only after the Infer task has run)
+            State state = new State(new Configuration());
+            assertNull(state.getVersionMinorNumber());
+
+            state.setVersion("1.2.3");
+            assertEquals("2", state.getVersionMinorNumber());
+        }
+
+        @Test
+        @DisplayName("State.getVersionPatchNumber()")
+        void getVersionPatchNumberTest()
+            throws Exception {
+            // make sure the version is null in the beginning (it's set only after the Infer task has run)
+            State state = new State(new Configuration());
+            assertNull(state.getVersionPatchNumber());
+
+            state.setVersion("1.2.3");
+            assertEquals("3", state.getVersionPatchNumber());
+        }
+
+        @Test
+        @DisplayName("State.getVersionPreReleaseIdentifier()")
+        void getVersionPreReleaseIdentifierTest()
+            throws Exception {
+            // make sure the version is null in the beginning (it's set only after the Infer task has run)
+            State state = new State(new Configuration());
+            assertNull(state.getVersionPreReleaseIdentifier());
+
+            state.setVersion("1.2.3");
+            assertNull(state.getVersionPreReleaseIdentifier());
+
+            state.setVersion("1.2.3-alpha.5+build.123");
+            assertEquals("alpha.5", state.getVersionPreReleaseIdentifier());
+        }
+
+        @Test
         @DisplayName("State.getVersionRange()")
         void getVersionRangeTest()
             throws Exception {
@@ -723,6 +789,11 @@ public class StateTests {
             assertEquals(oldState.getReleaseScope().getPrimeVersionCommit().getTags(), resumedState.getReleaseScope().getPrimeVersionCommit().getTags());
             assertEquals(oldState.getTimestamp(), resumedState.getTimestamp());
             assertEquals(oldState.getVersion(), resumedState.getVersion());
+            assertEquals(oldState.getVersionBuildMetadata(), resumedState.getVersionBuildMetadata());
+            assertEquals(oldState.getVersionMajorNumber(), resumedState.getVersionMajorNumber());
+            assertEquals(oldState.getVersionMinorNumber(), resumedState.getVersionMinorNumber());
+            assertEquals(oldState.getVersionPatchNumber(), resumedState.getVersionPatchNumber());
+            assertEquals(oldState.getVersionPreReleaseIdentifier(), resumedState.getVersionPreReleaseIdentifier());
             assertEquals(oldState.getVersionRange(), resumedState.getVersionRange());
             assertEquals(oldState.getReleaseType().getCollapseVersions(), resumedState.getReleaseType().getCollapseVersions());
             assertEquals(oldState.getReleaseType().getCollapsedVersionQualifier(), resumedState.getReleaseType().getCollapsedVersionQualifier());
@@ -928,6 +999,11 @@ public class StateTests {
             assertEquals(oldState.getReleaseScope().getPrimeVersionCommit().getTags(), resumedState.getReleaseScope().getPrimeVersionCommit().getTags());
             assertEquals(oldState.getTimestamp(), resumedState.getTimestamp());
             assertEquals(oldState.getVersion(), resumedState.getVersion());
+            assertEquals(oldState.getVersionBuildMetadata(), resumedState.getVersionBuildMetadata());
+            assertEquals(oldState.getVersionMajorNumber(), resumedState.getVersionMajorNumber());
+            assertEquals(oldState.getVersionMinorNumber(), resumedState.getVersionMinorNumber());
+            assertEquals(oldState.getVersionPatchNumber(), resumedState.getVersionPatchNumber());
+            assertEquals(oldState.getVersionPreReleaseIdentifier(), resumedState.getVersionPreReleaseIdentifier());
             assertEquals(oldState.getVersionRange(), resumedState.getVersionRange());
             assertEquals(oldState.getReleaseType().getCollapseVersions(), resumedState.getReleaseType().getCollapseVersions());
             assertEquals(oldState.getReleaseType().getDescription(), resumedState.getReleaseType().getDescription());
