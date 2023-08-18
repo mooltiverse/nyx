@@ -1021,3 +1021,561 @@ func TestMakeRunWithCustomTemplateFromURL(t *testing.T) {
 	}
 	log.SetLevel(logLevel) // restore the original logging level
 }
+
+func TestMakeRunWithSubstitutionsUsingCargoVersionPreset(t *testing.T) {
+	logLevel := log.GetLevel()   // save the previous logging level
+	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
+	for _, command := range cmdtpl.CommandInvocationProxies(cmd.MAKE, gittools.INITIAL_COMMIT()) {
+		t.Run((*command).GetContextName(), func(t *testing.T) {
+			// first create the temporary directory and a subdirectory
+			destinationDir := (*command).Script().GetWorkingDirectory()
+			destinationSubDir := filepath.Join(destinationDir, "sub")
+			err := os.MkdirAll(destinationSubDir, os.ModePerm)
+			assert.NoError(t, err)
+			defer os.RemoveAll(destinationSubDir)
+			defer os.RemoveAll(destinationDir)
+
+			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
+			substitutions, err := ent.NewSubstitutionsWith(
+				&[]*string{utl.PointerToString("cargo_version")},
+				&map[string]*ent.Substitution{"cargo_version": cnf.CARGO_VERSION},
+			)
+			assert.NoError(t, err)
+			configurationLayerMock.SetSubstitutions(substitutions)
+			var configurationLayer cnf.ConfigurationLayer
+			configurationLayer = configurationLayerMock
+			(*command).State().GetConfiguration().WithRuntimeConfiguration(&configurationLayer)
+
+			cargoFileInRootDirectory := filepath.Join(destinationDir, "Cargo.toml")
+			cargoFileInSubDirectory := filepath.Join(destinationSubDir, "Cargo.toml")
+			otherFileInRootDirectory := filepath.Join(destinationDir, "other.txt")
+			otherFileInSubDirectory := filepath.Join(destinationSubDir, "other.txt")
+			//files := []string{cargoFileInRootDirectory, cargoFileInSubDirectory, otherFileInRootDirectory, otherFileInSubDirectory}
+
+			writeFile(cargoFileInRootDirectory, "[package]\nname = \"hello_world\" # the name of the package\nversion = \"91.92.93\" # the current version, obeying semver\nauthors = [\"Alice <a@example.com>\", \"Bob <b@example.com>\"]\n")
+			writeFile(cargoFileInSubDirectory, "[package]\nname = \"hello_world\" # the name of the package\n   version   =     \"91.92.93\" # the current version, obeying semver\nauthors = [\"Alice <a@example.com>\", \"Bob <b@example.com>\"]\n")
+
+			writeFile(otherFileInRootDirectory, "Some text file not to be touched by the command")
+			writeFile(otherFileInSubDirectory, "Some text file not to be touched by the command")
+
+			_, err = (*command).Run()
+			assert.NoError(t, err)
+
+			// when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
+			if (*command).GetContextName() != cmdtpl.STANDALONE_CONTEXT_NAME {
+				// print the files to standard output for inspection purpose
+				//for _, f := range files {
+				//	fmt.Printf("--------------------- " + f + " ---------------------\n")
+				//	fmt.Printf(readFile(f))
+				//	fmt.Println()
+				//	fmt.Printf("-----------------------------------------\n")
+				//}
+
+				// test the rendered files
+				fileContent := readFile(cargoFileInRootDirectory)
+				assert.False(t, strings.Contains(fileContent, "91.92.93"))
+				assert.True(t, strings.Contains(fileContent, "version = \"0.1.0\""))
+
+				fileContent = readFile(cargoFileInSubDirectory)
+				assert.False(t, strings.Contains(fileContent, "91.92.93"))
+				assert.True(t, strings.Contains(fileContent, "version = \"0.1.0\""))
+
+				fileContent = readFile(otherFileInRootDirectory)
+				assert.Equal(t, "Some text file not to be touched by the command", fileContent)
+
+				fileContent = readFile(otherFileInSubDirectory)
+				assert.Equal(t, "Some text file not to be touched by the command", fileContent)
+			}
+
+		})
+	}
+	log.SetLevel(logLevel) // restore the original logging level
+}
+
+func TestMakeRunWithSubstitutionsUsingComposerVersionPreset(t *testing.T) {
+	logLevel := log.GetLevel()   // save the previous logging level
+	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
+	for _, command := range cmdtpl.CommandInvocationProxies(cmd.MAKE, gittools.INITIAL_COMMIT()) {
+		t.Run((*command).GetContextName(), func(t *testing.T) {
+			// first create the temporary directory and a subdirectory
+			destinationDir := (*command).Script().GetWorkingDirectory()
+			destinationSubDir := filepath.Join(destinationDir, "sub")
+			err := os.MkdirAll(destinationSubDir, os.ModePerm)
+			assert.NoError(t, err)
+			defer os.RemoveAll(destinationSubDir)
+			defer os.RemoveAll(destinationDir)
+
+			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
+			substitutions, err := ent.NewSubstitutionsWith(
+				&[]*string{utl.PointerToString("composer_version")},
+				&map[string]*ent.Substitution{"composer_version": cnf.COMPOSER_VERSION},
+			)
+			assert.NoError(t, err)
+			configurationLayerMock.SetSubstitutions(substitutions)
+			var configurationLayer cnf.ConfigurationLayer
+			configurationLayer = configurationLayerMock
+			(*command).State().GetConfiguration().WithRuntimeConfiguration(&configurationLayer)
+
+			composerFileInRootDirectory := filepath.Join(destinationDir, "composer.json")
+			composerFileInSubDirectory := filepath.Join(destinationSubDir, "composer.json")
+			otherFileInRootDirectory := filepath.Join(destinationDir, "other.txt")
+			otherFileInSubDirectory := filepath.Join(destinationSubDir, "other.txt")
+			//files := []string{composerFileInRootDirectory, composerFileInSubDirectory, otherFileInRootDirectory, otherFileInSubDirectory}
+
+			writeFile(composerFileInRootDirectory, "{\n    \"version\": \"91.92.93\"\n}\n")
+			writeFile(composerFileInSubDirectory, "{\n    \"version\"  :      \"91.92.93\"\n}\n")
+
+			writeFile(otherFileInRootDirectory, "Some text file not to be touched by the command")
+			writeFile(otherFileInSubDirectory, "Some text file not to be touched by the command")
+
+			_, err = (*command).Run()
+			assert.NoError(t, err)
+
+			// when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
+			if (*command).GetContextName() != cmdtpl.STANDALONE_CONTEXT_NAME {
+				// print the files to standard output for inspection purpose
+				//for _, f := range files {
+				//	fmt.Printf("--------------------- " + f + " ---------------------\n")
+				//	fmt.Printf(readFile(f))
+				//	fmt.Println()
+				//	fmt.Printf("-----------------------------------------\n")
+				//}
+
+				// test the rendered files
+				fileContent := readFile(composerFileInRootDirectory)
+				assert.False(t, strings.Contains(fileContent, "91.92.93"))
+				assert.True(t, strings.Contains(fileContent, "\"version\": \"0.1.0\""))
+
+				fileContent = readFile(composerFileInSubDirectory)
+				assert.False(t, strings.Contains(fileContent, "91.92.93"))
+				assert.True(t, strings.Contains(fileContent, "\"version\": \"0.1.0\""))
+
+				fileContent = readFile(otherFileInRootDirectory)
+				assert.Equal(t, "Some text file not to be touched by the command", fileContent)
+
+				fileContent = readFile(otherFileInSubDirectory)
+				assert.Equal(t, "Some text file not to be touched by the command", fileContent)
+			}
+
+		})
+	}
+	log.SetLevel(logLevel) // restore the original logging level
+}
+
+func TestMakeRunWithSubstitutionsUsingDartVersionPreset(t *testing.T) {
+	logLevel := log.GetLevel()   // save the previous logging level
+	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
+	for _, command := range cmdtpl.CommandInvocationProxies(cmd.MAKE, gittools.INITIAL_COMMIT()) {
+		t.Run((*command).GetContextName(), func(t *testing.T) {
+			// first create the temporary directory and a subdirectory
+			destinationDir := (*command).Script().GetWorkingDirectory()
+			destinationSubDir := filepath.Join(destinationDir, "sub")
+			err := os.MkdirAll(destinationSubDir, os.ModePerm)
+			assert.NoError(t, err)
+			defer os.RemoveAll(destinationSubDir)
+			defer os.RemoveAll(destinationDir)
+
+			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
+			substitutions, err := ent.NewSubstitutionsWith(
+				&[]*string{utl.PointerToString("dart_version")},
+				&map[string]*ent.Substitution{"dart_version": cnf.DART_VERSION},
+			)
+			assert.NoError(t, err)
+			configurationLayerMock.SetSubstitutions(substitutions)
+			var configurationLayer cnf.ConfigurationLayer
+			configurationLayer = configurationLayerMock
+			(*command).State().GetConfiguration().WithRuntimeConfiguration(&configurationLayer)
+
+			dartFileInRootDirectory := filepath.Join(destinationDir, "pubspec.yaml")
+			dartFileInSubDirectory := filepath.Join(destinationSubDir, "pubspec.yaml")
+			otherFileInRootDirectory := filepath.Join(destinationDir, "other.txt")
+			otherFileInSubDirectory := filepath.Join(destinationSubDir, "other.txt")
+			//files := []string{dartFileInRootDirectory, dartFileInSubDirectory, otherFileInRootDirectory, otherFileInSubDirectory}
+
+			writeFile(dartFileInRootDirectory, "name: newtify\ndescription: >-\n    Blah blah\nversion: 91.92.93\nhomepage: https://example-pet-store.com/newtify\n")
+			writeFile(dartFileInSubDirectory, "name: newtify\ndescription: >-\n    Blah blah\nversion: 91.92.93\nhomepage: https://example-pet-store.com/newtify\n")
+
+			writeFile(otherFileInRootDirectory, "Some text file not to be touched by the command")
+			writeFile(otherFileInSubDirectory, "Some text file not to be touched by the command")
+
+			_, err = (*command).Run()
+			assert.NoError(t, err)
+
+			// when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
+			if (*command).GetContextName() != cmdtpl.STANDALONE_CONTEXT_NAME {
+				// print the files to standard output for inspection purpose
+				//for _, f := range files {
+				//	fmt.Printf("--------------------- " + f + " ---------------------\n")
+				//	fmt.Printf(readFile(f))
+				//	fmt.Println()
+				//	fmt.Printf("-----------------------------------------\n")
+				//}
+
+				// test the rendered files
+				fileContent := readFile(dartFileInRootDirectory)
+				assert.False(t, strings.Contains(fileContent, "91.92.93"))
+				assert.True(t, strings.Contains(fileContent, "version: \"0.1.0\""))
+
+				fileContent = readFile(dartFileInSubDirectory)
+				assert.False(t, strings.Contains(fileContent, "91.92.93"))
+				assert.True(t, strings.Contains(fileContent, "version: \"0.1.0\""))
+
+				fileContent = readFile(otherFileInRootDirectory)
+				assert.Equal(t, "Some text file not to be touched by the command", fileContent)
+
+				fileContent = readFile(otherFileInSubDirectory)
+				assert.Equal(t, "Some text file not to be touched by the command", fileContent)
+			}
+
+		})
+	}
+	log.SetLevel(logLevel) // restore the original logging level
+}
+
+func TestMakeRunWithSubstitutionsUsingElixirVersionPreset(t *testing.T) {
+	logLevel := log.GetLevel()   // save the previous logging level
+	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
+	for _, command := range cmdtpl.CommandInvocationProxies(cmd.MAKE, gittools.INITIAL_COMMIT()) {
+		t.Run((*command).GetContextName(), func(t *testing.T) {
+			// first create the temporary directory and a subdirectory
+			destinationDir := (*command).Script().GetWorkingDirectory()
+			destinationSubDir := filepath.Join(destinationDir, "sub")
+			err := os.MkdirAll(destinationSubDir, os.ModePerm)
+			assert.NoError(t, err)
+			defer os.RemoveAll(destinationSubDir)
+			defer os.RemoveAll(destinationDir)
+
+			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
+			substitutions, err := ent.NewSubstitutionsWith(
+				&[]*string{utl.PointerToString("elixir_version")},
+				&map[string]*ent.Substitution{"elixir_version": cnf.ELIXIR_VERSION},
+			)
+			assert.NoError(t, err)
+			configurationLayerMock.SetSubstitutions(substitutions)
+			var configurationLayer cnf.ConfigurationLayer
+			configurationLayer = configurationLayerMock
+			(*command).State().GetConfiguration().WithRuntimeConfiguration(&configurationLayer)
+
+			elixirFileInRootDirectory := filepath.Join(destinationDir, "mix.exs")
+			elixirFileInSubDirectory := filepath.Join(destinationSubDir, "mix.exs")
+			otherFileInRootDirectory := filepath.Join(destinationDir, "other.txt")
+			otherFileInSubDirectory := filepath.Join(destinationSubDir, "other.txt")
+			//files := []string{elixirFileInRootDirectory, elixirFileInSubDirectory, otherFileInRootDirectory, otherFileInSubDirectory}
+
+			writeFile(elixirFileInRootDirectory, "defmodule KV.MixProject do\n  use Mix.Project\n  def project do\n    [\n      app: :kv,\n      version: \"91.92.93\",\n      elixir: \"~> 1.11\",\n    ]\n  end\n")
+			writeFile(elixirFileInSubDirectory, "defmodule KV.MixProject do\n  use Mix.Project\n  def project do\n    [\n      app: :kv,\n      version   :     \"91.92.93\"   ,\n      elixir: \"~> 1.11\",\n    ]\n  end\n")
+
+			writeFile(otherFileInRootDirectory, "Some text file not to be touched by the command")
+			writeFile(otherFileInSubDirectory, "Some text file not to be touched by the command")
+
+			_, err = (*command).Run()
+			assert.NoError(t, err)
+
+			// when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
+			if (*command).GetContextName() != cmdtpl.STANDALONE_CONTEXT_NAME {
+				// print the files to standard output for inspection purpose
+				//for _, f := range files {
+				//	fmt.Printf("--------------------- " + f + " ---------------------\n")
+				//	fmt.Printf(readFile(f))
+				//	fmt.Println()
+				//	fmt.Printf("-----------------------------------------\n")
+				//}
+
+				// test the rendered files
+				fileContent := readFile(elixirFileInRootDirectory)
+				assert.False(t, strings.Contains(fileContent, "91.92.93"))
+				assert.True(t, strings.Contains(fileContent, "version: \"0.1.0\""))
+
+				fileContent = readFile(elixirFileInSubDirectory)
+				assert.False(t, strings.Contains(fileContent, "91.92.93"))
+				assert.True(t, strings.Contains(fileContent, "version: \"0.1.0\""))
+
+				fileContent = readFile(otherFileInRootDirectory)
+				assert.Equal(t, "Some text file not to be touched by the command", fileContent)
+
+				fileContent = readFile(otherFileInSubDirectory)
+				assert.Equal(t, "Some text file not to be touched by the command", fileContent)
+			}
+
+		})
+	}
+	log.SetLevel(logLevel) // restore the original logging level
+}
+
+func TestMakeRunWithSubstitutionsUsingExpoVersionPreset(t *testing.T) {
+	logLevel := log.GetLevel()   // save the previous logging level
+	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
+	for _, command := range cmdtpl.CommandInvocationProxies(cmd.MAKE, gittools.INITIAL_COMMIT()) {
+		t.Run((*command).GetContextName(), func(t *testing.T) {
+			// first create the temporary directory and a subdirectory
+			destinationDir := (*command).Script().GetWorkingDirectory()
+			destinationSubDir := filepath.Join(destinationDir, "sub")
+			err := os.MkdirAll(destinationSubDir, os.ModePerm)
+			assert.NoError(t, err)
+			defer os.RemoveAll(destinationSubDir)
+			defer os.RemoveAll(destinationDir)
+
+			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
+			substitutions, err := ent.NewSubstitutionsWith(
+				&[]*string{utl.PointerToString("expo_version")},
+				&map[string]*ent.Substitution{"expo_version": cnf.EXPO_VERSION},
+			)
+			assert.NoError(t, err)
+			configurationLayerMock.SetSubstitutions(substitutions)
+			var configurationLayer cnf.ConfigurationLayer
+			configurationLayer = configurationLayerMock
+			(*command).State().GetConfiguration().WithRuntimeConfiguration(&configurationLayer)
+
+			expoFileInRootDirectory := filepath.Join(destinationDir, "app.json")
+			expoFileInSubDirectory := filepath.Join(destinationSubDir, "app.config.json")
+			otherFileInRootDirectory := filepath.Join(destinationDir, "other.txt")
+			otherFileInSubDirectory := filepath.Join(destinationSubDir, "other.txt")
+			//files := []string{expoFileInRootDirectory, expoFileInSubDirectory, otherFileInRootDirectory, otherFileInSubDirectory}
+
+			writeFile(expoFileInRootDirectory, "{\n    \"expo\": {\n        \"name\": \"appname\",\n        \"slug\": \"appslug\",\n        \"version\": \"91.92.93\",\n        \"orientation\": \"portrait\",\n    }\n}\n")
+			writeFile(expoFileInSubDirectory, "{\n    \"expo\": {\n        \"name\": \"appname\",\n        \"slug\": \"appslug\",\n        \"version\"   :     \"91.92.93\",\n        \"orientation\": \"portrait\",\n    }\n}\n")
+
+			writeFile(otherFileInRootDirectory, "Some text file not to be touched by the command")
+			writeFile(otherFileInSubDirectory, "Some text file not to be touched by the command")
+
+			_, err = (*command).Run()
+			assert.NoError(t, err)
+
+			// when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
+			if (*command).GetContextName() != cmdtpl.STANDALONE_CONTEXT_NAME {
+				// print the files to standard output for inspection purpose
+				//for _, f := range files {
+				//	fmt.Printf("--------------------- " + f + " ---------------------\n")
+				//	fmt.Printf(readFile(f))
+				//	fmt.Println()
+				//	fmt.Printf("-----------------------------------------\n")
+				//}
+
+				// test the rendered files
+				fileContent := readFile(expoFileInRootDirectory)
+				assert.False(t, strings.Contains(fileContent, "91.92.93"))
+				assert.True(t, strings.Contains(fileContent, "\"version\": \"0.1.0\""))
+
+				fileContent = readFile(expoFileInRootDirectory)
+				assert.False(t, strings.Contains(fileContent, "91.92.93"))
+				assert.True(t, strings.Contains(fileContent, "\"version\": \"0.1.0\""))
+
+				fileContent = readFile(otherFileInRootDirectory)
+				assert.Equal(t, "Some text file not to be touched by the command", fileContent)
+
+				fileContent = readFile(otherFileInSubDirectory)
+				assert.Equal(t, "Some text file not to be touched by the command", fileContent)
+			}
+
+		})
+	}
+	log.SetLevel(logLevel) // restore the original logging level
+}
+
+func TestMakeRunWithSubstitutionsUsingHelmVersionPreset(t *testing.T) {
+	logLevel := log.GetLevel()   // save the previous logging level
+	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
+	for _, command := range cmdtpl.CommandInvocationProxies(cmd.MAKE, gittools.INITIAL_COMMIT()) {
+		t.Run((*command).GetContextName(), func(t *testing.T) {
+			// first create the temporary directory and a subdirectory
+			destinationDir := (*command).Script().GetWorkingDirectory()
+			destinationSubDir := filepath.Join(destinationDir, "sub")
+			err := os.MkdirAll(destinationSubDir, os.ModePerm)
+			assert.NoError(t, err)
+			defer os.RemoveAll(destinationSubDir)
+			defer os.RemoveAll(destinationDir)
+
+			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
+			substitutions, err := ent.NewSubstitutionsWith(
+				&[]*string{utl.PointerToString("helm_version")},
+				&map[string]*ent.Substitution{"helm_version": cnf.HELM_VERSION},
+			)
+			assert.NoError(t, err)
+			configurationLayerMock.SetSubstitutions(substitutions)
+			var configurationLayer cnf.ConfigurationLayer
+			configurationLayer = configurationLayerMock
+			(*command).State().GetConfiguration().WithRuntimeConfiguration(&configurationLayer)
+
+			helmFileInRootDirectory := filepath.Join(destinationDir, "Chart.yaml")
+			helmFileInSubDirectory := filepath.Join(destinationSubDir, "Chart.yaml")
+			otherFileInRootDirectory := filepath.Join(destinationDir, "other.txt")
+			otherFileInSubDirectory := filepath.Join(destinationSubDir, "other.txt")
+			//files := []string{helmFileInRootDirectory, helmFileInSubDirectory, otherFileInRootDirectory, otherFileInSubDirectory}
+
+			writeFile(helmFileInRootDirectory, "apiVersion: The chart API version\nname: The name of the chart (required)\nversion: \"91.92.93\"\nkubeVersion: A SemVer range of compatible Kubernetes versions (optional)\ndescription: A single-sentence description of this project (optional)\n")
+			writeFile(helmFileInSubDirectory, "apiVersion: The chart API version\nname: The name of the chart (required)\nversion: \"91.92.93\"\nkubeVersion: A SemVer range of compatible Kubernetes versions (optional)\ndescription: A single-sentence description of this project (optional)\n")
+
+			writeFile(otherFileInRootDirectory, "Some text file not to be touched by the command")
+			writeFile(otherFileInSubDirectory, "Some text file not to be touched by the command")
+
+			_, err = (*command).Run()
+			assert.NoError(t, err)
+
+			// when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
+			if (*command).GetContextName() != cmdtpl.STANDALONE_CONTEXT_NAME {
+				// print the files to standard output for inspection purpose
+				//for _, f := range files {
+				//	fmt.Printf("--------------------- " + f + " ---------------------\n")
+				//	fmt.Printf(readFile(f))
+				//	fmt.Println()
+				//	fmt.Printf("-----------------------------------------\n")
+				//}
+
+				// test the rendered files
+				fileContent := readFile(helmFileInRootDirectory)
+				assert.False(t, strings.Contains(fileContent, "91.92.93"))
+				assert.True(t, strings.Contains(fileContent, "version: \"0.1.0\""))
+
+				fileContent = readFile(helmFileInSubDirectory)
+				assert.False(t, strings.Contains(fileContent, "91.92.93"))
+				assert.True(t, strings.Contains(fileContent, "version: \"0.1.0\""))
+
+				fileContent = readFile(otherFileInRootDirectory)
+				assert.Equal(t, "Some text file not to be touched by the command", fileContent)
+
+				fileContent = readFile(otherFileInSubDirectory)
+				assert.Equal(t, "Some text file not to be touched by the command", fileContent)
+			}
+
+		})
+	}
+	log.SetLevel(logLevel) // restore the original logging level
+}
+
+func TestMakeRunWithSubstitutionsUsingNodeVersionPreset(t *testing.T) {
+	logLevel := log.GetLevel()   // save the previous logging level
+	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
+	for _, command := range cmdtpl.CommandInvocationProxies(cmd.MAKE, gittools.INITIAL_COMMIT()) {
+		t.Run((*command).GetContextName(), func(t *testing.T) {
+			// first create the temporary directory and a subdirectory
+			destinationDir := (*command).Script().GetWorkingDirectory()
+			destinationSubDir := filepath.Join(destinationDir, "sub")
+			err := os.MkdirAll(destinationSubDir, os.ModePerm)
+			assert.NoError(t, err)
+			defer os.RemoveAll(destinationSubDir)
+			defer os.RemoveAll(destinationDir)
+
+			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
+			substitutions, err := ent.NewSubstitutionsWith(
+				&[]*string{utl.PointerToString("node_version")},
+				&map[string]*ent.Substitution{"node_version": cnf.NODE_VERSION},
+			)
+			assert.NoError(t, err)
+			configurationLayerMock.SetSubstitutions(substitutions)
+			var configurationLayer cnf.ConfigurationLayer
+			configurationLayer = configurationLayerMock
+			(*command).State().GetConfiguration().WithRuntimeConfiguration(&configurationLayer)
+
+			nodeFileInRootDirectory := filepath.Join(destinationDir, "package.json")
+			nodeFileInSubDirectory := filepath.Join(destinationSubDir, "package.json")
+			otherFileInRootDirectory := filepath.Join(destinationDir, "other.txt")
+			otherFileInSubDirectory := filepath.Join(destinationSubDir, "other.txt")
+			//files := []string{nodeFileInRootDirectory, nodeFileInSubDirectory, otherFileInRootDirectory, otherFileInSubDirectory}
+
+			writeFile(nodeFileInRootDirectory, "{\n    \"name\": \"foo\",\n    \"version\": \"91.92.93\",\n    \"description\": \"A packaged foo fooer for fooing foos\",\n}\n")
+			writeFile(nodeFileInSubDirectory, "{\n    \"name\": \"foo\",\n    \"version\"   :     \"91.92.93\",\n    \"description\": \"A packaged foo fooer for fooing foos\",\n}\n")
+
+			writeFile(otherFileInRootDirectory, "Some text file not to be touched by the command")
+			writeFile(otherFileInSubDirectory, "Some text file not to be touched by the command")
+
+			_, err = (*command).Run()
+			assert.NoError(t, err)
+
+			// when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
+			if (*command).GetContextName() != cmdtpl.STANDALONE_CONTEXT_NAME {
+				// print the files to standard output for inspection purpose
+				//for _, f := range files {
+				//	fmt.Printf("--------------------- " + f + " ---------------------\n")
+				//	fmt.Printf(readFile(f))
+				//	fmt.Println()
+				//	fmt.Printf("-----------------------------------------\n")
+				//}
+
+				// test the rendered files
+				fileContent := readFile(nodeFileInRootDirectory)
+				assert.False(t, strings.Contains(fileContent, "91.92.93"))
+				assert.True(t, strings.Contains(fileContent, "\"version\": \"0.1.0\""))
+
+				fileContent = readFile(nodeFileInSubDirectory)
+				assert.False(t, strings.Contains(fileContent, "91.92.93"))
+				assert.True(t, strings.Contains(fileContent, "\"version\": \"0.1.0\""))
+
+				fileContent = readFile(otherFileInRootDirectory)
+				assert.Equal(t, "Some text file not to be touched by the command", fileContent)
+
+				fileContent = readFile(otherFileInSubDirectory)
+				assert.Equal(t, "Some text file not to be touched by the command", fileContent)
+			}
+
+		})
+	}
+	log.SetLevel(logLevel) // restore the original logging level
+}
+
+func TestMakeRunWithSubstitutionsUsingTextVersionPreset(t *testing.T) {
+	logLevel := log.GetLevel()   // save the previous logging level
+	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
+	for _, command := range cmdtpl.CommandInvocationProxies(cmd.MAKE, gittools.INITIAL_COMMIT()) {
+		t.Run((*command).GetContextName(), func(t *testing.T) {
+			// first create the temporary directory and a subdirectory
+			destinationDir := (*command).Script().GetWorkingDirectory()
+			destinationSubDir := filepath.Join(destinationDir, "sub")
+			err := os.MkdirAll(destinationSubDir, os.ModePerm)
+			assert.NoError(t, err)
+			defer os.RemoveAll(destinationSubDir)
+			defer os.RemoveAll(destinationDir)
+
+			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
+			substitutions, err := ent.NewSubstitutionsWith(
+				&[]*string{utl.PointerToString("text_version")},
+				&map[string]*ent.Substitution{"text_version": cnf.TEXT_VERSION},
+			)
+			assert.NoError(t, err)
+			configurationLayerMock.SetSubstitutions(substitutions)
+			var configurationLayer cnf.ConfigurationLayer
+			configurationLayer = configurationLayerMock
+			(*command).State().GetConfiguration().WithRuntimeConfiguration(&configurationLayer)
+
+			textFileInRootDirectory := filepath.Join(destinationDir, "version.txt")
+			textFileInSubDirectory := filepath.Join(destinationSubDir, "version.txt")
+			otherFileInRootDirectory := filepath.Join(destinationDir, "other.txt")
+			otherFileInSubDirectory := filepath.Join(destinationSubDir, "other.txt")
+			//files := []string{textFileInRootDirectory, textFileInSubDirectory, otherFileInRootDirectory, otherFileInSubDirectory}
+
+			writeFile(textFileInRootDirectory, "91.92.93")
+			writeFile(textFileInSubDirectory, "91.92.93")
+
+			writeFile(otherFileInRootDirectory, "Some text file not to be touched by the command")
+			writeFile(otherFileInSubDirectory, "Some text file not to be touched by the command")
+
+			_, err = (*command).Run()
+			assert.NoError(t, err)
+
+			// when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
+			if (*command).GetContextName() != cmdtpl.STANDALONE_CONTEXT_NAME {
+				// print the files to standard output for inspection purpose
+				//for _, f := range files {
+				//	fmt.Printf("--------------------- " + f + " ---------------------\n")
+				//	fmt.Printf(readFile(f))
+				//	fmt.Println()
+				//	fmt.Printf("-----------------------------------------\n")
+				//}
+
+				// test the rendered files
+				fileContent := readFile(textFileInRootDirectory)
+				assert.Equal(t, "0.1.0", fileContent)
+
+				fileContent = readFile(textFileInSubDirectory)
+				assert.Equal(t, "0.1.0", fileContent)
+
+				fileContent = readFile(otherFileInRootDirectory)
+				assert.Equal(t, "Some text file not to be touched by the command", fileContent)
+
+				fileContent = readFile(otherFileInSubDirectory)
+				assert.Equal(t, "Some text file not to be touched by the command", fileContent)
+			}
+
+		})
+	}
+	log.SetLevel(logLevel) // restore the original logging level
+}

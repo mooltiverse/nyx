@@ -519,6 +519,66 @@ public class EnvironmentConfigurationLayerTests {
     }
 
     @Test
+    @DisplayName("EnvironmentConfigurationLayer.getStateFile()")
+    void getStateFileTest()
+        throws Exception {
+        EnvironmentConfigurationLayerMock environmentConfigurationLayer = EnvironmentConfigurationLayerMock.getInstance();
+        assertNull(environmentConfigurationLayer.getStateFile());
+
+        environmentConfigurationLayer.environment.put("NYX_STATE_FILE", "state.yml");
+        assertEquals("state.yml", environmentConfigurationLayer.getStateFile());
+    }
+
+    @Test
+    @DisplayName("EnvironmentConfigurationLayer.getSubstitutions()")
+    void getSubstitutionsTest()
+        throws Exception {
+        EnvironmentConfigurationLayerMock environmentConfigurationLayer = EnvironmentConfigurationLayerMock.getInstance();
+        assertNotNull(environmentConfigurationLayer.getSubstitutions());
+        assertTrue(environmentConfigurationLayer.getSubstitutions().getEnabled().isEmpty());
+        assertTrue(environmentConfigurationLayer.getSubstitutions().getItems().isEmpty());
+
+        // get a new instance or a stale object is returned by getSubstitutions()
+        environmentConfigurationLayer = EnvironmentConfigurationLayerMock.getInstance();
+        environmentConfigurationLayer.environment.put("NYX_SUBSTITUTIONS_ENABLED", "one,two");
+
+        assertEquals(2, environmentConfigurationLayer.getSubstitutions().getEnabled().size());
+        assertTrue(environmentConfigurationLayer.getSubstitutions().getEnabled().containsAll(List.<String>of("one", "two")));
+        assertEquals(0, environmentConfigurationLayer.getSubstitutions().getItems().size());
+        
+        // get a new instance or a stale object is returned by getSubstitutions()
+        environmentConfigurationLayer = EnvironmentConfigurationLayerMock.getInstance();
+        environmentConfigurationLayer.environment.put("NYX_SUBSTITUTIONS_ENABLED", "one,two");
+        environmentConfigurationLayer.environment.put("NYX_SUBSTITUTIONS_one_FILES", "");
+        environmentConfigurationLayer.environment.put("NYX_SUBSTITUTIONS_two_FILES", "");
+
+        assertEquals(2, environmentConfigurationLayer.getSubstitutions().getEnabled().size());
+        assertTrue(environmentConfigurationLayer.getSubstitutions().getEnabled().containsAll(List.<String>of("one", "two")));
+        assertEquals(2, environmentConfigurationLayer.getSubstitutions().getItems().size());
+        assertNotNull(environmentConfigurationLayer.getSubstitutions().getItems().get("one"));
+        assertNotNull(environmentConfigurationLayer.getSubstitutions().getItems().get("two"));
+
+        // get a new instance or a stale object is returned by getSubstitutions()
+        environmentConfigurationLayer = EnvironmentConfigurationLayerMock.getInstance();
+        environmentConfigurationLayer.environment.put("NYX_SUBSTITUTIONS_ENABLED", "one,two");
+        environmentConfigurationLayer.environment.put("NYX_SUBSTITUTIONS_one_FILES", "*.json");
+        environmentConfigurationLayer.environment.put("NYX_SUBSTITUTIONS_one_MATCH", "version: 1.2.3");
+        environmentConfigurationLayer.environment.put("NYX_SUBSTITUTIONS_two_FILES", "*.toml");
+        environmentConfigurationLayer.environment.put("NYX_SUBSTITUTIONS_two_MATCH", "version = 4.5.6");
+        environmentConfigurationLayer.environment.put("NYX_SUBSTITUTIONS_two_REPLACE", "version = 7.8.9");
+
+        assertEquals(2, environmentConfigurationLayer.getSubstitutions().getEnabled().size());
+        assertTrue(environmentConfigurationLayer.getSubstitutions().getEnabled().containsAll(List.<String>of("one", "two")));
+        assertEquals(2, environmentConfigurationLayer.getSubstitutions().getItems().size());
+        assertEquals("*.json", environmentConfigurationLayer.getSubstitutions().getItems().get("one").getFiles());
+        assertEquals("version: 1.2.3", environmentConfigurationLayer.getSubstitutions().getItems().get("one").getMatch());
+        assertNull(environmentConfigurationLayer.getSubstitutions().getItems().get("one").getReplace());
+        assertEquals("*.toml", environmentConfigurationLayer.getSubstitutions().getItems().get("two").getFiles());
+        assertEquals("version = 4.5.6", environmentConfigurationLayer.getSubstitutions().getItems().get("two").getMatch());
+        assertEquals("version = 7.8.9", environmentConfigurationLayer.getSubstitutions().getItems().get("two").getReplace());
+    }
+
+    @Test
     @DisplayName("EnvironmentConfigurationLayer.getSummary()")
     void getSummaryTest()
         throws Exception {
@@ -538,17 +598,6 @@ public class EnvironmentConfigurationLayerTests {
 
         environmentConfigurationLayer.environment.put("NYX_SUMMARY_FILE", "summary.txt");
         assertEquals("summary.txt", environmentConfigurationLayer.getSummaryFile());
-    }
-
-    @Test
-    @DisplayName("EnvironmentConfigurationLayer.getStateFile()")
-    void getStateFileTest()
-        throws Exception {
-        EnvironmentConfigurationLayerMock environmentConfigurationLayer = EnvironmentConfigurationLayerMock.getInstance();
-        assertNull(environmentConfigurationLayer.getStateFile());
-
-        environmentConfigurationLayer.environment.put("NYX_STATE_FILE", "state.yml");
-        assertEquals("state.yml", environmentConfigurationLayer.getStateFile());
     }
 
     @Test

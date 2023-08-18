@@ -75,6 +75,9 @@ type Configuration struct {
 	// The private instance of the services configuration section.
 	servicesSection *map[string]*ent.ServiceConfiguration
 
+	// The private instance of the substitutions configuration section.
+	substitutionsSection *ent.Substitutions
+
 	// The internal representation of the configuration layers and their priorities.
 	//
 	// Since the priorities are well known the array is statically sized and each layer appears in the array
@@ -225,6 +228,7 @@ func (c *Configuration) resetCache() {
 	c.releaseAssetsSection = nil
 	c.releaseTypesSection = nil
 	c.servicesSection = nil
+	c.substitutionsSection = nil
 }
 
 /*
@@ -417,6 +421,14 @@ func (c *Configuration) Flatten() (*SimpleConfigurationLayer, error) {
 	if err != nil {
 		return nil, &errs.DataAccessError{Message: fmt.Sprintf("unable to resolve configuration option '%s'", "sharedConfigurationFile"), Cause: err}
 	}
+	stateFile, err := c.GetStateFile()
+	if err != nil {
+		return nil, &errs.DataAccessError{Message: fmt.Sprintf("unable to resolve configuration option '%s'", "stateFile"), Cause: err}
+	}
+	substitutions, err := c.GetSubstitutions()
+	if err != nil {
+		return nil, &errs.DataAccessError{Message: fmt.Sprintf("unable to resolve configuration option '%s'", "substitutions"), Cause: err}
+	}
 	summary, err := c.GetSummary()
 	if err != nil {
 		return nil, &errs.DataAccessError{Message: fmt.Sprintf("unable to resolve configuration option '%s'", "summary"), Cause: err}
@@ -424,10 +436,6 @@ func (c *Configuration) Flatten() (*SimpleConfigurationLayer, error) {
 	summaryFile, err := c.GetSummaryFile()
 	if err != nil {
 		return nil, &errs.DataAccessError{Message: fmt.Sprintf("unable to resolve configuration option '%s'", "summaryFile"), Cause: err}
-	}
-	stateFile, err := c.GetStateFile()
-	if err != nil {
-		return nil, &errs.DataAccessError{Message: fmt.Sprintf("unable to resolve configuration option '%s'", "stateFile"), Cause: err}
 	}
 	verbosity, err := c.GetVerbosity()
 	if err != nil {
@@ -456,9 +464,10 @@ func (c *Configuration) Flatten() (*SimpleConfigurationLayer, error) {
 		Scheme:                   scheme,
 		Services:                 services,
 		SharedConfigurationFile:  sharedConfigurationFile,
+		Substitutions:            substitutions,
+		StateFile:                stateFile,
 		Summary:                  summary,
 		SummaryFile:              summaryFile,
-		StateFile:                stateFile,
 		Verbosity:                verbosity,
 		Version:                  version,
 	}, nil
@@ -1166,6 +1175,87 @@ func (c *Configuration) GetSharedConfigurationFile() (*string, error) {
 }
 
 /*
+Returns the path to the file where the Nyx State must be saved as it's defined by this configuration.
+
+Error is:
+- DataAccessError: in case the option cannot be read or accessed.
+- IllegalPropertyError: in case the option has been defined but has incorrect values or it can't be resolved.
+*/
+func (c *Configuration) GetStateFile() (*string, error) {
+	log.Tracef("retrieving the '%s' configuration option", "stateFile")
+	for _, configurationLayer := range c.layers {
+		if configurationLayer != nil {
+			stateFile, err := (*configurationLayer).GetStateFile()
+			if err != nil {
+				return nil, err
+			}
+			if stateFile != nil {
+				log.Tracef("the '%s' configuration option value is: '%s'", "stateFile", *stateFile)
+				return stateFile, nil
+			}
+		}
+	}
+	return GetDefaultLayerInstance().GetStateFile()
+}
+
+/*
+Returns the substitutions configuration section.
+
+Error is:
+- DataAccessError: in case the option cannot be read or accessed.
+- IllegalPropertyError: in case the option has been defined but has incorrect values or it can't be resolved.
+*/
+func (c *Configuration) GetSubstitutions() (*ent.Substitutions, error) {
+	log.Trace("retrieving the substitutions")
+	if c.substitutionsSection == nil {
+		// parse the 'enabled' items list
+		enabled := make([]*string, 0)
+		for _, layer := range c.layers {
+			if layer != nil {
+				substitutions, err := (*layer).GetSubstitutions()
+				if err != nil {
+					return nil, err
+				}
+				if substitutions.GetEnabled() != nil && len(*substitutions.GetEnabled()) > 0 {
+					enabled = *substitutions.GetEnabled()
+					log.Tracef("the '%s.%s' configuration option value is: '%v'", "substitutions", "enabled", enabled)
+					break
+				}
+			}
+		}
+
+		// parse the 'items' map
+		items := make(map[string]*ent.Substitution)
+		for _, enabledItem := range enabled {
+			for _, layer := range c.layers {
+				if layer != nil {
+					substitutions, err := (*layer).GetSubstitutions()
+					if err != nil {
+						return nil, err
+					}
+
+					if substitutions != nil && (*substitutions).GetItems() != nil {
+						item := (*(*substitutions).GetItems())[*enabledItem]
+						if item != nil {
+							items[*enabledItem] = item
+							log.Tracef("the '%s.%s[%s]' configuration option has been resolved", "substitutions", "items", *enabledItem)
+							break
+						}
+					}
+				}
+			}
+		}
+
+		s, err := ent.NewSubstitutionsWith(&enabled, &items)
+		if err != nil {
+			return nil, err
+		}
+		c.substitutionsSection = s
+	}
+	return c.substitutionsSection, nil
+}
+
+/*
 Returns the value of the summary flag as it's defined by this configuration.
 
 Error is:
@@ -1211,30 +1301,6 @@ func (c *Configuration) GetSummaryFile() (*string, error) {
 		}
 	}
 	return GetDefaultLayerInstance().GetSummaryFile()
-}
-
-/*
-Returns the path to the file where the Nyx State must be saved as it's defined by this configuration.
-
-Error is:
-- DataAccessError: in case the option cannot be read or accessed.
-- IllegalPropertyError: in case the option has been defined but has incorrect values or it can't be resolved.
-*/
-func (c *Configuration) GetStateFile() (*string, error) {
-	log.Tracef("retrieving the '%s' configuration option", "stateFile")
-	for _, configurationLayer := range c.layers {
-		if configurationLayer != nil {
-			stateFile, err := (*configurationLayer).GetStateFile()
-			if err != nil {
-				return nil, err
-			}
-			if stateFile != nil {
-				log.Tracef("the '%s' configuration option value is: '%s'", "stateFile", *stateFile)
-				return stateFile, nil
-			}
-		}
-	}
-	return GetDefaultLayerInstance().GetStateFile()
 }
 
 /*

@@ -381,13 +381,46 @@ const (
 	SHARED_CONFIGURATION_FILE_ENVVAR_NAME = ENVVAR_NAME_GLOBAL_PREFIX + "SHARED_CONFIGURATION_FILE"
 
 	// The name of the environment variable to read for this value.
+	STATE_FILE_ENVVAR_NAME = ENVVAR_NAME_GLOBAL_PREFIX + "STATE_FILE"
+
+	// The name of the environment variable to read for this value.
+	SUBSTITUTIONS_ENVVAR_NAME = ENVVAR_NAME_GLOBAL_PREFIX + "SUBSTITUTIONS"
+
+	// The name of the environment variable to read for this value.
+	SUBSTITUTIONS_ENABLED_ENVVAR_NAME = SUBSTITUTIONS_ENVVAR_NAME + "_ENABLED"
+
+	// The regular expression used to scan the name of a substitution from an environment
+	// variable name. This expression is used to detect if an environment variable is used to define
+	// a substitution.
+	// This expression uses the 'name' capturing group which returns the commit substitution name, if detected.
+	SUBSTITUTIONS_ENVVAR_ITEM_NAME_REGEX = SUBSTITUTIONS_ENVVAR_NAME + "_(?<name>[a-zA-Z0-9]+)_([a-zA-Z0-9_]+)$"
+
+	// The parametrized name of the environment variable to read for the 'files' attribute of a
+	// substitution.
+	// This string is a prototype that contains a '%s' parameter for the substitution name
+	// and must be rendered using fmt.Sprintf(SUBSTITUTIONS_ENVVAR_ITEM_FILES_FORMAT_STRING, name)
+	// in order to get the actual name of the environment variable that brings the value for the substitution with the given 'name'.
+	SUBSTITUTIONS_ENVVAR_ITEM_FILES_FORMAT_STRING = SUBSTITUTIONS_ENVVAR_NAME + "_%s_FILES"
+
+	// The parametrized name of the environment variable to read for the 'match' attribute of a
+	// substitution.
+	// This string is a prototype that contains a '%s' parameter for the substitution name
+	// and must be rendered using fmt.Sprintf(SUBSTITUTIONS_ENVVAR_ITEM_MATCH_FORMAT_STRING, name)
+	// in order to get the actual name of the environment variable that brings the value for the substitution with the given 'name'.
+	SUBSTITUTIONS_ENVVAR_ITEM_MATCH_FORMAT_STRING = SUBSTITUTIONS_ENVVAR_NAME + "_%s_MATCH"
+
+	// The parametrized name of the environment variable to read for the 'replace' attribute of a
+	// substitution.
+	// This string is a prototype that contains a '%s' parameter for the substitution name
+	// and must be rendered using fmt.Sprintf(SUBSTITUTIONS_ENVVAR_ITEM_REPLACE_FORMAT_STRING, name)
+	// in order to get the actual name of the environment variable that brings the value for the substitution with the given 'name'.
+	SUBSTITUTIONS_ENVVAR_ITEM_REPLACE_FORMAT_STRING = SUBSTITUTIONS_ENVVAR_NAME + "_%s_REPLACE"
+
+	// The name of the environment variable to read for this value.
 	SUMMARY_ENVVAR_NAME = ENVVAR_NAME_GLOBAL_PREFIX + "SUMMARY"
 
 	// The name of the environment variable to read for this value.
 	SUMMARY_FILE_ENVVAR_NAME = ENVVAR_NAME_GLOBAL_PREFIX + "SUMMARY_FILE"
-
-	// The name of the environment variable to read for this value.
-	STATE_FILE_ENVVAR_NAME = ENVVAR_NAME_GLOBAL_PREFIX + "STATE_FILE"
 
 	// The name of the environment variable to read for this value.
 	VERBOSITY_ENVVAR_NAME = ENVVAR_NAME_GLOBAL_PREFIX + "VERBOSITY"
@@ -433,6 +466,9 @@ type EnvironmentConfigurationLayer struct {
 
 	// The services configuration section
 	services *map[string]*ent.ServiceConfiguration
+
+	// The substitutions configuration section.
+	substitutions *ent.Substitutions
 }
 
 /*
@@ -1177,6 +1213,54 @@ func (ecl *EnvironmentConfigurationLayer) GetSharedConfigurationFile() (*string,
 }
 
 /*
+Returns the path to the file where the Nyx State must be saved as it's defined by this configuration. A nil value means undefined.
+
+Error is:
+- DataAccessError: in case the option cannot be read or accessed.
+- IllegalPropertyError: in case the option has been defined but has incorrect values or it can't be resolved.
+*/
+func (ecl *EnvironmentConfigurationLayer) GetStateFile() (*string, error) {
+	return ecl.getEnvVar(STATE_FILE_ENVVAR_NAME), nil
+}
+
+/*
+Returns the substitutions configuration section.
+
+Error is:
+- DataAccessError: in case the option cannot be read or accessed.
+- IllegalPropertyError: in case the option has been defined but has incorrect values or it can't be resolved.
+*/
+func (ecl *EnvironmentConfigurationLayer) GetSubstitutions() (*ent.Substitutions, error) {
+	if ecl.substitutions == nil {
+		// parse the 'enabled' items list
+		enabled := ecl.getItemNamesListFromEnvironmentVariable("substitutions", "enabled", SUBSTITUTIONS_ENABLED_ENVVAR_NAME)
+
+		// parse the 'items' map
+		items := make(map[string]*ent.Substitution)
+
+		itemNames, err := ecl.scanItemNamesInEnvironmentVariables("substitutions", SUBSTITUTIONS_ENVVAR_ITEM_NAME_REGEX, nil)
+		if err != nil {
+			return nil, err
+		}
+		// now we have the set of all item names configured through environment variables and we can
+		// query specific environment variables
+		for _, itemName := range itemNames {
+			files := ecl.getEnvVar(fmt.Sprintf(SUBSTITUTIONS_ENVVAR_ITEM_FILES_FORMAT_STRING, itemName))
+			match := ecl.getEnvVar(fmt.Sprintf(SUBSTITUTIONS_ENVVAR_ITEM_MATCH_FORMAT_STRING, itemName))
+			replace := ecl.getEnvVar(fmt.Sprintf(SUBSTITUTIONS_ENVVAR_ITEM_REPLACE_FORMAT_STRING, itemName))
+
+			items[itemName] = ent.NewSubstitutionWith(files, match, replace)
+		}
+		enabledPointers := ecl.toSliceOfStringPointers(enabled)
+		ecl.substitutions, err = ent.NewSubstitutionsWith(&enabledPointers, &items)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return ecl.substitutions, nil
+}
+
+/*
 Returns the value of the summary flag as it's defined by this configuration. A nil value means undefined.
 
 Error is:
@@ -1201,17 +1285,6 @@ Error is:
 */
 func (ecl *EnvironmentConfigurationLayer) GetSummaryFile() (*string, error) {
 	return ecl.getEnvVar(SUMMARY_FILE_ENVVAR_NAME), nil
-}
-
-/*
-Returns the path to the file where the Nyx State must be saved as it's defined by this configuration. A nil value means undefined.
-
-Error is:
-- DataAccessError: in case the option cannot be read or accessed.
-- IllegalPropertyError: in case the option has been defined but has incorrect values or it can't be resolved.
-*/
-func (ecl *EnvironmentConfigurationLayer) GetStateFile() (*string, error) {
-	return ecl.getEnvVar(STATE_FILE_ENVVAR_NAME), nil
 }
 
 /*

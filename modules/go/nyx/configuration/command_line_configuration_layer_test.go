@@ -22,9 +22,8 @@
 package configuration
 
 import (
-	"io/ioutil" // https://pkg.go.dev/io/ioutil
-	"os"        // https://pkg.go.dev/os
-	"testing"   // https://pkg.go.dev/testing
+	"os"      // https://pkg.go.dev/os
+	"testing" // https://pkg.go.dev/testing
 
 	assert "github.com/stretchr/testify/assert" // https://pkg.go.dev/github.com/stretchr/testify/assert
 
@@ -251,9 +250,9 @@ func TestCommandLineConfigurationLayerGetDirectory(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Nil(t, directory)
 
-	dir1, err := ioutil.TempDir("", "1")
+	dir1, err := os.MkdirTemp("", "1")
 	assert.NoError(t, err)
-	dir2, err := ioutil.TempDir("", "2")
+	dir2, err := os.MkdirTemp("", "2")
 	assert.NoError(t, err)
 
 	// Test the extended version
@@ -808,6 +807,82 @@ func TestCommandLineConfigurationLayerGetStateFile(t *testing.T) {
 	stateFile, err = commandLineConfigurationLayer.GetStateFile()
 	assert.NoError(t, err)
 	assert.Equal(t, "state.yml", *stateFile)
+}
+
+func TestCommandLineConfigurationLayerGetSubstitutions(t *testing.T) {
+	commandLineConfigurationLayer := CommandLineConfigurationLayer{}
+
+	substitutions, err := commandLineConfigurationLayer.GetSubstitutions()
+	assert.NoError(t, err)
+	assert.NotNil(t, substitutions)
+	assert.Equal(t, 0, len(*substitutions.GetEnabled()))
+	assert.Equal(t, 0, len(*substitutions.GetItems()))
+
+	// get a new instance or a stale set of arguments is still in the configuration layer
+	commandLineConfigurationLayer = CommandLineConfigurationLayer{}
+	commandLineConfigurationLayer.withArguments([]string{
+		"--substitutions-enabled=one,two",
+	})
+
+	substitutions, err = commandLineConfigurationLayer.GetSubstitutions()
+	assert.NoError(t, err)
+	assert.NotNil(t, substitutions)
+
+	enabled := *substitutions.GetEnabled()
+	items := *substitutions.GetItems()
+	assert.Equal(t, 2, len(enabled))
+	assert.Equal(t, *enabled[0], "one")
+	assert.Equal(t, *enabled[1], "two")
+	assert.Equal(t, 0, len(items))
+
+	// get a new instance or a stale set of arguments is still in the configuration layer
+	commandLineConfigurationLayer = CommandLineConfigurationLayer{}
+	commandLineConfigurationLayer.withArguments([]string{
+		"--substitutions-enabled=one,two",
+		"--substitutions-one-expression=",
+		"--substitutions-two-expression=",
+	})
+
+	substitutions, err = commandLineConfigurationLayer.GetSubstitutions()
+	assert.NoError(t, err)
+	assert.NotNil(t, substitutions)
+
+	enabled = *substitutions.GetEnabled()
+	items = *substitutions.GetItems()
+	assert.Equal(t, 2, len(enabled))
+	assert.Equal(t, *enabled[0], "one")
+	assert.Equal(t, *enabled[1], "two")
+	assert.Equal(t, 2, len(*substitutions.GetItems()))
+	assert.NotNil(t, *items["one"])
+	assert.NotNil(t, *items["two"])
+
+	// get a new instance or a stale set of arguments is still in the configuration layer
+	commandLineConfigurationLayer = CommandLineConfigurationLayer{}
+	commandLineConfigurationLayer.withArguments([]string{
+		"--substitutions-enabled=one,two",
+		"--substitutions-one-files=*.json",
+		"--substitutions-one-match=version: 1.2.3",
+		"--substitutions-two-files=*.toml",
+		"--substitutions-two-match=version: 4.5.6",
+		"--substitutions-two-replace=version: 7.8.9",
+	})
+
+	substitutions, err = commandLineConfigurationLayer.GetSubstitutions()
+	assert.NoError(t, err)
+	assert.NotNil(t, substitutions)
+
+	enabled = *substitutions.GetEnabled()
+	items = *substitutions.GetItems()
+	assert.Equal(t, 2, len(enabled))
+	assert.Equal(t, *enabled[0], "one")
+	assert.Equal(t, *enabled[1], "two")
+	assert.Equal(t, 2, len(items))
+	assert.Equal(t, "*.json", *items["one"].GetFiles())
+	assert.Equal(t, "version: 1.2.3", *items["one"].GetMatch())
+	assert.Nil(t, items["one"].GetReplace())
+	assert.Equal(t, "*.toml", *items["two"].GetFiles())
+	assert.Equal(t, "version: 4.5.6", *items["two"].GetMatch())
+	assert.Equal(t, "version: 7.8.9", *items["two"].GetReplace())
 }
 
 func TestCommandLineConfigurationLayerGetVerbosity(t *testing.T) {

@@ -390,6 +390,30 @@ func TestSaveAndLoadJSON(t *testing.T) {
 			}
 		}
 	}
+
+	sSubstitutions, _ := source.GetSubstitutions()
+	tSubstitutions, _ := target.GetSubstitutions()
+
+	if sSubstitutions == nil {
+		assert.Equal(t, ent.SUBSTITUTIONS, tSubstitutions)
+	} else {
+		if sSubstitutions.GetEnabled() == nil {
+			assert.Nil(t, tSubstitutions.GetEnabled())
+		} else {
+			for sSubstitutionsEnabled, _ := range *sSubstitutions.GetEnabled() {
+				assert.NotNil(t, (*tSubstitutions.GetEnabled())[sSubstitutionsEnabled])
+				assert.Equal(t, (*sSubstitutions.GetEnabled())[sSubstitutionsEnabled], (*tSubstitutions.GetEnabled())[sSubstitutionsEnabled])
+			}
+			for sSubstitutionsItemKey, _ := range *sSubstitutions.GetItems() {
+				assert.NotNil(t, (*(*tSubstitutions.GetItems())[sSubstitutionsItemKey]).GetFiles())
+				assert.Equal(t, (*(*sSubstitutions.GetItems())[sSubstitutionsItemKey].GetFiles()), (*(*tSubstitutions.GetItems())[sSubstitutionsItemKey].GetFiles()))
+				assert.NotNil(t, (*(*tSubstitutions.GetItems())[sSubstitutionsItemKey]).GetMatch())
+				assert.Equal(t, (*(*sSubstitutions.GetItems())[sSubstitutionsItemKey].GetMatch()), (*(*tSubstitutions.GetItems())[sSubstitutionsItemKey].GetMatch()))
+				assert.NotNil(t, (*(*tSubstitutions.GetItems())[sSubstitutionsItemKey]).GetReplace())
+				assert.Equal(t, (*(*sSubstitutions.GetItems())[sSubstitutionsItemKey].GetReplace()), (*(*tSubstitutions.GetItems())[sSubstitutionsItemKey].GetReplace()))
+			}
+		}
+	}
 }
 
 func TestSaveAndLoadYAML(t *testing.T) {
@@ -744,6 +768,30 @@ func TestSaveAndLoadYAML(t *testing.T) {
 			}
 		}
 	}
+
+	sSubstitutions, _ := source.GetSubstitutions()
+	tSubstitutions, _ := target.GetSubstitutions()
+
+	if sSubstitutions == nil {
+		assert.Equal(t, ent.SUBSTITUTIONS, tSubstitutions)
+	} else {
+		if sSubstitutions.GetEnabled() == nil {
+			assert.Nil(t, tSubstitutions.GetEnabled())
+		} else {
+			for sSubstitutionsEnabled, _ := range *sSubstitutions.GetEnabled() {
+				assert.NotNil(t, (*tSubstitutions.GetEnabled())[sSubstitutionsEnabled])
+				assert.Equal(t, (*sSubstitutions.GetEnabled())[sSubstitutionsEnabled], (*tSubstitutions.GetEnabled())[sSubstitutionsEnabled])
+			}
+			for sSubstitutionsItemKey, _ := range *sSubstitutions.GetItems() {
+				assert.NotNil(t, (*(*tSubstitutions.GetItems())[sSubstitutionsItemKey]).GetFiles())
+				assert.Equal(t, (*(*sSubstitutions.GetItems())[sSubstitutionsItemKey].GetFiles()), (*(*tSubstitutions.GetItems())[sSubstitutionsItemKey].GetFiles()))
+				assert.NotNil(t, (*(*tSubstitutions.GetItems())[sSubstitutionsItemKey]).GetMatch())
+				assert.Equal(t, (*(*sSubstitutions.GetItems())[sSubstitutionsItemKey].GetMatch()), (*(*tSubstitutions.GetItems())[sSubstitutionsItemKey].GetMatch()))
+				assert.NotNil(t, (*(*tSubstitutions.GetItems())[sSubstitutionsItemKey]).GetReplace())
+				assert.Equal(t, (*(*sSubstitutions.GetItems())[sSubstitutionsItemKey].GetReplace()), (*(*tSubstitutions.GetItems())[sSubstitutionsItemKey].GetReplace()))
+			}
+		}
+	}
 }
 
 /*
@@ -838,6 +886,17 @@ func TestSerializationWithMultipleConfigurationLayersJSON(t *testing.T) {
 	mediumPriorityConfigurationLayerMock.SetSharedConfigurationFile(utl.PointerToString(os.Getenv(SIMPLEST_JSON_EXAMPLE_CONFIGURATION_FILE_ENVIRONMENT_VARIABLE)))
 	highPriorityConfigurationLayerMock.SetSharedConfigurationFile(utl.PointerToString(os.Getenv(SIMPLEST_YAML_EXAMPLE_CONFIGURATION_FILE_ENVIRONMENT_VARIABLE)))
 
+	lowPriorityConfigurationLayerMock.SetStateFile(utl.PointerToString("file.yaml"))
+	mediumPriorityConfigurationLayerMock.SetStateFile(utl.PointerToString("file.yaml"))
+	highPriorityConfigurationLayerMock.SetStateFile(utl.PointerToString("file.json"))
+
+	lpSubstitutions, _ := ent.NewSubstitutionsWith(&[]*string{utl.PointerToString("substitution1")}, &map[string]*ent.Substitution{"substitution1": ent.NewSubstitutionWith(utl.PointerToString("glob1"), utl.PointerToString("match1"), utl.PointerToString("replace1"))})
+	lowPriorityConfigurationLayerMock.SetSubstitutions(lpSubstitutions)
+	mpSubstitutions, _ := ent.NewSubstitutionsWith(&[]*string{utl.PointerToString("substitution2")}, &map[string]*ent.Substitution{"substitution2": ent.NewSubstitutionWith(utl.PointerToString("glob2"), utl.PointerToString("match2"), utl.PointerToString("replace2"))})
+	mediumPriorityConfigurationLayerMock.SetSubstitutions(mpSubstitutions)
+	hpSubstitutions, _ := ent.NewSubstitutionsWith(&[]*string{utl.PointerToString("substitution3")}, &map[string]*ent.Substitution{"substitution3": ent.NewSubstitutionWith(utl.PointerToString("glob3"), utl.PointerToString("match3"), utl.PointerToString("replace3"))})
+	highPriorityConfigurationLayerMock.SetSubstitutions(hpSubstitutions)
+
 	lowPriorityConfigurationLayerMock.SetSummary(utl.PointerToBoolean(true))
 	mediumPriorityConfigurationLayerMock.SetSummary(utl.PointerToBoolean(true))
 	highPriorityConfigurationLayerMock.SetSummary(utl.PointerToBoolean(false))
@@ -845,10 +904,6 @@ func TestSerializationWithMultipleConfigurationLayersJSON(t *testing.T) {
 	lowPriorityConfigurationLayerMock.SetSummaryFile(utl.PointerToString("summary.low"))
 	mediumPriorityConfigurationLayerMock.SetSummaryFile(utl.PointerToString("summary.medium"))
 	highPriorityConfigurationLayerMock.SetSummaryFile(utl.PointerToString("summary.high"))
-
-	lowPriorityConfigurationLayerMock.SetStateFile(utl.PointerToString("file.yaml"))
-	mediumPriorityConfigurationLayerMock.SetStateFile(utl.PointerToString("file.yaml"))
-	highPriorityConfigurationLayerMock.SetStateFile(utl.PointerToString("file.json"))
 
 	lowPriorityConfigurationLayerMock.SetVerbosity(ent.PointerToVerbosity(ent.TRACE))
 	mediumPriorityConfigurationLayerMock.SetVerbosity(ent.PointerToVerbosity(ent.INFO))
@@ -993,6 +1048,16 @@ func TestSerializationWithMultipleConfigurationLayersJSON(t *testing.T) {
 	sharedConfigurationFile, _ := deserializedConfigurationLayer.GetSharedConfigurationFile()
 	assert.Equal(t, *hpSharedConfigurationFile, *sharedConfigurationFile)
 
+	hpStateFile, _ := highPriorityConfigurationLayerMock.GetStateFile()
+	stateFile, _ := deserializedConfigurationLayer.GetStateFile()
+	assert.Equal(t, *hpStateFile, *stateFile)
+
+	substitutions, _ := deserializedConfigurationLayer.GetSubstitutions()
+	assert.Equal(t, *(*hpSubstitutions.GetEnabled())[0], *(*substitutions.GetEnabled())[0])
+	assert.Equal(t, *(*hpSubstitutions.GetItems())["substitution3"].GetFiles(), *(*substitutions.GetItems())["substitution3"].GetFiles())
+	assert.Equal(t, *(*hpSubstitutions.GetItems())["substitution3"].GetMatch(), *(*substitutions.GetItems())["substitution3"].GetMatch())
+	assert.Equal(t, *(*hpSubstitutions.GetItems())["substitution3"].GetReplace(), *(*substitutions.GetItems())["substitution3"].GetReplace())
+
 	hpSummary, _ := highPriorityConfigurationLayerMock.GetSummary()
 	summary, _ := deserializedConfigurationLayer.GetSummary()
 	assert.Equal(t, *hpSummary, *summary)
@@ -1000,10 +1065,6 @@ func TestSerializationWithMultipleConfigurationLayersJSON(t *testing.T) {
 	hpSummaryFile, _ := highPriorityConfigurationLayerMock.GetSummaryFile()
 	summaryFile, _ := deserializedConfigurationLayer.GetSummaryFile()
 	assert.Equal(t, *hpSummaryFile, *summaryFile)
-
-	hpStateFile, _ := highPriorityConfigurationLayerMock.GetStateFile()
-	stateFile, _ := deserializedConfigurationLayer.GetStateFile()
-	assert.Equal(t, *hpStateFile, *stateFile)
 
 	hpVerbosity, _ := highPriorityConfigurationLayerMock.GetVerbosity()
 	verbosity, _ := deserializedConfigurationLayer.GetVerbosity()
@@ -1106,6 +1167,17 @@ func TestSerializationWithMultipleConfigurationLayersYAML(t *testing.T) {
 	mediumPriorityConfigurationLayerMock.SetSharedConfigurationFile(utl.PointerToString(os.Getenv(SIMPLEST_YAML_EXAMPLE_CONFIGURATION_FILE_ENVIRONMENT_VARIABLE)))
 	highPriorityConfigurationLayerMock.SetSharedConfigurationFile(utl.PointerToString(os.Getenv(SIMPLEST_JSON_EXAMPLE_CONFIGURATION_FILE_ENVIRONMENT_VARIABLE)))
 
+	lowPriorityConfigurationLayerMock.SetStateFile(utl.PointerToString("file.json"))
+	mediumPriorityConfigurationLayerMock.SetStateFile(utl.PointerToString("file.json"))
+	highPriorityConfigurationLayerMock.SetStateFile(utl.PointerToString("file.yaml"))
+
+	lpSubstitutions, _ := ent.NewSubstitutionsWith(&[]*string{utl.PointerToString("substitution1")}, &map[string]*ent.Substitution{"substitution1": ent.NewSubstitutionWith(utl.PointerToString("glob1"), utl.PointerToString("match1"), utl.PointerToString("replace1"))})
+	lowPriorityConfigurationLayerMock.SetSubstitutions(lpSubstitutions)
+	mpSubstitutions, _ := ent.NewSubstitutionsWith(&[]*string{utl.PointerToString("substitution2")}, &map[string]*ent.Substitution{"substitution2": ent.NewSubstitutionWith(utl.PointerToString("glob2"), utl.PointerToString("match2"), utl.PointerToString("replace2"))})
+	mediumPriorityConfigurationLayerMock.SetSubstitutions(mpSubstitutions)
+	hpSubstitutions, _ := ent.NewSubstitutionsWith(&[]*string{utl.PointerToString("substitution3")}, &map[string]*ent.Substitution{"substitution3": ent.NewSubstitutionWith(utl.PointerToString("glob3"), utl.PointerToString("match3"), utl.PointerToString("replace3"))})
+	highPriorityConfigurationLayerMock.SetSubstitutions(hpSubstitutions)
+
 	lowPriorityConfigurationLayerMock.SetSummary(utl.PointerToBoolean(true))
 	mediumPriorityConfigurationLayerMock.SetSummary(utl.PointerToBoolean(true))
 	highPriorityConfigurationLayerMock.SetSummary(utl.PointerToBoolean(false))
@@ -1113,10 +1185,6 @@ func TestSerializationWithMultipleConfigurationLayersYAML(t *testing.T) {
 	lowPriorityConfigurationLayerMock.SetSummaryFile(utl.PointerToString("summary.low"))
 	mediumPriorityConfigurationLayerMock.SetSummaryFile(utl.PointerToString("summary.medium"))
 	highPriorityConfigurationLayerMock.SetSummaryFile(utl.PointerToString("summary.high"))
-
-	lowPriorityConfigurationLayerMock.SetStateFile(utl.PointerToString("file.json"))
-	mediumPriorityConfigurationLayerMock.SetStateFile(utl.PointerToString("file.json"))
-	highPriorityConfigurationLayerMock.SetStateFile(utl.PointerToString("file.yaml"))
 
 	lowPriorityConfigurationLayerMock.SetVerbosity(ent.PointerToVerbosity(ent.TRACE))
 	mediumPriorityConfigurationLayerMock.SetVerbosity(ent.PointerToVerbosity(ent.INFO))
@@ -1261,6 +1329,16 @@ func TestSerializationWithMultipleConfigurationLayersYAML(t *testing.T) {
 	sharedConfigurationFile, _ := deserializedConfigurationLayer.GetSharedConfigurationFile()
 	assert.Equal(t, *hpSharedConfigurationFile, *sharedConfigurationFile)
 
+	hpStateFile, _ := highPriorityConfigurationLayerMock.GetStateFile()
+	stateFile, _ := deserializedConfigurationLayer.GetStateFile()
+	assert.Equal(t, *hpStateFile, *stateFile)
+
+	substitutions, _ := deserializedConfigurationLayer.GetSubstitutions()
+	assert.Equal(t, *(*hpSubstitutions.GetEnabled())[0], *(*substitutions.GetEnabled())[0])
+	assert.Equal(t, *(*hpSubstitutions.GetItems())["substitution3"].GetFiles(), *(*substitutions.GetItems())["substitution3"].GetFiles())
+	assert.Equal(t, *(*hpSubstitutions.GetItems())["substitution3"].GetMatch(), *(*substitutions.GetItems())["substitution3"].GetMatch())
+	assert.Equal(t, *(*hpSubstitutions.GetItems())["substitution3"].GetReplace(), *(*substitutions.GetItems())["substitution3"].GetReplace())
+
 	hpSummary, _ := highPriorityConfigurationLayerMock.GetSummary()
 	summary, _ := deserializedConfigurationLayer.GetSummary()
 	assert.Equal(t, *hpSummary, *summary)
@@ -1268,10 +1346,6 @@ func TestSerializationWithMultipleConfigurationLayersYAML(t *testing.T) {
 	hpSummaryFile, _ := highPriorityConfigurationLayerMock.GetSummaryFile()
 	summaryFile, _ := deserializedConfigurationLayer.GetSummaryFile()
 	assert.Equal(t, *hpSummaryFile, *summaryFile)
-
-	hpStateFile, _ := highPriorityConfigurationLayerMock.GetStateFile()
-	stateFile, _ := deserializedConfigurationLayer.GetStateFile()
-	assert.Equal(t, *hpStateFile, *stateFile)
 
 	hpVerbosity, _ := highPriorityConfigurationLayerMock.GetVerbosity()
 	verbosity, _ := deserializedConfigurationLayer.GetVerbosity()

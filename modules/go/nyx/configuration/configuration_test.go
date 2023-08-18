@@ -231,6 +231,28 @@ func TestConfigurationDefaultsGetSharedConfigurationFile(t *testing.T) {
 	}
 }
 
+func TestConfigurationDefaultsGetStateFile(t *testing.T) {
+	configuration, _ := NewConfiguration()
+	stateFile, _ := configuration.GetStateFile()
+	if stateFile == nil {
+		assert.Nil(t, stateFile)
+	} else {
+		assert.Equal(t, *ent.STATE_FILE, *stateFile)
+	}
+}
+
+func TestConfigurationDefaultsGetSubstitutions(t *testing.T) {
+	configuration, _ := NewConfiguration()
+	substitutions, _ := configuration.GetSubstitutions()
+	if substitutions == nil {
+		assert.Nil(t, substitutions)
+	} else {
+		assert.Equal(t, *ent.SUBSTITUTIONS, *substitutions)
+		assert.Equal(t, (*ent.SUBSTITUTIONS).GetEnabled(), (*substitutions).GetEnabled())
+		assert.Equal(t, 0, len(*substitutions.GetItems()))
+	}
+}
+
 func TestConfigurationDefaultsGetSummary(t *testing.T) {
 	configuration, _ := NewConfiguration()
 	summary, _ := configuration.GetSummary()
@@ -248,16 +270,6 @@ func TestConfigurationDefaultsGetSummaryFile(t *testing.T) {
 		assert.Nil(t, summaryFile)
 	} else {
 		assert.Equal(t, *ent.SUMMARY_FILE, *summaryFile)
-	}
-}
-
-func TestConfigurationDefaultsGetStateFile(t *testing.T) {
-	configuration, _ := NewConfiguration()
-	stateFile, _ := configuration.GetStateFile()
-	if stateFile == nil {
-		assert.Nil(t, stateFile)
-	} else {
-		assert.Equal(t, *ent.STATE_FILE, *stateFile)
 	}
 }
 
@@ -956,6 +968,77 @@ func TestConfigurationWithCommandLineConfigurationGetSharedConfigurationFile(t *
 	assert.Nil(t, sharedConfigurationFile2)
 }
 
+func TestConfigurationWithCommandLineConfigurationGetStateFile(t *testing.T) {
+	configurationLayerMock := NewCommandLineConfigurationLayer()
+	configuration, _ := NewConfiguration()
+	configurationLayerMock.withArguments([]string{
+		"--state-file=state-file.yml",
+	})
+
+	// in order to make the test meaningful, make sure the default and mock values are different
+	assert.Nil(t, ent.STATE_FILE)
+	stateFile1, _ := configurationLayerMock.GetStateFile()
+	assert.Equal(t, "state-file.yml", *stateFile1)
+
+	// make sure the initial values come from defaults, until we inject the command line configuration
+	assert.Nil(t, ent.STATE_FILE)
+	stateFile2, _ := configuration.GetStateFile()
+	assert.Nil(t, stateFile2)
+
+	// inject the command line configuration and test the new value is returned from that
+	var cl ConfigurationLayer = configurationLayerMock
+	configuration.WithCommandLineConfiguration(&cl)
+
+	stateFile2, _ = configuration.GetStateFile()
+	assert.Equal(t, *stateFile1, *stateFile2)
+
+	// now remove the command line configuration and test that now default values are returned again
+	configuration, _ = configuration.WithCommandLineConfiguration(nil)
+	stateFile2, _ = configuration.GetStateFile()
+	assert.Nil(t, stateFile2)
+}
+
+func TestConfigurationWithCommandLineConfigurationGetSubstitutions(t *testing.T) {
+	configurationLayerMock := NewCommandLineConfigurationLayer()
+	configuration, _ := NewConfiguration()
+	configurationLayerMock.withArguments([]string{
+		"--substitutions-enabled=substitution1",
+		"--substitutions-substitution1-files=glob1",
+	})
+
+	// in order to make the test meaningful, make sure the default and mock values are different
+	assert.NotNil(t, *ent.SUBSTITUTIONS)
+	substitutions1, _ := configurationLayerMock.GetSubstitutions()
+	assert.NotNil(t, substitutions1)
+	substitutions2, _ := configuration.GetSubstitutions()
+	assert.NotNil(t, substitutions2)
+	assert.NotEqual(t, substitutions1, substitutions2)
+
+	// make sure the initial values come from defaults, until we inject the command line configuration
+	assert.Equal(t, 0, len(*(*ent.SUBSTITUTIONS).GetEnabled()))
+	assert.Equal(t, 0, len(*(*substitutions2).GetEnabled()))
+	assert.Equal(t, 0, len(*(*ent.SUBSTITUTIONS).GetItems()))
+	assert.Equal(t, 0, len(*(*substitutions2).GetItems()))
+
+	// inject the command line configuration and test the new value is returned from that
+	var cl ConfigurationLayer = configurationLayerMock
+	configuration.WithCommandLineConfiguration(&cl)
+
+	substitutions2, _ = configuration.GetSubstitutions()
+	assert.NotNil(t, (*substitutions2).GetEnabled())
+	assert.NotNil(t, (*substitutions2).GetItems())
+	assert.Equal(t, 1, len(*(*substitutions2).GetEnabled()))
+	assert.Equal(t, "substitution1", *(*(*substitutions2).GetEnabled())[0])
+	assert.Equal(t, 1, len(*(*substitutions2).GetItems()))
+	assert.Equal(t, "glob1", *(*(*(*substitutions2).GetItems())["substitution1"]).GetFiles())
+
+	// now remove the command line configuration and test that now default values are returned again
+	configuration.WithCommandLineConfiguration(nil)
+	substitutions2, _ = configuration.GetSubstitutions()
+	assert.Equal(t, 0, len(*(*substitutions2).GetEnabled()))
+	assert.Equal(t, 0, len(*(*substitutions2).GetItems()))
+}
+
 func TestConfigurationWithCommandLineConfigurationGetSummary(t *testing.T) {
 	configurationLayerMock := NewCommandLineConfigurationLayer()
 	configuration, _ := NewConfiguration()
@@ -1014,36 +1097,6 @@ func TestConfigurationWithCommandLineConfigurationGetSummaryFile(t *testing.T) {
 	configuration, _ = configuration.WithCommandLineConfiguration(nil)
 	summaryFile2, _ = configuration.GetSummaryFile()
 	assert.Nil(t, summaryFile2)
-}
-
-func TestConfigurationWithCommandLineConfigurationGetStateFile(t *testing.T) {
-	configurationLayerMock := NewCommandLineConfigurationLayer()
-	configuration, _ := NewConfiguration()
-	configurationLayerMock.withArguments([]string{
-		"--state-file=state-file.yml",
-	})
-
-	// in order to make the test meaningful, make sure the default and mock values are different
-	assert.Nil(t, ent.STATE_FILE)
-	stateFile1, _ := configurationLayerMock.GetStateFile()
-	assert.Equal(t, "state-file.yml", *stateFile1)
-
-	// make sure the initial values come from defaults, until we inject the command line configuration
-	assert.Nil(t, ent.STATE_FILE)
-	stateFile2, _ := configuration.GetStateFile()
-	assert.Nil(t, stateFile2)
-
-	// inject the command line configuration and test the new value is returned from that
-	var cl ConfigurationLayer = configurationLayerMock
-	configuration.WithCommandLineConfiguration(&cl)
-
-	stateFile2, _ = configuration.GetStateFile()
-	assert.Equal(t, *stateFile1, *stateFile2)
-
-	// now remove the command line configuration and test that now default values are returned again
-	configuration, _ = configuration.WithCommandLineConfiguration(nil)
-	stateFile2, _ = configuration.GetStateFile()
-	assert.Nil(t, stateFile2)
 }
 
 func TestConfigurationWithCommandLineConfigurationGetVerbosity(t *testing.T) {
@@ -1709,6 +1762,73 @@ func TestConfigurationWithPluginConfigurationGetSharedConfigurationFile(t *testi
 	assert.Nil(t, sharedConfigurationFile2)
 }
 
+func TestConfigurationWithPluginConfigurationGetStateFile(t *testing.T) {
+	configurationLayerMock := NewSimpleConfigurationLayer()
+	configuration, _ := NewConfiguration()
+	configurationLayerMock.SetStateFile(utl.PointerToString("state-file.yml"))
+
+	// in order to make the test meaningful, make sure the default and mock values are different
+	assert.Nil(t, ent.STATE_FILE)
+	stateFile1, _ := configurationLayerMock.GetStateFile()
+	assert.Equal(t, "state-file.yml", *stateFile1)
+
+	// make sure the initial values come from defaults, until we inject the command line configuration
+	assert.Nil(t, ent.STATE_FILE)
+	stateFile2, _ := configuration.GetStateFile()
+	assert.Nil(t, stateFile2)
+
+	// inject the command line configuration and test the new value is returned from that
+	var cl ConfigurationLayer = configurationLayerMock
+	configuration.WithPluginConfiguration(&cl)
+
+	stateFile2, _ = configuration.GetStateFile()
+	assert.Equal(t, *stateFile1, *stateFile2)
+
+	// now remove the command line configuration and test that now default values are returned again
+	configuration, _ = configuration.WithPluginConfiguration(nil)
+	stateFile2, _ = configuration.GetStateFile()
+	assert.Nil(t, stateFile2)
+}
+
+func TestConfigurationWithPluginConfigurationGetSubstitutions(t *testing.T) {
+	configurationLayerMock := NewSimpleConfigurationLayer()
+	configuration, _ := NewConfiguration()
+	substitutions, _ := ent.NewSubstitutionsWith(&[]*string{utl.PointerToString("substitution1")}, &map[string]*ent.Substitution{"substitution1": ent.NewSubstitutionWith(utl.PointerToString("glob1"), utl.PointerToString("match1"), utl.PointerToString("replace1"))})
+	configurationLayerMock.SetSubstitutions(substitutions)
+
+	// in order to make the test meaningful, make sure the default and mock values are different
+	assert.NotNil(t, *ent.SUBSTITUTIONS)
+	substitutions1, _ := configurationLayerMock.GetSubstitutions()
+	assert.NotNil(t, substitutions1)
+	substitutions2, _ := configuration.GetSubstitutions()
+	assert.NotNil(t, substitutions2)
+	assert.NotEqual(t, substitutions1, substitutions2)
+
+	// make sure the initial values come from defaults, until we inject the command line configuration
+	assert.Equal(t, 0, len(*(*ent.SUBSTITUTIONS).GetEnabled()))
+	assert.Equal(t, 0, len(*(*substitutions2).GetEnabled()))
+	assert.Equal(t, 0, len(*(*ent.SUBSTITUTIONS).GetItems()))
+	assert.Equal(t, 0, len(*(*substitutions2).GetItems()))
+
+	// inject the command line configuration and test the new value is returned from that
+	var cl ConfigurationLayer = configurationLayerMock
+	configuration.WithPluginConfiguration(&cl)
+
+	substitutions2, _ = configuration.GetSubstitutions()
+	assert.NotNil(t, (*substitutions2).GetEnabled())
+	assert.NotNil(t, (*substitutions2).GetItems())
+	assert.Equal(t, 1, len(*(*substitutions2).GetEnabled()))
+	assert.Equal(t, "substitution1", *(*(*substitutions2).GetEnabled())[0])
+	assert.Equal(t, 1, len(*(*substitutions2).GetItems()))
+	assert.Equal(t, "glob1", *(*(*(*substitutions2).GetItems())["substitution1"]).GetFiles())
+
+	// now remove the command line configuration and test that now default values are returned again
+	configuration.WithPluginConfiguration(nil)
+	substitutions2, _ = configuration.GetSubstitutions()
+	assert.Equal(t, 0, len(*(*substitutions2).GetEnabled()))
+	assert.Equal(t, 0, len(*(*substitutions2).GetItems()))
+}
+
 func TestConfigurationWithPluginConfigurationGetSummary(t *testing.T) {
 	configurationLayerMock := NewSimpleConfigurationLayer()
 	configuration, _ := NewConfiguration()
@@ -1763,34 +1883,6 @@ func TestConfigurationWithPluginConfigurationGetSummaryFile(t *testing.T) {
 	configuration, _ = configuration.WithPluginConfiguration(nil)
 	summaryFile2, _ = configuration.GetSummaryFile()
 	assert.Nil(t, summaryFile2)
-}
-
-func TestConfigurationWithPluginConfigurationGetStateFile(t *testing.T) {
-	configurationLayerMock := NewSimpleConfigurationLayer()
-	configuration, _ := NewConfiguration()
-	configurationLayerMock.SetStateFile(utl.PointerToString("state-file.yml"))
-
-	// in order to make the test meaningful, make sure the default and mock values are different
-	assert.Nil(t, ent.STATE_FILE)
-	stateFile1, _ := configurationLayerMock.GetStateFile()
-	assert.Equal(t, "state-file.yml", *stateFile1)
-
-	// make sure the initial values come from defaults, until we inject the command line configuration
-	assert.Nil(t, ent.STATE_FILE)
-	stateFile2, _ := configuration.GetStateFile()
-	assert.Nil(t, stateFile2)
-
-	// inject the command line configuration and test the new value is returned from that
-	var cl ConfigurationLayer = configurationLayerMock
-	configuration.WithPluginConfiguration(&cl)
-
-	stateFile2, _ = configuration.GetStateFile()
-	assert.Equal(t, *stateFile1, *stateFile2)
-
-	// now remove the command line configuration and test that now default values are returned again
-	configuration, _ = configuration.WithPluginConfiguration(nil)
-	stateFile2, _ = configuration.GetStateFile()
-	assert.Nil(t, stateFile2)
 }
 
 func TestConfigurationWithPluginConfigurationGetVerbosity(t *testing.T) {
@@ -2452,6 +2544,73 @@ func TestConfigurationWithRuntimeConfigurationGetSharedConfigurationFile(t *test
 	assert.Nil(t, sharedConfigurationFile2)
 }
 
+func TestConfigurationWithRuntimeConfigurationGetStateFile(t *testing.T) {
+	configurationLayerMock := NewSimpleConfigurationLayer()
+	configuration, _ := NewConfiguration()
+	configurationLayerMock.SetStateFile(utl.PointerToString("state-file.yml"))
+
+	// in order to make the test meaningful, make sure the default and mock values are different
+	assert.Nil(t, ent.STATE_FILE)
+	stateFile1, _ := configurationLayerMock.GetStateFile()
+	assert.Equal(t, "state-file.yml", *stateFile1)
+
+	// make sure the initial values come from defaults, until we inject the command line configuration
+	assert.Nil(t, ent.STATE_FILE)
+	stateFile2, _ := configuration.GetStateFile()
+	assert.Nil(t, stateFile2)
+
+	// inject the command line configuration and test the new value is returned from that
+	var cl ConfigurationLayer = configurationLayerMock
+	configuration.WithRuntimeConfiguration(&cl)
+
+	stateFile2, _ = configuration.GetStateFile()
+	assert.Equal(t, *stateFile1, *stateFile2)
+
+	// now remove the command line configuration and test that now default values are returned again
+	configuration, _ = configuration.WithRuntimeConfiguration(nil)
+	stateFile2, _ = configuration.GetStateFile()
+	assert.Nil(t, stateFile2)
+}
+
+func TestConfigurationWithRuntimeConfigurationGetSubstitutions(t *testing.T) {
+	configurationLayerMock := NewSimpleConfigurationLayer()
+	configuration, _ := NewConfiguration()
+	substitutions, _ := ent.NewSubstitutionsWith(&[]*string{utl.PointerToString("substitution1")}, &map[string]*ent.Substitution{"substitution1": ent.NewSubstitutionWith(utl.PointerToString("glob1"), utl.PointerToString("match1"), utl.PointerToString("replace1"))})
+	configurationLayerMock.SetSubstitutions(substitutions)
+
+	// in order to make the test meaningful, make sure the default and mock values are different
+	assert.NotNil(t, *ent.SUBSTITUTIONS)
+	substitutions1, _ := configurationLayerMock.GetSubstitutions()
+	assert.NotNil(t, substitutions1)
+	substitutions2, _ := configuration.GetSubstitutions()
+	assert.NotNil(t, substitutions2)
+	assert.NotEqual(t, substitutions1, substitutions2)
+
+	// make sure the initial values come from defaults, until we inject the command line configuration
+	assert.Equal(t, 0, len(*(*ent.SUBSTITUTIONS).GetEnabled()))
+	assert.Equal(t, 0, len(*(*substitutions2).GetEnabled()))
+	assert.Equal(t, 0, len(*(*ent.SUBSTITUTIONS).GetItems()))
+	assert.Equal(t, 0, len(*(*substitutions2).GetItems()))
+
+	// inject the command line configuration and test the new value is returned from that
+	var cl ConfigurationLayer = configurationLayerMock
+	configuration.WithRuntimeConfiguration(&cl)
+
+	substitutions2, _ = configuration.GetSubstitutions()
+	assert.NotNil(t, (*substitutions2).GetEnabled())
+	assert.NotNil(t, (*substitutions2).GetItems())
+	assert.Equal(t, 1, len(*(*substitutions2).GetEnabled()))
+	assert.Equal(t, "substitution1", *(*(*substitutions2).GetEnabled())[0])
+	assert.Equal(t, 1, len(*(*substitutions2).GetItems()))
+	assert.Equal(t, "glob1", *(*(*(*substitutions2).GetItems())["substitution1"]).GetFiles())
+
+	// now remove the command line configuration and test that now default values are returned again
+	configuration.WithRuntimeConfiguration(nil)
+	substitutions2, _ = configuration.GetSubstitutions()
+	assert.Equal(t, 0, len(*(*substitutions2).GetEnabled()))
+	assert.Equal(t, 0, len(*(*substitutions2).GetItems()))
+}
+
 func TestConfigurationWithRuntimeConfigurationGetSummary(t *testing.T) {
 	configurationLayerMock := NewSimpleConfigurationLayer()
 	configuration, _ := NewConfiguration()
@@ -2506,34 +2665,6 @@ func TestConfigurationWithRuntimeConfigurationGetSummaryFile(t *testing.T) {
 	configuration, _ = configuration.WithRuntimeConfiguration(nil)
 	summaryFile2, _ = configuration.GetSummaryFile()
 	assert.Nil(t, summaryFile2)
-}
-
-func TestConfigurationWithRuntimeConfigurationGetStateFile(t *testing.T) {
-	configurationLayerMock := NewSimpleConfigurationLayer()
-	configuration, _ := NewConfiguration()
-	configurationLayerMock.SetStateFile(utl.PointerToString("state-file.yml"))
-
-	// in order to make the test meaningful, make sure the default and mock values are different
-	assert.Nil(t, ent.STATE_FILE)
-	stateFile1, _ := configurationLayerMock.GetStateFile()
-	assert.Equal(t, "state-file.yml", *stateFile1)
-
-	// make sure the initial values come from defaults, until we inject the command line configuration
-	assert.Nil(t, ent.STATE_FILE)
-	stateFile2, _ := configuration.GetStateFile()
-	assert.Nil(t, stateFile2)
-
-	// inject the command line configuration and test the new value is returned from that
-	var cl ConfigurationLayer = configurationLayerMock
-	configuration.WithRuntimeConfiguration(&cl)
-
-	stateFile2, _ = configuration.GetStateFile()
-	assert.Equal(t, *stateFile1, *stateFile2)
-
-	// now remove the command line configuration and test that now default values are returned again
-	configuration, _ = configuration.WithRuntimeConfiguration(nil)
-	stateFile2, _ = configuration.GetStateFile()
-	assert.Nil(t, stateFile2)
 }
 
 func TestConfigurationWithRuntimeConfigurationGetVerbosity(t *testing.T) {
@@ -3137,6 +3268,62 @@ func TestConfigurationWithMultipleConfigurationLayersGetSharedConfigurationFile(
 	assert.Equal(t, *hpSharedConfigurationFile, *sharedConfigurationFile)
 }
 
+func TestConfigurationWithMultipleConfigurationLayersGetStateFile(t *testing.T) {
+	lowPriorityConfigurationLayerMock := NewSimpleConfigurationLayer()
+	mediumPriorityConfigurationLayerMock := NewCommandLineConfigurationLayer()
+	highPriorityConfigurationLayerMock := NewSimpleConfigurationLayer()
+	configuration, _ := NewConfiguration()
+	lowPriorityConfigurationLayerMock.SetStateFile(utl.PointerToString("file.yaml"))
+	mediumPriorityConfigurationLayerMock.withArguments([]string{
+		"--state-file=file.yml",
+	})
+	highPriorityConfigurationLayerMock.SetStateFile(utl.PointerToString("file.json"))
+
+	// inject the plugin configuration and test the new value is returned from that
+	var lpl ConfigurationLayer = lowPriorityConfigurationLayerMock
+	var mpl ConfigurationLayer = mediumPriorityConfigurationLayerMock
+	var hpl ConfigurationLayer = highPriorityConfigurationLayerMock
+	configuration.WithPluginConfiguration(&lpl)
+	configuration.WithCommandLineConfiguration(&mpl)
+	configuration.WithRuntimeConfiguration(&hpl)
+
+	hpStateFile, _ := highPriorityConfigurationLayerMock.GetStateFile()
+	stateFile, _ := configuration.GetStateFile()
+	assert.Equal(t, *hpStateFile, *stateFile)
+}
+
+func TestConfigurationWithMultipleConfigurationLayersGetSubstitutions(t *testing.T) {
+	lowPriorityConfigurationLayerMock := NewSimpleConfigurationLayer()
+	mediumPriorityConfigurationLayerMock := NewCommandLineConfigurationLayer()
+	highPriorityConfigurationLayerMock := NewSimpleConfigurationLayer()
+	configuration, _ := NewConfiguration()
+
+	lpSubstitutions, _ := ent.NewSubstitutionsWith(&[]*string{utl.PointerToString("substitution1")}, &map[string]*ent.Substitution{"substitution1": ent.NewSubstitutionWith(utl.PointerToString("glob1"), utl.PointerToString("match1"), utl.PointerToString("replace1"))})
+	lowPriorityConfigurationLayerMock.SetSubstitutions(lpSubstitutions)
+	mediumPriorityConfigurationLayerMock.withArguments([]string{
+		"--substitutions-enabled=substitution2",
+		"--substitutions-substitution2-files=glob2",
+	})
+	hpSubstitutions, _ := ent.NewSubstitutionsWith(&[]*string{utl.PointerToString("substitution3")}, &map[string]*ent.Substitution{"substitution3": ent.NewSubstitutionWith(utl.PointerToString("glob3"), utl.PointerToString("match3"), utl.PointerToString("replace3"))})
+	highPriorityConfigurationLayerMock.SetSubstitutions(hpSubstitutions)
+
+	// inject the command line configuration and test the new value is returned from that
+	var lpl ConfigurationLayer = lowPriorityConfigurationLayerMock
+	var mpl ConfigurationLayer = mediumPriorityConfigurationLayerMock
+	var hpl ConfigurationLayer = highPriorityConfigurationLayerMock
+	configuration.WithPluginConfiguration(&lpl)
+	configuration.WithCommandLineConfiguration(&mpl)
+	configuration.WithRuntimeConfiguration(&hpl)
+
+	substitutions, _ := configuration.GetSubstitutions()
+	assert.NotNil(t, *substitutions.GetEnabled())
+	assert.NotNil(t, *substitutions.GetItems())
+	assert.Equal(t, 1, len(*substitutions.GetEnabled()))
+	assert.Equal(t, "substitution3", *(*substitutions.GetEnabled())[0])
+	assert.Equal(t, 1, len(*substitutions.GetItems()))
+	assert.Equal(t, "glob3", *(*substitutions.GetItems())["substitution3"].GetFiles())
+}
+
 func TestConfigurationWithMultipleConfigurationLayersGetSummary(t *testing.T) {
 	lowPriorityConfigurationLayerMock := NewSimpleConfigurationLayer()
 	mediumPriorityConfigurationLayerMock := NewCommandLineConfigurationLayer()
@@ -3183,30 +3370,6 @@ func TestConfigurationWithMultipleConfigurationLayersGetSummaryFile(t *testing.T
 	hpSummaryFile, _ := highPriorityConfigurationLayerMock.GetSummaryFile()
 	summaryFile, _ := configuration.GetSummaryFile()
 	assert.Equal(t, *hpSummaryFile, *summaryFile)
-}
-
-func TestConfigurationWithMultipleConfigurationLayersGetStateFile(t *testing.T) {
-	lowPriorityConfigurationLayerMock := NewSimpleConfigurationLayer()
-	mediumPriorityConfigurationLayerMock := NewCommandLineConfigurationLayer()
-	highPriorityConfigurationLayerMock := NewSimpleConfigurationLayer()
-	configuration, _ := NewConfiguration()
-	lowPriorityConfigurationLayerMock.SetStateFile(utl.PointerToString("file.yaml"))
-	mediumPriorityConfigurationLayerMock.withArguments([]string{
-		"--state-file=file.yml",
-	})
-	highPriorityConfigurationLayerMock.SetStateFile(utl.PointerToString("file.json"))
-
-	// inject the plugin configuration and test the new value is returned from that
-	var lpl ConfigurationLayer = lowPriorityConfigurationLayerMock
-	var mpl ConfigurationLayer = mediumPriorityConfigurationLayerMock
-	var hpl ConfigurationLayer = highPriorityConfigurationLayerMock
-	configuration.WithPluginConfiguration(&lpl)
-	configuration.WithCommandLineConfiguration(&mpl)
-	configuration.WithRuntimeConfiguration(&hpl)
-
-	hpStateFile, _ := highPriorityConfigurationLayerMock.GetStateFile()
-	stateFile, _ := configuration.GetStateFile()
-	assert.Equal(t, *hpStateFile, *stateFile)
 }
 
 func TestConfigurationWithMultipleConfigurationLayersGetVerbosity(t *testing.T) {

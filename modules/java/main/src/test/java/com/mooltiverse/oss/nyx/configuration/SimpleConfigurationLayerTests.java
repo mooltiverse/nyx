@@ -38,6 +38,8 @@ import com.mooltiverse.oss.nyx.entities.Provider;
 import com.mooltiverse.oss.nyx.entities.ReleaseType;
 import com.mooltiverse.oss.nyx.entities.ReleaseTypes;
 import com.mooltiverse.oss.nyx.entities.ServiceConfiguration;
+import com.mooltiverse.oss.nyx.entities.Substitution;
+import com.mooltiverse.oss.nyx.entities.Substitutions;
 import com.mooltiverse.oss.nyx.entities.Verbosity;
 import com.mooltiverse.oss.nyx.version.Scheme;
 
@@ -347,6 +349,40 @@ public class SimpleConfigurationLayerTests {
     }
 
     @Test
+    @DisplayName("SimpleConfigurationLayer.getStateFile()")
+    void getStateFileTest()
+        throws Exception {
+        SimpleConfigurationLayer simpleConfigurationLayer = new SimpleConfigurationLayer();
+        assertNull(simpleConfigurationLayer.getStateFile());
+
+        simpleConfigurationLayer.setStateFile("state.yml");
+        assertEquals("state.yml", simpleConfigurationLayer.getStateFile());
+    }
+
+    @Test
+    @DisplayName("SimpleConfigurationLayer.getSubstitutions()")
+    void getSubstitutionsTest()
+        throws Exception {
+        SimpleConfigurationLayer simpleConfigurationLayer = new SimpleConfigurationLayer();
+        assertNotNull(simpleConfigurationLayer.getSubstitutions());
+        assertTrue(simpleConfigurationLayer.getSubstitutions().getEnabled().isEmpty());
+        assertTrue(simpleConfigurationLayer.getSubstitutions().getItems().isEmpty());
+
+        simpleConfigurationLayer.setSubstitutions(
+            new Substitutions(
+                List.<String>of("one", "two"),
+                Map.<String,Substitution>of("one", new Substitution(), "two", new Substitution())
+            )
+        );
+
+        assertEquals(2, simpleConfigurationLayer.getSubstitutions().getEnabled().size());
+        assertTrue(simpleConfigurationLayer.getSubstitutions().getEnabled().containsAll(List.<String>of("one", "two")));
+        assertEquals(2, simpleConfigurationLayer.getSubstitutions().getItems().size());
+        assertNotNull(simpleConfigurationLayer.getSubstitutions().getItems().get("one"));
+        assertNotNull(simpleConfigurationLayer.getSubstitutions().getItems().get("two"));
+    }
+
+    @Test
     @DisplayName("SimpleConfigurationLayer.getSummary()")
     void getSummaryTest()
         throws Exception {
@@ -366,17 +402,6 @@ public class SimpleConfigurationLayerTests {
 
         simpleConfigurationLayer.setSummaryFile("summary.txt");
         assertEquals("summary.txt", simpleConfigurationLayer.getSummaryFile());
-    }
-
-    @Test
-    @DisplayName("SimpleConfigurationLayer.getStateFile()")
-    void getStateFileTest()
-        throws Exception {
-        SimpleConfigurationLayer simpleConfigurationLayer = new SimpleConfigurationLayer();
-        assertNull(simpleConfigurationLayer.getStateFile());
-
-        simpleConfigurationLayer.setStateFile("state.yml");
-        assertEquals("state.yml", simpleConfigurationLayer.getStateFile());
     }
 
     @Test

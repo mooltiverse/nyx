@@ -24,6 +24,7 @@ import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
 import com.mooltiverse.oss.nyx.entities.GitConfiguration;
 import com.mooltiverse.oss.nyx.entities.ReleaseTypes;
 import com.mooltiverse.oss.nyx.entities.ServiceConfiguration;
+import com.mooltiverse.oss.nyx.entities.Substitutions;
 import com.mooltiverse.oss.nyx.entities.Verbosity;
 import com.mooltiverse.oss.nyx.version.Scheme;
 
@@ -119,17 +120,22 @@ public class SimpleConfigurationLayer implements ConfigurationLayer {
     /**
      * The value held by this object.
      */
+    private String stateFile = null;
+
+    /**
+     * The value held by this object.
+     */
+    private Substitutions substitutions = new Substitutions();
+
+    /**
+     * The value held by this object.
+     */
     private Boolean summary = null;
 
     /**
      * The value held by this object.
      */
     private String summaryFile = null;
-
-    /**
-     * The value held by this object.
-     */
-    private String stateFile = null;
 
     /**
      * The value held by this object.
@@ -441,6 +447,40 @@ public class SimpleConfigurationLayer implements ConfigurationLayer {
      * {@inheritDoc}
      */
     @Override
+    public String getStateFile() {
+        return stateFile;
+    }
+
+    /**
+     * Sets the value for this option.
+     * 
+     * @param stateFile the value for this option.
+     */
+    public void setStateFile(String stateFile) {
+        this.stateFile = stateFile;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Substitutions getSubstitutions() {
+        return substitutions;
+    }
+
+    /**
+     * Sets the value for this option.
+     * 
+     * @param substitutions the value for this option.
+     */
+    public void setSubstitutions(Substitutions substitutions) {
+        this.substitutions = substitutions;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Boolean getSummary() {
         return summary;
     }
@@ -469,23 +509,6 @@ public class SimpleConfigurationLayer implements ConfigurationLayer {
      */
     public void setSummaryFile(String summaryFile) {
         this.summaryFile = summaryFile;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getStateFile() {
-        return stateFile;
-    }
-
-    /**
-     * Sets the value for this option.
-     * 
-     * @param stateFile the value for this option.
-     */
-    public void setStateFile(String stateFile) {
-        this.stateFile = stateFile;
     }
 
     /**

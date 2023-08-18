@@ -92,6 +92,8 @@ nav-user-guide:
         url: /guide/user/configuration-reference/release-types/
       - title: "Services"
         url: /guide/user/configuration-reference/services/
+      - title: "Substitutions"
+        url: /guide/user/configuration-reference/substitutions/
       - title: "Templates"
         url: /guide/user/configuration-reference/templates/
   - title: Configuration Presets

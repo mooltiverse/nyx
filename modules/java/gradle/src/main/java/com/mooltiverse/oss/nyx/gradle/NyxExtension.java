@@ -214,6 +214,11 @@ public abstract class NyxExtension {
     private final Property<String> stateFile = getObjectfactory().property(String.class);
 
     /**
+     * The nested 'substitutions' block.
+     */
+    private final Substitutions substitutions = getObjectfactory().newInstance(Substitutions.class);
+
+    /**
      * The 'verbosity' property.
      * 
      * Please note that the verbosity option is actually ignored in this plugin implementation and the backing Nyx implementation
@@ -593,6 +598,29 @@ public abstract class NyxExtension {
      */
     public Property<String> getStateFile() {
         return stateFile;
+    }
+
+    /**
+     * Returns the object mapping the {@code substitutions} block.
+     * 
+     * We provide an implementation of this method instead of using the abstract definition as it's
+     * safer for old Gradle versions we support.
+     * 
+     * @return the object mapping the {@code substitutions} block
+     */
+    public Substitutions getSubstitutions() {
+        return substitutions;
+    }
+
+    /**
+     * Accepts the DSL configuration for the {@code substitutions} block, needed for defining
+     * the block using the curly braces syntax in Gradle build scripts.
+     * See the documentation on top of this class for more.
+     * 
+     * @param configurationAction the configuration action for the {@code substitutions} block
+     */
+    public void substitutions(Action<? super Substitutions> configurationAction) {
+        configurationAction.execute(substitutions);
     }
 
     /**
@@ -1850,6 +1878,164 @@ public abstract class NyxExtension {
          */
         public void options(Action<? super MapProperty<String,String>> configurationAction) {
             configurationAction.execute(options);
+        }
+    }
+
+    /**
+     * The class to model the 'substitutions' block within the extension.
+     */
+    public abstract static class Substitutions {
+        /**
+         * The list of enabled substitution names.
+         */
+        private final ListProperty<String> enabled = getObjectfactory().listProperty(String.class);
+
+        /**
+         * The nested 'items' block.
+         * 
+         * @see Substitution
+         */
+        private NamedDomainObjectContainer<Substitution> items = getObjectfactory().domainObjectContainer(Substitution.class);
+
+        /**
+         * Returns an object factory instance.
+         * 
+         * The instance is injected by Gradle as soon as this getter method is invoked.
+         * 
+         * Using <a href="https://docs.gradle.org/current/userguide/custom_gradle_types.html#property_injection">property injection</a>
+         * instead of <a href="https://docs.gradle.org/current/userguide/custom_gradle_types.html#constructor_injection">constructor injection</a>
+         * has a few advantages: it allows Gradle to refer injecting the object until it's required and is safer for backward
+         * compatibility (older versions can be supported).
+         * 
+         * @return the object factory instance
+         */
+        @Inject
+        protected abstract ObjectFactory getObjectfactory();
+
+        /**
+         * Returns list of enabled substitution names.
+         * 
+         * @return list of enabled substitution names.
+         */
+        public ListProperty<String> getEnabled() {
+            return enabled;
+        }
+
+        /**
+         * Returns the map of substitution items.
+         * 
+         * @return the map of substitution items.
+         */
+        public NamedDomainObjectContainer<Substitution> getItems() {
+            return items;
+        }
+
+        /**
+         * Accepts the DSL configuration for the {@code items} block, needed for defining
+         * the block using the curly braces syntax in Gradle build scripts.
+         * See the documentation on top of this class for more.
+         * 
+         * @param configurationAction the configuration action for the {@code items} block
+         */
+        public void items(Action<? super NamedDomainObjectContainer<Substitution>> configurationAction) {
+            configurationAction.execute(items);
+        }
+
+        /**
+         * The class to model a single 'substitution' item within the extension.
+         */
+        public abstract static class Substitution {
+            /**
+             * The substitution name.
+             */
+            private final String name;
+
+            /**
+             * The substitution files property.
+             */
+            private final Property<String> files = getObjectfactory().property(String.class);
+
+            /**
+             * The substitution match property.
+             */
+            private final Property<String> match = getObjectfactory().property(String.class);
+
+            /**
+             * The substitution replace property.
+             */
+            private final Property<String> replace = getObjectfactory().property(String.class);
+
+            /**
+             * Returns an object factory instance.
+             * 
+             * The instance is injected by Gradle as soon as this getter method is invoked.
+             * 
+             * Using <a href="https://docs.gradle.org/current/userguide/custom_gradle_types.html#property_injection">property injection</a>
+             * instead of <a href="https://docs.gradle.org/current/userguide/custom_gradle_types.html#constructor_injection">constructor injection</a>
+             * has a few advantages: it allows Gradle to refer injecting the object until it's required and is safer for backward
+             * compatibility (older versions can be supported).
+             * 
+             * @return the object factory instance
+             */
+            @Inject
+            protected abstract ObjectFactory getObjectfactory();
+
+            /**
+             * Constructor.
+             * 
+             * This constructor is required as per the {@link NamedDomainObjectContainer} specification.
+             * 
+             * @param name the substitution name
+             */
+            public Substitution(String name) {
+                super();
+                this.name = name;
+            }
+
+            /**
+             * Returns the name read-only mandatory property.
+             * 
+             * @return the name read-only mandatory property.
+             */
+            public String getName() {
+                return name;
+            }
+
+            /**
+             * Returns the glob expression to select the text files to replace the matched strings into.
+             * 
+             * We provide an implementation of this method instead of using the abstract definition as it's
+             * safer for old Gradle versions we support.
+             * 
+             * @return the glob expression to select the text files to replace the matched strings into.
+             */
+            public Property<String> getFiles() {
+                return files;
+            }
+
+            /**
+             * Returns the regular expression used to match the text to be replaced replace in files.
+             * 
+             * We provide an implementation of this method instead of using the abstract definition as it's
+             * safer for old Gradle versions we support.
+             * 
+             * @return the regular expression used to match the text to be replaced replace in files.
+             */
+            public Property<String> getMatch() {
+                return match;
+            }
+
+            /**
+             * Returns the template expression defining the text to use when replacing all matched tokens.
+             * 
+             * We provide an implementation of this method instead of using the abstract definition as it's
+             * safer for old Gradle versions we support.
+             * 
+             * @return the template expression defining the text to use when replacing all matched tokens.
+             */
+            public Property<String> getReplace() {
+                return replace;
+            }
         }
     }
 }

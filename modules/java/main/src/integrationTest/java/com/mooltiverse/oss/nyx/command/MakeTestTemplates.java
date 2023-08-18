@@ -39,6 +39,8 @@ import com.mooltiverse.oss.nyx.command.template.StandaloneCommandProxy;
 import com.mooltiverse.oss.nyx.configuration.SimpleConfigurationLayer;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConvention;
 import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
+import com.mooltiverse.oss.nyx.entities.Substitution;
+import com.mooltiverse.oss.nyx.entities.Substitutions;
 import com.mooltiverse.oss.nyx.entities.Changelog.Release;
 import com.mooltiverse.oss.nyx.git.GitException;
 import com.mooltiverse.oss.nyx.git.tools.Scenario;
@@ -823,6 +825,732 @@ public class MakeTestTemplates {
                 String fileContent = readFile(changelogFile);
                 assertTrue(fileContent.startsWith("# Changelog"));  // title header check
                 assertTrue(fileContent.contains("## 0.1.0 "));      // release header check
+            }
+        }
+
+        @TestTemplate
+        @DisplayName("Make.run() with substitutions using the 'cargo_version' preset")
+        @Baseline(Scenario.INITIAL_COMMIT)
+        void runTestWithSubstitutionsUsingCargoVersionPreset(@CommandSelector(Commands.MAKE) CommandProxy command, Script script)
+            throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
+            // first create the temporary directory and a subdirectory
+            File destinationDir = script.getWorkingDirectory();
+            //Files.createTempDirectory("nyx-test-make-test-").toFile();
+            File destinationSubDir = new File(destinationDir, "sub");
+            destinationSubDir.mkdirs();
+            destinationSubDir.deleteOnExit();
+            destinationDir.deleteOnExit();
+
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            configurationLayerMock.setSubstitutions(
+                new Substitutions(
+                    List.<String>of("cargo_version"),
+                    Map.<String,Substitution>of("cargo_version", com.mooltiverse.oss.nyx.configuration.presets.Substitutions.CARGO_VERSION)
+                )
+            );
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
+
+            File cargoFileInRootDirectory = new File(destinationDir, "Cargo.toml");
+            File cargoFileInSubDirectory = new File(destinationSubDir, "Cargo.toml");
+            File otherFileInRootDirectory = new File(destinationDir, "other.txt");
+            File otherFileInSubDirectory = new File(destinationSubDir, "other.txt");
+            List<File> files = List.<File>of(
+                cargoFileInRootDirectory,
+                cargoFileInSubDirectory,
+                otherFileInRootDirectory,
+                otherFileInSubDirectory
+            );
+
+            FileWriter writer = new FileWriter(cargoFileInRootDirectory);
+            writer.write("[package]\n");
+            writer.write("name = \"hello_world\" # the name of the package\n");
+            writer.write("version = \"91.92.93\" # the current version, obeying semver\n");
+            writer.write("authors = [\"Alice <a@example.com>\", \"Bob <b@example.com>\"]\n");
+            writer.flush();
+            writer.close();
+
+            writer = new FileWriter(cargoFileInSubDirectory);
+            writer.write("[package]\n");
+            writer.write("name = \"hello_world\" # the name of the package\n");
+            writer.write("   version   =     \"91.92.93\" # the current version, obeying semver\n");
+            writer.write("authors = [\"Alice <a@example.com>\", \"Bob <b@example.com>\"]\n");
+            writer.flush();
+            writer.close();
+
+            writer = new FileWriter(otherFileInRootDirectory);
+            writer.write("Some text file not to be touched by the command");
+            writer.flush();
+            writer.close();
+
+            writer = new FileWriter(otherFileInSubDirectory);
+            writer.write("Some text file not to be touched by the command");
+            writer.flush();
+            writer.close();
+
+            command.run();
+
+            // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
+            if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
+                // print the files to standard output for inspection purpose
+                for (File f: files) {
+                    System.out.println("--------------------- "+f.getAbsolutePath()+" ---------------------");
+                    System.out.println(readFile(f));
+                    System.out.println("-----------------------------------------");
+                    System.out.flush();
+                }
+
+                // test the rendered files
+                String fileContent = readFile(cargoFileInRootDirectory);
+                assertFalse(fileContent.contains("91.92.93"));
+                assertTrue(fileContent.contains("version = \"0.1.0\""));
+
+                fileContent = readFile(cargoFileInSubDirectory);
+                assertFalse(fileContent.contains("91.92.93"));
+                assertTrue(fileContent.contains("version = \"0.1.0\""));
+
+                fileContent = readFile(otherFileInRootDirectory);
+                assertEquals("Some text file not to be touched by the command", fileContent);
+
+                fileContent = readFile(otherFileInSubDirectory);
+                assertEquals("Some text file not to be touched by the command", fileContent);
+            }
+        }
+
+        @TestTemplate
+        @DisplayName("Make.run() with substitutions using the 'composer_version' preset")
+        @Baseline(Scenario.INITIAL_COMMIT)
+        void runTestWithSubstitutionsUsingComposerVersionPreset(@CommandSelector(Commands.MAKE) CommandProxy command, Script script)
+            throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
+            // first create the temporary directory and a subdirectory
+            File destinationDir = script.getWorkingDirectory();
+            //Files.createTempDirectory("nyx-test-make-test-").toFile();
+            File destinationSubDir = new File(destinationDir, "sub");
+            destinationSubDir.mkdirs();
+            destinationSubDir.deleteOnExit();
+            destinationDir.deleteOnExit();
+
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            configurationLayerMock.setSubstitutions(
+                new Substitutions(
+                    List.<String>of("composer_version"),
+                    Map.<String,Substitution>of("composer_version", com.mooltiverse.oss.nyx.configuration.presets.Substitutions.COMPOSER_VERSION)
+                )
+            );
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
+
+            File composerFileInRootDirectory = new File(destinationDir, "composer.json");
+            File composerFileInSubDirectory = new File(destinationSubDir, "composer.json");
+            File otherFileInRootDirectory = new File(destinationDir, "other.txt");
+            File otherFileInSubDirectory = new File(destinationSubDir, "other.txt");
+            List<File> files = List.<File>of(
+                composerFileInRootDirectory,
+                composerFileInSubDirectory,
+                otherFileInRootDirectory,
+                otherFileInSubDirectory
+            );
+
+            FileWriter writer = new FileWriter(composerFileInRootDirectory);
+            writer.write("{\n");
+            writer.write("    \"version\": \"91.92.93\"\n");
+            writer.write("}\n");
+            writer.flush();
+            writer.close();
+
+            writer = new FileWriter(composerFileInSubDirectory);
+            writer.write("{\n");
+            writer.write("    \"version\"  :      \"91.92.93\"\n");
+            writer.write("}\n");
+            writer.flush();
+            writer.close();
+
+            writer = new FileWriter(otherFileInRootDirectory);
+            writer.write("Some text file not to be touched by the command");
+            writer.flush();
+            writer.close();
+
+            writer = new FileWriter(otherFileInSubDirectory);
+            writer.write("Some text file not to be touched by the command");
+            writer.flush();
+            writer.close();
+
+            command.run();
+
+            // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
+            if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
+                // print the files to standard output for inspection purpose
+                for (File f: files) {
+                    System.out.println("--------------------- "+f.getAbsolutePath()+" ---------------------");
+                    System.out.println(readFile(f));
+                    System.out.println("-----------------------------------------");
+                    System.out.flush();
+                }
+
+                // test the rendered files
+                String fileContent = readFile(composerFileInRootDirectory);
+                assertFalse(fileContent.contains("91.92.93"));
+                assertTrue(fileContent.contains("\"version\": \"0.1.0\""));
+
+                fileContent = readFile(composerFileInSubDirectory);
+                assertFalse(fileContent.contains("91.92.93"));
+                assertTrue(fileContent.contains("\"version\": \"0.1.0\""));
+
+                fileContent = readFile(otherFileInRootDirectory);
+                assertEquals("Some text file not to be touched by the command", fileContent);
+
+                fileContent = readFile(otherFileInSubDirectory);
+                assertEquals("Some text file not to be touched by the command", fileContent);
+            }
+        }
+
+        @TestTemplate
+        @DisplayName("Make.run() with substitutions using the 'dart_version' preset")
+        @Baseline(Scenario.INITIAL_COMMIT)
+        void runTestWithSubstitutionsUsingDartVersionPreset(@CommandSelector(Commands.MAKE) CommandProxy command, Script script)
+            throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
+            // first create the temporary directory and a subdirectory
+            File destinationDir = script.getWorkingDirectory();
+            //Files.createTempDirectory("nyx-test-make-test-").toFile();
+            File destinationSubDir = new File(destinationDir, "sub");
+            destinationSubDir.mkdirs();
+            destinationSubDir.deleteOnExit();
+            destinationDir.deleteOnExit();
+
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            configurationLayerMock.setSubstitutions(
+                new Substitutions(
+                    List.<String>of("dart_version"),
+                    Map.<String,Substitution>of("dart_version", com.mooltiverse.oss.nyx.configuration.presets.Substitutions.DART_VERSION)
+                )
+            );
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
+
+            File dartFileInRootDirectory = new File(destinationDir, "pubspec.yaml");
+            File dartFileInSubDirectory = new File(destinationSubDir, "pubspec.yaml");
+            File otherFileInRootDirectory = new File(destinationDir, "other.txt");
+            File otherFileInSubDirectory = new File(destinationSubDir, "other.txt");
+            List<File> files = List.<File>of(
+                dartFileInRootDirectory,
+                dartFileInSubDirectory,
+                otherFileInRootDirectory,
+                otherFileInSubDirectory
+            );
+
+            FileWriter writer = new FileWriter(dartFileInRootDirectory);
+            writer.write("name: newtify\n");
+            writer.write("description: >-\n");
+            writer.write("    Blah blah\n");
+            writer.write("version: 91.92.93\n");
+            writer.write("homepage: https://example-pet-store.com/newtify\n");
+            writer.flush();
+            writer.close();
+
+            writer = new FileWriter(dartFileInSubDirectory);
+            writer.write("name: newtify\n");
+            writer.write("description: >-\n");
+            writer.write("    Blah blah\n");
+            writer.write("version: 91.92.93\n");
+            writer.write("homepage: https://example-pet-store.com/newtify\n");
+            writer.flush();
+            writer.close();
+
+            writer = new FileWriter(otherFileInRootDirectory);
+            writer.write("Some text file not to be touched by the command");
+            writer.flush();
+            writer.close();
+
+            writer = new FileWriter(otherFileInSubDirectory);
+            writer.write("Some text file not to be touched by the command");
+            writer.flush();
+            writer.close();
+
+            command.run();
+
+            // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
+            if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
+                // print the files to standard output for inspection purpose
+                for (File f: files) {
+                    System.out.println("--------------------- "+f.getAbsolutePath()+" ---------------------");
+                    System.out.println(readFile(f));
+                    System.out.println("-----------------------------------------");
+                    System.out.flush();
+                }
+
+                // test the rendered files
+                String fileContent = readFile(dartFileInRootDirectory);
+                assertFalse(fileContent.contains("91.92.93"));
+                assertTrue(fileContent.contains("version: \"0.1.0\""));
+
+                fileContent = readFile(dartFileInSubDirectory);
+                assertFalse(fileContent.contains("91.92.93"));
+                assertTrue(fileContent.contains("version: \"0.1.0\""));
+
+                fileContent = readFile(otherFileInRootDirectory);
+                assertEquals("Some text file not to be touched by the command", fileContent);
+
+                fileContent = readFile(otherFileInSubDirectory);
+                assertEquals("Some text file not to be touched by the command", fileContent);
+            }
+        }
+
+        @TestTemplate
+        @DisplayName("Make.run() with substitutions using the 'elixir_version' preset")
+        @Baseline(Scenario.INITIAL_COMMIT)
+        void runTestWithSubstitutionsUsingElixirVersionPreset(@CommandSelector(Commands.MAKE) CommandProxy command, Script script)
+            throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
+            // first create the temporary directory and a subdirectory
+            File destinationDir = script.getWorkingDirectory();
+            //Files.createTempDirectory("nyx-test-make-test-").toFile();
+            File destinationSubDir = new File(destinationDir, "sub");
+            destinationSubDir.mkdirs();
+            destinationSubDir.deleteOnExit();
+            destinationDir.deleteOnExit();
+
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            configurationLayerMock.setSubstitutions(
+                new Substitutions(
+                    List.<String>of("elixir_version"),
+                    Map.<String,Substitution>of("elixir_version", com.mooltiverse.oss.nyx.configuration.presets.Substitutions.ELIXIR_VERSION)
+                )
+            );
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
+
+            File elixirFileInRootDirectory = new File(destinationDir, "mix.exs");
+            File elixirFileInSubDirectory = new File(destinationSubDir, "mix.exs");
+            File otherFileInRootDirectory = new File(destinationDir, "other.txt");
+            File otherFileInSubDirectory = new File(destinationSubDir, "other.txt");
+            List<File> files = List.<File>of(
+                elixirFileInRootDirectory,
+                elixirFileInSubDirectory,
+                otherFileInRootDirectory,
+                otherFileInSubDirectory
+            );
+
+            FileWriter writer = new FileWriter(elixirFileInRootDirectory);
+            writer.write("defmodule KV.MixProject do\n");
+            writer.write("  use Mix.Project\n");
+            writer.write("  def project do\n");
+            writer.write("    [\n");
+            writer.write("      app: :kv,\n");
+            writer.write("      version: \"91.92.93\",\n");
+            writer.write("      elixir: \"~> 1.11\",\n");
+            writer.write("    ]\n");
+            writer.write("  end\n");
+            writer.flush();
+            writer.close();
+
+            writer = new FileWriter(elixirFileInSubDirectory);
+            writer.write("defmodule KV.MixProject do\n");
+            writer.write("  use Mix.Project\n");
+            writer.write("  def project do\n");
+            writer.write("    [\n");
+            writer.write("      app: :kv,\n");
+            writer.write("      version   :     \"91.92.93\"   ,\n");
+            writer.write("      elixir: \"~> 1.11\",\n");
+            writer.write("    ]\n");
+            writer.write("  end\n");
+            writer.flush();
+            writer.close();
+
+            writer = new FileWriter(otherFileInRootDirectory);
+            writer.write("Some text file not to be touched by the command");
+            writer.flush();
+            writer.close();
+
+            writer = new FileWriter(otherFileInSubDirectory);
+            writer.write("Some text file not to be touched by the command");
+            writer.flush();
+            writer.close();
+
+            command.run();
+
+            // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
+            if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
+                // print the files to standard output for inspection purpose
+                for (File f: files) {
+                    System.out.println("--------------------- "+f.getAbsolutePath()+" ---------------------");
+                    System.out.println(readFile(f));
+                    System.out.println("-----------------------------------------");
+                    System.out.flush();
+                }
+
+                // test the rendered files
+                String fileContent = readFile(elixirFileInRootDirectory);
+                assertFalse(fileContent.contains("91.92.93"));
+                assertTrue(fileContent.contains("version: \"0.1.0\""));
+
+                fileContent = readFile(elixirFileInSubDirectory);
+                assertFalse(fileContent.contains("91.92.93"));
+                assertTrue(fileContent.contains("version: \"0.1.0\""));
+
+                fileContent = readFile(otherFileInRootDirectory);
+                assertEquals("Some text file not to be touched by the command", fileContent);
+
+                fileContent = readFile(otherFileInSubDirectory);
+                assertEquals("Some text file not to be touched by the command", fileContent);
+            }
+        }
+
+        @TestTemplate
+        @DisplayName("Make.run() with substitutions using the 'expo_version' preset")
+        @Baseline(Scenario.INITIAL_COMMIT)
+        void runTestWithSubstitutionsUsingExpoVersionPreset(@CommandSelector(Commands.MAKE) CommandProxy command, Script script)
+            throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
+            // first create the temporary directory and a subdirectory
+            File destinationDir = script.getWorkingDirectory();
+            //Files.createTempDirectory("nyx-test-make-test-").toFile();
+            File destinationSubDir = new File(destinationDir, "sub");
+            destinationSubDir.mkdirs();
+            destinationSubDir.deleteOnExit();
+            destinationDir.deleteOnExit();
+
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            configurationLayerMock.setSubstitutions(
+                new Substitutions(
+                    List.<String>of("expo_version"),
+                    Map.<String,Substitution>of("expo_version", com.mooltiverse.oss.nyx.configuration.presets.Substitutions.EXPO_VERSION)
+                )
+            );
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
+
+            File expoFileInRootDirectory = new File(destinationDir, "app.json");
+            File expoFileInSubDirectory = new File(destinationSubDir, "app.config.json");
+            File otherFileInRootDirectory = new File(destinationDir, "other.txt");
+            File otherFileInSubDirectory = new File(destinationSubDir, "other.txt");
+            List<File> files = List.<File>of(
+                expoFileInRootDirectory,
+                expoFileInSubDirectory,
+                otherFileInRootDirectory,
+                otherFileInSubDirectory
+            );
+
+            FileWriter writer = new FileWriter(expoFileInRootDirectory);
+            writer.write("{\n");
+            writer.write("    \"expo\": {\n");
+            writer.write("        \"name\": \"appname\",\n");
+            writer.write("        \"slug\": \"appslug\",\n");
+            writer.write("        \"version\": \"91.92.93\",\n");
+            writer.write("        \"orientation\": \"portrait\",\n");
+            writer.write("    }\n");
+            writer.write("}\n");
+            writer.flush();
+            writer.close();
+
+            writer = new FileWriter(expoFileInSubDirectory);
+            writer.write("{\n");
+            writer.write("    \"expo\": {\n");
+            writer.write("        \"name\": \"appname\",\n");
+            writer.write("        \"slug\": \"appslug\",\n");
+            writer.write("        \"version\"   :     \"91.92.93\",\n");
+            writer.write("        \"orientation\": \"portrait\",\n");
+            writer.write("    }\n");
+            writer.write("}\n");
+            writer.flush();
+            writer.close();
+
+            writer = new FileWriter(otherFileInRootDirectory);
+            writer.write("Some text file not to be touched by the command");
+            writer.flush();
+            writer.close();
+
+            writer = new FileWriter(otherFileInSubDirectory);
+            writer.write("Some text file not to be touched by the command");
+            writer.flush();
+            writer.close();
+
+            command.run();
+
+            // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
+            if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
+                // print the files to standard output for inspection purpose
+                for (File f: files) {
+                    System.out.println("--------------------- "+f.getAbsolutePath()+" ---------------------");
+                    System.out.println(readFile(f));
+                    System.out.println("-----------------------------------------");
+                    System.out.flush();
+                }
+
+                // test the rendered files
+                String fileContent = readFile(expoFileInRootDirectory);
+                assertFalse(fileContent.contains("91.92.93"));
+                assertTrue(fileContent.contains("\"version\": \"0.1.0\""));
+
+                fileContent = readFile(expoFileInRootDirectory);
+                assertFalse(fileContent.contains("91.92.93"));
+                assertTrue(fileContent.contains("\"version\": \"0.1.0\""));
+
+                fileContent = readFile(otherFileInRootDirectory);
+                assertEquals("Some text file not to be touched by the command", fileContent);
+
+                fileContent = readFile(otherFileInSubDirectory);
+                assertEquals("Some text file not to be touched by the command", fileContent);
+            }
+        }
+
+        @TestTemplate
+        @DisplayName("Make.run() with substitutions using the 'helm_version' preset")
+        @Baseline(Scenario.INITIAL_COMMIT)
+        void runTestWithSubstitutionsUsingHelmVersionPreset(@CommandSelector(Commands.MAKE) CommandProxy command, Script script)
+            throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
+            // first create the temporary directory and a subdirectory
+            File destinationDir = script.getWorkingDirectory();
+            //Files.createTempDirectory("nyx-test-make-test-").toFile();
+            File destinationSubDir = new File(destinationDir, "sub");
+            destinationSubDir.mkdirs();
+            destinationSubDir.deleteOnExit();
+            destinationDir.deleteOnExit();
+
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            configurationLayerMock.setSubstitutions(
+                new Substitutions(
+                    List.<String>of("helm_version"),
+                    Map.<String,Substitution>of("helm_version", com.mooltiverse.oss.nyx.configuration.presets.Substitutions.HELM_VERSION)
+                )
+            );
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
+
+            File helmFileInRootDirectory = new File(destinationDir, "Chart.yaml");
+            File helmFileInSubDirectory = new File(destinationSubDir, "Chart.yaml");
+            File otherFileInRootDirectory = new File(destinationDir, "other.txt");
+            File otherFileInSubDirectory = new File(destinationSubDir, "other.txt");
+            List<File> files = List.<File>of(
+                helmFileInRootDirectory,
+                helmFileInSubDirectory,
+                otherFileInRootDirectory,
+                otherFileInSubDirectory
+            );
+
+            FileWriter writer = new FileWriter(helmFileInRootDirectory);
+            writer.write("apiVersion: The chart API version\n");
+            writer.write("name: The name of the chart (required)\n");
+            writer.write("version: \"91.92.93\"\n");
+            writer.write("kubeVersion: A SemVer range of compatible Kubernetes versions (optional)\n");
+            writer.write("description: A single-sentence description of this project (optional)\n");
+            writer.flush();
+            writer.close();
+
+            writer = new FileWriter(helmFileInSubDirectory);
+            writer.write("apiVersion: The chart API version\n");
+            writer.write("name: The name of the chart (required)\n");
+            writer.write("version: \"91.92.93\"\n");
+            writer.write("kubeVersion: A SemVer range of compatible Kubernetes versions (optional)\n");
+            writer.write("description: A single-sentence description of this project (optional)\n");
+            writer.flush();
+            writer.close();
+
+            writer = new FileWriter(otherFileInRootDirectory);
+            writer.write("Some text file not to be touched by the command");
+            writer.flush();
+            writer.close();
+
+            writer = new FileWriter(otherFileInSubDirectory);
+            writer.write("Some text file not to be touched by the command");
+            writer.flush();
+            writer.close();
+
+            command.run();
+
+            // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
+            if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
+                // print the files to standard output for inspection purpose
+                for (File f: files) {
+                    System.out.println("--------------------- "+f.getAbsolutePath()+" ---------------------");
+                    System.out.println(readFile(f));
+                    System.out.println("-----------------------------------------");
+                    System.out.flush();
+                }
+
+                // test the rendered files
+                String fileContent = readFile(helmFileInRootDirectory);
+                assertFalse(fileContent.contains("91.92.93"));
+                assertTrue(fileContent.contains("version: \"0.1.0\""));
+
+                fileContent = readFile(helmFileInSubDirectory);
+                assertFalse(fileContent.contains("91.92.93"));
+                assertTrue(fileContent.contains("version: \"0.1.0\""));
+
+                fileContent = readFile(otherFileInRootDirectory);
+                assertEquals("Some text file not to be touched by the command", fileContent);
+
+                fileContent = readFile(otherFileInSubDirectory);
+                assertEquals("Some text file not to be touched by the command", fileContent);
+            }
+        }
+
+        @TestTemplate
+        @DisplayName("Make.run() with substitutions using the 'node_version' preset")
+        @Baseline(Scenario.INITIAL_COMMIT)
+        void runTestWithSubstitutionsUsingNodeVersionPreset(@CommandSelector(Commands.MAKE) CommandProxy command, Script script)
+            throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
+            // first create the temporary directory and a subdirectory
+            File destinationDir = script.getWorkingDirectory();
+            //Files.createTempDirectory("nyx-test-make-test-").toFile();
+            File destinationSubDir = new File(destinationDir, "sub");
+            destinationSubDir.mkdirs();
+            destinationSubDir.deleteOnExit();
+            destinationDir.deleteOnExit();
+
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            configurationLayerMock.setSubstitutions(
+                new Substitutions(
+                    List.<String>of("node_version"),
+                    Map.<String,Substitution>of("node_version", com.mooltiverse.oss.nyx.configuration.presets.Substitutions.NODE_VERSION)
+                )
+            );
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
+
+            File nodeFileInRootDirectory = new File(destinationDir, "package.json");
+            File nodeFileInSubDirectory = new File(destinationSubDir, "package.json");
+            File otherFileInRootDirectory = new File(destinationDir, "other.txt");
+            File otherFileInSubDirectory = new File(destinationSubDir, "other.txt");
+            List<File> files = List.<File>of(
+                nodeFileInRootDirectory,
+                nodeFileInSubDirectory,
+                otherFileInRootDirectory,
+                otherFileInSubDirectory
+            );
+
+            FileWriter writer = new FileWriter(nodeFileInRootDirectory);
+            writer.write("{\n");
+            writer.write("    \"name\": \"foo\",\n");
+            writer.write("    \"version\": \"91.92.93\",\n");
+            writer.write("    \"description\": \"A packaged foo fooer for fooing foos\",\n");
+            writer.write("}\n");
+            writer.flush();
+            writer.close();
+
+            writer = new FileWriter(nodeFileInSubDirectory);
+            writer.write("{\n");
+            writer.write("    \"name\": \"foo\",\n");
+            writer.write("    \"version\"   :     \"91.92.93\",\n");
+            writer.write("    \"description\": \"A packaged foo fooer for fooing foos\",\n");
+            writer.write("}\n");
+            writer.flush();
+            writer.close();
+
+            writer = new FileWriter(otherFileInRootDirectory);
+            writer.write("Some text file not to be touched by the command");
+            writer.flush();
+            writer.close();
+
+            writer = new FileWriter(otherFileInSubDirectory);
+            writer.write("Some text file not to be touched by the command");
+            writer.flush();
+            writer.close();
+
+            command.run();
+
+            // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
+            if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
+                // print the files to standard output for inspection purpose
+                for (File f: files) {
+                    System.out.println("--------------------- "+f.getAbsolutePath()+" ---------------------");
+                    System.out.println(readFile(f));
+                    System.out.println("-----------------------------------------");
+                    System.out.flush();
+                }
+
+                // test the rendered files
+                String fileContent = readFile(nodeFileInRootDirectory);
+                assertFalse(fileContent.contains("91.92.93"));
+                assertTrue(fileContent.contains("\"version\": \"0.1.0\""));
+
+                fileContent = readFile(nodeFileInSubDirectory);
+                assertFalse(fileContent.contains("91.92.93"));
+                assertTrue(fileContent.contains("\"version\": \"0.1.0\""));
+
+                fileContent = readFile(otherFileInRootDirectory);
+                assertEquals("Some text file not to be touched by the command", fileContent);
+
+                fileContent = readFile(otherFileInSubDirectory);
+                assertEquals("Some text file not to be touched by the command", fileContent);
+            }
+        }
+
+        @TestTemplate
+        @DisplayName("Make.run() with substitutions using the 'text_version' preset")
+        @Baseline(Scenario.INITIAL_COMMIT)
+        void runTestWithSubstitutionsUsingTextVersionPreset(@CommandSelector(Commands.MAKE) CommandProxy command, Script script)
+            throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
+            // first create the temporary directory and a subdirectory
+            File destinationDir = script.getWorkingDirectory();
+            //Files.createTempDirectory("nyx-test-make-test-").toFile();
+            File destinationSubDir = new File(destinationDir, "sub");
+            destinationSubDir.mkdirs();
+            destinationSubDir.deleteOnExit();
+            destinationDir.deleteOnExit();
+
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            configurationLayerMock.setSubstitutions(
+                new Substitutions(
+                    List.<String>of("text_version"),
+                    Map.<String,Substitution>of("text_version", com.mooltiverse.oss.nyx.configuration.presets.Substitutions.TEXT_VERSION)
+                )
+            );
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
+
+            File textFileInRootDirectory = new File(destinationDir, "version.txt");
+            File textFileInSubDirectory = new File(destinationSubDir, "version.txt");
+            File otherFileInRootDirectory = new File(destinationDir, "other.txt");
+            File otherFileInSubDirectory = new File(destinationSubDir, "other.txt");
+            List<File> files = List.<File>of(
+                textFileInRootDirectory,
+                textFileInSubDirectory,
+                otherFileInRootDirectory,
+                otherFileInSubDirectory
+            );
+
+            FileWriter writer = new FileWriter(textFileInRootDirectory);
+            writer.write("91.92.93");
+            writer.flush();
+            writer.close();
+
+            writer = new FileWriter(textFileInSubDirectory);
+            writer.write("91.92.93");
+            writer.flush();
+            writer.close();
+
+            writer = new FileWriter(otherFileInRootDirectory);
+            writer.write("Some text file not to be touched by the command");
+            writer.flush();
+            writer.close();
+
+            writer = new FileWriter(otherFileInSubDirectory);
+            writer.write("Some text file not to be touched by the command");
+            writer.flush();
+            writer.close();
+
+            command.run();
+
+            // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
+            if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
+                // print the files to standard output for inspection purpose
+                for (File f: files) {
+                    System.out.println("--------------------- "+f.getAbsolutePath()+" ---------------------");
+                    System.out.println(readFile(f));
+                    System.out.println("-----------------------------------------");
+                    System.out.flush();
+                }
+
+                // test the rendered files
+                String fileContent = readFile(textFileInRootDirectory);
+                assertEquals("0.1.0", fileContent);
+
+                fileContent = readFile(textFileInSubDirectory);
+                assertEquals("0.1.0", fileContent);
+
+                fileContent = readFile(otherFileInRootDirectory);
+                assertEquals("Some text file not to be touched by the command", fileContent);
+
+                fileContent = readFile(otherFileInSubDirectory);
+                assertEquals("Some text file not to be touched by the command", fileContent);
             }
         }
     }

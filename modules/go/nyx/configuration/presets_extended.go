@@ -38,5 +38,8 @@ func NewExtendedPreset() *SimpleConfigurationLayer {
 	releaseTypes, _ := ent.NewReleaseTypesWith(&[]*string{utl.PointerToString("mainline"), utl.PointerToString("integration"), utl.PointerToString("maturity"), utl.PointerToString("feature"), utl.PointerToString("fix"), utl.PointerToString("hotfix"), utl.PointerToString("release"), utl.PointerToString("maintenance"), utl.PointerToString("internal")}, &[]*string{}, &[]*string{}, &map[string]*ent.ReleaseType{"mainline": RELEASE_TYPES_MAINLINE, "integration": RELEASE_TYPES_INTEGRATION, "maturity": RELEASE_TYPES_MATURITY, "feature": RELEASE_TYPES_FEATURE, "fix": RELEASE_TYPES_FIX, "hotfix": RELEASE_TYPES_HOTFIX, "release": RELEASE_TYPES_RELEASE, "maintenance": RELEASE_TYPES_MAINTENANCE, "internal": RELEASE_TYPES_INTERNAL})
 	scl.SetReleaseTypes(releaseTypes)
 
+	substitutions, _ := ent.NewSubstitutionsWith(&[]*string{}, &map[string]*ent.Substitution{"cargo_version": CARGO_VERSION, "composer_version": COMPOSER_VERSION, "dart_version": DART_VERSION, "elixir_version": ELIXIR_VERSION, "expo_version": EXPO_VERSION, "helm_version": HELM_VERSION, "node_version": NODE_VERSION, "text_version": TEXT_VERSION})
+	scl.SetSubstitutions(substitutions)
+
 	return scl
 }

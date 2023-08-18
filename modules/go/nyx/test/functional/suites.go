@@ -195,9 +195,17 @@ scheme: SEMVER
                 "publish":"true"
 			}
 		}
+	},
+	"substitutions":{
+		"enabled":[
+			"node_version",
+			"text_version"
+		]
 	}
 }				  
 `,
+				// the version.txt file, used to test for substitutions, initialized with a fake version number to be replaced by Make
+				"version.txt": `91.92.93`,
 			},
 			RemoteRepoName:     nil,
 			HostingRepoService: nil,
@@ -232,6 +240,9 @@ scheme: SEMVER
 					"* [] feat: Untagged commit [#2](https://example.com/issues/2)",
 					"### Fixed",
 					"* [] fix: Untagged commit [#1](https://example.com/issues/1)",
+				},
+				"version.txt": []string{
+					"v0.1.0",
 				},
 			},
 			RepositoryTags:       []string{"v0.1.0"},
@@ -309,9 +320,17 @@ scheme: SEMVER
                 "publish":"true"
 			}
 		}
+	},
+	"substitutions":{
+		"enabled":[
+			"node_version",
+			"text_version"
+		]
 	}
 }				  
 `,
+				// the version.txt file, used to test for substitutions, initialized with a fake version number to be replaced by Make
+				"version.txt": `91.92.93`,
 			},
 			RemoteRepoName:     utl.PointerToString("replica"),
 			HostingRepoService: nil,
@@ -346,6 +365,9 @@ scheme: SEMVER
 					"* [] feat: Untagged commit [#2](https://example.com/issues/2)",
 					"### Fixed",
 					"* [] fix: Untagged commit [#1](https://example.com/issues/1)",
+				},
+				"version.txt": []string{
+					"v0.1.0",
 				},
 			},
 			RepositoryTags:       []string{"v0.1.0"},
@@ -423,9 +445,17 @@ commitMessageConventions:
                 "publish":"true"
 			}
 		}
+	},
+	"substitutions":{
+		"enabled":[
+			"node_version",
+			"text_version"
+		]
 	}
 }				  
 `,
+				// the version.txt file, used to test for substitutions, initialized with a fake version number to be replaced by Make
+				"version.txt": `91.92.93`,
 			},
 			RemoteRepoName:     utl.PointerToString("replica"),
 			HostingRepoService: nil,
@@ -456,6 +486,9 @@ commitMessageConventions:
 				"CHANGELOG.md": []string{
 					"## 0.0.6",
 					"No changes.",
+				},
+				"version.txt": []string{
+					"0.0.6",
 				},
 			},
 			RepositoryTags:       []string{"0.0.6"},
@@ -544,9 +577,17 @@ scheme: SEMVER
                 "publish":"true"
 			}
 		}
+	},
+	"substitutions":{
+		"enabled":[
+			"node_version",
+			"text_version"
+		]
 	}
 }				  
 `,
+				// the version.txt file, used to test for substitutions, initialized with a fake version number to be replaced by Make
+				"version.txt": `91.92.93`,
 			},
 			RemoteRepoName:     nil, //utl.PointerToString("origin"), // use 'origin', from the cloned repository from the hosting service
 			HostingRepoService: utl.PointerToString("github"),
@@ -581,6 +622,9 @@ scheme: SEMVER
 					"* [] feat: Untagged commit [#2](https://example.com/issues/2)",
 					"### Fixed",
 					"* [] fix: Untagged commit [#1](https://example.com/issues/1)",
+				},
+				"version.txt": []string{
+					"v0.1.0",
 				},
 			},
 			RepositoryTags:       []string{"v0.1.0"},
@@ -669,9 +713,16 @@ scheme: SEMVER
                 "publish":"true"
 			}
 		}
+	},
+	"substitutions":{
+		"enabled":[
+			"node_version","text_version"
+		]
 	}
 }				  
 `,
+				// the version.txt file, used to test for substitutions, initialized with a fake version number to be replaced by Make
+				"version.txt": `91.92.93`,
 			},
 			RemoteRepoName:     nil, //utl.PointerToString("origin"), // use 'origin', from the cloned repository from the hosting service
 			HostingRepoService: utl.PointerToString("gitlab"),
@@ -706,6 +757,9 @@ scheme: SEMVER
 					"* [] feat: Untagged commit [#2](https://example.com/issues/2)",
 					"### Fixed",
 					"* [] fix: Untagged commit [#1](https://example.com/issues/1)",
+				},
+				"version.txt": []string{
+					"v0.1.0",
 				},
 			},
 			RepositoryTags:       []string{"v0.1.0"},

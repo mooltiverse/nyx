@@ -23,7 +23,7 @@ import (
 	"bytes"         // https://pkg.go.dev/bytes
 	"encoding/json" // https://pkg.go.dev/encoding/json
 	"fmt"           // https://pkg.go.dev/fmt
-	"io/ioutil"     // https://pkg.go.dev/io/ioutil
+	"io"            // https://pkg.go.dev/io
 	"net/http"      // https://pkg.go.dev/net/http
 	"net/url"       // https://pkg.go.dev/net/url
 	"os"            // https://pkg.go.dev/os
@@ -71,7 +71,7 @@ func LoadFromFile(path string, target any) error {
 	}
 	log.Tracef("reading contents from file '%v'", path)
 
-	content, err := ioutil.ReadFile(path)
+	content, err := os.ReadFile(path)
 	if err != nil {
 		return &errs.DataAccessError{Message: fmt.Sprintf("unable to read file '%s'", path), Cause: err}
 	}
@@ -124,7 +124,7 @@ func LoadFromURL(path url.URL, target any) error {
 	if response.StatusCode != http.StatusOK {
 		return &errs.DataAccessError{Message: fmt.Sprintf("unable to read URL '%s', server returned error %v", path.String(), response.StatusCode)}
 	}
-	content, err := ioutil.ReadAll(response.Body)
+	content, err := io.ReadAll(response.Body)
 	if err != nil {
 		return &errs.DataAccessError{Message: fmt.Sprintf("unable to read URL '%s'", path.String()), Cause: err}
 	}
@@ -199,7 +199,7 @@ func Save(path string, content any) error {
 		}
 	}
 
-	err = ioutil.WriteFile(path, buffer.Bytes(), 0644)
+	err = os.WriteFile(path, buffer.Bytes(), 0644)
 	if err != nil {
 		return &errs.DataAccessError{Message: fmt.Sprintf("unable to write file '%s'", path), Cause: err}
 	}
