@@ -59,6 +59,12 @@ type ReleaseType struct {
 	// The list of templates to use as tag names when tagging a commit.
 	GitTagNames *[]*string `json:"gitTagNames,omitempty" yaml:"gitTagNames,omitempty"`
 
+	// This private field is set to true when user explicitly sets value for the GitTagNames field.
+	// This is a workaround to Go not allowing default values for list/slice fields.
+	// Since Go doesn't support default values for list/slice fields, when the GitTagNames is nil, this is the only way we have to know
+	// if a user has explicitly set the GitTagNames to nil or not. If not, we will return the default value.
+	gitTagNamesUserOverwrite bool
+
 	// The identifiers configuration block. Elements of this list must be of type Identifier. A nil value means undefined.
 	Identifiers *[]*Identifier `json:"identifiers,omitempty" yaml:"identifiers,omitempty"`
 
@@ -135,6 +141,10 @@ func NewReleaseTypeWith(assets *[]*string, collapseVersions *bool, collapsedVers
 	rt.Publish = publish
 	rt.VersionRange = versionRange
 	rt.VersionRangeFromBranchName = versionRangeFromBranchName
+
+	// From now on, with this flag set, we will not return the default value for GitTagNames anymore
+	// See GetGitTagNames() for more
+	rt.gitTagNamesUserOverwrite = true
 
 	return &rt
 }
@@ -310,13 +320,26 @@ func (rt *ReleaseType) SetGitTagMessage(gitTagMessage *string) {
 Returns the list of templates to use as tag names when tagging a commit. A nil value means undefined.
 */
 func (rt *ReleaseType) GetGitTagNames() *[]*string {
-	return rt.GitTagNames
+	// This private field is set to true in SetGitTagNames(...) when user explicitly sets value for the GitTagNames field.
+	// This is a workaround to Go not allowing default values for list/slice fields.
+	// Since Go doesn't support default values for list/slice fields, when the GitTagNames is nil, this is the only way we have to know
+	// if a user has explicitly set the GitTagNames to nil or not. If not, we will return the default value.
+	// This is also required for backward compatibility as all existing configurations before the introduction of the GitTagNames
+	// expect a behavior like the field is set to RELEASE_TYPE_GIT_TAG_NAMES.
+	if rt.gitTagNamesUserOverwrite || rt.GitTagNames != nil {
+		return rt.GitTagNames
+	} else {
+		return RELEASE_TYPE_GIT_TAG_NAMES
+	}
 }
 
 /*
 Sets the list of templates to use as tag names when tagging a commit. A nil value means undefined.
 */
 func (rt *ReleaseType) SetGitTagNames(gitTagNames *[]*string) {
+	// From now on, with this flag set, we will not return the default value for GitTagNames anymore
+	// See GetGitTagNames() for more
+	rt.gitTagNamesUserOverwrite = true
 	rt.GitTagNames = gitTagNames
 }
 

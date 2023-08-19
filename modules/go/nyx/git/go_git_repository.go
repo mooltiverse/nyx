@@ -1000,6 +1000,7 @@ func (r goGitRepository) PushToRemotesWithPublicKey(remotes []string, privateKey
 
 /*
 Tags the latest commit in the current branch with a tag with the given name. The resulting tag is lightweight.
+If the tag already exists it's updated.
 
 Returns the object modelling the new tag that was created. Never nil.
 
@@ -1010,7 +1011,7 @@ Arguments are as follows:
 Errors can be:
 
   - GitError in case some problem is encountered with the underlying Git repository, preventing to tag
-    (i.e. when the tag name is nil or there is already a tag with the given name in the repository).
+    (i.e. when the tag name is nil).
 */
 func (r goGitRepository) Tag(name *string) (gitent.Tag, error) {
 	return r.TagWithMessage(name, nil)
@@ -1018,6 +1019,7 @@ func (r goGitRepository) Tag(name *string) (gitent.Tag, error) {
 
 /*
 Tags the latest commit in the current branch with a tag with the given name and optional message.
+If the tag already exists it's updated.
 
 Returns the object modelling the new tag that was created. Never nil.
 
@@ -1030,7 +1032,7 @@ Arguments are as follows:
 Errors can be:
 
   - GitError in case some problem is encountered with the underlying Git repository, preventing to tag
-    (i.e. when the tag name is nil or there is already a tag with the given name in the repository).
+    (i.e. when the tag name is nil).
 */
 func (r goGitRepository) TagWithMessage(name *string, message *string) (gitent.Tag, error) {
 	return r.TagWithMessageAndIdentity(name, message, nil)
@@ -1039,6 +1041,7 @@ func (r goGitRepository) TagWithMessage(name *string, message *string) (gitent.T
 /*
 Tags the latest commit in the current branch with a tag with the given name and optional message using the optional
 tagger identity.
+If the tag already exists it's updated.
 
 Returns the object modelling the new tag that was created. Never nil.
 
@@ -1052,7 +1055,7 @@ Arguments are as follows:
 Errors can be:
 
   - GitError in case some problem is encountered with the underlying Git repository, preventing to tag
-    (i.e. when the tag name is nil or there is already a tag with the given name in the repository).
+    (i.e. when the tag name is nil).
 */
 func (r goGitRepository) TagWithMessageAndIdentity(name *string, message *string, tagger *gitent.Identity) (gitent.Tag, error) {
 	return r.TagCommitWithMessageAndIdentity(nil, name, message, tagger)
@@ -1061,6 +1064,7 @@ func (r goGitRepository) TagWithMessageAndIdentity(name *string, message *string
 /*
 Tags the object represented by the given SHA-1 with a tag with the given name and optional message using the optional
 tagger identity.
+If the tag already exists it's updated.
 
 Returns the object modelling the new tag that was created. Never nil.
 
@@ -1075,11 +1079,22 @@ Arguments are as follows:
 Errors can be:
 
   - GitError in case some problem is encountered with the underlying Git repository, preventing to tag
-    (i.e. when the tag name is nil or there is already a tag with the given name in the repository).
+    (i.e. when the tag name is nil).
 */
 func (r goGitRepository) TagCommitWithMessageAndIdentity(target *string, name *string, message *string, tagger *gitent.Identity) (gitent.Tag, error) {
 	if name == nil {
 		return gitent.Tag{}, &errs.GitError{Message: fmt.Sprintf("tag name cannot be nil")}
+	}
+
+	// go-git does not support updating (forcing) existing tags so in order to update we first need to delete the previous tag
+	_, err := r.repository.Tag(*name)
+	if err == nil {
+		// err is != nil if the tag was not found
+		log.Debugf("the repository already had a tag '%s' so it will be deleted first", *name)
+		err = r.repository.DeleteTag(*name)
+		if err != nil {
+			return gitent.Tag{}, &errs.GitError{Message: fmt.Sprintf("unable to delete Git tag '%s' for update", *name), Cause: err}
+		}
 	}
 
 	log.Debugf("tagging as '%s'", *name)

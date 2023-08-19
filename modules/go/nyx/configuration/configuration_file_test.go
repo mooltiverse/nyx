@@ -341,11 +341,7 @@ func TestSaveAndLoadJSON(t *testing.T) {
 				assert.Equal(t, (*(*sReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitTagMessage(), (*(*tReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitTagMessage())
 
 				if (*(*sReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitTagNames() == nil {
-					// This doesn't work because Go has no default values for structs and we can't return the default value
-					// from GetGitTagNames() in the ReleaseType object because we can't distinguish wher it's been explicitly
-					// set to nil by the user
-					// TODO: enable this when we have a way to set thie default value for ReleaseType.GetGitTagNames()
-					//assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, (*(*tReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitTagNames())
+					assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, (*(*tReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitTagNames())
 				} else {
 					assert.NotNil(t, (*(*tReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitTagNames())
 					assert.Equal(t, (*(*sReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitTagNames(), (*(*tReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitTagNames())
@@ -733,11 +729,7 @@ func TestSaveAndLoadYAML(t *testing.T) {
 				assert.Equal(t, (*(*sReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitTagMessage(), (*(*tReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitTagMessage())
 
 				if (*(*sReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitTagNames() == nil {
-					// This doesn't work because Go has no default values for structs and we can't return the default value
-					// from GetGitTagNames() in the ReleaseType object because we can't distinguish wher it's been explicitly
-					// set to nil by the user
-					// TODO: enable this when we have a way to set thie default value for ReleaseType.GetGitTagNames()
-					//assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, (*(*tReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitTagNames())
+					assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, (*(*tReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitTagNames())
 				} else {
 					assert.NotNil(t, (*(*tReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitTagNames())
 					assert.Equal(t, (*(*sReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitTagNames(), (*(*tReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitTagNames())
