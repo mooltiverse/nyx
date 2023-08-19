@@ -1029,7 +1029,7 @@ public class MarkTestTemplates {
         @TestTemplate
         @DisplayName("Mark.run() on a clean workspace using a release type with Commit, Tag and Push enabled after Infer has generated a new Version using multiple tag names > yield to a new commit and multiple tags, with changes pushed to remote")
         @Baseline(Scenario.ONE_BRANCH_SHORT)
-        void runOnCleanWorkspaceWithNewVersionOrNewReleaseWithCommitAndTagAndPushEnabledUsingMultipleTagnamesTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script)
+        void runOnCleanWorkspaceWithNewVersionOrNewReleaseWithCommitAndTagAndPushEnabledUsingMultipleTagNamesTest(@CommandSelector(Commands.MARK) CommandProxy command, Script script)
             throws Exception {
             script.getWorkingDirectory().deleteOnExit();
             Script remoteScript = Scenario.BARE.realize(true);
