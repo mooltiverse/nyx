@@ -148,6 +148,11 @@ public interface Defaults {
         public static final String GIT_TAG_MESSAGE = null;
 
         /**
+         * The list of templates to use as tag names when tagging a commit. Value: {@code "[ {{version}} ]"}
+         */
+        public static final List<String> GIT_TAG_NAMES = List.<String>of("{{version}}");
+
+        /**
          * The identifiers configuration block. Value: {@code null}
          */
         public static final List<Identifier> IDENTIFIERS = null;

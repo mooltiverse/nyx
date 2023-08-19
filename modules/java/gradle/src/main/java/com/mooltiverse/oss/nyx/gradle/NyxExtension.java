@@ -1346,6 +1346,11 @@ public abstract class NyxExtension {
             private final Property<String> gitTagMessage = getObjectfactory().property(String.class);
 
             /**
+             * The list of templates to use as tag names when tagging a commit.
+             */
+            private final ListProperty<String> gitTagNames = getObjectfactory().listProperty(String.class);
+            
+            /**
              * The nested 'identifiers' block.
              */
             // TODO: remove this member if and when https://github.com/mooltiverse/nyx/issues/77 is solved
@@ -1554,6 +1559,15 @@ public abstract class NyxExtension {
              */
             public Property<String> getGitTagMessage() {
                 return gitTagMessage;
+            }
+
+            /**
+             * Returns the list of templates to use as tag names when tagging a commit.
+             * 
+             * @return the list of templates to use as tag names when tagging a commit.
+             */
+            public ListProperty<String> getGitTagNames() {
+                return gitTagNames;
             }
 
             /**

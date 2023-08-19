@@ -1416,6 +1416,70 @@ func TestMarkRunOnDirtyWorkspaceWithNewVersionOrNewReleaseWithCommitAndTagAndPus
 	log.SetLevel(logLevel) // restore the original logging level
 }
 
+func TestMarkRunOnCleanWorkspaceWithNewVersionOrNewReleaseWithCommitAndTagAndPushEnabledUsingMultipleTagNames(t *testing.T) {
+	logLevel := log.GetLevel()   // save the previous logging level
+	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
+	for _, command := range cmdtpl.CommandInvocationProxies(cmd.MARK, gittools.ONE_BRANCH_SHORT()) {
+		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
+			remoteScript := gittools.BARE().RealizeBare(true)
+			defer os.RemoveAll(remoteScript.GetWorkingDirectory())
+			(*command).Script().AddRemote(remoteScript.GetWorkingDirectory(), "replica") // use the GitDirectory even if it's a bare repository as it's managed internally and still points to the repo dir
+			previousLastCommit := (*command).Script().GetLastCommitID()
+			previousCommits := (*command).Script().GetCommitIDs()
+			previousTags := (*command).Script().GetTags()
+			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
+			// add a mock convention that accepts all non nil messages and dumps the minor identifier for each
+			commitMessageConventions, _ := ent.NewCommitMessageConventionsWith(&[]*string{utl.PointerToString("testConvention")},
+				&map[string]*ent.CommitMessageConvention{"testConvention": ent.NewCommitMessageConventionWith(utl.PointerToString(".*"),
+					&map[string]string{"patch": ".*"})})
+			configurationLayerMock.SetCommitMessageConventions(commitMessageConventions)
+			// add a custom release type that always enables committing, tagging and pushing
+			releaseType := ent.NewReleaseType()
+			releaseType.SetGitCommit(utl.PointerToString("true"))
+			releaseType.SetGitPush(utl.PointerToString("true"))
+			releaseType.SetGitTag(utl.PointerToString("true"))
+			// here 0.0.1 is an existing tag so we test for updating/rewriting tags
+			releaseType.SetGitTagNames(&[]*string{utl.PointerToString("0.0.1"), utl.PointerToString("{{version}}"), utl.PointerToString("{{versionMajorNumber}}"), utl.PointerToString("{{versionMajorNumber}}.{{versionMinorNumber}}")})
+			releaseTypes, _ := ent.NewReleaseTypesWith(&[]*string{utl.PointerToString("testReleaseType")},
+				&[]*string{}, &[]*string{utl.PointerToString("replica")},
+				&map[string]*ent.ReleaseType{"testReleaseType": releaseType})
+			configurationLayerMock.SetReleaseTypes(releaseTypes)
+			var configurationLayer cnf.ConfigurationLayer
+			configurationLayer = configurationLayerMock
+			(*command).State().GetConfiguration().WithRuntimeConfiguration(&configurationLayer)
+
+			_, err := (*command).Run()
+			assert.NoError(t, err)
+
+			// when the command is executed standalone, Infer is not executed so Run() will just do nothing as the release scope is undefined
+			if (*command).GetContextName() != cmdtpl.STANDALONE_CONTEXT_NAME {
+				version2, _ := (*command).State().GetVersion()
+				majorVersion2, _ := (*command).State().GetVersionMajorNumber()
+				minorVersion2, _ := (*command).State().GetVersionMinorNumber()
+				assert.Equal(t, "0.0.5", *version2)
+				assert.Equal(t, previousLastCommit, (*command).Script().GetLastCommitID())
+				assert.Equal(t, len(previousCommits), len((*command).Script().GetCommitIDs()))
+				assert.Equal(t, len(previousTags)+3, len((*command).Script().GetTags()))
+				_, ok := (*command).Script().GetTags()[*version2]
+				assert.True(t, ok)
+				_, ok = (*command).Script().GetTags()[*majorVersion2]
+				assert.True(t, ok)
+				_, ok = (*command).Script().GetTags()[*majorVersion2+"."+*minorVersion2]
+				assert.True(t, ok)
+				assert.Equal(t, len((*command).Script().GetTags()), len(remoteScript.GetTags()))
+				_, ok = remoteScript.GetTags()[*version2]
+				assert.True(t, ok)
+				_, ok = remoteScript.GetTags()[*majorVersion2]
+				assert.True(t, ok)
+				_, ok = remoteScript.GetTags()[*majorVersion2+"."+*minorVersion2]
+				assert.True(t, ok)
+			}
+		})
+	}
+	log.SetLevel(logLevel) // restore the original logging level
+}
+
 func TestMarkRunOnGitHubClonedWorkspaceWithAdditionalRemoteWithNewVersionOrNewReleaseWithCommitAndTagAndPushEnabledUsingUsernameAndPasswordCredentials(t *testing.T) {
 	logLevel := log.GetLevel()   // save the previous logging level
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests

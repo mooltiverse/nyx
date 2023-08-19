@@ -191,6 +191,7 @@ scheme: SEMVER
                 "gitPush":"false",
                 "gitTag":"true",
                 "gitTagMessage":"Tag version {{version}}",
+				"gitTagNames":["{{version}}", "{{versionMajorNumber}}.{{versionMinorNumber}}", "stable", "latest"],
                 "matchBranches":"^(master|main)$",
                 "publish":"true"
 			}
@@ -245,7 +246,7 @@ scheme: SEMVER
 					"v0.1.0",
 				},
 			},
-			RepositoryTags:       []string{"v0.1.0"},
+			RepositoryTags:       []string{"v0.1.0", "0.1", "stable", "latest"},
 			RemoteRepositoryTags: []string{}, // not using remotes for this suite
 			HostedReleaseTags:    []string{}, // not using hosting services for this suite
 		},

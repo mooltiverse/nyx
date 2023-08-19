@@ -316,19 +316,21 @@ public interface Repository {
 
     /**
      * Tags the latest commit in the current branch with a tag with the given name. The resulting tag is lightweight.
+     * If the tag already exists it's updated.
      * 
      * @param name the name of the tag. Cannot be {@code null}
      * 
      * @return the object modelling the new tag that was created. Never {@code null}.
      * 
      * @throws GitException in case some problem is encountered with the underlying Git repository, preventing to tag
-     * (i.e. when the tag name is {@code null} or there is already a tag with the given name in the repository).
+     * (i.e. when the tag name is {@code null}).
      */
     public Tag tag(String name)
         throws GitException;
 
     /**
      * Tags the latest commit in the current branch with a tag with the given name and optional message.
+     * If the tag already exists it's updated.
      * 
      * @param name the name of the tag. Cannot be {@code null}
      * @param message the optional tag message. If {@code null} the new tag will be lightweight, otherwise it will be an
@@ -337,7 +339,7 @@ public interface Repository {
      * @return the object modelling the new tag that was created. Never {@code null}.
      * 
      * @throws GitException in case some problem is encountered with the underlying Git repository, preventing to tag
-     * (i.e. when the tag name is {@code null} or there is already a tag with the given name in the repository).
+     * (i.e. when the tag name is {@code null}).
      */
     public Tag tag(String name, String message)
         throws GitException;
@@ -345,6 +347,7 @@ public interface Repository {
     /**
      * Tags the latest commit in the current branch with a tag with the given name and optional message using the optional
      * tagger identity.
+     * If the tag already exists it's updated.
      * 
      * @param name the name of the tag. Cannot be {@code null}
      * @param message the optional tag message. If {@code null} the new tag will be lightweight, otherwise it will be an
@@ -355,7 +358,7 @@ public interface Repository {
      * @return the object modelling the new tag that was created. Never {@code null}.
      * 
      * @throws GitException in case some problem is encountered with the underlying Git repository, preventing to tag
-     * (i.e. when the tag name is {@code null} or there is already a tag with the given name in the repository).
+     * (i.e. when the tag name is {@code null}).
      */
     public Tag tag(String name, String message, Identity tagger)
         throws GitException;
@@ -363,6 +366,7 @@ public interface Repository {
     /**
      * Tags the object represented by the given SHA-1 with a tag with the given name and optional message using the optional
      * tagger identity.
+     * If the tag already exists it's updated.
      * 
      * @param target the SHA-1 identifier of the object to tag. If {@code null} the latest commit in the current branch is tagged.
      * @param name the name of the tag. Cannot be {@code null}
@@ -374,7 +378,7 @@ public interface Repository {
      * @return the object modelling the new tag that was created. Never {@code null}.
      * 
      * @throws GitException in case some problem is encountered with the underlying Git repository, preventing to tag
-     * (i.e. when the tag name is {@code null} or there is already a tag with the given name in the repository).
+     * (i.e. when the tag name is {@code null}).
      */
     public Tag tag(String target, String name, String message, Identity tagger)
         throws GitException;

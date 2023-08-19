@@ -299,6 +299,13 @@ const (
 	// in order to get the actual name of the environment variable that brings the value for the release type with the given 'name'.
 	RELEASE_TYPES_ENVVAR_ITEM_GIT_TAG_MESSAGE_FORMAT_STRING = RELEASE_TYPES_ENVVAR_NAME + "_%s_GIT_TAG_MESSAGE"
 
+	// The parametrized name of the environment variable to read for the 'gitTagNames' attribute of a
+	// release type.
+	// This string is a prototype that contains a '%s' parameter for the release type name
+	// and must be rendered using fmt.Sprintf(RELEASE_TYPES_ENVVAR_ITEM_GIT_TAG_NAMES_FORMAT_STRING, name)
+	// in order to get the actual name of the environment variable that brings the value for the release type with the given 'name'.
+	RELEASE_TYPES_ENVVAR_ITEM_GIT_TAG_NAMES_FORMAT_STRING = RELEASE_TYPES_ENVVAR_NAME + "_%s_GIT_TAG_NAMES"
+
 	// The parametrized name of the environment variable to read for the 'identifiers' attribute of a
 	// release type.
 	// This string is a prototype that contains a '%s' parameter for the commit release type name
@@ -1091,6 +1098,19 @@ func (ecl *EnvironmentConfigurationLayer) GetReleaseTypes() (*ent.ReleaseTypes, 
 			gitPush := ecl.getEnvVar(fmt.Sprintf(RELEASE_TYPES_ENVVAR_ITEM_GIT_PUSH_FORMAT_STRING, itemName))
 			gitTag := ecl.getEnvVar(fmt.Sprintf(RELEASE_TYPES_ENVVAR_ITEM_GIT_TAG_FORMAT_STRING, itemName))
 			gitTagMessage := ecl.getEnvVar(fmt.Sprintf(RELEASE_TYPES_ENVVAR_ITEM_GIT_TAG_MESSAGE_FORMAT_STRING, itemName))
+			gitTagNamesList := ecl.getEnvVar(fmt.Sprintf(RELEASE_TYPES_ENVVAR_ITEM_GIT_TAG_NAMES_FORMAT_STRING, itemName))
+			var gitTagNames *[]*string
+			if gitTagNamesList != nil {
+				gitTagNamesSlice := strings.Split(*gitTagNamesList, ",")
+				var gitTagNamesArray []*string
+				for _, tagName := range gitTagNamesSlice {
+					tagNameCopy := tagName
+					gitTagNamesArray = append(gitTagNamesArray, &tagNameCopy)
+				}
+				gitTagNames = &gitTagNamesArray
+			} else {
+				gitTagNames = nil
+			}
 			identifiers, err := ecl.getIdentifiersListFromEnvironmentVariable("releaseTypes"+"."+itemName+"."+"identifiers", fmt.Sprintf(RELEASE_TYPES_ENVVAR_ITEM_IDENTIFIERS_FORMAT_STRING, itemName), nil)
 			if err != nil {
 				return nil, &errs.IllegalPropertyError{Message: fmt.Sprintf("The environment variable '%s' has an illegal value", fmt.Sprintf(RELEASE_TYPES_ENVVAR_ITEM_IDENTIFIERS_FORMAT_STRING, itemName)), Cause: err}
@@ -1118,7 +1138,7 @@ func (ecl *EnvironmentConfigurationLayer) GetReleaseTypes() (*ent.ReleaseTypes, 
 				versionRangeFromBranchName = &vrfbn
 			}
 
-			items[itemName] = ent.NewReleaseTypeWith(assets, collapseVersions, collapseVersionQualifier, description, filterTags, gitCommit, gitCommitMessage, gitPush, gitTag, gitTagMessage, &identifiers, matchBranches, &matchEnvironmentVariables, matchWorkspaceStatus, publish, versionRange, versionRangeFromBranchName)
+			items[itemName] = ent.NewReleaseTypeWith(assets, collapseVersions, collapseVersionQualifier, description, filterTags, gitCommit, gitCommitMessage, gitPush, gitTag, gitTagMessage, gitTagNames, &identifiers, matchBranches, &matchEnvironmentVariables, matchWorkspaceStatus, publish, versionRange, versionRangeFromBranchName)
 		}
 
 		enabledPointers := ecl.toSliceOfStringPointers(enabled)

@@ -749,6 +749,7 @@ func TestConfigurationWithCommandLineConfigurationGetReleaseTypes(t *testing.T) 
 		"--release-types-type1-git-push=true",
 		"--release-types-type1-git-tag=true",
 		"--release-types-type1-git-tag-message=Tagging {{version}}",
+		"--release-types-type1-git-tag-names=one,two,three",
 		"--release-types-type1-identifiers-0-position=" + ent.BUILD.String(),
 		"--release-types-type1-identifiers-0-qualifier=build",
 		"--release-types-type1-identifiers-0-value=12",
@@ -806,6 +807,10 @@ func TestConfigurationWithCommandLineConfigurationGetReleaseTypes(t *testing.T) 
 	assert.Equal(t, "true", *(*(*releaseTypes2).GetItems())["type1"].GetGitPush())
 	assert.Equal(t, "true", *(*(*releaseTypes2).GetItems())["type1"].GetGitTag())
 	assert.Equal(t, "Tagging {{version}}", *(*(*releaseTypes2).GetItems())["type1"].GetGitTagMessage())
+	assert.Equal(t, 3, len(*(*(*releaseTypes2).GetItems())["type1"].GetGitTagNames()))
+	assert.Equal(t, "one", *(*(*(*releaseTypes2).GetItems())["type1"].GetGitTagNames())[0])
+	assert.Equal(t, "two", *(*(*(*releaseTypes2).GetItems())["type1"].GetGitTagNames())[1])
+	assert.Equal(t, "three", *(*(*(*releaseTypes2).GetItems())["type1"].GetGitTagNames())[2])
 	assert.Equal(t, "type1", *(*(*releaseTypes2).GetEnabled())[0])
 	assert.NotNil(t, *(*(*releaseTypes2).GetItems())["type1"].GetIdentifiers())
 	assert.False(t, len(*(*(*releaseTypes2).GetItems())["type1"].GetIdentifiers()) == 0)
@@ -1565,7 +1570,7 @@ func TestConfigurationWithPluginConfigurationGetReleasePrefix(t *testing.T) {
 func TestConfigurationWithPluginConfigurationGetReleaseTypes(t *testing.T) {
 	configurationLayerMock := NewSimpleConfigurationLayer()
 	configuration, _ := NewConfiguration()
-	releaseTypes, _ := ent.NewReleaseTypesWith(&[]*string{utl.PointerToString("type1")}, &[]*string{utl.PointerToString("service1")}, &[]*string{utl.PointerToString("remote1")}, &map[string]*ent.ReleaseType{"type1": ent.NewReleaseTypeWith(&[]*string{utl.PointerToString("asset1"), utl.PointerToString("asset2")}, utl.PointerToBoolean(true), utl.PointerToString("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}"), utl.PointerToString("Release description"), utl.PointerToString("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$"), utl.PointerToString("true"), utl.PointerToString("Committing {{version}}"), utl.PointerToString("true"), utl.PointerToString("true"), utl.PointerToString("Tagging {{version}}"), &[]*ent.Identifier{ent.NewIdentifierWith(utl.PointerToString("build"), utl.PointerToString("12"), ent.PointerToPosition(ent.BUILD))}, utl.PointerToString(""), &map[string]string{"PATH": ".*"}, nil, utl.PointerToString("true"), utl.PointerToString(""), utl.PointerToBoolean(false))})
+	releaseTypes, _ := ent.NewReleaseTypesWith(&[]*string{utl.PointerToString("type1")}, &[]*string{utl.PointerToString("service1")}, &[]*string{utl.PointerToString("remote1")}, &map[string]*ent.ReleaseType{"type1": ent.NewReleaseTypeWith(&[]*string{utl.PointerToString("asset1"), utl.PointerToString("asset2")}, utl.PointerToBoolean(true), utl.PointerToString("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}"), utl.PointerToString("Release description"), utl.PointerToString("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$"), utl.PointerToString("true"), utl.PointerToString("Committing {{version}}"), utl.PointerToString("true"), utl.PointerToString("true"), utl.PointerToString("Tagging {{version}}"), &[]*string{utl.PointerToString("one"), utl.PointerToString("two"), utl.PointerToString("three")}, &[]*ent.Identifier{ent.NewIdentifierWith(utl.PointerToString("build"), utl.PointerToString("12"), ent.PointerToPosition(ent.BUILD))}, utl.PointerToString(""), &map[string]string{"PATH": ".*"}, nil, utl.PointerToString("true"), utl.PointerToString(""), utl.PointerToBoolean(false))})
 	configurationLayerMock.SetReleaseTypes(releaseTypes)
 
 	// in order to make the test meaningful, make sure the default and mock values are different
@@ -1615,6 +1620,10 @@ func TestConfigurationWithPluginConfigurationGetReleaseTypes(t *testing.T) {
 	assert.Equal(t, "true", *(*(*releaseTypes2).GetItems())["type1"].GetGitPush())
 	assert.Equal(t, "true", *(*(*releaseTypes2).GetItems())["type1"].GetGitTag())
 	assert.Equal(t, "Tagging {{version}}", *(*(*releaseTypes2).GetItems())["type1"].GetGitTagMessage())
+	assert.Equal(t, 3, len(*(*(*releaseTypes2).GetItems())["type1"].GetGitTagNames()))
+	assert.Equal(t, "one", *(*(*(*releaseTypes2).GetItems())["type1"].GetGitTagNames())[0])
+	assert.Equal(t, "two", *(*(*(*releaseTypes2).GetItems())["type1"].GetGitTagNames())[1])
+	assert.Equal(t, "three", *(*(*(*releaseTypes2).GetItems())["type1"].GetGitTagNames())[2])
 	assert.Equal(t, "type1", *(*(*releaseTypes2).GetEnabled())[0])
 	assert.NotNil(t, *(*(*releaseTypes2).GetItems())["type1"].GetIdentifiers())
 	assert.False(t, len(*(*(*releaseTypes2).GetItems())["type1"].GetIdentifiers()) == 0)
@@ -2347,7 +2356,7 @@ func TestConfigurationWithRuntimeConfigurationGetReleasePrefix(t *testing.T) {
 func TestConfigurationWithRuntimeConfigurationGetReleaseTypes(t *testing.T) {
 	configurationLayerMock := NewSimpleConfigurationLayer()
 	configuration, _ := NewConfiguration()
-	releaseTypes, _ := ent.NewReleaseTypesWith(&[]*string{utl.PointerToString("type1")}, &[]*string{utl.PointerToString("service1")}, &[]*string{utl.PointerToString("remote1")}, &map[string]*ent.ReleaseType{"type1": ent.NewReleaseTypeWith(&[]*string{utl.PointerToString("asset1"), utl.PointerToString("asset2")}, utl.PointerToBoolean(true), utl.PointerToString("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}"), utl.PointerToString("Release description"), utl.PointerToString("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$"), utl.PointerToString("true"), utl.PointerToString("Committing {{version}}"), utl.PointerToString("true"), utl.PointerToString("true"), utl.PointerToString("Tagging {{version}}"), &[]*ent.Identifier{ent.NewIdentifierWith(utl.PointerToString("build"), utl.PointerToString("12"), ent.PointerToPosition(ent.BUILD))}, utl.PointerToString(""), &map[string]string{"PATH": ".*"}, nil, utl.PointerToString("true"), utl.PointerToString(""), utl.PointerToBoolean(false))})
+	releaseTypes, _ := ent.NewReleaseTypesWith(&[]*string{utl.PointerToString("type1")}, &[]*string{utl.PointerToString("service1")}, &[]*string{utl.PointerToString("remote1")}, &map[string]*ent.ReleaseType{"type1": ent.NewReleaseTypeWith(&[]*string{utl.PointerToString("asset1"), utl.PointerToString("asset2")}, utl.PointerToBoolean(true), utl.PointerToString("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}"), utl.PointerToString("Release description"), utl.PointerToString("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$"), utl.PointerToString("true"), utl.PointerToString("Committing {{version}}"), utl.PointerToString("true"), utl.PointerToString("true"), utl.PointerToString("Tagging {{version}}"), &[]*string{utl.PointerToString("one"), utl.PointerToString("two"), utl.PointerToString("three")}, &[]*ent.Identifier{ent.NewIdentifierWith(utl.PointerToString("build"), utl.PointerToString("12"), ent.PointerToPosition(ent.BUILD))}, utl.PointerToString(""), &map[string]string{"PATH": ".*"}, nil, utl.PointerToString("true"), utl.PointerToString(""), utl.PointerToBoolean(false))})
 	configurationLayerMock.SetReleaseTypes(releaseTypes)
 
 	// in order to make the test meaningful, make sure the default and mock values are different
@@ -2397,6 +2406,10 @@ func TestConfigurationWithRuntimeConfigurationGetReleaseTypes(t *testing.T) {
 	assert.Equal(t, "true", *(*(*releaseTypes2).GetItems())["type1"].GetGitPush())
 	assert.Equal(t, "true", *(*(*releaseTypes2).GetItems())["type1"].GetGitTag())
 	assert.Equal(t, "Tagging {{version}}", *(*(*releaseTypes2).GetItems())["type1"].GetGitTagMessage())
+	assert.Equal(t, 3, len(*(*(*releaseTypes2).GetItems())["type1"].GetGitTagNames()))
+	assert.Equal(t, "one", *(*(*(*releaseTypes2).GetItems())["type1"].GetGitTagNames())[0])
+	assert.Equal(t, "two", *(*(*(*releaseTypes2).GetItems())["type1"].GetGitTagNames())[1])
+	assert.Equal(t, "three", *(*(*(*releaseTypes2).GetItems())["type1"].GetGitTagNames())[2])
 	assert.Equal(t, "type1", *(*(*releaseTypes2).GetEnabled())[0])
 	assert.NotNil(t, *(*(*releaseTypes2).GetItems())["type1"].GetIdentifiers())
 	assert.False(t, len(*(*(*releaseTypes2).GetItems())["type1"].GetIdentifiers()) == 0)
@@ -3081,7 +3094,7 @@ func TestConfigurationWithMultipleConfigurationLayersGetReleaseTypes(t *testing.
 	mediumPriorityConfigurationLayerMock := NewCommandLineConfigurationLayer()
 	highPriorityConfigurationLayerMock := NewSimpleConfigurationLayer()
 	configuration, _ := NewConfiguration()
-	lpReleaseTypes, _ := ent.NewReleaseTypesWith(&[]*string{utl.PointerToString("type1")}, &[]*string{utl.PointerToString("service1")}, &[]*string{utl.PointerToString("remote1")}, &map[string]*ent.ReleaseType{"type1": ent.NewReleaseTypeWith(&[]*string{utl.PointerToString("assetA1"), utl.PointerToString("assetA2")}, utl.PointerToBoolean(false), utl.PointerToString("{{branch1}}"), utl.PointerToString("Release description 1"), utl.PointerToString("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$"), utl.PointerToString("true"), utl.PointerToString("Committing {{version}}"), utl.PointerToString("true"), utl.PointerToString("true"), utl.PointerToString("Tagging {{version}}"), &[]*ent.Identifier{ent.NewIdentifierWith(utl.PointerToString("build"), utl.PointerToString("12"), ent.PointerToPosition(ent.BUILD))}, utl.PointerToString(""), &map[string]string{"PATH": ".*"}, nil, utl.PointerToString("true"), utl.PointerToString(""), utl.PointerToBoolean(false))})
+	lpReleaseTypes, _ := ent.NewReleaseTypesWith(&[]*string{utl.PointerToString("type1")}, &[]*string{utl.PointerToString("service1")}, &[]*string{utl.PointerToString("remote1")}, &map[string]*ent.ReleaseType{"type1": ent.NewReleaseTypeWith(&[]*string{utl.PointerToString("assetA1"), utl.PointerToString("assetA2")}, utl.PointerToBoolean(false), utl.PointerToString("{{branch1}}"), utl.PointerToString("Release description 1"), utl.PointerToString("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$"), utl.PointerToString("true"), utl.PointerToString("Committing {{version}}"), utl.PointerToString("true"), utl.PointerToString("true"), utl.PointerToString("Tagging {{version}}"), &[]*string{utl.PointerToString("one"), utl.PointerToString("two"), utl.PointerToString("three")}, &[]*ent.Identifier{ent.NewIdentifierWith(utl.PointerToString("build"), utl.PointerToString("12"), ent.PointerToPosition(ent.BUILD))}, utl.PointerToString(""), &map[string]string{"PATH": ".*"}, nil, utl.PointerToString("true"), utl.PointerToString(""), utl.PointerToBoolean(false))})
 	lowPriorityConfigurationLayerMock.SetReleaseTypes(lpReleaseTypes)
 	mediumPriorityConfigurationLayerMock.withArguments([]string{
 		"--release-types-enabled=type2",
@@ -3106,7 +3119,7 @@ func TestConfigurationWithMultipleConfigurationLayersGetReleaseTypes(t *testing.
 		"--release-types-type2-version-range=",
 		"--release-types-type2-version-range-from-branch-name=false",
 	})
-	hpReleaseTypes, _ := ent.NewReleaseTypesWith(&[]*string{utl.PointerToString("type3")}, &[]*string{utl.PointerToString("service3")}, &[]*string{utl.PointerToString("remote3")}, &map[string]*ent.ReleaseType{"type3": ent.NewReleaseTypeWith(&[]*string{utl.PointerToString("assetC1"), utl.PointerToString("assetC2")}, utl.PointerToBoolean(true), utl.PointerToString("{{branch3}}"), utl.PointerToString("Release description 3"), utl.PointerToString("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$"), utl.PointerToString("true"), utl.PointerToString("Committing {{version}}"), utl.PointerToString("true"), utl.PointerToString("true"), utl.PointerToString("Tagging {{version}}"), &[]*ent.Identifier{ent.NewIdentifierWith(utl.PointerToString("build"), utl.PointerToString("12"), ent.PointerToPosition(ent.BUILD))}, utl.PointerToString(""), &map[string]string{"PATH": ".*"}, nil, utl.PointerToString("true"), utl.PointerToString(""), utl.PointerToBoolean(false))})
+	hpReleaseTypes, _ := ent.NewReleaseTypesWith(&[]*string{utl.PointerToString("type3")}, &[]*string{utl.PointerToString("service3")}, &[]*string{utl.PointerToString("remote3")}, &map[string]*ent.ReleaseType{"type3": ent.NewReleaseTypeWith(&[]*string{utl.PointerToString("assetC1"), utl.PointerToString("assetC2")}, utl.PointerToBoolean(true), utl.PointerToString("{{branch3}}"), utl.PointerToString("Release description 3"), utl.PointerToString("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$"), utl.PointerToString("true"), utl.PointerToString("Committing {{version}}"), utl.PointerToString("true"), utl.PointerToString("true"), utl.PointerToString("Tagging {{version}}"), &[]*string{utl.PointerToString("one"), utl.PointerToString("two"), utl.PointerToString("three")}, &[]*ent.Identifier{ent.NewIdentifierWith(utl.PointerToString("build"), utl.PointerToString("12"), ent.PointerToPosition(ent.BUILD))}, utl.PointerToString(""), &map[string]string{"PATH": ".*"}, nil, utl.PointerToString("true"), utl.PointerToString(""), utl.PointerToBoolean(false))})
 	highPriorityConfigurationLayerMock.SetReleaseTypes(hpReleaseTypes)
 
 	// inject the command line configuration and test the new value is returned from that
@@ -3141,6 +3154,10 @@ func TestConfigurationWithMultipleConfigurationLayersGetReleaseTypes(t *testing.
 	assert.Equal(t, "true", *(*(*releaseTypes).GetItems())["type3"].GetGitPush())
 	assert.Equal(t, "true", *(*(*releaseTypes).GetItems())["type3"].GetGitTag())
 	assert.Equal(t, "Tagging {{version}}", *(*(*releaseTypes).GetItems())["type3"].GetGitTagMessage())
+	assert.Equal(t, 3, len(*(*(*releaseTypes).GetItems())["type3"].GetGitTagNames()))
+	assert.Equal(t, "one", *(*(*(*releaseTypes).GetItems())["type3"].GetGitTagNames())[0])
+	assert.Equal(t, "two", *(*(*(*releaseTypes).GetItems())["type3"].GetGitTagNames())[1])
+	assert.Equal(t, "three", *(*(*(*releaseTypes).GetItems())["type3"].GetGitTagNames())[2])
 	assert.Nil(t, (*(*releaseTypes).GetItems())["type1"])
 	assert.Nil(t, (*(*releaseTypes).GetItems())["type2"])
 	assert.NotNil(t, (*(*releaseTypes).GetItems())["type3"])

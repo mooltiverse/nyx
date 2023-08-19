@@ -47,6 +47,7 @@ nyx {
         gitPush = 'true'
         gitTag = 'true'
         gitTagMessage = 'Tag release {{version}}'
+        gitTagNames = [ '{{version}}', 'stable', 'latest' ]
         matchBranches = '^(master|main)$'
         matchEnvironmentVariables {
           CI = '^true$'

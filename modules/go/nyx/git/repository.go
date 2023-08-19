@@ -309,6 +309,7 @@ type Repository interface {
 
 	/*
 	   Tags the latest commit in the current branch with a tag with the given name. The resulting tag is lightweight.
+	   If the tag already exists it's updated.
 
 	   Returns the object modelling the new tag that was created. Never nil.
 
@@ -319,12 +320,13 @@ type Repository interface {
 	   Errors can be:
 
 	   - GitError in case some problem is encountered with the underlying Git repository, preventing to tag
-	     (i.e. when the tag name is nil or there is already a tag with the given name in the repository).
+	     (i.e. when the tag name is nil).
 	*/
 	Tag(name *string) (gitent.Tag, error)
 
 	/*
 	   Tags the latest commit in the current branch with a tag with the given name and optional message.
+	   If the tag already exists it's updated.
 
 	   Returns the object modelling the new tag that was created. Never nil.
 
@@ -337,13 +339,14 @@ type Repository interface {
 	   Errors can be:
 
 	   - GitError in case some problem is encountered with the underlying Git repository, preventing to tag
-	     (i.e. when the tag name is nil or there is already a tag with the given name in the repository).
+	     (i.e. when the tag name is nil).
 	*/
 	TagWithMessage(name *string, message *string) (gitent.Tag, error)
 
 	/*
 	   Tags the latest commit in the current branch with a tag with the given name and optional message using the optional
 	   tagger identity.
+	   If the tag already exists it's updated.
 
 	   Returns the object modelling the new tag that was created. Never nil.
 
@@ -357,13 +360,14 @@ type Repository interface {
 	   Errors can be:
 
 	   - GitError in case some problem is encountered with the underlying Git repository, preventing to tag
-	     (i.e. when the tag name is nil or there is already a tag with the given name in the repository).
+	     (i.e. when the tag name is nil).
 	*/
 	TagWithMessageAndIdentity(name *string, message *string, tagger *gitent.Identity) (gitent.Tag, error)
 
 	/*
 	   Tags the object represented by the given SHA-1 with a tag with the given name and optional message using the optional
 	   tagger identity.
+	   If the tag already exists it's updated.
 
 	   Returns the object modelling the new tag that was created. Never nil.
 
@@ -378,7 +382,7 @@ type Repository interface {
 	   Errors can be:
 
 	   - GitError in case some problem is encountered with the underlying Git repository, preventing to tag
-	     (i.e. when the tag name is nil or there is already a tag with the given name in the repository).
+	     (i.e. when the tag name is nil).
 	*/
 	TagCommitWithMessageAndIdentity(target *string, name *string, message *string, tagger *gitent.Identity) (gitent.Tag, error)
 

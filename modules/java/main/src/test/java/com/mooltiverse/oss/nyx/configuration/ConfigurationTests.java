@@ -618,7 +618,7 @@ public class ConfigurationTests {
                     List.<String>of("type1"),
                     List.<String>of("service1"),
                     List.<String>of("remote1"),
-                    Map.<String,ReleaseType>of("type1", new ReleaseType(List.<String>of("asset1", "asset2"), true, "{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}", "Release description", "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{version}}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{version}}", List.<Identifier>of(new Identifier("build", "12", Identifier.Position.BUILD)), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), "", Boolean.FALSE))
+                    Map.<String,ReleaseType>of("type1", new ReleaseType(List.<String>of("asset1", "asset2"), true, "{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}", "Release description", "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{version}}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{version}}", List.<String>of("one", "two", "three"), List.<Identifier>of(new Identifier("build", "12", Identifier.Position.BUILD)), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), "", Boolean.FALSE))
                 )
             );
 
@@ -663,6 +663,10 @@ public class ConfigurationTests {
             assertEquals(Boolean.TRUE.toString(), configuration.getReleaseTypes().getItems().get("type1").getGitPush());
             assertEquals(Boolean.TRUE.toString(), configuration.getReleaseTypes().getItems().get("type1").getGitTag());
             assertEquals("Tagging {{version}}", configuration.getReleaseTypes().getItems().get("type1").getGitTagMessage());
+            assertEquals(3, configuration.getReleaseTypes().getItems().get("type1").getGitTagNames().size());
+            assertEquals("one", configuration.getReleaseTypes().getItems().get("type1").getGitTagNames().get(0));
+            assertEquals("two", configuration.getReleaseTypes().getItems().get("type1").getGitTagNames().get(1));
+            assertEquals("three", configuration.getReleaseTypes().getItems().get("type1").getGitTagNames().get(2));
             assertNotNull(configuration.getReleaseTypes().getEnabled().contains("type1"));
             assertNotNull(configuration.getReleaseTypes().getItems().get("type1").getIdentifiers());
             assertFalse(configuration.getReleaseTypes().getItems().get("type1").getIdentifiers().isEmpty());
@@ -1329,7 +1333,7 @@ public class ConfigurationTests {
                     List.<String>of("type1"),
                     List.<String>of("service1"),
                     List.<String>of("remote1"),
-                    Map.<String,ReleaseType>of("type1", new ReleaseType(List.<String>of("asset1", "asset2"), true, "{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}", "Release description", "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{version}}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{version}}", List.<Identifier>of(new Identifier("build", "12", Identifier.Position.BUILD)), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), "", Boolean.FALSE))
+                    Map.<String,ReleaseType>of("type1", new ReleaseType(List.<String>of("asset1", "asset2"), true, "{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}", "Release description", "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{version}}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{version}}", List.<String>of("one", "two", "three"), List.<Identifier>of(new Identifier("build", "12", Identifier.Position.BUILD)), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), "", Boolean.FALSE))
                 )
             );
 
@@ -1374,6 +1378,10 @@ public class ConfigurationTests {
             assertEquals(Boolean.TRUE.toString(), configuration.getReleaseTypes().getItems().get("type1").getGitPush());
             assertEquals(Boolean.TRUE.toString(), configuration.getReleaseTypes().getItems().get("type1").getGitTag());
             assertEquals("Tagging {{version}}", configuration.getReleaseTypes().getItems().get("type1").getGitTagMessage());
+            assertEquals(3, configuration.getReleaseTypes().getItems().get("type1").getGitTagNames().size());
+            assertEquals("one", configuration.getReleaseTypes().getItems().get("type1").getGitTagNames().get(0));
+            assertEquals("two", configuration.getReleaseTypes().getItems().get("type1").getGitTagNames().get(1));
+            assertEquals("three", configuration.getReleaseTypes().getItems().get("type1").getGitTagNames().get(2));
             assertNotNull(configuration.getReleaseTypes().getEnabled().contains("type1"));
             assertNotNull(configuration.getReleaseTypes().getItems().get("type1").getIdentifiers());
             assertFalse(configuration.getReleaseTypes().getItems().get("type1").getIdentifiers().isEmpty());
@@ -2030,7 +2038,7 @@ public class ConfigurationTests {
                     List.<String>of("type1"),
                     List.<String>of("service1"),
                     List.<String>of("remote1"),
-                    Map.<String,ReleaseType>of("type1", new ReleaseType(List.<String>of("asset1", "asset2"), true, "{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}", "Release description", "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{version}}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{version}}", List.<Identifier>of(new Identifier("build", "12", Identifier.Position.BUILD)), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), "", Boolean.FALSE))
+                    Map.<String,ReleaseType>of("type1", new ReleaseType(List.<String>of("asset1", "asset2"), true, "{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}", "Release description", "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{version}}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{version}}", List.<String>of("one", "two", "three"), List.<Identifier>of(new Identifier("build", "12", Identifier.Position.BUILD)), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), "", Boolean.FALSE))
                 )
             );
 
@@ -2075,6 +2083,10 @@ public class ConfigurationTests {
             assertEquals(Boolean.TRUE.toString(), configuration.getReleaseTypes().getItems().get("type1").getGitPush());
             assertEquals(Boolean.TRUE.toString(), configuration.getReleaseTypes().getItems().get("type1").getGitTag());
             assertEquals("Tagging {{version}}", configuration.getReleaseTypes().getItems().get("type1").getGitTagMessage());
+            assertEquals(3, configuration.getReleaseTypes().getItems().get("type1").getGitTagNames().size());
+            assertEquals("one", configuration.getReleaseTypes().getItems().get("type1").getGitTagNames().get(0));
+            assertEquals("two", configuration.getReleaseTypes().getItems().get("type1").getGitTagNames().get(1));
+            assertEquals("three", configuration.getReleaseTypes().getItems().get("type1").getGitTagNames().get(2));
             assertNotNull(configuration.getReleaseTypes().getEnabled().contains("type1"));
             assertNotNull(configuration.getReleaseTypes().getItems().get("type1").getIdentifiers());
             assertFalse(configuration.getReleaseTypes().getItems().get("type1").getIdentifiers().isEmpty());
@@ -2742,7 +2754,7 @@ public class ConfigurationTests {
                     List.<String>of("type1"),
                     List.<String>of("service1"),
                     List.<String>of("remote1"),
-                    Map.<String,ReleaseType>of("type1", new ReleaseType(List.<String>of("assetA1", "assetA2"), false, "{{branch1}}", "Release description 1", "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{version}}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{version}}", List.<Identifier>of(new Identifier("build", "12", Identifier.Position.BUILD)), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), "", Boolean.FALSE))
+                    Map.<String,ReleaseType>of("type1", new ReleaseType(List.<String>of("assetA1", "assetA2"), false, "{{branch1}}", "Release description 1", "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{version}}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{version}}", List.<String>of("one", "two", "three"), List.<Identifier>of(new Identifier("build", "12", Identifier.Position.BUILD)), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), "", Boolean.FALSE))
                 )
             );
             mediumPriorityConfigurationLayerMock.setReleaseTypes(
@@ -2750,7 +2762,7 @@ public class ConfigurationTests {
                     List.<String>of("type2"),
                     List.<String>of("service2"),
                     List.<String>of("remote2"),
-                    Map.<String,ReleaseType>of("type2", new ReleaseType(List.<String>of("assetB1", "assetB2"), true, "{{branch2}}", "Release description 2", "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{version}}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{version}}", List.<Identifier>of(new Identifier("build", "12", Identifier.Position.BUILD)), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), "", Boolean.FALSE))
+                    Map.<String,ReleaseType>of("type2", new ReleaseType(List.<String>of("assetB1", "assetB2"), true, "{{branch2}}", "Release description 2", "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{version}}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{version}}", List.<String>of("one", "two", "three"), List.<Identifier>of(new Identifier("build", "12", Identifier.Position.BUILD)), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), "", Boolean.FALSE))
                 )
             );
             highPriorityConfigurationLayerMock.setReleaseTypes(
@@ -2758,7 +2770,7 @@ public class ConfigurationTests {
                     List.<String>of("type3"),
                     List.<String>of("service3"),
                     List.<String>of("remote3"),
-                    Map.<String,ReleaseType>of("type3", new ReleaseType(List.<String>of("assetC1", "assetC2"), true, "{{branch3}}", "Release description 3", "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{version}}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{version}}", List.<Identifier>of(new Identifier("build", "12", Identifier.Position.BUILD)), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), "", Boolean.FALSE))
+                    Map.<String,ReleaseType>of("type3", new ReleaseType(List.<String>of("assetC1", "assetC2"), true, "{{branch3}}", "Release description 3", "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{version}}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{version}}", List.<String>of("one", "two", "three"), List.<Identifier>of(new Identifier("build", "12", Identifier.Position.BUILD)), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), "", Boolean.FALSE))
                 )
             );
             
@@ -2790,6 +2802,10 @@ public class ConfigurationTests {
             assertEquals(Boolean.TRUE.toString(), configuration.getReleaseTypes().getItems().get("type3").getGitPush());
             assertEquals(Boolean.TRUE.toString(), configuration.getReleaseTypes().getItems().get("type3").getGitTag());
             assertEquals("Tagging {{version}}", configuration.getReleaseTypes().getItems().get("type3").getGitTagMessage());
+            assertEquals(3, configuration.getReleaseTypes().getItems().get("type3").getGitTagNames().size());
+            assertEquals("one", configuration.getReleaseTypes().getItems().get("type3").getGitTagNames().get(0));
+            assertEquals("two", configuration.getReleaseTypes().getItems().get("type3").getGitTagNames().get(1));
+            assertEquals("three", configuration.getReleaseTypes().getItems().get("type3").getGitTagNames().get(2));
             assertFalse(configuration.getReleaseTypes().getEnabled().contains("type1"));
             assertFalse(configuration.getReleaseTypes().getEnabled().contains("type2"));
             assertTrue(configuration.getReleaseTypes().getEnabled().contains("type3"));

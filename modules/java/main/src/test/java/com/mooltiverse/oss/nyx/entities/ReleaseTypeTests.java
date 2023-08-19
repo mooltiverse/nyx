@@ -40,6 +40,7 @@ public class ReleaseTypeTests {
                 Boolean.TRUE.toString(),
                 Boolean.TRUE.toString(),
                 "Tagging {{version}}",
+                List.<String>of(),
                 List.<Identifier>of(new Identifier("build", "12", Identifier.Position.BUILD)),
                 "",
                 Map.<String,String>of("PATH",".*"),

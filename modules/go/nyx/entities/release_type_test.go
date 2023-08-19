@@ -61,7 +61,7 @@ func TestReleaseTypeNewReleaseTypeWith(t *testing.T) {
 	i2 := NewIdentifierWith(utl.PointerToString("build"), utl.PointerToString("123"), PointerToPosition(BUILD))
 	l := []*Identifier{i1, i2}
 
-	rt := NewReleaseTypeWith(&al, utl.PointerToBoolean(true), utl.PointerToString("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}"), utl.PointerToString("Release description"), utl.PointerToString("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$"), utl.PointerToString("true"), utl.PointerToString("Committing {{version}}"), utl.PointerToString("true"), utl.PointerToString("true"), utl.PointerToString("Tagging {{version}}"), &l, utl.PointerToString(""), &m, nil, utl.PointerToString("true"), utl.PointerToString(""), utl.PointerToBoolean(false))
+	rt := NewReleaseTypeWith(&al, utl.PointerToBoolean(true), utl.PointerToString("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}"), utl.PointerToString("Release description"), utl.PointerToString("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$"), utl.PointerToString("true"), utl.PointerToString("Committing {{version}}"), utl.PointerToString("true"), utl.PointerToString("true"), utl.PointerToString("Tagging {{version}}"), &[]*string{}, &l, utl.PointerToString(""), &m, nil, utl.PointerToString("true"), utl.PointerToString(""), utl.PointerToBoolean(false))
 
 	a := rt.GetAssets()
 	assert.Equal(t, 2, len(*a))
