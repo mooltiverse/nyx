@@ -1192,6 +1192,7 @@ public class Suites {
                         .concat("                \"gitPush\":\"false\",").concat(newLine)
                         .concat("                \"gitTag\":\"true\",").concat(newLine)
                         .concat("                \"gitTagMessage\":\"Tag version {{version}}\",").concat(newLine)
+                        .concat("                \"gitTagNames\":[\"{{version}}\", \"{{versionMajorNumber}}.{{versionMinorNumber}}\", \"stable\", \"latest\"],").concat(newLine)
                         .concat("                \"matchBranches\":\"^(master|main)$\",").concat(newLine)
                         .concat("                \"publish\":\"true\"").concat(newLine)
                         .concat("            }").concat(newLine)
@@ -1242,7 +1243,7 @@ public class Suites {
                         "v0.1.0"
                     )
                 );
-                repositoryTags = Set.<String>of("v0.1.0");
+                repositoryTags = Set.<String>of("v0.1.0", "0.1", "stable", "latest"); // also test for tag aliases set with gitTagNames
                 remoteRepositoryTags = Set.<String>of(); // not using remotes for this suite
                 hostedReleaseTags = Set.<String>of(); // not using hosting services for this suite
             }},
@@ -1321,6 +1322,7 @@ public class Suites {
                         .concat("                \"gitPush\":\"false\",").concat(newLine)
                         .concat("                \"gitTag\":\"true\",").concat(newLine)
                         .concat("                \"gitTagMessage\":\"Tag version {{version}}\",").concat(newLine)
+                        .concat("                \"gitTagNames\":[\"{{version}}\", \"{{versionMajorNumber}}.{{versionMinorNumber}}\", \"stable\", \"latest\"],").concat(newLine)
                         .concat("                \"matchBranches\":\"^(master|main)$\",").concat(newLine)
                         .concat("                \"publish\":\"true\"").concat(newLine)
                         .concat("            }").concat(newLine)
@@ -1371,7 +1373,7 @@ public class Suites {
                         "v0.1.0"
                     )
                 );
-                repositoryTags = Set.<String>of("v0.1.0");
+                repositoryTags = Set.<String>of("v0.1.0", "0.1", "stable", "latest"); // also test for tag aliases set with gitTagNames
                 remoteRepositoryTags = Set.<String>of(); // not using remotes for this suite
                 hostedReleaseTags = Set.<String>of(); // not using hosting services for this suite
             }},

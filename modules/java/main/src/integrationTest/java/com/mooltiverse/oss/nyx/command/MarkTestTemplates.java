@@ -1057,7 +1057,7 @@ public class MarkTestTemplates {
                             setGitCommit(Boolean.TRUE.toString());
                             setGitPush(Boolean.TRUE.toString());
                             setGitTag(Boolean.TRUE.toString());
-                            // here 0.0.1 is an existing tag so we test for rewriting
+                            // here 0.0.1 is an existing tag so we test for updating/rewriting tags
                             setGitTagNames(List.<String>of("0.0.1", "{{version}}", "{{versionMajorNumber}}", "{{versionMajorNumber}}.{{versionMinorNumber}}"));
                         }}
                     )
