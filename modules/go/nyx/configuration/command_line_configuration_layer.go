@@ -352,6 +352,13 @@ const (
 	// in order to get the actual name of the argument that brings the value for the release type with the given 'name'.
 	RELEASE_TYPES_ARGUMENT_ITEM_PUBLISH_FORMAT_STRING = RELEASE_TYPES_ARGUMENT_NAME + "-%s-publish"
 
+	// The parametrized name of the argument to read for the 'releaseName' attribute of a
+	// release type.
+	// This string is a prototype that contains a '%s' parameter for the release type name
+	// and must be rendered using fmt.Sprintf(RELEASE_TYPES_ARGUMENT_ITEM_RELEASE_NAME_FORMAT_STRING, name)
+	// in order to get the actual name of the argument that brings the value for the release type with the given 'name'.
+	RELEASE_TYPES_ARGUMENT_ITEM_RELEASE_NAME_FORMAT_STRING = RELEASE_TYPES_ARGUMENT_NAME + "-%s-release-name"
+
 	// The parametrized name of the argument to read for the 'versionRange' attribute of a
 	// release type.
 	// This string is a prototype that contains a '%s' parameter for the release type name
@@ -1218,6 +1225,7 @@ func (clcl *CommandLineConfigurationLayer) GetReleaseTypes() (*ent.ReleaseTypes,
 				matchWorkspaceStatus = &mws
 			}
 			publish := clcl.getArgument(fmt.Sprintf(RELEASE_TYPES_ARGUMENT_ITEM_PUBLISH_FORMAT_STRING, itemName))
+			releaseName := clcl.getArgument(fmt.Sprintf(RELEASE_TYPES_ARGUMENT_ITEM_RELEASE_NAME_FORMAT_STRING, itemName))
 			versionRange := clcl.getArgument(fmt.Sprintf(RELEASE_TYPES_ARGUMENT_ITEM_VERSION_RANGE_FORMAT_STRING, itemName))
 			var versionRangeFromBranchName *bool = nil
 			versionRangeFromBranchNameString := clcl.getArgument(fmt.Sprintf(RELEASE_TYPES_ARGUMENT_ITEM_VERSION_RANGE_FROM_BRANCH_NAME_FORMAT_STRING, itemName))
@@ -1229,7 +1237,7 @@ func (clcl *CommandLineConfigurationLayer) GetReleaseTypes() (*ent.ReleaseTypes,
 				versionRangeFromBranchName = &vrfbn
 			}
 
-			items[itemName] = ent.NewReleaseTypeWith(assets, collapseVersions, collapseVersionQualifier, description, filterTags, gitCommit, gitCommitMessage, gitPush, gitTag, gitTagMessage, gitTagNames, &identifiers, matchBranches, &matchEnvironmentVariables, matchWorkspaceStatus, publish, versionRange, versionRangeFromBranchName)
+			items[itemName] = ent.NewReleaseTypeWith(assets, collapseVersions, collapseVersionQualifier, description, filterTags, gitCommit, gitCommitMessage, gitPush, gitTag, gitTagMessage, gitTagNames, &identifiers, matchBranches, &matchEnvironmentVariables, matchWorkspaceStatus, publish, releaseName, versionRange, versionRangeFromBranchName)
 		}
 
 		enabledPointers := clcl.toSliceOfStringPointers(enabled)

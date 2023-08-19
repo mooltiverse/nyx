@@ -176,6 +176,87 @@ public class PublishTests {
         }
 
         @Test
+        @DisplayName("Publish.run() after a new release has been created on a GitHub hosted repository using a custom release name > publishes a new version with a custom release name")
+        void runWithNewReleaseWithCustomNameOnGitHubRepositoryTest()
+            throws Exception {
+            String randomID = RandomUtil.randomAlphabeticString(5);
+            // the 'gitHubTestUserToken' system property is set by the build script, which in turn reads it from an environment variable
+            GitHub gitHub = GitHub.instance(Map.<String,String>of(GitHub.AUTHENTICATION_TOKEN_OPTION_NAME, System.getProperty("gitHubTestUserToken")));
+            GitHubUser user = gitHub.getAuthenticatedUser();
+            GitHubRepository gitHubRepository = gitHub.createGitRepository(randomID, "Test repository "+randomID, false, true);
+
+            // if we clone too quickly next calls may fail
+            Thread.sleep(4000);
+
+            Script script = Scenario.ONE_BRANCH_SHORT.applyOnClone(gitHubRepository.getHTTPURL(), System.getProperty("gitHubTestUserToken"), "");
+            script.getWorkingDirectory().deleteOnExit();
+            script.push(System.getProperty("gitHubTestUserToken"), "");
+
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            // add a mock convention that accepts all non null messages and dumps the major identifier for each
+            configurationLayerMock.setCommitMessageConventions(
+                new CommitMessageConventions(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", ".*")))
+                )
+            );
+            // add the test publishing service
+            configurationLayerMock.setServices(Map.<String,ServiceConfiguration>of(
+                "github", new ServiceConfiguration(Provider.GITHUB, Map.<String,String>of(
+                    GitHub.AUTHENTICATION_TOKEN_OPTION_NAME, System.getProperty("gitHubTestUserToken"),
+                    GitHub.REPOSITORY_NAME_OPTION_NAME, gitHubRepository.getName(),
+                    GitHub.REPOSITORY_OWNER_OPTION_NAME, user.getUserName()
+                ))
+            ));
+            // set up the Git remote credentials
+            configurationLayerMock.getGit().setRemotes(Map.<String,GitRemoteConfiguration>of(
+                "origin", new GitRemoteConfiguration(AuthenticationMethod.USER_PASSWORD, System.getProperty("gitHubTestUserToken"), "", null, null))
+            );
+            // add a custom release type that always enables committing, tagging and pushing
+            // and all the publishing service enabled
+            configurationLayerMock.setReleaseTypes(
+                new ReleaseTypes(
+                    List.<String>of("testReleaseType"),
+                    List.<String>of("github"),
+                    List.<String>of(), // default 'origin' is used if we don't specify the remotes here
+                    Map.<String,ReleaseType>of("testReleaseType", new ReleaseType() {
+                        {
+                            setGitCommit(Boolean.TRUE.toString());
+                            setGitPush(Boolean.TRUE.toString());
+                            setGitTag(Boolean.TRUE.toString());
+                            setPublish(Boolean.TRUE.toString());
+                            setReleaseName("Stable {{version}} release");
+                        }}
+                    )
+                )
+            );
+
+            Nyx nyx = new Nyx(script.getWorkingDirectory());
+            nyx.configuration().withRuntimeConfiguration(configurationLayerMock);
+
+            assertNull(gitHub.getReleaseByTag(user.getUserName(), gitHubRepository.getName(), "1.0.0"));
+
+            nyx.publish();
+
+            // if we read too quickly we often get a 404 from the server so let's wait a short while
+            Thread.sleep(2000);
+
+            // read the release from the hosting service
+            GitHubRelease gitHubRelease = gitHub.getReleaseByTag(user.getUserName(), gitHubRepository.getName(), "1.0.0");
+        
+            assertEquals("1.0.0", nyx.state().getVersion());
+            assertNotNull(gitHubRelease);
+            assertEquals("1.0.0", gitHubRelease.getTag());
+            assertEquals("Stable 1.0.0 release", gitHubRelease.getTitle());
+        
+            // if we delete too quickly we often get a 404 from the server so let's wait a short while
+            Thread.sleep(2000);
+
+            // now delete it
+//            gitHub.deleteGitRepository(randomID);
+        }
+
+        @Test
         @DisplayName("Publish.run() after a new release has been created on a GitHub hosted repository using filtered assets > publishes a new version with filtered assets published as release assets")
         void runWithNewReleaseAndFilteredAssetsOnGitHubRepositoryTest()
             throws Exception {
@@ -418,6 +499,89 @@ public class PublishTests {
 
             // now delete it
             gitLab.deleteGitRepository(gitLabRepository.getID());
+        }
+
+        @Test
+        @DisplayName("Publish.run() after a new release has been created on a GitLab hosted repository using a custom release name > publishes a new version with a custom release name")
+        void runWithNewReleaseWithCustomNameOnGitLabRepositoryTest()
+            throws Exception {
+            String randomID = RandomUtil.randomAlphabeticString(5);
+            // the 'gitLabTestUserToken' system property is set by the build script, which in turn reads it from an environment variable
+            GitLab gitLab = GitLab.instance(Map.<String,String>of(GitLab.AUTHENTICATION_TOKEN_OPTION_NAME, System.getProperty("gitLabTestUserToken")));
+            GitLabUser user = gitLab.getAuthenticatedUser();
+            GitLabRepository gitLabRepository = gitLab.createGitRepository(randomID, "Test repository "+randomID, false, true);
+
+            // if we clone too quickly next calls may fail
+            Thread.sleep(4000);
+
+            // when a token for user and password authentication for plain Git operations against a GitLab repository,
+            // the user is the "PRIVATE-TOKEN" string and the password is the token
+            Script script = Scenario.ONE_BRANCH_SHORT.applyOnClone(gitLabRepository.getHTTPURL(), "PRIVATE-TOKEN", System.getProperty("gitLabTestUserToken"));
+            script.getWorkingDirectory().deleteOnExit();
+            script.push("PRIVATE-TOKEN", System.getProperty("gitLabTestUserToken"));
+
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            // add a mock convention that accepts all non null messages and dumps the major identifier for each
+            configurationLayerMock.setCommitMessageConventions(
+                new CommitMessageConventions(
+                    List.<String>of("testConvention"),
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention(".*", Map.<String,String>of("major", ".*")))
+                )
+            );
+            // add the test publishing service
+            configurationLayerMock.setServices(Map.<String,ServiceConfiguration>of(
+                "gitlab", new ServiceConfiguration(Provider.GITLAB, Map.<String,String>of(
+                    GitLab.AUTHENTICATION_TOKEN_OPTION_NAME, System.getProperty("gitLabTestUserToken"),
+                    GitLab.REPOSITORY_NAME_OPTION_NAME, gitLabRepository.getName(),
+                    GitLab.REPOSITORY_OWNER_OPTION_NAME, user.getUserName()
+                ))
+            ));
+            // set up the Git remote credentials
+            configurationLayerMock.getGit().setRemotes(Map.<String,GitRemoteConfiguration>of(
+                "origin", new GitRemoteConfiguration(AuthenticationMethod.USER_PASSWORD, "PRIVATE-TOKEN", System.getProperty("gitLabTestUserToken"), null, null))
+            );
+            // add a custom release type that always enables committing, tagging and pushing
+            // and all the publishing service enabled
+            configurationLayerMock.setReleaseTypes(
+                new ReleaseTypes(
+                    List.<String>of("testReleaseType"),
+                    List.<String>of("gitlab"),
+                    List.<String>of(), // default 'origin' is used if we don't specify the remotes here
+                    Map.<String,ReleaseType>of("testReleaseType", new ReleaseType() {
+                        {
+                            setGitCommit(Boolean.TRUE.toString());
+                            setGitPush(Boolean.TRUE.toString());
+                            setGitTag(Boolean.TRUE.toString());
+                            setPublish(Boolean.TRUE.toString());
+                            setReleaseName("Stable {{version}} release");
+                        }}
+                    )
+                )
+            );
+
+            Nyx nyx = new Nyx(script.getWorkingDirectory());
+            nyx.configuration().withRuntimeConfiguration(configurationLayerMock);
+
+            assertNull(gitLab.getReleaseByTag(user.getUserName(), gitLabRepository.getName(), "1.0.0"));
+
+            nyx.publish();
+
+            // if we read too quickly we often get a 404 from the server so let's wait a short while
+            Thread.sleep(2000);
+
+            // read the release from the hosting service
+            GitLabRelease gitLabRelease = gitLab.getReleaseByTag(user.getUserName(), gitLabRepository.getName(), "1.0.0");
+        
+            assertEquals("1.0.0", nyx.state().getVersion());
+            assertNotNull(gitLabRelease);
+            assertEquals("1.0.0", gitLabRelease.getTag());
+            assertEquals("Stable 1.0.0 release", gitHubRelease.getTitle());
+        
+            // if we delete too quickly we often get a 404 from the server so let's wait a short while
+            Thread.sleep(2000);
+
+            // now delete it
+//            gitLab.deleteGitRepository(gitLabRepository.getID());
         }
 
         @Test

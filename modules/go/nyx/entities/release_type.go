@@ -80,6 +80,9 @@ type ReleaseType struct {
 	// The optional flag or the template to render indicating whether or not releases must be published. A nil value means undefined.
 	Publish *string `json:"publish,omitempty" yaml:"publish,omitempty"`
 
+	// The optional template to set the name of releases published to remote services. A nil value means undefined.
+	ReleaseName *string `json:"releaseName,omitempty" yaml:"releaseName,omitempty"`
+
 	// The optional template to render as a regular expression used to constrain versions issued by this release type. A nil value means undefined.
 	VersionRange *string `json:"versionRange,omitempty" yaml:"versionRange,omitempty"`
 
@@ -117,10 +120,11 @@ Arguments are as follows:
 - matchEnvironmentVariables the map of the match environment variables items, where keys are environment variable names and values are regular expressions.
 - matchWorkspaceStatus the identifier of a specific workspace status to be matched.
 - publish the optional flag or the template to render indicating whether or not releases must be published.
+- releaseName the optional template to set the name of releases published to remote services.
 - versionRange the optional regular expression used to constrain versions issued by this release type.
 - versionRangeFromBranchName the optional flag telling if the version range must be inferred from the branch name.
 */
-func NewReleaseTypeWith(assets *[]*string, collapseVersions *bool, collapsedVersionQualifier *string, description *string, filterTags *string, gitCommit *string, gitCommitMessage *string, gitPush *string, gitTag *string, gitTagMessage *string, gitTagNames *[]*string, identifiers *[]*Identifier, matchBranches *string, matchEnvironmentVariables *map[string]string, matchWorkspaceStatus *WorkspaceStatus, publish *string, versionRange *string, versionRangeFromBranchName *bool) *ReleaseType {
+func NewReleaseTypeWith(assets *[]*string, collapseVersions *bool, collapsedVersionQualifier *string, description *string, filterTags *string, gitCommit *string, gitCommitMessage *string, gitPush *string, gitTag *string, gitTagMessage *string, gitTagNames *[]*string, identifiers *[]*Identifier, matchBranches *string, matchEnvironmentVariables *map[string]string, matchWorkspaceStatus *WorkspaceStatus, publish *string, releaseName *string, versionRange *string, versionRangeFromBranchName *bool) *ReleaseType {
 	rt := ReleaseType{}
 
 	rt.Assets = assets
@@ -139,6 +143,7 @@ func NewReleaseTypeWith(assets *[]*string, collapseVersions *bool, collapsedVers
 	rt.MatchEnvironmentVariables = matchEnvironmentVariables
 	rt.MatchWorkspaceStatus = matchWorkspaceStatus
 	rt.Publish = publish
+	rt.ReleaseName = releaseName
 	rt.VersionRange = versionRange
 	rt.VersionRangeFromBranchName = versionRangeFromBranchName
 
@@ -169,6 +174,7 @@ func (rt *ReleaseType) setDefaults() {
 	rt.MatchEnvironmentVariables = RELEASE_TYPE_MATCH_ENVIRONMENT_VARIABLES
 	rt.MatchWorkspaceStatus = RELEASE_TYPE_MATCH_WORKSPACE_STATUS
 	rt.Publish = RELEASE_TYPE_PUBLISH
+	rt.ReleaseName = RELEASE_TYPE_RELEASE_NAME
 	rt.VersionRange = RELEASE_TYPE_VERSION_RANGE
 	rt.VersionRangeFromBranchName = RELEASE_TYPE_VERSION_RANGE_FROM_BRANCH_NAME
 }
@@ -411,6 +417,20 @@ Sets the optional flag or the template to render indicating whether or not relea
 */
 func (rt *ReleaseType) SetPublish(publish *string) {
 	rt.Publish = publish
+}
+
+/*
+Returns the optional template to set the name of releases published to remote services.
+*/
+func (rt *ReleaseType) GetReleaseName() *string {
+	return rt.ReleaseName
+}
+
+/*
+Sets the optional template to set the name of releases published to remote services.
+*/
+func (rt *ReleaseType) SetReleaseName(releaseName *string) {
+	rt.ReleaseName = releaseName
 }
 
 /*

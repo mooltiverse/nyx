@@ -113,6 +113,9 @@ var (
 	// The optional flag or the template to render indicating whether or not releases must be published. Value: 'false'
 	RELEASE_TYPE_PUBLISH *string = utl.PointerToString("false")
 
+	// The optional template to set the name of releases published to remote services. Value: nil
+	RELEASE_TYPE_RELEASE_NAME *string = nil
+
 	// The optional template to render as a regular expression used to constrain versions issued by this release type. Value: nil
 	RELEASE_TYPE_VERSION_RANGE *string = nil
 

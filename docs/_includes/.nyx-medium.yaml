@@ -50,6 +50,7 @@ releaseTypes:
         CI: "^true$"
       matchWorkspaceStatus: "CLEAN"
       publish: "true"
+      releaseName: "Release {{version}}"
       versionRangeFromBranchName: false
     internal: 
       collapseVersions: false

@@ -15,6 +15,7 @@ This release:
 * adds support for arbitrary [substitutions](https://mooltiverse.github.io/nyx/guide/user/configuration-reference/substitutions/) in text files within the project using dynamic values from the [State](https://mooltiverse.github.io/nyx/guide/user/state-reference/) ([#182](https://github.com/mooltiverse/nyx/issues/182)) ([#223](https://github.com/mooltiverse/nyx/issues/223))
 * adds support for multiple Git tag [names](https://mooltiverse.github.io/nyx/guide/user/configuration-reference/release-types/#git-tag-names) that can be used to change the default git tag or add some tag aliases ([#243](https://github.com/mooltiverse/nyx/issues/243))
 * adds support for the new `versionMajorNumber`, `versionMinorNumber`, `versionPatchNumber`, `versionPreReleaseIdentifier`, `versionBuildMetadata` [state attributes](https://mooltiverse.github.io/nyx/guide/user/state-reference/global-attributes/)
+* adds support for the new [`releaseName`](https://mooltiverse.github.io/nyx/guide/user/configuration-reference/release-types/#release-name) configuration option to control the name of releases published to remote services
 * adds support for Gradle `8.2.1` and `8.3`.
 
 ### Fixed issues

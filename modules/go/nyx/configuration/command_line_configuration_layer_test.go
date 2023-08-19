@@ -605,6 +605,7 @@ func TestCommandLineConfigurationLayerGetReleaseTypes(t *testing.T) {
 		"--release-types-two-match-environment-variables-USER=any user",
 		"--release-types-two-match-workspace-status=" + ent.CLEAN.String(),
 		"--release-types-two-publish=true",
+		"--release-types-two-release-name=myrelease",
 		"--release-types-two-version-range-from-branch-name=true",
 	})
 
@@ -639,6 +640,7 @@ func TestCommandLineConfigurationLayerGetReleaseTypes(t *testing.T) {
 	assert.Equal(t, 0, len(*(*(*releaseTypes.GetItems())["one"]).GetMatchEnvironmentVariables()))
 	assert.Equal(t, ent.DIRTY, *(*(*releaseTypes.GetItems())["one"]).GetMatchWorkspaceStatus())
 	assert.Equal(t, "false", *(*(*releaseTypes.GetItems())["one"]).GetPublish())
+	assert.Nil(t, (*(*releaseTypes.GetItems())["one"]).GetReleaseName())
 	assert.Equal(t, "true", *(*(*releaseTypes.GetItems())["one"]).GetVersionRange())
 	assert.Nil(t, (*(*releaseTypes.GetItems())["one"]).GetVersionRangeFromBranchName())
 	assert.Nil(t, (*(*releaseTypes).GetItems())["two"].GetAssets())
@@ -671,6 +673,7 @@ func TestCommandLineConfigurationLayerGetReleaseTypes(t *testing.T) {
 	assert.Equal(t, "any user", (*(*(*releaseTypes.GetItems())["two"]).GetMatchEnvironmentVariables())["USER"])
 	assert.Equal(t, ent.CLEAN, *(*(*releaseTypes.GetItems())["two"]).GetMatchWorkspaceStatus())
 	assert.Equal(t, "true", *(*(*releaseTypes.GetItems())["two"]).GetPublish())
+	assert.Equal(t, "myrelease", *(*(*releaseTypes.GetItems())["two"]).GetReleaseName())
 	assert.Nil(t, (*(*releaseTypes.GetItems())["two"]).GetVersionRange())
 	assert.True(t, *(*(*releaseTypes.GetItems())["two"]).GetVersionRangeFromBranchName())
 }

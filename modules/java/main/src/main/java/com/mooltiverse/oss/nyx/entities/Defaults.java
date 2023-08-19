@@ -179,6 +179,11 @@ public interface Defaults {
         public static final String PUBLISH = Boolean.FALSE.toString();
 
         /**
+         * The optional template to set the name of releases published to remote services. Value: {@code null}
+         */
+        public static final String RELEASE_NAME = null;
+
+        /**
          * The optional template to render as a regular expression used to constrain versions issued by this release type. Value: {@code null}
          */
         public static final String VERSION_RANGE = null;

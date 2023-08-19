@@ -45,6 +45,7 @@ public class ReleaseTypeTests {
                 "",
                 Map.<String,String>of("PATH",".*"),
                 null,
+                null,
                 Boolean.TRUE.toString(),
                 "",
                 Boolean.FALSE));
