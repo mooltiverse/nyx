@@ -370,7 +370,7 @@ func TestPublishRunWithNewReleaseWithCustomNameOnGitHubRepository(t *testing.T) 
 	time.Sleep(2000 * time.Millisecond)
 
 	// now delete it
-	//gitHub.DeleteGitRepository(randomID)
+	gitHub.DeleteGitRepository(randomID)
 
 	log.SetLevel(logLevel) // restore the original logging level
 }
@@ -734,7 +734,7 @@ func TestPublishRunWithNewReleaseWithCustomNameOnGitLabRepository(t *testing.T) 
 	time.Sleep(2000 * time.Millisecond)
 
 	// now delete it
-	//gitLab.DeleteGitRepository((*gitLabRepository).GetID())
+	gitLab.DeleteGitRepository((*gitLabRepository).GetID())
 
 	log.SetLevel(logLevel) // restore the original logging level
 }

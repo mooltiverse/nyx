@@ -253,7 +253,7 @@ public class PublishTests {
             Thread.sleep(2000);
 
             // now delete it
-//            gitHub.deleteGitRepository(randomID);
+            gitHub.deleteGitRepository(randomID);
         }
 
         @Test
@@ -575,13 +575,13 @@ public class PublishTests {
             assertEquals("1.0.0", nyx.state().getVersion());
             assertNotNull(gitLabRelease);
             assertEquals("1.0.0", gitLabRelease.getTag());
-            assertEquals("Stable 1.0.0 release", gitHubRelease.getTitle());
+            assertEquals("Stable 1.0.0 release", gitLabRelease.getTitle());
         
             // if we delete too quickly we often get a 404 from the server so let's wait a short while
             Thread.sleep(2000);
 
             // now delete it
-//            gitLab.deleteGitRepository(gitLabRepository.getID());
+            gitLab.deleteGitRepository(gitLabRepository.getID());
         }
 
         @Test
