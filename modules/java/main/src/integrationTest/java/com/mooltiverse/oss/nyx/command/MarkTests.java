@@ -592,7 +592,7 @@ public class MarkTests {
             assertEquals(script.getTags().size(), remoteScript.getTags().size());
 
             // now delete it
-            gitHub.deleteGitRepository(randomID);
+            gitLab.deleteGitRepository(randomID);
         }
 
         @Test
