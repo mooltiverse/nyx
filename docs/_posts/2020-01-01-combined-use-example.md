@@ -69,11 +69,11 @@ jobs:
       with:
         fetch-depth: 0
     # Java is required for Gradle, don't pay attention to the version
-    - name: Set up JDK 19
+    - name: Set up JDK 20
       uses: actions/setup-java@v3
       with:
         distribution: 'temurin'
-        java-version: 19
+        java-version: 20
     # This job only runs nyxInfer to produce the initial version and write the state file
     # Since Nyx is applied as a settings plugin the nyxInfer task is not even needed, but Gradle needs a task to run
     - name: Nyx Infer
@@ -117,11 +117,11 @@ jobs:
       with:
         fetch-depth: 0
     # Java is required for Gradle, don't pay attention to the version
-    - name: Set up JDK 19
+    - name: Set up JDK 20
       uses: actions/setup-java@v3
       with:
         distribution: 'temurin'
-        java-version: 19
+        java-version: 20
     # Set up a cache that stores the Nyx state so that other jobs can retrieve it
     - name: Set up the Nyx state cache
       uses: actions/cache@v3
@@ -157,11 +157,11 @@ jobs:
       with:
         fetch-depth: 0
     # Java is required for Gradle, don't pay attention to the version
-    - name: Set up JDK 19
+    - name: Set up JDK 20
       uses: actions/setup-java@v3
       with:
         distribution: 'temurin'
-        java-version: 19
+        java-version: 20
     # Set up a cache that stores the Nyx state so that other jobs can retrieve it
     - name: Set up the Nyx state cache
       uses: actions/cache@v3
