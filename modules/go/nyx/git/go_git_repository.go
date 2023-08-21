@@ -857,7 +857,8 @@ func (r goGitRepository) PushToRemoteWithUserNameAndPassword(remote *string, use
 	branchRefSpec := ggitconfig.RefSpec(currentBranchRef + ":" + currentBranchRef)
 	tagsRefSpec := ggitconfig.RefSpec("refs/tags/*:refs/tags/*") // this is required to also push tags
 
-	options := &ggit.PushOptions{RemoteName: remoteString, RefSpecs: []ggitconfig.RefSpec{branchRefSpec, tagsRefSpec}}
+	// the force flag may be required to update existing tags, especially when tag aliases are used
+	options := &ggit.PushOptions{RemoteName: remoteString, Force: true, RefSpecs: []ggitconfig.RefSpec{branchRefSpec, tagsRefSpec}}
 	auth := getBasicAuth(user, password)
 	if auth != nil {
 		log.Debugf("username and password authentication will use custom authentication options")
@@ -913,7 +914,8 @@ func (r goGitRepository) PushToRemoteWithPublicKey(remote *string, privateKey *s
 	branchRefSpec := ggitconfig.RefSpec(currentBranchRef + ":" + currentBranchRef)
 	tagsRefSpec := ggitconfig.RefSpec("refs/tags/*:refs/tags/*") // this is required to also push tags
 
-	options := &ggit.PushOptions{RemoteName: remoteString, RefSpecs: []ggitconfig.RefSpec{branchRefSpec, tagsRefSpec}}
+	// the force flag may be required to update existing tags, especially when tag aliases are used
+	options := &ggit.PushOptions{RemoteName: remoteString, Force: true, RefSpecs: []ggitconfig.RefSpec{branchRefSpec, tagsRefSpec}}
 	auth := getPublicKeyAuth(privateKey, passphrase)
 	if auth != nil {
 		log.Debugf("public key (SSH) authentication will use custom authentication options")
