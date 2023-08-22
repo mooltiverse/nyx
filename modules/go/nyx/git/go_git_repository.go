@@ -857,7 +857,8 @@ func (r goGitRepository) PushToRemoteWithUserNameAndPassword(remote *string, use
 	branchRefSpec := ggitconfig.RefSpec(currentBranchRef + ":" + currentBranchRef)
 	tagsRefSpec := ggitconfig.RefSpec("refs/tags/*:refs/tags/*") // this is required to also push tags
 
-	// the force flag may be required to update existing tags, especially when tag aliases are used
+	// The force flag may be required to update existing tags, especially when tag aliases are used.
+	// On the other hand it may also interfere with some workflows (i.e. when using branch protection rules) so we need to be careful.
 	options := &ggit.PushOptions{RemoteName: remoteString, Force: true, RefSpecs: []ggitconfig.RefSpec{branchRefSpec, tagsRefSpec}}
 	auth := getBasicAuth(user, password)
 	if auth != nil {
@@ -914,7 +915,8 @@ func (r goGitRepository) PushToRemoteWithPublicKey(remote *string, privateKey *s
 	branchRefSpec := ggitconfig.RefSpec(currentBranchRef + ":" + currentBranchRef)
 	tagsRefSpec := ggitconfig.RefSpec("refs/tags/*:refs/tags/*") // this is required to also push tags
 
-	// the force flag may be required to update existing tags, especially when tag aliases are used
+	// The force flag may be required to update existing tags, especially when tag aliases are used.
+	// On the other hand it may also interfere with some workflows (i.e. when using branch protection rules) so we need to be careful.
 	options := &ggit.PushOptions{RemoteName: remoteString, Force: true, RefSpecs: []ggitconfig.RefSpec{branchRefSpec, tagsRefSpec}}
 	auth := getPublicKeyAuth(privateKey, passphrase)
 	if auth != nil {
