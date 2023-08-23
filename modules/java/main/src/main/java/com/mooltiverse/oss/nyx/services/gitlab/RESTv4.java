@@ -26,7 +26,7 @@ import java.nio.file.Paths;
 
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URL;
+import java.net.URISyntaxException;
 import java.net.URLEncoder;
 
 import java.net.http.HttpClient;
@@ -391,10 +391,10 @@ class RESTv4 extends API {
 
                 try {
                     // just check if it's a valid URL and if it is add it to the result assets
-                    new URL(asset.getPath());
+                    new URI(asset.getPath()).toURL();
                     result.add(asset);
                 }
-                catch (MalformedURLException mue) {
+                catch (MalformedURLException | URISyntaxException ue) {
                     logger.warn(SERVICE, "The path '{}' for the asset '{}' cannot be resolved to a local file and is not a valid URL and will be skipped", asset.getPath(), asset.getFileName());
                 }
             }
