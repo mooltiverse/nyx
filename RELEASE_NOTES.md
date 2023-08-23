@@ -17,6 +17,7 @@ This release:
 * adds support for the new `versionMajorNumber`, `versionMinorNumber`, `versionPatchNumber`, `versionPreReleaseIdentifier`, `versionBuildMetadata` [state attributes](https://mooltiverse.github.io/nyx/guide/user/state-reference/global-attributes/)
 * adds support for the new [`releaseName`](https://mooltiverse.github.io/nyx/guide/user/configuration-reference/release-types/#release-name) configuration option to control the name of releases published to remote services
 * adds support for the new [`publishDraft`](https://mooltiverse.github.io/nyx/guide/user/configuration-reference/release-types/#publish-draft) and [`publishDraft`](https://mooltiverse.github.io/nyx/guide/user/configuration-reference/release-types/#publish-pre-release) configuration options to control extra flags of releases published to remote services (as of now only [supported by GitHub](https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository))
+* adds support for Git tag updates so existing tags can be replaced and overwritten
 * adds support for Gradle `8.2.1` and `8.3`.
 
 ### Fixed issues
