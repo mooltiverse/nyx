@@ -28,6 +28,7 @@ import java.util.Set;
 import org.kohsuke.github.GitHubBuilder;
 import org.kohsuke.github.GHAsset;
 import org.kohsuke.github.GHRelease;
+import org.kohsuke.github.GHReleaseBuilder;
 import org.kohsuke.github.GHRepository;
 
 import org.slf4j.Logger;
@@ -283,10 +284,31 @@ public class GitHub implements GitHostingService, ReleaseService, UserService {
      * {@inheritDoc}
      */
     @Override
-    public GitHubRelease publishRelease(String owner, String repository, String title, String tag, String description)
+    public GitHubRelease publishRelease(String owner, String repository, String title, String tag, String description, Map<String,Object> options)
         throws SecurityException, TransportException {
         try {
-            return new GitHubRelease(getRepository(owner, repository).createRelease(tag).name(title).body(description).create());
+            GHReleaseBuilder releaseBuilder = getRepository(owner, repository).createRelease(tag).name(title).body(description);
+            if (!Objects.isNull(options)) {
+                if (options.containsKey(RELEASE_OPTION_DRAFT)) {
+                    logger.debug(SERVICE, "The release options contain the '{}' option: {}", RELEASE_OPTION_DRAFT, options.get(RELEASE_OPTION_DRAFT));
+                    Object optionValue = options.get(RELEASE_OPTION_DRAFT);
+                    if (Objects.isNull(optionValue)) {
+                        logger.debug(SERVICE, "The release options contain the '{}' option but it's null so it will be ignored", RELEASE_OPTION_DRAFT);
+                    } else {
+                        releaseBuilder.draft(Boolean.valueOf(optionValue.toString()).booleanValue());
+                    }
+                }
+                if (options.containsKey(RELEASE_OPTION_PRE_RELEASE)) {
+                    logger.debug(SERVICE, "The release options contain the '{}' option: {}", RELEASE_OPTION_PRE_RELEASE, options.get(RELEASE_OPTION_PRE_RELEASE));
+                    Object optionValue = options.get(RELEASE_OPTION_PRE_RELEASE);
+                    if (Objects.isNull(optionValue)) {
+                        logger.debug(SERVICE, "The release options contain the '{}' option but it's null so it will be ignored", RELEASE_OPTION_PRE_RELEASE);
+                    } else {
+                        releaseBuilder.prerelease(Boolean.valueOf(optionValue.toString()).booleanValue());
+                    }
+                }
+            }
+            return new GitHubRelease(releaseBuilder.create());
         }
         catch (IOException ioe) {
             throw new TransportException(String.format("Unable to publish the release '%s'", tag), ioe);

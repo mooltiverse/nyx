@@ -24,6 +24,7 @@ import (
 	errs "github.com/mooltiverse/nyx/modules/go/errors"
 	ent "github.com/mooltiverse/nyx/modules/go/nyx/entities"
 	git "github.com/mooltiverse/nyx/modules/go/nyx/git"
+	api "github.com/mooltiverse/nyx/modules/go/nyx/services/api"
 	stt "github.com/mooltiverse/nyx/modules/go/nyx/state"
 )
 
@@ -136,9 +137,24 @@ func (c *Publish) publish() error {
 					// if no release name template was specified then fall-back to the version for the release title
 					releaseName = version
 				}
+
+				// evaluate the release options
+				publishDraft, err := c.renderTemplateAsBoolean(releaseType.GetPublishDraft())
+				if err != nil {
+					return err
+				}
+				publishPreRelease, err := c.renderTemplateAsBoolean(releaseType.GetPublishPreRelease())
+				if err != nil {
+					return err
+				}
+				releaseOptions := &map[string]interface{}{
+					api.RELEASE_OPTION_DRAFT:       publishDraft,
+					api.RELEASE_OPTION_PRE_RELEASE: publishPreRelease,
+				}
+
 				// The first two parameters here are nil because the repository owner and name are expected to be passed
 				// along with service options. This is just a place where we could override them.
-				release, err := (*service).PublishRelease(nil, nil, releaseName, *version, description)
+				release, err := (*service).PublishRelease(nil, nil, releaseName, *version, description, releaseOptions)
 				if err != nil {
 					return err
 				}

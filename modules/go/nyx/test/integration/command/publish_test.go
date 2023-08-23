@@ -513,6 +513,166 @@ func TestPublishRunWithNewReleaseAndFilteredAssetsOnGitHubRepository(t *testing.
 	log.SetLevel(logLevel) // restore the original logging level
 }
 
+func TestPublishRunWithNewReleaseWithDraftFlagOnGitHubRepository(t *testing.T) {
+	logLevel := log.GetLevel()   // save the previous logging level
+	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
+	randomID := gitutil.RandomAlphabeticString(5, 202)
+	// the 'gitHubTestUserToken' system property is set by the build script, which in turn reads it from an environment variable
+	assert.NotEmpty(t, os.Getenv("gitHubTestUserToken"), "A GitHub authentication token must be passed to this test as an environment variable but it was not set")
+	gitHub, err := github.Instance(map[string]string{github.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitHubTestUserToken")})
+	assert.NoError(t, err)
+	user, err := gitHub.GetAuthenticatedUser()
+	assert.NoError(t, err)
+	gitHubRepository, err := gitHub.CreateGitRepository(randomID, utl.PointerToString("Test repository "+randomID), false, true)
+	assert.NoError(t, err)
+
+	// if we clone too quickly next calls may fail
+	time.Sleep(4000 * time.Millisecond)
+
+	script := gittools.ONE_BRANCH_SHORT().ApplyOnCloneFromWithUserNameAndPassword((*gitHubRepository).GetHTTPURL(), utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(""))
+	defer os.RemoveAll(script.GetWorkingDirectory())
+	script.PushWithUserNameAndPassword(utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(""))
+
+	configurationLayerMock := cnf.NewSimpleConfigurationLayer()
+
+	// add a mock convention that accepts all non nil messages and dumps the major identifier for each
+	commitMessageConventions, _ := ent.NewCommitMessageConventionsWith(&[]*string{utl.PointerToString("testConvention")},
+		&map[string]*ent.CommitMessageConvention{"testConvention": ent.NewCommitMessageConventionWith(utl.PointerToString(".*"),
+			&map[string]string{"major": ".*"})})
+	configurationLayerMock.SetCommitMessageConventions(commitMessageConventions)
+	// add the test publishing service
+	configurationLayerMock.SetServices(&map[string]*ent.ServiceConfiguration{
+		"github": ent.NewServiceConfigurationWith(ent.PointerToProvider(ent.GITHUB),
+			&map[string]string{
+				github.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitHubTestUserToken"),
+				github.REPOSITORY_NAME_OPTION_NAME:      (*gitHubRepository).GetName(),
+				github.REPOSITORY_OWNER_OPTION_NAME:     (*user).GetUserName(),
+			}),
+	})
+	// set up the Git remote credentials
+	gitConfiguration, _ := configurationLayerMock.GetGit()
+	gitConfiguration.SetRemotes(&map[string]*ent.GitRemoteConfiguration{
+		"origin": ent.NewGitRemoteConfigurationWith(ent.PointerToAuthenticationMethod(ent.USER_PASSWORD), utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(""), nil, nil),
+	})
+	// add a custom release type that always enables committing, tagging and pushing
+	// and all the publishing service enabled
+	releaseType := ent.NewReleaseType()
+	releaseType.SetGitCommit(utl.PointerToString("true"))
+	releaseType.SetGitPush(utl.PointerToString("true"))
+	releaseType.SetGitTag(utl.PointerToString("true"))
+	releaseType.SetPublish(utl.PointerToString("true"))
+	releaseType.SetPublishDraft(utl.PointerToString("true"))
+	releaseTypes, _ := ent.NewReleaseTypesWith(&[]*string{utl.PointerToString("testReleaseType")},
+		&[]*string{utl.PointerToString("github")}, &[]*string{},
+		&map[string]*ent.ReleaseType{"testReleaseType": releaseType})
+	configurationLayerMock.SetReleaseTypes(releaseTypes)
+
+	nyx := nyx.NewNyxIn(script.GetWorkingDirectory())
+	nyxConfiguration, _ := nyx.Configuration()
+	var configurationLayer cnf.ConfigurationLayer
+	configurationLayer = configurationLayerMock
+	nyxConfiguration.WithRuntimeConfiguration(&configurationLayer)
+
+	gitHubRelease, err := gitHub.GetReleaseByTag(utl.PointerToString((*user).GetUserName()), utl.PointerToString((*gitHubRepository).GetName()), "1.0.0")
+	assert.NoError(t, err)
+	assert.Nil(t, gitHubRelease)
+
+	_, err = nyx.Publish()
+	assert.NoError(t, err)
+
+	// if we read too quickly we often get a 404 from the server so let's wait a short while
+	time.Sleep(2000 * time.Millisecond)
+
+	// The Release object does not bring information about the 'draft' flag so there is no other test
+	// we can run here. The only test is manually checking on GitHub whether the release has been created
+	// with the flag (and yes, it is).
+
+	// now delete it
+	gitHub.DeleteGitRepository(randomID)
+
+	log.SetLevel(logLevel) // restore the original logging level
+}
+
+func TestPublishRunWithNewReleaseWithPreReleaseFlagOnGitHubRepository(t *testing.T) {
+	logLevel := log.GetLevel()   // save the previous logging level
+	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
+	randomID := gitutil.RandomAlphabeticString(5, 202)
+	// the 'gitHubTestUserToken' system property is set by the build script, which in turn reads it from an environment variable
+	assert.NotEmpty(t, os.Getenv("gitHubTestUserToken"), "A GitHub authentication token must be passed to this test as an environment variable but it was not set")
+	gitHub, err := github.Instance(map[string]string{github.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitHubTestUserToken")})
+	assert.NoError(t, err)
+	user, err := gitHub.GetAuthenticatedUser()
+	assert.NoError(t, err)
+	gitHubRepository, err := gitHub.CreateGitRepository(randomID, utl.PointerToString("Test repository "+randomID), false, true)
+	assert.NoError(t, err)
+
+	// if we clone too quickly next calls may fail
+	time.Sleep(4000 * time.Millisecond)
+
+	script := gittools.ONE_BRANCH_SHORT().ApplyOnCloneFromWithUserNameAndPassword((*gitHubRepository).GetHTTPURL(), utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(""))
+	defer os.RemoveAll(script.GetWorkingDirectory())
+	script.PushWithUserNameAndPassword(utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(""))
+
+	configurationLayerMock := cnf.NewSimpleConfigurationLayer()
+
+	// add a mock convention that accepts all non nil messages and dumps the major identifier for each
+	commitMessageConventions, _ := ent.NewCommitMessageConventionsWith(&[]*string{utl.PointerToString("testConvention")},
+		&map[string]*ent.CommitMessageConvention{"testConvention": ent.NewCommitMessageConventionWith(utl.PointerToString(".*"),
+			&map[string]string{"major": ".*"})})
+	configurationLayerMock.SetCommitMessageConventions(commitMessageConventions)
+	// add the test publishing service
+	configurationLayerMock.SetServices(&map[string]*ent.ServiceConfiguration{
+		"github": ent.NewServiceConfigurationWith(ent.PointerToProvider(ent.GITHUB),
+			&map[string]string{
+				github.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitHubTestUserToken"),
+				github.REPOSITORY_NAME_OPTION_NAME:      (*gitHubRepository).GetName(),
+				github.REPOSITORY_OWNER_OPTION_NAME:     (*user).GetUserName(),
+			}),
+	})
+	// set up the Git remote credentials
+	gitConfiguration, _ := configurationLayerMock.GetGit()
+	gitConfiguration.SetRemotes(&map[string]*ent.GitRemoteConfiguration{
+		"origin": ent.NewGitRemoteConfigurationWith(ent.PointerToAuthenticationMethod(ent.USER_PASSWORD), utl.PointerToString(os.Getenv("gitHubTestUserToken")), utl.PointerToString(""), nil, nil),
+	})
+	// add a custom release type that always enables committing, tagging and pushing
+	// and all the publishing service enabled
+	releaseType := ent.NewReleaseType()
+	releaseType.SetGitCommit(utl.PointerToString("true"))
+	releaseType.SetGitPush(utl.PointerToString("true"))
+	releaseType.SetGitTag(utl.PointerToString("true"))
+	releaseType.SetPublish(utl.PointerToString("true"))
+	releaseType.SetPublishPreRelease(utl.PointerToString("true"))
+	releaseTypes, _ := ent.NewReleaseTypesWith(&[]*string{utl.PointerToString("testReleaseType")},
+		&[]*string{utl.PointerToString("github")}, &[]*string{},
+		&map[string]*ent.ReleaseType{"testReleaseType": releaseType})
+	configurationLayerMock.SetReleaseTypes(releaseTypes)
+
+	nyx := nyx.NewNyxIn(script.GetWorkingDirectory())
+	nyxConfiguration, _ := nyx.Configuration()
+	var configurationLayer cnf.ConfigurationLayer
+	configurationLayer = configurationLayerMock
+	nyxConfiguration.WithRuntimeConfiguration(&configurationLayer)
+
+	gitHubRelease, err := gitHub.GetReleaseByTag(utl.PointerToString((*user).GetUserName()), utl.PointerToString((*gitHubRepository).GetName()), "1.0.0")
+	assert.NoError(t, err)
+	assert.Nil(t, gitHubRelease)
+
+	_, err = nyx.Publish()
+	assert.NoError(t, err)
+
+	// if we read too quickly we often get a 404 from the server so let's wait a short while
+	time.Sleep(2000 * time.Millisecond)
+
+	// The Release object does not bring information about the 'pre-release' flag so there is no other test
+	// we can run here. The only test is manually checking on GitHub whether the release has been created
+	// with the flag (and yes, it is).
+
+	// now delete it
+	gitHub.DeleteGitRepository(randomID)
+
+	log.SetLevel(logLevel) // restore the original logging level
+}
+
 func TestPublishRunWithNewReleaseAndGlobalAssetsOnGitLabRepository(t *testing.T) {
 	logLevel := log.GetLevel()   // save the previous logging level
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
@@ -868,6 +1028,168 @@ func TestPublishRunWithNewReleaseAndFilteredAssetsOnGitLabRepository(t *testing.
 		//assert.Equal(t, "text/plain", *asset.GetType()) // the content type is not available via this API
 		//assert.True(t, strings.HasPrefix(*asset.GetPath(), "https://api.github.com/repos/")) // as of now these URLS are like https://storage.googleapis.com...
 	}
+
+	// now delete it
+	gitLab.DeleteGitRepository((*gitLabRepository).GetID())
+
+	log.SetLevel(logLevel) // restore the original logging level
+}
+
+func TestPublishRunWithNewReleaseWithDraftFlagOnGitLabRepository(t *testing.T) {
+	// ATTENTION: the "draft" flag is not supported on GitLab so here we just test that setting the flag has no effect
+	logLevel := log.GetLevel()   // save the previous logging level
+	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
+	randomID := gitutil.RandomAlphabeticString(5, 204)
+	// the 'gitLabTestUserToken' system property is set by the build script, which in turn reads it from an environment variable
+	assert.NotEmpty(t, os.Getenv("gitLabTestUserToken"), "A GitLab authentication token must be passed to this test as an environment variable but it was not set")
+	gitLab, err := gitlab.Instance(map[string]string{gitlab.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitLabTestUserToken")})
+	assert.NoError(t, err)
+	user, err := gitLab.GetAuthenticatedUser()
+	assert.NoError(t, err)
+	gitLabRepository, err := gitLab.CreateGitRepository(randomID, utl.PointerToString("Test repository "+randomID), false, true)
+	assert.NoError(t, err)
+
+	// if we clone too quickly next calls may fail
+	time.Sleep(4000 * time.Millisecond)
+
+	// when a token for user and password authentication for plain Git operations against a GitLab repository,
+	// the user is the "PRIVATE-TOKEN" string and the password is the token
+	script := gittools.ONE_BRANCH_SHORT().ApplyOnCloneFromWithUserNameAndPassword((*gitLabRepository).GetHTTPURL(), utl.PointerToString("PRIVATE-TOKEN"), utl.PointerToString(os.Getenv("gitLabTestUserToken")))
+	defer os.RemoveAll(script.GetWorkingDirectory())
+	script.PushWithUserNameAndPassword(utl.PointerToString("PRIVATE-TOKEN"), utl.PointerToString(os.Getenv("gitLabTestUserToken")))
+
+	configurationLayerMock := cnf.NewSimpleConfigurationLayer()
+
+	// add a mock convention that accepts all non nil messages and dumps the major identifier for each
+	commitMessageConventions, _ := ent.NewCommitMessageConventionsWith(&[]*string{utl.PointerToString("testConvention")},
+		&map[string]*ent.CommitMessageConvention{"testConvention": ent.NewCommitMessageConventionWith(utl.PointerToString(".*"),
+			&map[string]string{"major": ".*"})})
+	configurationLayerMock.SetCommitMessageConventions(commitMessageConventions)
+	// add the test publishing service
+	configurationLayerMock.SetServices(&map[string]*ent.ServiceConfiguration{
+		"gitlab": ent.NewServiceConfigurationWith(ent.PointerToProvider(ent.GITLAB),
+			&map[string]string{
+				gitlab.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitLabTestUserToken"),
+				gitlab.REPOSITORY_NAME_OPTION_NAME:      (*gitLabRepository).GetName(),
+				gitlab.REPOSITORY_OWNER_OPTION_NAME:     (*user).GetUserName(),
+			}),
+	})
+	// set up the Git remote credentials
+	gitConfiguration, _ := configurationLayerMock.GetGit()
+	gitConfiguration.SetRemotes(&map[string]*ent.GitRemoteConfiguration{
+		"origin": ent.NewGitRemoteConfigurationWith(ent.PointerToAuthenticationMethod(ent.USER_PASSWORD), utl.PointerToString("PRIVATE-TOKEN"), utl.PointerToString(os.Getenv("gitLabTestUserToken")), nil, nil),
+	})
+	// add a custom release type that always enables committing, tagging and pushing
+	// and all the publishing service enabled
+	releaseType := ent.NewReleaseType()
+	releaseType.SetGitCommit(utl.PointerToString("true"))
+	releaseType.SetGitPush(utl.PointerToString("true"))
+	releaseType.SetGitTag(utl.PointerToString("true"))
+	releaseType.SetPublish(utl.PointerToString("true"))
+	releaseType.SetPublishDraft(utl.PointerToString("true"))
+	releaseTypes, _ := ent.NewReleaseTypesWith(&[]*string{utl.PointerToString("testReleaseType")},
+		&[]*string{utl.PointerToString("gitlab")}, &[]*string{},
+		&map[string]*ent.ReleaseType{"testReleaseType": releaseType})
+	configurationLayerMock.SetReleaseTypes(releaseTypes)
+
+	nyx := nyx.NewNyxIn(script.GetWorkingDirectory())
+	nyxConfiguration, _ := nyx.Configuration()
+	var configurationLayer cnf.ConfigurationLayer
+	configurationLayer = configurationLayerMock
+	nyxConfiguration.WithRuntimeConfiguration(&configurationLayer)
+
+	gitLabRelease, err := gitLab.GetReleaseByTag(utl.PointerToString((*user).GetUserName()), utl.PointerToString((*gitLabRepository).GetName()), "1.0.0")
+	assert.NoError(t, err)
+	assert.Nil(t, gitLabRelease)
+
+	_, err = nyx.Publish()
+	assert.NoError(t, err)
+
+	// if we read too quickly we often get a 404 from the server so let's wait a short while
+	time.Sleep(2000 * time.Millisecond)
+
+	// ATTENTION: the "draft" flag is not supported on GitLab so here we just test that setting the flag has no effect
+
+	// now delete it
+	gitLab.DeleteGitRepository((*gitLabRepository).GetID())
+
+	log.SetLevel(logLevel) // restore the original logging level
+}
+
+func TestPublishRunWithNewReleaseWithPreReleaseFlagOnGitLabRepository(t *testing.T) {
+	// ATTENTION: the "pre-release" flag is not supported on GitLab so here we just test that setting the flag has no effect
+	logLevel := log.GetLevel()   // save the previous logging level
+	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
+	randomID := gitutil.RandomAlphabeticString(5, 204)
+	// the 'gitLabTestUserToken' system property is set by the build script, which in turn reads it from an environment variable
+	assert.NotEmpty(t, os.Getenv("gitLabTestUserToken"), "A GitLab authentication token must be passed to this test as an environment variable but it was not set")
+	gitLab, err := gitlab.Instance(map[string]string{gitlab.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitLabTestUserToken")})
+	assert.NoError(t, err)
+	user, err := gitLab.GetAuthenticatedUser()
+	assert.NoError(t, err)
+	gitLabRepository, err := gitLab.CreateGitRepository(randomID, utl.PointerToString("Test repository "+randomID), false, true)
+	assert.NoError(t, err)
+
+	// if we clone too quickly next calls may fail
+	time.Sleep(4000 * time.Millisecond)
+
+	// when a token for user and password authentication for plain Git operations against a GitLab repository,
+	// the user is the "PRIVATE-TOKEN" string and the password is the token
+	script := gittools.ONE_BRANCH_SHORT().ApplyOnCloneFromWithUserNameAndPassword((*gitLabRepository).GetHTTPURL(), utl.PointerToString("PRIVATE-TOKEN"), utl.PointerToString(os.Getenv("gitLabTestUserToken")))
+	defer os.RemoveAll(script.GetWorkingDirectory())
+	script.PushWithUserNameAndPassword(utl.PointerToString("PRIVATE-TOKEN"), utl.PointerToString(os.Getenv("gitLabTestUserToken")))
+
+	configurationLayerMock := cnf.NewSimpleConfigurationLayer()
+
+	// add a mock convention that accepts all non nil messages and dumps the major identifier for each
+	commitMessageConventions, _ := ent.NewCommitMessageConventionsWith(&[]*string{utl.PointerToString("testConvention")},
+		&map[string]*ent.CommitMessageConvention{"testConvention": ent.NewCommitMessageConventionWith(utl.PointerToString(".*"),
+			&map[string]string{"major": ".*"})})
+	configurationLayerMock.SetCommitMessageConventions(commitMessageConventions)
+	// add the test publishing service
+	configurationLayerMock.SetServices(&map[string]*ent.ServiceConfiguration{
+		"gitlab": ent.NewServiceConfigurationWith(ent.PointerToProvider(ent.GITLAB),
+			&map[string]string{
+				gitlab.AUTHENTICATION_TOKEN_OPTION_NAME: os.Getenv("gitLabTestUserToken"),
+				gitlab.REPOSITORY_NAME_OPTION_NAME:      (*gitLabRepository).GetName(),
+				gitlab.REPOSITORY_OWNER_OPTION_NAME:     (*user).GetUserName(),
+			}),
+	})
+	// set up the Git remote credentials
+	gitConfiguration, _ := configurationLayerMock.GetGit()
+	gitConfiguration.SetRemotes(&map[string]*ent.GitRemoteConfiguration{
+		"origin": ent.NewGitRemoteConfigurationWith(ent.PointerToAuthenticationMethod(ent.USER_PASSWORD), utl.PointerToString("PRIVATE-TOKEN"), utl.PointerToString(os.Getenv("gitLabTestUserToken")), nil, nil),
+	})
+	// add a custom release type that always enables committing, tagging and pushing
+	// and all the publishing service enabled
+	releaseType := ent.NewReleaseType()
+	releaseType.SetGitCommit(utl.PointerToString("true"))
+	releaseType.SetGitPush(utl.PointerToString("true"))
+	releaseType.SetGitTag(utl.PointerToString("true"))
+	releaseType.SetPublish(utl.PointerToString("true"))
+	releaseType.SetPublishPreRelease(utl.PointerToString("true"))
+	releaseTypes, _ := ent.NewReleaseTypesWith(&[]*string{utl.PointerToString("testReleaseType")},
+		&[]*string{utl.PointerToString("gitlab")}, &[]*string{},
+		&map[string]*ent.ReleaseType{"testReleaseType": releaseType})
+	configurationLayerMock.SetReleaseTypes(releaseTypes)
+
+	nyx := nyx.NewNyxIn(script.GetWorkingDirectory())
+	nyxConfiguration, _ := nyx.Configuration()
+	var configurationLayer cnf.ConfigurationLayer
+	configurationLayer = configurationLayerMock
+	nyxConfiguration.WithRuntimeConfiguration(&configurationLayer)
+
+	gitLabRelease, err := gitLab.GetReleaseByTag(utl.PointerToString((*user).GetUserName()), utl.PointerToString((*gitLabRepository).GetName()), "1.0.0")
+	assert.NoError(t, err)
+	assert.Nil(t, gitLabRelease)
+
+	_, err = nyx.Publish()
+	assert.NoError(t, err)
+
+	// if we read too quickly we often get a 404 from the server so let's wait a short while
+	time.Sleep(2000 * time.Millisecond)
+
+	// ATTENTION: the "pre-release" flag is not supported on GitLab so here we just test that setting the flag has no effect
 
 	// now delete it
 	gitLab.DeleteGitRepository((*gitLabRepository).GetID())

@@ -228,12 +228,20 @@ public class GitLab implements GitHostingService, ReleaseService, UserService {
      * {@inheritDoc}
      */
     @Override
-    public GitLabRelease publishRelease(String owner, String repository, String title, String tag, String description)
+    public GitLabRelease publishRelease(String owner, String repository, String title, String tag, String description, Map<String,Object> options)
         throws SecurityException, TransportException {
         if (Objects.isNull(owner) && Objects.isNull(repositoryOwner))
             logger.warn(SERVICE, "The repository owner was not passed as a service option nor overridden as an argument, creating the release may fail. Use the '{}' option to set this option or override it when invoking this method.", REPOSITORY_OWNER_OPTION_NAME);
         if (Objects.isNull(repository) && Objects.isNull(repositoryName))
             logger.warn(SERVICE, "The repository name was not passed as a service option nor overridden as an argument, creating the release may fail. Use the '{}' option to set this option or override it when invoking this method.", REPOSITORY_NAME_OPTION_NAME);
+        if (!Objects.isNull(options)) {
+            if (options.containsKey(RELEASE_OPTION_DRAFT)) {
+                logger.debug(SERVICE, "The release options contain the '{}' option but GitLab does not support the flag. The option will be ignored.", RELEASE_OPTION_DRAFT);
+            }
+            if (options.containsKey(RELEASE_OPTION_PRE_RELEASE)) {
+                logger.debug(SERVICE, "The release options contain the '{}' option but GitLab does not support the flag. The option will be ignored.", RELEASE_OPTION_PRE_RELEASE);
+            }
+        }
         return new GitLabRelease(api, api.publishRelease(Objects.isNull(owner) ? repositoryOwner : owner, Objects.isNull(repository) ? this.repositoryName : repository, title, tag, description));
     }
 

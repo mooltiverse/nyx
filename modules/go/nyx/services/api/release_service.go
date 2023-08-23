@@ -21,6 +21,20 @@ import (
 )
 
 /*
+The name of the release option used to define a release as draft.
+Use this option in the 'options' map passed to publishRelease(...).
+This option, when defined, must have a boolean value.
+*/
+const RELEASE_OPTION_DRAFT = "draft"
+
+/*
+The name of the release option used to define a release as a pre-release.
+Use this option in the 'options' map passed to publishRelease(...).
+This option, when defined, must have a boolean value.
+*/
+const RELEASE_OPTION_PRE_RELEASE = "pre-release"
+
+/*
 A service that supports the RELEASES feature to publish releases.
 */
 type ReleaseService interface {
@@ -51,15 +65,17 @@ type ReleaseService interface {
 		Arguments are as follows:
 
 		- owner the name of the repository owner to create the release for. It may be nil, in which case,
-		  the repository owner must be passed as a service option (see services implementing this interface for more
-		  details on the options they accept). If not nil this value overrides the option passed to the service.
+			the repository owner must be passed as a service option (see services implementing this interface for more
+			details on the options they accept). If not nil this value overrides the option passed to the service.
 		- repository the name of the repository to create the release for. It may be nil, in which case,
-		  the repository name must be passed as a service option (see services implementing this interface for more
-		  details on the options they accept). If not nil this value overrides the option passed to the service.
+			the repository name must be passed as a service option (see services implementing this interface for more
+			details on the options they accept). If not nil this value overrides the option passed to the service.
 		- title the release title, it may be the same of tag but not necessarily. It may be nil
 		- tag tag to publish the release for (i.e. 1.2.3, v4.5.6). It can't be nil
 		- description the release description. This is usually a Markdown text containing release notes or a changelog
-		  or something like that giving an overall description of the release
+			or something like that giving an overall description of the release
+		- options the optional map of release options (RELEASE_OPTION_DRAFT, RELEASE_OPTION_PRE_RELEASE).
+			When nil no options are evaluated.
 
 		Errors can be:
 
@@ -67,7 +83,7 @@ type ReleaseService interface {
 		- TransportError if communication to the remote endpoint fails
 		- UnsupportedOperationError if the underlying implementation does not support the RELEASES feature.
 	*/
-	PublishRelease(owner *string, repository *string, title *string, tag string, description *string) (*Release, error)
+	PublishRelease(owner *string, repository *string, title *string, tag string, description *string, options *map[string]interface{}) (*Release, error)
 
 	/*
 		Publishes a set of assets for a release. Even when the service supports the RELEASE_ASSETS

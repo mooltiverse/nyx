@@ -145,7 +145,7 @@ public class GitHubTest {
             script.push(System.getProperty("gitHubTestUserToken"), "");
 
             // publish the release
-            Release release = gitHub.publishRelease(user.getUserName(), gitHubRepository.getName(), "Release 1.0.0-alpha.1", "1.0.0-alpha.1", "A test description for the release\non multiple lines\nlike these");
+            Release release = gitHub.publishRelease(user.getUserName(), gitHubRepository.getName(), "Release 1.0.0-alpha.1", "1.0.0-alpha.1", "A test description for the release\non multiple lines\nlike these", null);
             assertEquals("Release 1.0.0-alpha.1", release.getTitle());
             assertEquals("1.0.0-alpha.1", release.getTag());
 

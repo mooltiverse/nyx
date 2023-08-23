@@ -498,6 +498,8 @@ Arguments are as follows:
   - tag tag to publish the release for (i.e. 1.2.3, v4.5.6). It can't be nil
   - description the release description. This is usually a Markdown text containing release notes or a changelog
     or something like that giving an overall description of the release
+  - options the optional map of release options (RELEASE_OPTION_DRAFT, RELEASE_OPTION_PRE_RELEASE).
+    When nil no options are evaluated.
 
 Errors can be:
 
@@ -505,7 +507,7 @@ Errors can be:
 - TransportError if communication to the remote endpoint fails
 - UnsupportedOperationError if the underlying implementation does not support the RELEASES feature.
 */
-func (s GitLab) publishRelease(owner *string, repository *string, title *string, tag string, description *string) (*GitLabRelease, error) {
+func (s GitLab) publishRelease(owner *string, repository *string, title *string, tag string, description *string, options *map[string]interface{}) (*GitLabRelease, error) {
 	log.Debugf("publishing GitLab release '%s'", tag)
 	requestOwner := ""
 	if owner != nil {
@@ -524,15 +526,26 @@ func (s GitLab) publishRelease(owner *string, repository *string, title *string,
 		log.Warnf("the repository name was not passed as a service option nor overridden as an argument, getting the release may fail. Use the '%s' option to set this option or override it when invoking this method.", REPOSITORY_NAME_OPTION_NAME)
 	}
 
-	options := &gl.CreateReleaseOptions{TagName: &tag}
-	if title != nil {
-		options.Name = title
-	}
-	if description != nil {
-		options.Description = description
+	if options != nil {
+		_, ok := (*options)[api.RELEASE_OPTION_DRAFT]
+		if ok {
+			log.Debugf("the release options contain the '%s' option but GitLab does not support the flag. The option will be ignored.", api.RELEASE_OPTION_DRAFT)
+		}
+		_, ok = (*options)[api.RELEASE_OPTION_PRE_RELEASE]
+		if ok {
+			log.Debugf("the release options contain the '%s' option but GitLab does not support the flag. The option will be ignored.", api.RELEASE_OPTION_PRE_RELEASE)
+		}
 	}
 
-	release, _, err := s.client.Releases.CreateRelease(requestOwner+"/"+requestRepository, options)
+	releaseOptions := &gl.CreateReleaseOptions{TagName: &tag}
+	if title != nil {
+		releaseOptions.Name = title
+	}
+	if description != nil {
+		releaseOptions.Description = description
+	}
+
+	release, _, err := s.client.Releases.CreateRelease(requestOwner+"/"+requestRepository, releaseOptions)
 	if err != nil {
 		log.Debugf("an error occurred while publishing GitLab release '%s': %v", tag, err)
 		return nil, errs.TransportError{Message: fmt.Sprintf("could not publish GitLab release with tag '%s'", tag), Cause: err}
@@ -557,6 +570,8 @@ Arguments are as follows:
   - tag tag to publish the release for (i.e. 1.2.3, v4.5.6). It can't be nil
   - description the release description. This is usually a Markdown text containing release notes or a changelog
     or something like that giving an overall description of the release
+  - options the optional map of release options (RELEASE_OPTION_DRAFT, RELEASE_OPTION_PRE_RELEASE).
+    When nil no options are evaluated.
 
 Errors can be:
 
@@ -564,9 +579,9 @@ Errors can be:
 - TransportError if communication to the remote endpoint fails
 - UnsupportedOperationError if the underlying implementation does not support the RELEASES feature.
 */
-func (s GitLab) PublishRelease(owner *string, repository *string, title *string, tag string, description *string) (*api.Release, error) {
+func (s GitLab) PublishRelease(owner *string, repository *string, title *string, tag string, description *string, options *map[string]interface{}) (*api.Release, error) {
 	// This is the method exposed to the outside and the following just casts values to/from the internal implementation
-	release, err := s.publishRelease(owner, repository, title, tag, description)
+	release, err := s.publishRelease(owner, repository, title, tag, description, options)
 	if err != nil {
 		return nil, err
 	}
