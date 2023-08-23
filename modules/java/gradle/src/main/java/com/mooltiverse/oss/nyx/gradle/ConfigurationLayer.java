@@ -301,6 +301,8 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
                             type.getMatchEnvironmentVariables().isPresent() ? type.getMatchEnvironmentVariables().get() : Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES,
                             type.getMatchWorkspaceStatus().isPresent() ? WorkspaceStatus.valueOf(type.getMatchWorkspaceStatus().get()) : Defaults.ReleaseType.MATCH_WORKSPACE_STATUS,
                             type.getPublish().isPresent() ? type.getPublish().get() : Defaults.ReleaseType.PUBLISH,
+                            type.getPublishDraft().isPresent() ? type.getPublishDraft().get() : Defaults.ReleaseType.PUBLISH_DRAFT,
+                            type.getPublishPreRelease().isPresent() ? type.getPublishPreRelease().get() : Defaults.ReleaseType.PUBLISH_PRE_RELEASE,
                             type.getReleaseName().isPresent() ? type.getReleaseName().get() : Defaults.ReleaseType.RELEASE_NAME,
                             type.getVersionRange().isPresent() ? type.getVersionRange().get() : Defaults.ReleaseType.VERSION_RANGE,
                             type.getVersionRangeFromBranchName().isPresent() ? type.getVersionRangeFromBranchName().get() : Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME

@@ -113,6 +113,12 @@ var (
 	// The optional flag or the template to render indicating whether or not releases must be published. Value: 'false'
 	RELEASE_TYPE_PUBLISH *string = utl.PointerToString("false")
 
+	// The optional template to set the draft flag of releases published to remote services. Value: 'false'
+	RELEASE_TYPE_PUBLISH_DRAFT *string = utl.PointerToString("false")
+
+	// The optional template to set the pre-release flag of releases published to remote services. Value: 'false'
+	RELEASE_TYPE_PUBLISH_PRE_RELEASE *string = utl.PointerToString("false")
+
 	// The optional template to set the name of releases published to remote services. Value: nil
 	RELEASE_TYPE_RELEASE_NAME *string = nil
 

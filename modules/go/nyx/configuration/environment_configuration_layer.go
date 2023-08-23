@@ -341,6 +341,20 @@ const (
 	// in order to get the actual name of the environment variable that brings the value for the release type with the given 'name'.
 	RELEASE_TYPES_ENVVAR_ITEM_PUBLISH_FORMAT_STRING = RELEASE_TYPES_ENVVAR_NAME + "_%s_PUBLISH"
 
+	// The parametrized name of the environment variable to read for the 'publishDraft' attribute of a
+	// release type.
+	// This string is a prototype that contains a '%s' parameter for the release type name
+	// and must be rendered using fmt.Sprintf(RELEASE_TYPES_ENVVAR_ITEM_PUBLISH_DRAFT_FORMAT_STRING, name)
+	// in order to get the actual name of the environment variable that brings the value for the release type with the given 'name'.
+	RELEASE_TYPES_ENVVAR_ITEM_PUBLISH_DRAFT_FORMAT_STRING = RELEASE_TYPES_ENVVAR_NAME + "_%s_PUBLISH_DRAFT"
+
+	// The parametrized name of the environment variable to read for the 'publishPreRelease' attribute of a
+	// release type.
+	// This string is a prototype that contains a '%s' parameter for the release type name
+	// and must be rendered using fmt.Sprintf(RELEASE_TYPES_ENVVAR_ITEM_PUBLISH_PRE_RELEASE_FORMAT_STRING, name)
+	// in order to get the actual name of the environment variable that brings the value for the release type with the given 'name'.
+	RELEASE_TYPES_ENVVAR_ITEM_PUBLISH_PRE_RELEASE_FORMAT_STRING = RELEASE_TYPES_ENVVAR_NAME + "_%s_PUBLISH_PRE_RELEASE"
+
 	// The parametrized name of the environment variable to read for the 'releaseName' attribute of a
 	// release type.
 	// This string is a prototype that contains a '%s' parameter for the release type name
@@ -1134,6 +1148,8 @@ func (ecl *EnvironmentConfigurationLayer) GetReleaseTypes() (*ent.ReleaseTypes, 
 				matchWorkspaceStatus = &mws
 			}
 			publish := ecl.getEnvVar(fmt.Sprintf(RELEASE_TYPES_ENVVAR_ITEM_PUBLISH_FORMAT_STRING, itemName))
+			publishDraft := ecl.getEnvVar(fmt.Sprintf(RELEASE_TYPES_ENVVAR_ITEM_PUBLISH_DRAFT_FORMAT_STRING, itemName))
+			publishPreRelease := ecl.getEnvVar(fmt.Sprintf(RELEASE_TYPES_ENVVAR_ITEM_PUBLISH_PRE_RELEASE_FORMAT_STRING, itemName))
 			releaseName := ecl.getEnvVar(fmt.Sprintf(RELEASE_TYPES_ENVVAR_ITEM_RELEASE_NAME_FORMAT_STRING, itemName))
 			versionRange := ecl.getEnvVar(fmt.Sprintf(RELEASE_TYPES_ENVVAR_ITEM_VERSION_RANGE_FORMAT_STRING, itemName))
 			var versionRangeFromBranchName *bool = nil
@@ -1146,7 +1162,7 @@ func (ecl *EnvironmentConfigurationLayer) GetReleaseTypes() (*ent.ReleaseTypes, 
 				versionRangeFromBranchName = &vrfbn
 			}
 
-			items[itemName] = ent.NewReleaseTypeWith(assets, collapseVersions, collapseVersionQualifier, description, filterTags, gitCommit, gitCommitMessage, gitPush, gitTag, gitTagMessage, gitTagNames, &identifiers, matchBranches, &matchEnvironmentVariables, matchWorkspaceStatus, publish, releaseName, versionRange, versionRangeFromBranchName)
+			items[itemName] = ent.NewReleaseTypeWith(assets, collapseVersions, collapseVersionQualifier, description, filterTags, gitCommit, gitCommitMessage, gitPush, gitTag, gitTagMessage, gitTagNames, &identifiers, matchBranches, &matchEnvironmentVariables, matchWorkspaceStatus, publish, publishDraft, publishPreRelease, releaseName, versionRange, versionRangeFromBranchName)
 		}
 
 		enabledPointers := ecl.toSliceOfStringPointers(enabled)

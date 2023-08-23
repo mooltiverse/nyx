@@ -45,8 +45,10 @@ public class ReleaseTypeTests {
                 "",
                 Map.<String,String>of("PATH",".*"),
                 null,
-                null,
                 Boolean.TRUE.toString(),
+                Boolean.FALSE.toString(),
+                Boolean.FALSE.toString(),
+                null,
                 "",
                 Boolean.FALSE));
         assertNull(new ReleaseType().getAssets());

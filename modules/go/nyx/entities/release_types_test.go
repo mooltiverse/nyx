@@ -47,7 +47,7 @@ func TestReleaseTypeNewReleasesTypeWith(t *testing.T) {
 	identifier2 := NewIdentifierWith(utl.PointerToString("build"), utl.PointerToString("123"), PointerToPosition(BUILD))
 	identifiers := []*Identifier{identifier1, identifier2}
 
-	releaseType := NewReleaseTypeWith(nil, utl.PointerToBoolean(true), utl.PointerToString("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}"), utl.PointerToString("Release description"), utl.PointerToString("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$"), utl.PointerToString("true"), utl.PointerToString("Committing {{version}}"), utl.PointerToString("true"), utl.PointerToString("true"), utl.PointerToString("Tagging {{version}}"), &[]*string{}, &identifiers, utl.PointerToString(""), &matchEnvironmentVariables, nil, utl.PointerToString("true"), utl.PointerToString("myrelease"), utl.PointerToString(""), utl.PointerToBoolean(false))
+	releaseType := NewReleaseTypeWith(nil, utl.PointerToBoolean(true), utl.PointerToString("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}"), utl.PointerToString("Release description"), utl.PointerToString("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$"), utl.PointerToString("true"), utl.PointerToString("Committing {{version}}"), utl.PointerToString("true"), utl.PointerToString("true"), utl.PointerToString("Tagging {{version}}"), &[]*string{}, &identifiers, utl.PointerToString(""), &matchEnvironmentVariables, nil, utl.PointerToString("true"), utl.PointerToString("false"), utl.PointerToString("true"), utl.PointerToString("myrelease"), utl.PointerToString(""), utl.PointerToBoolean(false))
 
 	items := make(map[string]*ReleaseType)
 	items["one"] = releaseType
@@ -118,7 +118,7 @@ func TestReleaseTypesGetItems(t *testing.T) {
 	identifier2 := NewIdentifierWith(utl.PointerToString("build"), utl.PointerToString("123"), PointerToPosition(BUILD))
 	identifiers := []*Identifier{identifier1, identifier2}
 
-	releaseType := NewReleaseTypeWith(nil, utl.PointerToBoolean(true), utl.PointerToString("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}"), utl.PointerToString("Release description"), utl.PointerToString("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$"), utl.PointerToString("true"), utl.PointerToString("Committing {{version}}"), utl.PointerToString("true"), utl.PointerToString("true"), utl.PointerToString("Tagging {{version}}"), &[]*string{}, &identifiers, utl.PointerToString(""), &matchEnvironmentVariables, nil, utl.PointerToString("true"), utl.PointerToString("myrelease"), utl.PointerToString(""), utl.PointerToBoolean(false))
+	releaseType := NewReleaseTypeWith(nil, utl.PointerToBoolean(true), utl.PointerToString("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}"), utl.PointerToString("Release description"), utl.PointerToString("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$"), utl.PointerToString("true"), utl.PointerToString("Committing {{version}}"), utl.PointerToString("true"), utl.PointerToString("true"), utl.PointerToString("Tagging {{version}}"), &[]*string{}, &identifiers, utl.PointerToString(""), &matchEnvironmentVariables, nil, utl.PointerToString("true"), utl.PointerToString("false"), utl.PointerToString("true"), utl.PointerToString("myrelease"), utl.PointerToString(""), utl.PointerToBoolean(false))
 
 	items := make(map[string]*ReleaseType)
 	items["one"] = releaseType

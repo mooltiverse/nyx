@@ -380,6 +380,8 @@ public class EnvironmentConfigurationLayerTests {
         environmentConfigurationLayer.environment.put("NYX_RELEASE_TYPES_two_MATCH_ENVIRONMENT_VARIABLES_USER", "any user");
         environmentConfigurationLayer.environment.put("NYX_RELEASE_TYPES_two_MATCH_WORKSPACE_STATUS", WorkspaceStatus.CLEAN.toString());
         environmentConfigurationLayer.environment.put("NYX_RELEASE_TYPES_two_PUBLISH", "true");
+        environmentConfigurationLayer.environment.put("NYX_RELEASE_TYPES_two_PUBLISH_DRAFT", "false");
+        environmentConfigurationLayer.environment.put("NYX_RELEASE_TYPES_two_PUBLISH_PRE_RELEASE", "true");
         environmentConfigurationLayer.environment.put("NYX_RELEASE_TYPES_two_RELEASE_NAME", "myrelease");
         environmentConfigurationLayer.environment.put("NYX_RELEASE_TYPES_two_VERSION_RANGE_FROM_BRANCH_NAME", "true");
         
@@ -408,6 +410,8 @@ public class EnvironmentConfigurationLayerTests {
         assertEquals(0, environmentConfigurationLayer.getReleaseTypes().getItems().get("one").getMatchEnvironmentVariables().size());
         assertEquals(WorkspaceStatus.DIRTY, environmentConfigurationLayer.getReleaseTypes().getItems().get("one").getMatchWorkspaceStatus());
         assertEquals("false", environmentConfigurationLayer.getReleaseTypes().getItems().get("one").getPublish());
+        assertNull(environmentConfigurationLayer.getReleaseTypes().getItems().get("one").getPublishDraft());
+        assertNull(environmentConfigurationLayer.getReleaseTypes().getItems().get("one").getPublishPreRelease());
         assertNull(environmentConfigurationLayer.getReleaseTypes().getItems().get("one").getReleaseName());
         assertEquals("true", environmentConfigurationLayer.getReleaseTypes().getItems().get("one").getVersionRange());
         assertNull(environmentConfigurationLayer.getReleaseTypes().getItems().get("one").getVersionRangeFromBranchName());
@@ -441,6 +445,8 @@ public class EnvironmentConfigurationLayerTests {
         assertEquals("any user", environmentConfigurationLayer.getReleaseTypes().getItems().get("two").getMatchEnvironmentVariables().get("USER"));
         assertEquals(WorkspaceStatus.CLEAN, environmentConfigurationLayer.getReleaseTypes().getItems().get("two").getMatchWorkspaceStatus());
         assertEquals("true", environmentConfigurationLayer.getReleaseTypes().getItems().get("two").getPublish());
+        assertEquals("false", environmentConfigurationLayer.getReleaseTypes().getItems().get("two").getPublishDraft());
+        assertEquals("true", environmentConfigurationLayer.getReleaseTypes().getItems().get("two").getPublishPreRelease());
         assertEquals("myrelease", environmentConfigurationLayer.getReleaseTypes().getItems().get("two").getReleaseName());
         assertNull(environmentConfigurationLayer.getReleaseTypes().getItems().get("two").getVersionRange());
         assertEquals(Boolean.TRUE, environmentConfigurationLayer.getReleaseTypes().getItems().get("two").getVersionRangeFromBranchName());

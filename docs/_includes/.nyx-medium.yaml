@@ -78,6 +78,7 @@ releaseTypes:
           qualifier: timestamp
           value: "{{#timestampYYYYMMDDHHMMSS}}{{timestamp}}{{/timestampYYYYMMDDHHMMSS}}"
       publish: "false"
+      publishDraft: "true"
       versionRangeFromBranchName: false
 scheme: "SEMVER"
 services: 

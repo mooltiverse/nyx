@@ -179,6 +179,16 @@ public interface Defaults {
         public static final String PUBLISH = Boolean.FALSE.toString();
 
         /**
+         * The optional template to set the draft flag of releases published to remote services. Value: {@code false}
+         */
+        public static final String PUBLISH_DRAFT = Boolean.FALSE.toString();
+
+        /**
+         * The optional template to set the pre-release flag of releases published to remote services. Value: {@code false}
+         */
+        public static final String PUBLISH_PRE_RELEASE = Boolean.FALSE.toString();
+
+        /**
          * The optional template to set the name of releases published to remote services. Value: {@code null}
          */
         public static final String RELEASE_NAME = null;

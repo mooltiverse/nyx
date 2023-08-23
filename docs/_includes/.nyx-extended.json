@@ -108,6 +108,7 @@
         "matchBranches":"^(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)$",
         "matchWorkspaceStatus":"CLEAN",
         "publish":"true",
+        "publishPreRelease":"true",
         "versionRangeFromBranchName":false
       },
       "integration":{
@@ -123,6 +124,7 @@
         "matchBranches":"^(develop|development|integration|latest)$",
         "matchWorkspaceStatus":"CLEAN",
         "publish":"true",
+        "publishPreRelease":"true",
         "versionRangeFromBranchName":false
       },
       "feature":{
@@ -135,6 +137,7 @@
         "gitTag":"false",
         "matchBranches":"^(feat|feature)((-|\\/)[0-9a-zA-Z-_]+)?$",
         "publish":"false",
+        "publishPreRelease":"true",
         "versionRangeFromBranchName":false
       },
       "hotfix":{
@@ -150,6 +153,7 @@
         "matchBranches":"^(fix|hotfix)((-|\\/)[0-9a-zA-Z-_]+)?$",
         "matchWorkspaceStatus":"CLEAN",
         "publish":"true",
+        "publishPreRelease":"true",
         "versionRangeFromBranchName":false
       },
       "release":{
@@ -209,6 +213,7 @@
           }
         ],
         "publish":"false",
+        "publishDraft":"true",
         "versionRangeFromBranchName":false
       }
     }

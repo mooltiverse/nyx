@@ -88,6 +88,7 @@ nyx {
           }
         }
         publish = 'false'
+        publishDraft = 'true'
         versionRangeFromBranchName = false
       }
     }
