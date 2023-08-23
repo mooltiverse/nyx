@@ -921,6 +921,9 @@ class JGitRepository implements Repository {
             PushCommand pushCommand = jGit.push().setRefSpecs(refSpec);
             if (!Objects.isNull(remote) && !remote.isBlank())
                 pushCommand.setRemote(remote);
+            // The force flag may be required to update existing tags, especially when tag aliases are used.
+	        // On the other hand it may also interfere with some workflows (i.e. when using branch protection rules) so we need to be careful.
+            pushCommand.setForce(true);
             pushCommand.setPushTags();
             pushCommand.setCredentialsProvider(getCredentialsProvider(user, password));
             pushCommand.call();
@@ -946,6 +949,9 @@ class JGitRepository implements Repository {
             PushCommand pushCommand = jGit.push().setRefSpecs(refSpec);
             if (!Objects.isNull(remote) && !remote.isBlank())
                 pushCommand.setRemote(remote);
+            // The force flag may be required to update existing tags, especially when tag aliases are used.
+	        // On the other hand it may also interfere with some workflows (i.e. when using branch protection rules) so we need to be careful.
+            pushCommand.setForce(true);
             pushCommand.setPushTags();
             pushCommand.setTransportConfigCallback(getTransportConfigCallback(privateKey, passphrase));
             pushCommand.call();
