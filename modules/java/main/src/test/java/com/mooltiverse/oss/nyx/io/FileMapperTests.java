@@ -17,7 +17,6 @@ package com.mooltiverse.oss.nyx.io;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.net.URI;
 import java.net.URL;
 
 import org.junit.jupiter.api.DisplayName;
@@ -54,7 +53,7 @@ public class FileMapperTests {
         @DisplayName("FileMapper.load(URL, ?)")
         void loadFromURLTest()
             throws Exception {
-            URL url = new URI("http://ip.jsontest.com/").toURL();
+            URL url = new URL("http://ip.jsontest.com/");
 
             try {
                 JSONTestIPOutput testOutput = FileMapper.load(url, JSONTestIPOutput.class);
