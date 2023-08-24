@@ -22,6 +22,7 @@
 package command_test
 
 import (
+	"fmt"
 	"os"            // https://pkg.go.dev/os
 	"path/filepath" // https://pkg.go.dev/path/filepath
 	"strings"       // https://pkg.go.dev/strings
@@ -1016,6 +1017,156 @@ func TestMakeRunWithCustomTemplateFromURL(t *testing.T) {
 				fileContent := readFile(changelogFile)
 				assert.True(t, strings.HasPrefix(fileContent, "# Changelog")) // title header check
 				assert.True(t, strings.Contains(fileContent, "## 0.1.0 "))    // release header check
+			}
+		})
+	}
+	log.SetLevel(logLevel) // restore the original logging level
+}
+
+func TestMakeRunWithExistingFileAndAppendingToHead(t *testing.T) {
+	logLevel := log.GetLevel()   // save the previous logging level
+	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
+	for _, command := range cmdtpl.CommandInvocationProxies(cmd.MAKE, gittools.ONE_BRANCH_SHORT_CONVENTIONAL_COMMITS()) {
+		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
+			// first create the temporary directory and the abstract destination file
+			destinationDir, _ := os.MkdirTemp("", "nyx-test-make-test-")
+			defer os.RemoveAll(destinationDir)
+			// create the custom template, with simple strings used as markers
+			templateFile := filepath.Join(destinationDir, "template.tpl")
+			// this template only writes static content, which is easier to match after the changelog has been generated
+			writeFile(templateFile, "NEW CHANGELOG CONTENT\n")
+			changelogFile := filepath.Join(destinationDir, "CHANGELOG.md")
+
+			// create a changelog with some existing content so we can test where content is appended
+			writeFile(changelogFile, "PREVIOUS CHANGELOG CONTENT\n")
+
+			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
+			changelogConfiguration, _ := configurationLayerMock.GetChangelog()
+			changelogConfiguration.SetAppend(utl.PointerToString("head"))
+			changelogConfiguration.SetPath(&changelogFile)
+			changelogConfiguration.SetTemplate(&templateFile)
+			// add the conventional commits convention
+			commitMessageConventions, _ := ent.NewCommitMessageConventionsWith(&[]*string{utl.PointerToString("conventionalCommits")},
+				&map[string]*ent.CommitMessageConvention{"conventionalCommits": cnf.COMMIT_MESSAGE_CONVENTIONS_CONVENTIONAL_COMMITS})
+			configurationLayerMock.SetCommitMessageConventions(commitMessageConventions)
+			var configurationLayer cnf.ConfigurationLayer
+			configurationLayer = configurationLayerMock
+			(*command).State().GetConfiguration().WithRuntimeConfiguration(&configurationLayer)
+
+			_, err := os.Stat(changelogFile)
+			changelogFileExists := err == nil
+			assert.True(t, changelogFileExists)
+
+			_, err = (*command).Run()
+			assert.NoError(t, err)
+
+			// when the command is executed standalone, Infer is not executed so Run() will just do nothing as the release scope is undefined
+			if (*command).GetContextName() != cmdtpl.STANDALONE_CONTEXT_NAME {
+				_, err = os.Stat(changelogFile)
+				changelogFileExists = err == nil
+				assert.True(t, changelogFileExists)
+
+				// print the file to standard output for inspection purpose
+				fmt.Printf("------- CHANGELOG -------\n")
+				fmt.Printf("Loading from: %v\n", changelogFile)
+				fmt.Printf("-----------------------------------------\n")
+				fmt.Printf(readFile(changelogFile))
+				fmt.Println()
+				fmt.Printf("-----------------------------------------\n")
+
+				// test the rendered file
+				fileContent := strings.Replace(readFile(changelogFile), "\r", "", -1)
+				assert.Equal(t, "NEW CHANGELOG CONTENT\nPREVIOUS CHANGELOG CONTENT\n", fileContent) // title header check
+
+				// run again and make sure values didn't change
+				upToDate, err := (*command).IsUpToDate()
+				assert.NoError(t, err)
+				assert.True(t, upToDate)
+				_, err = (*command).Run()
+				assert.NoError(t, err)
+				upToDate, err = (*command).IsUpToDate()
+				assert.NoError(t, err)
+				assert.True(t, upToDate)
+
+				// test the rendered file again
+				fileContent = strings.Replace(readFile(changelogFile), "\r", "", -1)
+				assert.Equal(t, "NEW CHANGELOG CONTENT\nPREVIOUS CHANGELOG CONTENT\n", fileContent) // title header check
+			}
+		})
+	}
+	log.SetLevel(logLevel) // restore the original logging level
+}
+
+func TestMakeRunWithExistingFileAndAppendingToTail(t *testing.T) {
+	logLevel := log.GetLevel()   // save the previous logging level
+	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
+	for _, command := range cmdtpl.CommandInvocationProxies(cmd.MAKE, gittools.ONE_BRANCH_SHORT_CONVENTIONAL_COMMITS()) {
+		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
+			// first create the temporary directory and the abstract destination file
+			destinationDir, _ := os.MkdirTemp("", "nyx-test-make-test-")
+			defer os.RemoveAll(destinationDir)
+			// create the custom template, with simple strings used as markers
+			templateFile := filepath.Join(destinationDir, "template.tpl")
+			// this template only writes static content, which is easier to match after the changelog has been generated
+			writeFile(templateFile, "NEW CHANGELOG CONTENT\n")
+			changelogFile := filepath.Join(destinationDir, "CHANGELOG.md")
+
+			// create a changelog with some existing content so we can test where content is appended
+			writeFile(changelogFile, "PREVIOUS CHANGELOG CONTENT\n")
+
+			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
+			changelogConfiguration, _ := configurationLayerMock.GetChangelog()
+			changelogConfiguration.SetAppend(utl.PointerToString("tail"))
+			changelogConfiguration.SetPath(&changelogFile)
+			changelogConfiguration.SetTemplate(&templateFile)
+			// add the conventional commits convention
+			commitMessageConventions, _ := ent.NewCommitMessageConventionsWith(&[]*string{utl.PointerToString("conventionalCommits")},
+				&map[string]*ent.CommitMessageConvention{"conventionalCommits": cnf.COMMIT_MESSAGE_CONVENTIONS_CONVENTIONAL_COMMITS})
+			configurationLayerMock.SetCommitMessageConventions(commitMessageConventions)
+			var configurationLayer cnf.ConfigurationLayer
+			configurationLayer = configurationLayerMock
+			(*command).State().GetConfiguration().WithRuntimeConfiguration(&configurationLayer)
+
+			_, err := os.Stat(changelogFile)
+			changelogFileExists := err == nil
+			assert.True(t, changelogFileExists)
+
+			_, err = (*command).Run()
+			assert.NoError(t, err)
+
+			// when the command is executed standalone, Infer is not executed so Run() will just do nothing as the release scope is undefined
+			if (*command).GetContextName() != cmdtpl.STANDALONE_CONTEXT_NAME {
+				_, err = os.Stat(changelogFile)
+				changelogFileExists = err == nil
+				assert.True(t, changelogFileExists)
+
+				// print the file to standard output for inspection purpose
+				fmt.Printf("------- CHANGELOG -------\n")
+				fmt.Printf("Loading from: %v\n", changelogFile)
+				fmt.Printf("-----------------------------------------\n")
+				fmt.Printf(readFile(changelogFile))
+				fmt.Println()
+				fmt.Printf("-----------------------------------------\n")
+
+				// test the rendered file
+				fileContent := strings.Replace(readFile(changelogFile), "\r", "", -1)
+				assert.Equal(t, "PREVIOUS CHANGELOG CONTENT\nNEW CHANGELOG CONTENT\n", fileContent) // title header check
+
+				// run again and make sure values didn't change
+				upToDate, err := (*command).IsUpToDate()
+				assert.NoError(t, err)
+				assert.True(t, upToDate)
+				_, err = (*command).Run()
+				assert.NoError(t, err)
+				upToDate, err = (*command).IsUpToDate()
+				assert.NoError(t, err)
+				assert.True(t, upToDate)
+
+				// test the rendered file again
+				fileContent = strings.Replace(readFile(changelogFile), "\r", "", -1)
+				assert.Equal(t, "PREVIOUS CHANGELOG CONTENT\nNEW CHANGELOG CONTENT\n", fileContent) // title header check
 			}
 		})
 	}
