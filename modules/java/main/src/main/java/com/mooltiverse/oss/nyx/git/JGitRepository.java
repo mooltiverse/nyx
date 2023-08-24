@@ -862,7 +862,7 @@ class JGitRepository implements Repository {
         try {
             RefDatabase refDatabase = jGit.getRepository().getRefDatabase();
             for (Ref tagRef: refDatabase.getRefsByPrefix(Constants.R_TAGS)) {
-                // refs must be peeled in order to see if they're annoteted or lightweight
+                // refs must be peeled in order to see if they're annotated or lightweight
                 tagRef = refDatabase.peel(tagRef);
                 res.add(ObjectFactory.tagFrom(tagRef));
             }
