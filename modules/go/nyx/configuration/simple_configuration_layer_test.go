@@ -51,7 +51,7 @@ func TestSimpleConfigurationLayerGetChangelogConfiguration(t *testing.T) {
 	assert.NoError(t, error)
 	assert.NotNil(t, cc)
 
-	ccParam, _ := ent.NewChangelogConfigurationWith(utl.PointerToString("CHANGELOG.md"), &map[string]string{"Section1": "regex1", "Section2": "regex2"}, utl.PointerToString("changelog.tpl"), &map[string]string{"Expression1": "string1"})
+	ccParam, _ := ent.NewChangelogConfigurationWith(nil, utl.PointerToString("CHANGELOG.md"), &map[string]string{"Section1": "regex1", "Section2": "regex2"}, utl.PointerToString("changelog.tpl"), &map[string]string{"Expression1": "string1"})
 
 	simpleConfigurationLayer.SetChangelog(ccParam)
 	cc, error = simpleConfigurationLayer.GetChangelog()

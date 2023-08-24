@@ -64,6 +64,8 @@ public class NyxExtensionTestTemplates {
             NyxExtension extension = project.getExtensions().getByType(NyxExtension.class);
 
             assertNotNull(extension.getChangelog());
+            assertFalse(extension.getChangelog().getAppend().isPresent());
+            assertNull(extension.getChangelog().getAppend().getOrNull());
             assertFalse(extension.getChangelog().getPath().isPresent());
             assertNull(extension.getChangelog().getPath().getOrNull());
             //assertTrue(extension.getChangelog().geSections().isPresent());

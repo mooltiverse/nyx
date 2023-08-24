@@ -50,6 +50,7 @@ public class EnvironmentConfigurationLayerTests {
         throws Exception {
         EnvironmentConfigurationLayerMock environmentConfigurationLayer = EnvironmentConfigurationLayerMock.getInstance();
         assertNotNull(environmentConfigurationLayer.getChangelog());
+        assertNull(environmentConfigurationLayer.getChangelog().getAppend());
         assertNull(environmentConfigurationLayer.getChangelog().getPath());
         assertTrue(environmentConfigurationLayer.getChangelog().getSections().isEmpty());
         assertTrue(environmentConfigurationLayer.getChangelog().getSubstitutions().isEmpty());
@@ -59,6 +60,7 @@ public class EnvironmentConfigurationLayerTests {
         environmentConfigurationLayer = EnvironmentConfigurationLayerMock.getInstance();
         environmentConfigurationLayer.environment.put("NYX_CHANGELOG_PATH", "CHANGELOG.md");
 
+        assertNull(environmentConfigurationLayer.getChangelog().getAppend());
         assertEquals("CHANGELOG.md", environmentConfigurationLayer.getChangelog().getPath());
         assertTrue(environmentConfigurationLayer.getChangelog().getSections().isEmpty());
         assertTrue(environmentConfigurationLayer.getChangelog().getSubstitutions().isEmpty());
@@ -66,12 +68,14 @@ public class EnvironmentConfigurationLayerTests {
         
         // get a new instance or a stale object is returned by getChangelog()
         environmentConfigurationLayer = EnvironmentConfigurationLayerMock.getInstance();
+        environmentConfigurationLayer.environment.put("NYX_CHANGELOG_APPEND", "head");
         environmentConfigurationLayer.environment.put("NYX_CHANGELOG_PATH", "CHANGELOG.md");
         environmentConfigurationLayer.environment.put("NYX_CHANGELOG_SECTIONS_Section1", "regex1");
         environmentConfigurationLayer.environment.put("NYX_CHANGELOG_SECTIONS_Section2", "regex2");
         environmentConfigurationLayer.environment.put("NYX_CHANGELOG_SUBSTITUTIONS_Expr1", "string1");
         environmentConfigurationLayer.environment.put("NYX_CHANGELOG_TEMPLATE", "changelog.tpl");
 
+        assertEquals("head", environmentConfigurationLayer.getChangelog().getAppend());
         assertEquals("CHANGELOG.md", environmentConfigurationLayer.getChangelog().getPath());
         assertEquals(2, environmentConfigurationLayer.getChangelog().getSections().size());
         assertTrue(environmentConfigurationLayer.getChangelog().getSections().containsKey("Section1"));

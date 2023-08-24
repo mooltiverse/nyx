@@ -33,6 +33,7 @@ func TestChangelogConfigurationNewChangelogConfiguration(t *testing.T) {
 	cc := NewChangelogConfiguration()
 
 	// default constructor has its fields set to default values
+	assert.Nil(t, cc.GetAppend())
 	assert.Nil(t, cc.GetPath())
 	assert.Equal(t, 0, len(*cc.GetSections()))
 	assert.Equal(t, 0, len(*cc.GetSubstitutions()))
@@ -47,9 +48,11 @@ func TestChangelogConfigurationNewChangelogConfigurationWith(t *testing.T) {
 	substitutions := make(map[string]string)
 	substitutions["Expression1"] = "string1"
 
-	cc, err := NewChangelogConfigurationWith(utl.PointerToString("CHANGELOG.md"), &sections, utl.PointerToString("changelog.tpl"), &substitutions)
+	cc, err := NewChangelogConfigurationWith(utl.PointerToString("tail"), utl.PointerToString("CHANGELOG.md"), &sections, utl.PointerToString("changelog.tpl"), &substitutions)
 	assert.NoError(t, err)
 
+	a := cc.GetAppend()
+	assert.Equal(t, "tail", *a)
 	p := cc.GetPath()
 	assert.Equal(t, "CHANGELOG.md", *p)
 	s1 := cc.GetSections()
@@ -60,8 +63,16 @@ func TestChangelogConfigurationNewChangelogConfigurationWith(t *testing.T) {
 	assert.Equal(t, &substitutions, s2)
 
 	// also test error conditions when nil parameters are passed
-	_, err = NewChangelogConfigurationWith(utl.PointerToString("CHANGELOG.md"), nil, utl.PointerToString("changelog.tpl"), &substitutions)
+	_, err = NewChangelogConfigurationWith(nil, utl.PointerToString("CHANGELOG.md"), nil, utl.PointerToString("changelog.tpl"), &substitutions)
 	assert.NotNil(t, err)
+}
+
+func TestChangelogConfigurationGetAppend(t *testing.T) {
+	cc := NewChangelogConfiguration()
+
+	cc.SetAppend(utl.PointerToString("tail"))
+	a := cc.GetAppend()
+	assert.Equal(t, "tail", *a)
 }
 
 func TestChangelogConfigurationGetPath(t *testing.T) {

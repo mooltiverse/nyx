@@ -28,10 +28,11 @@ public class ChangelogConfigurationTests {
     @DisplayName("ChangelogConfiguration()")
     void constructorTest()
         throws Exception {
-        assertEquals("CHANGELOG.md", new ChangelogConfiguration("CHANGELOG.md", Map.<String,String>of("Section1", "regex1", "Section2", "regex2"), "changelog.tpl", Map.<String,String>of("Expression1", "string1")).getPath());
-        assertEquals("regex1", new ChangelogConfiguration("CHANGELOG.md", Map.<String,String>of("Section1", "regex1", "Section2", "regex2"), "changelog.tpl", Map.<String,String>of("Expression1", "string1")).getSections().get("Section1"));
-        assertEquals("regex2", new ChangelogConfiguration("CHANGELOG.md", Map.<String,String>of("Section1", "regex1", "Section2", "regex2"), "changelog.tpl", Map.<String,String>of("Expression1", "string1")).getSections().get("Section2"));
-        assertEquals("string1", new ChangelogConfiguration("CHANGELOG.md", Map.<String,String>of("Section1", "regex1", "Section2", "regex2"), "changelog.tpl", Map.<String,String>of("Expression1", "string1")).getSubstitutions().get("Expression1"));
-        assertEquals("changelog.tpl", new ChangelogConfiguration("CHANGELOG.md", Map.<String,String>of("Section1", "regex1", "Section2", "regex2"), "changelog.tpl", Map.<String,String>of("Expression1", "string1")).getTemplate());
+        assertEquals("tail", new ChangelogConfiguration("tail", "CHANGELOG.md", Map.<String,String>of("Section1", "regex1", "Section2", "regex2"), "changelog.tpl", Map.<String,String>of("Expression1", "string1")).getAppend());
+        assertEquals("CHANGELOG.md", new ChangelogConfiguration("tail", "CHANGELOG.md", Map.<String,String>of("Section1", "regex1", "Section2", "regex2"), "changelog.tpl", Map.<String,String>of("Expression1", "string1")).getPath());
+        assertEquals("regex1", new ChangelogConfiguration("tail", "CHANGELOG.md", Map.<String,String>of("Section1", "regex1", "Section2", "regex2"), "changelog.tpl", Map.<String,String>of("Expression1", "string1")).getSections().get("Section1"));
+        assertEquals("regex2", new ChangelogConfiguration("tail", "CHANGELOG.md", Map.<String,String>of("Section1", "regex1", "Section2", "regex2"), "changelog.tpl", Map.<String,String>of("Expression1", "string1")).getSections().get("Section2"));
+        assertEquals("string1", new ChangelogConfiguration("tail", "CHANGELOG.md", Map.<String,String>of("Section1", "regex1", "Section2", "regex2"), "changelog.tpl", Map.<String,String>of("Expression1", "string1")).getSubstitutions().get("Expression1"));
+        assertEquals("changelog.tpl", new ChangelogConfiguration("tail", "CHANGELOG.md", Map.<String,String>of("Section1", "regex1", "Section2", "regex2"), "changelog.tpl", Map.<String,String>of("Expression1", "string1")).getTemplate());
     }
 }

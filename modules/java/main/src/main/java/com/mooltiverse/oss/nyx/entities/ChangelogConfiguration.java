@@ -24,6 +24,11 @@ import java.util.Objects;
  */
 public class ChangelogConfiguration {
     /**
+     * The flag instructing if and when to append contents to the existing changelog file.
+     */
+    private String append = null;
+
+    /**
      * The path to the destination file.
      */
     private String path = null;
@@ -55,6 +60,7 @@ public class ChangelogConfiguration {
     /**
      * Standard constructor.
      * 
+     * @param append the flag instructing if and when to append contents to the existing changelog file. It may be {@code null}.
      * @param path the path to the destination file. It may be {@code null}.
      * @param sections the map of sections and commit types.
      * @param template the path to the optional template file. It may be {@code null}.
@@ -62,13 +68,32 @@ public class ChangelogConfiguration {
      * 
      * @throws NullPointerException if some mandatory argument is {@code null}
      */
-    public ChangelogConfiguration(String path, Map<String,String> sections, String template, Map<String,String> substitutions) {
+    public ChangelogConfiguration(String append, String path, Map<String,String> sections, String template, Map<String,String> substitutions) {
         super();
         Objects.requireNonNull(sections);
+        this.append = append;
         this.path = path;
         this.sections = sections;
         this.template = template;
         this.substitutions = substitutions;
+    }
+
+    /**
+     * Returns the flag instructing if and when to append contents to the existing changelog file. It may be {@code null}.
+     * 
+     * @return the flag instructing if and when to append contents to the existing changelog file. It may be {@code null}.
+     */
+    public String getAppend() {
+        return append;
+    }
+
+    /**
+     * Sets the flag instructing if and when to append contents to the existing changelog file. It may be {@code null}.
+     * 
+     * @param append the flag instructing if and when to append contents to the existing changelog file. It may be {@code null}.
+     */
+    public void setAppend(String append) {
+        this.append = append;
     }
 
     /**

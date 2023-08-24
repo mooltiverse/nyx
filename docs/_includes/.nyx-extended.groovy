@@ -1,5 +1,6 @@
 nyx {
   changelog {
+    append = 'head'
     path = 'CHANGELOG.md'
     sections = [
       'Added' : '^feat$',

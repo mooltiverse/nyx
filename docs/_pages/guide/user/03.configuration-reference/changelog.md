@@ -17,10 +17,28 @@ The changelog is generated only when a [new version]({{ site.baseurl }}{% link _
 
 | Name                                                 | Type    | Command Line Option                                                           | Environment Variable                             | Default                                |
 | ---------------------------------------------------- | ------- | ----------------------------------------------------------------------------- | ------------------------------------------------ | -------------------------------------- |
+| [`changelog/append`](#append)                        | string  | `--changelog-append=head|tail`                                                | `NYX_CHANGELOG_APPEND=head|tail`                 | N/A                                    |
 | [`changelog/path`](#path)                            | string  | `--changelog-path=<PATH>`                                                     | `NYX_CHANGELOG_PATH=<PATH>`                      | N/A                                    |
 | [`changelog/sections`](#sections)                    | [map]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}#collections-of-objects) | `--changelog-sections-<NAME>=<REGEX>` | `NYX_CHANGELOG_SECTIONS_<NAME>=<REGEX>` | N/A                                    |
 | [`changelog/substitutions`](#substitutions)          | [map]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}#collections-of-objects) | `--changelog-substitutions-<REGEX>=<FORMAT_STRING>` | `NYX_CHANGELOG_SUBSTITUTIONS_<REGEX>=<FORMAT_STRING>` | N/A                                    |
 | [`changelog/template`](#template)                    | string  | `--changelog-template=<PATH>`                                                 | `NYX_CHANGELOG_TEMPLATE=<PATH>`                  | N/A                                    |
+
+#### Append
+
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `changelog/append`                                                                       |
+| Type                      | string                                                                                   |
+| Default                   | N/A                                                                                      |
+| Command Line Option       | `--changelog-append=head|tail`                                                           |
+| Environment Variable      | `NYX_CHANGELOG_APPEND=head|tail`                                                         |
+| Configuration File Option | `changelog/append`                                                                       |
+| Related state attributes  | [changelog]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/changelog.md %}){: .btn .btn--info .btn--small} |
+
+If a changelog file already exists at the given [path](#path), this flag allow to append the contents for the new release to the existing content.
+
+When this value is `head` new contents are added on top of the file, shifting the precedent contents down, otherwise when this is set to `tail` new contents are appended at the end of the file. In other words, use `head` to have a changelog with most recent releases on top of the file, or `tail` to have them at the end (natural ordering).
+
+When this option is not set or is emptty the previous contents of the changelog file are overwitten.
 
 #### Path
 

@@ -643,6 +643,11 @@ public abstract class NyxExtension {
      */
     public abstract static class ChangelogConfiguration {
         /**
+         * The flag instructing if and when to append contents to the existing changelog file.
+         */
+        private final Property<String> append = getObjectfactory().property(String.class);
+
+        /**
          * The path to the destination file.
          */
         private final Property<String> path = getObjectfactory().property(String.class);
@@ -676,6 +681,18 @@ public abstract class NyxExtension {
          */
         @Inject
         protected abstract ObjectFactory getObjectfactory();
+
+        /**
+         * Returns the flag instructing if and when to append contents to the existing changelog file.
+         * 
+         * We provide an implementation of this method instead of using the abstract definition as it's
+         * safer for old Gradle versions we support.
+         * 
+         * @return the flag instructing if and when to append contents to the existing changelog file.
+         */
+        public Property<String> getAppend() {
+            return append;
+        }
 
         /**
          * Returns the path to the destination file. When this is set by the user it overrides

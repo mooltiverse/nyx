@@ -29,6 +29,9 @@ This structure is JSON and YAML aware so all objects are properly managed for ma
 as all internal fields must be exported (have the first capital letter in their names) or they can't be marshalled.
 */
 type ChangelogConfiguration struct {
+	// The flag instructing if and when to append contents to the existing changelog file.
+	Append *string `json:"append,omitempty" yaml:"append,omitempty"`
+
 	// The path to the destination file.
 	Path *string `json:"path,omitempty" yaml:"path,omitempty"`
 
@@ -61,6 +64,7 @@ Standard constructor.
 
 Arguments are as follows:
 
+- append the flag instructing if and when to append contents to the existing changelog file. It may be nil
 - path the path to the destination file. It may be nil
 - sections the map of sections and commit types.
 - template the path to the optional template file. It may be nil
@@ -70,13 +74,14 @@ Errors can be:
 
 - NilPointerError in case sections is nil
 */
-func NewChangelogConfigurationWith(path *string, sections *map[string]string, template *string, substitutions *map[string]string) (*ChangelogConfiguration, error) {
+func NewChangelogConfigurationWith(append *string, path *string, sections *map[string]string, template *string, substitutions *map[string]string) (*ChangelogConfiguration, error) {
 	cl := ChangelogConfiguration{}
 
 	if sections == nil {
 		return nil, &errs.NilPointerError{Message: fmt.Sprintf("nil pointer '%s'", "sections")}
 	}
 
+	cl.Append = append
 	cl.Path = path
 	cl.Sections = sections
 	cl.Substitutions = substitutions
@@ -92,6 +97,25 @@ func NewChangelogConfigurationWith(path *string, sections *map[string]string, te
 	}
 
 	return &cl, nil
+}
+
+/*
+Returns the flag instructing if and when to append contents to the existing changelog file.
+*/
+func (cl *ChangelogConfiguration) GetAppend() *string {
+	return cl.Append
+}
+
+/*
+Sets the flag instructing if and when to append contents to the existing changelog file.
+
+Errors can be:
+
+- none
+*/
+func (cl *ChangelogConfiguration) SetAppend(append *string) error {
+	cl.Append = append
+	return nil
 }
 
 /*

@@ -43,6 +43,9 @@ const (
 	CHANGELOG_CONFIGURATION_ENVVAR_NAME = ENVVAR_NAME_GLOBAL_PREFIX + "CHANGELOG"
 
 	// The name of the environment variable to read for this value.
+	CHANGELOG_CONFIGURATION_APPEND_ENVVAR_NAME = CHANGELOG_CONFIGURATION_ENVVAR_NAME + "_APPEND"
+
+	// The name of the environment variable to read for this value.
 	CHANGELOG_CONFIGURATION_PATH_ENVVAR_NAME = CHANGELOG_CONFIGURATION_ENVVAR_NAME + "_PATH"
 
 	// The name of the environment variable to read for this value.
@@ -848,7 +851,7 @@ func (ecl *EnvironmentConfigurationLayer) GetChangelog() (*ent.ChangelogConfigur
 			substitutions[substitutionName] = *substitutionValue
 		}
 
-		ecl.changelog, err = ent.NewChangelogConfigurationWith(ecl.getEnvVar(CHANGELOG_CONFIGURATION_PATH_ENVVAR_NAME), &sections, ecl.getEnvVar(CHANGELOG_CONFIGURATION_TEMPLATE_ENVVAR_NAME), &substitutions)
+		ecl.changelog, err = ent.NewChangelogConfigurationWith(ecl.getEnvVar(CHANGELOG_CONFIGURATION_APPEND_ENVVAR_NAME), ecl.getEnvVar(CHANGELOG_CONFIGURATION_PATH_ENVVAR_NAME), &sections, ecl.getEnvVar(CHANGELOG_CONFIGURATION_TEMPLATE_ENVVAR_NAME), &substitutions)
 		if err != nil {
 			return nil, err
 		}
