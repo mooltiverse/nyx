@@ -22,7 +22,6 @@
 package command_test
 
 import (
-	"fmt"
 	"os"            // https://pkg.go.dev/os
 	"path/filepath" // https://pkg.go.dev/path/filepath
 	"strings"       // https://pkg.go.dev/strings
@@ -1068,12 +1067,12 @@ func TestMakeRunWithExistingFileAndAppendingToHead(t *testing.T) {
 				assert.True(t, changelogFileExists)
 
 				// print the file to standard output for inspection purpose
-				fmt.Printf("------- CHANGELOG -------\n")
-				fmt.Printf("Loading from: %v\n", changelogFile)
-				fmt.Printf("-----------------------------------------\n")
-				fmt.Printf(readFile(changelogFile))
-				fmt.Println()
-				fmt.Printf("-----------------------------------------\n")
+				//fmt.Printf("------- CHANGELOG -------\n")
+				//fmt.Printf("Loading from: %v\n", changelogFile)
+				//fmt.Printf("-----------------------------------------\n")
+				//fmt.Printf(readFile(changelogFile))
+				//fmt.Println()
+				//fmt.Printf("-----------------------------------------\n")
 
 				// test the rendered file
 				fileContent := strings.Replace(readFile(changelogFile), "\r", "", -1)
@@ -1143,12 +1142,12 @@ func TestMakeRunWithExistingFileAndAppendingToTail(t *testing.T) {
 				assert.True(t, changelogFileExists)
 
 				// print the file to standard output for inspection purpose
-				fmt.Printf("------- CHANGELOG -------\n")
-				fmt.Printf("Loading from: %v\n", changelogFile)
-				fmt.Printf("-----------------------------------------\n")
-				fmt.Printf(readFile(changelogFile))
-				fmt.Println()
-				fmt.Printf("-----------------------------------------\n")
+				//fmt.Printf("------- CHANGELOG -------\n")
+				//fmt.Printf("Loading from: %v\n", changelogFile)
+				//fmt.Printf("-----------------------------------------\n")
+				//fmt.Printf(readFile(changelogFile))
+				//fmt.Println()
+				//fmt.Printf("-----------------------------------------\n")
 
 				// test the rendered file
 				fileContent := strings.Replace(readFile(changelogFile), "\r", "", -1)
