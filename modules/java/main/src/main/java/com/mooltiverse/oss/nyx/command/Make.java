@@ -39,6 +39,8 @@ import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -185,7 +187,7 @@ public class Make extends AbstractCommand {
             String templatePath = state().getConfiguration().getChangelog().getTemplate();
             try {
                 // try loading the file as an URL
-                URL templateURL = new URL(templatePath);
+                URL templateURL = new URI(templatePath).toURL();
                 try {
                     return new InputStreamReader(templateURL.openStream());
                 }
@@ -193,7 +195,7 @@ public class Make extends AbstractCommand {
                     throw new DataAccessException(String.format("Unable to load the configured changelog template file from URL '%s'", templatePath), ioe);
                 }
             }
-            catch (MalformedURLException mue) {
+            catch (MalformedURLException | URISyntaxException | IllegalArgumentException ue) {
                 // it's a local file, not an URL, so load it as such
                 try {
                     return new FileReader(templatePath);
