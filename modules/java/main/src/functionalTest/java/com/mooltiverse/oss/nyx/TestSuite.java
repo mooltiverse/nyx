@@ -24,6 +24,6 @@ package com.mooltiverse.oss.nyx;
  * - performs the checks, according to the above fixture
  */
 public class TestSuite {
-	// No tests to run as long as there is no Java binary to test.
+    // No tests to run as long as there is no Java binary to test.
     // See the Gradle package for actual tests.
 }

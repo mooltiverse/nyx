@@ -340,7 +340,7 @@ public class Suites {
                         .concat("releasePrefix: v").concat(newLine)
                         .concat("scheme: SEMVER").concat(newLine),
                     // the .nyx.json is the standard configuration file
-				    ".nyx.json", "{".concat(newLine)
+                    ".nyx.json", "{".concat(newLine)
                         .concat("    \"releaseTypes\": {").concat(newLine)
                         .concat("        \"items\": {").concat(newLine)
                         .concat("            \"mainline\": {").concat(newLine)
@@ -441,7 +441,7 @@ public class Suites {
                         .concat("releasePrefix: v").concat(newLine)
                         .concat("scheme: SEMVER").concat(newLine),
                     // the .nyx.json is the standard configuration file
-				    ".nyx.json", "{".concat(newLine)
+                    ".nyx.json", "{".concat(newLine)
                         .concat("    \"releaseTypes\": {").concat(newLine)
                         .concat("        \"items\": {").concat(newLine)
                         .concat("            \"mainline\": {").concat(newLine)
@@ -544,7 +544,7 @@ public class Suites {
                         .concat("releasePrefix: v").concat(newLine)
                         .concat("scheme: SEMVER").concat(newLine),
                     // the .nyx.json is the standard configuration file
-				    ".nyx.json", "{".concat(newLine)
+                    ".nyx.json", "{".concat(newLine)
                         .concat("    \"releaseTypes\": {").concat(newLine)
                         .concat("        \"items\": {").concat(newLine)
                         .concat("            \"mainline\": {").concat(newLine)
@@ -648,7 +648,7 @@ public class Suites {
                         .concat("releasePrefix: v").concat(newLine)
                         .concat("scheme: SEMVER").concat(newLine),
                     // the .nyx.json is the standard configuration file
-				    ".nyx.json", "{".concat(newLine)
+                    ".nyx.json", "{".concat(newLine)
                         .concat("    \"releaseTypes\": {").concat(newLine)
                         .concat("        \"items\": {").concat(newLine)
                         .concat("            \"mainline\": {").concat(newLine)
@@ -752,7 +752,7 @@ public class Suites {
                         .concat("releasePrefix: v").concat(newLine)
                         .concat("scheme: SEMVER").concat(newLine),
                     // the .nyx.json is the standard configuration file
-				    ".nyx.json", "{".concat(newLine)
+                    ".nyx.json", "{".concat(newLine)
                         .concat("    \"releaseTypes\": {").concat(newLine)
                         .concat("        \"items\": {").concat(newLine)
                         .concat("            \"mainline\": {").concat(newLine)
@@ -856,7 +856,7 @@ public class Suites {
                         .concat("releasePrefix: v").concat(newLine)
                         .concat("scheme: SEMVER").concat(newLine),
                     // the .nyx.json is the standard configuration file
-				    ".nyx.json", "{".concat(newLine)
+                    ".nyx.json", "{".concat(newLine)
                         .concat("    \"releaseTypes\": {").concat(newLine)
                         .concat("        \"items\": {").concat(newLine)
                         .concat("            \"mainline\": {").concat(newLine)
@@ -963,7 +963,7 @@ public class Suites {
                         .concat("releasePrefix: v").concat(newLine)
                         .concat("scheme: SEMVER").concat(newLine),
                     // the .nyx.json is the standard configuration file
-				    ".nyx.json", "{".concat(newLine)
+                    ".nyx.json", "{".concat(newLine)
                         .concat("    \"releaseTypes\": {").concat(newLine)
                         .concat("        \"items\": {").concat(newLine)
                         .concat("            \"mainline\": {").concat(newLine)
@@ -1071,7 +1071,7 @@ public class Suites {
                         .concat("releasePrefix: v").concat(newLine)
                         .concat("scheme: SEMVER").concat(newLine),
                     // the .nyx.json is the standard configuration file
-				    ".nyx.json", "{".concat(newLine)
+                    ".nyx.json", "{".concat(newLine)
                         .concat("    \"releaseTypes\": {").concat(newLine)
                         .concat("        \"items\": {").concat(newLine)
                         .concat("            \"mainline\": {").concat(newLine)
@@ -1172,7 +1172,7 @@ public class Suites {
                         .concat("releasePrefix: v").concat(newLine)
                         .concat("scheme: SEMVER").concat(newLine),
                     // the .nyx.json is the standard configuration file
-				    ".nyx.json", "{".concat(newLine)
+                    ".nyx.json", "{".concat(newLine)
                         .concat("    \"changelog\":{").concat(newLine)
                         .concat("        \"path\":\"CHANGELOG.md\",").concat(newLine)
                         .concat("        \"sections\":{").concat(newLine)
@@ -1302,7 +1302,7 @@ public class Suites {
                         .concat("releasePrefix: v").concat(newLine)
                         .concat("scheme: SEMVER").concat(newLine),
                     // the .nyx.json is the standard configuration file
-				    ".nyx.json", "{".concat(newLine)
+                    ".nyx.json", "{".concat(newLine)
                         .concat("    \"changelog\":{").concat(newLine)
                         .concat("        \"path\":\"CHANGELOG.md\",").concat(newLine)
                         .concat("        \"sections\":{").concat(newLine)
@@ -1429,7 +1429,7 @@ public class Suites {
                         .concat("releasePrefix: v").concat(newLine)
                         .concat("scheme: SEMVER").concat(newLine),
                     // the .nyx.json is the standard configuration file
-				    ".nyx.json", "{".concat(newLine)
+                    ".nyx.json", "{".concat(newLine)
                         .concat("    \"changelog\":{").concat(newLine)
                         .concat("        \"path\":\"CHANGELOG.md\",").concat(newLine)
                         .concat("        \"sections\":{").concat(newLine)
@@ -1561,7 +1561,7 @@ public class Suites {
                         .concat("releasePrefix: v").concat(newLine)
                         .concat("scheme: SEMVER").concat(newLine),
                     // the .nyx.json is the standard configuration file
-				    ".nyx.json", "{".concat(newLine)
+                    ".nyx.json", "{".concat(newLine)
                         .concat("    \"changelog\":{").concat(newLine)
                         .concat("        \"path\":\"CHANGELOG.md\",").concat(newLine)
                         .concat("        \"sections\":{").concat(newLine)
@@ -1686,7 +1686,7 @@ public class Suites {
                         .concat("      bumpExpressions:").concat(newLine)
                         .concat("        patch: \".*\"").concat(newLine),
                     // the .nyx.json is the standard configuration file
-				    ".nyx.json", "{".concat(newLine)
+                    ".nyx.json", "{".concat(newLine)
                         .concat("    \"changelog\":{").concat(newLine)
                         .concat("        \"path\":\"CHANGELOG.md\",").concat(newLine)
                         .concat("        \"sections\":{").concat(newLine)
@@ -1750,7 +1750,7 @@ public class Suites {
                     ),
                     "CHANGELOG.md", Set.<String>of(
                         "## 0.0.6",
-					    "No changes."
+                        "No changes."
                     ),
                     "version.txt", Set.<String>of(
                         "0.0.6"
@@ -1808,7 +1808,7 @@ public class Suites {
                         .concat("      bumpExpressions:").concat(newLine)
                         .concat("        patch: \".*\"").concat(newLine),
                     // the .nyx.json is the standard configuration file
-				    ".nyx.json", "{".concat(newLine)
+                    ".nyx.json", "{".concat(newLine)
                         .concat("    \"changelog\":{").concat(newLine)
                         .concat("        \"path\":\"CHANGELOG.md\",").concat(newLine)
                         .concat("        \"sections\":{").concat(newLine)
@@ -1872,7 +1872,7 @@ public class Suites {
                     ),
                     "CHANGELOG.md", Set.<String>of(
                         "## 0.0.6",
-					    "No changes."
+                        "No changes."
                     ),
                     "version.txt", Set.<String>of(
                         "0.0.6"
@@ -1893,7 +1893,7 @@ public class Suites {
                                 "GH_TOKEN",                             System.getProperty("gitHubTestUserToken"), // The 'gitHubTestUserToken' variable is set in Gradle build scripts
                                 "NYX_PRESET",                       "extended",
                                 "NYX_GIT_REMOTES_origin_USER",      "{{#environmentVariable}}GH_TOKEN{{/environmentVariable}}",
-				                "NYX_GIT_REMOTES_origin_PASSWORD",  ""
+                                "NYX_GIT_REMOTES_origin_PASSWORD",  ""
                 );
                 files       = Map.<String,String>of(
                     // the .gitignore file, required to avoid conflicts due to locked files (i.e. 'The process cannot access the file because another process has locked a portion of the file') etc
@@ -1936,7 +1936,7 @@ public class Suites {
                         .concat("releasePrefix: v").concat(newLine)
                         .concat("scheme: SEMVER").concat(newLine),
                     // the .nyx.json is the standard configuration file
-				    ".nyx.json", "{".concat(newLine)
+                    ".nyx.json", "{".concat(newLine)
                         .concat("    \"changelog\":{").concat(newLine)
                         .concat("        \"path\":\"CHANGELOG.md\",").concat(newLine)
                         .concat("        \"sections\":{").concat(newLine)
@@ -2034,7 +2034,7 @@ public class Suites {
                                 "GH_TOKEN",                             System.getProperty("gitHubTestUserToken"), // The 'gitHubTestUserToken' variable is set in Gradle build scripts
                                 "NYX_PRESET",                       "extended",
                                 "NYX_GIT_REMOTES_origin_USER",      "{{#environmentVariable}}GH_TOKEN{{/environmentVariable}}",
-				                "NYX_GIT_REMOTES_origin_PASSWORD",  ""
+                                "NYX_GIT_REMOTES_origin_PASSWORD",  ""
                 );
                 files       = Map.<String,String>of(
                     // the .gitignore file, required to avoid conflicts due to locked files (i.e. 'The process cannot access the file because another process has locked a portion of the file') etc
@@ -2080,7 +2080,7 @@ public class Suites {
                         .concat("releasePrefix: v").concat(newLine)
                         .concat("scheme: SEMVER").concat(newLine),
                     // the .nyx.json is the standard configuration file
-				    ".nyx.json", "{".concat(newLine)
+                    ".nyx.json", "{".concat(newLine)
                         .concat("    \"changelog\":{").concat(newLine)
                         .concat("        \"path\":\"CHANGELOG.md\",").concat(newLine)
                         .concat("        \"sections\":{").concat(newLine)
@@ -2178,7 +2178,7 @@ public class Suites {
                                 "GL_TOKEN",                             System.getProperty("gitLabTestUserToken"), // The 'gitLabTestUserToken' variable is set in Gradle build scripts
                                 "NYX_PRESET",                       "extended",
                                 "NYX_GIT_REMOTES_origin_USER",      "PRIVATE-TOKEN",
-				                "NYX_GIT_REMOTES_origin_PASSWORD",  "{{#environmentVariable}}GL_TOKEN{{/environmentVariable}}"
+                                "NYX_GIT_REMOTES_origin_PASSWORD",  "{{#environmentVariable}}GL_TOKEN{{/environmentVariable}}"
                 );
                 files       = Map.<String,String>of(
                     // the .gitignore file, required to avoid conflicts due to locked files (i.e. 'The process cannot access the file because another process has locked a portion of the file') etc
@@ -2221,7 +2221,7 @@ public class Suites {
                         .concat("releasePrefix: v").concat(newLine)
                         .concat("scheme: SEMVER").concat(newLine),
                     // the .nyx.json is the standard configuration file
-				    ".nyx.json", "{".concat(newLine)
+                    ".nyx.json", "{".concat(newLine)
                         .concat("    \"changelog\":{").concat(newLine)
                         .concat("        \"path\":\"CHANGELOG.md\",").concat(newLine)
                         .concat("        \"sections\":{").concat(newLine)
@@ -2319,7 +2319,7 @@ public class Suites {
                                 "GL_TOKEN",                             System.getProperty("gitLabTestUserToken"), // The 'gitLabTestUserToken' variable is set in Gradle build scripts
                                 "NYX_PRESET",                       "extended",
                                 "NYX_GIT_REMOTES_origin_USER",      "PRIVATE-TOKEN",
-				                "NYX_GIT_REMOTES_origin_PASSWORD",  "{{#environmentVariable}}GL_TOKEN{{/environmentVariable}}"
+                                "NYX_GIT_REMOTES_origin_PASSWORD",  "{{#environmentVariable}}GL_TOKEN{{/environmentVariable}}"
                 );
                 files       = Map.<String,String>of(
                     // the .gitignore file, required to avoid conflicts due to locked files (i.e. 'The process cannot access the file because another process has locked a portion of the file') etc
@@ -2365,7 +2365,7 @@ public class Suites {
                         .concat("releasePrefix: v").concat(newLine)
                         .concat("scheme: SEMVER").concat(newLine),
                     // the .nyx.json is the standard configuration file
-				    ".nyx.json", "{".concat(newLine)
+                    ".nyx.json", "{".concat(newLine)
                         .concat("    \"changelog\":{").concat(newLine)
                         .concat("        \"path\":\"CHANGELOG.md\",").concat(newLine)
                         .concat("        \"sections\":{").concat(newLine)
