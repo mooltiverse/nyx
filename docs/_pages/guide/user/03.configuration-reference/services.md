@@ -101,6 +101,13 @@ Release assets whose [path]({{ site.baseurl }}{% link _pages/guide/user/03.confi
 Due to a limitation in the underlying library, the command line version does not support uploading the asset description. Only file names are uploaded and displayed.
 {: .notice--warning}
 
+##### Release flags support
+
+This service type supports:
+
+* [draft releases]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#publish-draft) (see [here](https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository))
+* [pre-releases]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#publish-pre-release) (see [here](https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository))
+
 ##### GitHub configuration options
 
 This service type supports the following [options](#options):
@@ -140,6 +147,13 @@ This service type supports all release publication features with no limitations.
 This service supports both local files and remote URLs for [release assets]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-assets.md %}).
 
 Release assets whose [path]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-assets.md %}#path) represents a local file but cannot be resolved to an existing file are skipped.
+
+##### Release flags support
+
+This service type does not support:
+
+* [draft releases]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#publish-draft)
+* [pre-releases]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/release-types.md %}#publish-pre-release)
 
 ##### GitLab configuration options
 

@@ -1378,6 +1378,21 @@ public abstract class NyxExtension {
             private final Property<String> publish = getObjectfactory().property(String.class);
 
             /**
+             * The the optional template to set the draft flag of releases published to remote services.
+             */
+            private final Property<String> publishDraft = getObjectfactory().property(String.class);
+
+            /**
+             * The optional template to set the pre-release flag of releases published to remote services.
+             */
+            private final Property<String> publishPreRelease = getObjectfactory().property(String.class);
+
+            /**
+             * The optional template to set the name of releases published to remote services.
+             */
+            private final Property<String> releaseName = getObjectfactory().property(String.class);
+
+            /**
              * The optional template to render as a regular expression used to constrain versions issued by this release type.
              */
             private final Property<String> versionRange = getObjectfactory().property(String.class);
@@ -1674,6 +1689,42 @@ public abstract class NyxExtension {
              */
             public Property<String> getPublish() {
                 return publish;
+            }
+
+            /**
+             * Returns the optional template to set the draft flag of releases published to remote services.
+             * 
+             * We provide an implementation of this method instead of using the abstract definition as it's
+             * safer for old Gradle versions we support.
+             * 
+             * @return the optional template to set the draft flag of releases published to remote services.
+             */
+            public Property<String> getPublishDraft() {
+                return publishDraft;
+            }
+
+            /**
+             * Returns the optional template to set the pre-release flag of releases published to remote services.
+             * 
+             * We provide an implementation of this method instead of using the abstract definition as it's
+             * safer for old Gradle versions we support.
+             * 
+             * @return the optional template to set the pre-release flag of releases published to remote services.
+             */
+            public Property<String> getPublishPreRelease() {
+                return publishPreRelease;
+            }
+
+            /**
+             * Returns the optional template to set the name of releases published to remote services.
+             * 
+             * We provide an implementation of this method instead of using the abstract definition as it's
+             * safer for old Gradle versions we support.
+             * 
+             * @return the optional template to set the name of releases published to remote services.
+             */
+            public Property<String> getReleaseName() {
+                return releaseName;
             }
 
             /**

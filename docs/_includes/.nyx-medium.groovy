@@ -54,6 +54,7 @@ nyx {
         }
         matchWorkspaceStatus = 'CLEAN'
         publish = 'true'
+        releaseName = 'Release {{version}}'
         versionRangeFromBranchName = false
       }
       internal {
@@ -87,6 +88,7 @@ nyx {
           }
         }
         publish = 'false'
+        publishDraft = 'true'
         versionRangeFromBranchName = false
       }
     }

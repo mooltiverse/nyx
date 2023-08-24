@@ -47,6 +47,8 @@ func TestReleaseTypeNewReleaseType(t *testing.T) {
 	assert.Equal(t, RELEASE_TYPE_MATCH_ENVIRONMENT_VARIABLES, rt.GetMatchEnvironmentVariables())
 	assert.Equal(t, RELEASE_TYPE_MATCH_WORKSPACE_STATUS, rt.GetMatchWorkspaceStatus())
 	assert.Equal(t, RELEASE_TYPE_PUBLISH, rt.GetPublish())
+	assert.Equal(t, RELEASE_TYPE_PUBLISH_DRAFT, rt.GetPublishDraft())
+	assert.Equal(t, RELEASE_TYPE_PUBLISH_PRE_RELEASE, rt.GetPublishPreRelease())
 	assert.Equal(t, RELEASE_TYPE_VERSION_RANGE, rt.GetVersionRange())
 	assert.Equal(t, RELEASE_TYPE_VERSION_RANGE_FROM_BRANCH_NAME, rt.GetVersionRangeFromBranchName())
 }
@@ -61,7 +63,7 @@ func TestReleaseTypeNewReleaseTypeWith(t *testing.T) {
 	i2 := NewIdentifierWith(utl.PointerToString("build"), utl.PointerToString("123"), PointerToPosition(BUILD))
 	l := []*Identifier{i1, i2}
 
-	rt := NewReleaseTypeWith(&al, utl.PointerToBoolean(true), utl.PointerToString("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}"), utl.PointerToString("Release description"), utl.PointerToString("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$"), utl.PointerToString("true"), utl.PointerToString("Committing {{version}}"), utl.PointerToString("true"), utl.PointerToString("true"), utl.PointerToString("Tagging {{version}}"), &[]*string{}, &l, utl.PointerToString(""), &m, nil, utl.PointerToString("true"), utl.PointerToString(""), utl.PointerToBoolean(false))
+	rt := NewReleaseTypeWith(&al, utl.PointerToBoolean(true), utl.PointerToString("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}"), utl.PointerToString("Release description"), utl.PointerToString("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$"), utl.PointerToString("true"), utl.PointerToString("Committing {{version}}"), utl.PointerToString("true"), utl.PointerToString("true"), utl.PointerToString("Tagging {{version}}"), &[]*string{}, &l, utl.PointerToString(""), &m, nil, utl.PointerToString("true"), utl.PointerToString("false"), utl.PointerToString("true"), utl.PointerToString("myrelease"), utl.PointerToString(""), utl.PointerToBoolean(false))
 
 	a := rt.GetAssets()
 	assert.Equal(t, 2, len(*a))
@@ -95,6 +97,12 @@ func TestReleaseTypeNewReleaseTypeWith(t *testing.T) {
 	assert.Nil(t, mws)
 	p := rt.GetPublish()
 	assert.Equal(t, "true", *p)
+	pd := rt.GetPublishDraft()
+	assert.Equal(t, "false", *pd)
+	ppr := rt.GetPublishPreRelease()
+	assert.Equal(t, "true", *ppr)
+	rn := rt.GetReleaseName()
+	assert.Equal(t, "myrelease", *rn)
 	vr := rt.GetVersionRange()
 	assert.Equal(t, "", *vr)
 	vrfbn := rt.GetVersionRangeFromBranchName()

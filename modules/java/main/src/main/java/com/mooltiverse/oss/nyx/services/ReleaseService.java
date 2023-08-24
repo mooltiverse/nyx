@@ -15,6 +15,7 @@
  */
 package com.mooltiverse.oss.nyx.services;
 
+import java.util.Map;
 import java.util.Set;
 
 import com.mooltiverse.oss.nyx.entities.Attachment;
@@ -25,6 +26,24 @@ import com.mooltiverse.oss.nyx.io.TransportException;
  * to publish releases.
  */
 public interface ReleaseService extends Service {
+    /**
+     * The name of the release option used to define a release as draft.
+     * Use this option in the {@code options} map passed to {@link #publishRelease(String, String, String, String, String, Map)}.
+     * This option, when defined, must have a boolean value.
+     * 
+     * @see #publishRelease(String, String, String, String, String, Map)
+     */
+    String RELEASE_OPTION_DRAFT = "draft";
+
+    /**
+     * The name of the release option used to define a release as a pre-release.
+     * Use this option in the {@code options} map passed to {@link #publishRelease(String, String, String, String, String, Map)}.
+     * This option, when defined, must have a boolean value.
+     * 
+     * @see #publishRelease(String, String, String, String, String, Map)
+     */
+    String RELEASE_OPTION_PRE_RELEASE = "pre-release";
+
     /**
      * Finds the release in the given repository by the release tag.
      * 
@@ -59,6 +78,8 @@ public interface ReleaseService extends Service {
      * @param tag tag to publish the release for (i.e. {@code 1.2.3}, {@code v4.5.6}). It can't be {@code null}
      * @param description the release description. This is usually a Markdown text containing release notes or a changelog
      * or something like that giving an overall description of the release
+     * @param options the optional map of release options ({@link #RELEASE_OPTION_DRAFT}, {@link #RELEASE_OPTION_PRE_RELEASE}).
+     * When {@code null} no options are evaluated.
      *
      * @return the newly created release
      * 
@@ -67,7 +88,7 @@ public interface ReleaseService extends Service {
      * @throws UnsupportedOperationException if the underlying implementation does not
      * {@link #supports(Service.Feature) support} the {@link Service.Feature#RELEASES} feature.
      */
-    public Release publishRelease(String owner, String repository, String title, String tag, String description)
+    public Release publishRelease(String owner, String repository, String title, String tag, String description, Map<String,Object> options)
         throws SecurityException, TransportException;
 
     /**

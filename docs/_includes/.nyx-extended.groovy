@@ -76,6 +76,7 @@ nyx {
         }
         matchWorkspaceStatus = 'CLEAN'
         publish = 'true'
+        releaseName = 'Release {{version}}'
         versionRangeFromBranchName = false
       }
       maturity {
@@ -90,6 +91,7 @@ nyx {
         matchBranches = '^(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)$'
         matchWorkspaceStatus = 'CLEAN'
         publish = 'true'
+        publishPreRelease = 'true'
         versionRangeFromBranchName = false
       }
       integration {
@@ -105,6 +107,7 @@ nyx {
         matchBranches = '^(develop|development|integration|latest)$'
         matchWorkspaceStatus = 'CLEAN'
         publish = 'true'
+        publishPreRelease = 'true'
         versionRangeFromBranchName = false
       }
       feature {
@@ -117,6 +120,7 @@ nyx {
         gitTag = 'false'
         matchBranches = '^(feat|feature)((-|\\/)[0-9a-zA-Z-_]+)?$'
         publish = 'false'
+        publishPreRelease = 'true'
         versionRangeFromBranchName = false
       }
       hotfix {
@@ -132,6 +136,7 @@ nyx {
         matchBranches = '^(fix|hotfix)((-|\\/)[0-9a-zA-Z-_]+)?$'
         matchWorkspaceStatus = 'CLEAN'
         publish = 'true'
+        publishPreRelease = 'true'
         versionRangeFromBranchName = false
       }
       release {
@@ -191,6 +196,7 @@ nyx {
           }
         }
         publish = 'false'
+        publishDraft = 'true'
         versionRangeFromBranchName = false
       }
     }

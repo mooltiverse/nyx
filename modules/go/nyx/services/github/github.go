@@ -24,6 +24,7 @@ import (
 	"fmt"      // https://pkg.go.dev/fmt
 	"net/http" // https://pkg.go.dev/net/http
 	"os"       // https://pkg.go.dev/os
+	"reflect"  // https://pkg.go.dev/reflect
 	"strings"  // https://pkg.go.dev/strings
 
 	gh "github.com/google/go-github/github" // https://pkg.go.dev/github.com/google/go-github/github
@@ -33,6 +34,7 @@ import (
 	errs "github.com/mooltiverse/nyx/modules/go/errors"
 	ent "github.com/mooltiverse/nyx/modules/go/nyx/entities"
 	api "github.com/mooltiverse/nyx/modules/go/nyx/services/api"
+	utl "github.com/mooltiverse/nyx/modules/go/utils"
 )
 
 const (
@@ -495,6 +497,8 @@ Arguments are as follows:
   - tag tag to publish the release for (i.e. 1.2.3, v4.5.6). It can't be nil
   - description the release description. This is usually a Markdown text containing release notes or a changelog
     or something like that giving an overall description of the release
+  - options the optional map of release options (RELEASE_OPTION_DRAFT, RELEASE_OPTION_PRE_RELEASE).
+    When nil no options are evaluated.
 
 Errors can be:
 
@@ -502,7 +506,7 @@ Errors can be:
 - TransportError if communication to the remote endpoint fails
 - UnsupportedOperationError if the underlying implementation does not support the RELEASES feature.
 */
-func (s GitHub) publishRelease(owner *string, repository *string, title *string, tag string, description *string) (*GitHubRelease, error) {
+func (s GitHub) publishRelease(owner *string, repository *string, title *string, tag string, description *string, options *map[string]interface{}) (*GitHubRelease, error) {
 	log.Debugf("publishing GitHub release '%s'", tag)
 	release := &gh.RepositoryRelease{TagName: &tag}
 	if title != nil {
@@ -510,6 +514,21 @@ func (s GitHub) publishRelease(owner *string, repository *string, title *string,
 	}
 	if description != nil {
 		release.Body = description
+	}
+
+	if options != nil {
+		optionValue, ok := (*options)[api.RELEASE_OPTION_DRAFT]
+		if ok {
+			log.Debugf("the release options contain the '%s' option : %s", api.RELEASE_OPTION_PRE_RELEASE, optionValue)
+			optionBooleanValue := reflect.ValueOf(optionValue).Bool()
+			release.Draft = utl.PointerToBoolean(optionBooleanValue)
+		}
+		optionValue, ok = (*options)[api.RELEASE_OPTION_PRE_RELEASE]
+		if ok {
+			log.Debugf("the release options contain the '%s' option : %s", api.RELEASE_OPTION_PRE_RELEASE, optionValue)
+			optionBooleanValue := reflect.ValueOf(optionValue).Bool()
+			release.Prerelease = utl.PointerToBoolean(optionBooleanValue)
+		}
 	}
 
 	requestOwner := ""
@@ -554,6 +573,8 @@ Arguments are as follows:
   - tag tag to publish the release for (i.e. 1.2.3, v4.5.6). It can't be nil
   - description the release description. This is usually a Markdown text containing release notes or a changelog
     or something like that giving an overall description of the release
+  - options the optional map of release options (RELEASE_OPTION_DRAFT, RELEASE_OPTION_PRE_RELEASE).
+    When nil no options are evaluated.
 
 Errors can be:
 
@@ -561,9 +582,9 @@ Errors can be:
 - TransportError if communication to the remote endpoint fails
 - UnsupportedOperationError if the underlying implementation does not support the RELEASES feature.
 */
-func (s GitHub) PublishRelease(owner *string, repository *string, title *string, tag string, description *string) (*api.Release, error) {
+func (s GitHub) PublishRelease(owner *string, repository *string, title *string, tag string, description *string, options *map[string]interface{}) (*api.Release, error) {
 	// This is the method exposed to the outside and the following just casts values to/from the internal implementation
-	release, err := s.publishRelease(owner, repository, title, tag, description)
+	release, err := s.publishRelease(owner, repository, title, tag, description, options)
 	if err != nil {
 		return nil, err
 	}

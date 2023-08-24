@@ -429,7 +429,7 @@ func TestStateGetNewRelease(t *testing.T) {
 	configuration, _ := cnf.NewConfiguration()
 	state, _ := NewStateWith(configuration)
 	// inject a releaseType with the 'publish' flag to TRUE
-	state.SetReleaseType(ent.NewReleaseTypeWith(nil, utl.PointerToBoolean(true), nil, nil, nil, utl.PointerToString("false"), nil, utl.PointerToString("false"), utl.PointerToString("false"), nil, &[]*string{}, nil, nil, nil, nil /*this is the 'publish' flag -> */, utl.PointerToString("true"), nil, utl.PointerToBoolean(false)))
+	state.SetReleaseType(ent.NewReleaseTypeWith(nil, utl.PointerToBoolean(true), nil, nil, nil, utl.PointerToString("false"), nil, utl.PointerToString("false"), utl.PointerToString("false"), nil, &[]*string{}, nil, nil, nil, nil /*this is the 'publish' flag -> */, utl.PointerToString("true"), utl.PointerToString("false"), utl.PointerToString("true"), nil, nil, utl.PointerToBoolean(false)))
 	state.SetVersion(utl.PointerToString("1.2.3"))
 	releaseScope, _ := state.GetReleaseScope()
 	releaseScope.SetPreviousVersion(utl.PointerToString("1.2.3"))
@@ -446,7 +446,7 @@ func TestStateGetNewRelease(t *testing.T) {
 	assert.True(t, newRelease)
 
 	// now replace the releaseType with the 'publish' flag to FALSE
-	state.SetReleaseType(ent.NewReleaseTypeWith(nil, utl.PointerToBoolean(true), nil, nil, nil, utl.PointerToString("false"), nil, utl.PointerToString("false"), utl.PointerToString("false"), nil, &[]*string{}, nil, nil, nil, nil /*this is the 'publish' flag -> */, utl.PointerToString("false"), nil, utl.PointerToBoolean(false)))
+	state.SetReleaseType(ent.NewReleaseTypeWith(nil, utl.PointerToBoolean(true), nil, nil, nil, utl.PointerToString("false"), nil, utl.PointerToString("false"), utl.PointerToString("false"), nil, &[]*string{}, nil, nil, nil, nil /*this is the 'publish' flag -> */, utl.PointerToString("false"), utl.PointerToString("false"), utl.PointerToString("true"), nil, nil, utl.PointerToBoolean(false)))
 
 	releaseScope, _ = state.GetReleaseScope()
 	releaseScope.SetPreviousVersion(utl.PointerToString("0.1.0"))

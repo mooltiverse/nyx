@@ -111,6 +111,9 @@ Each release type has the following attributes:
 | [`releaseTypes/<NAME>/matchWorkspaceStatus`](#match-workspace-status)                      | string  | `--release-types-<NAME>-match-workspace-status`                       | `NYX_RELEASE_TYPES_<NAME>_MATCH_WORKSPACE_STATUS=<STATUS>`              | Empty                                                |
 | [`releaseTypes/<NAME>/name`](#name)                                                        | string  | `--release-types-<NAME>-name=<NAME>`                                  | `NYX_RELEASE_TYPES_<NAME>_NAME=<NAME>`                                  | N/A                                                    |
 | [`releaseTypes/<NAME>/publish`](#publish)                                                  | string  | `--release-types-<NAME>-publish=<TEMPLATE>`                           | `NYX_RELEASE_TYPES_<NAME>_PUBLISH=<TEMPLATE>`                           | `false`                                              |
+| [`releaseTypes/<NAME>/publishDraft`](#publish-draft)                                       | string  | `--release-types-<NAME>-publish-draft=<TEMPLATE>`                     | `NYX_RELEASE_TYPES_<NAME>_PUBLISH_DRAFT=<TEMPLATE>`                     | `false`                                              |
+| [`releaseTypes/<NAME>/publishPreRelease`](#publish-pre-release)                            | string  | `--release-types-<NAME>-publish-pre-release=<TEMPLATE>`               | `NYX_RELEASE_TYPES_<NAME>_PUBLISH_PRE_RELEASE=<TEMPLATE>`               | `false`                                              |
+| [`releaseTypes/<NAME>/releaseName`](#release-name)                                         | string  | `--release-types-<NAME>-release-name=<TEMPLATE>`                      | `NYX_RELEASE_TYPES_<NAME>_RELEASE_NAME=<TEMPLATE>`                      | Empty                                                                      |
 | [`releaseTypes/<NAME>/versionRange`](#version-range)                                       | string  | `--release-types-<NAME>-version-range=<TEMPLATE>`                     | `NYX_RELEASE_TYPES_<NAME>_VERSION_RANGE=<TEMPLATE>`                     | Empty (no constrained range)                                               |
 | [`releaseTypes/<NAME>/versionRangeFromBranchName`](#version-range-from-branch-name)        | boolean | `--release-types-<NAME>-version-range-from-branch-name=true|false`    | `NYX_RELEASE_TYPES_<NAME>_VERSION_RANGE_FROM_BRANCH_NAME=true|false`    | `false`                                              |
 
@@ -497,8 +500,8 @@ When using this option, the release type is only evaluated when the current bran
 | Name                      | `releaseTypes/<NAME>/matchEnvironmentVariables`                                          |
 | Type                      | [map]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}#collections-of-objects) |
 | Default                   | Empty (matches anything)                                                                 |
-| Command Line Option       | `--release-types-<NAME>-match-environment-variables-<VARNAME>=<VALUE>`                      |
-| Environment Variable      | `NYX_RELEASE_TYPES_<NAME>_MATCH_ENVIRONMENT_VARIABLES_<VARNAME>=<VALUE>`                    |
+| Command Line Option       | `--release-types-<NAME>-match-environment-variables-<VARNAME>=<VALUE>`                   |
+| Environment Variable      | `NYX_RELEASE_TYPES_<NAME>_MATCH_ENVIRONMENT_VARIABLES_<VARNAME>=<VALUE>`                 |
 | Configuration File Option | `releaseTypes/items/<NAME>/matchEnvironmentVariables`                                    |
 | Related state attributes  |                                                                                          |
 
@@ -563,6 +566,57 @@ Here you can define a [template]({{ site.baseurl }}{% link _pages/guide/user/03.
 When this value evaluates to *true* releases are published to the [services]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}) listed in the [`releaseTypes/publicationServices`](#publication-services) option. Otherwise, when this evaluates to *false*, no publication is done.
 
 Also see [`assets`](#assets) for more on the assets attached to releases upon publication.
+
+#### Publish draft
+
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `releaseTypes/<NAME>/publishDraft`                                                       |
+| Type                      | string                                                                                   |
+| Default                   | EMpty                                                                                    |
+| Command Line Option       | `--release-types-<NAME>-publish-draft=<TEMPLATE>`                                        |
+| Environment Variable      | `NYX_RELEASE_TYPES_<NAME>_PUBLISH_DRAFT=<TEMPLATE>`                                      |
+| Configuration File Option | `releaseTypes/items/<NAME>/publishDraft`                                                 |
+| Related state attributes  |                                                                                          |
+
+When this value evaluates to *true* Nyx will [publish]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#publish) the releases from this release type as *draft*. The semantics of *draft*, when supported, depend on the target [services]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}) the release is published to. Not all services support this option. Please refer to the [services]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}) documentation to know more.
+
+Here you can define a [template]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}) that is evaluated at runtime to make this decision dynamic.
+
+This option only takes effect when [`publish`](#publish) evaluates `true`.
+
+#### Publish pre-release
+
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `releaseTypes/<NAME>/publishPreRelease`                                                  |
+| Type                      | string                                                                                   |
+| Default                   | EMpty                                                                                    |
+| Command Line Option       | `--release-types-<NAME>-publish-pre-release=<TEMPLATE>`                                  |
+| Environment Variable      | `NYX_RELEASE_TYPES_<NAME>_PUBLISH_PRE_RELEASE=<TEMPLATE>`                                |
+| Configuration File Option | `releaseTypes/items/<NAME>/publishPreRelease`                                            |
+| Related state attributes  |                                                                                          |
+
+When this value evaluates to *true* Nyx will [publish]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#publish) the releases from this release type as *pre-release*. The semantics of *pre-release*, when supported, depend on the target [services]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}) the release is published to. Not all services support this option. Please refer to the [services]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}) documentation to know more.
+
+Here you can define a [template]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}) that is evaluated at runtime to make this decision dynamic.
+
+This option only takes effect when [`publish`](#publish) evaluates `true`.
+
+#### Release name
+
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `releaseTypes/<NAME>/releaseName`                                                        |
+| Type                      | string                                                                                   |
+| Default                   | EMpty                                                                                    |
+| Command Line Option       | `--release-types-<NAME>-release-name=<TEMPLATE>`                                         |
+| Environment Variable      | `NYX_RELEASE_TYPES_<NAME>_RELEASE_NAME=<TEMPLATE>`                                       |
+| Configuration File Option | `releaseTypes/items/<NAME>/releaseName`                                                  |
+| Related state attributes  | [version]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#version){: .btn .btn--info .btn--small} |
+
+A [template]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}) that is evaluated at runtime to define the name of the releases to be published.
+
+This option only takes effect when [`publish`](#publish) evaluates `true`.
+
+When this option is not defined or is empty the [version]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#version) is used for the release name.
 
 #### Version range
 

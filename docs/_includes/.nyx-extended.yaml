@@ -77,6 +77,7 @@ releaseTypes:
         CI: "^true$"
       matchWorkspaceStatus: "CLEAN"
       publish: "true"
+      releaseName: "Release {{version}}"
       versionRangeFromBranchName: false
     maturity: 
       collapseVersions: true
@@ -89,6 +90,7 @@ releaseTypes:
       matchBranches: "^(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)$"
       matchWorkspaceStatus: "CLEAN"
       publish: "true"
+      publishPreRelease: "true"
       versionRangeFromBranchName: false
     integration: 
       assets:
@@ -104,6 +106,7 @@ releaseTypes:
       matchBranches: "^(develop|development|integration|latest)$"
       matchWorkspaceStatus: "CLEAN"
       publish: "true"
+      publishPreRelease: "true"
       versionRangeFromBranchName: false
     feature: 
       collapseVersions: true
@@ -117,6 +120,7 @@ releaseTypes:
         - "{{version}}"
       matchBranches: "^(feat|feature)((-|\\/)[0-9a-zA-Z-_]+)?$"
       publish: "false"
+      publishPreRelease: "true"
       versionRangeFromBranchName: false
     hotfix:
       assets:
@@ -133,6 +137,7 @@ releaseTypes:
       matchBranches: "^(fix|hotfix)((-|\\/)[0-9a-zA-Z-_]+)?$"
       matchWorkspaceStatus: "CLEAN"
       publish: "true"
+      publishPreRelease: "true"
       versionRangeFromBranchName: false
     release: 
       collapseVersions: true
@@ -186,6 +191,7 @@ releaseTypes:
           qualifier: user
           value: "{{#sanitizeLower}}{{environmentUser}}{{/sanitizeLower}}"
       publish: "false"
+      publishDraft: "true"
       versionRangeFromBranchName: false
 resume: true
 scheme: SEMVER

@@ -507,6 +507,9 @@ func TestEnvironmentConfigurationLayerGetReleaseTypes(t *testing.T) {
 		"NYX_RELEASE_TYPES_two_MATCH_ENVIRONMENT_VARIABLES_USER=any user",
 		"NYX_RELEASE_TYPES_two_MATCH_WORKSPACE_STATUS=" + ent.CLEAN.String(),
 		"NYX_RELEASE_TYPES_two_PUBLISH=true",
+		"NYX_RELEASE_TYPES_two_PUBLISH_DRAFT=false",
+		"NYX_RELEASE_TYPES_two_PUBLISH_PRE_RELEASE=true",
+		"NYX_RELEASE_TYPES_two_RELEASE_NAME=myrelease",
 		"NYX_RELEASE_TYPES_two_VERSION_RANGE_FROM_BRANCH_NAME=true",
 	})
 
@@ -541,6 +544,9 @@ func TestEnvironmentConfigurationLayerGetReleaseTypes(t *testing.T) {
 	assert.Equal(t, 0, len(*(*(*releaseTypes.GetItems())["one"]).GetMatchEnvironmentVariables()))
 	assert.Equal(t, ent.DIRTY, *(*(*releaseTypes.GetItems())["one"]).GetMatchWorkspaceStatus())
 	assert.Equal(t, "false", *(*(*releaseTypes.GetItems())["one"]).GetPublish())
+	assert.Nil(t, (*(*releaseTypes.GetItems())["one"]).GetPublishDraft())
+	assert.Nil(t, (*(*releaseTypes.GetItems())["one"]).GetPublishPreRelease())
+	assert.Nil(t, (*(*releaseTypes.GetItems())["one"]).GetReleaseName())
 	assert.Equal(t, "true", *(*(*releaseTypes.GetItems())["one"]).GetVersionRange())
 	assert.Nil(t, (*(*releaseTypes.GetItems())["one"]).GetVersionRangeFromBranchName())
 	assert.Nil(t, (*(*releaseTypes).GetItems())["two"].GetAssets())
@@ -573,6 +579,9 @@ func TestEnvironmentConfigurationLayerGetReleaseTypes(t *testing.T) {
 	assert.Equal(t, "any user", (*(*(*releaseTypes.GetItems())["two"]).GetMatchEnvironmentVariables())["USER"])
 	assert.Equal(t, ent.CLEAN, *(*(*releaseTypes.GetItems())["two"]).GetMatchWorkspaceStatus())
 	assert.Equal(t, "true", *(*(*releaseTypes.GetItems())["two"]).GetPublish())
+	assert.Equal(t, "false", *(*(*releaseTypes.GetItems())["two"]).GetPublishDraft())
+	assert.Equal(t, "true", *(*(*releaseTypes.GetItems())["two"]).GetPublishPreRelease())
+	assert.Equal(t, "myrelease", *(*(*releaseTypes.GetItems())["two"]).GetReleaseName())
 	assert.Nil(t, (*(*releaseTypes.GetItems())["two"]).GetVersionRange())
 	assert.True(t, *(*(*releaseTypes.GetItems())["two"]).GetVersionRangeFromBranchName())
 }

@@ -575,7 +575,8 @@ scheme: SEMVER
                 "gitTag":"true",
                 "gitTagMessage":"Tag version {{version}}",
                 "matchBranches":"^(master|main)$",
-                "publish":"true"
+                "publish":"true",
+				"releaseName":"Stable {{version}}"
 			}
 		}
 	},
@@ -711,7 +712,8 @@ scheme: SEMVER
                 "gitTag":"true",
                 "gitTagMessage":"Tag version {{version}}",
                 "matchBranches":"^(master|main)$",
-                "publish":"true"
+                "publish":"true",
+				"releaseName":"Stable {{version}}"
 			}
 		}
 	},
