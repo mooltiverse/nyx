@@ -41,6 +41,7 @@ import com.mooltiverse.oss.nyx.io.DataAccessException;
 import com.mooltiverse.oss.nyx.io.FileMapper;
 import com.mooltiverse.oss.nyx.template.Templates;
 import com.mooltiverse.oss.nyx.version.Scheme;
+import com.mooltiverse.oss.nyx.version.SemanticVersion;
 import com.mooltiverse.oss.nyx.version.Versions;
 
 /**
@@ -642,6 +643,116 @@ public class State {
         if (Objects.isNull(getConfiguration()) || Objects.isNull(getConfiguration().getVersion()))
             this.version = version;
         else throw new IllegalStateException(String.format("The state version attribute can't be set when it's ovverridden by the configuration. Configuration version attribute is '%s'", getConfiguration().getVersion()));
+    }
+
+    /**
+     * Returns the version build metadata inferred by Nyx, if any. If the configured version scheme is not {@code SEMVER}
+     * this method always returns {@code null}.
+     * 
+     * @return the version build metadata number inferred by Nyx. This is {@code null} if {@link #getVersion()} is {@code null} or
+     * the configured version scheme is not {@code SEMVER}.
+     * 
+     * @throws DataAccessException in case the attribute cannot be read or accessed.
+     * @throws IllegalPropertyException in case the attribute has been defined but has incorrect values or it can't be resolved.
+     * 
+     * @see #getVersion()
+     */
+    public String getVersionBuildMetadata() 
+        throws DataAccessException, IllegalPropertyException {
+        if ((!hasVersion()) || (!Scheme.SEMVER.equals(getScheme()))) {
+            return null;
+        }
+        else {
+            return SemanticVersion.valueOf(getVersion(), true).getBuild();
+        }
+    }
+
+    /**
+     * Returns the version major number inferred by Nyx, if any. If the configured version scheme is not {@code SEMVER}
+     * this method always returns {@code null}.
+     * 
+     * @return the version major number inferred by Nyx. This is {@code null} if {@link #getVersion()} is {@code null} or
+     * the configured version scheme is not {@code SEMVER}.
+     * 
+     * @throws DataAccessException in case the attribute cannot be read or accessed.
+     * @throws IllegalPropertyException in case the attribute has been defined but has incorrect values or it can't be resolved.
+     * 
+     * @see #getVersion()
+     */
+    public String getVersionMajorNumber() 
+        throws DataAccessException, IllegalPropertyException {
+        if ((!hasVersion()) || (!Scheme.SEMVER.equals(getScheme()))) {
+            return null;
+        }
+        else {
+            return Integer.toString(SemanticVersion.valueOf(getVersion(), true).getMajor());
+        }
+    }
+
+    /**
+     * Returns the version minor number inferred by Nyx, if any. If the configured version scheme is not {@code SEMVER}
+     * this method always returns {@code null}.
+     * 
+     * @return the version minor number inferred by Nyx. This is {@code null} if {@link #getVersion()} is {@code null} or
+     * the configured version scheme is not {@code SEMVER}.
+     * 
+     * @throws DataAccessException in case the attribute cannot be read or accessed.
+     * @throws IllegalPropertyException in case the attribute has been defined but has incorrect values or it can't be resolved.
+     * 
+     * @see #getVersion()
+     */
+    public String getVersionMinorNumber() 
+        throws DataAccessException, IllegalPropertyException {
+        if ((!hasVersion()) || (!Scheme.SEMVER.equals(getScheme()))) {
+            return null;
+        }
+        else {
+            return Integer.toString(SemanticVersion.valueOf(getVersion(), true).getMinor());
+        }
+    }
+
+    /**
+     * Returns the version patch number inferred by Nyx, if any. If the configured version scheme is not {@code SEMVER}
+     * this method always returns {@code null}.
+     * 
+     * @return the version patch number inferred by Nyx. This is {@code null} if {@link #getVersion()} is {@code null} or
+     * the configured version scheme is not {@code SEMVER}.
+     * 
+     * @throws DataAccessException in case the attribute cannot be read or accessed.
+     * @throws IllegalPropertyException in case the attribute has been defined but has incorrect values or it can't be resolved.
+     * 
+     * @see #getVersion()
+     */
+    public String getVersionPatchNumber() 
+        throws DataAccessException, IllegalPropertyException {
+        if ((!hasVersion()) || (!Scheme.SEMVER.equals(getScheme()))) {
+            return null;
+        }
+        else {
+            return Integer.toString(SemanticVersion.valueOf(getVersion(), true).getPatch());
+        }
+    }
+
+    /**
+     * Returns the version pre-release identifier inferred by Nyx, if any. If the configured version scheme is not {@code SEMVER}
+     * this method always returns {@code null}.
+     * 
+     * @return the version pre-release identifier number inferred by Nyx. This is {@code null} if {@link #getVersion()} is {@code null} or
+     * the configured version scheme is not {@code SEMVER}.
+     * 
+     * @throws DataAccessException in case the attribute cannot be read or accessed.
+     * @throws IllegalPropertyException in case the attribute has been defined but has incorrect values or it can't be resolved.
+     * 
+     * @see #getVersion()
+     */
+    public String getVersionPreReleaseIdentifier() 
+        throws DataAccessException, IllegalPropertyException {
+        if ((!hasVersion()) || (!Scheme.SEMVER.equals(getScheme()))) {
+            return null;
+        }
+        else {
+            return SemanticVersion.valueOf(getVersion(), true).getPrerelease();
+        }
     }
 
     /**

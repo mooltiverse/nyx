@@ -22,9 +22,8 @@
 package configuration
 
 import (
-	"io/ioutil" // https://pkg.go.dev/io/ioutil
-	"os"        // https://pkg.go.dev/os
-	"testing"   // https://pkg.go.dev/testing
+	"os"      // https://pkg.go.dev/os
+	"testing" // https://pkg.go.dev/testing
 
 	assert "github.com/stretchr/testify/assert" // https://pkg.go.dev/github.com/stretchr/testify/assert
 
@@ -251,9 +250,9 @@ func TestCommandLineConfigurationLayerGetDirectory(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Nil(t, directory)
 
-	dir1, err := ioutil.TempDir("", "1")
+	dir1, err := os.MkdirTemp("", "1")
 	assert.NoError(t, err)
-	dir2, err := ioutil.TempDir("", "2")
+	dir2, err := os.MkdirTemp("", "2")
 	assert.NoError(t, err)
 
 	// Test the extended version
@@ -592,6 +591,7 @@ func TestCommandLineConfigurationLayerGetReleaseTypes(t *testing.T) {
 		"--release-types-two-git-push=false",
 		"--release-types-two-git-tag=false",
 		"--release-types-two-git-tag-message=Tag message",
+		"--release-types-two-git-tag-names=one,two,three",
 		"--release-types-two-identifiers-0-position=" + ent.PRE_RELEASE.String(),
 		"--release-types-two-identifiers-0-qualifier=q1",
 		"--release-types-two-identifiers-0-value=v1",
@@ -605,6 +605,9 @@ func TestCommandLineConfigurationLayerGetReleaseTypes(t *testing.T) {
 		"--release-types-two-match-environment-variables-USER=any user",
 		"--release-types-two-match-workspace-status=" + ent.CLEAN.String(),
 		"--release-types-two-publish=true",
+		"--release-types-two-publish-draft=false",
+		"--release-types-two-publish-pre-release=true",
+		"--release-types-two-release-name=myrelease",
 		"--release-types-two-version-range-from-branch-name=true",
 	})
 
@@ -632,12 +635,16 @@ func TestCommandLineConfigurationLayerGetReleaseTypes(t *testing.T) {
 	assert.Nil(t, (*(*releaseTypes.GetItems())["one"]).GetGitCommitMessage())
 	assert.Equal(t, "true", *(*(*releaseTypes.GetItems())["one"]).GetGitTag())
 	assert.Nil(t, (*(*releaseTypes.GetItems())["one"]).GetGitTagMessage())
+	assert.Nil(t, (*(*releaseTypes.GetItems())["one"]).GetGitTagNames())
 	assert.Equal(t, "true", *(*(*releaseTypes.GetItems())["one"]).GetGitPush())
 	assert.Equal(t, 0, len(*(*(*releaseTypes.GetItems())["one"]).GetIdentifiers()))
 	assert.Equal(t, "alpha,beta", *(*(*releaseTypes.GetItems())["one"]).GetMatchBranches())
 	assert.Equal(t, 0, len(*(*(*releaseTypes.GetItems())["one"]).GetMatchEnvironmentVariables()))
 	assert.Equal(t, ent.DIRTY, *(*(*releaseTypes.GetItems())["one"]).GetMatchWorkspaceStatus())
 	assert.Equal(t, "false", *(*(*releaseTypes.GetItems())["one"]).GetPublish())
+	assert.Nil(t, (*(*releaseTypes.GetItems())["one"]).GetPublishDraft())
+	assert.Nil(t, (*(*releaseTypes.GetItems())["one"]).GetPublishPreRelease())
+	assert.Nil(t, (*(*releaseTypes.GetItems())["one"]).GetReleaseName())
 	assert.Equal(t, "true", *(*(*releaseTypes.GetItems())["one"]).GetVersionRange())
 	assert.Nil(t, (*(*releaseTypes.GetItems())["one"]).GetVersionRangeFromBranchName())
 	assert.Nil(t, (*(*releaseTypes).GetItems())["two"].GetAssets())
@@ -649,6 +656,10 @@ func TestCommandLineConfigurationLayerGetReleaseTypes(t *testing.T) {
 	assert.Equal(t, "Commit message", *(*(*releaseTypes.GetItems())["two"]).GetGitCommitMessage())
 	assert.Equal(t, "false", *(*(*releaseTypes.GetItems())["two"]).GetGitTag())
 	assert.Equal(t, "Tag message", *(*(*releaseTypes.GetItems())["two"]).GetGitTagMessage())
+	assert.Equal(t, 3, len(*(*(*releaseTypes.GetItems())["two"]).GetGitTagNames()))
+	assert.Equal(t, "one", *(*(*(*releaseTypes.GetItems())["two"]).GetGitTagNames())[0])
+	assert.Equal(t, "two", *(*(*(*releaseTypes.GetItems())["two"]).GetGitTagNames())[1])
+	assert.Equal(t, "three", *(*(*(*releaseTypes.GetItems())["two"]).GetGitTagNames())[2])
 	assert.Equal(t, "false", *(*(*releaseTypes.GetItems())["two"]).GetGitPush())
 	assert.Equal(t, 3, len(*(*(*releaseTypes.GetItems())["two"]).GetIdentifiers()))
 	assert.Equal(t, ent.PRE_RELEASE, *(*(*(*releaseTypes.GetItems())["two"]).GetIdentifiers())[0].GetPosition())
@@ -666,6 +677,9 @@ func TestCommandLineConfigurationLayerGetReleaseTypes(t *testing.T) {
 	assert.Equal(t, "any user", (*(*(*releaseTypes.GetItems())["two"]).GetMatchEnvironmentVariables())["USER"])
 	assert.Equal(t, ent.CLEAN, *(*(*releaseTypes.GetItems())["two"]).GetMatchWorkspaceStatus())
 	assert.Equal(t, "true", *(*(*releaseTypes.GetItems())["two"]).GetPublish())
+	assert.Equal(t, "false", *(*(*releaseTypes.GetItems())["two"]).GetPublishDraft())
+	assert.Equal(t, "true", *(*(*releaseTypes.GetItems())["two"]).GetPublishPreRelease())
+	assert.Equal(t, "myrelease", *(*(*releaseTypes.GetItems())["two"]).GetReleaseName())
 	assert.Nil(t, (*(*releaseTypes.GetItems())["two"]).GetVersionRange())
 	assert.True(t, *(*(*releaseTypes.GetItems())["two"]).GetVersionRangeFromBranchName())
 }
@@ -808,6 +822,82 @@ func TestCommandLineConfigurationLayerGetStateFile(t *testing.T) {
 	stateFile, err = commandLineConfigurationLayer.GetStateFile()
 	assert.NoError(t, err)
 	assert.Equal(t, "state.yml", *stateFile)
+}
+
+func TestCommandLineConfigurationLayerGetSubstitutions(t *testing.T) {
+	commandLineConfigurationLayer := CommandLineConfigurationLayer{}
+
+	substitutions, err := commandLineConfigurationLayer.GetSubstitutions()
+	assert.NoError(t, err)
+	assert.NotNil(t, substitutions)
+	assert.Equal(t, 0, len(*substitutions.GetEnabled()))
+	assert.Equal(t, 0, len(*substitutions.GetItems()))
+
+	// get a new instance or a stale set of arguments is still in the configuration layer
+	commandLineConfigurationLayer = CommandLineConfigurationLayer{}
+	commandLineConfigurationLayer.withArguments([]string{
+		"--substitutions-enabled=one,two",
+	})
+
+	substitutions, err = commandLineConfigurationLayer.GetSubstitutions()
+	assert.NoError(t, err)
+	assert.NotNil(t, substitutions)
+
+	enabled := *substitutions.GetEnabled()
+	items := *substitutions.GetItems()
+	assert.Equal(t, 2, len(enabled))
+	assert.Equal(t, *enabled[0], "one")
+	assert.Equal(t, *enabled[1], "two")
+	assert.Equal(t, 0, len(items))
+
+	// get a new instance or a stale set of arguments is still in the configuration layer
+	commandLineConfigurationLayer = CommandLineConfigurationLayer{}
+	commandLineConfigurationLayer.withArguments([]string{
+		"--substitutions-enabled=one,two",
+		"--substitutions-one-expression=",
+		"--substitutions-two-expression=",
+	})
+
+	substitutions, err = commandLineConfigurationLayer.GetSubstitutions()
+	assert.NoError(t, err)
+	assert.NotNil(t, substitutions)
+
+	enabled = *substitutions.GetEnabled()
+	items = *substitutions.GetItems()
+	assert.Equal(t, 2, len(enabled))
+	assert.Equal(t, *enabled[0], "one")
+	assert.Equal(t, *enabled[1], "two")
+	assert.Equal(t, 2, len(*substitutions.GetItems()))
+	assert.NotNil(t, *items["one"])
+	assert.NotNil(t, *items["two"])
+
+	// get a new instance or a stale set of arguments is still in the configuration layer
+	commandLineConfigurationLayer = CommandLineConfigurationLayer{}
+	commandLineConfigurationLayer.withArguments([]string{
+		"--substitutions-enabled=one,two",
+		"--substitutions-one-files=*.json",
+		"--substitutions-one-match=version: 1.2.3",
+		"--substitutions-two-files=*.toml",
+		"--substitutions-two-match=version: 4.5.6",
+		"--substitutions-two-replace=version: 7.8.9",
+	})
+
+	substitutions, err = commandLineConfigurationLayer.GetSubstitutions()
+	assert.NoError(t, err)
+	assert.NotNil(t, substitutions)
+
+	enabled = *substitutions.GetEnabled()
+	items = *substitutions.GetItems()
+	assert.Equal(t, 2, len(enabled))
+	assert.Equal(t, *enabled[0], "one")
+	assert.Equal(t, *enabled[1], "two")
+	assert.Equal(t, 2, len(items))
+	assert.Equal(t, "*.json", *items["one"].GetFiles())
+	assert.Equal(t, "version: 1.2.3", *items["one"].GetMatch())
+	assert.Nil(t, items["one"].GetReplace())
+	assert.Equal(t, "*.toml", *items["two"].GetFiles())
+	assert.Equal(t, "version: 4.5.6", *items["two"].GetMatch())
+	assert.Equal(t, "version: 7.8.9", *items["two"].GetReplace())
 }
 
 func TestCommandLineConfigurationLayerGetVerbosity(t *testing.T) {

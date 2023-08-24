@@ -15,6 +15,9 @@ Since state files are platform and flavor agnostic they can be used in [combined
 You can access the State attributes directly from **Gradle** build scripts as explained [here]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/usage.md %}#accessing-the-nyx-state-extra-project-property-from-build-scripts).
 {: .notice--info}
 
+State attributes can be used to [replace]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/substitutions.md %}) text token into arbitrary files within the project (i.e. to update the `version` attribute in platform-specific descriptors).
+{: .notice--info}
+
 If you need less informations but in an easily parseable for also consider using the [`summary`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#summary) or the [`summaryFile`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/global-options.md %}#summary-file).
 
 In this section you can find details about every value contained in the State file.

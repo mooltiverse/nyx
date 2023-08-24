@@ -66,9 +66,6 @@ const (
 
 	// The name used for the internal state attribute where we store the last commit created by this command.
 	MARK_INTERNAL_OUPUT_ATTRIBUTE_COMMIT = MARK_INTERNAL_OUTPUT_ATTRIBUTE_PREFIX + "." + "commit"
-
-	// The name used for the internal state attribute where we store the last tag created by this command.
-	MARK_INTERNAL_OUPUT_ATTRIBUTE_TAG = MARK_INTERNAL_OUTPUT_ATTRIBUTE_PREFIX + "." + "tag"
 )
 
 /*
@@ -205,20 +202,26 @@ func (c *Mark) tag() error {
 		if err != nil {
 			return err
 		}
-		version, err := c.State().GetVersion()
-		if err != nil {
-			return err
-		}
-		log.Debugf("tagging latest commit '%s' with tag '%s'", latestCommit, *version)
-		// Here we can also specify the Tagger Identity as per https://github.com/mooltiverse/nyx/issues/65
-		if tagMessage == nil || "" == strings.TrimSpace(*tagMessage) {
-			(*c.Repository()).TagWithMessage(version, nil)
+		if releaseType.GetGitTagNames() == nil || len(*releaseType.GetGitTagNames()) == 0 {
+			log.Debugf("no tag name has been configured for this release type so no tag is applied")
 		} else {
-			(*c.Repository()).TagWithMessage(version, tagMessage)
-		}
+			for _, tagTemplate := range *releaseType.GetGitTagNames() {
+				tag, err := c.renderTemplate(tagTemplate)
+				if err != nil {
+					return err
+				}
+				log.Tracef("tag template '%s' renders to '%s'", *tagTemplate, *tag)
+				log.Debugf("tagging latest commit '%s' with tag '%s'", latestCommit, *tag)
+				// Here we can also specify the Tagger Identity as per https://github.com/mooltiverse/nyx/issues/65
+				if tagMessage == nil || "" == strings.TrimSpace(*tagMessage) {
+					(*c.Repository()).TagWithMessage(tag, nil)
+				} else {
+					(*c.Repository()).TagWithMessage(tag, tagMessage)
+				}
 
-		log.Debugf("tag '%s' applied to commit '%s'", *version, latestCommit)
-		c.putInternalAttribute(MARK_INTERNAL_OUPUT_ATTRIBUTE_TAG, version)
+				log.Debugf("tag '%s' applied to commit '%s'", *tag, latestCommit)
+			}
+		}
 	}
 	return nil
 }

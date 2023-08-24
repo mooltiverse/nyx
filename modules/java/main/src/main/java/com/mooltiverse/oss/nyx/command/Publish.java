@@ -110,9 +110,19 @@ public class Publish extends AbstractCommand {
                         ReleaseService service = resolveReleaseService(serviceName);
                         if (Objects.isNull(service))
                             throw new IllegalPropertyException(String.format("The release type uses the '%s' publication service but no such service has been configured in the 'services' section", serviceName));
+                        String releaseName = renderTemplate(state().getReleaseType().getReleaseName());
+                        if (Objects.isNull(releaseName) || releaseName.isBlank()) {
+                            // if no release name template was specified then fall-back to the version for the release title
+                            releaseName = state().getVersion();
+                        }
+                        // evaluate the release options
+                        Boolean publishDraft = renderTemplateAsBoolean(state().getReleaseType().getPublishDraft());
+                        Boolean publishPreRelease = renderTemplateAsBoolean(state().getReleaseType().getPublishPreRelease());
+                        Map<String,Object> releaseOptions = Map.<String,Object>of(ReleaseService.RELEASE_OPTION_DRAFT, publishDraft.booleanValue(), ReleaseService.RELEASE_OPTION_PRE_RELEASE, publishPreRelease.booleanValue());
+
                         // The first two parameters here are null because the repository owner and name are expected to be passed
                         // along with service options. This is just a place where we could override them.
-                        Release release = service.publishRelease(null, null, state().getVersion(), state().getVersion(), description);
+                        Release release = service.publishRelease(null, null, releaseName, state().getVersion(), description, releaseOptions);
                         putInternalAttribute(INTERNAL_OUPUT_ATTRIBUTE_STATE_VERSION, state().getVersion());
 
                         // publish release assets now

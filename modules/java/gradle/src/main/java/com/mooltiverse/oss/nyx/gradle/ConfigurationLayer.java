@@ -37,6 +37,8 @@ import com.mooltiverse.oss.nyx.entities.Provider;
 import com.mooltiverse.oss.nyx.entities.ReleaseType;
 import com.mooltiverse.oss.nyx.entities.ReleaseTypes;
 import com.mooltiverse.oss.nyx.entities.ServiceConfiguration;
+import com.mooltiverse.oss.nyx.entities.Substitution;
+import com.mooltiverse.oss.nyx.entities.Substitutions;
 import com.mooltiverse.oss.nyx.entities.Verbosity;
 import com.mooltiverse.oss.nyx.entities.WorkspaceStatus;
 import com.mooltiverse.oss.nyx.version.Scheme;
@@ -85,6 +87,11 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
      * The private instance of the services configuration section.
      */
     private Map<String,ServiceConfiguration> servicesSection = null;
+
+    /**
+     * The private instance of the substitutions configuration section.
+     */
+    private Substitutions substitutionsSection = null;
 
     /**
      * Standard constructor.
@@ -288,11 +295,15 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
                             type.getGitPush().isPresent() ? type.getGitPush().get() : Defaults.ReleaseType.GIT_PUSH,
                             type.getGitTag().isPresent() ? type.getGitTag().get() : Defaults.ReleaseType.GIT_TAG,
                             type.getGitTagMessage().isPresent() ? type.getGitTagMessage().get() : Defaults.ReleaseType.GIT_TAG_MESSAGE,
+                            type.getGitTagNames().isPresent() ? type.getGitTagNames().get() : Defaults.ReleaseType.GIT_TAG_NAMES,
                             identifiers,
                             type.getMatchBranches().isPresent() ? type.getMatchBranches().get() : Defaults.ReleaseType.MATCH_BRANCHES,
                             type.getMatchEnvironmentVariables().isPresent() ? type.getMatchEnvironmentVariables().get() : Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES,
                             type.getMatchWorkspaceStatus().isPresent() ? WorkspaceStatus.valueOf(type.getMatchWorkspaceStatus().get()) : Defaults.ReleaseType.MATCH_WORKSPACE_STATUS,
                             type.getPublish().isPresent() ? type.getPublish().get() : Defaults.ReleaseType.PUBLISH,
+                            type.getPublishDraft().isPresent() ? type.getPublishDraft().get() : Defaults.ReleaseType.PUBLISH_DRAFT,
+                            type.getPublishPreRelease().isPresent() ? type.getPublishPreRelease().get() : Defaults.ReleaseType.PUBLISH_PRE_RELEASE,
+                            type.getReleaseName().isPresent() ? type.getReleaseName().get() : Defaults.ReleaseType.RELEASE_NAME,
                             type.getVersionRange().isPresent() ? type.getVersionRange().get() : Defaults.ReleaseType.VERSION_RANGE,
                             type.getVersionRangeFromBranchName().isPresent() ? type.getVersionRangeFromBranchName().get() : Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME
                         ));
@@ -367,6 +378,39 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
      * {@inheritDoc}
      */
     @Override
+    public String getStateFile() {
+        return extension.getStateFile().isPresent() ? extension.getStateFile().get() : null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Substitutions getSubstitutions() {
+        if (Objects.isNull(substitutionsSection)) {
+            // the list property is always present and never null but is empty when the user doesn't define its contents
+            List<String> enabled = extension.getSubstitutions().getEnabled().isPresent() && !extension.getSubstitutions().getEnabled().get().isEmpty() ? extension.getSubstitutions().getEnabled().get() : List.<String>of();
+
+            Map<String, Substitution> items = new HashMap<String, Substitution>(extension.getSubstitutions().getItems().size());
+            // the map property is always present and never null but is empty when the user doesn't define its contents
+            if (!extension.getSubstitutions().getItems().isEmpty()) {
+                for (NyxExtension.Substitutions.Substitution substitution: extension.getSubstitutions().getItems()) {
+                    if (!items.containsKey(substitution.getName())) {
+                        items.put(substitution.getName(), new Substitution(substitution.getFiles().get(), substitution.getMatch().get(), substitution.getReplace().get()));
+                    }
+                }
+            }
+
+            substitutionsSection = new Substitutions(enabled, items);
+        }
+        return substitutionsSection;
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Boolean getSummary() {
         return extension.getSummary().getOrNull();
     }
@@ -377,14 +421,6 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
     @Override
     public String getSummaryFile() {
         return extension.getSummaryFile().isPresent() ? extension.getSummaryFile().get() : null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getStateFile() {
-        return extension.getStateFile().isPresent() ? extension.getStateFile().get() : null;
     }
 
     /**

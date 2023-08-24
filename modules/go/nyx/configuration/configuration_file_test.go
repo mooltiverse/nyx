@@ -340,6 +340,16 @@ func TestSaveAndLoadJSON(t *testing.T) {
 				assert.Equal(t, (*(*sReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitTag(), (*(*tReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitTag())
 				assert.Equal(t, (*(*sReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitTagMessage(), (*(*tReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitTagMessage())
 
+				if (*(*sReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitTagNames() == nil {
+					assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, (*(*tReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitTagNames())
+				} else {
+					assert.NotNil(t, (*(*tReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitTagNames())
+					assert.Equal(t, (*(*sReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitTagNames(), (*(*tReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitTagNames())
+					for i, _ := range *(*(*tReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitTagNames() {
+						assert.Equal(t, *(*(*(*sReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitTagNames())[i], *(*(*(*tReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitTagNames())[i])
+					}
+				}
+
 				if (*(*sReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetIdentifiers() == nil {
 					assert.Equal(t, ent.RELEASE_TYPE_IDENTIFIERS, (*(*tReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetIdentifiers())
 				} else {
@@ -364,6 +374,9 @@ func TestSaveAndLoadJSON(t *testing.T) {
 
 				assert.Equal(t, (*(*sReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetMatchWorkspaceStatus(), (*(*tReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetMatchWorkspaceStatus())
 				assert.Equal(t, (*(*sReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetPublish(), (*(*tReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetPublish())
+				assert.Equal(t, (*(*sReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetPublishDraft(), (*(*tReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetPublishDraft())
+				assert.Equal(t, (*(*sReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetPublishPreRelease(), (*(*tReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetPublishPreRelease())
+				assert.Equal(t, (*(*sReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetReleaseName(), (*(*tReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetReleaseName())
 				assert.Equal(t, (*(*sReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetVersionRange(), (*(*tReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetVersionRange())
 				assert.Equal(t, (*(*sReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetVersionRangeFromBranchName(), (*(*tReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetVersionRangeFromBranchName())
 			}
@@ -387,6 +400,30 @@ func TestSaveAndLoadJSON(t *testing.T) {
 					assert.NotNil(t, (*(*(*sServices)[sServicesItemKey]).GetOptions())[sServicesOptionItemKey])
 					assert.Equal(t, (*(*(*sServices)[sServicesItemKey]).GetOptions())[sServicesOptionItemKey], (*(*(*sServices)[sServicesItemKey]).GetOptions())[sServicesOptionItemKey])
 				}
+			}
+		}
+	}
+
+	sSubstitutions, _ := source.GetSubstitutions()
+	tSubstitutions, _ := target.GetSubstitutions()
+
+	if sSubstitutions == nil {
+		assert.Equal(t, ent.SUBSTITUTIONS, tSubstitutions)
+	} else {
+		if sSubstitutions.GetEnabled() == nil {
+			assert.Nil(t, tSubstitutions.GetEnabled())
+		} else {
+			for sSubstitutionsEnabled, _ := range *sSubstitutions.GetEnabled() {
+				assert.NotNil(t, (*tSubstitutions.GetEnabled())[sSubstitutionsEnabled])
+				assert.Equal(t, (*sSubstitutions.GetEnabled())[sSubstitutionsEnabled], (*tSubstitutions.GetEnabled())[sSubstitutionsEnabled])
+			}
+			for sSubstitutionsItemKey, _ := range *sSubstitutions.GetItems() {
+				assert.NotNil(t, (*(*tSubstitutions.GetItems())[sSubstitutionsItemKey]).GetFiles())
+				assert.Equal(t, (*(*sSubstitutions.GetItems())[sSubstitutionsItemKey].GetFiles()), (*(*tSubstitutions.GetItems())[sSubstitutionsItemKey].GetFiles()))
+				assert.NotNil(t, (*(*tSubstitutions.GetItems())[sSubstitutionsItemKey]).GetMatch())
+				assert.Equal(t, (*(*sSubstitutions.GetItems())[sSubstitutionsItemKey].GetMatch()), (*(*tSubstitutions.GetItems())[sSubstitutionsItemKey].GetMatch()))
+				assert.NotNil(t, (*(*tSubstitutions.GetItems())[sSubstitutionsItemKey]).GetReplace())
+				assert.Equal(t, (*(*sSubstitutions.GetItems())[sSubstitutionsItemKey].GetReplace()), (*(*tSubstitutions.GetItems())[sSubstitutionsItemKey].GetReplace()))
 			}
 		}
 	}
@@ -694,6 +731,16 @@ func TestSaveAndLoadYAML(t *testing.T) {
 				assert.Equal(t, (*(*sReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitTag(), (*(*tReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitTag())
 				assert.Equal(t, (*(*sReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitTagMessage(), (*(*tReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitTagMessage())
 
+				if (*(*sReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitTagNames() == nil {
+					assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, (*(*tReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitTagNames())
+				} else {
+					assert.NotNil(t, (*(*tReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitTagNames())
+					assert.Equal(t, (*(*sReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitTagNames(), (*(*tReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitTagNames())
+					for i, _ := range *(*(*tReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitTagNames() {
+						assert.Equal(t, *(*(*(*sReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitTagNames())[i], *(*(*(*tReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitTagNames())[i])
+					}
+				}
+
 				if (*(*sReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetIdentifiers() == nil {
 					assert.Equal(t, ent.RELEASE_TYPE_IDENTIFIERS, (*(*tReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetIdentifiers())
 				} else {
@@ -718,6 +765,9 @@ func TestSaveAndLoadYAML(t *testing.T) {
 
 				assert.Equal(t, (*(*sReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetMatchWorkspaceStatus(), (*(*tReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetMatchWorkspaceStatus())
 				assert.Equal(t, (*(*sReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetPublish(), (*(*tReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetPublish())
+				assert.Equal(t, (*(*sReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetPublishDraft(), (*(*tReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetPublishDraft())
+				assert.Equal(t, (*(*sReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetPublishPreRelease(), (*(*tReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetPublishPreRelease())
+				assert.Equal(t, (*(*sReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetReleaseName(), (*(*tReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetReleaseName())
 				assert.Equal(t, (*(*sReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetVersionRange(), (*(*tReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetVersionRange())
 				assert.Equal(t, (*(*sReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetVersionRangeFromBranchName(), (*(*tReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetVersionRangeFromBranchName())
 			}
@@ -741,6 +791,30 @@ func TestSaveAndLoadYAML(t *testing.T) {
 					assert.NotNil(t, (*(*(*sServices)[sServicesItemKey]).GetOptions())[sServicesOptionItemKey])
 					assert.Equal(t, (*(*(*sServices)[sServicesItemKey]).GetOptions())[sServicesOptionItemKey], (*(*(*sServices)[sServicesItemKey]).GetOptions())[sServicesOptionItemKey])
 				}
+			}
+		}
+	}
+
+	sSubstitutions, _ := source.GetSubstitutions()
+	tSubstitutions, _ := target.GetSubstitutions()
+
+	if sSubstitutions == nil {
+		assert.Equal(t, ent.SUBSTITUTIONS, tSubstitutions)
+	} else {
+		if sSubstitutions.GetEnabled() == nil {
+			assert.Nil(t, tSubstitutions.GetEnabled())
+		} else {
+			for sSubstitutionsEnabled, _ := range *sSubstitutions.GetEnabled() {
+				assert.NotNil(t, (*tSubstitutions.GetEnabled())[sSubstitutionsEnabled])
+				assert.Equal(t, (*sSubstitutions.GetEnabled())[sSubstitutionsEnabled], (*tSubstitutions.GetEnabled())[sSubstitutionsEnabled])
+			}
+			for sSubstitutionsItemKey, _ := range *sSubstitutions.GetItems() {
+				assert.NotNil(t, (*(*tSubstitutions.GetItems())[sSubstitutionsItemKey]).GetFiles())
+				assert.Equal(t, (*(*sSubstitutions.GetItems())[sSubstitutionsItemKey].GetFiles()), (*(*tSubstitutions.GetItems())[sSubstitutionsItemKey].GetFiles()))
+				assert.NotNil(t, (*(*tSubstitutions.GetItems())[sSubstitutionsItemKey]).GetMatch())
+				assert.Equal(t, (*(*sSubstitutions.GetItems())[sSubstitutionsItemKey].GetMatch()), (*(*tSubstitutions.GetItems())[sSubstitutionsItemKey].GetMatch()))
+				assert.NotNil(t, (*(*tSubstitutions.GetItems())[sSubstitutionsItemKey]).GetReplace())
+				assert.Equal(t, (*(*sSubstitutions.GetItems())[sSubstitutionsItemKey].GetReplace()), (*(*tSubstitutions.GetItems())[sSubstitutionsItemKey].GetReplace()))
 			}
 		}
 	}
@@ -815,11 +889,11 @@ func TestSerializationWithMultipleConfigurationLayersJSON(t *testing.T) {
 	mediumPriorityConfigurationLayerMock.SetReleasePrefix(utl.PointerToString("mpprefix"))
 	highPriorityConfigurationLayerMock.SetReleasePrefix(utl.PointerToString("hpprefix"))
 
-	lpReleaseTypes, _ := ent.NewReleaseTypesWith(&[]*string{utl.PointerToString("type1")}, &[]*string{utl.PointerToString("service1")}, &[]*string{utl.PointerToString("remote1")}, &map[string]*ent.ReleaseType{"type1": ent.NewReleaseTypeWith(&[]*string{utl.PointerToString("asset1"), utl.PointerToString("asset2")}, utl.PointerToBoolean(false), utl.PointerToString("{{branch1}}"), utl.PointerToString("Release description 1"), utl.PointerToString("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$"), utl.PointerToString("true"), utl.PointerToString("Committing {{version}}"), utl.PointerToString("true"), utl.PointerToString("true"), utl.PointerToString("Tagging {{version}}"), &[]*ent.Identifier{ent.NewIdentifierWith(utl.PointerToString("build"), utl.PointerToString("12"), ent.PointerToPosition(ent.BUILD))}, utl.PointerToString(""), &map[string]string{"PATH": ".*"}, nil, utl.PointerToString("true"), utl.PointerToString(""), utl.PointerToBoolean(false))})
+	lpReleaseTypes, _ := ent.NewReleaseTypesWith(&[]*string{utl.PointerToString("type1")}, &[]*string{utl.PointerToString("service1")}, &[]*string{utl.PointerToString("remote1")}, &map[string]*ent.ReleaseType{"type1": ent.NewReleaseTypeWith(&[]*string{utl.PointerToString("asset1"), utl.PointerToString("asset2")}, utl.PointerToBoolean(false), utl.PointerToString("{{branch1}}"), utl.PointerToString("Release description 1"), utl.PointerToString("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$"), utl.PointerToString("true"), utl.PointerToString("Committing {{version}}"), utl.PointerToString("true"), utl.PointerToString("true"), utl.PointerToString("Tagging {{version}}"), &[]*string{utl.PointerToString("one"), utl.PointerToString("two"), utl.PointerToString("three")}, &[]*ent.Identifier{ent.NewIdentifierWith(utl.PointerToString("build"), utl.PointerToString("12"), ent.PointerToPosition(ent.BUILD))}, utl.PointerToString(""), &map[string]string{"PATH": ".*"}, nil, utl.PointerToString("true"), utl.PointerToString("false"), utl.PointerToString("true"), utl.PointerToString("myrelease1"), utl.PointerToString(""), utl.PointerToBoolean(false))})
 	lowPriorityConfigurationLayerMock.SetReleaseTypes(lpReleaseTypes)
-	mpReleaseTypes, _ := ent.NewReleaseTypesWith(&[]*string{utl.PointerToString("type2")}, &[]*string{utl.PointerToString("service2")}, &[]*string{utl.PointerToString("remote2")}, &map[string]*ent.ReleaseType{"type2": ent.NewReleaseTypeWith(&[]*string{utl.PointerToString("asset1"), utl.PointerToString("asset2")}, utl.PointerToBoolean(true), utl.PointerToString("{{branch2}}"), utl.PointerToString("Release description 2"), utl.PointerToString("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$"), utl.PointerToString("true"), utl.PointerToString("Committing {{version}}"), utl.PointerToString("true"), utl.PointerToString("true"), utl.PointerToString("Tagging {{version}}"), &[]*ent.Identifier{ent.NewIdentifierWith(utl.PointerToString("build"), utl.PointerToString("12"), ent.PointerToPosition(ent.BUILD))}, utl.PointerToString(""), &map[string]string{"PATH": ".*"}, nil, utl.PointerToString("true"), utl.PointerToString(""), utl.PointerToBoolean(false))})
+	mpReleaseTypes, _ := ent.NewReleaseTypesWith(&[]*string{utl.PointerToString("type2")}, &[]*string{utl.PointerToString("service2")}, &[]*string{utl.PointerToString("remote2")}, &map[string]*ent.ReleaseType{"type2": ent.NewReleaseTypeWith(&[]*string{utl.PointerToString("asset1"), utl.PointerToString("asset2")}, utl.PointerToBoolean(true), utl.PointerToString("{{branch2}}"), utl.PointerToString("Release description 2"), utl.PointerToString("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$"), utl.PointerToString("true"), utl.PointerToString("Committing {{version}}"), utl.PointerToString("true"), utl.PointerToString("true"), utl.PointerToString("Tagging {{version}}"), &[]*string{utl.PointerToString("one"), utl.PointerToString("two"), utl.PointerToString("three")}, &[]*ent.Identifier{ent.NewIdentifierWith(utl.PointerToString("build"), utl.PointerToString("12"), ent.PointerToPosition(ent.BUILD))}, utl.PointerToString(""), &map[string]string{"PATH": ".*"}, nil, utl.PointerToString("true"), utl.PointerToString("false"), utl.PointerToString("true"), utl.PointerToString("myrelease2"), utl.PointerToString(""), utl.PointerToBoolean(false))})
 	mediumPriorityConfigurationLayerMock.SetReleaseTypes(mpReleaseTypes)
-	hpReleaseTypes, _ := ent.NewReleaseTypesWith(&[]*string{utl.PointerToString("type3")}, &[]*string{utl.PointerToString("service3")}, &[]*string{utl.PointerToString("remote3")}, &map[string]*ent.ReleaseType{"type3": ent.NewReleaseTypeWith(&[]*string{utl.PointerToString("asset1"), utl.PointerToString("asset2")}, utl.PointerToBoolean(true), utl.PointerToString("{{branch3}}"), utl.PointerToString("Release description 3"), utl.PointerToString("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$"), utl.PointerToString("true"), utl.PointerToString("Committing {{version}}"), utl.PointerToString("true"), utl.PointerToString("true"), utl.PointerToString("Tagging {{version}}"), &[]*ent.Identifier{ent.NewIdentifierWith(utl.PointerToString("build"), utl.PointerToString("12"), ent.PointerToPosition(ent.BUILD))}, utl.PointerToString(""), &map[string]string{"PATH": ".*"}, nil, utl.PointerToString("true"), utl.PointerToString(""), utl.PointerToBoolean(false))})
+	hpReleaseTypes, _ := ent.NewReleaseTypesWith(&[]*string{utl.PointerToString("type3")}, &[]*string{utl.PointerToString("service3")}, &[]*string{utl.PointerToString("remote3")}, &map[string]*ent.ReleaseType{"type3": ent.NewReleaseTypeWith(&[]*string{utl.PointerToString("asset1"), utl.PointerToString("asset2")}, utl.PointerToBoolean(true), utl.PointerToString("{{branch3}}"), utl.PointerToString("Release description 3"), utl.PointerToString("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$"), utl.PointerToString("true"), utl.PointerToString("Committing {{version}}"), utl.PointerToString("true"), utl.PointerToString("true"), utl.PointerToString("Tagging {{version}}"), &[]*string{utl.PointerToString("one"), utl.PointerToString("two"), utl.PointerToString("three")}, &[]*ent.Identifier{ent.NewIdentifierWith(utl.PointerToString("build"), utl.PointerToString("12"), ent.PointerToPosition(ent.BUILD))}, utl.PointerToString(""), &map[string]string{"PATH": ".*"}, nil, utl.PointerToString("true"), utl.PointerToString("false"), utl.PointerToString("true"), utl.PointerToString("myrelease3"), utl.PointerToString(""), utl.PointerToBoolean(false))})
 	highPriorityConfigurationLayerMock.SetReleaseTypes(hpReleaseTypes)
 
 	lowPriorityConfigurationLayerMock.SetResume(utl.PointerToBoolean(true))
@@ -838,6 +912,17 @@ func TestSerializationWithMultipleConfigurationLayersJSON(t *testing.T) {
 	mediumPriorityConfigurationLayerMock.SetSharedConfigurationFile(utl.PointerToString(os.Getenv(SIMPLEST_JSON_EXAMPLE_CONFIGURATION_FILE_ENVIRONMENT_VARIABLE)))
 	highPriorityConfigurationLayerMock.SetSharedConfigurationFile(utl.PointerToString(os.Getenv(SIMPLEST_YAML_EXAMPLE_CONFIGURATION_FILE_ENVIRONMENT_VARIABLE)))
 
+	lowPriorityConfigurationLayerMock.SetStateFile(utl.PointerToString("file.yaml"))
+	mediumPriorityConfigurationLayerMock.SetStateFile(utl.PointerToString("file.yaml"))
+	highPriorityConfigurationLayerMock.SetStateFile(utl.PointerToString("file.json"))
+
+	lpSubstitutions, _ := ent.NewSubstitutionsWith(&[]*string{utl.PointerToString("substitution1")}, &map[string]*ent.Substitution{"substitution1": ent.NewSubstitutionWith(utl.PointerToString("glob1"), utl.PointerToString("match1"), utl.PointerToString("replace1"))})
+	lowPriorityConfigurationLayerMock.SetSubstitutions(lpSubstitutions)
+	mpSubstitutions, _ := ent.NewSubstitutionsWith(&[]*string{utl.PointerToString("substitution2")}, &map[string]*ent.Substitution{"substitution2": ent.NewSubstitutionWith(utl.PointerToString("glob2"), utl.PointerToString("match2"), utl.PointerToString("replace2"))})
+	mediumPriorityConfigurationLayerMock.SetSubstitutions(mpSubstitutions)
+	hpSubstitutions, _ := ent.NewSubstitutionsWith(&[]*string{utl.PointerToString("substitution3")}, &map[string]*ent.Substitution{"substitution3": ent.NewSubstitutionWith(utl.PointerToString("glob3"), utl.PointerToString("match3"), utl.PointerToString("replace3"))})
+	highPriorityConfigurationLayerMock.SetSubstitutions(hpSubstitutions)
+
 	lowPriorityConfigurationLayerMock.SetSummary(utl.PointerToBoolean(true))
 	mediumPriorityConfigurationLayerMock.SetSummary(utl.PointerToBoolean(true))
 	highPriorityConfigurationLayerMock.SetSummary(utl.PointerToBoolean(false))
@@ -845,10 +930,6 @@ func TestSerializationWithMultipleConfigurationLayersJSON(t *testing.T) {
 	lowPriorityConfigurationLayerMock.SetSummaryFile(utl.PointerToString("summary.low"))
 	mediumPriorityConfigurationLayerMock.SetSummaryFile(utl.PointerToString("summary.medium"))
 	highPriorityConfigurationLayerMock.SetSummaryFile(utl.PointerToString("summary.high"))
-
-	lowPriorityConfigurationLayerMock.SetStateFile(utl.PointerToString("file.yaml"))
-	mediumPriorityConfigurationLayerMock.SetStateFile(utl.PointerToString("file.yaml"))
-	highPriorityConfigurationLayerMock.SetStateFile(utl.PointerToString("file.json"))
 
 	lowPriorityConfigurationLayerMock.SetVerbosity(ent.PointerToVerbosity(ent.TRACE))
 	mediumPriorityConfigurationLayerMock.SetVerbosity(ent.PointerToVerbosity(ent.INFO))
@@ -965,8 +1046,12 @@ func TestSerializationWithMultipleConfigurationLayersJSON(t *testing.T) {
 	assert.Equal(t, *(*(*hpReleaseTypes).GetItems())["type3"].GetGitPush(), *(*(*releaseTypes).GetItems())["type3"].GetGitPush())
 	assert.Equal(t, *(*(*hpReleaseTypes).GetItems())["type3"].GetGitTag(), *(*(*releaseTypes).GetItems())["type3"].GetGitTag())
 	assert.Equal(t, *(*(*hpReleaseTypes).GetItems())["type3"].GetGitTagMessage(), *(*(*releaseTypes).GetItems())["type3"].GetGitTagMessage())
+	assert.Equal(t, *(*(*hpReleaseTypes).GetItems())["type3"].GetGitTagNames(), *(*(*releaseTypes).GetItems())["type3"].GetGitTagNames())
 	assert.Equal(t, *(*(*hpReleaseTypes).GetItems())["type3"].GetMatchBranches(), *(*(*releaseTypes).GetItems())["type3"].GetMatchBranches())
 	assert.Equal(t, *(*(*hpReleaseTypes).GetItems())["type3"].GetPublish(), *(*(*releaseTypes).GetItems())["type3"].GetPublish())
+	assert.Equal(t, *(*(*hpReleaseTypes).GetItems())["type3"].GetPublishDraft(), *(*(*releaseTypes).GetItems())["type3"].GetPublishDraft())
+	assert.Equal(t, *(*(*hpReleaseTypes).GetItems())["type3"].GetPublishPreRelease(), *(*(*releaseTypes).GetItems())["type3"].GetPublishPreRelease())
+	assert.Equal(t, *(*(*hpReleaseTypes).GetItems())["type3"].GetReleaseName(), *(*(*releaseTypes).GetItems())["type3"].GetReleaseName())
 	assert.Equal(t, *(*(*hpReleaseTypes).GetItems())["type3"].GetVersionRange(), *(*(*releaseTypes).GetItems())["type3"].GetVersionRange())
 	assert.Equal(t, *(*(*hpReleaseTypes).GetItems())["type3"].GetVersionRangeFromBranchName(), *(*(*releaseTypes).GetItems())["type3"].GetVersionRangeFromBranchName())
 
@@ -993,6 +1078,16 @@ func TestSerializationWithMultipleConfigurationLayersJSON(t *testing.T) {
 	sharedConfigurationFile, _ := deserializedConfigurationLayer.GetSharedConfigurationFile()
 	assert.Equal(t, *hpSharedConfigurationFile, *sharedConfigurationFile)
 
+	hpStateFile, _ := highPriorityConfigurationLayerMock.GetStateFile()
+	stateFile, _ := deserializedConfigurationLayer.GetStateFile()
+	assert.Equal(t, *hpStateFile, *stateFile)
+
+	substitutions, _ := deserializedConfigurationLayer.GetSubstitutions()
+	assert.Equal(t, *(*hpSubstitutions.GetEnabled())[0], *(*substitutions.GetEnabled())[0])
+	assert.Equal(t, *(*hpSubstitutions.GetItems())["substitution3"].GetFiles(), *(*substitutions.GetItems())["substitution3"].GetFiles())
+	assert.Equal(t, *(*hpSubstitutions.GetItems())["substitution3"].GetMatch(), *(*substitutions.GetItems())["substitution3"].GetMatch())
+	assert.Equal(t, *(*hpSubstitutions.GetItems())["substitution3"].GetReplace(), *(*substitutions.GetItems())["substitution3"].GetReplace())
+
 	hpSummary, _ := highPriorityConfigurationLayerMock.GetSummary()
 	summary, _ := deserializedConfigurationLayer.GetSummary()
 	assert.Equal(t, *hpSummary, *summary)
@@ -1000,10 +1095,6 @@ func TestSerializationWithMultipleConfigurationLayersJSON(t *testing.T) {
 	hpSummaryFile, _ := highPriorityConfigurationLayerMock.GetSummaryFile()
 	summaryFile, _ := deserializedConfigurationLayer.GetSummaryFile()
 	assert.Equal(t, *hpSummaryFile, *summaryFile)
-
-	hpStateFile, _ := highPriorityConfigurationLayerMock.GetStateFile()
-	stateFile, _ := deserializedConfigurationLayer.GetStateFile()
-	assert.Equal(t, *hpStateFile, *stateFile)
 
 	hpVerbosity, _ := highPriorityConfigurationLayerMock.GetVerbosity()
 	verbosity, _ := deserializedConfigurationLayer.GetVerbosity()
@@ -1083,11 +1174,11 @@ func TestSerializationWithMultipleConfigurationLayersYAML(t *testing.T) {
 	mediumPriorityConfigurationLayerMock.SetReleasePrefix(utl.PointerToString("mpprefix"))
 	highPriorityConfigurationLayerMock.SetReleasePrefix(utl.PointerToString("hpprefix"))
 
-	lpReleaseTypes, _ := ent.NewReleaseTypesWith(&[]*string{utl.PointerToString("type1")}, &[]*string{utl.PointerToString("service1")}, &[]*string{utl.PointerToString("remote1")}, &map[string]*ent.ReleaseType{"type1": ent.NewReleaseTypeWith(&[]*string{utl.PointerToString("asset1"), utl.PointerToString("asset2")}, utl.PointerToBoolean(false), utl.PointerToString("{{branch1}}"), utl.PointerToString("Release description 1"), utl.PointerToString("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$"), utl.PointerToString("true"), utl.PointerToString("Committing {{version}}"), utl.PointerToString("true"), utl.PointerToString("true"), utl.PointerToString("Tagging {{version}}"), &[]*ent.Identifier{ent.NewIdentifierWith(utl.PointerToString("build"), utl.PointerToString("12"), ent.PointerToPosition(ent.BUILD))}, utl.PointerToString(""), &map[string]string{"PATH": ".*"}, nil, utl.PointerToString("true"), utl.PointerToString(""), utl.PointerToBoolean(false))})
+	lpReleaseTypes, _ := ent.NewReleaseTypesWith(&[]*string{utl.PointerToString("type1")}, &[]*string{utl.PointerToString("service1")}, &[]*string{utl.PointerToString("remote1")}, &map[string]*ent.ReleaseType{"type1": ent.NewReleaseTypeWith(&[]*string{utl.PointerToString("asset1"), utl.PointerToString("asset2")}, utl.PointerToBoolean(false), utl.PointerToString("{{branch1}}"), utl.PointerToString("Release description 1"), utl.PointerToString("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$"), utl.PointerToString("true"), utl.PointerToString("Committing {{version}}"), utl.PointerToString("true"), utl.PointerToString("true"), utl.PointerToString("Tagging {{version}}"), &[]*string{utl.PointerToString("one"), utl.PointerToString("two"), utl.PointerToString("three")}, &[]*ent.Identifier{ent.NewIdentifierWith(utl.PointerToString("build"), utl.PointerToString("12"), ent.PointerToPosition(ent.BUILD))}, utl.PointerToString(""), &map[string]string{"PATH": ".*"}, nil, utl.PointerToString("true"), utl.PointerToString("false"), utl.PointerToString("true"), utl.PointerToString("myrelease1"), utl.PointerToString(""), utl.PointerToBoolean(false))})
 	lowPriorityConfigurationLayerMock.SetReleaseTypes(lpReleaseTypes)
-	mpReleaseTypes, _ := ent.NewReleaseTypesWith(&[]*string{utl.PointerToString("type2")}, &[]*string{utl.PointerToString("service2")}, &[]*string{utl.PointerToString("remote2")}, &map[string]*ent.ReleaseType{"type2": ent.NewReleaseTypeWith(&[]*string{utl.PointerToString("asset1"), utl.PointerToString("asset2")}, utl.PointerToBoolean(true), utl.PointerToString("{{branch2}}"), utl.PointerToString("Release description 2"), utl.PointerToString("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$"), utl.PointerToString("true"), utl.PointerToString("Committing {{version}}"), utl.PointerToString("true"), utl.PointerToString("true"), utl.PointerToString("Tagging {{version}}"), &[]*ent.Identifier{ent.NewIdentifierWith(utl.PointerToString("build"), utl.PointerToString("12"), ent.PointerToPosition(ent.BUILD))}, utl.PointerToString(""), &map[string]string{"PATH": ".*"}, nil, utl.PointerToString("true"), utl.PointerToString(""), utl.PointerToBoolean(false))})
+	mpReleaseTypes, _ := ent.NewReleaseTypesWith(&[]*string{utl.PointerToString("type2")}, &[]*string{utl.PointerToString("service2")}, &[]*string{utl.PointerToString("remote2")}, &map[string]*ent.ReleaseType{"type2": ent.NewReleaseTypeWith(&[]*string{utl.PointerToString("asset1"), utl.PointerToString("asset2")}, utl.PointerToBoolean(true), utl.PointerToString("{{branch2}}"), utl.PointerToString("Release description 2"), utl.PointerToString("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$"), utl.PointerToString("true"), utl.PointerToString("Committing {{version}}"), utl.PointerToString("true"), utl.PointerToString("true"), utl.PointerToString("Tagging {{version}}"), &[]*string{utl.PointerToString("one"), utl.PointerToString("two"), utl.PointerToString("three")}, &[]*ent.Identifier{ent.NewIdentifierWith(utl.PointerToString("build"), utl.PointerToString("12"), ent.PointerToPosition(ent.BUILD))}, utl.PointerToString(""), &map[string]string{"PATH": ".*"}, nil, utl.PointerToString("true"), utl.PointerToString("false"), utl.PointerToString("true"), utl.PointerToString("myrelease2"), utl.PointerToString(""), utl.PointerToBoolean(false))})
 	mediumPriorityConfigurationLayerMock.SetReleaseTypes(mpReleaseTypes)
-	hpReleaseTypes, _ := ent.NewReleaseTypesWith(&[]*string{utl.PointerToString("type3")}, &[]*string{utl.PointerToString("service3")}, &[]*string{utl.PointerToString("remote3")}, &map[string]*ent.ReleaseType{"type3": ent.NewReleaseTypeWith(&[]*string{utl.PointerToString("asset1"), utl.PointerToString("asset2")}, utl.PointerToBoolean(true), utl.PointerToString("{{branch3}}"), utl.PointerToString("Release description 3"), utl.PointerToString("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$"), utl.PointerToString("true"), utl.PointerToString("Committing {{version}}"), utl.PointerToString("true"), utl.PointerToString("true"), utl.PointerToString("Tagging {{version}}"), &[]*ent.Identifier{ent.NewIdentifierWith(utl.PointerToString("build"), utl.PointerToString("12"), ent.PointerToPosition(ent.BUILD))}, utl.PointerToString(""), &map[string]string{"PATH": ".*"}, nil, utl.PointerToString("true"), utl.PointerToString(""), utl.PointerToBoolean(false))})
+	hpReleaseTypes, _ := ent.NewReleaseTypesWith(&[]*string{utl.PointerToString("type3")}, &[]*string{utl.PointerToString("service3")}, &[]*string{utl.PointerToString("remote3")}, &map[string]*ent.ReleaseType{"type3": ent.NewReleaseTypeWith(&[]*string{utl.PointerToString("asset1"), utl.PointerToString("asset2")}, utl.PointerToBoolean(true), utl.PointerToString("{{branch3}}"), utl.PointerToString("Release description 3"), utl.PointerToString("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$"), utl.PointerToString("true"), utl.PointerToString("Committing {{version}}"), utl.PointerToString("true"), utl.PointerToString("true"), utl.PointerToString("Tagging {{version}}"), &[]*string{utl.PointerToString("one"), utl.PointerToString("two"), utl.PointerToString("three")}, &[]*ent.Identifier{ent.NewIdentifierWith(utl.PointerToString("build"), utl.PointerToString("12"), ent.PointerToPosition(ent.BUILD))}, utl.PointerToString(""), &map[string]string{"PATH": ".*"}, nil, utl.PointerToString("true"), utl.PointerToString("false"), utl.PointerToString("true"), utl.PointerToString("myrelease3"), utl.PointerToString(""), utl.PointerToBoolean(false))})
 	highPriorityConfigurationLayerMock.SetReleaseTypes(hpReleaseTypes)
 
 	lowPriorityConfigurationLayerMock.SetResume(utl.PointerToBoolean(true))
@@ -1106,6 +1197,17 @@ func TestSerializationWithMultipleConfigurationLayersYAML(t *testing.T) {
 	mediumPriorityConfigurationLayerMock.SetSharedConfigurationFile(utl.PointerToString(os.Getenv(SIMPLEST_YAML_EXAMPLE_CONFIGURATION_FILE_ENVIRONMENT_VARIABLE)))
 	highPriorityConfigurationLayerMock.SetSharedConfigurationFile(utl.PointerToString(os.Getenv(SIMPLEST_JSON_EXAMPLE_CONFIGURATION_FILE_ENVIRONMENT_VARIABLE)))
 
+	lowPriorityConfigurationLayerMock.SetStateFile(utl.PointerToString("file.json"))
+	mediumPriorityConfigurationLayerMock.SetStateFile(utl.PointerToString("file.json"))
+	highPriorityConfigurationLayerMock.SetStateFile(utl.PointerToString("file.yaml"))
+
+	lpSubstitutions, _ := ent.NewSubstitutionsWith(&[]*string{utl.PointerToString("substitution1")}, &map[string]*ent.Substitution{"substitution1": ent.NewSubstitutionWith(utl.PointerToString("glob1"), utl.PointerToString("match1"), utl.PointerToString("replace1"))})
+	lowPriorityConfigurationLayerMock.SetSubstitutions(lpSubstitutions)
+	mpSubstitutions, _ := ent.NewSubstitutionsWith(&[]*string{utl.PointerToString("substitution2")}, &map[string]*ent.Substitution{"substitution2": ent.NewSubstitutionWith(utl.PointerToString("glob2"), utl.PointerToString("match2"), utl.PointerToString("replace2"))})
+	mediumPriorityConfigurationLayerMock.SetSubstitutions(mpSubstitutions)
+	hpSubstitutions, _ := ent.NewSubstitutionsWith(&[]*string{utl.PointerToString("substitution3")}, &map[string]*ent.Substitution{"substitution3": ent.NewSubstitutionWith(utl.PointerToString("glob3"), utl.PointerToString("match3"), utl.PointerToString("replace3"))})
+	highPriorityConfigurationLayerMock.SetSubstitutions(hpSubstitutions)
+
 	lowPriorityConfigurationLayerMock.SetSummary(utl.PointerToBoolean(true))
 	mediumPriorityConfigurationLayerMock.SetSummary(utl.PointerToBoolean(true))
 	highPriorityConfigurationLayerMock.SetSummary(utl.PointerToBoolean(false))
@@ -1113,10 +1215,6 @@ func TestSerializationWithMultipleConfigurationLayersYAML(t *testing.T) {
 	lowPriorityConfigurationLayerMock.SetSummaryFile(utl.PointerToString("summary.low"))
 	mediumPriorityConfigurationLayerMock.SetSummaryFile(utl.PointerToString("summary.medium"))
 	highPriorityConfigurationLayerMock.SetSummaryFile(utl.PointerToString("summary.high"))
-
-	lowPriorityConfigurationLayerMock.SetStateFile(utl.PointerToString("file.json"))
-	mediumPriorityConfigurationLayerMock.SetStateFile(utl.PointerToString("file.json"))
-	highPriorityConfigurationLayerMock.SetStateFile(utl.PointerToString("file.yaml"))
 
 	lowPriorityConfigurationLayerMock.SetVerbosity(ent.PointerToVerbosity(ent.TRACE))
 	mediumPriorityConfigurationLayerMock.SetVerbosity(ent.PointerToVerbosity(ent.INFO))
@@ -1233,8 +1331,12 @@ func TestSerializationWithMultipleConfigurationLayersYAML(t *testing.T) {
 	assert.Equal(t, *(*(*hpReleaseTypes).GetItems())["type3"].GetGitPush(), *(*(*releaseTypes).GetItems())["type3"].GetGitPush())
 	assert.Equal(t, *(*(*hpReleaseTypes).GetItems())["type3"].GetGitTag(), *(*(*releaseTypes).GetItems())["type3"].GetGitTag())
 	assert.Equal(t, *(*(*hpReleaseTypes).GetItems())["type3"].GetGitTagMessage(), *(*(*releaseTypes).GetItems())["type3"].GetGitTagMessage())
+	assert.Equal(t, *(*(*hpReleaseTypes).GetItems())["type3"].GetGitTagNames(), *(*(*releaseTypes).GetItems())["type3"].GetGitTagNames())
 	assert.Equal(t, *(*(*hpReleaseTypes).GetItems())["type3"].GetMatchBranches(), *(*(*releaseTypes).GetItems())["type3"].GetMatchBranches())
 	assert.Equal(t, *(*(*hpReleaseTypes).GetItems())["type3"].GetPublish(), *(*(*releaseTypes).GetItems())["type3"].GetPublish())
+	assert.Equal(t, *(*(*hpReleaseTypes).GetItems())["type3"].GetPublishDraft(), *(*(*releaseTypes).GetItems())["type3"].GetPublishDraft())
+	assert.Equal(t, *(*(*hpReleaseTypes).GetItems())["type3"].GetPublishPreRelease(), *(*(*releaseTypes).GetItems())["type3"].GetPublishPreRelease())
+	assert.Equal(t, *(*(*hpReleaseTypes).GetItems())["type3"].GetReleaseName(), *(*(*releaseTypes).GetItems())["type3"].GetReleaseName())
 	assert.Equal(t, *(*(*hpReleaseTypes).GetItems())["type3"].GetVersionRange(), *(*(*releaseTypes).GetItems())["type3"].GetVersionRange())
 	assert.Equal(t, *(*(*hpReleaseTypes).GetItems())["type3"].GetVersionRangeFromBranchName(), *(*(*releaseTypes).GetItems())["type3"].GetVersionRangeFromBranchName())
 
@@ -1261,6 +1363,16 @@ func TestSerializationWithMultipleConfigurationLayersYAML(t *testing.T) {
 	sharedConfigurationFile, _ := deserializedConfigurationLayer.GetSharedConfigurationFile()
 	assert.Equal(t, *hpSharedConfigurationFile, *sharedConfigurationFile)
 
+	hpStateFile, _ := highPriorityConfigurationLayerMock.GetStateFile()
+	stateFile, _ := deserializedConfigurationLayer.GetStateFile()
+	assert.Equal(t, *hpStateFile, *stateFile)
+
+	substitutions, _ := deserializedConfigurationLayer.GetSubstitutions()
+	assert.Equal(t, *(*hpSubstitutions.GetEnabled())[0], *(*substitutions.GetEnabled())[0])
+	assert.Equal(t, *(*hpSubstitutions.GetItems())["substitution3"].GetFiles(), *(*substitutions.GetItems())["substitution3"].GetFiles())
+	assert.Equal(t, *(*hpSubstitutions.GetItems())["substitution3"].GetMatch(), *(*substitutions.GetItems())["substitution3"].GetMatch())
+	assert.Equal(t, *(*hpSubstitutions.GetItems())["substitution3"].GetReplace(), *(*substitutions.GetItems())["substitution3"].GetReplace())
+
 	hpSummary, _ := highPriorityConfigurationLayerMock.GetSummary()
 	summary, _ := deserializedConfigurationLayer.GetSummary()
 	assert.Equal(t, *hpSummary, *summary)
@@ -1268,10 +1380,6 @@ func TestSerializationWithMultipleConfigurationLayersYAML(t *testing.T) {
 	hpSummaryFile, _ := highPriorityConfigurationLayerMock.GetSummaryFile()
 	summaryFile, _ := deserializedConfigurationLayer.GetSummaryFile()
 	assert.Equal(t, *hpSummaryFile, *summaryFile)
-
-	hpStateFile, _ := highPriorityConfigurationLayerMock.GetStateFile()
-	stateFile, _ := deserializedConfigurationLayer.GetStateFile()
-	assert.Equal(t, *hpStateFile, *stateFile)
 
 	hpVerbosity, _ := highPriorityConfigurationLayerMock.GetVerbosity()
 	verbosity, _ := deserializedConfigurationLayer.GetVerbosity()

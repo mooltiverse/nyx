@@ -24,6 +24,7 @@ import com.mooltiverse.oss.nyx.entities.CommitMessageConventions;
 import com.mooltiverse.oss.nyx.entities.ReleaseType;
 import com.mooltiverse.oss.nyx.entities.ReleaseTypes;
 import com.mooltiverse.oss.nyx.entities.ServiceConfiguration;
+import com.mooltiverse.oss.nyx.entities.Substitution;
 
 /**
  * The extended configuration preset.
@@ -75,5 +76,23 @@ public class Extended extends SimpleConfigurationLayer {
             "github", ServiceConfigurations.GITHUB,
             "gitlab", ServiceConfigurations.GITLAB
         ));
+
+        // add the 'cargo', 'composer', 'dart', 'elixir', 'expo', 'helm', 'node' and 'text' substitution configurations
+        // no substitution is enabled by default
+        setSubstitutions(
+            new com.mooltiverse.oss.nyx.entities.Substitutions(
+                List.<String>of(),
+                Map.<String,Substitution>of(
+                    "cargo_version", com.mooltiverse.oss.nyx.configuration.presets.Substitutions.CARGO_VERSION,
+                    "composer_version", com.mooltiverse.oss.nyx.configuration.presets.Substitutions.COMPOSER_VERSION,
+                    "dart_version", com.mooltiverse.oss.nyx.configuration.presets.Substitutions.DART_VERSION,
+                    "elixir_version", com.mooltiverse.oss.nyx.configuration.presets.Substitutions.ELIXIR_VERSION,
+                    "expo_version", com.mooltiverse.oss.nyx.configuration.presets.Substitutions.EXPO_VERSION,
+                    "helm_version", com.mooltiverse.oss.nyx.configuration.presets.Substitutions.HELM_VERSION,
+                    "node_version", com.mooltiverse.oss.nyx.configuration.presets.Substitutions.NODE_VERSION,
+                    "text_version", com.mooltiverse.oss.nyx.configuration.presets.Substitutions.TEXT_VERSION
+                )
+            )
+        );
     }
 }

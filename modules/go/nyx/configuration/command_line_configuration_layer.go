@@ -310,6 +310,13 @@ const (
 	// in order to get the actual name of the argument that brings the value for the release type with the given 'name'.
 	RELEASE_TYPES_ARGUMENT_ITEM_GIT_TAG_MESSAGE_FORMAT_STRING = RELEASE_TYPES_ARGUMENT_NAME + "-%s-git-tag-message"
 
+	// The parametrized name of the argument to read for the 'gitTagNames' attribute of a
+	// release type.
+	// This string is a prototype that contains a '%s' parameter for the release type name
+	// and must be rendered using fmt.Sprintf(RELEASE_TYPES_ARGUMENT_ITEM_GIT_TAG_NAMES_FORMAT_STRING, name)
+	// in order to get the actual name of the argument that brings the value for the release type with the given 'name'.
+	RELEASE_TYPES_ARGUMENT_ITEM_GIT_TAG_NAMES_FORMAT_STRING = RELEASE_TYPES_ARGUMENT_NAME + "-%s-git-tag-names"
+
 	// The parametrized name of the argument to read for the 'identifiers' attribute of a
 	// release type.
 	// This string is a prototype that contains a '%s' parameter for the commit release type name
@@ -344,6 +351,27 @@ const (
 	// and must be rendered using fmt.Sprintf(RELEASE_TYPES_ARGUMENT_ITEM_PUBLISH_FORMAT_STRING, name)
 	// in order to get the actual name of the argument that brings the value for the release type with the given 'name'.
 	RELEASE_TYPES_ARGUMENT_ITEM_PUBLISH_FORMAT_STRING = RELEASE_TYPES_ARGUMENT_NAME + "-%s-publish"
+
+	// The parametrized name of the argument to read for the 'publishDraft' attribute of a
+	// release type.
+	// This string is a prototype that contains a '%s' parameter for the release type name
+	// and must be rendered using fmt.Sprintf(RELEASE_TYPES_ARGUMENT_ITEM_PUBLISH_DRAFT_FORMAT_STRING, name)
+	// in order to get the actual name of the argument that brings the value for the release type with the given 'name'.
+	RELEASE_TYPES_ARGUMENT_ITEM_PUBLISH_DRAFT_FORMAT_STRING = RELEASE_TYPES_ARGUMENT_NAME + "-%s-publish-draft"
+
+	// The parametrized name of the argument to read for the 'publishPreRelease' attribute of a
+	// release type.
+	// This string is a prototype that contains a '%s' parameter for the release type name
+	// and must be rendered using fmt.Sprintf(RELEASE_TYPES_ARGUMENT_ITEM_PUBLISH_PRE_RELEASE_FORMAT_STRING, name)
+	// in order to get the actual name of the argument that brings the value for the release type with the given 'name'.
+	RELEASE_TYPES_ARGUMENT_ITEM_PUBLISH_PRE_RELEASE_FORMAT_STRING = RELEASE_TYPES_ARGUMENT_NAME + "-%s-publish-pre-release"
+
+	// The parametrized name of the argument to read for the 'releaseName' attribute of a
+	// release type.
+	// This string is a prototype that contains a '%s' parameter for the release type name
+	// and must be rendered using fmt.Sprintf(RELEASE_TYPES_ARGUMENT_ITEM_RELEASE_NAME_FORMAT_STRING, name)
+	// in order to get the actual name of the argument that brings the value for the release type with the given 'name'.
+	RELEASE_TYPES_ARGUMENT_ITEM_RELEASE_NAME_FORMAT_STRING = RELEASE_TYPES_ARGUMENT_NAME + "-%s-release-name"
 
 	// The parametrized name of the argument to read for the 'versionRange' attribute of a
 	// release type.
@@ -392,10 +420,43 @@ const (
 	SHARED_CONFIGURATION_FILE_ARGUMENT_NAME = "--shared-configuration-file"
 
 	// The name of the argument to read for this value.
-	SUMMARY_ARGUMENT_NAME = "--summary"
+	STATE_FILE_ARGUMENT_NAME = "--state-file"
 
 	// The name of the argument to read for this value.
-	STATE_FILE_ARGUMENT_NAME = "--state-file"
+	SUBSTITUTIONS_ARGUMENT_NAME = "--substitutions"
+
+	// The name of the argument to read for this value.
+	SUBSTITUTIONS_ENABLED_ARGUMENT_NAME = SUBSTITUTIONS_ARGUMENT_NAME + "-enabled"
+
+	// The regular expression used to scan the name of a substitution from an argument
+	// name. This expression is used to detect if an argument is used to define
+	// a substitution.
+	// This expression uses the 'name' capturing group which returns the substitution name, if detected.
+	SUBSTITUTIONS_ARGUMENT_ITEM_NAME_REGEX = SUBSTITUTIONS_ARGUMENT_NAME + "-(?<name>[a-zA-Z0-9]+)-([a-zA-Z0-9-]+)$"
+
+	// The parametrized name of the argument to read for the 'files' attribute of a
+	// substitution.
+	// This string is a prototype that contains a '%s' parameter for the commit substitution name
+	// and must be rendered using fmt.Sprintf(SUBSTITUTIONS_ARGUMENT_ITEM_FILES_FORMAT_STRING, name)
+	// in order to get the actual name of the argument that brings the value for the substitution with the given 'name'.
+	SUBSTITUTIONS_ARGUMENT_ITEM_FILES_FORMAT_STRING = SUBSTITUTIONS_ARGUMENT_NAME + "-%s-files"
+
+	// The parametrized name of the argument to read for the 'match' attribute of a
+	// substitution.
+	// This string is a prototype that contains a '%s' parameter for the commit substitution name
+	// and must be rendered using fmt.Sprintf(SUBSTITUTIONS_ARGUMENT_ITEM_MATCH_FORMAT_STRING, name)
+	// in order to get the actual name of the argument that brings the value for the substitution with the given 'name'.
+	SUBSTITUTIONS_ARGUMENT_ITEM_MATCH_FORMAT_STRING = SUBSTITUTIONS_ARGUMENT_NAME + "-%s-match"
+
+	// The parametrized name of the argument to read for the 'replace' attribute of a
+	// substitution.
+	// This string is a prototype that contains a '%s' parameter for the commit substitution name
+	// and must be rendered using fmt.Sprintf(SUBSTITUTIONS_ARGUMENT_ITEM_REPLACE_FORMAT_STRING, name)
+	// in order to get the actual name of the argument that brings the value for the substitution with the given 'name'.
+	SUBSTITUTIONS_ARGUMENT_ITEM_REPLACE_FORMAT_STRING = SUBSTITUTIONS_ARGUMENT_NAME + "-%s-replace"
+
+	// The name of the argument to read for this value.
+	SUMMARY_ARGUMENT_NAME = "--summary"
 
 	// The name of the argument to read for this value.
 	SUMMARY_FILE_ARGUMENT_NAME = "--summary-file"
@@ -465,6 +526,9 @@ type CommandLineConfigurationLayer struct {
 
 	// The services configuration section
 	services *map[string]*ent.ServiceConfiguration
+
+	// The substitutions configuration section.
+	substitutions *ent.Substitutions
 }
 
 /*
@@ -1146,6 +1210,19 @@ func (clcl *CommandLineConfigurationLayer) GetReleaseTypes() (*ent.ReleaseTypes,
 			gitPush := clcl.getArgument(fmt.Sprintf(RELEASE_TYPES_ARGUMENT_ITEM_GIT_PUSH_FORMAT_STRING, itemName))
 			gitTag := clcl.getArgument(fmt.Sprintf(RELEASE_TYPES_ARGUMENT_ITEM_GIT_TAG_FORMAT_STRING, itemName))
 			gitTagMessage := clcl.getArgument(fmt.Sprintf(RELEASE_TYPES_ARGUMENT_ITEM_GIT_TAG_MESSAGE_FORMAT_STRING, itemName))
+			gitTagNamesList := clcl.getArgument(fmt.Sprintf(RELEASE_TYPES_ARGUMENT_ITEM_GIT_TAG_NAMES_FORMAT_STRING, itemName))
+			var gitTagNames *[]*string
+			if gitTagNamesList != nil {
+				gitTagNamesSlice := strings.Split(*gitTagNamesList, ",")
+				var gitTagNamesArray []*string
+				for _, tagName := range gitTagNamesSlice {
+					tagNameCopy := tagName
+					gitTagNamesArray = append(gitTagNamesArray, &tagNameCopy)
+				}
+				gitTagNames = &gitTagNamesArray
+			} else {
+				gitTagNames = nil
+			}
 			identifiers, err := clcl.getIdentifiersListFromArgument("releaseTypes"+"."+itemName+"."+"identifiers", fmt.Sprintf(RELEASE_TYPES_ARGUMENT_ITEM_IDENTIFIERS_FORMAT_STRING, itemName), nil)
 			if err != nil {
 				return nil, &errs.IllegalPropertyError{Message: fmt.Sprintf("The argument '%s' has an illegal value", fmt.Sprintf(RELEASE_TYPES_ARGUMENT_ITEM_IDENTIFIERS_FORMAT_STRING, itemName)), Cause: err}
@@ -1162,6 +1239,9 @@ func (clcl *CommandLineConfigurationLayer) GetReleaseTypes() (*ent.ReleaseTypes,
 				matchWorkspaceStatus = &mws
 			}
 			publish := clcl.getArgument(fmt.Sprintf(RELEASE_TYPES_ARGUMENT_ITEM_PUBLISH_FORMAT_STRING, itemName))
+			publishDraft := clcl.getArgument(fmt.Sprintf(RELEASE_TYPES_ARGUMENT_ITEM_PUBLISH_DRAFT_FORMAT_STRING, itemName))
+			publishPreRelease := clcl.getArgument(fmt.Sprintf(RELEASE_TYPES_ARGUMENT_ITEM_PUBLISH_PRE_RELEASE_FORMAT_STRING, itemName))
+			releaseName := clcl.getArgument(fmt.Sprintf(RELEASE_TYPES_ARGUMENT_ITEM_RELEASE_NAME_FORMAT_STRING, itemName))
 			versionRange := clcl.getArgument(fmt.Sprintf(RELEASE_TYPES_ARGUMENT_ITEM_VERSION_RANGE_FORMAT_STRING, itemName))
 			var versionRangeFromBranchName *bool = nil
 			versionRangeFromBranchNameString := clcl.getArgument(fmt.Sprintf(RELEASE_TYPES_ARGUMENT_ITEM_VERSION_RANGE_FROM_BRANCH_NAME_FORMAT_STRING, itemName))
@@ -1173,7 +1253,7 @@ func (clcl *CommandLineConfigurationLayer) GetReleaseTypes() (*ent.ReleaseTypes,
 				versionRangeFromBranchName = &vrfbn
 			}
 
-			items[itemName] = ent.NewReleaseTypeWith(assets, collapseVersions, collapseVersionQualifier, description, filterTags, gitCommit, gitCommitMessage, gitPush, gitTag, gitTagMessage, &identifiers, matchBranches, &matchEnvironmentVariables, matchWorkspaceStatus, publish, versionRange, versionRangeFromBranchName)
+			items[itemName] = ent.NewReleaseTypeWith(assets, collapseVersions, collapseVersionQualifier, description, filterTags, gitCommit, gitCommitMessage, gitPush, gitTag, gitTagMessage, gitTagNames, &identifiers, matchBranches, &matchEnvironmentVariables, matchWorkspaceStatus, publish, publishDraft, publishPreRelease, releaseName, versionRange, versionRangeFromBranchName)
 		}
 
 		enabledPointers := clcl.toSliceOfStringPointers(enabled)
@@ -1273,6 +1353,54 @@ func (clcl *CommandLineConfigurationLayer) GetSharedConfigurationFile() (*string
 }
 
 /*
+Returns the path to the file where the Nyx State must be saved as it's defined by this configuration. A nil value means undefined.
+
+Error is:
+- DataAccessError: in case the option cannot be read or accessed.
+- IllegalPropertyError: in case the option has been defined but has incorrect values or it can't be resolved.
+*/
+func (clcl *CommandLineConfigurationLayer) GetStateFile() (*string, error) {
+	return clcl.getArgument(STATE_FILE_ARGUMENT_NAME), nil
+}
+
+/*
+Returns the substitutions configuration section.
+
+Error is:
+- DataAccessError: in case the option cannot be read or accessed.
+- IllegalPropertyError: in case the option has been defined but has incorrect values or it can't be resolved.
+*/
+func (clcl *CommandLineConfigurationLayer) GetSubstitutions() (*ent.Substitutions, error) {
+	if clcl.substitutions == nil {
+		// parse the 'enabled' items list
+		enabled := clcl.getItemNamesListFromArgument("substitutions", "enabled", SUBSTITUTIONS_ENABLED_ARGUMENT_NAME)
+
+		// parse the 'items' map
+		items := make(map[string]*ent.Substitution)
+
+		itemNames, err := clcl.scanItemNamesInArguments("substitutions", SUBSTITUTIONS_ARGUMENT_ITEM_NAME_REGEX, nil)
+		if err != nil {
+			return nil, err
+		}
+		// now we have the set of all item names configured through arguments and we can
+		// query specific arguments
+		for _, itemName := range itemNames {
+			files := clcl.getArgument(fmt.Sprintf(SUBSTITUTIONS_ARGUMENT_ITEM_FILES_FORMAT_STRING, itemName))
+			match := clcl.getArgument(fmt.Sprintf(SUBSTITUTIONS_ARGUMENT_ITEM_MATCH_FORMAT_STRING, itemName))
+			replace := clcl.getArgument(fmt.Sprintf(SUBSTITUTIONS_ARGUMENT_ITEM_REPLACE_FORMAT_STRING, itemName))
+
+			items[itemName] = ent.NewSubstitutionWith(files, match, replace)
+		}
+		enabledPointers := clcl.toSliceOfStringPointers(enabled)
+		clcl.substitutions, err = ent.NewSubstitutionsWith(&enabledPointers, &items)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return clcl.substitutions, nil
+}
+
+/*
 Returns the value of the summary flag as it's defined by this configuration. A nil value means undefined.
 
 Error is:
@@ -1302,17 +1430,6 @@ Error is:
 */
 func (clcl *CommandLineConfigurationLayer) GetSummaryFile() (*string, error) {
 	return clcl.getArgument(SUMMARY_FILE_ARGUMENT_NAME), nil
-}
-
-/*
-Returns the path to the file where the Nyx State must be saved as it's defined by this configuration. A nil value means undefined.
-
-Error is:
-- DataAccessError: in case the option cannot be read or accessed.
-- IllegalPropertyError: in case the option has been defined but has incorrect values or it can't be resolved.
-*/
-func (clcl *CommandLineConfigurationLayer) GetStateFile() (*string, error) {
-	return clcl.getArgument(STATE_FILE_ARGUMENT_NAME), nil
 }
 
 /*

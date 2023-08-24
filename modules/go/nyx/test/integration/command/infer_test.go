@@ -2039,6 +2039,7 @@ func TestInferRunUsingDefaultReleaseTypeWithInitialCommitOnly(t *testing.T) {
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_PUSH, releaseType.GetGitPush())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG, releaseType.GetGitTag())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
 			assert.Equal(t, ent.RELEASE_TYPE_IDENTIFIERS, releaseType.GetIdentifiers())
 			if ent.RELEASE_TYPE_IDENTIFIERS == nil {
 				assert.Equal(t, ent.RELEASE_TYPE_IDENTIFIERS, releaseType.GetIdentifiers())
@@ -2112,6 +2113,7 @@ func TestInferRunUsingDefaultReleaseTypeWithInitialCommitOnlyAndInitialVersionOv
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_PUSH, releaseType.GetGitPush())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG, releaseType.GetGitTag())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
 			if ent.RELEASE_TYPE_IDENTIFIERS == nil {
 				assert.Equal(t, ent.RELEASE_TYPE_IDENTIFIERS, releaseType.GetIdentifiers())
 			} else {
@@ -2184,6 +2186,7 @@ func TestInferRunUsingDefaultReleaseTypeWithInitialCommitOnlyAndVersionOverride(
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_PUSH, releaseType.GetGitPush())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG, releaseType.GetGitTag())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
 			if ent.RELEASE_TYPE_IDENTIFIERS == nil {
 				assert.Equal(t, ent.RELEASE_TYPE_IDENTIFIERS, releaseType.GetIdentifiers())
 			} else {
@@ -2256,6 +2259,7 @@ func TestInferRunUsingDefaultReleaseTypeWithInitialCommitOnlyAndBumpMajorOverrid
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_PUSH, releaseType.GetGitPush())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG, releaseType.GetGitTag())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
 			if ent.RELEASE_TYPE_IDENTIFIERS == nil {
 				assert.Equal(t, ent.RELEASE_TYPE_IDENTIFIERS, releaseType.GetIdentifiers())
 			} else {
@@ -2328,6 +2332,7 @@ func TestInferRunUsingDefaultReleaseTypeWithInitialCommitOnlyAndBumpMinorOverrid
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_PUSH, releaseType.GetGitPush())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG, releaseType.GetGitTag())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
 			if ent.RELEASE_TYPE_IDENTIFIERS == nil {
 				assert.Equal(t, ent.RELEASE_TYPE_IDENTIFIERS, releaseType.GetIdentifiers())
 			} else {
@@ -2400,6 +2405,7 @@ func TestInferRunUsingDefaultReleaseTypeWithInitialCommitOnlyAndBumpPatchOverrid
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_PUSH, releaseType.GetGitPush())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG, releaseType.GetGitTag())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
 			if ent.RELEASE_TYPE_IDENTIFIERS == nil {
 				assert.Equal(t, ent.RELEASE_TYPE_IDENTIFIERS, releaseType.GetIdentifiers())
 			} else {
@@ -2472,6 +2478,7 @@ func TestInferRunUsingDefaultReleaseTypeWithInitialCommitOnlyAndBumpAlphaOverrid
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_PUSH, releaseType.GetGitPush())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG, releaseType.GetGitTag())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
 			if ent.RELEASE_TYPE_IDENTIFIERS == nil {
 				assert.Equal(t, ent.RELEASE_TYPE_IDENTIFIERS, releaseType.GetIdentifiers())
 			} else {
@@ -2544,6 +2551,7 @@ func TestInferRunUsingDefaultReleaseTypeWithBumpMajorOverriddenByUserInRepoWithJ
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_PUSH, releaseType.GetGitPush())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG, releaseType.GetGitTag())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
 			if ent.RELEASE_TYPE_IDENTIFIERS == nil {
 				assert.Equal(t, ent.RELEASE_TYPE_IDENTIFIERS, releaseType.GetIdentifiers())
 			} else {
@@ -2616,6 +2624,7 @@ func TestInferRunUsingDefaultReleaseTypeWithBumpMinorOverriddenByUserInRepoWithJ
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_PUSH, releaseType.GetGitPush())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG, releaseType.GetGitTag())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
 			if ent.RELEASE_TYPE_IDENTIFIERS == nil {
 				assert.Equal(t, ent.RELEASE_TYPE_IDENTIFIERS, releaseType.GetIdentifiers())
 			} else {
@@ -2688,6 +2697,7 @@ func TestInferRunUsingDefaultReleaseTypeWithBumpPatchOverriddenByUserInRepoWithJ
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_PUSH, releaseType.GetGitPush())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG, releaseType.GetGitTag())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
 			if ent.RELEASE_TYPE_IDENTIFIERS == nil {
 				assert.Equal(t, ent.RELEASE_TYPE_IDENTIFIERS, releaseType.GetIdentifiers())
 			} else {
@@ -2760,6 +2770,7 @@ func TestInferRunUsingDefaultReleaseTypeWithBumpAlphaOverriddenByUserInRepoWithJ
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_PUSH, releaseType.GetGitPush())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG, releaseType.GetGitTag())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
 			if ent.RELEASE_TYPE_IDENTIFIERS == nil {
 				assert.Equal(t, ent.RELEASE_TYPE_IDENTIFIERS, releaseType.GetIdentifiers())
 			} else {
@@ -2832,6 +2843,7 @@ func TestInferRunUsingDefaultReleaseTypeWithReleaseLenientInRepoWithPrefixedVers
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_PUSH, releaseType.GetGitPush())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG, releaseType.GetGitTag())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
 			if ent.RELEASE_TYPE_IDENTIFIERS == nil {
 				assert.Equal(t, ent.RELEASE_TYPE_IDENTIFIERS, releaseType.GetIdentifiers())
 			} else {
@@ -2904,6 +2916,7 @@ func TestInferRunUsingDefaultReleaseTypeWithoutReleaseLenientInRepoWithoutPrefix
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_PUSH, releaseType.GetGitPush())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG, releaseType.GetGitTag())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
 			if ent.RELEASE_TYPE_IDENTIFIERS == nil {
 				assert.Equal(t, ent.RELEASE_TYPE_IDENTIFIERS, releaseType.GetIdentifiers())
 			} else {
@@ -2977,6 +2990,7 @@ func TestInferRunUsingDefaultReleaseTypeWithoutLenientAndWithPrefixReleaseInRepo
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_PUSH, releaseType.GetGitPush())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG, releaseType.GetGitTag())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
 			if ent.RELEASE_TYPE_IDENTIFIERS == nil {
 				assert.Equal(t, ent.RELEASE_TYPE_IDENTIFIERS, releaseType.GetIdentifiers())
 			} else {
@@ -3043,6 +3057,7 @@ func TestInferRunUsingDefaultReleaseTypeInRepoWithSimpleLinearCommitHistoryAndNo
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_PUSH, releaseType.GetGitPush())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG, releaseType.GetGitTag())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
 			if ent.RELEASE_TYPE_IDENTIFIERS == nil {
 				assert.Equal(t, ent.RELEASE_TYPE_IDENTIFIERS, releaseType.GetIdentifiers())
 			} else {
@@ -3114,6 +3129,7 @@ func TestInferRunUsingDefaultReleaseTypeInRepoWithSimpleLinearCommitHistoryAndNo
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_PUSH, releaseType.GetGitPush())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG, releaseType.GetGitTag())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
 			if ent.RELEASE_TYPE_IDENTIFIERS == nil {
 				assert.Equal(t, ent.RELEASE_TYPE_IDENTIFIERS, releaseType.GetIdentifiers())
 			} else {
@@ -3185,6 +3201,7 @@ func TestInferRunUsingDefaultReleaseTypeWithVersionOverriddenByUserInRepoWithFur
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_PUSH, releaseType.GetGitPush())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG, releaseType.GetGitTag())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
 			if ent.RELEASE_TYPE_IDENTIFIERS == nil {
 				assert.Equal(t, ent.RELEASE_TYPE_IDENTIFIERS, releaseType.GetIdentifiers())
 			} else {
@@ -3257,6 +3274,7 @@ func TestInferRunUsingDefaultReleaseTypeWithBumpMajorOverrideInRepoWithFurtherNo
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_PUSH, releaseType.GetGitPush())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG, releaseType.GetGitTag())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
 			if ent.RELEASE_TYPE_IDENTIFIERS == nil {
 				assert.Equal(t, ent.RELEASE_TYPE_IDENTIFIERS, releaseType.GetIdentifiers())
 			} else {
@@ -3329,6 +3347,7 @@ func TestInferRunUsingDefaultReleaseTypeWithBumpMinorOverrideInRepoWithFurtherNo
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_PUSH, releaseType.GetGitPush())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG, releaseType.GetGitTag())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
 			if ent.RELEASE_TYPE_IDENTIFIERS == nil {
 				assert.Equal(t, ent.RELEASE_TYPE_IDENTIFIERS, releaseType.GetIdentifiers())
 			} else {
@@ -3401,6 +3420,7 @@ func TestInferRunUsingDefaultReleaseTypeWithBumpPatchOverrideInRepoWithFurtherNo
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_PUSH, releaseType.GetGitPush())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG, releaseType.GetGitTag())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
 			if ent.RELEASE_TYPE_IDENTIFIERS == nil {
 				assert.Equal(t, ent.RELEASE_TYPE_IDENTIFIERS, releaseType.GetIdentifiers())
 			} else {
@@ -3473,6 +3493,7 @@ func TestInferRunUsingDefaultReleaseTypeWithBumpAlphaOverrideInRepoWithFurtherNo
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_PUSH, releaseType.GetGitPush())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG, releaseType.GetGitTag())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
 			if ent.RELEASE_TYPE_IDENTIFIERS == nil {
 				assert.Equal(t, ent.RELEASE_TYPE_IDENTIFIERS, releaseType.GetIdentifiers())
 			} else {
@@ -3545,6 +3566,7 @@ func TestInferRunUsingDefaultReleaseTypeWithReleaseLenientAndWithoutPrefixInRepo
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_PUSH, releaseType.GetGitPush())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG, releaseType.GetGitTag())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
 			if ent.RELEASE_TYPE_IDENTIFIERS == nil {
 				assert.Equal(t, ent.RELEASE_TYPE_IDENTIFIERS, releaseType.GetIdentifiers())
 			} else {
@@ -3617,6 +3639,7 @@ func TestInferRunUsingDefaultReleaseTypeWithoutReleaseLenientAndWithoutPrefixInR
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_PUSH, releaseType.GetGitPush())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG, releaseType.GetGitTag())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
 			if ent.RELEASE_TYPE_IDENTIFIERS == nil {
 				assert.Equal(t, ent.RELEASE_TYPE_IDENTIFIERS, releaseType.GetIdentifiers())
 			} else {
@@ -3690,6 +3713,7 @@ func TestInferRunUsingDefaultReleaseTypeWithoutReleaseLenientAndWithPrefixInRepo
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_PUSH, releaseType.GetGitPush())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG, releaseType.GetGitTag())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
 			if ent.RELEASE_TYPE_IDENTIFIERS == nil {
 				assert.Equal(t, ent.RELEASE_TYPE_IDENTIFIERS, releaseType.GetIdentifiers())
 			} else {
@@ -3763,6 +3787,7 @@ func TestInferRunUsingDefaultReleaseTypeInRepoWithOverlappingTagsCommit(t *testi
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_PUSH, releaseType.GetGitPush())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG, releaseType.GetGitTag())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
 			if ent.RELEASE_TYPE_IDENTIFIERS == nil {
 				assert.Equal(t, ent.RELEASE_TYPE_IDENTIFIERS, releaseType.GetIdentifiers())
 			} else {
@@ -3840,6 +3865,7 @@ func TestInferRunUsingDefaultReleaseTypeWithAlwaysPositiveCommitConventionInRepo
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_PUSH, releaseType.GetGitPush())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG, releaseType.GetGitTag())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
 			if ent.RELEASE_TYPE_IDENTIFIERS == nil {
 				assert.Equal(t, ent.RELEASE_TYPE_IDENTIFIERS, releaseType.GetIdentifiers())
 			} else {
@@ -3916,6 +3942,7 @@ func TestInferRunUsingDefaultReleaseTypeWithAlwaysNegativeCommitConventionInRepo
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_PUSH, releaseType.GetGitPush())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG, releaseType.GetGitTag())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
 			if ent.RELEASE_TYPE_IDENTIFIERS == nil {
 				assert.Equal(t, ent.RELEASE_TYPE_IDENTIFIERS, releaseType.GetIdentifiers())
 			} else {
@@ -3999,6 +4026,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysPositiveCommitConventi
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitPush(), releaseType.GetGitPush())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTag(), releaseType.GetGitTag())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagMessage(), releaseType.GetGitTagMessage())
+			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagNames(), releaseType.GetGitTagNames())
 			if (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers() == nil {
 				assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers(), releaseType.GetIdentifiers())
 			} else {
@@ -4082,6 +4110,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysNegativeCommitConventi
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitPush(), releaseType.GetGitPush())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTag(), releaseType.GetGitTag())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagMessage(), releaseType.GetGitTagMessage())
+			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagNames(), releaseType.GetGitTagNames())
 			if (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers() == nil {
 				assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers(), releaseType.GetIdentifiers())
 			} else {
@@ -4164,6 +4193,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysPositiveCommitConventi
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitPush(), releaseType.GetGitPush())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTag(), releaseType.GetGitTag())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagMessage(), releaseType.GetGitTagMessage())
+			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagNames(), releaseType.GetGitTagNames())
 			if (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers() == nil {
 				assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers(), releaseType.GetIdentifiers())
 			} else {
@@ -4246,6 +4276,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysNegativeCommitConventi
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitPush(), releaseType.GetGitPush())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTag(), releaseType.GetGitTag())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagMessage(), releaseType.GetGitTagMessage())
+			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagNames(), releaseType.GetGitTagNames())
 			if (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers() == nil {
 				assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers(), releaseType.GetIdentifiers())
 			} else {
@@ -4328,6 +4359,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysPositiveCommitConventi
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitPush(), releaseType.GetGitPush())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTag(), releaseType.GetGitTag())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagMessage(), releaseType.GetGitTagMessage())
+			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagNames(), releaseType.GetGitTagNames())
 			if (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers() == nil {
 				assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers(), releaseType.GetIdentifiers())
 			} else {
@@ -4410,6 +4442,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysNegativeCommitConventi
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitPush(), releaseType.GetGitPush())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTag(), releaseType.GetGitTag())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagMessage(), releaseType.GetGitTagMessage())
+			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagNames(), releaseType.GetGitTagNames())
 			if (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers() == nil {
 				assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers(), releaseType.GetIdentifiers())
 			} else {
@@ -4492,6 +4525,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysPositiveCommitConventi
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitPush(), releaseType.GetGitPush())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTag(), releaseType.GetGitTag())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagMessage(), releaseType.GetGitTagMessage())
+			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagNames(), releaseType.GetGitTagNames())
 			if (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers() == nil {
 				assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers(), releaseType.GetIdentifiers())
 			} else {
@@ -4574,6 +4608,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysNegativeCommitConventi
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitPush(), releaseType.GetGitPush())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTag(), releaseType.GetGitTag())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagMessage(), releaseType.GetGitTagMessage())
+			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagNames(), releaseType.GetGitTagNames())
 			if (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers() == nil {
 				assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers(), releaseType.GetIdentifiers())
 			} else {
@@ -4656,6 +4691,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysPositiveCommitConventi
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitPush(), releaseType.GetGitPush())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTag(), releaseType.GetGitTag())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagMessage(), releaseType.GetGitTagMessage())
+			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagNames(), releaseType.GetGitTagNames())
 			if (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers() == nil {
 				assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers(), releaseType.GetIdentifiers())
 			} else {
@@ -4738,6 +4774,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysNegativeCommitConventi
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitPush(), releaseType.GetGitPush())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTag(), releaseType.GetGitTag())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagMessage(), releaseType.GetGitTagMessage())
+			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagNames(), releaseType.GetGitTagNames())
 			if (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers() == nil {
 				assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers(), releaseType.GetIdentifiers())
 			} else {
@@ -4820,6 +4857,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysPositiveCommitConventi
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitPush(), releaseType.GetGitPush())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTag(), releaseType.GetGitTag())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagMessage(), releaseType.GetGitTagMessage())
+			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagNames(), releaseType.GetGitTagNames())
 			if (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers() == nil {
 				assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers(), releaseType.GetIdentifiers())
 			} else {
@@ -4902,6 +4940,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysNegativeCommitConventi
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitPush(), releaseType.GetGitPush())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTag(), releaseType.GetGitTag())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagMessage(), releaseType.GetGitTagMessage())
+			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagNames(), releaseType.GetGitTagNames())
 			if (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers() == nil {
 				assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers(), releaseType.GetIdentifiers())
 			} else {
@@ -4984,6 +5023,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysPositiveCommitConventi
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitPush(), releaseType.GetGitPush())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTag(), releaseType.GetGitTag())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagMessage(), releaseType.GetGitTagMessage())
+			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagNames(), releaseType.GetGitTagNames())
 			if (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers() == nil {
 				assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers(), releaseType.GetIdentifiers())
 			} else {
@@ -5066,6 +5106,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysNegativeCommitConventi
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitPush(), releaseType.GetGitPush())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTag(), releaseType.GetGitTag())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagMessage(), releaseType.GetGitTagMessage())
+			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagNames(), releaseType.GetGitTagNames())
 			if (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers() == nil {
 				assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers(), releaseType.GetIdentifiers())
 			} else {
@@ -5148,6 +5189,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysPositiveCommitConventi
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitPush(), releaseType.GetGitPush())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTag(), releaseType.GetGitTag())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagMessage(), releaseType.GetGitTagMessage())
+			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagNames(), releaseType.GetGitTagNames())
 			if (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers() == nil {
 				assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers(), releaseType.GetIdentifiers())
 			} else {
@@ -5230,6 +5272,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysNegativeCommitConventi
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitPush(), releaseType.GetGitPush())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTag(), releaseType.GetGitTag())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagMessage(), releaseType.GetGitTagMessage())
+			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagNames(), releaseType.GetGitTagNames())
 			if (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers() == nil {
 				assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers(), releaseType.GetIdentifiers())
 			} else {
@@ -5339,6 +5382,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysPositiveCommitConventi
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitPush(), releaseType.GetGitPush())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTag(), releaseType.GetGitTag())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagMessage(), releaseType.GetGitTagMessage())
+			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagNames(), releaseType.GetGitTagNames())
 			if (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers() == nil {
 				assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers(), releaseType.GetIdentifiers())
 			} else {
@@ -5421,6 +5465,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysNegativeCommitConventi
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitPush(), releaseType.GetGitPush())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTag(), releaseType.GetGitTag())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagMessage(), releaseType.GetGitTagMessage())
+			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagNames(), releaseType.GetGitTagNames())
 			if (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers() == nil {
 				assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers(), releaseType.GetIdentifiers())
 			} else {
@@ -5530,6 +5575,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysPositiveCommitConventi
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitPush(), releaseType.GetGitPush())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTag(), releaseType.GetGitTag())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagMessage(), releaseType.GetGitTagMessage())
+			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagNames(), releaseType.GetGitTagNames())
 			if (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers() == nil {
 				assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers(), releaseType.GetIdentifiers())
 			} else {
@@ -5612,6 +5658,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysNegativeCommitConventi
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitPush(), releaseType.GetGitPush())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTag(), releaseType.GetGitTag())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagMessage(), releaseType.GetGitTagMessage())
+			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagNames(), releaseType.GetGitTagNames())
 			if (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers() == nil {
 				assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers(), releaseType.GetIdentifiers())
 			} else {
@@ -5694,6 +5741,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysPositiveCommitConventi
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitPush(), releaseType.GetGitPush())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTag(), releaseType.GetGitTag())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagMessage(), releaseType.GetGitTagMessage())
+			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagNames(), releaseType.GetGitTagNames())
 			if (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers() == nil {
 				assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers(), releaseType.GetIdentifiers())
 			} else {
@@ -5776,6 +5824,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysNegativeCommitConventi
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitPush(), releaseType.GetGitPush())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTag(), releaseType.GetGitTag())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagMessage(), releaseType.GetGitTagMessage())
+			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagNames(), releaseType.GetGitTagNames())
 			if (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers() == nil {
 				assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers(), releaseType.GetIdentifiers())
 			} else {
@@ -5858,6 +5907,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysPositiveCommitConventi
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitPush(), releaseType.GetGitPush())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTag(), releaseType.GetGitTag())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagMessage(), releaseType.GetGitTagMessage())
+			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagNames(), releaseType.GetGitTagNames())
 			if (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers() == nil {
 				assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers(), releaseType.GetIdentifiers())
 			} else {
@@ -5940,6 +5990,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysNegativeCommitConventi
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitPush(), releaseType.GetGitPush())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTag(), releaseType.GetGitTag())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagMessage(), releaseType.GetGitTagMessage())
+			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagNames(), releaseType.GetGitTagNames())
 			if (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers() == nil {
 				assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers(), releaseType.GetIdentifiers())
 			} else {
@@ -6022,6 +6073,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysPositiveCommitConventi
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitPush(), releaseType.GetGitPush())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTag(), releaseType.GetGitTag())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagMessage(), releaseType.GetGitTagMessage())
+			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagNames(), releaseType.GetGitTagNames())
 			if (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers() == nil {
 				assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers(), releaseType.GetIdentifiers())
 			} else {
@@ -6106,6 +6158,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysNegativeCommitConventi
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitPush(), releaseType.GetGitPush())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTag(), releaseType.GetGitTag())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagMessage(), releaseType.GetGitTagMessage())
+			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagNames(), releaseType.GetGitTagNames())
 			if (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers() == nil {
 				assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers(), releaseType.GetIdentifiers())
 			} else {
@@ -6188,6 +6241,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysPositiveCommitConventi
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitPush(), releaseType.GetGitPush())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTag(), releaseType.GetGitTag())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagMessage(), releaseType.GetGitTagMessage())
+			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagNames(), releaseType.GetGitTagNames())
 			if (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers() == nil {
 				assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers(), releaseType.GetIdentifiers())
 			} else {
@@ -6272,6 +6326,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysNegativeCommitConventi
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitPush(), releaseType.GetGitPush())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTag(), releaseType.GetGitTag())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagMessage(), releaseType.GetGitTagMessage())
+			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagNames(), releaseType.GetGitTagNames())
 			if (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers() == nil {
 				assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers(), releaseType.GetIdentifiers())
 			} else {
@@ -6354,6 +6409,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysPositiveCommitConventi
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitPush(), releaseType.GetGitPush())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTag(), releaseType.GetGitTag())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagMessage(), releaseType.GetGitTagMessage())
+			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagNames(), releaseType.GetGitTagNames())
 			if (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers() == nil {
 				assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers(), releaseType.GetIdentifiers())
 			} else {
@@ -6438,6 +6494,7 @@ func TestInferRunUsingExtendedPresetReleaseTypesWithAlwaysNegativeCommitConventi
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitPush(), releaseType.GetGitPush())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTag(), releaseType.GetGitTag())
 			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagMessage(), releaseType.GetGitTagMessage())
+			assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetGitTagNames(), releaseType.GetGitTagNames())
 			if (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers() == nil {
 				assert.Equal(t, (*(*releaseTypes.GetItems())[MATCHING_RELEASE_TYPE_NAME]).GetIdentifiers(), releaseType.GetIdentifiers())
 			} else {
@@ -6530,6 +6587,7 @@ func TestInferRunUsingCustomReleaseTypeWithAlwaysPositiveCommitConventionInInter
 			assert.Equal(t, "true", *releaseType.GetGitPush())
 			assert.Equal(t, "true", *releaseType.GetGitTag())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
 			assert.Equal(t, 1, len(*releaseType.GetIdentifiers()))
 			assert.Equal(t, "customId", *(*releaseType.GetIdentifiers())[0].GetQualifier())
 			assert.Equal(t, "999", *(*releaseType.GetIdentifiers())[0].GetValue())
@@ -6616,6 +6674,7 @@ func TestInferRunUsingCustomReleaseTypeWithAlwaysNegativeCommitConventionInInter
 			assert.Equal(t, "true", *releaseType.GetGitPush())
 			assert.Equal(t, "true", *releaseType.GetGitTag())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
 			assert.Equal(t, 1, len(*releaseType.GetIdentifiers()))
 			assert.Equal(t, "customId", *(*releaseType.GetIdentifiers())[0].GetQualifier())
 			assert.Equal(t, "999", *(*releaseType.GetIdentifiers())[0].GetValue())
@@ -6694,6 +6753,7 @@ func TestInferRunUsingCustomFlatReleaseTypeWithInferringCommitConventionInMaster
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_PUSH, releaseType.GetGitPush())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG, releaseType.GetGitTag())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
 			assert.Equal(t, ent.RELEASE_TYPE_IDENTIFIERS, releaseType.GetIdentifiers())
 			assert.Equal(t, ".*", *releaseType.GetMatchBranches())
 			assert.Equal(t, ent.RELEASE_TYPE_MATCH_ENVIRONMENT_VARIABLES, releaseType.GetMatchEnvironmentVariables())
@@ -6768,6 +6828,7 @@ func TestInferRunUsingCustomFlatReleaseTypeWithInferringCommitConventionInTagged
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_PUSH, releaseType.GetGitPush())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG, releaseType.GetGitTag())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
 			assert.Equal(t, ent.RELEASE_TYPE_IDENTIFIERS, releaseType.GetIdentifiers())
 			assert.Equal(t, ".*", *releaseType.GetMatchBranches())
 			assert.Equal(t, ent.RELEASE_TYPE_MATCH_ENVIRONMENT_VARIABLES, releaseType.GetMatchEnvironmentVariables())
@@ -6842,6 +6903,7 @@ func TestInferRunUsingCustomFlatReleaseTypeWithInferringCommitConventionInTagged
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_PUSH, releaseType.GetGitPush())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG, releaseType.GetGitTag())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
 			assert.Equal(t, ent.RELEASE_TYPE_IDENTIFIERS, releaseType.GetIdentifiers())
 			assert.Equal(t, ".*", *releaseType.GetMatchBranches())
 			assert.Equal(t, ent.RELEASE_TYPE_MATCH_ENVIRONMENT_VARIABLES, releaseType.GetMatchEnvironmentVariables())
@@ -6916,6 +6978,7 @@ func TestInferRunUsingCustomFlatReleaseTypeWithInferringCommitConventionInUntagg
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_PUSH, releaseType.GetGitPush())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG, releaseType.GetGitTag())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
 			assert.Equal(t, ent.RELEASE_TYPE_IDENTIFIERS, releaseType.GetIdentifiers())
 			assert.Equal(t, ".*", *releaseType.GetMatchBranches())
 			assert.Equal(t, ent.RELEASE_TYPE_MATCH_ENVIRONMENT_VARIABLES, releaseType.GetMatchEnvironmentVariables())
@@ -6990,6 +7053,7 @@ func TestInferRunUsingCustomFlatReleaseTypeWithInferringCommitConventionInUntagg
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_PUSH, releaseType.GetGitPush())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG, releaseType.GetGitTag())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
 			assert.Equal(t, ent.RELEASE_TYPE_IDENTIFIERS, releaseType.GetIdentifiers())
 			assert.Equal(t, ".*", *releaseType.GetMatchBranches())
 			assert.Equal(t, ent.RELEASE_TYPE_MATCH_ENVIRONMENT_VARIABLES, releaseType.GetMatchEnvironmentVariables())
@@ -7069,6 +7133,7 @@ func TestInferRunUsingCustomCollapsedReleaseTypeWithInferringCommitConventionInM
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_PUSH, releaseType.GetGitPush())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG, releaseType.GetGitTag())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
 			assert.Equal(t, ent.RELEASE_TYPE_IDENTIFIERS, releaseType.GetIdentifiers())
 			assert.Equal(t, "^(master|main)$", *releaseType.GetMatchBranches())
 			assert.Equal(t, ent.RELEASE_TYPE_MATCH_ENVIRONMENT_VARIABLES, releaseType.GetMatchEnvironmentVariables())
@@ -7148,6 +7213,7 @@ func TestInferRunUsingCustomCollapsedReleaseTypeWithInferringCommitConventionInA
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_PUSH, releaseType.GetGitPush())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG, releaseType.GetGitTag())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
 			assert.Equal(t, ent.RELEASE_TYPE_IDENTIFIERS, releaseType.GetIdentifiers())
 			assert.Equal(t, ".*", *releaseType.GetMatchBranches())
 			assert.Equal(t, ent.RELEASE_TYPE_MATCH_ENVIRONMENT_VARIABLES, releaseType.GetMatchEnvironmentVariables())
@@ -7227,6 +7293,7 @@ func TestInferRunUsingCustomCollapsedReleaseTypeWithInferringCommitConventionInB
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_PUSH, releaseType.GetGitPush())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG, releaseType.GetGitTag())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
 			assert.Equal(t, ent.RELEASE_TYPE_IDENTIFIERS, releaseType.GetIdentifiers())
 			assert.Equal(t, ".*", *releaseType.GetMatchBranches())
 			assert.Equal(t, ent.RELEASE_TYPE_MATCH_ENVIRONMENT_VARIABLES, releaseType.GetMatchEnvironmentVariables())
@@ -7306,6 +7373,7 @@ func TestInferRunUsingCustomCollapsedReleaseTypeWithInferringCommitConventionInG
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_PUSH, releaseType.GetGitPush())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG, releaseType.GetGitTag())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
 			assert.Equal(t, ent.RELEASE_TYPE_IDENTIFIERS, releaseType.GetIdentifiers())
 			assert.Equal(t, ".*", *releaseType.GetMatchBranches())
 			assert.Equal(t, ent.RELEASE_TYPE_MATCH_ENVIRONMENT_VARIABLES, releaseType.GetMatchEnvironmentVariables())
@@ -7385,6 +7453,7 @@ func TestInferRunUsingCustomCollapsedReleaseTypeWithInferringCommitConventionInD
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_PUSH, releaseType.GetGitPush())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG, releaseType.GetGitTag())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
 			assert.Equal(t, ent.RELEASE_TYPE_IDENTIFIERS, releaseType.GetIdentifiers())
 			assert.Equal(t, ".*", *releaseType.GetMatchBranches())
 			assert.Equal(t, ent.RELEASE_TYPE_MATCH_ENVIRONMENT_VARIABLES, releaseType.GetMatchEnvironmentVariables())
@@ -7464,6 +7533,7 @@ func TestInferRunUsingCustomCollapsedReleaseTypeWithInferringCommitConventionInE
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_PUSH, releaseType.GetGitPush())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG, releaseType.GetGitTag())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
 			assert.Equal(t, ent.RELEASE_TYPE_IDENTIFIERS, releaseType.GetIdentifiers())
 			assert.Equal(t, ".*", *releaseType.GetMatchBranches())
 			assert.Equal(t, ent.RELEASE_TYPE_MATCH_ENVIRONMENT_VARIABLES, releaseType.GetMatchEnvironmentVariables())
@@ -7543,6 +7613,7 @@ func TestInferRunUsingCustomCollapsedReleaseTypeWithInferringCommitConventionInZ
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_PUSH, releaseType.GetGitPush())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG, releaseType.GetGitTag())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
 			assert.Equal(t, ent.RELEASE_TYPE_IDENTIFIERS, releaseType.GetIdentifiers())
 			assert.Equal(t, ".*", *releaseType.GetMatchBranches())
 			assert.Equal(t, ent.RELEASE_TYPE_MATCH_ENVIRONMENT_VARIABLES, releaseType.GetMatchEnvironmentVariables())
@@ -7622,6 +7693,7 @@ func TestInferRunUsingCustomCollapsedReleaseTypeWithInferringCommitConventionInE
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_PUSH, releaseType.GetGitPush())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG, releaseType.GetGitTag())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
 			assert.Equal(t, ent.RELEASE_TYPE_IDENTIFIERS, releaseType.GetIdentifiers())
 			assert.Equal(t, ".*", *releaseType.GetMatchBranches())
 			assert.Equal(t, ent.RELEASE_TYPE_MATCH_ENVIRONMENT_VARIABLES, releaseType.GetMatchEnvironmentVariables())
@@ -7701,6 +7773,7 @@ func TestInferRunUsingCustomCollapsedReleaseTypeWithInferringCommitConventionInT
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_PUSH, releaseType.GetGitPush())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG, releaseType.GetGitTag())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
 			assert.Equal(t, ent.RELEASE_TYPE_IDENTIFIERS, releaseType.GetIdentifiers())
 			assert.Equal(t, ".*", *releaseType.GetMatchBranches())
 			assert.Equal(t, ent.RELEASE_TYPE_MATCH_ENVIRONMENT_VARIABLES, releaseType.GetMatchEnvironmentVariables())
@@ -7776,6 +7849,7 @@ func TestInferRunUsingCustomFlatReleaseTypeWithExtraIdentifierWithInferringCommi
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_PUSH, releaseType.GetGitPush())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG, releaseType.GetGitTag())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
 			assert.Equal(t, 1, len(*releaseType.GetIdentifiers()))
 			assert.Equal(t, ".*", *releaseType.GetMatchBranches())
 			assert.Equal(t, ent.RELEASE_TYPE_MATCH_ENVIRONMENT_VARIABLES, releaseType.GetMatchEnvironmentVariables())
@@ -7851,6 +7925,7 @@ func TestInferRunUsingCustomFlatReleaseTypeWithExtraIdentifierWithInferringCommi
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_PUSH, releaseType.GetGitPush())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG, releaseType.GetGitTag())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
 			assert.Equal(t, 1, len(*releaseType.GetIdentifiers()))
 			assert.Equal(t, ".*", *releaseType.GetMatchBranches())
 			assert.Equal(t, ent.RELEASE_TYPE_MATCH_ENVIRONMENT_VARIABLES, releaseType.GetMatchEnvironmentVariables())
@@ -7926,6 +8001,7 @@ func TestInferRunUsingCustomFlatReleaseTypeWithExtraIdentifierWithInferringCommi
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_PUSH, releaseType.GetGitPush())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG, releaseType.GetGitTag())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
 			assert.Equal(t, 1, len(*releaseType.GetIdentifiers()))
 			assert.Equal(t, ".*", *releaseType.GetMatchBranches())
 			assert.Equal(t, ent.RELEASE_TYPE_MATCH_ENVIRONMENT_VARIABLES, releaseType.GetMatchEnvironmentVariables())
@@ -8001,6 +8077,7 @@ func TestInferRunUsingCustomFlatReleaseTypeWithExtraIdentifierWithInferringCommi
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_PUSH, releaseType.GetGitPush())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG, releaseType.GetGitTag())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
 			assert.Equal(t, 1, len(*releaseType.GetIdentifiers()))
 			assert.Equal(t, ".*", *releaseType.GetMatchBranches())
 			assert.Equal(t, ent.RELEASE_TYPE_MATCH_ENVIRONMENT_VARIABLES, releaseType.GetMatchEnvironmentVariables())
@@ -8076,6 +8153,7 @@ func TestInferRunUsingCustomFlatReleaseTypeWithExtraIdentifierWithInferringCommi
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_PUSH, releaseType.GetGitPush())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG, releaseType.GetGitTag())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
 			assert.Equal(t, 1, len(*releaseType.GetIdentifiers()))
 			assert.Equal(t, ".*", *releaseType.GetMatchBranches())
 			assert.Equal(t, ent.RELEASE_TYPE_MATCH_ENVIRONMENT_VARIABLES, releaseType.GetMatchEnvironmentVariables())
@@ -8156,6 +8234,7 @@ func TestInferRunUsingCustomCollapsedReleaseTypeWithExtraIdentifiersWithInferrin
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_PUSH, releaseType.GetGitPush())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG, releaseType.GetGitTag())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
 			assert.Equal(t, 1, len(*releaseType.GetIdentifiers()))
 			assert.Equal(t, "^(master|main)$", *releaseType.GetMatchBranches())
 			assert.Equal(t, ent.RELEASE_TYPE_MATCH_ENVIRONMENT_VARIABLES, releaseType.GetMatchEnvironmentVariables())
@@ -8236,6 +8315,7 @@ func TestInferRunUsingCustomCollapsedReleaseTypeWithExtraIdentifiersWithInferrin
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_PUSH, releaseType.GetGitPush())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG, releaseType.GetGitTag())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
 			assert.Equal(t, ent.RELEASE_TYPE_IDENTIFIERS, releaseType.GetIdentifiers())
 			assert.Equal(t, ".*", *releaseType.GetMatchBranches())
 			assert.Equal(t, ent.RELEASE_TYPE_MATCH_ENVIRONMENT_VARIABLES, releaseType.GetMatchEnvironmentVariables())
@@ -8316,6 +8396,7 @@ func TestInferRunUsingCustomCollapsedReleaseTypeWithExtraIdentifiersWithInferrin
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_PUSH, releaseType.GetGitPush())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG, releaseType.GetGitTag())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
 			assert.Equal(t, ent.RELEASE_TYPE_IDENTIFIERS, releaseType.GetIdentifiers())
 			assert.Equal(t, ".*", *releaseType.GetMatchBranches())
 			assert.Equal(t, ent.RELEASE_TYPE_MATCH_ENVIRONMENT_VARIABLES, releaseType.GetMatchEnvironmentVariables())
@@ -8396,6 +8477,7 @@ func TestInferRunUsingCustomCollapsedReleaseTypeWithExtraIdentifiersWithInferrin
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_PUSH, releaseType.GetGitPush())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG, releaseType.GetGitTag())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
 			assert.Equal(t, ent.RELEASE_TYPE_IDENTIFIERS, releaseType.GetIdentifiers())
 			assert.Equal(t, ".*", *releaseType.GetMatchBranches())
 			assert.Equal(t, ent.RELEASE_TYPE_MATCH_ENVIRONMENT_VARIABLES, releaseType.GetMatchEnvironmentVariables())
@@ -8476,6 +8558,7 @@ func TestInferRunUsingCustomCollapsedReleaseTypeWithExtraIdentifiersWithInferrin
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_PUSH, releaseType.GetGitPush())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG, releaseType.GetGitTag())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
 			assert.Equal(t, ent.RELEASE_TYPE_IDENTIFIERS, releaseType.GetIdentifiers())
 			assert.Equal(t, ".*", *releaseType.GetMatchBranches())
 			assert.Equal(t, ent.RELEASE_TYPE_MATCH_ENVIRONMENT_VARIABLES, releaseType.GetMatchEnvironmentVariables())
@@ -8556,6 +8639,7 @@ func TestInferRunUsingCustomCollapsedReleaseTypeWithExtraIdentifiersWithInferrin
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_PUSH, releaseType.GetGitPush())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG, releaseType.GetGitTag())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
 			assert.Equal(t, ent.RELEASE_TYPE_IDENTIFIERS, releaseType.GetIdentifiers())
 			assert.Equal(t, ".*", *releaseType.GetMatchBranches())
 			assert.Equal(t, ent.RELEASE_TYPE_MATCH_ENVIRONMENT_VARIABLES, releaseType.GetMatchEnvironmentVariables())
@@ -8636,6 +8720,7 @@ func TestInferRunUsingCustomCollapsedReleaseTypeWithExtraIdentifiersWithInferrin
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_PUSH, releaseType.GetGitPush())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG, releaseType.GetGitTag())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
 			assert.Equal(t, ent.RELEASE_TYPE_IDENTIFIERS, releaseType.GetIdentifiers())
 			assert.Equal(t, ".*", *releaseType.GetMatchBranches())
 			assert.Equal(t, ent.RELEASE_TYPE_MATCH_ENVIRONMENT_VARIABLES, releaseType.GetMatchEnvironmentVariables())
@@ -8716,6 +8801,7 @@ func TestInferRunUsingCustomCollapsedReleaseTypeWithExtraIdentifiersWithInferrin
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_PUSH, releaseType.GetGitPush())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG, releaseType.GetGitTag())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
 			assert.Equal(t, ent.RELEASE_TYPE_IDENTIFIERS, releaseType.GetIdentifiers())
 			assert.Equal(t, ".*", *releaseType.GetMatchBranches())
 			assert.Equal(t, ent.RELEASE_TYPE_MATCH_ENVIRONMENT_VARIABLES, releaseType.GetMatchEnvironmentVariables())
@@ -8796,6 +8882,7 @@ func TestInferRunUsingCustomCollapsedReleaseTypeWithExtraIdentifiersWithExtraIde
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_PUSH, releaseType.GetGitPush())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG, releaseType.GetGitTag())
 			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
 			assert.Equal(t, ent.RELEASE_TYPE_IDENTIFIERS, releaseType.GetIdentifiers())
 			assert.Equal(t, ".*", *releaseType.GetMatchBranches())
 			assert.Equal(t, ent.RELEASE_TYPE_MATCH_ENVIRONMENT_VARIABLES, releaseType.GetMatchEnvironmentVariables())

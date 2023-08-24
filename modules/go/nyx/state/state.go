@@ -25,6 +25,7 @@ import (
 	"bytes"         // https://pkg.go.dev/bytes
 	"encoding/json" // https://pkg.go.dev/encoding/json
 	"fmt"           // https://pkg.go.dev/fmt
+	"strconv"       // https://pkg.go.dev/strconv
 	"time"          // https://pkg.go.dev/time
 
 	log "github.com/sirupsen/logrus" // https://pkg.go.dev/github.com/sirupsen/logrus
@@ -34,6 +35,7 @@ import (
 	ent "github.com/mooltiverse/nyx/modules/go/nyx/entities"
 	io "github.com/mooltiverse/nyx/modules/go/nyx/io"
 	tpl "github.com/mooltiverse/nyx/modules/go/nyx/template"
+	utl "github.com/mooltiverse/nyx/modules/go/utils"
 	ver "github.com/mooltiverse/nyx/modules/go/version"
 )
 
@@ -80,6 +82,21 @@ type State struct {
 
 	// The version that has been inferred.
 	Version *string `json:"version,omitempty" yaml:"version,omitempty" handlebars:"version"`
+
+	// The version build metadata that has been inferred.
+	VersionBuildMetadata *string `json:"versionBuildMetadata,omitempty" yaml:"versionBuildMetadata,omitempty" handlebars:"versionBuildMetadata"`
+
+	// The version major number that has been inferred.
+	VersionMajorNumber *string `json:"versionMajorNumber,omitempty" yaml:"versionMajorNumber,omitempty" handlebars:"versionMajorNumber"`
+
+	// The version minor number that has been inferred.
+	VersionMinorNumber *string `json:"versionMinorNumber,omitempty" yaml:"versionMinorNumber,omitempty" versionMinorNumber:"version"`
+
+	// The version patch number that has been inferred.
+	VersionPatchNumber *string `json:"versionPatchNumber,omitempty" yaml:"versionPatchNumber,omitempty" handlebars:"versionPatchNumber"`
+
+	// The version pre-release identifier that has been inferred.
+	VersionPreReleaseIdentifier *string `json:"versionPreReleaseIdentifier,omitempty" yaml:"versionPreReleaseIdentifier,omitempty" handlebars:"versionPreReleaseIdentifier"`
 
 	// The regular expression used to check the version against a range constraint.
 	VersionRange *string `json:"versionRange,omitempty" yaml:"versionRange,omitempty" handlebars:"versionRange"`
@@ -148,6 +165,21 @@ type FlatState struct {
 
 	// The version that has been inferred.
 	Version *string `json:"version,omitempty" yaml:"version,omitempty" handlebars:"version"`
+
+	// The version build metadata that has been inferred.
+	VersionBuildMetadata *string `json:"versionBuildMetadata,omitempty" yaml:"versionBuildMetadata,omitempty" handlebars:"versionBuildMetadata"`
+
+	// The version major number that has been inferred.
+	VersionMajorNumber *string `json:"versionMajorNumber,omitempty" yaml:"versionMajorNumber,omitempty" handlebars:"versionMajorNumber"`
+
+	// The version minor number that has been inferred.
+	VersionMinorNumber *string `json:"versionMinorNumber,omitempty" yaml:"versionMinorNumber,omitempty" versionMinorNumber:"version"`
+
+	// The version patch number that has been inferred.
+	VersionPatchNumber *string `json:"versionPatchNumber,omitempty" yaml:"versionPatchNumber,omitempty" handlebars:"versionPatchNumber"`
+
+	// The version pre-release identifier that has been inferred.
+	VersionPreReleaseIdentifier *string `json:"versionPreReleaseIdentifier,omitempty" yaml:"versionPreReleaseIdentifier,omitempty" handlebars:"versionPreReleaseIdentifier"`
 
 	// The regular expression used to check the version against a range constraint.
 	VersionRange *string `json:"versionRange,omitempty" yaml:"versionRange,omitempty" handlebars:"versionRange"`
@@ -304,6 +336,26 @@ func (s *State) Flatten() (*FlatState, error) {
 	resolvedState.Version, err = s.GetVersion()
 	if err != nil {
 		return nil, &errs.DataAccessError{Message: fmt.Sprintf("unable to resolve configuration option '%s'", "version"), Cause: err}
+	}
+	resolvedState.VersionBuildMetadata, err = s.GetVersionBuildMetadata()
+	if err != nil {
+		return nil, &errs.DataAccessError{Message: fmt.Sprintf("unable to resolve configuration option '%s'", "versionBuildMetadata"), Cause: err}
+	}
+	resolvedState.VersionMajorNumber, err = s.GetVersionMajorNumber()
+	if err != nil {
+		return nil, &errs.DataAccessError{Message: fmt.Sprintf("unable to resolve configuration option '%s'", "versionMajorNumber"), Cause: err}
+	}
+	resolvedState.VersionMinorNumber, err = s.GetVersionMinorNumber()
+	if err != nil {
+		return nil, &errs.DataAccessError{Message: fmt.Sprintf("unable to resolve configuration option '%s'", "versionMinorNumber"), Cause: err}
+	}
+	resolvedState.VersionPatchNumber, err = s.GetVersionPatchNumber()
+	if err != nil {
+		return nil, &errs.DataAccessError{Message: fmt.Sprintf("unable to resolve configuration option '%s'", "versionPatchNumber"), Cause: err}
+	}
+	resolvedState.VersionPreReleaseIdentifier, err = s.GetVersionPreReleaseIdentifier()
+	if err != nil {
+		return nil, &errs.DataAccessError{Message: fmt.Sprintf("unable to resolve configuration option '%s'", "versionPreReleaseIdentifier"), Cause: err}
 	}
 	resolvedState.VersionRange, err = s.GetVersionRange()
 	if err != nil {
@@ -829,6 +881,143 @@ func (s *State) SetVersion(version *string) error {
 	}
 
 	return nil
+}
+
+/*
+Returns the version build metadata inferred by Nyx, if any. If the configured version scheme is not SEMVER
+this method always returns nil.
+
+Error is:
+- DataAccessError: in case the attribute cannot be written or accessed.
+- IllegalPropertyError: in case the attribute has incorrect values or it can't be resolved.
+*/
+func (s *State) GetVersionBuildMetadata() (*string, error) {
+	scheme, err := s.GetScheme()
+	if err != nil || scheme == nil {
+		return nil, &errs.IllegalStateError{Message: "unable to read the scheme attribute", Cause: err}
+	}
+	if !s.HasVersion() || ver.SEMVER != *scheme {
+		return nil, nil
+	}
+	version, err := s.GetVersion()
+	if err != nil {
+		return nil, &errs.IllegalStateError{Message: "unable to read the version attribute", Cause: err}
+	}
+	semVer, err := ver.ValueOfSemanticVersionWithSanitization(*version, true)
+	if err != nil {
+		return nil, &errs.IllegalStateError{Message: "unable to parse the version attribute", Cause: err}
+	}
+
+	return semVer.GetBuild(), nil
+}
+
+/*
+Returns the version major number inferred by Nyx, if any. If the configured version scheme is not SEMVER
+this method always returns nil.
+
+Error is:
+- DataAccessError: in case the attribute cannot be written or accessed.
+- IllegalPropertyError: in case the attribute has incorrect values or it can't be resolved.
+*/
+func (s *State) GetVersionMajorNumber() (*string, error) {
+	scheme, err := s.GetScheme()
+	if err != nil || scheme == nil {
+		return nil, &errs.IllegalStateError{Message: "unable to read the scheme attribute", Cause: err}
+	}
+	if !s.HasVersion() || ver.SEMVER != *scheme {
+		return nil, nil
+	}
+	version, err := s.GetVersion()
+	if err != nil {
+		return nil, &errs.IllegalStateError{Message: "unable to read the version attribute", Cause: err}
+	}
+	semVer, err := ver.ValueOfSemanticVersionWithSanitization(*version, true)
+	if err != nil {
+		return nil, &errs.IllegalStateError{Message: "unable to parse the version attribute", Cause: err}
+	}
+	return utl.PointerToString(strconv.Itoa(semVer.GetMajor())), nil
+}
+
+/*
+Returns the version minor number inferred by Nyx, if any. If the configured version scheme is not SEMVER
+this method always returns nil.
+
+Error is:
+- DataAccessError: in case the attribute cannot be written or accessed.
+- IllegalPropertyError: in case the attribute has incorrect values or it can't be resolved.
+*/
+func (s *State) GetVersionMinorNumber() (*string, error) {
+	scheme, err := s.GetScheme()
+	if err != nil || scheme == nil {
+		return nil, &errs.IllegalStateError{Message: "unable to read the scheme attribute", Cause: err}
+	}
+	if !s.HasVersion() || ver.SEMVER != *scheme {
+		return nil, nil
+	}
+	version, err := s.GetVersion()
+	if err != nil {
+		return nil, &errs.IllegalStateError{Message: "unable to read the version attribute", Cause: err}
+	}
+	semVer, err := ver.ValueOfSemanticVersionWithSanitization(*version, true)
+	if err != nil {
+		return nil, &errs.IllegalStateError{Message: "unable to parse the version attribute", Cause: err}
+	}
+	return utl.PointerToString(strconv.Itoa(semVer.GetMinor())), nil
+}
+
+/*
+Returns the version patch number inferred by Nyx, if any. If the configured version scheme is not SEMVER
+this method always returns nil.
+
+Error is:
+- DataAccessError: in case the attribute cannot be written or accessed.
+- IllegalPropertyError: in case the attribute has incorrect values or it can't be resolved.
+*/
+func (s *State) GetVersionPatchNumber() (*string, error) {
+	scheme, err := s.GetScheme()
+	if err != nil || scheme == nil {
+		return nil, &errs.IllegalStateError{Message: "unable to read the scheme attribute", Cause: err}
+	}
+	if !s.HasVersion() || ver.SEMVER != *scheme {
+		return nil, nil
+	}
+	version, err := s.GetVersion()
+	if err != nil {
+		return nil, &errs.IllegalStateError{Message: "unable to read the version attribute", Cause: err}
+	}
+	semVer, err := ver.ValueOfSemanticVersionWithSanitization(*version, true)
+	if err != nil {
+		return nil, &errs.IllegalStateError{Message: "unable to parse the version attribute", Cause: err}
+	}
+	return utl.PointerToString(strconv.Itoa(semVer.GetPatch())), nil
+}
+
+/*
+Returns the version pre-release identifier inferred by Nyx, if any. If the configured version scheme is not SEMVER
+this method always returns nil.
+
+Error is:
+- DataAccessError: in case the attribute cannot be written or accessed.
+- IllegalPropertyError: in case the attribute has incorrect values or it can't be resolved.
+*/
+func (s *State) GetVersionPreReleaseIdentifier() (*string, error) {
+	scheme, err := s.GetScheme()
+	if err != nil || scheme == nil {
+		return nil, &errs.IllegalStateError{Message: "unable to read the scheme attribute", Cause: err}
+	}
+	if !s.HasVersion() || ver.SEMVER != *scheme {
+		return nil, nil
+	}
+	version, err := s.GetVersion()
+	if err != nil {
+		return nil, &errs.IllegalStateError{Message: "unable to read the version attribute", Cause: err}
+	}
+	semVer, err := ver.ValueOfSemanticVersionWithSanitization(*version, true)
+	if err != nil {
+		return nil, &errs.IllegalStateError{Message: "unable to parse the version attribute", Cause: err}
+	}
+
+	return semVer.GetPrerelease(), nil
 }
 
 /*

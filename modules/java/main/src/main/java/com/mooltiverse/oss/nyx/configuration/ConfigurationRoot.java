@@ -24,6 +24,7 @@ import com.mooltiverse.oss.nyx.entities.GitConfiguration;
 import com.mooltiverse.oss.nyx.entities.IllegalPropertyException;
 import com.mooltiverse.oss.nyx.entities.ReleaseTypes;
 import com.mooltiverse.oss.nyx.entities.ServiceConfiguration;
+import com.mooltiverse.oss.nyx.entities.Substitutions;
 import com.mooltiverse.oss.nyx.entities.Verbosity;
 import com.mooltiverse.oss.nyx.io.DataAccessException;
 import com.mooltiverse.oss.nyx.state.State;
@@ -224,6 +225,28 @@ public interface ConfigurationRoot {
         throws DataAccessException, IllegalPropertyException;
 
     /**
+     * Returns the path to the file where the Nyx {@link State} must be saved as it's defined by this configuration.
+     * 
+     * @return the configured value for this option or {@code null} if the value hasn't been defined.
+     * 
+     * @throws DataAccessException in case the option cannot be read or accessed.
+     * @throws IllegalPropertyException in case the option has been defined but has incorrect values or it can't be resolved.
+     */
+    public String getStateFile()
+        throws DataAccessException, IllegalPropertyException;
+
+    /**
+     * Returns the substitutions configuration section.
+     * 
+     * @return the substitutions configuration section. Never {@code null}.
+     * 
+     * @throws DataAccessException in case the option cannot be read or accessed.
+     * @throws IllegalPropertyException in case the option has been defined but has incorrect values or it can't be resolved.
+     */
+    public Substitutions getSubstitutions()
+        throws DataAccessException, IllegalPropertyException;
+
+    /**
      * Returns the value of the summary flag as it's defined by this configuration.
      * 
      * @return the configured value for this option or {@code null} if the value hasn't been defined.
@@ -243,17 +266,6 @@ public interface ConfigurationRoot {
      * @throws IllegalPropertyException in case the option has been defined but has incorrect values or it can't be resolved.
      */
     public String getSummaryFile()
-        throws DataAccessException, IllegalPropertyException;
-
-    /**
-     * Returns the path to the file where the Nyx {@link State} must be saved as it's defined by this configuration.
-     * 
-     * @return the configured value for this option or {@code null} if the value hasn't been defined.
-     * 
-     * @throws DataAccessException in case the option cannot be read or accessed.
-     * @throws IllegalPropertyException in case the option has been defined but has incorrect values or it can't be resolved.
-     */
-    public String getStateFile()
         throws DataAccessException, IllegalPropertyException;
 
     /**

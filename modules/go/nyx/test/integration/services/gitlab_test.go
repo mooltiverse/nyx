@@ -167,7 +167,7 @@ func TestGitLabReleaseServiceCreateRelease(t *testing.T) {
 	script.PushWithUserNameAndPassword(utl.PointerToString("PRIVATE-TOKEN"), utl.PointerToString(os.Getenv("gitLabTestUserToken")))
 
 	// publish the release
-	release, err = gitLab.PublishRelease(&ownerName, &repositoryName, utl.PointerToString("Release 1.0.0-alpha.1"), "1.0.0-alpha.1", utl.PointerToString("A test description for the release\non multiple lines\nlike these"))
+	release, err = gitLab.PublishRelease(&ownerName, &repositoryName, utl.PointerToString("Release 1.0.0-alpha.1"), "1.0.0-alpha.1", utl.PointerToString("A test description for the release\non multiple lines\nlike these"), nil)
 	assert.NoError(t, err)
 	assert.Equal(t, "Release 1.0.0-alpha.1", (*release).GetTitle())
 	assert.Equal(t, "1.0.0-alpha.1", (*release).GetTag())

@@ -43,6 +43,8 @@ import com.mooltiverse.oss.nyx.entities.Provider;
 import com.mooltiverse.oss.nyx.entities.ReleaseType;
 import com.mooltiverse.oss.nyx.entities.ReleaseTypes;
 import com.mooltiverse.oss.nyx.entities.ServiceConfiguration;
+import com.mooltiverse.oss.nyx.entities.Substitution;
+import com.mooltiverse.oss.nyx.entities.Substitutions;
 import com.mooltiverse.oss.nyx.entities.Verbosity;
 import com.mooltiverse.oss.nyx.io.FileMapper;
 import com.mooltiverse.oss.nyx.version.Scheme;
@@ -117,6 +119,13 @@ public class ConfigurationFileTests {
             }
             assertEquals(source.getChangelog().getTemplate(), target.getChangelog().getTemplate());
 
+            assertEquals(Objects.isNull(source.getCommitMessageConventions().getEnabled()) ? Defaults.COMMIT_MESSAGE_CONVENTIONS.getEnabled() : source.getCommitMessageConventions().getEnabled(), target.getCommitMessageConventions().getEnabled());
+            assertEquals(source.getCommitMessageConventions().getItems().keySet(), target.getCommitMessageConventions().getItems().keySet());
+            for (String item: source.getCommitMessageConventions().getItems().keySet()) {
+                assertEquals(source.getCommitMessageConventions().getItems().get(item).getExpression(), target.getCommitMessageConventions().getItems().get(item).getExpression());
+                assertEquals(source.getCommitMessageConventions().getItems().get(item).getBumpExpressions(), target.getCommitMessageConventions().getItems().get(item).getBumpExpressions());
+            }
+
             assertEquals(source.getGit().getRemotes().keySet(), target.getGit().getRemotes().keySet());
             for (String item: source.getGit().getRemotes().keySet()) {
                 assertEquals(source.getGit().getRemotes().get(item).getAuthenticationMethod(), target.getGit().getRemotes().get(item).getAuthenticationMethod());
@@ -147,6 +156,15 @@ public class ConfigurationFileTests {
                 assertEquals(Objects.isNull(source.getReleaseTypes().getItems().get(item).getGitTag()) ? Defaults.ReleaseType.GIT_TAG : source.getReleaseTypes().getItems().get(item).getGitTag(), target.getReleaseTypes().getItems().get(item).getGitTag());
                 assertEquals(Objects.isNull(source.getReleaseTypes().getItems().get(item).getGitTagMessage()) ? Defaults.ReleaseType.GIT_TAG_MESSAGE : source.getReleaseTypes().getItems().get(item).getGitTagMessage(), target.getReleaseTypes().getItems().get(item).getGitTagMessage());
 
+                if (Objects.isNull(source.getReleaseTypes().getItems().get(item).getGitTagNames()))
+                    assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, target.getReleaseTypes().getItems().get(item).getGitTagNames());
+                else {
+                    assertEquals(source.getReleaseTypes().getItems().get(item).getGitTagNames().size(), target.getReleaseTypes().getItems().get(item).getGitTagNames().size());
+                    for (int i=0; i<source.getReleaseTypes().getItems().get(item).getGitTagNames().size(); i++) {
+                        assertEquals(source.getReleaseTypes().getItems().get(item).getGitTagNames().get(i), target.getReleaseTypes().getItems().get(item).getGitTagNames().get(i));
+                    }
+                }
+
                 if (Objects.isNull(source.getReleaseTypes().getItems().get(item).getIdentifiers()))
                     assertEquals(Defaults.ReleaseType.IDENTIFIERS, target.getReleaseTypes().getItems().get(item).getIdentifiers());
                 else {
@@ -172,6 +190,9 @@ public class ConfigurationFileTests {
                 
                 assertEquals(Objects.isNull(source.getReleaseTypes().getItems().get(item).getMatchWorkspaceStatus()) ? Defaults.ReleaseType.MATCH_WORKSPACE_STATUS : source.getReleaseTypes().getItems().get(item).getMatchWorkspaceStatus(), target.getReleaseTypes().getItems().get(item).getMatchWorkspaceStatus());
                 assertEquals(Objects.isNull(source.getReleaseTypes().getItems().get(item).getPublish()) ? Defaults.ReleaseType.PUBLISH : source.getReleaseTypes().getItems().get(item).getPublish(), target.getReleaseTypes().getItems().get(item).getPublish());
+                assertEquals(Objects.isNull(source.getReleaseTypes().getItems().get(item).getPublishDraft()) ? Defaults.ReleaseType.PUBLISH_DRAFT : source.getReleaseTypes().getItems().get(item).getPublishDraft(), target.getReleaseTypes().getItems().get(item).getPublishDraft());
+                assertEquals(Objects.isNull(source.getReleaseTypes().getItems().get(item).getPublishPreRelease()) ? Defaults.ReleaseType.PUBLISH_PRE_RELEASE : source.getReleaseTypes().getItems().get(item).getPublishPreRelease(), target.getReleaseTypes().getItems().get(item).getPublishPreRelease());
+                assertEquals(Objects.isNull(source.getReleaseTypes().getItems().get(item).getReleaseName()) ? Defaults.ReleaseType.RELEASE_NAME : source.getReleaseTypes().getItems().get(item).getReleaseName(), target.getReleaseTypes().getItems().get(item).getReleaseName());
                 assertEquals(Objects.isNull(source.getReleaseTypes().getItems().get(item).getVersionRange()) ? Defaults.ReleaseType.VERSION_RANGE : source.getReleaseTypes().getItems().get(item).getVersionRange(), target.getReleaseTypes().getItems().get(item).getVersionRange());
                 assertEquals(Objects.isNull(source.getReleaseTypes().getItems().get(item).getVersionRangeFromBranchName()) ? Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME : source.getReleaseTypes().getItems().get(item).getVersionRangeFromBranchName(), target.getReleaseTypes().getItems().get(item).getVersionRangeFromBranchName());
             }
@@ -188,6 +209,14 @@ public class ConfigurationFileTests {
                         assertEquals(entry.getValue(), target.getServices().get(item).getOptions().get(entry.getKey()));
                     }
                 }
+            }
+
+            assertEquals(Objects.isNull(source.getSubstitutions().getEnabled()) ? Defaults.SUBSTITUTIONS.getEnabled() : source.getSubstitutions().getEnabled(), target.getSubstitutions().getEnabled());
+            assertEquals(source.getSubstitutions().getItems().keySet(), target.getSubstitutions().getItems().keySet());
+            for (String item: source.getSubstitutions().getItems().keySet()) {
+                assertEquals(source.getSubstitutions().getItems().get(item).getFiles(), target.getSubstitutions().getItems().get(item).getFiles());
+                assertEquals(source.getSubstitutions().getItems().get(item).getMatch(), target.getSubstitutions().getItems().get(item).getMatch());
+                assertEquals(source.getSubstitutions().getItems().get(item).getReplace(), target.getSubstitutions().getItems().get(item).getReplace());
             }
         }
 
@@ -283,6 +312,15 @@ public class ConfigurationFileTests {
                 assertEquals(Objects.isNull(source.getReleaseTypes().getItems().get(item).getGitTag()) ? Defaults.ReleaseType.GIT_TAG : source.getReleaseTypes().getItems().get(item).getGitTag(), target.getReleaseTypes().getItems().get(item).getGitTag());
                 assertEquals(Objects.isNull(source.getReleaseTypes().getItems().get(item).getGitTagMessage()) ? Defaults.ReleaseType.GIT_TAG_MESSAGE : source.getReleaseTypes().getItems().get(item).getGitTagMessage(), target.getReleaseTypes().getItems().get(item).getGitTagMessage());
 
+                if (Objects.isNull(source.getReleaseTypes().getItems().get(item).getGitTagNames()))
+                    assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, target.getReleaseTypes().getItems().get(item).getGitTagNames());
+                else {
+                    assertEquals(source.getReleaseTypes().getItems().get(item).getGitTagNames().size(), target.getReleaseTypes().getItems().get(item).getGitTagNames().size());
+                    for (int i=0; i<source.getReleaseTypes().getItems().get(item).getGitTagNames().size(); i++) {
+                        assertEquals(source.getReleaseTypes().getItems().get(item).getGitTagNames().get(i), target.getReleaseTypes().getItems().get(item).getGitTagNames().get(i));
+                    }
+                }
+
                 if (Objects.isNull(source.getReleaseTypes().getItems().get(item).getIdentifiers()))
                     assertEquals(Defaults.ReleaseType.IDENTIFIERS, target.getReleaseTypes().getItems().get(item).getIdentifiers());
                 else {
@@ -308,6 +346,9 @@ public class ConfigurationFileTests {
                 
                 assertEquals(Objects.isNull(source.getReleaseTypes().getItems().get(item).getMatchWorkspaceStatus()) ? Defaults.ReleaseType.MATCH_WORKSPACE_STATUS : source.getReleaseTypes().getItems().get(item).getMatchWorkspaceStatus(), target.getReleaseTypes().getItems().get(item).getMatchWorkspaceStatus());
                 assertEquals(Objects.isNull(source.getReleaseTypes().getItems().get(item).getPublish()) ? Defaults.ReleaseType.PUBLISH : source.getReleaseTypes().getItems().get(item).getPublish(), target.getReleaseTypes().getItems().get(item).getPublish());
+                assertEquals(Objects.isNull(source.getReleaseTypes().getItems().get(item).getPublishDraft()) ? Defaults.ReleaseType.PUBLISH_DRAFT : source.getReleaseTypes().getItems().get(item).getPublishDraft(), target.getReleaseTypes().getItems().get(item).getPublishDraft());
+                assertEquals(Objects.isNull(source.getReleaseTypes().getItems().get(item).getPublishPreRelease()) ? Defaults.ReleaseType.PUBLISH_PRE_RELEASE : source.getReleaseTypes().getItems().get(item).getPublishPreRelease(), target.getReleaseTypes().getItems().get(item).getPublishPreRelease());
+                assertEquals(Objects.isNull(source.getReleaseTypes().getItems().get(item).getReleaseName()) ? Defaults.ReleaseType.RELEASE_NAME : source.getReleaseTypes().getItems().get(item).getReleaseName(), target.getReleaseTypes().getItems().get(item).getReleaseName());
                 assertEquals(Objects.isNull(source.getReleaseTypes().getItems().get(item).getVersionRange()) ? Defaults.ReleaseType.VERSION_RANGE : source.getReleaseTypes().getItems().get(item).getVersionRange(), target.getReleaseTypes().getItems().get(item).getVersionRange());
                 assertEquals(Objects.isNull(source.getReleaseTypes().getItems().get(item).getVersionRangeFromBranchName()) ? Defaults.ReleaseType.VERSION_RANGE_FROM_BRANCH_NAME : source.getReleaseTypes().getItems().get(item).getVersionRangeFromBranchName(), target.getReleaseTypes().getItems().get(item).getVersionRangeFromBranchName());
             }
@@ -324,6 +365,14 @@ public class ConfigurationFileTests {
                         assertEquals(entry.getValue(), target.getServices().get(item).getOptions().get(entry.getKey()));
                     }
                 }
+            }
+
+            assertEquals(Objects.isNull(source.getSubstitutions().getEnabled()) ? Defaults.SUBSTITUTIONS.getEnabled() : source.getSubstitutions().getEnabled(), target.getSubstitutions().getEnabled());
+            assertEquals(source.getSubstitutions().getItems().keySet(), target.getSubstitutions().getItems().keySet());
+            for (String item: source.getSubstitutions().getItems().keySet()) {
+                assertEquals(source.getSubstitutions().getItems().get(item).getFiles(), target.getSubstitutions().getItems().get(item).getFiles());
+                assertEquals(source.getSubstitutions().getItems().get(item).getMatch(), target.getSubstitutions().getItems().get(item).getMatch());
+                assertEquals(source.getSubstitutions().getItems().get(item).getReplace(), target.getSubstitutions().getItems().get(item).getReplace());
             }
         }
     }
@@ -430,7 +479,7 @@ public class ConfigurationFileTests {
                     List.<String>of("type1"),
                     List.<String>of("service1"),
                     List.<String>of("remote1"),
-                    Map.<String,ReleaseType>of("type1", new ReleaseType(List.<String>of("asset1", "asset2"), false, "{{branch1}}", "Release description 1", "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{version}}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{version}}", List.<Identifier>of(new Identifier("build", "12", Identifier.Position.BUILD)), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), "", Boolean.FALSE))
+                    Map.<String,ReleaseType>of("type1", new ReleaseType(List.<String>of("asset1", "asset2"), false, "{{branch1}}", "Release description 1", "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{version}}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{version}}", List.<String>of("one", "two", "three"), List.<Identifier>of(new Identifier("build", "12", Identifier.Position.BUILD)), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), Boolean.FALSE.toString(), Boolean.TRUE.toString(), "myrelease1", "", Boolean.FALSE))
                 )
             );
             mediumPriorityConfigurationLayerMock.setReleaseTypes(
@@ -438,7 +487,7 @@ public class ConfigurationFileTests {
                     List.<String>of("type2"),
                     List.<String>of("service2"),
                     List.<String>of("remote2"),
-                    Map.<String,ReleaseType>of("type2", new ReleaseType(List.<String>of("asset1", "asset2"), true, "{{branch2}}", "Release description 2", "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{version}}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{version}}", List.<Identifier>of(new Identifier("build", "12", Identifier.Position.BUILD)), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), "", Boolean.FALSE))
+                    Map.<String,ReleaseType>of("type2", new ReleaseType(List.<String>of("asset1", "asset2"), true, "{{branch2}}", "Release description 2", "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{version}}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{version}}", List.<String>of("one", "two", "three"), List.<Identifier>of(new Identifier("build", "12", Identifier.Position.BUILD)), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), Boolean.FALSE.toString(), Boolean.TRUE.toString(), "myrelease2", "", Boolean.FALSE))
                 )
             );
             highPriorityConfigurationLayerMock.setReleaseTypes(
@@ -446,7 +495,7 @@ public class ConfigurationFileTests {
                     List.<String>of("type3"),
                     List.<String>of("service3"),
                     List.<String>of("remote3"),
-                    Map.<String,ReleaseType>of("type3", new ReleaseType(List.<String>of("asset1", "asset2"), true, "{{branch3}}", "Release description 3", "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{version}}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{version}}", List.<Identifier>of(new Identifier("build", "12", Identifier.Position.BUILD)), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), "", Boolean.FALSE))
+                    Map.<String,ReleaseType>of("type3", new ReleaseType(List.<String>of("asset1", "asset2"), true, "{{branch3}}", "Release description 3", "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{version}}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{version}}", List.<String>of("one", "two", "three"), List.<Identifier>of(new Identifier("build", "12", Identifier.Position.BUILD)), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), Boolean.FALSE.toString(), Boolean.TRUE.toString(), "myrelease3", "", Boolean.FALSE))
                 )
             );
 
@@ -505,6 +554,29 @@ public class ConfigurationFileTests {
             mediumPriorityConfigurationLayerMock.setSharedConfigurationFile(System.getProperty(SIMPLEST_JSON_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY));
             highPriorityConfigurationLayerMock.setSharedConfigurationFile(System.getProperty(SIMPLEST_YAML_EXAMPLE_CONFIGURATION_FILE_SYSTEM_PROPERTY));
 
+            lowPriorityConfigurationLayerMock.setStateFile("file.yaml");
+            mediumPriorityConfigurationLayerMock.setStateFile("file.yaml");
+            highPriorityConfigurationLayerMock.setStateFile("file.json");
+
+            lowPriorityConfigurationLayerMock.setSubstitutions(
+                new Substitutions(
+                    List.<String>of("substitution1"),
+                    Map.<String,Substitution>of("substitution1", new Substitution("glob1", "match1", "replace1"))
+                )
+            );
+            mediumPriorityConfigurationLayerMock.setSubstitutions(
+                new Substitutions(
+                    List.<String>of("substitution2"),
+                    Map.<String,Substitution>of("substitution2", new Substitution("glob2", "match2", "replace2"))
+                )
+            );
+            highPriorityConfigurationLayerMock.setSubstitutions(
+                new Substitutions(
+                    List.<String>of("substitution3"),
+                    Map.<String,Substitution>of("substitution3", new Substitution("glob3", "match3", "replace3"))
+                )
+            );
+
             lowPriorityConfigurationLayerMock.setSummary(Boolean.TRUE);
             mediumPriorityConfigurationLayerMock.setSummary(Boolean.TRUE);
             highPriorityConfigurationLayerMock.setSummary(Boolean.FALSE);
@@ -512,10 +584,6 @@ public class ConfigurationFileTests {
             lowPriorityConfigurationLayerMock.setSummaryFile("summary.low");
             mediumPriorityConfigurationLayerMock.setSummaryFile("summary.medium");
             highPriorityConfigurationLayerMock.setSummaryFile("summary.high");
-
-            lowPriorityConfigurationLayerMock.setStateFile("file.yaml");
-            mediumPriorityConfigurationLayerMock.setStateFile("file.yaml");
-            highPriorityConfigurationLayerMock.setStateFile("file.json");
 
             lowPriorityConfigurationLayerMock.setVerbosity(Verbosity.TRACE);
             mediumPriorityConfigurationLayerMock.setVerbosity(Verbosity.INFO);
@@ -582,8 +650,12 @@ public class ConfigurationFileTests {
             assertEquals(highPriorityConfigurationLayerMock.getReleaseTypes().getItems().get("type3").getGitPush(), deserializedConfigurationLayer.getReleaseTypes().getItems().get("type3").getGitPush());
             assertEquals(highPriorityConfigurationLayerMock.getReleaseTypes().getItems().get("type3").getGitTag(), deserializedConfigurationLayer.getReleaseTypes().getItems().get("type3").getGitTag());
             assertEquals(highPriorityConfigurationLayerMock.getReleaseTypes().getItems().get("type3").getGitTagMessage(), deserializedConfigurationLayer.getReleaseTypes().getItems().get("type3").getGitTagMessage());
+            assertEquals(highPriorityConfigurationLayerMock.getReleaseTypes().getItems().get("type3").getGitTagNames(), deserializedConfigurationLayer.getReleaseTypes().getItems().get("type3").getGitTagNames());
             assertEquals(highPriorityConfigurationLayerMock.getReleaseTypes().getItems().get("type3").getMatchBranches(), deserializedConfigurationLayer.getReleaseTypes().getItems().get("type3").getMatchBranches());
             assertEquals(highPriorityConfigurationLayerMock.getReleaseTypes().getItems().get("type3").getPublish(), deserializedConfigurationLayer.getReleaseTypes().getItems().get("type3").getPublish());
+            assertEquals(highPriorityConfigurationLayerMock.getReleaseTypes().getItems().get("type3").getPublishDraft(), deserializedConfigurationLayer.getReleaseTypes().getItems().get("type3").getPublishDraft());
+            assertEquals(highPriorityConfigurationLayerMock.getReleaseTypes().getItems().get("type3").getPublishPreRelease(), deserializedConfigurationLayer.getReleaseTypes().getItems().get("type3").getPublishPreRelease());
+            assertEquals(highPriorityConfigurationLayerMock.getReleaseTypes().getItems().get("type3").getReleaseName(), deserializedConfigurationLayer.getReleaseTypes().getItems().get("type3").getReleaseName());
             assertEquals(highPriorityConfigurationLayerMock.getReleaseTypes().getItems().get("type3").getVersionRange(), deserializedConfigurationLayer.getReleaseTypes().getItems().get("type3").getVersionRange());
             assertEquals(highPriorityConfigurationLayerMock.getReleaseTypes().getItems().get("type3").getVersionRangeFromBranchName(), deserializedConfigurationLayer.getReleaseTypes().getItems().get("type3").getVersionRangeFromBranchName());
             assertEquals(highPriorityConfigurationLayerMock.getResume(), deserializedConfigurationLayer.getResume());
@@ -597,9 +669,12 @@ public class ConfigurationFileTests {
             assertEquals(highPriorityConfigurationLayerMock.getServices().get("gitlab").getOptions().get("REPOSITORY_NAME"), deserializedConfigurationLayer.getServices().get("gitlab").getOptions().get("REPOSITORY_NAME"));
             assertEquals(highPriorityConfigurationLayerMock.getServices().get("gitlab").getOptions().get("REPOSITORY_OWNER"), deserializedConfigurationLayer.getServices().get("gitlab").getOptions().get("REPOSITORY_OWNER"));
             assertEquals(highPriorityConfigurationLayerMock.getSharedConfigurationFile(), deserializedConfigurationLayer.getSharedConfigurationFile());
+            assertEquals(highPriorityConfigurationLayerMock.getStateFile(), deserializedConfigurationLayer.getStateFile());
+            assertEquals(highPriorityConfigurationLayerMock.getSubstitutions().getItems().get("substitution3").getFiles(), deserializedConfigurationLayer.getSubstitutions().getItems().get("substitution3").getFiles());
+            assertEquals(highPriorityConfigurationLayerMock.getSubstitutions().getItems().get("substitution3").getMatch(), deserializedConfigurationLayer.getSubstitutions().getItems().get("substitution3").getMatch());
+            assertEquals(highPriorityConfigurationLayerMock.getSubstitutions().getItems().get("substitution3").getReplace(), deserializedConfigurationLayer.getSubstitutions().getItems().get("substitution3").getReplace());
             assertEquals(highPriorityConfigurationLayerMock.getSummary(), deserializedConfigurationLayer.getSummary());
             assertEquals(highPriorityConfigurationLayerMock.getSummaryFile(), deserializedConfigurationLayer.getSummaryFile());
-            assertEquals(highPriorityConfigurationLayerMock.getStateFile(), deserializedConfigurationLayer.getStateFile());
             assertEquals(highPriorityConfigurationLayerMock.getVerbosity(), deserializedConfigurationLayer.getVerbosity());
         }
 
@@ -698,7 +773,7 @@ public class ConfigurationFileTests {
                     List.<String>of("type1"),
                     List.<String>of("service1"),
                     List.<String>of("remote1"),
-                    Map.<String,ReleaseType>of("type1", new ReleaseType(List.<String>of("asset1", "asset2"), false, "{{branch1}}", "Release description 1", "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{version}}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{version}}", List.<Identifier>of(new Identifier("build", "12", Identifier.Position.BUILD)), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), "", Boolean.FALSE))
+                    Map.<String,ReleaseType>of("type1", new ReleaseType(List.<String>of("asset1", "asset2"), false, "{{branch1}}", "Release description 1", "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{version}}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{version}}", List.<String>of("one", "two", "three"), List.<Identifier>of(new Identifier("build", "12", Identifier.Position.BUILD)), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), Boolean.FALSE.toString(), Boolean.TRUE.toString(), "myrelease1", "", Boolean.FALSE))
                 )
             );
             mediumPriorityConfigurationLayerMock.setReleaseTypes(
@@ -706,7 +781,7 @@ public class ConfigurationFileTests {
                     List.<String>of("type2"),
                     List.<String>of("service2"),
                     List.<String>of("remote2"),
-                    Map.<String,ReleaseType>of("type2", new ReleaseType(List.<String>of("asset1", "asset2"), true, "{{branch2}}", "Release description 2", "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{version}}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{version}}", List.<Identifier>of(new Identifier("build", "12", Identifier.Position.BUILD)), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), "", Boolean.FALSE))
+                    Map.<String,ReleaseType>of("type2", new ReleaseType(List.<String>of("asset1", "asset2"), true, "{{branch2}}", "Release description 2", "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{version}}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{version}}", List.<String>of("one", "two", "three"), List.<Identifier>of(new Identifier("build", "12", Identifier.Position.BUILD)), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), Boolean.FALSE.toString(), Boolean.TRUE.toString(), "myrelease2", "", Boolean.FALSE))
                 )
             );
             highPriorityConfigurationLayerMock.setReleaseTypes(
@@ -714,7 +789,7 @@ public class ConfigurationFileTests {
                     List.<String>of("type3"),
                     List.<String>of("service3"),
                     List.<String>of("remote3"),
-                    Map.<String,ReleaseType>of("type3", new ReleaseType(List.<String>of("asset1", "asset2"), true, "{{branch3}}", "Release description 3", "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{version}}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{version}}", List.<Identifier>of(new Identifier("build", "12", Identifier.Position.BUILD)), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), "", Boolean.FALSE))
+                    Map.<String,ReleaseType>of("type3", new ReleaseType(List.<String>of("asset1", "asset2"), true, "{{branch3}}", "Release description 3", "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{version}}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{version}}", List.<String>of("one", "two", "three"), List.<Identifier>of(new Identifier("build", "12", Identifier.Position.BUILD)), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), Boolean.FALSE.toString(), Boolean.TRUE.toString(), "myrelease3", "", Boolean.FALSE))
                 )
             );
 
@@ -777,13 +852,32 @@ public class ConfigurationFileTests {
             mediumPriorityConfigurationLayerMock.setSummary(Boolean.TRUE);
             highPriorityConfigurationLayerMock.setSummary(Boolean.FALSE);
 
-            lowPriorityConfigurationLayerMock.setSummaryFile("summary.low");
-            mediumPriorityConfigurationLayerMock.setSummaryFile("summary.medium");
-            highPriorityConfigurationLayerMock.setSummaryFile("summary.high");
-
             lowPriorityConfigurationLayerMock.setStateFile("file.json");
             mediumPriorityConfigurationLayerMock.setStateFile("file.json");
             highPriorityConfigurationLayerMock.setStateFile("file.yaml");
+
+            lowPriorityConfigurationLayerMock.setSubstitutions(
+                new Substitutions(
+                    List.<String>of("substitution1"),
+                    Map.<String,Substitution>of("substitution1", new Substitution("glob1", "match1", "replace1"))
+                )
+            );
+            mediumPriorityConfigurationLayerMock.setSubstitutions(
+                new Substitutions(
+                    List.<String>of("substitution2"),
+                    Map.<String,Substitution>of("substitution2", new Substitution("glob2", "match2", "replace2"))
+                )
+            );
+            highPriorityConfigurationLayerMock.setSubstitutions(
+                new Substitutions(
+                    List.<String>of("substitution3"),
+                    Map.<String,Substitution>of("substitution3", new Substitution("glob3", "match3", "replace3"))
+                )
+            );
+
+            lowPriorityConfigurationLayerMock.setSummaryFile("summary.low");
+            mediumPriorityConfigurationLayerMock.setSummaryFile("summary.medium");
+            highPriorityConfigurationLayerMock.setSummaryFile("summary.high");
 
             lowPriorityConfigurationLayerMock.setVerbosity(Verbosity.TRACE);
             mediumPriorityConfigurationLayerMock.setVerbosity(Verbosity.INFO);
@@ -850,8 +944,12 @@ public class ConfigurationFileTests {
             assertEquals(highPriorityConfigurationLayerMock.getReleaseTypes().getItems().get("type3").getGitPush(), deserializedConfigurationLayer.getReleaseTypes().getItems().get("type3").getGitPush());
             assertEquals(highPriorityConfigurationLayerMock.getReleaseTypes().getItems().get("type3").getGitTag(), deserializedConfigurationLayer.getReleaseTypes().getItems().get("type3").getGitTag());
             assertEquals(highPriorityConfigurationLayerMock.getReleaseTypes().getItems().get("type3").getGitTagMessage(), deserializedConfigurationLayer.getReleaseTypes().getItems().get("type3").getGitTagMessage());
+            assertEquals(highPriorityConfigurationLayerMock.getReleaseTypes().getItems().get("type3").getGitTagNames(), deserializedConfigurationLayer.getReleaseTypes().getItems().get("type3").getGitTagNames());
             assertEquals(highPriorityConfigurationLayerMock.getReleaseTypes().getItems().get("type3").getMatchBranches(), deserializedConfigurationLayer.getReleaseTypes().getItems().get("type3").getMatchBranches());
             assertEquals(highPriorityConfigurationLayerMock.getReleaseTypes().getItems().get("type3").getPublish(), deserializedConfigurationLayer.getReleaseTypes().getItems().get("type3").getPublish());
+            assertEquals(highPriorityConfigurationLayerMock.getReleaseTypes().getItems().get("type3").getPublishDraft(), deserializedConfigurationLayer.getReleaseTypes().getItems().get("type3").getPublishDraft());
+            assertEquals(highPriorityConfigurationLayerMock.getReleaseTypes().getItems().get("type3").getPublishPreRelease(), deserializedConfigurationLayer.getReleaseTypes().getItems().get("type3").getPublishPreRelease());
+            assertEquals(highPriorityConfigurationLayerMock.getReleaseTypes().getItems().get("type3").getReleaseName(), deserializedConfigurationLayer.getReleaseTypes().getItems().get("type3").getReleaseName());
             assertEquals(highPriorityConfigurationLayerMock.getReleaseTypes().getItems().get("type3").getVersionRange(), deserializedConfigurationLayer.getReleaseTypes().getItems().get("type3").getVersionRange());
             assertEquals(highPriorityConfigurationLayerMock.getReleaseTypes().getItems().get("type3").getVersionRangeFromBranchName(), deserializedConfigurationLayer.getReleaseTypes().getItems().get("type3").getVersionRangeFromBranchName());
             assertEquals(highPriorityConfigurationLayerMock.getResume(), deserializedConfigurationLayer.getResume());
@@ -865,9 +963,12 @@ public class ConfigurationFileTests {
             assertEquals(highPriorityConfigurationLayerMock.getServices().get("gitlab").getOptions().get("REPOSITORY_NAME"), deserializedConfigurationLayer.getServices().get("gitlab").getOptions().get("REPOSITORY_NAME"));
             assertEquals(highPriorityConfigurationLayerMock.getServices().get("gitlab").getOptions().get("REPOSITORY_OWNER"), deserializedConfigurationLayer.getServices().get("gitlab").getOptions().get("REPOSITORY_OWNER"));
             assertEquals(highPriorityConfigurationLayerMock.getSharedConfigurationFile(), deserializedConfigurationLayer.getSharedConfigurationFile());
+            assertEquals(highPriorityConfigurationLayerMock.getStateFile(), deserializedConfigurationLayer.getStateFile());
+            assertEquals(highPriorityConfigurationLayerMock.getSubstitutions().getItems().get("substitution3").getFiles(), deserializedConfigurationLayer.getSubstitutions().getItems().get("substitution3").getFiles());
+            assertEquals(highPriorityConfigurationLayerMock.getSubstitutions().getItems().get("substitution3").getMatch(), deserializedConfigurationLayer.getSubstitutions().getItems().get("substitution3").getMatch());
+            assertEquals(highPriorityConfigurationLayerMock.getSubstitutions().getItems().get("substitution3").getReplace(), deserializedConfigurationLayer.getSubstitutions().getItems().get("substitution3").getReplace());
             assertEquals(highPriorityConfigurationLayerMock.getSummary(), deserializedConfigurationLayer.getSummary());
             assertEquals(highPriorityConfigurationLayerMock.getSummaryFile(), deserializedConfigurationLayer.getSummaryFile());
-            assertEquals(highPriorityConfigurationLayerMock.getStateFile(), deserializedConfigurationLayer.getStateFile());
             assertEquals(highPriorityConfigurationLayerMock.getVerbosity(), deserializedConfigurationLayer.getVerbosity());
         }
     }

@@ -106,11 +106,6 @@ public class Mark extends AbstractCommand {
     private static final String INTERNAL_OUPUT_ATTRIBUTE_COMMIT = INTERNAL_OUTPUT_ATTRIBUTE_PREFIX.concat(".").concat("commit");
 
     /**
-     * The name used for the internal state attribute where we store the last tag created by this command.
-     */
-    private static final String INTERNAL_OUPUT_ATTRIBUTE_TAG = INTERNAL_OUTPUT_ATTRIBUTE_PREFIX.concat(".").concat("tag");
-
-    /**
      * Standard constructor.
      * 
      * @param state the state reference
@@ -173,11 +168,19 @@ public class Mark extends AbstractCommand {
             logger.info(COMMAND, "Git tag skipped due to dry run");
         else {
             String tagMessage = renderTemplate(state().getReleaseType().getGitTagMessage());
-            logger.debug(COMMAND, "Tagging latest commit '{}' with tag '{}'", repository().getLatestCommit(), state().getVersion());
-            // Here we can also specify the Tagger Identity as per https://github.com/mooltiverse/nyx/issues/65
-            repository().tag(state().getVersion(), Objects.isNull(tagMessage) || tagMessage.isBlank() ? null : tagMessage);
-            logger.debug(COMMAND, "Tag '{}' applied to commit '{}'", state().getVersion(), repository().getLatestCommit());
-            putInternalAttribute(INTERNAL_OUPUT_ATTRIBUTE_TAG, state().getVersion());
+            if (Objects.isNull(state().getReleaseType().getGitTagNames()) || state().getReleaseType().getGitTagNames().isEmpty()) {
+                logger.debug(COMMAND, "No tag name has been configured for this release type so no tag is applied");
+            }
+            else {
+                for (String tagTemplate: state().getReleaseType().getGitTagNames()) {
+                    String tag = renderTemplate(tagTemplate);
+                    logger.trace(COMMAND, "Tag template '{}' renders to '{}'", tagTemplate, tag);
+                    logger.debug(COMMAND, "Tagging latest commit '{}' with tag '{}'", repository().getLatestCommit(), tag);
+                    // Here we can also specify the Tagger Identity as per https://github.com/mooltiverse/nyx/issues/65
+                    repository().tag(tag, Objects.isNull(tagMessage) || tagMessage.isBlank() ? null : tagMessage);
+                    logger.debug(COMMAND, "Tag '{}' applied to commit '{}'", tag, repository().getLatestCommit());
+                }
+            }
         }
     }
 

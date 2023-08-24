@@ -95,6 +95,9 @@ var (
 	// The optional string or the template to render to use as the tag message if a tag has to be made. Value: nil
 	RELEASE_TYPE_GIT_TAG_MESSAGE *string = nil
 
+	// The list of templates to use as tag names when tagging a commit. Value: [ {{version}} ]
+	RELEASE_TYPE_GIT_TAG_NAMES *[]*string = &[]*string{utl.PointerToString("{{version}}")}
+
 	// The identifiers configuration block. Elements of this list must be of type Identifier. Value: nil
 	RELEASE_TYPE_IDENTIFIERS *[]*Identifier = nil
 
@@ -109,6 +112,15 @@ var (
 
 	// The optional flag or the template to render indicating whether or not releases must be published. Value: 'false'
 	RELEASE_TYPE_PUBLISH *string = utl.PointerToString("false")
+
+	// The optional template to set the draft flag of releases published to remote services. Value: 'false'
+	RELEASE_TYPE_PUBLISH_DRAFT *string = utl.PointerToString("false")
+
+	// The optional template to set the pre-release flag of releases published to remote services. Value: 'false'
+	RELEASE_TYPE_PUBLISH_PRE_RELEASE *string = utl.PointerToString("false")
+
+	// The optional template to set the name of releases published to remote services. Value: nil
+	RELEASE_TYPE_RELEASE_NAME *string = nil
 
 	// The optional template to render as a regular expression used to constrain versions issued by this release type. Value: nil
 	RELEASE_TYPE_VERSION_RANGE *string = nil
@@ -131,14 +143,17 @@ var (
 	// The default shared custom configuration file path. Value: nil
 	SHARED_CONFIGURATION_FILE *string = nil
 
+	// The default path to the local state file. Value: nil
+	STATE_FILE *string = nil
+
+	// The default substitutions block.
+	SUBSTITUTIONS, _ = NewSubstitutionsWith(&[]*string{}, &map[string]*Substitution{})
+
 	// The default flag that tells when to print a summary to the console. Value: false
 	SUMMARY *bool = utl.PointerToBoolean(false)
 
 	// The default path to the local summary file. Value: nil
 	SUMMARY_FILE *string = nil
-
-	// The default path to the local state file. Value: nil
-	STATE_FILE *string = nil
 
 	// The default logging level. Value: WARNING
 	VERBOSITY *Verbosity = PointerToVerbosity(WARNING)

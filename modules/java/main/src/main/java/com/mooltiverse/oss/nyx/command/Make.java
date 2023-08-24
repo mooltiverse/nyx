@@ -27,11 +27,24 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.FileVisitor;
+import java.nio.file.FileVisitResult;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
+import java.nio.file.PathMatcher;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.net.MalformedURLException;
 import java.text.SimpleDateFormat;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.TimeZone;
@@ -354,6 +367,91 @@ public class Make extends AbstractCommand {
     }
 
     /**
+     * Applies the configured substitutions to project files.
+     * 
+     * @throws DataAccessException in case the configuration can't be loaded for some reason.
+     * @throws IllegalPropertyException in case the configuration has some illegal options.
+     * @throws GitException in case of unexpected issues when accessing the Git repository.
+     * @throws ReleaseException if the task is unable to complete for reasons due to the release process.
+     */
+    private void applySubstitutions()
+        throws DataAccessException, IllegalPropertyException, GitException, ReleaseException {
+        logger.debug(COMMAND, "Applying substitutions to project files...");
+        if (Objects.isNull(state().getConfiguration().getSubstitutions()) || Objects.isNull(state().getConfiguration().getSubstitutions().getEnabled()) || state().getConfiguration().getSubstitutions().getEnabled().isEmpty() || Objects.isNull(state().getConfiguration().getSubstitutions().getItems()) || state().getConfiguration().getSubstitutions().getItems().isEmpty()) {
+            logger.debug(COMMAND, "No substitutions have been configured or enabled.");
+            return;
+        }
+
+        for (String ruleName : state().getConfiguration().getSubstitutions().getEnabled()) {
+            logger.debug(COMMAND, "Applying substitution rule '{}' to project files...", ruleName);
+            if (Objects.isNull(state().getConfiguration().getSubstitutions().getItems().get(ruleName)))
+                throw new IllegalPropertyException(String.format("Substitution rule '%s' is enabled but not configured", ruleName));
+            if (Objects.isNull(state().getConfiguration().getSubstitutions().getItems().get(ruleName).getFiles()) || state().getConfiguration().getSubstitutions().getItems().get(ruleName).getFiles().isBlank() ||
+                Objects.isNull(state().getConfiguration().getSubstitutions().getItems().get(ruleName).getMatch()) || state().getConfiguration().getSubstitutions().getItems().get(ruleName).getMatch().isBlank() ||
+                Objects.isNull(state().getConfiguration().getSubstitutions().getItems().get(ruleName).getReplace()))
+                throw new IllegalPropertyException(String.format("Substitution rule '%s' is enabled but not all of its required attributes have been set", ruleName));
+            
+            try {
+                // find files matching the glob
+                List<File> matches = new ArrayList<File>();
+                String globPattern = state().getConfiguration().getSubstitutions().getItems().get(ruleName).getFiles();
+
+                String rootDirectory = System.getProperty("user.dir");
+                if (!Objects.isNull(state().getConfiguration().getDirectory())) {
+                    rootDirectory = state().getConfiguration().getDirectory();
+                }
+                
+                // A FileVisitor to walk the directory and select only the files whose names match the glob pattern
+                FileVisitor<Path> matcherVisitor = new SimpleFileVisitor<Path>() {
+                    @Override
+                    public FileVisitResult visitFile(Path file, BasicFileAttributes attribs)
+                        throws IOException {
+                        FileSystem fs = FileSystems.getDefault();
+                        PathMatcher matcher = fs.getPathMatcher("glob:"+globPattern);
+                        if (matcher.matches(file)) {
+                            matches.add(file.toFile());
+                        }
+                        return FileVisitResult.CONTINUE;
+                    }
+                };
+                Files.walkFileTree(Paths.get(rootDirectory), matcherVisitor);
+
+                if (matches.isEmpty()) {
+                    logger.debug(COMMAND, "Glob pattern '{}' doesn't match any file in directory '{}'", state().getConfiguration().getSubstitutions().getItems().get(ruleName).getFiles(), rootDirectory);
+                }
+                else {
+                    for (File file: matches) {
+                        logger.debug(COMMAND, "Applying substitutions in file '{}'...", file.getCanonicalPath());
+                        FileReader fileReader = new FileReader(file);
+                        StringWriter stringWriter = new StringWriter();
+                        fileReader.transferTo(stringWriter);
+                        fileReader.close();
+                        String fileBuffer = stringWriter.toString();
+
+                        String replacement = renderTemplate(state().getConfiguration().getSubstitutions().getItems().get(ruleName).getReplace());
+                        Pattern substitutionPattern = Pattern.compile(state().getConfiguration().getSubstitutions().getItems().get(ruleName).getMatch());
+                        Matcher substitutionMatcher = substitutionPattern.matcher(fileBuffer);
+                        fileBuffer = substitutionMatcher.replaceAll(replacement);
+
+                        FileWriter fileWriter = new FileWriter(file);
+                        fileWriter.write(fileBuffer);
+                        fileWriter.flush();
+                        fileWriter.close();
+                        logger.debug(COMMAND, "Substitutions have been applied in file '{}'.", file.getCanonicalPath());
+                    }
+                    logger.debug(COMMAND, "Substitution rule '{}' applied to project files.", ruleName);
+                }
+            }
+            catch (InvalidPathException ipe) {
+                throw new IllegalPropertyException(ipe);
+            }
+            catch (IOException ioe) {
+                throw new DataAccessException(ioe);
+            }
+        }
+    }
+
+    /**
      * Reset the attributes store by this command into the internal state object.
      * This is required before running the command in order to make sure that the new execution is not affected
      * by a stale status coming from previous runs.
@@ -462,6 +560,8 @@ public class Make extends AbstractCommand {
         clearStateOutputAttributes();
 
         buildAssets();
+
+        applySubstitutions();
 
         storeStatusInternalAttributes();
         

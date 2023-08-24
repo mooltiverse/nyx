@@ -231,6 +231,28 @@ func TestConfigurationDefaultsGetSharedConfigurationFile(t *testing.T) {
 	}
 }
 
+func TestConfigurationDefaultsGetStateFile(t *testing.T) {
+	configuration, _ := NewConfiguration()
+	stateFile, _ := configuration.GetStateFile()
+	if stateFile == nil {
+		assert.Nil(t, stateFile)
+	} else {
+		assert.Equal(t, *ent.STATE_FILE, *stateFile)
+	}
+}
+
+func TestConfigurationDefaultsGetSubstitutions(t *testing.T) {
+	configuration, _ := NewConfiguration()
+	substitutions, _ := configuration.GetSubstitutions()
+	if substitutions == nil {
+		assert.Nil(t, substitutions)
+	} else {
+		assert.Equal(t, *ent.SUBSTITUTIONS, *substitutions)
+		assert.Equal(t, (*ent.SUBSTITUTIONS).GetEnabled(), (*substitutions).GetEnabled())
+		assert.Equal(t, 0, len(*substitutions.GetItems()))
+	}
+}
+
 func TestConfigurationDefaultsGetSummary(t *testing.T) {
 	configuration, _ := NewConfiguration()
 	summary, _ := configuration.GetSummary()
@@ -248,16 +270,6 @@ func TestConfigurationDefaultsGetSummaryFile(t *testing.T) {
 		assert.Nil(t, summaryFile)
 	} else {
 		assert.Equal(t, *ent.SUMMARY_FILE, *summaryFile)
-	}
-}
-
-func TestConfigurationDefaultsGetStateFile(t *testing.T) {
-	configuration, _ := NewConfiguration()
-	stateFile, _ := configuration.GetStateFile()
-	if stateFile == nil {
-		assert.Nil(t, stateFile)
-	} else {
-		assert.Equal(t, *ent.STATE_FILE, *stateFile)
 	}
 }
 
@@ -737,12 +749,16 @@ func TestConfigurationWithCommandLineConfigurationGetReleaseTypes(t *testing.T) 
 		"--release-types-type1-git-push=true",
 		"--release-types-type1-git-tag=true",
 		"--release-types-type1-git-tag-message=Tagging {{version}}",
+		"--release-types-type1-git-tag-names=one,two,three",
 		"--release-types-type1-identifiers-0-position=" + ent.BUILD.String(),
 		"--release-types-type1-identifiers-0-qualifier=build",
 		"--release-types-type1-identifiers-0-value=12",
 		"--release-types-type1-match-branches=",
 		"--release-types-type1-match-environment-variables-PATH=.*",
 		"--release-types-type1-publish=true",
+		"--release-types-type1-publish-draft=false",
+		"--release-types-type1-publish-pre-release=true",
+		"--release-types-type1-release-name=myrelease",
 		"--release-types-type1-version-range=",
 		"--release-types-type1-version-range-from-branch-name=false",
 	})
@@ -794,6 +810,10 @@ func TestConfigurationWithCommandLineConfigurationGetReleaseTypes(t *testing.T) 
 	assert.Equal(t, "true", *(*(*releaseTypes2).GetItems())["type1"].GetGitPush())
 	assert.Equal(t, "true", *(*(*releaseTypes2).GetItems())["type1"].GetGitTag())
 	assert.Equal(t, "Tagging {{version}}", *(*(*releaseTypes2).GetItems())["type1"].GetGitTagMessage())
+	assert.Equal(t, 3, len(*(*(*releaseTypes2).GetItems())["type1"].GetGitTagNames()))
+	assert.Equal(t, "one", *(*(*(*releaseTypes2).GetItems())["type1"].GetGitTagNames())[0])
+	assert.Equal(t, "two", *(*(*(*releaseTypes2).GetItems())["type1"].GetGitTagNames())[1])
+	assert.Equal(t, "three", *(*(*(*releaseTypes2).GetItems())["type1"].GetGitTagNames())[2])
 	assert.Equal(t, "type1", *(*(*releaseTypes2).GetEnabled())[0])
 	assert.NotNil(t, *(*(*releaseTypes2).GetItems())["type1"].GetIdentifiers())
 	assert.False(t, len(*(*(*releaseTypes2).GetItems())["type1"].GetIdentifiers()) == 0)
@@ -802,6 +822,9 @@ func TestConfigurationWithCommandLineConfigurationGetReleaseTypes(t *testing.T) 
 	assert.False(t, len(*(*(*releaseTypes2).GetItems())["type1"].GetMatchEnvironmentVariables()) == 0)
 	assert.Nil(t, (*(*releaseTypes2).GetItems())["type1"].GetMatchWorkspaceStatus())
 	assert.Equal(t, "true", *(*(*releaseTypes2).GetItems())["type1"].GetPublish())
+	assert.Equal(t, "false", *(*(*releaseTypes2).GetItems())["type1"].GetPublishDraft())
+	assert.Equal(t, "true", *(*(*releaseTypes2).GetItems())["type1"].GetPublishPreRelease())
+	assert.Equal(t, "myrelease", *(*(*releaseTypes2).GetItems())["type1"].GetReleaseName())
 	assert.Equal(t, "", *(*(*releaseTypes2).GetItems())["type1"].GetVersionRange())
 	assert.Equal(t, false, *(*(*releaseTypes2).GetItems())["type1"].GetVersionRangeFromBranchName())
 
@@ -956,6 +979,77 @@ func TestConfigurationWithCommandLineConfigurationGetSharedConfigurationFile(t *
 	assert.Nil(t, sharedConfigurationFile2)
 }
 
+func TestConfigurationWithCommandLineConfigurationGetStateFile(t *testing.T) {
+	configurationLayerMock := NewCommandLineConfigurationLayer()
+	configuration, _ := NewConfiguration()
+	configurationLayerMock.withArguments([]string{
+		"--state-file=state-file.yml",
+	})
+
+	// in order to make the test meaningful, make sure the default and mock values are different
+	assert.Nil(t, ent.STATE_FILE)
+	stateFile1, _ := configurationLayerMock.GetStateFile()
+	assert.Equal(t, "state-file.yml", *stateFile1)
+
+	// make sure the initial values come from defaults, until we inject the command line configuration
+	assert.Nil(t, ent.STATE_FILE)
+	stateFile2, _ := configuration.GetStateFile()
+	assert.Nil(t, stateFile2)
+
+	// inject the command line configuration and test the new value is returned from that
+	var cl ConfigurationLayer = configurationLayerMock
+	configuration.WithCommandLineConfiguration(&cl)
+
+	stateFile2, _ = configuration.GetStateFile()
+	assert.Equal(t, *stateFile1, *stateFile2)
+
+	// now remove the command line configuration and test that now default values are returned again
+	configuration, _ = configuration.WithCommandLineConfiguration(nil)
+	stateFile2, _ = configuration.GetStateFile()
+	assert.Nil(t, stateFile2)
+}
+
+func TestConfigurationWithCommandLineConfigurationGetSubstitutions(t *testing.T) {
+	configurationLayerMock := NewCommandLineConfigurationLayer()
+	configuration, _ := NewConfiguration()
+	configurationLayerMock.withArguments([]string{
+		"--substitutions-enabled=substitution1",
+		"--substitutions-substitution1-files=glob1",
+	})
+
+	// in order to make the test meaningful, make sure the default and mock values are different
+	assert.NotNil(t, *ent.SUBSTITUTIONS)
+	substitutions1, _ := configurationLayerMock.GetSubstitutions()
+	assert.NotNil(t, substitutions1)
+	substitutions2, _ := configuration.GetSubstitutions()
+	assert.NotNil(t, substitutions2)
+	assert.NotEqual(t, substitutions1, substitutions2)
+
+	// make sure the initial values come from defaults, until we inject the command line configuration
+	assert.Equal(t, 0, len(*(*ent.SUBSTITUTIONS).GetEnabled()))
+	assert.Equal(t, 0, len(*(*substitutions2).GetEnabled()))
+	assert.Equal(t, 0, len(*(*ent.SUBSTITUTIONS).GetItems()))
+	assert.Equal(t, 0, len(*(*substitutions2).GetItems()))
+
+	// inject the command line configuration and test the new value is returned from that
+	var cl ConfigurationLayer = configurationLayerMock
+	configuration.WithCommandLineConfiguration(&cl)
+
+	substitutions2, _ = configuration.GetSubstitutions()
+	assert.NotNil(t, (*substitutions2).GetEnabled())
+	assert.NotNil(t, (*substitutions2).GetItems())
+	assert.Equal(t, 1, len(*(*substitutions2).GetEnabled()))
+	assert.Equal(t, "substitution1", *(*(*substitutions2).GetEnabled())[0])
+	assert.Equal(t, 1, len(*(*substitutions2).GetItems()))
+	assert.Equal(t, "glob1", *(*(*(*substitutions2).GetItems())["substitution1"]).GetFiles())
+
+	// now remove the command line configuration and test that now default values are returned again
+	configuration.WithCommandLineConfiguration(nil)
+	substitutions2, _ = configuration.GetSubstitutions()
+	assert.Equal(t, 0, len(*(*substitutions2).GetEnabled()))
+	assert.Equal(t, 0, len(*(*substitutions2).GetItems()))
+}
+
 func TestConfigurationWithCommandLineConfigurationGetSummary(t *testing.T) {
 	configurationLayerMock := NewCommandLineConfigurationLayer()
 	configuration, _ := NewConfiguration()
@@ -1014,36 +1108,6 @@ func TestConfigurationWithCommandLineConfigurationGetSummaryFile(t *testing.T) {
 	configuration, _ = configuration.WithCommandLineConfiguration(nil)
 	summaryFile2, _ = configuration.GetSummaryFile()
 	assert.Nil(t, summaryFile2)
-}
-
-func TestConfigurationWithCommandLineConfigurationGetStateFile(t *testing.T) {
-	configurationLayerMock := NewCommandLineConfigurationLayer()
-	configuration, _ := NewConfiguration()
-	configurationLayerMock.withArguments([]string{
-		"--state-file=state-file.yml",
-	})
-
-	// in order to make the test meaningful, make sure the default and mock values are different
-	assert.Nil(t, ent.STATE_FILE)
-	stateFile1, _ := configurationLayerMock.GetStateFile()
-	assert.Equal(t, "state-file.yml", *stateFile1)
-
-	// make sure the initial values come from defaults, until we inject the command line configuration
-	assert.Nil(t, ent.STATE_FILE)
-	stateFile2, _ := configuration.GetStateFile()
-	assert.Nil(t, stateFile2)
-
-	// inject the command line configuration and test the new value is returned from that
-	var cl ConfigurationLayer = configurationLayerMock
-	configuration.WithCommandLineConfiguration(&cl)
-
-	stateFile2, _ = configuration.GetStateFile()
-	assert.Equal(t, *stateFile1, *stateFile2)
-
-	// now remove the command line configuration and test that now default values are returned again
-	configuration, _ = configuration.WithCommandLineConfiguration(nil)
-	stateFile2, _ = configuration.GetStateFile()
-	assert.Nil(t, stateFile2)
 }
 
 func TestConfigurationWithCommandLineConfigurationGetVerbosity(t *testing.T) {
@@ -1512,7 +1576,7 @@ func TestConfigurationWithPluginConfigurationGetReleasePrefix(t *testing.T) {
 func TestConfigurationWithPluginConfigurationGetReleaseTypes(t *testing.T) {
 	configurationLayerMock := NewSimpleConfigurationLayer()
 	configuration, _ := NewConfiguration()
-	releaseTypes, _ := ent.NewReleaseTypesWith(&[]*string{utl.PointerToString("type1")}, &[]*string{utl.PointerToString("service1")}, &[]*string{utl.PointerToString("remote1")}, &map[string]*ent.ReleaseType{"type1": ent.NewReleaseTypeWith(&[]*string{utl.PointerToString("asset1"), utl.PointerToString("asset2")}, utl.PointerToBoolean(true), utl.PointerToString("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}"), utl.PointerToString("Release description"), utl.PointerToString("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$"), utl.PointerToString("true"), utl.PointerToString("Committing {{version}}"), utl.PointerToString("true"), utl.PointerToString("true"), utl.PointerToString("Tagging {{version}}"), &[]*ent.Identifier{ent.NewIdentifierWith(utl.PointerToString("build"), utl.PointerToString("12"), ent.PointerToPosition(ent.BUILD))}, utl.PointerToString(""), &map[string]string{"PATH": ".*"}, nil, utl.PointerToString("true"), utl.PointerToString(""), utl.PointerToBoolean(false))})
+	releaseTypes, _ := ent.NewReleaseTypesWith(&[]*string{utl.PointerToString("type1")}, &[]*string{utl.PointerToString("service1")}, &[]*string{utl.PointerToString("remote1")}, &map[string]*ent.ReleaseType{"type1": ent.NewReleaseTypeWith(&[]*string{utl.PointerToString("asset1"), utl.PointerToString("asset2")}, utl.PointerToBoolean(true), utl.PointerToString("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}"), utl.PointerToString("Release description"), utl.PointerToString("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$"), utl.PointerToString("true"), utl.PointerToString("Committing {{version}}"), utl.PointerToString("true"), utl.PointerToString("true"), utl.PointerToString("Tagging {{version}}"), &[]*string{utl.PointerToString("one"), utl.PointerToString("two"), utl.PointerToString("three")}, &[]*ent.Identifier{ent.NewIdentifierWith(utl.PointerToString("build"), utl.PointerToString("12"), ent.PointerToPosition(ent.BUILD))}, utl.PointerToString(""), &map[string]string{"PATH": ".*"}, nil, utl.PointerToString("true"), utl.PointerToString("false"), utl.PointerToString("true"), utl.PointerToString("myrelease"), utl.PointerToString(""), utl.PointerToBoolean(false))})
 	configurationLayerMock.SetReleaseTypes(releaseTypes)
 
 	// in order to make the test meaningful, make sure the default and mock values are different
@@ -1562,6 +1626,10 @@ func TestConfigurationWithPluginConfigurationGetReleaseTypes(t *testing.T) {
 	assert.Equal(t, "true", *(*(*releaseTypes2).GetItems())["type1"].GetGitPush())
 	assert.Equal(t, "true", *(*(*releaseTypes2).GetItems())["type1"].GetGitTag())
 	assert.Equal(t, "Tagging {{version}}", *(*(*releaseTypes2).GetItems())["type1"].GetGitTagMessage())
+	assert.Equal(t, 3, len(*(*(*releaseTypes2).GetItems())["type1"].GetGitTagNames()))
+	assert.Equal(t, "one", *(*(*(*releaseTypes2).GetItems())["type1"].GetGitTagNames())[0])
+	assert.Equal(t, "two", *(*(*(*releaseTypes2).GetItems())["type1"].GetGitTagNames())[1])
+	assert.Equal(t, "three", *(*(*(*releaseTypes2).GetItems())["type1"].GetGitTagNames())[2])
 	assert.Equal(t, "type1", *(*(*releaseTypes2).GetEnabled())[0])
 	assert.NotNil(t, *(*(*releaseTypes2).GetItems())["type1"].GetIdentifiers())
 	assert.False(t, len(*(*(*releaseTypes2).GetItems())["type1"].GetIdentifiers()) == 0)
@@ -1570,6 +1638,9 @@ func TestConfigurationWithPluginConfigurationGetReleaseTypes(t *testing.T) {
 	assert.False(t, len(*(*(*releaseTypes2).GetItems())["type1"].GetMatchEnvironmentVariables()) == 0)
 	assert.Nil(t, (*(*releaseTypes2).GetItems())["type1"].GetMatchWorkspaceStatus())
 	assert.Equal(t, "true", *(*(*releaseTypes2).GetItems())["type1"].GetPublish())
+	assert.Equal(t, "false", *(*(*releaseTypes2).GetItems())["type1"].GetPublishDraft())
+	assert.Equal(t, "true", *(*(*releaseTypes2).GetItems())["type1"].GetPublishPreRelease())
+	assert.Equal(t, "myrelease", *(*(*releaseTypes2).GetItems())["type1"].GetReleaseName())
 	assert.Equal(t, "", *(*(*releaseTypes2).GetItems())["type1"].GetVersionRange())
 	assert.Equal(t, false, *(*(*releaseTypes2).GetItems())["type1"].GetVersionRangeFromBranchName())
 
@@ -1709,6 +1780,73 @@ func TestConfigurationWithPluginConfigurationGetSharedConfigurationFile(t *testi
 	assert.Nil(t, sharedConfigurationFile2)
 }
 
+func TestConfigurationWithPluginConfigurationGetStateFile(t *testing.T) {
+	configurationLayerMock := NewSimpleConfigurationLayer()
+	configuration, _ := NewConfiguration()
+	configurationLayerMock.SetStateFile(utl.PointerToString("state-file.yml"))
+
+	// in order to make the test meaningful, make sure the default and mock values are different
+	assert.Nil(t, ent.STATE_FILE)
+	stateFile1, _ := configurationLayerMock.GetStateFile()
+	assert.Equal(t, "state-file.yml", *stateFile1)
+
+	// make sure the initial values come from defaults, until we inject the command line configuration
+	assert.Nil(t, ent.STATE_FILE)
+	stateFile2, _ := configuration.GetStateFile()
+	assert.Nil(t, stateFile2)
+
+	// inject the command line configuration and test the new value is returned from that
+	var cl ConfigurationLayer = configurationLayerMock
+	configuration.WithPluginConfiguration(&cl)
+
+	stateFile2, _ = configuration.GetStateFile()
+	assert.Equal(t, *stateFile1, *stateFile2)
+
+	// now remove the command line configuration and test that now default values are returned again
+	configuration, _ = configuration.WithPluginConfiguration(nil)
+	stateFile2, _ = configuration.GetStateFile()
+	assert.Nil(t, stateFile2)
+}
+
+func TestConfigurationWithPluginConfigurationGetSubstitutions(t *testing.T) {
+	configurationLayerMock := NewSimpleConfigurationLayer()
+	configuration, _ := NewConfiguration()
+	substitutions, _ := ent.NewSubstitutionsWith(&[]*string{utl.PointerToString("substitution1")}, &map[string]*ent.Substitution{"substitution1": ent.NewSubstitutionWith(utl.PointerToString("glob1"), utl.PointerToString("match1"), utl.PointerToString("replace1"))})
+	configurationLayerMock.SetSubstitutions(substitutions)
+
+	// in order to make the test meaningful, make sure the default and mock values are different
+	assert.NotNil(t, *ent.SUBSTITUTIONS)
+	substitutions1, _ := configurationLayerMock.GetSubstitutions()
+	assert.NotNil(t, substitutions1)
+	substitutions2, _ := configuration.GetSubstitutions()
+	assert.NotNil(t, substitutions2)
+	assert.NotEqual(t, substitutions1, substitutions2)
+
+	// make sure the initial values come from defaults, until we inject the command line configuration
+	assert.Equal(t, 0, len(*(*ent.SUBSTITUTIONS).GetEnabled()))
+	assert.Equal(t, 0, len(*(*substitutions2).GetEnabled()))
+	assert.Equal(t, 0, len(*(*ent.SUBSTITUTIONS).GetItems()))
+	assert.Equal(t, 0, len(*(*substitutions2).GetItems()))
+
+	// inject the command line configuration and test the new value is returned from that
+	var cl ConfigurationLayer = configurationLayerMock
+	configuration.WithPluginConfiguration(&cl)
+
+	substitutions2, _ = configuration.GetSubstitutions()
+	assert.NotNil(t, (*substitutions2).GetEnabled())
+	assert.NotNil(t, (*substitutions2).GetItems())
+	assert.Equal(t, 1, len(*(*substitutions2).GetEnabled()))
+	assert.Equal(t, "substitution1", *(*(*substitutions2).GetEnabled())[0])
+	assert.Equal(t, 1, len(*(*substitutions2).GetItems()))
+	assert.Equal(t, "glob1", *(*(*(*substitutions2).GetItems())["substitution1"]).GetFiles())
+
+	// now remove the command line configuration and test that now default values are returned again
+	configuration.WithPluginConfiguration(nil)
+	substitutions2, _ = configuration.GetSubstitutions()
+	assert.Equal(t, 0, len(*(*substitutions2).GetEnabled()))
+	assert.Equal(t, 0, len(*(*substitutions2).GetItems()))
+}
+
 func TestConfigurationWithPluginConfigurationGetSummary(t *testing.T) {
 	configurationLayerMock := NewSimpleConfigurationLayer()
 	configuration, _ := NewConfiguration()
@@ -1763,34 +1901,6 @@ func TestConfigurationWithPluginConfigurationGetSummaryFile(t *testing.T) {
 	configuration, _ = configuration.WithPluginConfiguration(nil)
 	summaryFile2, _ = configuration.GetSummaryFile()
 	assert.Nil(t, summaryFile2)
-}
-
-func TestConfigurationWithPluginConfigurationGetStateFile(t *testing.T) {
-	configurationLayerMock := NewSimpleConfigurationLayer()
-	configuration, _ := NewConfiguration()
-	configurationLayerMock.SetStateFile(utl.PointerToString("state-file.yml"))
-
-	// in order to make the test meaningful, make sure the default and mock values are different
-	assert.Nil(t, ent.STATE_FILE)
-	stateFile1, _ := configurationLayerMock.GetStateFile()
-	assert.Equal(t, "state-file.yml", *stateFile1)
-
-	// make sure the initial values come from defaults, until we inject the command line configuration
-	assert.Nil(t, ent.STATE_FILE)
-	stateFile2, _ := configuration.GetStateFile()
-	assert.Nil(t, stateFile2)
-
-	// inject the command line configuration and test the new value is returned from that
-	var cl ConfigurationLayer = configurationLayerMock
-	configuration.WithPluginConfiguration(&cl)
-
-	stateFile2, _ = configuration.GetStateFile()
-	assert.Equal(t, *stateFile1, *stateFile2)
-
-	// now remove the command line configuration and test that now default values are returned again
-	configuration, _ = configuration.WithPluginConfiguration(nil)
-	stateFile2, _ = configuration.GetStateFile()
-	assert.Nil(t, stateFile2)
 }
 
 func TestConfigurationWithPluginConfigurationGetVerbosity(t *testing.T) {
@@ -2255,7 +2365,7 @@ func TestConfigurationWithRuntimeConfigurationGetReleasePrefix(t *testing.T) {
 func TestConfigurationWithRuntimeConfigurationGetReleaseTypes(t *testing.T) {
 	configurationLayerMock := NewSimpleConfigurationLayer()
 	configuration, _ := NewConfiguration()
-	releaseTypes, _ := ent.NewReleaseTypesWith(&[]*string{utl.PointerToString("type1")}, &[]*string{utl.PointerToString("service1")}, &[]*string{utl.PointerToString("remote1")}, &map[string]*ent.ReleaseType{"type1": ent.NewReleaseTypeWith(&[]*string{utl.PointerToString("asset1"), utl.PointerToString("asset2")}, utl.PointerToBoolean(true), utl.PointerToString("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}"), utl.PointerToString("Release description"), utl.PointerToString("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$"), utl.PointerToString("true"), utl.PointerToString("Committing {{version}}"), utl.PointerToString("true"), utl.PointerToString("true"), utl.PointerToString("Tagging {{version}}"), &[]*ent.Identifier{ent.NewIdentifierWith(utl.PointerToString("build"), utl.PointerToString("12"), ent.PointerToPosition(ent.BUILD))}, utl.PointerToString(""), &map[string]string{"PATH": ".*"}, nil, utl.PointerToString("true"), utl.PointerToString(""), utl.PointerToBoolean(false))})
+	releaseTypes, _ := ent.NewReleaseTypesWith(&[]*string{utl.PointerToString("type1")}, &[]*string{utl.PointerToString("service1")}, &[]*string{utl.PointerToString("remote1")}, &map[string]*ent.ReleaseType{"type1": ent.NewReleaseTypeWith(&[]*string{utl.PointerToString("asset1"), utl.PointerToString("asset2")}, utl.PointerToBoolean(true), utl.PointerToString("{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}"), utl.PointerToString("Release description"), utl.PointerToString("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$"), utl.PointerToString("true"), utl.PointerToString("Committing {{version}}"), utl.PointerToString("true"), utl.PointerToString("true"), utl.PointerToString("Tagging {{version}}"), &[]*string{utl.PointerToString("one"), utl.PointerToString("two"), utl.PointerToString("three")}, &[]*ent.Identifier{ent.NewIdentifierWith(utl.PointerToString("build"), utl.PointerToString("12"), ent.PointerToPosition(ent.BUILD))}, utl.PointerToString(""), &map[string]string{"PATH": ".*"}, nil, utl.PointerToString("true"), utl.PointerToString("false"), utl.PointerToString("true"), utl.PointerToString("myrelease"), utl.PointerToString(""), utl.PointerToBoolean(false))})
 	configurationLayerMock.SetReleaseTypes(releaseTypes)
 
 	// in order to make the test meaningful, make sure the default and mock values are different
@@ -2305,6 +2415,10 @@ func TestConfigurationWithRuntimeConfigurationGetReleaseTypes(t *testing.T) {
 	assert.Equal(t, "true", *(*(*releaseTypes2).GetItems())["type1"].GetGitPush())
 	assert.Equal(t, "true", *(*(*releaseTypes2).GetItems())["type1"].GetGitTag())
 	assert.Equal(t, "Tagging {{version}}", *(*(*releaseTypes2).GetItems())["type1"].GetGitTagMessage())
+	assert.Equal(t, 3, len(*(*(*releaseTypes2).GetItems())["type1"].GetGitTagNames()))
+	assert.Equal(t, "one", *(*(*(*releaseTypes2).GetItems())["type1"].GetGitTagNames())[0])
+	assert.Equal(t, "two", *(*(*(*releaseTypes2).GetItems())["type1"].GetGitTagNames())[1])
+	assert.Equal(t, "three", *(*(*(*releaseTypes2).GetItems())["type1"].GetGitTagNames())[2])
 	assert.Equal(t, "type1", *(*(*releaseTypes2).GetEnabled())[0])
 	assert.NotNil(t, *(*(*releaseTypes2).GetItems())["type1"].GetIdentifiers())
 	assert.False(t, len(*(*(*releaseTypes2).GetItems())["type1"].GetIdentifiers()) == 0)
@@ -2313,6 +2427,9 @@ func TestConfigurationWithRuntimeConfigurationGetReleaseTypes(t *testing.T) {
 	assert.False(t, len(*(*(*releaseTypes2).GetItems())["type1"].GetMatchEnvironmentVariables()) == 0)
 	assert.Nil(t, (*(*releaseTypes2).GetItems())["type1"].GetMatchWorkspaceStatus())
 	assert.Equal(t, "true", *(*(*releaseTypes2).GetItems())["type1"].GetPublish())
+	assert.Equal(t, "false", *(*(*releaseTypes2).GetItems())["type1"].GetPublishDraft())
+	assert.Equal(t, "true", *(*(*releaseTypes2).GetItems())["type1"].GetPublishPreRelease())
+	assert.Equal(t, "myrelease", *(*(*releaseTypes2).GetItems())["type1"].GetReleaseName())
 	assert.Equal(t, "", *(*(*releaseTypes2).GetItems())["type1"].GetVersionRange())
 	assert.Equal(t, false, *(*(*releaseTypes2).GetItems())["type1"].GetVersionRangeFromBranchName())
 
@@ -2452,6 +2569,73 @@ func TestConfigurationWithRuntimeConfigurationGetSharedConfigurationFile(t *test
 	assert.Nil(t, sharedConfigurationFile2)
 }
 
+func TestConfigurationWithRuntimeConfigurationGetStateFile(t *testing.T) {
+	configurationLayerMock := NewSimpleConfigurationLayer()
+	configuration, _ := NewConfiguration()
+	configurationLayerMock.SetStateFile(utl.PointerToString("state-file.yml"))
+
+	// in order to make the test meaningful, make sure the default and mock values are different
+	assert.Nil(t, ent.STATE_FILE)
+	stateFile1, _ := configurationLayerMock.GetStateFile()
+	assert.Equal(t, "state-file.yml", *stateFile1)
+
+	// make sure the initial values come from defaults, until we inject the command line configuration
+	assert.Nil(t, ent.STATE_FILE)
+	stateFile2, _ := configuration.GetStateFile()
+	assert.Nil(t, stateFile2)
+
+	// inject the command line configuration and test the new value is returned from that
+	var cl ConfigurationLayer = configurationLayerMock
+	configuration.WithRuntimeConfiguration(&cl)
+
+	stateFile2, _ = configuration.GetStateFile()
+	assert.Equal(t, *stateFile1, *stateFile2)
+
+	// now remove the command line configuration and test that now default values are returned again
+	configuration, _ = configuration.WithRuntimeConfiguration(nil)
+	stateFile2, _ = configuration.GetStateFile()
+	assert.Nil(t, stateFile2)
+}
+
+func TestConfigurationWithRuntimeConfigurationGetSubstitutions(t *testing.T) {
+	configurationLayerMock := NewSimpleConfigurationLayer()
+	configuration, _ := NewConfiguration()
+	substitutions, _ := ent.NewSubstitutionsWith(&[]*string{utl.PointerToString("substitution1")}, &map[string]*ent.Substitution{"substitution1": ent.NewSubstitutionWith(utl.PointerToString("glob1"), utl.PointerToString("match1"), utl.PointerToString("replace1"))})
+	configurationLayerMock.SetSubstitutions(substitutions)
+
+	// in order to make the test meaningful, make sure the default and mock values are different
+	assert.NotNil(t, *ent.SUBSTITUTIONS)
+	substitutions1, _ := configurationLayerMock.GetSubstitutions()
+	assert.NotNil(t, substitutions1)
+	substitutions2, _ := configuration.GetSubstitutions()
+	assert.NotNil(t, substitutions2)
+	assert.NotEqual(t, substitutions1, substitutions2)
+
+	// make sure the initial values come from defaults, until we inject the command line configuration
+	assert.Equal(t, 0, len(*(*ent.SUBSTITUTIONS).GetEnabled()))
+	assert.Equal(t, 0, len(*(*substitutions2).GetEnabled()))
+	assert.Equal(t, 0, len(*(*ent.SUBSTITUTIONS).GetItems()))
+	assert.Equal(t, 0, len(*(*substitutions2).GetItems()))
+
+	// inject the command line configuration and test the new value is returned from that
+	var cl ConfigurationLayer = configurationLayerMock
+	configuration.WithRuntimeConfiguration(&cl)
+
+	substitutions2, _ = configuration.GetSubstitutions()
+	assert.NotNil(t, (*substitutions2).GetEnabled())
+	assert.NotNil(t, (*substitutions2).GetItems())
+	assert.Equal(t, 1, len(*(*substitutions2).GetEnabled()))
+	assert.Equal(t, "substitution1", *(*(*substitutions2).GetEnabled())[0])
+	assert.Equal(t, 1, len(*(*substitutions2).GetItems()))
+	assert.Equal(t, "glob1", *(*(*(*substitutions2).GetItems())["substitution1"]).GetFiles())
+
+	// now remove the command line configuration and test that now default values are returned again
+	configuration.WithRuntimeConfiguration(nil)
+	substitutions2, _ = configuration.GetSubstitutions()
+	assert.Equal(t, 0, len(*(*substitutions2).GetEnabled()))
+	assert.Equal(t, 0, len(*(*substitutions2).GetItems()))
+}
+
 func TestConfigurationWithRuntimeConfigurationGetSummary(t *testing.T) {
 	configurationLayerMock := NewSimpleConfigurationLayer()
 	configuration, _ := NewConfiguration()
@@ -2506,34 +2690,6 @@ func TestConfigurationWithRuntimeConfigurationGetSummaryFile(t *testing.T) {
 	configuration, _ = configuration.WithRuntimeConfiguration(nil)
 	summaryFile2, _ = configuration.GetSummaryFile()
 	assert.Nil(t, summaryFile2)
-}
-
-func TestConfigurationWithRuntimeConfigurationGetStateFile(t *testing.T) {
-	configurationLayerMock := NewSimpleConfigurationLayer()
-	configuration, _ := NewConfiguration()
-	configurationLayerMock.SetStateFile(utl.PointerToString("state-file.yml"))
-
-	// in order to make the test meaningful, make sure the default and mock values are different
-	assert.Nil(t, ent.STATE_FILE)
-	stateFile1, _ := configurationLayerMock.GetStateFile()
-	assert.Equal(t, "state-file.yml", *stateFile1)
-
-	// make sure the initial values come from defaults, until we inject the command line configuration
-	assert.Nil(t, ent.STATE_FILE)
-	stateFile2, _ := configuration.GetStateFile()
-	assert.Nil(t, stateFile2)
-
-	// inject the command line configuration and test the new value is returned from that
-	var cl ConfigurationLayer = configurationLayerMock
-	configuration.WithRuntimeConfiguration(&cl)
-
-	stateFile2, _ = configuration.GetStateFile()
-	assert.Equal(t, *stateFile1, *stateFile2)
-
-	// now remove the command line configuration and test that now default values are returned again
-	configuration, _ = configuration.WithRuntimeConfiguration(nil)
-	stateFile2, _ = configuration.GetStateFile()
-	assert.Nil(t, stateFile2)
 }
 
 func TestConfigurationWithRuntimeConfigurationGetVerbosity(t *testing.T) {
@@ -2950,7 +3106,7 @@ func TestConfigurationWithMultipleConfigurationLayersGetReleaseTypes(t *testing.
 	mediumPriorityConfigurationLayerMock := NewCommandLineConfigurationLayer()
 	highPriorityConfigurationLayerMock := NewSimpleConfigurationLayer()
 	configuration, _ := NewConfiguration()
-	lpReleaseTypes, _ := ent.NewReleaseTypesWith(&[]*string{utl.PointerToString("type1")}, &[]*string{utl.PointerToString("service1")}, &[]*string{utl.PointerToString("remote1")}, &map[string]*ent.ReleaseType{"type1": ent.NewReleaseTypeWith(&[]*string{utl.PointerToString("assetA1"), utl.PointerToString("assetA2")}, utl.PointerToBoolean(false), utl.PointerToString("{{branch1}}"), utl.PointerToString("Release description 1"), utl.PointerToString("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$"), utl.PointerToString("true"), utl.PointerToString("Committing {{version}}"), utl.PointerToString("true"), utl.PointerToString("true"), utl.PointerToString("Tagging {{version}}"), &[]*ent.Identifier{ent.NewIdentifierWith(utl.PointerToString("build"), utl.PointerToString("12"), ent.PointerToPosition(ent.BUILD))}, utl.PointerToString(""), &map[string]string{"PATH": ".*"}, nil, utl.PointerToString("true"), utl.PointerToString(""), utl.PointerToBoolean(false))})
+	lpReleaseTypes, _ := ent.NewReleaseTypesWith(&[]*string{utl.PointerToString("type1")}, &[]*string{utl.PointerToString("service1")}, &[]*string{utl.PointerToString("remote1")}, &map[string]*ent.ReleaseType{"type1": ent.NewReleaseTypeWith(&[]*string{utl.PointerToString("assetA1"), utl.PointerToString("assetA2")}, utl.PointerToBoolean(false), utl.PointerToString("{{branch1}}"), utl.PointerToString("Release description 1"), utl.PointerToString("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$"), utl.PointerToString("true"), utl.PointerToString("Committing {{version}}"), utl.PointerToString("true"), utl.PointerToString("true"), utl.PointerToString("Tagging {{version}}"), &[]*string{utl.PointerToString("one"), utl.PointerToString("two"), utl.PointerToString("three")}, &[]*ent.Identifier{ent.NewIdentifierWith(utl.PointerToString("build"), utl.PointerToString("12"), ent.PointerToPosition(ent.BUILD))}, utl.PointerToString(""), &map[string]string{"PATH": ".*"}, nil, utl.PointerToString("true"), utl.PointerToString("false"), utl.PointerToString("true"), utl.PointerToString("myrelease"), utl.PointerToString(""), utl.PointerToBoolean(false))})
 	lowPriorityConfigurationLayerMock.SetReleaseTypes(lpReleaseTypes)
 	mediumPriorityConfigurationLayerMock.withArguments([]string{
 		"--release-types-enabled=type2",
@@ -2972,10 +3128,12 @@ func TestConfigurationWithMultipleConfigurationLayersGetReleaseTypes(t *testing.
 		"--release-types-type2-match-branches=",
 		"--release-types-type2-match-environment-variables-PATH=.*",
 		"--release-types-type2-publish=true",
+		"--release-types-type1-publish-draft=true",
+		"--release-types-type1-publish-pre-release=true",
 		"--release-types-type2-version-range=",
 		"--release-types-type2-version-range-from-branch-name=false",
 	})
-	hpReleaseTypes, _ := ent.NewReleaseTypesWith(&[]*string{utl.PointerToString("type3")}, &[]*string{utl.PointerToString("service3")}, &[]*string{utl.PointerToString("remote3")}, &map[string]*ent.ReleaseType{"type3": ent.NewReleaseTypeWith(&[]*string{utl.PointerToString("assetC1"), utl.PointerToString("assetC2")}, utl.PointerToBoolean(true), utl.PointerToString("{{branch3}}"), utl.PointerToString("Release description 3"), utl.PointerToString("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$"), utl.PointerToString("true"), utl.PointerToString("Committing {{version}}"), utl.PointerToString("true"), utl.PointerToString("true"), utl.PointerToString("Tagging {{version}}"), &[]*ent.Identifier{ent.NewIdentifierWith(utl.PointerToString("build"), utl.PointerToString("12"), ent.PointerToPosition(ent.BUILD))}, utl.PointerToString(""), &map[string]string{"PATH": ".*"}, nil, utl.PointerToString("true"), utl.PointerToString(""), utl.PointerToBoolean(false))})
+	hpReleaseTypes, _ := ent.NewReleaseTypesWith(&[]*string{utl.PointerToString("type3")}, &[]*string{utl.PointerToString("service3")}, &[]*string{utl.PointerToString("remote3")}, &map[string]*ent.ReleaseType{"type3": ent.NewReleaseTypeWith(&[]*string{utl.PointerToString("assetC1"), utl.PointerToString("assetC2")}, utl.PointerToBoolean(true), utl.PointerToString("{{branch3}}"), utl.PointerToString("Release description 3"), utl.PointerToString("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$"), utl.PointerToString("true"), utl.PointerToString("Committing {{version}}"), utl.PointerToString("true"), utl.PointerToString("true"), utl.PointerToString("Tagging {{version}}"), &[]*string{utl.PointerToString("one"), utl.PointerToString("two"), utl.PointerToString("three")}, &[]*ent.Identifier{ent.NewIdentifierWith(utl.PointerToString("build"), utl.PointerToString("12"), ent.PointerToPosition(ent.BUILD))}, utl.PointerToString(""), &map[string]string{"PATH": ".*"}, nil, utl.PointerToString("true"), utl.PointerToString("false"), utl.PointerToString("true"), utl.PointerToString("myrelease"), utl.PointerToString(""), utl.PointerToBoolean(false))})
 	highPriorityConfigurationLayerMock.SetReleaseTypes(hpReleaseTypes)
 
 	// inject the command line configuration and test the new value is returned from that
@@ -3010,6 +3168,10 @@ func TestConfigurationWithMultipleConfigurationLayersGetReleaseTypes(t *testing.
 	assert.Equal(t, "true", *(*(*releaseTypes).GetItems())["type3"].GetGitPush())
 	assert.Equal(t, "true", *(*(*releaseTypes).GetItems())["type3"].GetGitTag())
 	assert.Equal(t, "Tagging {{version}}", *(*(*releaseTypes).GetItems())["type3"].GetGitTagMessage())
+	assert.Equal(t, 3, len(*(*(*releaseTypes).GetItems())["type3"].GetGitTagNames()))
+	assert.Equal(t, "one", *(*(*(*releaseTypes).GetItems())["type3"].GetGitTagNames())[0])
+	assert.Equal(t, "two", *(*(*(*releaseTypes).GetItems())["type3"].GetGitTagNames())[1])
+	assert.Equal(t, "three", *(*(*(*releaseTypes).GetItems())["type3"].GetGitTagNames())[2])
 	assert.Nil(t, (*(*releaseTypes).GetItems())["type1"])
 	assert.Nil(t, (*(*releaseTypes).GetItems())["type2"])
 	assert.NotNil(t, (*(*releaseTypes).GetItems())["type3"])
@@ -3017,6 +3179,9 @@ func TestConfigurationWithMultipleConfigurationLayersGetReleaseTypes(t *testing.
 	assert.Equal(t, 1, len(*(*(*releaseTypes).GetItems())["type3"].GetIdentifiers()))
 	assert.Equal(t, "", *(*(*releaseTypes).GetItems())["type3"].GetMatchBranches())
 	assert.Equal(t, "true", *(*(*releaseTypes).GetItems())["type3"].GetPublish())
+	assert.Equal(t, "false", *(*(*releaseTypes).GetItems())["type3"].GetPublishDraft())
+	assert.Equal(t, "true", *(*(*releaseTypes).GetItems())["type3"].GetPublishPreRelease())
+	assert.Equal(t, "myrelease", *(*(*releaseTypes).GetItems())["type3"].GetReleaseName())
 	assert.Equal(t, "", *(*(*releaseTypes).GetItems())["type3"].GetVersionRange())
 	assert.Equal(t, false, *(*(*releaseTypes).GetItems())["type3"].GetVersionRangeFromBranchName())
 }
@@ -3137,6 +3302,62 @@ func TestConfigurationWithMultipleConfigurationLayersGetSharedConfigurationFile(
 	assert.Equal(t, *hpSharedConfigurationFile, *sharedConfigurationFile)
 }
 
+func TestConfigurationWithMultipleConfigurationLayersGetStateFile(t *testing.T) {
+	lowPriorityConfigurationLayerMock := NewSimpleConfigurationLayer()
+	mediumPriorityConfigurationLayerMock := NewCommandLineConfigurationLayer()
+	highPriorityConfigurationLayerMock := NewSimpleConfigurationLayer()
+	configuration, _ := NewConfiguration()
+	lowPriorityConfigurationLayerMock.SetStateFile(utl.PointerToString("file.yaml"))
+	mediumPriorityConfigurationLayerMock.withArguments([]string{
+		"--state-file=file.yml",
+	})
+	highPriorityConfigurationLayerMock.SetStateFile(utl.PointerToString("file.json"))
+
+	// inject the plugin configuration and test the new value is returned from that
+	var lpl ConfigurationLayer = lowPriorityConfigurationLayerMock
+	var mpl ConfigurationLayer = mediumPriorityConfigurationLayerMock
+	var hpl ConfigurationLayer = highPriorityConfigurationLayerMock
+	configuration.WithPluginConfiguration(&lpl)
+	configuration.WithCommandLineConfiguration(&mpl)
+	configuration.WithRuntimeConfiguration(&hpl)
+
+	hpStateFile, _ := highPriorityConfigurationLayerMock.GetStateFile()
+	stateFile, _ := configuration.GetStateFile()
+	assert.Equal(t, *hpStateFile, *stateFile)
+}
+
+func TestConfigurationWithMultipleConfigurationLayersGetSubstitutions(t *testing.T) {
+	lowPriorityConfigurationLayerMock := NewSimpleConfigurationLayer()
+	mediumPriorityConfigurationLayerMock := NewCommandLineConfigurationLayer()
+	highPriorityConfigurationLayerMock := NewSimpleConfigurationLayer()
+	configuration, _ := NewConfiguration()
+
+	lpSubstitutions, _ := ent.NewSubstitutionsWith(&[]*string{utl.PointerToString("substitution1")}, &map[string]*ent.Substitution{"substitution1": ent.NewSubstitutionWith(utl.PointerToString("glob1"), utl.PointerToString("match1"), utl.PointerToString("replace1"))})
+	lowPriorityConfigurationLayerMock.SetSubstitutions(lpSubstitutions)
+	mediumPriorityConfigurationLayerMock.withArguments([]string{
+		"--substitutions-enabled=substitution2",
+		"--substitutions-substitution2-files=glob2",
+	})
+	hpSubstitutions, _ := ent.NewSubstitutionsWith(&[]*string{utl.PointerToString("substitution3")}, &map[string]*ent.Substitution{"substitution3": ent.NewSubstitutionWith(utl.PointerToString("glob3"), utl.PointerToString("match3"), utl.PointerToString("replace3"))})
+	highPriorityConfigurationLayerMock.SetSubstitutions(hpSubstitutions)
+
+	// inject the command line configuration and test the new value is returned from that
+	var lpl ConfigurationLayer = lowPriorityConfigurationLayerMock
+	var mpl ConfigurationLayer = mediumPriorityConfigurationLayerMock
+	var hpl ConfigurationLayer = highPriorityConfigurationLayerMock
+	configuration.WithPluginConfiguration(&lpl)
+	configuration.WithCommandLineConfiguration(&mpl)
+	configuration.WithRuntimeConfiguration(&hpl)
+
+	substitutions, _ := configuration.GetSubstitutions()
+	assert.NotNil(t, *substitutions.GetEnabled())
+	assert.NotNil(t, *substitutions.GetItems())
+	assert.Equal(t, 1, len(*substitutions.GetEnabled()))
+	assert.Equal(t, "substitution3", *(*substitutions.GetEnabled())[0])
+	assert.Equal(t, 1, len(*substitutions.GetItems()))
+	assert.Equal(t, "glob3", *(*substitutions.GetItems())["substitution3"].GetFiles())
+}
+
 func TestConfigurationWithMultipleConfigurationLayersGetSummary(t *testing.T) {
 	lowPriorityConfigurationLayerMock := NewSimpleConfigurationLayer()
 	mediumPriorityConfigurationLayerMock := NewCommandLineConfigurationLayer()
@@ -3183,30 +3404,6 @@ func TestConfigurationWithMultipleConfigurationLayersGetSummaryFile(t *testing.T
 	hpSummaryFile, _ := highPriorityConfigurationLayerMock.GetSummaryFile()
 	summaryFile, _ := configuration.GetSummaryFile()
 	assert.Equal(t, *hpSummaryFile, *summaryFile)
-}
-
-func TestConfigurationWithMultipleConfigurationLayersGetStateFile(t *testing.T) {
-	lowPriorityConfigurationLayerMock := NewSimpleConfigurationLayer()
-	mediumPriorityConfigurationLayerMock := NewCommandLineConfigurationLayer()
-	highPriorityConfigurationLayerMock := NewSimpleConfigurationLayer()
-	configuration, _ := NewConfiguration()
-	lowPriorityConfigurationLayerMock.SetStateFile(utl.PointerToString("file.yaml"))
-	mediumPriorityConfigurationLayerMock.withArguments([]string{
-		"--state-file=file.yml",
-	})
-	highPriorityConfigurationLayerMock.SetStateFile(utl.PointerToString("file.json"))
-
-	// inject the plugin configuration and test the new value is returned from that
-	var lpl ConfigurationLayer = lowPriorityConfigurationLayerMock
-	var mpl ConfigurationLayer = mediumPriorityConfigurationLayerMock
-	var hpl ConfigurationLayer = highPriorityConfigurationLayerMock
-	configuration.WithPluginConfiguration(&lpl)
-	configuration.WithCommandLineConfiguration(&mpl)
-	configuration.WithRuntimeConfiguration(&hpl)
-
-	hpStateFile, _ := highPriorityConfigurationLayerMock.GetStateFile()
-	stateFile, _ := configuration.GetStateFile()
-	assert.Equal(t, *hpStateFile, *stateFile)
 }
 
 func TestConfigurationWithMultipleConfigurationLayersGetVerbosity(t *testing.T) {

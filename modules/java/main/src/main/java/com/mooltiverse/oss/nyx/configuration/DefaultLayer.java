@@ -31,6 +31,7 @@ import com.mooltiverse.oss.nyx.entities.GitConfiguration;
 import com.mooltiverse.oss.nyx.entities.IllegalPropertyException;
 import com.mooltiverse.oss.nyx.entities.ReleaseTypes;
 import com.mooltiverse.oss.nyx.entities.ServiceConfiguration;
+import com.mooltiverse.oss.nyx.entities.Substitutions;
 import com.mooltiverse.oss.nyx.entities.Verbosity;
 import com.mooltiverse.oss.nyx.io.DataAccessException;
 import com.mooltiverse.oss.nyx.version.Scheme;
@@ -263,6 +264,16 @@ class DefaultLayer implements ConfigurationLayer, Defaults {
         throws DataAccessException, IllegalPropertyException {
         logger.trace(DEFAULT, "Retrieving the default '{}' configuration option: '{}'", "stateFile", STATE_FILE);
         return STATE_FILE;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Substitutions getSubstitutions()
+        throws DataAccessException, IllegalPropertyException {
+        logger.trace(DEFAULT, "Retrieving the default '{}' configuration option", "substitutions");
+        return SUBSTITUTIONS;
     }
 
     /**

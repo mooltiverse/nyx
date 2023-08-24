@@ -22,9 +22,8 @@
 package configuration
 
 import (
-	"io/ioutil" // https://pkg.go.dev/io/ioutil
-	"os"        // https://pkg.go.dev/os
-	"testing"   // https://pkg.go.dev/testing
+	"os"      // https://pkg.go.dev/os
+	"testing" // https://pkg.go.dev/testing
 
 	assert "github.com/stretchr/testify/assert" // https://pkg.go.dev/github.com/stretchr/testify/assert
 
@@ -206,7 +205,7 @@ func TestEnvironmentConfigurationLayerGetDirectory(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Nil(t, directory)
 
-	dir, err := ioutil.TempDir("", "")
+	dir, err := os.MkdirTemp("", "")
 	assert.NoError(t, err)
 
 	// get a new instance or a stale set of environment variables is still in the configuration layer
@@ -494,6 +493,7 @@ func TestEnvironmentConfigurationLayerGetReleaseTypes(t *testing.T) {
 		"NYX_RELEASE_TYPES_two_GIT_PUSH=false",
 		"NYX_RELEASE_TYPES_two_GIT_TAG=false",
 		"NYX_RELEASE_TYPES_two_GIT_TAG_MESSAGE=Tag message",
+		"NYX_RELEASE_TYPES_two_GIT_TAG_NAMES=one,two,three",
 		"NYX_RELEASE_TYPES_two_IDENTIFIERS_0_POSITION=" + ent.PRE_RELEASE.String(),
 		"NYX_RELEASE_TYPES_two_IDENTIFIERS_0_QUALIFIER=q1",
 		"NYX_RELEASE_TYPES_two_IDENTIFIERS_0_VALUE=v1",
@@ -507,6 +507,9 @@ func TestEnvironmentConfigurationLayerGetReleaseTypes(t *testing.T) {
 		"NYX_RELEASE_TYPES_two_MATCH_ENVIRONMENT_VARIABLES_USER=any user",
 		"NYX_RELEASE_TYPES_two_MATCH_WORKSPACE_STATUS=" + ent.CLEAN.String(),
 		"NYX_RELEASE_TYPES_two_PUBLISH=true",
+		"NYX_RELEASE_TYPES_two_PUBLISH_DRAFT=false",
+		"NYX_RELEASE_TYPES_two_PUBLISH_PRE_RELEASE=true",
+		"NYX_RELEASE_TYPES_two_RELEASE_NAME=myrelease",
 		"NYX_RELEASE_TYPES_two_VERSION_RANGE_FROM_BRANCH_NAME=true",
 	})
 
@@ -534,12 +537,16 @@ func TestEnvironmentConfigurationLayerGetReleaseTypes(t *testing.T) {
 	assert.Nil(t, (*(*releaseTypes.GetItems())["one"]).GetGitCommitMessage())
 	assert.Equal(t, "true", *(*(*releaseTypes.GetItems())["one"]).GetGitTag())
 	assert.Nil(t, (*(*releaseTypes.GetItems())["one"]).GetGitTagMessage())
+	assert.Nil(t, (*(*releaseTypes.GetItems())["one"]).GetGitTagNames())
 	assert.Equal(t, "true", *(*(*releaseTypes.GetItems())["one"]).GetGitPush())
 	assert.Equal(t, 0, len(*(*(*releaseTypes.GetItems())["one"]).GetIdentifiers()))
 	assert.Equal(t, "alpha,beta", *(*(*releaseTypes.GetItems())["one"]).GetMatchBranches())
 	assert.Equal(t, 0, len(*(*(*releaseTypes.GetItems())["one"]).GetMatchEnvironmentVariables()))
 	assert.Equal(t, ent.DIRTY, *(*(*releaseTypes.GetItems())["one"]).GetMatchWorkspaceStatus())
 	assert.Equal(t, "false", *(*(*releaseTypes.GetItems())["one"]).GetPublish())
+	assert.Nil(t, (*(*releaseTypes.GetItems())["one"]).GetPublishDraft())
+	assert.Nil(t, (*(*releaseTypes.GetItems())["one"]).GetPublishPreRelease())
+	assert.Nil(t, (*(*releaseTypes.GetItems())["one"]).GetReleaseName())
 	assert.Equal(t, "true", *(*(*releaseTypes.GetItems())["one"]).GetVersionRange())
 	assert.Nil(t, (*(*releaseTypes.GetItems())["one"]).GetVersionRangeFromBranchName())
 	assert.Nil(t, (*(*releaseTypes).GetItems())["two"].GetAssets())
@@ -551,6 +558,10 @@ func TestEnvironmentConfigurationLayerGetReleaseTypes(t *testing.T) {
 	assert.Equal(t, "Commit message", *(*(*releaseTypes.GetItems())["two"]).GetGitCommitMessage())
 	assert.Equal(t, "false", *(*(*releaseTypes.GetItems())["two"]).GetGitTag())
 	assert.Equal(t, "Tag message", *(*(*releaseTypes.GetItems())["two"]).GetGitTagMessage())
+	assert.Equal(t, 3, len(*(*(*releaseTypes.GetItems())["two"]).GetGitTagNames()))
+	assert.Equal(t, "one", *(*(*(*releaseTypes.GetItems())["two"]).GetGitTagNames())[0])
+	assert.Equal(t, "two", *(*(*(*releaseTypes.GetItems())["two"]).GetGitTagNames())[1])
+	assert.Equal(t, "three", *(*(*(*releaseTypes.GetItems())["two"]).GetGitTagNames())[2])
 	assert.Equal(t, "false", *(*(*releaseTypes.GetItems())["two"]).GetGitPush())
 	assert.Equal(t, 3, len(*(*(*releaseTypes.GetItems())["two"]).GetIdentifiers()))
 	assert.Equal(t, ent.PRE_RELEASE, *(*(*(*releaseTypes.GetItems())["two"]).GetIdentifiers())[0].GetPosition())
@@ -568,6 +579,9 @@ func TestEnvironmentConfigurationLayerGetReleaseTypes(t *testing.T) {
 	assert.Equal(t, "any user", (*(*(*releaseTypes.GetItems())["two"]).GetMatchEnvironmentVariables())["USER"])
 	assert.Equal(t, ent.CLEAN, *(*(*releaseTypes.GetItems())["two"]).GetMatchWorkspaceStatus())
 	assert.Equal(t, "true", *(*(*releaseTypes.GetItems())["two"]).GetPublish())
+	assert.Equal(t, "false", *(*(*releaseTypes.GetItems())["two"]).GetPublishDraft())
+	assert.Equal(t, "true", *(*(*releaseTypes.GetItems())["two"]).GetPublishPreRelease())
+	assert.Equal(t, "myrelease", *(*(*releaseTypes.GetItems())["two"]).GetReleaseName())
 	assert.Nil(t, (*(*releaseTypes.GetItems())["two"]).GetVersionRange())
 	assert.True(t, *(*(*releaseTypes.GetItems())["two"]).GetVersionRangeFromBranchName())
 }
@@ -682,6 +696,100 @@ func TestEnvironmentConfigurationLayerGetSharedConfigurationFile(t *testing.T) {
 	assert.Equal(t, "config.yml", *sharedConfigurationFile)
 }
 
+func TestEnvironmentConfigurationLayerGetStateFile(t *testing.T) {
+	environmentConfigurationLayer := EnvironmentConfigurationLayer{}
+
+	stateFile, err := environmentConfigurationLayer.GetStateFile()
+	assert.NoError(t, err)
+	assert.Nil(t, stateFile)
+
+	// get a new instance or a stale set of environment variables is still in the configuration layer
+	environmentConfigurationLayer = EnvironmentConfigurationLayer{}
+	environmentConfigurationLayer.withEnvironmentVariables([]string{
+		"NYX_STATE_FILE=state.yml",
+	})
+
+	stateFile, err = environmentConfigurationLayer.GetStateFile()
+	assert.NoError(t, err)
+	assert.Equal(t, "state.yml", *stateFile)
+}
+
+func TestEnvironmentConfigurationLayerGetSubstitutions(t *testing.T) {
+	environmentConfigurationLayer := EnvironmentConfigurationLayer{}
+
+	substitutions, err := environmentConfigurationLayer.GetSubstitutions()
+	assert.NoError(t, err)
+	assert.NotNil(t, substitutions)
+	assert.Equal(t, 0, len(*substitutions.GetEnabled()))
+	assert.Equal(t, 0, len(*substitutions.GetItems()))
+
+	// get a new instance or a stale set of environment variables is still in the configuration layer
+	environmentConfigurationLayer = EnvironmentConfigurationLayer{}
+	environmentConfigurationLayer.withEnvironmentVariables([]string{
+		"NYX_SUBSTITUTIONS_ENABLED=one,two",
+	})
+
+	substitutions, err = environmentConfigurationLayer.GetSubstitutions()
+	assert.NoError(t, err)
+	assert.NotNil(t, substitutions)
+
+	enabled := *substitutions.GetEnabled()
+	items := *substitutions.GetItems()
+	assert.Equal(t, 2, len(enabled))
+	assert.Equal(t, *enabled[0], "one")
+	assert.Equal(t, *enabled[1], "two")
+	assert.Equal(t, 0, len(items))
+
+	// get a new instance or a stale set of environment variables is still in the configuration layer
+	environmentConfigurationLayer = EnvironmentConfigurationLayer{}
+	environmentConfigurationLayer.withEnvironmentVariables([]string{
+		"NYX_SUBSTITUTIONS_ENABLED=one,two",
+		"NYX_SUBSTITUTIONS_one_FILES=",
+		"NYX_SUBSTITUTIONS_two_FILES=",
+	})
+
+	substitutions, err = environmentConfigurationLayer.GetSubstitutions()
+	assert.NoError(t, err)
+	assert.NotNil(t, substitutions)
+
+	enabled = *substitutions.GetEnabled()
+	items = *substitutions.GetItems()
+	assert.Equal(t, 2, len(enabled))
+	assert.Equal(t, *enabled[0], "one")
+	assert.Equal(t, *enabled[1], "two")
+	assert.Equal(t, 2, len(*substitutions.GetItems()))
+	assert.NotNil(t, *items["one"])
+	assert.NotNil(t, *items["two"])
+
+	// get a new instance or a stale set of environment variables is still in the configuration layer
+	environmentConfigurationLayer = EnvironmentConfigurationLayer{}
+	environmentConfigurationLayer.withEnvironmentVariables([]string{
+		"NYX_SUBSTITUTIONS_ENABLED=one,two",
+		"NYX_SUBSTITUTIONS_one_FILES=*.json",
+		"NYX_SUBSTITUTIONS_one_MATCH=version: 1.2.3",
+		"NYX_SUBSTITUTIONS_two_FILES=*.toml",
+		"NYX_SUBSTITUTIONS_two_MATCH=version: 4.5.6",
+		"NYX_SUBSTITUTIONS_two_REPLACE=version: 7.8.9",
+	})
+
+	substitutions, err = environmentConfigurationLayer.GetSubstitutions()
+	assert.NoError(t, err)
+	assert.NotNil(t, substitutions)
+
+	enabled = *substitutions.GetEnabled()
+	items = *substitutions.GetItems()
+	assert.Equal(t, 2, len(enabled))
+	assert.Equal(t, *enabled[0], "one")
+	assert.Equal(t, *enabled[1], "two")
+	assert.Equal(t, 2, len(items))
+	assert.Equal(t, "*.json", *items["one"].GetFiles())
+	assert.Equal(t, "version: 1.2.3", *items["one"].GetMatch())
+	assert.Nil(t, items["one"].GetReplace())
+	assert.Equal(t, "*.toml", *items["two"].GetFiles())
+	assert.Equal(t, "version: 4.5.6", *items["two"].GetMatch())
+	assert.Equal(t, "version: 7.8.9", *items["two"].GetReplace())
+}
+
 func TestEnvironmentConfigurationLayerGetSummary(t *testing.T) {
 	environmentConfigurationLayer := EnvironmentConfigurationLayer{}
 
@@ -716,24 +824,6 @@ func TestEnvironmentConfigurationLayerGetSummaryFile(t *testing.T) {
 	summaryFile, err = environmentConfigurationLayer.GetSummaryFile()
 	assert.NoError(t, err)
 	assert.Equal(t, "summary.txt", *summaryFile)
-}
-
-func TestEnvironmentConfigurationLayerGetStateFile(t *testing.T) {
-	environmentConfigurationLayer := EnvironmentConfigurationLayer{}
-
-	stateFile, err := environmentConfigurationLayer.GetStateFile()
-	assert.NoError(t, err)
-	assert.Nil(t, stateFile)
-
-	// get a new instance or a stale set of environment variables is still in the configuration layer
-	environmentConfigurationLayer = EnvironmentConfigurationLayer{}
-	environmentConfigurationLayer.withEnvironmentVariables([]string{
-		"NYX_STATE_FILE=state.yml",
-	})
-
-	stateFile, err = environmentConfigurationLayer.GetStateFile()
-	assert.NoError(t, err)
-	assert.Equal(t, "state.yml", *stateFile)
 }
 
 func TestEnvironmentConfigurationLayerGetVerbosity(t *testing.T) {

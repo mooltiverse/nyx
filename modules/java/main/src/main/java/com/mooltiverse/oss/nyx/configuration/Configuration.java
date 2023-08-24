@@ -41,6 +41,8 @@ import com.mooltiverse.oss.nyx.entities.IllegalPropertyException;
 import com.mooltiverse.oss.nyx.entities.ReleaseType;
 import com.mooltiverse.oss.nyx.entities.ReleaseTypes;
 import com.mooltiverse.oss.nyx.entities.ServiceConfiguration;
+import com.mooltiverse.oss.nyx.entities.Substitution;
+import com.mooltiverse.oss.nyx.entities.Substitutions;
 import com.mooltiverse.oss.nyx.entities.Verbosity;
 import com.mooltiverse.oss.nyx.io.DataAccessException;
 import com.mooltiverse.oss.nyx.io.FileMapper;
@@ -95,6 +97,11 @@ public class Configuration implements ConfigurationRoot {
      * The private instance of the services configuration section.
      */
     private Map<String,ServiceConfiguration> servicesSection = null;
+
+    /**
+     * The private instance of the substitutions configuration section.
+     */
+    private Substitutions substitutionsSection = null;
 
     /**
      * The internal representation of the configuration layers and their priorities.
@@ -198,6 +205,7 @@ public class Configuration implements ConfigurationRoot {
         releaseAssetsSection = null;
         releaseTypesSection = null;
         servicesSection = null;
+        substitutionsSection = null;
     }
 
     /**
@@ -743,6 +751,60 @@ public class Configuration implements ConfigurationRoot {
      * {@inheritDoc}
      */
     @Override
+    public String getStateFile()
+        throws DataAccessException, IllegalPropertyException {
+        logger.trace(CONFIGURATION, "Retrieving the '{}' configuration option", "stateFile");
+        for (ConfigurationLayer layer: layers.values()) {
+            String stateFile = layer.getStateFile();
+            if (!Objects.isNull(stateFile)) {
+                logger.trace(CONFIGURATION, "The '{}' configuration option value is: '{}'", "stateFile", stateFile);
+                return stateFile;
+            }
+        }
+        return DefaultLayer.getInstance().getStateFile();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Substitutions getSubstitutions()
+        throws DataAccessException, IllegalPropertyException {
+        logger.trace(CONFIGURATION, "Retrieving the substitutions");
+        if (Objects.isNull(substitutionsSection)) { 
+            // parse the 'enabled' items list
+            List<String> enabled = new ArrayList<String>();
+            for (ConfigurationLayer layer: layers.values()) {
+                if (!Objects.isNull(layer.getSubstitutions().getEnabled()) && !layer.getSubstitutions().getEnabled().isEmpty()) {
+                    enabled = layer.getSubstitutions().getEnabled();
+                    logger.trace(CONFIGURATION, "The '{}.{}' configuration option value is: '{}'", "substitutions", "enabled", String.join(", ", enabled));
+                    break;
+                }
+            }
+
+            // parse the 'items' map
+            Map<String,Substitution> items = new HashMap<String,Substitution>();
+            for (String enabledItem: enabled) {
+                for (ConfigurationLayer layer: layers.values()) {
+                    Substitution item = layer.getSubstitutions().getItems().get(enabledItem);
+                    if (!Objects.isNull(item)) {
+                        items.put(enabledItem, item);
+                        logger.trace(CONFIGURATION, "The '{}.{}[{}]' configuration option has been resolved", "substitutions", "items", enabledItem);
+                        break;
+                    }
+                }
+            }
+
+            substitutionsSection = new Substitutions(enabled, items);
+            logger.trace(CONFIGURATION, "The '{}' configuration option has been resolved", "substitutions");
+        }
+        return substitutionsSection;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Boolean getSummary()
         throws DataAccessException, IllegalPropertyException {
         logger.trace(CONFIGURATION, "Retrieving the '{}' configuration option", "summary");
@@ -771,23 +833,6 @@ public class Configuration implements ConfigurationRoot {
             }
         }
         return DefaultLayer.getInstance().getSummaryFile();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getStateFile()
-        throws DataAccessException, IllegalPropertyException {
-        logger.trace(CONFIGURATION, "Retrieving the '{}' configuration option", "stateFile");
-        for (ConfigurationLayer layer: layers.values()) {
-            String stateFile = layer.getStateFile();
-            if (!Objects.isNull(stateFile)) {
-                logger.trace(CONFIGURATION, "The '{}' configuration option value is: '{}'", "stateFile", stateFile);
-                return stateFile;
-            }
-        }
-        return DefaultLayer.getInstance().getStateFile();
     }
 
     /**

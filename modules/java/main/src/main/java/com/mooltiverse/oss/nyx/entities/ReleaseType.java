@@ -76,6 +76,11 @@ public class ReleaseType {
     private String gitTagMessage = Defaults.ReleaseType.GIT_TAG_MESSAGE;
 
     /**
+     * The list of templates to use as tag names when tagging a commit.
+     */
+    private List<String> gitTagNames = Defaults.ReleaseType.GIT_TAG_NAMES;
+
+    /**
      * The identifiers configuration block.
      */
     private List<Identifier> identifiers = Defaults.ReleaseType.IDENTIFIERS;
@@ -100,6 +105,21 @@ public class ReleaseType {
      * The optional flag or the template to render indicating whether or not releases must be published.
      */
     private String publish = Defaults.ReleaseType.PUBLISH;
+
+    /**
+     * The optional template to set the draft flag of releases published to remote services.
+     */
+    private String publishDraft = Defaults.ReleaseType.PUBLISH_DRAFT;
+
+    /**
+     * The optional template to set the pre-release flag of releases published to remote services.
+     */
+    private String publishPreRelease = Defaults.ReleaseType.PUBLISH_PRE_RELEASE;
+
+    /**
+     * The optional template to set the name of releases published to remote services.
+     */
+    private String releaseName = Defaults.ReleaseType.RELEASE_NAME;
 
     /**
      * The optional template to render as a regular expression used to constrain versions issued by this release type.
@@ -144,6 +164,7 @@ public class ReleaseType {
      * @param gitTag the optional flag or the template to render indicating whether or not
      * a new tag must be generated.
      * @param gitTagMessage the optional identifiers configuration block.
+     * @param gitTagNames the list of templates to use as tag names when tagging a commit.
      * @param identifiers the optional nested map of the custom extra identifiers to be used in a
      * release type.
      * @param matchBranches the optional template to render as a regular expression used to
@@ -153,6 +174,11 @@ public class ReleaseType {
      * @param matchWorkspaceStatus the identifier of a specific workspace status to be matched.
      * @param publish the optional flag or the template to render indicating whether or not
      * releases must be published.
+     * @param publishDraft the optional template to set the draft flag of releases published
+     * to remote services.
+     * @param publishPreRelease the optional template to set the pre-release flag of releases
+     * published to remote services.
+     * @param releaseName the optional template to set the name of releases published to remote services.
      * @param versionRange the optional regular expression used to constrain versions issued
      * by this release type.
      * @param versionRangeFromBranchName the optional flag telling if the version range must
@@ -160,7 +186,7 @@ public class ReleaseType {
      * 
      * @see Defaults.ReleaseType
      */
-    public ReleaseType(List<String> assets, boolean collapseVersions, String collapsedVersionQualifier, String description, String filterTags, String gitCommit, String gitCommitMessage, String gitPush, String gitTag, String gitTagMessage, List<Identifier> identifiers, String matchBranches, Map<String,String> matchEnvironmentVariables, WorkspaceStatus matchWorkspaceStatus, String publish, String versionRange, Boolean versionRangeFromBranchName) {
+    public ReleaseType(List<String> assets, boolean collapseVersions, String collapsedVersionQualifier, String description, String filterTags, String gitCommit, String gitCommitMessage, String gitPush, String gitTag, String gitTagMessage, List<String> gitTagNames, List<Identifier> identifiers, String matchBranches, Map<String,String> matchEnvironmentVariables, WorkspaceStatus matchWorkspaceStatus, String publish, String publishDraft, String publishPreRelease, String releaseName, String versionRange, Boolean versionRangeFromBranchName) {
         super();
         this.assets = assets;
         this.collapseVersions = collapseVersions;
@@ -172,11 +198,15 @@ public class ReleaseType {
         this.gitPush = gitPush;
         this.gitTag = gitTag;
         this.gitTagMessage = gitTagMessage;
+        this.gitTagNames = gitTagNames;
         this.identifiers = identifiers;
         this.matchBranches = matchBranches;
         this.matchEnvironmentVariables = matchEnvironmentVariables;
         this.matchWorkspaceStatus = matchWorkspaceStatus;
         this.publish = publish;
+        this.publishDraft = publishDraft;
+        this.publishPreRelease = publishPreRelease;
+        this.releaseName = releaseName;
         this.versionRange = versionRange;
         this.versionRangeFromBranchName = versionRangeFromBranchName;
     }
@@ -410,6 +440,24 @@ public class ReleaseType {
     }
 
     /**
+     * Returns the list of templates to use as tag names when tagging a commit.
+     * 
+     * @return the list of templates to use as tag names when tagging a commit.
+     */
+    public List<String> getGitTagNames() {
+        return gitTagNames;
+    }
+
+    /**
+     * Sets the list of templates to use as tag names when tagging a commit.
+     * 
+     * @param gitTagNames the list of templates to use as tag names when tagging a commit.
+     */
+    public void setGitTagNames(List<String> gitTagNames) {
+        this.gitTagNames = gitTagNames;
+    }
+
+    /**
      * Returns the identifiers configuration block.
      * 
      * @return the identifiers configuration block.
@@ -497,6 +545,60 @@ public class ReleaseType {
      */
     public void setPublish(String publish) {
         this.publish = publish;
+    }
+
+    /**
+     * Returns the optional template to set the draft flag of releases published to remote services.
+     * 
+     * @return the optional template to set the draft flag of releases published to remote services.
+     */
+    public String getPublishDraft() {
+        return publishDraft;
+    }
+
+    /**
+     * Sets the optional template to set the draft flag of releases published to remote services.
+     * 
+     * @param publishDraft the optional template to set the draft flag of releases published to remote services.
+     */
+    public void setPublishDraft(String publishDraft) {
+        this.publishDraft = publishDraft;
+    }
+
+    /**
+     * Returns the optional template to set the pre-release flag of releases published to remote services.
+     * 
+     * @return the optional template to set the pre-release flag of releases published to remote services.
+     */
+    public String getPublishPreRelease() {
+        return publishPreRelease;
+    }
+
+    /**
+     * Sets the optional template to set the pre-release flag of releases published to remote services.
+     * 
+     * @param publishPreRelease the optional template to set the pre-release flag of releases published to remote services.
+     */
+    public void setPublishPreRelease(String publishPreRelease) {
+        this.publishPreRelease = publishPreRelease;
+    }
+
+    /**
+     * Returns the optional template to set the name of releases published to remote services.
+     * 
+     * @return the optional template to set the name of releases published to remote services.
+     */
+    public String getReleaseName() {
+        return releaseName;
+    }
+
+    /**
+     * Sets the optional template to set the name of releases published to remote services.
+     * 
+     * @param releaseName the optional template to set the name of releases published to remote services.
+     */
+    public void setReleaseName(String releaseName) {
+        this.releaseName = releaseName;
     }
 
     /**

@@ -87,11 +87,11 @@ jobs:
             - 'modules/go/**'
           javaChanged:
             - 'modules/java/**'
-    - name: Set up JDK 19
+    - name: Set up JDK 20
       uses: actions/setup-java@v3
       with:
         distribution: 'temurin'
-        java-version: 19
+        java-version: 20
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Make Git ignore execute permission changes in files (like gradlew)
@@ -150,11 +150,11 @@ jobs:
       uses: actions/checkout@v3
       with:
         fetch-depth: 0
-    - name: Set up JDK 19
+    - name: Set up JDK 20
       uses: actions/setup-java@v3
       with:
         distribution: 'temurin'
-        java-version: 19
+        java-version: 20
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Make Git ignore execute permission changes in files (like gradlew)
@@ -225,11 +225,11 @@ jobs:
       uses: actions/checkout@v3
       with:
         fetch-depth: 0
-    - name: Set up JDK 19
+    - name: Set up JDK 20
       uses: actions/setup-java@v3
       with:
         distribution: 'temurin'
-        java-version: 19
+        java-version: 20
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Make Git ignore execute permission changes in files (like gradlew)
@@ -301,11 +301,11 @@ jobs:
       uses: actions/checkout@v3
       with:
         fetch-depth: 0
-    - name: Set up JDK 19
+    - name: Set up JDK 20
       uses: actions/setup-java@v3
       with:
         distribution: 'temurin'
-        java-version: 19
+        java-version: 20
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Make Git ignore execute permission changes in files (like gradlew)
@@ -431,7 +431,7 @@ jobs:
     # to the Gradle compatibility matrix. See CONTRIBUTING.md in the root directory or the Gradle functional test suites for more.
     strategy:
       matrix:
-        java: [ '11', '19' ]
+        java: [ '11', '20' ]
     runs-on: ubuntu-latest
     steps:
     - name: Git checkout
@@ -524,7 +524,7 @@ jobs:
     # to the Gradle compatibility matrix. See CONTRIBUTING.md in the root directory or the Gradle functional test suites for more.
     strategy:
       matrix:
-        java: [ '11', '19' ]
+        java: [ '11', '20' ]
     runs-on: ubuntu-latest
     steps:
     - name: Git checkout
@@ -639,7 +639,7 @@ jobs:
     # to the Gradle compatibility matrix. See CONTRIBUTING.md in the root directory or the Gradle functional test suites for more.
     strategy:
       matrix:
-        java: [ '11', '19' ]
+        java: [ '11', '20' ]
     runs-on: ubuntu-latest
     steps:
     - name: Git checkout
@@ -751,11 +751,11 @@ jobs:
       uses: actions/checkout@v3
       with:
         fetch-depth: 0
-    - name: Set up JDK 19
+    - name: Set up JDK 20
       uses: actions/setup-java@v3
       with:
         distribution: 'temurin'
-        java-version: 19
+        java-version: 20
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Make Git ignore execute permission changes in files (like gradlew)
@@ -846,11 +846,11 @@ jobs:
       uses: actions/checkout@v3
       with:
         fetch-depth: 0
-    - name: Set up JDK 19
+    - name: Set up JDK 20
       uses: actions/setup-java@v3
       with:
         distribution: 'temurin'
-        java-version: 19
+        java-version: 20
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Make Git ignore execute permission changes in files (like gradlew)
@@ -964,11 +964,11 @@ jobs:
       uses: actions/checkout@v3
       with:
         fetch-depth: 0
-    - name: Set up JDK 19
+    - name: Set up JDK 20
       uses: actions/setup-java@v3
       with:
         distribution: 'temurin'
-        java-version: 19
+        java-version: 20
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Make Git ignore execute permission changes in files (like gradlew)
@@ -1080,11 +1080,11 @@ jobs:
       uses: actions/checkout@v3
       with:
         fetch-depth: 0
-    - name: Set up JDK 19
+    - name: Set up JDK 20
       uses: actions/setup-java@v3
       with:
         distribution: 'temurin'
-        java-version: 19
+        java-version: 20
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Make Git ignore execute permission changes in files (like gradlew)
@@ -1183,11 +1183,11 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: Set up JDK 19
+      - name: Set up JDK 20
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
-          java-version: 19
+          java-version: 20
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Make Git ignore execute permission changes in files (like gradlew)
@@ -1268,11 +1268,11 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: Set up JDK 19
+      - name: Set up JDK 20
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
-          java-version: 19
+          java-version: 20
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Make Git ignore execute permission changes in files (like gradlew)

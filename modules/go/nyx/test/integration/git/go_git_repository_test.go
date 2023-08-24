@@ -1517,9 +1517,9 @@ func TestGoGitRepositoryTag(t *testing.T) {
 	assert.Equal(t, latestCommit, script.GetTags()["ltag"])
 	assert.Equal(t, *script.GetCommitByTag("ltag"), latestCommit)
 
-	// make sure an error is thrown when the tag name is duplicated
+	// make sure no exception is thrown when the tag name is duplicated
 	lTag, err = repository.Tag(&tName)
-	assert.Error(t, err)
+	assert.NoError(t, err)
 }
 
 func TestGoGitRepositoryTagWithMessage(t *testing.T) {
@@ -1567,11 +1567,11 @@ func TestGoGitRepositoryTagWithMessage(t *testing.T) {
 	assert.Equal(t, latestCommit, script.GetTags()["atag"])
 	assert.Equal(t, *script.GetCommitByTag("atag"), latestCommit)
 
-	// make sure an error is thrown when the tag name is duplicated
+	// make sure no exception is thrown when the tag name is duplicated
 	lTag, err = repository.TagWithMessage(&tName, nil)
-	assert.Error(t, err)
+	assert.NoError(t, err)
 	lTag, err = repository.TagWithMessage(&tName, &tagMessage)
-	assert.Error(t, err)
+	assert.NoError(t, err)
 }
 
 func TestGoGitRepositoryTagWithMessageAndIdentity(t *testing.T) {
@@ -1619,11 +1619,11 @@ func TestGoGitRepositoryTagWithMessageAndIdentity(t *testing.T) {
 	assert.Equal(t, latestCommit, script.GetTags()["atag"])
 	assert.Equal(t, *script.GetCommitByTag("atag"), latestCommit)
 
-	// make sure an error is thrown when the tag name is duplicated
+	// make sure no exception is thrown when the tag name is duplicated
 	lTag, err = repository.TagWithMessageAndIdentity(&tName, nil, nil)
-	assert.Error(t, err)
+	assert.NoError(t, err)
 	lTag, err = repository.TagWithMessageAndIdentity(&tName, &tagMessage, nil)
-	assert.Error(t, err)
+	assert.NoError(t, err)
 }
 
 func TestGoGitRepositoryTagCommitWithMessageAndIdentity(t *testing.T) {
@@ -1701,11 +1701,11 @@ func TestGoGitRepositoryTagCommitWithMessageAndIdentity(t *testing.T) {
 	assert.Equal(t, latestCommit, script.GetTags()["atag2"])
 	assert.Equal(t, *script.GetCommitByTag("atag2"), latestCommit)
 
-	// make sure an error is thrown when the tag name is duplicated
+	// make sure no exception is thrown when the tag name is duplicated
 	lTag, err = repository.TagCommitWithMessageAndIdentity(&latestCommit, &tName, nil, nil)
-	assert.Error(t, err)
+	assert.NoError(t, err)
 	lTag, err = repository.TagCommitWithMessageAndIdentity(&latestCommit, &tName, &tagMessage, nil)
-	assert.Error(t, err)
+	assert.NoError(t, err)
 }
 
 func TestGoGitRepositoryGetCurrentBranch(t *testing.T) {

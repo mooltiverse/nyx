@@ -1806,6 +1806,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, command.state().getReleaseType().getGitTagNames());
             assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             if (Objects.isNull(Defaults.ReleaseType.IDENTIFIERS)) {
                 assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
@@ -1863,6 +1864,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, command.state().getReleaseType().getGitTagNames());
             if (Objects.isNull(Defaults.ReleaseType.IDENTIFIERS)) {
                 assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             }
@@ -1919,6 +1921,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, command.state().getReleaseType().getGitTagNames());
             if (Objects.isNull(Defaults.ReleaseType.IDENTIFIERS)) {
                 assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             }
@@ -1975,6 +1978,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, command.state().getReleaseType().getGitTagNames());
             if (Objects.isNull(Defaults.ReleaseType.IDENTIFIERS)) {
                 assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             }
@@ -2031,6 +2035,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, command.state().getReleaseType().getGitTagNames());
             if (Objects.isNull(Defaults.ReleaseType.IDENTIFIERS)) {
                 assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             }
@@ -2087,6 +2092,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, command.state().getReleaseType().getGitTagNames());
             if (Objects.isNull(Defaults.ReleaseType.IDENTIFIERS)) {
                 assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             }
@@ -2143,6 +2149,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, command.state().getReleaseType().getGitTagNames());
             if (Objects.isNull(Defaults.ReleaseType.IDENTIFIERS)) {
                 assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             }
@@ -2199,6 +2206,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, command.state().getReleaseType().getGitTagNames());
             if (Objects.isNull(Defaults.ReleaseType.IDENTIFIERS)) {
                 assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             }
@@ -2255,6 +2263,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, command.state().getReleaseType().getGitTagNames());
             if (Objects.isNull(Defaults.ReleaseType.IDENTIFIERS)) {
                 assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             }
@@ -2311,6 +2320,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, command.state().getReleaseType().getGitTagNames());
             if (Objects.isNull(Defaults.ReleaseType.IDENTIFIERS)) {
                 assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             }
@@ -2367,6 +2377,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, command.state().getReleaseType().getGitTagNames());
             if (Objects.isNull(Defaults.ReleaseType.IDENTIFIERS)) {
                 assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             }
@@ -2423,6 +2434,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, command.state().getReleaseType().getGitTagNames());
             if (Objects.isNull(Defaults.ReleaseType.IDENTIFIERS)) {
                 assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             }
@@ -2479,6 +2491,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, command.state().getReleaseType().getGitTagNames());
             if (Objects.isNull(Defaults.ReleaseType.IDENTIFIERS)) {
                 assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             }
@@ -2536,6 +2549,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, command.state().getReleaseType().getGitTagNames());
             if (Objects.isNull(Defaults.ReleaseType.IDENTIFIERS)) {
                 assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             }
@@ -2588,6 +2602,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, command.state().getReleaseType().getGitTagNames());
             if (Objects.isNull(Defaults.ReleaseType.IDENTIFIERS)) {
                 assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             }
@@ -2643,6 +2658,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, command.state().getReleaseType().getGitTagNames());
             if (Objects.isNull(Defaults.ReleaseType.IDENTIFIERS)) {
                 assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             }
@@ -2698,6 +2714,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, command.state().getReleaseType().getGitTagNames());
             if (Objects.isNull(Defaults.ReleaseType.IDENTIFIERS)) {
                 assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             }
@@ -2754,6 +2771,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, command.state().getReleaseType().getGitTagNames());
             if (Objects.isNull(Defaults.ReleaseType.IDENTIFIERS)) {
                 assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             }
@@ -2810,6 +2828,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, command.state().getReleaseType().getGitTagNames());
             if (Objects.isNull(Defaults.ReleaseType.IDENTIFIERS)) {
                 assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             }
@@ -2866,6 +2885,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, command.state().getReleaseType().getGitTagNames());
             if (Objects.isNull(Defaults.ReleaseType.IDENTIFIERS)) {
                 assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             }
@@ -2922,6 +2942,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, command.state().getReleaseType().getGitTagNames());
             if (Objects.isNull(Defaults.ReleaseType.IDENTIFIERS)) {
                 assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             }
@@ -2978,6 +2999,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, command.state().getReleaseType().getGitTagNames());
             if (Objects.isNull(Defaults.ReleaseType.IDENTIFIERS)) {
                 assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             }
@@ -3034,6 +3056,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, command.state().getReleaseType().getGitTagNames());
             if (Objects.isNull(Defaults.ReleaseType.IDENTIFIERS)) {
                 assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             }
@@ -3091,6 +3114,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, command.state().getReleaseType().getGitTagNames());
             if (Objects.isNull(Defaults.ReleaseType.IDENTIFIERS)) {
                 assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             }
@@ -3147,6 +3171,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, command.state().getReleaseType().getGitTagNames());
             if (Objects.isNull(Defaults.ReleaseType.IDENTIFIERS)) {
                 assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             }
@@ -3210,6 +3235,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, command.state().getReleaseType().getGitTagNames());
             if (Objects.isNull(Defaults.ReleaseType.IDENTIFIERS)) {
                 assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             }
@@ -3271,6 +3297,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, command.state().getReleaseType().getGitTagNames());
             if (Objects.isNull(Defaults.ReleaseType.IDENTIFIERS)) {
                 assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             }
@@ -3338,6 +3365,15 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames(), command.state().getReleaseType().getGitTagNames());
+            }
+            else {
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().containsAll(command.state().getReleaseType().getGitTagNames()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().get(i), command.state().getReleaseType().getGitTagNames().get(i));
+                }
+            }
             if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
                 assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
@@ -3405,6 +3441,15 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames(), command.state().getReleaseType().getGitTagNames());
+            }
+            else {
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().containsAll(command.state().getReleaseType().getGitTagNames()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().get(i), command.state().getReleaseType().getGitTagNames().get(i));
+                }
+            }
             if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
                 assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
@@ -3472,6 +3517,15 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames(), command.state().getReleaseType().getGitTagNames());
+            }
+            else {
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().containsAll(command.state().getReleaseType().getGitTagNames()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().get(i), command.state().getReleaseType().getGitTagNames().get(i));
+                }
+            }
             if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
                 assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
@@ -3539,6 +3593,15 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames(), command.state().getReleaseType().getGitTagNames());
+            }
+            else {
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().containsAll(command.state().getReleaseType().getGitTagNames()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().get(i), command.state().getReleaseType().getGitTagNames().get(i));
+                }
+            }
             if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
                 assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
@@ -3606,6 +3669,15 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames(), command.state().getReleaseType().getGitTagNames());
+            }
+            else {
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().containsAll(command.state().getReleaseType().getGitTagNames()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().get(i), command.state().getReleaseType().getGitTagNames().get(i));
+                }
+            }
             if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
                 assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
@@ -3673,6 +3745,15 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames(), command.state().getReleaseType().getGitTagNames());
+            }
+            else {
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().containsAll(command.state().getReleaseType().getGitTagNames()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().get(i), command.state().getReleaseType().getGitTagNames().get(i));
+                }
+            }
             if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
                 assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
@@ -3740,6 +3821,15 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames(), command.state().getReleaseType().getGitTagNames());
+            }
+            else {
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().containsAll(command.state().getReleaseType().getGitTagNames()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().get(i), command.state().getReleaseType().getGitTagNames().get(i));
+                }
+            }
             if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
                 assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
@@ -3807,6 +3897,15 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames(), command.state().getReleaseType().getGitTagNames());
+            }
+            else {
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().containsAll(command.state().getReleaseType().getGitTagNames()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().get(i), command.state().getReleaseType().getGitTagNames().get(i));
+                }
+            }
             if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
                 assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
@@ -3874,6 +3973,15 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames(), command.state().getReleaseType().getGitTagNames());
+            }
+            else {
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().containsAll(command.state().getReleaseType().getGitTagNames()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().get(i), command.state().getReleaseType().getGitTagNames().get(i));
+                }
+            }
             if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
                 assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
@@ -3941,6 +4049,15 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames(), command.state().getReleaseType().getGitTagNames());
+            }
+            else {
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().containsAll(command.state().getReleaseType().getGitTagNames()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().get(i), command.state().getReleaseType().getGitTagNames().get(i));
+                }
+            }
             if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
                 assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
@@ -4008,6 +4125,15 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames(), command.state().getReleaseType().getGitTagNames());
+            }
+            else {
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().containsAll(command.state().getReleaseType().getGitTagNames()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().get(i), command.state().getReleaseType().getGitTagNames().get(i));
+                }
+            }
             if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
                 assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
@@ -4075,6 +4201,15 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames(), command.state().getReleaseType().getGitTagNames());
+            }
+            else {
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().containsAll(command.state().getReleaseType().getGitTagNames()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().get(i), command.state().getReleaseType().getGitTagNames().get(i));
+                }
+            }
             if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
                 assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
@@ -4142,6 +4277,15 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames(), command.state().getReleaseType().getGitTagNames());
+            }
+            else {
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().containsAll(command.state().getReleaseType().getGitTagNames()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().get(i), command.state().getReleaseType().getGitTagNames().get(i));
+                }
+            }
             if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
                 assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
@@ -4209,6 +4353,15 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames(), command.state().getReleaseType().getGitTagNames());
+            }
+            else {
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().containsAll(command.state().getReleaseType().getGitTagNames()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().get(i), command.state().getReleaseType().getGitTagNames().get(i));
+                }
+            }
             if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
                 assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
@@ -4276,6 +4429,15 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames(), command.state().getReleaseType().getGitTagNames());
+            }
+            else {
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().containsAll(command.state().getReleaseType().getGitTagNames()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().get(i), command.state().getReleaseType().getGitTagNames().get(i));
+                }
+            }
             if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
                 assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
@@ -4343,6 +4505,15 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames(), command.state().getReleaseType().getGitTagNames());
+            }
+            else {
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().containsAll(command.state().getReleaseType().getGitTagNames()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().get(i), command.state().getReleaseType().getGitTagNames().get(i));
+                }
+            }
             if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
                 assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
@@ -4435,6 +4606,15 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames(), command.state().getReleaseType().getGitTagNames());
+            }
+            else {
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().containsAll(command.state().getReleaseType().getGitTagNames()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().get(i), command.state().getReleaseType().getGitTagNames().get(i));
+                }
+            }
             if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
                 assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
@@ -4502,6 +4682,15 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames(), command.state().getReleaseType().getGitTagNames());
+            }
+            else {
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().containsAll(command.state().getReleaseType().getGitTagNames()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().get(i), command.state().getReleaseType().getGitTagNames().get(i));
+                }
+            }
             if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
                 assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
@@ -4594,6 +4783,15 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames(), command.state().getReleaseType().getGitTagNames());
+            }
+            else {
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().containsAll(command.state().getReleaseType().getGitTagNames()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().get(i), command.state().getReleaseType().getGitTagNames().get(i));
+                }
+            }
             if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
                 assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
@@ -4661,6 +4859,15 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames(), command.state().getReleaseType().getGitTagNames());
+            }
+            else {
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().containsAll(command.state().getReleaseType().getGitTagNames()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().get(i), command.state().getReleaseType().getGitTagNames().get(i));
+                }
+            }
             if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
                 assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
@@ -4728,6 +4935,15 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames(), command.state().getReleaseType().getGitTagNames());
+            }
+            else {
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().containsAll(command.state().getReleaseType().getGitTagNames()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().get(i), command.state().getReleaseType().getGitTagNames().get(i));
+                }
+            }
             if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
                 assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
@@ -4795,6 +5011,15 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames(), command.state().getReleaseType().getGitTagNames());
+            }
+            else {
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().containsAll(command.state().getReleaseType().getGitTagNames()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().get(i), command.state().getReleaseType().getGitTagNames().get(i));
+                }
+            }
             if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
                 assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
@@ -4862,6 +5087,15 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames(), command.state().getReleaseType().getGitTagNames());
+            }
+            else {
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().containsAll(command.state().getReleaseType().getGitTagNames()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().get(i), command.state().getReleaseType().getGitTagNames().get(i));
+                }
+            }
             if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
                 assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
@@ -4929,6 +5163,15 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames(), command.state().getReleaseType().getGitTagNames());
+            }
+            else {
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().containsAll(command.state().getReleaseType().getGitTagNames()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().get(i), command.state().getReleaseType().getGitTagNames().get(i));
+                }
+            }
             if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
                 assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
@@ -4996,6 +5239,15 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames(), command.state().getReleaseType().getGitTagNames());
+            }
+            else {
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().containsAll(command.state().getReleaseType().getGitTagNames()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().get(i), command.state().getReleaseType().getGitTagNames().get(i));
+                }
+            }
             if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
                 assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
@@ -5065,6 +5317,15 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames(), command.state().getReleaseType().getGitTagNames());
+            }
+            else {
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().containsAll(command.state().getReleaseType().getGitTagNames()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().get(i), command.state().getReleaseType().getGitTagNames().get(i));
+                }
+            }
             if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
                 assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
@@ -5132,6 +5393,15 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames(), command.state().getReleaseType().getGitTagNames());
+            }
+            else {
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().containsAll(command.state().getReleaseType().getGitTagNames()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().get(i), command.state().getReleaseType().getGitTagNames().get(i));
+                }
+            }
             if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
                 assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
@@ -5201,6 +5471,15 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames(), command.state().getReleaseType().getGitTagNames());
+            }
+            else {
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().containsAll(command.state().getReleaseType().getGitTagNames()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().get(i), command.state().getReleaseType().getGitTagNames().get(i));
+                }
+            }
             if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
                 assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
@@ -5268,6 +5547,15 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames(), command.state().getReleaseType().getGitTagNames());
+            }
+            else {
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().containsAll(command.state().getReleaseType().getGitTagNames()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().get(i), command.state().getReleaseType().getGitTagNames().get(i));
+                }
+            }
             if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
                 assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
@@ -5337,6 +5625,15 @@ public class InferTestTemplates {
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitPush(), command.state().getReleaseType().getGitPush());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTag(), command.state().getReleaseType().getGitTag());
             assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagMessage(), command.state().getReleaseType().getGitTagMessage());
+            if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames())) {
+                assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames(), command.state().getReleaseType().getGitTagNames());
+            }
+            else {
+                assertTrue(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().containsAll(command.state().getReleaseType().getGitTagNames()));
+                for (int i=0; i<command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().size(); i++) {
+                    assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getGitTagNames().get(i), command.state().getReleaseType().getGitTagNames().get(i));
+                }
+            }
             if (Objects.isNull(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers())) {
                 assertEquals(command.state().getConfiguration().getReleaseTypes().getItems().get(MATCHING_RELEASE_TYPE_NAME).getIdentifiers(), command.state().getReleaseType().getIdentifiers());
             }
@@ -5422,6 +5719,7 @@ public class InferTestTemplates {
             assertEquals(Boolean.TRUE.toString(), command.state().getReleaseType().getGitPush());
             assertEquals(Boolean.TRUE.toString(), command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, command.state().getReleaseType().getGitTagNames());
             assertEquals(1, command.state().getReleaseType().getIdentifiers().size());
             assertEquals("customId", command.state().getReleaseType().getIdentifiers().get(0).getQualifier());
             assertEquals("999", command.state().getReleaseType().getIdentifiers().get(0).getValue());
@@ -5500,6 +5798,7 @@ public class InferTestTemplates {
             assertEquals(Boolean.TRUE.toString(), command.state().getReleaseType().getGitPush());
             assertEquals(Boolean.TRUE.toString(), command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, command.state().getReleaseType().getGitTagNames());
             assertEquals(1, command.state().getReleaseType().getIdentifiers().size());
             assertEquals("customId", command.state().getReleaseType().getIdentifiers().get(0).getQualifier());
             assertEquals("999", command.state().getReleaseType().getIdentifiers().get(0).getValue());
@@ -5571,6 +5870,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, command.state().getReleaseType().getGitTagNames());
             assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             assertEquals(".*", command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -5638,6 +5938,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, command.state().getReleaseType().getGitTagNames());
             assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             assertEquals(".*", command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -5705,6 +6006,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, command.state().getReleaseType().getGitTagNames());
             assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             assertEquals(".*", command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -5772,6 +6074,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, command.state().getReleaseType().getGitTagNames());
             assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             assertEquals(".*", command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -5839,6 +6142,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, command.state().getReleaseType().getGitTagNames());
             assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             assertEquals(".*", command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -5913,6 +6217,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, command.state().getReleaseType().getGitTagNames());
             assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             assertEquals("^(master|main)$", command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -5987,6 +6292,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, command.state().getReleaseType().getGitTagNames());
             assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             assertEquals(".*", command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -6061,6 +6367,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, command.state().getReleaseType().getGitTagNames());
             assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             assertEquals(".*", command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -6135,6 +6442,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, command.state().getReleaseType().getGitTagNames());
             assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             assertEquals(".*", command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -6209,6 +6517,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, command.state().getReleaseType().getGitTagNames());
             assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             assertEquals(".*", command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -6283,6 +6592,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, command.state().getReleaseType().getGitTagNames());
             assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             assertEquals(".*", command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -6357,6 +6667,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, command.state().getReleaseType().getGitTagNames());
             assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             assertEquals(".*", command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -6431,6 +6742,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, command.state().getReleaseType().getGitTagNames());
             assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             assertEquals(".*", command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -6505,6 +6817,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, command.state().getReleaseType().getGitTagNames());
             assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             assertEquals(".*", command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -6573,6 +6886,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, command.state().getReleaseType().getGitTagNames());
             assertEquals(1, command.state().getReleaseType().getIdentifiers().size());
             assertEquals(".*", command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -6641,6 +6955,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, command.state().getReleaseType().getGitTagNames());
             assertEquals(1, command.state().getReleaseType().getIdentifiers().size());
             assertEquals(".*", command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -6709,6 +7024,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, command.state().getReleaseType().getGitTagNames());
             assertEquals(1, command.state().getReleaseType().getIdentifiers().size());
             assertEquals(".*", command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -6777,6 +7093,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, command.state().getReleaseType().getGitTagNames());
             assertEquals(1, command.state().getReleaseType().getIdentifiers().size());
             assertEquals(".*", command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -6845,6 +7162,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, command.state().getReleaseType().getGitTagNames());
             assertEquals(1, command.state().getReleaseType().getIdentifiers().size());
             assertEquals(".*", command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -6920,6 +7238,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, command.state().getReleaseType().getGitTagNames());
             assertEquals(1, command.state().getReleaseType().getIdentifiers().size());
             assertEquals("^(master|main)$", command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -6995,6 +7314,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, command.state().getReleaseType().getGitTagNames());
             assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             assertEquals(".*", command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -7070,6 +7390,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, command.state().getReleaseType().getGitTagNames());
             assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             assertEquals(".*", command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -7145,6 +7466,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, command.state().getReleaseType().getGitTagNames());
             assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             assertEquals(".*", command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -7220,6 +7542,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, command.state().getReleaseType().getGitTagNames());
             assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             assertEquals(".*", command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -7295,6 +7618,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, command.state().getReleaseType().getGitTagNames());
             assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             assertEquals(".*", command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -7370,6 +7694,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, command.state().getReleaseType().getGitTagNames());
             assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             assertEquals(".*", command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -7445,6 +7770,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, command.state().getReleaseType().getGitTagNames());
             assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             assertEquals(".*", command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());
@@ -7520,6 +7846,7 @@ public class InferTestTemplates {
             assertEquals(Defaults.ReleaseType.GIT_PUSH, command.state().getReleaseType().getGitPush());
             assertEquals(Defaults.ReleaseType.GIT_TAG, command.state().getReleaseType().getGitTag());
             assertEquals(Defaults.ReleaseType.GIT_TAG_MESSAGE, command.state().getReleaseType().getGitTagMessage());
+            assertEquals(Defaults.ReleaseType.GIT_TAG_NAMES, command.state().getReleaseType().getGitTagNames());
             assertEquals(Defaults.ReleaseType.IDENTIFIERS, command.state().getReleaseType().getIdentifiers());
             assertEquals(".*", command.state().getReleaseType().getMatchBranches());
             assertEquals(Defaults.ReleaseType.MATCH_ENVIRONMENT_VARIABLES, command.state().getReleaseType().getMatchEnvironmentVariables());

@@ -148,6 +148,11 @@ public interface Defaults {
         public static final String GIT_TAG_MESSAGE = null;
 
         /**
+         * The list of templates to use as tag names when tagging a commit. Value: {@code "[ {{version}} ]"}
+         */
+        public static final List<String> GIT_TAG_NAMES = List.<String>of("{{version}}");
+
+        /**
          * The identifiers configuration block. Value: {@code null}
          */
         public static final List<Identifier> IDENTIFIERS = null;
@@ -172,6 +177,21 @@ public interface Defaults {
          * The optional flag or the template to render indicating whether or not releases must be published. Value: {@code false}
          */
         public static final String PUBLISH = Boolean.FALSE.toString();
+
+        /**
+         * The optional template to set the draft flag of releases published to remote services. Value: {@code false}
+         */
+        public static final String PUBLISH_DRAFT = Boolean.FALSE.toString();
+
+        /**
+         * The optional template to set the pre-release flag of releases published to remote services. Value: {@code false}
+         */
+        public static final String PUBLISH_PRE_RELEASE = Boolean.FALSE.toString();
+
+        /**
+         * The optional template to set the name of releases published to remote services. Value: {@code null}
+         */
+        public static final String RELEASE_NAME = null;
 
         /**
          * The optional template to render as a regular expression used to constrain versions issued by this release type. Value: {@code null}
@@ -213,6 +233,11 @@ public interface Defaults {
      * The default path to the local state file. Value: {@code null}
      */
     public static final String STATE_FILE = null;
+
+    /**
+     * The default substitutions block.
+     */
+    public static final Substitutions SUBSTITUTIONS = new Substitutions(List.<String>of(), Map.<String,Substitution>of());
 
     /**
      * The default flag that tells when to print a summary to the console. Value: {@code false}

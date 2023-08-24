@@ -47,12 +47,14 @@ nyx {
         gitPush = 'true'
         gitTag = 'true'
         gitTagMessage = 'Tag release {{version}}'
+        gitTagNames = [ '{{version}}', 'stable', 'latest' ]
         matchBranches = '^(master|main)$'
         matchEnvironmentVariables {
           CI = '^true$'
         }
         matchWorkspaceStatus = 'CLEAN'
         publish = 'true'
+        releaseName = 'Release {{version}}'
         versionRangeFromBranchName = false
       }
       internal {
@@ -86,6 +88,7 @@ nyx {
           }
         }
         publish = 'false'
+        publishDraft = 'true'
         versionRangeFromBranchName = false
       }
     }
@@ -98,6 +101,16 @@ nyx {
         AUTHENTICATION_TOKEN = '{{#environmentVariable}}GITHUB_TOKEN{{/environmentVariable}}'
         REPOSITORY_NAME = 'myrepo'
         REPOSITORY_OWNER = 'acme'
+      }
+    }
+  }
+  substitutions {
+    enabled = [ 'npm' ]
+    items {
+      npm {
+        files = 'package.json'
+        match = '"version"(\s)*:(\s)*"(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?"'
+        replace = '"version": "{{version}}"'
       }
     }
   }

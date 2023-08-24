@@ -366,6 +366,7 @@ public class EnvironmentConfigurationLayerTests {
         environmentConfigurationLayer.environment.put("NYX_RELEASE_TYPES_two_GIT_PUSH", "false");
         environmentConfigurationLayer.environment.put("NYX_RELEASE_TYPES_two_GIT_TAG", "false");
         environmentConfigurationLayer.environment.put("NYX_RELEASE_TYPES_two_GIT_TAG_MESSAGE", "Tag message");
+        environmentConfigurationLayer.environment.put("NYX_RELEASE_TYPES_two_GIT_TAG_NAMES", "one,two,three");
         environmentConfigurationLayer.environment.put("NYX_RELEASE_TYPES_two_IDENTIFIERS_0_POSITION", Identifier.Position.PRE_RELEASE.toString());
         environmentConfigurationLayer.environment.put("NYX_RELEASE_TYPES_two_IDENTIFIERS_0_QUALIFIER", "q1");
         environmentConfigurationLayer.environment.put("NYX_RELEASE_TYPES_two_IDENTIFIERS_0_VALUE", "v1");
@@ -379,6 +380,9 @@ public class EnvironmentConfigurationLayerTests {
         environmentConfigurationLayer.environment.put("NYX_RELEASE_TYPES_two_MATCH_ENVIRONMENT_VARIABLES_USER", "any user");
         environmentConfigurationLayer.environment.put("NYX_RELEASE_TYPES_two_MATCH_WORKSPACE_STATUS", WorkspaceStatus.CLEAN.toString());
         environmentConfigurationLayer.environment.put("NYX_RELEASE_TYPES_two_PUBLISH", "true");
+        environmentConfigurationLayer.environment.put("NYX_RELEASE_TYPES_two_PUBLISH_DRAFT", "false");
+        environmentConfigurationLayer.environment.put("NYX_RELEASE_TYPES_two_PUBLISH_PRE_RELEASE", "true");
+        environmentConfigurationLayer.environment.put("NYX_RELEASE_TYPES_two_RELEASE_NAME", "myrelease");
         environmentConfigurationLayer.environment.put("NYX_RELEASE_TYPES_two_VERSION_RANGE_FROM_BRANCH_NAME", "true");
         
         assertEquals(2, environmentConfigurationLayer.getReleaseTypes().getEnabled().size());
@@ -399,12 +403,16 @@ public class EnvironmentConfigurationLayerTests {
         assertNull(environmentConfigurationLayer.getReleaseTypes().getItems().get("one").getGitCommitMessage());
         assertEquals("true", environmentConfigurationLayer.getReleaseTypes().getItems().get("one").getGitTag());
         assertNull(environmentConfigurationLayer.getReleaseTypes().getItems().get("one").getGitTagMessage());
+        assertNull(environmentConfigurationLayer.getReleaseTypes().getItems().get("one").getGitTagNames());
         assertEquals("true", environmentConfigurationLayer.getReleaseTypes().getItems().get("one").getGitPush());
         assertEquals(0, environmentConfigurationLayer.getReleaseTypes().getItems().get("one").getIdentifiers().size());
         assertEquals("alpha,beta", environmentConfigurationLayer.getReleaseTypes().getItems().get("one").getMatchBranches());
         assertEquals(0, environmentConfigurationLayer.getReleaseTypes().getItems().get("one").getMatchEnvironmentVariables().size());
         assertEquals(WorkspaceStatus.DIRTY, environmentConfigurationLayer.getReleaseTypes().getItems().get("one").getMatchWorkspaceStatus());
         assertEquals("false", environmentConfigurationLayer.getReleaseTypes().getItems().get("one").getPublish());
+        assertNull(environmentConfigurationLayer.getReleaseTypes().getItems().get("one").getPublishDraft());
+        assertNull(environmentConfigurationLayer.getReleaseTypes().getItems().get("one").getPublishPreRelease());
+        assertNull(environmentConfigurationLayer.getReleaseTypes().getItems().get("one").getReleaseName());
         assertEquals("true", environmentConfigurationLayer.getReleaseTypes().getItems().get("one").getVersionRange());
         assertNull(environmentConfigurationLayer.getReleaseTypes().getItems().get("one").getVersionRangeFromBranchName());
         assertNull(environmentConfigurationLayer.getReleaseTypes().getItems().get("two").getAssets());
@@ -417,6 +425,10 @@ public class EnvironmentConfigurationLayerTests {
         assertEquals("false", environmentConfigurationLayer.getReleaseTypes().getItems().get("two").getGitPush());
         assertEquals("false", environmentConfigurationLayer.getReleaseTypes().getItems().get("two").getGitTag());
         assertEquals("Tag message", environmentConfigurationLayer.getReleaseTypes().getItems().get("two").getGitTagMessage());
+        assertEquals(3, environmentConfigurationLayer.getReleaseTypes().getItems().get("two").getGitTagNames().size());
+        assertEquals("one", environmentConfigurationLayer.getReleaseTypes().getItems().get("two").getGitTagNames().get(0));
+        assertEquals("two", environmentConfigurationLayer.getReleaseTypes().getItems().get("two").getGitTagNames().get(1));
+        assertEquals("three", environmentConfigurationLayer.getReleaseTypes().getItems().get("two").getGitTagNames().get(2));
         assertEquals(3, environmentConfigurationLayer.getReleaseTypes().getItems().get("two").getIdentifiers().size());
         assertEquals(Identifier.Position.PRE_RELEASE, environmentConfigurationLayer.getReleaseTypes().getItems().get("two").getIdentifiers().get(0).getPosition());
         assertEquals("q1", environmentConfigurationLayer.getReleaseTypes().getItems().get("two").getIdentifiers().get(0).getQualifier());
@@ -433,6 +445,9 @@ public class EnvironmentConfigurationLayerTests {
         assertEquals("any user", environmentConfigurationLayer.getReleaseTypes().getItems().get("two").getMatchEnvironmentVariables().get("USER"));
         assertEquals(WorkspaceStatus.CLEAN, environmentConfigurationLayer.getReleaseTypes().getItems().get("two").getMatchWorkspaceStatus());
         assertEquals("true", environmentConfigurationLayer.getReleaseTypes().getItems().get("two").getPublish());
+        assertEquals("false", environmentConfigurationLayer.getReleaseTypes().getItems().get("two").getPublishDraft());
+        assertEquals("true", environmentConfigurationLayer.getReleaseTypes().getItems().get("two").getPublishPreRelease());
+        assertEquals("myrelease", environmentConfigurationLayer.getReleaseTypes().getItems().get("two").getReleaseName());
         assertNull(environmentConfigurationLayer.getReleaseTypes().getItems().get("two").getVersionRange());
         assertEquals(Boolean.TRUE, environmentConfigurationLayer.getReleaseTypes().getItems().get("two").getVersionRangeFromBranchName());
     }
@@ -519,6 +534,66 @@ public class EnvironmentConfigurationLayerTests {
     }
 
     @Test
+    @DisplayName("EnvironmentConfigurationLayer.getStateFile()")
+    void getStateFileTest()
+        throws Exception {
+        EnvironmentConfigurationLayerMock environmentConfigurationLayer = EnvironmentConfigurationLayerMock.getInstance();
+        assertNull(environmentConfigurationLayer.getStateFile());
+
+        environmentConfigurationLayer.environment.put("NYX_STATE_FILE", "state.yml");
+        assertEquals("state.yml", environmentConfigurationLayer.getStateFile());
+    }
+
+    @Test
+    @DisplayName("EnvironmentConfigurationLayer.getSubstitutions()")
+    void getSubstitutionsTest()
+        throws Exception {
+        EnvironmentConfigurationLayerMock environmentConfigurationLayer = EnvironmentConfigurationLayerMock.getInstance();
+        assertNotNull(environmentConfigurationLayer.getSubstitutions());
+        assertTrue(environmentConfigurationLayer.getSubstitutions().getEnabled().isEmpty());
+        assertTrue(environmentConfigurationLayer.getSubstitutions().getItems().isEmpty());
+
+        // get a new instance or a stale object is returned by getSubstitutions()
+        environmentConfigurationLayer = EnvironmentConfigurationLayerMock.getInstance();
+        environmentConfigurationLayer.environment.put("NYX_SUBSTITUTIONS_ENABLED", "one,two");
+
+        assertEquals(2, environmentConfigurationLayer.getSubstitutions().getEnabled().size());
+        assertTrue(environmentConfigurationLayer.getSubstitutions().getEnabled().containsAll(List.<String>of("one", "two")));
+        assertEquals(0, environmentConfigurationLayer.getSubstitutions().getItems().size());
+        
+        // get a new instance or a stale object is returned by getSubstitutions()
+        environmentConfigurationLayer = EnvironmentConfigurationLayerMock.getInstance();
+        environmentConfigurationLayer.environment.put("NYX_SUBSTITUTIONS_ENABLED", "one,two");
+        environmentConfigurationLayer.environment.put("NYX_SUBSTITUTIONS_one_FILES", "");
+        environmentConfigurationLayer.environment.put("NYX_SUBSTITUTIONS_two_FILES", "");
+
+        assertEquals(2, environmentConfigurationLayer.getSubstitutions().getEnabled().size());
+        assertTrue(environmentConfigurationLayer.getSubstitutions().getEnabled().containsAll(List.<String>of("one", "two")));
+        assertEquals(2, environmentConfigurationLayer.getSubstitutions().getItems().size());
+        assertNotNull(environmentConfigurationLayer.getSubstitutions().getItems().get("one"));
+        assertNotNull(environmentConfigurationLayer.getSubstitutions().getItems().get("two"));
+
+        // get a new instance or a stale object is returned by getSubstitutions()
+        environmentConfigurationLayer = EnvironmentConfigurationLayerMock.getInstance();
+        environmentConfigurationLayer.environment.put("NYX_SUBSTITUTIONS_ENABLED", "one,two");
+        environmentConfigurationLayer.environment.put("NYX_SUBSTITUTIONS_one_FILES", "*.json");
+        environmentConfigurationLayer.environment.put("NYX_SUBSTITUTIONS_one_MATCH", "version: 1.2.3");
+        environmentConfigurationLayer.environment.put("NYX_SUBSTITUTIONS_two_FILES", "*.toml");
+        environmentConfigurationLayer.environment.put("NYX_SUBSTITUTIONS_two_MATCH", "version = 4.5.6");
+        environmentConfigurationLayer.environment.put("NYX_SUBSTITUTIONS_two_REPLACE", "version = 7.8.9");
+
+        assertEquals(2, environmentConfigurationLayer.getSubstitutions().getEnabled().size());
+        assertTrue(environmentConfigurationLayer.getSubstitutions().getEnabled().containsAll(List.<String>of("one", "two")));
+        assertEquals(2, environmentConfigurationLayer.getSubstitutions().getItems().size());
+        assertEquals("*.json", environmentConfigurationLayer.getSubstitutions().getItems().get("one").getFiles());
+        assertEquals("version: 1.2.3", environmentConfigurationLayer.getSubstitutions().getItems().get("one").getMatch());
+        assertNull(environmentConfigurationLayer.getSubstitutions().getItems().get("one").getReplace());
+        assertEquals("*.toml", environmentConfigurationLayer.getSubstitutions().getItems().get("two").getFiles());
+        assertEquals("version = 4.5.6", environmentConfigurationLayer.getSubstitutions().getItems().get("two").getMatch());
+        assertEquals("version = 7.8.9", environmentConfigurationLayer.getSubstitutions().getItems().get("two").getReplace());
+    }
+
+    @Test
     @DisplayName("EnvironmentConfigurationLayer.getSummary()")
     void getSummaryTest()
         throws Exception {
@@ -538,17 +613,6 @@ public class EnvironmentConfigurationLayerTests {
 
         environmentConfigurationLayer.environment.put("NYX_SUMMARY_FILE", "summary.txt");
         assertEquals("summary.txt", environmentConfigurationLayer.getSummaryFile());
-    }
-
-    @Test
-    @DisplayName("EnvironmentConfigurationLayer.getStateFile()")
-    void getStateFileTest()
-        throws Exception {
-        EnvironmentConfigurationLayerMock environmentConfigurationLayer = EnvironmentConfigurationLayerMock.getInstance();
-        assertNull(environmentConfigurationLayer.getStateFile());
-
-        environmentConfigurationLayer.environment.put("NYX_STATE_FILE", "state.yml");
-        assertEquals("state.yml", environmentConfigurationLayer.getStateFile());
     }
 
     @Test

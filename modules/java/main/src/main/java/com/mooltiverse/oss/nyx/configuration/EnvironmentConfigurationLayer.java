@@ -49,6 +49,8 @@ import com.mooltiverse.oss.nyx.entities.Provider;
 import com.mooltiverse.oss.nyx.entities.ReleaseType;
 import com.mooltiverse.oss.nyx.entities.ReleaseTypes;
 import com.mooltiverse.oss.nyx.entities.ServiceConfiguration;
+import com.mooltiverse.oss.nyx.entities.Substitution;
+import com.mooltiverse.oss.nyx.entities.Substitutions;
 import com.mooltiverse.oss.nyx.entities.Verbosity;
 import com.mooltiverse.oss.nyx.entities.WorkspaceStatus;
 import com.mooltiverse.oss.nyx.version.Scheme;
@@ -539,6 +541,19 @@ class EnvironmentConfigurationLayer implements ConfigurationLayer {
     private static final String RELEASE_TYPES_ITEM_GIT_TAG_MESSAGE_FORMAT_STRING = RELEASE_TYPES_ENVVAR_NAME.concat("_%s_GIT_TAG_MESSAGE");
 
     /**
+     * The parametrized name of the environment variable to read for the 'gitTagNames' attribute of a
+     * release type.
+     * This string is a {@link Formatter string} that contains a '%s' parameter for the release type name
+     * and must be rendered using {@link String#format(String, Object...) String.format(RELEASE_TYPES_ITEM_GIT_TAG_NAMES_FORMAT_STRING, name)}
+     * in order to get the actual name of environment variable that brings the value for the release type with the given {@code name}.
+     * Value: {@value}
+     * 
+     * @see Formatter
+     * @see String#format(String, Object...)
+     */
+    private static final String RELEASE_TYPES_ITEM_GIT_TAG_NAMES_FORMAT_STRING = RELEASE_TYPES_ENVVAR_NAME.concat("_%s_GIT_TAG_NAMES");
+
+    /**
      * The parametrized name of the environment variable to read for the 'identifiers' attribute of a
      * release type.
      * This string is a {@link Formatter string} that contains a '%s' parameter for the commit release type name
@@ -602,6 +617,45 @@ class EnvironmentConfigurationLayer implements ConfigurationLayer {
      * @see String#format(String, Object...)
      */
     private static final String RELEASE_TYPES_ITEM_PUBLISH_FORMAT_STRING = RELEASE_TYPES_ENVVAR_NAME.concat("_%s_PUBLISH");
+
+    /**
+     * The parametrized name of the environment variable to read for the 'publishDraft' attribute of a
+     * release type.
+     * This string is a {@link Formatter string} that contains a '%s' parameter for the release type name
+     * and must be rendered using {@link String#format(String, Object...) String.format(RELEASE_TYPES_ITEM_PUBLISH_DRAFT_FORMAT_STRING, name)}
+     * in order to get the actual name of environment variable that brings the value for the release type with the given {@code name}.
+     * Value: {@value}
+     * 
+     * @see Formatter
+     * @see String#format(String, Object...)
+     */
+    private static final String RELEASE_TYPES_ITEM_PUBLISH_DRAFT_FORMAT_STRING = RELEASE_TYPES_ENVVAR_NAME.concat("_%s_PUBLISH_DRAFT");
+
+    /**
+     * The parametrized name of the environment variable to read for the 'publishPreRelease' attribute of a
+     * release type.
+     * This string is a {@link Formatter string} that contains a '%s' parameter for the release type name
+     * and must be rendered using {@link String#format(String, Object...) String.format(RELEASE_TYPES_ITEM_PUBLISH_PRE_RELEASE_FORMAT_STRING, name)}
+     * in order to get the actual name of environment variable that brings the value for the release type with the given {@code name}.
+     * Value: {@value}
+     * 
+     * @see Formatter
+     * @see String#format(String, Object...)
+     */
+    private static final String RELEASE_TYPES_ITEM_PUBLISH_PRE_RELEASE_FORMAT_STRING = RELEASE_TYPES_ENVVAR_NAME.concat("_%s_PUBLISH_PRE_RELEASE");
+
+    /**
+     * The parametrized name of the environment variable to read for the 'releaseName' attribute of a
+     * release type.
+     * This string is a {@link Formatter string} that contains a '%s' parameter for the release type name
+     * and must be rendered using {@link String#format(String, Object...) String.format(RELEASE_TYPES_ITEM_RELEASE_NAME_FORMAT_STRING, name)}
+     * in order to get the actual name of environment variable that brings the value for the release type with the given {@code name}.
+     * Value: {@value}
+     * 
+     * @see Formatter
+     * @see String#format(String, Object...)
+     */
+    private static final String RELEASE_TYPES_ITEM_RELEASE_NAME_FORMAT_STRING = RELEASE_TYPES_ENVVAR_NAME.concat("_%s_RELEASE_NAME");
 
     /**
      * The parametrized name of the environment variable to read for the 'versionRange' attribute of a
@@ -687,17 +741,75 @@ class EnvironmentConfigurationLayer implements ConfigurationLayer {
     /**
      * The name of the environment variable to read for this value. Value: {@value}
      */
+    private static final String STATE_FILE_ENVVAR_NAME = ENVVAR_NAME_GLOBAL_PREFIX.concat("STATE_FILE");
+
+    /**
+     * The name of the environment variable to read for this value. Value: {@value}
+     */
+    private static final String SUBSTITUTIONS_ENVVAR_NAME = ENVVAR_NAME_GLOBAL_PREFIX.concat("SUBSTITUTIONS");
+
+    /**
+     * The name of the environment variable to read for this value. Value: {@value}
+     */
+    private static final String SUBSTITUTIONS_ENABLED_ENVVAR_NAME = SUBSTITUTIONS_ENVVAR_NAME.concat("_ENABLED");
+
+    /**
+     * The regular expression used to scan the name of a substitution from an environment
+     * variable name. This expression is used to detect if an environment variable is used to define
+     * a substitution.
+     * This expression uses the 'name' capturing group which returns the substitution name, if detected.
+     * Value: {@value}
+     */
+    private static final String SUBSTITUTIONS_ITEM_NAME_REGEX = SUBSTITUTIONS_ENVVAR_NAME.concat("_(?<name>[a-zA-Z0-9]+)_([a-zA-Z0-9_]+)$");
+
+    /**
+     * The parametrized name of the environment variable to read for the 'files' attribute of a
+     * substitution.
+     * This string is a {@link Formatter string} that contains a '%s' parameter for the substitution name
+     * and must be rendered using {@link String#format(String, Object...) String.format(SUBSTITUTIONS_ITEM_EXPRESSION_FORMAT_STRING, name)}
+     * in order to get the actual name of environment variable that brings the value for the substitution with the given {@code name}.
+     * Value: {@value}
+     * 
+     * @see Formatter
+     * @see String#format(String, Object...)
+     */
+    private static final String SUBSTITUTIONS_ITEM_FILES_FORMAT_STRING = SUBSTITUTIONS_ENVVAR_NAME.concat("_%s_FILES");
+
+    /**
+     * The parametrized name of the environment variable to read for the 'match' attribute of a
+     * substitution.
+     * This string is a {@link Formatter string} that contains a '%s' parameter for the substitution name
+     * and must be rendered using {@link String#format(String, Object...) String.format(SUBSTITUTIONS_ITEM_EXPRESSION_FORMAT_STRING, name)}
+     * in order to get the actual name of environment variable that brings the value for the substitution with the given {@code name}.
+     * Value: {@value}
+     * 
+     * @see Formatter
+     * @see String#format(String, Object...)
+     */
+    private static final String SUBSTITUTIONS_ITEM_MATCH_FORMAT_STRING = SUBSTITUTIONS_ENVVAR_NAME.concat("_%s_MATCH");
+
+    /**
+     * The parametrized name of the environment variable to read for the 'replace' attribute of a
+     * substitution.
+     * This string is a {@link Formatter string} that contains a '%s' parameter for the substitution name
+     * and must be rendered using {@link String#format(String, Object...) String.format(SUBSTITUTIONS_ITEM_EXPRESSION_FORMAT_STRING, name)}
+     * in order to get the actual name of environment variable that brings the value for the substitution with the given {@code name}.
+     * Value: {@value}
+     * 
+     * @see Formatter
+     * @see String#format(String, Object...)
+     */
+    private static final String SUBSTITUTIONS_ITEM_REPLACE_FORMAT_STRING = SUBSTITUTIONS_ENVVAR_NAME.concat("_%s_REPLACE");
+
+    /**
+     * The name of the environment variable to read for this value. Value: {@value}
+     */
     private static final String SUMMARY_ENVVAR_NAME = ENVVAR_NAME_GLOBAL_PREFIX.concat("SUMMARY");
 
     /**
      * The name of the environment variable to read for this value. Value: {@value}
      */
     private static final String SUMMARY_FILE_ENVVAR_NAME = ENVVAR_NAME_GLOBAL_PREFIX.concat("SUMMARY_FILE");
-    
-    /**
-     * The name of the environment variable to read for this value. Value: {@value}
-     */
-    private static final String STATE_FILE_ENVVAR_NAME = ENVVAR_NAME_GLOBAL_PREFIX.concat("STATE_FILE");
 
     /**
      * The name of the environment variable to read for this value. Value: {@value}
@@ -738,6 +850,11 @@ class EnvironmentConfigurationLayer implements ConfigurationLayer {
      * The private instance of the services configuration section.
      */
     private Map<String,ServiceConfiguration> servicesSection = null;
+
+    /**
+     * The private instance of the substitutions configuration section.
+     */
+    private Substitutions substitutionsSection = null;
 
     /**
      * Default constructor is private on purpose.
@@ -1199,6 +1316,8 @@ class EnvironmentConfigurationLayer implements ConfigurationLayer {
                 String gitPush                                  = getenv(String.format(RELEASE_TYPES_ITEM_GIT_PUSH_FORMAT_STRING, itemName));
                 String gitTag                                   = getenv(String.format(RELEASE_TYPES_ITEM_GIT_TAG_FORMAT_STRING, itemName));
                 String gitTagMessage                            = getenv(String.format(RELEASE_TYPES_ITEM_GIT_TAG_MESSAGE_FORMAT_STRING, itemName));
+                String gitTagNamesList                          = getenv(String.format(RELEASE_TYPES_ITEM_GIT_TAG_NAMES_FORMAT_STRING, itemName));
+                List<String> gitTagNames                        = Objects.isNull(gitTagNamesList) ? null : List.<String>of(gitTagNamesList.split(","));
                 List<Identifier> identifiers                    = getIdentifiersListFromEnvironmentVariable("releaseTypes".concat(".").concat(itemName).concat(".").concat("identifiers"), String.format(RELEASE_TYPES_ITEM_IDENTIFIERS_FORMAT_STRING, itemName), null);
                 String matchBranches                            = getenv(String.format(RELEASE_TYPES_ITEM_MATCH_BRANCHES_FORMAT_STRING, itemName));
                 Map<String,String> matchEnvironmentVariables    = getAttributeMapFromEnvironmentVariable("releaseTypes".concat(".").concat(itemName).concat(".").concat("matchEnvironmentVariables"), String.format(RELEASE_TYPES_ITEM_MATCH_ENVIRONMENT_VARIABLES_FORMAT_STRING, itemName), null);
@@ -1212,6 +1331,9 @@ class EnvironmentConfigurationLayer implements ConfigurationLayer {
                     throw new IllegalPropertyException(String.format("The environment variable '%s' has an illegal value '%s'", String.format(RELEASE_TYPES_ITEM_MATCH_WORKSPACE_STATUS_FORMAT_STRING, itemName), matchWorkspaceStatusString), iae);
                 }
                 String publish                                  = getenv(String.format(RELEASE_TYPES_ITEM_PUBLISH_FORMAT_STRING, itemName));
+                String publishDraft                             = getenv(String.format(RELEASE_TYPES_ITEM_PUBLISH_DRAFT_FORMAT_STRING, itemName));
+                String publishPreRelease                        = getenv(String.format(RELEASE_TYPES_ITEM_PUBLISH_PRE_RELEASE_FORMAT_STRING, itemName));
+                String releaseName                              = getenv(String.format(RELEASE_TYPES_ITEM_RELEASE_NAME_FORMAT_STRING, itemName));
                 String versionRange                             = getenv(String.format(RELEASE_TYPES_ITEM_VERSION_RANGE_FORMAT_STRING, itemName));
                 Boolean versionRangeFromBranchName              = null;
                 String versionRangeFromBranchNameString         = getenv(String.format(RELEASE_TYPES_ITEM_VERSION_RANGE_FROM_BRANCH_NAME_FORMAT_STRING, itemName));
@@ -1223,7 +1345,7 @@ class EnvironmentConfigurationLayer implements ConfigurationLayer {
                     throw new IllegalPropertyException(String.format("The environment variable '%s' has an illegal value '%s'", String.format(RELEASE_TYPES_ITEM_VERSION_RANGE_FROM_BRANCH_NAME_FORMAT_STRING, itemName), versionRangeFromBranchNameString), iae);
                 }
 
-                items.put(itemName, new ReleaseType(assets, Objects.isNull(collapseVersions) ? Defaults.ReleaseType.COLLAPSE_VERSIONS : collapseVersions, collapseVersionQualifier, description, filterTags, gitCommit, gitCommitMessage, gitPush, gitTag, gitTagMessage, identifiers, matchBranches, matchEnvironmentVariables, matchWorkspaceStatus, publish, versionRange, versionRangeFromBranchName));
+                items.put(itemName, new ReleaseType(assets, Objects.isNull(collapseVersions) ? Defaults.ReleaseType.COLLAPSE_VERSIONS : collapseVersions, collapseVersionQualifier, description, filterTags, gitCommit, gitCommitMessage, gitPush, gitTag, gitTagMessage, gitTagNames, identifiers, matchBranches, matchEnvironmentVariables, matchWorkspaceStatus, publish, publishDraft, publishPreRelease, releaseName, versionRange, versionRangeFromBranchName));
             }
 
             releaseTypesSection = new ReleaseTypes(enabled, publicationServices, remoteRepositories, items);
@@ -1302,6 +1424,43 @@ class EnvironmentConfigurationLayer implements ConfigurationLayer {
      * {@inheritDoc}
      */
     @Override
+    public String getStateFile() {
+        return getenv(STATE_FILE_ENVVAR_NAME);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Substitutions getSubstitutions()
+        throws IllegalPropertyException {
+        if (Objects.isNull(substitutionsSection)) {
+            // parse the 'enabled' items list
+            List<String> enabled = getItemNamesListFromEnvironmentVariable("substitutions", "enabled", SUBSTITUTIONS_ENABLED_ENVVAR_NAME);
+            
+            // parse the 'items' map
+            Map<String,Substitution> items = new HashMap<String,Substitution>();
+
+            Set<String> itemNames = scanItemNamesInEnvironmentVariables("substitutions", SUBSTITUTIONS_ITEM_NAME_REGEX, null);
+            // now we have the set of all item names configured through environment variables and we can
+            // query specific environment variables
+            for (String itemName: itemNames) {
+                String files = getenv(String.format(SUBSTITUTIONS_ITEM_FILES_FORMAT_STRING, itemName));
+                String match = getenv(String.format(SUBSTITUTIONS_ITEM_MATCH_FORMAT_STRING, itemName));
+                String replace = getenv(String.format(SUBSTITUTIONS_ITEM_REPLACE_FORMAT_STRING, itemName));
+                
+                items.put(itemName, new Substitution(files, match, replace));
+            }
+
+            substitutionsSection = new Substitutions(enabled, items);
+        }
+        return substitutionsSection;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Boolean getSummary()
         throws IllegalPropertyException {
         try {
@@ -1318,14 +1477,6 @@ class EnvironmentConfigurationLayer implements ConfigurationLayer {
     @Override
     public String getSummaryFile() {
         return getenv(SUMMARY_FILE_ENVVAR_NAME);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getStateFile() {
-        return getenv(STATE_FILE_ENVVAR_NAME);
     }
 
     /**
