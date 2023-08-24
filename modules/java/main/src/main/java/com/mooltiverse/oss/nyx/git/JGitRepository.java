@@ -1035,7 +1035,7 @@ class JGitRepository implements Repository {
                     command.setTagger(new PersonIdent(tagger.getName(), tagger.getEmail()));
                 }
             }
-            command.setForceUpdate​(true); // Tags may be rewritten/updated especially when using aliases (multiple tag names)
+            command.setForceUpdate(true); // Tags may be rewritten/updated especially when using aliases (multiple tag names)
             return ObjectFactory.tagFrom(jGit.getRepository().getRefDatabase().peel(command.setName(name).call()));
         }
         catch (GitAPIException | JGitInternalException | IOException e) {

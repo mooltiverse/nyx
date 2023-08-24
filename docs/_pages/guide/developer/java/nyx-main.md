@@ -88,8 +88,8 @@ public class Test {
         // Create a new configuration layer, set some options, and add it on top
         // of other layers at the 'command line' layer level
         SimpleConfigurationLayer configurationLayer = new SimpleConfigurationLayer();
-        configurationLayer.setDryRun​(Boolean.TRUE); // make it run dry
-        configurationLayer.setReleasePrefix​("rel"); // make it use 'rel' as the prefix for generated versions
+        configurationLayer.setDryRun(Boolean.TRUE); // make it run dry
+        configurationLayer.setReleasePrefix("rel"); // make it use 'rel' as the prefix for generated versions
         nyx.configuration().withCommandLineConfiguration(configurationLayer); // inject the configuration
 
         nyx.infer(); // let Nyx infer values from the Git repository
@@ -100,7 +100,7 @@ public class Test {
 
         // it might be a good place to run some custom tasks of yours, i.e. using the Git Repository
         // let's say you create a RELEASE_NOTES.md file and want to commit it
-        nyx.repository().commit​("Adding RELEASE_NOTES.md");
+        nyx.repository().commit("Adding RELEASE_NOTES.md");
 
         // then run the remaining tasks one by one
         nyx.make();

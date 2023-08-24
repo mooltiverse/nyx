@@ -77,7 +77,7 @@ func main() {
 
     // it might be a good place to run some custom tasks of yours, i.e. using the Git Repository
     // let's say you create a RELEASE_NOTES.md file and want to commit it
-    n.Repository().Commit​("Adding RELEASE_NOTES.md")
+    n.Repository().Commit("Adding RELEASE_NOTES.md")
 
     // then run the remaining tasks one by one
     n.Make()

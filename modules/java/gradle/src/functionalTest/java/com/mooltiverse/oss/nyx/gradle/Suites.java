@@ -160,7 +160,7 @@ public class Suites {
            This means it has a different method for setting nested blocks into the extension object.
            If support for these versions is strongly needed we may find a workaround but it's worthless so far.
 
-           Gradle versions prior than 5.5 do not support ObjectFactory.domainObjectContainer​(Class<T> elementType), indeed introduced in version 5.5,
+           Gradle versions prior than 5.5 do not support ObjectFactory.domainObjectContainer(Class<T> elementType), indeed introduced in version 5.5,
            which is used in NyxExtension.*/
         /*if (javaVersion <= 12) {
             extensiveTestVersions.add("5.6.4");
