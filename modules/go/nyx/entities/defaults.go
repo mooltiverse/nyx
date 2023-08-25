@@ -89,8 +89,14 @@ var (
 	// The optional flag or the template to render indicating whether or not a new commit must be generated and pushed in case new artifacts are generated. Value: 'false'
 	RELEASE_TYPE_GIT_PUSH *string = utl.PointerToString("false")
 
+	// The optional flag or the template to enable/disable the Git push operation. Value: 'nil'
+	RELEASE_TYPE_GIT_PUSH_FORCE *string = nil
+
 	// The optional flag or the template to render indicating whether or not a new tag must be generated. Value: 'false'
 	RELEASE_TYPE_GIT_TAG *string = utl.PointerToString("false")
+
+	// The optional flag or the template to enable/disable the Git tag operation. Value: 'nil'
+	RELEASE_TYPE_GIT_TAG_FORCE *string = nil
 
 	// The optional string or the template to render to use as the tag message if a tag has to be made. Value: nil
 	RELEASE_TYPE_GIT_TAG_MESSAGE *string = nil

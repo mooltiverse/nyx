@@ -368,7 +368,9 @@ public class EnvironmentConfigurationLayerTests {
         environmentConfigurationLayer.environment.put("NYX_RELEASE_TYPES_two_GIT_COMMIT", "false");
         environmentConfigurationLayer.environment.put("NYX_RELEASE_TYPES_two_GIT_COMMIT_MESSAGE", "Commit message");
         environmentConfigurationLayer.environment.put("NYX_RELEASE_TYPES_two_GIT_PUSH", "false");
+        environmentConfigurationLayer.environment.put("NYX_RELEASE_TYPES_two_GIT_PUSH_FORCE", "true");
         environmentConfigurationLayer.environment.put("NYX_RELEASE_TYPES_two_GIT_TAG", "false");
+        environmentConfigurationLayer.environment.put("NYX_RELEASE_TYPES_two_GIT_TAG_FORCE", "true");
         environmentConfigurationLayer.environment.put("NYX_RELEASE_TYPES_two_GIT_TAG_MESSAGE", "Tag message");
         environmentConfigurationLayer.environment.put("NYX_RELEASE_TYPES_two_GIT_TAG_NAMES", "one,two,three");
         environmentConfigurationLayer.environment.put("NYX_RELEASE_TYPES_two_IDENTIFIERS_0_POSITION", Identifier.Position.PRE_RELEASE.toString());
@@ -406,9 +408,11 @@ public class EnvironmentConfigurationLayerTests {
         assertEquals("true", environmentConfigurationLayer.getReleaseTypes().getItems().get("one").getGitCommit());
         assertNull(environmentConfigurationLayer.getReleaseTypes().getItems().get("one").getGitCommitMessage());
         assertEquals("true", environmentConfigurationLayer.getReleaseTypes().getItems().get("one").getGitTag());
+        assertNull(environmentConfigurationLayer.getReleaseTypes().getItems().get("one").getGitTagForce());
         assertNull(environmentConfigurationLayer.getReleaseTypes().getItems().get("one").getGitTagMessage());
         assertNull(environmentConfigurationLayer.getReleaseTypes().getItems().get("one").getGitTagNames());
         assertEquals("true", environmentConfigurationLayer.getReleaseTypes().getItems().get("one").getGitPush());
+        assertNull(environmentConfigurationLayer.getReleaseTypes().getItems().get("one").getGitPushForce());
         assertEquals(0, environmentConfigurationLayer.getReleaseTypes().getItems().get("one").getIdentifiers().size());
         assertEquals("alpha,beta", environmentConfigurationLayer.getReleaseTypes().getItems().get("one").getMatchBranches());
         assertEquals(0, environmentConfigurationLayer.getReleaseTypes().getItems().get("one").getMatchEnvironmentVariables().size());
@@ -427,7 +431,9 @@ public class EnvironmentConfigurationLayerTests {
         assertEquals("false", environmentConfigurationLayer.getReleaseTypes().getItems().get("two").getGitCommit());
         assertEquals("Commit message", environmentConfigurationLayer.getReleaseTypes().getItems().get("two").getGitCommitMessage());
         assertEquals("false", environmentConfigurationLayer.getReleaseTypes().getItems().get("two").getGitPush());
+        assertEquals("true", environmentConfigurationLayer.getReleaseTypes().getItems().get("two").getGitPushForce());
         assertEquals("false", environmentConfigurationLayer.getReleaseTypes().getItems().get("two").getGitTag());
+        assertEquals("true", environmentConfigurationLayer.getReleaseTypes().getItems().get("two").getGitTagForce());
         assertEquals("Tag message", environmentConfigurationLayer.getReleaseTypes().getItems().get("two").getGitTagMessage());
         assertEquals(3, environmentConfigurationLayer.getReleaseTypes().getItems().get("two").getGitTagNames().size());
         assertEquals("one", environmentConfigurationLayer.getReleaseTypes().getItems().get("two").getGitTagNames().get(0));

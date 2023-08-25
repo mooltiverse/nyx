@@ -1353,9 +1353,19 @@ public abstract class NyxExtension {
             private final Property<String> gitPush = getObjectfactory().property(String.class);
 
             /**
+             * The optional flag or the template to enable/disable the Git push operation.
+             */
+            private final Property<String> gitPushForce = getObjectfactory().property(String.class);
+
+            /**
              * The optional flag or the template to render indicating whether or not a new tag must be generated.
              */
             private final Property<String> gitTag = getObjectfactory().property(String.class);
+
+            /**
+             * The optional flag or the template to enable/disable the Git tag operation.
+             */
+            private final Property<String> gitTagForce = getObjectfactory().property(String.class);
 
             /**
              * The optional string or the template to render to use as the tag message if a tag has to be made.
@@ -1568,6 +1578,18 @@ public abstract class NyxExtension {
             }
 
             /**
+             * Returns optional flag or the template to enable/disable the Git push operation.
+             * 
+             * We provide an implementation of this method instead of using the abstract definition as it's
+             * safer for old Gradle versions we support.
+             * 
+             * @return the optional flag or the template to enable/disable the Git push operation.
+             */
+            public Property<String> getGitPushForce() {
+                return gitPushForce;
+            }
+
+            /**
              * Returns the optional flag or the template to render indicating whether or not a new tag must be generated.
              * When this is set by the user it overrides the inference performed by Nyx.
              * 
@@ -1578,6 +1600,18 @@ public abstract class NyxExtension {
              */
             public Property<String> getGitTag() {
                 return gitTag;
+            }
+
+            /**
+             * Returns optional flag or the template to enable/disable the Git tag operation.
+             * 
+             * We provide an implementation of this method instead of using the abstract definition as it's
+             * safer for old Gradle versions we support.
+             * 
+             * @return the optional flag or the template to enable/disable the Git tag operation.
+             */
+            public Property<String> getGitTagForce() {
+                return gitTagForce;
             }
 
             /**

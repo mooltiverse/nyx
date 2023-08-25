@@ -50,8 +50,14 @@ type ReleaseType struct {
 	// The optional flag or the template to render indicating whether or not a new commit must be generated and pushed in case new artifacts are generated. A nil value means undefined.
 	GitPush *string `json:"gitPush,omitempty" yaml:"gitPush,omitempty"`
 
+	// The optional flag or the template to enable/disable the Git push operation. A nil value means undefined.
+	GitPushForce *string `json:"gitPushForce,omitempty" yaml:"gitPushForce,omitempty"`
+
 	// The optional flag or the template to render indicating whether or not a new tag must be generated. A nil value means undefined.
 	GitTag *string `json:"gitTag,omitempty" yaml:"gitTag,omitempty"`
+
+	// The optional flag or the template to enable/disable the Git tag operation. A nil value means undefined.
+	GitTagForce *string `json:"gitTagForce,omitempty" yaml:"gitTagForce,omitempty"`
 
 	// The optional string or the template to render to use as the tag message if a tag has to be made. A nil value means undefined.
 	GitTagMessage *string `json:"gitTagMessage,omitempty" yaml:"gitTagMessage,omitempty"`
@@ -118,7 +124,9 @@ Arguments are as follows:
 - gitCommit the optional flag or the template to render indicating whether or not a new commit must be generated in case new artifacts are generated.
 - gitCommitMessage the optional string or the template to render to use as the commit message if a commit has to be made.
 - gitPush the optional flag or the template to render indicating whether or not a new commit must be generated and pushed in case new artifacts are generated.
+- gitPushForce the optional flag or the template to enable/disable the Git tag operation.
 - gitTag the optional flag or the template to render indicating whether or not a new tag must be generated.
+- gitTagForce the optional flag or the template to enable/disable the Git tag operation.
 - gitTagMessage the optional identifiers configuration block.
 - gitTagNames the list of templates to use as tag names when tagging a commit.
 - identifiers the optional nested map of the custom extra identifiers to be used in a release type.
@@ -132,7 +140,7 @@ Arguments are as follows:
 - versionRange the optional regular expression used to constrain versions issued by this release type.
 - versionRangeFromBranchName the optional flag telling if the version range must be inferred from the branch name.
 */
-func NewReleaseTypeWith(assets *[]*string, collapseVersions *bool, collapsedVersionQualifier *string, description *string, filterTags *string, gitCommit *string, gitCommitMessage *string, gitPush *string, gitTag *string, gitTagMessage *string, gitTagNames *[]*string, identifiers *[]*Identifier, matchBranches *string, matchEnvironmentVariables *map[string]string, matchWorkspaceStatus *WorkspaceStatus, publish *string, publishDraft *string, publishPreRelease *string, releaseName *string, versionRange *string, versionRangeFromBranchName *bool) *ReleaseType {
+func NewReleaseTypeWith(assets *[]*string, collapseVersions *bool, collapsedVersionQualifier *string, description *string, filterTags *string, gitCommit *string, gitCommitMessage *string, gitPush *string, gitPushForce *string, gitTag *string, gitTagForce *string, gitTagMessage *string, gitTagNames *[]*string, identifiers *[]*Identifier, matchBranches *string, matchEnvironmentVariables *map[string]string, matchWorkspaceStatus *WorkspaceStatus, publish *string, publishDraft *string, publishPreRelease *string, releaseName *string, versionRange *string, versionRangeFromBranchName *bool) *ReleaseType {
 	rt := ReleaseType{}
 
 	rt.Assets = assets
@@ -143,6 +151,9 @@ func NewReleaseTypeWith(assets *[]*string, collapseVersions *bool, collapsedVers
 	rt.GitCommit = gitCommit
 	rt.GitCommitMessage = gitCommitMessage
 	rt.GitPush = gitPush
+	rt.GitPushForce = gitPushForce
+	rt.GitTag = gitTag
+	rt.GitTagForce = gitTagForce
 	rt.GitTag = gitTag
 	rt.GitTagMessage = gitTagMessage
 	rt.GitTagNames = gitTagNames
@@ -176,7 +187,9 @@ func (rt *ReleaseType) setDefaults() {
 	rt.GitCommit = RELEASE_TYPE_GIT_COMMIT
 	rt.GitCommitMessage = RELEASE_TYPE_GIT_COMMIT_MESSAGE
 	rt.GitPush = RELEASE_TYPE_GIT_PUSH
+	rt.GitPushForce = RELEASE_TYPE_GIT_PUSH_FORCE
 	rt.GitTag = RELEASE_TYPE_GIT_TAG
+	rt.GitTagForce = RELEASE_TYPE_GIT_TAG_FORCE
 	rt.GitTagMessage = RELEASE_TYPE_GIT_TAG_MESSAGE
 	rt.GitTagNames = RELEASE_TYPE_GIT_TAG_NAMES
 	rt.Identifiers = RELEASE_TYPE_IDENTIFIERS
@@ -307,6 +320,20 @@ func (rt *ReleaseType) SetGitPush(gitPush *string) {
 }
 
 /*
+Returns the optional flag or the template to enable/disable the Git push operation. A nil value means undefined.
+*/
+func (rt *ReleaseType) GetGitPushForce() *string {
+	return rt.GitPushForce
+}
+
+/*
+Sets the optional flag or the template to enable/disable the Git push operation. A nil value means undefined.
+*/
+func (rt *ReleaseType) SetGitPushForce(gitPushForce *string) {
+	rt.GitPushForce = gitPushForce
+}
+
+/*
 Returns the optional flag or the template to render indicating whether or not a new tag must be generated. A nil value means undefined.
 */
 func (rt *ReleaseType) GetGitTag() *string {
@@ -318,6 +345,20 @@ Sets the optional flag or the template to render indicating whether or not a new
 */
 func (rt *ReleaseType) SetGitTag(gitTag *string) {
 	rt.GitTag = gitTag
+}
+
+/*
+Returns the optional flag or the template to enable/disable the Git tag operation. A nil value means undefined.
+*/
+func (rt *ReleaseType) GetGitTagForce() *string {
+	return rt.GitTagForce
+}
+
+/*
+Sets the optional flag or the template to enable/disable the Git tag operation. A nil value means undefined.
+*/
+func (rt *ReleaseType) SetGitTagForce(gitTagForce *string) {
+	rt.GitTagForce = gitTagForce
 }
 
 /*

@@ -67,7 +67,9 @@ releaseTypes:
       gitCommit: "false"
       gitCommitMessage: "Release version {{version}}"
       gitPush: "true"
+      gitPushForce: "true"
       gitTag: "true"
+      gitTagForce: "true"
       gitTagMessage: "Tag version {{version}}"
       gitTagNames:
         - "{{version}}"

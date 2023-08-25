@@ -367,7 +367,7 @@ public class StateTests {
             throws Exception {
             State state = new State(new Configuration());
             // inject a releaseType with the 'publish' flag to TRUE
-            state.setReleaseType(new ReleaseType(null, true, null, null, null, Boolean.FALSE.toString(), null, Boolean.FALSE.toString(), Boolean.FALSE.toString(), null, List.<String>of(), null, null, null, null, /*this is the 'publish' flag -> */ Boolean.TRUE.toString(), Boolean.FALSE.toString(), Boolean.TRUE.toString(), null, null, Boolean.FALSE));
+            state.setReleaseType(new ReleaseType(null, true, null, null, null, Boolean.FALSE.toString(), null, Boolean.FALSE.toString(), null, Boolean.FALSE.toString(), null, null, List.<String>of(), null, null, null, null, /*this is the 'publish' flag -> */ Boolean.TRUE.toString(), Boolean.FALSE.toString(), Boolean.TRUE.toString(), null, null, Boolean.FALSE));
             state.setVersion("1.2.3");
             state.getReleaseScope().setPreviousVersion("1.2.3");
             assertFalse(state.getNewVersion());
@@ -378,7 +378,7 @@ public class StateTests {
             assertTrue(state.getNewRelease());
 
             // now replace the releaseType with the 'publish' flag to FALSE
-            state.setReleaseType(new ReleaseType(null, true, null, null, null, Boolean.FALSE.toString(), null, Boolean.FALSE.toString(), Boolean.FALSE.toString(), null, List.<String>of(), null, null, null, null, /*this is the 'publish' flag -> */ Boolean.FALSE.toString(), Boolean.FALSE.toString(), Boolean.TRUE.toString(), null, null, Boolean.FALSE));
+            state.setReleaseType(new ReleaseType(null, true, null, null, null, Boolean.FALSE.toString(), null, Boolean.FALSE.toString(), null, Boolean.FALSE.toString(), null, null, List.<String>of(), null, null, null, null, /*this is the 'publish' flag -> */ Boolean.FALSE.toString(), Boolean.FALSE.toString(), Boolean.TRUE.toString(), null, null, Boolean.FALSE));
 
             state.getReleaseScope().setPreviousVersion("0.1.0");
             assertTrue(state.getNewVersion());

@@ -66,9 +66,19 @@ public class ReleaseType {
     private String gitPush = Defaults.ReleaseType.GIT_PUSH;
 
     /**
+     * The optional flag or the template to enable/disable the Git push operation.
+     */
+    private String gitPushForce = Defaults.ReleaseType.GIT_PUSH_FORCE;
+
+    /**
      * The optional flag or the template to render indicating whether or not a new tag must be generated.
      */
     private String gitTag = Defaults.ReleaseType.GIT_TAG;
+
+    /**
+     * The optional flag or the template to enable/disable the Git tag operation.
+     */
+    private String gitTagForce = Defaults.ReleaseType.GIT_TAG_FORCE;
 
     /**
      * The optional string or the template to render to use as the tag message if a tag has to be made.
@@ -161,8 +171,10 @@ public class ReleaseType {
      * commit message if a commit has to be made.
      * @param gitPush the optional flag or the template to render indicating whether or not
      * a new commit must be generated and pushed in case new artifacts are generated.
+     * @param gitPushForce the optional flag or the template to enable/disable the Git tag operation.
      * @param gitTag the optional flag or the template to render indicating whether or not
      * a new tag must be generated.
+     * @param gitTagForce the optional flag or the template to enable/disable the Git tag operation.
      * @param gitTagMessage the optional identifiers configuration block.
      * @param gitTagNames the list of templates to use as tag names when tagging a commit.
      * @param identifiers the optional nested map of the custom extra identifiers to be used in a
@@ -186,7 +198,7 @@ public class ReleaseType {
      * 
      * @see Defaults.ReleaseType
      */
-    public ReleaseType(List<String> assets, boolean collapseVersions, String collapsedVersionQualifier, String description, String filterTags, String gitCommit, String gitCommitMessage, String gitPush, String gitTag, String gitTagMessage, List<String> gitTagNames, List<Identifier> identifiers, String matchBranches, Map<String,String> matchEnvironmentVariables, WorkspaceStatus matchWorkspaceStatus, String publish, String publishDraft, String publishPreRelease, String releaseName, String versionRange, Boolean versionRangeFromBranchName) {
+    public ReleaseType(List<String> assets, boolean collapseVersions, String collapsedVersionQualifier, String description, String filterTags, String gitCommit, String gitCommitMessage, String gitPush, String gitPushForce, String gitTag, String gitTagForce, String gitTagMessage, List<String> gitTagNames, List<Identifier> identifiers, String matchBranches, Map<String,String> matchEnvironmentVariables, WorkspaceStatus matchWorkspaceStatus, String publish, String publishDraft, String publishPreRelease, String releaseName, String versionRange, Boolean versionRangeFromBranchName) {
         super();
         this.assets = assets;
         this.collapseVersions = collapseVersions;
@@ -196,7 +208,9 @@ public class ReleaseType {
         this.gitCommit = gitCommit;
         this.gitCommitMessage = gitCommitMessage;
         this.gitPush = gitPush;
+        this.gitPushForce = gitPushForce;
         this.gitTag = gitTag;
+        this.gitTagForce = gitTagForce;
         this.gitTagMessage = gitTagMessage;
         this.gitTagNames = gitTagNames;
         this.identifiers = identifiers;
@@ -396,6 +410,24 @@ public class ReleaseType {
     }
 
     /**
+     * Returns the optional flag or the template to enable/disable the Git push operation.
+     * 
+     * @return the optional flag or the template to enable/disable the Git push operation.
+     */
+    public String getGitPushForce() {
+        return gitPushForce;
+    }
+
+    /**
+     * Sets the optional flag or the template to enable/disable the Git push operation.
+     * 
+     * @param gitPushForce the optional flag or the template to enable/disable the Git push operation.
+     */
+    public void setGitPushForce(String gitPushForce) {
+        this.gitPushForce = gitPushForce;
+    }
+
+    /**
      * Returns the optional flag or the template to render indicating whether or not
      * a new tag must be generated.
      * 
@@ -415,6 +447,24 @@ public class ReleaseType {
      */
     public void setGitTag(String gitTag) {
         this.gitTag = gitTag;
+    }
+
+    /**
+     * Returns the optional flag or the template to enable/disable the Git tag operation.
+     * 
+     * @return the optional flag or the template to enable/disable the Git tag operation.
+     */
+    public String getGitTagForce() {
+        return gitTagForce;
+    }
+
+    /**
+     * Sets the optional flag or the template to enable/disable the Git tag operation.
+     * 
+     * @param gitTagForce the optional flag or the template to enable/disable the Git tag operation.
+     */
+    public void setGitTagForce(String gitTagForce) {
+        this.gitTagForce = gitTagForce;
     }
 
     /**
