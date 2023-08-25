@@ -1378,8 +1378,8 @@ public class JGitRepositoryTests {
             assertEquals(repository.getLatestCommit(), script.getTags().get("ltag"));
             assertEquals(script.getCommitByTag("ltag"), repository.getLatestCommit());
 
-            // make sure no exception is thrown when the tag name is duplicated
-            repository.tag("ltag");
+            // make sure an exception is thrown when the tag name is duplicated
+            assertThrows(GitException.class, () -> repository.tag("ltag"));
         }
 
         @DisplayName("JGitRepository.tag(String, String)")
@@ -1412,9 +1412,44 @@ public class JGitRepositoryTests {
             assertEquals(repository.getLatestCommit(), script.getTags().get("atag"));
             assertEquals(script.getCommitByTag("atag"), repository.getLatestCommit());
 
+            // make sure an exception is thrown when the tag name is duplicated
+            assertThrows(GitException.class, () -> repository.tag("atag", null));
+            assertThrows(GitException.class, () -> repository.tag("atag", "The tag message"));
+        }
+
+        @DisplayName("JGitRepository.tag(String, String, boolean)")
+        @Test
+        public void tagWithMessageAndForceTest()
+            throws Exception {
+            Script script = Scenario.INITIAL_COMMIT.realize();
+            script.getWorkingDirectory().deleteOnExit();
+            Repository repository = JGitRepository.open(script.getWorkingDirectory());
+
+            // make sure an exception is thrown when the tag name is null
+            assertThrows(GitException.class, () -> repository.tag(null, null, true));
+            assertThrows(GitException.class, () -> repository.tag(null, "The tag message", true));
+            
+            assertEquals(0, script.getTags().size());
+
+            Tag lTag = repository.tag("ltag", null, true);
+            assertEquals(repository.getLatestCommit(), lTag.getTarget());
+            assertEquals("ltag", lTag.getName());
+            assertEquals(1, script.getTags().size());
+            assertTrue(script.getTags().containsKey("ltag"));
+            assertEquals(repository.getLatestCommit(), script.getTags().get("ltag"));
+            assertEquals(script.getCommitByTag("ltag"), repository.getLatestCommit());
+
+            Tag aTag = repository.tag("atag", "The tag message", true);
+            assertEquals(repository.getLatestCommit(), aTag.getTarget());
+            assertEquals("atag", aTag.getName());
+            assertEquals(2, script.getTags().size());
+            assertTrue(script.getTags().containsKey("atag"));
+            assertEquals(repository.getLatestCommit(), script.getTags().get("atag"));
+            assertEquals(script.getCommitByTag("atag"), repository.getLatestCommit());
+
             // make sure no exception is thrown when the tag name is duplicated
-            repository.tag("atag", null);
-            repository.tag("atag", "The tag message");
+            repository.tag("atag", null, true);
+            repository.tag("atag", "The tag message", true);
         }
 
         @DisplayName("JGitRepository.tag(String, String, Identity)")
@@ -1447,9 +1482,9 @@ public class JGitRepositoryTests {
             assertEquals(repository.getLatestCommit(), script.getTags().get("atag"));
             assertEquals(script.getCommitByTag("atag"), repository.getLatestCommit());
 
-            // make sure no exception is thrown when the tag name is duplicated
-            repository.tag("ltag", null, null);
-            repository.tag("atag", "The tag message", null);
+            // make sure an exception is thrown when the tag name is duplicated
+            assertThrows(GitException.class, () -> repository.tag("ltag", null, null));
+            assertThrows(GitException.class, () -> repository.tag("atag", "The tag message", null));
         }
 
         @DisplayName("JGitRepository.tag(String, String, String, Identity)")
@@ -1498,9 +1533,60 @@ public class JGitRepositoryTests {
             assertEquals(repository.getLatestCommit(), script.getTags().get("atag2"));
             assertEquals(script.getCommitByTag("atag2"), repository.getLatestCommit());
 
+            // make sure an exception is thrown when the tag name is duplicated
+            assertThrows(GitException.class, () -> repository.tag(repository.getLatestCommit(), "ltag", null, null));
+            assertThrows(GitException.class, () -> repository.tag(repository.getLatestCommit(), "atag", "The tag message", null));
+        }
+
+        @DisplayName("JGitRepository.tag(String, String, String, Identity, boolean)")
+        @Test
+        public void tagCommitWithMessageAndIdentityAndForceTest()
+            throws Exception {
+            Script script = Scenario.INITIAL_COMMIT.realize();
+            script.getWorkingDirectory().deleteOnExit();
+            Repository repository = JGitRepository.open(script.getWorkingDirectory());
+
+            // make sure an exception is thrown when the tag name is null
+            assertThrows(GitException.class, () -> repository.tag(repository.getLatestCommit(), null, null, null));
+            assertThrows(GitException.class, () -> repository.tag(repository.getLatestCommit(), null, "The tag message", null));
+            
+            assertEquals(0, script.getTags().size());
+
+            Tag lTag = repository.tag(repository.getLatestCommit(), "ltag", null, new Identity("John Doe", "jdoe@example.com"), true);
+            assertEquals(repository.getLatestCommit(), lTag.getTarget());
+            assertEquals("ltag", lTag.getName());
+            assertEquals(1, script.getTags().size());
+            assertTrue(script.getTags().containsKey("ltag"));
+            assertEquals(repository.getLatestCommit(), script.getTags().get("ltag"));
+            assertEquals(script.getCommitByTag("ltag"), repository.getLatestCommit());
+
+            lTag = repository.tag(null, "ltag2", null, new Identity("John Doe", "jdoe@example.com"), true);
+            assertEquals(repository.getLatestCommit(), lTag.getTarget());
+            assertEquals("ltag2", lTag.getName());
+            assertEquals(2, script.getTags().size());
+            assertTrue(script.getTags().containsKey("ltag2"));
+            assertEquals(repository.getLatestCommit(), script.getTags().get("ltag2"));
+            assertEquals(script.getCommitByTag("ltag2"), repository.getLatestCommit());
+
+            Tag aTag = repository.tag(repository.getLatestCommit(), "atag", "The tag message", new Identity("John Doe", "jdoe@example.com"), true);
+            assertEquals(repository.getLatestCommit(), aTag.getTarget());
+            assertEquals("atag", aTag.getName());
+            assertEquals(3, script.getTags().size());
+            assertTrue(script.getTags().containsKey("atag"));
+            assertEquals(repository.getLatestCommit(), script.getTags().get("atag"));
+            assertEquals(script.getCommitByTag("atag"), repository.getLatestCommit());
+
+            aTag = repository.tag(null, "atag2", "The tag message", new Identity("John Doe", "jdoe@example.com"), true);
+            assertEquals(repository.getLatestCommit(), aTag.getTarget());
+            assertEquals("atag2", aTag.getName());
+            assertEquals(4, script.getTags().size());
+            assertTrue(script.getTags().containsKey("atag2"));
+            assertEquals(repository.getLatestCommit(), script.getTags().get("atag2"));
+            assertEquals(script.getCommitByTag("atag2"), repository.getLatestCommit());
+
             // make sure no exception is thrown when the tag name is duplicated
-            repository.tag(repository.getLatestCommit(), "ltag", null, null);
-            repository.tag(repository.getLatestCommit(), "atag", "The tag message", null);
+            repository.tag(repository.getLatestCommit(), "ltag", null, null, true);
+            repository.tag(repository.getLatestCommit(), "atag", "The tag message", null, true);
         }
     }
 

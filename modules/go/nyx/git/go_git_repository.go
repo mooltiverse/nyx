@@ -841,6 +841,31 @@ Errors can be:
 - GitError in case some problem is encountered with the underlying Git repository, preventing to push.
 */
 func (r goGitRepository) PushToRemoteWithUserNameAndPassword(remote *string, user *string, password *string) (string, error) {
+	return r.PushToRemoteWithUserNameAndPasswordAndForce(remote, user, password, false)
+}
+
+/*
+Pushes local changes in the current branch to the default remote origin.
+This method allows using user name and password authentication (also used for tokens).
+
+Returns the local name of the remotes that has been pushed.
+
+Arguments are as follows:
+
+  - remote the name of the remote to push to. If nil or empty the default remote name (origin) is used.
+  - user the user name to create when credentials are required. If this and password are both nil
+    then no credentials is used. When using single token authentication (i.e. OAuth or Personal Access Tokens)
+    this value may be the token or something other than a token, depending on the remote provider.
+  - password the password to create when credentials are required. If this and user are both nil
+    then no credentials is used. When using single token authentication (i.e. OAuth or Personal Access Tokens)
+    this value may be the token or something other than a token, depending on the remote provider.
+  - force set it to true if you want the push to be executed using the force option
+
+Errors can be:
+
+- GitError in case some problem is encountered with the underlying Git repository, preventing to push.
+*/
+func (r goGitRepository) PushToRemoteWithUserNameAndPasswordAndForce(remote *string, user *string, password *string, force bool) (string, error) {
 	remoteString := ""
 	if remote != nil {
 		remoteString = *remote
@@ -857,9 +882,7 @@ func (r goGitRepository) PushToRemoteWithUserNameAndPassword(remote *string, use
 	branchRefSpec := ggitconfig.RefSpec(currentBranchRef + ":" + currentBranchRef)
 	tagsRefSpec := ggitconfig.RefSpec("refs/tags/*:refs/tags/*") // this is required to also push tags
 
-	// The force flag may be required to update existing tags, especially when tag aliases are used.
-	// On the other hand it may also interfere with some workflows (i.e. when using branch protection rules) so we need to be careful.
-	options := &ggit.PushOptions{RemoteName: remoteString, Force: true, RefSpecs: []ggitconfig.RefSpec{branchRefSpec, tagsRefSpec}}
+	options := &ggit.PushOptions{RemoteName: remoteString, Force: force, RefSpecs: []ggitconfig.RefSpec{branchRefSpec, tagsRefSpec}}
 	auth := getBasicAuth(user, password)
 	if auth != nil {
 		log.Debugf("username and password authentication will use custom authentication options")
@@ -899,6 +922,30 @@ Errors can be:
 - GitError in case some problem is encountered with the underlying Git repository, preventing to push.
 */
 func (r goGitRepository) PushToRemoteWithPublicKey(remote *string, privateKey *string, passphrase *string) (string, error) {
+	return r.PushToRemoteWithPublicKeyAndForce(remote, privateKey, passphrase, false)
+}
+
+/*
+Pushes local changes in the current branch to the default remote origin.
+This method allows using SSH authentication.
+
+Returns the local name of the remotes that has been pushed.
+
+Arguments are as follows:
+
+  - remote the name of the remote to push to. If nil or empty the default remote name (origin) is used.
+  - privateKey the SSH private key. If nil the private key will be searched in its default location
+    (i.e. in the users' $HOME/.ssh directory).
+  - passphrase the optional password to use to open the private key, in case it's protected by a passphrase.
+    This is required when the private key is password protected as this implementation does not support prompting
+    the user interactively for entering the password.
+  - force set it to true if you want the push to be executed using the force option
+
+Errors can be:
+
+- GitError in case some problem is encountered with the underlying Git repository, preventing to push.
+*/
+func (r goGitRepository) PushToRemoteWithPublicKeyAndForce(remote *string, privateKey *string, passphrase *string, force bool) (string, error) {
 	remoteString := ""
 	if remote != nil {
 		remoteString = *remote
@@ -915,9 +962,7 @@ func (r goGitRepository) PushToRemoteWithPublicKey(remote *string, privateKey *s
 	branchRefSpec := ggitconfig.RefSpec(currentBranchRef + ":" + currentBranchRef)
 	tagsRefSpec := ggitconfig.RefSpec("refs/tags/*:refs/tags/*") // this is required to also push tags
 
-	// The force flag may be required to update existing tags, especially when tag aliases are used.
-	// On the other hand it may also interfere with some workflows (i.e. when using branch protection rules) so we need to be careful.
-	options := &ggit.PushOptions{RemoteName: remoteString, Force: true, RefSpecs: []ggitconfig.RefSpec{branchRefSpec, tagsRefSpec}}
+	options := &ggit.PushOptions{RemoteName: remoteString, Force: force, RefSpecs: []ggitconfig.RefSpec{branchRefSpec, tagsRefSpec}}
 	auth := getPublicKeyAuth(privateKey, passphrase)
 	if auth != nil {
 		log.Debugf("public key (SSH) authentication will use custom authentication options")
@@ -1043,6 +1088,28 @@ func (r goGitRepository) TagWithMessage(name *string, message *string) (gitent.T
 }
 
 /*
+Tags the latest commit in the current branch with a tag with the given name and optional message.
+If the tag already exists it's updated.
+
+Returns the object modelling the new tag that was created. Never nil.
+
+Arguments are as follows:
+
+  - name the name of the tag. Cannot be nil
+  - message the optional tag message. If nil the new tag will be lightweight, otherwise it will be an
+    annotated tag
+  - force set it to true if you want the tag to be applied using the force option
+
+Errors can be:
+
+  - GitError in case some problem is encountered with the underlying Git repository, preventing to tag
+    (i.e. when the tag name is nil).
+*/
+func (r goGitRepository) TagWithMessageAndForce(name *string, message *string, force bool) (gitent.Tag, error) {
+	return r.TagCommitWithMessageAndIdentityAndForce(nil, name, message, nil, force)
+}
+
+/*
 Tags the latest commit in the current branch with a tag with the given name and optional message using the optional
 tagger identity.
 If the tag already exists it's updated.
@@ -1086,6 +1153,31 @@ Errors can be:
     (i.e. when the tag name is nil).
 */
 func (r goGitRepository) TagCommitWithMessageAndIdentity(target *string, name *string, message *string, tagger *gitent.Identity) (gitent.Tag, error) {
+	return r.TagCommitWithMessageAndIdentityAndForce(target, name, message, tagger, false)
+}
+
+/*
+Tags the object represented by the given SHA-1 with a tag with the given name and optional message using the optional
+tagger identity.
+If the tag already exists it's updated.
+
+Returns the object modelling the new tag that was created. Never nil.
+
+Arguments are as follows:
+
+  - target the SHA-1 identifier of the object to tag. If nil the latest commit in the current branch is tagged.
+  - name the name of the tag. Cannot be nil
+  - message the optional tag message. If nil the new tag will be lightweight, otherwise it will be an
+    annotated tag
+  - tagger the optional identity of the tagger. If nil Git defaults are used. If message is nil this is ignored.
+  - force set it to true if you want the tag to be applied using the force option
+
+Errors can be:
+
+  - GitError in case some problem is encountered with the underlying Git repository, preventing to tag
+    (i.e. when the tag name is nil).
+*/
+func (r goGitRepository) TagCommitWithMessageAndIdentityAndForce(target *string, name *string, message *string, tagger *gitent.Identity, force bool) (gitent.Tag, error) {
 	if name == nil {
 		return gitent.Tag{}, &errs.GitError{Message: fmt.Sprintf("tag name cannot be nil")}
 	}
@@ -1094,10 +1186,14 @@ func (r goGitRepository) TagCommitWithMessageAndIdentity(target *string, name *s
 	_, err := r.repository.Tag(*name)
 	if err == nil {
 		// err is != nil if the tag was not found
-		log.Debugf("the repository already had a tag '%s' so it will be deleted first", *name)
-		err = r.repository.DeleteTag(*name)
-		if err != nil {
-			return gitent.Tag{}, &errs.GitError{Message: fmt.Sprintf("unable to delete Git tag '%s' for update", *name), Cause: err}
+		if force {
+			log.Debugf("the repository already had a tag '%s' and the 'force' flag is enabled so the tag will be deleted first", *name)
+			err = r.repository.DeleteTag(*name)
+			if err != nil {
+				return gitent.Tag{}, &errs.GitError{Message: fmt.Sprintf("unable to delete Git tag '%s' for update", *name), Cause: err}
+			}
+		} else {
+			log.Warnf("the repository already had a tag '%s' but the 'force' flag is disabled so the tag will not be deleted before applying the new one", *name)
 		}
 	}
 

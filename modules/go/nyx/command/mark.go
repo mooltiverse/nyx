@@ -210,13 +210,19 @@ func (c *Mark) tag() error {
 				if err != nil {
 					return err
 				}
+				forceFlag, err := c.renderTemplateAsBoolean(releaseType.GetGitTagForce())
+				if err != nil {
+					return err
+				}
+
 				log.Tracef("tag template '%s' renders to '%s'", *tagTemplate, *tag)
+				log.Debugf("tag force flag is '%t'", forceFlag)
 				log.Debugf("tagging latest commit '%s' with tag '%s'", latestCommit, *tag)
 				// Here we can also specify the Tagger Identity as per https://github.com/mooltiverse/nyx/issues/65
 				if tagMessage == nil || "" == strings.TrimSpace(*tagMessage) {
-					(*c.Repository()).TagWithMessage(tag, nil)
+					(*c.Repository()).TagWithMessageAndForce(tag, nil, forceFlag)
 				} else {
-					(*c.Repository()).TagWithMessage(tag, tagMessage)
+					(*c.Repository()).TagWithMessageAndForce(tag, tagMessage, forceFlag)
 				}
 
 				log.Debugf("tag '%s' applied to commit '%s'", *tag, latestCommit)
@@ -245,6 +251,10 @@ func (c *Mark) push() error {
 		log.Infof("Git push skipped due to dry run")
 	} else {
 		log.Debugf("pushing local changes to remotes")
+		releaseType, err := c.State().GetReleaseType()
+		if err != nil {
+			return err
+		}
 		releaseTypes, err := c.State().GetConfiguration().GetReleaseTypes()
 		if err != nil {
 			return err
@@ -298,10 +308,15 @@ func (c *Mark) push() error {
 			}
 
 			// finally push
+			forceFlag, err := c.renderTemplateAsBoolean(releaseType.GetGitPushForce())
+			if err != nil {
+				return err
+			}
+			log.Debugf("push force flag is '%t'", forceFlag)
 			if authenticationMethod != nil && ent.PUBLIC_KEY == *authenticationMethod {
 				log.Debugf("attempting push to '%s' using public key credentials.", *remote)
 
-				_, err = (*c.Repository()).PushToRemoteWithPublicKey(remote, privateKey, passphrase)
+				_, err = (*c.Repository()).PushToRemoteWithPublicKeyAndForce(remote, privateKey, passphrase, forceFlag)
 				if err != nil {
 					return err
 				}
@@ -312,7 +327,7 @@ func (c *Mark) push() error {
 					log.Debugf("attempting push to '%s' using user name and password credentials.", *remote)
 				}
 
-				_, err = (*c.Repository()).PushToRemoteWithUserNameAndPassword(remote, user, password)
+				_, err = (*c.Repository()).PushToRemoteWithUserNameAndPasswordAndForce(remote, user, password, forceFlag)
 				if err != nil {
 					return err
 				}

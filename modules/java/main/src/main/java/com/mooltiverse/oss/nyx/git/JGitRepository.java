@@ -912,6 +912,15 @@ class JGitRepository implements Repository {
     @Override
     public String push(String remote, String user, String password)
         throws GitException {
+        return push(remote, user, password, false);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String push(String remote, String user, String password, boolean force)
+        throws GitException {
         logger.debug(GIT, "Pushing changes to remote repository '{}' using username and password", remote);
         try {
             // get the current branch name
@@ -921,9 +930,7 @@ class JGitRepository implements Repository {
             PushCommand pushCommand = jGit.push().setRefSpecs(refSpec);
             if (!Objects.isNull(remote) && !remote.isBlank())
                 pushCommand.setRemote(remote);
-            // The force flag may be required to update existing tags, especially when tag aliases are used.
-	        // On the other hand it may also interfere with some workflows (i.e. when using branch protection rules) so we need to be careful.
-            pushCommand.setForce(true);
+            pushCommand.setForce(force);
             pushCommand.setPushTags();
             pushCommand.setCredentialsProvider(getCredentialsProvider(user, password));
             pushCommand.call();
@@ -940,6 +947,15 @@ class JGitRepository implements Repository {
     @Override
     public String push(String remote, String privateKey, byte[] passphrase)
         throws GitException {
+        return push(remote, privateKey, passphrase, false);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String push(String remote, String privateKey, byte[] passphrase, boolean force)
+        throws GitException {
         logger.debug(GIT, "Pushing changes to remote repository '{}' using public key (SSH) authentication", remote);
         try {
             // get the current branch name
@@ -949,9 +965,7 @@ class JGitRepository implements Repository {
             PushCommand pushCommand = jGit.push().setRefSpecs(refSpec);
             if (!Objects.isNull(remote) && !remote.isBlank())
                 pushCommand.setRemote(remote);
-            // The force flag may be required to update existing tags, especially when tag aliases are used.
-	        // On the other hand it may also interfere with some workflows (i.e. when using branch protection rules) so we need to be careful.
-            pushCommand.setForce(true);
+            pushCommand.setForce(force);
             pushCommand.setPushTags();
             pushCommand.setTransportConfigCallback(getTransportConfigCallback(privateKey, passphrase));
             pushCommand.call();
@@ -1012,6 +1026,15 @@ class JGitRepository implements Repository {
      * {@inheritDoc}
      */
     @Override
+    public Tag tag(String name, String message, boolean force)
+        throws GitException {
+        return tag(null, name, message, null, force);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Tag tag(String name, String message, Identity tagger)
         throws GitException {
         return tag(null, name, message, tagger);
@@ -1022,6 +1045,15 @@ class JGitRepository implements Repository {
      */
     @Override
     public Tag tag(String target, String name, String message, Identity tagger)
+        throws GitException {
+        return tag(target, name, message, tagger, false);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Tag tag(String target, String name, String message, Identity tagger, boolean force)
         throws GitException {
         logger.debug(GIT, "Tagging as '{}'", name);
         try {
@@ -1035,7 +1067,7 @@ class JGitRepository implements Repository {
                     command.setTagger(new PersonIdent(tagger.getName(), tagger.getEmail()));
                 }
             }
-            command.setForceUpdate​(true); // Tags may be rewritten/updated especially when using aliases (multiple tag names)
+            command.setForceUpdate​(force); // Tags may be rewritten/updated especially when using aliases (multiple tag names)
             return ObjectFactory.tagFrom(jGit.getRepository().getRefDatabase().peel(command.setName(name).call()));
         }
         catch (GitAPIException | JGitInternalException | IOException e) {
