@@ -1490,6 +1490,8 @@ func TestGoGitRepositoryPushToRemotesWithRequiredSSHProtectedCredentials(t *test
 }
 
 func TestGoGitRepositoryTag(t *testing.T) {
+	logLevel := log.GetLevel()   // save the previous logging level
+	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.INITIAL_COMMIT().Realize()
 	defer os.RemoveAll(script.GetWorkingDirectory())
@@ -1520,9 +1522,12 @@ func TestGoGitRepositoryTag(t *testing.T) {
 	// make sure an exception is thrown when the tag name is duplicated
 	lTag, err = repository.Tag(&tName)
 	assert.Error(t, err)
+	log.SetLevel(logLevel) // restore the original logging level
 }
 
 func TestGoGitRepositoryTagWithMessage(t *testing.T) {
+	logLevel := log.GetLevel()   // save the previous logging level
+	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.INITIAL_COMMIT().Realize()
 	defer os.RemoveAll(script.GetWorkingDirectory())
@@ -1572,6 +1577,7 @@ func TestGoGitRepositoryTagWithMessage(t *testing.T) {
 	assert.Error(t, err)
 	lTag, err = repository.TagWithMessage(&tName, &tagMessage)
 	assert.Error(t, err)
+	log.SetLevel(logLevel) // restore the original logging level
 }
 
 func TestGoGitRepositoryTagWithMessageAndForce(t *testing.T) {
@@ -1627,6 +1633,8 @@ func TestGoGitRepositoryTagWithMessageAndForce(t *testing.T) {
 }
 
 func TestGoGitRepositoryTagWithMessageAndIdentity(t *testing.T) {
+	logLevel := log.GetLevel()   // save the previous logging level
+	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.INITIAL_COMMIT().Realize()
 	defer os.RemoveAll(script.GetWorkingDirectory())
@@ -1676,9 +1684,12 @@ func TestGoGitRepositoryTagWithMessageAndIdentity(t *testing.T) {
 	assert.Error(t, err)
 	lTag, err = repository.TagWithMessageAndIdentity(&tName, &tagMessage, nil)
 	assert.Error(t, err)
+	log.SetLevel(logLevel) // restore the original logging level
 }
 
 func TestGoGitRepositoryTagCommitWithMessageAndIdentity(t *testing.T) {
+	logLevel := log.GetLevel()   // save the previous logging level
+	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.INITIAL_COMMIT().Realize()
 	defer os.RemoveAll(script.GetWorkingDirectory())
@@ -1755,9 +1766,10 @@ func TestGoGitRepositoryTagCommitWithMessageAndIdentity(t *testing.T) {
 
 	// make sure no exception is thrown when the tag name is duplicated
 	lTag, err = repository.TagCommitWithMessageAndIdentity(&latestCommit, &tName, nil, nil)
-	assert.NoError(t, err)
+	assert.Error(t, err)
 	lTag, err = repository.TagCommitWithMessageAndIdentity(&latestCommit, &tName, &tagMessage, nil)
-	assert.NoError(t, err)
+	assert.Error(t, err)
+	log.SetLevel(logLevel) // restore the original logging level
 }
 
 func TestGoGitRepositoryTagCommitWithMessageAndIdentityAndForce(t *testing.T) {
