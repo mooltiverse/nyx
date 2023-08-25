@@ -282,7 +282,7 @@ public class ConfigurationTests {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
             configurationLayerMock.setChangelog(
-                new ChangelogConfiguration("CHANGELOG.md", Map.<String,String>of("Section1", "regex1", "Section2", "regex2"), "changelog.tpl", Map.<String,String>of("Expression1", "string1"))
+                new ChangelogConfiguration("head", "CHANGELOG.md", Map.<String,String>of("Section1", "regex1", "Section2", "regex2"), "changelog.tpl", Map.<String,String>of("Expression1", "string1"))
             );
 
             // in order to make the test meaningful, make sure the default and mock values are different
@@ -291,6 +291,7 @@ public class ConfigurationTests {
             assertNotSame(configuration.getChangelog(), configurationLayerMock.getChangelog());
 
             // make sure the initial values come from defaults, until we inject the command line configuration
+            assertNull(Defaults.CHANGELOG.getAppend());
             assertNull(Defaults.CHANGELOG.getPath());
             assertNull(configuration.getChangelog().getPath());
             assertTrue(Defaults.CHANGELOG.getSections().isEmpty());
@@ -303,6 +304,7 @@ public class ConfigurationTests {
             // inject the command line configuration and test the new value is returned from that
             configuration.withCommandLineConfiguration(configurationLayerMock);
 
+            assertEquals("head", configuration.getChangelog().getAppend());
             assertEquals("CHANGELOG.md", configuration.getChangelog().getPath());
             assertNotNull(configuration.getChangelog().getSections());
             assertEquals(2, configuration.getChangelog().getSections().size());
@@ -315,6 +317,7 @@ public class ConfigurationTests {
 
             // now remove the command line configuration and test that now default values are returned again
             configuration.withCommandLineConfiguration(null);
+            assertNull(configuration.getChangelog().getAppend());
             assertNull(configuration.getChangelog().getPath());
             assertTrue(configuration.getChangelog().getSections().isEmpty());
             assertTrue(configuration.getChangelog().getSubstitutions().isEmpty());
@@ -1010,7 +1013,7 @@ public class ConfigurationTests {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
             configurationLayerMock.setChangelog(
-                new ChangelogConfiguration("CHANGELOG.md", Map.<String,String>of("Section1", "regex1", "Section2", "regex2"), "changelog.tpl", Map.<String,String>of("Expression1", "string1"))
+                new ChangelogConfiguration("head", "CHANGELOG.md", Map.<String,String>of("Section1", "regex1", "Section2", "regex2"), "changelog.tpl", Map.<String,String>of("Expression1", "string1"))
             );
 
             // in order to make the test meaningful, make sure the default and mock values are different
@@ -1019,6 +1022,7 @@ public class ConfigurationTests {
             assertNotSame(configuration.getChangelog(), configurationLayerMock.getChangelog());
 
             // make sure the initial values come from defaults, until we inject the command line configuration
+            assertNull(Defaults.CHANGELOG.getAppend());
             assertNull(Defaults.CHANGELOG.getPath());
             assertNull(configuration.getChangelog().getPath());
             assertTrue(Defaults.CHANGELOG.getSections().isEmpty());
@@ -1031,6 +1035,7 @@ public class ConfigurationTests {
             // inject the command line configuration and test the new value is returned from that
             configuration.withPluginConfiguration(configurationLayerMock);
 
+            assertEquals("head", configuration.getChangelog().getAppend());
             assertEquals("CHANGELOG.md", configuration.getChangelog().getPath());
             assertNotNull(configuration.getChangelog().getSections());
             assertEquals(2, configuration.getChangelog().getSections().size());
@@ -1043,6 +1048,7 @@ public class ConfigurationTests {
 
             // now remove the command line configuration and test that now default values are returned again
             configuration.withPluginConfiguration(null);
+            assertNull(configuration.getChangelog().getAppend());
             assertNull(configuration.getChangelog().getPath());
             assertTrue(configuration.getChangelog().getSections().isEmpty());
             assertTrue(configuration.getChangelog().getSubstitutions().isEmpty());
@@ -1718,7 +1724,7 @@ public class ConfigurationTests {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
             configurationLayerMock.setChangelog(
-                new ChangelogConfiguration("CHANGELOG.md", Map.<String,String>of("Section1", "regex1", "Section2", "regex2"), "changelog.tpl", Map.<String,String>of("Expression1", "string1"))
+                new ChangelogConfiguration("head", "CHANGELOG.md", Map.<String,String>of("Section1", "regex1", "Section2", "regex2"), "changelog.tpl", Map.<String,String>of("Expression1", "string1"))
             );
 
             // in order to make the test meaningful, make sure the default and mock values are different
@@ -1727,6 +1733,7 @@ public class ConfigurationTests {
             assertNotSame(configuration.getChangelog(), configurationLayerMock.getChangelog());
 
             // make sure the initial values come from defaults, until we inject the command line configuration
+            assertNull(Defaults.CHANGELOG.getAppend());
             assertNull(Defaults.CHANGELOG.getPath());
             assertNull(configuration.getChangelog().getPath());
             assertTrue(Defaults.CHANGELOG.getSections().isEmpty());
@@ -1739,6 +1746,7 @@ public class ConfigurationTests {
             // inject the command line configuration and test the new value is returned from that
             configuration.withRuntimeConfiguration(configurationLayerMock);
 
+            assertEquals("head", configuration.getChangelog().getAppend());
             assertEquals("CHANGELOG.md", configuration.getChangelog().getPath());
             assertNotNull(configuration.getChangelog().getSections());
             assertEquals(2, configuration.getChangelog().getSections().size());
@@ -1751,6 +1759,7 @@ public class ConfigurationTests {
 
             // now remove the command line configuration and test that now default values are returned again
             configuration.withRuntimeConfiguration(null);
+            assertNull(configuration.getChangelog().getAppend());
             assertNull(configuration.getChangelog().getPath());
             assertTrue(configuration.getChangelog().getSections().isEmpty());
             assertTrue(configuration.getChangelog().getSubstitutions().isEmpty());
@@ -2425,13 +2434,13 @@ public class ConfigurationTests {
             SimpleConfigurationLayer highPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
             lowPriorityConfigurationLayerMock.setChangelog(
-                new ChangelogConfiguration("CHANGELOG1.md", Map.<String,String>of("SectionA1", "regexA1", "SectionA2", "regexA2"), "changelog1.tpl", Map.<String,String>of("Expression1", "string1"))
+                new ChangelogConfiguration(null, "CHANGELOG1.md", Map.<String,String>of("SectionA1", "regexA1", "SectionA2", "regexA2"), "changelog1.tpl", Map.<String,String>of("Expression1", "string1"))
             );
             mediumPriorityConfigurationLayerMock.setChangelog(
-                new ChangelogConfiguration("CHANGELOG2.md", Map.<String,String>of("SectionB1", "regexB1", "SectionB2", "regexB2"), "changelog2.tpl", Map.<String,String>of("Expression2", "string2"))
+                new ChangelogConfiguration("head", "CHANGELOG2.md", Map.<String,String>of("SectionB1", "regexB1", "SectionB2", "regexB2"), "changelog2.tpl", Map.<String,String>of("Expression2", "string2"))
             );
             highPriorityConfigurationLayerMock.setChangelog(
-                new ChangelogConfiguration("CHANGELOG3.md", Map.<String,String>of("SectionC1", "regexC1", "SectionC2", "regexC2"), "changelog3.tpl", Map.<String,String>of("Expression3", "string3"))
+                new ChangelogConfiguration("tail", "CHANGELOG3.md", Map.<String,String>of("SectionC1", "regexC1", "SectionC2", "regexC2"), "changelog3.tpl", Map.<String,String>of("Expression3", "string3"))
             );
             
             // inject the command line configuration and test the new value is returned from that
@@ -2439,6 +2448,7 @@ public class ConfigurationTests {
             configuration.withCommandLineConfiguration(mediumPriorityConfigurationLayerMock);
             configuration.withRuntimeConfiguration(highPriorityConfigurationLayerMock);
 
+            assertEquals("tail", configuration.getChangelog().getAppend());
             assertEquals("CHANGELOG3.md", configuration.getChangelog().getPath());
             assertNotNull(configuration.getChangelog().getSections());
             assertEquals(2, configuration.getChangelog().getSections().size());

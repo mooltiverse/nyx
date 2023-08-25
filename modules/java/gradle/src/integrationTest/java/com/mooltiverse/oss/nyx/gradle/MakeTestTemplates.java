@@ -85,8 +85,8 @@ public class MakeTestTemplates {
         throws Exception {
             script.getWorkingDirectory().deleteOnExit();
             //make sure the Gradle working directory and the Git repository directory are not the same
-            assertFalse(project.getBuildDir().equals(script.getWorkingDirectory()));
-            assertFalse(project.getBuildDir().getAbsolutePath().equals(script.getWorkingDirectory().getAbsolutePath()));
+            assertFalse(project.getLayout().getBuildDirectory().getAsFile().get().equals(script.getWorkingDirectory()));
+            assertFalse(project.getLayout().getBuildDirectory().getAsFile().get().getAbsolutePath().equals(script.getWorkingDirectory().getAbsolutePath()));
     
             // the valid Git directory, different than the current working directory, is passed as the 'directory' configuration option through the extension
             project.getExtensions().getByType(NyxExtension.class).getDirectory().set(script.getWorkingDirectory());

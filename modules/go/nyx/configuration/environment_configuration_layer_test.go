@@ -55,6 +55,7 @@ func TestEnvironmentConfigurationLayerGetChangelog(t *testing.T) {
 	changelog, err := environmentConfigurationLayer.GetChangelog()
 	assert.NoError(t, err)
 	assert.NotNil(t, changelog)
+	assert.Nil(t, changelog.GetAppend())
 	assert.Nil(t, changelog.GetPath())
 	assert.Equal(t, 0, len(*changelog.GetSections()))
 	assert.Equal(t, 0, len(*changelog.GetSubstitutions()))
@@ -70,6 +71,7 @@ func TestEnvironmentConfigurationLayerGetChangelog(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, changelog)
 
+	assert.Nil(t, changelog.GetAppend())
 	assert.Equal(t, "CHANGELOG.md", *changelog.GetPath())
 	assert.Equal(t, 0, len(*changelog.GetSections()))
 	assert.Equal(t, 0, len(*changelog.GetSubstitutions()))
@@ -78,6 +80,7 @@ func TestEnvironmentConfigurationLayerGetChangelog(t *testing.T) {
 	// get a new instance or a stale set of environment variables is still in the configuration layer
 	environmentConfigurationLayer = EnvironmentConfigurationLayer{}
 	environmentConfigurationLayer.withEnvironmentVariables([]string{
+		"NYX_CHANGELOG_APPEND=head",
 		"NYX_CHANGELOG_PATH=CHANGELOG.md",
 		"NYX_CHANGELOG_SECTIONS_Section1=regex1",
 		"NYX_CHANGELOG_SECTIONS_Section2=regex2",
@@ -88,6 +91,7 @@ func TestEnvironmentConfigurationLayerGetChangelog(t *testing.T) {
 	changelog, err = environmentConfigurationLayer.GetChangelog()
 	assert.NoError(t, err)
 	assert.NotNil(t, changelog)
+	assert.Equal(t, "head", *changelog.GetAppend())
 	assert.Equal(t, "CHANGELOG.md", *changelog.GetPath())
 
 	assert.Equal(t, 2, len(*changelog.GetSections()))

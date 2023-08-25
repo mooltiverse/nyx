@@ -90,6 +90,11 @@ class EnvironmentConfigurationLayer implements ConfigurationLayer {
     /**
      * The name of the environment variable to read for this value. Value: {@value}
      */
+    private static final String CHANGELOG_CONFIGURATION_APPEND_ENVVAR_NAME = CHANGELOG_CONFIGURATION_ENVVAR_NAME.concat("_APPEND");
+
+    /**
+     * The name of the environment variable to read for this value. Value: {@value}
+     */
     private static final String CHANGELOG_CONFIGURATION_PATH_ENVVAR_NAME = CHANGELOG_CONFIGURATION_ENVVAR_NAME.concat("_PATH");
 
     /**
@@ -1111,7 +1116,7 @@ class EnvironmentConfigurationLayer implements ConfigurationLayer {
                 substitutions.put(substitutionName, getenv(String.format(CHANGELOG_CONFIGURATION_SUBSTITUTIONS_ITEM_REGEXP_FORMAT_STRING, substitutionName)));
             }
 
-            changelogSection = new ChangelogConfiguration(getenv(CHANGELOG_CONFIGURATION_PATH_ENVVAR_NAME), sections, getenv(CHANGELOG_CONFIGURATION_TEMPLATE_ENVVAR_NAME), substitutions);
+            changelogSection = new ChangelogConfiguration(getenv(CHANGELOG_CONFIGURATION_APPEND_ENVVAR_NAME), getenv(CHANGELOG_CONFIGURATION_PATH_ENVVAR_NAME), sections, getenv(CHANGELOG_CONFIGURATION_TEMPLATE_ENVVAR_NAME), substitutions);
         }
         return changelogSection;
     }

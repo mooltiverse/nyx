@@ -123,6 +123,7 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
     public ChangelogConfiguration getChangelog() {
         if (Objects.isNull(changelogConfigurationSection)) {
             changelogConfigurationSection = new ChangelogConfiguration(
+                extension.getChangelog().getAppend().getOrNull(),
                 extension.getChangelog().getPath().getOrNull(),
                 extension.getChangelog().getSections().isPresent() ?  extension.getChangelog().getSections().get() : Map.<String,String>of(),
                 extension.getChangelog().getTemplate().getOrNull(),

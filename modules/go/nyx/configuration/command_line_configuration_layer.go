@@ -45,6 +45,9 @@ const (
 	CHANGELOG_CONFIGURATION_ARGUMENT_NAME = "--changelog"
 
 	// The name of the argument to read for this value.
+	CHANGELOG_CONFIGURATION_APPEND_ARGUMENT_NAME = CHANGELOG_CONFIGURATION_ARGUMENT_NAME + "-append"
+
+	// The name of the argument to read for this value.
 	CHANGELOG_CONFIGURATION_PATH_ARGUMENT_NAME = CHANGELOG_CONFIGURATION_ARGUMENT_NAME + "-path"
 
 	// The name of the argument to read for this value.
@@ -921,7 +924,7 @@ func (clcl *CommandLineConfigurationLayer) GetChangelog() (*ent.ChangelogConfigu
 			substitutions[substitutionName] = *substitutionValue
 		}
 
-		clcl.changelog, err = ent.NewChangelogConfigurationWith(clcl.getArgument(CHANGELOG_CONFIGURATION_PATH_ARGUMENT_NAME), &sections, clcl.getArgument(CHANGELOG_CONFIGURATION_TEMPLATE_ARGUMENT_NAME), &substitutions)
+		clcl.changelog, err = ent.NewChangelogConfigurationWith(clcl.getArgument(CHANGELOG_CONFIGURATION_APPEND_ARGUMENT_NAME), clcl.getArgument(CHANGELOG_CONFIGURATION_PATH_ARGUMENT_NAME), &sections, clcl.getArgument(CHANGELOG_CONFIGURATION_TEMPLATE_ARGUMENT_NAME), &substitutions)
 		if err != nil {
 			return nil, err
 		}

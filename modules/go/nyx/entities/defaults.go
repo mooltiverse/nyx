@@ -29,7 +29,7 @@ var (
 	BUMP *string = nil
 
 	// The default changelog configuration block.
-	CHANGELOG, _ = NewChangelogConfigurationWith(nil, &map[string]string{}, nil, &map[string]string{})
+	CHANGELOG, _ = NewChangelogConfigurationWith(nil, nil, &map[string]string{}, nil, &map[string]string{})
 
 	// The default commit message conventions block.
 	COMMIT_MESSAGE_CONVENTIONS, _ = NewCommitMessageConventionsWith(&[]*string{}, &map[string]*CommitMessageConvention{})

@@ -212,6 +212,12 @@ func TestSaveAndLoadJSON(t *testing.T) {
 	if sChangelog == nil {
 		assert.Nil(t, tChangelog)
 	} else {
+		if sChangelog.GetAppend() == nil {
+			assert.Nil(t, tChangelog.GetAppend())
+		} else {
+			assert.Equal(t, *sChangelog.GetAppend(), *tChangelog.GetAppend())
+		}
+
 		if sChangelog.GetPath() == nil {
 			assert.Nil(t, tChangelog.GetPath())
 		} else {
@@ -603,6 +609,12 @@ func TestSaveAndLoadYAML(t *testing.T) {
 	if sChangelog == nil {
 		assert.Nil(t, tChangelog)
 	} else {
+		if sChangelog.GetAppend() == nil {
+			assert.Nil(t, tChangelog.GetAppend())
+		} else {
+			assert.Equal(t, *sChangelog.GetAppend(), *tChangelog.GetAppend())
+		}
+
 		if sChangelog.GetPath() == nil {
 			assert.Nil(t, tChangelog.GetPath())
 		} else {
@@ -836,11 +848,11 @@ func TestSerializationWithMultipleConfigurationLayersJSON(t *testing.T) {
 	mediumPriorityConfigurationLayerMock.SetBump(utl.PointerToString("beta"))
 	highPriorityConfigurationLayerMock.SetBump(utl.PointerToString("gamma"))
 
-	lpChangelogConfiguration, _ := ent.NewChangelogConfigurationWith(utl.PointerToString("CHANGELOG1.md"), &map[string]string{"SectionA1": "regexA1", "SectionA2": "regexA2"}, utl.PointerToString("changelog1.tpl"), &map[string]string{"Expression1": "string1"})
+	lpChangelogConfiguration, _ := ent.NewChangelogConfigurationWith(nil, utl.PointerToString("CHANGELOG1.md"), &map[string]string{"SectionA1": "regexA1", "SectionA2": "regexA2"}, utl.PointerToString("changelog1.tpl"), &map[string]string{"Expression1": "string1"})
 	lowPriorityConfigurationLayerMock.SetChangelog(lpChangelogConfiguration)
-	mpChangelogConfiguration, _ := ent.NewChangelogConfigurationWith(utl.PointerToString("CHANGELOG2.md"), &map[string]string{"SectionB1": "regexB1", "SectionB2": "regexB2"}, utl.PointerToString("changelog2.tpl"), &map[string]string{"Expression2": "string2"})
+	mpChangelogConfiguration, _ := ent.NewChangelogConfigurationWith(utl.PointerToString("head"), utl.PointerToString("CHANGELOG2.md"), &map[string]string{"SectionB1": "regexB1", "SectionB2": "regexB2"}, utl.PointerToString("changelog2.tpl"), &map[string]string{"Expression2": "string2"})
 	mediumPriorityConfigurationLayerMock.SetChangelog(mpChangelogConfiguration)
-	hpChangelogConfiguration, _ := ent.NewChangelogConfigurationWith(utl.PointerToString("CHANGELOG3.md"), &map[string]string{"SectionC1": "regexC1", "SectionC2": "regexC2"}, utl.PointerToString("changelog3.tpl"), &map[string]string{"Expression3": "string3"})
+	hpChangelogConfiguration, _ := ent.NewChangelogConfigurationWith(utl.PointerToString("tail"), utl.PointerToString("CHANGELOG2.md"), &map[string]string{"SectionC1": "regexC1", "SectionC2": "regexC2"}, utl.PointerToString("changelog3.tpl"), &map[string]string{"Expression3": "string3"})
 	highPriorityConfigurationLayerMock.SetChangelog(hpChangelogConfiguration)
 
 	lpCommitMessageConventions, _ := ent.NewCommitMessageConventionsWith(&[]*string{utl.PointerToString("convention1")}, &map[string]*ent.CommitMessageConvention{"convention1": ent.NewCommitMessageConventionWith(utl.PointerToString("expr1"), &map[string]string{})})
@@ -964,6 +976,7 @@ func TestSerializationWithMultipleConfigurationLayersJSON(t *testing.T) {
 
 	hpChangelog, _ := highPriorityConfigurationLayerMock.GetChangelog()
 	changelog, _ := deserializedConfigurationLayer.GetChangelog()
+	assert.Equal(t, *hpChangelog.GetAppend(), *changelog.GetAppend())
 	assert.Equal(t, *hpChangelog.GetPath(), *changelog.GetPath())
 	assert.Equal(t, (*hpChangelog.GetSections())["SectionC1"], (*changelog.GetSections())["SectionC1"])
 	assert.Equal(t, (*hpChangelog.GetSections())["SectionC2"], (*changelog.GetSections())["SectionC2"])
@@ -1121,11 +1134,11 @@ func TestSerializationWithMultipleConfigurationLayersYAML(t *testing.T) {
 	mediumPriorityConfigurationLayerMock.SetBump(utl.PointerToString("beta"))
 	highPriorityConfigurationLayerMock.SetBump(utl.PointerToString("gamma"))
 
-	lpChangelogConfiguration, _ := ent.NewChangelogConfigurationWith(utl.PointerToString("CHANGELOG1.md"), &map[string]string{"SectionA1": "regexA1", "SectionA2": "regexA2"}, utl.PointerToString("changelog1.tpl"), &map[string]string{"Expression1": "string1"})
+	lpChangelogConfiguration, _ := ent.NewChangelogConfigurationWith(nil, utl.PointerToString("CHANGELOG1.md"), &map[string]string{"SectionA1": "regexA1", "SectionA2": "regexA2"}, utl.PointerToString("changelog1.tpl"), &map[string]string{"Expression1": "string1"})
 	lowPriorityConfigurationLayerMock.SetChangelog(lpChangelogConfiguration)
-	mpChangelogConfiguration, _ := ent.NewChangelogConfigurationWith(utl.PointerToString("CHANGELOG2.md"), &map[string]string{"SectionB1": "regexB1", "SectionB2": "regexB2"}, utl.PointerToString("changelog2.tpl"), &map[string]string{"Expression2": "string2"})
+	mpChangelogConfiguration, _ := ent.NewChangelogConfigurationWith(utl.PointerToString("head"), utl.PointerToString("CHANGELOG2.md"), &map[string]string{"SectionB1": "regexB1", "SectionB2": "regexB2"}, utl.PointerToString("changelog2.tpl"), &map[string]string{"Expression2": "string2"})
 	mediumPriorityConfigurationLayerMock.SetChangelog(mpChangelogConfiguration)
-	hpChangelogConfiguration, _ := ent.NewChangelogConfigurationWith(utl.PointerToString("CHANGELOG3.md"), &map[string]string{"SectionC1": "regexC1", "SectionC2": "regexC2"}, utl.PointerToString("changelog3.tpl"), &map[string]string{"Expression3": "string3"})
+	hpChangelogConfiguration, _ := ent.NewChangelogConfigurationWith(utl.PointerToString("tail"), utl.PointerToString("CHANGELOG3.md"), &map[string]string{"SectionC1": "regexC1", "SectionC2": "regexC2"}, utl.PointerToString("changelog3.tpl"), &map[string]string{"Expression3": "string3"})
 	highPriorityConfigurationLayerMock.SetChangelog(hpChangelogConfiguration)
 
 	lpCommitMessageConventions, _ := ent.NewCommitMessageConventionsWith(&[]*string{utl.PointerToString("convention1")}, &map[string]*ent.CommitMessageConvention{"convention1": ent.NewCommitMessageConventionWith(utl.PointerToString("expr1"), &map[string]string{})})
@@ -1249,6 +1262,7 @@ func TestSerializationWithMultipleConfigurationLayersYAML(t *testing.T) {
 
 	hpChangelog, _ := highPriorityConfigurationLayerMock.GetChangelog()
 	changelog, _ := deserializedConfigurationLayer.GetChangelog()
+	assert.Equal(t, *hpChangelog.GetAppend(), *changelog.GetAppend())
 	assert.Equal(t, *hpChangelog.GetPath(), *changelog.GetPath())
 	assert.Equal(t, (*hpChangelog.GetSections())["SectionC1"], (*changelog.GetSections())["SectionC1"])
 	assert.Equal(t, (*hpChangelog.GetSections())["SectionC2"], (*changelog.GetSections())["SectionC2"])

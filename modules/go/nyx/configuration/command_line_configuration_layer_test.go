@@ -76,6 +76,7 @@ func TestCommandLineConfigurationLayerGetChangelog(t *testing.T) {
 	changelog, err := commandLineConfigurationLayer.GetChangelog()
 	assert.NoError(t, err)
 	assert.NotNil(t, changelog)
+	assert.Nil(t, changelog.GetAppend())
 	assert.Nil(t, changelog.GetPath())
 	assert.Equal(t, 0, len(*changelog.GetSections()))
 	assert.Equal(t, 0, len(*changelog.GetSubstitutions()))
@@ -91,6 +92,7 @@ func TestCommandLineConfigurationLayerGetChangelog(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, changelog)
 
+	assert.Nil(t, changelog.GetAppend())
 	assert.Equal(t, "CHANGELOG.md", *changelog.GetPath())
 	assert.Equal(t, 0, len(*changelog.GetSections()))
 	assert.Equal(t, 0, len(*changelog.GetSubstitutions()))
@@ -99,6 +101,7 @@ func TestCommandLineConfigurationLayerGetChangelog(t *testing.T) {
 	// get a new instance or a stale set of arguments is still in the configuration layer
 	commandLineConfigurationLayer = CommandLineConfigurationLayer{}
 	commandLineConfigurationLayer.withArguments([]string{
+		"--changelog-append=head",
 		"--changelog-path=CHANGELOG.md",
 		"--changelog-sections-Section1=regex1",
 		"--changelog-sections-Section2=regex2",
@@ -109,6 +112,7 @@ func TestCommandLineConfigurationLayerGetChangelog(t *testing.T) {
 	changelog, err = commandLineConfigurationLayer.GetChangelog()
 	assert.NoError(t, err)
 	assert.NotNil(t, changelog)
+	assert.Equal(t, "head", *changelog.GetAppend())
 	assert.Equal(t, "CHANGELOG.md", *changelog.GetPath())
 
 	assert.Equal(t, 2, len(*changelog.GetSections()))

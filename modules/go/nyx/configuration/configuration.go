@@ -646,6 +646,9 @@ func (c *Configuration) GetChangelog() (*ent.ChangelogConfiguration, error) {
 					return nil, err
 				}
 
+				if c.changelogSection.GetAppend() == nil {
+					c.changelogSection.SetAppend(changelog.GetAppend())
+				}
 				if c.changelogSection.GetPath() == nil {
 					c.changelogSection.SetPath(changelog.GetPath())
 				}

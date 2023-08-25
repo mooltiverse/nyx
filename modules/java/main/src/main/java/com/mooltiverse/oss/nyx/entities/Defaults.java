@@ -33,7 +33,7 @@ public interface Defaults {
     /**
      * The default changelog configuration block.
      */
-    public static final ChangelogConfiguration CHANGELOG = new ChangelogConfiguration(null, Map.<String,String>of(), null, Map.<String,String>of());
+    public static final ChangelogConfiguration CHANGELOG = new ChangelogConfiguration(null, null, Map.<String,String>of(), null, Map.<String,String>of());
 
     /**
      * The default commit message conventions block.

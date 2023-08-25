@@ -565,7 +565,7 @@ public class Workbench {
         Map<String,String> res = new HashMap<String,String>();
         RefDatabase refDatabase = git.getRepository().getRefDatabase();
         for (Ref tagRef: refDatabase.getRefsByPrefix(Constants.R_TAGS)) {
-            // refs must be peeled in order to see if they're annoteted or lightweight
+            // refs must be peeled in order to see if they're annotated or lightweight
             tagRef = refDatabase.peel(tagRef);
 
             // when it's an annotated tag tagRef.getPeeledObjectId() is not null,

@@ -331,6 +331,7 @@ func TestConfigurationWithCommandLineConfigurationGetChangelog(t *testing.T) {
 	configurationLayerMock := NewCommandLineConfigurationLayer()
 	configuration, _ := NewConfiguration()
 	configurationLayerMock.withArguments([]string{
+		"--changelog-append=head",
 		"--changelog-path=CHANGELOG.md",
 		"--changelog-sections-Section1=regex1",
 		"--changelog-sections-Section2=regex2",
@@ -347,6 +348,8 @@ func TestConfigurationWithCommandLineConfigurationGetChangelog(t *testing.T) {
 	assert.NotEqual(t, changelog1, changelog2)
 
 	// make sure the initial values come from defaults, until we inject the command line configuration
+	assert.Nil(t, (*ent.CHANGELOG).GetAppend())
+	assert.Nil(t, (*changelog2).GetAppend())
 	assert.Nil(t, (*ent.CHANGELOG).GetPath())
 	assert.Nil(t, (*changelog2).GetPath())
 	assert.Equal(t, 0, len(*(*ent.CHANGELOG).GetSections()))
@@ -361,6 +364,7 @@ func TestConfigurationWithCommandLineConfigurationGetChangelog(t *testing.T) {
 	configuration.WithCommandLineConfiguration(&cl)
 
 	changelog2, _ = configuration.GetChangelog()
+	assert.Equal(t, "head", *(*changelog2).GetAppend())
 	assert.Equal(t, "CHANGELOG.md", *(*changelog2).GetPath())
 	assert.NotNil(t, (*changelog2).GetSections())
 	assert.Equal(t, 2, len(*(*changelog2).GetSections()))
@@ -374,6 +378,7 @@ func TestConfigurationWithCommandLineConfigurationGetChangelog(t *testing.T) {
 	// now remove the command line configuration and test that now default values are returned again
 	configuration.WithCommandLineConfiguration(nil)
 	changelog2, _ = configuration.GetChangelog()
+	assert.Nil(t, (*changelog2).GetAppend())
 	assert.Nil(t, (*changelog2).GetPath())
 	assert.Equal(t, 0, len(*(*changelog2).GetSections()))
 	assert.Equal(t, 0, len(*(*changelog2).GetSubstitutions()))
@@ -1206,7 +1211,7 @@ func TestConfigurationWithPluginConfigurationGetBump(t *testing.T) {
 func TestConfigurationWithPluginConfigurationGetChangelog(t *testing.T) {
 	configurationLayerMock := NewSimpleConfigurationLayer()
 	configuration, _ := NewConfiguration()
-	changelogConfiguration, _ := ent.NewChangelogConfigurationWith(utl.PointerToString("CHANGELOG.md"), &map[string]string{"Section1": "regex1", "Section2": "regex2"}, utl.PointerToString("changelog.tpl"), &map[string]string{"Expression1": "string1"})
+	changelogConfiguration, _ := ent.NewChangelogConfigurationWith(utl.PointerToString("head"), utl.PointerToString("CHANGELOG.md"), &map[string]string{"Section1": "regex1", "Section2": "regex2"}, utl.PointerToString("changelog.tpl"), &map[string]string{"Expression1": "string1"})
 	configurationLayerMock.SetChangelog(changelogConfiguration)
 
 	// in order to make the test meaningful, make sure the default and mock values are different
@@ -1218,6 +1223,8 @@ func TestConfigurationWithPluginConfigurationGetChangelog(t *testing.T) {
 	assert.NotEqual(t, changelog1, changelog2)
 
 	// make sure the initial values come from defaults, until we inject the command line configuration
+	assert.Nil(t, (*ent.CHANGELOG).GetAppend())
+	assert.Nil(t, (*changelog2).GetAppend())
 	assert.Nil(t, (*ent.CHANGELOG).GetPath())
 	assert.Nil(t, (*changelog2).GetPath())
 	assert.Equal(t, 0, len(*(*ent.CHANGELOG).GetSections()))
@@ -1232,6 +1239,7 @@ func TestConfigurationWithPluginConfigurationGetChangelog(t *testing.T) {
 	configuration.WithPluginConfiguration(&cl)
 
 	changelog2, _ = configuration.GetChangelog()
+	assert.Equal(t, "head", *(*changelog2).GetAppend())
 	assert.Equal(t, "CHANGELOG.md", *(*changelog2).GetPath())
 	assert.NotNil(t, (*changelog2).GetSections())
 	assert.Equal(t, 2, len(*(*changelog2).GetSections()))
@@ -1245,6 +1253,7 @@ func TestConfigurationWithPluginConfigurationGetChangelog(t *testing.T) {
 	// now remove the command line configuration and test that now default values are returned again
 	configuration.WithPluginConfiguration(nil)
 	changelog2, _ = configuration.GetChangelog()
+	assert.Nil(t, (*changelog2).GetAppend())
 	assert.Nil(t, (*changelog2).GetPath())
 	assert.Equal(t, 0, len(*(*changelog2).GetSections()))
 	assert.Equal(t, 0, len(*(*changelog2).GetSubstitutions()))
@@ -1995,7 +2004,7 @@ func TestConfigurationWithRuntimeConfigurationGetBump(t *testing.T) {
 func TestConfigurationWithRuntimeConfigurationGetChangelog(t *testing.T) {
 	configurationLayerMock := NewSimpleConfigurationLayer()
 	configuration, _ := NewConfiguration()
-	changelogConfiguration, _ := ent.NewChangelogConfigurationWith(utl.PointerToString("CHANGELOG.md"), &map[string]string{"Section1": "regex1", "Section2": "regex2"}, utl.PointerToString("changelog.tpl"), &map[string]string{"Expression1": "string1"})
+	changelogConfiguration, _ := ent.NewChangelogConfigurationWith(utl.PointerToString("head"), utl.PointerToString("CHANGELOG.md"), &map[string]string{"Section1": "regex1", "Section2": "regex2"}, utl.PointerToString("changelog.tpl"), &map[string]string{"Expression1": "string1"})
 	configurationLayerMock.SetChangelog(changelogConfiguration)
 
 	// in order to make the test meaningful, make sure the default and mock values are different
@@ -2007,6 +2016,8 @@ func TestConfigurationWithRuntimeConfigurationGetChangelog(t *testing.T) {
 	assert.NotEqual(t, changelog1, changelog2)
 
 	// make sure the initial values come from defaults, until we inject the command line configuration
+	assert.Nil(t, (*ent.CHANGELOG).GetAppend())
+	assert.Nil(t, (*changelog2).GetAppend())
 	assert.Nil(t, (*ent.CHANGELOG).GetPath())
 	assert.Nil(t, (*changelog2).GetPath())
 	assert.Equal(t, 0, len(*(*ent.CHANGELOG).GetSections()))
@@ -2021,6 +2032,7 @@ func TestConfigurationWithRuntimeConfigurationGetChangelog(t *testing.T) {
 	configuration.WithRuntimeConfiguration(&cl)
 
 	changelog2, _ = configuration.GetChangelog()
+	assert.Equal(t, "head", *(*changelog2).GetAppend())
 	assert.Equal(t, "CHANGELOG.md", *(*changelog2).GetPath())
 	assert.NotNil(t, (*changelog2).GetSections())
 	assert.Equal(t, 2, len(*(*changelog2).GetSections()))
@@ -2034,6 +2046,7 @@ func TestConfigurationWithRuntimeConfigurationGetChangelog(t *testing.T) {
 	// now remove the command line configuration and test that now default values are returned again
 	configuration.WithRuntimeConfiguration(nil)
 	changelog2, _ = configuration.GetChangelog()
+	assert.Nil(t, (*changelog2).GetAppend())
 	assert.Nil(t, (*changelog2).GetPath())
 	assert.Equal(t, 0, len(*(*changelog2).GetSections()))
 	assert.Equal(t, 0, len(*(*changelog2).GetSubstitutions()))
@@ -2782,16 +2795,17 @@ func TestConfigurationWithMultipleConfigurationLayersGetChangelog(t *testing.T) 
 	mediumPriorityConfigurationLayerMock := NewCommandLineConfigurationLayer()
 	highPriorityConfigurationLayerMock := NewSimpleConfigurationLayer()
 	configuration, _ := NewConfiguration()
-	lpChangelogConfiguration, _ := ent.NewChangelogConfigurationWith(utl.PointerToString("CHANGELOG1.md"), &map[string]string{"SectionA1": "regexA1", "SectionA2": "regexA2"}, utl.PointerToString("changelog1.tpl"), &map[string]string{"Expression1": "string1"})
+	lpChangelogConfiguration, _ := ent.NewChangelogConfigurationWith(nil, utl.PointerToString("CHANGELOG1.md"), &map[string]string{"SectionA1": "regexA1", "SectionA2": "regexA2"}, utl.PointerToString("changelog1.tpl"), &map[string]string{"Expression1": "string1"})
 	lowPriorityConfigurationLayerMock.SetChangelog(lpChangelogConfiguration)
 	mediumPriorityConfigurationLayerMock.withArguments([]string{
+		"--changelog-append=head",
 		"--changelog-path=CHANGELOG2.md",
 		"--changelog-sections-SectionB1=regexB1",
 		"--changelog-sections-SectionB2=regexB2",
 		"--changelog-substitutions-Expression2=string2",
 		"--changelog-template=changelog2.tpl",
 	})
-	hpChangelogConfiguration, _ := ent.NewChangelogConfigurationWith(utl.PointerToString("CHANGELOG3.md"), &map[string]string{"SectionC1": "regexC1", "SectionC2": "regexC2"}, utl.PointerToString("changelog3.tpl"), &map[string]string{"Expression3": "string3"})
+	hpChangelogConfiguration, _ := ent.NewChangelogConfigurationWith(utl.PointerToString("tail"), utl.PointerToString("CHANGELOG3.md"), &map[string]string{"SectionC1": "regexC1", "SectionC2": "regexC2"}, utl.PointerToString("changelog3.tpl"), &map[string]string{"Expression3": "string3"})
 	highPriorityConfigurationLayerMock.SetChangelog(hpChangelogConfiguration)
 
 	// inject the command line configuration and test the new value is returned from that
@@ -2803,6 +2817,7 @@ func TestConfigurationWithMultipleConfigurationLayersGetChangelog(t *testing.T) 
 	configuration.WithRuntimeConfiguration(&hpl)
 
 	changelog, _ := configuration.GetChangelog()
+	assert.Equal(t, "tail", *changelog.GetAppend())
 	assert.Equal(t, "CHANGELOG3.md", *changelog.GetPath())
 	assert.NotNil(t, *changelog.GetSections())
 	assert.Equal(t, 2, len(*changelog.GetSections()))

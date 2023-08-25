@@ -402,13 +402,13 @@ public class ConfigurationFileTests {
             highPriorityConfigurationLayerMock.setBump("gamma");
 
             lowPriorityConfigurationLayerMock.setChangelog(
-                new ChangelogConfiguration("CHANGELOG1.md", Map.<String,String>of("SectionA1", "regexA1", "SectionA2", "regexA2"), "changelog1.tpl", Map.<String,String>of("Expression1", "string1"))
+                new ChangelogConfiguration(null, "CHANGELOG1.md", Map.<String,String>of("SectionA1", "regexA1", "SectionA2", "regexA2"), "changelog1.tpl", Map.<String,String>of("Expression1", "string1"))
             );
             mediumPriorityConfigurationLayerMock.setChangelog(
-                new ChangelogConfiguration("CHANGELOG2.md", Map.<String,String>of("SectionB1", "regexB1", "SectionB2", "regexB2"), "changelog2.tpl", Map.<String,String>of("Expression2", "string2"))
+                new ChangelogConfiguration("head", "CHANGELOG2.md", Map.<String,String>of("SectionB1", "regexB1", "SectionB2", "regexB2"), "changelog2.tpl", Map.<String,String>of("Expression2", "string2"))
             );
             highPriorityConfigurationLayerMock.setChangelog(
-                new ChangelogConfiguration("CHANGELOG3.md", Map.<String,String>of("SectionC1", "regexC1", "SectionC2", "regexC2"), "changelog3.tpl", Map.<String,String>of("Expression3", "string3"))
+                new ChangelogConfiguration("tail", "CHANGELOG3.md", Map.<String,String>of("SectionC1", "regexC1", "SectionC2", "regexC2"), "changelog3.tpl", Map.<String,String>of("Expression3", "string3"))
             );
 
             lowPriorityConfigurationLayerMock.setCommitMessageConventions(
@@ -608,6 +608,7 @@ public class ConfigurationFileTests {
 
             // now check for all values
             assertEquals(highPriorityConfigurationLayerMock.getBump(), deserializedConfigurationLayer.getBump());
+            assertEquals(highPriorityConfigurationLayerMock.getChangelog().getAppend(), deserializedConfigurationLayer.getChangelog().getAppend());
             assertEquals(highPriorityConfigurationLayerMock.getChangelog().getPath(), deserializedConfigurationLayer.getChangelog().getPath());
             assertEquals(highPriorityConfigurationLayerMock.getChangelog().getSections().get("SectionC1"), deserializedConfigurationLayer.getChangelog().getSections().get("SectionC1"));
             assertEquals(highPriorityConfigurationLayerMock.getChangelog().getSections().get("SectionC2"), deserializedConfigurationLayer.getChangelog().getSections().get("SectionC2"));
@@ -696,13 +697,13 @@ public class ConfigurationFileTests {
             highPriorityConfigurationLayerMock.setBump("gamma");
 
             lowPriorityConfigurationLayerMock.setChangelog(
-                new ChangelogConfiguration("CHANGELOG1.md", Map.<String,String>of("SectionA1", "regexA1", "SectionA2", "regexA2"), "changelog1.tpl", Map.<String,String>of("Expression1", "string1"))
+                new ChangelogConfiguration(null, "CHANGELOG1.md", Map.<String,String>of("SectionA1", "regexA1", "SectionA2", "regexA2"), "changelog1.tpl", Map.<String,String>of("Expression1", "string1"))
             );
             mediumPriorityConfigurationLayerMock.setChangelog(
-                new ChangelogConfiguration("CHANGELOG2.md", Map.<String,String>of("SectionB1", "regexB1", "SectionB2", "regexB2"), "changelog2.tpl", Map.<String,String>of("Expression2", "string2"))
+                new ChangelogConfiguration("head", "CHANGELOG2.md", Map.<String,String>of("SectionB1", "regexB1", "SectionB2", "regexB2"), "changelog2.tpl", Map.<String,String>of("Expression2", "string2"))
             );
             highPriorityConfigurationLayerMock.setChangelog(
-                new ChangelogConfiguration("CHANGELOG3.md", Map.<String,String>of("SectionC1", "regexC1", "SectionC2", "regexC2"), "changelog3.tpl", Map.<String,String>of("Expression3", "string3"))
+                new ChangelogConfiguration("tail", "CHANGELOG3.md", Map.<String,String>of("SectionC1", "regexC1", "SectionC2", "regexC2"), "changelog3.tpl", Map.<String,String>of("Expression3", "string3"))
             );
 
             lowPriorityConfigurationLayerMock.setCommitMessageConventions(
@@ -902,6 +903,7 @@ public class ConfigurationFileTests {
 
             // now check for all values
             assertEquals(highPriorityConfigurationLayerMock.getBump(), deserializedConfigurationLayer.getBump());
+            assertEquals(highPriorityConfigurationLayerMock.getChangelog().getAppend(), deserializedConfigurationLayer.getChangelog().getAppend());
             assertEquals(highPriorityConfigurationLayerMock.getChangelog().getPath(), deserializedConfigurationLayer.getChangelog().getPath());
             assertEquals(highPriorityConfigurationLayerMock.getChangelog().getSections().get("SectionC1"), deserializedConfigurationLayer.getChangelog().getSections().get("SectionC1"));
             assertEquals(highPriorityConfigurationLayerMock.getChangelog().getSections().get("SectionC2"), deserializedConfigurationLayer.getChangelog().getSections().get("SectionC2"));
