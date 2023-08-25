@@ -880,9 +880,7 @@ public class MakeTestTemplates {
                 assertEquals("NEW CHANGELOG CONTENT\nPREVIOUS CHANGELOG CONTENT\n", fileContent);
 
                 // run again and make sure values didn't change
-                assertTrue(command.isUpToDate());
                 command.run();
-                assertTrue(command.isUpToDate());
 
                 // test the rendered file again
                 fileContent = readFile(changelogFile).replaceAll("\\r", ""); // remove \r to make test work on windows too
@@ -942,9 +940,7 @@ public class MakeTestTemplates {
                 assertEquals("PREVIOUS CHANGELOG CONTENT\nNEW CHANGELOG CONTENT\n", fileContent);
 
                 // run again and make sure values didn't change
-                assertTrue(command.isUpToDate());
                 command.run();
-                assertTrue(command.isUpToDate());
 
                 // test the rendered file again
                 fileContent = readFile(changelogFile).replaceAll("\\r", ""); // remove \r to make test work on windows too

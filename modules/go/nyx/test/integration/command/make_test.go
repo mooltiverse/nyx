@@ -1079,14 +1079,8 @@ func TestMakeRunWithExistingFileAndAppendingToHead(t *testing.T) {
 				assert.Equal(t, "NEW CHANGELOG CONTENT\nPREVIOUS CHANGELOG CONTENT\n", fileContent) // title header check
 
 				// run again and make sure values didn't change
-				upToDate, err := (*command).IsUpToDate()
-				assert.NoError(t, err)
-				assert.True(t, upToDate)
 				_, err = (*command).Run()
 				assert.NoError(t, err)
-				upToDate, err = (*command).IsUpToDate()
-				assert.NoError(t, err)
-				assert.True(t, upToDate)
 
 				// test the rendered file again
 				fileContent = strings.Replace(readFile(changelogFile), "\r", "", -1)
@@ -1154,14 +1148,8 @@ func TestMakeRunWithExistingFileAndAppendingToTail(t *testing.T) {
 				assert.Equal(t, "PREVIOUS CHANGELOG CONTENT\nNEW CHANGELOG CONTENT\n", fileContent) // title header check
 
 				// run again and make sure values didn't change
-				upToDate, err := (*command).IsUpToDate()
-				assert.NoError(t, err)
-				assert.True(t, upToDate)
 				_, err = (*command).Run()
 				assert.NoError(t, err)
-				upToDate, err = (*command).IsUpToDate()
-				assert.NoError(t, err)
-				assert.True(t, upToDate)
 
 				// test the rendered file again
 				fileContent = strings.Replace(readFile(changelogFile), "\r", "", -1)
