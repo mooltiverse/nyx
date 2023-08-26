@@ -102,7 +102,9 @@ Each release type has the following attributes:
 | [`releaseTypes/<NAME>/gitCommit`](#git-commit)                                             | string  | `--release-types-<NAME>-git-commit=<TEMPLATE>`                        | `NYX_RELEASE_TYPES_<NAME>_GIT_COMMIT=<TEMPLATE>`                        | `false`                                              |
 | [`releaseTypes/<NAME>/gitCommitMessage`](#git-commit-message)                              | string  | `--release-types-<NAME>-git-commit-message=<TEMPLATE>`                | `NYX_RELEASE_TYPES_<NAME>_GIT_COMMIT_MESSAGE=<TEMPLATE>`                | `{% raw %}Release version {{version}}{% endraw %}`   |
 | [`releaseTypes/<NAME>/gitPush`](#git-push)                                                 | string  | `--release-types-<NAME>-git-push=<TEMPLATE>`                          | `NYX_RELEASE_TYPES_<NAME>_GIT_PUSH=<TEMPLATE>`                          | `false`                                              |
+| [`releaseTypes/<NAME>/gitPushForce`](#git-push-force)                                      | string  | `--release-types-<NAME>-git-push-force=<TEMPLATE>`                    | `NYX_RELEASE_TYPES_<NAME>_GIT_PUSH_FORCE=<TEMPLATE>`                    | `false`                                              |
 | [`releaseTypes/<NAME>/gitTag`](#git-tag)                                                   | string  | `--release-types-<NAME>-git-tag=<TEMPLATE>`                           | `NYX_RELEASE_TYPES_<NAME>_GIT_TAG=<TEMPLATE>`                           | `false`                                              |
+| [`releaseTypes/<NAME>/gitTagForce`](#git-tag-force)                                        | string  | `--release-types-<NAME>-git-tag-force=<TEMPLATE>`                     | `NYX_RELEASE_TYPES_<NAME>_GIT_TAG_FORCE=<TEMPLATE>`                     | `false`                                              |
 | [`releaseTypes/<NAME>/gitTagMessage`](#git-tag-message)                                    | string  | `--release-types-<NAME>-git-tag-message=<TEMPLATE>`                   | `NYX_RELEASE_TYPES_<NAME>_GIT_TAG_MESSAGE=<TEMPLATE>`                   | Empty                                                |
 | [`releaseTypes/<NAME>/gitTagNames`](#git-tag-names)                                        | list    | `--release-types-<NAME>-git-tag-names=<TEMPLATES>`                    | `NYX_RELEASE_TYPES_<NAME>_GIT_TAG_NAMES=<TEMPLATES>`                    | [ `{% raw %}{{version}}{% endraw %}` ]                                    |
 | [`releaseTypes/<NAME>/identifiers`](#identifiers)                                          | [list]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/configuration-methods.md %}#collections-of-objects) | `--release-types-<NAME>-identifiers-<#>=<ID_ATTRIBUTE>` | `NYX_RELEASE_TYPES_<NAME>_IDENTIFIERS_<#>=<ID_ATTRIBUTE>` | Empty |
@@ -313,6 +315,25 @@ Here you can define a [template]({{ site.baseurl }}{% link _pages/guide/user/03.
 
 When this flag is enabled changes are pushed to the default `origin` remote by default unless the [`remoteRepositories`](#remote-repositories) option has been used to set a specific list of remotes to push to.
 
+#### Git push force
+
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `releaseTypes/<NAME>/gitPushForce`                                                       |
+| Type                      | string                                                                                   |
+| Default                   | Empty (no message)                                                                       |
+| Command Line Option       | `--release-types-<NAME>-git-push-force=<TEMPLATE>`                                       |
+| Environment Variable      | `NYX_RELEASE_TYPES_<NAME>_GIT_PUSH_FORCE=<TEMPLATE>`                                     |
+| Configuration File Option | `releaseTypes/items/<NAME>/gitPushForce`                                                 |
+| Related state attributes  |                                                                                          |
+
+This is a short [template]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}) that, once rendered, is used as a flag to enable/disable [forcing](https://git-scm.com/docs/git-push#Documentation/git-push.txt---force) git pushing to remote repositories. When enabled, this is equivalent to using the `--force` flag when running [`git push`](https://git-scm.com/docs/git-push).
+
+This template is parsed as a [boolean]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}#type-conversions). The default behavior when this option is not defined is equivalent to `false`.
+
+You likely need to set this option `true` when using multiple [tag names](#git-tag-names) as tag aliases where tags are updated or overwritten over releases.
+
+This option is ignored when [`gitPush`](#git-push) is `false`.
+
 #### Git tag
 
 | ------------------------- | ---------------------------------------------------------------------------------------- |
@@ -327,6 +348,25 @@ When this flag is enabled changes are pushed to the default `origin` remote by d
 When `true` Nyx will tag the current commit with the new release version. Tags to be applied are defined by the [`gitTagNames`](#git-tag-names) option.
 
 Here you can define a [template]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}) that is [evaluated as a boolean]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}#type-conversions) at runtime to make this decision dynamic.
+
+#### Git tag force
+
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                      | `releaseTypes/<NAME>/gitTagForce`                                                        |
+| Type                      | string                                                                                   |
+| Default                   | Empty (no message)                                                                       |
+| Command Line Option       | `--release-types-<NAME>-git-tag-force=<TEMPLATE>`                                        |
+| Environment Variable      | `NYX_RELEASE_TYPES_<NAME>_GIT_TAG_FORCE=<TEMPLATE>`                                      |
+| Configuration File Option | `releaseTypes/items/<NAME>/gitTagForce`                                                  |
+| Related state attributes  |                                                                                          |
+
+This is a short [template]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}) that, once rendered, is used as a flag to enable/disable [forcing](https://git-scm.com/docs/git-tag#Documentation/git-tag.txt---force) git tagging. When enabled, this is equivalent to using the `--force` flag when running [`git tag`](https://git-scm.com/docs/git-tag).
+
+This template is parsed as a [boolean]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}#type-conversions). The default behavior when this option is not defined is equivalent to `false`.
+
+You likely need to set this option `true` when using multiple [tag names](#git-tag-names) as tag aliases where tags are updated or overwritten over releases.
+
+This option is ignored when [`gitTag`](#git-tag) is `false`.
 
 #### Git tag message
 
@@ -360,7 +400,7 @@ The comma separated list of Git tag [names](https://git-scm.com/docs/git-tag) to
 
 By default a single tag name is applied using the [version]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#version) name. You can add as many tag names as you wish in order to add additional tags or aliases.
 
-If a tag already exists in the repository it is replaced (moved to the current commit).
+If a tag already exists in the repository it is replaced (moved to the current commit). When using tag aliases that need to be updated or rewritten over releases you should consider enabling the [`gitPushForce`](#git-push-force) and [`gitTagForce`](#git-tag-force) options.
 
 This option is ignored when [`gitTag`](#git-tag) is `false`.
 

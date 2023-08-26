@@ -39,6 +39,8 @@ public class ReleaseTypeTests {
                 "Committing {{version}}",
                 Boolean.TRUE.toString(),
                 Boolean.TRUE.toString(),
+                Boolean.TRUE.toString(),
+                Boolean.TRUE.toString(),
                 "Tagging {{version}}",
                 List.<String>of(),
                 List.<Identifier>of(new Identifier("build", "12", Identifier.Position.BUILD)),

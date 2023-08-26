@@ -284,9 +284,16 @@ const (
 	// The parametrized name of the environment variable to read for the 'gitPush' attribute of a
 	// release type.
 	// This string is a prototype that contains a '%s' parameter for the release type name
-	// and must be rendered using fmt.Sprintf(RELEASE_TYPES_ENVVAR_ITEM_GIT_COMMIT_FORMAT_STRING, name)
+	// and must be rendered using fmt.Sprintf(RELEASE_TYPES_ENVVAR_ITEM_GIT_PUSH_FORMAT_STRING, name)
 	// in order to get the actual name of the environment variable that brings the value for the release type with the given 'name'.
 	RELEASE_TYPES_ENVVAR_ITEM_GIT_PUSH_FORMAT_STRING = RELEASE_TYPES_ENVVAR_NAME + "_%s_GIT_PUSH"
+
+	// The parametrized name of the environment variable to read for the 'gitPushForce' attribute of a
+	// release type.
+	// This string is a prototype that contains a '%s' parameter for the release type name
+	// and must be rendered using fmt.Sprintf(RELEASE_TYPES_ENVVAR_ITEM_GIT_PUSH_FORCE_FORMAT_STRING, name)
+	// in order to get the actual name of the environment variable that brings the value for the release type with the given 'name'.
+	RELEASE_TYPES_ENVVAR_ITEM_GIT_PUSH_FORCE_FORMAT_STRING = RELEASE_TYPES_ENVVAR_NAME + "_%s_GIT_PUSH_FORCE"
 
 	// The parametrized name of the environment variable to read for the 'gitTag' attribute of a
 	// release type.
@@ -294,6 +301,13 @@ const (
 	// and must be rendered using fmt.Sprintf(RELEASE_TYPES_ENVVAR_ITEM_GIT_TAG_FORMAT_STRING, name)
 	// in order to get the actual name of the environment variable that brings the value for the release type with the given 'name'.
 	RELEASE_TYPES_ENVVAR_ITEM_GIT_TAG_FORMAT_STRING = RELEASE_TYPES_ENVVAR_NAME + "_%s_GIT_TAG"
+
+	// The parametrized name of the environment variable to read for the 'gitTagForce' attribute of a
+	// release type.
+	// This string is a prototype that contains a '%s' parameter for the release type name
+	// and must be rendered using fmt.Sprintf(RELEASE_TYPES_ENVVAR_ITEM_GIT_TAG_FORCE_FORMAT_STRING, name)
+	// in order to get the actual name of the environment variable that brings the value for the release type with the given 'name'.
+	RELEASE_TYPES_ENVVAR_ITEM_GIT_TAG_FORCE_FORMAT_STRING = RELEASE_TYPES_ENVVAR_NAME + "_%s_GIT_TAG_FORCE"
 
 	// The parametrized name of the environment variable to read for the 'gitTagMessage' attribute of a
 	// release type.
@@ -1120,7 +1134,9 @@ func (ecl *EnvironmentConfigurationLayer) GetReleaseTypes() (*ent.ReleaseTypes, 
 			gitCommit := ecl.getEnvVar(fmt.Sprintf(RELEASE_TYPES_ENVVAR_ITEM_GIT_COMMIT_FORMAT_STRING, itemName))
 			gitCommitMessage := ecl.getEnvVar(fmt.Sprintf(RELEASE_TYPES_ENVVAR_ITEM_GIT_COMMIT_MESSAGE_FORMAT_STRING, itemName))
 			gitPush := ecl.getEnvVar(fmt.Sprintf(RELEASE_TYPES_ENVVAR_ITEM_GIT_PUSH_FORMAT_STRING, itemName))
+			gitPushForce := ecl.getEnvVar(fmt.Sprintf(RELEASE_TYPES_ENVVAR_ITEM_GIT_PUSH_FORCE_FORMAT_STRING, itemName))
 			gitTag := ecl.getEnvVar(fmt.Sprintf(RELEASE_TYPES_ENVVAR_ITEM_GIT_TAG_FORMAT_STRING, itemName))
+			gitTagForce := ecl.getEnvVar(fmt.Sprintf(RELEASE_TYPES_ENVVAR_ITEM_GIT_TAG_FORCE_FORMAT_STRING, itemName))
 			gitTagMessage := ecl.getEnvVar(fmt.Sprintf(RELEASE_TYPES_ENVVAR_ITEM_GIT_TAG_MESSAGE_FORMAT_STRING, itemName))
 			gitTagNamesList := ecl.getEnvVar(fmt.Sprintf(RELEASE_TYPES_ENVVAR_ITEM_GIT_TAG_NAMES_FORMAT_STRING, itemName))
 			var gitTagNames *[]*string
@@ -1165,7 +1181,7 @@ func (ecl *EnvironmentConfigurationLayer) GetReleaseTypes() (*ent.ReleaseTypes, 
 				versionRangeFromBranchName = &vrfbn
 			}
 
-			items[itemName] = ent.NewReleaseTypeWith(assets, collapseVersions, collapseVersionQualifier, description, filterTags, gitCommit, gitCommitMessage, gitPush, gitTag, gitTagMessage, gitTagNames, &identifiers, matchBranches, &matchEnvironmentVariables, matchWorkspaceStatus, publish, publishDraft, publishPreRelease, releaseName, versionRange, versionRangeFromBranchName)
+			items[itemName] = ent.NewReleaseTypeWith(assets, collapseVersions, collapseVersionQualifier, description, filterTags, gitCommit, gitCommitMessage, gitPush, gitPushForce, gitTag, gitTagForce, gitTagMessage, gitTagNames, &identifiers, matchBranches, &matchEnvironmentVariables, matchWorkspaceStatus, publish, publishDraft, publishPreRelease, releaseName, versionRange, versionRangeFromBranchName)
 		}
 
 		enabledPointers := ecl.toSliceOfStringPointers(enabled)

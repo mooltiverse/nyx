@@ -295,9 +295,16 @@ const (
 	// The parametrized name of the argument to read for the 'gitPush' attribute of a
 	// release type.
 	// This string is a prototype that contains a '%s' parameter for the release type name
-	// and must be rendered using fmt.Sprintf(RELEASE_TYPES_ARGUMENT_ITEM_GIT_COMMIT_FORMAT_STRING, name)
+	// and must be rendered using fmt.Sprintf(RELEASE_TYPES_ARGUMENT_ITEM_GIT_PUSH_FORMAT_STRING, name)
 	// in order to get the actual name of the argument that brings the value for the release type with the given 'name'.
 	RELEASE_TYPES_ARGUMENT_ITEM_GIT_PUSH_FORMAT_STRING = RELEASE_TYPES_ARGUMENT_NAME + "-%s-git-push"
+
+	// The parametrized name of the argument to read for the 'gitPushForce' attribute of a
+	// release type.
+	// This string is a prototype that contains a '%s' parameter for the release type name
+	// and must be rendered using fmt.Sprintf(RELEASE_TYPES_ARGUMENT_ITEM_GIT_PUSH_FORCE_FORMAT_STRING, name)
+	// in order to get the actual name of the argument that brings the value for the release type with the given 'name'.
+	RELEASE_TYPES_ARGUMENT_ITEM_GIT_PUSH_FORCE_FORMAT_STRING = RELEASE_TYPES_ARGUMENT_NAME + "-%s-git-push-force"
 
 	// The parametrized name of the argument to read for the 'gitTag' attribute of a
 	// release type.
@@ -305,6 +312,13 @@ const (
 	// and must be rendered using fmt.Sprintf(RELEASE_TYPES_ARGUMENT_ITEM_GIT_TAG_FORMAT_STRING, name)
 	// in order to get the actual name of the argument that brings the value for the release type with the given 'name'.
 	RELEASE_TYPES_ARGUMENT_ITEM_GIT_TAG_FORMAT_STRING = RELEASE_TYPES_ARGUMENT_NAME + "-%s-git-tag"
+
+	// The parametrized name of the argument to read for the 'gitTagForce' attribute of a
+	// release type.
+	// This string is a prototype that contains a '%s' parameter for the release type name
+	// and must be rendered using fmt.Sprintf(RELEASE_TYPES_ARGUMENT_ITEM_GIT_TAG_FORCE_FORMAT_STRING, name)
+	// in order to get the actual name of the argument that brings the value for the release type with the given 'name'.
+	RELEASE_TYPES_ARGUMENT_ITEM_GIT_TAG_FORCE_FORMAT_STRING = RELEASE_TYPES_ARGUMENT_NAME + "-%s-git-tag-force"
 
 	// The parametrized name of the argument to read for the 'gitTagMessage' attribute of a
 	// release type.
@@ -1211,7 +1225,9 @@ func (clcl *CommandLineConfigurationLayer) GetReleaseTypes() (*ent.ReleaseTypes,
 			gitCommit := clcl.getArgument(fmt.Sprintf(RELEASE_TYPES_ARGUMENT_ITEM_GIT_COMMIT_FORMAT_STRING, itemName))
 			gitCommitMessage := clcl.getArgument(fmt.Sprintf(RELEASE_TYPES_ARGUMENT_ITEM_GIT_COMMIT_MESSAGE_FORMAT_STRING, itemName))
 			gitPush := clcl.getArgument(fmt.Sprintf(RELEASE_TYPES_ARGUMENT_ITEM_GIT_PUSH_FORMAT_STRING, itemName))
+			gitPushForce := clcl.getArgument(fmt.Sprintf(RELEASE_TYPES_ARGUMENT_ITEM_GIT_PUSH_FORCE_FORMAT_STRING, itemName))
 			gitTag := clcl.getArgument(fmt.Sprintf(RELEASE_TYPES_ARGUMENT_ITEM_GIT_TAG_FORMAT_STRING, itemName))
+			gitTagForce := clcl.getArgument(fmt.Sprintf(RELEASE_TYPES_ARGUMENT_ITEM_GIT_TAG_FORCE_FORMAT_STRING, itemName))
 			gitTagMessage := clcl.getArgument(fmt.Sprintf(RELEASE_TYPES_ARGUMENT_ITEM_GIT_TAG_MESSAGE_FORMAT_STRING, itemName))
 			gitTagNamesList := clcl.getArgument(fmt.Sprintf(RELEASE_TYPES_ARGUMENT_ITEM_GIT_TAG_NAMES_FORMAT_STRING, itemName))
 			var gitTagNames *[]*string
@@ -1256,7 +1272,7 @@ func (clcl *CommandLineConfigurationLayer) GetReleaseTypes() (*ent.ReleaseTypes,
 				versionRangeFromBranchName = &vrfbn
 			}
 
-			items[itemName] = ent.NewReleaseTypeWith(assets, collapseVersions, collapseVersionQualifier, description, filterTags, gitCommit, gitCommitMessage, gitPush, gitTag, gitTagMessage, gitTagNames, &identifiers, matchBranches, &matchEnvironmentVariables, matchWorkspaceStatus, publish, publishDraft, publishPreRelease, releaseName, versionRange, versionRangeFromBranchName)
+			items[itemName] = ent.NewReleaseTypeWith(assets, collapseVersions, collapseVersionQualifier, description, filterTags, gitCommit, gitCommitMessage, gitPush, gitPushForce, gitTag, gitTagForce, gitTagMessage, gitTagNames, &identifiers, matchBranches, &matchEnvironmentVariables, matchWorkspaceStatus, publish, publishDraft, publishPreRelease, releaseName, versionRange, versionRangeFromBranchName)
 		}
 
 		enabledPointers := clcl.toSliceOfStringPointers(enabled)

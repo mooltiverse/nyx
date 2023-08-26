@@ -174,10 +174,13 @@ public class Mark extends AbstractCommand {
             else {
                 for (String tagTemplate: state().getReleaseType().getGitTagNames()) {
                     String tag = renderTemplate(tagTemplate);
+                    boolean forceFlag = renderTemplateAsBoolean(state().getReleaseType().getGitTagForce());
+
                     logger.trace(COMMAND, "Tag template '{}' renders to '{}'", tagTemplate, tag);
+                    logger.debug(COMMAND, "Tag force flag is '{}'", forceFlag);
                     logger.debug(COMMAND, "Tagging latest commit '{}' with tag '{}'", repository().getLatestCommit(), tag);
                     // Here we can also specify the Tagger Identity as per https://github.com/mooltiverse/nyx/issues/65
-                    repository().tag(tag, Objects.isNull(tagMessage) || tagMessage.isBlank() ? null : tagMessage);
+                    repository().tag(tag, Objects.isNull(tagMessage) || tagMessage.isBlank() ? null : tagMessage, forceFlag);
                     logger.debug(COMMAND, "Tag '{}' applied to commit '{}'", tag, repository().getLatestCommit());
                 }
             }
@@ -234,15 +237,17 @@ public class Mark extends AbstractCommand {
                 }
 
                 // finally push
+                boolean forceFlag = renderTemplateAsBoolean(state().getReleaseType().getGitPushForce());
+                logger.trace(COMMAND, "Push force flag is '{}'", forceFlag);
                 if (AuthenticationMethod.PUBLIC_KEY.equals(authenticationMethod)) {
                     logger.debug(COMMAND, "Attempting push to '{}' using public key credentials.", remote);
-                    repository().push(remote, privateKey, passphrase);
+                    repository().push(remote, privateKey, passphrase, forceFlag);
                 }
                 else {
                     if (Objects.isNull(user) && Objects.isNull(password))
                         logger.debug(COMMAND, "No credentials were configured for remote '{}'. Attempting anonymous push.", remote);
                     else logger.debug(COMMAND, "Attempting push to '{}' using user name and password credentials.", remote);
-                    repository().push(remote, user, password);
+                    repository().push(remote, user, password, forceFlag);
                 }
 
                 logger.debug(COMMAND, "Local changes pushed to remote '{}'", remote);
