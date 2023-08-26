@@ -1438,7 +1438,9 @@ func TestMarkRunOnCleanWorkspaceWithNewVersionOrNewReleaseWithCommitAndTagAndPus
 			releaseType := ent.NewReleaseType()
 			releaseType.SetGitCommit(utl.PointerToString("true"))
 			releaseType.SetGitPush(utl.PointerToString("true"))
+			releaseType.SetGitPushForce(utl.PointerToString("true"))
 			releaseType.SetGitTag(utl.PointerToString("true"))
+			releaseType.SetGitTagForce(utl.PointerToString("true"))
 			// here 0.0.1 is an existing tag so we test for updating/rewriting tags
 			releaseType.SetGitTagNames(&[]*string{utl.PointerToString("0.0.1"), utl.PointerToString("{{version}}"), utl.PointerToString("{{versionMajorNumber}}"), utl.PointerToString("{{versionMajorNumber}}.{{versionMinorNumber}}")})
 			releaseTypes, _ := ent.NewReleaseTypesWith(&[]*string{utl.PointerToString("testReleaseType")},
@@ -1600,7 +1602,9 @@ func TestMarkRunOnGitHubClonedWorkspaceWithWithMultipleTagNamesAndNewVersionOrNe
 	releaseType := ent.NewReleaseType()
 	releaseType.SetGitCommit(utl.PointerToString("true"))
 	releaseType.SetGitPush(utl.PointerToString("true"))
+	releaseType.SetGitPushForce(utl.PointerToString("true"))
 	releaseType.SetGitTag(utl.PointerToString("true"))
+	releaseType.SetGitTagForce(utl.PointerToString("true"))
 	// here 0.0.4 is an existing tag so we test for updating/rewriting tags
 	releaseType.SetGitTagNames(&[]*string{utl.PointerToString("0.0.4"), utl.PointerToString("{{version}}"), utl.PointerToString("{{versionMajorNumber}}"), utl.PointerToString("{{versionMajorNumber}}.{{versionMinorNumber}}"), utl.PointerToString("latest")})
 	releaseTypes, _ := ent.NewReleaseTypesWith(&[]*string{utl.PointerToString("testReleaseType")},
@@ -1982,7 +1986,9 @@ func TestMarkRunOnGitLabClonedWorkspaceWithWithMultipleTagNamesAndNewVersionOrNe
 	releaseType := ent.NewReleaseType()
 	releaseType.SetGitCommit(utl.PointerToString("true"))
 	releaseType.SetGitPush(utl.PointerToString("true"))
+	releaseType.SetGitPushForce(utl.PointerToString("true"))
 	releaseType.SetGitTag(utl.PointerToString("true"))
+	releaseType.SetGitTagForce(utl.PointerToString("true"))
 	// here 0.0.4 is an existing tag so we test for updating/rewriting tags
 	releaseType.SetGitTagNames(&[]*string{utl.PointerToString("0.0.4"), utl.PointerToString("{{version}}"), utl.PointerToString("{{versionMajorNumber}}"), utl.PointerToString("{{versionMajorNumber}}.{{versionMinorNumber}}"), utl.PointerToString("latest")})
 	releaseTypes, _ := ent.NewReleaseTypesWith(&[]*string{utl.PointerToString("testReleaseType")},

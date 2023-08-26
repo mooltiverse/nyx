@@ -70,6 +70,8 @@ public class ConfigurationLayerTestTemplates {
 
             assertNotNull(extension.getChangelog());
             assertNotNull(configurationLayer.getChangelog());
+            assertFalse(extension.getChangelog().getAppend().isPresent());
+            assertNull(extension.getChangelog().getAppend().getOrNull());
             assertFalse(extension.getChangelog().getPath().isPresent());
             assertNull(extension.getChangelog().getPath().getOrNull());
             //assertTrue(extension.getChangelog().geSections().isPresent());

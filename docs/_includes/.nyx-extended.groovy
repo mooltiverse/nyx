@@ -1,5 +1,6 @@
 nyx {
   changelog {
+    append = 'head'
     path = 'CHANGELOG.md'
     sections = [
       'Added' : '^feat$',
@@ -67,7 +68,9 @@ nyx {
         gitCommit = 'false'
         gitCommitMessage = 'Release version {{version}}'
         gitPush = 'true'
+        gitPushForce = 'true'
         gitTag = 'true'
+        gitTagForce = 'true'
         gitTagMessage = 'Tag version {{version}}'
         gitTagNames = [ '{{version}}', 'stable', 'latest' ]
         matchBranches = '^(master|main)$'

@@ -90,6 +90,11 @@ class EnvironmentConfigurationLayer implements ConfigurationLayer {
     /**
      * The name of the environment variable to read for this value. Value: {@value}
      */
+    private static final String CHANGELOG_CONFIGURATION_APPEND_ENVVAR_NAME = CHANGELOG_CONFIGURATION_ENVVAR_NAME.concat("_APPEND");
+
+    /**
+     * The name of the environment variable to read for this value. Value: {@value}
+     */
     private static final String CHANGELOG_CONFIGURATION_PATH_ENVVAR_NAME = CHANGELOG_CONFIGURATION_ENVVAR_NAME.concat("_PATH");
 
     /**
@@ -515,6 +520,19 @@ class EnvironmentConfigurationLayer implements ConfigurationLayer {
     private static final String RELEASE_TYPES_ITEM_GIT_PUSH_FORMAT_STRING = RELEASE_TYPES_ENVVAR_NAME.concat("_%s_GIT_PUSH");
 
     /**
+     * The parametrized name of the environment variable to read for the 'gitPushForce' attribute of a
+     * release type.
+     * This string is a {@link Formatter string} that contains a '%s' parameter for the release type name
+     * and must be rendered using {@link String#format(String, Object...) String.format(RELEASE_TYPES_ITEM_GIT_PUSH_FORCE_FORMAT_STRING, name)}
+     * in order to get the actual name of environment variable that brings the value for the release type with the given {@code name}.
+     * Value: {@value}
+     * 
+     * @see Formatter
+     * @see String#format(String, Object...)
+     */
+    private static final String RELEASE_TYPES_ITEM_GIT_PUSH_FORCE_FORMAT_STRING = RELEASE_TYPES_ENVVAR_NAME.concat("_%s_GIT_PUSH_FORCE");
+
+    /**
      * The parametrized name of the environment variable to read for the 'gitTag' attribute of a
      * release type.
      * This string is a {@link Formatter string} that contains a '%s' parameter for the release type name
@@ -526,6 +544,19 @@ class EnvironmentConfigurationLayer implements ConfigurationLayer {
      * @see String#format(String, Object...)
      */
     private static final String RELEASE_TYPES_ITEM_GIT_TAG_FORMAT_STRING = RELEASE_TYPES_ENVVAR_NAME.concat("_%s_GIT_TAG");
+
+    /**
+     * The parametrized name of the environment variable to read for the 'gitTagForce' attribute of a
+     * release type.
+     * This string is a {@link Formatter string} that contains a '%s' parameter for the release type name
+     * and must be rendered using {@link String#format(String, Object...) String.format(RELEASE_TYPES_ITEM_GIT_TAG_FORCE_FORMAT_STRING, name)}
+     * in order to get the actual name of environment variable that brings the value for the release type with the given {@code name}.
+     * Value: {@value}
+     * 
+     * @see Formatter
+     * @see String#format(String, Object...)
+     */
+    private static final String RELEASE_TYPES_ITEM_GIT_TAG_FORCE_FORMAT_STRING = RELEASE_TYPES_ENVVAR_NAME.concat("_%s_GIT_TAG_FORCE");
 
     /**
      * The parametrized name of the environment variable to read for the 'gitTagMessage' attribute of a
@@ -1111,7 +1142,7 @@ class EnvironmentConfigurationLayer implements ConfigurationLayer {
                 substitutions.put(substitutionName, getenv(String.format(CHANGELOG_CONFIGURATION_SUBSTITUTIONS_ITEM_REGEXP_FORMAT_STRING, substitutionName)));
             }
 
-            changelogSection = new ChangelogConfiguration(getenv(CHANGELOG_CONFIGURATION_PATH_ENVVAR_NAME), sections, getenv(CHANGELOG_CONFIGURATION_TEMPLATE_ENVVAR_NAME), substitutions);
+            changelogSection = new ChangelogConfiguration(getenv(CHANGELOG_CONFIGURATION_APPEND_ENVVAR_NAME), getenv(CHANGELOG_CONFIGURATION_PATH_ENVVAR_NAME), sections, getenv(CHANGELOG_CONFIGURATION_TEMPLATE_ENVVAR_NAME), substitutions);
         }
         return changelogSection;
     }
@@ -1314,7 +1345,9 @@ class EnvironmentConfigurationLayer implements ConfigurationLayer {
                 String gitCommit                                = getenv(String.format(RELEASE_TYPES_ITEM_GIT_COMMIT_FORMAT_STRING, itemName));
                 String gitCommitMessage                         = getenv(String.format(RELEASE_TYPES_ITEM_GIT_COMMIT_MESSAGE_FORMAT_STRING, itemName));
                 String gitPush                                  = getenv(String.format(RELEASE_TYPES_ITEM_GIT_PUSH_FORMAT_STRING, itemName));
+                String gitPushForce                             = getenv(String.format(RELEASE_TYPES_ITEM_GIT_PUSH_FORCE_FORMAT_STRING, itemName));
                 String gitTag                                   = getenv(String.format(RELEASE_TYPES_ITEM_GIT_TAG_FORMAT_STRING, itemName));
+                String gitTagForce                              = getenv(String.format(RELEASE_TYPES_ITEM_GIT_TAG_FORCE_FORMAT_STRING, itemName));
                 String gitTagMessage                            = getenv(String.format(RELEASE_TYPES_ITEM_GIT_TAG_MESSAGE_FORMAT_STRING, itemName));
                 String gitTagNamesList                          = getenv(String.format(RELEASE_TYPES_ITEM_GIT_TAG_NAMES_FORMAT_STRING, itemName));
                 List<String> gitTagNames                        = Objects.isNull(gitTagNamesList) ? null : List.<String>of(gitTagNamesList.split(","));
@@ -1345,7 +1378,7 @@ class EnvironmentConfigurationLayer implements ConfigurationLayer {
                     throw new IllegalPropertyException(String.format("The environment variable '%s' has an illegal value '%s'", String.format(RELEASE_TYPES_ITEM_VERSION_RANGE_FROM_BRANCH_NAME_FORMAT_STRING, itemName), versionRangeFromBranchNameString), iae);
                 }
 
-                items.put(itemName, new ReleaseType(assets, Objects.isNull(collapseVersions) ? Defaults.ReleaseType.COLLAPSE_VERSIONS : collapseVersions, collapseVersionQualifier, description, filterTags, gitCommit, gitCommitMessage, gitPush, gitTag, gitTagMessage, gitTagNames, identifiers, matchBranches, matchEnvironmentVariables, matchWorkspaceStatus, publish, publishDraft, publishPreRelease, releaseName, versionRange, versionRangeFromBranchName));
+                items.put(itemName, new ReleaseType(assets, Objects.isNull(collapseVersions) ? Defaults.ReleaseType.COLLAPSE_VERSIONS : collapseVersions, collapseVersionQualifier, description, filterTags, gitCommit, gitCommitMessage, gitPush, gitPushForce, gitTag, gitTagForce, gitTagMessage, gitTagNames, identifiers, matchBranches, matchEnvironmentVariables, matchWorkspaceStatus, publish, publishDraft, publishPreRelease, releaseName, versionRange, versionRangeFromBranchName));
             }
 
             releaseTypesSection = new ReleaseTypes(enabled, publicationServices, remoteRepositories, items);

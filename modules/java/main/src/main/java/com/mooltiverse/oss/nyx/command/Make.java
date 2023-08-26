@@ -39,6 +39,8 @@ import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -185,7 +187,7 @@ public class Make extends AbstractCommand {
             String templatePath = state().getConfiguration().getChangelog().getTemplate();
             try {
                 // try loading the file as an URL
-                URL templateURL = new URL(templatePath);
+                URL templateURL = new URI(templatePath).toURL();
                 try {
                     return new InputStreamReader(templateURL.openStream());
                 }
@@ -193,7 +195,7 @@ public class Make extends AbstractCommand {
                     throw new DataAccessException(String.format("Unable to load the configured changelog template file from URL '%s'", templatePath), ioe);
                 }
             }
-            catch (MalformedURLException mue) {
+            catch (MalformedURLException | URISyntaxException | IllegalArgumentException ue) {
                 // it's a local file, not an URL, so load it as such
                 try {
                     return new FileReader(templatePath);
@@ -338,10 +340,41 @@ public class Make extends AbstractCommand {
                     }
 
                     // now write to the actual destination file
-                    FileWriter fileWriter = new FileWriter(changelogFile);
-                    fileWriter.write(changelogBuffer);
-                    fileWriter.flush();
-                    fileWriter.close();
+                    if (Objects.isNull(state().getConfiguration().getChangelog().getAppend()) || state().getConfiguration().getChangelog().getAppend().isBlank()) {
+                        logger.debug(COMMAND, "No append flag was defined for the changelog so the original file '{}', if any, will be overwritten", changelogFile.getAbsolutePath());
+                        // overwrite the file
+                        FileWriter fileWriter = new FileWriter(changelogFile);
+                        fileWriter.write(changelogBuffer);
+                        fileWriter.flush();
+                        fileWriter.close();
+                    }
+                    else if ("tail".equalsIgnoreCase(state().getConfiguration().getChangelog().getAppend().trim())) {
+                        logger.debug(COMMAND, "The '{}' append flag has been defined for the changelog so new contents will be appended to the end of the existing file '{}', if any", state().getConfiguration().getChangelog().getAppend(), changelogFile.getAbsolutePath());
+                        // append to end
+                        FileWriter fileWriter = new FileWriter(changelogFile, true);
+                        fileWriter.write(changelogBuffer);
+                        fileWriter.flush();
+                        fileWriter.close();
+                    }
+                    else if ("head".equalsIgnoreCase(state().getConfiguration().getChangelog().getAppend().trim())) {
+                        logger.debug(COMMAND, "The '{}' append flag has been defined for the changelog so new contents will be inserted to the beginning of the existing file '{}', if any", state().getConfiguration().getChangelog().getAppend(), changelogFile.getAbsolutePath());
+                        // save the previous contents to a temporary buffer
+                        StringWriter previousContentBuffer = new StringWriter();
+                        if (changelogFile.exists()) {
+                            FileReader reader = new FileReader(changelogFile);
+                            reader.transferTo(previousContentBuffer);
+                            reader.close();
+                        }
+
+                        // overwrite the file with the new content and append the previous contents to the file
+                        FileWriter fileWriter = new FileWriter(changelogFile);
+                        fileWriter.write(changelogBuffer);
+                        fileWriter.write(previousContentBuffer.toString());
+                        fileWriter.flush();
+                        fileWriter.close();
+                    } else {
+                        throw new IllegalPropertyException(String.format("Illegal option '%s' has been defined for the changelog append option", state().getConfiguration().getChangelog().getAppend()));
+                    }
                 }
                 catch (IOException ioe) {
                     throw new DataAccessException(String.format("Unable to render the changelog to file '%s'. Make sure the path to the file exists and can be written.", changelogFile.getAbsolutePath()), ioe);

@@ -382,6 +382,8 @@ public class Configuration implements ConfigurationRoot {
                 // Since all attributes of the changelog configuration are objects we assume that if they are null
                 // they have the default values and we keep non null values as those overriding defaults.
                 // The sections map is assumed to override inherited values if its size is not 0
+                if (Objects.isNull(changelogSection.getAppend()))
+                    changelogSection.setAppend(layer.getChangelog().getAppend());
                 if (Objects.isNull(changelogSection.getPath()))
                     changelogSection.setPath(layer.getChangelog().getPath());
                 if (Objects.isNull(changelogSection.getSections()) || changelogSection.getSections().isEmpty())

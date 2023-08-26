@@ -123,6 +123,7 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
     public ChangelogConfiguration getChangelog() {
         if (Objects.isNull(changelogConfigurationSection)) {
             changelogConfigurationSection = new ChangelogConfiguration(
+                extension.getChangelog().getAppend().getOrNull(),
                 extension.getChangelog().getPath().getOrNull(),
                 extension.getChangelog().getSections().isPresent() ?  extension.getChangelog().getSections().get() : Map.<String,String>of(),
                 extension.getChangelog().getTemplate().getOrNull(),
@@ -293,7 +294,9 @@ class ConfigurationLayer implements com.mooltiverse.oss.nyx.configuration.Config
                             type.getGitCommit().isPresent() ? type.getGitCommit().get() : Defaults.ReleaseType.GIT_COMMIT,
                             type.getGitCommitMessage().isPresent() ? type.getGitCommitMessage().get() : Defaults.ReleaseType.GIT_COMMIT_MESSAGE,
                             type.getGitPush().isPresent() ? type.getGitPush().get() : Defaults.ReleaseType.GIT_PUSH,
+                            type.getGitPushForce().isPresent() ? type.getGitPushForce().get() : Defaults.ReleaseType.GIT_PUSH_FORCE,
                             type.getGitTag().isPresent() ? type.getGitTag().get() : Defaults.ReleaseType.GIT_TAG,
+                            type.getGitTagForce().isPresent() ? type.getGitTagForce().get() : Defaults.ReleaseType.GIT_TAG_FORCE,
                             type.getGitTagMessage().isPresent() ? type.getGitTagMessage().get() : Defaults.ReleaseType.GIT_TAG_MESSAGE,
                             type.getGitTagNames().isPresent() ? type.getGitTagNames().get() : Defaults.ReleaseType.GIT_TAG_NAMES,
                             identifiers,

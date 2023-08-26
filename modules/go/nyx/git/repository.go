@@ -245,6 +245,29 @@ type Repository interface {
 
 	/*
 		Pushes local changes in the current branch to the default remote origin.
+		This method allows using user name and password authentication (also used for tokens).
+
+		Returns the local name of the remotes that has been pushed.
+
+		Arguments are as follows:
+
+		- remote the name of the remote to push to. If nil or empty the default remote name (origin) is used.
+		- user the user name to create when credentials are required. If this and password are both nil
+			then no credentials is used. When using single token authentication (i.e. OAuth or Personal Access Tokens)
+			this value may be the token or something other than a token, depending on the remote provider.
+		- password the password to create when credentials are required. If this and user are both nil
+			then no credentials is used. When using single token authentication (i.e. OAuth or Personal Access Tokens)
+			this value may be the token or something other than a token, depending on the remote provider.
+		- force set it to true if you want the push to be executed using the force option
+
+		Errors can be:
+
+		- GitError in case some problem is encountered with the underlying Git repository, preventing to push.
+	*/
+	PushToRemoteWithUserNameAndPasswordAndForce(remote *string, user *string, password *string, force bool) (string, error)
+
+	/*
+		Pushes local changes in the current branch to the default remote origin.
 		This method allows using SSH authentication.
 
 		Returns the local name of the remotes that has been pushed.
@@ -263,6 +286,28 @@ type Repository interface {
 		- GitError in case some problem is encountered with the underlying Git repository, preventing to push.
 	*/
 	PushToRemoteWithPublicKey(remote *string, privateKey *string, passphrase *string) (string, error)
+
+	/*
+		Pushes local changes in the current branch to the default remote origin.
+		This method allows using SSH authentication.
+
+		Returns the local name of the remotes that has been pushed.
+
+		Arguments are as follows:
+
+		- remote the name of the remote to push to. If nil or empty the default remote name (origin) is used.
+		- privateKey the SSH private key. If nil the private key will be searched in its default location
+			(i.e. in the users' $HOME/.ssh directory).
+		- passphrase the optional password to use to open the private key, in case it's protected by a passphrase.
+			This is required when the private key is password protected as this implementation does not support prompting
+			the user interactively for entering the password.
+		- force set it to true if you want the push to be executed using the force option
+
+		Errors can be:
+
+		- GitError in case some problem is encountered with the underlying Git repository, preventing to push.
+	*/
+	PushToRemoteWithPublicKeyAndForce(remote *string, privateKey *string, passphrase *string, force bool) (string, error)
 
 	/*
 	   Pushes local changes in the current branch to the given remotes.
@@ -344,6 +389,26 @@ type Repository interface {
 	TagWithMessage(name *string, message *string) (gitent.Tag, error)
 
 	/*
+	   Tags the latest commit in the current branch with a tag with the given name and optional message.
+	   If the tag already exists it's updated.
+
+	   Returns the object modelling the new tag that was created. Never nil.
+
+	   Arguments are as follows:
+
+	   - name the name of the tag. Cannot be nil
+	   - message the optional tag message. If nil the new tag will be lightweight, otherwise it will be an
+	     annotated tag
+	   - force set it to true if you want the tag to be applied using the force option
+
+	   Errors can be:
+
+	   - GitError in case some problem is encountered with the underlying Git repository, preventing to tag
+	     (i.e. when the tag name is nil).
+	*/
+	TagWithMessageAndForce(name *string, message *string, force bool) (gitent.Tag, error)
+
+	/*
 	   Tags the latest commit in the current branch with a tag with the given name and optional message using the optional
 	   tagger identity.
 	   If the tag already exists it's updated.
@@ -385,6 +450,29 @@ type Repository interface {
 	     (i.e. when the tag name is nil).
 	*/
 	TagCommitWithMessageAndIdentity(target *string, name *string, message *string, tagger *gitent.Identity) (gitent.Tag, error)
+
+	/*
+	   Tags the object represented by the given SHA-1 with a tag with the given name and optional message using the optional
+	   tagger identity.
+	   If the tag already exists it's updated.
+
+	   Returns the object modelling the new tag that was created. Never nil.
+
+	   Arguments are as follows:
+
+	   - target the SHA-1 identifier of the object to tag. If nil the latest commit in the current branch is tagged.
+	   - name the name of the tag. Cannot be nil
+	   - message the optional tag message. If nil the new tag will be lightweight, otherwise it will be an
+	     annotated tag
+	   - tagger the optional identity of the tagger. If nil Git defaults are used. If message is nil this is ignored.
+	   - force set it to true if you want the tag to be applied using the force option
+
+	   Errors can be:
+
+	   - GitError in case some problem is encountered with the underlying Git repository, preventing to tag
+	     (i.e. when the tag name is nil).
+	*/
+	TagCommitWithMessageAndIdentityAndForce(target *string, name *string, message *string, tagger *gitent.Identity, force bool) (gitent.Tag, error)
 
 	/*
 		Browse the repository commit history using the given visitor to inspect each commit. Commits are

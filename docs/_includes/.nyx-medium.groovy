@@ -45,7 +45,9 @@ nyx {
         gitCommit = 'true'
         gitCommitMessage = 'Release version {{version}}'
         gitPush = 'true'
+        gitPushForce = 'true'
         gitTag = 'true'
+        gitTagForce = 'true'
         gitTagMessage = 'Tag release {{version}}'
         gitTagNames = [ '{{version}}', 'stable', 'latest' ]
         matchBranches = '^(master|main)$'

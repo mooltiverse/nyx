@@ -282,7 +282,7 @@ public class ConfigurationTests {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
             configurationLayerMock.setChangelog(
-                new ChangelogConfiguration("CHANGELOG.md", Map.<String,String>of("Section1", "regex1", "Section2", "regex2"), "changelog.tpl", Map.<String,String>of("Expression1", "string1"))
+                new ChangelogConfiguration("head", "CHANGELOG.md", Map.<String,String>of("Section1", "regex1", "Section2", "regex2"), "changelog.tpl", Map.<String,String>of("Expression1", "string1"))
             );
 
             // in order to make the test meaningful, make sure the default and mock values are different
@@ -291,6 +291,7 @@ public class ConfigurationTests {
             assertNotSame(configuration.getChangelog(), configurationLayerMock.getChangelog());
 
             // make sure the initial values come from defaults, until we inject the command line configuration
+            assertNull(Defaults.CHANGELOG.getAppend());
             assertNull(Defaults.CHANGELOG.getPath());
             assertNull(configuration.getChangelog().getPath());
             assertTrue(Defaults.CHANGELOG.getSections().isEmpty());
@@ -303,6 +304,7 @@ public class ConfigurationTests {
             // inject the command line configuration and test the new value is returned from that
             configuration.withCommandLineConfiguration(configurationLayerMock);
 
+            assertEquals("head", configuration.getChangelog().getAppend());
             assertEquals("CHANGELOG.md", configuration.getChangelog().getPath());
             assertNotNull(configuration.getChangelog().getSections());
             assertEquals(2, configuration.getChangelog().getSections().size());
@@ -315,6 +317,7 @@ public class ConfigurationTests {
 
             // now remove the command line configuration and test that now default values are returned again
             configuration.withCommandLineConfiguration(null);
+            assertNull(configuration.getChangelog().getAppend());
             assertNull(configuration.getChangelog().getPath());
             assertTrue(configuration.getChangelog().getSections().isEmpty());
             assertTrue(configuration.getChangelog().getSubstitutions().isEmpty());
@@ -618,7 +621,7 @@ public class ConfigurationTests {
                     List.<String>of("type1"),
                     List.<String>of("service1"),
                     List.<String>of("remote1"),
-                    Map.<String,ReleaseType>of("type1", new ReleaseType(List.<String>of("asset1", "asset2"), true, "{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}", "Release description", "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{version}}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{version}}", List.<String>of("one", "two", "three"), List.<Identifier>of(new Identifier("build", "12", Identifier.Position.BUILD)), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), Boolean.FALSE.toString(), Boolean.TRUE.toString(), "myrelease", "", Boolean.FALSE))
+                    Map.<String,ReleaseType>of("type1", new ReleaseType(List.<String>of("asset1", "asset2"), true, "{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}", "Release description", "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{version}}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{version}}", List.<String>of("one", "two", "three"), List.<Identifier>of(new Identifier("build", "12", Identifier.Position.BUILD)), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), Boolean.FALSE.toString(), Boolean.TRUE.toString(), "myrelease", "", Boolean.FALSE))
                 )
             );
 
@@ -661,7 +664,9 @@ public class ConfigurationTests {
             assertEquals(Boolean.TRUE.toString(), configuration.getReleaseTypes().getItems().get("type1").getGitCommit());
             assertEquals("Committing {{version}}", configuration.getReleaseTypes().getItems().get("type1").getGitCommitMessage());
             assertEquals(Boolean.TRUE.toString(), configuration.getReleaseTypes().getItems().get("type1").getGitPush());
+            assertEquals(Boolean.TRUE.toString(), configuration.getReleaseTypes().getItems().get("type1").getGitPushForce());
             assertEquals(Boolean.TRUE.toString(), configuration.getReleaseTypes().getItems().get("type1").getGitTag());
+            assertEquals(Boolean.TRUE.toString(), configuration.getReleaseTypes().getItems().get("type1").getGitTagForce());
             assertEquals("Tagging {{version}}", configuration.getReleaseTypes().getItems().get("type1").getGitTagMessage());
             assertEquals(3, configuration.getReleaseTypes().getItems().get("type1").getGitTagNames().size());
             assertEquals("one", configuration.getReleaseTypes().getItems().get("type1").getGitTagNames().get(0));
@@ -1010,7 +1015,7 @@ public class ConfigurationTests {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
             configurationLayerMock.setChangelog(
-                new ChangelogConfiguration("CHANGELOG.md", Map.<String,String>of("Section1", "regex1", "Section2", "regex2"), "changelog.tpl", Map.<String,String>of("Expression1", "string1"))
+                new ChangelogConfiguration("head", "CHANGELOG.md", Map.<String,String>of("Section1", "regex1", "Section2", "regex2"), "changelog.tpl", Map.<String,String>of("Expression1", "string1"))
             );
 
             // in order to make the test meaningful, make sure the default and mock values are different
@@ -1019,6 +1024,7 @@ public class ConfigurationTests {
             assertNotSame(configuration.getChangelog(), configurationLayerMock.getChangelog());
 
             // make sure the initial values come from defaults, until we inject the command line configuration
+            assertNull(Defaults.CHANGELOG.getAppend());
             assertNull(Defaults.CHANGELOG.getPath());
             assertNull(configuration.getChangelog().getPath());
             assertTrue(Defaults.CHANGELOG.getSections().isEmpty());
@@ -1031,6 +1037,7 @@ public class ConfigurationTests {
             // inject the command line configuration and test the new value is returned from that
             configuration.withPluginConfiguration(configurationLayerMock);
 
+            assertEquals("head", configuration.getChangelog().getAppend());
             assertEquals("CHANGELOG.md", configuration.getChangelog().getPath());
             assertNotNull(configuration.getChangelog().getSections());
             assertEquals(2, configuration.getChangelog().getSections().size());
@@ -1043,6 +1050,7 @@ public class ConfigurationTests {
 
             // now remove the command line configuration and test that now default values are returned again
             configuration.withPluginConfiguration(null);
+            assertNull(configuration.getChangelog().getAppend());
             assertNull(configuration.getChangelog().getPath());
             assertTrue(configuration.getChangelog().getSections().isEmpty());
             assertTrue(configuration.getChangelog().getSubstitutions().isEmpty());
@@ -1336,7 +1344,7 @@ public class ConfigurationTests {
                     List.<String>of("type1"),
                     List.<String>of("service1"),
                     List.<String>of("remote1"),
-                    Map.<String,ReleaseType>of("type1", new ReleaseType(List.<String>of("asset1", "asset2"), true, "{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}", "Release description", "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{version}}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{version}}", List.<String>of("one", "two", "three"), List.<Identifier>of(new Identifier("build", "12", Identifier.Position.BUILD)), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), Boolean.FALSE.toString(), Boolean.TRUE.toString(), "myrelease", "", Boolean.FALSE))
+                    Map.<String,ReleaseType>of("type1", new ReleaseType(List.<String>of("asset1", "asset2"), true, "{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}", "Release description", "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{version}}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{version}}", List.<String>of("one", "two", "three"), List.<Identifier>of(new Identifier("build", "12", Identifier.Position.BUILD)), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), Boolean.FALSE.toString(), Boolean.TRUE.toString(), "myrelease", "", Boolean.FALSE))
                 )
             );
 
@@ -1379,7 +1387,9 @@ public class ConfigurationTests {
             assertEquals(Boolean.TRUE.toString(), configuration.getReleaseTypes().getItems().get("type1").getGitCommit());
             assertEquals("Committing {{version}}", configuration.getReleaseTypes().getItems().get("type1").getGitCommitMessage());
             assertEquals(Boolean.TRUE.toString(), configuration.getReleaseTypes().getItems().get("type1").getGitPush());
+            assertEquals(Boolean.TRUE.toString(), configuration.getReleaseTypes().getItems().get("type1").getGitPushForce());
             assertEquals(Boolean.TRUE.toString(), configuration.getReleaseTypes().getItems().get("type1").getGitTag());
+            assertEquals(Boolean.TRUE.toString(), configuration.getReleaseTypes().getItems().get("type1").getGitTagForce());
             assertEquals("Tagging {{version}}", configuration.getReleaseTypes().getItems().get("type1").getGitTagMessage());
             assertEquals(3, configuration.getReleaseTypes().getItems().get("type1").getGitTagNames().size());
             assertEquals("one", configuration.getReleaseTypes().getItems().get("type1").getGitTagNames().get(0));
@@ -1718,7 +1728,7 @@ public class ConfigurationTests {
             SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
             configurationLayerMock.setChangelog(
-                new ChangelogConfiguration("CHANGELOG.md", Map.<String,String>of("Section1", "regex1", "Section2", "regex2"), "changelog.tpl", Map.<String,String>of("Expression1", "string1"))
+                new ChangelogConfiguration("head", "CHANGELOG.md", Map.<String,String>of("Section1", "regex1", "Section2", "regex2"), "changelog.tpl", Map.<String,String>of("Expression1", "string1"))
             );
 
             // in order to make the test meaningful, make sure the default and mock values are different
@@ -1727,6 +1737,7 @@ public class ConfigurationTests {
             assertNotSame(configuration.getChangelog(), configurationLayerMock.getChangelog());
 
             // make sure the initial values come from defaults, until we inject the command line configuration
+            assertNull(Defaults.CHANGELOG.getAppend());
             assertNull(Defaults.CHANGELOG.getPath());
             assertNull(configuration.getChangelog().getPath());
             assertTrue(Defaults.CHANGELOG.getSections().isEmpty());
@@ -1739,6 +1750,7 @@ public class ConfigurationTests {
             // inject the command line configuration and test the new value is returned from that
             configuration.withRuntimeConfiguration(configurationLayerMock);
 
+            assertEquals("head", configuration.getChangelog().getAppend());
             assertEquals("CHANGELOG.md", configuration.getChangelog().getPath());
             assertNotNull(configuration.getChangelog().getSections());
             assertEquals(2, configuration.getChangelog().getSections().size());
@@ -1751,6 +1763,7 @@ public class ConfigurationTests {
 
             // now remove the command line configuration and test that now default values are returned again
             configuration.withRuntimeConfiguration(null);
+            assertNull(configuration.getChangelog().getAppend());
             assertNull(configuration.getChangelog().getPath());
             assertTrue(configuration.getChangelog().getSections().isEmpty());
             assertTrue(configuration.getChangelog().getSubstitutions().isEmpty());
@@ -2044,7 +2057,7 @@ public class ConfigurationTests {
                     List.<String>of("type1"),
                     List.<String>of("service1"),
                     List.<String>of("remote1"),
-                    Map.<String,ReleaseType>of("type1", new ReleaseType(List.<String>of("asset1", "asset2"), true, "{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}", "Release description", "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{version}}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{version}}", List.<String>of("one", "two", "three"), List.<Identifier>of(new Identifier("build", "12", Identifier.Position.BUILD)), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), Boolean.FALSE.toString(), Boolean.TRUE.toString(), "myrelease", "", Boolean.FALSE))
+                    Map.<String,ReleaseType>of("type1", new ReleaseType(List.<String>of("asset1", "asset2"), true, "{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}", "Release description", "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{version}}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{version}}", List.<String>of("one", "two", "three"), List.<Identifier>of(new Identifier("build", "12", Identifier.Position.BUILD)), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), Boolean.FALSE.toString(), Boolean.TRUE.toString(), "myrelease", "", Boolean.FALSE))
                 )
             );
 
@@ -2087,7 +2100,9 @@ public class ConfigurationTests {
             assertEquals(Boolean.TRUE.toString(), configuration.getReleaseTypes().getItems().get("type1").getGitCommit());
             assertEquals("Committing {{version}}", configuration.getReleaseTypes().getItems().get("type1").getGitCommitMessage());
             assertEquals(Boolean.TRUE.toString(), configuration.getReleaseTypes().getItems().get("type1").getGitPush());
+            assertEquals(Boolean.TRUE.toString(), configuration.getReleaseTypes().getItems().get("type1").getGitPushForce());
             assertEquals(Boolean.TRUE.toString(), configuration.getReleaseTypes().getItems().get("type1").getGitTag());
+            assertEquals(Boolean.TRUE.toString(), configuration.getReleaseTypes().getItems().get("type1").getGitTagForce());
             assertEquals("Tagging {{version}}", configuration.getReleaseTypes().getItems().get("type1").getGitTagMessage());
             assertEquals(3, configuration.getReleaseTypes().getItems().get("type1").getGitTagNames().size());
             assertEquals("one", configuration.getReleaseTypes().getItems().get("type1").getGitTagNames().get(0));
@@ -2425,13 +2440,13 @@ public class ConfigurationTests {
             SimpleConfigurationLayer highPriorityConfigurationLayerMock = new SimpleConfigurationLayer();
             Configuration configuration = new Configuration();
             lowPriorityConfigurationLayerMock.setChangelog(
-                new ChangelogConfiguration("CHANGELOG1.md", Map.<String,String>of("SectionA1", "regexA1", "SectionA2", "regexA2"), "changelog1.tpl", Map.<String,String>of("Expression1", "string1"))
+                new ChangelogConfiguration(null, "CHANGELOG1.md", Map.<String,String>of("SectionA1", "regexA1", "SectionA2", "regexA2"), "changelog1.tpl", Map.<String,String>of("Expression1", "string1"))
             );
             mediumPriorityConfigurationLayerMock.setChangelog(
-                new ChangelogConfiguration("CHANGELOG2.md", Map.<String,String>of("SectionB1", "regexB1", "SectionB2", "regexB2"), "changelog2.tpl", Map.<String,String>of("Expression2", "string2"))
+                new ChangelogConfiguration("head", "CHANGELOG2.md", Map.<String,String>of("SectionB1", "regexB1", "SectionB2", "regexB2"), "changelog2.tpl", Map.<String,String>of("Expression2", "string2"))
             );
             highPriorityConfigurationLayerMock.setChangelog(
-                new ChangelogConfiguration("CHANGELOG3.md", Map.<String,String>of("SectionC1", "regexC1", "SectionC2", "regexC2"), "changelog3.tpl", Map.<String,String>of("Expression3", "string3"))
+                new ChangelogConfiguration("tail", "CHANGELOG3.md", Map.<String,String>of("SectionC1", "regexC1", "SectionC2", "regexC2"), "changelog3.tpl", Map.<String,String>of("Expression3", "string3"))
             );
             
             // inject the command line configuration and test the new value is returned from that
@@ -2439,6 +2454,7 @@ public class ConfigurationTests {
             configuration.withCommandLineConfiguration(mediumPriorityConfigurationLayerMock);
             configuration.withRuntimeConfiguration(highPriorityConfigurationLayerMock);
 
+            assertEquals("tail", configuration.getChangelog().getAppend());
             assertEquals("CHANGELOG3.md", configuration.getChangelog().getPath());
             assertNotNull(configuration.getChangelog().getSections());
             assertEquals(2, configuration.getChangelog().getSections().size());
@@ -2763,7 +2779,7 @@ public class ConfigurationTests {
                     List.<String>of("type1"),
                     List.<String>of("service1"),
                     List.<String>of("remote1"),
-                    Map.<String,ReleaseType>of("type1", new ReleaseType(List.<String>of("assetA1", "assetA2"), false, "{{branch1}}", "Release description 1", "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{version}}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{version}}", List.<String>of("one", "two", "three"), List.<Identifier>of(new Identifier("build", "12", Identifier.Position.BUILD)), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), Boolean.FALSE.toString(), Boolean.TRUE.toString(), "myrelease1", "", Boolean.FALSE))
+                    Map.<String,ReleaseType>of("type1", new ReleaseType(List.<String>of("assetA1", "assetA2"), false, "{{branch1}}", "Release description 1", "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{version}}", Boolean.TRUE.toString(), Boolean.FALSE.toString(), Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{version}}", List.<String>of("one", "two", "three"), List.<Identifier>of(new Identifier("build", "12", Identifier.Position.BUILD)), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), Boolean.FALSE.toString(), Boolean.TRUE.toString(), "myrelease1", "", Boolean.FALSE))
                 )
             );
             mediumPriorityConfigurationLayerMock.setReleaseTypes(
@@ -2771,7 +2787,7 @@ public class ConfigurationTests {
                     List.<String>of("type2"),
                     List.<String>of("service2"),
                     List.<String>of("remote2"),
-                    Map.<String,ReleaseType>of("type2", new ReleaseType(List.<String>of("assetB1", "assetB2"), true, "{{branch2}}", "Release description 2", "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{version}}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{version}}", List.<String>of("one", "two", "three"), List.<Identifier>of(new Identifier("build", "12", Identifier.Position.BUILD)), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), Boolean.FALSE.toString(), Boolean.TRUE.toString(), "myrelease2", "", Boolean.FALSE))
+                    Map.<String,ReleaseType>of("type2", new ReleaseType(List.<String>of("assetB1", "assetB2"), true, "{{branch2}}", "Release description 2", "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{version}}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), Boolean.TRUE.toString(), Boolean.FALSE.toString(), "Tagging {{version}}", List.<String>of("one", "two", "three"), List.<Identifier>of(new Identifier("build", "12", Identifier.Position.BUILD)), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), Boolean.FALSE.toString(), Boolean.TRUE.toString(), "myrelease2", "", Boolean.FALSE))
                 )
             );
             highPriorityConfigurationLayerMock.setReleaseTypes(
@@ -2779,7 +2795,7 @@ public class ConfigurationTests {
                     List.<String>of("type3"),
                     List.<String>of("service3"),
                     List.<String>of("remote3"),
-                    Map.<String,ReleaseType>of("type3", new ReleaseType(List.<String>of("assetC1", "assetC2"), true, "{{branch3}}", "Release description 3", "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{version}}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{version}}", List.<String>of("one", "two", "three"), List.<Identifier>of(new Identifier("build", "12", Identifier.Position.BUILD)), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), Boolean.FALSE.toString(), Boolean.TRUE.toString(), "myrelease3", "", Boolean.FALSE))
+                    Map.<String,ReleaseType>of("type3", new ReleaseType(List.<String>of("assetC1", "assetC2"), true, "{{branch3}}", "Release description 3", "^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$", Boolean.TRUE.toString(), "Committing {{version}}", Boolean.TRUE.toString(), Boolean.TRUE.toString(), Boolean.TRUE.toString(), Boolean.TRUE.toString(), "Tagging {{version}}", List.<String>of("one", "two", "three"), List.<Identifier>of(new Identifier("build", "12", Identifier.Position.BUILD)), "", Map.<String,String>of("PATH",".*"), null, Boolean.TRUE.toString(), Boolean.FALSE.toString(), Boolean.TRUE.toString(), "myrelease3", "", Boolean.FALSE))
                 )
             );
             
@@ -2809,7 +2825,9 @@ public class ConfigurationTests {
             assertEquals(Boolean.TRUE.toString(), configuration.getReleaseTypes().getItems().get("type3").getGitCommit());
             assertEquals("Committing {{version}}", configuration.getReleaseTypes().getItems().get("type3").getGitCommitMessage());
             assertEquals(Boolean.TRUE.toString(), configuration.getReleaseTypes().getItems().get("type3").getGitPush());
+            assertEquals(Boolean.TRUE.toString(), configuration.getReleaseTypes().getItems().get("type3").getGitPushForce());
             assertEquals(Boolean.TRUE.toString(), configuration.getReleaseTypes().getItems().get("type3").getGitTag());
+            assertEquals(Boolean.TRUE.toString(), configuration.getReleaseTypes().getItems().get("type3").getGitTagForce());
             assertEquals("Tagging {{version}}", configuration.getReleaseTypes().getItems().get("type3").getGitTagMessage());
             assertEquals(3, configuration.getReleaseTypes().getItems().get("type3").getGitTagNames().size());
             assertEquals("one", configuration.getReleaseTypes().getItems().get("type3").getGitTagNames().get(0));

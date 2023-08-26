@@ -255,6 +255,29 @@ public interface Repository {
         throws GitException;
     
     /**
+     * Pushes local changes in the current branch to the given remote.
+     * This method allows using user name and password authentication (also used for tokens).
+     * 
+     * @param remote the name of the remote to push to. If {@code null} or empty the default remote name ({@code origin})
+     * is used.
+     * @param user the user name to create when credentials are required. If this and {@code password} are both {@code null}
+     * then no credentials is used. When using single token authentication (i.e. OAuth or Personal Access Tokens)
+     * this value may be the token or something other than a token, depending on the remote provider.
+     * @param password the password to create when credentials are required. If this and {@code user} are both {@code null}
+     * then no credentials is used. When using single token authentication (i.e. OAuth or Personal Access Tokens)
+     * this value may be the token or something other than a token, depending on the remote provider.
+     * @param force set it to {@code true} if you want the push to be executed using the force option
+     * 
+     * @return the local name of the remotes that has been pushed
+     * 
+     * @throws GitException in case some problem is encountered with the underlying Git repository, preventing to push.
+     * 
+     * @see #DEFAULT_REMOTE_NAME
+     */
+    public String push(String remote, String user, String password, boolean force)
+        throws GitException;
+    
+    /**
      * Pushes local changes in the current branch to the given remote using no authentication.
      * This method allows using SSH authentication.
      * 
@@ -273,6 +296,28 @@ public interface Repository {
      * @see #DEFAULT_REMOTE_NAME
      */
     public String push(String remote, String privateKey, byte[] passphrase)
+        throws GitException;
+    
+    /**
+     * Pushes local changes in the current branch to the given remote using no authentication.
+     * This method allows using SSH authentication.
+     * 
+     * @param remote the name of the remote to push to. If {@code null} or empty the default remote name ({@code origin})
+     * is used.
+     * @param privateKey the SSH private key. If {@code null} the private key will be searched in its default location
+     * (i.e. in the users' {@code $HOME/.ssh} directory).
+     * @param passphrase the optional password to use to open the private key, in case it's protected by a passphrase.
+     * This is required when the private key is password protected as this implementation does not support prompting
+     * the user interactively for entering the password.
+     * @param force set it to {@code true} if you want the push to be executed using the force option
+     * 
+     * @return the local name of the remotes that has been pushed
+     * 
+     * @throws GitException in case some problem is encountered with the underlying Git repository, preventing to push.
+     * 
+     * @see #DEFAULT_REMOTE_NAME
+     */
+    public String push(String remote, String privateKey, byte[] passphrase, boolean force)
         throws GitException;
 
     /**
@@ -343,6 +388,23 @@ public interface Repository {
      */
     public Tag tag(String name, String message)
         throws GitException;
+    
+    /**
+     * Tags the latest commit in the current branch with a tag with the given name and optional message.
+     * If the tag already exists it's updated.
+     * 
+     * @param name the name of the tag. Cannot be {@code null}
+     * @param message the optional tag message. If {@code null} the new tag will be lightweight, otherwise it will be an
+     * annotated tag
+     * @param force set it to {@code true} if you want the tag to be applied using the force option
+     * 
+     * @return the object modelling the new tag that was created. Never {@code null}.
+     * 
+     * @throws GitException in case some problem is encountered with the underlying Git repository, preventing to tag
+     * (i.e. when the tag name is {@code null}).
+     */
+    public Tag tag(String name, String message, boolean force)
+        throws GitException;
 
     /**
      * Tags the latest commit in the current branch with a tag with the given name and optional message using the optional
@@ -381,6 +443,27 @@ public interface Repository {
      * (i.e. when the tag name is {@code null}).
      */
     public Tag tag(String target, String name, String message, Identity tagger)
+        throws GitException;
+    
+    /**
+     * Tags the object represented by the given SHA-1 with a tag with the given name and optional message using the optional
+     * tagger identity.
+     * If the tag already exists it's updated.
+     * 
+     * @param target the SHA-1 identifier of the object to tag. If {@code null} the latest commit in the current branch is tagged.
+     * @param name the name of the tag. Cannot be {@code null}
+     * @param message the optional tag message. If {@code null} the new tag will be lightweight, otherwise it will be an
+     * annotated tag
+     * @param tagger the optional identity of the tagger. If {@code null} Git defaults are used. If {@code message} is {@code null}
+     * this is ignored.
+     * @param force set it to {@code true} if you want the tag to be applied using the force option
+     * 
+     * @return the object modelling the new tag that was created. Never {@code null}.
+     * 
+     * @throws GitException in case some problem is encountered with the underlying Git repository, preventing to tag
+     * (i.e. when the tag name is {@code null}).
+     */
+    public Tag tag(String target, String name, String message, Identity tagger, boolean force)
         throws GitException;
 
     /**

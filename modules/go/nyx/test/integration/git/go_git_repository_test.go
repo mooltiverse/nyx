@@ -1490,6 +1490,8 @@ func TestGoGitRepositoryPushToRemotesWithRequiredSSHProtectedCredentials(t *test
 }
 
 func TestGoGitRepositoryTag(t *testing.T) {
+	logLevel := log.GetLevel()   // save the previous logging level
+	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.INITIAL_COMMIT().Realize()
 	defer os.RemoveAll(script.GetWorkingDirectory())
@@ -1517,12 +1519,15 @@ func TestGoGitRepositoryTag(t *testing.T) {
 	assert.Equal(t, latestCommit, script.GetTags()["ltag"])
 	assert.Equal(t, *script.GetCommitByTag("ltag"), latestCommit)
 
-	// make sure no exception is thrown when the tag name is duplicated
+	// make sure an exception is thrown when the tag name is duplicated
 	lTag, err = repository.Tag(&tName)
-	assert.NoError(t, err)
+	assert.Error(t, err)
+	log.SetLevel(logLevel) // restore the original logging level
 }
 
 func TestGoGitRepositoryTagWithMessage(t *testing.T) {
+	logLevel := log.GetLevel()   // save the previous logging level
+	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.INITIAL_COMMIT().Realize()
 	defer os.RemoveAll(script.GetWorkingDirectory())
@@ -1567,14 +1572,69 @@ func TestGoGitRepositoryTagWithMessage(t *testing.T) {
 	assert.Equal(t, latestCommit, script.GetTags()["atag"])
 	assert.Equal(t, *script.GetCommitByTag("atag"), latestCommit)
 
-	// make sure no exception is thrown when the tag name is duplicated
+	// make sure an exception is thrown when the tag name is duplicated
 	lTag, err = repository.TagWithMessage(&tName, nil)
-	assert.NoError(t, err)
+	assert.Error(t, err)
 	lTag, err = repository.TagWithMessage(&tName, &tagMessage)
+	assert.Error(t, err)
+	log.SetLevel(logLevel) // restore the original logging level
+}
+
+func TestGoGitRepositoryTagWithMessageAndForce(t *testing.T) {
+	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
+	script := gittools.INITIAL_COMMIT().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
+	dir := script.GetWorkingDirectory()
+	repository, err := GitInstance().Open(dir)
+	assert.NoError(t, err)
+
+	// make sure an error is thrown when the tag name is nil
+	_, err = repository.TagWithMessageAndForce(nil, nil, true)
+	assert.Error(t, err)
+	tagMessage := "The tag message"
+	_, err = repository.TagWithMessageAndForce(nil, &tagMessage, true)
+	assert.Error(t, err)
+
+	assert.Equal(t, 0, len(script.GetTags()))
+
+	tName := "ltag"
+	lTag, err := repository.TagWithMessageAndForce(&tName, nil, true)
+	assert.NoError(t, err)
+
+	latestCommit, err := repository.GetLatestCommit()
+	assert.Equal(t, latestCommit, lTag.GetTarget())
+	assert.Equal(t, "ltag", lTag.GetName())
+	assert.Equal(t, 1, len(script.GetTags()))
+	_, containsTag := script.GetTags()["ltag"]
+	assert.True(t, containsTag)
+	latestCommit, _ = repository.GetLatestCommit()
+	assert.Equal(t, latestCommit, script.GetTags()["ltag"])
+	assert.Equal(t, *script.GetCommitByTag("ltag"), latestCommit)
+
+	tName = "atag"
+	lTag, err = repository.TagWithMessageAndForce(&tName, &tagMessage, true)
+	assert.NoError(t, err)
+
+	latestCommit, _ = repository.GetLatestCommit()
+	assert.Equal(t, latestCommit, lTag.GetTarget())
+	assert.Equal(t, "atag", lTag.GetName())
+	assert.Equal(t, 2, len(script.GetTags()))
+	_, containsTag = script.GetTags()["atag"]
+	assert.True(t, containsTag)
+	latestCommit, _ = repository.GetLatestCommit()
+	assert.Equal(t, latestCommit, script.GetTags()["atag"])
+	assert.Equal(t, *script.GetCommitByTag("atag"), latestCommit)
+
+	// make sure no exception is thrown when the tag name is duplicated
+	lTag, err = repository.TagWithMessageAndForce(&tName, nil, true)
+	assert.NoError(t, err)
+	lTag, err = repository.TagWithMessageAndForce(&tName, &tagMessage, true)
 	assert.NoError(t, err)
 }
 
 func TestGoGitRepositoryTagWithMessageAndIdentity(t *testing.T) {
+	logLevel := log.GetLevel()   // save the previous logging level
+	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.INITIAL_COMMIT().Realize()
 	defer os.RemoveAll(script.GetWorkingDirectory())
@@ -1619,14 +1679,17 @@ func TestGoGitRepositoryTagWithMessageAndIdentity(t *testing.T) {
 	assert.Equal(t, latestCommit, script.GetTags()["atag"])
 	assert.Equal(t, *script.GetCommitByTag("atag"), latestCommit)
 
-	// make sure no exception is thrown when the tag name is duplicated
+	// make sure an exception is thrown when the tag name is duplicated
 	lTag, err = repository.TagWithMessageAndIdentity(&tName, nil, nil)
-	assert.NoError(t, err)
+	assert.Error(t, err)
 	lTag, err = repository.TagWithMessageAndIdentity(&tName, &tagMessage, nil)
-	assert.NoError(t, err)
+	assert.Error(t, err)
+	log.SetLevel(logLevel) // restore the original logging level
 }
 
 func TestGoGitRepositoryTagCommitWithMessageAndIdentity(t *testing.T) {
+	logLevel := log.GetLevel()   // save the previous logging level
+	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
 	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
 	script := gittools.INITIAL_COMMIT().Realize()
 	defer os.RemoveAll(script.GetWorkingDirectory())
@@ -1703,8 +1766,91 @@ func TestGoGitRepositoryTagCommitWithMessageAndIdentity(t *testing.T) {
 
 	// make sure no exception is thrown when the tag name is duplicated
 	lTag, err = repository.TagCommitWithMessageAndIdentity(&latestCommit, &tName, nil, nil)
-	assert.NoError(t, err)
+	assert.Error(t, err)
 	lTag, err = repository.TagCommitWithMessageAndIdentity(&latestCommit, &tName, &tagMessage, nil)
+	assert.Error(t, err)
+	log.SetLevel(logLevel) // restore the original logging level
+}
+
+func TestGoGitRepositoryTagCommitWithMessageAndIdentityAndForce(t *testing.T) {
+	// since the goGitRepository is not visible outside the package we need to retrieve it through the Git object
+	script := gittools.INITIAL_COMMIT().Realize()
+	defer os.RemoveAll(script.GetWorkingDirectory())
+	dir := script.GetWorkingDirectory()
+	repository, err := GitInstance().Open(dir)
+	assert.NoError(t, err)
+
+	// make sure an error is thrown when the tag name is nil
+	_, err = repository.TagCommitWithMessageAndIdentityAndForce(nil, nil, nil, nil, true)
+	assert.Error(t, err)
+	tagMessage := "The tag message"
+	_, err = repository.TagCommitWithMessageAndIdentityAndForce(nil, nil, &tagMessage, nil, true)
+	assert.Error(t, err)
+
+	assert.Equal(t, 0, len(script.GetTags()))
+
+	tName := "ltag"
+	latestCommit, err := repository.GetLatestCommit()
+	lTag, err := repository.TagCommitWithMessageAndIdentityAndForce(&latestCommit, &tName, nil, gitent.NewIdentityWith("John Doe", "jdoe@example.com"), true)
+	assert.NoError(t, err)
+
+	latestCommit, err = repository.GetLatestCommit()
+	assert.Equal(t, latestCommit, lTag.GetTarget())
+	assert.Equal(t, "ltag", lTag.GetName())
+	assert.Equal(t, 1, len(script.GetTags()))
+	_, containsTag := script.GetTags()["ltag"]
+	assert.True(t, containsTag)
+	latestCommit, _ = repository.GetLatestCommit()
+	assert.Equal(t, latestCommit, script.GetTags()["ltag"])
+	assert.Equal(t, *script.GetCommitByTag("ltag"), latestCommit)
+
+	tName = "ltag2"
+	lTag, err = repository.TagCommitWithMessageAndIdentityAndForce(nil, &tName, nil, gitent.NewIdentityWith("John Doe", "jdoe@example.com"), true)
+	assert.NoError(t, err)
+
+	latestCommit, err = repository.GetLatestCommit()
+	assert.Equal(t, latestCommit, lTag.GetTarget())
+	assert.Equal(t, "ltag2", lTag.GetName())
+	assert.Equal(t, 2, len(script.GetTags()))
+	_, containsTag = script.GetTags()["ltag2"]
+	assert.True(t, containsTag)
+	latestCommit, _ = repository.GetLatestCommit()
+	assert.Equal(t, latestCommit, script.GetTags()["ltag2"])
+	assert.Equal(t, *script.GetCommitByTag("ltag2"), latestCommit)
+
+	tName = "atag"
+	latestCommit, err = repository.GetLatestCommit()
+	lTag, err = repository.TagCommitWithMessageAndIdentityAndForce(&latestCommit, &tName, &tagMessage, gitent.NewIdentityWith("John Doe", "jdoe@example.com"), true)
+	assert.NoError(t, err)
+
+	latestCommit, _ = repository.GetLatestCommit()
+	assert.Equal(t, latestCommit, lTag.GetTarget())
+	assert.Equal(t, "atag", lTag.GetName())
+	assert.Equal(t, 3, len(script.GetTags()))
+	_, containsTag = script.GetTags()["atag"]
+	assert.True(t, containsTag)
+	latestCommit, _ = repository.GetLatestCommit()
+	assert.Equal(t, latestCommit, script.GetTags()["atag"])
+	assert.Equal(t, *script.GetCommitByTag("atag"), latestCommit)
+
+	tName = "atag2"
+	lTag, err = repository.TagCommitWithMessageAndIdentityAndForce(nil, &tName, &tagMessage, gitent.NewIdentityWith("John Doe", "jdoe@example.com"), true)
+	assert.NoError(t, err)
+
+	latestCommit, _ = repository.GetLatestCommit()
+	assert.Equal(t, latestCommit, lTag.GetTarget())
+	assert.Equal(t, "atag2", lTag.GetName())
+	assert.Equal(t, 4, len(script.GetTags()))
+	_, containsTag = script.GetTags()["atag2"]
+	assert.True(t, containsTag)
+	latestCommit, _ = repository.GetLatestCommit()
+	assert.Equal(t, latestCommit, script.GetTags()["atag2"])
+	assert.Equal(t, *script.GetCommitByTag("atag2"), latestCommit)
+
+	// make sure no exception is thrown when the tag name is duplicated
+	lTag, err = repository.TagCommitWithMessageAndIdentityAndForce(&latestCommit, &tName, nil, nil, true)
+	assert.NoError(t, err)
+	lTag, err = repository.TagCommitWithMessageAndIdentityAndForce(&latestCommit, &tName, &tagMessage, nil, true)
 	assert.NoError(t, err)
 }
 

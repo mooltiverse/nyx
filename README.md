@@ -35,8 +35,18 @@ The project is open source and hosted on [GitHub](https://github.com/mooltiverse
 3. open a shell, *cd* into your project folder and run:
 
 ```bash
-$ nyx --preset=simple infer
-Version: 1.2.3
+$ nyx --preset=simple --summary infer
+branch           = main
+bump             =
+core version     = true
+latest version   = false
+new release      = false
+new version      = false
+scheme           = SEMVER
+timestamp        = 1692276827782
+current version  = 1.2.3
+previous version = 1.2.3
+prime version    = 1.2.3
 ```
 
 This will not apply any change to your repository (as the *infer* command doesn't) but will give you a taste of what Nyx finds out. Here `1.2.3` is the version that Nyx has inferred from the commit history and will be the one it will tag and release with if you use other commands, like `nyx --preset=simple publish`.

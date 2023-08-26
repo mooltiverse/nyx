@@ -33,7 +33,7 @@ public interface Defaults {
     /**
      * The default changelog configuration block.
      */
-    public static final ChangelogConfiguration CHANGELOG = new ChangelogConfiguration(null, Map.<String,String>of(), null, Map.<String,String>of());
+    public static final ChangelogConfiguration CHANGELOG = new ChangelogConfiguration(null, null, Map.<String,String>of(), null, Map.<String,String>of());
 
     /**
      * The default commit message conventions block.
@@ -138,9 +138,19 @@ public interface Defaults {
         public static final String GIT_PUSH = Boolean.FALSE.toString();
 
         /**
+         * The optional flag or the template to enable/disable the Git push operation. Value: {@code null}
+         */
+        public static final String GIT_PUSH_FORCE = null;
+
+        /**
          * The optional flag or the template to render indicating whether or not a new tag must be generated. Value: {@code false}
          */
         public static final String GIT_TAG = Boolean.FALSE.toString();
+
+        /**
+         * The optional flag or the template to enable/disable the Git tag operation. Value: {@code null}
+         */
+        public static final String GIT_TAG_FORCE = null;
 
         /**
          * The optional string or the template to render to use as the tag message if a tag has to be made. Value: {@code null}

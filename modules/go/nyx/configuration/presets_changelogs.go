@@ -23,11 +23,11 @@ import (
 
 var (
 	// The changelog configuration that is suitable when using any commit message convention.
-	CHANGELOGS_ANY, _ = ent.NewChangelogConfigurationWith(utl.PointerToString("CHANGELOG.md"), &map[string]string{"Added": "^(feat|:boom:|:sparkles:)$", "Fixed": "^(fix|:bug:|:ambulance:)$", "Removed": "^:fire:$", "Security": "^:lock:$"}, nil, nil)
+	CHANGELOGS_ANY, _ = ent.NewChangelogConfigurationWith(nil, utl.PointerToString("CHANGELOG.md"), &map[string]string{"Added": "^(feat|:boom:|:sparkles:)$", "Fixed": "^(fix|:bug:|:ambulance:)$", "Removed": "^:fire:$", "Security": "^:lock:$"}, nil, nil)
 
 	// The changelog configuration that is suitable when using Conventional Commits as the commit message convention.
-	CHANGELOGS_CONVENTIONAL_COMMITS, _ = ent.NewChangelogConfigurationWith(utl.PointerToString("CHANGELOG.md"), &map[string]string{"Added": "^feat$", "Fixed": "^fix$"}, nil, nil)
+	CHANGELOGS_CONVENTIONAL_COMMITS, _ = ent.NewChangelogConfigurationWith(nil, utl.PointerToString("CHANGELOG.md"), &map[string]string{"Added": "^feat$", "Fixed": "^fix$"}, nil, nil)
 
 	// The changelog configuration that is suitable when using gitmoji as the commit message convention.
-	CHANGELOGS_GITMOJI, _ = ent.NewChangelogConfigurationWith(utl.PointerToString("CHANGELOG.md"), &map[string]string{"Added": "^(:boom:|:sparkles:)$", "Fixed": "^(:bug:|:ambulance:)$", "Removed": "^:fire:$", "Security": "^:lock:$"}, nil, nil)
+	CHANGELOGS_GITMOJI, _ = ent.NewChangelogConfigurationWith(nil, utl.PointerToString("CHANGELOG.md"), &map[string]string{"Added": "^(:boom:|:sparkles:)$", "Fixed": "^(:bug:|:ambulance:)$", "Removed": "^:fire:$", "Security": "^:lock:$"}, nil, nil)
 )

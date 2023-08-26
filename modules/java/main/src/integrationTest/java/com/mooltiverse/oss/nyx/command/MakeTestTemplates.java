@@ -829,6 +829,126 @@ public class MakeTestTemplates {
         }
 
         @TestTemplate
+        @DisplayName("Make.run() with existing changelog file and append=head > yield to new changelog with new content inserted on top of previous content")
+        @Baseline(Scenario.ONE_BRANCH_SHORT_CONVENTIONAL_COMMITS)
+        void runTestWithExistingFileAndAppendingToHead(@CommandSelector(Commands.MAKE) CommandProxy command, Script script)
+            throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
+            // first create the temporary directory and the abstract destination file
+            File destinationDir = Files.createTempDirectory("nyx-test-make-test-").toFile();
+            destinationDir.deleteOnExit();
+
+            // create the custom template, with simple strings used as markers
+            File templateFile = new File(destinationDir, "template.tpl");
+            // this template only writes static content, which is easier to match after the changelog has been generated
+            writeFile(templateFile, "NEW CHANGELOG CONTENT\n");
+            File changelogFile = new File(destinationDir, "CHANGELOG.md");
+
+            // create a changelog with some existing content so we can test where content is appended
+            writeFile(changelogFile, "PREVIOUS CHANGELOG CONTENT\n");
+
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            configurationLayerMock.getChangelog().setAppend("head");
+            configurationLayerMock.getChangelog().setPath(changelogFile.getAbsolutePath());
+            configurationLayerMock.getChangelog().setTemplate(templateFile.getAbsolutePath());
+            // add the conventional commits convention
+            configurationLayerMock.setCommitMessageConventions(
+                new CommitMessageConventions(
+                    List.<String>of("conventionalCommits"),
+                    Map.<String,CommitMessageConvention>of("conventionalCommits", CONVENTIONAL_COMMITS))
+            );
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
+
+            assertTrue(changelogFile.exists());
+
+            command.run();
+
+            // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
+            if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
+                assertTrue(changelogFile.exists());
+
+                // print the file to standard output for inspection purpose
+                System.out.println("------- CHANGELOG -------");
+                System.out.println("Loading from: "+changelogFile.getAbsolutePath());
+                System.out.println("-----------------------------------------");
+                System.out.println(readFile(changelogFile));
+                System.out.println("-----------------------------------------");
+                System.out.flush();
+
+                // test the rendered file
+                String fileContent = readFile(changelogFile).replaceAll("\\r", ""); // remove \r to make test work on windows too
+                assertEquals("NEW CHANGELOG CONTENT\nPREVIOUS CHANGELOG CONTENT\n", fileContent);
+
+                // run again and make sure values didn't change
+                command.run();
+
+                // test the rendered file again
+                fileContent = readFile(changelogFile).replaceAll("\\r", ""); // remove \r to make test work on windows too
+                assertEquals("NEW CHANGELOG CONTENT\nPREVIOUS CHANGELOG CONTENT\n", fileContent);
+            }
+        }
+
+        @TestTemplate
+        @DisplayName("Make.run() with existing changelog file and append=tail > yield to new changelog with new content inserted after previous content")
+        @Baseline(Scenario.ONE_BRANCH_SHORT_CONVENTIONAL_COMMITS)
+        void runTestWithExistingFileAndAppendingToTail(@CommandSelector(Commands.MAKE) CommandProxy command, Script script)
+            throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
+            // first create the temporary directory and the abstract destination file
+            File destinationDir = Files.createTempDirectory("nyx-test-make-test-").toFile();
+            destinationDir.deleteOnExit();
+
+            // create the custom template, with simple strings used as markers
+            File templateFile = new File(destinationDir, "template.tpl");
+            // this template only writes static content, which is easier to match after the changelog has been generated
+            writeFile(templateFile, "NEW CHANGELOG CONTENT\n");
+            File changelogFile = new File(destinationDir, "CHANGELOG.md");
+
+            // create a changelog with some existing content so we can test where content is appended
+            writeFile(changelogFile, "PREVIOUS CHANGELOG CONTENT\n");
+
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            configurationLayerMock.getChangelog().setAppend("tail");
+            configurationLayerMock.getChangelog().setPath(changelogFile.getAbsolutePath());
+            configurationLayerMock.getChangelog().setTemplate(templateFile.getAbsolutePath());
+            // add the conventional commits convention
+            configurationLayerMock.setCommitMessageConventions(
+                new CommitMessageConventions(
+                    List.<String>of("conventionalCommits"),
+                    Map.<String,CommitMessageConvention>of("conventionalCommits", CONVENTIONAL_COMMITS))
+            );
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
+
+            assertTrue(changelogFile.exists());
+
+            command.run();
+
+            // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
+            if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
+                assertTrue(changelogFile.exists());
+
+                // print the file to standard output for inspection purpose
+                System.out.println("------- CHANGELOG -------");
+                System.out.println("Loading from: "+changelogFile.getAbsolutePath());
+                System.out.println("-----------------------------------------");
+                System.out.println(readFile(changelogFile));
+                System.out.println("-----------------------------------------");
+                System.out.flush();
+
+                // test the rendered file
+                String fileContent = readFile(changelogFile).replaceAll("\\r", "");  // remove \r to make test work on windows too
+                assertEquals("PREVIOUS CHANGELOG CONTENT\nNEW CHANGELOG CONTENT\n", fileContent);
+
+                // run again and make sure values didn't change
+                command.run();
+
+                // test the rendered file again
+                fileContent = readFile(changelogFile).replaceAll("\\r", ""); // remove \r to make test work on windows too
+                assertEquals("PREVIOUS CHANGELOG CONTENT\nNEW CHANGELOG CONTENT\n", fileContent);
+            }
+        }
+
+        @TestTemplate
         @DisplayName("Make.run() with substitutions using the 'cargo_version' preset")
         @Baseline(Scenario.INITIAL_COMMIT)
         void runTestWithSubstitutionsUsingCargoVersionPreset(@CommandSelector(Commands.MAKE) CommandProxy command, Script script)

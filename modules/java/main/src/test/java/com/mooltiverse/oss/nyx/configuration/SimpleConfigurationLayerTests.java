@@ -68,10 +68,11 @@ public class SimpleConfigurationLayerTests {
         assertNull(simpleConfigurationLayer.getChangelog().getTemplate());
 
         simpleConfigurationLayer.setChangelog(
-            new ChangelogConfiguration("CHANGELOG.md", Map.<String,String>of("Section1", "regex1", "Section2", "regex2"), "changelog.tpl", Map.<String,String>of("Expression1", "string1"))
+            new ChangelogConfiguration("head", "CHANGELOG.md", Map.<String,String>of("Section1", "regex1", "Section2", "regex2"), "changelog.tpl", Map.<String,String>of("Expression1", "string1"))
         );
 
         assertNotNull(simpleConfigurationLayer.getChangelog());
+        assertEquals("head", simpleConfigurationLayer.getChangelog().getAppend());
         assertEquals("CHANGELOG.md", simpleConfigurationLayer.getChangelog().getPath());
         assertFalse(simpleConfigurationLayer.getChangelog().getSections().isEmpty());
         assertEquals(2, simpleConfigurationLayer.getChangelog().getSections().size());

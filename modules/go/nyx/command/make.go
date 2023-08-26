@@ -388,7 +388,27 @@ func (c *Make) buildChangelog() error {
 				log.Debugf("configured substitutions have been applied to the changelog")
 			}
 
-			// now write to the actual destination file
+			if changelogConfiguration.GetAppend() == nil || "" == strings.TrimSpace(*changelogConfiguration.GetAppend()) {
+				log.Debugf("no append flag was defined for the changelog so the original file '%s', if any, will be overwritten", *changelogFile)
+			} else if strings.EqualFold("tail", strings.TrimSpace(*changelogConfiguration.GetAppend())) || strings.EqualFold("head", strings.TrimSpace(*changelogConfiguration.GetAppend())) {
+				// save the previous contents to a temporary buffer
+				previousContentBytes, err := os.ReadFile(*changelogFile)
+				if err != nil {
+					return &errs.DataAccessError{Message: fmt.Sprintf("unable to load the changelog file from '%s'", *changelogFile), Cause: err}
+				}
+				previousContentBuffer := string(previousContentBytes)
+
+				if strings.EqualFold("tail", strings.TrimSpace(*changelogConfiguration.GetAppend())) {
+					changelogBuffer = previousContentBuffer + changelogBuffer
+				}
+				if strings.EqualFold("head", strings.TrimSpace(*changelogConfiguration.GetAppend())) {
+					changelogBuffer = changelogBuffer + previousContentBuffer
+				}
+			} else {
+				return &errs.IllegalPropertyError{Message: fmt.Sprintf("illegal option '%s' has been defined for the changelog append option", *changelogConfiguration.GetAppend())}
+			}
+
+			// now actually write the file
 			err = os.WriteFile(*changelogFile, []byte(changelogBuffer), 0644)
 			if err != nil {
 				return &errs.DataAccessError{Message: fmt.Sprintf("unable to render the changelog to file '%s'. Make sure the path to the file exists and can be written.", *changelogFile), Cause: err}

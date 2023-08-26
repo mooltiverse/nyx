@@ -55,6 +55,7 @@ func TestEnvironmentConfigurationLayerGetChangelog(t *testing.T) {
 	changelog, err := environmentConfigurationLayer.GetChangelog()
 	assert.NoError(t, err)
 	assert.NotNil(t, changelog)
+	assert.Nil(t, changelog.GetAppend())
 	assert.Nil(t, changelog.GetPath())
 	assert.Equal(t, 0, len(*changelog.GetSections()))
 	assert.Equal(t, 0, len(*changelog.GetSubstitutions()))
@@ -70,6 +71,7 @@ func TestEnvironmentConfigurationLayerGetChangelog(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, changelog)
 
+	assert.Nil(t, changelog.GetAppend())
 	assert.Equal(t, "CHANGELOG.md", *changelog.GetPath())
 	assert.Equal(t, 0, len(*changelog.GetSections()))
 	assert.Equal(t, 0, len(*changelog.GetSubstitutions()))
@@ -78,6 +80,7 @@ func TestEnvironmentConfigurationLayerGetChangelog(t *testing.T) {
 	// get a new instance or a stale set of environment variables is still in the configuration layer
 	environmentConfigurationLayer = EnvironmentConfigurationLayer{}
 	environmentConfigurationLayer.withEnvironmentVariables([]string{
+		"NYX_CHANGELOG_APPEND=head",
 		"NYX_CHANGELOG_PATH=CHANGELOG.md",
 		"NYX_CHANGELOG_SECTIONS_Section1=regex1",
 		"NYX_CHANGELOG_SECTIONS_Section2=regex2",
@@ -88,6 +91,7 @@ func TestEnvironmentConfigurationLayerGetChangelog(t *testing.T) {
 	changelog, err = environmentConfigurationLayer.GetChangelog()
 	assert.NoError(t, err)
 	assert.NotNil(t, changelog)
+	assert.Equal(t, "head", *changelog.GetAppend())
 	assert.Equal(t, "CHANGELOG.md", *changelog.GetPath())
 
 	assert.Equal(t, 2, len(*changelog.GetSections()))
@@ -491,7 +495,9 @@ func TestEnvironmentConfigurationLayerGetReleaseTypes(t *testing.T) {
 		"NYX_RELEASE_TYPES_two_GIT_COMMIT=false",
 		"NYX_RELEASE_TYPES_two_GIT_COMMIT_MESSAGE=Commit message",
 		"NYX_RELEASE_TYPES_two_GIT_PUSH=false",
+		"NYX_RELEASE_TYPES_two_GIT_PUSH_FORCE=true",
 		"NYX_RELEASE_TYPES_two_GIT_TAG=false",
+		"NYX_RELEASE_TYPES_two_GIT_TAG_FORCE=true",
 		"NYX_RELEASE_TYPES_two_GIT_TAG_MESSAGE=Tag message",
 		"NYX_RELEASE_TYPES_two_GIT_TAG_NAMES=one,two,three",
 		"NYX_RELEASE_TYPES_two_IDENTIFIERS_0_POSITION=" + ent.PRE_RELEASE.String(),
@@ -536,9 +542,11 @@ func TestEnvironmentConfigurationLayerGetReleaseTypes(t *testing.T) {
 	assert.Equal(t, "true", *(*(*releaseTypes.GetItems())["one"]).GetGitCommit())
 	assert.Nil(t, (*(*releaseTypes.GetItems())["one"]).GetGitCommitMessage())
 	assert.Equal(t, "true", *(*(*releaseTypes.GetItems())["one"]).GetGitTag())
+	assert.Nil(t, (*(*releaseTypes.GetItems())["one"]).GetGitTagForce())
 	assert.Nil(t, (*(*releaseTypes.GetItems())["one"]).GetGitTagMessage())
 	assert.Nil(t, (*(*releaseTypes.GetItems())["one"]).GetGitTagNames())
 	assert.Equal(t, "true", *(*(*releaseTypes.GetItems())["one"]).GetGitPush())
+	assert.Nil(t, (*(*releaseTypes.GetItems())["one"]).GetGitPushForce())
 	assert.Equal(t, 0, len(*(*(*releaseTypes.GetItems())["one"]).GetIdentifiers()))
 	assert.Equal(t, "alpha,beta", *(*(*releaseTypes.GetItems())["one"]).GetMatchBranches())
 	assert.Equal(t, 0, len(*(*(*releaseTypes.GetItems())["one"]).GetMatchEnvironmentVariables()))
@@ -557,12 +565,14 @@ func TestEnvironmentConfigurationLayerGetReleaseTypes(t *testing.T) {
 	assert.Equal(t, "false", *(*(*releaseTypes.GetItems())["two"]).GetGitCommit())
 	assert.Equal(t, "Commit message", *(*(*releaseTypes.GetItems())["two"]).GetGitCommitMessage())
 	assert.Equal(t, "false", *(*(*releaseTypes.GetItems())["two"]).GetGitTag())
+	assert.Equal(t, "true", *(*(*releaseTypes.GetItems())["two"]).GetGitTagForce())
 	assert.Equal(t, "Tag message", *(*(*releaseTypes.GetItems())["two"]).GetGitTagMessage())
 	assert.Equal(t, 3, len(*(*(*releaseTypes.GetItems())["two"]).GetGitTagNames()))
 	assert.Equal(t, "one", *(*(*(*releaseTypes.GetItems())["two"]).GetGitTagNames())[0])
 	assert.Equal(t, "two", *(*(*(*releaseTypes.GetItems())["two"]).GetGitTagNames())[1])
 	assert.Equal(t, "three", *(*(*(*releaseTypes.GetItems())["two"]).GetGitTagNames())[2])
 	assert.Equal(t, "false", *(*(*releaseTypes.GetItems())["two"]).GetGitPush())
+	assert.Equal(t, "true", *(*(*releaseTypes.GetItems())["two"]).GetGitPushForce())
 	assert.Equal(t, 3, len(*(*(*releaseTypes.GetItems())["two"]).GetIdentifiers()))
 	assert.Equal(t, ent.PRE_RELEASE, *(*(*(*releaseTypes.GetItems())["two"]).GetIdentifiers())[0].GetPosition())
 	assert.Equal(t, "q1", *(*(*(*releaseTypes.GetItems())["two"]).GetIdentifiers())[0].GetQualifier())

@@ -212,6 +212,12 @@ func TestSaveAndLoadJSON(t *testing.T) {
 	if sChangelog == nil {
 		assert.Nil(t, tChangelog)
 	} else {
+		if sChangelog.GetAppend() == nil {
+			assert.Nil(t, tChangelog.GetAppend())
+		} else {
+			assert.Equal(t, *sChangelog.GetAppend(), *tChangelog.GetAppend())
+		}
+
 		if sChangelog.GetPath() == nil {
 			assert.Nil(t, tChangelog.GetPath())
 		} else {
@@ -337,7 +343,9 @@ func TestSaveAndLoadJSON(t *testing.T) {
 				assert.Equal(t, (*(*sReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitCommit(), (*(*tReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitCommit())
 				assert.Equal(t, (*(*sReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitCommitMessage(), (*(*tReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitCommitMessage())
 				assert.Equal(t, (*(*sReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitPush(), (*(*tReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitPush())
+				assert.Equal(t, (*(*sReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitPushForce(), (*(*tReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitPushForce())
 				assert.Equal(t, (*(*sReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitTag(), (*(*tReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitTag())
+				assert.Equal(t, (*(*sReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitTagForce(), (*(*tReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitTagForce())
 				assert.Equal(t, (*(*sReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitTagMessage(), (*(*tReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitTagMessage())
 
 				if (*(*sReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitTagNames() == nil {
@@ -603,6 +611,12 @@ func TestSaveAndLoadYAML(t *testing.T) {
 	if sChangelog == nil {
 		assert.Nil(t, tChangelog)
 	} else {
+		if sChangelog.GetAppend() == nil {
+			assert.Nil(t, tChangelog.GetAppend())
+		} else {
+			assert.Equal(t, *sChangelog.GetAppend(), *tChangelog.GetAppend())
+		}
+
 		if sChangelog.GetPath() == nil {
 			assert.Nil(t, tChangelog.GetPath())
 		} else {
@@ -728,7 +742,9 @@ func TestSaveAndLoadYAML(t *testing.T) {
 				assert.Equal(t, (*(*sReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitCommit(), (*(*tReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitCommit())
 				assert.Equal(t, (*(*sReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitCommitMessage(), (*(*tReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitCommitMessage())
 				assert.Equal(t, (*(*sReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitPush(), (*(*tReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitPush())
+				assert.Equal(t, (*(*sReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitPushForce(), (*(*tReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitPushForce())
 				assert.Equal(t, (*(*sReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitTag(), (*(*tReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitTag())
+				assert.Equal(t, (*(*sReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitTagForce(), (*(*tReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitTagForce())
 				assert.Equal(t, (*(*sReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitTagMessage(), (*(*tReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitTagMessage())
 
 				if (*(*sReleaseTypes.GetItems())[sReleaseTypesItemKey]).GetGitTagNames() == nil {
@@ -836,11 +852,11 @@ func TestSerializationWithMultipleConfigurationLayersJSON(t *testing.T) {
 	mediumPriorityConfigurationLayerMock.SetBump(utl.PointerToString("beta"))
 	highPriorityConfigurationLayerMock.SetBump(utl.PointerToString("gamma"))
 
-	lpChangelogConfiguration, _ := ent.NewChangelogConfigurationWith(utl.PointerToString("CHANGELOG1.md"), &map[string]string{"SectionA1": "regexA1", "SectionA2": "regexA2"}, utl.PointerToString("changelog1.tpl"), &map[string]string{"Expression1": "string1"})
+	lpChangelogConfiguration, _ := ent.NewChangelogConfigurationWith(nil, utl.PointerToString("CHANGELOG1.md"), &map[string]string{"SectionA1": "regexA1", "SectionA2": "regexA2"}, utl.PointerToString("changelog1.tpl"), &map[string]string{"Expression1": "string1"})
 	lowPriorityConfigurationLayerMock.SetChangelog(lpChangelogConfiguration)
-	mpChangelogConfiguration, _ := ent.NewChangelogConfigurationWith(utl.PointerToString("CHANGELOG2.md"), &map[string]string{"SectionB1": "regexB1", "SectionB2": "regexB2"}, utl.PointerToString("changelog2.tpl"), &map[string]string{"Expression2": "string2"})
+	mpChangelogConfiguration, _ := ent.NewChangelogConfigurationWith(utl.PointerToString("head"), utl.PointerToString("CHANGELOG2.md"), &map[string]string{"SectionB1": "regexB1", "SectionB2": "regexB2"}, utl.PointerToString("changelog2.tpl"), &map[string]string{"Expression2": "string2"})
 	mediumPriorityConfigurationLayerMock.SetChangelog(mpChangelogConfiguration)
-	hpChangelogConfiguration, _ := ent.NewChangelogConfigurationWith(utl.PointerToString("CHANGELOG3.md"), &map[string]string{"SectionC1": "regexC1", "SectionC2": "regexC2"}, utl.PointerToString("changelog3.tpl"), &map[string]string{"Expression3": "string3"})
+	hpChangelogConfiguration, _ := ent.NewChangelogConfigurationWith(utl.PointerToString("tail"), utl.PointerToString("CHANGELOG2.md"), &map[string]string{"SectionC1": "regexC1", "SectionC2": "regexC2"}, utl.PointerToString("changelog3.tpl"), &map[string]string{"Expression3": "string3"})
 	highPriorityConfigurationLayerMock.SetChangelog(hpChangelogConfiguration)
 
 	lpCommitMessageConventions, _ := ent.NewCommitMessageConventionsWith(&[]*string{utl.PointerToString("convention1")}, &map[string]*ent.CommitMessageConvention{"convention1": ent.NewCommitMessageConventionWith(utl.PointerToString("expr1"), &map[string]string{})})
@@ -889,11 +905,11 @@ func TestSerializationWithMultipleConfigurationLayersJSON(t *testing.T) {
 	mediumPriorityConfigurationLayerMock.SetReleasePrefix(utl.PointerToString("mpprefix"))
 	highPriorityConfigurationLayerMock.SetReleasePrefix(utl.PointerToString("hpprefix"))
 
-	lpReleaseTypes, _ := ent.NewReleaseTypesWith(&[]*string{utl.PointerToString("type1")}, &[]*string{utl.PointerToString("service1")}, &[]*string{utl.PointerToString("remote1")}, &map[string]*ent.ReleaseType{"type1": ent.NewReleaseTypeWith(&[]*string{utl.PointerToString("asset1"), utl.PointerToString("asset2")}, utl.PointerToBoolean(false), utl.PointerToString("{{branch1}}"), utl.PointerToString("Release description 1"), utl.PointerToString("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$"), utl.PointerToString("true"), utl.PointerToString("Committing {{version}}"), utl.PointerToString("true"), utl.PointerToString("true"), utl.PointerToString("Tagging {{version}}"), &[]*string{utl.PointerToString("one"), utl.PointerToString("two"), utl.PointerToString("three")}, &[]*ent.Identifier{ent.NewIdentifierWith(utl.PointerToString("build"), utl.PointerToString("12"), ent.PointerToPosition(ent.BUILD))}, utl.PointerToString(""), &map[string]string{"PATH": ".*"}, nil, utl.PointerToString("true"), utl.PointerToString("false"), utl.PointerToString("true"), utl.PointerToString("myrelease1"), utl.PointerToString(""), utl.PointerToBoolean(false))})
+	lpReleaseTypes, _ := ent.NewReleaseTypesWith(&[]*string{utl.PointerToString("type1")}, &[]*string{utl.PointerToString("service1")}, &[]*string{utl.PointerToString("remote1")}, &map[string]*ent.ReleaseType{"type1": ent.NewReleaseTypeWith(&[]*string{utl.PointerToString("asset1"), utl.PointerToString("asset2")}, utl.PointerToBoolean(false), utl.PointerToString("{{branch1}}"), utl.PointerToString("Release description 1"), utl.PointerToString("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$"), utl.PointerToString("true"), utl.PointerToString("Committing {{version}}"), utl.PointerToString("true"), utl.PointerToString("false"), utl.PointerToString("true"), utl.PointerToString("true"), utl.PointerToString("Tagging {{version}}"), &[]*string{utl.PointerToString("one"), utl.PointerToString("two"), utl.PointerToString("three")}, &[]*ent.Identifier{ent.NewIdentifierWith(utl.PointerToString("build"), utl.PointerToString("12"), ent.PointerToPosition(ent.BUILD))}, utl.PointerToString(""), &map[string]string{"PATH": ".*"}, nil, utl.PointerToString("true"), utl.PointerToString("false"), utl.PointerToString("true"), utl.PointerToString("myrelease1"), utl.PointerToString(""), utl.PointerToBoolean(false))})
 	lowPriorityConfigurationLayerMock.SetReleaseTypes(lpReleaseTypes)
-	mpReleaseTypes, _ := ent.NewReleaseTypesWith(&[]*string{utl.PointerToString("type2")}, &[]*string{utl.PointerToString("service2")}, &[]*string{utl.PointerToString("remote2")}, &map[string]*ent.ReleaseType{"type2": ent.NewReleaseTypeWith(&[]*string{utl.PointerToString("asset1"), utl.PointerToString("asset2")}, utl.PointerToBoolean(true), utl.PointerToString("{{branch2}}"), utl.PointerToString("Release description 2"), utl.PointerToString("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$"), utl.PointerToString("true"), utl.PointerToString("Committing {{version}}"), utl.PointerToString("true"), utl.PointerToString("true"), utl.PointerToString("Tagging {{version}}"), &[]*string{utl.PointerToString("one"), utl.PointerToString("two"), utl.PointerToString("three")}, &[]*ent.Identifier{ent.NewIdentifierWith(utl.PointerToString("build"), utl.PointerToString("12"), ent.PointerToPosition(ent.BUILD))}, utl.PointerToString(""), &map[string]string{"PATH": ".*"}, nil, utl.PointerToString("true"), utl.PointerToString("false"), utl.PointerToString("true"), utl.PointerToString("myrelease2"), utl.PointerToString(""), utl.PointerToBoolean(false))})
+	mpReleaseTypes, _ := ent.NewReleaseTypesWith(&[]*string{utl.PointerToString("type2")}, &[]*string{utl.PointerToString("service2")}, &[]*string{utl.PointerToString("remote2")}, &map[string]*ent.ReleaseType{"type2": ent.NewReleaseTypeWith(&[]*string{utl.PointerToString("asset1"), utl.PointerToString("asset2")}, utl.PointerToBoolean(true), utl.PointerToString("{{branch2}}"), utl.PointerToString("Release description 2"), utl.PointerToString("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$"), utl.PointerToString("true"), utl.PointerToString("Committing {{version}}"), utl.PointerToString("true"), utl.PointerToString("true"), utl.PointerToString("true"), utl.PointerToString("false"), utl.PointerToString("Tagging {{version}}"), &[]*string{utl.PointerToString("one"), utl.PointerToString("two"), utl.PointerToString("three")}, &[]*ent.Identifier{ent.NewIdentifierWith(utl.PointerToString("build"), utl.PointerToString("12"), ent.PointerToPosition(ent.BUILD))}, utl.PointerToString(""), &map[string]string{"PATH": ".*"}, nil, utl.PointerToString("true"), utl.PointerToString("false"), utl.PointerToString("true"), utl.PointerToString("myrelease2"), utl.PointerToString(""), utl.PointerToBoolean(false))})
 	mediumPriorityConfigurationLayerMock.SetReleaseTypes(mpReleaseTypes)
-	hpReleaseTypes, _ := ent.NewReleaseTypesWith(&[]*string{utl.PointerToString("type3")}, &[]*string{utl.PointerToString("service3")}, &[]*string{utl.PointerToString("remote3")}, &map[string]*ent.ReleaseType{"type3": ent.NewReleaseTypeWith(&[]*string{utl.PointerToString("asset1"), utl.PointerToString("asset2")}, utl.PointerToBoolean(true), utl.PointerToString("{{branch3}}"), utl.PointerToString("Release description 3"), utl.PointerToString("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$"), utl.PointerToString("true"), utl.PointerToString("Committing {{version}}"), utl.PointerToString("true"), utl.PointerToString("true"), utl.PointerToString("Tagging {{version}}"), &[]*string{utl.PointerToString("one"), utl.PointerToString("two"), utl.PointerToString("three")}, &[]*ent.Identifier{ent.NewIdentifierWith(utl.PointerToString("build"), utl.PointerToString("12"), ent.PointerToPosition(ent.BUILD))}, utl.PointerToString(""), &map[string]string{"PATH": ".*"}, nil, utl.PointerToString("true"), utl.PointerToString("false"), utl.PointerToString("true"), utl.PointerToString("myrelease3"), utl.PointerToString(""), utl.PointerToBoolean(false))})
+	hpReleaseTypes, _ := ent.NewReleaseTypesWith(&[]*string{utl.PointerToString("type3")}, &[]*string{utl.PointerToString("service3")}, &[]*string{utl.PointerToString("remote3")}, &map[string]*ent.ReleaseType{"type3": ent.NewReleaseTypeWith(&[]*string{utl.PointerToString("asset1"), utl.PointerToString("asset2")}, utl.PointerToBoolean(true), utl.PointerToString("{{branch3}}"), utl.PointerToString("Release description 3"), utl.PointerToString("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$"), utl.PointerToString("true"), utl.PointerToString("Committing {{version}}"), utl.PointerToString("true"), utl.PointerToString("true"), utl.PointerToString("true"), utl.PointerToString("true"), utl.PointerToString("Tagging {{version}}"), &[]*string{utl.PointerToString("one"), utl.PointerToString("two"), utl.PointerToString("three")}, &[]*ent.Identifier{ent.NewIdentifierWith(utl.PointerToString("build"), utl.PointerToString("12"), ent.PointerToPosition(ent.BUILD))}, utl.PointerToString(""), &map[string]string{"PATH": ".*"}, nil, utl.PointerToString("true"), utl.PointerToString("false"), utl.PointerToString("true"), utl.PointerToString("myrelease3"), utl.PointerToString(""), utl.PointerToBoolean(false))})
 	highPriorityConfigurationLayerMock.SetReleaseTypes(hpReleaseTypes)
 
 	lowPriorityConfigurationLayerMock.SetResume(utl.PointerToBoolean(true))
@@ -964,6 +980,7 @@ func TestSerializationWithMultipleConfigurationLayersJSON(t *testing.T) {
 
 	hpChangelog, _ := highPriorityConfigurationLayerMock.GetChangelog()
 	changelog, _ := deserializedConfigurationLayer.GetChangelog()
+	assert.Equal(t, *hpChangelog.GetAppend(), *changelog.GetAppend())
 	assert.Equal(t, *hpChangelog.GetPath(), *changelog.GetPath())
 	assert.Equal(t, (*hpChangelog.GetSections())["SectionC1"], (*changelog.GetSections())["SectionC1"])
 	assert.Equal(t, (*hpChangelog.GetSections())["SectionC2"], (*changelog.GetSections())["SectionC2"])
@@ -1044,7 +1061,9 @@ func TestSerializationWithMultipleConfigurationLayersJSON(t *testing.T) {
 	assert.Equal(t, *(*(*hpReleaseTypes).GetItems())["type3"].GetGitCommit(), *(*(*releaseTypes).GetItems())["type3"].GetGitCommit())
 	assert.Equal(t, *(*(*hpReleaseTypes).GetItems())["type3"].GetGitCommitMessage(), *(*(*releaseTypes).GetItems())["type3"].GetGitCommitMessage())
 	assert.Equal(t, *(*(*hpReleaseTypes).GetItems())["type3"].GetGitPush(), *(*(*releaseTypes).GetItems())["type3"].GetGitPush())
+	assert.Equal(t, *(*(*hpReleaseTypes).GetItems())["type3"].GetGitPushForce(), *(*(*releaseTypes).GetItems())["type3"].GetGitPushForce())
 	assert.Equal(t, *(*(*hpReleaseTypes).GetItems())["type3"].GetGitTag(), *(*(*releaseTypes).GetItems())["type3"].GetGitTag())
+	assert.Equal(t, *(*(*hpReleaseTypes).GetItems())["type3"].GetGitTagForce(), *(*(*releaseTypes).GetItems())["type3"].GetGitTagForce())
 	assert.Equal(t, *(*(*hpReleaseTypes).GetItems())["type3"].GetGitTagMessage(), *(*(*releaseTypes).GetItems())["type3"].GetGitTagMessage())
 	assert.Equal(t, *(*(*hpReleaseTypes).GetItems())["type3"].GetGitTagNames(), *(*(*releaseTypes).GetItems())["type3"].GetGitTagNames())
 	assert.Equal(t, *(*(*hpReleaseTypes).GetItems())["type3"].GetMatchBranches(), *(*(*releaseTypes).GetItems())["type3"].GetMatchBranches())
@@ -1121,11 +1140,11 @@ func TestSerializationWithMultipleConfigurationLayersYAML(t *testing.T) {
 	mediumPriorityConfigurationLayerMock.SetBump(utl.PointerToString("beta"))
 	highPriorityConfigurationLayerMock.SetBump(utl.PointerToString("gamma"))
 
-	lpChangelogConfiguration, _ := ent.NewChangelogConfigurationWith(utl.PointerToString("CHANGELOG1.md"), &map[string]string{"SectionA1": "regexA1", "SectionA2": "regexA2"}, utl.PointerToString("changelog1.tpl"), &map[string]string{"Expression1": "string1"})
+	lpChangelogConfiguration, _ := ent.NewChangelogConfigurationWith(nil, utl.PointerToString("CHANGELOG1.md"), &map[string]string{"SectionA1": "regexA1", "SectionA2": "regexA2"}, utl.PointerToString("changelog1.tpl"), &map[string]string{"Expression1": "string1"})
 	lowPriorityConfigurationLayerMock.SetChangelog(lpChangelogConfiguration)
-	mpChangelogConfiguration, _ := ent.NewChangelogConfigurationWith(utl.PointerToString("CHANGELOG2.md"), &map[string]string{"SectionB1": "regexB1", "SectionB2": "regexB2"}, utl.PointerToString("changelog2.tpl"), &map[string]string{"Expression2": "string2"})
+	mpChangelogConfiguration, _ := ent.NewChangelogConfigurationWith(utl.PointerToString("head"), utl.PointerToString("CHANGELOG2.md"), &map[string]string{"SectionB1": "regexB1", "SectionB2": "regexB2"}, utl.PointerToString("changelog2.tpl"), &map[string]string{"Expression2": "string2"})
 	mediumPriorityConfigurationLayerMock.SetChangelog(mpChangelogConfiguration)
-	hpChangelogConfiguration, _ := ent.NewChangelogConfigurationWith(utl.PointerToString("CHANGELOG3.md"), &map[string]string{"SectionC1": "regexC1", "SectionC2": "regexC2"}, utl.PointerToString("changelog3.tpl"), &map[string]string{"Expression3": "string3"})
+	hpChangelogConfiguration, _ := ent.NewChangelogConfigurationWith(utl.PointerToString("tail"), utl.PointerToString("CHANGELOG3.md"), &map[string]string{"SectionC1": "regexC1", "SectionC2": "regexC2"}, utl.PointerToString("changelog3.tpl"), &map[string]string{"Expression3": "string3"})
 	highPriorityConfigurationLayerMock.SetChangelog(hpChangelogConfiguration)
 
 	lpCommitMessageConventions, _ := ent.NewCommitMessageConventionsWith(&[]*string{utl.PointerToString("convention1")}, &map[string]*ent.CommitMessageConvention{"convention1": ent.NewCommitMessageConventionWith(utl.PointerToString("expr1"), &map[string]string{})})
@@ -1174,11 +1193,11 @@ func TestSerializationWithMultipleConfigurationLayersYAML(t *testing.T) {
 	mediumPriorityConfigurationLayerMock.SetReleasePrefix(utl.PointerToString("mpprefix"))
 	highPriorityConfigurationLayerMock.SetReleasePrefix(utl.PointerToString("hpprefix"))
 
-	lpReleaseTypes, _ := ent.NewReleaseTypesWith(&[]*string{utl.PointerToString("type1")}, &[]*string{utl.PointerToString("service1")}, &[]*string{utl.PointerToString("remote1")}, &map[string]*ent.ReleaseType{"type1": ent.NewReleaseTypeWith(&[]*string{utl.PointerToString("asset1"), utl.PointerToString("asset2")}, utl.PointerToBoolean(false), utl.PointerToString("{{branch1}}"), utl.PointerToString("Release description 1"), utl.PointerToString("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$"), utl.PointerToString("true"), utl.PointerToString("Committing {{version}}"), utl.PointerToString("true"), utl.PointerToString("true"), utl.PointerToString("Tagging {{version}}"), &[]*string{utl.PointerToString("one"), utl.PointerToString("two"), utl.PointerToString("three")}, &[]*ent.Identifier{ent.NewIdentifierWith(utl.PointerToString("build"), utl.PointerToString("12"), ent.PointerToPosition(ent.BUILD))}, utl.PointerToString(""), &map[string]string{"PATH": ".*"}, nil, utl.PointerToString("true"), utl.PointerToString("false"), utl.PointerToString("true"), utl.PointerToString("myrelease1"), utl.PointerToString(""), utl.PointerToBoolean(false))})
+	lpReleaseTypes, _ := ent.NewReleaseTypesWith(&[]*string{utl.PointerToString("type1")}, &[]*string{utl.PointerToString("service1")}, &[]*string{utl.PointerToString("remote1")}, &map[string]*ent.ReleaseType{"type1": ent.NewReleaseTypeWith(&[]*string{utl.PointerToString("asset1"), utl.PointerToString("asset2")}, utl.PointerToBoolean(false), utl.PointerToString("{{branch1}}"), utl.PointerToString("Release description 1"), utl.PointerToString("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$"), utl.PointerToString("true"), utl.PointerToString("Committing {{version}}"), utl.PointerToString("true"), utl.PointerToString("false"), utl.PointerToString("true"), utl.PointerToString("true"), utl.PointerToString("Tagging {{version}}"), &[]*string{utl.PointerToString("one"), utl.PointerToString("two"), utl.PointerToString("three")}, &[]*ent.Identifier{ent.NewIdentifierWith(utl.PointerToString("build"), utl.PointerToString("12"), ent.PointerToPosition(ent.BUILD))}, utl.PointerToString(""), &map[string]string{"PATH": ".*"}, nil, utl.PointerToString("true"), utl.PointerToString("false"), utl.PointerToString("true"), utl.PointerToString("myrelease1"), utl.PointerToString(""), utl.PointerToBoolean(false))})
 	lowPriorityConfigurationLayerMock.SetReleaseTypes(lpReleaseTypes)
-	mpReleaseTypes, _ := ent.NewReleaseTypesWith(&[]*string{utl.PointerToString("type2")}, &[]*string{utl.PointerToString("service2")}, &[]*string{utl.PointerToString("remote2")}, &map[string]*ent.ReleaseType{"type2": ent.NewReleaseTypeWith(&[]*string{utl.PointerToString("asset1"), utl.PointerToString("asset2")}, utl.PointerToBoolean(true), utl.PointerToString("{{branch2}}"), utl.PointerToString("Release description 2"), utl.PointerToString("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$"), utl.PointerToString("true"), utl.PointerToString("Committing {{version}}"), utl.PointerToString("true"), utl.PointerToString("true"), utl.PointerToString("Tagging {{version}}"), &[]*string{utl.PointerToString("one"), utl.PointerToString("two"), utl.PointerToString("three")}, &[]*ent.Identifier{ent.NewIdentifierWith(utl.PointerToString("build"), utl.PointerToString("12"), ent.PointerToPosition(ent.BUILD))}, utl.PointerToString(""), &map[string]string{"PATH": ".*"}, nil, utl.PointerToString("true"), utl.PointerToString("false"), utl.PointerToString("true"), utl.PointerToString("myrelease2"), utl.PointerToString(""), utl.PointerToBoolean(false))})
+	mpReleaseTypes, _ := ent.NewReleaseTypesWith(&[]*string{utl.PointerToString("type2")}, &[]*string{utl.PointerToString("service2")}, &[]*string{utl.PointerToString("remote2")}, &map[string]*ent.ReleaseType{"type2": ent.NewReleaseTypeWith(&[]*string{utl.PointerToString("asset1"), utl.PointerToString("asset2")}, utl.PointerToBoolean(true), utl.PointerToString("{{branch2}}"), utl.PointerToString("Release description 2"), utl.PointerToString("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$"), utl.PointerToString("true"), utl.PointerToString("Committing {{version}}"), utl.PointerToString("true"), utl.PointerToString("true"), utl.PointerToString("true"), utl.PointerToString("false"), utl.PointerToString("Tagging {{version}}"), &[]*string{utl.PointerToString("one"), utl.PointerToString("two"), utl.PointerToString("three")}, &[]*ent.Identifier{ent.NewIdentifierWith(utl.PointerToString("build"), utl.PointerToString("12"), ent.PointerToPosition(ent.BUILD))}, utl.PointerToString(""), &map[string]string{"PATH": ".*"}, nil, utl.PointerToString("true"), utl.PointerToString("false"), utl.PointerToString("true"), utl.PointerToString("myrelease2"), utl.PointerToString(""), utl.PointerToBoolean(false))})
 	mediumPriorityConfigurationLayerMock.SetReleaseTypes(mpReleaseTypes)
-	hpReleaseTypes, _ := ent.NewReleaseTypesWith(&[]*string{utl.PointerToString("type3")}, &[]*string{utl.PointerToString("service3")}, &[]*string{utl.PointerToString("remote3")}, &map[string]*ent.ReleaseType{"type3": ent.NewReleaseTypeWith(&[]*string{utl.PointerToString("asset1"), utl.PointerToString("asset2")}, utl.PointerToBoolean(true), utl.PointerToString("{{branch3}}"), utl.PointerToString("Release description 3"), utl.PointerToString("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$"), utl.PointerToString("true"), utl.PointerToString("Committing {{version}}"), utl.PointerToString("true"), utl.PointerToString("true"), utl.PointerToString("Tagging {{version}}"), &[]*string{utl.PointerToString("one"), utl.PointerToString("two"), utl.PointerToString("three")}, &[]*ent.Identifier{ent.NewIdentifierWith(utl.PointerToString("build"), utl.PointerToString("12"), ent.PointerToPosition(ent.BUILD))}, utl.PointerToString(""), &map[string]string{"PATH": ".*"}, nil, utl.PointerToString("true"), utl.PointerToString("false"), utl.PointerToString("true"), utl.PointerToString("myrelease3"), utl.PointerToString(""), utl.PointerToBoolean(false))})
+	hpReleaseTypes, _ := ent.NewReleaseTypesWith(&[]*string{utl.PointerToString("type3")}, &[]*string{utl.PointerToString("service3")}, &[]*string{utl.PointerToString("remote3")}, &map[string]*ent.ReleaseType{"type3": ent.NewReleaseTypeWith(&[]*string{utl.PointerToString("asset1"), utl.PointerToString("asset2")}, utl.PointerToBoolean(true), utl.PointerToString("{{branch3}}"), utl.PointerToString("Release description 3"), utl.PointerToString("^({{configuration.releasePrefix}})?([0-9]\\d*)\\.([0-9]\\d*)\\.([0-9]\\d*)$"), utl.PointerToString("true"), utl.PointerToString("Committing {{version}}"), utl.PointerToString("true"), utl.PointerToString("true"), utl.PointerToString("true"), utl.PointerToString("true"), utl.PointerToString("Tagging {{version}}"), &[]*string{utl.PointerToString("one"), utl.PointerToString("two"), utl.PointerToString("three")}, &[]*ent.Identifier{ent.NewIdentifierWith(utl.PointerToString("build"), utl.PointerToString("12"), ent.PointerToPosition(ent.BUILD))}, utl.PointerToString(""), &map[string]string{"PATH": ".*"}, nil, utl.PointerToString("true"), utl.PointerToString("false"), utl.PointerToString("true"), utl.PointerToString("myrelease3"), utl.PointerToString(""), utl.PointerToBoolean(false))})
 	highPriorityConfigurationLayerMock.SetReleaseTypes(hpReleaseTypes)
 
 	lowPriorityConfigurationLayerMock.SetResume(utl.PointerToBoolean(true))
@@ -1249,6 +1268,7 @@ func TestSerializationWithMultipleConfigurationLayersYAML(t *testing.T) {
 
 	hpChangelog, _ := highPriorityConfigurationLayerMock.GetChangelog()
 	changelog, _ := deserializedConfigurationLayer.GetChangelog()
+	assert.Equal(t, *hpChangelog.GetAppend(), *changelog.GetAppend())
 	assert.Equal(t, *hpChangelog.GetPath(), *changelog.GetPath())
 	assert.Equal(t, (*hpChangelog.GetSections())["SectionC1"], (*changelog.GetSections())["SectionC1"])
 	assert.Equal(t, (*hpChangelog.GetSections())["SectionC2"], (*changelog.GetSections())["SectionC2"])
@@ -1329,7 +1349,9 @@ func TestSerializationWithMultipleConfigurationLayersYAML(t *testing.T) {
 	assert.Equal(t, *(*(*hpReleaseTypes).GetItems())["type3"].GetGitCommit(), *(*(*releaseTypes).GetItems())["type3"].GetGitCommit())
 	assert.Equal(t, *(*(*hpReleaseTypes).GetItems())["type3"].GetGitCommitMessage(), *(*(*releaseTypes).GetItems())["type3"].GetGitCommitMessage())
 	assert.Equal(t, *(*(*hpReleaseTypes).GetItems())["type3"].GetGitPush(), *(*(*releaseTypes).GetItems())["type3"].GetGitPush())
+	assert.Equal(t, *(*(*hpReleaseTypes).GetItems())["type3"].GetGitPushForce(), *(*(*releaseTypes).GetItems())["type3"].GetGitPushForce())
 	assert.Equal(t, *(*(*hpReleaseTypes).GetItems())["type3"].GetGitTag(), *(*(*releaseTypes).GetItems())["type3"].GetGitTag())
+	assert.Equal(t, *(*(*hpReleaseTypes).GetItems())["type3"].GetGitTagForce(), *(*(*releaseTypes).GetItems())["type3"].GetGitTagForce())
 	assert.Equal(t, *(*(*hpReleaseTypes).GetItems())["type3"].GetGitTagMessage(), *(*(*releaseTypes).GetItems())["type3"].GetGitTagMessage())
 	assert.Equal(t, *(*(*hpReleaseTypes).GetItems())["type3"].GetGitTagNames(), *(*(*releaseTypes).GetItems())["type3"].GetGitTagNames())
 	assert.Equal(t, *(*(*hpReleaseTypes).GetItems())["type3"].GetMatchBranches(), *(*(*releaseTypes).GetItems())["type3"].GetMatchBranches())
