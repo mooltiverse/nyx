@@ -1236,9 +1236,9 @@ public class Suites {
                     "CHANGELOG.md", Set.<String>of(
                         "## v0.1.0",
                         "### Added",
-                        "* [] feat: Untagged commit [#2](https://example.com/issues/2)",
+                        "\\* \\[[a-z0-9]{5}\\] feat: Untagged commit \\[#2\\]\\(https:\\/\\/example\\.com\\/issues\\/2\\)",
                         "### Fixed",
-                        "* [] fix: Untagged commit [#1](https://example.com/issues/1)"
+                        "\\* \\[[a-z0-9]{5}\\] fix: Untagged commit \\[#1\\]\\(https:\\/\\/example\\.com\\/issues\\/1\\)"
                     ),
                     "version.txt", Set.<String>of(
                         "v0.1.0"
@@ -1366,9 +1366,9 @@ public class Suites {
                     "CHANGELOG.md", Set.<String>of(
                         "## v0.1.0",
                         "### Added",
-                        "* [] feat: Untagged commit [#2](https://example.com/issues/2)",
+                        "\\* \\[[a-z0-9]{5}\\] feat: Untagged commit \\[#2\\]\\(https:\\/\\/example\\.com\\/issues\\/2\\)",
                         "### Fixed",
-                        "* [] fix: Untagged commit [#1](https://example.com/issues/1)"
+                        "\\* \\[[a-z0-9]{5}\\] fix: Untagged commit \\[#1\\]\\(https:\\/\\/example\\.com\\/issues\\/1\\)"
                     ),
                     "version.txt", Set.<String>of(
                         "v0.1.0"
@@ -1495,9 +1495,9 @@ public class Suites {
                     "CHANGELOG.md", Set.<String>of(
                         "## v0.1.0",
                         "### Added",
-                        "* [] feat: Untagged commit [#2](https://example.com/issues/2)",
+                        "\\* \\[[a-z0-9]{5}\\] feat: Untagged commit \\[#2\\]\\(https:\\/\\/example\\.com\\/issues\\/2\\)",
                         "### Fixed",
-                        "* [] fix: Untagged commit [#1](https://example.com/issues/1)"
+                        "\\* \\[[a-z0-9]{5}\\] fix: Untagged commit \\[#1\\]\\(https:\\/\\/example\\.com\\/issues\\/1\\)"
                     ),
                     "version.txt", Set.<String>of(
                         "v0.1.0"
@@ -1627,9 +1627,9 @@ public class Suites {
                     "CHANGELOG.md", Set.<String>of(
                         "## v0.1.0",
                         "### Added",
-                        "* [] feat: Untagged commit [#2](https://example.com/issues/2)",
+                        "\\* \\[[a-z0-9]{5}\\] feat: Untagged commit \\[#2\\]\\(https:\\/\\/example\\.com\\/issues\\/2\\)",
                         "### Fixed",
-                        "* [] fix: Untagged commit [#1](https://example.com/issues/1)"
+                        "\\* \\[[a-z0-9]{5}\\] fix: Untagged commit \\[#1\\]\\(https:\\/\\/example\\.com\\/issues\\/1\\)"
                     ),
                     "version.txt", Set.<String>of(
                         "v0.1.0"
@@ -2011,9 +2011,9 @@ public class Suites {
                     "CHANGELOG.md", Set.<String>of(
                         "## v0.1.0",
                         "### Added",
-                        "* [] feat: Untagged commit [#2](https://example.com/issues/2)",
+                        "\\* \\[[a-z0-9]{5}\\] feat: Untagged commit \\[#2\\]\\(https:\\/\\/example\\.com\\/issues\\/2\\)",
                         "### Fixed",
-                        "* [] fix: Untagged commit [#1](https://example.com/issues/1)"
+                        "\\* \\[[a-z0-9]{5}\\] fix: Untagged commit \\[#1\\]\\(https:\\/\\/example\\.com\\/issues\\/1\\)"
                     ),
                     "version.txt", Set.<String>of(
                         "v0.1.0"
@@ -2155,9 +2155,9 @@ public class Suites {
                     "CHANGELOG.md", Set.<String>of(
                         "## v0.1.0",
                         "### Added",
-                        "* [] feat: Untagged commit [#2](https://example.com/issues/2)",
+                        "\\* \\[[a-z0-9]{5}\\] feat: Untagged commit \\[#2\\]\\(https:\\/\\/example\\.com\\/issues\\/2\\)",
                         "### Fixed",
-                        "* [] fix: Untagged commit [#1](https://example.com/issues/1)"
+                        "\\* \\[[a-z0-9]{5}\\] fix: Untagged commit \\[#1\\]\\(https:\\/\\/example\\.com\\/issues\\/1\\)"
                     ),
                     "version.txt", Set.<String>of(
                         "v0.1.0"
@@ -2296,9 +2296,9 @@ public class Suites {
                     "CHANGELOG.md", Set.<String>of(
                         "## v0.1.0",
                         "### Added",
-                        "* [] feat: Untagged commit [#2](https://example.com/issues/2)",
+                        "\\* \\[[a-z0-9]{5}\\] feat: Untagged commit \\[#2\\]\\(https:\\/\\/example\\.com\\/issues\\/2\\)",
                         "### Fixed",
-                        "* [] fix: Untagged commit [#1](https://example.com/issues/1)"
+                        "\\* \\[[a-z0-9]{5}\\] fix: Untagged commit \\[#1\\]\\(https:\\/\\/example\\.com\\/issues\\/1\\)"
                     ),
                     "version.txt", Set.<String>of(
                         "v0.1.0"
@@ -2440,9 +2440,9 @@ public class Suites {
                     "CHANGELOG.md", Set.<String>of(
                         "## v0.1.0",
                         "### Added",
-                        "* [] feat: Untagged commit [#2](https://example.com/issues/2)",
+                        "\\* \\[[a-z0-9]{5}\\] feat: Untagged commit \\[#2\\]\\(https:\\/\\/example\\.com\\/issues\\/2\\)",
                         "### Fixed",
-                        "* [] fix: Untagged commit [#1](https://example.com/issues/1)"
+                        "\\* \\[[a-z0-9]{5}\\] fix: Untagged commit \\[#1\\]\\(https:\\/\\/example\\.com\\/issues\\/1\\)"
                     ),
                     "version.txt", Set.<String>of(
                         "v0.1.0"
