@@ -308,23 +308,25 @@ public class Infer extends AbstractCommand {
                         (collapsedVersioning && (!(state().getReleaseScope().hasPrimeVersion() && state().getReleaseScope().hasPrimeVersionCommit())))) {
                         logger.debug(COMMAND, "Trying to infer the identifier to bump based on the commit message of commit '{}'", c.getSHA());
                         for (Map.Entry<String,CommitMessageConvention> cmcEntry: commitMessageConventions.entrySet()) {
-                            logger.debug(COMMAND, "Evaluating commit '{}' against message convention '{}'", c.getSHA(), cmcEntry.getKey());                                
+                            logger.debug(COMMAND, "Evaluating commit '{}' against message convention '{}'", c.getSHA(), cmcEntry.getKey());
                             Matcher messageMatcher = Pattern.compile(cmcEntry.getValue().getExpression()).matcher(c.getMessage().getFullMessage());
-                            if (messageMatcher.matches()) {
+                            if (messageMatcher.find()) {
                                 logger.debug(COMMAND, "Commit message convention '{}' matches commit '{}'", cmcEntry.getKey(), c.getSHA());
                                 for (Map.Entry<String,String> bumpExpression: cmcEntry.getValue().getBumpExpressions().entrySet()) {
                                     logger.debug(COMMAND, "Matching commit '{}' ('{}') against bump expression '{}' ('{}') of message convention '{}'", c.getSHA(), c.getMessage().getFullMessage(), bumpExpression.getKey(), bumpExpression.getValue(), cmcEntry.getKey());
                                     Matcher bumpMatcher = Pattern.compile(bumpExpression.getValue()).matcher(c.getMessage().getFullMessage());
-                                    if (bumpMatcher.matches()) {
+                                    if (bumpMatcher.find()) {
                                         logger.debug(COMMAND, "Bump expression '{}' of message convention '{}' matches commit '{}', meaning that the '{}' identifier has to be bumped, according to this commit", bumpExpression.getKey(), cmcEntry.getKey(), c.getSHA(), bumpExpression.getKey());
                                         // if we reached this point this is also in the 'prime commit' scope
                                         primeBumpIdentifiers.add(bumpExpression.getKey());
-                                        primeSignificantCommits.add(c);
+                                        if (!primeSignificantCommits.contains(c))
+                                            primeSignificantCommits.add(c);
 
                                         if (!(state().getReleaseScope().hasPreviousVersion() && state().getReleaseScope().hasPreviousVersionCommit())) {
                                             // if the previous version wasn't found yet this is in the 'previous commit' scope
                                             previousBumpIdentifiers.add(bumpExpression.getKey());
-                                            previousSignificantCommits.add(c);
+                                            if (!previousSignificantCommits.contains(c))
+                                                previousSignificantCommits.add(c);
                                         }
                                     }
                                     else logger.debug(COMMAND, "Bump expression '{}' of message convention '{}' doesn't match commit '{}'", bumpExpression.getKey(), cmcEntry.getKey(), c.getSHA());

@@ -66,6 +66,7 @@ import com.mooltiverse.oss.nyx.git.Repository;
 import com.mooltiverse.oss.nyx.io.DataAccessException;
 import com.mooltiverse.oss.nyx.state.State;
 import com.mooltiverse.oss.nyx.template.Templates;
+import com.mooltiverse.oss.nyx.version.Versions;
 
 /**
  * The Make command takes care of building the release artifacts.
@@ -259,8 +260,19 @@ public class Make extends AbstractCommand {
                         Matcher messageMatcher = Pattern.compile(cmcEntry.getValue().getExpression()).matcher(commit.getMessage().getFullMessage());
                         try {
                             if (messageMatcher.find()) {
-                                commitType = messageMatcher.group("type");
-                                logger.debug(COMMAND, "The type of commit '{}' is '{}'", commit.getSHA(), commitType);
+                                logger.debug(COMMAND, "Commit message convention '{}' matches commit '{}'", cmcEntry.getKey(), commit.getSHA());
+                                for (Map.Entry<String,String> bumpExpression: cmcEntry.getValue().getBumpExpressions().entrySet()) {
+                                    logger.debug(COMMAND, "Matching commit '{}' ('{}') against bump expression '{}' ('{}') of message convention '{}'", commit.getSHA(), commit.getMessage().getFullMessage(), bumpExpression.getKey(), bumpExpression.getValue(), cmcEntry.getKey());
+                                    Matcher bumpMatcher = Pattern.compile(bumpExpression.getValue()).matcher(commit.getMessage().getFullMessage());
+                                    if (bumpMatcher.find()) {
+                                        logger.debug(COMMAND, "Bump expression '{}' of message convention '{}' matches commit '{}', meaning that the '{}' identifier has to be bumped, according to this commit", bumpExpression.getKey(), cmcEntry.getKey(), commit.getSHA(), bumpExpression.getKey());
+                                        // In case the release matches multiple bump identifiers (i.e. when using a commit message convention that supports merge commits)
+                                        // the commitType must always use the most significant one.
+                                        commitType = Versions.mostRelevantIdentifier(state().getConfiguration().getScheme(), commitType, bumpExpression.getKey());
+                                        logger.debug(COMMAND, "The type of commit '{}' is '{}'", commit.getSHA(), commitType);
+                                    }
+                                    else logger.debug(COMMAND, "Bump expression '{}' of message convention '{}' doesn't match commit '{}'", bumpExpression.getKey(), cmcEntry.getKey(), commit.getSHA());
+                                }
                             }
                         }
                         catch (IllegalArgumentException iae) {

@@ -17,6 +17,7 @@ package com.mooltiverse.oss.nyx.command;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static com.mooltiverse.oss.nyx.configuration.presets.CommitMessageConventions.CONVENTIONAL_COMMITS;
+import static com.mooltiverse.oss.nyx.configuration.presets.CommitMessageConventions.CONVENTIONAL_COMMITS_FOR_MERGE;
 
 import java.io.File;
 import java.io.FileReader;
@@ -1671,6 +1672,59 @@ public class MakeTestTemplates {
 
                 fileContent = readFile(otherFileInSubDirectory);
                 assertEquals("Some text file not to be touched by the command", fileContent);
+            }
+        }
+
+        @TestTemplate
+        @DisplayName("Make.run() with conventional commit for merge message convention and without sections > yield to changelog where sections are commit types")
+        @Baseline(Scenario.ONE_BRANCH_SHORT_CONVENTIONAL_COMMITS_FOR_MERGE)
+        void runTestWithConventionalCommitsForMergeConventionAndWithoutSections(@CommandSelector(Commands.MAKE) CommandProxy command, Script script)
+            throws Exception {
+            script.getWorkingDirectory().deleteOnExit();
+            // first create the temporary directory and the abstract destination file
+            File destinationDir = Files.createTempDirectory("nyx-test-make-test-").toFile();
+            destinationDir.deleteOnExit();
+            File changelogFile = new File(destinationDir, "CHANGELOG.md");
+
+            SimpleConfigurationLayer configurationLayerMock = new SimpleConfigurationLayer();
+            configurationLayerMock.getChangelog().setPath(changelogFile.getAbsolutePath());
+            // add the conventional commits for merge convention
+            configurationLayerMock.setCommitMessageConventions(
+                new CommitMessageConventions(
+                    List.<String>of("conventionalCommitsForMerge"),
+                    Map.<String,CommitMessageConvention>of("conventionalCommitsForMerge", CONVENTIONAL_COMMITS_FOR_MERGE))
+            );
+            command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
+
+            assertFalse(changelogFile.exists());
+
+            command.run();
+
+            // when the command is executed standalone, Infer is not executed so run() will just do nothing as the release scope is undefined
+            if (!command.getContextName().equals(StandaloneCommandProxy.CONTEXT_NAME)) {
+                assertTrue(changelogFile.exists());
+
+                // print the file to standard output for inspection purpose
+                System.out.println("------- CHANGELOG -------");
+                System.out.println("Loading from: "+changelogFile.getAbsolutePath());
+                System.out.println("-----------------------------------------");
+                System.out.println(readFile(changelogFile));
+                System.out.println("-----------------------------------------");
+                System.out.flush();
+
+                // test the data model
+                assertEquals(1, command.state().getChangelog().getReleases().size());
+                assertEquals("1.0.0", command.state().getChangelog().getReleases().get(0).getName());
+                assertEquals(1, command.state().getChangelog().getReleases().get(0).getSections().size());
+                assertEquals("major", command.state().getChangelog().getReleases().get(0).getSections().get(0).getName());
+                assertEquals(1, command.state().getChangelog().getReleases().get(0).getSections().get(0).getCommits().size());
+
+                // test the rendered file
+                String fileContent = readFile(changelogFile);
+                assertTrue(fileContent.startsWith("# Changelog"));  // title header check
+                assertTrue(fileContent.contains("## 1.0.0 "));      // release header check
+                assertTrue(fileContent.contains("### major"));      // section header check
+                assertTrue(fileContent.contains("] Alpha ("));      // partial line check
             }
         }
     }

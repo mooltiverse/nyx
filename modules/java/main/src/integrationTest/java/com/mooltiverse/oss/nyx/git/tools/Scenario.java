@@ -100,8 +100,8 @@ public enum Scenario {
      * This yields to a repository like:
      * 
      * <pre>
-     *   * cb9423c (HEAD -> master) Untagged commit #2
-     *   * ddb0b9f Untagged commit #1
+     *   * cb9423c (HEAD -> master) feat: Untagged commit #2
+     *   * ddb0b9f fix: Untagged commit #1
      *   * 44944e7 (tag: 0.0.4) Commit lij
      *   * 92cd45c (tag: 0.0.3) Commit aem
      *   * 9709d14 (tag: 0.0.2) Commit gin
@@ -117,6 +117,30 @@ public enum Scenario {
         .andCommitWithTag("0.0.4", "feat: Annotated tag to commit 0.0.4")
         .andCommit("fix: Untagged commit #1")
         .andCommit("feat: Untagged commit #2")
+    ),
+
+    /**
+     * The scenario where the Git repository has been created with a few tagged commits plus an untagged commit.
+     * Commit messages are formatted as conventional commits for merge.
+     * The latest commit is tagged as {@code 0.4.0}.
+     * This yields to a repository like:
+     * 
+     * <pre>
+     *   * cb9423c (HEAD -> master) Alpha
+     *   * 44944e7 (tag: 0.0.4) Commit lij
+     *   * 92cd45c (tag: 0.0.3) Commit aem
+     *   * 9709d14 (tag: 0.0.2) Commit gin
+     *   * c996caa (tag: 0.0.1) Commit rfi
+     *   * 2b0ce8c Initial commit
+     * </pre>
+     */
+    ONE_BRANCH_SHORT_CONVENTIONAL_COMMITS_FOR_MERGE( f -> Script.from(f).andAddFiles()
+        .andCommit("Initial commit")
+        .andCommitWithTag("0.0.1")
+        .andCommitWithTag("0.0.2", "fix: Annotated tag to commit 0.0.2")
+        .andCommitWithTag("0.0.3")
+        .andCommitWithTag("0.0.4", "feat: Annotated tag to commit 0.0.4")
+        .andCommit("Alpha\n\n* fix: patch #1\n\n* feat: minor #1\n\nfeat!: major #1")
     ),
 
     /**

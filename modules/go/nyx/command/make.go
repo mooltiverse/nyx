@@ -38,6 +38,7 @@ import (
 	stt "github.com/mooltiverse/nyx/modules/go/nyx/state"
 	tpl "github.com/mooltiverse/nyx/modules/go/nyx/template"
 	utl "github.com/mooltiverse/nyx/modules/go/utils"
+	ver "github.com/mooltiverse/nyx/modules/go/version"
 )
 
 const (
@@ -274,16 +275,38 @@ func (c *Make) buildChangelog() error {
 					if err != nil {
 						return &errs.IllegalPropertyError{Message: fmt.Sprintf("cannot compile regular expression '%s'", *cmcEntryValue.GetExpression()), Cause: err}
 					}
-					match, err := re.FindStringMatch(commit.GetMessage().GetFullMessage())
+					matchMessage, err := re.FindStringMatch(commit.GetMessage().GetFullMessage())
 					if err != nil {
 						return &errs.IllegalPropertyError{Message: fmt.Sprintf("cannot evaluate regular expression '%s' against '%s'", *cmcEntryValue.GetExpression(), commit.GetMessage().GetFullMessage()), Cause: err}
 					}
-					if match != nil {
-						commitTypeGroup := match.GroupByName("type")
-						if commitTypeGroup != nil && len(commitTypeGroup.Captures) > 0 {
-							commitTypeString := commitTypeGroup.Captures[0].String()
-							commitType = &commitTypeString
-							log.Debugf("the type of commit '%s' is '%s'", commit.GetSHA(), *commitType)
+					if matchMessage != nil {
+
+						log.Debugf("commit message convention '%s' matches commit '%s'", cmcEntryKey, commit.GetSHA())
+						for bumpExpressionKey, bumpExpressionValue := range *cmcEntryValue.GetBumpExpressions() {
+							log.Debugf("matching commit '%s' ('%s') against bump expression '%s' ('%s') of message convention '%s'", commit.GetSHA(), commit.GetMessage().GetFullMessage(), bumpExpressionKey, bumpExpressionValue, cmcEntryKey)
+							re, err = regexp2.Compile(bumpExpressionValue, 0)
+							if err != nil {
+								log.Errorf("cannot compile regular expression '%s': %v", bumpExpressionValue, err)
+							}
+							matchBump, err := re.MatchString(commit.GetMessage().GetFullMessage())
+							if err != nil {
+								log.Errorf("cannot evaluate regular expression '%s' against '%s': %v", bumpExpressionValue, commit.GetMessage().GetFullMessage(), err)
+							}
+							if matchBump {
+								log.Debugf("bump expression '%s' of message convention '%s' matches commit '%s', meaning that the '%s' identifier has to be bumped, according to this commit", bumpExpressionKey, cmcEntryKey, commit.GetSHA(), bumpExpressionKey)
+								// In case the release matches multiple bump identifiers (i.e. when using a commit message convention that supports merge commits)
+								// the commitType must always use the most significant one.
+								configurationScheme, err := c.State().GetConfiguration().GetScheme()
+								if err != nil {
+									return err
+								}
+								if configurationScheme == nil {
+									return &errs.IllegalPropertyError{Message: fmt.Sprintf("cannot retrieve the current scheme from the configuration")}
+								}
+								commitType = ver.MostRelevantIdentifierBetween(*configurationScheme, commitType, utl.PointerToString(bumpExpressionKey))
+							} else {
+								log.Debugf("bump expression '%s' of message convention '%s' doesn't match commit '%s'", bumpExpressionKey, cmcEntryKey, commit.GetSHA())
+							}
 						}
 					}
 					if commitType == nil {

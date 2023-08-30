@@ -8899,3 +8899,81 @@ func TestInferRunUsingCustomCollapsedReleaseTypeWithExtraIdentifiersWithExtraIde
 	}
 	log.SetLevel(logLevel) // restore the original logging level
 }
+
+func TestInferRunUsingDefaultReleaseTypeWithMergeCommitResumingMultipleCommits(t *testing.T) {
+	logLevel := log.GetLevel()   // save the previous logging level
+	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
+	for _, command := range cmdtpl.CommandInvocationProxies(cmd.INFER, gittools.ONE_BRANCH_SHORT_CONVENTIONAL_COMMITS_FOR_MERGE()) {
+		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
+			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
+			// add a mock convention that matches multiple items in the commit message
+			// this convention is like the CONVENTIONAL_COMMITS_FOR_MERGE
+			commitMessageConventions, _ := ent.NewCommitMessageConventionsWith(&[]*string{utl.PointerToString("testConvention")},
+				&map[string]*ent.CommitMessageConvention{"testConvention": ent.NewCommitMessageConventionWith(utl.PointerToString("(?<type>[a-zA-Z0-9_]+)(!)?(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))"),
+					&map[string]string{"major": "(?s)(?m)[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*", "minor": "(?s)(?m)feat(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*", "patch": "(?s)(?m)fix(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*"})})
+			configurationLayerMock.SetCommitMessageConventions(commitMessageConventions)
+			var configurationLayer cnf.ConfigurationLayer
+			configurationLayer = configurationLayerMock
+			(*command).State().GetConfiguration().WithRuntimeConfiguration(&configurationLayer)
+			_, err := (*command).Run()
+			assert.NoError(t, err)
+
+			releaseType, _ := (*command).State().GetReleaseType()
+			releaseScope, _ := (*command).State().GetReleaseScope()
+			branch, _ := (*command).State().GetBranch()
+			bump, _ := (*command).State().GetBump()
+			newVersion, _ := (*command).State().GetNewVersion()
+			coreVersion, _ := (*command).State().GetCoreVersion()
+			latestVersion, _ := (*command).State().GetLatestVersion()
+			newRelease, _ := (*command).State().GetNewRelease()
+			scheme, _ := (*command).State().GetScheme()
+			version, _ := (*command).State().GetVersion()
+			versionRange, _ := (*command).State().GetVersionRange()
+			assert.Equal(t, "master", *branch)
+			assert.Equal(t, "major", *bump)
+			assert.Equal(t, ent.SCHEME, scheme)
+			assert.Equal(t, 1, len(releaseScope.GetCommits()))
+			assert.Equal(t, (*command).Script().GetLastCommitID(), releaseScope.GetInitialCommit().GetSHA())
+			assert.Equal(t, (*command).Script().GetLastCommitID(), releaseScope.GetFinalCommit().GetSHA())
+			assert.Equal(t, "0.0.4", releaseScope.GetPreviousVersion())
+			assert.Equal(t, *(*command).Script().GetCommitByTag("0.0.4"), releaseScope.GetPreviousVersionCommit())
+			assert.Equal(t, "0.0.4", releaseScope.GetPrimeVersion())
+			assert.Equal(t, *(*command).Script().GetCommitByTag("0.0.4"), releaseScope.GetPrimeVersionCommit())
+			assert.Equal(t, 0, len(releaseScope.GetSignificantCommits()))
+			assert.Equal(t, ent.RELEASE_TYPE_COLLAPSE_VERSIONS, releaseType.GetCollapseVersions())
+			assert.Equal(t, ent.RELEASE_TYPE_COLLAPSED_VERSION_QUALIFIER, releaseType.GetCollapsedVersionQualifier())
+			assert.Equal(t, ent.RELEASE_TYPE_DESCRIPTION, releaseType.GetDescription())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_COMMIT, releaseType.GetGitCommit())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_COMMIT_MESSAGE, releaseType.GetGitCommitMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_PUSH, releaseType.GetGitPush())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG, releaseType.GetGitTag())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_MESSAGE, releaseType.GetGitTagMessage())
+			assert.Equal(t, ent.RELEASE_TYPE_GIT_TAG_NAMES, releaseType.GetGitTagNames())
+			assert.Equal(t, ent.RELEASE_TYPE_IDENTIFIERS, releaseType.GetIdentifiers())
+			if ent.RELEASE_TYPE_IDENTIFIERS == nil {
+				assert.Equal(t, ent.RELEASE_TYPE_IDENTIFIERS, releaseType.GetIdentifiers())
+			} else {
+				assert.True(t, containsAllIdentifiers(ent.RELEASE_TYPE_IDENTIFIERS, releaseType.GetIdentifiers()))
+				for i := 0; i < len(*ent.RELEASE_TYPE_IDENTIFIERS); i++ {
+					assert.Equal(t, (*ent.RELEASE_TYPE_IDENTIFIERS)[i].GetQualifier(), (*releaseType.GetIdentifiers())[i].GetQualifier())
+					assert.Equal(t, (*ent.RELEASE_TYPE_IDENTIFIERS)[i].GetValue(), (*releaseType.GetIdentifiers())[i].GetValue())
+					assert.Equal(t, (*ent.RELEASE_TYPE_IDENTIFIERS)[i].GetPosition(), (*releaseType.GetIdentifiers())[i].GetPosition())
+				}
+			}
+			assert.Equal(t, ent.RELEASE_TYPE_MATCH_BRANCHES, releaseType.GetMatchBranches())
+			assert.Equal(t, ent.RELEASE_TYPE_MATCH_ENVIRONMENT_VARIABLES, releaseType.GetMatchEnvironmentVariables())
+			assert.Equal(t, ent.RELEASE_TYPE_MATCH_WORKSPACE_STATUS, releaseType.GetMatchWorkspaceStatus())
+			assert.Equal(t, ent.RELEASE_TYPE_PUBLISH, releaseType.GetPublish())
+			assert.Equal(t, ent.RELEASE_TYPE_VERSION_RANGE, releaseType.GetVersionRange())
+			assert.Equal(t, ent.RELEASE_TYPE_VERSION_RANGE_FROM_BRANCH_NAME, releaseType.GetVersionRangeFromBranchName())
+			assert.True(t, coreVersion)
+			assert.True(t, *latestVersion)
+			assert.True(t, newVersion)
+			assert.False(t, newRelease)
+			assert.Equal(t, "1.0.0", version)
+			assert.Nil(t, versionRange)
+		})
+	}
+	log.SetLevel(logLevel) // restore the original logging level
+}
