@@ -4,7 +4,7 @@
 ------------------------------------------------------------------------------*/
 plugins {
   // use our own plugin
-  id "com.mooltiverse.oss.nyx" version "2.4.7"
+  id "com.mooltiverse.oss.nyx" version "2.5.0"
 
   // Gradle Enterprise plugin (used for build scans)
   id "com.gradle.enterprise" version "3.12.3"
@@ -15,7 +15,6 @@ plugins {
 ------------------------------------------------------------------------------*/
 rootProject.name = 'nyx'
 
-include 'docs'
 include 'modules:docker'
 include 'modules:go'
 include 'modules:go:errors'

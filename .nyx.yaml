@@ -189,6 +189,7 @@ releaseTypes:
         CI: "^true$"                 # only match this release type when running on CI servers
       matchWorkspaceStatus: "CLEAN"  # only match this release type when the repository is clean
       publish: "true"
+      publishPreRelease: "true"
     integration:
       description: "{{#fileContent}}build/CHANGELOG.md{{/fileContent}}"
       collapseVersions: true
@@ -201,6 +202,7 @@ releaseTypes:
         CI: "^true$"                 # only match this release type when running on CI servers
       matchWorkspaceStatus: "CLEAN"  # only match this release type when the repository is clean
       publish: "true"
+      publishPreRelease: "true"
     feature:
       description: "{{#fileContent}}build/CHANGELOG.md{{/fileContent}}"
       collapseVersions: true
@@ -213,6 +215,7 @@ releaseTypes:
         CI: "^true$"                 # only match this release type when running on CI servers
       matchWorkspaceStatus: "CLEAN"  # only match this release type when the repository is clean
       publish: "false"
+      publishPreRelease: "true"
     fix:
       description: "{{#fileContent}}build/CHANGELOG.md{{/fileContent}}"
       collapseVersions: true
@@ -225,6 +228,7 @@ releaseTypes:
         CI: "^true$"                 # only match this release type when running on CI servers
       matchWorkspaceStatus: "CLEAN"  # only match this release type when the repository is clean
       publish: "false"
+      publishPreRelease: "true"
     hotfix:
       description: "{{#fileContent}}build/CHANGELOG.md{{/fileContent}}"
       collapseVersions: true
@@ -237,6 +241,7 @@ releaseTypes:
         CI: "^true$"                 # only match this release type when running on CI servers
       matchWorkspaceStatus: "CLEAN"  # only match this release type when the repository is clean
       publish: "true"
+      publishPreRelease: "true"
     release:
       description: "{{#fileContent}}build/CHANGELOG.md{{/fileContent}}"
       collapseVersions: true
@@ -279,6 +284,7 @@ releaseTypes:
           qualifier: "{{#timestampYYYYMMDDHHMMSS}}{{timestamp}}{{/timestampYYYYMMDDHHMMSS}}"
           position: "BUILD"
       publish: "false"
+      publishPreRelease: "true"
 services: 
   github: 
     type: "GITHUB"
@@ -292,3 +298,11 @@ services:
       REPOSITORY_OWNER: "mooltiverse"
 resume: true
 stateFile: "build/.nyx-state.json"
+substitutions: 
+  enabled: 
+    - jekyll-data
+  items: 
+    jekyll-data: 
+      files: "docs/_data/nyx.yml"
+      match: "version(\\s)*:(\\s)*\"(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?\""
+      replace: "version: \"{{version}}\""
