@@ -238,9 +238,9 @@ scheme: SEMVER
 				"CHANGELOG.md": []string{
 					"## v0.1.0",
 					"### Added",
-					"* [] feat: Untagged commit [#2](https://example.com/issues/2)",
+					"\\* \\[[a-z0-9]{5}\\] feat: Untagged commit \\[#2\\]\\(https:\\/\\/example\\.com\\/issues\\/2\\)",
 					"### Fixed",
-					"* [] fix: Untagged commit [#1](https://example.com/issues/1)",
+					"\\* \\[[a-z0-9]{5}\\] fix: Untagged commit \\[#1\\]\\(https:\\/\\/example\\.com\\/issues\\/1\\)",
 				},
 				"version.txt": []string{
 					"v0.1.0",
@@ -363,9 +363,9 @@ scheme: SEMVER
 				"CHANGELOG.md": []string{
 					"## v0.1.0",
 					"### Added",
-					"* [] feat: Untagged commit [#2](https://example.com/issues/2)",
+					"\\* \\[[a-z0-9]{5}\\] feat: Untagged commit \\[#2\\]\\(https:\\/\\/example\\.com\\/issues\\/2\\)",
 					"### Fixed",
-					"* [] fix: Untagged commit [#1](https://example.com/issues/1)",
+					"\\* \\[[a-z0-9]{5}\\] fix: Untagged commit \\[#1\\]\\(https:\\/\\/example\\.com\\/issues\\/1\\)",
 				},
 				"version.txt": []string{
 					"v0.1.0",
@@ -621,9 +621,9 @@ scheme: SEMVER
 				"CHANGELOG.md": []string{
 					"## v0.1.0",
 					"### Added",
-					"* [] feat: Untagged commit [#2](https://example.com/issues/2)",
+					"\\* \\[[a-z0-9]{5}\\] feat: Untagged commit \\[#2\\]\\(https:\\/\\/example\\.com\\/issues\\/2\\)",
 					"### Fixed",
-					"* [] fix: Untagged commit [#1](https://example.com/issues/1)",
+					"\\* \\[[a-z0-9]{5}\\] fix: Untagged commit \\[#1\\]\\(https:\\/\\/example\\.com\\/issues\\/1\\)",
 				},
 				"version.txt": []string{
 					"v0.1.0",
@@ -757,9 +757,9 @@ scheme: SEMVER
 				"CHANGELOG.md": []string{
 					"## v0.1.0",
 					"### Added",
-					"* [] feat: Untagged commit [#2](https://example.com/issues/2)",
+					"\\* \\[[a-z0-9]{5}\\] feat: Untagged commit \\[#2\\]\\(https:\\/\\/example\\.com\\/issues\\/2\\)",
 					"### Fixed",
-					"* [] fix: Untagged commit [#1](https://example.com/issues/1)",
+					"\\* \\[[a-z0-9]{5}\\] fix: Untagged commit \\[#1\\]\\(https:\\/\\/example\\.com\\/issues\\/1\\)",
 				},
 				"version.txt": []string{
 					"v0.1.0",
