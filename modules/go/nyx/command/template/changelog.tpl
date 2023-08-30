@@ -8,7 +8,7 @@
 ### {{name}}
 
 {{#commits}}
-* [{{#short5}}{{sha}}{{/short5}}] {{message.shortMessage}} ({{authorAction.identity.name}})
+* [{{#short5}}{{SHA}}{{/short5}}] {{message.shortMessage}} ({{authorAction.identity.name}})
 
 {{/commits}}
 {{^commits}}
