@@ -32,7 +32,7 @@ Returns the extended configuration preset.
 func NewExtendedPreset() *SimpleConfigurationLayer {
 	scl := NewSimpleConfigurationLayer()
 
-	commitMessageConventions, _ := ent.NewCommitMessageConventionsWith(&[]*string{utl.PointerToString("conventionalCommits"), utl.PointerToString("gitmoji")}, &map[string]*ent.CommitMessageConvention{"conventionalCommits": COMMIT_MESSAGE_CONVENTIONS_CONVENTIONAL_COMMITS, "gitmoji": COMMIT_MESSAGE_CONVENTIONS_GITMOJI})
+	commitMessageConventions, _ := ent.NewCommitMessageConventionsWith(&[]*string{utl.PointerToString("conventionalCommits"), utl.PointerToString("gitmoji")}, &map[string]*ent.CommitMessageConvention{"conventionalCommits": COMMIT_MESSAGE_CONVENTIONS_CONVENTIONAL_COMMITS, "conventionalCommitsForMerge": COMMIT_MESSAGE_CONVENTIONS_CONVENTIONAL_COMMITS_FOR_MERGE, "gitmoji": COMMIT_MESSAGE_CONVENTIONS_GITMOJI})
 	scl.SetCommitMessageConventions(commitMessageConventions)
 
 	releaseTypes, _ := ent.NewReleaseTypesWith(&[]*string{utl.PointerToString("mainline"), utl.PointerToString("integration"), utl.PointerToString("maturity"), utl.PointerToString("feature"), utl.PointerToString("fix"), utl.PointerToString("hotfix"), utl.PointerToString("release"), utl.PointerToString("maintenance"), utl.PointerToString("internal")}, &[]*string{}, &[]*string{}, &map[string]*ent.ReleaseType{"mainline": RELEASE_TYPES_MAINLINE, "integration": RELEASE_TYPES_INTEGRATION, "maturity": RELEASE_TYPES_MATURITY, "feature": RELEASE_TYPES_FEATURE, "fix": RELEASE_TYPES_FIX, "hotfix": RELEASE_TYPES_HOTFIX, "release": RELEASE_TYPES_RELEASE, "maintenance": RELEASE_TYPES_MAINTENANCE, "internal": RELEASE_TYPES_INTERNAL})

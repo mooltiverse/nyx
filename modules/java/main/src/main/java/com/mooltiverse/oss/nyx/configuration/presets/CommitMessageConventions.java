@@ -28,9 +28,27 @@ public class CommitMessageConventions {
         {
             setExpression("(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))$(?s).*");
 
-            getBumpExpressions().put("major", "(?s)(?m)^[a-zA-Z0-9_]+(!|.*^(BREAKING( |-)CHANGE: )).*");
-            getBumpExpressions().put("minor", "(?s)(?m)^feat(?!!|.*^(BREAKING( |-)CHANGE: )).*");
-            getBumpExpressions().put("patch", "(?s)(?m)^fix(?!!|.*^(BREAKING( |-)CHANGE: )).*");
+            getBumpExpressions().put("major", "(?s)(?m)^[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*");
+            getBumpExpressions().put("minor", "(?s)(?m)^feat(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*");
+            getBumpExpressions().put("patch", "(?s)(?m)^fix(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*");
+        }
+    };
+
+    /**
+     * An unofficial extension for the <a href="https://www.conventionalcommits.org/">Conventional Commits</a> configuration
+     * which also parses the commit message body to detect which changes have occurred.
+     * 
+     * This convention is useful in merge commits whose messages have been automatically generated listing all the commits
+     * that have been merged (i.e. when squashing) so the bump identifiers are scanned in the body, which may contain multiple
+     * significant rows, rather than just the first line.
+     */
+    public static final CommitMessageConvention CONVENTIONAL_COMMITS_FOR_MERGE = new CommitMessageConvention() {
+        {
+            setExpression("(?<type>[a-zA-Z0-9_]+)(!)?(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))");
+
+            getBumpExpressions().put("major", "(?s)(?m)[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*");
+            getBumpExpressions().put("minor", "(?s)(?m)feat(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*");
+            getBumpExpressions().put("patch", "(?s)(?m)fix(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*");
         }
     };
 
