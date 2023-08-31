@@ -260,18 +260,20 @@ public class Make extends AbstractCommand {
                         logger.debug(COMMAND, "Evaluating commit '{}' against message convention '{}'", commit.getSHA(), cmcEntry.getKey());                                
                         Matcher messageMatcher = Pattern.compile(cmcEntry.getValue().getExpression()).matcher(commit.getMessage().getFullMessage());
                         try {
-                            if (messageMatcher.find()) {
+                            // if the commit message matches multiple times we need to determine the commit type for all matches
+                            while (messageMatcher.find()) {
                                 logger.debug(COMMAND, "Commit message convention '{}' matches commit '{}'", cmcEntry.getKey(), commit.getSHA());
+                                String commitType = messageMatcher.group("type");
                                 for (Map.Entry<String,String> bumpExpression: cmcEntry.getValue().getBumpExpressions().entrySet()) {
                                     logger.debug(COMMAND, "Matching commit '{}' ('{}') against bump expression '{}' ('{}') of message convention '{}'", commit.getSHA(), commit.getMessage().getFullMessage(), bumpExpression.getKey(), bumpExpression.getValue(), cmcEntry.getKey());
                                     Matcher bumpMatcher = Pattern.compile(bumpExpression.getValue()).matcher(commit.getMessage().getFullMessage());
                                     if (bumpMatcher.find()) {
                                         // In case the release matches multiple bump identifiers (i.e. when using a commit message convention that supports merge commits)
                                         // the commit must belong to multiple commit types.
-                                        commitTypes.add(messageMatcher.group("type"));
-                                        logger.debug(COMMAND, "The commit '{}' is of type '{}'", commit.getSHA(), messageMatcher.group("type"));
+                                        commitTypes.add(commitType);
+                                        logger.debug(COMMAND, "The commit '{}' is of type '{}'", commit.getSHA(), commitType);
                                     }
-                                    else logger.debug(COMMAND, "The commit '{}' is not of type '{}'", commit.getSHA(), messageMatcher.group("type"));
+                                    else logger.debug(COMMAND, "The commit '{}' is not of type '{}'", commit.getSHA(), commitType);
                                 }
                             }
                         }
@@ -282,12 +284,10 @@ public class Make extends AbstractCommand {
                         catch (IllegalStateException ise) {
                             throw new ReleaseException(String.format("Cannot infer the commit type for commit '%s' match operation failed for the regular expression '%s' from commit message convention '%s'", commit.getSHA(), cmcEntry.getValue().getExpression(), cmcEntry.getKey()), ise);
                         }
-                        if (Objects.isNull(commitTypes) || commitTypes.isEmpty())
-                            logger.debug(COMMAND, "The commit type cannot be inferred for commit '{}' using the regular expression '{}' from commit message convention '{}'", commit.getSHA(), cmcEntry.getValue().getExpression(), cmcEntry.getKey());
                     }
                 }
                 if (Objects.isNull(commitTypes) || commitTypes.isEmpty())
-                    logger.debug(COMMAND, "No commit message convention has been configured or the configured commit message conventions do not allow to infer the 'type' for commit '{}'. The commit will not appear in the changelog.", commit.getSHA());
+                    logger.debug(COMMAND, "Unable infer the 'type' for commit '{}'. The commit will not appear in the changelog.", commit.getSHA());
                 else {
                     for (String commitType: commitTypes) {
                         // If the user has defined some sections mapping we need to map the commit type to those sections,

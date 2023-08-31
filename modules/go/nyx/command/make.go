@@ -278,13 +278,14 @@ func (c *Make) buildChangelog() error {
 					if err != nil {
 						return &errs.IllegalPropertyError{Message: fmt.Sprintf("cannot evaluate regular expression '%s' against '%s'", *cmcEntryValue.GetExpression(), commit.GetMessage().GetFullMessage()), Cause: err}
 					}
-					if matchMessage != nil {
+					// if the commit message matches multiple times we need to determine the commit type for all matches
+					for matchMessage != nil {
 						log.Debugf("commit message convention '%s' matches commit '%s'", cmcEntryKey, commit.GetSHA())
 						commitTypeGroup := matchMessage.GroupByName("type")
-						commitType := ""
+						var commitType *string
 						if commitTypeGroup != nil && len(commitTypeGroup.Captures) > 0 {
-							commitType = commitTypeGroup.Captures[0].String()
-							log.Debugf("the type of commit '%s' is '%s'", commit.GetSHA(), commitType)
+							commitTypeString := commitTypeGroup.Captures[0].String()
+							commitType = &commitTypeString
 							for bumpExpressionKey, bumpExpressionValue := range *cmcEntryValue.GetBumpExpressions() {
 								log.Debugf("matching commit '%s' ('%s') against bump expression '%s' ('%s') of message convention '%s'", commit.GetSHA(), commit.GetMessage().GetFullMessage(), bumpExpressionKey, bumpExpressionValue, cmcEntryKey)
 								re, err = regexp2.Compile(bumpExpressionValue, 0)
@@ -298,24 +299,20 @@ func (c *Make) buildChangelog() error {
 								if matchBump {
 									// In case the release matches multiple bump identifiers (i.e. when using a commit message convention that supports merge commits)
 									// the commitType must always use the most significant one.
-									configurationScheme, err := c.State().GetConfiguration().GetScheme()
-									if err != nil {
-										return err
-									}
-									if configurationScheme == nil {
-										return &errs.IllegalPropertyError{Message: fmt.Sprintf("cannot retrieve the current scheme from the configuration")}
-									}
-									commitTypes = append(commitTypes, commitTypeGroup.Captures[0].String())
-									log.Debugf("the commit '%s' is of type '%s'", commit.GetSHA(), commitType)
+									commitTypes = append(commitTypes, *commitType)
+									log.Debugf("the commit '%s' is of type '%s'", commit.GetSHA(), *commitType)
 								} else {
-									log.Debugf("the commit '%s' is not of type '%s'", commit.GetSHA(), commitType)
+									log.Debugf("the commit '%s' is not of type '%s'", commit.GetSHA(), *commitType)
 								}
 							}
 						} else {
-							log.Debugf("the commit type cannot be inferred for commit '%s' using the regular expression '%s' from commit message convention '%s'", commit.GetSHA(), *cmcEntryValue.GetExpression(), cmcEntryKey)
+							// the regular expression doesn't match the name capturing group, no commit type is inferred
+							//return &errs.IllegalPropertyError{Message: fmt.Sprintf("the regular expression '%s' defined for commit message convention '%s' does not define the 'type' named capturing group", *cmcEntryValue.GetExpression(), cmcEntryKey)}
 						}
-					} else {
-						log.Debugf("the commit type cannot be inferred for commit '%s' using the regular expression '%s' from commit message convention '%s'", commit.GetSHA(), *cmcEntryValue.GetExpression(), cmcEntryKey)
+						matchMessage, err = re.FindNextMatch(matchMessage)
+						if err != nil {
+							return &errs.IllegalPropertyError{Message: fmt.Sprintf("cannot evaluate regular expression '%s' against '%s'", *cmcEntryValue.GetExpression(), commit.GetMessage().GetFullMessage()), Cause: err}
+						}
 					}
 				}
 			}
