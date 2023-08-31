@@ -108,9 +108,9 @@ Each entry in this map is made of two strings: the name of a version identifier 
 
 For example, the [Conventional Commits](https://www.conventionalcommits.org/) bump expressions are:
 
-* `major` = `(?s)(?m)^[a-zA-Z0-9_]+(!|.*^(BREAKING( |-)CHANGE: )).*`
-* `minor` = `(?s)(?m)^feat(?!!|.*^(BREAKING( |-)CHANGE: )).*`
-* `patch` = `(?s)(?m)^fix(?!!|.*^(BREAKING( |-)CHANGE: )).*`
+* `major` = `(?s)(?m)^[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*`
+* `minor` = `(?s)(?m)^feat(!{0})(\([a-z ]+\))?: (?!.*^(BREAKING( |-)CHANGE: )).*`
+* `patch` = `(?s)(?m)^fix(!{0})(\([a-z ]+\))?: (?!.*^(BREAKING( |-)CHANGE: )).*`
 
 As you can see, when a commit message has an exlamation mark after the `type` or `BREAKING CHANGE: ` (or `BREAKING-CHANGE: `) appears in the footer, the `major` identifier is bumped, otherwise `minor` is bumped when the message `type` is `feat` or `patch` is bumped when the message `type` is `fix`. No bump is performed if none of these expressions is matched.
 

@@ -59,6 +59,7 @@ settings.gradle
 .nyx-state.yml
 `,
 				// the .nyx-shared.yaml is the standard shared configuration file
+				// note we use single quotes in some of the rows below to avoid escaping all of the YAML special characters
 				".nyx-shared.yaml": `---
 commitMessageConventions:
   enabled:
@@ -67,9 +68,9 @@ commitMessageConventions:
     conventionalCommits:
       expression: "(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))$(?s).*"
       bumpExpressions:
-        major: "(?s)(?m)^[a-zA-Z0-9_]+(!|.*^(BREAKING( |-)CHANGE: )).*"
-        minor: "(?s)(?m)^feat(?!!|.*^(BREAKING( |-)CHANGE: )).*"
-        patch: "(?s)(?m)^fix(?!!|.*^(BREAKING( |-)CHANGE: )).*"
+        major: '(?s)(?m)^[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*'
+        minor: '(?s)(?m)^feat(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'
+        patch: '(?s)(?m)^fix(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'
 initialVersion: "1.0.0"
 releaseLenient: true
 releasePrefix: v
@@ -153,6 +154,7 @@ settings.gradle
 .nyx-state.yml
 `,
 				// the .nyx-shared.yaml is the standard shared configuration file
+				// note we use single quotes in some of the rows below to avoid escaping all of the YAML special characters
 				".nyx-shared.yaml": `---
 commitMessageConventions:
   enabled:
@@ -161,9 +163,9 @@ commitMessageConventions:
     conventionalCommits: 
       expression: "(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))$(?s).*"
       bumpExpressions: 
-        major: "(?s)(?m)^[a-zA-Z0-9_]+(!|.*^(BREAKING( |-)CHANGE: )).*"
-        minor: "(?s)(?m)^feat(?!!|.*^(BREAKING( |-)CHANGE: )).*"
-        patch: "(?s)(?m)^fix(?!!|.*^(BREAKING( |-)CHANGE: )).*"
+        major: '(?s)(?m)^[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*'
+        minor: '(?s)(?m)^feat(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'
+        patch: '(?s)(?m)^fix(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'
 initialVersion: "1.0.0"
 releaseLenient: true
 releasePrefix: v
@@ -276,6 +278,7 @@ settings.gradle
 .nyx-state.yml
 `,
 				// the .nyx-shared.yaml is the standard shared configuration file
+				// note we use single quotes in some of the rows below to avoid escaping all of the YAML special characters
 				".nyx-shared.yaml": `---
 commitMessageConventions:
   enabled:
@@ -284,9 +287,9 @@ commitMessageConventions:
     conventionalCommits: 
       expression: "(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))$(?s).*"
       bumpExpressions: 
-        major: "(?s)(?m)^[a-zA-Z0-9_]+(!|.*^(BREAKING( |-)CHANGE: )).*"
-        minor: "(?s)(?m)^feat(?!!|.*^(BREAKING( |-)CHANGE: )).*"
-        patch: "(?s)(?m)^fix(?!!|.*^(BREAKING( |-)CHANGE: )).*"
+        major: '(?s)(?m)^[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*'
+        minor: '(?s)(?m)^feat(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'
+        patch: '(?s)(?m)^fix(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'
 initialVersion: "1.0.0"
 releaseLenient: true
 releasePrefix: v
@@ -525,6 +528,7 @@ settings.gradle
 .nyx-state.yml
 `,
 				// the .nyx-shared.yaml is the standard shared configuration file
+				// note we use single quotes in some of the rows below to avoid escaping all of the YAML special characters
 				".nyx-shared.yaml": `---
 commitMessageConventions:
   enabled:
@@ -533,9 +537,9 @@ commitMessageConventions:
     conventionalCommits: 
       expression: "(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))$(?s).*"
       bumpExpressions: 
-        major: "(?s)(?m)^[a-zA-Z0-9_]+(!|.*^(BREAKING( |-)CHANGE: )).*"
-        minor: "(?s)(?m)^feat(?!!|.*^(BREAKING( |-)CHANGE: )).*"
-        patch: "(?s)(?m)^fix(?!!|.*^(BREAKING( |-)CHANGE: )).*"
+        major: '(?s)(?m)^[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*'
+        minor: '(?s)(?m)^feat(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'
+        patch: '(?s)(?m)^fix(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'
 initialVersion: "1.0.0"
 releaseLenient: true
 releasePrefix: v
@@ -662,6 +666,7 @@ settings.gradle
 .nyx-state.yml
 `,
 				// the .nyx-shared.yaml is the standard shared configuration file
+				// note we use single quotes in some of the rows below to avoid escaping all of the YAML special characters
 				".nyx-shared.yaml": `---
 commitMessageConventions:
   enabled:
@@ -670,9 +675,9 @@ commitMessageConventions:
     conventionalCommits: 
       expression: "(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))$(?s).*"
       bumpExpressions: 
-        major: "(?s)(?m)^[a-zA-Z0-9_]+(!|.*^(BREAKING( |-)CHANGE: )).*"
-        minor: "(?s)(?m)^feat(?!!|.*^(BREAKING( |-)CHANGE: )).*"
-        patch: "(?s)(?m)^fix(?!!|.*^(BREAKING( |-)CHANGE: )).*"
+        major: '(?s)(?m)^[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*'
+        minor: '(?s)(?m)^feat(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'
+        patch: '(?s)(?m)^fix(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'
 initialVersion: "1.0.0"
 releaseLenient: true
 releasePrefix: v
