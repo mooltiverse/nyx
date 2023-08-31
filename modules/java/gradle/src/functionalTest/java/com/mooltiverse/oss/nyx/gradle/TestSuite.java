@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -304,7 +305,7 @@ public class TestSuite {
 					else {
 						// if it's not contained as a plain string try matching it as a regular expression
 						logger.debug("File '{}' does not contain plain string '{}', now trying to interpret the string as a regular expression and matching it", file.getAbsolutePath(), fileContentItemToCheck);
-						regexMatched = fileContent.matches(fileContentItemToCheck);
+						regexMatched = Pattern.compile(fileContentItemToCheck).matcher(fileContent).find();
 					}
 					assertTrue(plainStringContained || regexMatched, String.format("File '%s' was expected to contain plain string '%s' or match it as a regular expression but it doesn't", file.getAbsolutePath(), fileContentItemToCheck));
 					if (!(plainStringContained || regexMatched)) {

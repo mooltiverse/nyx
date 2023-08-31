@@ -1,5 +1,25 @@
 # Nyx Release Notes
 
+## 2.5.1
+
+This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/2.5.1).
+
+### Upgrade instructions
+
+There are no actions to take for backward compatibility.
+
+### New features and improvements
+
+This release:
+
+There are no new features or improvements in this release.
+
+### Fixed issues
+
+This release:
+
+* fixes a bug in changelog templates where commit SHA was not rendered properly ([#243](https://github.com/mooltiverse/nyx/issues/259))
+
 ## 2.5.0
 
 This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/2.5.0).
