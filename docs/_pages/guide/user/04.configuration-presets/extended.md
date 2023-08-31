@@ -25,13 +25,20 @@ This corresponds to the following configuration options:
 
 ### Commit message conventions
 
-The [Conventional Commits](https://www.conventionalcommits.org/) and [gitmoji](https://gitmoji.dev/) conventions come with this preset. This corresponds to the following configuration options:
+The [*Conventional Commits*](https://www.conventionalcommits.org/), *Conventional Commits For Merge* and [*gitmoji*](https://gitmoji.dev/) conventions come with this preset. *Conventional Commits* and *gitmoji* are enabled by default, while *Conventional Commits For Merge* is not.
+
+The *Conventional Commits For Merge* convention is **not** compliant to *Conventional Commits* and is **not officially supported**. It is useful when parsing merge commits bringing details on multiple commits (usually [squashed](https://docs.gitlab.com/ee/user/project/merge_requests/squash_and_merge.html)), each one with it's message title listed in the body of the merge commit message. This convention is able to match the message multiple times, each time yielding to a (potentially) different bump identifier. If you want to use this convention and you're using this preset you need to [enable](http://localhost:4000/nyx/guide/user/configuration-reference/commit-message-conventions/#enabled) it explicitly, otherwise you can copy its configuration attributes below to your custom configuration.
+{: .notice--warning}
+
+This corresponds to the following configuration options:
 
 | Name                                            | Value                                                                                    |
 | ----------------------------------------------- | ---------------------------------------------------------------------------------------- |
 | [`commitMessageConventions/enabled`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/commit-message-conventions.md %}#enabled) | ["`conventionalCommits`", "`gitmoji`"] |
 | [`commitMessageConventions/conventionalCommits/expression`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/commit-message-conventions.md %}#expression) | "`(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\((?<scope>[a-z ]+)\))?:( (?<title>.+))$(?s).*`" |
 | [`commitMessageConventions/conventionalCommits/bumpExpressions`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/commit-message-conventions.md %}#bump-expressions) | "`major`" = "`(?s)(?m)^[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*`", "`minor`" = "`(?s)(?m)^feat(!{0})(\([a-z ]+\))?: (?!.*^(BREAKING( |-)CHANGE: )).*`", "`patch`" = "`(?s)(?m)^fix(!{0})(\([a-z ]+\))?: (?!.*^(BREAKING( |-)CHANGE: )).*`" |
+| [`commitMessageConventions/conventionalCommitsForMerge/expression`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/commit-message-conventions.md %}#expression) | "`(?<type>[a-zA-Z0-9_]+)(!)?(\((?<scope>[a-z ]+)\))?:( (?<title>.+))`" |
+| [`commitMessageConventions/conventionalCommitsForMerge/bumpExpressions`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/commit-message-conventions.md %}#bump-expressions) | "`major`" = "`(?s)(?m)[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*`", "`minor`" = "`(?s)(?m)feat(!{0})(\([a-z ]+\))?: (?!.*^(BREAKING( |-)CHANGE: )).*`", "`patch`" = "`(?s)(?m)fix(!{0})(\([a-z ]+\))?: (?!.*^(BREAKING( |-)CHANGE: )).*`" |
 | [`commitMessageConventions/gitmoji/expression`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/commit-message-conventions.md %}#expression) | "`(?m)^(:(?<type>[a-zA-Z0-9_]+):)( (?<title>.+))?$(?s).*`" |
 | [`commitMessageConventions/gitmoji/bumpExpressions`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/commit-message-conventions.md %}#bump-expressions) | "`major`" = "`(?m)^:boom:(?s).*`", "`minor`" = "`(?m)^:sparkles:(?s).*`", "`patch`" = "`(?m)^:(zap|bug|ambulance|lipstick|lock|arrow_down|arrow_up|pushpin|chart_with_upwards_trend|heavy_plus_sign|heavy_minus_sign|wrench|globe_with_meridians|pencil2|rewind|package|alien|bento|wheelchair|speech_balloon|card_file_box|children_crossing|iphone|egg|alembic|mag|label|triangular_flag_on_post|goal_net|dizzy|wastebasket|passport_control|adhesive_bandage):(?s).*`" |
 
