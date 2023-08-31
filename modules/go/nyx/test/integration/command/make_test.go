@@ -1717,3 +1717,72 @@ func TestMakeRunWithSubstitutionsUsingTextVersionPreset(t *testing.T) {
 	}
 	log.SetLevel(logLevel) // restore the original logging level
 }
+
+func TestMakeRunWithConventionalCommitsForMergeConventionAndWithoutSections(t *testing.T) {
+	logLevel := log.GetLevel()   // save the previous logging level
+	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
+	for _, command := range cmdtpl.CommandInvocationProxies(cmd.MAKE, gittools.ONE_BRANCH_SHORT_CONVENTIONAL_COMMITS_FOR_MERGE()) {
+		t.Run((*command).GetContextName(), func(t *testing.T) {
+			defer os.RemoveAll((*command).Script().GetWorkingDirectory())
+			// first create the temporary directory and the abstract destination file
+			destinationDir, _ := os.MkdirTemp("", "nyx-test-make-test-")
+			defer os.RemoveAll(destinationDir)
+			changelogFile := filepath.Join(destinationDir, "CHANGELOG.md")
+
+			configurationLayerMock := cnf.NewSimpleConfigurationLayer()
+			changelogConfiguration, _ := configurationLayerMock.GetChangelog()
+			changelogConfiguration.SetPath(&changelogFile)
+			// add the conventional commits for merge convention
+			commitMessageConventions, _ := ent.NewCommitMessageConventionsWith(&[]*string{utl.PointerToString("conventionalCommitsForMerge")},
+				&map[string]*ent.CommitMessageConvention{"conventionalCommitsForMerge": cnf.COMMIT_MESSAGE_CONVENTIONS_CONVENTIONAL_COMMITS_FOR_MERGE})
+			configurationLayerMock.SetCommitMessageConventions(commitMessageConventions)
+			var configurationLayer cnf.ConfigurationLayer
+			configurationLayer = configurationLayerMock
+			(*command).State().GetConfiguration().WithRuntimeConfiguration(&configurationLayer)
+
+			_, err := os.Stat(changelogFile)
+			changelogFileExists := err == nil
+			assert.False(t, changelogFileExists)
+
+			_, err = (*command).Run()
+			assert.NoError(t, err)
+
+			// when the command is executed standalone, Infer is not executed so Run() will just do nothing as the release scope is undefined
+			if (*command).GetContextName() != cmdtpl.STANDALONE_CONTEXT_NAME {
+				_, err = os.Stat(changelogFile)
+				changelogFileExists = err == nil
+				assert.True(t, changelogFileExists)
+
+				// print the file to standard output for inspection purpose
+				//fmt.Printf("------- CHANGELOG -------\n")
+				//fmt.Printf("Loading from: %v\n", changelogFile)
+				//fmt.Printf("-----------------------------------------\n")
+				//fmt.Printf(readFile(changelogFile))
+				//fmt.Println()
+				//fmt.Printf("-----------------------------------------\n")
+
+				// test the data model
+				changelog, _ := (*command).State().GetChangelog()
+				assert.Equal(t, 1, len(changelog.GetReleases()))
+				assert.Equal(t, "1.0.0", *(*changelog.GetReleases()[0]).GetName())
+				// TODO: re-enable this test when https://github.com/mooltiverse/nyx/issues/262 is fixed
+				//assert.Equal(t, 2, len((*changelog.GetReleases()[0]).GetSections()))
+				assert.Equal(t, "fix", *(*(*changelog.GetReleases()[0]).GetSections()[0]).GetName())
+				assert.Equal(t, 1, len((*(*changelog.GetReleases()[0]).GetSections()[0]).GetCommits()))
+				// TODO: re-enable these tests when https://github.com/mooltiverse/nyx/issues/262 is fixed
+				//assert.Equal(t, "feat", *(*(*changelog.GetReleases()[0]).GetSections()[1]).GetName())
+				//assert.Equal(t, 1, len((*(*changelog.GetReleases()[0]).GetSections()[1]).GetCommits()))
+
+				// test the rendered file
+				fileContent := readFile(changelogFile)
+				assert.True(t, strings.HasPrefix(fileContent, "# Changelog")) // title header check
+				assert.True(t, strings.Contains(fileContent, "## 1.0.0 "))    // release header check
+				// TODO: re-enable this test when https://github.com/mooltiverse/nyx/issues/262 is fixed
+				//assert.True(t, strings.Contains(fileContent, "### feat"))     // section header check
+				assert.True(t, strings.Contains(fileContent, "### fix"))   // section header check
+				assert.True(t, strings.Contains(fileContent, "] Alpha (")) // partial line check
+			}
+		})
+	}
+	log.SetLevel(logLevel) // restore the original logging level
+}

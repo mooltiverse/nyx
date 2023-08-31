@@ -48,7 +48,7 @@ public class Extended extends SimpleConfigurationLayer {
         setCommitMessageConventions(
             new CommitMessageConventions(
                 List.<String>of("conventionalCommits", "gitmoji"),
-                Map.<String,CommitMessageConvention>of("conventionalCommits", com.mooltiverse.oss.nyx.configuration.presets.CommitMessageConventions.CONVENTIONAL_COMMITS, "gitmoji", com.mooltiverse.oss.nyx.configuration.presets.CommitMessageConventions.GITMOJI))
+                Map.<String,CommitMessageConvention>of("conventionalCommits", com.mooltiverse.oss.nyx.configuration.presets.CommitMessageConventions.CONVENTIONAL_COMMITS, "conventionalCommitsForMerge", com.mooltiverse.oss.nyx.configuration.presets.CommitMessageConventions.CONVENTIONAL_COMMITS_FOR_MERGE, "gitmoji", com.mooltiverse.oss.nyx.configuration.presets.CommitMessageConventions.GITMOJI))
         );
 
         // add the 'mainline' and 'internal' release types

@@ -12,7 +12,9 @@ There are no actions to take for backward compatibility.
 
 This release:
 
-There are no new features or improvements in this release.
+* adds support for commit message conventions matching multiple portions of commit messages (yielding to multiple bump identifiers per commit), useful for merge commits ([#125](https://github.com/mooltiverse/nyx/issues/125))
+* improves regular expressions used for the Conventional Commits convention
+* adds the unofficial `conventionalCommitsForMerge` convention (disabled by default) to the [extended preset](https://mooltiverse.github.io/nyx/guide/user/configuration-presets/extended/), useful for merge commits ([#125](https://github.com/mooltiverse/nyx/issues/125))
 
 ### Fixed issues
 

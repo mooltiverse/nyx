@@ -17,7 +17,8 @@
 package command
 
 import (
-	"fmt"     // https://pkg.go.dev/fmt
+	"fmt" // https://pkg.go.dev/fmt
+	// https://pkg.go.dev/slices
 	"strconv" // https://pkg.go.dev/strconv
 	"strings" // https://pkg.go.dev/strings
 
@@ -377,12 +378,30 @@ func (c *Infer) scanRepository(scheme *ver.Scheme, bump *string, releaseLenient 
 									log.Debugf("bump expression '%s' of message convention '%s' matches commit '%s', meaning that the '%s' identifier has to be bumped, according to this commit", bumpExpressionKey, cmcEntryKey, cc.GetSHA(), bumpExpressionKey)
 									// if we reached this point this is also in the 'prime commit' scope
 									primeBumpIdentifiersResult = append(primeBumpIdentifiersResult, bumpExpressionKey)
-									primeSignificantCommitsResult = append(primeSignificantCommitsResult, cc)
+									// check if the commit was already there to avoid adding it twice
+									pmscAlreadyPresent := false
+									for _, psc := range primeSignificantCommitsResult {
+										if psc.GetSHA() == cc.GetSHA() {
+											pmscAlreadyPresent = true
+										}
+									}
+									if !pmscAlreadyPresent {
+										primeSignificantCommitsResult = append(primeSignificantCommitsResult, cc)
+									}
 
 									if !(releaseScope.HasPreviousVersion() && releaseScope.HasPreviousVersionCommit()) {
 										// if the previous version wasn't found yet this is in the 'previous commit' scope
 										previousBumpIdentifiersResult = append(previousBumpIdentifiersResult, bumpExpressionKey)
-										previousSignificantCommitsResult = append(previousSignificantCommitsResult, cc)
+										// check if the commit was already there to avoid adding it twice
+										pvscAlreadyPresent := false
+										for _, psc := range previousSignificantCommitsResult {
+											if psc.GetSHA() == cc.GetSHA() {
+												pvscAlreadyPresent = true
+											}
+										}
+										if !pvscAlreadyPresent {
+											previousSignificantCommitsResult = append(previousSignificantCommitsResult, cc)
+										}
 									}
 								} else {
 									log.Debugf("bump expression '%s' of message convention '%s' doesn't match commit '%s'", bumpExpressionKey, cmcEntryKey, cc.GetSHA())

@@ -87,6 +87,61 @@ var (
 	}
 
 	/*
+	   A fixture with valid structured data to test commit messages using Conventional Commits For Merge.
+
+	   Each returned argument has the fields:
+	   - message: the entire message
+	   - type: the type that is expected to be returned as the commit message type
+	   - scope: the scope that is expected to be returned as the commit message scope, or nil if not present
+	   - title: the description that is expected to be returned as the commit message description
+	   - bump: the version identifier that is expected to be bumped by the given commit message, or nil
+	*/
+	// This convention must also comply with the standard Conventional Commits so we concatenate the two stream
+	wellKnownValidConventionalCommitsForMergeMessages = append(wellKnownValidConventionalCommitsMessages, []struct {
+		message      *string
+		returnedType *string
+		scope        *string
+		title        *string
+		bump         *string
+	}{
+		{message: utl.PointerToString("\nfeat: allow provided config object to extend other configs\nBREAKING CHANGE: `extends` key in config file is now used for extending other config files"), returnedType: utl.PointerToString("feat"), scope: nil, title: utl.PointerToString("allow provided config object to extend other configs"), bump: utl.PointerToString("major")},
+		{message: utl.PointerToString("Anything\nfeat: allow provided config object to extend other configs\nBREAKING CHANGE: `extends` key in config file is now used for extending other config files"), returnedType: utl.PointerToString("feat"), scope: nil, title: utl.PointerToString("allow provided config object to extend other configs"), bump: utl.PointerToString("major")},
+		{message: utl.PointerToString("Anything\n\nfeat: allow provided config object to extend other configs\nBREAKING CHANGE: `extends` key in config file is now used for extending other config files"), returnedType: utl.PointerToString("feat"), scope: nil, title: utl.PointerToString("allow provided config object to extend other configs"), bump: utl.PointerToString("major")},
+		{message: utl.PointerToString("Anything\n\nrefactor!: drop support 1 for Node 6"), returnedType: utl.PointerToString("refactor"), scope: nil, title: utl.PointerToString("drop support 1 for Node 6"), bump: utl.PointerToString("major")},
+		{message: utl.PointerToString("Anything\n\nrefactor!: drop support 2 for Node 6\nBREAKING CHANGE: refactor to use JavaScript features not available in Node 6."), returnedType: utl.PointerToString("refactor"), scope: nil, title: utl.PointerToString("drop support 2 for Node 6"), bump: utl.PointerToString("major")},
+		{message: utl.PointerToString("Anything\n\nrefactor: drop support 3 for Node 6\nBREAKING CHANGE: refactor to use JavaScript features not available in Node 6."), returnedType: utl.PointerToString("refactor"), scope: nil, title: utl.PointerToString("drop support 3 for Node 6"), bump: utl.PointerToString("major")},
+		{message: utl.PointerToString("Anything\n\nrefactor: drop support 4 for Node 6\nBREAKING-CHANGE: refactor to use JavaScript features not available in Node 6."), returnedType: utl.PointerToString("refactor"), scope: nil, title: utl.PointerToString("drop support 4 for Node 6"), bump: utl.PointerToString("major")},
+		{message: utl.PointerToString("Anything\n\nrefactor: drop support 5 for Node 6\nBREAKING CHANGE:"), returnedType: utl.PointerToString("refactor"), scope: nil, title: utl.PointerToString("drop support 5 for Node 6"), bump: nil},
+		{message: utl.PointerToString("Anything\n\nrefactor: drop support 6 for Node 6\nBREAKING CHANGE refactor to use JavaScript features not available in Node 6."), returnedType: utl.PointerToString("refactor"), scope: nil, title: utl.PointerToString("drop support 6 for Node 6"), bump: nil},
+		{message: utl.PointerToString("Anything\n\nrefactor: drop support 7 for Node 6\nbreaking change: refactor to use JavaScript features not available in Node 6."), returnedType: utl.PointerToString("refactor"), scope: nil, title: utl.PointerToString("drop support 7 for Node 6"), bump: nil},
+		{message: utl.PointerToString("Anything\n\ndocs: correct spelling of CHANGELOG"), returnedType: utl.PointerToString("docs"), scope: nil, title: utl.PointerToString("correct spelling of CHANGELOG"), bump: nil},
+		{message: utl.PointerToString("Anything\n\nfeat(lang): add polish language"), returnedType: utl.PointerToString("feat"), scope: utl.PointerToString("lang"), title: utl.PointerToString("add polish language"), bump: utl.PointerToString("minor")},
+		{message: utl.PointerToString("Anything\n\nfix: correct minor typos in code\n\nsee the issue for details\n\non typos fixed.\n\nReviewed-by: Z\nRefs #133"), returnedType: utl.PointerToString("fix"), scope: nil, title: utl.PointerToString("correct minor typos in code"), bump: utl.PointerToString("patch")},
+		{message: utl.PointerToString("Anything\n\nfeat(shopping cart): add the amazing button"), returnedType: utl.PointerToString("feat"), scope: utl.PointerToString("shopping cart"), title: utl.PointerToString("add the amazing button"), bump: utl.PointerToString("minor")},
+		{message: utl.PointerToString("Anything\n\nfeat: remove ticket list endpoint\n\nrefers to JIRA-1337\nBREAKING CHANGES: ticket enpoints no longer supports list all entites."), returnedType: utl.PointerToString("feat"), scope: nil, title: utl.PointerToString("remove ticket list endpoint"), bump: utl.PointerToString("minor")},
+		{message: utl.PointerToString("Anything\n\nfix: add missing parameter to service call\n\nThe error occurred because of <reasons>."), returnedType: utl.PointerToString("fix"), scope: nil, title: utl.PointerToString("add missing parameter to service call"), bump: utl.PointerToString("patch")},
+		{message: utl.PointerToString("Anything\n\nbuild: update dependencies"), returnedType: utl.PointerToString("build"), scope: nil, title: utl.PointerToString("update dependencies"), bump: nil},
+	}...)
+
+	/*
+	   A fixture with invalid structured data to test commit messages using Conventional Commits For Merge.
+	   Each returned argument has one field with a commit message that doesn't match the Conventional Commits specification.
+
+	   Each returned argument has the fields:
+	   - message: the entire message
+	*/
+	// This convention must also comply with the standard Conventional Commits so we concatenate the two stream
+	wellKnownInvalidConventionalCommitsForMergeMessages = append(wellKnownInvalidConventionalCommitsMessages, []struct {
+		message      *string
+		returnedType *string
+		scope        *string
+		title        *string
+		bump         *string
+	}{
+		// no further elements to add here, elements for the standard Conventional Commit are sufficient
+	}...)
+
+	/*
 	   A fixture with valid structured data to test commit messages using GitMoji.
 
 	   Each returned argument has the fields:
@@ -222,6 +277,104 @@ func TestCommitMessageConventionConventionalCommitsCommitBumpComponent(t *testin
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			if tc.bump != nil {
 				for key, value := range *COMMIT_MESSAGE_CONVENTIONS_CONVENTIONAL_COMMITS.GetBumpExpressions() {
+					re, err := regexp2.Compile(value, 0)
+					assert.NoError(t, err)
+					match, err := re.MatchString(*tc.message)
+					assert.NoError(t, err)
+					if key == *tc.bump {
+						assert.True(t, match)
+					} else {
+						assert.Falsef(t, match, "expression '%s' ('%s') was not expected to match but it did", key, value)
+					}
+				}
+			}
+		})
+	}
+}
+
+func TestCommitMessageConventionConventionalCommitsForMergeMatchPositiveMatch(t *testing.T) {
+	for i, tc := range wellKnownValidConventionalCommitsForMergeMessages {
+		// just use the interation number for the description here
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			re, err := regexp2.Compile(*COMMIT_MESSAGE_CONVENTIONS_CONVENTIONAL_COMMITS_FOR_MERGE.GetExpression(), 0)
+			assert.NoError(t, err)
+			match, err := re.MatchString(*tc.message)
+			assert.NoError(t, err)
+			assert.True(t, match)
+		})
+	}
+}
+
+func TestCommitMessageConventionConventionalCommitsForMergeMatchNegativeMatch(t *testing.T) {
+	for i, tc := range wellKnownInvalidConventionalCommitsForMergeMessages {
+		// just use the interation number for the description here
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			re, err := regexp2.Compile(*COMMIT_MESSAGE_CONVENTIONS_CONVENTIONAL_COMMITS_FOR_MERGE.GetExpression(), 0)
+			assert.NoError(t, err)
+			match, err := re.MatchString(*tc.message)
+			assert.NoError(t, err)
+			assert.False(t, match)
+		})
+	}
+}
+
+func TestCommitMessageConventionConventionalCommitsForMergeCommitType(t *testing.T) {
+	for i, tc := range wellKnownValidConventionalCommitsForMergeMessages {
+		// just use the interation number for the description here
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			re, err := regexp2.Compile(*COMMIT_MESSAGE_CONVENTIONS_CONVENTIONAL_COMMITS_FOR_MERGE.GetExpression(), 0)
+			assert.NoError(t, err)
+			match, err := re.FindStringMatch(*tc.message)
+			assert.NoError(t, err)
+			g := match.GroupByName("type")
+			if tc.returnedType != nil {
+				assert.NotNil(t, g)
+				assert.Equal(t, *tc.returnedType, g.Captures[0].String())
+			}
+		})
+	}
+}
+
+func TestCommitMessageConventionConventionalCommitsForMergeCommitScope(t *testing.T) {
+	for i, tc := range wellKnownValidConventionalCommitsForMergeMessages {
+		// just use the interation number for the description here
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			re, err := regexp2.Compile(*COMMIT_MESSAGE_CONVENTIONS_CONVENTIONAL_COMMITS_FOR_MERGE.GetExpression(), 0)
+			assert.NoError(t, err)
+			match, err := re.FindStringMatch(*tc.message)
+			assert.NoError(t, err)
+			g := match.GroupByName("scope")
+			if tc.scope != nil {
+				assert.NotNil(t, g)
+				assert.Equal(t, *tc.scope, g.Captures[0].String())
+			}
+		})
+	}
+}
+
+func TestCommitMessageConventionConventionalCommitsForMergeCommitTitle(t *testing.T) {
+	for i, tc := range wellKnownValidConventionalCommitsForMergeMessages {
+		// just use the interation number for the description here
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			re, err := regexp2.Compile(*COMMIT_MESSAGE_CONVENTIONS_CONVENTIONAL_COMMITS_FOR_MERGE.GetExpression(), 0)
+			assert.NoError(t, err)
+			match, err := re.FindStringMatch(*tc.message)
+			assert.NoError(t, err)
+			g := match.GroupByName("title")
+			if tc.title != nil {
+				assert.NotNil(t, g)
+				assert.Equal(t, *tc.title, g.Captures[0].String())
+			}
+		})
+	}
+}
+
+func TestCommitMessageConventionConventionalCommitsForMergeCommitBumpComponent(t *testing.T) {
+	for i, tc := range wellKnownValidConventionalCommitsForMergeMessages {
+		// just use the interation number for the description here
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			if tc.bump != nil {
+				for key, value := range *COMMIT_MESSAGE_CONVENTIONS_CONVENTIONAL_COMMITS_FOR_MERGE.GetBumpExpressions() {
 					re, err := regexp2.Compile(value, 0)
 					assert.NoError(t, err)
 					match, err := re.MatchString(*tc.message)

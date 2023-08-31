@@ -69,6 +69,7 @@ The `expression` in a commit message convention is a regular expression that:
 
 * is evaluated against the entire commit message
 * needs to *match* the entire commit message in order to be selected
+* can match multiple portions of the commit message, in which case its capturing group are evaluated for each match
 * uses a well defined set of *named capturing group* in order to return structured fields
 
 The named capturing groups are:
@@ -81,7 +82,7 @@ All the capturing groups are optional as not all conventions support all of thes
 
 For example, the [Conventional Commits](https://www.conventionalcommits.org/) expression is `(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\((?<scope>[a-z ]+)\))?:( (?<title>.+))$(?s).*` and as you can see it has all the named capturing groups.
 
-Commit messages are often made of multiple lines of text so, when authoring these expressions, consider using the *multi-line* and *single-line* flags (`(?m)` and `(?s)`, respectively).
+Commit messages are often made of multiple lines of text so, when authoring these expressions, consider using the *multi-line* and *single-line* flags (`(?m)` and `(?s)`, respectively). This also affects whether or not you want to match one (i.e. the first line) or multiple portions of the commit message.
 {: .notice--info}
 
 Use tools like [regular expressions 101](https://regex101.com/) to write and test your regular expressions.
@@ -100,7 +101,7 @@ While conventions usually define a range of allowed values for `type` and `scope
 | Configuration File Option | `commitMessageConventions/items/<NAME>/bumpExpressions`                                  |
 | Related state attributes  | [newVersion]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#new-version){: .btn .btn--info .btn--small} [releaseScope/significantCommits]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#significant-commits){: .btn .btn--info .btn--small} [scheme]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#scheme){: .btn .btn--info .btn--small} [version]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#version){: .btn .btn--info .btn--small} |
 
-The `bumpExpressions` map gives Nyx instructions about which version identifiers are expected to be bumped according to the commit message. This map can be empty for those conventions not addressing the version bumping.
+The `bumpExpressions` map gives Nyx instructions about which version identifiers are expected to be bumped according to each match against the commit message. This map can be empty for those conventions not addressing the version bumping.
 
 Those commits in the release scope that successfully match one of these expressions are available in the [`significantCommits`]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#significant-commits) list.
 
@@ -108,9 +109,9 @@ Each entry in this map is made of two strings: the name of a version identifier 
 
 For example, the [Conventional Commits](https://www.conventionalcommits.org/) bump expressions are:
 
-* `major` = `(?s)(?m)^[a-zA-Z0-9_]+(!|.*^(BREAKING( |-)CHANGE: )).*`
-* `minor` = `(?s)(?m)^feat(?!!|.*^(BREAKING( |-)CHANGE: )).*`
-* `patch` = `(?s)(?m)^fix(?!!|.*^(BREAKING( |-)CHANGE: )).*`
+* `major` = `(?s)(?m)^[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*`
+* `minor` = `(?s)(?m)^feat(!{0})(\([a-z ]+\))?: (?!.*^(BREAKING( |-)CHANGE: )).*`
+* `patch` = `(?s)(?m)^fix(!{0})(\([a-z ]+\))?: (?!.*^(BREAKING( |-)CHANGE: )).*`
 
 As you can see, when a commit message has an exlamation mark after the `type` or `BREAKING CHANGE: ` (or `BREAKING-CHANGE: `) appears in the footer, the `major` identifier is bumped, otherwise `minor` is bumped when the message `type` is `feat` or `patch` is bumped when the message `type` is `fix`. No bump is performed if none of these expressions is matched.
 
