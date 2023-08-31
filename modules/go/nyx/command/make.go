@@ -309,6 +309,7 @@ func (c *Make) buildChangelog() error {
 							// the regular expression doesn't match the name capturing group, no commit type is inferred
 							//return &errs.IllegalPropertyError{Message: fmt.Sprintf("the regular expression '%s' defined for commit message convention '%s' does not define the 'type' named capturing group", *cmcEntryValue.GetExpression(), cmcEntryKey)}
 						}
+						// TODO: check the outcome of this method invocation as per https://github.com/mooltiverse/nyx/issues/262
 						matchMessage, err = re.FindNextMatch(matchMessage)
 						if err != nil {
 							return &errs.IllegalPropertyError{Message: fmt.Sprintf("cannot evaluate regular expression '%s' against '%s'", *cmcEntryValue.GetExpression(), commit.GetMessage().GetFullMessage()), Cause: err}

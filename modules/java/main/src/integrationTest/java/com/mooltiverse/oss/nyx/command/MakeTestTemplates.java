@@ -1715,15 +1715,18 @@ public class MakeTestTemplates {
                 // test the data model
                 assertEquals(1, command.state().getChangelog().getReleases().size());
                 assertEquals("1.0.0", command.state().getChangelog().getReleases().get(0).getName());
-                assertEquals(1, command.state().getChangelog().getReleases().get(0).getSections().size());
-                assertEquals("major", command.state().getChangelog().getReleases().get(0).getSections().get(0).getName());
+                assertEquals(2, command.state().getChangelog().getReleases().get(0).getSections().size());
+                assertEquals("fix", command.state().getChangelog().getReleases().get(0).getSections().get(0).getName());
                 assertEquals(1, command.state().getChangelog().getReleases().get(0).getSections().get(0).getCommits().size());
+                assertEquals("feat", command.state().getChangelog().getReleases().get(0).getSections().get(1).getName());
+                assertEquals(1, command.state().getChangelog().getReleases().get(0).getSections().get(1).getCommits().size());
 
                 // test the rendered file
                 String fileContent = readFile(changelogFile);
                 assertTrue(fileContent.startsWith("# Changelog"));  // title header check
                 assertTrue(fileContent.contains("## 1.0.0 "));      // release header check
-                assertTrue(fileContent.contains("### major"));      // section header check
+                assertTrue(fileContent.contains("### feat"));       // section header check
+                assertTrue(fileContent.contains("### fix"));        // section header check
                 assertTrue(fileContent.contains("] Alpha ("));      // partial line check
             }
         }
