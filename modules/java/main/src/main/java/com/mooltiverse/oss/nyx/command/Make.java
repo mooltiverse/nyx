@@ -46,8 +46,10 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Objects;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
@@ -66,7 +68,6 @@ import com.mooltiverse.oss.nyx.git.Repository;
 import com.mooltiverse.oss.nyx.io.DataAccessException;
 import com.mooltiverse.oss.nyx.state.State;
 import com.mooltiverse.oss.nyx.template.Templates;
-import com.mooltiverse.oss.nyx.version.Versions;
 
 /**
  * The Make command takes care of building the release artifacts.
@@ -252,7 +253,7 @@ public class Make extends AbstractCommand {
             // if the user didn't map the sections
             for (Commit commit: state().getReleaseScope().getCommits()) {
                 // Now we need to infer the commit type by using the commit message conventions
-                String commitType = null;
+                Set<String> commitTypes = new HashSet<String>();
                 if (!Objects.isNull(state().getConfiguration().getCommitMessageConventions().getItems())) {
                     logger.debug(COMMAND, "Trying to infer the commit type based on the commit message of commit '{}'", commit.getSHA());
                     for (Map.Entry<String,CommitMessageConvention> cmcEntry: state().getConfiguration().getCommitMessageConventions().getItems().entrySet()) {
@@ -265,13 +266,12 @@ public class Make extends AbstractCommand {
                                     logger.debug(COMMAND, "Matching commit '{}' ('{}') against bump expression '{}' ('{}') of message convention '{}'", commit.getSHA(), commit.getMessage().getFullMessage(), bumpExpression.getKey(), bumpExpression.getValue(), cmcEntry.getKey());
                                     Matcher bumpMatcher = Pattern.compile(bumpExpression.getValue()).matcher(commit.getMessage().getFullMessage());
                                     if (bumpMatcher.find()) {
-                                        logger.debug(COMMAND, "Bump expression '{}' of message convention '{}' matches commit '{}', meaning that the '{}' identifier has to be bumped, according to this commit", bumpExpression.getKey(), cmcEntry.getKey(), commit.getSHA(), bumpExpression.getKey());
                                         // In case the release matches multiple bump identifiers (i.e. when using a commit message convention that supports merge commits)
-                                        // the commitType must always use the most significant one.
-                                        commitType = Versions.mostRelevantIdentifier(state().getConfiguration().getScheme(), commitType, bumpExpression.getKey());
-                                        logger.debug(COMMAND, "The type of commit '{}' is '{}'", commit.getSHA(), commitType);
+                                        // the commit must belong to multiple commit types.
+                                        commitTypes.add(messageMatcher.group("type"));
+                                        logger.debug(COMMAND, "The commit '{}' is of type '{}'", commit.getSHA(), messageMatcher.group("type"));
                                     }
-                                    else logger.debug(COMMAND, "Bump expression '{}' of message convention '{}' doesn't match commit '{}'", bumpExpression.getKey(), cmcEntry.getKey(), commit.getSHA());
+                                    else logger.debug(COMMAND, "The commit '{}' is not of type '{}'", commit.getSHA(), messageMatcher.group("type"));
                                 }
                             }
                         }
@@ -282,30 +282,32 @@ public class Make extends AbstractCommand {
                         catch (IllegalStateException ise) {
                             throw new ReleaseException(String.format("Cannot infer the commit type for commit '%s' match operation failed for the regular expression '%s' from commit message convention '%s'", commit.getSHA(), cmcEntry.getValue().getExpression(), cmcEntry.getKey()), ise);
                         }
-                        if (Objects.isNull(commitType))
+                        if (Objects.isNull(commitTypes) || commitTypes.isEmpty())
                             logger.debug(COMMAND, "The commit type cannot be inferred for commit '{}' using the regular expression '{}' from commit message convention '{}'", commit.getSHA(), cmcEntry.getValue().getExpression(), cmcEntry.getKey());
                     }
                 }
-                if (Objects.isNull(commitType) || commitType.isBlank())
+                if (Objects.isNull(commitTypes) || commitTypes.isEmpty())
                     logger.debug(COMMAND, "No commit message convention has been configured or the configured commit message conventions do not allow to infer the 'type' for commit '{}'. The commit will not appear in the changelog.", commit.getSHA());
                 else {
-                    // If the user has defined some sections mapping we need to map the commit type to those sections,
-                    // otherwise the section will be the commit type
-                    if (Objects.isNull(state().getConfiguration().getChangelog().getSections()) || state().getConfiguration().getChangelog().getSections().isEmpty()) {
-                        logger.debug(COMMAND, "Changelog sections haven't been defined by user. Commit '{}' will appear in section '{}' (same as the commit type)", commit.getSHA(), commitType);
-                        release.getSection(commitType, true).getCommits().add(commit);
-                    }
-                    else {
-                        for (Map.Entry<String,String> sectionEntry: state().getConfiguration().getChangelog().getSections().entrySet()) {
-                            logger.debug(COMMAND, "Evaluating commit type '{}' against changelog section '{}'", commitType, sectionEntry.getKey());
-                            if (Pattern.matches(sectionEntry.getValue(), commitType)) {
-                                logger.debug(COMMAND, "Expression '{}' for section '{}' successfully matches type '{}' so commit '{}' will appear under the '{}' section", sectionEntry.getValue(), sectionEntry.getKey(), commitType, commit.getSHA(), sectionEntry.getKey());
-                                release.getSection(sectionEntry.getKey(), true).getCommits().add(commit);
-                                break;
-                            }
-                            else {
-                                logger.debug(COMMAND, "Expression '{}' for section '{}' does not match type '{}'. Trying with next sections, if any.", sectionEntry.getValue(), sectionEntry.getKey(), commitType);
-                                continue;
+                    for (String commitType: commitTypes) {
+                        // If the user has defined some sections mapping we need to map the commit type to those sections,
+                        // otherwise the section will be the commit type
+                        if (Objects.isNull(state().getConfiguration().getChangelog().getSections()) || state().getConfiguration().getChangelog().getSections().isEmpty()) {
+                            logger.debug(COMMAND, "Changelog sections haven't been defined by user. Commit '{}' will appear in section '{}' (same as the commit type)", commit.getSHA(), commitType);
+                            release.getSection(commitType, true).getCommits().add(commit);
+                        }
+                        else {
+                            for (Map.Entry<String,String> sectionEntry: state().getConfiguration().getChangelog().getSections().entrySet()) {
+                                logger.debug(COMMAND, "Evaluating commit type '{}' against changelog section '{}'", commitType, sectionEntry.getKey());
+                                if (Pattern.matches(sectionEntry.getValue(), commitType)) {
+                                    logger.debug(COMMAND, "Expression '{}' for section '{}' successfully matches type '{}' so commit '{}' will appear under the '{}' section", sectionEntry.getValue(), sectionEntry.getKey(), commitType, commit.getSHA(), sectionEntry.getKey());
+                                    release.getSection(sectionEntry.getKey(), true).getCommits().add(commit);
+                                    break;
+                                }
+                                else {
+                                    logger.debug(COMMAND, "Expression '{}' for section '{}' does not match type '{}'. Trying with next sections, if any.", sectionEntry.getValue(), sectionEntry.getKey(), commitType);
+                                    continue;
+                                }
                             }
                         }
                     }

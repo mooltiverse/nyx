@@ -38,7 +38,6 @@ import (
 	stt "github.com/mooltiverse/nyx/modules/go/nyx/state"
 	tpl "github.com/mooltiverse/nyx/modules/go/nyx/template"
 	utl "github.com/mooltiverse/nyx/modules/go/utils"
-	ver "github.com/mooltiverse/nyx/modules/go/version"
 )
 
 const (
@@ -262,7 +261,7 @@ func (c *Make) buildChangelog() error {
 		}
 		for _, commit := range releaseScope.GetCommits() {
 			// Now we need to infer the commit type by using the commit message conventions
-			var commitType *string
+			var commitTypes []string
 			commitMessageConventions, err := c.State().GetConfiguration().GetCommitMessageConventions()
 			if err != nil {
 				return err
@@ -280,73 +279,81 @@ func (c *Make) buildChangelog() error {
 						return &errs.IllegalPropertyError{Message: fmt.Sprintf("cannot evaluate regular expression '%s' against '%s'", *cmcEntryValue.GetExpression(), commit.GetMessage().GetFullMessage()), Cause: err}
 					}
 					if matchMessage != nil {
-
 						log.Debugf("commit message convention '%s' matches commit '%s'", cmcEntryKey, commit.GetSHA())
-						for bumpExpressionKey, bumpExpressionValue := range *cmcEntryValue.GetBumpExpressions() {
-							log.Debugf("matching commit '%s' ('%s') against bump expression '%s' ('%s') of message convention '%s'", commit.GetSHA(), commit.GetMessage().GetFullMessage(), bumpExpressionKey, bumpExpressionValue, cmcEntryKey)
-							re, err = regexp2.Compile(bumpExpressionValue, 0)
-							if err != nil {
-								log.Errorf("cannot compile regular expression '%s': %v", bumpExpressionValue, err)
-							}
-							matchBump, err := re.MatchString(commit.GetMessage().GetFullMessage())
-							if err != nil {
-								log.Errorf("cannot evaluate regular expression '%s' against '%s': %v", bumpExpressionValue, commit.GetMessage().GetFullMessage(), err)
-							}
-							if matchBump {
-								log.Debugf("bump expression '%s' of message convention '%s' matches commit '%s', meaning that the '%s' identifier has to be bumped, according to this commit", bumpExpressionKey, cmcEntryKey, commit.GetSHA(), bumpExpressionKey)
-								// In case the release matches multiple bump identifiers (i.e. when using a commit message convention that supports merge commits)
-								// the commitType must always use the most significant one.
-								configurationScheme, err := c.State().GetConfiguration().GetScheme()
+						commitTypeGroup := matchMessage.GroupByName("type")
+						commitType := ""
+						if commitTypeGroup != nil && len(commitTypeGroup.Captures) > 0 {
+							commitType = commitTypeGroup.Captures[0].String()
+							log.Debugf("the type of commit '%s' is '%s'", commit.GetSHA(), commitType)
+							for bumpExpressionKey, bumpExpressionValue := range *cmcEntryValue.GetBumpExpressions() {
+								log.Debugf("matching commit '%s' ('%s') against bump expression '%s' ('%s') of message convention '%s'", commit.GetSHA(), commit.GetMessage().GetFullMessage(), bumpExpressionKey, bumpExpressionValue, cmcEntryKey)
+								re, err = regexp2.Compile(bumpExpressionValue, 0)
 								if err != nil {
-									return err
+									log.Errorf("cannot compile regular expression '%s': %v", bumpExpressionValue, err)
 								}
-								if configurationScheme == nil {
-									return &errs.IllegalPropertyError{Message: fmt.Sprintf("cannot retrieve the current scheme from the configuration")}
+								matchBump, err := re.MatchString(commit.GetMessage().GetFullMessage())
+								if err != nil {
+									log.Errorf("cannot evaluate regular expression '%s' against '%s': %v", bumpExpressionValue, commit.GetMessage().GetFullMessage(), err)
 								}
-								commitType = ver.MostRelevantIdentifierBetween(*configurationScheme, commitType, utl.PointerToString(bumpExpressionKey))
-							} else {
-								log.Debugf("bump expression '%s' of message convention '%s' doesn't match commit '%s'", bumpExpressionKey, cmcEntryKey, commit.GetSHA())
+								if matchBump {
+									// In case the release matches multiple bump identifiers (i.e. when using a commit message convention that supports merge commits)
+									// the commitType must always use the most significant one.
+									configurationScheme, err := c.State().GetConfiguration().GetScheme()
+									if err != nil {
+										return err
+									}
+									if configurationScheme == nil {
+										return &errs.IllegalPropertyError{Message: fmt.Sprintf("cannot retrieve the current scheme from the configuration")}
+									}
+									commitTypes = append(commitTypes, commitTypeGroup.Captures[0].String())
+									log.Debugf("the commit '%s' is of type '%s'", commit.GetSHA(), commitType)
+								} else {
+									log.Debugf("the commit '%s' is not of type '%s'", commit.GetSHA(), commitType)
+								}
 							}
+						} else {
+							log.Debugf("the commit type cannot be inferred for commit '%s' using the regular expression '%s' from commit message convention '%s'", commit.GetSHA(), *cmcEntryValue.GetExpression(), cmcEntryKey)
 						}
-					}
-					if commitType == nil {
+					} else {
 						log.Debugf("the commit type cannot be inferred for commit '%s' using the regular expression '%s' from commit message convention '%s'", commit.GetSHA(), *cmcEntryValue.GetExpression(), cmcEntryKey)
 					}
 				}
 			}
-			if commitType == nil || "" == strings.TrimSpace(*commitType) {
-				log.Debugf("no commit message convention has been configured or the configured commit message conventions do not allow to infer the 'type' for commit '%s'. The commit will not appear in the changelog.", commit.GetSHA())
+			if len(commitTypes) == 0 {
+				log.Debugf("unable infer the 'type' for commit '%s'. The commit will not appear in the changelog.", commit.GetSHA())
 			} else {
-				// If the user has defined some sections mapping we need to map the commit type to those sections,
-				// otherwise the section will be the commit type
-				if changelogConfiguration.GetSections() == nil || len(*changelogConfiguration.GetSections()) == 0 {
-					log.Debugf("changelog sections haven't been defined by user. Commit '%s' will appear in section '%s' (same as the commit type)", commit.GetSHA(), *commitType)
-					releaseCommits := release.GetSection(*commitType, true).GetCommits()
-					commitCopy := commit // avoid appending the same item by creating a copy of the item
-					releaseCommits = append(releaseCommits, commitCopy)
-					release.GetSection(*commitType, true).SetCommits(releaseCommits)
-				} else {
-					for sectionEntryKey, sectionEntryValue := range *changelogConfiguration.GetSections() {
-						log.Debugf("evaluating commit type '%s' against changelog section '%s'", *commitType, sectionEntryKey)
-						re, err := regexp2.Compile(sectionEntryValue, 0)
-						if err != nil {
-							return &errs.IllegalPropertyError{Message: fmt.Sprintf("cannot compile regular expression '%s'", sectionEntryValue), Cause: err}
-						}
-						match, err := re.MatchString(*commitType)
-						if err != nil {
-							return &errs.IllegalPropertyError{Message: fmt.Sprintf("cannot evaluate regular expression '%s' against '%s'", sectionEntryValue, *commitType), Cause: err}
-						}
-						if match {
-							log.Debugf("expression '%s' for section '%s' successfully matches type '%s' so commit '%s' will appear under the '%s' section", sectionEntryValue, sectionEntryKey, *commitType, commit.GetSHA(), sectionEntryKey)
-							releaseCommits := release.GetSection(sectionEntryKey, true).GetCommits()
-							commitCopy := commit // avoid appending the same item by creating a copy of the item
-							releaseCommits = append(releaseCommits, commitCopy)
-							release.GetSection(sectionEntryKey, true).SetCommits(releaseCommits)
+				for _, commitType := range commitTypes {
+					// If the user has defined some sections mapping we need to map the commit type to those sections,
+					// otherwise the section will be the commit type
+					if changelogConfiguration.GetSections() == nil || len(*changelogConfiguration.GetSections()) == 0 {
+						log.Debugf("changelog sections haven't been defined by user. Commit '%s' will appear in section '%s' (same as the commit type)", commit.GetSHA(), commitType)
+						releaseCommits := release.GetSection(commitType, true).GetCommits()
+						commitCopy := commit // avoid appending the same item by creating a copy of the item
+						releaseCommits = append(releaseCommits, commitCopy)
+						release.GetSection(commitType, true).SetCommits(releaseCommits)
+					} else {
+						for sectionEntryKey, sectionEntryValue := range *changelogConfiguration.GetSections() {
+							log.Debugf("evaluating commit type '%s' against changelog section '%s'", commitType, sectionEntryKey)
+							re, err := regexp2.Compile(sectionEntryValue, 0)
+							if err != nil {
+								return &errs.IllegalPropertyError{Message: fmt.Sprintf("cannot compile regular expression '%s'", sectionEntryValue), Cause: err}
+							}
+							match, err := re.MatchString(commitType)
+							if err != nil {
+								return &errs.IllegalPropertyError{Message: fmt.Sprintf("cannot evaluate regular expression '%s' against '%s'", sectionEntryValue, commitType), Cause: err}
+							}
+							if match {
+								log.Debugf("expression '%s' for section '%s' successfully matches type '%s' so commit '%s' will appear under the '%s' section", sectionEntryValue, sectionEntryKey, commitType, commit.GetSHA(), sectionEntryKey)
+								releaseCommits := release.GetSection(sectionEntryKey, true).GetCommits()
+								commitCopy := commit // avoid appending the same item by creating a copy of the item
+								releaseCommits = append(releaseCommits, commitCopy)
+								release.GetSection(sectionEntryKey, true).SetCommits(releaseCommits)
 
-							break
-						} else {
-							log.Debugf("expression '%s' for section '%s' does not match type '%s'. Trying with next sections, if any.", sectionEntryValue, sectionEntryKey, *commitType)
-							continue
+								break
+							} else {
+								log.Debugf("expression '%s' for section '%s' does not match type '%s'. Trying with next sections, if any.", sectionEntryValue, sectionEntryKey, commitType)
+								continue
+							}
 						}
 					}
 				}
