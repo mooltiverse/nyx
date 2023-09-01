@@ -18,7 +18,7 @@
 This package provides functional tests.
 
 In order to make these tests work both from regular hosts and from inside other containers
-(like Development Containers) we need to mount the test repository data with Docker volumes,
+(i.e. Development Containers) we need to mount the test repository data with Docker volumes,
 otherwise, if we mount a folder into the test container, the folder that Docker tries to
 mount is always from the host, even when running inside a development container, and in that
 case tests fail.

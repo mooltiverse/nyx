@@ -23,8 +23,7 @@ import (
 /*
 This interface models a an execution context that allows running the Nyx executable from within a specific environment.
 
-This interface can be implemented by different contexts in order to run a certain command
-in a context specific way.
+This interface can be implemented by different contexts in order to run a certain command in a context specific way.
 */
 type ExecutionContext interface {
 	/*
