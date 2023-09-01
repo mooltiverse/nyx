@@ -165,7 +165,7 @@ func (ctx *DockerExecutionContext) GetPreTestCommands(repoDir string, env map[st
 		exec.Command("docker", "container", "create", "--name", disposeableContainerName, "-v", dockerVolumeNameFromRepoDir(repoDir)+":/project", "alpine"),
 		// copy the test repository file to the volume mounted in the disposeable container
 		// note the "/." at the end of the source path (see https://docs.docker.com/engine/reference/commandline/cp/)
-		exec.Command("docker", "cp", repoDir+"/.", disposeableContainerName+":"+"/project"),
+		exec.Command("docker", "cp", "-a", repoDir+"/.", disposeableContainerName+":"+"/project"),
 	}
 }
 
