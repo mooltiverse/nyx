@@ -521,6 +521,11 @@ jobs:
     # - the Java files have changed
     # - a new release must be issued (this flag is inferred by Nyx), in which case we rebuild and test everything
     if: needs.init.outputs.javaChanged == 'true' || needs.init.outputs.newRelease == 'true'
+    # Avoid jobs invoking remote services to run in parallel to avoid throttling down by those services (with consequent test failures).
+    # See https://github.com/mooltiverse/nyx/issues/206 for more
+    concurrency:
+      group: rate-limited-remote-services
+      cancel-in-progress: false
     # The recommended JDK version is 15 or above but since we need to test for backward compatibility to JVMs 11 or newer we
     # need a matrix here. Depending on the JDK version the set of Gradle version that the tests run on will change, according
     # to the Gradle compatibility matrix. See CONTRIBUTING.md in the root directory or the Gradle functional test suites for more.
@@ -839,6 +844,11 @@ jobs:
     # - the Go files have changed
     # - a new release must be issued (this flag is inferred by Nyx), in which case we rebuild and test everything
     if: needs.init.outputs.goChanged == 'true' || needs.init.outputs.newRelease == 'true'
+    # Avoid jobs invoking remote services to run in parallel to avoid throttling down by those services (with consequent test failures).
+    # See https://github.com/mooltiverse/nyx/issues/206 for more
+    concurrency:
+      group: rate-limited-remote-services
+      cancel-in-progress: false
     strategy:
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
