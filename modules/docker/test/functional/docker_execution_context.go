@@ -26,12 +26,12 @@ case tests fail.
 package docker_functional_test
 
 import (
-	"os"            // https://pkg.go.dev/os
-	"os/exec"       // https://pkg.go.dev/os/exec
-	"os/user"       // https://pkg.go.dev/os/user
+	"os"      // https://pkg.go.dev/os
+	"os/exec" // https://pkg.go.dev/os/exec
+	// https://pkg.go.dev/os/user
 	"path/filepath" // https://pkg.go.dev/path/filepath
-	"runtime"       // https://pkg.go.dev/runtime
 
+	// https://pkg.go.dev/runtime
 	. "github.com/mooltiverse/nyx/modules/go/nyx/test/functional"
 )
 
@@ -125,7 +125,9 @@ func (ctx *DockerExecutionContext) GetTestCommands(repoDir string, env map[strin
 
 	// the volume mounted here is created by commands from GetPreTestCommands
 	cmdArgs := []string{"run" /*, "-it"*/, "--rm", "-v", dockerVolumeNameFromRepoDir(repoDir) + ":/project"}
-	if runtime.GOOS != "windows" {
+	// As long as files are copied in a Docker volume as root let's just run as root
+	cmdArgs = append(cmdArgs, "-u=root:root")
+	/*if runtime.GOOS != "windows" {
 		// map the container user to the local user ID, like -u $(id -u):$(id -g)
 		// do this on all platforms but Windows
 		usr, err := user.Current()
@@ -133,7 +135,7 @@ func (ctx *DockerExecutionContext) GetTestCommands(repoDir string, env map[strin
 			panic(err)
 		}
 		cmdArgs = append(cmdArgs, "-u="+usr.Uid+":"+usr.Gid)
-	}
+	}*/
 	if env != nil && len(env) > 0 {
 		cmdArgs = append(cmdArgs, translateEnvironmentVariables(env)...)
 	}
