@@ -28,6 +28,7 @@ package docker_functional_test
 import (
 	"os"      // https://pkg.go.dev/os
 	"os/exec" // https://pkg.go.dev/os/exec
+
 	// https://pkg.go.dev/os/user
 	"path/filepath" // https://pkg.go.dev/path/filepath
 
@@ -125,7 +126,9 @@ func (ctx *DockerExecutionContext) GetTestCommands(repoDir string, env map[strin
 
 	// the volume mounted here is created by commands from GetPreTestCommands
 	cmdArgs := []string{"run" /*, "-it"*/, "--rm", "-v", dockerVolumeNameFromRepoDir(repoDir) + ":/project"}
-	// As long as files are copied in a Docker volume as root let's just run as root
+	// As long as files are copied in the PreTest commands in a Docker volume as root (Alpine's default, and Alpine uses root)
+	// let's just run as root (by default), otherwise, on GitHub Actions, where the host user is other than root (runner:docker, to be specific),
+	// files inside the container aren't modifiable by the runtime user
 	cmdArgs = append(cmdArgs, "-u=root:root")
 	/*if runtime.GOOS != "windows" {
 		// map the container user to the local user ID, like -u $(id -u):$(id -g)
@@ -168,12 +171,6 @@ func (ctx *DockerExecutionContext) GetPreTestCommands(repoDir string, env map[st
 		// copy the test repository file to the volume mounted in the disposeable container
 		// note the "/." at the end of the source path (see https://docs.docker.com/engine/reference/commandline/cp/)
 		exec.Command("docker", "cp", "-a", repoDir+"/.", disposeableContainerName+":"+"/project"),
-		// TODO: remove the following lines, used just for debug purposes
-		exec.Command("id"),                  // on local
-		exec.Command("ls", "-alR", repoDir), // on local
-
-		exec.Command("docker", "container", "run", "--rm", "alpine", "id"),                                                                             // on disposeable container
-		exec.Command("docker", "container", "run", "--rm", "-v", dockerVolumeNameFromRepoDir(repoDir)+":/project", "alpine", "ls", "-alR", "/project"), // on disposeable container
 	}
 }
 
