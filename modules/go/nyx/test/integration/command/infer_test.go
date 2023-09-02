@@ -8911,7 +8911,7 @@ func TestInferRunUsingDefaultReleaseTypeWithMergeCommitResumingMultipleCommits(t
 			// this convention is like the CONVENTIONAL_COMMITS_FOR_MERGE
 			commitMessageConventions, _ := ent.NewCommitMessageConventionsWith(&[]*string{utl.PointerToString("testConvention")},
 				&map[string]*ent.CommitMessageConvention{"testConvention": ent.NewCommitMessageConventionWith(utl.PointerToString("(?<type>[a-zA-Z0-9_]+)(!)?(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))"),
-					&map[string]string{"major": "(?s)(?m)^[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*", "minor": "(?s)(?m)^feat(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*", "patch": "(?s)(?m)^fix(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*"})})
+					&map[string]string{"major": "(?s)(?m)[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*", "minor": "(?s)(?m)feat(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*", "patch": "(?s)(?m)fix(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*"})})
 			configurationLayerMock.SetCommitMessageConventions(commitMessageConventions)
 			var configurationLayer cnf.ConfigurationLayer
 			configurationLayer = configurationLayerMock

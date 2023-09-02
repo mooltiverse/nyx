@@ -34,7 +34,7 @@ var (
 		that have been merged (i.e. when squashing) so the bump identifiers are scanned in the body, which may contain multiple
 		significant rows, rather than just the first line.
 	*/
-	COMMIT_MESSAGE_CONVENTIONS_CONVENTIONAL_COMMITS_FOR_MERGE = ent.NewCommitMessageConventionWith(utl.PointerToString("(?<type>[a-zA-Z0-9_]+)(!)?(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))"), &map[string]string{"major": "(?s)(?m)^[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*", "minor": "(?s)(?m)^feat(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*", "patch": "(?s)(?m)^fix(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*"})
+	COMMIT_MESSAGE_CONVENTIONS_CONVENTIONAL_COMMITS_FOR_MERGE = ent.NewCommitMessageConventionWith(utl.PointerToString("(?<type>[a-zA-Z0-9_]+)(!)?(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))"), &map[string]string{"major": "(?s)(?m)[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*", "minor": "(?s)(?m)feat(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*", "patch": "(?s)(?m)fix(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*"})
 
 	/*
 		The gitmoji configuration.

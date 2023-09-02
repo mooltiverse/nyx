@@ -7873,7 +7873,7 @@ public class InferTestTemplates {
             configurationLayerMock.setCommitMessageConventions(
                 new CommitMessageConventions(
                     List.<String>of("testConvention"),
-                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention("(?<type>[a-zA-Z0-9_]+)(!)?(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))", Map.<String,String>of("major", "(?s)(?m)^[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*", "minor", "(?s)(?m)^feat(!{0})(\\\\([a-z ]+\\\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*", "patch", "(?s)(?m)^fix(!{0})(\\\\([a-z ]+\\\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*")))
+                    Map.<String,CommitMessageConvention>of("testConvention", new CommitMessageConvention("(?<type>[a-zA-Z0-9_]+)(!)?(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))", Map.<String,String>of("major", "(?s)(?m)[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*", "minor", "(?s)(?m)feat(!{0})(\\\\([a-z ]+\\\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*", "patch", "(?s)(?m)fix(!{0})(\\\\([a-z ]+\\\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*")))
                 )
             );
             command.state().getConfiguration().withRuntimeConfiguration(configurationLayerMock);
