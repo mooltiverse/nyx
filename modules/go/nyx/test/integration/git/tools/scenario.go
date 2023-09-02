@@ -143,7 +143,7 @@ This yields to a repository like:
 */
 func ONE_BRANCH_SHORT_CONVENTIONAL_COMMITS_FOR_MERGE() Scenario {
 	return Scenario{function: func(directory string) Script {
-		return From(directory).AndAddFiles().AndCommitWith(utl.PointerToString("Initial commit")).AndCommitWithTag("0.0.1").AndCommitWithTagNameAndMessage("0.0.2", utl.PointerToString("fix: Annotated tag to commit 0.0.2")).AndCommitWithTag("0.0.3").AndCommitWithTagNameAndMessage("0.0.4", utl.PointerToString("feat: Annotated tag to commit 0.0.4")).AndCommitWith(utl.PointerToString("Alpha\n\n* fix: patch #1\n\n* feat: minor #1\n\nfeat!: major #1"))
+		return From(directory).AndAddFiles().AndCommitWith(utl.PointerToString("Initial commit")).AndCommitWithTag("0.0.1").AndCommitWithTagNameAndMessage("0.0.2", utl.PointerToString("fix: Annotated tag to commit 0.0.2")).AndCommitWithTag("0.0.3").AndCommitWithTagNameAndMessage("0.0.4", utl.PointerToString("feat: Annotated tag to commit 0.0.4")).AndCommitWith(utl.PointerToString("Alpha\n\n* fix: patch #1\n\n* feat: minor #1\n\n* feat!: major #1"))
 	}}
 }
 

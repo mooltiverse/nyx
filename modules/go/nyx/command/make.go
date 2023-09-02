@@ -282,34 +282,24 @@ func (c *Make) buildChangelog() error {
 					for matchMessage != nil {
 						log.Debugf("commit message convention '%s' matches commit '%s'", cmcEntryKey, commit.GetSHA())
 						commitTypeGroup := matchMessage.GroupByName("type")
-						var commitType *string
 						if commitTypeGroup != nil && len(commitTypeGroup.Captures) > 0 {
 							commitTypeString := commitTypeGroup.Captures[0].String()
-							commitType = &commitTypeString
-							for bumpExpressionKey, bumpExpressionValue := range *cmcEntryValue.GetBumpExpressions() {
-								log.Debugf("matching commit '%s' ('%s') against bump expression '%s' ('%s') of message convention '%s'", commit.GetSHA(), commit.GetMessage().GetFullMessage(), bumpExpressionKey, bumpExpressionValue, cmcEntryKey)
-								re, err = regexp2.Compile(bumpExpressionValue, 0)
-								if err != nil {
-									log.Errorf("cannot compile regular expression '%s': %v", bumpExpressionValue, err)
+							commitType := &commitTypeString
+							// avoid inserting duplicates in the commitTypes, only add the new commitType if was not already present
+							commitTypeAlreadyPresent := false
+							for _, v := range commitTypes {
+								if v == commitTypeString {
+									commitTypeAlreadyPresent = true
 								}
-								matchBump, err := re.MatchString(commit.GetMessage().GetFullMessage())
-								if err != nil {
-									log.Errorf("cannot evaluate regular expression '%s' against '%s': %v", bumpExpressionValue, commit.GetMessage().GetFullMessage(), err)
-								}
-								if matchBump {
-									// In case the release matches multiple bump identifiers (i.e. when using a commit message convention that supports merge commits)
-									// the commitType must always use the most significant one.
-									commitTypes = append(commitTypes, *commitType)
-									log.Debugf("the commit '%s' is of type '%s'", commit.GetSHA(), *commitType)
-								} else {
-									log.Debugf("the commit '%s' is not of type '%s'", commit.GetSHA(), *commitType)
-								}
+							}
+							if !commitTypeAlreadyPresent {
+								commitTypes = append(commitTypes, *commitType)
+								log.Debugf("the commit '%s' is of type '%s'", commit.GetSHA(), *commitType)
 							}
 						} else {
 							// the regular expression doesn't match the name capturing group, no commit type is inferred
 							//return &errs.IllegalPropertyError{Message: fmt.Sprintf("the regular expression '%s' defined for commit message convention '%s' does not define the 'type' named capturing group", *cmcEntryValue.GetExpression(), cmcEntryKey)}
 						}
-						// TODO: check the outcome of this method invocation as per https://github.com/mooltiverse/nyx/issues/262
 						matchMessage, err = re.FindNextMatch(matchMessage)
 						if err != nil {
 							return &errs.IllegalPropertyError{Message: fmt.Sprintf("cannot evaluate regular expression '%s' against '%s'", *cmcEntryValue.GetExpression(), commit.GetMessage().GetFullMessage()), Cause: err}
