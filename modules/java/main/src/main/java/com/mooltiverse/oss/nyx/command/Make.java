@@ -264,17 +264,8 @@ public class Make extends AbstractCommand {
                             while (messageMatcher.find()) {
                                 logger.debug(COMMAND, "Commit message convention '{}' matches commit '{}'", cmcEntry.getKey(), commit.getSHA());
                                 String commitType = messageMatcher.group("type");
-                                for (Map.Entry<String,String> bumpExpression: cmcEntry.getValue().getBumpExpressions().entrySet()) {
-                                    logger.debug(COMMAND, "Matching commit '{}' ('{}') against bump expression '{}' ('{}') of message convention '{}'", commit.getSHA(), commit.getMessage().getFullMessage(), bumpExpression.getKey(), bumpExpression.getValue(), cmcEntry.getKey());
-                                    Matcher bumpMatcher = Pattern.compile(bumpExpression.getValue()).matcher(commit.getMessage().getFullMessage());
-                                    if (bumpMatcher.find()) {
-                                        // In case the release matches multiple bump identifiers (i.e. when using a commit message convention that supports merge commits)
-                                        // the commit must belong to multiple commit types.
-                                        commitTypes.add(commitType);
-                                        logger.debug(COMMAND, "The commit '{}' is of type '{}'", commit.getSHA(), commitType);
-                                    }
-                                    else logger.debug(COMMAND, "The commit '{}' is not of type '{}'", commit.getSHA(), commitType);
-                                }
+                                commitTypes.add(commitType);
+                                logger.debug(COMMAND, "The commit '{}' is of type '{}'", commit.getSHA(), commitType);
                             }
                         }
                         catch (IllegalArgumentException iae) {

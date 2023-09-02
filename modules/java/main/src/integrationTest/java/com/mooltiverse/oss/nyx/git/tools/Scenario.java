@@ -140,7 +140,7 @@ public enum Scenario {
         .andCommitWithTag("0.0.2", "fix: Annotated tag to commit 0.0.2")
         .andCommitWithTag("0.0.3")
         .andCommitWithTag("0.0.4", "feat: Annotated tag to commit 0.0.4")
-        .andCommit("Alpha\n\n* fix: patch #1\n\n* feat: minor #1\n\nfeat!: major #1")
+        .andCommit("Alpha\n\n* fix: patch #1\n\n* feat: minor #1\n\n* feat!: major #1")
     ),
 
     /**
