@@ -216,9 +216,10 @@ jobs:
     name: Build - Go
     needs: init
     # This job is time consuming so only run it if:
+    # - the Docker files have changed
     # - the Go files have changed
     # - a new release must be issued (this flag is inferred by Nyx), in which case we rebuild and test everything
-    if: needs.init.outputs.goChanged == 'true' || needs.init.outputs.newRelease == 'true'
+    if: needs.init.outputs.dockerChanged == 'true' || needs.init.outputs.goChanged == 'true' || needs.init.outputs.newRelease == 'true'
     runs-on: ubuntu-latest
     steps:
     - name: Git checkout
@@ -293,6 +294,7 @@ jobs:
     needs: build-go
     # This job is time consuming so only run it if:
     # - the Docker files have changed
+    # - the Go files have changed
     # - a new release must be issued (this flag is inferred by Nyx), in which case we rebuild and test everything
     if: needs.init.outputs.dockerChanged == 'true' || needs.init.outputs.goChanged == 'true' || needs.init.outputs.newRelease == 'true'
     runs-on: ubuntu-latest
