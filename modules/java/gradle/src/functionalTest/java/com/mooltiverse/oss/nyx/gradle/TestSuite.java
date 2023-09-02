@@ -256,7 +256,11 @@ public class TestSuite {
 		}
 
 		// Prepare the command to run
-		logger.debug("Setting up the command to run");
+		logger.debug("Running the pre-test commands");
+		for (GradleCommand preCmd: context.getPreTestCommands(script.getWorkingDirectory(), env, null)) {
+			preCmd.run();
+		}
+
 		String[] cmdArgs = args;
 		if (!Objects.isNull(tasks)) {
 			for (String task: tasks) {
@@ -264,25 +268,31 @@ public class TestSuite {
 				cmdArgs[cmdArgs.length - 1] = task;
 			}
 		}
-		GradleCommand cmd = context.getCommand(script.getWorkingDirectory(), gradleVersion, env, cmdArgs);
+		logger.debug("Setting up the command to run");
+		for (GradleCommand cmd: context.getTestCommands(script.getWorkingDirectory(), gradleVersion, env, cmdArgs)) {
+			// Run the command
+			logger.debug("running Gradle");
+			logger.debug("   in directory              : '{}'", script.getWorkingDirectory());
+			logger.debug("   with arguments ", Objects.isNull(cmdArgs) ? "" : String.join(" ", cmdArgs));
+			logger.debug("   with '{}' environment variables", Objects.isNull(env) ? 0 : env.size());
+			//logger.trace("   with '{}' environment variables: '{}'", Objects.isNull(env) ? 0 : env.size(), env) // keep this at the trace level as it may expose the token values
+			BuildResult result = cmd.run();
+			logger.debug("command executed without errors");
+			logger.debug("command output is: *** START ***");
+			logger.debug(result.getOutput());
+			logger.debug("command output is: ***  END  ***");
+			// also log to stdout as Gradle mutes the logger
+			System.out.println("command executed without errors");
+			System.out.println("command output is: *** START ***");
+			System.out.println(result.getOutput());
+			System.out.println("command output is: ***  END  ***");
+			System.out.flush();
+		}
 
-		// Run the command
-		logger.debug("running Gradle");
-		logger.debug("   in directory              : '{}'", script.getWorkingDirectory());
-		logger.debug("   with arguments ", Objects.isNull(cmdArgs) ? "" : String.join(" ", cmdArgs));
-		logger.debug("   with '{}' environment variables", Objects.isNull(env) ? 0 : env.size());
-		//logger.trace("   with '{}' environment variables: '{}'", Objects.isNull(env) ? 0 : env.size(), env) // keep this at the trace level as it may expose the token values
-		BuildResult result = cmd.run();
-		logger.debug("command executed without errors");
-		logger.debug("command output is: *** START ***");
-		logger.debug(result.getOutput());
-		logger.debug("command output is: ***  END  ***");
-		// also log to stdout as Gradle mutes the logger
-		System.out.println("command executed without errors");
-		System.out.println("command output is: *** START ***");
-		System.out.println(result.getOutput());
-		System.out.println("command output is: ***  END  ***");
-		System.out.flush();
+		logger.debug("Running the post-test commands");
+		for (GradleCommand postCmd: context.getPostTestCommands(script.getWorkingDirectory(), env, null)) {
+			postCmd.run();
+		}
 
 		// Run the checks on file contents
 		logger.debug("Running file content checks, if any");
@@ -367,6 +377,11 @@ public class TestSuite {
 				}
 				default: throw new RuntimeException("unknown provider");
 			}
+		}
+
+		logger.debug("Running the clean-up commands");
+		for (GradleCommand cleanCmd: context.getCleanUpCommands(script.getWorkingDirectory(), env, null)) {
+			cleanCmd.run();
 		}
 	}
 }

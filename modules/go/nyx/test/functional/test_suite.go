@@ -212,33 +212,59 @@ func (ts *TestSuite) Test(t *testing.T, context ExecutionContext) error {
 	}
 
 	// Prepare the command to run
-	log.Debugf("setting up the command to run")
+	var outBuffer bytes.Buffer
+	log.Debugf("running the pre-test commands")
+	for _, preCmd := range context.GetPreTestCommands(script.GetWorkingDirectory(), ts.Env, nil) {
+		log.Debugf("running command: %v", preCmd.String())
+		preCmd.Stdout = &outBuffer
+		preCmd.Stderr = &outBuffer
+		runErr := preCmd.Run()
+		if runErr != nil || log.IsLevelEnabled(log.DebugLevel) {
+			outBuffer.WriteTo(os.Stdout)
+			err = runErr
+		}
+	}
+
 	cmdArgs := ts.Args
 	if ts.NyxCommand != nil {
 		cmdArgs = append(cmdArgs, *ts.NyxCommand)
 	}
-	cmd := context.GetCommand(script.GetWorkingDirectory(), ts.Env, cmdArgs)
 
-	// Run the command
-	log.Debugf("running command: %v", cmd.String())
-	log.Debugf("   in directory              : %v", cmd.Dir)
-	log.Debugf("   with %d environment variables", len(cmd.Env))
-	//log.Tracef("   with %d environment variables: %v", len(cmd.Env), cmd.Env) // keep this at the trace level as it may expose the token values
-	var outBuffer bytes.Buffer
-	cmd.Stdout = &outBuffer
-	cmd.Stderr = &outBuffer
-	runErr := cmd.Run()
-	log.Debugf("command output is: *** START ***")
-	if runErr != nil || log.IsLevelEnabled(log.DebugLevel) {
-		outBuffer.WriteTo(os.Stdout)
+	log.Debugf("setting up the command to run")
+	for _, cmd := range context.GetTestCommands(script.GetWorkingDirectory(), ts.Env, cmdArgs) {
+		// Run the command
+		log.Debugf("running command: %v", cmd.String())
+		log.Debugf("   in directory              : %v", cmd.Dir)
+		log.Debugf("   with %d environment variables", len(cmd.Env))
+		//log.Tracef("   with %d environment variables: %v", len(cmd.Env), cmd.Env) // keep this at the trace level as it may expose the token values
+		cmd.Stdout = &outBuffer
+		cmd.Stderr = &outBuffer
+		runErr := cmd.Run()
+		log.Debugf("command output is: *** START ***")
+		if runErr != nil || log.IsLevelEnabled(log.DebugLevel) {
+			outBuffer.WriteTo(os.Stdout)
+		}
+		log.Debugf("command output is: ***  END  ***")
+		if runErr == nil {
+			log.Debugf("command executed without errors")
+		} else {
+			log.Infof("command executed with error: %v", runErr)
+			err = runErr
+		}
+		assert.NoError(t, runErr, "Nyx was expected to run without errors but an error was returned: %v", runErr)
 	}
-	log.Debugf("command output is: ***  END  ***")
-	if runErr == nil {
-		log.Debugf("command executed without errors")
-	} else {
-		log.Infof("command executed with error: %v", runErr)
+
+	log.Debugf("running the post-test commands")
+	for _, postCmd := range context.GetPostTestCommands(script.GetWorkingDirectory(), ts.Env, nil) {
+		log.Debugf("running command: %v", postCmd.String())
+		postCmd.Stdout = &outBuffer
+		postCmd.Stderr = &outBuffer
+		runErr := postCmd.Run()
+		if runErr != nil || log.IsLevelEnabled(log.DebugLevel) {
+			outBuffer.WriteTo(os.Stdout)
+			err = runErr
+		}
 	}
-	assert.NoError(t, runErr, "Nyx was expected to run without errors but an error was returned: %v", runErr)
 
 	// Run the checks on file contents
 	log.Debugf("running file content checks, if any")
@@ -348,5 +374,17 @@ func (ts *TestSuite) Test(t *testing.T, context ExecutionContext) error {
 		}
 	}
 
-	return runErr
+	log.Debugf("running the clean-up commands")
+	for _, cleanCmd := range context.GetCleanUpCommands(script.GetWorkingDirectory(), ts.Env, nil) {
+		log.Debugf("running command: %v", cleanCmd.String())
+		cleanCmd.Stdout = &outBuffer
+		cleanCmd.Stderr = &outBuffer
+		runErr := cleanCmd.Run()
+		if runErr != nil || log.IsLevelEnabled(log.DebugLevel) {
+			outBuffer.WriteTo(os.Stdout)
+			err = runErr
+		}
+	}
+
+	return err
 }
