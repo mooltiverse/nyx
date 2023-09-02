@@ -55,7 +55,8 @@ func filterSuitableSuites(suites []*TestSuite) []*TestSuite {
 func TestFunctional(t *testing.T) {
 	logLevel := log.GetLevel()   // save the previous logging level
 	log.SetLevel(log.ErrorLevel) // set the logging level to filter out warnings produced during tests
-	//log.SetLevel(log.DebugLevel)
+	// TODO: demove this line
+	log.SetLevel(log.DebugLevel)
 
 	for _, suite := range filterSuitableSuites(WellKnownFunctionalTestSuites()) {
 		t.Run(suite.Name+" (Docker)", func(t *testing.T) {
