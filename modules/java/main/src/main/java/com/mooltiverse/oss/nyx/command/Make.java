@@ -46,8 +46,10 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Objects;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
@@ -251,16 +253,19 @@ public class Make extends AbstractCommand {
             // if the user didn't map the sections
             for (Commit commit: state().getReleaseScope().getCommits()) {
                 // Now we need to infer the commit type by using the commit message conventions
-                String commitType = null;
+                Set<String> commitTypes = new HashSet<String>();
                 if (!Objects.isNull(state().getConfiguration().getCommitMessageConventions().getItems())) {
                     logger.debug(COMMAND, "Trying to infer the commit type based on the commit message of commit '{}'", commit.getSHA());
                     for (Map.Entry<String,CommitMessageConvention> cmcEntry: state().getConfiguration().getCommitMessageConventions().getItems().entrySet()) {
                         logger.debug(COMMAND, "Evaluating commit '{}' against message convention '{}'", commit.getSHA(), cmcEntry.getKey());                                
                         Matcher messageMatcher = Pattern.compile(cmcEntry.getValue().getExpression()).matcher(commit.getMessage().getFullMessage());
                         try {
-                            if (messageMatcher.find()) {
-                                commitType = messageMatcher.group("type");
-                                logger.debug(COMMAND, "The type of commit '{}' is '{}'", commit.getSHA(), commitType);
+                            // if the commit message matches multiple times we need to determine the commit type for all matches
+                            while (messageMatcher.find()) {
+                                logger.debug(COMMAND, "Commit message convention '{}' matches commit '{}'", cmcEntry.getKey(), commit.getSHA());
+                                String commitType = messageMatcher.group("type");
+                                commitTypes.add(commitType);
+                                logger.debug(COMMAND, "The commit '{}' is of type '{}'", commit.getSHA(), commitType);
                             }
                         }
                         catch (IllegalArgumentException iae) {
@@ -270,30 +275,30 @@ public class Make extends AbstractCommand {
                         catch (IllegalStateException ise) {
                             throw new ReleaseException(String.format("Cannot infer the commit type for commit '%s' match operation failed for the regular expression '%s' from commit message convention '%s'", commit.getSHA(), cmcEntry.getValue().getExpression(), cmcEntry.getKey()), ise);
                         }
-                        if (Objects.isNull(commitType))
-                            logger.debug(COMMAND, "The commit type cannot be inferred for commit '{}' using the regular expression '{}' from commit message convention '{}'", commit.getSHA(), cmcEntry.getValue().getExpression(), cmcEntry.getKey());
                     }
                 }
-                if (Objects.isNull(commitType) || commitType.isBlank())
-                    logger.debug(COMMAND, "No commit message convention has been configured or the configured commit message conventions do not allow to infer the 'type' for commit '{}'. The commit will not appear in the changelog.", commit.getSHA());
+                if (Objects.isNull(commitTypes) || commitTypes.isEmpty())
+                    logger.debug(COMMAND, "Unable infer the 'type' for commit '{}'. The commit will not appear in the changelog.", commit.getSHA());
                 else {
-                    // If the user has defined some sections mapping we need to map the commit type to those sections,
-                    // otherwise the section will be the commit type
-                    if (Objects.isNull(state().getConfiguration().getChangelog().getSections()) || state().getConfiguration().getChangelog().getSections().isEmpty()) {
-                        logger.debug(COMMAND, "Changelog sections haven't been defined by user. Commit '{}' will appear in section '{}' (same as the commit type)", commit.getSHA(), commitType);
-                        release.getSection(commitType, true).getCommits().add(commit);
-                    }
-                    else {
-                        for (Map.Entry<String,String> sectionEntry: state().getConfiguration().getChangelog().getSections().entrySet()) {
-                            logger.debug(COMMAND, "Evaluating commit type '{}' against changelog section '{}'", commitType, sectionEntry.getKey());
-                            if (Pattern.matches(sectionEntry.getValue(), commitType)) {
-                                logger.debug(COMMAND, "Expression '{}' for section '{}' successfully matches type '{}' so commit '{}' will appear under the '{}' section", sectionEntry.getValue(), sectionEntry.getKey(), commitType, commit.getSHA(), sectionEntry.getKey());
-                                release.getSection(sectionEntry.getKey(), true).getCommits().add(commit);
-                                break;
-                            }
-                            else {
-                                logger.debug(COMMAND, "Expression '{}' for section '{}' does not match type '{}'. Trying with next sections, if any.", sectionEntry.getValue(), sectionEntry.getKey(), commitType);
-                                continue;
+                    for (String commitType: commitTypes) {
+                        // If the user has defined some sections mapping we need to map the commit type to those sections,
+                        // otherwise the section will be the commit type
+                        if (Objects.isNull(state().getConfiguration().getChangelog().getSections()) || state().getConfiguration().getChangelog().getSections().isEmpty()) {
+                            logger.debug(COMMAND, "Changelog sections haven't been defined by user. Commit '{}' will appear in section '{}' (same as the commit type)", commit.getSHA(), commitType);
+                            release.getSection(commitType, true).getCommits().add(commit);
+                        }
+                        else {
+                            for (Map.Entry<String,String> sectionEntry: state().getConfiguration().getChangelog().getSections().entrySet()) {
+                                logger.debug(COMMAND, "Evaluating commit type '{}' against changelog section '{}'", commitType, sectionEntry.getKey());
+                                if (Pattern.matches(sectionEntry.getValue(), commitType)) {
+                                    logger.debug(COMMAND, "Expression '{}' for section '{}' successfully matches type '{}' so commit '{}' will appear under the '{}' section", sectionEntry.getValue(), sectionEntry.getKey(), commitType, commit.getSHA(), sectionEntry.getKey());
+                                    release.getSection(sectionEntry.getKey(), true).getCommits().add(commit);
+                                    break;
+                                }
+                                else {
+                                    logger.debug(COMMAND, "Expression '{}' for section '{}' does not match type '{}'. Trying with next sections, if any.", sectionEntry.getValue(), sectionEntry.getKey(), commitType);
+                                    continue;
+                                }
                             }
                         }
                     }

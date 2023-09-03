@@ -59,6 +59,7 @@ settings.gradle
 .nyx-state.yml
 `,
 				// the .nyx-shared.yaml is the standard shared configuration file
+				// note we use single quotes in some of the rows below to avoid escaping all of the YAML special characters
 				".nyx-shared.yaml": `---
 commitMessageConventions:
   enabled:
@@ -67,9 +68,9 @@ commitMessageConventions:
     conventionalCommits:
       expression: "(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))$(?s).*"
       bumpExpressions:
-        major: "(?s)(?m)^[a-zA-Z0-9_]+(!|.*^(BREAKING( |-)CHANGE: )).*"
-        minor: "(?s)(?m)^feat(?!!|.*^(BREAKING( |-)CHANGE: )).*"
-        patch: "(?s)(?m)^fix(?!!|.*^(BREAKING( |-)CHANGE: )).*"
+        major: '(?s)(?m)^[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*'
+        minor: '(?s)(?m)^feat(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'
+        patch: '(?s)(?m)^fix(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'
 initialVersion: "1.0.0"
 releaseLenient: true
 releasePrefix: v
@@ -153,6 +154,7 @@ settings.gradle
 .nyx-state.yml
 `,
 				// the .nyx-shared.yaml is the standard shared configuration file
+				// note we use single quotes in some of the rows below to avoid escaping all of the YAML special characters
 				".nyx-shared.yaml": `---
 commitMessageConventions:
   enabled:
@@ -161,9 +163,9 @@ commitMessageConventions:
     conventionalCommits: 
       expression: "(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))$(?s).*"
       bumpExpressions: 
-        major: "(?s)(?m)^[a-zA-Z0-9_]+(!|.*^(BREAKING( |-)CHANGE: )).*"
-        minor: "(?s)(?m)^feat(?!!|.*^(BREAKING( |-)CHANGE: )).*"
-        patch: "(?s)(?m)^fix(?!!|.*^(BREAKING( |-)CHANGE: )).*"
+        major: '(?s)(?m)^[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*'
+        minor: '(?s)(?m)^feat(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'
+        patch: '(?s)(?m)^fix(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'
 initialVersion: "1.0.0"
 releaseLenient: true
 releasePrefix: v
@@ -238,9 +240,9 @@ scheme: SEMVER
 				"CHANGELOG.md": []string{
 					"## v0.1.0",
 					"### Added",
-					"* [] feat: Untagged commit [#2](https://example.com/issues/2)",
+					"\\* \\[[a-z0-9]{5}\\] feat: Untagged commit \\[#2\\]\\(https:\\/\\/example\\.com\\/issues\\/2\\)",
 					"### Fixed",
-					"* [] fix: Untagged commit [#1](https://example.com/issues/1)",
+					"\\* \\[[a-z0-9]{5}\\] fix: Untagged commit \\[#1\\]\\(https:\\/\\/example\\.com\\/issues\\/1\\)",
 				},
 				"version.txt": []string{
 					"v0.1.0",
@@ -276,6 +278,7 @@ settings.gradle
 .nyx-state.yml
 `,
 				// the .nyx-shared.yaml is the standard shared configuration file
+				// note we use single quotes in some of the rows below to avoid escaping all of the YAML special characters
 				".nyx-shared.yaml": `---
 commitMessageConventions:
   enabled:
@@ -284,9 +287,9 @@ commitMessageConventions:
     conventionalCommits: 
       expression: "(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))$(?s).*"
       bumpExpressions: 
-        major: "(?s)(?m)^[a-zA-Z0-9_]+(!|.*^(BREAKING( |-)CHANGE: )).*"
-        minor: "(?s)(?m)^feat(?!!|.*^(BREAKING( |-)CHANGE: )).*"
-        patch: "(?s)(?m)^fix(?!!|.*^(BREAKING( |-)CHANGE: )).*"
+        major: '(?s)(?m)^[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*'
+        minor: '(?s)(?m)^feat(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'
+        patch: '(?s)(?m)^fix(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'
 initialVersion: "1.0.0"
 releaseLenient: true
 releasePrefix: v
@@ -363,9 +366,9 @@ scheme: SEMVER
 				"CHANGELOG.md": []string{
 					"## v0.1.0",
 					"### Added",
-					"* [] feat: Untagged commit [#2](https://example.com/issues/2)",
+					"\\* \\[[a-z0-9]{5}\\] feat: Untagged commit \\[#2\\]\\(https:\\/\\/example\\.com\\/issues\\/2\\)",
 					"### Fixed",
-					"* [] fix: Untagged commit [#1](https://example.com/issues/1)",
+					"\\* \\[[a-z0-9]{5}\\] fix: Untagged commit \\[#1\\]\\(https:\\/\\/example\\.com\\/issues\\/1\\)",
 				},
 				"version.txt": []string{
 					"v0.1.0",
@@ -525,6 +528,7 @@ settings.gradle
 .nyx-state.yml
 `,
 				// the .nyx-shared.yaml is the standard shared configuration file
+				// note we use single quotes in some of the rows below to avoid escaping all of the YAML special characters
 				".nyx-shared.yaml": `---
 commitMessageConventions:
   enabled:
@@ -533,9 +537,9 @@ commitMessageConventions:
     conventionalCommits: 
       expression: "(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))$(?s).*"
       bumpExpressions: 
-        major: "(?s)(?m)^[a-zA-Z0-9_]+(!|.*^(BREAKING( |-)CHANGE: )).*"
-        minor: "(?s)(?m)^feat(?!!|.*^(BREAKING( |-)CHANGE: )).*"
-        patch: "(?s)(?m)^fix(?!!|.*^(BREAKING( |-)CHANGE: )).*"
+        major: '(?s)(?m)^[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*'
+        minor: '(?s)(?m)^feat(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'
+        patch: '(?s)(?m)^fix(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'
 initialVersion: "1.0.0"
 releaseLenient: true
 releasePrefix: v
@@ -621,9 +625,9 @@ scheme: SEMVER
 				"CHANGELOG.md": []string{
 					"## v0.1.0",
 					"### Added",
-					"* [] feat: Untagged commit [#2](https://example.com/issues/2)",
+					"\\* \\[[a-z0-9]{5}\\] feat: Untagged commit \\[#2\\]\\(https:\\/\\/example\\.com\\/issues\\/2\\)",
 					"### Fixed",
-					"* [] fix: Untagged commit [#1](https://example.com/issues/1)",
+					"\\* \\[[a-z0-9]{5}\\] fix: Untagged commit \\[#1\\]\\(https:\\/\\/example\\.com\\/issues\\/1\\)",
 				},
 				"version.txt": []string{
 					"v0.1.0",
@@ -662,6 +666,7 @@ settings.gradle
 .nyx-state.yml
 `,
 				// the .nyx-shared.yaml is the standard shared configuration file
+				// note we use single quotes in some of the rows below to avoid escaping all of the YAML special characters
 				".nyx-shared.yaml": `---
 commitMessageConventions:
   enabled:
@@ -670,9 +675,9 @@ commitMessageConventions:
     conventionalCommits: 
       expression: "(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))$(?s).*"
       bumpExpressions: 
-        major: "(?s)(?m)^[a-zA-Z0-9_]+(!|.*^(BREAKING( |-)CHANGE: )).*"
-        minor: "(?s)(?m)^feat(?!!|.*^(BREAKING( |-)CHANGE: )).*"
-        patch: "(?s)(?m)^fix(?!!|.*^(BREAKING( |-)CHANGE: )).*"
+        major: '(?s)(?m)^[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*'
+        minor: '(?s)(?m)^feat(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'
+        patch: '(?s)(?m)^fix(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'
 initialVersion: "1.0.0"
 releaseLenient: true
 releasePrefix: v
@@ -757,9 +762,9 @@ scheme: SEMVER
 				"CHANGELOG.md": []string{
 					"## v0.1.0",
 					"### Added",
-					"* [] feat: Untagged commit [#2](https://example.com/issues/2)",
+					"\\* \\[[a-z0-9]{5}\\] feat: Untagged commit \\[#2\\]\\(https:\\/\\/example\\.com\\/issues\\/2\\)",
 					"### Fixed",
-					"* [] fix: Untagged commit [#1](https://example.com/issues/1)",
+					"\\* \\[[a-z0-9]{5}\\] fix: Untagged commit \\[#1\\]\\(https:\\/\\/example\\.com\\/issues\\/1\\)",
 				},
 				"version.txt": []string{
 					"v0.1.0",

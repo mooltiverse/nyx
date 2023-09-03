@@ -114,8 +114,8 @@ Commit messages are formatted as conventional commits.
 The latest commit is tagged as 0.4.0.
 This yields to a repository like:
 
-  - cb9423c (HEAD -> master) Untagged commit #2
-  - ddb0b9f Untagged commit #1
+  - cb9423c (HEAD -> master) feat: Untagged commit #2
+  - ddb0b9f fix: Untagged commit #1
   - 44944e7 (tag: 0.0.4) Commit lij
   - 92cd45c (tag: 0.0.3) Commit aem
   - 9709d14 (tag: 0.0.2) Commit gin
@@ -125,6 +125,25 @@ This yields to a repository like:
 func ONE_BRANCH_SHORT_CONVENTIONAL_COMMITS() Scenario {
 	return Scenario{function: func(directory string) Script {
 		return From(directory).AndAddFiles().AndCommitWith(utl.PointerToString("Initial commit")).AndCommitWithTag("0.0.1").AndCommitWithTagNameAndMessage("0.0.2", utl.PointerToString("fix: Annotated tag to commit 0.0.2")).AndCommitWithTag("0.0.3").AndCommitWithTagNameAndMessage("0.0.4", utl.PointerToString("feat: Annotated tag to commit 0.0.4")).AndCommitWith(utl.PointerToString("fix: Untagged commit #1")).AndCommitWith(utl.PointerToString("feat: Untagged commit #2"))
+	}}
+}
+
+/*
+The scenario where the Git repository has been created with a few tagged commits plus an untagged commit.
+Commit messages are formatted as conventional commits for merge.
+The latest commit is tagged as 0.4.0.
+This yields to a repository like:
+
+  - cb9423c (HEAD -> master) feat: Alpha
+  - 44944e7 (tag: 0.0.4) Commit lij
+  - 92cd45c (tag: 0.0.3) Commit aem
+  - 9709d14 (tag: 0.0.2) Commit gin
+  - c996caa (tag: 0.0.1) Commit rfi
+  - 2b0ce8c Initial commit
+*/
+func ONE_BRANCH_SHORT_CONVENTIONAL_COMMITS_FOR_MERGE() Scenario {
+	return Scenario{function: func(directory string) Script {
+		return From(directory).AndAddFiles().AndCommitWith(utl.PointerToString("Initial commit")).AndCommitWithTag("0.0.1").AndCommitWithTagNameAndMessage("0.0.2", utl.PointerToString("fix: Annotated tag to commit 0.0.2")).AndCommitWithTag("0.0.3").AndCommitWithTagNameAndMessage("0.0.4", utl.PointerToString("feat: Annotated tag to commit 0.0.4")).AndCommitWith(utl.PointerToString("Alpha\n\n* fix: patch #1\n\n* feat: minor #1\n\n* feat!: major #1"))
 	}}
 }
 

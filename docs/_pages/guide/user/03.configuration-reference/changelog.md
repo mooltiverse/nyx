@@ -9,7 +9,7 @@ The `changelog` *section* is where you configure the (optional) changelog genera
 
 There is only one `changelog` *section* per configuration.
 
-The range of commits included in the changelog is limited to those in the current [release scope]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#commits). What appears in the changelog is the first line of the commit message and, optionally, some decorators that may have been configured here or added by a custom template.
+The range of commits included in the changelog is limited to those in the current [release scope]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/release-scope.md %}#commits). What appears in the changelog is the first line of the commit message and, optionally, some decorators that may have been configured here or added by a custom template. If a commit is matched multiple times by the configured message convention, it may appear in multiple sections of the resulting changelog.
 
 The changelog is generated only when a [new version]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/global-attributes.md %}#new-version) has been [inferred]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer).
 
@@ -68,15 +68,16 @@ A common value used for this option is `CHANGELOG.md`.
 | Configuration File Option | `changelog/sections`                                                                     |
 | Related state attributes  | [changelog/releases/ID/sections]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/changelog.md %}#sections){: .btn .btn--info .btn--small} |
 
-The `sections` option lets you define the sections that will appear inside a single release in the changelog, each one grouping changes of the same *type*. Each section is defined by a *Name*, which is the name of the section to show in the changelog, and a regular expression that matches zero or more commit *types*, as they are inferred by the [`expression`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/commit-message-conventions.md %}#expression) option of the [commit message convention]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/commit-message-conventions.md %}) in use. If a commit *type* is not matched by any itemp in this map then it will not appear in the changelog, and this might be useful to skim all the unrelevant changes.
+The `sections` option lets you define the sections that will appear inside a single release in the changelog, each one grouping changes of the same *type*. Each section is defined by a *Name*, which is the name of the section to show in the changelog, and a regular expression that matches zero or more commit *types*, as they are inferred by the [`expression`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/commit-message-conventions.md %}#expression) option of the [commit message convention]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/commit-message-conventions.md %}) in use. If a commit *type* is not matched by any item in this map then it will not appear in the changelog, and this might be useful to skim all the unrelevant changes. If a commit is matched multiple times by the configured message convention, it may appear in multiple sections of the changelog.
 
-But let's resume the process to make things clearer:
+Let's resume the process to make things clearer:
 
 1. the [Infer]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#infer) task scans the commit history and, for each commit, it uses the configured [`expression`]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/commit-message-conventions.md %}#expression) to determine various attributes of the commit based on its message
 2. among the various attributes that are inferred, the commit `type` tells the type of changes contributed by the commit
 3. when generating the changelog commits are grouped by their `type` so that attribute is used to qualify the commit
 4. since the development team may want the layout of the changelog to be organized in a more readable manner, the map defined for this `sections` option allows to rename sections, sort them differently, and change the way commits are grouped by their `type`
 5. if the commit `type` is not matched by any section it is ignored by the changelog generator
+6. if the commit yields to multuple `type`s because the commit message convention matched multiple portions of the commit message, the commit may appear in multiple sections
 
 For example, when using the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) convention you get commit of these types: `fix`, `feat`, `build`, `chore`, `ci`, `docs`, `style`, `refactor`, `perf`, `test` and more. But using [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) as the changelog standard you need to map the above commit types to: `Added`, `Changed`, `Deprecated`, `Removed`, `Fixed`, `Security`. This mapping is exactly what is done by the `sections` option here. A starting point may be:
 

@@ -23,12 +23,12 @@ import (
 /*
 This interface models a an execution context that allows running the Nyx executable from within a specific environment.
 
-This interface can be implemented by different contexts in order to run a certain command
-in a context specific way.
+This interface can be implemented by different contexts in order to run a certain command in a context specific way.
 */
 type ExecutionContext interface {
 	/*
-		Returns the command object used to run the executable.
+		Returns the command objects used to run the test. Commands are required to be executed
+		in the same order they appear in the list.
 
 		Arguments are as follows:
 
@@ -36,5 +36,42 @@ type ExecutionContext interface {
 		- env the map of environment variables to pass to Nyx
 		- args the command line arguments to pass to the Nyx executable
 	*/
-	GetCommand(repoDir string, env map[string]string, args []string) *exec.Cmd
+	GetTestCommands(repoDir string, env map[string]string, args []string) []*exec.Cmd
+
+	/*
+		Returns the command objects used to run before the test. The returned list may be empty.
+		Commands are required to be executed in the same order they appear in the list.
+
+		Arguments are as follows:
+
+		- repoDir the directory containing the Git repository
+		- env the map of environment variables to pass to Nyx
+		- args the command line arguments to pass to the Nyx executable
+	*/
+	GetPreTestCommands(repoDir string, env map[string]string, args []string) []*exec.Cmd
+
+	/*
+		Returns the command object used to run after the test. The returned list may be empty.
+		Commands are required to be executed in the same order they appear in the list.
+
+		Arguments are as follows:
+
+		- repoDir the directory containing the Git repository
+		- env the map of environment variables to pass to Nyx
+		- args the command line arguments to pass to the Nyx executable
+	*/
+	GetPostTestCommands(repoDir string, env map[string]string, args []string) []*exec.Cmd
+
+	/*
+		Returns the command object used to run after the test, before the test exits.
+		The returned list may be empty.
+		Commands are required to be executed in the same order they appear in the list.
+
+		Arguments are as follows:
+
+		- repoDir the directory containing the Git repository
+		- env the map of environment variables to pass to Nyx
+		- args the command line arguments to pass to the Nyx executable
+	*/
+	GetCleanUpCommands(repoDir string, env map[string]string, args []string) []*exec.Cmd
 }

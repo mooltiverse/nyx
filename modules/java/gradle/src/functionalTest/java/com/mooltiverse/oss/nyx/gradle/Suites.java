@@ -332,9 +332,10 @@ public class Suites {
                         .concat("    conventionalCommits:").concat(newLine)
                         .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\\\((?<scope>[a-z ]+)\\\\))?:( (?<title>.+))$(?s).*\"").concat(newLine)
                         .concat("      bumpExpressions:").concat(newLine)
-                        .concat("        major: \"(?s)(?m)^[a-zA-Z0-9_]+(!|.*^(BREAKING( |-)CHANGE: )).*\"").concat(newLine)
-                        .concat("        minor: \"(?s)(?m)^feat(?!!|.*^(BREAKING( |-)CHANGE: )).*\"").concat(newLine)
-                        .concat("        patch: \"(?s)(?m)^fix(?!!|.*^(BREAKING( |-)CHANGE: )).*\"").concat(newLine)
+                        // note we use single quotes in the rows below to avoid escaping all of the YAML special characters
+                        .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
+                        .concat("        minor: '(?s)(?m)^feat(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
+                        .concat("        patch: '(?s)(?m)^fix(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("initialVersion: \"1.0.0\"").concat(newLine)
                         .concat("releaseLenient: true").concat(newLine)
                         .concat("releasePrefix: v").concat(newLine)
@@ -433,9 +434,10 @@ public class Suites {
                         .concat("    conventionalCommits:").concat(newLine)
                         .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\\\((?<scope>[a-z ]+)\\\\))?:( (?<title>.+))$(?s).*\"").concat(newLine)
                         .concat("      bumpExpressions:").concat(newLine)
-                        .concat("        major: \"(?s)(?m)^[a-zA-Z0-9_]+(!|.*^(BREAKING( |-)CHANGE: )).*\"").concat(newLine)
-                        .concat("        minor: \"(?s)(?m)^feat(?!!|.*^(BREAKING( |-)CHANGE: )).*\"").concat(newLine)
-                        .concat("        patch: \"(?s)(?m)^fix(?!!|.*^(BREAKING( |-)CHANGE: )).*\"").concat(newLine)
+                        // note we use single quotes in the rows below to avoid escaping all of the YAML special characters
+                        .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
+                        .concat("        minor: '(?s)(?m)^feat(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
+                        .concat("        patch: '(?s)(?m)^fix(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("initialVersion: \"1.0.0\"").concat(newLine)
                         .concat("releaseLenient: true").concat(newLine)
                         .concat("releasePrefix: v").concat(newLine)
@@ -536,9 +538,10 @@ public class Suites {
                         .concat("    conventionalCommits:").concat(newLine)
                         .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\\\((?<scope>[a-z ]+)\\\\))?:( (?<title>.+))$(?s).*\"").concat(newLine)
                         .concat("      bumpExpressions:").concat(newLine)
-                        .concat("        major: \"(?s)(?m)^[a-zA-Z0-9_]+(!|.*^(BREAKING( |-)CHANGE: )).*\"").concat(newLine)
-                        .concat("        minor: \"(?s)(?m)^feat(?!!|.*^(BREAKING( |-)CHANGE: )).*\"").concat(newLine)
-                        .concat("        patch: \"(?s)(?m)^fix(?!!|.*^(BREAKING( |-)CHANGE: )).*\"").concat(newLine)
+                        // note we use single quotes in the rows below to avoid escaping all of the YAML special characters
+                        .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
+                        .concat("        minor: '(?s)(?m)^feat(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
+                        .concat("        patch: '(?s)(?m)^fix(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("initialVersion: \"1.0.0\"").concat(newLine)
                         .concat("releaseLenient: true").concat(newLine)
                         .concat("releasePrefix: v").concat(newLine)
@@ -640,9 +643,10 @@ public class Suites {
                         .concat("    conventionalCommits:").concat(newLine)
                         .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\\\((?<scope>[a-z ]+)\\\\))?:( (?<title>.+))$(?s).*\"").concat(newLine)
                         .concat("      bumpExpressions:").concat(newLine)
-                        .concat("        major: \"(?s)(?m)^[a-zA-Z0-9_]+(!|.*^(BREAKING( |-)CHANGE: )).*\"").concat(newLine)
-                        .concat("        minor: \"(?s)(?m)^feat(?!!|.*^(BREAKING( |-)CHANGE: )).*\"").concat(newLine)
-                        .concat("        patch: \"(?s)(?m)^fix(?!!|.*^(BREAKING( |-)CHANGE: )).*\"").concat(newLine)
+                        // note we use single quotes in the rows below to avoid escaping all of the YAML special characters
+                        .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
+                        .concat("        minor: '(?s)(?m)^feat(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
+                        .concat("        patch: '(?s)(?m)^fix(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("initialVersion: \"1.0.0\"").concat(newLine)
                         .concat("releaseLenient: true").concat(newLine)
                         .concat("releasePrefix: v").concat(newLine)
@@ -744,9 +748,10 @@ public class Suites {
                         .concat("    conventionalCommits:").concat(newLine)
                         .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\\\((?<scope>[a-z ]+)\\\\))?:( (?<title>.+))$(?s).*\"").concat(newLine)
                         .concat("      bumpExpressions:").concat(newLine)
-                        .concat("        major: \"(?s)(?m)^[a-zA-Z0-9_]+(!|.*^(BREAKING( |-)CHANGE: )).*\"").concat(newLine)
-                        .concat("        minor: \"(?s)(?m)^feat(?!!|.*^(BREAKING( |-)CHANGE: )).*\"").concat(newLine)
-                        .concat("        patch: \"(?s)(?m)^fix(?!!|.*^(BREAKING( |-)CHANGE: )).*\"").concat(newLine)
+                        // note we use single quotes in the rows below to avoid escaping all of the YAML special characters
+                        .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
+                        .concat("        minor: '(?s)(?m)^feat(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
+                        .concat("        patch: '(?s)(?m)^fix(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("initialVersion: \"1.0.0\"").concat(newLine)
                         .concat("releaseLenient: true").concat(newLine)
                         .concat("releasePrefix: v").concat(newLine)
@@ -848,9 +853,10 @@ public class Suites {
                         .concat("    conventionalCommits:").concat(newLine)
                         .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\\\((?<scope>[a-z ]+)\\\\))?:( (?<title>.+))$(?s).*\"").concat(newLine)
                         .concat("      bumpExpressions:").concat(newLine)
-                        .concat("        major: \"(?s)(?m)^[a-zA-Z0-9_]+(!|.*^(BREAKING( |-)CHANGE: )).*\"").concat(newLine)
-                        .concat("        minor: \"(?s)(?m)^feat(?!!|.*^(BREAKING( |-)CHANGE: )).*\"").concat(newLine)
-                        .concat("        patch: \"(?s)(?m)^fix(?!!|.*^(BREAKING( |-)CHANGE: )).*\"").concat(newLine)
+                        // note we use single quotes in the rows below to avoid escaping all of the YAML special characters
+                        .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
+                        .concat("        minor: '(?s)(?m)^feat(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
+                        .concat("        patch: '(?s)(?m)^fix(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("initialVersion: \"1.0.0\"").concat(newLine)
                         .concat("releaseLenient: true").concat(newLine)
                         .concat("releasePrefix: v").concat(newLine)
@@ -955,9 +961,10 @@ public class Suites {
                         .concat("    conventionalCommits:").concat(newLine)
                         .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\\\((?<scope>[a-z ]+)\\\\))?:( (?<title>.+))$(?s).*\"").concat(newLine)
                         .concat("      bumpExpressions:").concat(newLine)
-                        .concat("        major: \"(?s)(?m)^[a-zA-Z0-9_]+(!|.*^(BREAKING( |-)CHANGE: )).*\"").concat(newLine)
-                        .concat("        minor: \"(?s)(?m)^feat(?!!|.*^(BREAKING( |-)CHANGE: )).*\"").concat(newLine)
-                        .concat("        patch: \"(?s)(?m)^fix(?!!|.*^(BREAKING( |-)CHANGE: )).*\"").concat(newLine)
+                        // note we use single quotes in the rows below to avoid escaping all of the YAML special characters
+                        .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
+                        .concat("        minor: '(?s)(?m)^feat(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
+                        .concat("        patch: '(?s)(?m)^fix(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("initialVersion: \"1.0.0\"").concat(newLine)
                         .concat("releaseLenient: true").concat(newLine)
                         .concat("releasePrefix: v").concat(newLine)
@@ -1063,9 +1070,10 @@ public class Suites {
                         .concat("    conventionalCommits:").concat(newLine)
                         .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\\\((?<scope>[a-z ]+)\\\\))?:( (?<title>.+))$(?s).*\"").concat(newLine)
                         .concat("      bumpExpressions:").concat(newLine)
-                        .concat("        major: \"(?s)(?m)^[a-zA-Z0-9_]+(!|.*^(BREAKING( |-)CHANGE: )).*\"").concat(newLine)
-                        .concat("        minor: \"(?s)(?m)^feat(?!!|.*^(BREAKING( |-)CHANGE: )).*\"").concat(newLine)
-                        .concat("        patch: \"(?s)(?m)^fix(?!!|.*^(BREAKING( |-)CHANGE: )).*\"").concat(newLine)
+                        // note we use single quotes in the rows below to avoid escaping all of the YAML special characters
+                        .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
+                        .concat("        minor: '(?s)(?m)^feat(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
+                        .concat("        patch: '(?s)(?m)^fix(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("initialVersion: \"1.0.0\"").concat(newLine)
                         .concat("releaseLenient: true").concat(newLine)
                         .concat("releasePrefix: v").concat(newLine)
@@ -1164,9 +1172,10 @@ public class Suites {
                         .concat("    conventionalCommits:").concat(newLine)
                         .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\\\((?<scope>[a-z ]+)\\\\))?:( (?<title>.+))$(?s).*\"").concat(newLine)
                         .concat("      bumpExpressions:").concat(newLine)
-                        .concat("        major: \"(?s)(?m)^[a-zA-Z0-9_]+(!|.*^(BREAKING( |-)CHANGE: )).*\"").concat(newLine)
-                        .concat("        minor: \"(?s)(?m)^feat(?!!|.*^(BREAKING( |-)CHANGE: )).*\"").concat(newLine)
-                        .concat("        patch: \"(?s)(?m)^fix(?!!|.*^(BREAKING( |-)CHANGE: )).*\"").concat(newLine)
+                        // note we use single quotes in the rows below to avoid escaping all of the YAML special characters
+                        .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
+                        .concat("        minor: '(?s)(?m)^feat(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
+                        .concat("        patch: '(?s)(?m)^fix(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("initialVersion: \"1.0.0\"").concat(newLine)
                         .concat("releaseLenient: true").concat(newLine)
                         .concat("releasePrefix: v").concat(newLine)
@@ -1236,9 +1245,9 @@ public class Suites {
                     "CHANGELOG.md", Set.<String>of(
                         "## v0.1.0",
                         "### Added",
-                        "* [] feat: Untagged commit [#2](https://example.com/issues/2)",
+                        "\\* \\[[a-z0-9]{5}\\] feat: Untagged commit \\[#2\\]\\(https:\\/\\/example\\.com\\/issues\\/2\\)",
                         "### Fixed",
-                        "* [] fix: Untagged commit [#1](https://example.com/issues/1)"
+                        "\\* \\[[a-z0-9]{5}\\] fix: Untagged commit \\[#1\\]\\(https:\\/\\/example\\.com\\/issues\\/1\\)"
                     ),
                     "version.txt", Set.<String>of(
                         "v0.1.0"
@@ -1294,9 +1303,10 @@ public class Suites {
                         .concat("    conventionalCommits:").concat(newLine)
                         .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\\\((?<scope>[a-z ]+)\\\\))?:( (?<title>.+))$(?s).*\"").concat(newLine)
                         .concat("      bumpExpressions:").concat(newLine)
-                        .concat("        major: \"(?s)(?m)^[a-zA-Z0-9_]+(!|.*^(BREAKING( |-)CHANGE: )).*\"").concat(newLine)
-                        .concat("        minor: \"(?s)(?m)^feat(?!!|.*^(BREAKING( |-)CHANGE: )).*\"").concat(newLine)
-                        .concat("        patch: \"(?s)(?m)^fix(?!!|.*^(BREAKING( |-)CHANGE: )).*\"").concat(newLine)
+                        // note we use single quotes in the rows below to avoid escaping all of the YAML special characters
+                        .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
+                        .concat("        minor: '(?s)(?m)^feat(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
+                        .concat("        patch: '(?s)(?m)^fix(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("initialVersion: \"1.0.0\"").concat(newLine)
                         .concat("releaseLenient: true").concat(newLine)
                         .concat("releasePrefix: v").concat(newLine)
@@ -1366,9 +1376,9 @@ public class Suites {
                     "CHANGELOG.md", Set.<String>of(
                         "## v0.1.0",
                         "### Added",
-                        "* [] feat: Untagged commit [#2](https://example.com/issues/2)",
+                        "\\* \\[[a-z0-9]{5}\\] feat: Untagged commit \\[#2\\]\\(https:\\/\\/example\\.com\\/issues\\/2\\)",
                         "### Fixed",
-                        "* [] fix: Untagged commit [#1](https://example.com/issues/1)"
+                        "\\* \\[[a-z0-9]{5}\\] fix: Untagged commit \\[#1\\]\\(https:\\/\\/example\\.com\\/issues\\/1\\)"
                     ),
                     "version.txt", Set.<String>of(
                         "v0.1.0"
@@ -1421,9 +1431,10 @@ public class Suites {
                         .concat("    conventionalCommits:").concat(newLine)
                         .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\\\((?<scope>[a-z ]+)\\\\))?:( (?<title>.+))$(?s).*\"").concat(newLine)
                         .concat("      bumpExpressions:").concat(newLine)
-                        .concat("        major: \"(?s)(?m)^[a-zA-Z0-9_]+(!|.*^(BREAKING( |-)CHANGE: )).*\"").concat(newLine)
-                        .concat("        minor: \"(?s)(?m)^feat(?!!|.*^(BREAKING( |-)CHANGE: )).*\"").concat(newLine)
-                        .concat("        patch: \"(?s)(?m)^fix(?!!|.*^(BREAKING( |-)CHANGE: )).*\"").concat(newLine)
+                        // note we use single quotes in the rows below to avoid escaping all of the YAML special characters
+                        .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
+                        .concat("        minor: '(?s)(?m)^feat(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
+                        .concat("        patch: '(?s)(?m)^fix(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("initialVersion: \"1.0.0\"").concat(newLine)
                         .concat("releaseLenient: true").concat(newLine)
                         .concat("releasePrefix: v").concat(newLine)
@@ -1495,9 +1506,9 @@ public class Suites {
                     "CHANGELOG.md", Set.<String>of(
                         "## v0.1.0",
                         "### Added",
-                        "* [] feat: Untagged commit [#2](https://example.com/issues/2)",
+                        "\\* \\[[a-z0-9]{5}\\] feat: Untagged commit \\[#2\\]\\(https:\\/\\/example\\.com\\/issues\\/2\\)",
                         "### Fixed",
-                        "* [] fix: Untagged commit [#1](https://example.com/issues/1)"
+                        "\\* \\[[a-z0-9]{5}\\] fix: Untagged commit \\[#1\\]\\(https:\\/\\/example\\.com\\/issues\\/1\\)"
                     ),
                     "version.txt", Set.<String>of(
                         "v0.1.0"
@@ -1553,9 +1564,10 @@ public class Suites {
                         .concat("    conventionalCommits:").concat(newLine)
                         .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\\\((?<scope>[a-z ]+)\\\\))?:( (?<title>.+))$(?s).*\"").concat(newLine)
                         .concat("      bumpExpressions:").concat(newLine)
-                        .concat("        major: \"(?s)(?m)^[a-zA-Z0-9_]+(!|.*^(BREAKING( |-)CHANGE: )).*\"").concat(newLine)
-                        .concat("        minor: \"(?s)(?m)^feat(?!!|.*^(BREAKING( |-)CHANGE: )).*\"").concat(newLine)
-                        .concat("        patch: \"(?s)(?m)^fix(?!!|.*^(BREAKING( |-)CHANGE: )).*\"").concat(newLine)
+                        // note we use single quotes in the rows below to avoid escaping all of the YAML special characters
+                        .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
+                        .concat("        minor: '(?s)(?m)^feat(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
+                        .concat("        patch: '(?s)(?m)^fix(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("initialVersion: \"1.0.0\"").concat(newLine)
                         .concat("releaseLenient: true").concat(newLine)
                         .concat("releasePrefix: v").concat(newLine)
@@ -1627,9 +1639,9 @@ public class Suites {
                     "CHANGELOG.md", Set.<String>of(
                         "## v0.1.0",
                         "### Added",
-                        "* [] feat: Untagged commit [#2](https://example.com/issues/2)",
+                        "\\* \\[[a-z0-9]{5}\\] feat: Untagged commit \\[#2\\]\\(https:\\/\\/example\\.com\\/issues\\/2\\)",
                         "### Fixed",
-                        "* [] fix: Untagged commit [#1](https://example.com/issues/1)"
+                        "\\* \\[[a-z0-9]{5}\\] fix: Untagged commit \\[#1\\]\\(https:\\/\\/example\\.com\\/issues\\/1\\)"
                     ),
                     "version.txt", Set.<String>of(
                         "v0.1.0"
@@ -1928,9 +1940,10 @@ public class Suites {
                         .concat("    conventionalCommits:").concat(newLine)
                         .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\\\((?<scope>[a-z ]+)\\\\))?:( (?<title>.+))$(?s).*\"").concat(newLine)
                         .concat("      bumpExpressions:").concat(newLine)
-                        .concat("        major: \"(?s)(?m)^[a-zA-Z0-9_]+(!|.*^(BREAKING( |-)CHANGE: )).*\"").concat(newLine)
-                        .concat("        minor: \"(?s)(?m)^feat(?!!|.*^(BREAKING( |-)CHANGE: )).*\"").concat(newLine)
-                        .concat("        patch: \"(?s)(?m)^fix(?!!|.*^(BREAKING( |-)CHANGE: )).*\"").concat(newLine)
+                        // note we use single quotes in the rows below to avoid escaping all of the YAML special characters
+                        .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
+                        .concat("        minor: '(?s)(?m)^feat(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
+                        .concat("        patch: '(?s)(?m)^fix(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("initialVersion: \"1.0.0\"").concat(newLine)
                         .concat("releaseLenient: true").concat(newLine)
                         .concat("releasePrefix: v").concat(newLine)
@@ -2011,9 +2024,9 @@ public class Suites {
                     "CHANGELOG.md", Set.<String>of(
                         "## v0.1.0",
                         "### Added",
-                        "* [] feat: Untagged commit [#2](https://example.com/issues/2)",
+                        "\\* \\[[a-z0-9]{5}\\] feat: Untagged commit \\[#2\\]\\(https:\\/\\/example\\.com\\/issues\\/2\\)",
                         "### Fixed",
-                        "* [] fix: Untagged commit [#1](https://example.com/issues/1)"
+                        "\\* \\[[a-z0-9]{5}\\] fix: Untagged commit \\[#1\\]\\(https:\\/\\/example\\.com\\/issues\\/1\\)"
                     ),
                     "version.txt", Set.<String>of(
                         "v0.1.0"
@@ -2072,9 +2085,10 @@ public class Suites {
                         .concat("    conventionalCommits:").concat(newLine)
                         .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\\\((?<scope>[a-z ]+)\\\\))?:( (?<title>.+))$(?s).*\"").concat(newLine)
                         .concat("      bumpExpressions:").concat(newLine)
-                        .concat("        major: \"(?s)(?m)^[a-zA-Z0-9_]+(!|.*^(BREAKING( |-)CHANGE: )).*\"").concat(newLine)
-                        .concat("        minor: \"(?s)(?m)^feat(?!!|.*^(BREAKING( |-)CHANGE: )).*\"").concat(newLine)
-                        .concat("        patch: \"(?s)(?m)^fix(?!!|.*^(BREAKING( |-)CHANGE: )).*\"").concat(newLine)
+                        // note we use single quotes in the rows below to avoid escaping all of the YAML special characters
+                        .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
+                        .concat("        minor: '(?s)(?m)^feat(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
+                        .concat("        patch: '(?s)(?m)^fix(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("initialVersion: \"1.0.0\"").concat(newLine)
                         .concat("releaseLenient: true").concat(newLine)
                         .concat("releasePrefix: v").concat(newLine)
@@ -2155,9 +2169,9 @@ public class Suites {
                     "CHANGELOG.md", Set.<String>of(
                         "## v0.1.0",
                         "### Added",
-                        "* [] feat: Untagged commit [#2](https://example.com/issues/2)",
+                        "\\* \\[[a-z0-9]{5}\\] feat: Untagged commit \\[#2\\]\\(https:\\/\\/example\\.com\\/issues\\/2\\)",
                         "### Fixed",
-                        "* [] fix: Untagged commit [#1](https://example.com/issues/1)"
+                        "\\* \\[[a-z0-9]{5}\\] fix: Untagged commit \\[#1\\]\\(https:\\/\\/example\\.com\\/issues\\/1\\)"
                     ),
                     "version.txt", Set.<String>of(
                         "v0.1.0"
@@ -2213,9 +2227,10 @@ public class Suites {
                         .concat("    conventionalCommits:").concat(newLine)
                         .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\\\((?<scope>[a-z ]+)\\\\))?:( (?<title>.+))$(?s).*\"").concat(newLine)
                         .concat("      bumpExpressions:").concat(newLine)
-                        .concat("        major: \"(?s)(?m)^[a-zA-Z0-9_]+(!|.*^(BREAKING( |-)CHANGE: )).*\"").concat(newLine)
-                        .concat("        minor: \"(?s)(?m)^feat(?!!|.*^(BREAKING( |-)CHANGE: )).*\"").concat(newLine)
-                        .concat("        patch: \"(?s)(?m)^fix(?!!|.*^(BREAKING( |-)CHANGE: )).*\"").concat(newLine)
+                        // note we use single quotes in the rows below to avoid escaping all of the YAML special characters
+                        .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
+                        .concat("        minor: '(?s)(?m)^feat(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
+                        .concat("        patch: '(?s)(?m)^fix(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("initialVersion: \"1.0.0\"").concat(newLine)
                         .concat("releaseLenient: true").concat(newLine)
                         .concat("releasePrefix: v").concat(newLine)
@@ -2296,9 +2311,9 @@ public class Suites {
                     "CHANGELOG.md", Set.<String>of(
                         "## v0.1.0",
                         "### Added",
-                        "* [] feat: Untagged commit [#2](https://example.com/issues/2)",
+                        "\\* \\[[a-z0-9]{5}\\] feat: Untagged commit \\[#2\\]\\(https:\\/\\/example\\.com\\/issues\\/2\\)",
                         "### Fixed",
-                        "* [] fix: Untagged commit [#1](https://example.com/issues/1)"
+                        "\\* \\[[a-z0-9]{5}\\] fix: Untagged commit \\[#1\\]\\(https:\\/\\/example\\.com\\/issues\\/1\\)"
                     ),
                     "version.txt", Set.<String>of(
                         "v0.1.0"
@@ -2357,9 +2372,10 @@ public class Suites {
                         .concat("    conventionalCommits:").concat(newLine)
                         .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\\\((?<scope>[a-z ]+)\\\\))?:( (?<title>.+))$(?s).*\"").concat(newLine)
                         .concat("      bumpExpressions:").concat(newLine)
-                        .concat("        major: \"(?s)(?m)^[a-zA-Z0-9_]+(!|.*^(BREAKING( |-)CHANGE: )).*\"").concat(newLine)
-                        .concat("        minor: \"(?s)(?m)^feat(?!!|.*^(BREAKING( |-)CHANGE: )).*\"").concat(newLine)
-                        .concat("        patch: \"(?s)(?m)^fix(?!!|.*^(BREAKING( |-)CHANGE: )).*\"").concat(newLine)
+                        // note we use single quotes in the rows below to avoid escaping all of the YAML special characters
+                        .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
+                        .concat("        minor: '(?s)(?m)^feat(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
+                        .concat("        patch: '(?s)(?m)^fix(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("initialVersion: \"1.0.0\"").concat(newLine)
                         .concat("releaseLenient: true").concat(newLine)
                         .concat("releasePrefix: v").concat(newLine)
@@ -2440,9 +2456,9 @@ public class Suites {
                     "CHANGELOG.md", Set.<String>of(
                         "## v0.1.0",
                         "### Added",
-                        "* [] feat: Untagged commit [#2](https://example.com/issues/2)",
+                        "\\* \\[[a-z0-9]{5}\\] feat: Untagged commit \\[#2\\]\\(https:\\/\\/example\\.com\\/issues\\/2\\)",
                         "### Fixed",
-                        "* [] fix: Untagged commit [#1](https://example.com/issues/1)"
+                        "\\* \\[[a-z0-9]{5}\\] fix: Untagged commit \\[#1\\]\\(https:\\/\\/example\\.com\\/issues\\/1\\)"
                     ),
                     "version.txt", Set.<String>of(
                         "v0.1.0"

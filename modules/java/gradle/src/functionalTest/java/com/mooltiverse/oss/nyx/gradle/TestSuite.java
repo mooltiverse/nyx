@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -255,7 +256,11 @@ public class TestSuite {
 		}
 
 		// Prepare the command to run
-		logger.debug("Setting up the command to run");
+		logger.debug("Running the pre-test commands");
+		for (GradleCommand preCmd: context.getPreTestCommands(script.getWorkingDirectory(), env, null)) {
+			preCmd.run();
+		}
+
 		String[] cmdArgs = args;
 		if (!Objects.isNull(tasks)) {
 			for (String task: tasks) {
@@ -263,25 +268,31 @@ public class TestSuite {
 				cmdArgs[cmdArgs.length - 1] = task;
 			}
 		}
-		GradleCommand cmd = context.getCommand(script.getWorkingDirectory(), gradleVersion, env, cmdArgs);
+		logger.debug("Setting up the command to run");
+		for (GradleCommand cmd: context.getTestCommands(script.getWorkingDirectory(), gradleVersion, env, cmdArgs)) {
+			// Run the command
+			logger.debug("running Gradle");
+			logger.debug("   in directory              : '{}'", script.getWorkingDirectory());
+			logger.debug("   with arguments ", Objects.isNull(cmdArgs) ? "" : String.join(" ", cmdArgs));
+			logger.debug("   with '{}' environment variables", Objects.isNull(env) ? 0 : env.size());
+			//logger.trace("   with '{}' environment variables: '{}'", Objects.isNull(env) ? 0 : env.size(), env) // keep this at the trace level as it may expose the token values
+			BuildResult result = cmd.run();
+			logger.debug("command executed without errors");
+			logger.debug("command output is: *** START ***");
+			logger.debug(result.getOutput());
+			logger.debug("command output is: ***  END  ***");
+			// also log to stdout as Gradle mutes the logger
+			System.out.println("command executed without errors");
+			System.out.println("command output is: *** START ***");
+			System.out.println(result.getOutput());
+			System.out.println("command output is: ***  END  ***");
+			System.out.flush();
+		}
 
-		// Run the command
-		logger.debug("running Gradle");
-		logger.debug("   in directory              : '{}'", script.getWorkingDirectory());
-		logger.debug("   with arguments ", Objects.isNull(cmdArgs) ? "" : String.join(" ", cmdArgs));
-		logger.debug("   with '{}' environment variables", Objects.isNull(env) ? 0 : env.size());
-		//logger.trace("   with '{}' environment variables: '{}'", Objects.isNull(env) ? 0 : env.size(), env) // keep this at the trace level as it may expose the token values
-		BuildResult result = cmd.run();
-		logger.debug("command executed without errors");
-		logger.debug("command output is: *** START ***");
-		logger.debug(result.getOutput());
-		logger.debug("command output is: ***  END  ***");
-		// also log to stdout as Gradle mutes the logger
-		System.out.println("command executed without errors");
-		System.out.println("command output is: *** START ***");
-		System.out.println(result.getOutput());
-		System.out.println("command output is: ***  END  ***");
-		System.out.flush();
+		logger.debug("Running the post-test commands");
+		for (GradleCommand postCmd: context.getPostTestCommands(script.getWorkingDirectory(), env, null)) {
+			postCmd.run();
+		}
 
 		// Run the checks on file contents
 		logger.debug("Running file content checks, if any");
@@ -304,7 +315,7 @@ public class TestSuite {
 					else {
 						// if it's not contained as a plain string try matching it as a regular expression
 						logger.debug("File '{}' does not contain plain string '{}', now trying to interpret the string as a regular expression and matching it", file.getAbsolutePath(), fileContentItemToCheck);
-						regexMatched = fileContent.matches(fileContentItemToCheck);
+						regexMatched = Pattern.compile(fileContentItemToCheck).matcher(fileContent).find();
 					}
 					assertTrue(plainStringContained || regexMatched, String.format("File '%s' was expected to contain plain string '%s' or match it as a regular expression but it doesn't", file.getAbsolutePath(), fileContentItemToCheck));
 					if (!(plainStringContained || regexMatched)) {
@@ -366,6 +377,11 @@ public class TestSuite {
 				}
 				default: throw new RuntimeException("unknown provider");
 			}
+		}
+
+		logger.debug("Running the clean-up commands");
+		for (GradleCommand cleanCmd: context.getCleanUpCommands(script.getWorkingDirectory(), env, null)) {
+			cleanCmd.run();
 		}
 	}
 }

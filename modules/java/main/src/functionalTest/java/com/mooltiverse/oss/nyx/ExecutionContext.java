@@ -16,6 +16,8 @@
 package com.mooltiverse.oss.nyx;
 
 import java.io.File;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This interface models an execution context that allows running the Nyx executable from within a specific environment.
@@ -24,14 +26,62 @@ import java.io.File;
  */
 public interface ExecutionContext {
     /**
-     * Returns the command object used to run the executable.
+     * Returns the command objects used to run the test.
      * 
      * @param repoDir the directory containing the Git repository
+     * @param args the optional array of command line arguments to pass to Gradle. It may be {@code null}
+     * @param env the optional map of environment variables to pass to Gradle. It may be {@code null}
      * 
-     * @return the command instance
+     * @return the command instances list. Commands are required to be executed in the same order
+     * they appear in the list.
      * 
      * @throws any exception that may be thrown when instantiating the command
      */
-    Command getCommand(File repoDir)
+    List<? extends Command> getTestCommands(File repoDir, Map<String,String> env, String[] args)
+        throws Exception;
+    
+    /**
+     * Returns the command objects used to run before the test.
+     * 
+     * @param repoDir the directory containing the Git repository
+     * @param args the optional array of command line arguments to pass to Gradle. It may be {@code null}
+     * @param env the optional map of environment variables to pass to Gradle. It may be {@code null}
+     * 
+     * @return the command instances list, which may be empty. Commands are required to be executed
+     * in the same order they appear in the list.
+     * 
+     * @throws any exception that may be thrown when instantiating the command
+     */
+    List<? extends Command> getPreTestCommands(File repoDir, Map<String,String> env, String[] args)
+        throws Exception;
+
+    /**
+     * Returns the command object used to run after the test.
+     * 
+     * @param repoDir the directory containing the Git repository
+     * @param args the optional array of command line arguments to pass to Gradle. It may be {@code null}
+     * @param env the optional map of environment variables to pass to Gradle. It may be {@code null}
+     * 
+     * @return the command instances list, which may be empty. Commands are required to be executed
+     * in the same order they appear in the list.
+     * 
+     * @throws any exception that may be thrown when instantiating the command
+     */
+    List<? extends Command> getPostTestCommands(File repoDir, Map<String,String> env, String[] args)
+        throws Exception;
+
+    /**
+     * Returns the command object used to run the after the test, before the test exits.
+     * 
+     * @param repoDir the directory containing the Git repository
+     * @param args the optional array of command line arguments to pass to Gradle. It may be {@code null}
+     * @param env the optional map of environment variables to pass to Gradle. It may be {@code null}
+     * 
+     * @return the command instances list, which may be empty. Commands are required to be executed
+     * in the same order they appear in the list.
+     * 
+     * @throws any exception that may be thrown when instantiating the command
+     */
+    List<? extends Command> getCleanUpCommands(File repoDir, Map<String,String> env, String[] args)
         throws Exception;
 }

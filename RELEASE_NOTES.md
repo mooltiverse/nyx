@@ -1,5 +1,27 @@
 # Nyx Release Notes
 
+## 2.5.1
+
+This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/2.5.1).
+
+### Upgrade instructions
+
+There are no actions to take for backward compatibility.
+
+### New features and improvements
+
+This release:
+
+* adds support for commit message conventions matching multiple portions of commit messages (yielding to multiple bump identifiers per commit), useful for merge commits ([#125](https://github.com/mooltiverse/nyx/issues/125))
+* improves regular expressions used for the Conventional Commits convention
+* adds the unofficial `conventionalCommitsForMerge` convention (disabled by default) to the [extended preset](https://mooltiverse.github.io/nyx/guide/user/configuration-presets/extended/), useful for merge commits ([#125](https://github.com/mooltiverse/nyx/issues/125))
+
+### Fixed issues
+
+This release:
+
+* fixes a bug in changelog templates where commit SHA was not rendered properly ([#243](https://github.com/mooltiverse/nyx/issues/259))
+
 ## 2.5.0
 
 This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/2.5.0).

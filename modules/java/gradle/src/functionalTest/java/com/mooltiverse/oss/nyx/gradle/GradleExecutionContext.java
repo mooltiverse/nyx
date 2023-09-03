@@ -16,6 +16,7 @@
 package com.mooltiverse.oss.nyx.gradle;
 
 import java.io.File;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -35,33 +36,27 @@ public class GradleExecutionContext implements ExecutionContext {
     }
 
     /**
-     * Returns the command object used to run Gradle.
-     * 
-     * @param repoDir the directory containing the Git repository
-     * 
-     * @return the command instance
-     * 
-     * @throws any exception that may be thrown when instantiating the command
+     * {@inheritDoc}
      */
     @Override
-    public GradleCommand getCommand(File repoDir)
+    public List<GradleCommand> getTestCommands(File repoDir, Map<String,String> env, String[] args)
         throws Exception {
-        return getCommand(repoDir, null, null, null);
+        return getTestCommands(repoDir, null, env, args);
     }
 
     /**
-     * Returns the command object used to run Gradle.
+     * Returns the command objects used to run the test.
      * 
      * @param repoDir the directory containing the Git repository
-     * @param gradleVersion the Gradle version to test against. If null the default version will be used
-     * @param env the optional map of environment variables to pass to Gradle. It may be null
-     * @param args the optional array of command line arguments to pass to Gradle. It may be null
+     * @param gradleVersion the Gradle version to test against. If {@code null} the default version will be used
+     * @param env the optional map of environment variables to pass to Gradle. It may be {@code null}
+     * @param args the optional array of command line arguments to pass to Gradle. It may be {@code null}
      * 
      * @return the command instance
      * 
      * @throws any exception that may be thrown when instantiating the command
      */
-    public GradleCommand getCommand(File repoDir, String gradleVersion, Map<String,String> env, String[] args)
+    public List<GradleCommand> getTestCommands(File repoDir, String gradleVersion, Map<String,String> env, String[] args)
         throws Exception {
         GradleCommand res = new GradleCommand();
         if (!Objects.isNull(gradleVersion)) {
@@ -76,6 +71,33 @@ public class GradleExecutionContext implements ExecutionContext {
         res.gradleRunner.forwardOutput();
         res.gradleRunner.withDebug(false); // enable debug if needed
         
-        return res;
+        return List.<GradleCommand>of(res);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<GradleCommand> getPreTestCommands(File repoDir, Map<String,String> env, String[] args)
+        throws Exception {
+        return List.<GradleCommand>of();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<GradleCommand> getPostTestCommands(File repoDir, Map<String,String> env, String[] args)
+        throws Exception {
+        return List.<GradleCommand>of();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<GradleCommand> getCleanUpCommands(File repoDir, Map<String,String> env, String[] args)
+        throws Exception {
+        return List.<GradleCommand>of();
     }
 }
