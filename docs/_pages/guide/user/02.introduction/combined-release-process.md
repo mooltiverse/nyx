@@ -135,7 +135,7 @@ jobs:
         stateFile: .nyx-state.json
 ```
 
-Please refer to the [Nyx GitHub Action](https://github.com/mooltiverse/nyx-github-action#combined-release-process) for more.
+Please refer to the [Nyx GitHub Action]({{ site.data.project.home }}-github-action#combined-release-process) for more.
 
 ## Using a combination of Nyx flavors
 

@@ -11,7 +11,7 @@ One of the fundamental decisions you have to make about your project is about th
 
 ## Version schemes
 
-Nyx supports and complies with [Semantic Versioning](#semantic-versioning-semver) and [will support](https://github.com/mooltiverse/nyx/issues/4) the [Maven scheme](#maven) in the future. Unless you need to stick with Maven for historical reasons, you should definitely use SemVer.
+Nyx supports and complies with [Semantic Versioning](#semantic-versioning-semver) and [will support]({{ site.data.project.home }}/issues/4) the [Maven scheme](#maven) in the future. Unless you need to stick with Maven for historical reasons, you should definitely use SemVer.
 
 The above statement is about the versioning strategy only. You can still use Maven as a build tool even when using Semantic Versioning.
 {: .notice--info}
@@ -41,5 +41,5 @@ Other optional identifiers are allowed in the `pre-release` and the `build` iden
 
 ### Maven
 
-Maven Versioning scheme is not supported yet. See [this issue](https://github.com/mooltiverse/nyx/issues/4){: .btn .btn--primary} to know more about the progress and schedule or vote.
+Maven Versioning scheme is not supported yet. See [this issue]({{ site.data.project.home }}/issues/4){: .btn .btn--primary} to know more about the progress and schedule or vote.
 {: .notice--warning}

@@ -21,7 +21,7 @@ Nyx provides the same features in all the available versions but the means to in
 
 ### Download the binary
 
-You can find the latest binaries for any platform in the [latest release](https://github.com/mooltiverse/nyx/releases/latest) assets.
+You can find the latest binaries for any platform in the [latest release]({{ site.data.project.home }}/releases/latest) assets.
 
 Make sure you store the binary so that it's available from the `PATH` and it has execution permissions.
 
@@ -138,7 +138,7 @@ Many teams prefer using Docker containers for their CI/CD and local development 
 
 The Docker images are published onto the two main registries:
 * [Docker Hub](https://hub.docker.com/repository/docker/mooltiverse/nyx) (the default)
-* [GitHub Container Registry](https://github.com/mooltiverse/nyx/pkgs/container/nyx)
+* [GitHub Container Registry]({{ site.data.project.home }}/pkgs/container/nyx)
 
 Nyx' Docker image has a small footprint (less than 10Mb) and uses [Alpine Linux](https://www.alpinelinux.org/) as the base image.
 
@@ -456,6 +456,6 @@ In this example `dumpSomeDiagnostics` represents some arbitrary task that depend
 
 ## Using the GitHub Action
 
-When using GitHub Actions, the [Nyx Action](https://github.com/mooltiverse/nyx-github-action) is the easiest and most effective way of using Nyx.
+When using GitHub Actions, the [Nyx Action]({{ site.data.project.home }}-github-action) is the easiest and most effective way of using Nyx.
 
-Please refer to the [action page](https://github.com/mooltiverse/nyx-github-action) for instructions.
+Please refer to the [action page]({{ site.data.project.home }}-github-action) for instructions.

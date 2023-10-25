@@ -10,7 +10,7 @@ In this section you can find instructions to use the available Java libraries to
 
 All java libraries have public API docs hosted [here](https://javadoc.io/doc/com.mooltiverse.oss.nyx/java) (thanks [javadoc.io](https://javadoc.io/)).
 
-All artifacts are available at the [Maven Central](https://search.maven.org/search?q=com.mooltiverse.oss.nyx) and the [GitHub Packages](https://github.com/mooltiverse/nyx/packages/) repositories.
+All artifacts are available at the [Maven Central](https://search.maven.org/search?q=com.mooltiverse.oss.nyx) and the [GitHub Packages]({{ site.data.project.home }}/packages/) repositories.
 
 The available libraries are:
 

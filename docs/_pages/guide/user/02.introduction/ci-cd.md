@@ -11,7 +11,7 @@ Nyx is perfectly suited for use in CI/CD platforms and leverage [automation]({{ 
 
 ### Using the official Nyx GitHub Action
 
-Please refer to the [GitHub Action home page](https://github.com/mooltiverse/nyx-github-action).
+Please refer to the [GitHub Action home page]({{ site.data.project.home }}-github-action).
 
 ### Check out the entire repository when running jobs
 
@@ -35,7 +35,7 @@ When running GitHub Actions pipelines you can take advantage of the [automatic t
 
 As an example, to read the token and set it as the `GH_TOKEN` environment variable you can define your GitHub Actions job like in the following snippets.
 
-Running Nyx using the [GitHub Action](https://github.com/mooltiverse/nyx-github-action#usage):
+Running Nyx using the [GitHub Action]({{ site.data.project.home }}-github-action#usage):
 
 ```yaml
 release:
