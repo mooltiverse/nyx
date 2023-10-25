@@ -14,7 +14,7 @@ This library is used at the Nyx core but yet is completely independent from its 
 ## Get the library
 
 ### Manual download
-You can download the jar file directly from the [Maven Central](https://repo.maven.apache.org/maven2/com/mooltiverse/oss/nyx/version/){:target="_blank"} repository or by using the [Maven Central repository search engine](https://search.maven.org/artifact/com.mooltiverse.oss.nyx/version){:target="_blank"}. The [GitHub Packages](https://github.com/mooltiverse/nyx/packages/){:target="_blank"} repository is the other source where you can get it.
+You can download the jar file directly from the [Maven Central](https://repo.maven.apache.org/maven2/com/mooltiverse/oss/nyx/version/){:target="_blank"} repository or by using the [Maven Central repository search engine](https://search.maven.org/artifact/com.mooltiverse.oss.nyx/version){:target="_blank"}. The [GitHub Packages]({{ site.data.project.home }}/packages/){:target="_blank"} repository is the other source where you can get it.
 
 ### Using Maven
 When using Maven just add the following dependency to your `POM`:
@@ -27,7 +27,7 @@ When using Maven just add the following dependency to your `POM`:
 </dependency>
 ```
 
-Your local Maven setup will likely use the [Maven Central](https://repo.maven.apache.org/maven2/com/mooltiverse/oss/nyx/version/) repository by default but if you like to use the [GitHub Packages](https://github.com/mooltiverse/nyx/packages/) repository you can follow [these instructions](https://help.github.com/en/packages/using-github-packages-with-your-projects-ecosystem/configuring-apache-maven-for-use-with-github-packages).
+Your local Maven setup will likely use the [Maven Central](https://repo.maven.apache.org/maven2/com/mooltiverse/oss/nyx/version/) repository by default but if you like to use the [GitHub Packages]({{ site.data.project.home }}/packages/) repository you can follow [these instructions](https://help.github.com/en/packages/using-github-packages-with-your-projects-ecosystem/configuring-apache-maven-for-use-with-github-packages).
 {: .notice--info}
 
 ### Using Ivy

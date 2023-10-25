@@ -23,7 +23,7 @@ Status: Downloaded newer image for mooltiverse/latest
 mooltiverse/latest
 ```
 
-In case you want to pull it from the [GitHub Container Registry](https://github.com/mooltiverse/nyx/pkgs/container/nyx), use the GitHub's registry like:
+In case you want to pull it from the [GitHub Container Registry]({{ site.data.project.home }}/pkgs/container/nyx), use the GitHub's registry like:
 
 ```bash
 $ docker pull ghcr.io/mooltiverse/nyx::latest

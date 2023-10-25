@@ -26,8 +26,8 @@
 # Review documentation to determine if you should use `theme` or `remote_theme`
 # https://mmistakes.github.io/minimal-mistakes/docs/quick-start-guide/#installing-the-theme
 
-#theme                  : "minimal-mistakes-jekyll"
-remote_theme           : "mmistakes/minimal-mistakes"
+#theme                  : "minimal-mistakes-jekyll"   # See: https://mmistakes.github.io/minimal-mistakes/docs/quick-start-guide/#gem-based-method
+remote_theme           : "mmistakes/minimal-mistakes" # See: https://mmistakes.github.io/minimal-mistakes/docs/quick-start-guide/#remote-theme-method
 minimal_mistakes_skin    : "default" # "default", "air", "aqua", "contrast", "dark", "dirt", "neon", "mint", "plum", "sunrise"
 
 # Site Settings
@@ -39,7 +39,23 @@ title_separator          : "-"
 subtitle                 : "The semantic release manager"
 name                     : "Mooltiverse"
 description              : "Documentation site"
-url                      : "https://mooltiverse.github.io" # "https://mooltiverse.github.io" # "https://mooltiverse.github.io/nyx"
+url                      : "https://mooltiverse.github.io" # "https://mooltiverse.github.io/nyx"
+# The baseurl generates some confusion, as discussed here:
+# - https://mmistakes.github.io/minimal-mistakes/docs/configuration/#site-base-url
+# - https://byparker.com/blog/2014/clearing-up-confusion-around-baseurl/
+# As a rule of thumb:
+# 1. when the site is deployed as a microsite under some path on a server, set this to the 'path' to the site.
+#    For example, when deploying to GitHub pages under https://user.github.io/path/ or a corporate server
+#    under https://server.example.com/path/, baseurl must be set to "/path".
+#    But there's a difference when you define cross-links in Markdown pages:
+#    a. when deploying to GitHub Pages all links must also contain the '{{ site.baseurl }}', i.e.
+#         [text]({{ site.baseurl }}{% link _pages/index.md %})
+#    b. when deploying to a custom server, links must not contain the '{{ site.baseurl }}', i.e.
+#         [text]({% link _pages/index.md %})
+# 2. when the site is deployed standalone (i.e. https://server.example.com/) the baseurl must NOT be set
+#
+# So, since we are deploying this site to GitHub pages, we define the baseurl and all links in Markdown
+# pages need to prepend with '{{ site.baseurl }}', i.e. [text]({{ site.baseurl }}{% link _pages/index.md %})
 baseurl                  : "/nyx" # "/nyx"
 repository               : "mooltiverse/nyx"
 teaser                   : # path of fallback teaser image, e.g. "/assets/images/500x300.png"
@@ -121,7 +137,6 @@ analytics:
   google:
     tracking_id          :
     anonymize_ip         : # true, false (default)
-
 
 # Site Author
 author:
@@ -217,14 +232,12 @@ keep_files:
 encoding: "utf-8"
 markdown_ext: "markdown,mkdown,mkdn,mkd,md"
 
-
 # Conversion
 markdown: kramdown
 highlighter: rouge
 lsi: false
 excerpt_separator: "\n\n"
 incremental: false
-
 
 # Markdown Processing
 kramdown:
@@ -237,12 +250,10 @@ kramdown:
   smart_quotes: lsquo,rsquo,ldquo,rdquo
   enable_coderay: false
 
-
 # Sass/SCSS
 sass:
   sass_dir: _sass
   style: compressed # https://sass-lang.com/documentation/file.SASS_REFERENCE.html#output_style
-
 
 # Outputting
 permalink: /:categories/:title/
@@ -250,14 +261,13 @@ paginate: 5 # amount of posts to show
 paginate_path: /page:num/
 timezone: # https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 
-
 # Plugins (previously gems:)
 plugins:
   - jekyll-paginate
   - jekyll-sitemap
   - jekyll-gist
   - jekyll-feed
-  - jekyll-include-cache
+  - jekyll-include-cache # See: https://mmistakes.github.io/minimal-mistakes/docs/quick-start-guide/#remote-theme-method
 
 # mimic GitHub Pages with --safe
 whitelist:
@@ -266,7 +276,6 @@ whitelist:
   - jekyll-gist
   - jekyll-feed
   - jekyll-include-cache
-
 
 # Archives
 #  Type
@@ -296,14 +305,12 @@ tag_archive:
 #     category: /categories/:name/
 #     tag: /tags/:name/
 
-
 # HTML Compression
 # - https://jch.penibelst.de/
 compress_html:
   clippings: all
   ignore:
     envs: development
-
 
 # Defaults
 defaults:

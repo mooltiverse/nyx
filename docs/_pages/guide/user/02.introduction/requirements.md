@@ -9,7 +9,7 @@ permalink: /guide/user/introduction/requirements/
 
 ### Command line binaries
 
-Supported platforms are those listed in the [available release assets](https://github.com/mooltiverse/nyx/releases/latest), namely:
+Supported platforms are those listed in the [available release assets]({{ site.data.project.home }}/releases/latest), namely:
 
 * `darwin` `amd64`
 * `darwin` `arm64`
@@ -58,4 +58,4 @@ Java VMs older than `11` and Gradle versions older than `6.0` are not supported.
 
 This is a [Docker Action](https://docs.github.com/en/actions/creating-actions/about-custom-actions#types-of-actions) so it's only available for Linux runners.
 
-Please refer to the [GitHub Action home page](https://github.com/mooltiverse/nyx-github-action).
+Please refer to the [GitHub Action home page]({{ site.data.project.home }}-github-action).

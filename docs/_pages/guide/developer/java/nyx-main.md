@@ -12,7 +12,7 @@ You can use the main Nyx library to embed it into your project and use all or so
 ## Get the library
 
 ### Manual download
-You can download the jar file directly from the [Maven Central](https://repo.maven.apache.org/maven2/com/mooltiverse/oss/nyx/main/){:target="_blank"} repository or by using the [Maven Central repository search engine](https://search.maven.org/artifact/com.mooltiverse.oss.nyx/main){:target="_blank"}. The [GitHub Packages](https://github.com/mooltiverse/nyx/packages/){:target="_blank"} repository is the other source where you can get it.
+You can download the jar file directly from the [Maven Central](https://repo.maven.apache.org/maven2/com/mooltiverse/oss/nyx/main/){:target="_blank"} repository or by using the [Maven Central repository search engine](https://search.maven.org/artifact/com.mooltiverse.oss.nyx/main){:target="_blank"}. The [GitHub Packages]({{ site.data.project.home }}/packages/){:target="_blank"} repository is the other source where you can get it.
 
 In order to also download the correct dependencies you should use one of the automatic tools below. If you really want to download manually take a look at the [`pom`](https://repo.maven.apache.org/maven2/com/mooltiverse/oss/nyx/main/{{ site.data.nyx.version }}/main-{{ site.data.nyx.version }}.pom){:target="_blank"} to see the dependencies to download.
 {: .notice--info}
@@ -28,7 +28,7 @@ When using Maven just add the following dependency to your `POM`:
 </dependency>
 ```
 
-Your local Maven setup will likely use the [Maven Central](https://repo.maven.apache.org/maven2/com/mooltiverse/oss/nyx/main/) repository by default but if you like to use the [GitHub Packages](https://github.com/mooltiverse/nyx/packages/) repository you can follow [these instructions](https://help.github.com/en/packages/using-github-packages-with-your-projects-ecosystem/configuring-apache-maven-for-use-with-github-packages).
+Your local Maven setup will likely use the [Maven Central](https://repo.maven.apache.org/maven2/com/mooltiverse/oss/nyx/main/) repository by default but if you like to use the [GitHub Packages]({{ site.data.project.home }}/packages/) repository you can follow [these instructions](https://help.github.com/en/packages/using-github-packages-with-your-projects-ecosystem/configuring-apache-maven-for-use-with-github-packages).
 {: .notice--info}
 
 ### Using Ivy
