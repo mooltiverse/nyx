@@ -66,9 +66,9 @@ commitMessageConventions:
     - conventionalCommits
   items:
     conventionalCommits:
-      expression: "(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))$(?s).*"
+      expression: "(?m)^(?<type>[a-zA-Z0-9_]+)(\\((?<scope>[a-z ]+)\\))?(!)?:( (?<title>.+))$(?s).*"
       bumpExpressions:
-        major: '(?s)(?m)^[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*'
+        major: '(?s)(?m)^[a-zA-Z0-9_]+(\\([a-z ]+\\))?(!: .*|.*^(BREAKING( |-)CHANGE: )).*'
         minor: '(?s)(?m)^feat(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'
         patch: '(?s)(?m)^fix(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'
 initialVersion: "1.0.0"
@@ -161,9 +161,9 @@ commitMessageConventions:
     - conventionalCommits
   items:
     conventionalCommits: 
-      expression: "(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))$(?s).*"
+      expression: "(?m)^(?<type>[a-zA-Z0-9_]+)(\\((?<scope>[a-z ]+)\\))?(!)?:( (?<title>.+))$(?s).*"
       bumpExpressions: 
-        major: '(?s)(?m)^[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*'
+        major: '(?s)(?m)^[a-zA-Z0-9_]+(\\([a-z ]+\\))?(!: .*|.*^(BREAKING( |-)CHANGE: )).*'
         minor: '(?s)(?m)^feat(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'
         patch: '(?s)(?m)^fix(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'
 initialVersion: "1.0.0"
@@ -285,9 +285,9 @@ commitMessageConventions:
     - conventionalCommits
   items:
     conventionalCommits: 
-      expression: "(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))$(?s).*"
+      expression: "(?m)^(?<type>[a-zA-Z0-9_]+)(\\((?<scope>[a-z ]+)\\))?(!)?:( (?<title>.+))$(?s).*"
       bumpExpressions: 
-        major: '(?s)(?m)^[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*'
+        major: '(?s)(?m)^[a-zA-Z0-9_]+(\\([a-z ]+\\))?(!: .*|.*^(BREAKING( |-)CHANGE: )).*'
         minor: '(?s)(?m)^feat(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'
         patch: '(?s)(?m)^fix(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'
 initialVersion: "1.0.0"
@@ -535,9 +535,9 @@ commitMessageConventions:
     - conventionalCommits
   items:
     conventionalCommits: 
-      expression: "(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))$(?s).*"
+      expression: "(?m)^(?<type>[a-zA-Z0-9_]+)(\\((?<scope>[a-z ]+)\\))?(!)?:( (?<title>.+))$(?s).*"
       bumpExpressions: 
-        major: '(?s)(?m)^[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*'
+        major: '(?s)(?m)^[a-zA-Z0-9_]+(\\([a-z ]+\\))?(!: .*|.*^(BREAKING( |-)CHANGE: )).*'
         minor: '(?s)(?m)^feat(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'
         patch: '(?s)(?m)^fix(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'
 initialVersion: "1.0.0"
@@ -673,9 +673,9 @@ commitMessageConventions:
     - conventionalCommits
   items:
     conventionalCommits: 
-      expression: "(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))$(?s).*"
+      expression: "(?m)^(?<type>[a-zA-Z0-9_]+)(\\((?<scope>[a-z ]+)\\))?(!)?:( (?<title>.+))$(?s).*"
       bumpExpressions: 
-        major: '(?s)(?m)^[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*'
+        major: '(?s)(?m)^[a-zA-Z0-9_]+(\\([a-z ]+\\))?(!: .*|.*^(BREAKING( |-)CHANGE: )).*'
         minor: '(?s)(?m)^feat(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'
         patch: '(?s)(?m)^fix(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'
 initialVersion: "1.0.0"

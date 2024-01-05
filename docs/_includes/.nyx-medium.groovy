@@ -15,7 +15,7 @@ nyx {
       conventionalCommits {
         expression = '(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\\\((?<scope>[a-z ]+)\\\\))?:( (?<title>.+))$(?s).*'
         bumpExpressions {
-          major = '(?s)(?m)^[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*'
+          major = '(?s)(?m)^[a-zA-Z0-9_]+(\\([a-z ]+\\))?(!: .*|.*^(BREAKING( |-)CHANGE: )).*'
           minor = '(?s)(?m)^feat(!{0})(\\\\([a-z ]+\\\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'
           patch = '(?s)(?m)^fix(!{0})(\\\\([a-z ]+\\\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'
         }

@@ -333,7 +333,7 @@ public class Suites {
                         .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\\\((?<scope>[a-z ]+)\\\\))?:( (?<title>.+))$(?s).*\"").concat(newLine)
                         .concat("      bumpExpressions:").concat(newLine)
                         // note we use single quotes in the rows below to avoid escaping all of the YAML special characters
-                        .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
+                        .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(\\([a-z ]+\\))?(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("        minor: '(?s)(?m)^feat(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("        patch: '(?s)(?m)^fix(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("initialVersion: \"1.0.0\"").concat(newLine)
@@ -435,7 +435,7 @@ public class Suites {
                         .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\\\((?<scope>[a-z ]+)\\\\))?:( (?<title>.+))$(?s).*\"").concat(newLine)
                         .concat("      bumpExpressions:").concat(newLine)
                         // note we use single quotes in the rows below to avoid escaping all of the YAML special characters
-                        .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
+                        .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(\\([a-z ]+\\))?(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("        minor: '(?s)(?m)^feat(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("        patch: '(?s)(?m)^fix(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("initialVersion: \"1.0.0\"").concat(newLine)
@@ -539,7 +539,7 @@ public class Suites {
                         .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\\\((?<scope>[a-z ]+)\\\\))?:( (?<title>.+))$(?s).*\"").concat(newLine)
                         .concat("      bumpExpressions:").concat(newLine)
                         // note we use single quotes in the rows below to avoid escaping all of the YAML special characters
-                        .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
+                        .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(\\([a-z ]+\\))?(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("        minor: '(?s)(?m)^feat(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("        patch: '(?s)(?m)^fix(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("initialVersion: \"1.0.0\"").concat(newLine)
@@ -644,7 +644,7 @@ public class Suites {
                         .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\\\((?<scope>[a-z ]+)\\\\))?:( (?<title>.+))$(?s).*\"").concat(newLine)
                         .concat("      bumpExpressions:").concat(newLine)
                         // note we use single quotes in the rows below to avoid escaping all of the YAML special characters
-                        .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
+                        .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(\\([a-z ]+\\))?(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("        minor: '(?s)(?m)^feat(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("        patch: '(?s)(?m)^fix(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("initialVersion: \"1.0.0\"").concat(newLine)
@@ -749,7 +749,7 @@ public class Suites {
                         .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\\\((?<scope>[a-z ]+)\\\\))?:( (?<title>.+))$(?s).*\"").concat(newLine)
                         .concat("      bumpExpressions:").concat(newLine)
                         // note we use single quotes in the rows below to avoid escaping all of the YAML special characters
-                        .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
+                        .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(\\([a-z ]+\\))?(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("        minor: '(?s)(?m)^feat(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("        patch: '(?s)(?m)^fix(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("initialVersion: \"1.0.0\"").concat(newLine)
@@ -854,7 +854,7 @@ public class Suites {
                         .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\\\((?<scope>[a-z ]+)\\\\))?:( (?<title>.+))$(?s).*\"").concat(newLine)
                         .concat("      bumpExpressions:").concat(newLine)
                         // note we use single quotes in the rows below to avoid escaping all of the YAML special characters
-                        .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
+                        .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(\\([a-z ]+\\))?(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("        minor: '(?s)(?m)^feat(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("        patch: '(?s)(?m)^fix(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("initialVersion: \"1.0.0\"").concat(newLine)
@@ -962,7 +962,7 @@ public class Suites {
                         .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\\\((?<scope>[a-z ]+)\\\\))?:( (?<title>.+))$(?s).*\"").concat(newLine)
                         .concat("      bumpExpressions:").concat(newLine)
                         // note we use single quotes in the rows below to avoid escaping all of the YAML special characters
-                        .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
+                        .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(\\([a-z ]+\\))?(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("        minor: '(?s)(?m)^feat(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("        patch: '(?s)(?m)^fix(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("initialVersion: \"1.0.0\"").concat(newLine)
@@ -1071,7 +1071,7 @@ public class Suites {
                         .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\\\((?<scope>[a-z ]+)\\\\))?:( (?<title>.+))$(?s).*\"").concat(newLine)
                         .concat("      bumpExpressions:").concat(newLine)
                         // note we use single quotes in the rows below to avoid escaping all of the YAML special characters
-                        .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
+                        .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(\\([a-z ]+\\))?(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("        minor: '(?s)(?m)^feat(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("        patch: '(?s)(?m)^fix(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("initialVersion: \"1.0.0\"").concat(newLine)
@@ -1173,7 +1173,7 @@ public class Suites {
                         .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\\\((?<scope>[a-z ]+)\\\\))?:( (?<title>.+))$(?s).*\"").concat(newLine)
                         .concat("      bumpExpressions:").concat(newLine)
                         // note we use single quotes in the rows below to avoid escaping all of the YAML special characters
-                        .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
+                        .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(\\([a-z ]+\\))?(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("        minor: '(?s)(?m)^feat(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("        patch: '(?s)(?m)^fix(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("initialVersion: \"1.0.0\"").concat(newLine)
@@ -1304,7 +1304,7 @@ public class Suites {
                         .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\\\((?<scope>[a-z ]+)\\\\))?:( (?<title>.+))$(?s).*\"").concat(newLine)
                         .concat("      bumpExpressions:").concat(newLine)
                         // note we use single quotes in the rows below to avoid escaping all of the YAML special characters
-                        .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
+                        .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(\\([a-z ]+\\))?(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("        minor: '(?s)(?m)^feat(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("        patch: '(?s)(?m)^fix(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("initialVersion: \"1.0.0\"").concat(newLine)
@@ -1432,7 +1432,7 @@ public class Suites {
                         .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\\\((?<scope>[a-z ]+)\\\\))?:( (?<title>.+))$(?s).*\"").concat(newLine)
                         .concat("      bumpExpressions:").concat(newLine)
                         // note we use single quotes in the rows below to avoid escaping all of the YAML special characters
-                        .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
+                        .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(\\([a-z ]+\\))?(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("        minor: '(?s)(?m)^feat(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("        patch: '(?s)(?m)^fix(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("initialVersion: \"1.0.0\"").concat(newLine)
@@ -1565,7 +1565,7 @@ public class Suites {
                         .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\\\((?<scope>[a-z ]+)\\\\))?:( (?<title>.+))$(?s).*\"").concat(newLine)
                         .concat("      bumpExpressions:").concat(newLine)
                         // note we use single quotes in the rows below to avoid escaping all of the YAML special characters
-                        .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
+                        .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(\\([a-z ]+\\))?(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("        minor: '(?s)(?m)^feat(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("        patch: '(?s)(?m)^fix(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("initialVersion: \"1.0.0\"").concat(newLine)
@@ -1941,7 +1941,7 @@ public class Suites {
                         .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\\\((?<scope>[a-z ]+)\\\\))?:( (?<title>.+))$(?s).*\"").concat(newLine)
                         .concat("      bumpExpressions:").concat(newLine)
                         // note we use single quotes in the rows below to avoid escaping all of the YAML special characters
-                        .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
+                        .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(\\([a-z ]+\\))?(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("        minor: '(?s)(?m)^feat(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("        patch: '(?s)(?m)^fix(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("initialVersion: \"1.0.0\"").concat(newLine)
@@ -2086,7 +2086,7 @@ public class Suites {
                         .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\\\((?<scope>[a-z ]+)\\\\))?:( (?<title>.+))$(?s).*\"").concat(newLine)
                         .concat("      bumpExpressions:").concat(newLine)
                         // note we use single quotes in the rows below to avoid escaping all of the YAML special characters
-                        .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
+                        .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(\\([a-z ]+\\))?(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("        minor: '(?s)(?m)^feat(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("        patch: '(?s)(?m)^fix(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("initialVersion: \"1.0.0\"").concat(newLine)
@@ -2228,7 +2228,7 @@ public class Suites {
                         .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\\\((?<scope>[a-z ]+)\\\\))?:( (?<title>.+))$(?s).*\"").concat(newLine)
                         .concat("      bumpExpressions:").concat(newLine)
                         // note we use single quotes in the rows below to avoid escaping all of the YAML special characters
-                        .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
+                        .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(\\([a-z ]+\\))?(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("        minor: '(?s)(?m)^feat(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("        patch: '(?s)(?m)^fix(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("initialVersion: \"1.0.0\"").concat(newLine)
@@ -2373,7 +2373,7 @@ public class Suites {
                         .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\\\((?<scope>[a-z ]+)\\\\))?:( (?<title>.+))$(?s).*\"").concat(newLine)
                         .concat("      bumpExpressions:").concat(newLine)
                         // note we use single quotes in the rows below to avoid escaping all of the YAML special characters
-                        .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
+                        .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(\\([a-z ]+\\))?(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("        minor: '(?s)(?m)^feat(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("        patch: '(?s)(?m)^fix(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
                         .concat("initialVersion: \"1.0.0\"").concat(newLine)
