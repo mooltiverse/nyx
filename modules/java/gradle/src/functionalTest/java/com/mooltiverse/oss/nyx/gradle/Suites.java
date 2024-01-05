@@ -330,7 +330,7 @@ public class Suites {
                         .concat("    - conventionalCommits").concat(newLine)
                         .concat("  items:").concat(newLine)
                         .concat("    conventionalCommits:").concat(newLine)
-                        .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\\\((?<scope>[a-z ]+)\\\\))?:( (?<title>.+))$(?s).*\"").concat(newLine)
+                        .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(\\\\((?<scope>[a-z ]+)\\\\))?(!)?:( (?<title>.+))$(?s).*\"").concat(newLine)
                         .concat("      bumpExpressions:").concat(newLine)
                         // note we use single quotes in the rows below to avoid escaping all of the YAML special characters
                         .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(\\([a-z ]+\\))?(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
@@ -432,7 +432,7 @@ public class Suites {
                         .concat("    - conventionalCommits").concat(newLine)
                         .concat("  items:").concat(newLine)
                         .concat("    conventionalCommits:").concat(newLine)
-                        .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\\\((?<scope>[a-z ]+)\\\\))?:( (?<title>.+))$(?s).*\"").concat(newLine)
+                        .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(\\\\((?<scope>[a-z ]+)\\\\))?(!)?:( (?<title>.+))$(?s).*\"").concat(newLine)
                         .concat("      bumpExpressions:").concat(newLine)
                         // note we use single quotes in the rows below to avoid escaping all of the YAML special characters
                         .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(\\([a-z ]+\\))?(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
@@ -536,7 +536,7 @@ public class Suites {
                         .concat("    - conventionalCommits").concat(newLine)
                         .concat("  items:").concat(newLine)
                         .concat("    conventionalCommits:").concat(newLine)
-                        .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\\\((?<scope>[a-z ]+)\\\\))?:( (?<title>.+))$(?s).*\"").concat(newLine)
+                        .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(\\\\((?<scope>[a-z ]+)\\\\))?(!)?:( (?<title>.+))$(?s).*\"").concat(newLine)
                         .concat("      bumpExpressions:").concat(newLine)
                         // note we use single quotes in the rows below to avoid escaping all of the YAML special characters
                         .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(\\([a-z ]+\\))?(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
@@ -641,7 +641,7 @@ public class Suites {
                         .concat("    - conventionalCommits").concat(newLine)
                         .concat("  items:").concat(newLine)
                         .concat("    conventionalCommits:").concat(newLine)
-                        .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\\\((?<scope>[a-z ]+)\\\\))?:( (?<title>.+))$(?s).*\"").concat(newLine)
+                        .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(\\\\((?<scope>[a-z ]+)\\\\))?(!)?:( (?<title>.+))$(?s).*\"").concat(newLine)
                         .concat("      bumpExpressions:").concat(newLine)
                         // note we use single quotes in the rows below to avoid escaping all of the YAML special characters
                         .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(\\([a-z ]+\\))?(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
@@ -746,7 +746,7 @@ public class Suites {
                         .concat("    - conventionalCommits").concat(newLine)
                         .concat("  items:").concat(newLine)
                         .concat("    conventionalCommits:").concat(newLine)
-                        .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\\\((?<scope>[a-z ]+)\\\\))?:( (?<title>.+))$(?s).*\"").concat(newLine)
+                        .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(\\\\((?<scope>[a-z ]+)\\\\))?(!)?:( (?<title>.+))$(?s).*\"").concat(newLine)
                         .concat("      bumpExpressions:").concat(newLine)
                         // note we use single quotes in the rows below to avoid escaping all of the YAML special characters
                         .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(\\([a-z ]+\\))?(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
@@ -851,7 +851,7 @@ public class Suites {
                         .concat("    - conventionalCommits").concat(newLine)
                         .concat("  items:").concat(newLine)
                         .concat("    conventionalCommits:").concat(newLine)
-                        .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\\\((?<scope>[a-z ]+)\\\\))?:( (?<title>.+))$(?s).*\"").concat(newLine)
+                        .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(\\\\((?<scope>[a-z ]+)\\\\))?(!)?:( (?<title>.+))$(?s).*\"").concat(newLine)
                         .concat("      bumpExpressions:").concat(newLine)
                         // note we use single quotes in the rows below to avoid escaping all of the YAML special characters
                         .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(\\([a-z ]+\\))?(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
@@ -959,7 +959,7 @@ public class Suites {
                         .concat("    - conventionalCommits").concat(newLine)
                         .concat("  items:").concat(newLine)
                         .concat("    conventionalCommits:").concat(newLine)
-                        .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\\\((?<scope>[a-z ]+)\\\\))?:( (?<title>.+))$(?s).*\"").concat(newLine)
+                        .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(\\\\((?<scope>[a-z ]+)\\\\))?(!)?:( (?<title>.+))$(?s).*\"").concat(newLine)
                         .concat("      bumpExpressions:").concat(newLine)
                         // note we use single quotes in the rows below to avoid escaping all of the YAML special characters
                         .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(\\([a-z ]+\\))?(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
@@ -1068,7 +1068,7 @@ public class Suites {
                         .concat("    - conventionalCommits").concat(newLine)
                         .concat("  items:").concat(newLine)
                         .concat("    conventionalCommits:").concat(newLine)
-                        .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\\\((?<scope>[a-z ]+)\\\\))?:( (?<title>.+))$(?s).*\"").concat(newLine)
+                        .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(\\\\((?<scope>[a-z ]+)\\\\))?(!)?:( (?<title>.+))$(?s).*\"").concat(newLine)
                         .concat("      bumpExpressions:").concat(newLine)
                         // note we use single quotes in the rows below to avoid escaping all of the YAML special characters
                         .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(\\([a-z ]+\\))?(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
@@ -1170,7 +1170,7 @@ public class Suites {
                         .concat("    - conventionalCommits").concat(newLine)
                         .concat("  items:").concat(newLine)
                         .concat("    conventionalCommits:").concat(newLine)
-                        .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\\\((?<scope>[a-z ]+)\\\\))?:( (?<title>.+))$(?s).*\"").concat(newLine)
+                        .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(\\\\((?<scope>[a-z ]+)\\\\))?(!)?:( (?<title>.+))$(?s).*\"").concat(newLine)
                         .concat("      bumpExpressions:").concat(newLine)
                         // note we use single quotes in the rows below to avoid escaping all of the YAML special characters
                         .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(\\([a-z ]+\\))?(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
@@ -1301,7 +1301,7 @@ public class Suites {
                         .concat("    - conventionalCommits").concat(newLine)
                         .concat("  items:").concat(newLine)
                         .concat("    conventionalCommits:").concat(newLine)
-                        .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\\\((?<scope>[a-z ]+)\\\\))?:( (?<title>.+))$(?s).*\"").concat(newLine)
+                        .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(\\\\((?<scope>[a-z ]+)\\\\))?(!)?:( (?<title>.+))$(?s).*\"").concat(newLine)
                         .concat("      bumpExpressions:").concat(newLine)
                         // note we use single quotes in the rows below to avoid escaping all of the YAML special characters
                         .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(\\([a-z ]+\\))?(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
@@ -1429,7 +1429,7 @@ public class Suites {
                         .concat("    - conventionalCommits").concat(newLine)
                         .concat("  items:").concat(newLine)
                         .concat("    conventionalCommits:").concat(newLine)
-                        .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\\\((?<scope>[a-z ]+)\\\\))?:( (?<title>.+))$(?s).*\"").concat(newLine)
+                        .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(\\\\((?<scope>[a-z ]+)\\\\))?(!)?:( (?<title>.+))$(?s).*\"").concat(newLine)
                         .concat("      bumpExpressions:").concat(newLine)
                         // note we use single quotes in the rows below to avoid escaping all of the YAML special characters
                         .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(\\([a-z ]+\\))?(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
@@ -1562,7 +1562,7 @@ public class Suites {
                         .concat("    - conventionalCommits").concat(newLine)
                         .concat("  items:").concat(newLine)
                         .concat("    conventionalCommits:").concat(newLine)
-                        .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\\\((?<scope>[a-z ]+)\\\\))?:( (?<title>.+))$(?s).*\"").concat(newLine)
+                        .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(\\\\((?<scope>[a-z ]+)\\\\))?(!)?:( (?<title>.+))$(?s).*\"").concat(newLine)
                         .concat("      bumpExpressions:").concat(newLine)
                         // note we use single quotes in the rows below to avoid escaping all of the YAML special characters
                         .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(\\([a-z ]+\\))?(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
@@ -1938,7 +1938,7 @@ public class Suites {
                         .concat("    - conventionalCommits").concat(newLine)
                         .concat("  items:").concat(newLine)
                         .concat("    conventionalCommits:").concat(newLine)
-                        .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\\\((?<scope>[a-z ]+)\\\\))?:( (?<title>.+))$(?s).*\"").concat(newLine)
+                        .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(\\\\((?<scope>[a-z ]+)\\\\))?(!)?:( (?<title>.+))$(?s).*\"").concat(newLine)
                         .concat("      bumpExpressions:").concat(newLine)
                         // note we use single quotes in the rows below to avoid escaping all of the YAML special characters
                         .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(\\([a-z ]+\\))?(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
@@ -2083,7 +2083,7 @@ public class Suites {
                         .concat("    - conventionalCommits").concat(newLine)
                         .concat("  items:").concat(newLine)
                         .concat("    conventionalCommits:").concat(newLine)
-                        .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\\\((?<scope>[a-z ]+)\\\\))?:( (?<title>.+))$(?s).*\"").concat(newLine)
+                        .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(\\\\((?<scope>[a-z ]+)\\\\))?(!)?:( (?<title>.+))$(?s).*\"").concat(newLine)
                         .concat("      bumpExpressions:").concat(newLine)
                         // note we use single quotes in the rows below to avoid escaping all of the YAML special characters
                         .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(\\([a-z ]+\\))?(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
@@ -2225,7 +2225,7 @@ public class Suites {
                         .concat("    - conventionalCommits").concat(newLine)
                         .concat("  items:").concat(newLine)
                         .concat("    conventionalCommits:").concat(newLine)
-                        .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\\\((?<scope>[a-z ]+)\\\\))?:( (?<title>.+))$(?s).*\"").concat(newLine)
+                        .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(\\\\((?<scope>[a-z ]+)\\\\))?(!)?:( (?<title>.+))$(?s).*\"").concat(newLine)
                         .concat("      bumpExpressions:").concat(newLine)
                         // note we use single quotes in the rows below to avoid escaping all of the YAML special characters
                         .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(\\([a-z ]+\\))?(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
@@ -2370,7 +2370,7 @@ public class Suites {
                         .concat("    - conventionalCommits").concat(newLine)
                         .concat("  items:").concat(newLine)
                         .concat("    conventionalCommits:").concat(newLine)
-                        .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\\\\((?<scope>[a-z ]+)\\\\))?:( (?<title>.+))$(?s).*\"").concat(newLine)
+                        .concat("      expression: \"(?m)^(?<type>[a-zA-Z0-9_]+)(\\\\((?<scope>[a-z ]+)\\\\))?(!)?:( (?<title>.+))$(?s).*\"").concat(newLine)
                         .concat("      bumpExpressions:").concat(newLine)
                         // note we use single quotes in the rows below to avoid escaping all of the YAML special characters
                         .concat("        major: '(?s)(?m)^[a-zA-Z0-9_]+(\\([a-z ]+\\))?(!: .*|.*^(BREAKING( |-)CHANGE: )).*'").concat(newLine)
