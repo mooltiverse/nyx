@@ -80,7 +80,7 @@ The named capturing groups are:
 
 All the capturing groups are optional as not all conventions support all of these fields. These groups are read by name when the regular expression is evaluated and their values are used as structured information for various purposes by Nyx.
 
-For example, the [Conventional Commits](https://www.conventionalcommits.org/) expression is `(?m)^(?<type>[a-zA-Z0-9_]+)(!)?(\((?<scope>[a-z ]+)\))?:( (?<title>.+))$(?s).*` and as you can see it has all the named capturing groups.
+For example, the [Conventional Commits](https://www.conventionalcommits.org/) expression is `(?m)^(?<type>[a-zA-Z0-9_]+)(\((?<scope>[a-z ]+)\))?(!)?:( (?<title>.+))$(?s).*` and as you can see it has all the named capturing groups.
 
 Commit messages are often made of multiple lines of text so, when authoring these expressions, consider using the *multi-line* and *single-line* flags (`(?m)` and `(?s)`, respectively). This also affects whether or not you want to match one (i.e. the first line) or multiple portions of the commit message.
 {: .notice--info}
