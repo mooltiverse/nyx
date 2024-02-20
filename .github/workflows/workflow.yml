@@ -71,12 +71,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Git checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
     # Here we set some flags depending on the files that have changed with this commit
     - name: File filters
-      uses: dorny/paths-filter@v2
+      uses: dorny/paths-filter@v3
       id: changes
       with:
         base: ${{ github.ref }}
@@ -88,7 +88,7 @@ jobs:
           javaChanged:
             - 'modules/java/**'
     - name: Set up JDK 20
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
         java-version: 20
@@ -99,7 +99,7 @@ jobs:
     # Bootstrap (no restore-keys) the pipeline cache and store it as -init
     # This cache only stores the .nyx-state.json file
     - name: Set up the pipeline cache bringing the Nyx state
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           build/
@@ -107,7 +107,7 @@ jobs:
         #restore-keys: not used here, start from scratch
     # Bootstrap (no restore-keys) the SonarCloud cache
     - name: Set up the SonarCloud cache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ~/.sonar/cache
         key: sonar-${{ github.run_id }}-${{ github.job }}
@@ -126,7 +126,7 @@ jobs:
       id: nyx
       uses: mooltiverse/nyx-github-action@main
     - name: Archive Nyx state file
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: ${{ always() }}
       with:
         name: .nyx-state-${{ github.job }}.json
@@ -147,11 +147,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Git checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
     - name: Set up JDK 20
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
         java-version: 20
@@ -161,7 +161,7 @@ jobs:
       run: git config core.fileMode false
     # Start from the -init pipeline cache and save the job output pipeline cache as -build-java
     - name: Set up the pipeline cache bringing the Nyx state
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           build/
@@ -170,14 +170,14 @@ jobs:
           pipeline-${{ github.run_id }}-init
     # Set up the SonarCloud cache
     - name: Set up the SonarCloud cache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ~/.sonar/cache
         key: sonar-${{ github.run_id }}-${{ github.job }}
         restore-keys: sonar-${{ github.run_id }}-${{ github.job }}
     # Bootstrap (no restore-keys) the Java cache and store it as -build-java
     - name: Set up the Java cache bringing Java artifacts
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           modules/java/**/build/
@@ -196,18 +196,18 @@ jobs:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: ./gradlew sonar --build-cache --stacktrace --info
     - name: Archive Nyx state file
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: ${{ always() }}
       with:
         name: .nyx-state-${{ github.job }}.json
         path: build/.nyx-state.json
     - name: Archive Jar
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: jar
         path: 'modules/java/**/build/libs/'
     - name: Archive Javadoc
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: javadoc
         path: 'modules/java/build/docs/javadoc/'
@@ -223,11 +223,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Git checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
     - name: Set up JDK 20
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
         java-version: 20
@@ -241,7 +241,7 @@ jobs:
         go-version: 1.20.1
     # Start from the -init pipeline cache and save the job output pipeline cache as -build-go
     - name: Set up the pipeline cache bringing the Nyx state
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           build/
@@ -250,14 +250,14 @@ jobs:
           pipeline-${{ github.run_id }}-init
     # Set up the SonarCloud cache
     - name: Set up the SonarCloud cache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ~/.sonar/cache
         key: sonar-${{ github.run_id }}-${{ github.job }}
         restore-keys: sonar-${{ github.run_id }}-${{ github.job }}
     # Bootstrap (no restore-keys) the Go cache and store it as -build-go
     - name: Set up the Go cache bringing Go artifacts
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           modules/go/**/build/
@@ -278,13 +278,13 @@ jobs:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: ./gradlew sonar --build-cache --stacktrace --info
     - name: Archive Nyx state file
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: ${{ always() }}
       with:
         name: .nyx-state-${{ github.job }}.json
         path: build/.nyx-state.json
     - name: Archive Binaries
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: bin
         path: 'modules/go/nyx/build/bin/*'
@@ -300,11 +300,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Git checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
     - name: Set up JDK 20
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
         java-version: 20
@@ -318,7 +318,7 @@ jobs:
         go-version: 1.20.1
     # Start from the -init pipeline cache and save the job output pipeline cache as -build-docker
     - name: Set up the pipeline cache bringing the Nyx state
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           build/
@@ -327,14 +327,14 @@ jobs:
           pipeline-${{ github.run_id }}-init
     # Set up the SonarCloud cache
     - name: Set up the SonarCloud cache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ~/.sonar/cache
         key: sonar-${{ github.run_id }}-${{ github.job }}
         restore-keys: sonar-${{ github.run_id }}-${{ github.job }}
     # Bootstrap (no restore-keys) the Docker cache starting from the -build-go (to get binaries) and store it as -build-docker
     - name: Set up the Go cache bringing Go artifacts
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           modules/go/**/build/
@@ -357,7 +357,7 @@ jobs:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: ./gradlew sonar --build-cache --stacktrace --info
     - name: Archive Nyx state file
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: ${{ always() }}
       with:
         name: .nyx-state-${{ github.job }}.json
@@ -377,7 +377,7 @@ jobs:
     # Pull the -build-docker cache (read only). This will be used in the next steps to create a new cache that merges this one and others
     # This may cause the next one fail as they both restore the same paths
     #- name: Set up the Go cache bringing Docker artifacts
-    #  uses: actions/cache@v3
+    #  uses: actions/cache@v4
     #  with:
     #    path: |
     #      modules/go/**/build/
@@ -388,7 +388,7 @@ jobs:
     #      docker-${{ github.run_id }}-build-docker
     # Pull the -build-go cache (read only). This will be used in the next steps to create a new cache that merges this one and others
     - name: Set up the Go cache bringing Go artifacts
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           modules/go/**/build/
@@ -397,14 +397,14 @@ jobs:
         key: go-${{ github.run_id }}-build-go
     # Pull the -build-java cache (read only). This will be used in the next steps to create a new cache that merges this one and others
     - name: Set up the Java cache bringing Java artifacts
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           modules/java/**/build/
         key: java-${{ github.run_id }}-build-java
     # Bootstrap (no restore-keys) the Build cache to collect all artifacts coming from upstream build jobs
     - name: Set up the Build cache bringing artifacts from the upstream Build jobs
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         # These patchs are merged from the previous caches
         path: |
@@ -437,11 +437,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Git checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
     - name: Set up JDK ${{ matrix.java }}
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
         java-version: ${{ matrix.java }}
@@ -451,21 +451,21 @@ jobs:
       run: git config core.fileMode false
     # Pull the the -init pipeline cache (read only)
     - name: Set up the pipeline cache bringing the Nyx state
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           build/
         key: pipeline-${{ github.run_id }}-build-java
     # Set up the SonarCloud cache
     - name: Set up the SonarCloud cache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ~/.sonar/cache
         key: sonar-${{ github.run_id }}-${{ github.job }}
         restore-keys: sonar-${{ github.run_id }}-${{ github.job }}
     # Start from the -build-java cache and save the job output cache as -java-unit-test
     - name: Set up the Java cache bringing Java artifacts
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           modules/java/**/build/
@@ -495,13 +495,13 @@ jobs:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: ./gradlew sonar --build-cache --stacktrace --info
     - name: Archive Nyx state file
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: ${{ always() }}
       with:
         name: .nyx-state-${{ github.job }}-${{ matrix.java }}.json
         path: build/.nyx-state.json
     - name: Archive Test Outputs
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: ${{ always() }}
       with:
         name: java-${{ matrix.java }}-unit-test-reports
@@ -535,11 +535,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Git checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
     - name: Set up JDK ${{ matrix.java }}
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
         java-version: ${{ matrix.java }}
@@ -549,21 +549,21 @@ jobs:
       run: git config core.fileMode false
     # Pull the the -init pipeline cache (read only)
     - name: Set up the pipeline cache bringing the Nyx state
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           build/
         key: pipeline-${{ github.run_id }}-build-java
     # Set up the SonarCloud cache
     - name: Set up the SonarCloud cache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ~/.sonar/cache
         key: sonar-${{ github.run_id }}-${{ github.job }}
         restore-keys: sonar-${{ github.run_id }}-${{ github.job }}
     # Start from the -java-unit-test cache and save the job output cache as -java-integration-test
     - name: Set up the Java cache bringing Java artifacts
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           modules/java/**/build/
@@ -610,13 +610,13 @@ jobs:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: ./gradlew sonar --build-cache --stacktrace --info
     - name: Archive Nyx state file
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: ${{ always() }}
       with:
         name: .nyx-state-${{ github.job }}-${{ matrix.java }}.json
         path: build/.nyx-state.json
     - name: Archive Test Outputs
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: ${{ always() }}
       with:
         name: java-${{ matrix.java }}-integration-test-reports
@@ -650,11 +650,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Git checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
     - name: Set up JDK ${{ matrix.java }}
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
         java-version: ${{ matrix.java }}
@@ -664,21 +664,21 @@ jobs:
       run: git config core.fileMode false
     # Pull the the -init pipeline cache (read only)
     - name: Set up the pipeline cache bringing the Nyx state
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           build/
         key: pipeline-${{ github.run_id }}-build-java
     # Set up the SonarCloud cache
     - name: Set up the SonarCloud cache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ~/.sonar/cache
         key: sonar-${{ github.run_id }}-${{ github.job }}
         restore-keys: sonar-${{ github.run_id }}-${{ github.job }}
     # Start from the -java-integration-test cache and save the job output cache as -java-functional-test
     - name: Set up the Java cache bringing Java artifacts
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           modules/java/**/build/
@@ -726,13 +726,13 @@ jobs:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: ./gradlew sonar --build-cache --stacktrace --info
     - name: Archive Nyx state file
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: ${{ always() }}
       with:
         name: .nyx-state-${{ github.job }}-${{ matrix.java }}.json
         path: build/.nyx-state.json
     - name: Archive Test Outputs
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: ${{ always() }}
       with:
         name: java-${{ matrix.java }}-functional-test-reports
@@ -755,11 +755,11 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
     - name: Git checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
     - name: Set up JDK 20
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
         java-version: 20
@@ -773,21 +773,21 @@ jobs:
         go-version: 1.20.1
     # Pull the the -init pipeline cache (read only)
     - name: Set up the pipeline cache bringing the Nyx state
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           build/
         key: pipeline-${{ github.run_id }}-build-java
     # Set up the SonarCloud cache
     - name: Set up the SonarCloud cache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ~/.sonar/cache
         key: sonar-${{ github.run_id }}-${{ github.job }}
         restore-keys: sonar-${{ github.run_id }}-${{ github.job }}
     # Start from the -build-go cache and save the job output cache as -go-unit-test
     - name: Set up the Go cache bringing Go artifacts
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           modules/go/**/build/
@@ -820,13 +820,13 @@ jobs:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: ./gradlew sonar --build-cache --stacktrace --info
     - name: Archive Nyx state file
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: ${{ always() }}
       with:
         name: .nyx-state-${{ github.job }}-${{ matrix.os }}.json
         path: build/.nyx-state.json
     - name: Archive Test Outputs
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: ${{ always() }}
       with:
         name: go-${{ matrix.os }}-unit-test-reports
@@ -855,11 +855,11 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
     - name: Git checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
     - name: Set up JDK 20
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
         java-version: 20
@@ -873,21 +873,21 @@ jobs:
         go-version: 1.20.1
     # Pull the the -init pipeline cache (read only)
     - name: Set up the pipeline cache bringing the Nyx state
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           build/
         key: pipeline-${{ github.run_id }}-build-java
     # Set up the SonarCloud cache
     - name: Set up the SonarCloud cache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ~/.sonar/cache
         key: sonar-${{ github.run_id }}-${{ github.job }}
         restore-keys: sonar-${{ github.run_id }}-${{ github.job }}
     # Start from the -go-unit-test cache and save the job output cache as -go-integration-test
     - name: Set up the Go cache bringing Go artifacts
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           modules/go/**/build/
@@ -938,13 +938,13 @@ jobs:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: ./gradlew sonar --build-cache --stacktrace --info
     - name: Archive Nyx state file
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: ${{ always() }}
       with:
         name: .nyx-state-${{ github.job }}-${{ matrix.os }}.json
         path: build/.nyx-state.json
     - name: Archive Test Outputs
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: ${{ always() }}
       with:
         name: go-${{ matrix.os }}-integration-test-reports
@@ -973,11 +973,11 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
     - name: Git checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
     - name: Set up JDK 20
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
         java-version: 20
@@ -991,21 +991,21 @@ jobs:
         go-version: 1.20.1
     # Pull the the -init pipeline cache (read only)
     - name: Set up the pipeline cache bringing the Nyx state
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           build/
         key: pipeline-${{ github.run_id }}-build-java
     # Set up the SonarCloud cache
     - name: Set up the SonarCloud cache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ~/.sonar/cache
         key: sonar-${{ github.run_id }}-${{ github.job }}
         restore-keys: sonar-${{ github.run_id }}-${{ github.job }}
     # Start from the -go-integration-test cache and save the job output cache as -go-functional-test
     - name: Set up the Go cache bringing Go artifacts
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           modules/go/**/build/
@@ -1057,13 +1057,13 @@ jobs:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: ./gradlew sonar --build-cache --stacktrace --info
     - name: Archive Nyx state file
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: ${{ always() }}
       with:
         name: .nyx-state-${{ github.job }}-${{ matrix.os }}.json
         path: build/.nyx-state.json
     - name: Archive Test Outputs
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: ${{ always() }}
       with:
         name: go-${{ matrix.os }}-functional-test-reports
@@ -1089,11 +1089,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Git checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
     - name: Set up JDK 20
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
         java-version: 20
@@ -1107,21 +1107,21 @@ jobs:
         go-version: 1.20.1
     # Pull the the -init pipeline cache (read only)
     - name: Set up the pipeline cache bringing the Nyx state
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           build/
         key: pipeline-${{ github.run_id }}-build-java
     # Set up the SonarCloud cache
     - name: Set up the SonarCloud cache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ~/.sonar/cache
         key: sonar-${{ github.run_id }}-${{ github.job }}
         restore-keys: sonar-${{ github.run_id }}-${{ github.job }}
     # Start from the -build-docker cache and save the job output cache as -docker-functional-test
     - name: Set up the Go cache bringing Go artifacts
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           modules/go/**/build/
@@ -1171,7 +1171,7 @@ jobs:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: ./gradlew sonar --build-cache --stacktrace --info
     - name: Archive Nyx state file
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: ${{ always() }}
       with:
         name: .nyx-state-${{ github.job }}.json
@@ -1192,11 +1192,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Git checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Set up JDK 20
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: 20
@@ -1210,7 +1210,7 @@ jobs:
           go-version: 1.20.1
       # Start from the -init pipeline cache and save the job output pipeline cache as -publish
       - name: Set up the pipeline cache bringing the Nyx state
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             build/
@@ -1218,7 +1218,7 @@ jobs:
           restore-keys: |
             pipeline-${{ github.run_id }}-init
       - name: Pull the Build cache bringing artifacts from the upstream Build jobs
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             modules/java/**/build/
@@ -1261,7 +1261,7 @@ jobs:
         if: ${{ always() }}
         run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
       - name: Archive Nyx state file
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: ${{ always() }}
         with:
           name: .nyx-state-${{ github.job }}.json
@@ -1277,11 +1277,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Git checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Set up JDK 20
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: 20
@@ -1295,7 +1295,7 @@ jobs:
           go-version: 1.20.1
       # Start from the -publish pipeline cache and save the job output pipeline cache as -release
       - name: Set up the pipeline cache bringing the Nyx state
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             build/
@@ -1303,7 +1303,7 @@ jobs:
           restore-keys: |
             pipeline-${{ github.run_id }}-publish
       - name: Pull the Build cache bringing artifacts from the upstream Build jobs
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             modules/java/**/build/
@@ -1338,7 +1338,7 @@ jobs:
         if: ${{ always() }}
         run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
       - name: Archive Nyx state file
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: ${{ always() }}
         with:
           name: .nyx-state-${{ github.job }}.json
