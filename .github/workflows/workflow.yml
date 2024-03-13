@@ -428,12 +428,12 @@ jobs:
     # - the Java files have changed
     # - a new release must be issued (this flag is inferred by Nyx), in which case we rebuild and test everything
     if: needs.init.outputs.javaChanged == 'true' || needs.init.outputs.newRelease == 'true'
-    # The recommended JDK version is 15 or above but since we need to test for backward compatibility to JVMs 11 or newer we
+    # The recommended JDK version is 17 or above but since we need to test for backward compatibility to JVMs 17 or newer we
     # need a matrix here. Depending on the JDK version the set of Gradle version that the tests run on will change, according
     # to the Gradle compatibility matrix. See CONTRIBUTING.md in the root directory or the Gradle functional test suites for more.
     strategy:
       matrix:
-        java: [ '11', '20' ]
+        java: [ '17', '20' ]
     runs-on: ubuntu-latest
     steps:
     - name: Git checkout
@@ -526,12 +526,12 @@ jobs:
     concurrency:
       group: rate-limited-remote-services
       cancel-in-progress: false
-    # The recommended JDK version is 15 or above but since we need to test for backward compatibility to JVMs 11 or newer we
+    # The recommended JDK version is 17 or above but since we need to test for backward compatibility to JVMs 17 or newer we
     # need a matrix here. Depending on the JDK version the set of Gradle version that the tests run on will change, according
     # to the Gradle compatibility matrix. See CONTRIBUTING.md in the root directory or the Gradle functional test suites for more.
     strategy:
       matrix:
-        java: [ '11', '20' ]
+        java: [ '17', '20' ]
     runs-on: ubuntu-latest
     steps:
     - name: Git checkout
@@ -641,12 +641,12 @@ jobs:
     concurrency:
       group: rate-limited-remote-services
       cancel-in-progress: false
-    # The recommended JDK version is 15 or above but since we need to test for backward compatibility to JVMs 11 or newer we
+    # The recommended JDK version is 17 or above but since we need to test for backward compatibility to JVMs 11 or newer we
     # need a matrix here. Depending on the JDK version the set of Gradle version that the tests run on will change, according
     # to the Gradle compatibility matrix. See CONTRIBUTING.md in the root directory or the Gradle functional test suites for more.
     strategy:
       matrix:
-        java: [ '11', '20' ]
+        java: [ '17', '20' ]
     runs-on: ubuntu-latest
     steps:
     - name: Git checkout

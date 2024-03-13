@@ -4,10 +4,10 @@
 ------------------------------------------------------------------------------*/
 plugins {
   // use our own plugin
-  id "com.mooltiverse.oss.nyx" version "2.5.1"
+  id "com.mooltiverse.oss.nyx" version "2.5.2"
 
   // Gradle Enterprise plugin (used for build scans)
-  id "com.gradle.enterprise" version "3.12.3"
+  id "com.gradle.enterprise" version "3.16.2"
 }
 
 /*------------------------------------------------------------------------------
