@@ -90,7 +90,7 @@ You can work on the project on any platform (Linux, Windows, Mac). You need to h
 
 * [Git](https://git-scm.com/)
 * [Go](https://go.dev/) 1.17 or above
-* Java JDK or JRE version 8 or above, either from [Oracle](https://www.oracle.com/java/technologies/javase-downloads.html) or [OpenJDK](https://openjdk.java.net/install/)
+* Java JDK or JRE version 17 or above, either from [Oracle](https://www.oracle.com/java/technologies/javase-downloads.html) or [OpenJDK](https://openjdk.java.net/install/)
 * [Gradle](https://gradle.org/install/) 7.x or above
 * [Docker CE](https://docs.docker.com/install/)
 * [Jekyll](https://jekyllrb.com/docs/installation/) 4.2.0 or above (also requires [Ruby](https://www.ruby-lang.org/en/downloads/) 2.4.0 or above)
@@ -162,7 +162,7 @@ where the main tasks are:
 
 The `publish` and `release` tasks can only be executed on the CI/CD platform.
 
-The recommended JDK version is `20` or newer. JDK version older than `11` is not supported.
+The recommended JDK version is `20` or newer. JDK version older than `17` is not supported.
 
 The JDK version affects the number of functional tests excuted for the Gradle plugin, according to the [Gradle compatibility matrix](https://docs.gradle.org/current/userguide/compatibility.html). This means that newer JDKs will run functional tests against a reduced set of Gradle versions because [TestKit](https://docs.gradle.org/current/userguide/test_kit.html) uses the original Java binaries for each tested Gradle release and Java classes compiled for JVM versions published after the Gradle release would raise an exception like `unsupported class file major version XY`. You don't need to worry about this (as it's already taken care of in the functional test suites) unless you need to run functional tests against a specific gradle version that is not covered by the tests due to the JDK version you're using.
 
