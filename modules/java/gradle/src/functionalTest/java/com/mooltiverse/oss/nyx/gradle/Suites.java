@@ -99,10 +99,17 @@ public class Suites {
             extensiveTestVersions.add("7.6");
         }
         if (javaVersion <= 18) {
+            // Gradle versions between 7.0.x and 7.5.x have a bug that prevents using some jars
+            // packaged with JDK version < 19. For examples ee https://github.com/gradle/gradle/issues/24390
+            /*
             extensiveTestVersions.add("7.5.1");
             extensiveTestVersions.add("7.5");
+            */
         }
         if (javaVersion <= 17) {
+            // Gradle versions between 7.0.x and 7.5.x have a bug that prevents using some jars
+            // packaged with JDK version < 19. For examples ee https://github.com/gradle/gradle/issues/24390
+            /*
             extensiveTestVersions.add("7.4.2");
             extensiveTestVersions.add("7.4.1");
             extensiveTestVersions.add("7.4");
@@ -110,6 +117,7 @@ public class Suites {
             extensiveTestVersions.add("7.3.2");
             extensiveTestVersions.add("7.3.1");
             extensiveTestVersions.add("7.3");
+            */
         }
         if (javaVersion <= 16) {
             extensiveTestVersions.add("7.2");
