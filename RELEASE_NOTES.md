@@ -13,7 +13,7 @@ There are no actions to take for backward compatibility.
 This release:
 
 * fixes the Java source and compatibility version to Java 17 ([#302](https://github.com/mooltiverse/nyx/issues/302))
-* upgrades the [Jackson](https://github.com/FasterXML/jackson) Java library to version 2.16.1
+* upgrades the [Jackson](https://github.com/FasterXML/jackson) Java library to version 2.16.0
 
 ### Fixed issues
 
