@@ -1,12 +1,31 @@
 # Nyx Release Notes
 
-## 3.0.0
+## 3.0.1
 
-This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/2.5.2).
+This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/3.0.1).
 
 ### Upgrade instructions
 
 There are no actions to take for backward compatibility.
+
+### New features and improvements
+
+This release:
+
+* fixes the Java source and compatibility version to Java 17 ([#302](https://github.com/mooltiverse/nyx/issues/302))
+* upgrades the [Jackson](https://github.com/FasterXML/jackson) Java library to version 2.16.1
+
+### Fixed issues
+
+There are no fixes in this release.
+
+## 3.0.0
+
+This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/3.0.0).
+
+### Upgrade instructions
+
+If using Gradle you need to upgrade to Java version 17 or later. Java versions older than 17 are no longer supported.
 
 ### New features and improvements
 
