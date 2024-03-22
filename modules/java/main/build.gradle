@@ -34,9 +34,9 @@ dependencies {
   implementation        'org.eclipse.jgit:org.eclipse.jgit:6.8.0.202311291450-r'                   // JGit (https://www.eclipse.org/jgit/)
   implementation        'org.eclipse.jgit:org.eclipse.jgit.ssh.jsch:6.8.0.202311291450-r'          // JGit JSch extension (https://www.eclipse.org/jgit/)
   implementation        'com.github.mwiede:jsch:0.2.17'                                            // JSch SSH2 Java library (https://github.com/mwiede/jsch)
-  implementation        'com.fasterxml.jackson.core:jackson-databind:2.13.4'                       // Jackson JSON library (https://github.com/FasterXML/jackson)
-  implementation        'com.fasterxml.jackson.core:jackson-annotations:2.13.4'                    // Jackson JSON library (https://github.com/FasterXML/jackson)
-  implementation        'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.13.4'          // Jackson YAML library (https://github.com/FasterXML/jackson-dataformats-text/tree/master/yaml)
+  implementation        'com.fasterxml.jackson.core:jackson-databind:2.16.0'                       // Jackson JSON library (https://github.com/FasterXML/jackson)
+  implementation        'com.fasterxml.jackson.core:jackson-annotations:2.16.0'                    // Jackson JSON library (https://github.com/FasterXML/jackson)
+  implementation        'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.16.0'          // Jackson YAML library (https://github.com/FasterXML/jackson-dataformats-text/tree/master/yaml)
   implementation        'com.github.jknack:handlebars:4.4.0'                                       // Handlebars library (https://github.com/jknack/handlebars.java)
   implementation        'org.kohsuke:github-api:1.319'                                             // GitHub API client Java library (https://github-api.kohsuke.org/)
   // Bouncycastle is used by JSch to provide support for certain key types when running on older JVMs (see: https://github.com/mwiede/jsch#faq).
