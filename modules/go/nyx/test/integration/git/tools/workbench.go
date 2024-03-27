@@ -331,7 +331,8 @@ func (w Workbench) Commit(message string) ggitobject.Commit {
 	if err != nil {
 		panic(err)
 	}
-	commitHash, err := worktree.Commit(message, &ggit.CommitOptions{All: false})
+	// Empty commints are disabled by default so we need to explicitly enable them
+	commitHash, err := worktree.Commit(message, &ggit.CommitOptions{AllowEmptyCommits: true})
 	if err != nil {
 		panic(err)
 	}
