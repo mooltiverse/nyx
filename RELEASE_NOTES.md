@@ -14,6 +14,7 @@ This release:
 
 * fixes the Java source and compatibility version to Java 17 ([#302](https://github.com/mooltiverse/nyx/issues/302))
 * upgrades the [Jackson](https://github.com/FasterXML/jackson) Java library to version 2.16.0
+* upgrades Go packages and fixes the following dependabot alerts: [4](https://github.com/mooltiverse/nyx/security/dependabot/4), [5](https://github.com/mooltiverse/nyx/security/dependabot/5), [6](https://github.com/mooltiverse/nyx/security/dependabot/6), [7](https://github.com/mooltiverse/nyx/security/dependabot/7), [8](https://github.com/mooltiverse/nyx/security/dependabot/8), [9](https://github.com/mooltiverse/nyx/security/dependabot/9), [10](https://github.com/mooltiverse/nyx/security/dependabot/10), [11](https://github.com/mooltiverse/nyx/security/dependabot/11), [12](https://github.com/mooltiverse/nyx/security/dependabot/12), [13](https://github.com/mooltiverse/nyx/security/dependabot/13), [14](https://github.com/mooltiverse/nyx/security/dependabot/14), [15](https://github.com/mooltiverse/nyx/security/dependabot/15)
 
 ### Fixed issues
 

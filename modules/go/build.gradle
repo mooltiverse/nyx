@@ -99,6 +99,27 @@ subprojects {
         }
     }
 
+    task goModUpgrade(group: 'build', description: 'Upgrades Go dependencies') {
+        // Task dependencies
+        dependsOn goModInit
+
+        // Declare inputs and outputs of this task
+        inputs.files(fileTree(projectDir).filter { File f ->
+            f.name.endsWith(".go")
+        })
+        outputs.file(modFile)
+
+        doLast {
+            logger.info('Upgrading dependencies in Go module '+modulePath+' file: '+modFile.path)
+            exec {
+                logging.captureStandardOutput LogLevel.QUIET
+                logging.captureStandardError  LogLevel.ERROR
+                // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
+                commandLine 'go', 'get', '-u', '-v'
+            }
+        }
+    }
+
     task goInit(group: 'build', description: 'Initializes the module') {
         // Task dependencies
         dependsOn goModInit, goModUpdate
