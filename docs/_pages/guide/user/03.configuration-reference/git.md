@@ -135,7 +135,7 @@ This value is only considered when the [authentication method](#authentication-m
 | Configuration File Option | `git/remotes/items/<NAME>/user`                                                          |
 | Related state attributes  |                                                                                          |
 
-The password to use when connecting to the remote repository. Here you can pass a [template]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}) to [read them from environment variables]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}#environmentvariable).
+The user to use when connecting to the remote repository. Here you can pass a [template]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}) to [read them from environment variables]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}#environmentvariable).
 
 This value is only considered when the [authentication method](#authentication-method) is `USER_PASSWORD` or is not set.
 
