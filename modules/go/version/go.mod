@@ -3,7 +3,7 @@ module github.com/mooltiverse/nyx/modules/go/version
 go 1.20
 
 require (
-	github.com/dlclark/regexp2 v1.7.0
+	github.com/dlclark/regexp2 v1.11.0
 	github.com/stretchr/testify v1.8.0
 )
 

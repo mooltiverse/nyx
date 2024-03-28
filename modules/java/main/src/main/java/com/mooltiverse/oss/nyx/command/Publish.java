@@ -215,7 +215,12 @@ public class Publish extends AbstractCommand {
         if (state().getNewVersion()) {
             if (renderTemplateAsBoolean(state().getReleaseType().getPublish())) {
                 logger.debug(COMMAND, "The release type has the publish flag enabled");
-                publish();
+                if ((renderTemplateAsBoolean(state().getReleaseType().getGitTag())) && (renderTemplateAsBoolean(state().getReleaseType().getGitPush()))) {
+                    logger.debug(COMMAND, "The release type also has the tag and push flags enabled");
+                    publish();
+                } else {
+                    logger.warn(COMMAND, "The release type has the publish flag enabled but the tag and push flags are not (or at least one of them is not) so the release can't be published. Please make sure the tag and push flags are enabled or disable the publish flag.");
+                }
             }
             else logger.debug(COMMAND, "The release type has the publish flag disabled");
         }

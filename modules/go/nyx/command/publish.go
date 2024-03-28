@@ -324,9 +324,22 @@ func (c *Publish) Run() (*stt.State, error) {
 		doCommit, err := c.renderTemplateAsBoolean(releaseType.GetPublish())
 		if doCommit {
 			log.Debugf("the release type has the publish flag enabled")
-			err = c.publish()
+			doTag, err := c.renderTemplateAsBoolean(releaseType.GetGitTag())
 			if err != nil {
 				return nil, err
+			}
+			doPush, err := c.renderTemplateAsBoolean(releaseType.GetGitPush())
+			if err != nil {
+				return nil, err
+			}
+			if doTag && doPush {
+				log.Debugf("the release type also has the tag and push flags enabled")
+				err = c.publish()
+				if err != nil {
+					return nil, err
+				}
+			} else {
+				log.Warningf("the release type has the publish flag enabled but the tag and push flags are not (or at least one of them is not) so the release can't be published. Please make sure the tag and push flags are enabled or disable the publish flag.")
 			}
 		} else {
 			log.Debugf("the release type has the publish flag disabled")
