@@ -601,6 +601,8 @@ This option is **mandatory**.
 
 When `true` Nyx will run the [publish]({{ site.baseurl }}{% link _pages/guide/user/02.introduction/how-nyx-works.md %}#publish) steps, when needed, otherwise will skip the step.
 
+For this flag to take effect you also need to enable the [`gitTag`](#git-tag) and [`gitPush`](#git-push) flags otherwise the new release can't be published. This is because the remote server requires a tag to bind the release to. Publishing a new release without a corresponding tag would result in a remote error.
+
 Here you can define a [template]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/templates.md %}) that is evaluated at runtime to make this decision dynamic.
 
 When this value evaluates to *true* releases are published to the [services]({{ site.baseurl }}{% link _pages/guide/user/03.configuration-reference/services.md %}) listed in the [`releaseTypes/publicationServices`](#publication-services) option. Otherwise, when this evaluates to *false*, no publication is done.
