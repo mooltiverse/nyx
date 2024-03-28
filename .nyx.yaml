@@ -215,7 +215,7 @@ releaseTypes:
         CI: "^true$"                 # only match this release type when running on CI servers
       matchWorkspaceStatus: "CLEAN"  # only match this release type when the repository is clean
       publish: "false"
-      publishPreRelease: "true"
+      publishPreRelease: "false"
     fix:
       description: "{{#fileContent}}build/CHANGELOG.md{{/fileContent}}"
       collapseVersions: true
@@ -228,7 +228,7 @@ releaseTypes:
         CI: "^true$"                 # only match this release type when running on CI servers
       matchWorkspaceStatus: "CLEAN"  # only match this release type when the repository is clean
       publish: "false"
-      publishPreRelease: "true"
+      publishPreRelease: "false"
     hotfix:
       description: "{{#fileContent}}build/CHANGELOG.md{{/fileContent}}"
       collapseVersions: true
@@ -284,7 +284,7 @@ releaseTypes:
           qualifier: "{{#timestampYYYYMMDDHHMMSS}}{{timestamp}}{{/timestampYYYYMMDDHHMMSS}}"
           position: "BUILD"
       publish: "false"
-      publishPreRelease: "true"
+      publishPreRelease: "false"
 services: 
   github: 
     type: "GITHUB"
