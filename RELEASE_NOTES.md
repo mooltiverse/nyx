@@ -1,5 +1,19 @@
 # Nyx Release Notes
 
+## 3.0.3
+
+This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/3.0.3).
+
+### Upgrade instructions
+
+There are no actions to take for backward compatibility.
+
+### New features and improvements
+
+This release:
+
+* adds support for Gradle `7.6.4`, `8.7` and `8.8`.
+
 ## 3.0.2
 
 This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/3.0.2).
