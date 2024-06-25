@@ -12,6 +12,7 @@ There are no actions to take for backward compatibility.
 
 This release:
 
+* upgrades Go to version 1.22.4
 * upgrades all Go libraries to the latest version
 
 ## 3.0.3

@@ -235,10 +235,10 @@ jobs:
       run: chmod +x gradlew
     - name: Make Git ignore execute permission changes in files (like gradlew)
       run: git config core.fileMode false
-    - name: Set up Go 1.20.1
+    - name: Set up Go 1.22.4
       uses: actions/setup-go@v3
       with:
-        go-version: 1.20.1
+        go-version: 1.22.4
     # Start from the -init pipeline cache and save the job output pipeline cache as -build-go
     - name: Set up the pipeline cache bringing the Nyx state
       uses: actions/cache@v4
@@ -312,10 +312,10 @@ jobs:
       run: chmod +x gradlew
     - name: Make Git ignore execute permission changes in files (like gradlew)
       run: git config core.fileMode false
-    - name: Set up Go 1.20.1
+    - name: Set up Go 1.22.4
       uses: actions/setup-go@v3
       with:
-        go-version: 1.20.1
+        go-version: 1.22.4
     # Start from the -init pipeline cache and save the job output pipeline cache as -build-docker
     - name: Set up the pipeline cache bringing the Nyx state
       uses: actions/cache@v4
@@ -767,10 +767,10 @@ jobs:
       run: chmod +x gradlew
     - name: Make Git ignore execute permission changes in files (like gradlew)
       run: git config core.fileMode false
-    - name: Set up Go 1.20.1
+    - name: Set up Go 1.22.4
       uses: actions/setup-go@v3
       with:
-        go-version: 1.20.1
+        go-version: 1.22.4
     # Pull the the -init pipeline cache (read only)
     - name: Set up the pipeline cache bringing the Nyx state
       uses: actions/cache@v4
@@ -867,10 +867,10 @@ jobs:
       run: chmod +x gradlew
     - name: Make Git ignore execute permission changes in files (like gradlew)
       run: git config core.fileMode false
-    - name: Set up Go 1.20.1
+    - name: Set up Go 1.22.4
       uses: actions/setup-go@v3
       with:
-        go-version: 1.20.1
+        go-version: 1.22.4
     # Pull the the -init pipeline cache (read only)
     - name: Set up the pipeline cache bringing the Nyx state
       uses: actions/cache@v4
@@ -985,10 +985,10 @@ jobs:
       run: chmod +x gradlew
     - name: Make Git ignore execute permission changes in files (like gradlew)
       run: git config core.fileMode false
-    - name: Set up Go 1.20.1
+    - name: Set up Go 1.22.4
       uses: actions/setup-go@v3
       with:
-        go-version: 1.20.1
+        go-version: 1.22.4
     # Pull the the -init pipeline cache (read only)
     - name: Set up the pipeline cache bringing the Nyx state
       uses: actions/cache@v4
@@ -1101,10 +1101,10 @@ jobs:
       run: chmod +x gradlew
     - name: Make Git ignore execute permission changes in files (like gradlew)
       run: git config core.fileMode false
-    - name: Set up Go 1.20.1
+    - name: Set up Go 1.22.4
       uses: actions/setup-go@v3
       with:
-        go-version: 1.20.1
+        go-version: 1.22.4
     # Pull the the -init pipeline cache (read only)
     - name: Set up the pipeline cache bringing the Nyx state
       uses: actions/cache@v4
@@ -1204,10 +1204,10 @@ jobs:
         run: chmod +x gradlew
       - name: Make Git ignore execute permission changes in files (like gradlew)
         run: git config core.fileMode false
-      - name: Set up Go 1.20.1
+      - name: Set up Go 1.22.4
         uses: actions/setup-go@v3
         with:
-          go-version: 1.20.1
+          go-version: 1.22.4
       # Start from the -init pipeline cache and save the job output pipeline cache as -publish
       - name: Set up the pipeline cache bringing the Nyx state
         uses: actions/cache@v4
@@ -1289,10 +1289,10 @@ jobs:
         run: chmod +x gradlew
       - name: Make Git ignore execute permission changes in files (like gradlew)
         run: git config core.fileMode false
-      - name: Set up Go 1.20.1
+      - name: Set up Go 1.22.4
         uses: actions/setup-go@v3
         with:
-          go-version: 1.20.1
+          go-version: 1.22.4
       # Start from the -publish pipeline cache and save the job output pipeline cache as -release
       - name: Set up the pipeline cache bringing the Nyx state
         uses: actions/cache@v4
