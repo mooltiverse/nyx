@@ -550,6 +550,10 @@ nexusPublishing {
         packageGroup = 'com.mooltiverse'
         //stagingProfileId = '302fa0a0346251' // see below on how to retrieve this automatically through the getStagingProfile task
         // 'sonatype' is preconfigured by the Nexus Publish Plugin with proper URLs.
+        // The following username and password properties must be a valid Sonatype token (which is actually
+        // a pair of values, the username and the password).
+        // The token can be generated at https://oss.sonatype.org/ selecting Profile > User Token (from the drop down).
+        // For more see:  https://support.sonatype.com/hc/en-us/articles/360049469534-401-Content-access-is-protected-by-token-when-accessing-repositories
         sonatype {
             username = findProperty("ossrhUsername")
             password = findProperty("ossrhPassword")
@@ -567,6 +571,9 @@ nexusStaging {
 
     packageGroup = 'com.mooltiverse'
     //stagingProfileId = '302fa0a0346251' // see below on how to retrieve this automatically through the getStagingProfile task
+    // The following username and password properties must be a valid Sonatype token (which is actually
+    // a pair of values, the username and the password).
+    // For more see:  https://support.sonatype.com/hc/en-us/articles/360049469534-401-Content-access-is-protected-by-token-when-accessing-repositories
     username findProperty("ossrhUsername")
     password findProperty("ossrhPassword")
 }

@@ -1239,6 +1239,9 @@ jobs:
           # The 'gitHubUser' and 'gitHubToken' variables are passed as credentials to publish packages to the GitHub Packages repository, see: https://docs.github.com/en/actions/publishing-packages/publishing-java-packages-with-gradle#publishing-packages-to-github-packages.
           # The GH_TOKEN is used by Nyx configured service 'github' (see the top level settings.gradle) to publish the release to GitHub Releases.
           # The 'GITHUB_TOKEN' is automatically generated and provided by GitHub Actions so it doesn't need to be manually created. We just use it and copy as Gradle properties or environment variables.
+          # The ossrhUsername and ossrhPassword must be a valid Sonatype token (which is actually a pair of values, the username and the password).
+          # The token can be generated at https://oss.sonatype.org/ selecting Profile > User Token (from the drop down).
+          # For more on Sonatype credentials see:  https://support.sonatype.com/hc/en-us/articles/360049469534-401-Content-access-is-protected-by-token-when-accessing-repositories
           # See:
           # - the Automatic Token Authentication: https://docs.github.com/en/actions/security-guides/automatic-token-authentication
           # - the 'secrets' Context:  https://docs.github.com/en/actions/learn-github-actions/contexts
