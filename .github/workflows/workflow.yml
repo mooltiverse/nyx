@@ -114,7 +114,7 @@ jobs:
         #restore-keys: sonar-${{ github.run_id }}-${{ github.job }}
     # Running the gradle-cache-action with no arguments makes it run just as a remote cache and not as a wrapper
     - name: Enable the Gradle remote cache
-      uses: burrunan/gradle-cache-action@v1
+      uses: burrunan/gradle-cache-action@v2
       with:
           # Disable warning about missing distributionSha256Sum property in gradle-wrapper.properties
           gradle-distribution-sha-256-sum-warning: false
@@ -184,7 +184,7 @@ jobs:
         key: java-${{ github.run_id }}-${{ github.job }}
     # Running the gradle-cache-action with no arguments makes it run just as a remote cache and not as a wrapper
     - name: Enable the Gradle remote cache
-      uses: burrunan/gradle-cache-action@v1
+      uses: burrunan/gradle-cache-action@v2
       with:
           # Disable warning about missing distributionSha256Sum property in gradle-wrapper.properties
           gradle-distribution-sha-256-sum-warning: false
@@ -266,7 +266,7 @@ jobs:
         key: go-${{ github.run_id }}-${{ github.job }}
     # Running the gradle-cache-action with no arguments makes it run just as a remote cache and not as a wrapper
     - name: Enable the Gradle remote cache
-      uses: burrunan/gradle-cache-action@v1
+      uses: burrunan/gradle-cache-action@v2
       with:
           # Disable warning about missing distributionSha256Sum property in gradle-wrapper.properties
           gradle-distribution-sha-256-sum-warning: false
@@ -345,7 +345,7 @@ jobs:
           go-${{ github.run_id }}-build-go
     # Running the gradle-cache-action with no arguments makes it run just as a remote cache and not as a wrapper
     - name: Enable the Gradle remote cache
-      uses: burrunan/gradle-cache-action@v1
+      uses: burrunan/gradle-cache-action@v2
       with:
           # Disable warning about missing distributionSha256Sum property in gradle-wrapper.properties
           gradle-distribution-sha-256-sum-warning: false
@@ -474,7 +474,7 @@ jobs:
           java-${{ github.run_id }}-build-java
     # Running the gradle-cache-action with no arguments makes it run just as a remote cache and not as a wrapper
     - name: Enable the Gradle remote cache
-      uses: burrunan/gradle-cache-action@v1
+      uses: burrunan/gradle-cache-action@v2
       with:
           # Disable warning about missing distributionSha256Sum property in gradle-wrapper.properties
           gradle-distribution-sha-256-sum-warning: false
@@ -572,7 +572,7 @@ jobs:
           java-${{ github.run_id }}-java-unit-test
     # Running the gradle-cache-action with no arguments makes it run just as a remote cache and not as a wrapper
     - name: Enable the Gradle remote cache
-      uses: burrunan/gradle-cache-action@v1
+      uses: burrunan/gradle-cache-action@v2
       with:
           # Disable warning about missing distributionSha256Sum property in gradle-wrapper.properties
           gradle-distribution-sha-256-sum-warning: false
@@ -687,7 +687,7 @@ jobs:
           java-${{ github.run_id }}-java-integration-test
     # Running the gradle-cache-action with no arguments makes it run just as a remote cache and not as a wrapper
     - name: Enable the Gradle remote cache
-      uses: burrunan/gradle-cache-action@v1
+      uses: burrunan/gradle-cache-action@v2
       with:
           # Disable warning about missing distributionSha256Sum property in gradle-wrapper.properties
           gradle-distribution-sha-256-sum-warning: false
@@ -798,7 +798,7 @@ jobs:
           go-${{ github.run_id }}-build-go
     # Running the gradle-cache-action with no arguments makes it run just as a remote cache and not as a wrapper
     - name: Enable the Gradle remote cache
-      uses: burrunan/gradle-cache-action@v1
+      uses: burrunan/gradle-cache-action@v2
       with:
           # Disable warning about missing distributionSha256Sum property in gradle-wrapper.properties
           gradle-distribution-sha-256-sum-warning: false
@@ -898,7 +898,7 @@ jobs:
           go-${{ github.run_id }}-go-unit-test
     # Running the gradle-cache-action with no arguments makes it run just as a remote cache and not as a wrapper
     - name: Enable the Gradle remote cache
-      uses: burrunan/gradle-cache-action@v1
+      uses: burrunan/gradle-cache-action@v2
       with:
           # Disable warning about missing distributionSha256Sum property in gradle-wrapper.properties
           gradle-distribution-sha-256-sum-warning: false
@@ -1016,7 +1016,7 @@ jobs:
           go-${{ github.run_id }}-go-integration-test
     # Running the gradle-cache-action with no arguments makes it run just as a remote cache and not as a wrapper
     - name: Enable the Gradle remote cache
-      uses: burrunan/gradle-cache-action@v1
+      uses: burrunan/gradle-cache-action@v2
       with:
           # Disable warning about missing distributionSha256Sum property in gradle-wrapper.properties
           gradle-distribution-sha-256-sum-warning: false
@@ -1132,7 +1132,7 @@ jobs:
           docker-${{ github.run_id }}-build-docker
     # Running the gradle-cache-action with no arguments makes it run just as a remote cache and not as a wrapper
     - name: Enable the Gradle remote cache
-      uses: burrunan/gradle-cache-action@v1
+      uses: burrunan/gradle-cache-action@v2
       with:
           # Disable warning about missing distributionSha256Sum property in gradle-wrapper.properties
           gradle-distribution-sha-256-sum-warning: false
@@ -1228,7 +1228,7 @@ jobs:
           key: build-${{ github.run_id }}
       # Running the gradle-cache-action with no arguments makes it run just as a remote cache and not as a wrapper
       - name: Enable the Gradle remote cache
-        uses: burrunan/gradle-cache-action@v1
+        uses: burrunan/gradle-cache-action@v2
         with:
           # Disable warning about missing distributionSha256Sum property in gradle-wrapper.properties
           gradle-distribution-sha-256-sum-warning: false
@@ -1316,7 +1316,7 @@ jobs:
           key: build-${{ github.run_id }}-${{ github.job }}
       # Running the gradle-cache-action with no arguments makes it run just as a remote cache and not as a wrapper
       - name: Enable the Gradle remote cache
-        uses: burrunan/gradle-cache-action@v1
+        uses: burrunan/gradle-cache-action@v2
         with:
           # Disable warning about missing distributionSha256Sum property in gradle-wrapper.properties
           gradle-distribution-sha-256-sum-warning: false
