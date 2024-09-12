@@ -19,6 +19,9 @@ fields:
   lifecycle: Active
 labels: []
 links:
+  - name: 'Jira Project'
+    type: PROJECT
+    url: 'https://github.com/mooltiverse/nyx/issues'
   - name: 'GitHub Repository'
     type: REPOSITORY
     url: 'https://github.com/mooltiverse/nyx'
