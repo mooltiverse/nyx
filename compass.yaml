@@ -1,23 +1,19 @@
 # This is the component descriptor for Atlassian Compass.
-# Find more on the format for this file at https://developer.atlassian.com/cloud/compass/config-as-code/structure-and-contents-of-a-compass-yml-file/
+# Find more on the format for this file at:
+# - https://developer.atlassian.com/cloud/compass/config-as-code/structure-and-contents-of-a-compass-yml-file/
 configVersion: 1
-name: Nyx
-# The ID may be empty as long as the component is not registered to Compass
-# but needs to be retrieved as soon as it is.
-# To find out the Compass Component ID see: https://developer.atlassian.com/cloud/compass/config-as-code/manage-components-with-config-as-code/#find-a-component-s-id
 id: 'ari:cloud:compass:e81d1a29-d0b3-4273-8c30-dcc48dee6c51:component/2da6ae46-b95a-4802-bb10-242908b93623/b2377178-3fd5-4e19-bab6-233fa5a32a25'
-description: The one stop semantic release tool
 typeId: APPLICATION
-# The ID may be empty as long as the component is not registered to Compass
-# but should to be retrieved as soon as it is.
-# To find out the Team's Owner ID see: https://developer.atlassian.com/cloud/compass/config-as-code/manage-components-with-config-as-code/#find-a-team-s-owner-id
 ownerId: 'ari:cloud:identity::team/2f94fdd2-6597-4c36-ac96-1a343ca3bf7f'
-fields:
-  # The Tier allows values ranging from 1 (highest importance) to 4 (lowest importance)
-  tier: 3
-  # The lifecycle represents the lifecycle status of teh component. Accepted values are: 'Pre-release', 'Active', 'Deprecated'
-  lifecycle: Active
-labels: []
+name: Nyx
+description: The one stop semantic release tool
+labels:
+  - docker
+  - github-actions
+  - go
+  - gradle
+  - java
+  - oss
 links:
   - name: 'GitHub Issues'
     type: PROJECT
@@ -25,5 +21,17 @@ links:
   - name: 'GitHub Repository'
     type: REPOSITORY
     url: 'https://github.com/mooltiverse/nyx'
+  - name: 'Documentation'
+    type: DOCUMENT
+    url: 'https://mooltiverse.github.io/nyx/'
+  - name: 'GitHub Actions'
+    type: DASHBOARD
+    url: 'https://github.com/mooltiverse/nyx/actions'
+  - name: 'GitHub Insights'
+    type: DASHBOARD
+    url: 'https://github.com/mooltiverse/nyx/pulse'
+fields:
+  tier: 3
+  lifecycle: Active
 customFields: []
 relationships: {}
