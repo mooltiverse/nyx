@@ -12,7 +12,7 @@ plugins {
     // (at times it doesn't work when using the ./gradlew wrapper).
     // This plugin can be commented out and used only when needed.
     // See: https://github.com/dorongold/gradle-task-tree
-    id "com.dorongold.task-tree" version "2.1.1"
+    id "com.dorongold.task-tree" version "4.0.0"
 }
 
 import groovy.json.JsonSlurper
@@ -22,6 +22,7 @@ import groovy.json.JsonOutput
   Root project properties
 ------------------------------------------------------------------------------*/
 project.description = 'Nyx is a portable and flexible semantic release tool.'
+project.group       = 'com.mooltiverse.oss.nyx'
 
 /*------------------------------------------------------------------------------
   This is the configuration for this project and all sub-projects
@@ -29,11 +30,6 @@ project.description = 'Nyx is a portable and flexible semantic release tool.'
 allprojects {
   // See: https://docs.gradle.org/current/userguide/base_plugin.html
   apply plugin: 'base'
-
-  /*------------------------------------------------------------------------------
-    Project overall attributes
-  ------------------------------------------------------------------------------*/
-  group   = 'com.mooltiverse.oss.nyx'
 
   /*------------------------------------------------------------------------------
     Extension configurations
@@ -205,7 +201,3 @@ task testClean() {
 
   dependsOn deleteTestDirectories, deleteGitHubTestProjects, deleteGitLabTestProjects
 }
-
-/*------------------------------------------------------------------------------
-  Additional task dependencies
-------------------------------------------------------------------------------*/
