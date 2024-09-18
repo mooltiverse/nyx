@@ -1,7 +1,31 @@
-# The Nyx CI pipeline running on GitHub Actions
+# This workflow takes care of building, testing and publishing the project and
+# its artifacts.
+#
+# The whole process is split into jobs, each running on a different node.
+# Jobs are executed conditionally, only when required, in order to avoid wasting
+# build time on useless jobs.
+# Job dependencies also make longer and expensive tasks depend on the success
+# of previous, less expensive tasks. If upstream tasks fail, their dependencies
+# are not executed.
+#
+# This implies that, in order to avoid repeating tasks and start one job from
+# where previous ones have finished, intermediate artifacts are handed over
+# from one task to another. For this we use cache actions like actions/cache@v4.
+# Moreover, since we use Gradle and its powerful up-to-date checks, we also need
+# to propagate the Gradle cache across jobs. For this we use the Gradle remote
+# cache action burrunan/gradle-cache-action@v2.
+#
+# This way of modelling the workflow requires extra engineering but allows for
+# fine grained control over the pipeline as a whole. It also introduces some
+# overhead, but that comes with the benefit of controlling the workflow stage
+# by stage.
+#
+# Gradle is used so that we use the same build scripts locally on developers'
+# hosts and the CI/CD environment. Again, this improves portability and
+# consistency.
 #
 # CACHES
-#
+# ------
 # We use GitHub Actions caches in two different modes:
 # - by mean of actions/cache: we use different caches in order to narrow their size. The major issue
 #   with this kind of cache is that each job can create a new one and store its contents but it cannot
@@ -42,16 +66,19 @@
 #   artifacts (but no tests) from the language specific build tasks
 #
 # MORE ON CACHES
+# --------------
 # Remember that:
 # - the 'path' items within 'actions/cache' actions must be the same when storing and retrieving the cache
 #   otherwise it won't work
 # - the above rules mean that a certain set of files/directories must always follow the same cache as
 # they can't be mixed up. On the other hand, each job may use/store multiple caches
 
-name: Nyx workflow
+name: Workflow
 on: [push]
 # Avoid running multiple pipelines concurrently to avoid overlapping releases and tags
 concurrency:
+  # Synch on the project to avoid conflicts when accessing remote resources
+  # (i.e. when testing against remote services)
   group: project
   cancel-in-progress: false
 
@@ -1236,18 +1263,8 @@ jobs:
         run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
       - name: Publish with Gradle
         env:
-          # The 'gitHubUser' and 'gitHubToken' variables are passed as credentials to publish packages to the GitHub Packages repository, see: https://docs.github.com/en/actions/publishing-packages/publishing-java-packages-with-gradle#publishing-packages-to-github-packages.
-          # The GH_TOKEN is used by Nyx configured service 'github' (see the top level settings.gradle) to publish the release to GitHub Releases.
-          # The 'GITHUB_TOKEN' is automatically generated and provided by GitHub Actions so it doesn't need to be manually created. We just use it and copy as Gradle properties or environment variables.
-          # The ossrhUsername and ossrhPassword must be a valid Sonatype token (which is actually a pair of values, the username and the password).
-          # The token can be generated at https://oss.sonatype.org/ selecting Profile > User Token (from the drop down).
-          # For more on Sonatype credentials see:  https://support.sonatype.com/hc/en-us/articles/360049469534-401-Content-access-is-protected-by-token-when-accessing-repositories
-          # See:
-          # - the Automatic Token Authentication: https://docs.github.com/en/actions/security-guides/automatic-token-authentication
-          # - the 'secrets' Context:  https://docs.github.com/en/actions/learn-github-actions/contexts
-          # - the Default Environment Variables: https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables
-          # - enabling GITHUB_TOKEN to publish packages: https://docs.github.com/en/packages/managing-github-packages-using-github-actions-workflows/publishing-and-installing-a-package-with-github-actions#upgrading-a-workflow-that-accesses-ghcrio
-          # See the top level https://github.com/mooltiverse/nyx/blob/main/CONTRIBUTING.md#contributing-code file for details about passing these values when testing locally
+          # The variables used here are automatically configured using Terraform by
+          # the Infrastructure project.
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ORG_GRADLE_PROJECT_gitHubUser: ${{ github.actor }}
           ORG_GRADLE_PROJECT_gitHubToken: ${{ secrets.GITHUB_TOKEN }}
@@ -1324,15 +1341,8 @@ jobs:
         run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
       - name: Release with Gradle
         env:
-          # The 'gitHubUser' and 'gitHubToken' variables are passed as credentials to publish packages to the GitHub Packages repository, see: https://docs.github.com/en/actions/publishing-packages/publishing-java-packages-with-gradle#publishing-packages-to-github-packages.
-          # The GH_TOKEN is used by Nyx configured service 'github' (see the top level settings.gradle) to publish the release to GitHub Releases.
-          # The 'GITHUB_TOKEN' is automatically generated and provided by GitHub Actions so it doesn't need to be manually created. We just use it and copy as Gradle properties or environment variables.
-          # See:
-          # - the Automatic Token Authentication: https://docs.github.com/en/actions/security-guides/automatic-token-authentication
-          # - the 'secrets' Context:  https://docs.github.com/en/actions/learn-github-actions/contexts
-          # - the Default Environment Variables: https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables
-          # - GITHUB_TOKEN permissions for repository: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository#setting-the-permissions-of-the-github_token-for-your-repository
-          # See the top level https://github.com/mooltiverse/nyx/blob/main/CONTRIBUTING.md#contributing-code file for details about passing these values when testing locally
+          # The variables used here are automatically configured using Terraform by
+          # the Infrastructure project.
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ORG_GRADLE_PROJECT_gitHubUser: ${{ github.actor }}
           ORG_GRADLE_PROJECT_gitHubToken: ${{ secrets.GITHUB_TOKEN }}
