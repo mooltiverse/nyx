@@ -456,11 +456,11 @@ jobs:
         git config core.fileMode false
         chmod +x gradlew
     # Set up the languages and tools
-    - name: Set up JDK ${{ env.JDK_VERSION }}
+    - name: Set up JDK ${{ matrix.java }}
       uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
-        java-version: ${{ env.JDK_VERSION }}
+        java-version: ${{ matrix.java }}
     # Set up the distributed caches used to share data among jobs
     - name: Set up the pipeline-${{ github.run_id }}-nyx cache storing the Nyx state
       uses: actions/cache@v4
@@ -509,7 +509,7 @@ jobs:
       uses: actions/upload-artifact@v4
       if: ${{ always() }}
       with:
-        name: .nyx-state-${{ github.job }}
+        name: .nyx-state-${{ github.job }}-${{ matrix.java }}
         path: build/.nyx-*.*
         include-hidden-files: true
     - name: Publish the Java unit test reports
@@ -557,11 +557,11 @@ jobs:
         git config core.fileMode false
         chmod +x gradlew
     # Set up the languages and tools
-    - name: Set up JDK ${{ env.JDK_VERSION }}
+    - name: Set up JDK ${{ matrix.java }}
       uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
-        java-version: ${{ env.JDK_VERSION }}
+        java-version: ${{ matrix.java }}
     # Set up the distributed caches used to share data among jobs
     - name: Set up the pipeline-${{ github.run_id }}-nyx cache storing the Nyx state
       uses: actions/cache@v4
@@ -627,7 +627,7 @@ jobs:
       uses: actions/upload-artifact@v4
       if: ${{ always() }}
       with:
-        name: .nyx-state-${{ github.job }}
+        name: .nyx-state-${{ github.job }}-${{ matrix.java }}
         path: build/.nyx-*.*
         include-hidden-files: true
     - name: Publish the Java integration test reports
@@ -675,11 +675,11 @@ jobs:
         git config core.fileMode false
         chmod +x gradlew
     # Set up the languages and tools
-    - name: Set up JDK ${{ env.JDK_VERSION }}
+    - name: Set up JDK ${{ matrix.java }}
       uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
-        java-version: ${{ env.JDK_VERSION }}
+        java-version: ${{ matrix.java }}
     # Set up the distributed caches used to share data among jobs
     - name: Set up the pipeline-${{ github.run_id }}-nyx cache storing the Nyx state
       uses: actions/cache@v4
@@ -746,7 +746,7 @@ jobs:
       uses: actions/upload-artifact@v4
       if: ${{ always() }}
       with:
-        name: .nyx-state-${{ github.job }}
+        name: .nyx-state-${{ github.job }}-${{ matrix.java }}
         path: build/.nyx-*.*
         include-hidden-files: true
     - name: Publish the Java functional test reports
