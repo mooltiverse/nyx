@@ -843,7 +843,7 @@ jobs:
       uses: actions/upload-artifact@v4
       if: ${{ always() }}
       with:
-        name: .nyx-state-${{ github.job }}
+        name: .nyx-state-${{ github.job }}-${{ matrix.os }}
         path: build/.nyx-*.*
         include-hidden-files: true
     - name: Publish the Go unit test reports
@@ -964,7 +964,7 @@ jobs:
       uses: actions/upload-artifact@v4
       if: ${{ always() }}
       with:
-        name: .nyx-state-${{ github.job }}
+        name: .nyx-state-${{ github.job }}-${{ matrix.os }}
         path: build/.nyx-*.*
         include-hidden-files: true
     - name: Publish the Go integration test reports
@@ -1086,7 +1086,7 @@ jobs:
       uses: actions/upload-artifact@v4
       if: ${{ always() }}
       with:
-        name: .nyx-state-${{ github.job }}
+        name: .nyx-state-${{ github.job }}-${{ matrix.os }}
         path: build/.nyx-*.*
         include-hidden-files: true
     - name: Publish the Go functional test reports
@@ -1218,8 +1218,7 @@ jobs:
     # Run this job only if:
     # - the Docker, Java or Go files have changed
     # - a new release must be issued (this flag is inferred by Nyx), in which case we rebuild and test everything
-    # TODO: re-enable this conditional
-    #if: needs.initialize.outputs.dockerChanged == 'true' || needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.javaChanged == 'true' || needs.initialize.outputs.newRelease == 'true'
+    if: needs.initialize.outputs.dockerChanged == 'true' || needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.javaChanged == 'true' || needs.initialize.outputs.newRelease == 'true'
     runs-on: ubuntu-latest
     steps:
     # Prepare the workspace
