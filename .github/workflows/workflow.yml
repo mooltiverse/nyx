@@ -51,20 +51,6 @@
 # We always create caches with identifiers containing the ${{ github.run_id }} in order to avoid
 # overlappings across multiple pipeline runs.
 #
-# The caches we use in the pipeline are:
-# - the pipeline cache (using key pipeline-${{ github.run_id }}-[JOB_ID]) that brings
-#   some pipeline overall artifacts like the Nyx state
-# - the SonarCloud cache (using key sonar-${{ github.run_id }}-[JOB_ID])
-# - the Java cache (using key java-${{ github.run_id }}--[JOB_ID]) that brings
-#   Java specific artifacts from the assemble tasks up to tests
-# - the Go cache (using key go-${{ github.run_id }}--[JOB_ID]) that brings
-#   Go specific artifacts from the assemble tasks up to tests
-# - the Docker cache (using key docker-${{ github.run_id }}--[JOB_ID]) that brings
-#   Docker specific artifacts from the assemble tasks up to tests. Since the Docker image needs the
-#   Go binaries this cache is forked from the Go cache after Go build/assemble tasks have completed
-# - the Build cache (using key build-${{ github.run_id }}) that brings all Build
-#   artifacts (but no tests) from the language specific build tasks
-#
 # MORE ON CACHES
 # --------------
 # Remember that:
@@ -73,7 +59,7 @@
 # - the above rules mean that a certain set of files/directories must always follow the same cache as
 # they can't be mixed up. On the other hand, each job may use/store multiple caches
 
-name: Workflow
+name: CI/CD Pipeline
 on: [push]
 # Avoid running multiple pipelines concurrently to avoid overlapping releases and tags
 concurrency:
@@ -81,159 +67,161 @@ concurrency:
   # (i.e. when testing against remote services)
   group: project
   cancel-in-progress: false
+env:
+  GO_VERSION: 1.22.4
+  JDK_VERSION: 20
 
 jobs:
-  # Initialize the build process and infer the new version number
-  init:
+  initialize:
     name: Initialize
-    outputs:
-      # Make the 'newRelease' outputs from the Nyx action available for other jobs
-      newRelease: ${{ steps.nyx.outputs.newRelease }}
-      # Expose the 'dockerChanged' output from the file filters
-      dockerChanged: ${{ steps.changes.outputs.dockerChanged }}
-      # Expose the 'goChanged' output from the file filters
-      goChanged: ${{ steps.changes.outputs.goChanged }}
-      # Expose the 'javaChanged' output from the file filters
-      javaChanged: ${{ steps.changes.outputs.javaChanged }}
     runs-on: ubuntu-latest
     steps:
+    # Prepare the workspace
     - name: Git checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
-    # Here we set some flags depending on the files that have changed with this commit
-    - name: File filters
+    - name: Set conditional flags based on files changed with the current commit
       uses: dorny/paths-filter@v3
       id: changes
       with:
         base: ${{ github.ref }}
         filters: |
           dockerChanged:
-            - 'modules/docker/**'
+          - 'modules/docker/**'
           goChanged:
-            - 'modules/go/**'
+          - 'modules/go/**'
           javaChanged:
-            - 'modules/java/**'
-    - name: Set up JDK 20
+          - 'modules/java/**'
+    - name: Grant execute permission for the gradlew executable
+      # We also need to make Git ignore execute permission changes to avoid
+      # false positives in change detection
+      run: |
+        git config core.fileMode false
+        chmod +x gradlew
+    # Set up the languages and tools
+    - name: Set up JDK ${{ env.JDK_VERSION }}
       uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
-        java-version: 20
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-    - name: Make Git ignore execute permission changes in files (like gradlew)
-      run: git config core.fileMode false
-    # Bootstrap (no restore-keys) the pipeline cache and store it as -init
-    # This cache only stores the .nyx-state.json file
-    - name: Set up the pipeline cache bringing the Nyx state
+        java-version: ${{ env.JDK_VERSION }}
+    # Set up the distributed caches used to share data among jobs
+    - name: Set up the pipeline-${{ github.run_id }}-nyx cache storing the Nyx state
       uses: actions/cache@v4
       with:
         path: |
-          build/
-        key: pipeline-${{ github.run_id }}-${{ github.job }}
-        #restore-keys: not used here, start from scratch
-    # Bootstrap (no restore-keys) the SonarCloud cache
-    - name: Set up the SonarCloud cache
-      uses: actions/cache@v4
-      with:
-        path: ~/.sonar/cache
-        key: sonar-${{ github.run_id }}-${{ github.job }}
-        #restore-keys: sonar-${{ github.run_id }}-${{ github.job }}
-    # Running the gradle-cache-action with no arguments makes it run just as a remote cache and not as a wrapper
-    - name: Enable the Gradle remote cache
+          build/.nyx-summary.txt
+          build/.nyx-state.json
+        key: pipeline-${{ github.run_id }}-nyx
+    - name: Enable the Gradle remote cache for distributed UP TO DATE checks
       uses: burrunan/gradle-cache-action@v2
       with:
-          # Disable warning about missing distributionSha256Sum property in gradle-wrapper.properties
-          gradle-distribution-sha-256-sum-warning: false
-    # This job only runs nyxInfer to produce the initial version and initializes the Gradle remote cache
-    - name: Init with Gradle
+        # Disable warning about missing distributionSha256Sum property in gradle-wrapper.properties
+        gradle-distribution-sha-256-sum-warning: false
+    # Run the actual tasks for this job
+    - name: Infer the project version and initialize the Gradle remote cache
       run: ./gradlew nyxInfer --build-cache --stacktrace
-    # Run Nyx again (as a GitHub Action) to load the data from the State so that we can export useful job outputs
-    - name: Load Nyx data
+    - name: Export Nyx values
+      # By using the Nyx GitHub Action we are able to load its data that was stored
+      # by the previous step into the build/.nyx-state.json and export it to other
+      # jobs in the pipeline using this job's outputs.
       id: nyx
       uses: mooltiverse/nyx-github-action@main
-    - name: Archive Nyx state file
+    # Publish the job artifacts
+    - name: Publish the Nyx state and summary as job artifacts
       uses: actions/upload-artifact@v4
       if: ${{ always() }}
       with:
-        name: .nyx-state-${{ github.job }}.json
-        path: build/.nyx-state.json
+        name: .nyx-state-${{ github.job }}
+        path: build/.nyx-*.*
+        include-hidden-files: true
+    outputs:
+      # Expose the 'newRelease' flag computed by the mooltiverse/nyx-github-action
+      # action to the next jobs so they can run conditionally.
+      newRelease: ${{ steps.nyx.outputs.newRelease }}
+      # Expose the conditional flags computed by the dorny/paths-filter action
+      # to the next jobs so they can run conditionally.
+      dockerChanged: ${{ steps.changes.outputs.dockerChanged }}
+      goChanged: ${{ steps.changes.outputs.goChanged }}
+      javaChanged: ${{ steps.changes.outputs.javaChanged }}
 
-###############################################################################################################################
-# BUILD
-# Here we have several parallel jobs to build artifacts, one for each language/tech stack, and in the end one fan in job.
-###############################################################################################################################
+  #############################################################################
+  # BUILD
+  # Here we have several parallel jobs to build artifacts, one for each
+  # language/tech stack, and in the end one fan in job.
+  #############################################################################
 
   build-java:
     name: Build - Java
-    needs: init
-    # This job is time consuming so only run it if:
-    # - the Java files have changed
-    # - a new release must be issued (this flag is inferred by Nyx), in which case we rebuild and test everything
-    if: needs.init.outputs.javaChanged == 'true' || needs.init.outputs.newRelease == 'true'
+    needs: [initialize]
+    # Run this job conditionally to avoid running needless tasks and useless resource consumption
+    # TODO: re-enable this conditional
+    #if: needs.initialize.outputs.javaChanged == 'true' || needs.initialize.outputs.newRelease == 'true'
     runs-on: ubuntu-latest
     steps:
+    # Prepare the workspace
     - name: Git checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
-    - name: Set up JDK 20
+    - name: Grant execute permission for the gradlew executable
+      # We also need to make Git ignore execute permission changes to avoid
+      # false positives in change detection
+      run: |
+        git config core.fileMode false
+        chmod +x gradlew
+    # Set up the languages and tools
+    - name: Set up JDK ${{ env.JDK_VERSION }}
       uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
-        java-version: 20
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-    - name: Make Git ignore execute permission changes in files (like gradlew)
-      run: git config core.fileMode false
-    # Start from the -init pipeline cache and save the job output pipeline cache as -build-java
-    - name: Set up the pipeline cache bringing the Nyx state
+        java-version: ${{ env.JDK_VERSION }}
+    # Set up the distributed caches used to share data among jobs
+    - name: Set up the pipeline-${{ github.run_id }}-nyx cache storing the Nyx state
       uses: actions/cache@v4
       with:
         path: |
-          build/
-        key: pipeline-${{ github.run_id }}-${{ github.job }}
-        restore-keys: |
-          pipeline-${{ github.run_id }}-init
-    # Set up the SonarCloud cache
-    - name: Set up the SonarCloud cache
-      uses: actions/cache@v4
-      with:
-        path: ~/.sonar/cache
-        key: sonar-${{ github.run_id }}-${{ github.job }}
-        restore-keys: sonar-${{ github.run_id }}-${{ github.job }}
-    # Bootstrap (no restore-keys) the Java cache and store it as -build-java
-    - name: Set up the Java cache bringing Java artifacts
+          build/.nyx-summary.txt
+          build/.nyx-state.json
+        key: pipeline-${{ github.run_id }}-nyx
+    - name: Set up the pipeline-${{ github.run_id }}-build-java cache storing the Java files
       uses: actions/cache@v4
       with:
         path: |
           modules/java/**/build/
-        key: java-${{ github.run_id }}-${{ github.job }}
-    # Running the gradle-cache-action with no arguments makes it run just as a remote cache and not as a wrapper
-    - name: Enable the Gradle remote cache
+        key: pipeline-${{ github.run_id }}-build-java
+    - name: Set up the pipeline-${{ github.run_id }}-sonar cache storing SonarCloud files
+      uses: actions/cache@v4
+      with:
+        path: ~/.sonar/cache
+        key: pipeline-${{ github.run_id }}-sonar
+    - name: Enable the Gradle remote cache for distributed UP TO DATE checks
       uses: burrunan/gradle-cache-action@v2
       with:
-          # Disable warning about missing distributionSha256Sum property in gradle-wrapper.properties
-          gradle-distribution-sha-256-sum-warning: false
-    - name: Assemble with Gradle
+        # Disable warning about missing distributionSha256Sum property in gradle-wrapper.properties
+        gradle-distribution-sha-256-sum-warning: false
+    # Run the actual tasks for this job
+    - name: Build the Java code
       run: ./gradlew modules:java:assemble --build-cache --stacktrace
     - name: Scan with SonarCloud
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: ./gradlew sonar --build-cache --stacktrace --info
-    - name: Archive Nyx state file
+    # Publish the job artifacts
+    - name: Publish the Nyx state and summary as job artifacts
       uses: actions/upload-artifact@v4
       if: ${{ always() }}
       with:
-        name: .nyx-state-${{ github.job }}.json
-        path: build/.nyx-state.json
-    - name: Archive Jar
+        name: .nyx-state-${{ github.job }}
+        path: build/.nyx-*.*
+        include-hidden-files: true
+    - name: Publish the Jar artifacts
       uses: actions/upload-artifact@v4
       with:
         name: jar
         path: 'modules/java/**/build/libs/'
-    - name: Archive Javadoc
+    - name: Publish the Javadoc artifacts
       uses: actions/upload-artifact@v4
       with:
         name: javadoc
@@ -241,76 +229,76 @@ jobs:
 
   build-go:
     name: Build - Go
-    needs: init
-    # This job is time consuming so only run it if:
-    # - the Docker files have changed
-    # - the Go files have changed
-    # - a new release must be issued (this flag is inferred by Nyx), in which case we rebuild and test everything
-    if: needs.init.outputs.dockerChanged == 'true' || needs.init.outputs.goChanged == 'true' || needs.init.outputs.newRelease == 'true'
+    needs: [initialize]
+    # Run this job conditionally to avoid running needless tasks and useless resource consumption
+    # TODO: re-enable this conditional
+    #if: needs.initialize.outputs.dockerChanged == 'true' || needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.newRelease == 'true'
     runs-on: ubuntu-latest
     steps:
+    # Prepare the workspace
     - name: Git checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
-    - name: Set up JDK 20
+    - name: Grant execute permission for the gradlew executable
+      # We also need to make Git ignore execute permission changes to avoid
+      # false positives in change detection
+      run: |
+        git config core.fileMode false
+        chmod +x gradlew
+    # Set up the languages and tools
+    - name: Set up JDK ${{ env.JDK_VERSION }}
       uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
-        java-version: 20
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-    - name: Make Git ignore execute permission changes in files (like gradlew)
-      run: git config core.fileMode false
-    - name: Set up Go 1.22.4
+        java-version: ${{ env.JDK_VERSION }}
+    - name: Set up Go ${{ env.GO_VERSION }}
       uses: actions/setup-go@v3
       with:
-        go-version: 1.22.4
-    # Start from the -init pipeline cache and save the job output pipeline cache as -build-go
-    - name: Set up the pipeline cache bringing the Nyx state
+        go-version: ${{ env.GO_VERSION }}
+    # Set up the distributed caches used to share data among jobs
+    - name: Set up the pipeline-${{ github.run_id }}-nyx cache storing the Nyx state
       uses: actions/cache@v4
       with:
         path: |
-          build/
-        key: pipeline-${{ github.run_id }}-${{ github.job }}
-        restore-keys: |
-          pipeline-${{ github.run_id }}-init
-    # Set up the SonarCloud cache
-    - name: Set up the SonarCloud cache
-      uses: actions/cache@v4
-      with:
-        path: ~/.sonar/cache
-        key: sonar-${{ github.run_id }}-${{ github.job }}
-        restore-keys: sonar-${{ github.run_id }}-${{ github.job }}
-    # Bootstrap (no restore-keys) the Go cache and store it as -build-go
-    - name: Set up the Go cache bringing Go artifacts
+          build/.nyx-summary.txt
+          build/.nyx-state.json
+        key: pipeline-${{ github.run_id }}-nyx
+    - name: Set up the pipeline-${{ github.run_id }}-build-go cache storing the Go files
       uses: actions/cache@v4
       with:
         path: |
           modules/go/**/build/
           ~/.cache/go-build
           ~/go/pkg/mod
-        key: go-${{ github.run_id }}-${{ github.job }}
-    # Running the gradle-cache-action with no arguments makes it run just as a remote cache and not as a wrapper
-    - name: Enable the Gradle remote cache
+        key: pipeline-${{ github.run_id }}-build-go
+    - name: Set up the pipeline-${{ github.run_id }}-sonar cache storing SonarCloud files
+      uses: actions/cache@v4
+      with:
+        path: ~/.sonar/cache
+        key: pipeline-${{ github.run_id }}-sonar
+    - name: Enable the Gradle remote cache for distributed UP TO DATE checks
       uses: burrunan/gradle-cache-action@v2
       with:
-          # Disable warning about missing distributionSha256Sum property in gradle-wrapper.properties
-          gradle-distribution-sha-256-sum-warning: false
-    - name: Assemble with Gradle
+        # Disable warning about missing distributionSha256Sum property in gradle-wrapper.properties
+        gradle-distribution-sha-256-sum-warning: false
+    # Run the actual tasks for this job
+    - name: Build the Go code
       run: ./gradlew modules:go:assemble --build-cache --stacktrace
     - name: Scan with SonarCloud
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: ./gradlew sonar --build-cache --stacktrace --info
-    - name: Archive Nyx state file
+    # Publish the job artifacts
+    - name: Publish the Nyx state and summary as job artifacts
       uses: actions/upload-artifact@v4
       if: ${{ always() }}
       with:
-        name: .nyx-state-${{ github.job }}.json
-        path: build/.nyx-state.json
-    - name: Archive Binaries
+        name: .nyx-state-${{ github.job }}
+        path: build/.nyx-*.*
+        include-hidden-files: true
+    - name: Publish the Go binaries
       uses: actions/upload-artifact@v4
       with:
         name: bin
@@ -319,118 +307,113 @@ jobs:
   build-docker:
     name: Build - Docker
     needs: build-go
-    # This job is time consuming so only run it if:
-    # - the Docker files have changed
-    # - the Go files have changed
-    # - a new release must be issued (this flag is inferred by Nyx), in which case we rebuild and test everything
-    if: needs.init.outputs.dockerChanged == 'true' || needs.init.outputs.goChanged == 'true' || needs.init.outputs.newRelease == 'true'
+    # Run this job conditionally to avoid running needless tasks and useless resource consumption
+    # TODO: re-enable this conditional
+    #if: needs.initialize.outputs.dockerChanged == 'true' || needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.newRelease == 'true'
     runs-on: ubuntu-latest
     steps:
+    # Prepare the workspace
     - name: Git checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
-    - name: Set up JDK 20
+    - name: Grant execute permission for the gradlew executable
+      # We also need to make Git ignore execute permission changes to avoid
+      # false positives in change detection
+      run: |
+        git config core.fileMode false
+        chmod +x gradlew
+    # Set up the languages and tools
+    - name: Set up JDK ${{ env.JDK_VERSION }}
       uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
-        java-version: 20
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-    - name: Make Git ignore execute permission changes in files (like gradlew)
-      run: git config core.fileMode false
-    - name: Set up Go 1.22.4
+        java-version: ${{ env.JDK_VERSION }}
+    - name: Set up Go ${{ env.GO_VERSION }}
       uses: actions/setup-go@v3
       with:
-        go-version: 1.22.4
-    # Start from the -init pipeline cache and save the job output pipeline cache as -build-docker
-    - name: Set up the pipeline cache bringing the Nyx state
+        go-version: ${{ env.GO_VERSION }}
+    # Set up the distributed caches used to share data among jobs
+    - name: Set up the pipeline-${{ github.run_id }}-nyx cache storing the Nyx state
       uses: actions/cache@v4
       with:
         path: |
-          build/
-        key: pipeline-${{ github.run_id }}-${{ github.job }}
-        restore-keys: |
-          pipeline-${{ github.run_id }}-init
-    # Set up the SonarCloud cache
-    - name: Set up the SonarCloud cache
-      uses: actions/cache@v4
-      with:
-        path: ~/.sonar/cache
-        key: sonar-${{ github.run_id }}-${{ github.job }}
-        restore-keys: sonar-${{ github.run_id }}-${{ github.job }}
-    # Bootstrap (no restore-keys) the Docker cache starting from the -build-go (to get binaries) and store it as -build-docker
-    - name: Set up the Go cache bringing Go artifacts
+          build/.nyx-summary.txt
+          build/.nyx-state.json
+        key: pipeline-${{ github.run_id }}-nyx
+    - name: Set up the pipeline-${{ github.run_id }}-build-docker cache storing the Docker files
       uses: actions/cache@v4
       with:
         path: |
           modules/go/**/build/
           ~/.cache/go-build
           ~/go/pkg/mod
-        key: docker-${{ github.run_id }}-${{ github.job }}
+        key: pipeline-${{ github.run_id }}-build-docker
         restore-keys: |
-          go-${{ github.run_id }}-build-go
-    # Running the gradle-cache-action with no arguments makes it run just as a remote cache and not as a wrapper
-    - name: Enable the Gradle remote cache
+          pipeline-${{ github.run_id }}-build-go
+    - name: Set up the pipeline-${{ github.run_id }}-sonar cache storing SonarCloud files
+      uses: actions/cache@v4
+      with:
+        path: ~/.sonar/cache
+        key: pipeline-${{ github.run_id }}-sonar
+    - name: Enable the Gradle remote cache for distributed UP TO DATE checks
       uses: burrunan/gradle-cache-action@v2
       with:
-          # Disable warning about missing distributionSha256Sum property in gradle-wrapper.properties
-          gradle-distribution-sha-256-sum-warning: false
-    - name: Assemble with Gradle
+        # Disable warning about missing distributionSha256Sum property in gradle-wrapper.properties
+        gradle-distribution-sha-256-sum-warning: false
+    # Run the actual tasks for this job
+    - name: Build the Docker images
       run: ./gradlew modules:docker:assemble --build-cache --stacktrace
     - name: Scan with SonarCloud
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: ./gradlew sonar --build-cache --stacktrace --info
-    - name: Archive Nyx state file
+    # Publish the job artifacts
+    - name: Publish the Nyx state and summary as job artifacts
       uses: actions/upload-artifact@v4
       if: ${{ always() }}
       with:
-        name: .nyx-state-${{ github.job }}.json
-        path: build/.nyx-state.json
+        name: .nyx-state-${{ github.job }}
+        path: build/.nyx-*.*
+        include-hidden-files: true
 
-  # This job acts as a connection from upstream jobs running build tasks
-  # Here we import the caches from specific language build jobs into one 
   build-merge:
-    name: Merge Builds
+    # This job acts as a connection from upstream jobs running build tasks.
+    # Here we import the caches from specific language build jobs into one.
+    name: Merge build artifacts
     needs: [build-java,build-go,build-docker]
-    # This job is time consuming so only run it if:
-    # - the Docker, Java or Go files have changed
-    # - a new release must be issued (this flag is inferred by Nyx), in which case we rebuild and test everything
-    if: needs.init.outputs.dockerChanged == 'true' || needs.init.outputs.goChanged == 'true' || needs.init.outputs.javaChanged == 'true' || needs.init.outputs.newRelease == 'true'
+    # Run this job conditionally to avoid running needless tasks and useless resource consumption
+    # TODO: re-enable this conditional
+    #if: needs.initialize.outputs.dockerChanged == 'true' || needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.javaChanged == 'true' || needs.initialize.outputs.newRelease == 'true'
     runs-on: ubuntu-latest
     steps:
-    # Pull the -build-docker cache (read only). This will be used in the next steps to create a new cache that merges this one and others
-    # This may cause the next one fail as they both restore the same paths
-    #- name: Set up the Go cache bringing Docker artifacts
-    #  uses: actions/cache@v4
-    #  with:
-    #    path: |
-    #      modules/go/**/build/
-    #      ~/.cache/go-build
-    #      ~/go/pkg/mod
-    #    key: docker-${{ github.run_id }}-${{ github.job }}
-    #    restore-keys: |
-    #      docker-${{ github.run_id }}-build-docker
-    # Pull the -build-go cache (read only). This will be used in the next steps to create a new cache that merges this one and others
-    - name: Set up the Go cache bringing Go artifacts
+    # Set up the distributed caches used to share data among jobs
+    - name: Set up the pipeline-${{ github.run_id }}-build-go cache storing the Go files
       uses: actions/cache@v4
       with:
         path: |
           modules/go/**/build/
           ~/.cache/go-build
           ~/go/pkg/mod
-        key: go-${{ github.run_id }}-build-go
-    # Pull the -build-java cache (read only). This will be used in the next steps to create a new cache that merges this one and others
-    - name: Set up the Java cache bringing Java artifacts
+        key: pipeline-${{ github.run_id }}-build-go
+    - name: Set up the pipeline-${{ github.run_id }}-build-java cache storing the Java files
       uses: actions/cache@v4
       with:
         path: |
           modules/java/**/build/
-        key: java-${{ github.run_id }}-build-java
-    # Bootstrap (no restore-keys) the Build cache to collect all artifacts coming from upstream build jobs
-    - name: Set up the Build cache bringing artifacts from the upstream Build jobs
+        key: pipeline-${{ github.run_id }}-build-java
+    #- name: Set up the pipeline-${{ github.run_id }}-build-docker cache storing the Docker files
+    #  uses: actions/cache@v4
+    #  with:
+    #    path: |
+    #      modules/go/**/build/
+    #      ~/.cache/go-build
+    #      ~/go/pkg/mod
+    #    key: pipeline-${{ github.run_id }}-build-docker
+    #    restore-keys: |
+    #      pipeline-${{ github.run_id }}-build-go
+    - name: Set up the pipeline-${{ github.run_id }}-artifacts cache storing artifacts from all upstream jobs
       uses: actions/cache@v4
       with:
         # These patchs are merged from the previous caches
@@ -439,22 +422,20 @@ jobs:
           modules/go/**/build/
           ~/.cache/go-build
           ~/go/pkg/mod
-        key: build-${{ github.run_id }}
-    - name: List contents in the cache
-      run: ls -alR modules/java/**/build/ modules/go/**/build/ ~/.cache/go-build ~/go/pkg/mod
+        key: pipeline-${{ github.run_id }}-artifacts
 
-###############################################################################################################################
-# TEST
-# Here we have several parallel jobs to run tests at different maturity levels, progressively, one for each language/tech stack
-###############################################################################################################################
+  #############################################################################
+  # TEST
+  # Here we have several parallel jobs to run tests at different maturity
+  # levels, progressively, one for each language/tech stack
+  #############################################################################
   
   java-unit-test:
     name: Test (Unit) - Java ${{ matrix.java }}
     needs: build-java
-    # This job is time consuming so only run it if:
-    # - the Java files have changed
-    # - a new release must be issued (this flag is inferred by Nyx), in which case we rebuild and test everything
-    if: needs.init.outputs.javaChanged == 'true' || needs.init.outputs.newRelease == 'true'
+    # Run this job conditionally to avoid running needless tasks and useless resource consumption
+    # TODO: re-enable this conditional
+    #if: needs.initialize.outputs.javaChanged == 'true' || needs.initialize.outputs.newRelease == 'true'
     # The recommended JDK version is 17 or above but since we need to test for backward compatibility to JVMs 17 or newer we
     # need a matrix here. Depending on the JDK version the set of Gradle version that the tests run on will change, according
     # to the Gradle compatibility matrix. See CONTRIBUTING.md in the root directory or the Gradle functional test suites for more.
@@ -463,49 +444,51 @@ jobs:
         java: [ '17', '20' ]
     runs-on: ubuntu-latest
     steps:
+    # Prepare the workspace
     - name: Git checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
-    - name: Set up JDK ${{ matrix.java }}
+    - name: Grant execute permission for the gradlew executable
+      # We also need to make Git ignore execute permission changes to avoid
+      # false positives in change detection
+      run: |
+        git config core.fileMode false
+        chmod +x gradlew
+    # Set up the languages and tools
+    - name: Set up JDK ${{ env.JDK_VERSION }}
       uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
-        java-version: ${{ matrix.java }}
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-    - name: Make Git ignore execute permission changes in files (like gradlew)
-      run: git config core.fileMode false
-    # Pull the the -init pipeline cache (read only)
-    - name: Set up the pipeline cache bringing the Nyx state
+        java-version: ${{ env.JDK_VERSION }}
+    # Set up the distributed caches used to share data among jobs
+    - name: Set up the pipeline-${{ github.run_id }}-nyx cache storing the Nyx state
       uses: actions/cache@v4
       with:
         path: |
-          build/
-        key: pipeline-${{ github.run_id }}-build-java
-    # Set up the SonarCloud cache
-    - name: Set up the SonarCloud cache
-      uses: actions/cache@v4
-      with:
-        path: ~/.sonar/cache
-        key: sonar-${{ github.run_id }}-${{ github.job }}
-        restore-keys: sonar-${{ github.run_id }}-${{ github.job }}
-    # Start from the -build-java cache and save the job output cache as -java-unit-test
-    - name: Set up the Java cache bringing Java artifacts
+          build/.nyx-summary.txt
+          build/.nyx-state.json
+        key: pipeline-${{ github.run_id }}-nyx
+    - name: Set up the pipeline-${{ github.run_id }}-java-unit-test cache storing the Java files
       uses: actions/cache@v4
       with:
         path: |
           modules/java/**/build/
-        key: java-${{ github.run_id }}-${{ github.job }}
+        key: pipeline-${{ github.run_id }}-java-unit-test
         restore-keys: |
-          java-${{ github.run_id }}-build-java
-    # Running the gradle-cache-action with no arguments makes it run just as a remote cache and not as a wrapper
-    - name: Enable the Gradle remote cache
+          pipeline-${{ github.run_id }}-build-java
+    - name: Set up the pipeline-${{ github.run_id }}-sonar cache storing SonarCloud files
+      uses: actions/cache@v4
+      with:
+        path: ~/.sonar/cache
+        key: pipeline-${{ github.run_id }}-sonar
+    - name: Enable the Gradle remote cache for distributed UP TO DATE checks
       uses: burrunan/gradle-cache-action@v2
       with:
-          # Disable warning about missing distributionSha256Sum property in gradle-wrapper.properties
-          gradle-distribution-sha-256-sum-warning: false
-    - name: Run Java Unit Tests with Gradle
+        # Disable warning about missing distributionSha256Sum property in gradle-wrapper.properties
+        gradle-distribution-sha-256-sum-warning: false
+    # Run the actual tasks for this job
+    - name: Run Java Unit Tests
       run: ./gradlew modules:java:test --build-cache --stacktrace
     - name: Upload code coverage statistics to Codecov
       uses: codecov/codecov-action@v3
@@ -521,13 +504,15 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: ./gradlew sonar --build-cache --stacktrace --info
-    - name: Archive Nyx state file
+    # Publish the job artifacts
+    - name: Publish the Nyx state and summary as job artifacts
       uses: actions/upload-artifact@v4
       if: ${{ always() }}
       with:
-        name: .nyx-state-${{ github.job }}-${{ matrix.java }}.json
-        path: build/.nyx-state.json
-    - name: Archive Test Outputs
+        name: .nyx-state-${{ github.job }}
+        path: build/.nyx-*.*
+        include-hidden-files: true
+    - name: Publish the Java unit test reports
       uses: actions/upload-artifact@v4
       if: ${{ always() }}
       with:
@@ -538,16 +523,15 @@ jobs:
           modules/java/**/build/reports/tests/test/
           modules/java/**/build/test-results/test/
   
-  # These tests may take a very long time to complete and their cache may easily go over the 5GB
-  # limit defined by GitHub Actions. This is why they are in a separate job and the output cache
-  # may fail to store at the end (but this won't affect other jobs).
   java-integration-test:
+    # These tests may take a very long time to complete and their cache may easily go over the 5GB
+    # limit defined by GitHub Actions. This is why they are in a separate job and the output cache
+    # may fail to store at the end (but this won't affect other jobs).
     name: Test (Integration) - Java ${{ matrix.java }}
     needs: java-unit-test
-    # This job is time consuming so only run it if:
-    # - the Java files have changed
-    # - a new release must be issued (this flag is inferred by Nyx), in which case we rebuild and test everything
-    if: needs.init.outputs.javaChanged == 'true' || needs.init.outputs.newRelease == 'true'
+    # Run this job conditionally to avoid running needless tasks and useless resource consumption
+    # TODO: re-enable this conditional
+    #if: needs.initialize.outputs.javaChanged == 'true' || needs.initialize.outputs.newRelease == 'true'
     # Avoid jobs invoking remote services to run in parallel to avoid throttling down by those services (with consequent test failures).
     # See https://github.com/mooltiverse/nyx/issues/206 for more
     concurrency:
@@ -561,51 +545,53 @@ jobs:
         java: [ '17', '20' ]
     runs-on: ubuntu-latest
     steps:
+    # Prepare the workspace
     - name: Git checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
-    - name: Set up JDK ${{ matrix.java }}
+    - name: Grant execute permission for the gradlew executable
+      # We also need to make Git ignore execute permission changes to avoid
+      # false positives in change detection
+      run: |
+        git config core.fileMode false
+        chmod +x gradlew
+    # Set up the languages and tools
+    - name: Set up JDK ${{ env.JDK_VERSION }}
       uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
-        java-version: ${{ matrix.java }}
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-    - name: Make Git ignore execute permission changes in files (like gradlew)
-      run: git config core.fileMode false
-    # Pull the the -init pipeline cache (read only)
-    - name: Set up the pipeline cache bringing the Nyx state
+        java-version: ${{ env.JDK_VERSION }}
+    # Set up the distributed caches used to share data among jobs
+    - name: Set up the pipeline-${{ github.run_id }}-nyx cache storing the Nyx state
       uses: actions/cache@v4
       with:
         path: |
-          build/
-        key: pipeline-${{ github.run_id }}-build-java
-    # Set up the SonarCloud cache
-    - name: Set up the SonarCloud cache
-      uses: actions/cache@v4
-      with:
-        path: ~/.sonar/cache
-        key: sonar-${{ github.run_id }}-${{ github.job }}
-        restore-keys: sonar-${{ github.run_id }}-${{ github.job }}
-    # Start from the -java-unit-test cache and save the job output cache as -java-integration-test
-    - name: Set up the Java cache bringing Java artifacts
+          build/.nyx-summary.txt
+          build/.nyx-state.json
+        key: pipeline-${{ github.run_id }}-nyx
+    - name: Set up the pipeline-${{ github.run_id }}-java-integration-test cache storing the Java files
       uses: actions/cache@v4
       with:
         path: |
           modules/java/**/build/
-        key: java-${{ github.run_id }}-${{ github.job }}
+        key: pipeline-${{ github.run_id }}-java-integration-test
         restore-keys: |
-          java-${{ github.run_id }}-java-unit-test
-    # Running the gradle-cache-action with no arguments makes it run just as a remote cache and not as a wrapper
-    - name: Enable the Gradle remote cache
+          pipeline-${{ github.run_id }}-java-unit-test
+    - name: Set up the pipeline-${{ github.run_id }}-sonar cache storing SonarCloud files
+      uses: actions/cache@v4
+      with:
+        path: ~/.sonar/cache
+        key: pipeline-${{ github.run_id }}-sonar
+    - name: Enable the Gradle remote cache for distributed UP TO DATE checks
       uses: burrunan/gradle-cache-action@v2
       with:
-          # Disable warning about missing distributionSha256Sum property in gradle-wrapper.properties
-          gradle-distribution-sha-256-sum-warning: false
+        # Disable warning about missing distributionSha256Sum property in gradle-wrapper.properties
+        gradle-distribution-sha-256-sum-warning: false
+    # Run the actual tasks for this job
     - name: Show current GitHub rate limits for test user nyxtest20200701
       run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
-    - name: Run Java Integration Tests with Gradle
+    - name: Run Java Integration Tests
       env:
         # See the top level https://github.com/mooltiverse/nyx/blob/main/CONTRIBUTING.md#contributing-code file for details about passing these values when testing locally
         ORG_GRADLE_PROJECT_gitHubTestUserToken: ${{ secrets.TEST_GITHUB_USER_TOKEN }}                                                # The test user token to test Nyx GitHub features
@@ -636,13 +622,15 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: ./gradlew sonar --build-cache --stacktrace --info
-    - name: Archive Nyx state file
+    # Publish the job artifacts
+    - name: Publish the Nyx state and summary as job artifacts
       uses: actions/upload-artifact@v4
       if: ${{ always() }}
       with:
-        name: .nyx-state-${{ github.job }}-${{ matrix.java }}.json
-        path: build/.nyx-state.json
-    - name: Archive Test Outputs
+        name: .nyx-state-${{ github.job }}
+        path: build/.nyx-*.*
+        include-hidden-files: true
+    - name: Publish the Java integration test reports
       uses: actions/upload-artifact@v4
       if: ${{ always() }}
       with:
@@ -653,16 +641,15 @@ jobs:
           modules/java/**/build/reports/tests/integrationTest/
           modules/java/**/build/test-results/integrationTest/
   
-  # These tests may take a very long time to complete and their cache may easily go over the 5GB
-  # limit defined by GitHub Actions. This is why they are in a separate job and the output cache
-  # may fail to store at the end (but this won't affect other jobs).
   java-functional-test:
+    # These tests may take a very long time to complete and their cache may easily go over the 5GB
+    # limit defined by GitHub Actions. This is why they are in a separate job and the output cache
+    # may fail to store at the end (but this won't affect other jobs).
     name: Test (Functional) - Java ${{ matrix.java }}
     needs: java-integration-test
-    # This job is time consuming so only run it if:
-    # - the Java files have changed
-    # - a new release must be issued (this flag is inferred by Nyx), in which case we rebuild and test everything
-    if: needs.init.outputs.javaChanged == 'true' || needs.init.outputs.newRelease == 'true'
+    # Run this job conditionally to avoid running needless tasks and useless resource consumption
+    # TODO: re-enable this conditional
+    #if: needs.initialize.outputs.javaChanged == 'true' || needs.initialize.outputs.newRelease == 'true'
     # Avoid jobs invoking remote services to run in parallel to avoid throttling down by those services (with consequent test failures).
     # See https://github.com/mooltiverse/nyx/issues/206 for more
     concurrency:
@@ -676,52 +663,54 @@ jobs:
         java: [ '17', '20' ]
     runs-on: ubuntu-latest
     steps:
+    # Prepare the workspace
     - name: Git checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
-    - name: Set up JDK ${{ matrix.java }}
+    - name: Grant execute permission for the gradlew executable
+      # We also need to make Git ignore execute permission changes to avoid
+      # false positives in change detection
+      run: |
+        git config core.fileMode false
+        chmod +x gradlew
+    # Set up the languages and tools
+    - name: Set up JDK ${{ env.JDK_VERSION }}
       uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
-        java-version: ${{ matrix.java }}
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-    - name: Make Git ignore execute permission changes in files (like gradlew)
-      run: git config core.fileMode false
-    # Pull the the -init pipeline cache (read only)
-    - name: Set up the pipeline cache bringing the Nyx state
+        java-version: ${{ env.JDK_VERSION }}
+    # Set up the distributed caches used to share data among jobs
+    - name: Set up the pipeline-${{ github.run_id }}-nyx cache storing the Nyx state
       uses: actions/cache@v4
       with:
         path: |
-          build/
-        key: pipeline-${{ github.run_id }}-build-java
-    # Set up the SonarCloud cache
-    - name: Set up the SonarCloud cache
-      uses: actions/cache@v4
-      with:
-        path: ~/.sonar/cache
-        key: sonar-${{ github.run_id }}-${{ github.job }}
-        restore-keys: sonar-${{ github.run_id }}-${{ github.job }}
-    # Start from the -java-integration-test cache and save the job output cache as -java-functional-test
-    - name: Set up the Java cache bringing Java artifacts
+          build/.nyx-summary.txt
+          build/.nyx-state.json
+        key: pipeline-${{ github.run_id }}-nyx
+    - name: Set up the pipeline-${{ github.run_id }}-java-integration-test cache storing the Java files
       uses: actions/cache@v4
       with:
         path: |
           modules/java/**/build/
-        key: java-${{ github.run_id }}-java-integration-test
+        key: pipeline-${{ github.run_id }}-java-integration-test
         restore-keys: |
-          java-${{ github.run_id }}-java-integration-test
-    # Running the gradle-cache-action with no arguments makes it run just as a remote cache and not as a wrapper
-    - name: Enable the Gradle remote cache
+          pipeline-${{ github.run_id }}-java-integration-test
+    - name: Set up the pipeline-${{ github.run_id }}-sonar cache storing SonarCloud files
+      uses: actions/cache@v4
+      with:
+        path: ~/.sonar/cache
+        key: pipeline-${{ github.run_id }}-sonar
+    - name: Enable the Gradle remote cache for distributed UP TO DATE checks
       uses: burrunan/gradle-cache-action@v2
       with:
-          # Disable warning about missing distributionSha256Sum property in gradle-wrapper.properties
-          gradle-distribution-sha-256-sum-warning: false
+        # Disable warning about missing distributionSha256Sum property in gradle-wrapper.properties
+        gradle-distribution-sha-256-sum-warning: false
+    # Run the actual tasks for this job
     - name: Show current GitHub rate limits for test user nyxtest20200701
       run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
     # Add the -PquickTests=true option to the Gradle command line to narrow the number of tests
-    - name: Run Java Functional Tests with Gradle
+    - name: Run Java Functional Tests
       env:
         # See the top level https://github.com/mooltiverse/nyx/blob/main/CONTRIBUTING.md#contributing-code file for details about passing these values when testing locally
         ORG_GRADLE_PROJECT_gitHubTestUserToken: ${{ secrets.TEST_GITHUB_USER_TOKEN }}                                                # The test user token to test Nyx GitHub features
@@ -752,13 +741,15 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: ./gradlew sonar --build-cache --stacktrace --info
-    - name: Archive Nyx state file
+    # Publish the job artifacts
+    - name: Publish the Nyx state and summary as job artifacts
       uses: actions/upload-artifact@v4
       if: ${{ always() }}
       with:
-        name: .nyx-state-${{ github.job }}-${{ matrix.java }}.json
-        path: build/.nyx-state.json
-    - name: Archive Test Outputs
+        name: .nyx-state-${{ github.job }}
+        path: build/.nyx-*.*
+        include-hidden-files: true
+    - name: Publish the Java functional test reports
       uses: actions/upload-artifact@v4
       if: ${{ always() }}
       with:
@@ -772,64 +763,65 @@ jobs:
   go-unit-test:
     name: Test (Unit) - Go
     needs: build-go
-    # This job is time consuming so only run it if:
-    # - the Go files have changed
-    # - a new release must be issued (this flag is inferred by Nyx), in which case we rebuild and test everything
-    if: needs.init.outputs.goChanged == 'true' || needs.init.outputs.newRelease == 'true'
+    # Run this job conditionally to avoid running needless tasks and useless resource consumption
+    # TODO: re-enable this conditional
+    #if: needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.newRelease == 'true'
     strategy:
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.os }}
     steps:
+    # Prepare the workspace
     - name: Git checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
-    - name: Set up JDK 20
+    - name: Grant execute permission for the gradlew executable
+      # We also need to make Git ignore execute permission changes to avoid
+      # false positives in change detection
+      run: |
+        git config core.fileMode false
+        chmod +x gradlew
+    # Set up the languages and tools
+    - name: Set up JDK ${{ env.JDK_VERSION }}
       uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
-        java-version: 20
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-    - name: Make Git ignore execute permission changes in files (like gradlew)
-      run: git config core.fileMode false
-    - name: Set up Go 1.22.4
+        java-version: ${{ env.JDK_VERSION }}
+    - name: Set up Go ${{ env.GO_VERSION }}
       uses: actions/setup-go@v3
       with:
-        go-version: 1.22.4
-    # Pull the the -init pipeline cache (read only)
-    - name: Set up the pipeline cache bringing the Nyx state
+        go-version: ${{ env.GO_VERSION }}
+    # Set up the distributed caches used to share data among jobs
+    - name: Set up the pipeline-${{ github.run_id }}-nyx cache storing the Nyx state
       uses: actions/cache@v4
       with:
         path: |
-          build/
-        key: pipeline-${{ github.run_id }}-build-java
-    # Set up the SonarCloud cache
-    - name: Set up the SonarCloud cache
-      uses: actions/cache@v4
-      with:
-        path: ~/.sonar/cache
-        key: sonar-${{ github.run_id }}-${{ github.job }}
-        restore-keys: sonar-${{ github.run_id }}-${{ github.job }}
-    # Start from the -build-go cache and save the job output cache as -go-unit-test
-    - name: Set up the Go cache bringing Go artifacts
+          build/.nyx-summary.txt
+          build/.nyx-state.json
+        key: pipeline-${{ github.run_id }}-nyx
+    - name: Set up the pipeline-${{ github.run_id }}-go-unit-test cache storing the Go files
       uses: actions/cache@v4
       with:
         path: |
           modules/go/**/build/
           ~/.cache/go-build
           ~/go/pkg/mod
-        key: go-${{ github.run_id }}-${{ github.job }}
+        key: pipeline-${{ github.run_id }}-go-unit-test
         restore-keys: |
-          go-${{ github.run_id }}-build-go
-    # Running the gradle-cache-action with no arguments makes it run just as a remote cache and not as a wrapper
-    - name: Enable the Gradle remote cache
+          pipeline-${{ github.run_id }}-build-go
+    - name: Set up the pipeline-${{ github.run_id }}-sonar cache storing SonarCloud files
+      uses: actions/cache@v4
+      with:
+        path: ~/.sonar/cache
+        key: pipeline-${{ github.run_id }}-sonar
+    - name: Enable the Gradle remote cache for distributed UP TO DATE checks
       uses: burrunan/gradle-cache-action@v2
       with:
-          # Disable warning about missing distributionSha256Sum property in gradle-wrapper.properties
-          gradle-distribution-sha-256-sum-warning: false
-    - name: Run Go Unit Tests with Gradle
+        # Disable warning about missing distributionSha256Sum property in gradle-wrapper.properties
+        gradle-distribution-sha-256-sum-warning: false
+    # Run the actual tasks for this job
+    - name: Run Go Unit Tests
       run: ./gradlew modules:go:test --build-cache --stacktrace
     - name: Upload code coverage statistics to Codecov
       uses: codecov/codecov-action@v3
@@ -846,13 +838,15 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: ./gradlew sonar --build-cache --stacktrace --info
-    - name: Archive Nyx state file
+    # Publish the job artifacts
+    - name: Publish the Nyx state and summary as job artifacts
       uses: actions/upload-artifact@v4
       if: ${{ always() }}
       with:
-        name: .nyx-state-${{ github.job }}-${{ matrix.os }}.json
-        path: build/.nyx-state.json
-    - name: Archive Test Outputs
+        name: .nyx-state-${{ github.job }}
+        path: build/.nyx-*.*
+        include-hidden-files: true
+    - name: Publish the Go unit test reports
       uses: actions/upload-artifact@v4
       if: ${{ always() }}
       with:
@@ -861,16 +855,15 @@ jobs:
           modules/go/**/build/reports/tests/test/
           modules/go/**/build/test-results/test/
   
-  # These tests may take a very long time to complete and their cache may easily go over the 5GB
-  # limit defined by GitHub Actions. This is why they are in a separate job and the output cache
-  # may fail to store at the end (but this won't affect other jobs).
   go-integration-test:
+    # These tests may take a very long time to complete and their cache may easily go over the 5GB
+    # limit defined by GitHub Actions. This is why they are in a separate job and the output cache
+    # may fail to store at the end (but this won't affect other jobs).
     name: Test (Integration) - Go
     needs: go-unit-test
-    # This job is time consuming so only run it if:
-    # - the Go files have changed
-    # - a new release must be issued (this flag is inferred by Nyx), in which case we rebuild and test everything
-    if: needs.init.outputs.goChanged == 'true' || needs.init.outputs.newRelease == 'true'
+    # Run this job conditionally to avoid running needless tasks and useless resource consumption
+    # TODO: re-enable this conditional
+    #if: needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.newRelease == 'true'
     # Avoid jobs invoking remote services to run in parallel to avoid throttling down by those services (with consequent test failures).
     # See https://github.com/mooltiverse/nyx/issues/206 for more
     concurrency:
@@ -881,58 +874,60 @@ jobs:
         os: [macos-latest, ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.os }}
     steps:
+    # Prepare the workspace
     - name: Git checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
-    - name: Set up JDK 20
+    - name: Grant execute permission for the gradlew executable
+      # We also need to make Git ignore execute permission changes to avoid
+      # false positives in change detection
+      run: |
+        git config core.fileMode false
+        chmod +x gradlew
+    # Set up the languages and tools
+    - name: Set up JDK ${{ env.JDK_VERSION }}
       uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
-        java-version: 20
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-    - name: Make Git ignore execute permission changes in files (like gradlew)
-      run: git config core.fileMode false
-    - name: Set up Go 1.22.4
+        java-version: ${{ env.JDK_VERSION }}
+    - name: Set up Go ${{ env.GO_VERSION }}
       uses: actions/setup-go@v3
       with:
-        go-version: 1.22.4
-    # Pull the the -init pipeline cache (read only)
-    - name: Set up the pipeline cache bringing the Nyx state
+        go-version: ${{ env.GO_VERSION }}
+    # Set up the distributed caches used to share data among jobs
+    - name: Set up the pipeline-${{ github.run_id }}-nyx cache storing the Nyx state
       uses: actions/cache@v4
       with:
         path: |
-          build/
-        key: pipeline-${{ github.run_id }}-build-java
-    # Set up the SonarCloud cache
-    - name: Set up the SonarCloud cache
-      uses: actions/cache@v4
-      with:
-        path: ~/.sonar/cache
-        key: sonar-${{ github.run_id }}-${{ github.job }}
-        restore-keys: sonar-${{ github.run_id }}-${{ github.job }}
-    # Start from the -go-unit-test cache and save the job output cache as -go-integration-test
-    - name: Set up the Go cache bringing Go artifacts
+          build/.nyx-summary.txt
+          build/.nyx-state.json
+        key: pipeline-${{ github.run_id }}-nyx
+    - name: Set up the pipeline-${{ github.run_id }}-go-integration-test cache storing the Go files
       uses: actions/cache@v4
       with:
         path: |
           modules/go/**/build/
           ~/.cache/go-build
           ~/go/pkg/mod
-        key: go-${{ github.run_id }}-${{ github.job }}
+        key: pipeline-${{ github.run_id }}-go-integration-test
         restore-keys: |
-          go-${{ github.run_id }}-go-unit-test
-    # Running the gradle-cache-action with no arguments makes it run just as a remote cache and not as a wrapper
-    - name: Enable the Gradle remote cache
+          pipeline-${{ github.run_id }}-go-unit-test
+    - name: Set up the pipeline-${{ github.run_id }}-sonar cache storing SonarCloud files
+      uses: actions/cache@v4
+      with:
+        path: ~/.sonar/cache
+        key: pipeline-${{ github.run_id }}-sonar
+    - name: Enable the Gradle remote cache for distributed UP TO DATE checks
       uses: burrunan/gradle-cache-action@v2
       with:
-          # Disable warning about missing distributionSha256Sum property in gradle-wrapper.properties
-          gradle-distribution-sha-256-sum-warning: false
+        # Disable warning about missing distributionSha256Sum property in gradle-wrapper.properties
+        gradle-distribution-sha-256-sum-warning: false
+    # Run the actual tasks for this job
     - name: Show current GitHub rate limits for test user nyxtest20200701
       if: ${{ matrix.os == 'ubuntu-latest' }} # This command is only supported on Linux
       run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
-    - name: Run Go Integration Tests with Gradle
+    - name: Run Go Integration Tests
       env:
         # See the top level https://github.com/mooltiverse/nyx/blob/main/CONTRIBUTING.md#contributing-code file for details about passing these values when testing locally
         ORG_GRADLE_PROJECT_gitHubTestUserToken: ${{ secrets.TEST_GITHUB_USER_TOKEN }}                                                # The test user token to test Nyx GitHub features
@@ -964,13 +959,15 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: ./gradlew sonar --build-cache --stacktrace --info
-    - name: Archive Nyx state file
+    # Publish the job artifacts
+    - name: Publish the Nyx state and summary as job artifacts
       uses: actions/upload-artifact@v4
       if: ${{ always() }}
       with:
-        name: .nyx-state-${{ github.job }}-${{ matrix.os }}.json
-        path: build/.nyx-state.json
-    - name: Archive Test Outputs
+        name: .nyx-state-${{ github.job }}
+        path: build/.nyx-*.*
+        include-hidden-files: true
+    - name: Publish the Go integration test reports
       uses: actions/upload-artifact@v4
       if: ${{ always() }}
       with:
@@ -979,16 +976,15 @@ jobs:
           modules/go/**/build/reports/tests/integrationTest/
           modules/go/**/build/test-results/integrationTest/
 
-  # These tests may take a very long time to complete and their cache may easily go over the 5GB
-  # limit defined by GitHub Actions. This is why they are in a separate job and the output cache
-  # may fail to store at the end (but this won't affect other jobs).
   go-functional-test:
+    # These tests may take a very long time to complete and their cache may easily go over the 5GB
+    # limit defined by GitHub Actions. This is why they are in a separate job and the output cache
+    # may fail to store at the end (but this won't affect other jobs).
     name: Test (Functional) - Go
     needs: go-integration-test
-    # This job is time consuming so only run it if:
-    # - the Go files have changed
-    # - a new release must be issued (this flag is inferred by Nyx), in which case we rebuild and test everything
-    if: needs.init.outputs.goChanged == 'true' || needs.init.outputs.newRelease == 'true'
+    # Run this job conditionally to avoid running needless tasks and useless resource consumption
+    # TODO: re-enable this conditional
+    #if: needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.newRelease == 'true'
     # Avoid jobs invoking remote services to run in parallel to avoid throttling down by those services (with consequent test failures).
     # See https://github.com/mooltiverse/nyx/issues/206 for more
     concurrency:
@@ -999,59 +995,61 @@ jobs:
         os: [macos-latest, ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.os }}
     steps:
+    # Prepare the workspace
     - name: Git checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
-    - name: Set up JDK 20
+    - name: Grant execute permission for the gradlew executable
+      # We also need to make Git ignore execute permission changes to avoid
+      # false positives in change detection
+      run: |
+        git config core.fileMode false
+        chmod +x gradlew
+    # Set up the languages and tools
+    - name: Set up JDK ${{ env.JDK_VERSION }}
       uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
-        java-version: 20
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-    - name: Make Git ignore execute permission changes in files (like gradlew)
-      run: git config core.fileMode false
-    - name: Set up Go 1.22.4
+        java-version: ${{ env.JDK_VERSION }}
+    - name: Set up Go ${{ env.GO_VERSION }}
       uses: actions/setup-go@v3
       with:
-        go-version: 1.22.4
-    # Pull the the -init pipeline cache (read only)
-    - name: Set up the pipeline cache bringing the Nyx state
+        go-version: ${{ env.GO_VERSION }}
+    # Set up the distributed caches used to share data among jobs
+    - name: Set up the pipeline-${{ github.run_id }}-nyx cache storing the Nyx state
       uses: actions/cache@v4
       with:
         path: |
-          build/
-        key: pipeline-${{ github.run_id }}-build-java
-    # Set up the SonarCloud cache
-    - name: Set up the SonarCloud cache
-      uses: actions/cache@v4
-      with:
-        path: ~/.sonar/cache
-        key: sonar-${{ github.run_id }}-${{ github.job }}
-        restore-keys: sonar-${{ github.run_id }}-${{ github.job }}
-    # Start from the -go-integration-test cache and save the job output cache as -go-functional-test
-    - name: Set up the Go cache bringing Go artifacts
+          build/.nyx-summary.txt
+          build/.nyx-state.json
+        key: pipeline-${{ github.run_id }}-nyx
+    - name: Set up the pipeline-${{ github.run_id }}-go-functional-test cache storing the Go files
       uses: actions/cache@v4
       with:
         path: |
           modules/go/**/build/
           ~/.cache/go-build
           ~/go/pkg/mod
-        key: go-${{ github.run_id }}-${{ github.job }}
+        key: pipeline-${{ github.run_id }}-go-functional-test
         restore-keys: |
-          go-${{ github.run_id }}-go-integration-test
-    # Running the gradle-cache-action with no arguments makes it run just as a remote cache and not as a wrapper
-    - name: Enable the Gradle remote cache
+          pipeline-${{ github.run_id }}-go-integration-test
+    - name: Set up the pipeline-${{ github.run_id }}-sonar cache storing SonarCloud files
+      uses: actions/cache@v4
+      with:
+        path: ~/.sonar/cache
+        key: pipeline-${{ github.run_id }}-sonar
+    - name: Enable the Gradle remote cache for distributed UP TO DATE checks
       uses: burrunan/gradle-cache-action@v2
       with:
-          # Disable warning about missing distributionSha256Sum property in gradle-wrapper.properties
-          gradle-distribution-sha-256-sum-warning: false
+        # Disable warning about missing distributionSha256Sum property in gradle-wrapper.properties
+        gradle-distribution-sha-256-sum-warning: false
+    # Run the actual tasks for this job
     - name: Show current GitHub rate limits for test user nyxtest20200701
       if: ${{ matrix.os == 'ubuntu-latest' }} # This command is only supported on Linux
       run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
     # Add the -PquickTests=true option to the Gradle command line to narrow the number of tests
-    - name: Run Go Functional Tests with Gradle
+    - name: Run Go Functional Tests
       env:
         # See the top level https://github.com/mooltiverse/nyx/blob/main/CONTRIBUTING.md#contributing-code file for details about passing these values when testing locally
         ORG_GRADLE_PROJECT_gitHubTestUserToken: ${{ secrets.TEST_GITHUB_USER_TOKEN }}                                                # The test user token to test Nyx GitHub features
@@ -1083,13 +1081,15 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: ./gradlew sonar --build-cache --stacktrace --info
-    - name: Archive Nyx state file
+    # Publish the job artifacts
+    - name: Publish the Nyx state and summary as job artifacts
       uses: actions/upload-artifact@v4
       if: ${{ always() }}
       with:
-        name: .nyx-state-${{ github.job }}-${{ matrix.os }}.json
-        path: build/.nyx-state.json
-    - name: Archive Test Outputs
+        name: .nyx-state-${{ github.job }}
+        path: build/.nyx-*.*
+        include-hidden-files: true
+    - name: Publish the Go functional test reports
       uses: actions/upload-artifact@v4
       if: ${{ always() }}
       with:
@@ -1098,16 +1098,15 @@ jobs:
           modules/go/**/build/reports/tests/functionalTest/
           modules/go/**/build/test-results/functionalTest/
 
-  # These tests may take a very long time to complete and their cache may easily go over the 5GB
-  # limit defined by GitHub Actions. This is why they are in a separate job and the output cache
-  # may fail to store at the end (but this won't affect other jobs).
   docker-functional-test:
+    # These tests may take a very long time to complete and their cache may easily go over the 5GB
+    # limit defined by GitHub Actions. This is why they are in a separate job and the output cache
+    # may fail to store at the end (but this won't affect other jobs).
     name: Test (Functional) - Docker
     needs: build-docker
-    # This job is time consuming so only run it if:
-    # - the Docker files have changed
-    # - a new release must be issued (this flag is inferred by Nyx), in which case we rebuild and test everything
-    if: needs.init.outputs.dockerChanged == 'true' || needs.init.outputs.goChanged == 'true' || needs.init.outputs.newRelease == 'true'
+    # Run this job conditionally to avoid running needless tasks and useless resource consumption
+    # TODO: re-enable this conditional
+    #if: needs.initialize.outputs.dockerChanged == 'true' || needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.newRelease == 'true'
     # Avoid jobs invoking remote services to run in parallel to avoid throttling down by those services (with consequent test failures).
     # See https://github.com/mooltiverse/nyx/issues/206 for more
     concurrency:
@@ -1115,58 +1114,60 @@ jobs:
       cancel-in-progress: false
     runs-on: ubuntu-latest
     steps:
+    # Prepare the workspace
     - name: Git checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
-    - name: Set up JDK 20
+    - name: Grant execute permission for the gradlew executable
+      # We also need to make Git ignore execute permission changes to avoid
+      # false positives in change detection
+      run: |
+        git config core.fileMode false
+        chmod +x gradlew
+    # Set up the languages and tools
+    - name: Set up JDK ${{ env.JDK_VERSION }}
       uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
-        java-version: 20
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-    - name: Make Git ignore execute permission changes in files (like gradlew)
-      run: git config core.fileMode false
-    - name: Set up Go 1.22.4
+        java-version: ${{ env.JDK_VERSION }}
+    - name: Set up Go ${{ env.GO_VERSION }}
       uses: actions/setup-go@v3
       with:
-        go-version: 1.22.4
-    # Pull the the -init pipeline cache (read only)
-    - name: Set up the pipeline cache bringing the Nyx state
+        go-version: ${{ env.GO_VERSION }}
+    # Set up the distributed caches used to share data among jobs
+    - name: Set up the pipeline-${{ github.run_id }}-nyx cache storing the Nyx state
       uses: actions/cache@v4
       with:
         path: |
-          build/
-        key: pipeline-${{ github.run_id }}-build-java
-    # Set up the SonarCloud cache
-    - name: Set up the SonarCloud cache
-      uses: actions/cache@v4
-      with:
-        path: ~/.sonar/cache
-        key: sonar-${{ github.run_id }}-${{ github.job }}
-        restore-keys: sonar-${{ github.run_id }}-${{ github.job }}
-    # Start from the -build-docker cache and save the job output cache as -docker-functional-test
-    - name: Set up the Go cache bringing Go artifacts
+          build/.nyx-summary.txt
+          build/.nyx-state.json
+        key: pipeline-${{ github.run_id }}-nyx
+    - name: Set up the pipeline-${{ github.run_id }}-docker-functional-test cache storing the Docker files
       uses: actions/cache@v4
       with:
         path: |
           modules/go/**/build/
           ~/.cache/go-build
           ~/go/pkg/mod
-        key: docker-${{ github.run_id }}-${{ github.job }}
+        key: pipeline-${{ github.run_id }}-docker-functional-test
         restore-keys: |
-          docker-${{ github.run_id }}-build-docker
-    # Running the gradle-cache-action with no arguments makes it run just as a remote cache and not as a wrapper
-    - name: Enable the Gradle remote cache
+          pipeline-${{ github.run_id }}-build-docker
+    - name: Set up the pipeline-${{ github.run_id }}-sonar cache storing SonarCloud files
+      uses: actions/cache@v4
+      with:
+        path: ~/.sonar/cache
+        key: pipeline-${{ github.run_id }}-sonar
+    - name: Enable the Gradle remote cache for distributed UP TO DATE checks
       uses: burrunan/gradle-cache-action@v2
       with:
-          # Disable warning about missing distributionSha256Sum property in gradle-wrapper.properties
-          gradle-distribution-sha-256-sum-warning: false
+        # Disable warning about missing distributionSha256Sum property in gradle-wrapper.properties
+        gradle-distribution-sha-256-sum-warning: false
+    # Run the actual tasks for this job
     - name: Show current GitHub rate limits for test user nyxtest20200701
       run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
     # Add the -PquickTests=true option to the Gradle command line to narrow the number of tests
-    - name: Run Docker Functional Tests with Gradle
+    - name: Run Docker Functional Tests
       env:
         # See the top level https://github.com/mooltiverse/nyx/blob/main/CONTRIBUTING.md#contributing-code file for details about passing these values when testing locally
         ORG_GRADLE_PROJECT_gitHubTestUserToken: ${{ secrets.TEST_GITHUB_USER_TOKEN }}                                                # The test user token to test Nyx GitHub features
@@ -1197,17 +1198,19 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: ./gradlew sonar --build-cache --stacktrace --info
-    - name: Archive Nyx state file
+    # Publish the job artifacts
+    - name: Publish the Nyx state and summary as job artifacts
       uses: actions/upload-artifact@v4
       if: ${{ always() }}
       with:
-        name: .nyx-state-${{ github.job }}.json
-        path: build/.nyx-state.json
+        name: .nyx-state-${{ github.job }}
+        path: build/.nyx-*.*
+        include-hidden-files: true
 
-###############################################################################################################################
-# FINAL JOBS
-# Here the serialized jobs to run when all of the above are succesful
-###############################################################################################################################
+  #############################################################################
+  # FINAL JOBS
+  # Here the serialized jobs to run when all of the above are succesful
+  #############################################################################
 
   publish:
     name: Publish
@@ -1215,77 +1218,83 @@ jobs:
     # Run this job only if:
     # - the Docker, Java or Go files have changed
     # - a new release must be issued (this flag is inferred by Nyx), in which case we rebuild and test everything
-    if: needs.init.outputs.dockerChanged == 'true' || needs.init.outputs.goChanged == 'true' || needs.init.outputs.javaChanged == 'true' || needs.init.outputs.newRelease == 'true'
+    # TODO: re-enable this conditional
+    #if: needs.initialize.outputs.dockerChanged == 'true' || needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.javaChanged == 'true' || needs.initialize.outputs.newRelease == 'true'
     runs-on: ubuntu-latest
     steps:
-      - name: Git checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Set up JDK 20
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: 20
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-      - name: Make Git ignore execute permission changes in files (like gradlew)
-        run: git config core.fileMode false
-      - name: Set up Go 1.22.4
-        uses: actions/setup-go@v3
-        with:
-          go-version: 1.22.4
-      # Start from the -init pipeline cache and save the job output pipeline cache as -publish
-      - name: Set up the pipeline cache bringing the Nyx state
-        uses: actions/cache@v4
-        with:
-          path: |
-            build/
-          key: pipeline-${{ github.run_id }}-${{ github.job }}
-          restore-keys: |
-            pipeline-${{ github.run_id }}-init
-      - name: Pull the Build cache bringing artifacts from the upstream Build jobs
-        uses: actions/cache@v4
-        with:
-          path: |
-            modules/java/**/build/
-            modules/go/**/build/
-            ~/.cache/go-build
-            ~/go/pkg/mod
-          key: build-${{ github.run_id }}
-      # Running the gradle-cache-action with no arguments makes it run just as a remote cache and not as a wrapper
-      - name: Enable the Gradle remote cache
-        uses: burrunan/gradle-cache-action@v2
-        with:
-          # Disable warning about missing distributionSha256Sum property in gradle-wrapper.properties
-          gradle-distribution-sha-256-sum-warning: false
-      - name: Show current GitHub rate limits for test user nyxtest20200701
-        run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
-      - name: Publish with Gradle
-        env:
-          # The variables used here are automatically configured using Terraform by
-          # the Infrastructure project.
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ORG_GRADLE_PROJECT_gitHubUser: ${{ github.actor }}
-          ORG_GRADLE_PROJECT_gitHubToken: ${{ secrets.GITHUB_TOKEN }}
-          ORG_GRADLE_PROJECT_dockerHubUser: ${{ secrets.DOCKER_HUB_USERNAME }}
-          ORG_GRADLE_PROJECT_dockerHubToken: ${{ secrets.DOCKER_HUB_TOKEN }}
-          ORG_GRADLE_PROJECT_ossrhUsername: ${{ secrets.MAVEN_USER }}
-          ORG_GRADLE_PROJECT_ossrhPassword: ${{ secrets.MAVEN_PASSWORD }}
-          ORG_GRADLE_PROJECT_signingKeyBase64: ${{ secrets.GPG_PRIVATE_KEY_BASE64 }}
-          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.GPC_PASSPHRASE }}
-          ORG_GRADLE_PROJECT_gradlePublishKey: ${{ secrets.GRADLE_PLUGIN_PUBLISH_KEY }}
-          ORG_GRADLE_PROJECT_gradlePublishSecret: ${{ secrets.GRADLE_PLUGIN_PUBLISH_SECRET }}
-        run: ./gradlew nyxMake nyxMark nyxPublish publish --build-cache --stacktrace
-      - name: Show current GitHub rate limits for test user nyxtest20200701
-        if: ${{ always() }}
-        run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
-      - name: Archive Nyx state file
-        uses: actions/upload-artifact@v4
-        if: ${{ always() }}
-        with:
-          name: .nyx-state-${{ github.job }}.json
-          path: build/.nyx-state.json
+    # Prepare the workspace
+    - name: Git checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: Grant execute permission for the gradlew executable
+      # We also need to make Git ignore execute permission changes to avoid
+      # false positives in change detection
+      run: |
+        git config core.fileMode false
+        chmod +x gradlew
+    # Set up the languages and tools
+    - name: Set up JDK ${{ env.JDK_VERSION }}
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: ${{ env.JDK_VERSION }}
+    - name: Set up Go ${{ env.GO_VERSION }}
+      uses: actions/setup-go@v3
+      with:
+        go-version: ${{ env.GO_VERSION }}
+    # Set up the distributed caches used to share data among jobs
+    - name: Set up the pipeline-${{ github.run_id }}-nyx cache storing the Nyx state
+      uses: actions/cache@v4
+      with:
+        path: |
+          build/.nyx-summary.txt
+          build/.nyx-state.json
+        key: pipeline-${{ github.run_id }}-nyx
+    - name: Set up the pipeline-${{ github.run_id }}-artifacts cache storing artifacts from all upstream jobs
+      uses: actions/cache@v4
+      with:
+        path: |
+          modules/java/**/build/
+          modules/go/**/build/
+          ~/.cache/go-build
+          ~/go/pkg/mod
+        key: pipeline-${{ github.run_id }}-artifacts
+    - name: Enable the Gradle remote cache for distributed UP TO DATE checks
+      uses: burrunan/gradle-cache-action@v2
+      with:
+        # Disable warning about missing distributionSha256Sum property in gradle-wrapper.properties
+        gradle-distribution-sha-256-sum-warning: false
+    # Run the actual tasks for this job
+    - name: Show current GitHub rate limits for test user nyxtest20200701
+      run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
+    - name: Publish
+      env:
+        # The variables used here are automatically configured using Terraform by
+        # the Infrastructure project.
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        ORG_GRADLE_PROJECT_gitHubUser: ${{ github.actor }}
+        ORG_GRADLE_PROJECT_gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+        ORG_GRADLE_PROJECT_dockerHubUser: ${{ secrets.DOCKER_HUB_USERNAME }}
+        ORG_GRADLE_PROJECT_dockerHubToken: ${{ secrets.DOCKER_HUB_TOKEN }}
+        ORG_GRADLE_PROJECT_ossrhUsername: ${{ secrets.MAVEN_USER }}
+        ORG_GRADLE_PROJECT_ossrhPassword: ${{ secrets.MAVEN_PASSWORD }}
+        ORG_GRADLE_PROJECT_signingKeyBase64: ${{ secrets.GPG_PRIVATE_KEY_BASE64 }}
+        ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.GPC_PASSPHRASE }}
+        ORG_GRADLE_PROJECT_gradlePublishKey: ${{ secrets.GRADLE_PLUGIN_PUBLISH_KEY }}
+        ORG_GRADLE_PROJECT_gradlePublishSecret: ${{ secrets.GRADLE_PLUGIN_PUBLISH_SECRET }}
+      run: ./gradlew nyxMake nyxMark nyxPublish publish --build-cache --stacktrace
+    - name: Show current GitHub rate limits for test user nyxtest20200701
+      if: ${{ always() }}
+      run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
+    # Publish the job artifacts
+    - name: Publish the Nyx state and summary as job artifacts
+      uses: actions/upload-artifact@v4
+      if: ${{ always() }}
+      with:
+        name: .nyx-state-${{ github.job }}
+        path: build/.nyx-*.*
+        include-hidden-files: true
 
   release:
     name: Release
@@ -1293,66 +1302,71 @@ jobs:
     # Run this job only if:
     # - the Docker, Java or Go files have changed
     # - a new release must be issued (this flag is inferred by Nyx), in which case we rebuild and test everything
-    if: needs.init.outputs.dockerChanged == 'true' || needs.init.outputs.goChanged == 'true' || needs.init.outputs.javaChanged == 'true' || needs.init.outputs.newRelease == 'true'
+    if: needs.initialize.outputs.dockerChanged == 'true' || needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.javaChanged == 'true' || needs.initialize.outputs.newRelease == 'true'
     runs-on: ubuntu-latest
     steps:
-      - name: Git checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Set up JDK 20
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: 20
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-      - name: Make Git ignore execute permission changes in files (like gradlew)
-        run: git config core.fileMode false
-      - name: Set up Go 1.22.4
-        uses: actions/setup-go@v3
-        with:
-          go-version: 1.22.4
-      # Start from the -publish pipeline cache and save the job output pipeline cache as -release
-      - name: Set up the pipeline cache bringing the Nyx state
-        uses: actions/cache@v4
-        with:
-          path: |
-            build/
-          key: pipeline-${{ github.run_id }}-${{ github.job }}
-          restore-keys: |
-            pipeline-${{ github.run_id }}-publish
-      - name: Pull the Build cache bringing artifacts from the upstream Build jobs
-        uses: actions/cache@v4
-        with:
-          path: |
-            modules/java/**/build/
-            modules/go/**/build/
-            ~/.cache/go-build
-            ~/go/pkg/mod
-          key: build-${{ github.run_id }}-${{ github.job }}
-      # Running the gradle-cache-action with no arguments makes it run just as a remote cache and not as a wrapper
-      - name: Enable the Gradle remote cache
-        uses: burrunan/gradle-cache-action@v2
-        with:
-          # Disable warning about missing distributionSha256Sum property in gradle-wrapper.properties
-          gradle-distribution-sha-256-sum-warning: false
-      - name: Show current GitHub rate limits for test user nyxtest20200701
-        run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
-      - name: Release with Gradle
-        env:
-          # The variables used here are automatically configured using Terraform by
-          # the Infrastructure project.
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ORG_GRADLE_PROJECT_gitHubUser: ${{ github.actor }}
-          ORG_GRADLE_PROJECT_gitHubToken: ${{ secrets.GITHUB_TOKEN }}
-        run: ./gradlew release --build-cache --stacktrace
-      - name: Show current GitHub rate limits for test user nyxtest20200701
-        if: ${{ always() }}
-        run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
-      - name: Archive Nyx state file
-        uses: actions/upload-artifact@v4
-        if: ${{ always() }}
-        with:
-          name: .nyx-state-${{ github.job }}.json
-          path: build/.nyx-state.json
+    # Prepare the workspace
+    - name: Git checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: Grant execute permission for the gradlew executable
+      # We also need to make Git ignore execute permission changes to avoid
+      # false positives in change detection
+      run: |
+        git config core.fileMode false
+        chmod +x gradlew
+    # Set up the languages and tools
+    - name: Set up JDK ${{ env.JDK_VERSION }}
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: ${{ env.JDK_VERSION }}
+    - name: Set up Go ${{ env.GO_VERSION }}
+      uses: actions/setup-go@v3
+      with:
+        go-version: ${{ env.GO_VERSION }}
+    # Set up the distributed caches used to share data among jobs
+    - name: Set up the pipeline-${{ github.run_id }}-nyx cache storing the Nyx state
+      uses: actions/cache@v4
+      with:
+        path: |
+          build/.nyx-summary.txt
+          build/.nyx-state.json
+        key: pipeline-${{ github.run_id }}-nyx
+    - name: Set up the pipeline-${{ github.run_id }}-artifacts cache storing artifacts from all upstream jobs
+      uses: actions/cache@v4
+      with:
+        path: |
+          modules/java/**/build/
+          modules/go/**/build/
+          ~/.cache/go-build
+          ~/go/pkg/mod
+        key: pipeline-${{ github.run_id }}-artifacts
+    - name: Enable the Gradle remote cache for distributed UP TO DATE checks
+      uses: burrunan/gradle-cache-action@v2
+      with:
+        # Disable warning about missing distributionSha256Sum property in gradle-wrapper.properties
+        gradle-distribution-sha-256-sum-warning: false
+    # Run the actual tasks for this job
+    - name: Show current GitHub rate limits for test user nyxtest20200701
+      run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
+    - name: Release
+      env:
+        # The variables used here are automatically configured using Terraform by
+        # the Infrastructure project.
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        ORG_GRADLE_PROJECT_gitHubUser: ${{ github.actor }}
+        ORG_GRADLE_PROJECT_gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+      run: ./gradlew release --build-cache --stacktrace
+    - name: Show current GitHub rate limits for test user nyxtest20200701
+      if: ${{ always() }}
+      run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
+    # Publish the job artifacts
+    - name: Publish the Nyx state and summary as job artifacts
+      uses: actions/upload-artifact@v4
+      if: ${{ always() }}
+      with:
+        name: .nyx-state-${{ github.job }}
+        path: build/.nyx-*.*
+        include-hidden-files: true
