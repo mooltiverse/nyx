@@ -155,8 +155,7 @@ jobs:
     name: Build - Java
     needs: [initialize]
     # Run this job conditionally to avoid running needless tasks and useless resource consumption
-    # TODO: re-enable this conditional
-    #if: needs.initialize.outputs.javaChanged == 'true' || needs.initialize.outputs.newRelease == 'true'
+    if: needs.initialize.outputs.javaChanged == 'true' || needs.initialize.outputs.newRelease == 'true'
     runs-on: ubuntu-latest
     steps:
     # Prepare the workspace
@@ -231,8 +230,7 @@ jobs:
     name: Build - Go
     needs: [initialize]
     # Run this job conditionally to avoid running needless tasks and useless resource consumption
-    # TODO: re-enable this conditional
-    #if: needs.initialize.outputs.dockerChanged == 'true' || needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.newRelease == 'true'
+    if: needs.initialize.outputs.dockerChanged == 'true' || needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.newRelease == 'true'
     runs-on: ubuntu-latest
     steps:
     # Prepare the workspace
@@ -308,8 +306,7 @@ jobs:
     name: Build - Docker
     needs: build-go
     # Run this job conditionally to avoid running needless tasks and useless resource consumption
-    # TODO: re-enable this conditional
-    #if: needs.initialize.outputs.dockerChanged == 'true' || needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.newRelease == 'true'
+    if: needs.initialize.outputs.dockerChanged == 'true' || needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.newRelease == 'true'
     runs-on: ubuntu-latest
     steps:
     # Prepare the workspace
@@ -384,8 +381,7 @@ jobs:
     name: Merge build artifacts
     needs: [build-java,build-go,build-docker]
     # Run this job conditionally to avoid running needless tasks and useless resource consumption
-    # TODO: re-enable this conditional
-    #if: needs.initialize.outputs.dockerChanged == 'true' || needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.javaChanged == 'true' || needs.initialize.outputs.newRelease == 'true'
+    if: needs.initialize.outputs.dockerChanged == 'true' || needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.javaChanged == 'true' || needs.initialize.outputs.newRelease == 'true'
     runs-on: ubuntu-latest
     steps:
     # Set up the distributed caches used to share data among jobs
@@ -434,8 +430,7 @@ jobs:
     name: Test (Unit) - Java ${{ matrix.java }}
     needs: build-java
     # Run this job conditionally to avoid running needless tasks and useless resource consumption
-    # TODO: re-enable this conditional
-    #if: needs.initialize.outputs.javaChanged == 'true' || needs.initialize.outputs.newRelease == 'true'
+    if: needs.initialize.outputs.javaChanged == 'true' || needs.initialize.outputs.newRelease == 'true'
     # The recommended JDK version is 17 or above but since we need to test for backward compatibility to JVMs 17 or newer we
     # need a matrix here. Depending on the JDK version the set of Gradle version that the tests run on will change, according
     # to the Gradle compatibility matrix. See CONTRIBUTING.md in the root directory or the Gradle functional test suites for more.
@@ -530,8 +525,7 @@ jobs:
     name: Test (Integration) - Java ${{ matrix.java }}
     needs: java-unit-test
     # Run this job conditionally to avoid running needless tasks and useless resource consumption
-    # TODO: re-enable this conditional
-    #if: needs.initialize.outputs.javaChanged == 'true' || needs.initialize.outputs.newRelease == 'true'
+    if: needs.initialize.outputs.javaChanged == 'true' || needs.initialize.outputs.newRelease == 'true'
     # Avoid jobs invoking remote services to run in parallel to avoid throttling down by those services (with consequent test failures).
     # See https://github.com/mooltiverse/nyx/issues/206 for more
     concurrency:
@@ -648,8 +642,7 @@ jobs:
     name: Test (Functional) - Java ${{ matrix.java }}
     needs: java-integration-test
     # Run this job conditionally to avoid running needless tasks and useless resource consumption
-    # TODO: re-enable this conditional
-    #if: needs.initialize.outputs.javaChanged == 'true' || needs.initialize.outputs.newRelease == 'true'
+    if: needs.initialize.outputs.javaChanged == 'true' || needs.initialize.outputs.newRelease == 'true'
     # Avoid jobs invoking remote services to run in parallel to avoid throttling down by those services (with consequent test failures).
     # See https://github.com/mooltiverse/nyx/issues/206 for more
     concurrency:
@@ -764,8 +757,7 @@ jobs:
     name: Test (Unit) - Go
     needs: build-go
     # Run this job conditionally to avoid running needless tasks and useless resource consumption
-    # TODO: re-enable this conditional
-    #if: needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.newRelease == 'true'
+    if: needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.newRelease == 'true'
     strategy:
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
@@ -862,8 +854,7 @@ jobs:
     name: Test (Integration) - Go
     needs: go-unit-test
     # Run this job conditionally to avoid running needless tasks and useless resource consumption
-    # TODO: re-enable this conditional
-    #if: needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.newRelease == 'true'
+    if: needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.newRelease == 'true'
     # Avoid jobs invoking remote services to run in parallel to avoid throttling down by those services (with consequent test failures).
     # See https://github.com/mooltiverse/nyx/issues/206 for more
     concurrency:
@@ -983,8 +974,7 @@ jobs:
     name: Test (Functional) - Go
     needs: go-integration-test
     # Run this job conditionally to avoid running needless tasks and useless resource consumption
-    # TODO: re-enable this conditional
-    #if: needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.newRelease == 'true'
+    if: needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.newRelease == 'true'
     # Avoid jobs invoking remote services to run in parallel to avoid throttling down by those services (with consequent test failures).
     # See https://github.com/mooltiverse/nyx/issues/206 for more
     concurrency:
@@ -1105,8 +1095,7 @@ jobs:
     name: Test (Functional) - Docker
     needs: build-docker
     # Run this job conditionally to avoid running needless tasks and useless resource consumption
-    # TODO: re-enable this conditional
-    #if: needs.initialize.outputs.dockerChanged == 'true' || needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.newRelease == 'true'
+    if: needs.initialize.outputs.dockerChanged == 'true' || needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.newRelease == 'true'
     # Avoid jobs invoking remote services to run in parallel to avoid throttling down by those services (with consequent test failures).
     # See https://github.com/mooltiverse/nyx/issues/206 for more
     concurrency:
