@@ -304,7 +304,7 @@ jobs:
 
   build-docker:
     name: Build - Docker
-    needs: build-go
+    needs: [build-go]
     # Run this job conditionally to avoid running needless tasks and useless resource consumption
     if: needs.initialize.outputs.dockerChanged == 'true' || needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.newRelease == 'true'
     runs-on: ubuntu-latest
@@ -428,7 +428,7 @@ jobs:
   
   java-unit-test:
     name: Test (Unit) - Java ${{ matrix.java }}
-    needs: build-java
+    needs: [build-java]
     # Run this job conditionally to avoid running needless tasks and useless resource consumption
     if: needs.initialize.outputs.javaChanged == 'true' || needs.initialize.outputs.newRelease == 'true'
     # The recommended JDK version is 17 or above but since we need to test for backward compatibility to JVMs 17 or newer we
@@ -523,7 +523,7 @@ jobs:
     # limit defined by GitHub Actions. This is why they are in a separate job and the output cache
     # may fail to store at the end (but this won't affect other jobs).
     name: Test (Integration) - Java ${{ matrix.java }}
-    needs: java-unit-test
+    needs: [java-unit-test]
     # Run this job conditionally to avoid running needless tasks and useless resource consumption
     if: needs.initialize.outputs.javaChanged == 'true' || needs.initialize.outputs.newRelease == 'true'
     # Avoid jobs invoking remote services to run in parallel to avoid throttling down by those services (with consequent test failures).
@@ -640,7 +640,7 @@ jobs:
     # limit defined by GitHub Actions. This is why they are in a separate job and the output cache
     # may fail to store at the end (but this won't affect other jobs).
     name: Test (Functional) - Java ${{ matrix.java }}
-    needs: java-integration-test
+    needs: [java-integration-test]
     # Run this job conditionally to avoid running needless tasks and useless resource consumption
     if: needs.initialize.outputs.javaChanged == 'true' || needs.initialize.outputs.newRelease == 'true'
     # Avoid jobs invoking remote services to run in parallel to avoid throttling down by those services (with consequent test failures).
@@ -755,7 +755,7 @@ jobs:
 
   go-unit-test:
     name: Test (Unit) - Go
-    needs: build-go
+    needs: [build-go]
     # Run this job conditionally to avoid running needless tasks and useless resource consumption
     if: needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.newRelease == 'true'
     strategy:
@@ -852,7 +852,7 @@ jobs:
     # limit defined by GitHub Actions. This is why they are in a separate job and the output cache
     # may fail to store at the end (but this won't affect other jobs).
     name: Test (Integration) - Go
-    needs: go-unit-test
+    needs: [go-unit-test]
     # Run this job conditionally to avoid running needless tasks and useless resource consumption
     if: needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.newRelease == 'true'
     # Avoid jobs invoking remote services to run in parallel to avoid throttling down by those services (with consequent test failures).
@@ -972,7 +972,7 @@ jobs:
     # limit defined by GitHub Actions. This is why they are in a separate job and the output cache
     # may fail to store at the end (but this won't affect other jobs).
     name: Test (Functional) - Go
-    needs: go-integration-test
+    needs: [go-integration-test]
     # Run this job conditionally to avoid running needless tasks and useless resource consumption
     if: needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.newRelease == 'true'
     # Avoid jobs invoking remote services to run in parallel to avoid throttling down by those services (with consequent test failures).
@@ -1093,7 +1093,7 @@ jobs:
     # limit defined by GitHub Actions. This is why they are in a separate job and the output cache
     # may fail to store at the end (but this won't affect other jobs).
     name: Test (Functional) - Docker
-    needs: build-docker
+    needs: [build-docker]
     # Run this job conditionally to avoid running needless tasks and useless resource consumption
     if: needs.initialize.outputs.dockerChanged == 'true' || needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.newRelease == 'true'
     # Avoid jobs invoking remote services to run in parallel to avoid throttling down by those services (with consequent test failures).
@@ -1286,7 +1286,7 @@ jobs:
 
   release:
     name: Release
-    needs: publish
+    needs: [publish]
     # Run this job only if:
     # - the Docker, Java or Go files have changed
     # - a new release must be issued (this flag is inferred by Nyx), in which case we rebuild and test everything
