@@ -754,7 +754,7 @@ jobs:
           modules/java/**/build/test-results/functionalTest/
 
   go-unit-test:
-    name: Test (Unit) - Go
+    name: Test (Unit) - Go ${{ matrix.os }}
     needs: [build-go]
     # Run this job conditionally to avoid running needless tasks and useless resource consumption
     if: needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.newRelease == 'true'
@@ -851,7 +851,7 @@ jobs:
     # These tests may take a very long time to complete and their cache may easily go over the 5GB
     # limit defined by GitHub Actions. This is why they are in a separate job and the output cache
     # may fail to store at the end (but this won't affect other jobs).
-    name: Test (Integration) - Go
+    name: Test (Integration) - Go ${{ matrix.os }}
     needs: [go-unit-test]
     # Run this job conditionally to avoid running needless tasks and useless resource consumption
     if: needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.newRelease == 'true'
@@ -971,7 +971,7 @@ jobs:
     # These tests may take a very long time to complete and their cache may easily go over the 5GB
     # limit defined by GitHub Actions. This is why they are in a separate job and the output cache
     # may fail to store at the end (but this won't affect other jobs).
-    name: Test (Functional) - Go
+    name: Test (Functional) - Go ${{ matrix.os }}
     needs: [go-integration-test]
     # Run this job conditionally to avoid running needless tasks and useless resource consumption
     if: needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.newRelease == 'true'
