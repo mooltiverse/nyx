@@ -1,6 +1,5 @@
 # Changelog
 
-
 {{#releases}}
 ## {{name}} ({{date}})
 

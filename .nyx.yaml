@@ -152,6 +152,7 @@ changelog:
     "Fixed": "^fix$"
   substitutions:
     "(?m)#([0-9]+)(?s)": "[#%s](https://github.com/mooltiverse/nyx/issues/%s)"
+    "(?m)\\[([a-z0-9]+)\\](?s)": "[[%s](https://github.com/mooltiverse/nyx/commit/%s)]"
 releaseTypes: 
   enabled: 
     - mainline
