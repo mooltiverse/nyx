@@ -42,3 +42,13 @@ CHANGELOG.md
 # Generated docs for Helm and Terraform
 docs/_includes/helm
 docs/_includes/terraform
+
+# Python files
+__pycache__
+*.egg-info
+.pytest_cache/
+htmlcov
+.ignore/
+
+# .env files
+*.env
