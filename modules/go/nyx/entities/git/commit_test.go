@@ -43,10 +43,10 @@ func TestNewCommitWith(t *testing.T) {
 	footers := map[string]string{"k1": "v1", "k2": "v2"}
 	message := NewMessageWith("full", "short", footers)
 
-	commit := NewCommitWith("f9422bd6e5b0ac0ab0df2bffc280c3d4caa11b44", 999999, parents, *authorAction, *commitAction, *message, tags)
+	commit := NewCommitWith("f9422bd6e5b0ac0ab0df2bffc280c3d4caa11b44", 1730308844000, parents, *authorAction, *commitAction, *message, tags)
 
 	assert.Equal(t, "f9422bd6e5b0ac0ab0df2bffc280c3d4caa11b44", commit.GetSHA())
-	assert.Equal(t, int64(999999), commit.GetDate())
+	assert.Equal(t, int64(1730308844000), commit.GetDate())
 	assert.Equal(t, 1, len(commit.GetParents()))
 	assert.Equal(t, "e7c4419c1a9635a264b1d6c573ac2af71e1eeea6", commit.GetParents()[0])
 	authorAction1 := commit.GetAuthorAction()

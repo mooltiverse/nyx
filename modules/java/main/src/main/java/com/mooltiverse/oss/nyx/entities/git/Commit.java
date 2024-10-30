@@ -41,7 +41,7 @@ public class Commit implements Comparable<Commit>, Cloneable, Serializable {
     /**
      * The commit date.
      */
-    private final int date;
+    private final long date;
 
     /**
      * The commit message
@@ -77,7 +77,7 @@ public class Commit implements Comparable<Commit>, Cloneable, Serializable {
      * non {@code null} set, must be passed
      */
     @JsonCreator
-    public Commit(@JsonProperty("sha") String sha, @JsonProperty("date") int date, @JsonProperty("parents") List<String> parents, @JsonProperty("authorAction") Action authorAction, @JsonProperty("commitAction") Action commitAction, @JsonProperty("message") Message message, @JsonProperty("tags") Set<Tag> tags) {
+    public Commit(@JsonProperty("sha") String sha, @JsonProperty("date") long date, @JsonProperty("parents") List<String> parents, @JsonProperty("authorAction") Action authorAction, @JsonProperty("commitAction") Action commitAction, @JsonProperty("message") Message message, @JsonProperty("tags") Set<Tag> tags) {
         super();
         Objects.requireNonNull(sha);
         Objects.requireNonNull(parents);
@@ -99,7 +99,7 @@ public class Commit implements Comparable<Commit>, Cloneable, Serializable {
      */
     @Override
     public int hashCode() {
-        return 41 * sha.hashCode() * 37 * date * 31 * parents.hashCode() * 29 * authorAction.hashCode() * 23 * commitAction.hashCode() * 19 * message.hashCode() * 17 * tags.hashCode();
+        return 41 * sha.hashCode() * 37 * Long.valueOf(date).intValue() * 31 * parents.hashCode() * 29 * authorAction.hashCode() * 23 * commitAction.hashCode() * 19 * message.hashCode() * 17 * tags.hashCode();
     }
 
     /**
@@ -142,7 +142,7 @@ public class Commit implements Comparable<Commit>, Cloneable, Serializable {
                 }
                 else return getParents().size() - c.getParents().size();
             }
-            else return getDate() - c.getDate();
+            else return Long.valueOf(getDate()).intValue() - Long.valueOf(c.getDate()).intValue();
         }
         else return getSHA().compareTo(c.getSHA());
     }
@@ -170,7 +170,7 @@ public class Commit implements Comparable<Commit>, Cloneable, Serializable {
      * 
      * @return the commit date.
      */
-    public int getDate() {
+    public long getDate() {
         return date;
     }
 
