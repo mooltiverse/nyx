@@ -45,10 +45,10 @@ public class CommitTests {
         Map<String,String> footers = Map.<String,String>of("k1", "v1", "k2", "v2");
         Message message = new Message("full", "short", footers);
 
-        Commit commit = new Commit("f9422bd6e5b0ac0ab0df2bffc280c3d4caa11b44", 999999, parents, authorAction, commitAction, message, tags);
+        Commit commit = new Commit("f9422bd6e5b0ac0ab0df2bffc280c3d4caa11b44", 1730308844000L, parents, authorAction, commitAction, message, tags);
 
         assertEquals("f9422bd6e5b0ac0ab0df2bffc280c3d4caa11b44", commit.getSHA());
-        assertEquals(999999, commit.getDate());
+        assertEquals(1730308844000L, commit.getDate());
         assertEquals(1, commit.getParents().size());
         assertEquals("e7c4419c1a9635a264b1d6c573ac2af71e1eeea6", commit.getParents().get(0));
         assertEquals("author", commit.getAuthorAction().getIdentity().getName());
