@@ -10,10 +10,12 @@
 #
 # This implies that, in order to avoid repeating tasks and start one job from
 # where previous ones have finished, intermediate artifacts are handed over
-# from one task to another. For this we use cache actions like actions/cache@v4.
-# Moreover, since we use Gradle and its powerful up-to-date checks, we also need
-# to propagate the Gradle cache across jobs. For this we use the Gradle remote
-# cache action burrunan/gradle-cache-action@v2.
+# from one job to another by means of caches. Caches have a few caveats though,
+# like being read-only and OS specific. This means that one cache stored by a
+# job running an a node with a certain operating system cannot be restored on
+# another node running another operating system and, instead of updating an
+# existing cache, one needs to create a new one starting from the previous,
+# so that caches are somehow 'chained' together, with one link for each job.
 #
 # This way of modelling the workflow requires extra engineering but allows for
 # fine grained control over the pipeline as a whole. It also introduces some
