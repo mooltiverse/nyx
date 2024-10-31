@@ -73,8 +73,7 @@ public class Commit implements Comparable<Commit>, Cloneable, Serializable {
      * @param authorAction the value holder about the author. Cannot be {@code null}
      * @param commitAction the value holder about the committer. Cannot be {@code null}
      * @param message the commit message. Cannot be {@code null}
-     * @param tags the tags applied to this commit. If the commit has no tags an empty,
-     * non {@code null} set, must be passed
+     * @param tags the tags applied to this commit. May be {@code null}
      */
     @JsonCreator
     public Commit(@JsonProperty("sha") String sha, @JsonProperty("date") long date, @JsonProperty("parents") List<String> parents, @JsonProperty("authorAction") Action authorAction, @JsonProperty("commitAction") Action commitAction, @JsonProperty("message") Message message, @JsonProperty("tags") Set<Tag> tags) {
@@ -84,14 +83,13 @@ public class Commit implements Comparable<Commit>, Cloneable, Serializable {
         Objects.requireNonNull(authorAction);
         Objects.requireNonNull(commitAction);
         Objects.requireNonNull(message);
-        Objects.requireNonNull(tags);
         this.sha = sha;
         this.date = date;
         this.parents = Collections.unmodifiableList(parents);
         this.authorAction = authorAction;
         this.commitAction = commitAction;
         this.message = message;
-        this.tags = Collections.unmodifiableSet(tags);
+        this.tags = tags == null ? null : Collections.unmodifiableSet(tags);
     }
 
     /**
@@ -99,7 +97,7 @@ public class Commit implements Comparable<Commit>, Cloneable, Serializable {
      */
     @Override
     public int hashCode() {
-        return 41 * sha.hashCode() * 37 * Long.valueOf(date).intValue() * 31 * parents.hashCode() * 29 * authorAction.hashCode() * 23 * commitAction.hashCode() * 19 * message.hashCode() * 17 * tags.hashCode();
+        return 41 * sha.hashCode() * 37 * Long.valueOf(date).intValue() * 31 * parents.hashCode() * 29 * authorAction.hashCode() * 23 * commitAction.hashCode() * 19 * message.hashCode() * 17 * (tags == null ? 1 : tags.hashCode());
     }
 
     /**
@@ -115,7 +113,7 @@ public class Commit implements Comparable<Commit>, Cloneable, Serializable {
             return false;
 
         Commit other = Commit.class.cast(obj);
-        return getSHA().equals(other.getSHA()) && getDate() == other.getDate() && getParents().equals(other.getParents()) && getAuthorAction().equals(other.getAuthorAction()) && getCommitAction().equals(other.getCommitAction()) && getMessage().equals(other.getMessage()) && getTags().equals(other.getTags());
+        return getSHA().equals(other.getSHA()) && getDate() == other.getDate() && getParents().equals(other.getParents()) && getAuthorAction().equals(other.getAuthorAction()) && getCommitAction().equals(other.getCommitAction()) && getMessage().equals(other.getMessage()) && (getTags() == null ? other.getTags() == null : getTags().equals(other.getTags()));
     }
 
     /**
@@ -132,7 +130,11 @@ public class Commit implements Comparable<Commit>, Cloneable, Serializable {
                     if (getAuthorAction().compareTo(c.getAuthorAction()) == 0) {
                         if (getCommitAction().compareTo(c.getCommitAction()) == 0) {
                             if (getMessage().compareTo(c.getMessage()) == 0) {
-                                return getTags().size()-c.getTags().size();
+                                if (getTags() == null) {
+                                    return c.getTags() == null ? 0 : c.getTags().size() * -1;
+                                } else {
+                                    return c.getTags() == null ? getTags().size() : getTags().size()-c.getTags().size();
+                                }
                             }
                             else return getMessage().compareTo(c.getMessage());
                         }
@@ -195,7 +197,7 @@ public class Commit implements Comparable<Commit>, Cloneable, Serializable {
     /**
      * Returns the immutable list of tags pointing to this commit.
      * 
-     * @return the immutable list of tags pointing to this commit. May be empty but not {@code null}.
+     * @return the immutable list of tags pointing to this commit. May be {@code null}.
      */
     public Set<Tag> getTags() {
         return tags;
