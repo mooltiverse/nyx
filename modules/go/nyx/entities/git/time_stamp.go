@@ -28,7 +28,7 @@ as all internal fields must be exported (have the first capital letter in their 
 */
 type TimeStamp struct {
 	// The time stamp.
-	TimeStamp int64 `json:"timeStamp" yaml:"timeStamp"`
+	TimeStamp int64 `json:"timeStamp,omitempty" yaml:"timeStamp,omitempty"`
 
 	// The time zone offset in minutes relative to UTC.
 	Offset *int `json:"offset,omitempty" yaml:"offset,omitempty"`

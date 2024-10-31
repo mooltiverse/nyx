@@ -24,25 +24,25 @@ as all internal fields must be exported (have the first capital letter in their 
 */
 type Commit struct {
 	// The author data
-	AuthorAction Action `json:"authorAction" yaml:"authorAction"`
+	AuthorAction Action `json:"authorAction,omitempty" yaml:"authorAction,omitempty"`
 
 	// The committer data
-	CommitAction Action `json:"commitAction" yaml:"commitAction"`
+	CommitAction Action `json:"commitAction,omitempty" yaml:"commitAction,omitempty"`
 
 	// The commit date
 	Date int64 `json:"date,omitempty" yaml:"date,omitempty"`
 
 	// The commit message
-	Message Message `json:"message" yaml:"message"`
+	Message Message `json:"message,omitempty" yaml:"message,omitempty"`
 
 	// The parents SHA's.
-	Parents []string `json:"parents" yaml:"parents"`
+	Parents []string `json:"parents,omitempty" yaml:"parents,omitempty"`
 
 	// The tags associated to the commit.
-	Tags []Tag `json:"tags" yaml:"tags"`
+	Tags []Tag `json:"tags,omitempty" yaml:"tags,omitempty"`
 
 	// The commit SHA-1 identifier.
-	Sha string `json:"sha" yaml:"sha"`
+	Sha string `json:"sha,omitempty" yaml:"sha,omitempty"`
 }
 
 /*
