@@ -24,7 +24,7 @@ as all internal fields must be exported (have the first capital letter in their 
 */
 type Action struct {
 	// The identity.
-	Identity Identity `json:"identity,omitempty" yaml:"identity,omitempty"`
+	Identity Identity `json:"identity" yaml:"identity"`
 
 	// The time stamp.
 	TimeStamp TimeStamp `json:"timeStamp,omitempty" yaml:"timeStamp,omitempty"`

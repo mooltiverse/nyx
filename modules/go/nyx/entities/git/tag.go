@@ -24,13 +24,13 @@ as all internal fields must be exported (have the first capital letter in their 
 */
 type Tag struct {
 	// The annotated or lightweight flag.
-	Annotated bool `json:"annotated,omitempty" yaml:"annotated,omitempty"`
+	Annotated bool `json:"annotated,omitempty" yaml:"annotated"`
 
 	// The name.
-	Name string `json:"name,omitempty" yaml:"name,omitempty"`
+	Name string `json:"name" yaml:"name"`
 
 	// The tagged object ID.
-	Target string `json:"target,omitempty" yaml:"target,omitempty"`
+	Target string `json:"target" yaml:"target"`
 }
 
 /*

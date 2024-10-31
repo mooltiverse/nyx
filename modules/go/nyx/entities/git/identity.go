@@ -27,7 +27,7 @@ type Identity struct {
 	Email string `json:"email,omitempty" yaml:"email,omitempty"`
 
 	// The name.
-	Name string `json:"name,omitempty" yaml:"name,omitempty"`
+	Name string `json:"name" yaml:"name"`
 }
 
 /*
