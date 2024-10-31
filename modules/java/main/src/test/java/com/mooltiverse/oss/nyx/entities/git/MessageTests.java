@@ -42,7 +42,6 @@ public class MessageTests {
         assertThrows(NullPointerException.class, () -> new Message(null, null, footers));
         assertThrows(NullPointerException.class, () -> new Message(null, "short", footers));
         assertThrows(NullPointerException.class, () -> new Message(null, "short", null));
-        assertThrows(NullPointerException.class, () -> new Message("full", "short", null));
         assertThrows(NullPointerException.class, () -> new Message("full", null, null));
     }
 }

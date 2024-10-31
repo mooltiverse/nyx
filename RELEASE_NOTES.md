@@ -1,5 +1,19 @@
 # Nyx Release Notes
 
+## 3.0.9
+
+This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/3.0.9).
+
+### Upgrade instructions
+
+There are no actions to take for backward compatibility.
+
+### New features and improvements
+
+This release:
+
+* fixes the mismatch between Go and Java on the Git entity serialization ([#332](https://github.com/mooltiverse/nyx/issues/332))
+
 ## 3.0.8
 
 This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/3.0.8).
@@ -12,7 +26,7 @@ There are no actions to take for backward compatibility.
 
 This release:
 
-* fixes the representation of commit dates in Java ([#300](https://github.com/mooltiverse/nyx/issues/330))
+* fixes the representation of commit dates in Java ([#330](https://github.com/mooltiverse/nyx/issues/330))
 
 ## 3.0.7
 
