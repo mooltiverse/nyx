@@ -253,7 +253,7 @@ jobs:
         distribution: 'temurin'
         java-version: ${{ env.JDK_VERSION }}
     - name: Set up Go ${{ env.GO_VERSION }}
-      uses: actions/setup-go@v3
+      uses: actions/setup-go@v5
       with:
         go-version: ${{ env.GO_VERSION }}
     # Set up the distributed caches used to share data among jobs
@@ -329,7 +329,7 @@ jobs:
         distribution: 'temurin'
         java-version: ${{ env.JDK_VERSION }}
     - name: Set up Go ${{ env.GO_VERSION }}
-      uses: actions/setup-go@v3
+      uses: actions/setup-go@v5
       with:
         go-version: ${{ env.GO_VERSION }}
     # Set up the distributed caches used to share data among jobs
@@ -488,7 +488,7 @@ jobs:
     - name: Run Java Unit Tests
       run: ./gradlew modules:java:test --build-cache --stacktrace
     - name: Upload code coverage statistics to Codecov
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       with:
         name: Nyx Java unit tests
         #token: // not required as it's an open source project, but the Codecov App must be installed for the repository (https://github.com/apps/codecov)
@@ -605,7 +605,7 @@ jobs:
       if: ${{ always() }}
       run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
     - name: Upload code coverage statistics to Codecov
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       with:
         name: Nyx Java integration tests
         #token: // not required as it's an open source project, but the Codecov App must be installed for the repository (https://github.com/apps/codecov)
@@ -723,7 +723,7 @@ jobs:
       if: ${{ always() }}
       run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
     - name: Upload code coverage statistics to Codecov
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       with:
         name: Nyx Java functional tests
         #token: // not required as it's an open source project, but the Codecov App must be installed for the repository (https://github.com/apps/codecov)
@@ -783,7 +783,7 @@ jobs:
         distribution: 'temurin'
         java-version: ${{ env.JDK_VERSION }}
     - name: Set up Go ${{ env.GO_VERSION }}
-      uses: actions/setup-go@v3
+      uses: actions/setup-go@v5
       with:
         go-version: ${{ env.GO_VERSION }}
     # Set up the distributed caches used to share data among jobs
@@ -818,7 +818,7 @@ jobs:
     - name: Run Go Unit Tests
       run: ./gradlew modules:go:test --build-cache --stacktrace
     - name: Upload code coverage statistics to Codecov
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       if: ${{ matrix.os == 'ubuntu-latest' }} # Avoid uploading the same code coverage metrix for all platforms as it's useless, just upload them from the Linux tests
       with:
         name: Nyx Go unit tests
@@ -885,7 +885,7 @@ jobs:
         distribution: 'temurin'
         java-version: ${{ env.JDK_VERSION }}
     - name: Set up Go ${{ env.GO_VERSION }}
-      uses: actions/setup-go@v3
+      uses: actions/setup-go@v5
       with:
         go-version: ${{ env.GO_VERSION }}
     # Set up the distributed caches used to share data among jobs
@@ -938,7 +938,7 @@ jobs:
       if: ${{ matrix.os == 'ubuntu-latest' && always() }} # This command is only supported on Linux and needs to run even if previous jobs have failed
       run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
     - name: Upload code coverage statistics to Codecov
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       if: ${{ matrix.os == 'ubuntu-latest' }} # Avoid uploading the same code coverage metrix for all platforms as it's useless, just upload them from the Linux tests
       with:
         name: Nyx Go integration tests
@@ -1005,7 +1005,7 @@ jobs:
         distribution: 'temurin'
         java-version: ${{ env.JDK_VERSION }}
     - name: Set up Go ${{ env.GO_VERSION }}
-      uses: actions/setup-go@v3
+      uses: actions/setup-go@v5
       with:
         go-version: ${{ env.GO_VERSION }}
     # Set up the distributed caches used to share data among jobs
@@ -1059,7 +1059,7 @@ jobs:
       if: ${{ matrix.os == 'ubuntu-latest' && always() }} # This command is only supported on Linux and needs to run even if previous jobs have failed
       run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
     - name: Upload code coverage statistics to Codecov
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       if: ${{ matrix.os == 'ubuntu-latest' }} # Avoid uploading the same code coverage metrix for all platforms as it's useless, just upload them from the Linux tests
       with:
         name: Nyx Go functional tests
@@ -1123,7 +1123,7 @@ jobs:
         distribution: 'temurin'
         java-version: ${{ env.JDK_VERSION }}
     - name: Set up Go ${{ env.GO_VERSION }}
-      uses: actions/setup-go@v3
+      uses: actions/setup-go@v5
       with:
         go-version: ${{ env.GO_VERSION }}
     # Set up the distributed caches used to share data among jobs
@@ -1176,7 +1176,7 @@ jobs:
       if: ${{ always() }}
       run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
     - name: Upload code coverage statistics to Codecov
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       with:
         name: Nyx Docker functional tests
         #token: // not required as it's an open source project, but the Codecov App must be installed for the repository (https://github.com/apps/codecov)
@@ -1230,7 +1230,7 @@ jobs:
         distribution: 'temurin'
         java-version: ${{ env.JDK_VERSION }}
     - name: Set up Go ${{ env.GO_VERSION }}
-      uses: actions/setup-go@v3
+      uses: actions/setup-go@v5
       with:
         go-version: ${{ env.GO_VERSION }}
     # Set up the distributed caches used to share data among jobs
@@ -1313,7 +1313,7 @@ jobs:
         distribution: 'temurin'
         java-version: ${{ env.JDK_VERSION }}
     - name: Set up Go ${{ env.GO_VERSION }}
-      uses: actions/setup-go@v3
+      uses: actions/setup-go@v5
       with:
         go-version: ${{ env.GO_VERSION }}
     # Set up the distributed caches used to share data among jobs

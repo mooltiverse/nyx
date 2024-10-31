@@ -638,7 +638,7 @@ public class StateTests {
             State oldState = new State(configuration);
 
             Commit initialCommit = new Commit("b50926577d36f403f4b3ebf51dfe34660b52eaa2", 1580515200, List.<String>of(), new Action(new Identity("Jim", "jim@example.com"), new TimeStamp(new Date(1580515200), Integer.valueOf(0))), new Action(new Identity("Jim", "jim@example.com"), new TimeStamp(new Date(1580515200), Integer.valueOf(0))), new Message("initial commit", "initial commit", Map.<String,String>of()), Set.<Tag>of());
-            Commit finalCommit = new Commit("e6b1c65eac4d81aadde22e796bb2a8e48da4c5d9", 1580515200, List.<String>of("b50926577d36f403f4b3ebf51dfe34660b52eaa2"), new Action(new Identity("Jim", "jim@example.com"), new TimeStamp(new Date(1580601600), Integer.valueOf(-120))), new Action(new Identity("Jim", "jim@example.com"), new TimeStamp(new Date(1580601600), Integer.valueOf(-120))), new Message("final commit", "final commit", Map.<String,String>of()), Set.<Tag>of());
+            Commit finalCommit = new Commit("e6b1c65eac4d81aadde22e796bb2a8e48da4c5d9", 1730308844000L, List.<String>of("b50926577d36f403f4b3ebf51dfe34660b52eaa2"), new Action(new Identity("Jim", "jim@example.com"), new TimeStamp(new Date(1580601600), Integer.valueOf(-120))), new Action(new Identity("Jim", "jim@example.com"), new TimeStamp(new Date(1580601600), Integer.valueOf(-120))), new Message("final commit", "final commit", Map.<String,String>of()), Set.<Tag>of());
 
             // set a few values to use later on for comparison
             oldState.setBump("minor");
@@ -856,7 +856,7 @@ public class StateTests {
             State oldState = new State(configuration);
 
             Commit initialCommit = new Commit("b50926577d36f403f4b3ebf51dfe34660b52eaa2", 1580515200, List.<String>of(), new Action(new Identity("Jim", "jim@example.com"), new TimeStamp(new Date(1580515200), Integer.valueOf(0))), new Action(new Identity("Jim", "jim@example.com"), new TimeStamp(new Date(1580515200), Integer.valueOf(0))), new Message("initial commit", "initial commit", Map.<String,String>of()), Set.<Tag>of());
-            Commit finalCommit = new Commit("e6b1c65eac4d81aadde22e796bb2a8e48da4c5d9", 1580515200, List.<String>of("b50926577d36f403f4b3ebf51dfe34660b52eaa2"), new Action(new Identity("Jim", "jim@example.com"), new TimeStamp(new Date(1580601600), Integer.valueOf(-120))), new Action(new Identity("Jim", "jim@example.com"), new TimeStamp(new Date(1580601600), Integer.valueOf(-120))), new Message("final commit", "final commit", Map.<String,String>of()), Set.<Tag>of());
+            Commit finalCommit = new Commit("e6b1c65eac4d81aadde22e796bb2a8e48da4c5d9", 1730308844000L, List.<String>of("b50926577d36f403f4b3ebf51dfe34660b52eaa2"), new Action(new Identity("Jim", "jim@example.com"), new TimeStamp(new Date(1580601600), Integer.valueOf(-120))), new Action(new Identity("Jim", "jim@example.com"), new TimeStamp(new Date(1580601600), Integer.valueOf(-120))), new Message("final commit", "final commit", Map.<String,String>of()), Set.<Tag>of());
 
             // set a few values to use later on for comparison
             oldState.setBump("minor");

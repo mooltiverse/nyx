@@ -706,7 +706,7 @@ func TestStateSaveAndResumeJSON(t *testing.T) {
 	oldState, _ := NewStateWith(configuration)
 
 	initialCommit := gitent.NewCommitWith("b50926577d36f403f4b3ebf51dfe34660b52eaa2", 1580515200, nil, *gitent.NewActionWith(*gitent.NewIdentityWith("Jim", "jim@example.com"), *gitent.NewTimeStampWithIn(time.Now().UnixMilli(), utl.PointerToInt(0))), *gitent.NewActionWith(*gitent.NewIdentityWith("Jim", "jim@example.com"), *gitent.NewTimeStampWithIn(time.Now().UnixMilli(), utl.PointerToInt(0))), *gitent.NewMessageWith("initial commit", "initial commit", nil), nil)
-	finalCommit := gitent.NewCommitWith("e6b1c65eac4d81aadde22e796bb2a8e48da4c5d9", 1580515200, []string{"b50926577d36f403f4b3ebf51dfe34660b52eaa2"}, *gitent.NewActionWith(*gitent.NewIdentityWith("Jim", "jim@example.com"), *gitent.NewTimeStampWithIn(time.Now().UnixMilli(), utl.PointerToInt(-120))), *gitent.NewActionWith(*gitent.NewIdentityWith("Jim", "jim@example.com"), *gitent.NewTimeStampWithIn(time.Now().UnixMilli(), utl.PointerToInt(-120))), *gitent.NewMessageWith("final commit", "final commit", nil), nil)
+	finalCommit := gitent.NewCommitWith("e6b1c65eac4d81aadde22e796bb2a8e48da4c5d9", 1730308844000, []string{"b50926577d36f403f4b3ebf51dfe34660b52eaa2"}, *gitent.NewActionWith(*gitent.NewIdentityWith("Jim", "jim@example.com"), *gitent.NewTimeStampWithIn(time.Now().UnixMilli(), utl.PointerToInt(-120))), *gitent.NewActionWith(*gitent.NewIdentityWith("Jim", "jim@example.com"), *gitent.NewTimeStampWithIn(time.Now().UnixMilli(), utl.PointerToInt(-120))), *gitent.NewMessageWith("final commit", "final commit", nil), nil)
 
 	// set a few values to use later on for comparison
 	release := ent.NewReleaseWith(utl.PointerToString("MyRelease"), utl.PointerToString("today"))
@@ -986,7 +986,7 @@ func TestStateSaveAndResumeYAML(t *testing.T) {
 	oldState, _ := NewStateWith(configuration)
 
 	initialCommit := gitent.NewCommitWith("b50926577d36f403f4b3ebf51dfe34660b52eaa2", 1580515200, nil, *gitent.NewActionWith(*gitent.NewIdentityWith("Jim", "jim@example.com"), *gitent.NewTimeStampWithIn(time.Now().UnixMilli(), utl.PointerToInt(0))), *gitent.NewActionWith(*gitent.NewIdentityWith("Jim", "jim@example.com"), *gitent.NewTimeStampWithIn(time.Now().UnixMilli(), utl.PointerToInt(0))), *gitent.NewMessageWith("initial commit", "initial commit", nil), nil)
-	finalCommit := gitent.NewCommitWith("e6b1c65eac4d81aadde22e796bb2a8e48da4c5d9", 1580515200, []string{"b50926577d36f403f4b3ebf51dfe34660b52eaa2"}, *gitent.NewActionWith(*gitent.NewIdentityWith("Jim", "jim@example.com"), *gitent.NewTimeStampWithIn(time.Now().UnixMilli(), utl.PointerToInt(-120))), *gitent.NewActionWith(*gitent.NewIdentityWith("Jim", "jim@example.com"), *gitent.NewTimeStampWithIn(time.Now().UnixMilli(), utl.PointerToInt(-120))), *gitent.NewMessageWith("final commit", "final commit", nil), nil)
+	finalCommit := gitent.NewCommitWith("e6b1c65eac4d81aadde22e796bb2a8e48da4c5d9", 1730308844000, []string{"b50926577d36f403f4b3ebf51dfe34660b52eaa2"}, *gitent.NewActionWith(*gitent.NewIdentityWith("Jim", "jim@example.com"), *gitent.NewTimeStampWithIn(time.Now().UnixMilli(), utl.PointerToInt(-120))), *gitent.NewActionWith(*gitent.NewIdentityWith("Jim", "jim@example.com"), *gitent.NewTimeStampWithIn(time.Now().UnixMilli(), utl.PointerToInt(-120))), *gitent.NewMessageWith("final commit", "final commit", nil), nil)
 
 	// set a few values to use later on for comparison
 	release := ent.NewReleaseWith(utl.PointerToString("MyRelease"), utl.PointerToString("today"))
