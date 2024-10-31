@@ -236,7 +236,7 @@ jobs:
     - name: Make Git ignore execute permission changes in files (like gradlew)
       run: git config core.fileMode false
     - name: Set up Go 1.22.4
-      uses: actions/setup-go@v3
+      uses: actions/setup-go@v5
       with:
         go-version: 1.22.4
     # Start from the -init pipeline cache and save the job output pipeline cache as -build-go
@@ -313,7 +313,7 @@ jobs:
     - name: Make Git ignore execute permission changes in files (like gradlew)
       run: git config core.fileMode false
     - name: Set up Go 1.22.4
-      uses: actions/setup-go@v3
+      uses: actions/setup-go@v5
       with:
         go-version: 1.22.4
     # Start from the -init pipeline cache and save the job output pipeline cache as -build-docker
@@ -481,7 +481,7 @@ jobs:
     - name: Run Java Unit Tests with Gradle
       run: ./gradlew modules:java:test --build-cache --stacktrace
     - name: Upload code coverage statistics to Codecov
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       with:
         name: Nyx Java unit tests
         #token: // not required as it's an open source project, but the Codecov App must be installed for the repository (https://github.com/apps/codecov)
@@ -596,7 +596,7 @@ jobs:
       if: ${{ always() }}
       run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
     - name: Upload code coverage statistics to Codecov
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       with:
         name: Nyx Java integration tests
         #token: // not required as it's an open source project, but the Codecov App must be installed for the repository (https://github.com/apps/codecov)
@@ -712,7 +712,7 @@ jobs:
       if: ${{ always() }}
       run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
     - name: Upload code coverage statistics to Codecov
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       with:
         name: Nyx Java functional tests
         #token: // not required as it's an open source project, but the Codecov App must be installed for the repository (https://github.com/apps/codecov)
@@ -768,7 +768,7 @@ jobs:
     - name: Make Git ignore execute permission changes in files (like gradlew)
       run: git config core.fileMode false
     - name: Set up Go 1.22.4
-      uses: actions/setup-go@v3
+      uses: actions/setup-go@v5
       with:
         go-version: 1.22.4
     # Pull the the -init pipeline cache (read only)
@@ -805,7 +805,7 @@ jobs:
     - name: Run Go Unit Tests with Gradle
       run: ./gradlew modules:go:test --build-cache --stacktrace
     - name: Upload code coverage statistics to Codecov
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       if: ${{ matrix.os == 'ubuntu-latest' }} # Avoid uploading the same code coverage metrix for all platforms as it's useless, just upload them from the Linux tests
       with:
         name: Nyx Go unit tests
@@ -868,7 +868,7 @@ jobs:
     - name: Make Git ignore execute permission changes in files (like gradlew)
       run: git config core.fileMode false
     - name: Set up Go 1.22.4
-      uses: actions/setup-go@v3
+      uses: actions/setup-go@v5
       with:
         go-version: 1.22.4
     # Pull the the -init pipeline cache (read only)
@@ -923,7 +923,7 @@ jobs:
       if: ${{ matrix.os == 'ubuntu-latest' && always() }} # This command is only supported on Linux and needs to run even if previous jobs have failed
       run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
     - name: Upload code coverage statistics to Codecov
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       if: ${{ matrix.os == 'ubuntu-latest' }} # Avoid uploading the same code coverage metrix for all platforms as it's useless, just upload them from the Linux tests
       with:
         name: Nyx Go integration tests
@@ -986,7 +986,7 @@ jobs:
     - name: Make Git ignore execute permission changes in files (like gradlew)
       run: git config core.fileMode false
     - name: Set up Go 1.22.4
-      uses: actions/setup-go@v3
+      uses: actions/setup-go@v5
       with:
         go-version: 1.22.4
     # Pull the the -init pipeline cache (read only)
@@ -1042,7 +1042,7 @@ jobs:
       if: ${{ matrix.os == 'ubuntu-latest' && always() }} # This command is only supported on Linux and needs to run even if previous jobs have failed
       run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
     - name: Upload code coverage statistics to Codecov
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       if: ${{ matrix.os == 'ubuntu-latest' }} # Avoid uploading the same code coverage metrix for all platforms as it's useless, just upload them from the Linux tests
       with:
         name: Nyx Go functional tests
@@ -1102,7 +1102,7 @@ jobs:
     - name: Make Git ignore execute permission changes in files (like gradlew)
       run: git config core.fileMode false
     - name: Set up Go 1.22.4
-      uses: actions/setup-go@v3
+      uses: actions/setup-go@v5
       with:
         go-version: 1.22.4
     # Pull the the -init pipeline cache (read only)
@@ -1157,7 +1157,7 @@ jobs:
       if: ${{ always() }}
       run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
     - name: Upload code coverage statistics to Codecov
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       with:
         name: Nyx Docker functional tests
         #token: // not required as it's an open source project, but the Codecov App must be installed for the repository (https://github.com/apps/codecov)
@@ -1205,7 +1205,7 @@ jobs:
       - name: Make Git ignore execute permission changes in files (like gradlew)
         run: git config core.fileMode false
       - name: Set up Go 1.22.4
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v5
         with:
           go-version: 1.22.4
       # Start from the -init pipeline cache and save the job output pipeline cache as -publish
@@ -1293,7 +1293,7 @@ jobs:
       - name: Make Git ignore execute permission changes in files (like gradlew)
         run: git config core.fileMode false
       - name: Set up Go 1.22.4
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v5
         with:
           go-version: 1.22.4
       # Start from the -publish pipeline cache and save the job output pipeline cache as -release
