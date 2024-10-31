@@ -27,10 +27,10 @@ type Message struct {
 	Footers map[string]string `json:"footers,omitempty" yaml:"footers,omitempty"`
 
 	// The full message.
-	FullMessage string `json:"fullMessage,omitempty" yaml:"fullMessage,omitempty"`
+	FullMessage string `json:"fullMessage" yaml:"fullMessage"`
 
 	// The short message.
-	ShortMessage string `json:"shortMessage,omitempty" yaml:"shortMessage,omitempty"`
+	ShortMessage string `json:"shortMessage" yaml:"shortMessage"`
 }
 
 /*

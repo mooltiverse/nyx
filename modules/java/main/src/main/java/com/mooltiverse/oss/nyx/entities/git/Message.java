@@ -47,17 +47,16 @@ public class Message implements Comparable<Message>, Cloneable, Serializable {
      * 
      * @param fullMessage the full message. Cannot be {@code null}
      * @param shortMessage the short message. Cannot be {@code null}
-     * @param footers the map of message footers, where keys are names and values are values. Cannot be {@code null}
+     * @param footers the map of message footers, where keys are names and values are values. May be {@code null}
      */
     @JsonCreator
     public Message(@JsonProperty("fullMessage") String fullMessage, @JsonProperty("shortMessage") String shortMessage, @JsonProperty("footers") Map<String,String> footers) {
         super();
         Objects.requireNonNull(fullMessage);
         Objects.requireNonNull(shortMessage);
-        Objects.requireNonNull(footers);
         this.fullMessage = fullMessage;
         this.shortMessage = shortMessage;
-        this.footers = Collections.unmodifiableMap(footers);
+        this.footers = footers == null ? null : Collections.unmodifiableMap(footers);
     }
 
     /**
@@ -65,7 +64,7 @@ public class Message implements Comparable<Message>, Cloneable, Serializable {
      */
     @Override
     public int hashCode() {
-        return 71 * fullMessage.hashCode() * 67 * shortMessage.hashCode() * 61 * footers.hashCode();
+        return 71 * fullMessage.hashCode() * 67 * shortMessage.hashCode() * 61 * (footers == null ? 1 : footers.hashCode());
     }
 
     /**
@@ -81,7 +80,7 @@ public class Message implements Comparable<Message>, Cloneable, Serializable {
             return false;
 
         Message other = Message.class.cast(obj);
-        return getFullMessage().equals(other.getFullMessage()) && getShortMessage().equals(other.getShortMessage()) && getFooters().equals(other.getFooters());
+        return getFullMessage().equals(other.getFullMessage()) && getShortMessage().equals(other.getShortMessage()) && (getFooters() == null ? other.getFooters() == null : getFooters().equals(other.getFooters()));
     }
 
     /**
@@ -94,7 +93,11 @@ public class Message implements Comparable<Message>, Cloneable, Serializable {
 
         if (getFullMessage().compareTo(m.getFullMessage()) == 0) {
             if (getShortMessage().compareTo(m.getShortMessage()) == 0) {
-                return getFooters().size()-m.getFooters().size();
+                if (getFooters() == null) {
+                    return m.getFooters() == null ? 0 : m.getFooters().size() * -1;
+                } else {
+                    return m.getFooters() == null ? getFooters().size() : getFooters().size()-m.getFooters().size();
+                }
             }
             else return getShortMessage().compareTo(m.getShortMessage());
         }
@@ -104,7 +107,7 @@ public class Message implements Comparable<Message>, Cloneable, Serializable {
     /**
      * Returns the immutable list of footers, where keys are names and values are values.
      * 
-     * @return the immutable list of footers, where keys are names and values are values. May be empty but not {@code null}.
+     * @return the immutable list of footers, where keys are names and values are values. May be {@code null}.
      */
     public Map<String,String> getFooters() {
         return footers;
