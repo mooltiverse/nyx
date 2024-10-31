@@ -76,7 +76,6 @@ public class CommitTests {
         assertThrows(NullPointerException.class, () -> new Commit("f9422bd6e5b0ac0ab0df2bffc280c3d4caa11b44", 0, parents, authorAction, commitAction, null, null));
         assertThrows(NullPointerException.class, () -> new Commit("f9422bd6e5b0ac0ab0df2bffc280c3d4caa11b44", 0, parents, authorAction, null, message, null));
         assertThrows(NullPointerException.class, () -> new Commit("f9422bd6e5b0ac0ab0df2bffc280c3d4caa11b44", 0, parents, authorAction, null, null, tags));
-        assertThrows(NullPointerException.class, () -> new Commit("f9422bd6e5b0ac0ab0df2bffc280c3d4caa11b44", 0, parents, authorAction, commitAction, message, null));
         assertThrows(NullPointerException.class, () -> new Commit("f9422bd6e5b0ac0ab0df2bffc280c3d4caa11b44", 0, parents, authorAction, commitAction, null, tags));
     }
 }

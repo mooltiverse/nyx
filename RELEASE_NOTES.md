@@ -1,5 +1,19 @@
 # Nyx Release Notes
 
+## 3.0.10
+
+This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/3.0.10).
+
+### Upgrade instructions
+
+There are no actions to take for backward compatibility.
+
+### New features and improvements
+
+This release:
+
+* fixes the mismatch between Go and Java on the Git entity serialization ([#332](https://github.com/mooltiverse/nyx/issues/332))
+
 ## 3.0.9
 
 This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/3.0.9).
