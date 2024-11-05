@@ -68,8 +68,8 @@ public class Commit implements Comparable<Commit>, Cloneable, Serializable {
      * 
      * @param sha the commit SHA-1 identifier. Cannot be {@code null}
      * @param date the commit date
-     * @param parents the SHA-1 identifiers of parent commits. If the commit has no parents an empty,
-     * non {@code null} list, must be passed
+     * @param parents the SHA-1 identifiers of parent commits. May be {@code null}
+     * if the commit has no parents
      * @param authorAction the value holder about the author. Cannot be {@code null}
      * @param commitAction the value holder about the committer. Cannot be {@code null}
      * @param message the commit message. Cannot be {@code null}
@@ -79,13 +79,12 @@ public class Commit implements Comparable<Commit>, Cloneable, Serializable {
     public Commit(@JsonProperty("sha") String sha, @JsonProperty("date") long date, @JsonProperty("parents") List<String> parents, @JsonProperty("authorAction") Action authorAction, @JsonProperty("commitAction") Action commitAction, @JsonProperty("message") Message message, @JsonProperty("tags") Set<Tag> tags) {
         super();
         Objects.requireNonNull(sha);
-        Objects.requireNonNull(parents);
         Objects.requireNonNull(authorAction);
         Objects.requireNonNull(commitAction);
         Objects.requireNonNull(message);
         this.sha = sha;
         this.date = date;
-        this.parents = Collections.unmodifiableList(parents);
+        this.parents = parents == null ? null : Collections.unmodifiableList(parents);
         this.authorAction = authorAction;
         this.commitAction = commitAction;
         this.message = message;
@@ -97,7 +96,7 @@ public class Commit implements Comparable<Commit>, Cloneable, Serializable {
      */
     @Override
     public int hashCode() {
-        return 41 * sha.hashCode() * 37 * Long.valueOf(date).intValue() * 31 * parents.hashCode() * 29 * authorAction.hashCode() * 23 * commitAction.hashCode() * 19 * message.hashCode() * 17 * (tags == null ? 1 : tags.hashCode());
+        return 41 * sha.hashCode() * 37 * Long.valueOf(date).intValue() * 31 * (parents == null ? 1 : parents.hashCode()) * 29 * authorAction.hashCode() * 23 * commitAction.hashCode() * 19 * message.hashCode() * 17 * (tags == null ? 1 : tags.hashCode());
     }
 
     /**
@@ -113,7 +112,7 @@ public class Commit implements Comparable<Commit>, Cloneable, Serializable {
             return false;
 
         Commit other = Commit.class.cast(obj);
-        return getSHA().equals(other.getSHA()) && getDate() == other.getDate() && getParents().equals(other.getParents()) && getAuthorAction().equals(other.getAuthorAction()) && getCommitAction().equals(other.getCommitAction()) && getMessage().equals(other.getMessage()) && (getTags() == null ? other.getTags() == null : getTags().equals(other.getTags()));
+        return getSHA().equals(other.getSHA()) && getDate() == other.getDate() && (getParents() == null ? other.getParents() == null : getParents().equals(other.getParents())) && getAuthorAction().equals(other.getAuthorAction()) && getCommitAction().equals(other.getCommitAction()) && getMessage().equals(other.getMessage()) && (getTags() == null ? other.getTags() == null : getTags().equals(other.getTags()));
     }
 
     /**
@@ -126,7 +125,7 @@ public class Commit implements Comparable<Commit>, Cloneable, Serializable {
 
         if (getSHA().compareTo(c.getSHA()) == 0) {
             if (getDate() == c.getDate()) {
-                if (getParents().size() == c.getParents().size()) {
+                if ((getParents() == null && c.getParents() == null) || ((getParents() != null && c.getParents() != null) && (getParents().size() == c.getParents().size()))) {
                     if (getAuthorAction().compareTo(c.getAuthorAction()) == 0) {
                         if (getCommitAction().compareTo(c.getCommitAction()) == 0) {
                             if (getMessage().compareTo(c.getMessage()) == 0) {
@@ -139,10 +138,14 @@ public class Commit implements Comparable<Commit>, Cloneable, Serializable {
                             else return getMessage().compareTo(c.getMessage());
                         }
                         else return getCommitAction().compareTo(c.getCommitAction());
-                    }
-                    else return getAuthorAction().compareTo(c.getAuthorAction());
+                    } else return getAuthorAction().compareTo(c.getAuthorAction());
+                } else if (getParents() == null) {
+                    return c.getParents().size() * -1;
+                } else if (c.getParents() == null) {
+                    return getParents().size();
+                } else {
+                    return getParents().size() - c.getParents().size();
                 }
-                else return getParents().size() - c.getParents().size();
             }
             else return Long.valueOf(getDate()).intValue() - Long.valueOf(c.getDate()).intValue();
         }
@@ -188,7 +191,7 @@ public class Commit implements Comparable<Commit>, Cloneable, Serializable {
     /**
      * Returns the immutable list of parent commit SHA-1 identifiers.
      * 
-     * @return the immutable list of parent commit SHA-1 identifiers. May be empty but not {@code null}.
+     * @return the immutable list of parent commit SHA-1 identifiers. May be {@code null}.
      */
     public List<String> getParents() {
         return parents;
