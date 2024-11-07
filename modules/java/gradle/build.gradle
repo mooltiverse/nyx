@@ -119,17 +119,7 @@ tasks.publish.dependsOn tasks.publishPlugins
 tasks.test.dependsOn project(':modules:java:main').tasks.test
 
 afterEvaluate {
-    // Only perform publishing if the Nyx release type enables publishing
-    // Remember that setting the 'onlyIf' on a task does not prevent its dependencies
-    // to run so the tasks of the entire tree must be disabled
-    // This is why we set the onlyIf to all tasks in the Publish group
-    tasks.matching {
-        it.group.equals('publishing')
-    }.all {
-        it.onlyIf { rootProject.nyxState.newRelease }
-    }
-
-    // The tasks listed here are those not caught in the section above
-    tasks.publish.onlyIf { rootProject.nyxState.newRelease }                    // this actually belongs to the 'publishing' group but doesn't get captured by the above section for some reason
-    tasks.publishPlugins.onlyIf { rootProject.nyxState.newRelease }             // from the 'plugin portal' group
+  // The tasks listed here are those not caught in the section above
+  tasks.publish.onlyIf { rootProject.nyxState.newRelease }                    // this actually belongs to the 'publishing' group but doesn't get captured by the above section for some reason
+  tasks.publishPlugins.onlyIf { rootProject.nyxState.newRelease }             // from the 'plugin portal' group
 }

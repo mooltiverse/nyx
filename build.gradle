@@ -3,16 +3,16 @@
   https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
 ------------------------------------------------------------------------------*/
 plugins {
-    // Enable the SonarCloud plugin.
-    // This creates the 'sonar' task
-    // See: https://docs.sonarcloud.io/advanced-setup/ci-based-analysis/sonarscanner-for-gradle/
-    id "org.sonarqube" version "4.4.1.3373"
+  // Enable the SonarCloud plugin.
+  // This creates the 'sonar' task
+  // See: https://docs.sonarcloud.io/advanced-setup/ci-based-analysis/sonarscanner-for-gradle/
+  id "org.sonarqube" version "4.4.1.3373"
 
-    // Builds a dependency tree of Gradle tasks, i.e. 'gradle <task> taskTree'
-    // (at times it doesn't work when using the ./gradlew wrapper).
-    // This plugin can be commented out and used only when needed.
-    // See: https://github.com/dorongold/gradle-task-tree
-    id "com.dorongold.task-tree" version "4.0.0"
+  // Builds a dependency tree of Gradle tasks, i.e. 'gradle <task> taskTree'
+  // (at times it doesn't work when using the ./gradlew wrapper).
+  // This plugin can be commented out and used only when needed.
+  // See: https://github.com/dorongold/gradle-task-tree
+  id "com.dorongold.task-tree" version "4.0.0"
 }
 
 import groovy.json.JsonSlurper
@@ -31,17 +31,26 @@ allprojects {
   // See: https://docs.gradle.org/current/userguide/base_plugin.html
   apply plugin: 'base'
 
+  afterEvaluate {
+    // Only perform publishing if the Nyx release type enables publishing.
+    tasks.matching {
+      it.group.equals('publishing')
+    }.all {
+      it.onlyIf { rootProject.nyxState.newRelease }
+    }
+  }
+
   /*------------------------------------------------------------------------------
     Extension configurations
   ------------------------------------------------------------------------------*/
   // Configure SonarCloud
   // See: https://docs.sonarcloud.io/advanced-setup/ci-based-analysis/sonarscanner-for-gradle/
   sonarqube {
-      properties {
-          property "sonar.host.url", "https://sonarcloud.io"
-          property "sonar.organization", "mooltiverse"
-          property "sonar.verbose", true
-      }
+    properties {
+      property "sonar.host.url", "https://sonarcloud.io"
+      property "sonar.organization", "mooltiverse"
+      property "sonar.verbose", true
+    }
   }
 
   // This task is useful to run all verification tasks (check, test but also functionalTest and integrationTest)
@@ -50,8 +59,8 @@ allprojects {
     group 'Verification'
 
     dependsOn project.tasks.matching {
-        // skip this task itself to avoid circular dependencies
-        it.group.equals('verification') && !it.name.equals('verify')
+      // skip this task itself to avoid circular dependencies
+      it.group.equals('verification') && !it.name.equals('verify')
     }
   }
 
@@ -73,8 +82,8 @@ allprojects {
   This is the configuration for all sub-projects
 ------------------------------------------------------------------------------*/
 subprojects {
-    // let all sub projects have the same version as the root project
-    version = rootProject.version
+  // let all sub projects have the same version as the root project
+  version = rootProject.version
 }
 
 /*------------------------------------------------------------------------------
@@ -83,9 +92,9 @@ subprojects {
 // Configure SonarCloud
 // See: https://docs.sonarcloud.io/advanced-setup/ci-based-analysis/sonarscanner-for-gradle/
 sonarqube {
-    properties {
-        property "sonar.projectKey", "mooltiverse_nyx"
-    }
+  properties {
+    property "sonar.projectKey", "mooltiverse_nyx"
+  }
 }
 
 /*------------------------------------------------------------------------------
@@ -201,3 +210,10 @@ task testClean() {
 
   dependsOn deleteTestDirectories, deleteGitHubTestProjects, deleteGitLabTestProjects
 }
+
+/*------------------------------------------------------------------------------
+  Additional task dependencies
+------------------------------------------------------------------------------*/
+// Only perform publishing if the Nyx release type enables publishing.
+tasks.nyxMark.onlyIf { rootProject.nyxState.newRelease }
+tasks.nyxPublish.onlyIf { rootProject.nyxState.newRelease }

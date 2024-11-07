@@ -400,18 +400,6 @@ subprojects {
     tasks.assemble.dependsOn tasks.goBuild
     tasks.test.dependsOn tasks.goTest
     tasks.check.dependsOn tasks.test
-
-    afterEvaluate {
-        // Only perform publishing if the Nyx release type enables publishing
-        // Remember that setting the 'onlyIf' on a task does not prevent its dependencies
-        // to run so the tasks of the entire tree must be disabled
-        // This is why we set the onlyIf to all tasks in the Publish group
-        tasks.matching {
-            it.group.equals('publishing')
-        }.all {
-            it.onlyIf { rootProject.nyxState.newRelease }
-        }
-    }
 }
 
 /*------------------------------------------------------------------------------
