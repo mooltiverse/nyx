@@ -142,7 +142,7 @@ task dockerImage(group: 'build', description: 'Builds the Docker image') {
 task dockerTag(group: 'build', description: 'Tags the Docker image for the configured registries and labels') {
     // Dependencies are created along with dynamic tasks below
 
-    // Only perform publishing if the Nyx release type enables publishing
+    // Only perform publishing if the Nyx release type enables publishing.
     it.onlyIf { rootProject.nyxState.newRelease }
 }
 
@@ -150,7 +150,7 @@ task dockerTag(group: 'build', description: 'Tags the Docker image for the confi
 task dockerPush(group: 'publishing', description: 'Pushes the Docker image to the configured registries') {
     // Dependencies are created along with dynamic tasks below
 
-    // Only perform publishing if the Nyx release type enables publishing
+    // Only perform publishing if the Nyx release type enables publishing.
     it.onlyIf { rootProject.nyxState.newRelease }
 }
 
@@ -164,7 +164,7 @@ registries.each { registry ->
             // Task dependencies
             dependsOn dockerImage
 
-            // Only perform publishing if the Nyx release type enables publishing
+            // Only perform publishing if the Nyx release type enables publishing.
             it.onlyIf { rootProject.nyxState.newRelease }
 
             doLast {
