@@ -108,7 +108,7 @@ jobs:
     needs:
     - initialize
     if: needs.initialize.outputs.javaChanged == 'true' || needs.initialize.outputs.release == 'true'
-    uses: skylltech/toolbox/.github/workflows/java-build.yml@main
+    uses: mooltiverse/toolbox/.github/workflows/java-build.yml@main
     with:
       install-jdk: true
       install-jdk-version: ${{ env.JDK_VERSION }}
@@ -132,7 +132,7 @@ jobs:
     strategy:
       matrix:
         java: [ '17', '20' ]
-    uses: skylltech/toolbox/.github/workflows/java-test-sequence.yml@main
+    uses: mooltiverse/toolbox/.github/workflows/java-test-sequence.yml@main
     with:
       install-jdk: true
       install-jdk-version: ${{ matrix.java }}
@@ -166,7 +166,7 @@ jobs:
     - java-build
     - java-test
     if: needs.initialize.outputs.javaChanged == 'true' || needs.initialize.outputs.release == 'true'
-    uses: skylltech/toolbox/.github/workflows/java-publish.yml@main
+    uses: mooltiverse/toolbox/.github/workflows/java-publish.yml@main
     with:
       install-jdk: true
       install-jdk-version: ${{ env.JDK_VERSION }}
@@ -198,7 +198,7 @@ jobs:
     needs:
     - initialize
     if: needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.release == 'true'
-    uses: skylltech/toolbox/.github/workflows/go-build.yml@main
+    uses: mooltiverse/toolbox/.github/workflows/go-build.yml@main
     with:
       install-go: true
       install-go-version: ${{ env.GO_VERSION }}
@@ -219,7 +219,7 @@ jobs:
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.os }}
-    uses: skylltech/toolbox/.github/workflows/go-test-sequence.yml@main
+    uses: mooltiverse/toolbox/.github/workflows/go-test-sequence.yml@main
     with:
       install-go: true
       install-go-version: ${{ env.GO_VERSION }}
@@ -255,7 +255,7 @@ jobs:
     - go-build
     - go-test
     if: needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.release == 'true'
-    uses: skylltech/toolbox/.github/workflows/go-publish.yml@main
+    uses: mooltiverse/toolbox/.github/workflows/go-publish.yml@main
     with:
       install-go: true
       install-go-version: ${{ env.GO_VERSION }}
