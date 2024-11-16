@@ -56,20 +56,6 @@ ext {
 }
 
 /*------------------------------------------------------------------------------
-  Extension configurations
-------------------------------------------------------------------------------*/
-// Configure SonarCloud
-// See: https://docs.sonarcloud.io/advanced-setup/ci-based-analysis/sonarscanner-for-gradle/
-sonarqube {
-    properties {
-        property "sonar.projectKey", "mooltiverse_nyx_docker"
-        property "sonar.sources", "Dockerfile"
-        property "sonar.tests", ""
-        property "sonar.go.coverage.reportPaths", "$buildDir/test-results/test/test-coverprofile.out,$buildDir/test-results/integrationTest/integrationTest-coverprofile.out,$buildDir/test-results/functionalTest/functionalTest-coverprofile.out"
-    }
-}
-
-/*------------------------------------------------------------------------------
   Additional tasks
 ------------------------------------------------------------------------------*/
 task dockerContext(group: 'build', description: 'Builds the Docker context') {

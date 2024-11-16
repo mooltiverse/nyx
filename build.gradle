@@ -3,11 +3,6 @@
   https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
 ------------------------------------------------------------------------------*/
 plugins {
-  // Enable the SonarCloud plugin.
-  // This creates the 'sonar' task
-  // See: https://docs.sonarcloud.io/advanced-setup/ci-based-analysis/sonarscanner-for-gradle/
-  id "org.sonarqube" version "4.4.1.3373"
-
   // Builds a dependency tree of Gradle tasks, i.e. 'gradle <task> taskTree'
   // (at times it doesn't work when using the ./gradlew wrapper).
   // This plugin can be commented out and used only when needed.
@@ -30,19 +25,6 @@ project.group       = 'com.mooltiverse.oss.nyx'
 allprojects {
   // See: https://docs.gradle.org/current/userguide/base_plugin.html
   apply plugin: 'base'
-
-  /*------------------------------------------------------------------------------
-    Extension configurations
-  ------------------------------------------------------------------------------*/
-  // Configure SonarCloud
-  // See: https://docs.sonarcloud.io/advanced-setup/ci-based-analysis/sonarscanner-for-gradle/
-  sonarqube {
-    properties {
-      property "sonar.host.url", "https://sonarcloud.io"
-      property "sonar.organization", "mooltiverse"
-      property "sonar.verbose", true
-    }
-  }
 
   // This task is useful to run all verification tasks (check, test but also functionalTest and integrationTest)
   task verify() {
@@ -84,17 +66,6 @@ allprojects {
 subprojects {
   // let all sub projects have the same version as the root project
   version = rootProject.version
-}
-
-/*------------------------------------------------------------------------------
-  Extension configurations
-------------------------------------------------------------------------------*/
-// Configure SonarCloud
-// See: https://docs.sonarcloud.io/advanced-setup/ci-based-analysis/sonarscanner-for-gradle/
-sonarqube {
-  properties {
-    property "sonar.projectKey", "mooltiverse_nyx"
-  }
 }
 
 /*------------------------------------------------------------------------------

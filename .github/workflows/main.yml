@@ -1,0 +1,393 @@
+# This workflow takes care of building, testing and publishing the project and
+# its artifacts and it uses the 'reusable' workflows.
+#
+# The whole process is split into jobs, each running on a different node.
+# Jobs are executed conditionally, only when required, in order to avoid wasting
+# build time on useless jobs.
+# Job dependencies also make longer and expensive tasks depend on the success
+# of previous, less expensive tasks. If upstream tasks fail, their dependencies
+# are not executed.
+#
+# Moreover, in order to avoid repeating tasks and start one job from where
+# previous ones have finished, intermediate artifacts are handed over from one
+# job to another by means of caches. Caches have a few caveats though, like
+# being read-only. This means that instead of updating an existing cache, one
+# needs to create a new one starting from the previous, so that caches are
+# somehow 'chained' together, with one link for each job.
+#
+# This way of modelling the workflow requires extra engineering but allows for
+# fine grained control over the pipeline as a whole. It also introduces some
+# overhead, but that comes with the benefit of controlling the workflow stage
+# by stage. On the other hand, most of this extra effort is solved using our
+# custom reusable actions.
+#
+# Gradle is used under the hood by reusable workflows and composite actions so
+# that we use the same build scripts that developers also use locally on their
+# workstations. This improves portability and consistency.
+
+name: Main
+
+on:
+  workflow_dispatch:
+  push:
+
+# Avoid running multiple pipelines concurrently to avoid overlapping releases and tags
+concurrency:
+  # Synch on the project to avoid conflicts when accessing remote resources
+  # (i.e. when testing against remote services)
+  group: project
+  cancel-in-progress: false
+
+env:
+  GO_VERSION: 1.22.4
+  JDK_VERSION: 20
+
+jobs:
+  #############################################################################
+  # Lifecycle and Waypoint Jobs
+  #############################################################################
+  initialize:
+    name: Initialize
+    # TODO: WAIT FOR MERGE: replace the following tag '@chore/retrofitting'
+    # with '@main' as soon as the branch has been merged to main.
+    uses: mooltiverse/nyx/.github/workflows/initialize.yml@chore/retrofitting
+  
+  build:
+    name: Waypoint
+    needs:
+    - initialize
+    - java-build
+    - go-build
+    - docker-build
+    - docusaurus-build
+    # TODO: WAIT FOR MERGE: replace the following tag '@chore/retrofitting'
+    # with '@main' as soon as the branch has been merged to main.
+    uses: mooltiverse/nyx/.github/workflows/build.yml@chore/retrofitting
+  
+  test:
+    name: Waypoint
+    needs:
+    - initialize
+    - build
+    - java-test
+    - go-test
+    - docker-test
+    # TODO: WAIT FOR MERGE: replace the following tag '@chore/retrofitting'
+    # with '@main' as soon as the branch has been merged to main.
+    uses: mooltiverse/nyx/.github/workflows/test.yml@chore/retrofitting
+
+  release:
+    name: Release
+    needs:
+    - initialize
+    - test
+    - java-publish
+    - go-publish
+    - docker-publish
+    - docusaurus-publish
+    if: needs.initialize.outputs.release == 'true'
+    # TODO: WAIT FOR MERGE: replace the following tag '@chore/retrofitting'
+    # with '@main' as soon as the branch has been merged to main.
+    uses: mooltiverse/nyx/.github/workflows/release.yml@chore/retrofitting
+    with:
+      install-jdk: true
+      install-jdk-version: ${{ env.JDK_VERSION }}
+      # Restore the cache from the previous job to 'chain' caches
+      nyx-cache-name-restore-suffix: ${{ needs.initialize.outputs.nyx-cache-name-suffix }}
+      java-cache-name-restore-suffix: ${{ needs.java-publish.outputs.java-cache-name-suffix }}
+      go-cache-name-restore-suffix: ${{ needs.go-publish.outputs.go-cache-name-suffix }}
+      docusaurus-cache-name-restore-suffix: ${{ needs.docusaurus-publish.outputs.docusaurus-cache-name-suffix }}
+      docker-cache-name-restore-suffix: ${{ needs.docker-publish.outputs.docker-cache-name-suffix }}
+
+  #############################################################################
+  # Java Jobs
+  #############################################################################
+
+  java-build:
+    name: Java Build
+    needs:
+    - initialize
+    if: needs.initialize.outputs.javaChanged == 'true' || needs.initialize.outputs.release == 'true'
+    uses: skylltech/toolbox/.github/workflows/java-build.yml@main
+    with:
+      install-jdk: true
+      install-jdk-version: ${{ env.JDK_VERSION }}
+      # Restore the cache from the previous job to 'chain' caches
+      nyx-cache-name-restore-suffix: ${{ needs.initialize.outputs.nyx-cache-name-suffix }}
+
+  java-test:
+    name: Java ${{ matrix.java }} Test
+    needs:
+    - initialize
+    - java-build
+    if: needs.initialize.outputs.javaChanged == 'true' || needs.initialize.outputs.release == 'true'
+    # Avoid jobs invoking remote services to run in parallel to avoid throttling down by those services (with consequent test failures).
+    # See https://github.com/mooltiverse/nyx/issues/206 for more
+    concurrency:
+      group: rate-limited-remote-services
+      cancel-in-progress: false
+    # The recommended JDK version is 17 or above but since we need to test for backward compatibility to JVMs 17 or newer we
+    # need a matrix here. Depending on the JDK version the set of Gradle version that the tests run on will change, according
+    # to the Gradle compatibility matrix. See CONTRIBUTING.md in the root directory or the Gradle functional test suites for more.
+    strategy:
+      matrix:
+        java: [ '17', '20' ]
+    uses: skylltech/toolbox/.github/workflows/java-test-sequence.yml@main
+    with:
+      install-jdk: true
+      install-jdk-version: ${{ matrix.java }}
+      # Pass extra properties used by the Gradle scripts to run tests.
+      # See the top level
+      #   https://github.com/mooltiverse/nyx/blob/main/CONTRIBUTING.md#contributing-code
+      # file for details about passing these values when testing locally.
+      # Also see:
+      # - https://docs.gradle.org/current/userguide/build_environment.html#setting_a_project_property
+      gradle-arguments: >-
+        --build-cache --stacktrace
+        -Dorg.gradle.project.gitHubTestUserToken=${{ secrets.TEST_GITHUB_USER_TOKEN }}
+        -Dorg.gradle.project.gitHubTestUserPublicKey=${{ secrets.TEST_GITHUB_USER_PUBLIC_KEY }}
+        -Dorg.gradle.project.gitHubTestUserPrivateKeyPassphrase=${{ secrets.TEST_GITHUB_USER_PASSPHRASE }}
+        -Dorg.gradle.project.gitHubTestUserPrivateKeyWithPassphrase=${{ secrets.TEST_GITHUB_USER_PRIVATE_KEY_WITH_PASSPHRASE }}
+        -Dorg.gradle.project.gitHubTestUserPrivateKeyWithoutPassphrase=${{ secrets.TEST_GITHUB_USER_PRIVATE_KEY_WITHOUT_PASSPHRASE }}
+        -Dorg.gradle.project.gitLabTestUserToken=${{ secrets.TEST_GITLAB_USER_TOKEN }}
+        -Dorg.gradle.project.gitLabTestUserPublicKey=${{ secrets.TEST_GITLAB_USER_PUBLIC_KEY }}
+        -Dorg.gradle.project.gitLabTestUserPrivateKeyPassphrase=${{ secrets.TEST_GITLAB_USER_PASSPHRASE }}
+        -Dorg.gradle.project.gitLabTestUserPrivateKeyWithPassphrase=${{ secrets.TEST_GITLAB_USER_PRIVATE_KEY_WITH_PASSPHRASE }}
+        -Dorg.gradle.project.gitLabTestUserPrivateKeyWithoutPassphrase=${{ secrets.TEST_GITLAB_USER_PRIVATE_KEY_WITHOUT_PASSPHRASE }}
+      # Restore the cache from the previous job to 'chain' caches
+      nyx-cache-name-restore-suffix: ${{ needs.initialize.outputs.nyx-cache-name-suffix }}
+      gradle-cache-name-restore-suffix: ${{ needs.java-build.outputs.gradle-cache-name-suffix }}
+      java-cache-name-restore-suffix: ${{ needs.java-build.outputs.java-cache-name-suffix }}
+  
+  java-publish:
+    name: Java Publish
+    needs:
+    - initialize
+    - java-build
+    - java-test
+    if: needs.initialize.outputs.javaChanged == 'true' || needs.initialize.outputs.release == 'true'
+    uses: skylltech/toolbox/.github/workflows/java-publish.yml@main
+    with:
+      install-jdk: true
+      install-jdk-version: ${{ env.JDK_VERSION }}
+      # Pass extra properties used by the Gradle scripts to run tests.
+      # See the top level
+      #   https://github.com/mooltiverse/nyx/blob/main/CONTRIBUTING.md#contributing-code
+      # file for details about passing these values when testing locally.
+      # Also see:
+      # - https://docs.gradle.org/current/userguide/build_environment.html#setting_a_project_property
+      gradle-arguments: >-
+        --build-cache --stacktrace
+        -Dorg.gradle.project.ossrhUsername=${{ secrets.MAVEN_USER }}
+        -Dorg.gradle.project.ossrhPassword=${{ secrets.MAVEN_PASSWORD }}
+        -Dorg.gradle.project.signingKeyBase64=${{ secrets.GPG_PRIVATE_KEY_BASE64 }}
+        -Dorg.gradle.project.signingPassword=${{ secrets.GPC_PASSPHRASE }}
+        -Dorg.gradle.project.gradlePublishKey=${{ secrets.GRADLE_PLUGIN_PUBLISH_KEY }}
+        -Dorg.gradle.project.gradlePublishSecret=${{ secrets.GRADLE_PLUGIN_PUBLISH_SECRET }}
+      # Restore the cache from the previous job to 'chain' caches
+      nyx-cache-name-restore-suffix: ${{ needs.initialize.outputs.nyx-cache-name-suffix }}
+      gradle-cache-name-restore-suffix: ${{ needs.java-build.outputs.gradle-cache-name-suffix }}
+      java-cache-name-restore-suffix: ${{ needs.java-build.outputs.java-cache-name-suffix }}
+
+  #############################################################################
+  # Go Jobs
+  #############################################################################
+
+  go-build:
+    name: Go Build
+    needs:
+    - initialize
+    if: needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.release == 'true'
+    uses: skylltech/toolbox/.github/workflows/go-build.yml@main
+    with:
+      install-go: true
+      install-go-version: ${{ env.GO_VERSION }}
+      install-jdk: true
+      install-jdk-version: ${{ env.JDK_VERSION }}
+      # Restore the cache from the previous job to 'chain' caches
+      nyx-cache-name-restore-suffix: ${{ needs.initialize.outputs.nyx-cache-name-suffix }}
+
+  go-test:
+    name: Go Test ${{ matrix.os }}
+    needs:
+    - initialize
+    - go-build
+    if: needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.release == 'true'
+    concurrency:
+      group: rate-limited-remote-services
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    uses: skylltech/toolbox/.github/workflows/go-test-sequence.yml@main
+    with:
+      install-go: true
+      install-go-version: ${{ env.GO_VERSION }}
+      install-jdk: true
+      install-jdk-version: ${{ env.JDK_VERSION }}
+      # Pass extra properties used by the Gradle scripts to run tests.
+      # See the top level
+      #   https://github.com/mooltiverse/nyx/blob/main/CONTRIBUTING.md#contributing-code
+      # file for details about passing these values when testing locally.
+      # Also see:
+      # - https://docs.gradle.org/current/userguide/build_environment.html#setting_a_project_property
+      gradle-arguments: >-
+        --build-cache --stacktrace
+        -Dorg.gradle.project.gitHubTestUserToken=${{ secrets.TEST_GITHUB_USER_TOKEN }}
+        -Dorg.gradle.project.gitHubTestUserPublicKey=${{ secrets.TEST_GITHUB_USER_PUBLIC_KEY }}
+        -Dorg.gradle.project.gitHubTestUserPrivateKeyPassphrase=${{ secrets.TEST_GITHUB_USER_PASSPHRASE }}
+        -Dorg.gradle.project.gitHubTestUserPrivateKeyWithPassphrase=${{ secrets.TEST_GITHUB_USER_PRIVATE_KEY_WITH_PASSPHRASE }}
+        -Dorg.gradle.project.gitHubTestUserPrivateKeyWithoutPassphrase=${{ secrets.TEST_GITHUB_USER_PRIVATE_KEY_WITHOUT_PASSPHRASE }}
+        -Dorg.gradle.project.gitLabTestUserToken=${{ secrets.TEST_GITLAB_USER_TOKEN }}
+        -Dorg.gradle.project.gitLabTestUserPublicKey=${{ secrets.TEST_GITLAB_USER_PUBLIC_KEY }}
+        -Dorg.gradle.project.gitLabTestUserPrivateKeyPassphrase=${{ secrets.TEST_GITLAB_USER_PASSPHRASE }}
+        -Dorg.gradle.project.gitLabTestUserPrivateKeyWithPassphrase=${{ secrets.TEST_GITLAB_USER_PRIVATE_KEY_WITH_PASSPHRASE }}
+        -Dorg.gradle.project.gitLabTestUserPrivateKeyWithoutPassphrase=${{ secrets.TEST_GITLAB_USER_PRIVATE_KEY_WITHOUT_PASSPHRASE }}
+      # Restore the cache from the previous job to 'chain' caches
+      nyx-cache-name-restore-suffix: ${{ needs.initialize.outputs.nyx-cache-name-suffix }}
+      gradle-cache-name-restore-suffix: ${{ needs.go-build.outputs.gradle-cache-name-suffix }}
+      go-cache-name-restore-suffix: ${{ needs.go-build.outputs.go-cache-name-suffix }}
+  
+  go-publish:
+    name: Go Publish
+    needs:
+    - initialize
+    - go-build
+    - go-test
+    if: needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.release == 'true'
+    uses: skylltech/toolbox/.github/workflows/go-publish.yml@main
+    with:
+      install-go: true
+      install-go-version: ${{ env.GO_VERSION }}
+      install-jdk: true
+      install-jdk-version: ${{ env.JDK_VERSION }}
+      # Restore the cache from the previous job to 'chain' caches
+      nyx-cache-name-restore-suffix: ${{ needs.initialize.outputs.nyx-cache-name-suffix }}
+      gradle-cache-name-restore-suffix: ${{ needs.go-build.outputs.gradle-cache-name-suffix }}
+      go-cache-name-restore-suffix: ${{ needs.go-build.outputs.go-cache-name-suffix }}
+
+  #############################################################################
+  # Docker Jobs
+  #############################################################################
+
+  docker-build:
+    name: Docker Build
+    needs:
+    - initialize
+    if: needs.initialize.outputs.dockerChanged == 'true' || needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.release == 'true'
+    # TODO: WAIT FOR MERGE: replace the following tag '@chore/retrofitting'
+    # with '@main' as soon as the branch has been merged to main.
+    uses: mooltiverse/nyx/.github/workflows/docker-build.yml@chore/retrofitting
+    with:
+      install-jdk: true
+      install-jdk-version: ${{ env.JDK_VERSION }}
+      # Restore the cache from the previous job to 'chain' caches
+      nyx-cache-name-restore-suffix: ${{ needs.initialize.outputs.nyx-cache-name-suffix }}
+      go-cache-name-restore-suffix: ${{ needs.go-build.outputs.go-cache-name-suffix }}
+
+  docker-test:
+    name: Docker Test
+    needs:
+    - initialize
+    - docker-build
+    if: needs.initialize.outputs.dockerChanged == 'true' || needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.release == 'true'
+    # Avoid jobs invoking remote services to run in parallel to avoid throttling down by those services (with consequent test failures).
+    # See https://github.com/mooltiverse/nyx/issues/206 for more
+    concurrency:
+      group: rate-limited-remote-services
+      cancel-in-progress: false
+    # TODO: WAIT FOR MERGE: replace the following tag '@chore/retrofitting'
+    # with '@main' as soon as the branch has been merged to main.
+    uses: mooltiverse/nyx/.github/workflows/docker-test-compact.yml@chore/retrofitting
+    with:
+      install-jdk: true
+      install-jdk-version: ${{ env.JDK_VERSION }}
+      # Pass extra properties used by the Gradle scripts to run tests.
+      # See the top level
+      #   https://github.com/mooltiverse/nyx/blob/main/CONTRIBUTING.md#contributing-code
+      # file for details about passing these values when testing locally.
+      # Also see:
+      # - https://docs.gradle.org/current/userguide/build_environment.html#setting_a_project_property
+      gradle-arguments: >-
+        --build-cache --stacktrace
+        -Dorg.gradle.project.gitHubTestUserToken=${{ secrets.TEST_GITHUB_USER_TOKEN }}
+        -Dorg.gradle.project.gitHubTestUserPublicKey=${{ secrets.TEST_GITHUB_USER_PUBLIC_KEY }}
+        -Dorg.gradle.project.gitHubTestUserPrivateKeyPassphrase=${{ secrets.TEST_GITHUB_USER_PASSPHRASE }}
+        -Dorg.gradle.project.gitHubTestUserPrivateKeyWithPassphrase=${{ secrets.TEST_GITHUB_USER_PRIVATE_KEY_WITH_PASSPHRASE }}
+        -Dorg.gradle.project.gitHubTestUserPrivateKeyWithoutPassphrase=${{ secrets.TEST_GITHUB_USER_PRIVATE_KEY_WITHOUT_PASSPHRASE }}
+        -Dorg.gradle.project.gitLabTestUserToken=${{ secrets.TEST_GITLAB_USER_TOKEN }}
+        -Dorg.gradle.project.gitLabTestUserPublicKey=${{ secrets.TEST_GITLAB_USER_PUBLIC_KEY }}
+        -Dorg.gradle.project.gitLabTestUserPrivateKeyPassphrase=${{ secrets.TEST_GITLAB_USER_PASSPHRASE }}
+        -Dorg.gradle.project.gitLabTestUserPrivateKeyWithPassphrase=${{ secrets.TEST_GITLAB_USER_PRIVATE_KEY_WITH_PASSPHRASE }}
+        -Dorg.gradle.project.gitLabTestUserPrivateKeyWithoutPassphrase=${{ secrets.TEST_GITLAB_USER_PRIVATE_KEY_WITHOUT_PASSPHRASE }}
+      # Restore the cache from the previous job to 'chain' caches
+      nyx-cache-name-restore-suffix: ${{ needs.initialize.outputs.nyx-cache-name-suffix }}
+      go-cache-name-restore-suffix: ${{ needs.go-build.outputs.go-cache-name-suffix }}
+      gradle-cache-name-restore-suffix: ${{ needs.docker-build.outputs.gradle-cache-name-suffix }}
+      docker-cache-name-restore-suffix: ${{ needs.docker-build.outputs.docker-cache-name-suffix }}
+
+  docker-publish:
+    name: Docker Publish
+    needs:
+    - initialize
+    - test
+    - docker-build
+    - docker-test
+    if: needs.initialize.outputs.dockerChanged == 'true' || needs.initialize.outputs.release == 'true'
+    # TODO: WAIT FOR MERGE: replace the following tag '@chore/retrofitting'
+    # with '@main' as soon as the branch has been merged to main.
+    uses: mooltiverse/nyx/.github/workflows/docker-publish.yml@chore/retrofitting
+    with:
+      install-jdk: true
+      install-jdk-version: ${{ env.JDK_VERSION }}
+      # Pass extra properties used by the Gradle scripts to run tests.
+      # See the top level
+      #   https://github.com/mooltiverse/nyx/blob/main/CONTRIBUTING.md#contributing-code
+      # file for details about passing these values when testing locally.
+      # Also see:
+      # - https://docs.gradle.org/current/userguide/build_environment.html#setting_a_project_property
+      gradle-arguments: >-
+        --build-cache --stacktrace
+        -Dorg.gradle.project.dockerHubUser=${{ secrets.DOCKER_HUB_USERNAME }}
+        -Dorg.gradle.project.dockerHubToken=${{ secrets.DOCKER_HUB_TOKEN }}
+      # Restore the cache from the previous job to 'chain' caches
+      nyx-cache-name-restore-suffix: ${{ needs.initialize.outputs.nyx-cache-name-suffix }}
+      gradle-cache-name-restore-suffix: ${{ needs.docker-build.outputs.gradle-cache-name-suffix }}
+      go-cache-name-restore-suffix: ${{ needs.initialize.outputs.go-cache-name-suffix }}
+      docker-cache-name-restore-suffix: ${{ needs.docker-build.outputs.docker-cache-name-suffix }}
+
+  #############################################################################
+  # Docusaurus Jobs
+  #############################################################################
+
+  docusaurus-build:
+    name: Docusaurus Build
+    needs:
+    - initialize
+    if: needs.initialize.outputs.docusaurusChanged == 'true' || needs.initialize.outputs.release == 'true'
+    # TODO: WAIT FOR MERGE: replace the following tag '@chore/retrofitting'
+    # with '@main' as soon as the branch has been merged to main.
+    uses: mooltiverse/nyx/.github/workflows/docusaurus-build.yml@chore/retrofitting
+    with:
+      install-jdk: true
+      install-jdk-version: ${{ env.JDK_VERSION }}
+      # Restore the cache from the previous job to 'chain' caches
+      nyx-cache-name-restore-suffix: ${{ needs.initialize.outputs.nyx-cache-name-suffix }}
+  
+  docusaurus-publish:
+    name: Docusaurus Publish
+    needs:
+    - initialize
+    - test
+    - docusaurus-build
+    if: needs.initialize.outputs.docusaurusChanged == 'true' || needs.initialize.outputs.release == 'true'
+    # TODO: WAIT FOR MERGE: replace the following tag '@chore/retrofitting'
+    # with '@main' as soon as the branch has been merged to main.
+    uses: mooltiverse/nyx/.github/workflows/docusaurus-publish.yml@chore/retrofitting
+    with:
+      install-jdk: true
+      install-jdk-version: ${{ env.JDK_VERSION }}
+      # Restore the cache from the previous job to 'chain' caches
+      nyx-cache-name-restore-suffix: ${{ needs.initialize.outputs.nyx-cache-name-suffix }}
+      gradle-cache-name-restore-suffix: ${{ needs.docusaurus-build.outputs.gradle-cache-name-suffix }}
+      docusaurus-cache-name-restore-suffix: ${{ needs.docusaurus-build.outputs.docusaurus-cache-name-suffix }}

@@ -1,0 +1,352 @@
+# Run Java tests in a job sequence.
+#
+# This workflow runs unit, integration and functional tests in separate
+# jobs and is well suited for medium and large test suites.
+# Execution is performed in the unit > integration > functional test
+# sequence so each job only runs if the previous is successful.
+# For smaler suites see the 'java-test-compact.yml' workflow.
+
+name: Java Test
+
+on:
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      runs-on:
+        description: |-
+          Define the type of machine to run the job on.
+          Default: ubuntu-latest
+        type: string
+        required: false
+        default: 'ubuntu-latest'
+      verbosity:
+        description: |-
+          Sets the verbosity level to adjust the output logs verbosity.
+          Allowed values are: 'error', 'warning', 'quiet', 'info', 'debug'.
+          Default: quiet
+        type: string
+        required: false
+        default: 'quiet'
+      gradle-arguments:
+        description: |-
+          The whitespace separated list of Gradle arguments to pass on the
+          Gradle command line.
+          For example you may use '--quiet', '--warn', '--info', '--debug' to
+          set the verbosity level.
+          For more see: https://docs.gradle.org/current/userguide/command_line_interface.html.
+          Default: --build-cache --stacktrace'
+        type: string
+        required: false
+        default: "--build-cache --stacktrace"
+      gradle-unit-test-tasks:
+        description: |-
+          The whitespace separated list of Gradle tasks to run for
+          Unit Tests.
+          Default: src:java:unitTest
+        type: string
+        required: false
+        default: "src:java:unitTest"
+      gradle-integration-test-tasks:
+        description: |-
+          The whitespace separated list of Gradle tasks to run for
+          Integration Tests.
+          Default: src:java:integrationTest
+        type: string
+        required: false
+        default: "src:java:integrationTest"
+      gradle-functional-test-tasks:
+        description: |-
+          The whitespace separated list of Gradle tasks to run for
+          Functional Tests.
+          Default: src:java:functionalTest
+        type: string
+        required: false
+        default: "src:java:functionalTest"
+      install-jdk:
+        description: |-
+          Whether to install the JDK or not.
+          For more see: https://github.com/actions/setup-java.
+          Please note that the tools come preinstalled in many hosted GitHub
+          runner images and re-installing would just slow down the setup process.
+          Consider installing only when the runners don't have it preinstalled or
+          when you need a specific version.
+          To check out if it's already installed see:
+          - https://docs.github.com/en/actions/using-github-hosted-runners/using-github-hosted-runners/about-github-hosted-runners#preinstalled-software
+          Default: false
+        type: boolean
+        required: false
+        default: true
+      install-jdk-distribution:
+        description: |-
+          The JDK distribution to setup if 'install-jdk' is 'true'.
+          For available distributions see: https://github.com/actions/setup-java.
+          Default: temurin
+        type: string
+        required: false
+        default: 'temurin'
+      install-jdk-version:
+        description: |-
+          The JDK version to setup if 'install-jdk' is 'true'.
+          For available versions see: https://github.com/actions/setup-java.
+          Default: 21
+        type: string
+        required: false
+        default: '21'
+      install-gradle:
+        description: |-
+          Whether to install Gradle or not.
+          For more see: https://github.com/gradle/actions/blob/main/docs/setup-gradle.md.
+          Please note that the tools come preinstalled in many hosted GitHub
+          runner images and re-installing would just slow down the setup process.
+          Consider installing only when the runners don't have it preinstalled or
+          when you need a specific version.
+          To check out if it's already installed see:
+          - https://docs.github.com/en/actions/using-github-hosted-runners/using-github-hosted-runners/about-github-hosted-runners#preinstalled-software
+          Default: false
+        type: boolean
+        required: false
+        default: false
+      install-gradle-version:
+        description: |-
+          The Gradle version to setup if 'install-gradle' is 'true'.
+          There are a few aliases that can be used here: 'wrapper' uses the version
+          defined in the Gradle wrapper (recommended), 'current' uses the latest
+          stable release.
+          For available versions see: https://github.com/gradle/actions/blob/main/docs/setup-gradle.md.
+          Default: wrapper
+        type: string
+        required: false
+        default: 'wrapper'
+      nyx-cache-name-restore-suffix:
+        description: |-
+          The suffix of the name to use for the cache that will be read by this
+          workflow. This is useful to 'chain' caches, so here you can pass the
+          suffix from a previous cache to make this workflow start from that
+          one cache.
+          If the cache to read does not exists a new one will be created from
+          scratch without errors.
+          Default: none
+        type: string
+        required: false
+        default: ""
+      gradle-cache-name-prefix:
+        description: |-
+          The prefix to use for the cache that will be read by this workflow.
+          This is useful to 'chain' caches, so here you can pass the suffix
+          from a previous cache to make this workflow start from that one cache.
+          Moreover, this can be used to override the default Gradle action's
+          cache prefix to make all jobs within the same stream (i.e. a feature)
+          share the same prefix and not overlap with other streams. However,
+          when setting this prefix to some specific feature you won't be
+          able to merge the caches and in case you 'chain' them you can only
+          use one upstream cache for each downstream job.
+          If the cache to read does not exists a new one will be created from
+          scratch without errors.
+          Default: gradle-\$\{\{ github.job \}\}-java (isolate the cache for
+          the 'java' feature).
+        type: string
+        required: false
+        default: "gradle-${{ github.run_id }}-java"
+      gradle-cache-name-restore-suffix:
+        description: |-
+          The suffix of the name to use for the cache that will be read by this
+          workflow. This is useful to 'chain' caches, so here you can pass the
+          suffix from a previous cache to make this workflow start from that
+          one cache.
+          If the cache to read does not exists a new one will be created from
+          scratch without errors.
+          Default: \$\{\{ github.job \}\}
+        type: string
+        required: false
+        default: "${{ github.job }}"
+      java-cache-name-restore-suffix:
+        description: |-
+          The suffix of the name to use for the cache that will be read by this
+          workflow. This is useful to 'chain' caches, so here you can pass the
+          suffix from a previous cache to make this workflow start from that
+          one cache.
+          If the cache to read does not exists a new one will be created from
+          scratch without errors.
+          Default: \$\{\{ github.job \}\}
+        type: string
+        required: false
+        default: "${{ github.job }}"
+    outputs:
+      gradle-cache-name-suffix:
+        description: "The suffix of the name used by the last cache in this workflow. This is useful to 'chain' caches, so you can pass this value as input for other actions or workflows."
+        value: ${{ jobs.test-functional.outputs.gradle-cache-name-suffix }}
+      java-cache-name-suffix:
+        description: "The suffix of the name used by the last cache in this workflow. This is useful to 'chain' caches, so you can pass this value as input for other actions or workflows."
+        value: ${{ jobs.test-functional.outputs.java-cache-name-suffix }}
+
+env:
+  # Compute the extra Gradle properties to use for Gradle commands.
+  # Here:
+  # - we add one argument for the verbosity level passed in the 'verbosity' input
+  GRADLE_EXTRA_OPTS: >-
+    ${{ inputs.gradle-arguments }}
+    ${{ inputs.verbosity == 'warning' && '--warn' || '' }}
+    ${{ inputs.verbosity == 'quiet' && '--quiet' || '' }}
+    ${{ inputs.verbosity == 'info' && '--info' || '' }}
+    ${{ inputs.verbosity == 'debug' && '--debug' || '' }}
+
+jobs:
+  test-unit:
+    name: Unit Test
+    runs-on: ${{ inputs.runs-on }}
+    steps:
+    # TODO: WAIT FOR MERGE: replace the following tag '@chore/retrofitting'
+    # with '@main' as soon as the branch has been merged to main.
+    - uses: mooltiverse/nyx/.github/actions/setup-git@chore/retrofitting
+      with:
+        verbosity: ${{ inputs.verbosity }}
+    - id: nyx
+      # TODO: WAIT FOR MERGE: replace the following tag '@chore/retrofitting'
+      # with '@main' as soon as the branch has been merged to main.
+      uses: mooltiverse/nyx/.github/actions/setup-nyx@chore/retrofitting
+      with:
+        verbosity: ${{ inputs.verbosity }}
+        cache-name-restore-suffix: ${{ inputs.nyx-cache-name-restore-suffix }}
+    - id: java
+      # TODO: WAIT FOR MERGE: replace the following tag '@chore/retrofitting'
+      # with '@main' as soon as the branch has been merged to main.
+      uses: mooltiverse/nyx/.github/actions/setup-java@chore/retrofitting
+      with:
+        verbosity: ${{ inputs.verbosity }}
+        # Restore the cache from the previous job to 'chain' the two caches
+        cache-name-restore-suffix: ${{ inputs.java-cache-name-restore-suffix }}
+    - id: gradle
+      # TODO: WAIT FOR MERGE: replace the following tag '@chore/retrofitting'
+      # with '@main' as soon as the branch has been merged to main.
+      uses: mooltiverse/nyx/.github/actions/setup-gradle@chore/retrofitting
+      with:
+        verbosity: ${{ inputs.verbosity }}
+        # Override the installed software version or re-install the packages if they
+	      # have been removed by the free-disk-space action.
+        install-jdk: ${{ inputs.install-jdk }}
+        install-jdk-version: ${{ inputs.install-jdk-version }}
+        install-jdk-distribution: ${{ inputs.install-jdk-distribution }}
+        install-gradle: ${{ inputs.install-gradle }}
+        install-gradle-version: ${{ inputs.install-gradle-version }}
+        cache-name-prefix: ${{ inputs.gradle-cache-name-prefix }}
+        # Restore the cache from the previous job to 'chain' the two caches
+        cache-name-restore-suffix: ${{ inputs.gradle-cache-name-restore-suffix }}
+    - name: Run Unit Tests the on Java code
+      run: ./gradlew ${{ env.GRADLE_EXTRA_OPTS }} ${{ inputs.gradle-unit-test-tasks }} ${{ inputs.gradle-arguments }}
+    - name: Publish the unit test report artifacts
+      uses: actions/upload-artifact@v4
+      if: ${{ always() }}
+      with:
+        name: java-unit-test-reports
+        path: src/java/**/build/test/reports/unit/
+    outputs:
+      java-cache-name-suffix: ${{ steps.java.outputs.cache-name-suffix }}
+      gradle-cache-name-suffix: ${{ steps.gradle.outputs.cache-name-suffix }}
+
+  test-integration:
+    name: Integration Test
+    needs:
+    - test-unit
+    runs-on: ${{ inputs.runs-on }}
+    steps:
+    # TODO: WAIT FOR MERGE: replace the following tag '@chore/retrofitting'
+    # with '@main' as soon as the branch has been merged to main.
+    - uses: mooltiverse/nyx/.github/actions/setup-git@chore/retrofitting
+      with:
+        verbosity: ${{ inputs.verbosity }}
+    - id: nyx
+      # TODO: WAIT FOR MERGE: replace the following tag '@chore/retrofitting'
+      # with '@main' as soon as the branch has been merged to main.
+      uses: mooltiverse/nyx/.github/actions/setup-nyx@chore/retrofitting
+      with:
+        verbosity: ${{ inputs.verbosity }}
+        cache-name-restore-suffix: ${{ inputs.nyx-cache-name-restore-suffix }}
+    - id: java
+      # TODO: WAIT FOR MERGE: replace the following tag '@chore/retrofitting'
+      # with '@main' as soon as the branch has been merged to main.
+      uses: mooltiverse/nyx/.github/actions/setup-java@chore/retrofitting
+      with:
+        verbosity: ${{ inputs.verbosity }}
+        # Restore the cache from the previous job to 'chain' the two caches
+        cache-name-restore-suffix: ${{ needs.test-unit.outputs.java-cache-name-suffix }}
+    - id: gradle
+      # TODO: WAIT FOR MERGE: replace the following tag '@chore/retrofitting'
+      # with '@main' as soon as the branch has been merged to main.
+      uses: mooltiverse/nyx/.github/actions/setup-gradle@chore/retrofitting
+      with:
+        verbosity: ${{ inputs.verbosity }}
+        # Override the installed software version or re-install the packages if they
+	      # have been removed by the free-disk-space action.
+        install-jdk: ${{ inputs.install-jdk }}
+        install-jdk-version: ${{ inputs.install-jdk-version }}
+        install-jdk-distribution: ${{ inputs.install-jdk-distribution }}
+        install-gradle: ${{ inputs.install-gradle }}
+        install-gradle-version: ${{ inputs.install-gradle-version }}
+        cache-name-prefix: ${{ inputs.gradle-cache-name-prefix }}
+        # Restore the cache from the previous job to 'chain' the two caches
+        cache-name-restore-suffix: ${{ needs.test-unit.outputs.gradle-cache-name-suffix }}
+    - name: Run Integration Tests on Java code
+      run: ./gradlew ${{ env.GRADLE_EXTRA_OPTS }} ${{ inputs.gradle-integration-test-tasks }} ${{ inputs.gradle-arguments }}
+    - name: Publish the integration test report artifacts
+      uses: actions/upload-artifact@v4
+      if: ${{ always() }}
+      with:
+        name: java-integration-test-reports
+        path: src/java/**/build/test/reports/integration/
+    outputs:
+      java-cache-name-suffix: ${{ steps.java.outputs.cache-name-suffix }}
+      gradle-cache-name-suffix: ${{ steps.gradle.outputs.cache-name-suffix }}
+
+  test-functional:
+    name: Functional Test
+    needs:
+    - test-integration
+    runs-on: ${{ inputs.runs-on }}
+    steps:
+    # TODO: WAIT FOR MERGE: replace the following tag '@chore/retrofitting'
+    # with '@main' as soon as the branch has been merged to main.
+    - uses: mooltiverse/nyx/.github/actions/setup-git@chore/retrofitting
+      with:
+        verbosity: ${{ inputs.verbosity }}
+    - id: nyx
+      # TODO: WAIT FOR MERGE: replace the following tag '@chore/retrofitting'
+      # with '@main' as soon as the branch has been merged to main.
+      uses: mooltiverse/nyx/.github/actions/setup-nyx@chore/retrofitting
+      with:
+        verbosity: ${{ inputs.verbosity }}
+        cache-name-restore-suffix: ${{ inputs.nyx-cache-name-restore-suffix }}
+    - id: java
+      # TODO: WAIT FOR MERGE: replace the following tag '@chore/retrofitting'
+      # with '@main' as soon as the branch has been merged to main.
+      uses: mooltiverse/nyx/.github/actions/setup-java@chore/retrofitting
+      with:
+        verbosity: ${{ inputs.verbosity }}
+        # Restore the cache from the previous job to 'chain' the two caches
+        cache-name-restore-suffix: ${{ needs.test-integration.outputs.java-cache-name-suffix }}
+    - id: gradle
+      # TODO: WAIT FOR MERGE: replace the following tag '@chore/retrofitting'
+      # with '@main' as soon as the branch has been merged to main.
+      uses: mooltiverse/nyx/.github/actions/setup-gradle@chore/retrofitting
+      with:
+        verbosity: ${{ inputs.verbosity }}
+        # Override the installed software version or re-install the packages if they
+	      # have been removed by the free-disk-space action.
+        install-jdk: ${{ inputs.install-jdk }}
+        install-jdk-version: ${{ inputs.install-jdk-version }}
+        install-jdk-distribution: ${{ inputs.install-jdk-distribution }}
+        install-gradle: ${{ inputs.install-gradle }}
+        install-gradle-version: ${{ inputs.install-gradle-version }}
+        cache-name-prefix: ${{ inputs.gradle-cache-name-prefix }}
+        # Restore the cache from the previous job to 'chain' the two caches
+        cache-name-restore-suffix: ${{ needs.test-integration.outputs.gradle-cache-name-suffix }}
+    - name: Run Functional Tests on Java code
+      run: ./gradlew ${{ env.GRADLE_EXTRA_OPTS }} ${{ inputs.gradle-functional-test-tasks }} ${{ inputs.gradle-arguments }}
+    - name: Publish the functional test report artifacts
+      uses: actions/upload-artifact@v4
+      if: ${{ always() }}
+      with:
+        name: java-functional-test-reports
+        path: src/java/**/build/test/reports/functional/
+    outputs:
+      java-cache-name-suffix: ${{ steps.java.outputs.cache-name-suffix }}
+      gradle-cache-name-suffix: ${{ steps.gradle.outputs.cache-name-suffix }}

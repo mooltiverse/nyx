@@ -1,0 +1,195 @@
+# Initialize the pipeline and expose outputs for next jobs.
+
+name: Initialize
+
+on:
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      runs-on:
+        description: |-
+          Define the type of machine to run the job on.
+          Default: ubuntu-latest
+        type: string
+        required: false
+        default: 'ubuntu-latest'
+      verbosity:
+        description: |-
+          Sets the verbosity level to adjust the output logs verbosity.
+          Allowed values are: 'error', 'warning', 'quiet', 'info', 'debug'.
+          Default: quiet
+        type: string
+        required: false
+        default: 'quiet'
+    outputs:
+      # Version attributes
+      isCoreVersion:
+        description: "This value is true when the version only uses core identifiers (i.e. is not a pre-release) according to the scheme"
+        value: ${{ jobs.infer.outputs.isCoreVersion }}
+      isLatestVersion:
+        description: "This value is true when the version is the latest in the repository, meaning that, according to the scheme, there are no other tags in the Git repository representing any version greater than version"
+        value: ${{ jobs.infer.outputs.isLatestVersion }}
+      isNewRelease:
+        description: "This value is true when the 'newVersion' is true and a new release with the current 'version' has to be issued"
+        value: ${{ jobs.infer.outputs.isNewRelease }}
+      isNewVersion:
+        description: "This value is true when the 'version' is new and is basically a shorthand to testing if 'version' is different than the 'previousVersion'"
+        value: ${{ jobs.infer.outputs.isNewVersion }}
+      previousVersion:
+        description: "The version that was released before the one being created"
+        value: ${{ jobs.infer.outputs.previousVersion }}
+      version:
+        description: "The version that was inferred"
+        value: ${{ jobs.infer.outputs.version }}
+      timestamp:
+        description: "The timestamp in the Unix format (seconds since Jan 01 1970. (UTC). Example: '1591802533'"
+        value: ${{ jobs.infer.outputs.timestamp }}
+      # Feature attributes
+      publish:
+        description: "This flag is true when the project has to publish artifacts upon a successful build"
+        value: ${{ jobs.infer.outputs.isNewRelease }}
+      release:
+        description: "This flag is true when the project has to issue a new release upon a successful build"
+        value: ${{ jobs.infer.outputs.isNewRelease }}
+      goProbed:
+        description: "This flag is true when Go contents have been detected within the project"
+        value: ${{ jobs.infer.outputs.goProbed }}
+      goChanged:
+        description: "This flag is true when Go contents have been detected within the project and they have changed"
+        value: ${{ jobs.infer.outputs.goChanged }}
+      javaProbed:
+        description: "This flag is true when Java contents have been detected within the project"
+        value: ${{ jobs.infer.outputs.javaProbed }}
+      javaChanged:
+        description: "This flag is true when Java contents have been detected within the project and they have changed"
+        value: ${{ jobs.infer.outputs.javaChanged }}
+      dockerProbed:
+        description: "This flag is true when Docker contents have been detected within the project"
+        value: ${{ jobs.infer.outputs.dockerProbed }}
+      dockerChanged:
+        description: "This flag is true when Docker contents have been detected within the project and they have changed"
+        value: ${{ jobs.infer.outputs.dockerChanged }}
+      docusaurusProbed:
+        description: "This flag is true when Docusaurus contents have been detected within the project"
+        value: ${{ jobs.infer.outputs.docusaurusProbed }}
+      docusaurusChanged:
+        description: "This flag is true when Docusaurus contents have been detected within the project and they have changed"
+        value: ${{ jobs.infer.outputs.docusaurusChanged }}
+      # Cache attributes
+      nyx-cache-name-suffix:
+        description: "The suffix of the name used by the last cache in this workflow. This is useful to 'chain' caches, so you can pass this value as input for other actions or workflows."
+        value: ${{ jobs.infer.outputs.nyx-cache-name-suffix }}
+
+jobs:
+  infer:
+    name: Infer
+    runs-on: ${{ inputs.runs-on }}
+    steps:
+    # Scan the project for all the supported features and infer the overall
+    # attributes and flags used to enable or disable jobs.
+    # Software setups and caches are disabled at this stage as we just need
+    # to detect whether or not certain workflows must be enabled.
+    - id: git
+      uses: mooltiverse/nyx/.github/actions/setup-git@main
+      with:
+        verbosity: ${{ inputs.verbosity }}
+    - id: nyx
+      # TODO: WAIT FOR MERGE: replace the following tag '@chore/retrofitting'
+      # with '@main' as soon as the branch has been merged to main.
+      uses: mooltiverse/nyx/.github/actions/setup-nyx@chore/retrofitting
+      with:
+        verbosity: ${{ inputs.verbosity }}
+        enable-artifacts: true
+    - id: go
+      # TODO: WAIT FOR MERGE: replace the following tag '@chore/retrofitting'
+      # with '@main' as soon as the branch has been merged to main.
+      uses: mooltiverse/nyx/.github/actions/setup-go@chore/retrofitting
+      with:
+        verbosity: ${{ inputs.verbosity }}
+        enable-cache: false
+        install-go: false
+    - id: java
+      # TODO: WAIT FOR MERGE: replace the following tag '@chore/retrofitting'
+      # with '@main' as soon as the branch has been merged to main.
+      uses: mooltiverse/nyx/.github/actions/setup-java@chore/retrofitting
+      with:
+        verbosity: ${{ inputs.verbosity }}
+        enable-cache: false
+        install-jdk: false
+    - id: docker
+      # TODO: WAIT FOR MERGE: replace the following tag '@chore/retrofitting'
+      # with '@main' as soon as the branch has been merged to main.
+      uses: mooltiverse/nyx/.github/actions/setup-docker@chore/retrofitting
+      with:
+        verbosity: ${{ inputs.verbosity }}
+        enable-cache: false
+        enable-containerd-image-store: false
+    - id: docusaurus
+      # TODO: WAIT FOR MERGE: replace the following tag '@chore/retrofitting'
+      # with '@main' as soon as the branch has been merged to main.
+      uses: mooltiverse/nyx/.github/actions/setup-docusaurus@chore/retrofitting
+      with:
+        verbosity: ${{ inputs.verbosity }}
+        enable-cache: false
+        install-node: false
+    # Produce annotation and log outputs
+    - name: Log the cache selection warning message
+      if: ${{ github.ref != 'refs/heads/main' }}
+      run: echo "::notice title=Limited Gradle cache support::The Gradle cache support is limited when running in any branch other than 'main' so you may experience the same tasks to run multiple times when in different jobs."
+    - name: Create 'Version' annotation
+      run: echo "::notice title=Version=${{ steps.nyx.outputs.version }}::previous version=${{ steps.nyx.outputs.previousVersion }}, new version=${{ steps.nyx.outputs.newVersion }}, new release=${{ steps.nyx.outputs.newRelease }}, core version=${{ steps.nyx.outputs.coreVersion }}, latest version=${{ steps.nyx.outputs.latestVersion }}, timestamp=${{ steps.nyx.outputs.timestamp }}"
+    - name: Create the 'Release' annotation
+      run: |
+        if [ "${{ steps.nyx.outputs.newRelease}}" = "true" ]; then
+          echo "::notice title=Release=${{ steps.nyx.outputs.version }}::Release ${{ steps.nyx.outputs.version }} will be issued as part of this pipeline"
+        else
+          echo "::notice title=Release=n/a::No release will be issued as part of this pipeline"
+        fi
+    - name: Log the 'Version attributes'
+      run: |
+        echo "::group::Version attributes"
+        echo "Version: ${{ steps.nyx.outputs.version }}"
+        echo "Previous Version: ${{ steps.nyx.outputs.previousVersion }}"
+        echo "Timestamp: ${{ steps.nyx.outputs.timestamp }}"
+        echo "Is a new version: ${{ steps.nyx.outputs.newVersion }}"
+        echo "Is a new release: ${{ steps.nyx.outputs.newRelease }}"
+        echo "Is a core version: ${{ steps.nyx.outputs.coreVersion }}"
+        echo "Is the latest version: ${{ steps.nyx.outputs.latestVersion }}"
+        echo "::endgroup::"
+    - name: Log the 'Probed features'
+      run: |
+        echo "::group::Probed features"
+        echo "Go: ${{ steps.go.outputs.probed }}"
+        echo "Java: ${{ steps.java.outputs.probed }}"
+        echo "Docker: ${{ steps.docker.outputs.probed }}"
+        echo "Docusaurus: ${{ steps.docusaurus.outputs.probed }}"
+        echo "::endgroup::"
+    - name: Log the 'Changed files'
+      run: |
+        echo "::group::Changed files"
+        echo "Go: ${{ steps.go.outputs.changed }}"
+        echo "Java: ${{ steps.java.outputs.changed }}"
+        echo "Docker: ${{ steps.docker.outputs.changed }}"
+        echo "Docusaurus: ${{ steps.docusaurus.outputs.changed }}"
+        echo "::endgroup::"
+    outputs:
+      # Expose the version attributes.
+      isCoreVersion: ${{ steps.nyx.outputs.coreVersion }}
+      isLatestVersion: ${{ steps.nyx.outputs.latestVersion }}
+      isNewRelease: ${{ steps.nyx.outputs.newRelease }}
+      isNewVersion: ${{ steps.nyx.outputs.newVersion }}
+      previousVersion: ${{ steps.nyx.outputs.previousVersion }}
+      version: ${{ steps.nyx.outputs.version }}
+      timestamp: ${{ steps.nyx.outputs.timestamp }}
+      # Expose the conditional flags telling which features have been probed
+      # and which files are changed.
+      goProbed: ${{ steps.go.outputs.probed }}
+      goChanged: ${{ steps.go.outputs.changed }}
+      javaProbed: ${{ steps.java.outputs.probed }}
+      javaChanged: ${{ steps.java.outputs.changed }}
+      dockerProbed: ${{ steps.docker.outputs.probed }}
+      dockerChanged: ${{ steps.docker.outputs.changed }}
+      docusaurusProbed: ${{ steps.docusaurus.outputs.probed }}
+      docusaurusChanged: ${{ steps.docusaurus.outputs.changed }}
+      # Expose the cache attributes
+      nyx-cache-name-suffix: ${{ steps.nyx.outputs.cache-name-suffix }}

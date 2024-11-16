@@ -394,16 +394,6 @@ allprojects.each {prj ->
 /*------------------------------------------------------------------------------
   Extension configurations
 ------------------------------------------------------------------------------*/
-// Configure SonarCloud
-// See: https://docs.sonarcloud.io/advanced-setup/ci-based-analysis/sonarscanner-for-gradle/
-sonarqube {
-    properties {
-        property "sonar.projectKey", "mooltiverse_nyx_java"
-        //property "sonar.junit.reportPaths", "$buildDir/test-results/test/*.xml,$buildDir/test-results/integrationTest/*.xml,$buildDir/test-results/functionalTest/*.xml"
-        property "sonar.coverage.jacoco.xmlReportPaths", "$buildDir/reports/jacoco/testCodeCoverageReport/testCodeCoverageReport.xml"
-    }
-}
-
 publishing {
     repositories {
         // The GitHub Packages repository, visible at https://github.com/mooltiverse/nyx/packages

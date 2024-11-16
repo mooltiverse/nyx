@@ -18,7 +18,6 @@ description = 'All the Nyx Go artifacts'
 allprojects {    
 }
 
-
 /*------------------------------------------------------------------------------
   This is the configuration for all sub-projects, but not this project
 ------------------------------------------------------------------------------*/
@@ -414,17 +413,6 @@ configurations {
   https://docs.gradle.org/current/userguide/dependency_management_for_java_projects.html
 */
 dependencies {
-}
-
-/*------------------------------------------------------------------------------
-  Extension configurations
-------------------------------------------------------------------------------*/
-// Configure SonarCloud
-// See: https://docs.sonarcloud.io/advanced-setup/ci-based-analysis/sonarscanner-for-gradle/
-sonarqube {
-    properties {
-        property "sonar.projectKey", "mooltiverse_nyx_go"
-    }
 }
 
 /*------------------------------------------------------------------------------

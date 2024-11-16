@@ -1,0 +1,335 @@
+name: "Setup Gradle"
+description: |-
+  Run the common tasks to setup a Gradle environment from scratch or restoring
+  the environment from a previous job:
+  - grants execute permissions to the gradlew script
+  - set up the JDK
+  - set up a Gradle cache for distributed up-to-date checks across jobs so
+    Gradle tasks can use the cache by just using the --build-cache option
+  Please note that this Action doesn't run and actual command or task other
+  than those used to set up the environment. Build commands are to be executed
+  after this Action completes.
+  
+  Also note that the underlying cache implementation is different when the
+  workflow runs in the 'main' branch or not.
+  When in the 'main' branch it uses the 'burrunan/gradle-cache-action@', which
+  is much more efficient but since that action doesn't work on any other branch
+  than 'main' we need to fall back to a custom cache handling when in other
+  branches.
+  The custom cache works well in a 'linear' scenario, when one job follows the
+  other, but has issues in merging caches from multiple jobs into one (i.e.
+  for 'fan-in' or 'waypoint' jobs) so in that case you basically just need
+  to start from the most significant cache, and Gradle will consider all the
+  tasks executed by other jobs not up to date.
+  Due to the above, the 'cache-name-suffix' and 'cache-name-restore-suffix'
+  inputs are only used for non-'main' branches, while for the 'main' branch
+  the centralized cache will only use the 'cache-name-prefix' for all caches.
+inputs:
+  directory:
+    description: |-
+      The directory, relative to the repository root and without the trailing
+      slash, where the contents for this feature are stored.
+      As long as you are using the common project layour you don't need to
+      change this directory.
+      This directory is used to probe this feature. See the 'probed' output for
+      more.
+      Default: .
+    required: false
+    default: '.'
+  verbosity:
+    description: |-
+      Sets the verbosity level to adjust the output logs verbosity.
+      Allowed values are: 'error', 'warning', 'quiet', 'info', 'debug'.
+      Default: quiet
+    required: false
+    default: 'quiet'
+  enable-cache:
+    description: |-
+      Whether to enable the cache.
+      Default: true
+    required: false
+    default: 'true'
+  cache-name-prefix:
+    description: |-
+      The prefix of the name to use for the cache that will be read and/or
+      written by this Action.
+      If the cache to read does not exists a new one will be created from
+      scratch without errors.
+      Default: gradle-\$\{\{ github.run_id \}\}
+    required: false
+    default: 'gradle-${{ github.run_id }}'
+  cache-name-suffix:
+    description: |-
+      The suffix of the name to use for the cache that will be written by this
+      Action.
+      If the cache to read does not exists a new one will be created from
+      scratch without errors.
+      In case you want multiple jobs share the same artifacts you can either
+      set this value to a generic identifier (which might as well be the
+      name of the job that bootstrapped the cache), using the same in all jobs,
+      or even leave it empty. What's important for sharing the same artifacts
+      is that all jobs use the same value for this attribute, so they use the
+      same cache instance.
+      Remember, though, that regardless of which job writes the cache, the same
+      entry (file) can only be written once in the cache so this means that
+      jobs may add new entries but not overwrite existing ones with new versions.
+      In the other case, when you need jobs to write new versions of files, you
+      need chaining caches, which means one job creates the first cache, then
+      others need to read from the previous cache version and create a new cache
+      with updated contents.
+      When chaining caches, this value should be (or at least include) the ID
+      of the Job that writes the cache, while the 'cache-name-restore-suffix'
+      has the value of the 'cache-name-suffix' of the job to read the previous
+      cache from.
+      This allows to chain caches in a way that each job writes its own cache,
+      while starting from a previous cache written by some other job.
+      Default: \$\{\{ github.job \}\}
+    required: false
+    default: '${{ github.job }}'
+  cache-name-restore-suffix:
+    description: |-
+      The suffix of the name to use for the cache that will be read by this
+      Action.
+      If the cache to read does not exists a new one will be created from
+      scratch without errors.
+      In case you want multiple jobs share the same artifacts just use the
+      same value here of the 'cache-name-suffix' attribute used in all jobs
+      sharing the cache.
+      In the other case, when you need jobs to write new versions of files,
+      you need chaining caches, which means one job creates the first cache,
+      then others need to read from the previous cache version and create a
+      new cache with updated contents. In this case this value must be the
+      'cache-name-suffix' of the job to read the previous version of the
+      cache from. This way you can start from the previous job's cache and
+      create a new version.
+      By default this value is the same as 'cache-name-suffix' so as long as
+      you don't set this value this cache will be read-only.
+      Default: \$\{\{ github.job \}\}
+    required: false
+    default: '${{ github.job }}'
+  cache-contents:
+    description: |-
+      The entries to include in the cache.
+      You can use a multi-line value here to specify multiple entries.
+      Default:
+        ~/.gradle/caches
+        ~/.gradle/wrapper
+        ~/.m2/repository
+        .gradle
+    required: false
+    default: |-
+      ~/.gradle/caches
+      ~/.gradle/wrapper
+      ~/.m2/repository
+      .gradle
+  install-jdk:
+    description: |-
+      Whether to install the JDK or not.
+      For more see: https://github.com/actions/setup-java.
+      Please note that the tools come preinstalled in many hosted GitHub
+      runner images and re-installing would just slow down the setup process.
+      Consider installing only when the runners don't have it preinstalled or
+      when you need a specific version.
+      To check out if it's already installed see:
+      - https://docs.github.com/en/actions/using-github-hosted-runners/using-github-hosted-runners/about-github-hosted-runners#preinstalled-software
+      Default: false
+    required: false
+    default: 'false'
+  install-jdk-distribution:
+    description: |-
+      The JDK distribution to setup if 'install-jdk' is 'true'.
+      For available distributions see: https://github.com/actions/setup-java.
+      Default: temurin
+    required: false
+    default: 'temurin'
+  install-jdk-version:
+    description: |-
+      The JDK version to setup if 'install-jdk' is 'true'.
+      For available versions see: https://github.com/actions/setup-java.
+      Default: 21
+    required: false
+    default: '21'
+  install-gradle:
+    description: |-
+      Whether to install Gradle or not.
+      For more see: https://github.com/gradle/actions/blob/main/docs/setup-gradle.md.
+      Please note that the tools come preinstalled in many hosted GitHub
+      runner images and re-installing would just slow down the setup process.
+      Consider installing only when the runners don't have it preinstalled or
+      when you need a specific version.
+      To check out if it's already installed see:
+      - https://docs.github.com/en/actions/using-github-hosted-runners/using-github-hosted-runners/about-github-hosted-runners#preinstalled-software
+      Default: false
+    required: false
+    default: 'false'
+  install-gradle-version:
+    description: |-
+      The Gradle version to setup if 'install-gradle' is 'true'.
+      There are a few aliases that can be used here: 'wrapper' uses the version
+      defined in the Gradle wrapper (recommended), 'current' uses the latest
+      stable release.
+      For available versions see: https://github.com/gradle/actions/blob/main/docs/setup-gradle.md.
+      Default: wrapper
+    required: false
+    default: 'wrapper'
+outputs:
+  probed:
+    description: "Returns 'true' if this action has probed the files for this feature."
+    value: ${{ steps.probe.outputs.files_exists == 'true' }}
+  cache-name:
+    description: "The name of the cache key"
+    value: ${{ inputs.cache-name-prefix }}-${{ inputs.cache-name-suffix }}
+  cache-name-suffix:
+    description: "The value of the 'cache-name-suffix'"
+    value: ${{ inputs.cache-name-suffix }}
+runs:
+  # Composite GitHub Actions actions require to set 'using': 'composite'
+  using: "composite"
+  steps:
+  - name: List contents used for probing the project
+    if: ${{ inputs.verbosity == 'debug' }}
+    shell: sh
+    continue-on-error: true
+    run: |
+      echo "::group::Contents used for probing the project"
+      ls -alR ${{ inputs.directory }}/gradlew ${{ inputs.directory }}/*.gradle ${{ inputs.directory }}/gradle.*
+      echo "::endgroup::"
+  - name: Probing the project
+    id: probe
+    uses: andstor/file-existence-action@v3
+    with:
+      files: "${{ inputs.directory }}/gradlew ${{ inputs.directory }}/*.gradle ${{ inputs.directory }}/gradle.*"
+  - name: Log the cache selection warnings
+    if: ${{ github.ref != 'refs/heads/main' && (inputs.verbosity == 'warning' || inputs.verbosity == 'quiet' || inputs.verbosity == 'info' || inputs.verbosity == 'debug') }}
+    shell: sh
+    run: |
+      echo "::group::Limited Gradle cache support"
+      echo "This action uses the 'burrunan/gradle-cache-action' distributed"
+      echo "Gradle cache when in the 'main' branch and the custom, standard,"
+      echo "'actions/cache' when in any other branch."
+      echo "This is due to a limitation of the 'burrunan/gradle-cache-action',"
+      echo "which is much more efficient and, since it's 'distributed', also"
+      echo "allows 'fan-in' or 'waypoint' jobs."
+      echo "The 'actions/cache' cache, though, is limited and cannot reconcile"
+      echo "in case of multiple streams of jobs and workflows."
+      echo "In other words, the 'burrunan/gradle-cache-action' is able to"
+      echo "manage the Gradle cache across multiple jobs and workers, while"
+      echo "the 'actions/cache' is limited to a single one, even when"
+      echo "this action carries on the cache from one job to another through"
+      echo "'chaining'. However, 'chaining' cannot merge among multiple sources"
+      echo "so in case of 'fan in' jobs (with multiple sources) the upstream"
+      echo "cache can't be used (or, in the best case, you can use a single"
+      echo "one, that you consider the most significant)."
+      echo "Therefore, when in non 'main' branches the cache will be less"
+      echo "efficient and Gradle will fail some up-to-date checks if you"
+      echo "previously had to select which cache to start from when in"
+      echo "'fan-in' or 'waypoint' jobs."
+      echo "As a consequence you may see Gradle re-running some tasks that"
+      echo "already completed in previous jobs."
+      echo "::endgroup::"
+  - name: Set up the ${{ inputs.cache-name-prefix }}-${{ inputs.cache-name-suffix }} cache
+    # The 'burrunan/gradle-cache-action' actions would be much more effective
+    # but only works in the 'main' branch, so when the branch is not 'main'
+    # we use this custom cache as a fallback.
+    # This custom cache works well in 'linear' scenarios, when one cache is
+    # handed over from one job to another using the 'cache-name-restore-suffix'
+    # input, but doesn't allow merging caches from multiple jobs into one.
+    uses: actions/cache@v4
+    if: ${{ inputs.enable-cache == 'true' && github.ref != 'refs/heads/main' }}
+    with:
+      key: ${{ inputs.cache-name-prefix }}-${{ inputs.cache-name-suffix }}
+      restore-keys: |-
+        ${{ inputs.cache-name-prefix }}-${{ inputs.cache-name-restore-suffix }}
+      path: ${{ inputs.cache-contents }}
+      enableCrossOsArchive: true
+  - name: List the cache contents
+    if: ${{ inputs.enable-cache == 'true' && github.ref != 'refs/heads/main' && inputs.verbosity == 'debug' }}
+    shell: sh
+    continue-on-error: true
+    run: |
+      echo "::group::Cache contents"
+      ls -alR ${{ inputs.cache-contents }}
+      echo "::endgroup::"
+  - name: Set up the ${{ inputs.cache-name-prefix }}-${{ inputs.cache-name-suffix }} remote cache
+    # Unfortunately this cache is only effective when in the 'main' branch.
+    # When not in the 'main' branch it will never store the cache at the end
+    # of a job and this is visible by the message it logs, like:
+    #     local-build-cache: old contents is not found, and the current cache
+    #         gradle-build-cache-Linux-gradle-11650325575-Linux-docker-gradle-8.10.1-feature-cccc10446ba74206a26ea2ac72221e2d137aa2ab
+    #     does not start with
+    #         gradle-build-cache-Linux-gradle-11650325575-Linux-docker-gradle-8.10.1-defaultbranch
+    #     so cache saving can't be done
+    # so the next jobs will never find any available cache.
+    # Unfortunately there is no way to control the cache key and the trailing
+    # part of the key, containing the branch name, is always added by the
+    # action so we can't force it to match the 'defaultbranch', which is also
+    # hardcoded for non 'main' branches.
+    # As a result, we only use this cache for the 'main' branch, where it's very
+    # effective, otherwise we use the custom one above.
+    uses: burrunan/gradle-cache-action@v2
+    if: ${{ inputs.enable-cache == 'true' && github.ref == 'refs/heads/main' }}
+    with:
+      gradle-version: ${{ inputs.install-gradle-version }}
+      # The remote cache needs to be identified by a 'group' of caches,
+      # otherwise storing the cache for each individual job won't share
+      # anything aming jobs, so here we use the prefix, that must be common
+      # for all jobs within a workflow.
+      job-id: ${{ inputs.cache-name-prefix }}
+      read-only: false
+      concurrent: true
+      save-local-build-cache: true
+      save-generated-gradle-jars: true
+      save-gradle-dependencies-cache: true
+      remote-build-cache-proxy-enabled: true
+      gradle-distribution-sha-256-sum-warning: false
+  - name: Grant execute permission for the 'gradlew' executable and make Git ignore file permissions
+    shell: bash
+    # We need to make Git ignore execute permission changes to avoid
+    # false positives in change detection
+    run: |-
+      git config core.fileMode false
+      chmod +x gradlew
+  - name: Setup Java
+    # TODO: WAIT FOR MERGE: replace the following tag '@chore/retrofitting'
+    # with '@main' as soon as the branch has been merged to main.
+    uses: mooltiverse/nyx/.github/actions/setup-java@chore/retrofitting
+    if: ${{ inputs.install-jdk == 'true' }}
+    with:
+      verbosity: ${{ inputs.verbosity }}
+      # No need to setup an extra cache for Java. The Gradle cache is enough.
+      install-jdk: ${{ inputs.install-jdk }}
+      enable-cache: false
+      enable-changed-files-detection: false
+      install-jdk-distribution: ${{ inputs.install-jdk-distribution }}
+      install-jdk-version: ${{ inputs.install-jdk-version }}
+  - name: Setup Gradle
+    # As long as we use the Gradle wrapper we could not set up Gradle with this
+    # action. However, this may be faster than downloading from the internet as
+    # it may be already cached in GitHub's infrastructure.
+    #
+    # This action could be a good option to also setup the Gradle cache but
+    # it doesn't allow to set the cache key name so it can't bring the cache
+    # across multiple jobs.
+    # The plugin is alble to bring the cache over for multiple steps within the
+    # same jobs but falls short when it comes to different jobs.
+    # This, by the way, makes it somehow useless because tasks running within
+    # the same job already share the same worker instance so the Gradle cache
+    # is not much of an issue. What the plugin seems good at is with next runs
+    # of the same job in the same pipeline (i.e. because of new Git commits),
+    # but we rather need to transport a cache between multiple jobs in the same
+    # run than the same job on multiple runs.
+    #
+    # For more see:
+    # - https://github.com/gradle/actions/blob/main/docs/setup-gradle.md
+    # - https://github.com/gradle/actions/blob/main/docs/setup-gradle.md#cache-keys
+    # - https://github.com/gradle/actions/blob/main/docs/setup-gradle.md#finding-a-matching-cache-entry
+    uses: gradle/actions/setup-gradle@v4
+    if: ${{ inputs.install-gradle == 'true' }}
+    with:
+      gradle-version: ${{ inputs.install-gradle-version }}
+      # Use the custom cache configured above
+      cache-disabled: true
+      # The build cache report on the Action page is cumbersome, especially
+      # when there are many tasks, so let's just print it in case of errors.
+      # Valid values are 'always' (default), 'never', and 'on-failure'
+      add-job-summary: 'on-failure'

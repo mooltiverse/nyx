@@ -14,6 +14,8 @@ This release:
 
 * applied conventions and styling rules
   * the `modules` directory has been renamed to to `src`
+  * GitHub Actions workflows have been refactored for reusability
+* SonarCloud and Codecov have been dismissed
 
 ## 3.0.11
 

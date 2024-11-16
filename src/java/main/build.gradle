@@ -23,7 +23,6 @@ configurations {
   functionalTestExport.extendsFrom(functionalTestRuntimeOnly)
 }
 
-
 /*------------------------------------------------------------------------------
   Repositories and dependencies
   https://docs.gradle.org/current/userguide/dependency_management_for_java_projects.html
@@ -86,19 +85,5 @@ testing {
         functionalTest(JvmTestSuite) {
             // Here we can configure additional dependencies, properties and options for these tests
         }
-    }
-}
-
-// Configure SonarCloud
-// See: https://docs.sonarcloud.io/advanced-setup/ci-based-analysis/sonarscanner-for-gradle/
-sonarqube {
-    properties {
-        property "sonar.projectKey", "mooltiverse_nyx_java_main"
-        property "sonar.java.file.suffixes", ".java"
-        property "sonar.sources", "src/main/"
-        property "sonar.tests", "src/test/,src/integrationTest/,src/functionalTest/"
-        property "sonar.exclusions", "src/test/,src/integrationTest/,src/functionalTest/"
-        property "sonar.junit.reportPaths", "$buildDir/test-results/test/*.xml,$buildDir/test-results/integrationTest/*.xml,$buildDir/test-results/functionalTest/*.xml"
-        property "sonar.coverage.jacoco.xmlReportPaths", "$buildDir/reports/jacoco/test/jacocoTestReport.xml,$buildDir/reports/jacoco/integrationTestCodeCoverageReport/integrationTestCodeCoverageReport.xml,$buildDir/reports/jacoco/functionalTestCodeCoverageReport/functionalTestCodeCoverageReport.xml"
     }
 }

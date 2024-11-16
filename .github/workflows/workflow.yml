@@ -62,7 +62,7 @@
 # they can't be mixed up. On the other hand, each job may use/store multiple caches
 
 name: CI/CD Pipeline
-on: [push]
+on: [workflow_dispatch]
 # Avoid running multiple pipelines concurrently to avoid overlapping releases and tags
 concurrency:
   # Synch on the project to avoid conflicts when accessing remote resources
@@ -191,11 +191,6 @@ jobs:
         path: |
           src/java/**/build/
         key: pipeline-${{ github.run_id }}-build-java
-    - name: Set up the pipeline-${{ github.run_id }}-sonar cache storing SonarCloud files
-      uses: actions/cache@v4
-      with:
-        path: ~/.sonar/cache
-        key: pipeline-${{ github.run_id }}-sonar
     - name: Enable the Gradle remote cache for distributed UP TO DATE checks
       uses: burrunan/gradle-cache-action@v2
       with:
@@ -204,11 +199,6 @@ jobs:
     # Run the actual tasks for this job
     - name: Build the Java code
       run: ./gradlew src:java:assemble --build-cache --stacktrace
-    - name: Scan with SonarCloud
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      run: ./gradlew sonar --build-cache --stacktrace --info
     # Publish the job artifacts
     - name: Publish the Nyx state and summary as job artifacts
       uses: actions/upload-artifact@v4
@@ -272,11 +262,6 @@ jobs:
           ~/.cache/go-build
           ~/go/pkg/mod
         key: pipeline-${{ github.run_id }}-build-go
-    - name: Set up the pipeline-${{ github.run_id }}-sonar cache storing SonarCloud files
-      uses: actions/cache@v4
-      with:
-        path: ~/.sonar/cache
-        key: pipeline-${{ github.run_id }}-sonar
     - name: Enable the Gradle remote cache for distributed UP TO DATE checks
       uses: burrunan/gradle-cache-action@v2
       with:
@@ -285,11 +270,6 @@ jobs:
     # Run the actual tasks for this job
     - name: Build the Go code
       run: ./gradlew src:go:assemble --build-cache --stacktrace
-    - name: Scan with SonarCloud
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      run: ./gradlew sonar --build-cache --stacktrace --info
     # Publish the job artifacts
     - name: Publish the Nyx state and summary as job artifacts
       uses: actions/upload-artifact@v4
@@ -350,11 +330,6 @@ jobs:
         key: pipeline-${{ github.run_id }}-build-docker
         restore-keys: |
           pipeline-${{ github.run_id }}-build-go
-    - name: Set up the pipeline-${{ github.run_id }}-sonar cache storing SonarCloud files
-      uses: actions/cache@v4
-      with:
-        path: ~/.sonar/cache
-        key: pipeline-${{ github.run_id }}-sonar
     - name: Enable the Gradle remote cache for distributed UP TO DATE checks
       uses: burrunan/gradle-cache-action@v2
       with:
@@ -363,11 +338,6 @@ jobs:
     # Run the actual tasks for this job
     - name: Build the Docker images
       run: ./gradlew src:docker:assemble --build-cache --stacktrace
-    - name: Scan with SonarCloud
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      run: ./gradlew sonar --build-cache --stacktrace --info
     # Publish the job artifacts
     - name: Publish the Nyx state and summary as job artifacts
       uses: actions/upload-artifact@v4
@@ -474,11 +444,6 @@ jobs:
         key: pipeline-${{ github.run_id }}-java-unit-test
         restore-keys: |
           pipeline-${{ github.run_id }}-build-java
-    - name: Set up the pipeline-${{ github.run_id }}-sonar cache storing SonarCloud files
-      uses: actions/cache@v4
-      with:
-        path: ~/.sonar/cache
-        key: pipeline-${{ github.run_id }}-sonar
     - name: Enable the Gradle remote cache for distributed UP TO DATE checks
       uses: burrunan/gradle-cache-action@v2
       with:
@@ -487,20 +452,6 @@ jobs:
     # Run the actual tasks for this job
     - name: Run Java Unit Tests
       run: ./gradlew src:java:test --build-cache --stacktrace
-    - name: Upload code coverage statistics to Codecov
-      uses: codecov/codecov-action@v4
-      with:
-        name: Nyx Java unit tests
-        #token: // not required as it's an open source project, but the Codecov App must be installed for the repository (https://github.com/apps/codecov)
-        files: ./src/java/main/build/reports/jacoco/test/jacocoTestReport.xml,./src/java/version/build/reports/jacoco/test/jacocoTestReport.xml
-        flags: java,unit
-        fail_ci_if_error: false # Codecov upload intermittently fails so setting this to false is the only way to avoid it breaking our builds. Codecov's bug is https://github.com/codecov/codecov-action/issues/557
-        verbose: true
-    - name: Scan test reports and metrics with SonarCloud
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      run: ./gradlew sonar --build-cache --stacktrace --info
     # Publish the job artifacts
     - name: Publish the Nyx state and summary as job artifacts
       uses: actions/upload-artifact@v4
@@ -574,11 +525,6 @@ jobs:
         key: pipeline-${{ github.run_id }}-java-integration-test
         restore-keys: |
           pipeline-${{ github.run_id }}-java-unit-test
-    - name: Set up the pipeline-${{ github.run_id }}-sonar cache storing SonarCloud files
-      uses: actions/cache@v4
-      with:
-        path: ~/.sonar/cache
-        key: pipeline-${{ github.run_id }}-sonar
     - name: Enable the Gradle remote cache for distributed UP TO DATE checks
       uses: burrunan/gradle-cache-action@v2
       with:
@@ -604,20 +550,6 @@ jobs:
     - name: Show current GitHub rate limits for test user nyxtest20200701
       if: ${{ always() }}
       run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
-    - name: Upload code coverage statistics to Codecov
-      uses: codecov/codecov-action@v4
-      with:
-        name: Nyx Java integration tests
-        #token: // not required as it's an open source project, but the Codecov App must be installed for the repository (https://github.com/apps/codecov)
-        files: ./src/java/main/build/reports/jacoco/integrationTestCodeCoverageReport/integrationTestCodeCoverageReport.xml,./src/java/version/build/reports/jacoco/integrationTestCodeCoverageReport/integrationTestCodeCoverageReport.xml
-        flags: java,integration
-        fail_ci_if_error: false # Codecov upload intermittently fails so setting this to false is the only way to avoid it breaking our builds. Codecov's bug is https://github.com/codecov/codecov-action/issues/557
-        verbose: true
-    - name: Scan test reports and metrics with SonarCloud
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      run: ./gradlew sonar --build-cache --stacktrace --info
     # Publish the job artifacts
     - name: Publish the Nyx state and summary as job artifacts
       uses: actions/upload-artifact@v4
@@ -691,11 +623,6 @@ jobs:
         key: pipeline-${{ github.run_id }}-java-integration-test
         restore-keys: |
           pipeline-${{ github.run_id }}-java-integration-test
-    - name: Set up the pipeline-${{ github.run_id }}-sonar cache storing SonarCloud files
-      uses: actions/cache@v4
-      with:
-        path: ~/.sonar/cache
-        key: pipeline-${{ github.run_id }}-sonar
     - name: Enable the Gradle remote cache for distributed UP TO DATE checks
       uses: burrunan/gradle-cache-action@v2
       with:
@@ -722,20 +649,6 @@ jobs:
     - name: Show current GitHub rate limits for test user nyxtest20200701
       if: ${{ always() }}
       run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
-    - name: Upload code coverage statistics to Codecov
-      uses: codecov/codecov-action@v4
-      with:
-        name: Nyx Java functional tests
-        #token: // not required as it's an open source project, but the Codecov App must be installed for the repository (https://github.com/apps/codecov)
-        files: ./src/java/main/build/reports/jacoco/functionalTestCodeCoverageReport/functionalTestCodeCoverageReport.xml,./src/java/version/build/reports/jacoco/functionalTestCodeCoverageReport/functionalTestCodeCoverageReport.xml
-        flags: java,functional
-        fail_ci_if_error: false # Codecov upload intermittently fails so setting this to false is the only way to avoid it breaking our builds. Codecov's bug is https://github.com/codecov/codecov-action/issues/557
-        verbose: true
-    - name: Scan test reports and metrics with SonarCloud
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      run: ./gradlew sonar --build-cache --stacktrace --info
     # Publish the job artifacts
     - name: Publish the Nyx state and summary as job artifacts
       uses: actions/upload-artifact@v4
@@ -804,11 +717,6 @@ jobs:
         key: pipeline-${{ github.run_id }}-go-unit-test
         restore-keys: |
           pipeline-${{ github.run_id }}-build-go
-    - name: Set up the pipeline-${{ github.run_id }}-sonar cache storing SonarCloud files
-      uses: actions/cache@v4
-      with:
-        path: ~/.sonar/cache
-        key: pipeline-${{ github.run_id }}-sonar
     - name: Enable the Gradle remote cache for distributed UP TO DATE checks
       uses: burrunan/gradle-cache-action@v2
       with:
@@ -817,21 +725,6 @@ jobs:
     # Run the actual tasks for this job
     - name: Run Go Unit Tests
       run: ./gradlew src:go:test --build-cache --stacktrace
-    - name: Upload code coverage statistics to Codecov
-      uses: codecov/codecov-action@v4
-      if: ${{ matrix.os == 'ubuntu-latest' }} # Avoid uploading the same code coverage metrix for all platforms as it's useless, just upload them from the Linux tests
-      with:
-        name: Nyx Go unit tests
-        #token: // not required as it's an open source project, but the Codecov App must be installed for the repository (https://github.com/apps/codecov)
-        files: ./src/go/nyx/build/test-results/test/test-coverprofile.out,./src/go/version/build/test-results/test/test-coverprofile.out,./src/go/errors/build/test-results/test/test-coverprofile.out,./src/go/utils/build/test-results/test/test-coverprofile.out
-        flags: go,unit
-        fail_ci_if_error: false # Codecov upload intermittently fails so setting this to false is the only way to avoid it breaking our builds. Codecov's bug is https://github.com/codecov/codecov-action/issues/557
-        verbose: true
-    - name: Scan test reports and metrics with SonarCloud
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      run: ./gradlew sonar --build-cache --stacktrace --info
     # Publish the job artifacts
     - name: Publish the Nyx state and summary as job artifacts
       uses: actions/upload-artifact@v4
@@ -906,11 +799,6 @@ jobs:
         key: pipeline-${{ github.run_id }}-go-integration-test
         restore-keys: |
           pipeline-${{ github.run_id }}-go-unit-test
-    - name: Set up the pipeline-${{ github.run_id }}-sonar cache storing SonarCloud files
-      uses: actions/cache@v4
-      with:
-        path: ~/.sonar/cache
-        key: pipeline-${{ github.run_id }}-sonar
     - name: Enable the Gradle remote cache for distributed UP TO DATE checks
       uses: burrunan/gradle-cache-action@v2
       with:
@@ -937,21 +825,6 @@ jobs:
     - name: Show current GitHub rate limits for test user nyxtest20200701
       if: ${{ matrix.os == 'ubuntu-latest' && always() }} # This command is only supported on Linux and needs to run even if previous jobs have failed
       run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
-    - name: Upload code coverage statistics to Codecov
-      uses: codecov/codecov-action@v4
-      if: ${{ matrix.os == 'ubuntu-latest' }} # Avoid uploading the same code coverage metrix for all platforms as it's useless, just upload them from the Linux tests
-      with:
-        name: Nyx Go integration tests
-        #token: // not required as it's an open source project, but the Codecov App must be installed for the repository (https://github.com/apps/codecov)
-        files: ./src/go/nyx/build/test-results/integrationTest/integrationTest-coverprofile.out,./src/go/version/build/test-results/integrationTest/integrationTest-coverprofile.out,./src/go/errors/build/test-results/integrationTest/integrationTest-coverprofile.out,./src/go/utils/build/test-results/integrationTest/integrationTest-coverprofile.out
-        flags: go,integration
-        fail_ci_if_error: false # Codecov upload intermittently fails so setting this to false is the only way to avoid it breaking our builds. Codecov's bug is https://github.com/codecov/codecov-action/issues/557
-        verbose: true
-    - name: Scan test reports and metrics with SonarCloud
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      run: ./gradlew sonar --build-cache --stacktrace --info
     # Publish the job artifacts
     - name: Publish the Nyx state and summary as job artifacts
       uses: actions/upload-artifact@v4
@@ -1026,11 +899,6 @@ jobs:
         key: pipeline-${{ github.run_id }}-go-functional-test
         restore-keys: |
           pipeline-${{ github.run_id }}-go-integration-test
-    - name: Set up the pipeline-${{ github.run_id }}-sonar cache storing SonarCloud files
-      uses: actions/cache@v4
-      with:
-        path: ~/.sonar/cache
-        key: pipeline-${{ github.run_id }}-sonar
     - name: Enable the Gradle remote cache for distributed UP TO DATE checks
       uses: burrunan/gradle-cache-action@v2
       with:
@@ -1058,21 +926,6 @@ jobs:
     - name: Show current GitHub rate limits for test user nyxtest20200701
       if: ${{ matrix.os == 'ubuntu-latest' && always() }} # This command is only supported on Linux and needs to run even if previous jobs have failed
       run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
-    - name: Upload code coverage statistics to Codecov
-      uses: codecov/codecov-action@v4
-      if: ${{ matrix.os == 'ubuntu-latest' }} # Avoid uploading the same code coverage metrix for all platforms as it's useless, just upload them from the Linux tests
-      with:
-        name: Nyx Go functional tests
-        #token: // not required as it's an open source project, but the Codecov App must be installed for the repository (https://github.com/apps/codecov)
-        files: ./src/go/nyx/build/test-results/functionalTest/functionalTest-coverprofile.out,./src/go/version/build/test-results/functionalTest/functionalTest-coverprofile.out,./src/go/errors/build/test-results/functionalTest/functionalTest-coverprofile.out,./src/go/utils/build/test-results/functionalTest/functionalTest-coverprofile.out
-        flags: go,integration
-        fail_ci_if_error: false # Codecov upload intermittently fails so setting this to false is the only way to avoid it breaking our builds. Codecov's bug is https://github.com/codecov/codecov-action/issues/557
-        verbose: true
-    - name: Scan test reports and metrics with SonarCloud
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      run: ./gradlew sonar --build-cache --stacktrace --info
     # Publish the job artifacts
     - name: Publish the Nyx state and summary as job artifacts
       uses: actions/upload-artifact@v4
@@ -1144,11 +997,6 @@ jobs:
         key: pipeline-${{ github.run_id }}-docker-functional-test
         restore-keys: |
           pipeline-${{ github.run_id }}-build-docker
-    - name: Set up the pipeline-${{ github.run_id }}-sonar cache storing SonarCloud files
-      uses: actions/cache@v4
-      with:
-        path: ~/.sonar/cache
-        key: pipeline-${{ github.run_id }}-sonar
     - name: Enable the Gradle remote cache for distributed UP TO DATE checks
       uses: burrunan/gradle-cache-action@v2
       with:
@@ -1175,20 +1023,6 @@ jobs:
     - name: Show current GitHub rate limits for test user nyxtest20200701
       if: ${{ always() }}
       run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
-    - name: Upload code coverage statistics to Codecov
-      uses: codecov/codecov-action@v4
-      with:
-        name: Nyx Docker functional tests
-        #token: // not required as it's an open source project, but the Codecov App must be installed for the repository (https://github.com/apps/codecov)
-        files: ./src/docker/build/test-results/functionalTest/functionalTest-coverprofile.out
-        flags: docker,functional
-        fail_ci_if_error: false # Codecov upload intermittently fails so setting this to false is the only way to avoid it breaking our builds. Codecov's bug is https://github.com/codecov/codecov-action/issues/557
-        verbose: true
-    - name: Scan test reports and metrics with SonarCloud
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      run: ./gradlew sonar --build-cache --stacktrace --info
     # Publish the job artifacts
     - name: Publish the Nyx state and summary as job artifacts
       uses: actions/upload-artifact@v4

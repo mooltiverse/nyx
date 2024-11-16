@@ -1,0 +1,233 @@
+name: "Setup Java"
+description: |-
+  Run the common tasks to setup a Java environment from scratch or restoring
+  the environment from a previous job:
+  - set up the JDK
+  - set up the distributed cache
+  - detect file changes
+  Please note that this Action doesn't run and actual command or task other
+  than those used to set up the environment. Build commands are to be executed
+  after this Action completes.
+inputs:
+  directory:
+    description: |-
+      The directory, relative to the repository root and without the trailing
+      slash, where the contents for this feature are stored.
+      As long as you are using the common project layour you don't need to
+      change this directory.
+      This directory is used to probe this feature. See the 'probed' output for
+      more.
+      Default: src/java
+    required: false
+    default: 'src/java'
+  verbosity:
+    description: |-
+      Sets the verbosity level to adjust the output logs verbosity.
+      Allowed values are: 'error', 'warning', 'quiet', 'info', 'debug'.
+      Default: quiet
+    required: false
+    default: 'quiet'
+  enable-cache:
+    description: |-
+      Whether to enable the cache.
+      Default: true
+    required: false
+    default: 'true'
+  cache-name-prefix:
+    description: |-
+      The prefix of the name to use for the cache that will be read and/or
+      written by this Action.
+      If the cache to read does not exists a new one will be created from
+      scratch without errors.
+      Default: java-\$\{\{ github.run_id \}\}
+    required: false
+    default: 'java-${{ github.run_id }}'
+  cache-name-suffix:
+    description: |-
+      The suffix of the name to use for the cache that will be written by this
+      Action.
+      If the cache to read does not exists a new one will be created from
+      scratch without errors.
+      In case you want multiple jobs share the same artifacts you can either
+      set this value to a generic identifier (which might as well be the
+      name of the job that bootstrapped the cache), using the same in all jobs,
+      or even leave it empty. What's important for sharing the same artifacts
+      is that all jobs use the same value for this attribute, so they use the
+      same cache instance.
+      Remember, though, that regardless of which job writes the cache, the same
+      entry (file) can only be written once in the cache so this means that
+      jobs may add new entries but not overwrite existing ones with new versions.
+      In the other case, when you need jobs to write new versions of files, you
+      need chaining caches, which means one job creates the first cache, then
+      others need to read from the previous cache version and create a new cache
+      with updated contents.
+      When chaining caches, this value should be (or at least include) the ID
+      of the Job that writes the cache, while the 'cache-name-restore-suffix'
+      has the value of the 'cache-name-suffix' of the job to read the previous
+      cache from.
+      This allows to chain caches in a way that each job writes its own cache,
+      while starting from a previous cache written by some other job.
+      Default: \$\{\{ github.job \}\}
+    required: false
+    default: '${{ github.job }}'
+  cache-name-restore-suffix:
+    description: |-
+      The suffix of the name to use for the cache that will be read by this
+      Action.
+      If the cache to read does not exists a new one will be created from
+      scratch without errors.
+      In case you want multiple jobs share the same artifacts just use the
+      same value here of the 'cache-name-suffix' attribute used in all jobs
+      sharing the cache.
+      In the other case, when you need jobs to write new versions of files,
+      you need chaining caches, which means one job creates the first cache,
+      then others need to read from the previous cache version and create a
+      new cache with updated contents. In this case this value must be the
+      'cache-name-suffix' of the job to read the previous version of the
+      cache from. This way you can start from the previous job's cache and
+      create a new version.
+      By default this value is the same as 'cache-name-suffix' so as long as
+      you don't set this value this cache will be read-only.
+      Default: \$\{\{ github.job \}\}
+    required: false
+    default: '${{ github.job }}'
+  cache-contents:
+    description: |-
+      The entries to include in the cache.
+      You can use a multi-line value here to specify multiple entries.
+      Default:
+        ~/.m2/repository
+        src/java/**/build
+    required: false
+    default: |-
+      ~/.m2/repository
+      src/java/**/build
+  enable-changed-files-detection:
+    description: |-
+      Whether to enable the detection of files changed in the workspace for
+      the current branch.
+      See 'changed-files-filter' for setting the filters to select the files
+      to detect changes for.
+      Default: true
+    required: false
+    default: 'true'
+  changed-files-pattern:
+    description: |-
+      The patterns used to match files that have changed.
+      If 'enable-changed-files-detection' is true and some of the files matched
+      by this filter have changed then the 'changed' output will return 'true',
+      'changes_count' will return the number of changed files and 'changed_files'
+      will return the list of changed files.
+      You can use a multi-line value here to specify multiple entries.
+      For more see: https://github.com/marketplace/actions/changed-files.
+      Default:
+        - src/java/**
+        - !src/java/**/build
+    required: false
+    default: |-
+      - src/java/**
+      - !src/java/**/build
+  install-jdk:
+    description: |-
+      Whether to install the JDK or not.
+      For more see: https://github.com/actions/setup-java.
+      Please note that the tools come preinstalled in many hosted GitHub
+      runner images and re-installing would just slow down the setup process.
+      Consider installing only when the runners don't have it preinstalled or
+      when you need a specific version.
+      To check out if it's already installed see:
+      - https://docs.github.com/en/actions/using-github-hosted-runners/using-github-hosted-runners/about-github-hosted-runners#preinstalled-software
+      Default: false
+    required: false
+    default: 'false'
+  install-jdk-distribution:
+    description: |-
+      The JDK distribution to setup if 'install-jdk' is 'true'.
+      For available distributions see: https://github.com/actions/setup-java.
+      Default: temurin
+    required: false
+    default: 'temurin'
+  install-jdk-version:
+    description: |-
+      The JDK version to setup if 'install-jdk' is 'true'.
+      For available versions see: https://github.com/actions/setup-java.
+      Default: 21
+    required: false
+    default: '21'
+outputs:
+  probed:
+    description: "Returns 'true' if this action has probed the files for this feature."
+    value: ${{ steps.probe.outputs.files_exists == 'true' }}
+  cache-name:
+    description: "The name of the cache key"
+    value: ${{ inputs.cache-name-prefix }}-${{ inputs.cache-name-suffix }}
+  cache-name-suffix:
+    description: "The value of the 'cache-name-suffix'"
+    value: ${{ inputs.cache-name-suffix }}
+  changed:
+    description: "Returns 'true' if the 'enable-changed-files-detection' input is true and some files defined in the 'changed-files-filter' input have changed"
+    value: ${{ inputs.enable-changed-files-detection == 'true' && steps.changes.outputs.any_changed || 'false' }}
+  changes_count:
+    description: "Returns the number of changed files if the 'enable-changed-files-detection' input is true and some files defined in the 'changed-files-filter' input have changed"
+    value: ${{ inputs.enable-changed-files-detection == 'true' && steps.changes.outputs.all_changed_and_modified_files_count || '0' }}
+  changed_files:
+    description: "Returns the list of changed files if the 'enable-changed-files-detection' input is true and some files defined in the 'changed-files-filter' input have changed"
+    value: ${{ inputs.enable-changed-files-detection == 'true' && steps.changes.outputs.all_changed_and_modified_files || '' }}
+runs:
+  # Composite GitHub Actions actions require to set 'using': 'composite'
+  using: "composite"
+  steps:
+  - name: List contents used for probing the project
+    if: ${{ inputs.verbosity == 'debug' }}
+    shell: sh
+    continue-on-error: true
+    run: |
+      echo "::group::Contents used for probing the project"
+      ls -alR ${{ inputs.directory }}/**/*.java
+      echo "::endgroup::"
+  - name: Probing the project
+    id: probe
+    uses: andstor/file-existence-action@v3
+    with:
+      files: "${{ inputs.directory }}/**/*.java"
+  - name: Set up the ${{ inputs.cache-name-prefix }}-${{ inputs.cache-name-suffix }} cache
+    uses: actions/cache@v4
+    if: ${{ inputs.enable-cache == 'true' }}
+    with:
+      key: ${{ inputs.cache-name-prefix }}-${{ inputs.cache-name-suffix }}
+      restore-keys: |-
+        ${{ inputs.cache-name-prefix }}-${{ inputs.cache-name-restore-suffix }}
+      path: ${{ inputs.cache-contents }}
+      enableCrossOsArchive: true
+  - name: List the cache contents
+    if: ${{ inputs.enable-cache == 'true' && inputs.verbosity == 'debug' }}
+    shell: sh
+    continue-on-error: true
+    run: |
+      echo "::group::Cache contents"
+      ls -alR ${{ inputs.cache-contents }}
+      echo "::endgroup::"
+  - name: Detect file changes
+    uses: tj-actions/changed-files@v45
+    if: ${{ inputs.enable-changed-files-detection == 'true' }}
+    id: changes
+    with:
+      files: |
+        ${{ inputs.changed-files-pattern }}
+  - name: List changed files
+    if: ${{ inputs.enable-changed-files-detection == 'true' && (inputs.verbosity == 'info' || inputs.verbosity == 'debug') }}
+    shell: sh
+    continue-on-error: true
+    env:
+      ALL_CHANGED_FILES: ${{ steps.changes.outputs.all_changed_and_modified_files }}
+    run: |
+      echo ${{ steps.changes.outputs.all_changed_and_modified_files_count }} files have changed.
+      for file in ${ALL_CHANGED_FILES}; do
+        echo "$file"
+      done
+  - name: Set up JDK ${{ inputs.jdk-version }} (${{ inputs.install-jdk-distribution }})
+    uses: actions/setup-java@v4
+    if: ${{ inputs.install-jdk == 'true' }}
+    with:
+      distribution: ${{ inputs.install-jdk-distribution }}
+      java-version: ${{ inputs.install-jdk-version }}
