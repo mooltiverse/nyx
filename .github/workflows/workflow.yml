@@ -90,11 +90,11 @@ jobs:
         base: ${{ github.ref }}
         filters: |
           dockerChanged:
-          - 'modules/docker/**'
+          - 'src/docker/**'
           goChanged:
-          - 'modules/go/**'
+          - 'src/go/**'
           javaChanged:
-          - 'modules/java/**'
+          - 'src/java/**'
     - name: Grant execute permission for the gradlew executable
       # We also need to make Git ignore execute permission changes to avoid
       # false positives in change detection
@@ -189,7 +189,7 @@ jobs:
       uses: actions/cache@v4
       with:
         path: |
-          modules/java/**/build/
+          src/java/**/build/
         key: pipeline-${{ github.run_id }}-build-java
     - name: Set up the pipeline-${{ github.run_id }}-sonar cache storing SonarCloud files
       uses: actions/cache@v4
@@ -203,7 +203,7 @@ jobs:
         gradle-distribution-sha-256-sum-warning: false
     # Run the actual tasks for this job
     - name: Build the Java code
-      run: ./gradlew modules:java:assemble --build-cache --stacktrace
+      run: ./gradlew src:java:assemble --build-cache --stacktrace
     - name: Scan with SonarCloud
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -221,12 +221,12 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: jar
-        path: 'modules/java/**/build/libs/'
+        path: 'src/java/**/build/libs/'
     - name: Publish the Javadoc artifacts
       uses: actions/upload-artifact@v4
       with:
         name: javadoc
-        path: 'modules/java/build/docs/javadoc/'
+        path: 'src/java/build/docs/javadoc/'
 
   build-go:
     name: Build - Go
@@ -268,7 +268,7 @@ jobs:
       uses: actions/cache@v4
       with:
         path: |
-          modules/go/**/build/
+          src/go/**/build/
           ~/.cache/go-build
           ~/go/pkg/mod
         key: pipeline-${{ github.run_id }}-build-go
@@ -284,7 +284,7 @@ jobs:
         gradle-distribution-sha-256-sum-warning: false
     # Run the actual tasks for this job
     - name: Build the Go code
-      run: ./gradlew modules:go:assemble --build-cache --stacktrace
+      run: ./gradlew src:go:assemble --build-cache --stacktrace
     - name: Scan with SonarCloud
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -302,7 +302,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: bin
-        path: 'modules/go/nyx/build/bin/*'
+        path: 'src/go/nyx/build/bin/*'
 
   build-docker:
     name: Build - Docker
@@ -344,7 +344,7 @@ jobs:
       uses: actions/cache@v4
       with:
         path: |
-          modules/go/**/build/
+          src/go/**/build/
           ~/.cache/go-build
           ~/go/pkg/mod
         key: pipeline-${{ github.run_id }}-build-docker
@@ -362,7 +362,7 @@ jobs:
         gradle-distribution-sha-256-sum-warning: false
     # Run the actual tasks for this job
     - name: Build the Docker images
-      run: ./gradlew modules:docker:assemble --build-cache --stacktrace
+      run: ./gradlew src:docker:assemble --build-cache --stacktrace
     - name: Scan with SonarCloud
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -391,7 +391,7 @@ jobs:
       uses: actions/cache@v4
       with:
         path: |
-          modules/go/**/build/
+          src/go/**/build/
           ~/.cache/go-build
           ~/go/pkg/mod
         key: pipeline-${{ github.run_id }}-build-go
@@ -399,13 +399,13 @@ jobs:
       uses: actions/cache@v4
       with:
         path: |
-          modules/java/**/build/
+          src/java/**/build/
         key: pipeline-${{ github.run_id }}-build-java
     #- name: Set up the pipeline-${{ github.run_id }}-build-docker cache storing the Docker files
     #  uses: actions/cache@v4
     #  with:
     #    path: |
-    #      modules/go/**/build/
+    #      src/go/**/build/
     #      ~/.cache/go-build
     #      ~/go/pkg/mod
     #    key: pipeline-${{ github.run_id }}-build-docker
@@ -416,8 +416,8 @@ jobs:
       with:
         # These patchs are merged from the previous caches
         path: |
-          modules/java/**/build/
-          modules/go/**/build/
+          src/java/**/build/
+          src/go/**/build/
           ~/.cache/go-build
           ~/go/pkg/mod
         key: pipeline-${{ github.run_id }}-artifacts
@@ -470,7 +470,7 @@ jobs:
       uses: actions/cache@v4
       with:
         path: |
-          modules/java/**/build/
+          src/java/**/build/
         key: pipeline-${{ github.run_id }}-java-unit-test
         restore-keys: |
           pipeline-${{ github.run_id }}-build-java
@@ -486,13 +486,13 @@ jobs:
         gradle-distribution-sha-256-sum-warning: false
     # Run the actual tasks for this job
     - name: Run Java Unit Tests
-      run: ./gradlew modules:java:test --build-cache --stacktrace
+      run: ./gradlew src:java:test --build-cache --stacktrace
     - name: Upload code coverage statistics to Codecov
       uses: codecov/codecov-action@v4
       with:
         name: Nyx Java unit tests
         #token: // not required as it's an open source project, but the Codecov App must be installed for the repository (https://github.com/apps/codecov)
-        files: ./modules/java/main/build/reports/jacoco/test/jacocoTestReport.xml,./modules/java/version/build/reports/jacoco/test/jacocoTestReport.xml
+        files: ./src/java/main/build/reports/jacoco/test/jacocoTestReport.xml,./src/java/version/build/reports/jacoco/test/jacocoTestReport.xml
         flags: java,unit
         fail_ci_if_error: false # Codecov upload intermittently fails so setting this to false is the only way to avoid it breaking our builds. Codecov's bug is https://github.com/codecov/codecov-action/issues/557
         verbose: true
@@ -515,10 +515,10 @@ jobs:
       with:
         name: java-${{ matrix.java }}-unit-test-reports
         path: |
-          modules/java/**/build/jacoco/
-          modules/java/**/build/reports/jacoco
-          modules/java/**/build/reports/tests/test/
-          modules/java/**/build/test-results/test/
+          src/java/**/build/jacoco/
+          src/java/**/build/reports/jacoco
+          src/java/**/build/reports/tests/test/
+          src/java/**/build/test-results/test/
   
   java-integration-test:
     # These tests may take a very long time to complete and their cache may easily go over the 5GB
@@ -570,7 +570,7 @@ jobs:
       uses: actions/cache@v4
       with:
         path: |
-          modules/java/**/build/
+          src/java/**/build/
         key: pipeline-${{ github.run_id }}-java-integration-test
         restore-keys: |
           pipeline-${{ github.run_id }}-java-unit-test
@@ -600,7 +600,7 @@ jobs:
         ORG_GRADLE_PROJECT_gitLabTestUserPrivateKeyPassphrase: ${{ secrets.TEST_GITLAB_USER_PASSPHRASE }}                            # The test private key passphrase to test Nyx GitLab features
         ORG_GRADLE_PROJECT_gitLabTestUserPrivateKeyWithPassphrase: ${{ secrets.TEST_GITLAB_USER_PRIVATE_KEY_WITH_PASSPHRASE }}       # The test password protected private key to test Nyx GitHub features
         ORG_GRADLE_PROJECT_gitLabTestUserPrivateKeyWithoutPassphrase: ${{ secrets.TEST_GITLAB_USER_PRIVATE_KEY_WITHOUT_PASSPHRASE }} # The test unprotected private key to test Nyx GitHub features
-      run: ./gradlew modules:java:integrationTest --build-cache --stacktrace
+      run: ./gradlew src:java:integrationTest --build-cache --stacktrace
     - name: Show current GitHub rate limits for test user nyxtest20200701
       if: ${{ always() }}
       run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
@@ -609,7 +609,7 @@ jobs:
       with:
         name: Nyx Java integration tests
         #token: // not required as it's an open source project, but the Codecov App must be installed for the repository (https://github.com/apps/codecov)
-        files: ./modules/java/main/build/reports/jacoco/integrationTestCodeCoverageReport/integrationTestCodeCoverageReport.xml,./modules/java/version/build/reports/jacoco/integrationTestCodeCoverageReport/integrationTestCodeCoverageReport.xml
+        files: ./src/java/main/build/reports/jacoco/integrationTestCodeCoverageReport/integrationTestCodeCoverageReport.xml,./src/java/version/build/reports/jacoco/integrationTestCodeCoverageReport/integrationTestCodeCoverageReport.xml
         flags: java,integration
         fail_ci_if_error: false # Codecov upload intermittently fails so setting this to false is the only way to avoid it breaking our builds. Codecov's bug is https://github.com/codecov/codecov-action/issues/557
         verbose: true
@@ -632,10 +632,10 @@ jobs:
       with:
         name: java-${{ matrix.java }}-integration-test-reports
         path: |
-          modules/java/**/build/jacoco/
-          modules/java/**/build/reports/jacoco
-          modules/java/**/build/reports/tests/integrationTest/
-          modules/java/**/build/test-results/integrationTest/
+          src/java/**/build/jacoco/
+          src/java/**/build/reports/jacoco
+          src/java/**/build/reports/tests/integrationTest/
+          src/java/**/build/test-results/integrationTest/
   
   java-functional-test:
     # These tests may take a very long time to complete and their cache may easily go over the 5GB
@@ -687,7 +687,7 @@ jobs:
       uses: actions/cache@v4
       with:
         path: |
-          modules/java/**/build/
+          src/java/**/build/
         key: pipeline-${{ github.run_id }}-java-integration-test
         restore-keys: |
           pipeline-${{ github.run_id }}-java-integration-test
@@ -718,7 +718,7 @@ jobs:
         ORG_GRADLE_PROJECT_gitLabTestUserPrivateKeyPassphrase: ${{ secrets.TEST_GITLAB_USER_PASSPHRASE }}                            # The test private key passphrase to test Nyx GitLab features
         ORG_GRADLE_PROJECT_gitLabTestUserPrivateKeyWithPassphrase: ${{ secrets.TEST_GITLAB_USER_PRIVATE_KEY_WITH_PASSPHRASE }}       # The test password protected private key to test Nyx GitHub features
         ORG_GRADLE_PROJECT_gitLabTestUserPrivateKeyWithoutPassphrase: ${{ secrets.TEST_GITLAB_USER_PRIVATE_KEY_WITHOUT_PASSPHRASE }} # The test unprotected private key to test Nyx GitHub features
-      run: ./gradlew modules:java:functionalTest --build-cache --stacktrace
+      run: ./gradlew src:java:functionalTest --build-cache --stacktrace
     - name: Show current GitHub rate limits for test user nyxtest20200701
       if: ${{ always() }}
       run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
@@ -727,7 +727,7 @@ jobs:
       with:
         name: Nyx Java functional tests
         #token: // not required as it's an open source project, but the Codecov App must be installed for the repository (https://github.com/apps/codecov)
-        files: ./modules/java/main/build/reports/jacoco/functionalTestCodeCoverageReport/functionalTestCodeCoverageReport.xml,./modules/java/version/build/reports/jacoco/functionalTestCodeCoverageReport/functionalTestCodeCoverageReport.xml
+        files: ./src/java/main/build/reports/jacoco/functionalTestCodeCoverageReport/functionalTestCodeCoverageReport.xml,./src/java/version/build/reports/jacoco/functionalTestCodeCoverageReport/functionalTestCodeCoverageReport.xml
         flags: java,functional
         fail_ci_if_error: false # Codecov upload intermittently fails so setting this to false is the only way to avoid it breaking our builds. Codecov's bug is https://github.com/codecov/codecov-action/issues/557
         verbose: true
@@ -750,10 +750,10 @@ jobs:
       with:
         name: java-${{ matrix.java }}-functional-test-reports
         path: |
-          modules/java/**/build/jacoco/
-          modules/java/**/build/reports/jacoco
-          modules/java/**/build/reports/tests/functionalTest/
-          modules/java/**/build/test-results/functionalTest/
+          src/java/**/build/jacoco/
+          src/java/**/build/reports/jacoco
+          src/java/**/build/reports/tests/functionalTest/
+          src/java/**/build/test-results/functionalTest/
 
   go-unit-test:
     name: Test (Unit) - Go ${{ matrix.os }}
@@ -798,7 +798,7 @@ jobs:
       uses: actions/cache@v4
       with:
         path: |
-          modules/go/**/build/
+          src/go/**/build/
           ~/.cache/go-build
           ~/go/pkg/mod
         key: pipeline-${{ github.run_id }}-go-unit-test
@@ -816,14 +816,14 @@ jobs:
         gradle-distribution-sha-256-sum-warning: false
     # Run the actual tasks for this job
     - name: Run Go Unit Tests
-      run: ./gradlew modules:go:test --build-cache --stacktrace
+      run: ./gradlew src:go:test --build-cache --stacktrace
     - name: Upload code coverage statistics to Codecov
       uses: codecov/codecov-action@v4
       if: ${{ matrix.os == 'ubuntu-latest' }} # Avoid uploading the same code coverage metrix for all platforms as it's useless, just upload them from the Linux tests
       with:
         name: Nyx Go unit tests
         #token: // not required as it's an open source project, but the Codecov App must be installed for the repository (https://github.com/apps/codecov)
-        files: ./modules/go/nyx/build/test-results/test/test-coverprofile.out,./modules/go/version/build/test-results/test/test-coverprofile.out,./modules/go/errors/build/test-results/test/test-coverprofile.out,./modules/go/utils/build/test-results/test/test-coverprofile.out
+        files: ./src/go/nyx/build/test-results/test/test-coverprofile.out,./src/go/version/build/test-results/test/test-coverprofile.out,./src/go/errors/build/test-results/test/test-coverprofile.out,./src/go/utils/build/test-results/test/test-coverprofile.out
         flags: go,unit
         fail_ci_if_error: false # Codecov upload intermittently fails so setting this to false is the only way to avoid it breaking our builds. Codecov's bug is https://github.com/codecov/codecov-action/issues/557
         verbose: true
@@ -846,8 +846,8 @@ jobs:
       with:
         name: go-${{ matrix.os }}-unit-test-reports
         path: |
-          modules/go/**/build/reports/tests/test/
-          modules/go/**/build/test-results/test/
+          src/go/**/build/reports/tests/test/
+          src/go/**/build/test-results/test/
   
   go-integration-test:
     # These tests may take a very long time to complete and their cache may easily go over the 5GB
@@ -900,7 +900,7 @@ jobs:
       uses: actions/cache@v4
       with:
         path: |
-          modules/go/**/build/
+          src/go/**/build/
           ~/.cache/go-build
           ~/go/pkg/mod
         key: pipeline-${{ github.run_id }}-go-integration-test
@@ -933,7 +933,7 @@ jobs:
         ORG_GRADLE_PROJECT_gitLabTestUserPrivateKeyPassphrase: ${{ secrets.TEST_GITLAB_USER_PASSPHRASE }}                            # The test private key passphrase to test Nyx GitLab features
         ORG_GRADLE_PROJECT_gitLabTestUserPrivateKeyWithPassphrase: ${{ secrets.TEST_GITLAB_USER_PRIVATE_KEY_WITH_PASSPHRASE }}       # The test password protected private key to test Nyx GitHub features
         ORG_GRADLE_PROJECT_gitLabTestUserPrivateKeyWithoutPassphrase: ${{ secrets.TEST_GITLAB_USER_PRIVATE_KEY_WITHOUT_PASSPHRASE }} # The test unprotected private key to test Nyx GitHub features
-      run: ./gradlew modules:go:integrationTest --build-cache --stacktrace
+      run: ./gradlew src:go:integrationTest --build-cache --stacktrace
     - name: Show current GitHub rate limits for test user nyxtest20200701
       if: ${{ matrix.os == 'ubuntu-latest' && always() }} # This command is only supported on Linux and needs to run even if previous jobs have failed
       run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
@@ -943,7 +943,7 @@ jobs:
       with:
         name: Nyx Go integration tests
         #token: // not required as it's an open source project, but the Codecov App must be installed for the repository (https://github.com/apps/codecov)
-        files: ./modules/go/nyx/build/test-results/integrationTest/integrationTest-coverprofile.out,./modules/go/version/build/test-results/integrationTest/integrationTest-coverprofile.out,./modules/go/errors/build/test-results/integrationTest/integrationTest-coverprofile.out,./modules/go/utils/build/test-results/integrationTest/integrationTest-coverprofile.out
+        files: ./src/go/nyx/build/test-results/integrationTest/integrationTest-coverprofile.out,./src/go/version/build/test-results/integrationTest/integrationTest-coverprofile.out,./src/go/errors/build/test-results/integrationTest/integrationTest-coverprofile.out,./src/go/utils/build/test-results/integrationTest/integrationTest-coverprofile.out
         flags: go,integration
         fail_ci_if_error: false # Codecov upload intermittently fails so setting this to false is the only way to avoid it breaking our builds. Codecov's bug is https://github.com/codecov/codecov-action/issues/557
         verbose: true
@@ -966,8 +966,8 @@ jobs:
       with:
         name: go-${{ matrix.os }}-integration-test-reports
         path: |
-          modules/go/**/build/reports/tests/integrationTest/
-          modules/go/**/build/test-results/integrationTest/
+          src/go/**/build/reports/tests/integrationTest/
+          src/go/**/build/test-results/integrationTest/
 
   go-functional-test:
     # These tests may take a very long time to complete and their cache may easily go over the 5GB
@@ -1020,7 +1020,7 @@ jobs:
       uses: actions/cache@v4
       with:
         path: |
-          modules/go/**/build/
+          src/go/**/build/
           ~/.cache/go-build
           ~/go/pkg/mod
         key: pipeline-${{ github.run_id }}-go-functional-test
@@ -1054,7 +1054,7 @@ jobs:
         ORG_GRADLE_PROJECT_gitLabTestUserPrivateKeyPassphrase: ${{ secrets.TEST_GITLAB_USER_PASSPHRASE }}                            # The test private key passphrase to test Nyx GitLab features
         ORG_GRADLE_PROJECT_gitLabTestUserPrivateKeyWithPassphrase: ${{ secrets.TEST_GITLAB_USER_PRIVATE_KEY_WITH_PASSPHRASE }}       # The test password protected private key to test Nyx GitHub features
         ORG_GRADLE_PROJECT_gitLabTestUserPrivateKeyWithoutPassphrase: ${{ secrets.TEST_GITLAB_USER_PRIVATE_KEY_WITHOUT_PASSPHRASE }} # The test unprotected private key to test Nyx GitHub features
-      run: ./gradlew modules:go:functionalTest --build-cache --stacktrace
+      run: ./gradlew src:go:functionalTest --build-cache --stacktrace
     - name: Show current GitHub rate limits for test user nyxtest20200701
       if: ${{ matrix.os == 'ubuntu-latest' && always() }} # This command is only supported on Linux and needs to run even if previous jobs have failed
       run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
@@ -1064,7 +1064,7 @@ jobs:
       with:
         name: Nyx Go functional tests
         #token: // not required as it's an open source project, but the Codecov App must be installed for the repository (https://github.com/apps/codecov)
-        files: ./modules/go/nyx/build/test-results/functionalTest/functionalTest-coverprofile.out,./modules/go/version/build/test-results/functionalTest/functionalTest-coverprofile.out,./modules/go/errors/build/test-results/functionalTest/functionalTest-coverprofile.out,./modules/go/utils/build/test-results/functionalTest/functionalTest-coverprofile.out
+        files: ./src/go/nyx/build/test-results/functionalTest/functionalTest-coverprofile.out,./src/go/version/build/test-results/functionalTest/functionalTest-coverprofile.out,./src/go/errors/build/test-results/functionalTest/functionalTest-coverprofile.out,./src/go/utils/build/test-results/functionalTest/functionalTest-coverprofile.out
         flags: go,integration
         fail_ci_if_error: false # Codecov upload intermittently fails so setting this to false is the only way to avoid it breaking our builds. Codecov's bug is https://github.com/codecov/codecov-action/issues/557
         verbose: true
@@ -1087,8 +1087,8 @@ jobs:
       with:
         name: go-${{ matrix.os }}-functional-test-reports
         path: |
-          modules/go/**/build/reports/tests/functionalTest/
-          modules/go/**/build/test-results/functionalTest/
+          src/go/**/build/reports/tests/functionalTest/
+          src/go/**/build/test-results/functionalTest/
 
   docker-functional-test:
     # These tests may take a very long time to complete and their cache may easily go over the 5GB
@@ -1138,7 +1138,7 @@ jobs:
       uses: actions/cache@v4
       with:
         path: |
-          modules/go/**/build/
+          src/go/**/build/
           ~/.cache/go-build
           ~/go/pkg/mod
         key: pipeline-${{ github.run_id }}-docker-functional-test
@@ -1171,7 +1171,7 @@ jobs:
         ORG_GRADLE_PROJECT_gitLabTestUserPrivateKeyPassphrase: ${{ secrets.TEST_GITLAB_USER_PASSPHRASE }}                            # The test private key passphrase to test Nyx GitLab features
         ORG_GRADLE_PROJECT_gitLabTestUserPrivateKeyWithPassphrase: ${{ secrets.TEST_GITLAB_USER_PRIVATE_KEY_WITH_PASSPHRASE }}       # The test password protected private key to test Nyx GitHub features
         ORG_GRADLE_PROJECT_gitLabTestUserPrivateKeyWithoutPassphrase: ${{ secrets.TEST_GITLAB_USER_PRIVATE_KEY_WITHOUT_PASSPHRASE }} # The test unprotected private key to test Nyx GitHub features
-      run: ./gradlew modules:docker:functionalTest --build-cache --stacktrace
+      run: ./gradlew src:docker:functionalTest --build-cache --stacktrace
     - name: Show current GitHub rate limits for test user nyxtest20200701
       if: ${{ always() }}
       run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
@@ -1180,7 +1180,7 @@ jobs:
       with:
         name: Nyx Docker functional tests
         #token: // not required as it's an open source project, but the Codecov App must be installed for the repository (https://github.com/apps/codecov)
-        files: ./modules/docker/build/test-results/functionalTest/functionalTest-coverprofile.out
+        files: ./src/docker/build/test-results/functionalTest/functionalTest-coverprofile.out
         flags: docker,functional
         fail_ci_if_error: false # Codecov upload intermittently fails so setting this to false is the only way to avoid it breaking our builds. Codecov's bug is https://github.com/codecov/codecov-action/issues/557
         verbose: true
@@ -1245,8 +1245,8 @@ jobs:
       uses: actions/cache@v4
       with:
         path: |
-          modules/java/**/build/
-          modules/go/**/build/
+          src/java/**/build/
+          src/go/**/build/
           ~/.cache/go-build
           ~/go/pkg/mod
         key: pipeline-${{ github.run_id }}-artifacts
@@ -1328,8 +1328,8 @@ jobs:
       uses: actions/cache@v4
       with:
         path: |
-          modules/java/**/build/
-          modules/go/**/build/
+          src/java/**/build/
+          src/go/**/build/
           ~/.cache/go-build
           ~/go/pkg/mod
         key: pipeline-${{ github.run_id }}-artifacts
