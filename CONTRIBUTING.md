@@ -107,7 +107,7 @@ You can use any IDE, just make sure you don't clutter the repo with IDE files.
 
 The repository uses [Gradle](https://gradle.org/) as the primary build tool and [GitHub Actions](https://help.github.com/en/actions) for CI/CD. GitHub Actions, in turn, run Gradle tasks. This gives contributor a perfectly consistent environment to work locally before they commit or submit pull requests. Some tasks, like `release` and `publish` can only be executed on the CI/CD platform as they require access to some secrets variables not available locally.
 
-The repository is divided into several [sub projects](https://docs.gradle.org/current/userguide/multi_project_builds.html), all under the `modules` directory plus the documentation, in the `docs` directory.
+The repository is divided into several [sub projects](https://docs.gradle.org/current/userguide/multi_project_builds.html), all under the `src` directory plus the documentation, in the `docs` directory.
 
 The resulting layout is:
 
@@ -121,14 +121,14 @@ nyx
 |   +--- _posts                     # Documentation articles (i.e. examples)
 |   \--- _config.yml                # Jekyll configuration for the documentation site
 +-- gradle                          # Gradle wrapper files
-+-- modules                         # Project sub-modules
++-- src                             # Project sources
 |   +--- docker                     # Docker image sub module
-|   \--- go                         # Go sub modules
+|   \--- go                         # Go sources
 |        +--- errors                # Go errors sub module
 |        +--- nyx                   # Go Main library sub module
 |        +--- utils                 # Go utilities sub module
 |        \--- version               # Go Version library sub module
-|   \--- java                       # Java sub modules
+|   \--- java                       # Java sources
 |        +--- gradle                # Gradle plugin sub module
 |        +--- main                  # Java Main library sub module
 |        \--- version               # Java Version library sub module

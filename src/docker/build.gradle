@@ -1,0 +1,399 @@
+/*------------------------------------------------------------------------------
+  Plugins DSL block
+  https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
+------------------------------------------------------------------------------*/
+plugins {
+}
+
+/*------------------------------------------------------------------------------
+  Local sub-project properties
+------------------------------------------------------------------------------*/
+description = 'The Nyx Docker image'
+
+// These statements force the other projects to be evaluated before this one. Without these,
+// the ':src:go:nyx:goBuild-nyx-linux-amd64' task would fail because its dependency ('goInit')
+// would not be available yet.
+// With these statements, instead, the project is entirely evaluated in advance, so we can use the
+// ':src:go:nyx:goBuild-nyx-linux-amd64' task outputs as it runs without errors.
+project.evaluationDependsOn(":src:go")
+
+// The project version may have a '+' sign (when using extra identifier in the 'build' part)
+// but since Docker doesn't handle it as a valid label we replace '+' with '_'.
+def sanitizedVersion = rootProject.version.replaceAll('\\+','_')
+
+// The directory used to build the Docker image
+def dockerContextDir = file(buildDir.path+'/docker')
+
+// The map of registries to publish the image to
+// About DockerHub:
+// - the repository 'mooltiverse/nyx' had to be created manually beforehand and permissions to write the repo had to be assigned to the service user.
+// - images are published to: https://hub.docker.com/repository/docker/mooltiverse/nyx
+// About GitHubContainerRegistry:
+// - in order to use the GITHUB_TOKEN issued by GitHub Actions, a first image must be published by hand and permissions set giving access to the repository
+//   according to https://docs.github.com/en/packages/managing-github-packages-using-github-actions-workflows/publishing-and-installing-a-package-with-github-actions#upgrading-a-workflow-that-accesses-ghcrio
+// - images are published to: https://github.com/orgs/mooltiverse/packages/container/package/nyx
+def registries = [ 'DockerHub':"${nyxOrganizationID}/${rootProject.name}",
+                   'GitHubContainerRegistry':"ghcr.io/${nyxOrganizationID}/${rootProject.name}" ]
+
+// The list of labels to publish with. The 'latest' label is only added if we are publishing an official version (like x.y.z, without extra identifiers)
+def labels = [ sanitizedVersion ]
+if (rootProject.nyxState.newRelease && rootProject.nyxState.coreVersion && rootProject.nyxState.latestVersion) {
+    labels.add('latest')
+}
+
+// The file used to store the latest Docker image SHA
+def dockerImageSHAFile = new File(buildDir, "dockerImageSHA.txt")
+
+ext {
+  // The property storing the SHA of the built Docker image (only available after the image has been built)
+  dockerImageSHA = ""
+
+  // The Go module path
+  modulePath = 'github.com/mooltiverse/nyx/src/docker/test/functional'
+
+  // The Go module file
+  modFile = file(projectDir.path+'/test/functional/go.mod')
+}
+
+/*------------------------------------------------------------------------------
+  Extension configurations
+------------------------------------------------------------------------------*/
+// Configure SonarCloud
+// See: https://docs.sonarcloud.io/advanced-setup/ci-based-analysis/sonarscanner-for-gradle/
+sonarqube {
+    properties {
+        property "sonar.projectKey", "mooltiverse_nyx_docker"
+        property "sonar.sources", "Dockerfile"
+        property "sonar.tests", ""
+        property "sonar.go.coverage.reportPaths", "$buildDir/test-results/test/test-coverprofile.out,$buildDir/test-results/integrationTest/integrationTest-coverprofile.out,$buildDir/test-results/functionalTest/functionalTest-coverprofile.out"
+    }
+}
+
+/*------------------------------------------------------------------------------
+  Additional tasks
+------------------------------------------------------------------------------*/
+task dockerContext(group: 'build', description: 'Builds the Docker context') {
+    dependsOn tasks.getByPath(':src:go:nyx:goBuild-nyx-linux-amd64')
+
+    // Declare inputs and outputs of this task
+    inputs.file(file('Dockerfile'))
+    inputs.files(tasks.getByPath(':src:go:nyx:goBuild-nyx-linux-amd64').outputs.files)
+    outputs.dir(dockerContextDir)
+
+    doLast {
+        logger.info('Building the Docker context')
+        mkdir dockerContextDir
+        copy {
+            // 
+            from file('Dockerfile')
+            into dockerContextDir
+        }
+        copy {
+            // add the files built from ':src:go:nyx:goBuild-nyx-linux-amd64' to the Docker build context so they are available for ADD and COPY directives
+            // this also adds an implicit dependency to task ':src:go:nyx:goBuild-nyx-linux-amd64'
+            from tasks.getByPath(':src:go:nyx:goBuild-nyx-linux-amd64').outputs
+            into dockerContextDir
+            include 'nyx-linux-amd64'
+        }
+    }
+}
+
+task dockerImage(group: 'build', description: 'Builds the Docker image') {
+    dependsOn dockerContext
+    // Declare inputs and outputs of this task
+    // The output here is the Docker image SHA that needs to be written to a file or gradle would fail up to date checks.
+    inputs.files(tasks.dockerContext.outputs.files)
+    outputs.files(dockerImageSHAFile)
+
+    doLast {
+        logger.info('Building the Docker image')
+        exec {
+            workingDir = dockerContextDir
+            logging.captureStandardOutput LogLevel.INFO
+            logging.captureStandardError  LogLevel.ERROR
+            // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
+            commandLine 'docker', 'build', '--label', "version=$sanitizedVersion", '--tag', "${rootProject.name}:${sanitizedVersion}", '--rm', '.'
+        }
+
+        logger.info('Retrieving the Docker image SHA')
+        def stdOut = new ByteArrayOutputStream()
+        exec {
+            workingDir = dockerContextDir
+            logging.captureStandardOutput LogLevel.INFO
+            logging.captureStandardError  LogLevel.ERROR
+            // looks like the docker command otputs everything to standard error so we need to redirect stdout and stderr together
+            // in order to capture output
+            standardOutput = stdOut
+            errorOutput = stdOut
+            // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
+            commandLine 'docker', 'inspect', '--format="{{.Id}}"', "${rootProject.name}:${sanitizedVersion}"
+        }
+        println stdOut.toString()
+
+        // extract the image SHA from the line looking like 'sha256:6307b6481d67da57f227c226289fb4d63adb95d5345adef23a4877acdf82ee59'
+        // this line uses Groovy regular expressions
+        ext.dockerImageSHA = (stdOut.toString() =~ "sha256:([a-z0-9]+)").findAll()[0][1]
+        println "Docker image SHA is:"+ext.dockerImageSHA
+        dockerImageSHAFile.text = ext.dockerImageSHA
+    }
+}
+
+// This is just a lifecycle task
+task dockerTag(group: 'build', description: 'Tags the Docker image for the configured registries and labels') {
+    // Dependencies are created along with dynamic tasks below
+
+    // Only perform publishing if the Nyx release type enables publishing.
+    it.onlyIf { rootProject.nyxState.newRelease }
+}
+
+// This is just a lifecycle task
+task dockerPush(group: 'publishing', description: 'Pushes the Docker image to the configured registries') {
+    // Dependencies are created along with dynamic tasks below
+
+    // Only perform publishing if the Nyx release type enables publishing.
+    it.onlyIf { rootProject.nyxState.newRelease }
+}
+
+// For each target registry and each label:
+// - create a tag task
+// - create a publish task
+registries.each { registry ->
+    labels.each { label ->
+        // The tag tasks for the specific registry and label
+        tasks.create(group: 'build', name: "dockerTag-${registry.key}-${label}", description: "Tags the Docker image for the ${registry.key} registry with the ${label} label") {
+            // Task dependencies
+            dependsOn dockerImage
+
+            // Only perform publishing if the Nyx release type enables publishing.
+            it.onlyIf { rootProject.nyxState.newRelease }
+
+            doLast {
+                logger.info("Tagging the Docker image for the ${registry.key} registry with the ${label} label")
+                exec {
+                    logging.captureStandardOutput LogLevel.INFO
+                    logging.captureStandardError  LogLevel.ERROR
+                    // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
+                    commandLine 'docker', 'tag', "${rootProject.name}:${sanitizedVersion}", "${registry.value}:${label}"
+                }
+            }
+        }
+        tasks.create(group: 'publishing', name: "dockerPush-${registry.key}-${label}", description: "Pushes the Docker image to the ${registry.key} registry with the ${label} label") {
+            // Task dependencies
+            dependsOn tasks.named("dockerTag-${registry.key}-${label}")
+
+            onlyIf { rootProject.nyxState.newRelease }
+
+            doLast {
+                logger.info('Logging out Docker from previous sessions')
+                exec {
+                    logging.captureStandardOutput LogLevel.INFO
+                    logging.captureStandardError  LogLevel.ERROR
+                    // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
+                    commandLine 'docker', 'logout'
+                }
+
+                exec {
+                    logging.captureStandardOutput LogLevel.INFO
+                    logging.captureStandardError  LogLevel.ERROR
+                    // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
+                    //
+                    // Here we should have credentials parametrized in the 'registry' map so we could avoid the confitional below.
+                    //
+                    // The 'dockerHubUser', 'dockerHubToken', 'gitHubUser' and 'gitHubToken' variables are passed as credentials fetching them in
+                    // GitHub Actions as 'secrets.DOCKER_HUB_USERNAME', 'secrets.DOCKER_HUB_TOKEN', 'secrets.GITHUB_ACTOR' and 'secrets.GITHUB_TOKEN'
+                    // respectively.
+                    // The actual environment variable names are 'ORG_GRADLE_PROJECT_dockerHubUser', 'ORG_GRADLE_PROJECT_dockerHubToken',
+                    // 'ORG_GRADLE_PROJECT_gitHubUser' and 'ORG_GRADLE_PROJECT_gitHubToken'
+                    // See the GitHub Actions definition for more.
+                    if ('DockerHub'.equals(registry.key)) {
+                        logger.info('Logging into Docker Hub')
+
+                        if( !findProperty("dockerHubUser") || !findProperty("dockerHubToken"))
+                        {
+                            logger.warn("Warning: dockerHubUser and/or dockerHubToken environment variables are not defined. This will make the login and push tasks fail.")
+                        }
+
+                        if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
+                            // Windows is used only on local development machines so there is no risk of exposing secrets from logs etc.
+                            // To make the 'stdin' method work on Windows we should also take care of when running on cmd or PowerShell, as they have different
+                            // means to echo environment variables. In short, it's not worth it and we just use the 'unsafe' method of passing the token as the '--password'
+                            commandLine 'docker', 'login', 'docker.io', '--username', findProperty("dockerHubUser"), '--password', findProperty("dockerHubToken")
+                        } else {
+                            //This version using the '--password-stdin' option doesn't work but credentials are not exposed in GitHub Actions logs anyway, so let's use the plain version
+                            //commandLine 'echo', '$ORG_GRADLE_PROJECT_dockerHubToken', '|', 'docker', 'login', '--username', findProperty("dockerHubUser"), '--password-stdin'
+                            commandLine 'docker', 'login', 'docker.io', '--username', findProperty("dockerHubUser"), '--password', findProperty("dockerHubToken")
+                        }
+                    }
+                    else if ('GitHubContainerRegistry'.equals(registry.key)) {
+                        logger.info('Logging into GitHub Container Registry')
+
+                        if( !findProperty("gitHubUser") || !findProperty("gitHubToken"))
+                        {
+                            logger.warn("Warning: gitHubUser and/or gitHubToken environment variables are not defined. This will make the login and push tasks fail.")
+                        }
+
+                        if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
+                            // Windows is used only on local development machines so there is no risk of exposing secrets from logs etc.
+                            // To make the 'stdin' method work on Windows we should also take care of when running on cmd or PowerShell, as they have different
+                            // means to echo environment variables. In short, it's not worth it and we just use the 'unsafe' method of passing the token as the '--password'
+                            commandLine 'docker', 'login', 'ghcr.io', '--username', findProperty("gitHubUser"), '--password', findProperty("gitHubToken")
+                        } else {
+                            //This version using the '--password-stdin' option doesn't work but credentials are not exposed in GitHub Actions logs anyway, so let's use the plain version
+                            //commandLine 'echo', '$ORG_GRADLE_PROJECT_gitHubToken', '|', 'docker', 'login', 'ghcr.io', '--username', findProperty("gitHubUser"), '--password-stdin'
+                            //In order to use the GITHUB_TOKEN issued by GitHub Actions, a first image must be published by hand and permissions set giving access to the repository
+                            //according to https://docs.github.com/en/packages/managing-github-packages-using-github-actions-workflows/publishing-and-installing-a-package-with-github-actions#upgrading-a-workflow-that-accesses-ghcrio
+                            commandLine 'docker', 'login', 'ghcr.io', '--username', findProperty("gitHubUser"), '--password', findProperty("gitHubToken")
+                        }
+                    }
+                    else throw new GradleException("Don't know how to log in to registry "+registry.key)
+                }
+
+                logger.info("Pushing the Docker image to the ${registry.key} registry with the ${label} label")
+                exec {
+                    logging.captureStandardOutput LogLevel.INFO
+                    logging.captureStandardError  LogLevel.ERROR
+                    // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
+                    commandLine 'docker', 'image', 'push', "${registry.value}:${label}"
+                }
+            }
+        }
+
+        // Make the overall dockerTag lifecycle task depend on the platform specific tag task
+        tasks.dockerTag.dependsOn tasks.named("dockerTag-${registry.key}-${label}")
+        // Make the overall dockerPush lifecycle task depend on the platform specific tag task
+        tasks.dockerPush.dependsOn tasks.named("dockerPush-${registry.key}-${label}")
+    }
+}
+
+// This is just a lifecycle task
+task publish(group: 'publishing', description: 'Publishes Docker images produced by this project') {
+    dependsOn dockerPush
+}
+
+task goFunctionalTestModInit(group: 'build', description: 'Initializes the go.mod file unless it aleady exists') {
+    // Run this task only if the module file doesn't exist (which might also be ignored by .gitignore although it shouldn't)
+    // Overwriting this file could be harmless as it could be generated again if it only contains dependencies that can be
+    // automatically inferred from sources but it may cause a loss of information and break the project when it also has
+    // extra directives like 'replace' (like in our case).
+    onlyIf { !modFile.exists() }
+
+    // Declare inputs and outputs of this task
+    inputs.files(fileTree(projectDir).filter { File f ->
+        f.name.endsWith(".go")
+    })
+    outputs.file(modFile)
+
+    doLast {
+        logger.info('Initializing the Go module '+modulePath+' file: '+modFile.path)
+        exec {
+            workingDir = projectDir.path+'/test/functional'
+            logging.captureStandardOutput LogLevel.QUIET
+            logging.captureStandardError  LogLevel.ERROR
+            // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
+            commandLine 'go', 'mod', 'init', modulePath
+        }
+    }
+}
+
+task goFunctionalTestModUpdate(group: 'build', description: 'Updates the go.mod file by adding new dependencies or removing those unnecessary') {
+    // Task dependencies
+    dependsOn goFunctionalTestModInit
+
+    // Declare inputs and outputs of this task
+    inputs.files(fileTree(projectDir.path+'/test/functional').filter { File f ->
+        f.name.endsWith(".go")
+    })
+    outputs.file(modFile)
+
+    doLast {
+        logger.info('Updating the Go module '+modulePath+' file: '+modFile.path)
+        exec {
+            workingDir = projectDir.path+'/test/functional'
+            logging.captureStandardOutput LogLevel.QUIET
+            logging.captureStandardError  LogLevel.ERROR
+            // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
+            commandLine 'go', 'mod', 'tidy', '-v'
+        }
+    }
+}
+
+task goFunctionalTestInit(group: 'build', description: 'Initializes the module') {
+    // Task dependencies
+    dependsOn goFunctionalTestModInit, goFunctionalTestModUpdate
+
+    // Declare inputs and outputs of this task
+    outputs.dir(file(buildDir.path+'/bin'))
+
+    doLast {
+        mkdir file(buildDir.path+'/bin')
+    }
+}
+
+// Run functional tests using the Docker image
+task functionalTest(group: 'Verification', description: 'Runs all Docker functional tests and verification tasks') {
+    dependsOn dockerImage, goFunctionalTestInit
+
+    // Declare inputs and outputs of this task
+    inputs.files(dockerImageSHAFile)
+    inputs.files(fileTree(projectDir.path+'/test/functional').filter { File f ->
+        f.name.endsWith(".go") || f.name.endsWith(".mod") || f.name.endsWith(".sum")
+    })
+    inputs.files(fileTree(project(':src:go:errors').projectDir).filter { File f ->
+        f.name.endsWith(".go") || f.name.endsWith(".mod") || f.name.endsWith(".sum")
+    })
+    inputs.files(fileTree(project(':src:go:nyx').projectDir).filter { File f ->
+        f.name.endsWith(".go") || f.name.endsWith(".mod") || f.name.endsWith(".sum")
+    })
+    inputs.files(fileTree(project(':src:go:utils').projectDir).filter { File f ->
+        f.name.endsWith(".go") || f.name.endsWith(".mod") || f.name.endsWith(".sum")
+    })
+    inputs.files(fileTree(project(':src:go:version').projectDir).filter { File f ->
+        f.name.endsWith(".go") || f.name.endsWith(".mod") || f.name.endsWith(".sum")
+    })
+    outputs.dir(buildDir.path+'/test-results/functionalTest/')
+    outputs.dir(buildDir.path+'/reports/tests/functionalTest/')
+
+    doLast {
+        // Pass the parameters to run functional tests
+        def testEnvironmentVariables = [:]
+        testEnvironmentVariables['nyxDockerImage']=dockerImageSHAFile.text // the Docker image to run
+        testEnvironmentVariables['quickTests']=findProperty("quickTests") // the flag to narrow the number of tests, added on the command line using the -PquickTests=true option
+        testEnvironmentVariables['gitHubTestUserToken']=findProperty("gitHubTestUserToken")
+        testEnvironmentVariables['gitHubTestUserPublicKey']=findProperty("gitHubTestUserPublicKey")
+        testEnvironmentVariables['gitHubTestUserPrivateKeyPassphrase']=findProperty("gitHubTestUserPrivateKeyPassphrase")
+        testEnvironmentVariables['gitHubTestUserPrivateKeyWithPassphrase']=findProperty("gitHubTestUserPrivateKeyWithPassphrase")
+        testEnvironmentVariables['gitHubTestUserPrivateKeyWithoutPassphrase']=findProperty("gitHubTestUserPrivateKeyWithoutPassphrase")
+        testEnvironmentVariables['gitLabTestUserToken']=findProperty("gitLabTestUserToken")
+        testEnvironmentVariables['gitLabTestUserPublicKey']=findProperty("gitLabTestUserPublicKey")
+        testEnvironmentVariables['gitLabTestUserPrivateKeyPassphrase']=findProperty("gitLabTestUserPrivateKeyPassphrase")
+        testEnvironmentVariables['gitLabTestUserPrivateKeyWithPassphrase']=findProperty("gitLabTestUserPrivateKeyWithPassphrase")
+        testEnvironmentVariables['gitLabTestUserPrivateKeyWithoutPassphrase']=findProperty("gitLabTestUserPrivateKeyWithoutPassphrase")
+
+        logger.info('Functional testing Docker image ${rootProject.name}:${sanitizedVersion}')
+        exec {
+            workingDir = projectDir.path+'/test/functional'
+            environment += testEnvironmentVariables
+            logging.captureStandardOutput LogLevel.QUIET
+            logging.captureStandardError  LogLevel.ERROR
+            // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
+            // note that with '--tags=functional' we only run tests declared in files with the '+build functional' directive on top
+            commandLine 'go', 'test', '--tags=functional', '-coverprofile='+buildDir.path+'/test-results/functionalTest/functionalTest-coverprofile.out', '-v', './...'
+        }
+        
+        logger.info('Rendering functional test coverage report for Docker image ${rootProject.name}:${sanitizedVersion}')
+        exec {
+            workingDir = projectDir.path+'/test/functional'
+            logging.captureStandardOutput LogLevel.QUIET
+            logging.captureStandardError  LogLevel.ERROR
+            // if this fails when using the Gradle wrapper you may need to run './gradlew --stop' first in order to get it running again
+            commandLine 'go', 'tool', 'cover', '-html', buildDir.path+'/test-results/functionalTest/functionalTest-coverprofile.out', '-o', buildDir.path+'/reports/tests/functionalTest/functionalTest.html'
+        }
+    }
+}
+
+/*------------------------------------------------------------------------------
+  Additional task dependencies
+------------------------------------------------------------------------------*/
+tasks.assemble.dependsOn tasks.dockerImage
+tasks.build.dependsOn tasks.dockerImage
+/*tasks.clean.dependsOn tasks.dockerClean*/

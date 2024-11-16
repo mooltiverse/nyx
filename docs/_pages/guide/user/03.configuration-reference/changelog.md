@@ -143,4 +143,4 @@ The absolute or relative path to a local file or an URL to load a remote file to
 
 If you need to know the object model available when customizing a see [this reference]({{ site.baseurl }}{% link _pages/guide/user/05.state-reference/changelog.md %}#functions)
 
-You can find the default template [here](https://raw.githubusercontent.com/mooltiverse/nyx/main/modules/java/main/src/main/resources/changelog.tpl){:target="_blank"}.
+You can find the default template [here](https://raw.githubusercontent.com/mooltiverse/nyx/main/src/java/main/src/main/resources/changelog.tpl){:target="_blank"}.

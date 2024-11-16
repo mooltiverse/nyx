@@ -23,21 +23,21 @@ coverage:
         informational: true
       java-main:
         paths:
-          - modules/java/main*
+          - src/java/main*
       java-version:
         paths:
-          - modules/java/version*
+          - src/java/version*
       java-gradle:
         paths:
-          - modules/java/gradle*
+          - src/java/gradle*
       go-main:
         paths:
-          - modules/go/nyx*
-          - modules/go/errors*
-          - modules/go/utils*
+          - src/go/nyx*
+          - src/go/errors*
+          - src/go/utils*
       go-version:
         paths:
-          - modules/go/version*
+          - src/go/version*
     patch:
       default:
         target: 80%
@@ -45,21 +45,21 @@ coverage:
         informational: true
       java-main:
         paths:
-          - modules/java/main*
+          - src/java/main*
       java-version:
         paths:
-          - modules/java/version*
+          - src/java/version*
       java-gradle:
         paths:
-          - modules/java/gradle*
+          - src/java/gradle*
       go-main:
         paths:
-          - modules/go/nyx*
-          - modules/go/errors*
-          - modules/go/utils*
+          - src/go/nyx*
+          - src/go/errors*
+          - src/go/utils*
       go-version:
         paths:
-          - modules/go/version*
+          - src/go/version*
 
 flag_management:
   default_rules:

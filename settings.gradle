@@ -15,16 +15,16 @@ plugins {
 ------------------------------------------------------------------------------*/
 rootProject.name = 'nyx'
 
-include 'modules:docker'
-include 'modules:go'
-include 'modules:go:errors'
-include 'modules:go:utils'
-include 'modules:go:version'
-include 'modules:go:nyx'
-include 'modules:java'
-include 'modules:java:version'
-include 'modules:java:main'
-include 'modules:java:gradle'
+include 'src:docker'
+include 'src:go'
+include 'src:go:errors'
+include 'src:go:utils'
+include 'src:go:version'
+include 'src:go:nyx'
+include 'src:java'
+include 'src:java:version'
+include 'src:java:main'
+include 'src:java:gradle'
 
 /*------------------------------------------------------------------------------
   Extension configurations

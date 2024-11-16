@@ -4,7 +4,7 @@
 [![GitHub Actions](https://github.com/mooltiverse/nyx/actions/workflows/workflow.yml/badge.svg?branch=main)](https://github.com/mooltiverse/nyx/actions/workflows/workflow.yml)
 [![Powered by Nyx](https://img.shields.io/badge/powered%20by-Nyx-blue)](https://github.com/mooltiverse/nyx)
 [![Javadoc](https://javadoc.io/badge2/com.mooltiverse.oss.nyx/java/Javadoc.svg)](https://javadoc.io/doc/com.mooltiverse.oss.nyx/java)
-[![Go Doc](https://godocs.io/github.com/mooltiverse/nyx/modules/go/nyx?status.svg)](https://godocs.io/github.com/mooltiverse/nyx/modules/go/nyx)
+[![Go Doc](https://godocs.io/github.com/mooltiverse/nyx/src/go/nyx?status.svg)](https://godocs.io/github.com/mooltiverse/nyx/src/go/nyx)
 [![License](https://img.shields.io/badge/License-Apache%202.0-grey.svg)](LICENSE.md) [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-grey.svg)](CODE_OF_CONDUCT.md)
 
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=mooltiverse_nyx&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=mooltiverse_nyx) [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=mooltiverse_nyx&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=mooltiverse_nyx)
@@ -99,7 +99,7 @@ Available for all platforms in the [latest release](https://github.com/mooltiver
 * [Main Nyx documentation](https://mooltiverse.github.io/nyx/)
   * [user guide](https://mooltiverse.github.io/nyx/guide/user/)
   * [developer guide](https://mooltiverse.github.io/nyx/guide/developer/)
-* [Godoc API](https://godocs.io/github.com/mooltiverse/nyx/modules/go/nyx)
+* [Godoc API](https://godocs.io/github.com/mooltiverse/nyx/src/go/nyx)
 * [Javadoc API](https://javadoc.io/doc/com.mooltiverse.oss.nyx/java)
   
 ### Articles

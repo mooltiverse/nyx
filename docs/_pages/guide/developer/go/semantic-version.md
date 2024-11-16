@@ -5,7 +5,7 @@ toc: true
 permalink: /guide/developer/go/semantic-version/
 ---
 
-The [`version`](https://godocs.io/github.com/mooltiverse/nyx/modules/go/version) package provides you with a fully featured implementation of the [Semantic Versioning (SemVer)](https://semver.org/) specification without any external dependency. Full support for parsing, ordering, bumping and manipulating versions and their identifiers is provided.
+The [`version`](https://godocs.io/github.com/mooltiverse/nyx/src/go/version) package provides you with a fully featured implementation of the [Semantic Versioning (SemVer)](https://semver.org/) specification without any external dependency. Full support for parsing, ordering, bumping and manipulating versions and their identifiers is provided.
 
 This library is used at the Nyx core but yet is completely independent from its logic so is perfectly suitable for use in ano other context.
 
@@ -14,29 +14,29 @@ This library is used at the Nyx core but yet is completely independent from its 
 To install the module locally run:
 
 ```bash
-go get github.com/mooltiverse/nyx/modules/go/version
+go get github.com/mooltiverse/nyx/src/go/version
 ```
 
 To import it in your source code:
 
 ```go
-import "github.com/mooltiverse/nyx/modules/go/version"
+import "github.com/mooltiverse/nyx/src/go/version"
 ```
 
 ## API docs
 
-Thanks to [Go docs](https://godocs.io/) you can browse the API docs at [this URL](https://godocs.io/github.com/mooltiverse/nyx/modules/go/version).
+Thanks to [Go docs](https://godocs.io/) you can browse the API docs at [this URL](https://godocs.io/github.com/mooltiverse/nyx/src/go/version).
 
 ## Using the library
 
-Using the library is simple. You just need to create a [`SemanticVersion`](https://godocs.io/github.com/mooltiverse/nyx/modules/go/version#SemanticVersion){:target="_blank"} and use it as in the following example.
+Using the library is simple. You just need to create a [`SemanticVersion`](https://godocs.io/github.com/mooltiverse/nyx/src/go/version#SemanticVersion){:target="_blank"} and use it as in the following example.
 
 **Remember the `SemanticVersion` is immutable** so every time you invoke a method that changes the number you actually get a new object representing the new state.
 
 ```go
 package main
 
-import version "github.com/mooltiverse/nyx/modules/go/version"
+import version "github.com/mooltiverse/nyx/src/go/version"
 
 func main() {
     // parse any string as a semantic version, in this case we use the default initial version "0.1.0"

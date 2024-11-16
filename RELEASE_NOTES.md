@@ -1,5 +1,20 @@
 # Nyx Release Notes
 
+## 3.1.0
+
+This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/3.1.0).
+
+### Upgrade instructions
+
+There are no actions to take for backward compatibility.
+
+### New features and improvements
+
+This release:
+
+* applied conventions and styling rules
+  * the `modules` directory has been renamed to to `src`
+
 ## 3.0.11
 
 This release is available at [this link](https://github.com/mooltiverse/nyx/releases/tag/3.0.11).

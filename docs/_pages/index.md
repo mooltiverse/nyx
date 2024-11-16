@@ -76,7 +76,7 @@ Available for all platforms in the [latest release]({{ site.data.project.home }}
 * [Main Nyx documentation]({{ site.data.project.docs_home }}/)
   * [user guide]({{ site.data.project.docs_home }}/guide/user/)
   * [developer guide]({{ site.data.project.docs_home }}/guide/developer/)
-* [Godoc API](https://godocs.io/github.com/mooltiverse/nyx/modules/go/nyx)
+* [Godoc API](https://godocs.io/github.com/mooltiverse/nyx/src/go/nyx)
 * [Javadoc API](https://javadoc.io/doc/com.mooltiverse.oss.nyx/java)
   
 ### Articles
