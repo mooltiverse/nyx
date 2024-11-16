@@ -108,7 +108,9 @@ jobs:
     needs:
     - initialize
     if: needs.initialize.outputs.javaChanged == 'true' || needs.initialize.outputs.release == 'true'
-    uses: mooltiverse/toolbox/.github/workflows/java-build.yml@main
+    # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
+    # with '@main' as soon as the branch has been merged to main.
+    uses: mooltiverse/nyx/.github/workflows/java-build.yml@retrofitting
     with:
       install-jdk: true
       install-jdk-version: ${{ env.JDK_VERSION }}
@@ -132,7 +134,9 @@ jobs:
     strategy:
       matrix:
         java: [ '17', '20' ]
-    uses: mooltiverse/toolbox/.github/workflows/java-test-sequence.yml@main
+    # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
+    # with '@main' as soon as the branch has been merged to main.
+    uses: mooltiverse/nyx/.github/workflows/java-test-sequence.yml@retrofitting
     with:
       install-jdk: true
       install-jdk-version: ${{ matrix.java }}
@@ -166,7 +170,9 @@ jobs:
     - java-build
     - java-test
     if: needs.initialize.outputs.javaChanged == 'true' || needs.initialize.outputs.release == 'true'
-    uses: mooltiverse/toolbox/.github/workflows/java-publish.yml@main
+    # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
+    # with '@main' as soon as the branch has been merged to main.
+    uses: mooltiverse/nyx/.github/workflows/java-publish.yml@retrofitting
     with:
       install-jdk: true
       install-jdk-version: ${{ env.JDK_VERSION }}
@@ -198,7 +204,9 @@ jobs:
     needs:
     - initialize
     if: needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.release == 'true'
-    uses: mooltiverse/toolbox/.github/workflows/go-build.yml@main
+    # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
+    # with '@main' as soon as the branch has been merged to main.
+    uses: mooltiverse/nyx/.github/workflows/go-build.yml@retrofitting
     with:
       install-go: true
       install-go-version: ${{ env.GO_VERSION }}
@@ -219,7 +227,9 @@ jobs:
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.os }}
-    uses: mooltiverse/toolbox/.github/workflows/go-test-sequence.yml@main
+    # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
+    # with '@main' as soon as the branch has been merged to main.
+    uses: mooltiverse/nyx/.github/workflows/go-test-sequence.yml@retrofitting
     with:
       install-go: true
       install-go-version: ${{ env.GO_VERSION }}
@@ -255,7 +265,9 @@ jobs:
     - go-build
     - go-test
     if: needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.release == 'true'
-    uses: mooltiverse/toolbox/.github/workflows/go-publish.yml@main
+    # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
+    # with '@main' as soon as the branch has been merged to main.
+    uses: mooltiverse/nyx/.github/workflows/go-publish.yml@retrofitting
     with:
       install-go: true
       install-go-version: ${{ env.GO_VERSION }}
