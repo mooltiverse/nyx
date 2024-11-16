@@ -425,40 +425,40 @@ jobs:
     - name: Log the warning message impairement about freeing disk space on the current runner
       if: runner.os != 'Linux' && (inputs.delete-tool-cache || inputs.delete-android || inputs.delete-dotnet || inputs.delete-haskell || inputs.delete-large-packages || inputs.delete-docker-images || inputs.delete-swap-storage)
       run: echo "::warning title=Unable to free disk space on ${{ runner.os }}::The job has been configured to delete preconfigured packages to free disk space but that feature is only supported on Linux (Ubuntu) runners, while this instance runs on ${{ runner.os }}."
-    # TODO: WAIT FOR MERGE: replace the following tag '@chore/retrofitting'
+    # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
     # with '@main' as soon as the branch has been merged to main.
-    - uses: mooltiverse/nyx/.github/actions/setup-git@chore/retrofitting
+    - uses: mooltiverse/nyx/.github/actions/setup-git@retrofitting
       with:
         verbosity: ${{ inputs.verbosity }}
     - id: nyx
-      # TODO: WAIT FOR MERGE: replace the following tag '@chore/retrofitting'
+      # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
       # with '@main' as soon as the branch has been merged to main.
-      uses: mooltiverse/nyx/.github/actions/setup-nyx@chore/retrofitting
+      uses: mooltiverse/nyx/.github/actions/setup-nyx@retrofitting
       with:
         verbosity: ${{ inputs.verbosity }}
         cache-name-restore-suffix: ${{ inputs.nyx-cache-name-restore-suffix }}
     - id: go
       if: inputs.go-cache-name-restore-suffix != ''
-      # TODO: WAIT FOR MERGE: replace the following tag '@chore/retrofitting'
+      # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
       # with '@main' as soon as the branch has been merged to main.
-      uses: mooltiverse/nyx/.github/actions/setup-go@chore/retrofitting
+      uses: mooltiverse/nyx/.github/actions/setup-go@retrofitting
       with:
         verbosity: ${{ inputs.verbosity }}
         # Restore the cache from the previous job to 'chain' the two caches
         cache-name-restore-suffix: ${{ inputs.go-cache-name-restore-suffix }}
     - id: java
       if: inputs.java-cache-name-restore-suffix != ''
-      # TODO: WAIT FOR MERGE: replace the following tag '@chore/retrofitting'
+      # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
       # with '@main' as soon as the branch has been merged to main.
-      uses: mooltiverse/nyx/.github/actions/setup-java@chore/retrofitting
+      uses: mooltiverse/nyx/.github/actions/setup-java@retrofitting
       with:
         verbosity: ${{ inputs.verbosity }}
         # Restore the cache from the previous job to 'chain' the two caches
         cache-name-restore-suffix: ${{ inputs.java-cache-name-restore-suffix }}
     - id: docker
-      # TODO: WAIT FOR MERGE: replace the following tag '@chore/retrofitting'
+      # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
       # with '@main' as soon as the branch has been merged to main.
-      uses: mooltiverse/nyx/.github/actions/setup-docker@chore/retrofitting
+      uses: mooltiverse/nyx/.github/actions/setup-docker@retrofitting
       with:
         verbosity: ${{ inputs.verbosity }}
         # Restore the cache from the previous job to 'chain' the two caches
@@ -472,9 +472,9 @@ jobs:
         aws-access-key-id: ${{ inputs.aws-access-key-id }}
         aws-secret-access-key: ${{ secrets.aws-secret-access-key }}
     - id: gradle
-      # TODO: WAIT FOR MERGE: replace the following tag '@chore/retrofitting'
+      # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
       # with '@main' as soon as the branch has been merged to main.
-      uses: mooltiverse/nyx/.github/actions/setup-gradle@chore/retrofitting
+      uses: mooltiverse/nyx/.github/actions/setup-gradle@retrofitting
       with:
         verbosity: ${{ inputs.verbosity }}
         # Override the installed software version or re-install the packages if they
@@ -524,40 +524,40 @@ jobs:
     - name: Log the warning message impairement about freeing disk space on the current runner
       if: runner.os != 'Linux' && (inputs.delete-tool-cache || inputs.delete-android || inputs.delete-dotnet || inputs.delete-haskell || inputs.delete-large-packages || inputs.delete-docker-images || inputs.delete-swap-storage)
       run: echo "::warning title=Unable to free disk space on ${{ runner.os }}::The job has been configured to delete preconfigured packages to free disk space but that feature is only supported on Linux (Ubuntu) runners, while this instance runs on ${{ runner.os }}."
-    # TODO: WAIT FOR MERGE: replace the following tag '@chore/retrofitting'
+    # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
     # with '@main' as soon as the branch has been merged to main.
-    - uses: mooltiverse/nyx/.github/actions/setup-git@chore/retrofitting
+    - uses: mooltiverse/nyx/.github/actions/setup-git@retrofitting
       with:
         verbosity: ${{ inputs.verbosity }}
     - id: nyx
-      # TODO: WAIT FOR MERGE: replace the following tag '@chore/retrofitting'
+      # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
       # with '@main' as soon as the branch has been merged to main.
-      uses: mooltiverse/nyx/.github/actions/setup-nyx@chore/retrofitting
+      uses: mooltiverse/nyx/.github/actions/setup-nyx@retrofitting
       with:
         verbosity: ${{ inputs.verbosity }}
         cache-name-restore-suffix: ${{ inputs.nyx-cache-name-restore-suffix }}
     - id: go
       if: inputs.go-cache-name-restore-suffix != ''
-      # TODO: WAIT FOR MERGE: replace the following tag '@chore/retrofitting'
+      # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
       # with '@main' as soon as the branch has been merged to main.
-      uses: mooltiverse/nyx/.github/actions/setup-go@chore/retrofitting
+      uses: mooltiverse/nyx/.github/actions/setup-go@retrofitting
       with:
         verbosity: ${{ inputs.verbosity }}
         # Restore the cache from the previous job to 'chain' the two caches
         cache-name-restore-suffix: ${{ inputs.go-cache-name-restore-suffix }}
     - id: java
       if: inputs.java-cache-name-restore-suffix != ''
-      # TODO: WAIT FOR MERGE: replace the following tag '@chore/retrofitting'
+      # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
       # with '@main' as soon as the branch has been merged to main.
-      uses: mooltiverse/nyx/.github/actions/setup-java@chore/retrofitting
+      uses: mooltiverse/nyx/.github/actions/setup-java@retrofitting
       with:
         verbosity: ${{ inputs.verbosity }}
         # Restore the cache from the previous job to 'chain' the two caches
         cache-name-restore-suffix: ${{ inputs.java-cache-name-restore-suffix }}
     - id: docker
-      # TODO: WAIT FOR MERGE: replace the following tag '@chore/retrofitting'
+      # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
       # with '@main' as soon as the branch has been merged to main.
-      uses: mooltiverse/nyx/.github/actions/setup-docker@chore/retrofitting
+      uses: mooltiverse/nyx/.github/actions/setup-docker@retrofitting
       with:
         verbosity: ${{ inputs.verbosity }}
         # Restore the cache from the previous job to 'chain' the two caches
@@ -571,9 +571,9 @@ jobs:
         aws-access-key-id: ${{ inputs.aws-access-key-id }}
         aws-secret-access-key: ${{ secrets.aws-secret-access-key }}
     - id: gradle
-      # TODO: WAIT FOR MERGE: replace the following tag '@chore/retrofitting'
+      # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
       # with '@main' as soon as the branch has been merged to main.
-      uses: mooltiverse/nyx/.github/actions/setup-gradle@chore/retrofitting
+      uses: mooltiverse/nyx/.github/actions/setup-gradle@retrofitting
       with:
         verbosity: ${{ inputs.verbosity }}
         # Override the installed software version or re-install the packages if they
@@ -623,40 +623,40 @@ jobs:
     - name: Log the warning message impairement about freeing disk space on the current runner
       if: runner.os != 'Linux' && (inputs.delete-tool-cache || inputs.delete-android || inputs.delete-dotnet || inputs.delete-haskell || inputs.delete-large-packages || inputs.delete-docker-images || inputs.delete-swap-storage)
       run: echo "::warning title=Unable to free disk space on ${{ runner.os }}::The job has been configured to delete preconfigured packages to free disk space but that feature is only supported on Linux (Ubuntu) runners, while this instance runs on ${{ runner.os }}."
-    # TODO: WAIT FOR MERGE: replace the following tag '@chore/retrofitting'
+    # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
     # with '@main' as soon as the branch has been merged to main.
-    - uses: mooltiverse/nyx/.github/actions/setup-git@chore/retrofitting
+    - uses: mooltiverse/nyx/.github/actions/setup-git@retrofitting
       with:
         verbosity: ${{ inputs.verbosity }}
     - id: nyx
-      # TODO: WAIT FOR MERGE: replace the following tag '@chore/retrofitting'
+      # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
       # with '@main' as soon as the branch has been merged to main.
-      uses: mooltiverse/nyx/.github/actions/setup-nyx@chore/retrofitting
+      uses: mooltiverse/nyx/.github/actions/setup-nyx@retrofitting
       with:
         verbosity: ${{ inputs.verbosity }}
         cache-name-restore-suffix: ${{ inputs.nyx-cache-name-restore-suffix }}
     - id: go
       if: inputs.go-cache-name-restore-suffix != ''
-      # TODO: WAIT FOR MERGE: replace the following tag '@chore/retrofitting'
+      # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
       # with '@main' as soon as the branch has been merged to main.
-      uses: mooltiverse/nyx/.github/actions/setup-go@chore/retrofitting
+      uses: mooltiverse/nyx/.github/actions/setup-go@retrofitting
       with:
         verbosity: ${{ inputs.verbosity }}
         # Restore the cache from the previous job to 'chain' the two caches
         cache-name-restore-suffix: ${{ inputs.go-cache-name-restore-suffix }}
     - id: java
       if: inputs.java-cache-name-restore-suffix != ''
-      # TODO: WAIT FOR MERGE: replace the following tag '@chore/retrofitting'
+      # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
       # with '@main' as soon as the branch has been merged to main.
-      uses: mooltiverse/nyx/.github/actions/setup-java@chore/retrofitting
+      uses: mooltiverse/nyx/.github/actions/setup-java@retrofitting
       with:
         verbosity: ${{ inputs.verbosity }}
         # Restore the cache from the previous job to 'chain' the two caches
         cache-name-restore-suffix: ${{ inputs.java-cache-name-restore-suffix }}
     - id: docker
-      # TODO: WAIT FOR MERGE: replace the following tag '@chore/retrofitting'
+      # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
       # with '@main' as soon as the branch has been merged to main.
-      uses: mooltiverse/nyx/.github/actions/setup-docker@chore/retrofitting
+      uses: mooltiverse/nyx/.github/actions/setup-docker@retrofitting
       with:
         verbosity: ${{ inputs.verbosity }}
         # Restore the cache from the previous job to 'chain' the two caches
@@ -670,9 +670,9 @@ jobs:
         aws-access-key-id: ${{ inputs.aws-access-key-id }}
         aws-secret-access-key: ${{ secrets.aws-secret-access-key }}
     - id: gradle
-      # TODO: WAIT FOR MERGE: replace the following tag '@chore/retrofitting'
+      # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
       # with '@main' as soon as the branch has been merged to main.
-      uses: mooltiverse/nyx/.github/actions/setup-gradle@chore/retrofitting
+      uses: mooltiverse/nyx/.github/actions/setup-gradle@retrofitting
       with:
         verbosity: ${{ inputs.verbosity }}
         # Override the installed software version or re-install the packages if they

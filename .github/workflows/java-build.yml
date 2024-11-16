@@ -172,30 +172,30 @@ jobs:
     name: Build
     runs-on: ${{ inputs.runs-on }}
     steps:
-    # TODO: WAIT FOR MERGE: replace the following tag '@chore/retrofitting'
+    # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
     # with '@main' as soon as the branch has been merged to main.
-    - uses: mooltiverse/nyx/.github/actions/setup-git@chore/retrofitting
+    - uses: mooltiverse/nyx/.github/actions/setup-git@retrofitting
       with:
         verbosity: ${{ inputs.verbosity }}
     - id: nyx
-      # TODO: WAIT FOR MERGE: replace the following tag '@chore/retrofitting'
+      # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
       # with '@main' as soon as the branch has been merged to main.
-      uses: mooltiverse/nyx/.github/actions/setup-nyx@chore/retrofitting
+      uses: mooltiverse/nyx/.github/actions/setup-nyx@retrofitting
       with:
         verbosity: ${{ inputs.verbosity }}
         cache-name-restore-suffix: ${{ inputs.nyx-cache-name-restore-suffix }}
     - id: java
-      # TODO: WAIT FOR MERGE: replace the following tag '@chore/retrofitting'
+      # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
       # with '@main' as soon as the branch has been merged to main.
-      uses: mooltiverse/nyx/.github/actions/setup-java@chore/retrofitting
+      uses: mooltiverse/nyx/.github/actions/setup-java@retrofitting
       with:
         verbosity: ${{ inputs.verbosity }}
         # Restore the cache from the previous job to 'chain' the two caches
         cache-name-restore-suffix: ${{ inputs.java-cache-name-restore-suffix }}
     - id: gradle
-      # TODO: WAIT FOR MERGE: replace the following tag '@chore/retrofitting'
+      # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
       # with '@main' as soon as the branch has been merged to main.
-      uses: mooltiverse/nyx/.github/actions/setup-gradle@chore/retrofitting
+      uses: mooltiverse/nyx/.github/actions/setup-gradle@retrofitting
       with:
         verbosity: ${{ inputs.verbosity }}
         # Override the installed software version or re-install the packages if they

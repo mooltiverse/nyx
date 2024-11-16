@@ -94,40 +94,40 @@ jobs:
       with:
         verbosity: ${{ inputs.verbosity }}
     - id: nyx
-      # TODO: WAIT FOR MERGE: replace the following tag '@chore/retrofitting'
+      # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
       # with '@main' as soon as the branch has been merged to main.
-      uses: mooltiverse/nyx/.github/actions/setup-nyx@chore/retrofitting
+      uses: mooltiverse/nyx/.github/actions/setup-nyx@retrofitting
       with:
         verbosity: ${{ inputs.verbosity }}
         enable-artifacts: true
     - id: go
-      # TODO: WAIT FOR MERGE: replace the following tag '@chore/retrofitting'
+      # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
       # with '@main' as soon as the branch has been merged to main.
-      uses: mooltiverse/nyx/.github/actions/setup-go@chore/retrofitting
+      uses: mooltiverse/nyx/.github/actions/setup-go@retrofitting
       with:
         verbosity: ${{ inputs.verbosity }}
         enable-cache: false
         install-go: false
     - id: java
-      # TODO: WAIT FOR MERGE: replace the following tag '@chore/retrofitting'
+      # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
       # with '@main' as soon as the branch has been merged to main.
-      uses: mooltiverse/nyx/.github/actions/setup-java@chore/retrofitting
+      uses: mooltiverse/nyx/.github/actions/setup-java@retrofitting
       with:
         verbosity: ${{ inputs.verbosity }}
         enable-cache: false
         install-jdk: false
     - id: docker
-      # TODO: WAIT FOR MERGE: replace the following tag '@chore/retrofitting'
+      # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
       # with '@main' as soon as the branch has been merged to main.
-      uses: mooltiverse/nyx/.github/actions/setup-docker@chore/retrofitting
+      uses: mooltiverse/nyx/.github/actions/setup-docker@retrofitting
       with:
         verbosity: ${{ inputs.verbosity }}
         enable-cache: false
         enable-containerd-image-store: false
     - id: docusaurus
-      # TODO: WAIT FOR MERGE: replace the following tag '@chore/retrofitting'
+      # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
       # with '@main' as soon as the branch has been merged to main.
-      uses: mooltiverse/nyx/.github/actions/setup-docusaurus@chore/retrofitting
+      uses: mooltiverse/nyx/.github/actions/setup-docusaurus@retrofitting
       with:
         verbosity: ${{ inputs.verbosity }}
         enable-cache: false
