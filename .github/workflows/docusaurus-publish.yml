@@ -194,7 +194,7 @@ env:
   # Compute the extra Gradle properties to use for Gradle commands.
   # Here:
   # - we add one argument for the verbosity level passed in the 'verbosity' input
-  GRADLE_EXTRA_OPTS: >-
+  GRADLE_EXTRA_OPTS: |
     ${{ secrets.gradle-secret-arguments }}
     ${{ inputs.gradle-arguments }}
     ${{ inputs.verbosity == 'warning' && '--warn' || '' }}
