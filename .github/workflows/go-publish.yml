@@ -194,8 +194,6 @@ env:
   # Here:
   # - we add one argument for the verbosity level passed in the 'verbosity' input
   GRADLE_EXTRA_OPTS: >-
-    ${{ secrets.gradle-secret-arguments }}
-    ${{ inputs.gradle-arguments }}
     ${{ inputs.verbosity == 'warning' && '--warn' || '' }}
     ${{ inputs.verbosity == 'quiet' && '--quiet' || '' }}
     ${{ inputs.verbosity == 'info' && '--info' || '' }}
@@ -243,7 +241,7 @@ jobs:
         # Restore the cache from the previous job to 'chain' the two caches
         cache-name-restore-suffix: ${{ inputs.gradle-cache-name-restore-suffix }}
     - name: Publish the Go artifacts
-      run: ./gradlew ${{ env.GRADLE_EXTRA_OPTS }} ${{ inputs.gradle-tasks }} ${{ inputs.gradle-arguments }}
+      run: ./gradlew ${{ inputs.gradle-arguments }} ${{ secrets.gradle-secret-arguments }} ${{ env.GRADLE_EXTRA_OPTS }} ${{ inputs.gradle-tasks }}
     outputs:
       go-cache-name-suffix: ${{ steps.go.outputs.cache-name-suffix }}
       gradle-cache-name-suffix: ${{ steps.gradle.outputs.cache-name-suffix }}

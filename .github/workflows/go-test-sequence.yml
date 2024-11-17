@@ -217,8 +217,6 @@ env:
   # Here:
   # - we add one argument for the verbosity level passed in the 'verbosity' input
   GRADLE_EXTRA_OPTS: >-
-    ${{ secrets.gradle-secret-arguments }}
-    ${{ inputs.gradle-arguments }}
     ${{ inputs.verbosity == 'warning' && '--warn' || '' }}
     ${{ inputs.verbosity == 'quiet' && '--quiet' || '' }}
     ${{ inputs.verbosity == 'info' && '--info' || '' }}
@@ -266,7 +264,7 @@ jobs:
         # Restore the cache from the previous job to 'chain' the two caches
         cache-name-restore-suffix: ${{ inputs.gradle-cache-name-restore-suffix }}
     - name: Run Unit Tests the on Go code
-      run: ./gradlew ${{ env.GRADLE_EXTRA_OPTS }} ${{ inputs.gradle-unit-test-tasks }} ${{ inputs.gradle-arguments }}
+      run: ./gradlew ${{ inputs.gradle-arguments }} ${{ secrets.gradle-secret-arguments }} ${{ env.GRADLE_EXTRA_OPTS }} ${{ inputs.gradle-unit-test-tasks }}
     - name: Publish the unit test report artifacts
       uses: actions/upload-artifact@v4
       if: ${{ always() }}
@@ -318,7 +316,7 @@ jobs:
         # Restore the cache from the previous job to 'chain' the two caches
         cache-name-restore-suffix: ${{ needs.test-unit.outputs.gradle-cache-name-suffix }}
     - name: Run Integration Tests on Go code
-      run: ./gradlew ${{ env.GRADLE_EXTRA_OPTS }} ${{ inputs.gradle-integration-test-tasks }} ${{ inputs.gradle-arguments }}
+      run: ./gradlew ${{ inputs.gradle-arguments }} ${{ secrets.gradle-secret-arguments }} ${{ env.GRADLE_EXTRA_OPTS }} ${{ inputs.gradle-integration-test-tasks }}
     - name: Publish the integration test report artifacts
       uses: actions/upload-artifact@v4
       if: ${{ always() }}
@@ -370,7 +368,7 @@ jobs:
         # Restore the cache from the previous job to 'chain' the two caches
         cache-name-restore-suffix: ${{ needs.test-integration.outputs.gradle-cache-name-suffix }}
     - name: Run Functional Tests on Go code
-      run: ./gradlew ${{ env.GRADLE_EXTRA_OPTS }} ${{ inputs.gradle-functional-test-tasks }} ${{ inputs.gradle-arguments }}
+      run: ./gradlew ${{ inputs.gradle-arguments }} ${{ secrets.gradle-secret-arguments }} ${{ env.GRADLE_EXTRA_OPTS }} ${{ inputs.gradle-functional-test-tasks }}
     - name: Publish the functional test report artifacts
       uses: actions/upload-artifact@v4
       if: ${{ always() }}

@@ -254,8 +254,6 @@ env:
   # Here:
   # - we add one argument for the verbosity level passed in the 'verbosity' input
   GRADLE_EXTRA_OPTS: >-
-    ${{ secrets.gradle-secret-arguments }}
-    ${{ inputs.gradle-arguments }}
     ${{ inputs.verbosity == 'warning' && '--warn' || '' }}
     ${{ inputs.verbosity == 'quiet' && '--quiet' || '' }}
     ${{ inputs.verbosity == 'info' && '--info' || '' }}
@@ -366,7 +364,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         NYX_SERVICES_github_OPTIONS_AUTHENTICATION_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: ./gradlew ${{ env.GRADLE_EXTRA_OPTS }} ${{ inputs.gradle-tasks }} ${{ inputs.gradle-arguments }}
+      run: ./gradlew ${{ inputs.gradle-arguments }} ${{ secrets.gradle-secret-arguments }} ${{ env.GRADLE_EXTRA_OPTS }} ${{ inputs.gradle-tasks }}
     - name: Create the 'Release' annotation
       if: steps.nyx.outputs.newRelease == 'true'
       run: |
