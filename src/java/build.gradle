@@ -157,12 +157,12 @@ allprojects {
     jar {
         manifest {
             attributes(
-                'Specification-Title'       : "${nyxID} ${project.name}",
+                'Specification-Title'       : "${projectID} ${project.name}",
                 'Specification-Version'     : rootProject.version,
-                'Specification-Vendor'      : nyxOrganizationName,
-                'Implementation-Title'      : "${nyxID} ${project.name} java",
+                'Specification-Vendor'      : projectOrganizationName,
+                'Implementation-Title'      : "${projectID} ${project.name} java",
                 'Implementation-Version'    : rootProject.version,
-                'Implementation-Vendor'     : nyxOrganizationName,
+                'Implementation-Vendor'     : projectOrganizationName,
                 'Build-Timestamp'           : new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").format(new Date()),
                 'Build-Revision'            : rootProject.version,
                 'Created-By'                : "Gradle ${gradle.gradleVersion}",
@@ -364,26 +364,26 @@ allprojects.each {prj ->
                     name = prj.name
                     // prj.description fails to evaluate because it's not yet available when publications are defined
                     description = "$prj.group:$prj.name:$rootProject.version $prj.description"
-                    url = nyxHomeURL
+                    url = projectURL
                     licenses {
                         license {
-                            name = nyxLicenseName
-                            url = nyxLicenseURL
+                            name = projectLicenseName
+                            url = projectLicenseURL
                         }
                     }
                     developers {
                         developer {
-                            id = nyxID
-                            name = nyxTeamName
-                            email = nyxTeamEmail
-                            organization = nyxOrganizationName
-                            organizationUrl = nyxOrganizationURL
+                            id = projectID
+                            name = projectTeamName
+                            email = projectTeamEmail
+                            organization = projectOrganizationName
+                            organizationUrl = projectOrganizationURL
                         }
                     }
                     scm {
-                        connection = nyxGitURL
-                        developerConnection = nyxGitURL
-                        url = nyxHomeURL
+                        connection = projectGitURL
+                        developerConnection = projectGitURL
+                        url = projectURL
                     }
                 }
             }
@@ -399,7 +399,7 @@ publishing {
         // The GitHub Packages repository, visible at https://github.com/mooltiverse/nyx/packages
         maven {
             name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/"+nyxOrganizationID+"/"+nyxID)
+            url = uri("https://maven.pkg.github.com/"+projectOrganizationID+"/"+projectID)
             credentials {
                 // The 'gitHubUser' and 'gitHubToken' variables are passed as credentials fetching them in GitHub Actions as 'secrets.GITHUB_ACTOR' and 'secrets.GITHUB_TOKEN', respectively.
                 // See the GitHub Actions definition for more.
