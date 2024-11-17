@@ -28,7 +28,7 @@
 name: Main
 
 on:
-  #workflow_dispatch:
+  workflow_dispatch:
   push:
 
 # Avoid running multiple pipelines concurrently to avoid overlapping releases and tags
@@ -38,9 +38,11 @@ concurrency:
   group: project
   cancel-in-progress: false
 
-env:
-  GO_VERSION: 1.22.4
-  JDK_VERSION: 20
+#env:
+  # We can't use the 'env' context for reusable workflows, so we need to hardcode
+  # the values in each reusable workflow instance.
+  #GO_VERSION: 1.22.4
+  #JDK_VERSION: 20
 
 jobs:
   #############################################################################
@@ -91,7 +93,7 @@ jobs:
     uses: mooltiverse/nyx/.github/workflows/release.yml@retrofitting
     with:
       install-jdk: true
-      install-jdk-version: ${{ env.JDK_VERSION }}
+      install-jdk-version: 20
       # Restore the cache from the previous job to 'chain' caches
       nyx-cache-name-restore-suffix: ${{ needs.initialize.outputs.nyx-cache-name-suffix }}
       java-cache-name-restore-suffix: ${{ needs.java-publish.outputs.java-cache-name-suffix }}
@@ -113,7 +115,7 @@ jobs:
     uses: mooltiverse/nyx/.github/workflows/java-build.yml@retrofitting
     with:
       install-jdk: true
-      install-jdk-version: ${{ env.JDK_VERSION }}
+      install-jdk-version: 20
       # Restore the cache from the previous job to 'chain' caches
       nyx-cache-name-restore-suffix: ${{ needs.initialize.outputs.nyx-cache-name-suffix }}
 
@@ -175,7 +177,7 @@ jobs:
     uses: mooltiverse/nyx/.github/workflows/java-publish.yml@retrofitting
     with:
       install-jdk: true
-      install-jdk-version: ${{ env.JDK_VERSION }}
+      install-jdk-version: 20
       # Pass extra properties used by the Gradle scripts to run tests.
       # See the top level
       #   https://github.com/mooltiverse/nyx/blob/main/CONTRIBUTING.md#contributing-code
@@ -209,9 +211,9 @@ jobs:
     uses: mooltiverse/nyx/.github/workflows/go-build.yml@retrofitting
     with:
       install-go: true
-      install-go-version: ${{ env.GO_VERSION }}
+      install-go-version: 1.22.4
       install-jdk: true
-      install-jdk-version: ${{ env.JDK_VERSION }}
+      install-jdk-version: 20
       # Restore the cache from the previous job to 'chain' caches
       nyx-cache-name-restore-suffix: ${{ needs.initialize.outputs.nyx-cache-name-suffix }}
 
@@ -232,9 +234,9 @@ jobs:
     uses: mooltiverse/nyx/.github/workflows/go-test-sequence.yml@retrofitting
     with:
       install-go: true
-      install-go-version: ${{ env.GO_VERSION }}
+      install-go-version: 1.22.4
       install-jdk: true
-      install-jdk-version: ${{ env.JDK_VERSION }}
+      install-jdk-version: 20
       # Pass extra properties used by the Gradle scripts to run tests.
       # See the top level
       #   https://github.com/mooltiverse/nyx/blob/main/CONTRIBUTING.md#contributing-code
@@ -270,9 +272,9 @@ jobs:
     uses: mooltiverse/nyx/.github/workflows/go-publish.yml@retrofitting
     with:
       install-go: true
-      install-go-version: ${{ env.GO_VERSION }}
+      install-go-version: 1.22.4
       install-jdk: true
-      install-jdk-version: ${{ env.JDK_VERSION }}
+      install-jdk-version: 20
       # Restore the cache from the previous job to 'chain' caches
       nyx-cache-name-restore-suffix: ${{ needs.initialize.outputs.nyx-cache-name-suffix }}
       gradle-cache-name-restore-suffix: ${{ needs.go-build.outputs.gradle-cache-name-suffix }}
@@ -292,7 +294,7 @@ jobs:
     uses: mooltiverse/nyx/.github/workflows/docker-build.yml@retrofitting
     with:
       install-jdk: true
-      install-jdk-version: ${{ env.JDK_VERSION }}
+      install-jdk-version: 20
       # Restore the cache from the previous job to 'chain' caches
       nyx-cache-name-restore-suffix: ${{ needs.initialize.outputs.nyx-cache-name-suffix }}
       go-cache-name-restore-suffix: ${{ needs.go-build.outputs.go-cache-name-suffix }}
@@ -313,7 +315,7 @@ jobs:
     uses: mooltiverse/nyx/.github/workflows/docker-test-sequence.yml@retrofitting
     with:
       install-jdk: true
-      install-jdk-version: ${{ env.JDK_VERSION }}
+      install-jdk-version: 20
       # Pass extra properties used by the Gradle scripts to run tests.
       # See the top level
       #   https://github.com/mooltiverse/nyx/blob/main/CONTRIBUTING.md#contributing-code
@@ -351,7 +353,7 @@ jobs:
     uses: mooltiverse/nyx/.github/workflows/docker-publish.yml@retrofitting
     with:
       install-jdk: true
-      install-jdk-version: ${{ env.JDK_VERSION }}
+      install-jdk-version: 20
       # Pass extra properties used by the Gradle scripts to run tests.
       # See the top level
       #   https://github.com/mooltiverse/nyx/blob/main/CONTRIBUTING.md#contributing-code
@@ -382,7 +384,7 @@ jobs:
     uses: mooltiverse/nyx/.github/workflows/docusaurus-build.yml@retrofitting
     with:
       install-jdk: true
-      install-jdk-version: ${{ env.JDK_VERSION }}
+      install-jdk-version: 20
       # Restore the cache from the previous job to 'chain' caches
       nyx-cache-name-restore-suffix: ${{ needs.initialize.outputs.nyx-cache-name-suffix }}
   
@@ -398,7 +400,7 @@ jobs:
     uses: mooltiverse/nyx/.github/workflows/docusaurus-publish.yml@retrofitting
     with:
       install-jdk: true
-      install-jdk-version: ${{ env.JDK_VERSION }}
+      install-jdk-version: 20
       # Restore the cache from the previous job to 'chain' caches
       nyx-cache-name-restore-suffix: ${{ needs.initialize.outputs.nyx-cache-name-suffix }}
       gradle-cache-name-restore-suffix: ${{ needs.docusaurus-build.outputs.gradle-cache-name-suffix }}
