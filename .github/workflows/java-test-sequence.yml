@@ -30,7 +30,8 @@ on:
       gradle-arguments:
         description: |-
           The whitespace separated list of Gradle arguments to pass on the
-          Gradle command line.
+          Gradle command line. See also 'gradle-secret-arguments' for passing
+          sensitive values.
           For example you may use '--quiet', '--warn', '--info', '--debug' to
           set the verbosity level.
           For more see: https://docs.gradle.org/current/userguide/command_line_interface.html.
@@ -175,7 +176,8 @@ on:
       gradle-secret-arguments:
         description: |-
           The whitespace separated list of Gradle arguments to pass on the
-          Gradle command line.
+          Gradle command line. This is for passing sensitive values.
+          See also 'gradle-arguments' for passing non sensitive values.
           For example you may use '--quiet', '--warn', '--info', '--debug' to
           set the verbosity level.
           For more see: https://docs.gradle.org/current/userguide/command_line_interface.html.

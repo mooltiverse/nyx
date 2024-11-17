@@ -24,7 +24,8 @@ on:
       gradle-arguments:
         description: |-
           The whitespace separated list of Gradle arguments to pass on the
-          Gradle command line.
+          Gradle command line. See also 'gradle-secret-arguments' for passing
+          sensitive values.
           For example you may use '--quiet', '--warn', '--info', '--debug' to
           set the verbosity level.
           For more see: https://docs.gradle.org/current/userguide/command_line_interface.html.
@@ -353,6 +354,15 @@ on:
         type: string
         required: false
     secrets:
+      gradle-secret-arguments:
+        description: |-
+          The whitespace separated list of Gradle arguments to pass on the
+          Gradle command line. This is for passing sensitive values.
+          See also 'gradle-arguments' for passing non sensitive values.
+          For example you may use '--quiet', '--warn', '--info', '--debug' to
+          set the verbosity level.
+          For more see: https://docs.gradle.org/current/userguide/command_line_interface.html.
+        required: false
       aws-secret-access-key:
         description: |-
           The AWS access key ID to use for remote API.
@@ -377,6 +387,7 @@ env:
     ${{ inputs.verbosity == 'quiet' && '--quiet' || '' }}
     ${{ inputs.verbosity == 'info' && '--info' || '' }}
     ${{ inputs.verbosity == 'debug' && '--debug' || '' }}
+    ${{ secrets.gradle-secret-arguments }}
 
 jobs:
   build:
