@@ -228,11 +228,11 @@ jobs:
     strategy:
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
-    runs-on: ${{ matrix.os }}
     # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
     # with '@main' as soon as the branch has been merged to main.
     uses: mooltiverse/nyx/.github/workflows/go-test-sequence.yml@retrofitting
     with:
+      runs-on: ${{ matrix.os }}
       install-go: true
       install-go-version: 1.22.4
       install-jdk: true
