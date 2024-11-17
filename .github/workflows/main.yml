@@ -156,7 +156,7 @@ jobs:
       # file for details about passing these values when testing locally.
       # Also see:
       # - https://docs.gradle.org/current/userguide/build_environment.html#setting_a_project_property
-      gradle-secret-arguments: |
+      gradle-secret-arguments: >
         -Dorg.gradle.project.gitHubTestUserToken=${{ secrets.TEST_GITHUB_USER_TOKEN }}
         -Dorg.gradle.project.gitHubTestUserPublicKey=${{ secrets.TEST_GITHUB_USER_PUBLIC_KEY }}
         -Dorg.gradle.project.gitHubTestUserPrivateKeyPassphrase=${{ secrets.TEST_GITHUB_USER_PASSPHRASE }}
@@ -193,7 +193,7 @@ jobs:
       # file for details about passing these values when testing locally.
       # Also see:
       # - https://docs.gradle.org/current/userguide/build_environment.html#setting_a_project_property
-      gradle-secret-arguments: |
+      gradle-secret-arguments: >
         -Dorg.gradle.project.ossrhUsername=${{ secrets.MAVEN_USER }}
         -Dorg.gradle.project.ossrhPassword=${{ secrets.MAVEN_PASSWORD }}
         -Dorg.gradle.project.signingKeyBase64=${{ secrets.GPG_PRIVATE_KEY_BASE64 }}
@@ -254,7 +254,7 @@ jobs:
       # file for details about passing these values when testing locally.
       # Also see:
       # - https://docs.gradle.org/current/userguide/build_environment.html#setting_a_project_property
-      gradle-secret-arguments: |
+      gradle-secret-arguments: >
         -Dorg.gradle.project.gitHubTestUserToken=${{ secrets.TEST_GITHUB_USER_TOKEN }}
         -Dorg.gradle.project.gitHubTestUserPublicKey=${{ secrets.TEST_GITHUB_USER_PUBLIC_KEY }}
         -Dorg.gradle.project.gitHubTestUserPrivateKeyPassphrase=${{ secrets.TEST_GITHUB_USER_PASSPHRASE }}
@@ -339,7 +339,7 @@ jobs:
       # file for details about passing these values when testing locally.
       # Also see:
       # - https://docs.gradle.org/current/userguide/build_environment.html#setting_a_project_property
-      gradle-secret-arguments: |
+      gradle-secret-arguments: >
         -Dorg.gradle.project.gitHubTestUserToken=${{ secrets.TEST_GITHUB_USER_TOKEN }}
         -Dorg.gradle.project.gitHubTestUserPublicKey=${{ secrets.TEST_GITHUB_USER_PUBLIC_KEY }}
         -Dorg.gradle.project.gitHubTestUserPrivateKeyPassphrase=${{ secrets.TEST_GITHUB_USER_PASSPHRASE }}
@@ -379,7 +379,7 @@ jobs:
       # file for details about passing these values when testing locally.
       # Also see:
       # - https://docs.gradle.org/current/userguide/build_environment.html#setting_a_project_property
-      gradle-secret-arguments: |
+      gradle-secret-arguments: >
         -Dorg.gradle.project.dockerHubUser=${{ secrets.DOCKER_HUB_USERNAME }}
         -Dorg.gradle.project.dockerHubToken=${{ secrets.DOCKER_HUB_TOKEN }}
 
