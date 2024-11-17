@@ -2,6 +2,7 @@
   Plugins DSL block
   https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block
 ------------------------------------------------------------------------------*/
+
 plugins {
     /* Direct publishing to Maven Central is forbidden because contents need a bunch of validation steps to succeed.
      * These validation steps wouldn't be necessary if we publish to private Maven repositories or others but in order
