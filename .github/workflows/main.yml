@@ -31,13 +31,6 @@ on:
   workflow_dispatch:
   push:
 
-# Avoid running multiple pipelines concurrently to avoid overlapping releases and tags
-concurrency:
-  # Synch on the project to avoid conflicts when accessing remote resources
-  # (i.e. when testing against remote services)
-  group: project
-  cancel-in-progress: false
-
 #env:
   # We can't use the 'env' context for reusable workflows, so we need to hardcode
   # the values in each reusable workflow instance.
