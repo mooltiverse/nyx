@@ -28,7 +28,7 @@
 name: Main
 
 on:
-  workflow_dispatch:
+  #workflow_dispatch:
   push:
 
 # Avoid running multiple pipelines concurrently to avoid overlapping releases and tags
