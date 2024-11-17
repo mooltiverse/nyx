@@ -212,8 +212,6 @@ jobs:
       uses: mooltiverse/nyx/.github/actions/setup-go@retrofitting
       with:
         verbosity: ${{ inputs.verbosity }}
-        # Override the installed software version or re-install the packages if they
-	      # have been removed by the free-disk-space action.
         install-go: ${{ inputs.install-go }}
         install-go-version: ${{ inputs.install-go-version }}
         # Restore the cache from the previous job to 'chain' the two caches
@@ -224,8 +222,6 @@ jobs:
       uses: mooltiverse/nyx/.github/actions/setup-gradle@retrofitting
       with:
         verbosity: ${{ inputs.verbosity }}
-        # Override the installed software version or re-install the packages if they
-	      # have been removed by the free-disk-space action.
         install-jdk: ${{ inputs.install-jdk }}
         install-jdk-version: ${{ inputs.install-jdk-version }}
         install-jdk-distribution: ${{ inputs.install-jdk-distribution }}
