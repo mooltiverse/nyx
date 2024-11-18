@@ -553,7 +553,7 @@ jobs:
         cache-name-restore-suffix: ${{ inputs.gradle-cache-name-restore-suffix }}
     - name: Run All Tests the on the Docker images
       # Use the 'join' function to normalize each entry into a single line
-      run: ./gradlew join("${{ inputs.gradle-arguments }} ${{ secrets.gradle-secret-arguments }} ${{ env.GRADLE_EXTRA_OPTS }}" , ' ') ${{ inputs.gradle-unit-test-tasks }} ${{ inputs.gradle-integration-test-tasks }} ${{ inputs.gradle-functional-test-tasks }}
+      run: ./gradlew ${{ join( inputs.gradle-arguments secrets.gradle-secret-arguments env.GRADLE_EXTRA_OPTS, ' ') }} ${{ inputs.gradle-unit-test-tasks }} ${{ inputs.gradle-integration-test-tasks }} ${{ inputs.gradle-functional-test-tasks }}
     - name: Publish the unit test report artifacts
       uses: actions/upload-artifact@v4
       if: ${{ always() }}
