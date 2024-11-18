@@ -181,6 +181,7 @@ jobs:
     name: Java Publish
     needs:
     - initialize
+    - test
     - java-build
     - java-test
     # TODO: uncomment this conditional after testing
@@ -244,7 +245,7 @@ jobs:
       group: rate-limited-remote-services
     strategy:
       matrix:
-        os: [macos-latest, windows-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
     # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
     # with '@main' as soon as the branch has been merged to main.
     uses: mooltiverse/nyx/.github/workflows/go-test-sequence.yml@retrofitting
@@ -263,7 +264,7 @@ jobs:
       # Here we simply avoid running integration and functional tests because
       # they take a long time and they've already been tested ok.
       # Once the workflow is tested we can restore the regular testing here.
-      #gradle-integration-test-tasks: src:go:unitTest
+      gradle-integration-test-tasks: src:go:unitTest
       gradle-functional-test-tasks: src:go:unitTest
     secrets:
       # Pass extra properties used by the Gradle scripts to run tests.
@@ -288,6 +289,7 @@ jobs:
     name: Go Publish
     needs:
     - initialize
+    - test
     - go-build
     - go-test
     # TODO: uncomment this conditional after testing

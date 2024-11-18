@@ -304,6 +304,8 @@ jobs:
       uses: mooltiverse/nyx/.github/actions/setup-go@retrofitting
       with:
         verbosity: ${{ inputs.verbosity }}
+        install-go: ${{ inputs.install-go }}
+        install-go-version: ${{ inputs.install-go-version }}
         # Restore the cache from the previous job to 'chain' the two caches
         cache-name-restore-suffix: ${{ needs.test-unit.outputs.go-cache-name-suffix }}
     - id: gradle
@@ -359,6 +361,8 @@ jobs:
       uses: mooltiverse/nyx/.github/actions/setup-go@retrofitting
       with:
         verbosity: ${{ inputs.verbosity }}
+        install-go: ${{ inputs.install-go }}
+        install-go-version: ${{ inputs.install-go-version }}
         # Restore the cache from the previous job to 'chain' the two caches
         cache-name-restore-suffix: ${{ needs.test-integration.outputs.go-cache-name-suffix }}
     - id: gradle
