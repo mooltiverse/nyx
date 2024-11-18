@@ -378,6 +378,12 @@ subprojects {
         dependsOn goTest
     }
 
+    // This task is an alias to the 'test' task
+    task unitTest(group: 'verification', description: 'Runs the unit tests') {
+        // Task dependencies
+        dependsOn test
+    }
+
     task integrationTest(group: 'verification', description: 'Runs the integration tests') {
         // Task dependencies
         dependsOn goIntegrationTest
@@ -424,6 +430,14 @@ task test() {
     group 'Verification'
 
     dependsOn subprojects*.test
+}
+
+// This task is an alias to the 'test' task
+task unitTest() {
+    description 'Runs all Go unit tests and verification tasks'
+    group 'Verification'
+
+    dependsOn test
 }
 
 // Create an overall Go integration test lifecycle task to trigger all integration tests in subprojects 
