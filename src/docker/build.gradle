@@ -67,6 +67,19 @@ subprojects {
   // The object used to format timestamps in log entries
   ext.logDateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
 
+  // This function returns true if Docker is installed locally.
+  ext.dockerIsInstalled = {
+    // To check whether or not Docker is installed we simply run
+    // 'docker version' it and and check for the exit status.
+    def processBuilder = new ProcessBuilder("docker", "version")
+    try {
+      return processBuilder.start().waitFor() == 0
+    } catch (Exception e) {
+      // In case of any exception we assume Docker is not installed
+      raturn false
+    }
+  }
+
   // This function returns the name to use for the BuildKit builder.
   // The flavor parameter is optional.
   ext.dockerBuilderName = { flavor ->
@@ -79,6 +92,9 @@ subprojects {
   // This function returns true if a Docker BuildKit builder with the given
   // name exists, false otherwise.
   ext.dockerBuilderExists = { name ->
+    if (!dockerIsInstalled()) {
+      return false
+    }
     // To check whether or not the builder exists we run the 'inspect'
     // command and check for the exit status.
     def exitValue = new ProcessBuilder("docker", "buildx", "inspect", name).start().waitFor()
@@ -89,6 +105,9 @@ subprojects {
   // exists in the local image store.
   // The given SHA may have an optional 'sha256:' prefix.
   ext.dockerImageExists = { sha ->
+    if (!dockerIsInstalled()) {
+      return false
+    }
     // To check whether or not the image exists we run the 'inspect'
     // command and check for the exit status.
     def exitValue = new ProcessBuilder("docker", "image", "inspect", sha).start().waitFor()

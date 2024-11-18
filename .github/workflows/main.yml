@@ -324,11 +324,6 @@ jobs:
     - docker-build
     # TODO: uncomment this conditional after testing
     #if: needs.initialize.outputs.dockerChanged == 'true' || needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.release == 'true'
-    # Avoid jobs invoking remote services to run in parallel to avoid throttling down by those services (with consequent test failures).
-    # See https://github.com/mooltiverse/nyx/issues/206 for more
-    concurrency:
-      group: rate-limited-remote-services
-      cancel-in-progress: false
     # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
     # with '@main' as soon as the branch has been merged to main.
     uses: mooltiverse/nyx/.github/workflows/docker-test-compact.yml@retrofitting
