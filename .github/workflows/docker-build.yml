@@ -474,7 +474,8 @@ jobs:
         # Restore the cache from the previous job to 'chain' the two caches
         cache-name-restore-suffix: ${{ inputs.gradle-cache-name-restore-suffix }}
     - name: Build the Docker images
-      run: ./gradlew ${{ inputs.gradle-arguments }} ${{ secrets.gradle-secret-arguments }} ${{ env.GRADLE_EXTRA_OPTS }} ${{ inputs.gradle-tasks }}
+      # Use the 'join' function to normalize each entry into a single line
+      run: ./gradlew join(${{ inputs.gradle-arguments }}, ' ') join(${{ secrets.gradle-secret-arguments }}, ' ') join(${{ env.GRADLE_EXTRA_OPTS }}, ' ') ${{ inputs.gradle-tasks }}
     outputs:
       docker-cache-name-suffix: ${{ steps.docker.outputs.cache-name-suffix }}
       gradle-cache-name-suffix: ${{ steps.gradle.outputs.cache-name-suffix }}

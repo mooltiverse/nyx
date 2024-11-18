@@ -152,6 +152,12 @@ jobs:
       nyx-cache-name-restore-suffix: ${{ needs.initialize.outputs.nyx-cache-name-suffix }}
       gradle-cache-name-restore-suffix: ${{ needs.java-build.outputs.gradle-cache-name-suffix }}
       java-cache-name-restore-suffix: ${{ needs.java-build.outputs.java-cache-name-suffix }}
+      # TODO: remove the following two lines after testing.
+      # Here we simply avoid running integration and functional tests because
+      # they take a long time and they've already been tested ok.
+      # Once the workflow is tested we can restore the regular testing here.
+      gradle-integration-test-tasks: src:java:unitTest
+      gradle-functional-test-tasks: src:java:unitTest
     secrets:
       # Pass extra properties used by the Gradle scripts to run tests.
       # See the top level

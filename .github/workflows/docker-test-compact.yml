@@ -552,7 +552,8 @@ jobs:
         # Restore the cache from the previous job to 'chain' the two caches
         cache-name-restore-suffix: ${{ inputs.gradle-cache-name-restore-suffix }}
     - name: Run All Tests the on the Docker images
-      run: ./gradlew ${{ inputs.gradle-arguments }} ${{ secrets.gradle-secret-arguments }} ${{ env.GRADLE_EXTRA_OPTS }} ${{ inputs.gradle-unit-test-tasks }} ${{ inputs.gradle-integration-test-tasks }} ${{ inputs.gradle-functional-test-tasks }}
+      # Use the 'join' function to normalize each entry into a single line
+      run: ./gradlew join(${{ inputs.gradle-arguments }}, ' ') join(${{ secrets.gradle-secret-arguments }}, ' ') join(${{ env.GRADLE_EXTRA_OPTS }}, ' ') ${{ inputs.gradle-unit-test-tasks }} ${{ inputs.gradle-integration-test-tasks }} ${{ inputs.gradle-functional-test-tasks }}
     - name: Publish the unit test report artifacts
       uses: actions/upload-artifact@v4
       if: ${{ always() }}
