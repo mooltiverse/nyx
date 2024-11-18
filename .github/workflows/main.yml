@@ -263,7 +263,7 @@ jobs:
       # Here we simply avoid running integration and functional tests because
       # they take a long time and they've already been tested ok.
       # Once the workflow is tested we can restore the regular testing here.
-      gradle-integration-test-tasks: src:go:unitTest
+      #gradle-integration-test-tasks: src:go:unitTest
       gradle-functional-test-tasks: src:go:unitTest
     secrets:
       # Pass extra properties used by the Gradle scripts to run tests.

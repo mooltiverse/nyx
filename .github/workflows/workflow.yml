@@ -98,6 +98,7 @@ jobs:
     - name: Grant execute permission for the gradlew executable
       # We also need to make Git ignore execute permission changes to avoid
       # false positives in change detection
+      shell: bash
       run: |
         git config core.fileMode false
         chmod +x gradlew
@@ -122,6 +123,7 @@ jobs:
         gradle-distribution-sha-256-sum-warning: false
     # Run the actual tasks for this job
     - name: Infer the project version and initialize the Gradle remote cache
+      shell: bash
       run: ./gradlew nyxInfer --build-cache --stacktrace
     - name: Export Nyx values
       # By using the Nyx GitHub Action we are able to load its data that was stored
@@ -168,6 +170,7 @@ jobs:
     - name: Grant execute permission for the gradlew executable
       # We also need to make Git ignore execute permission changes to avoid
       # false positives in change detection
+      shell: bash
       run: |
         git config core.fileMode false
         chmod +x gradlew
@@ -198,6 +201,7 @@ jobs:
         gradle-distribution-sha-256-sum-warning: false
     # Run the actual tasks for this job
     - name: Build the Java code
+      shell: bash
       run: ./gradlew src:java:assemble --build-cache --stacktrace
     # Publish the job artifacts
     - name: Publish the Nyx state and summary as job artifacts
@@ -233,6 +237,7 @@ jobs:
     - name: Grant execute permission for the gradlew executable
       # We also need to make Git ignore execute permission changes to avoid
       # false positives in change detection
+      shell: bash
       run: |
         git config core.fileMode false
         chmod +x gradlew
@@ -269,6 +274,7 @@ jobs:
         gradle-distribution-sha-256-sum-warning: false
     # Run the actual tasks for this job
     - name: Build the Go code
+      shell: bash
       run: ./gradlew src:go:assemble --build-cache --stacktrace
     # Publish the job artifacts
     - name: Publish the Nyx state and summary as job artifacts
@@ -299,6 +305,7 @@ jobs:
     - name: Grant execute permission for the gradlew executable
       # We also need to make Git ignore execute permission changes to avoid
       # false positives in change detection
+      shell: bash
       run: |
         git config core.fileMode false
         chmod +x gradlew
@@ -337,6 +344,7 @@ jobs:
         gradle-distribution-sha-256-sum-warning: false
     # Run the actual tasks for this job
     - name: Build the Docker images
+      shell: bash
       run: ./gradlew src:docker:assemble --build-cache --stacktrace
     # Publish the job artifacts
     - name: Publish the Nyx state and summary as job artifacts
@@ -419,6 +427,7 @@ jobs:
     - name: Grant execute permission for the gradlew executable
       # We also need to make Git ignore execute permission changes to avoid
       # false positives in change detection
+      shell: bash
       run: |
         git config core.fileMode false
         chmod +x gradlew
@@ -451,6 +460,7 @@ jobs:
         gradle-distribution-sha-256-sum-warning: false
     # Run the actual tasks for this job
     - name: Run Java Unit Tests
+      shell: bash
       run: ./gradlew src:java:test --build-cache --stacktrace
     # Publish the job artifacts
     - name: Publish the Nyx state and summary as job artifacts
@@ -500,6 +510,7 @@ jobs:
     - name: Grant execute permission for the gradlew executable
       # We also need to make Git ignore execute permission changes to avoid
       # false positives in change detection
+      shell: bash
       run: |
         git config core.fileMode false
         chmod +x gradlew
@@ -532,6 +543,7 @@ jobs:
         gradle-distribution-sha-256-sum-warning: false
     # Run the actual tasks for this job
     - name: Show current GitHub rate limits for test user nyxtest20200701
+      shell: bash
       run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
     - name: Run Java Integration Tests
       env:
@@ -546,9 +558,11 @@ jobs:
         ORG_GRADLE_PROJECT_gitLabTestUserPrivateKeyPassphrase: ${{ secrets.TEST_GITLAB_USER_PASSPHRASE }}                            # The test private key passphrase to test Nyx GitLab features
         ORG_GRADLE_PROJECT_gitLabTestUserPrivateKeyWithPassphrase: ${{ secrets.TEST_GITLAB_USER_PRIVATE_KEY_WITH_PASSPHRASE }}       # The test password protected private key to test Nyx GitHub features
         ORG_GRADLE_PROJECT_gitLabTestUserPrivateKeyWithoutPassphrase: ${{ secrets.TEST_GITLAB_USER_PRIVATE_KEY_WITHOUT_PASSPHRASE }} # The test unprotected private key to test Nyx GitHub features
+      shell: bash
       run: ./gradlew src:java:integrationTest --build-cache --stacktrace
     - name: Show current GitHub rate limits for test user nyxtest20200701
       if: ${{ always() }}
+      shell: bash
       run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
     # Publish the job artifacts
     - name: Publish the Nyx state and summary as job artifacts
@@ -598,6 +612,7 @@ jobs:
     - name: Grant execute permission for the gradlew executable
       # We also need to make Git ignore execute permission changes to avoid
       # false positives in change detection
+      shell: bash
       run: |
         git config core.fileMode false
         chmod +x gradlew
@@ -630,6 +645,7 @@ jobs:
         gradle-distribution-sha-256-sum-warning: false
     # Run the actual tasks for this job
     - name: Show current GitHub rate limits for test user nyxtest20200701
+      shell: bash
       run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
     # Add the -PquickTests=true option to the Gradle command line to narrow the number of tests
     - name: Run Java Functional Tests
@@ -645,9 +661,11 @@ jobs:
         ORG_GRADLE_PROJECT_gitLabTestUserPrivateKeyPassphrase: ${{ secrets.TEST_GITLAB_USER_PASSPHRASE }}                            # The test private key passphrase to test Nyx GitLab features
         ORG_GRADLE_PROJECT_gitLabTestUserPrivateKeyWithPassphrase: ${{ secrets.TEST_GITLAB_USER_PRIVATE_KEY_WITH_PASSPHRASE }}       # The test password protected private key to test Nyx GitHub features
         ORG_GRADLE_PROJECT_gitLabTestUserPrivateKeyWithoutPassphrase: ${{ secrets.TEST_GITLAB_USER_PRIVATE_KEY_WITHOUT_PASSPHRASE }} # The test unprotected private key to test Nyx GitHub features
+      shell: bash
       run: ./gradlew src:java:functionalTest --build-cache --stacktrace
     - name: Show current GitHub rate limits for test user nyxtest20200701
       if: ${{ always() }}
+      shell: bash
       run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
     # Publish the job artifacts
     - name: Publish the Nyx state and summary as job artifacts
@@ -686,6 +704,7 @@ jobs:
     - name: Grant execute permission for the gradlew executable
       # We also need to make Git ignore execute permission changes to avoid
       # false positives in change detection
+      shell: bash
       run: |
         git config core.fileMode false
         chmod +x gradlew
@@ -724,6 +743,7 @@ jobs:
         gradle-distribution-sha-256-sum-warning: false
     # Run the actual tasks for this job
     - name: Run Go Unit Tests
+      shell: bash
       run: ./gradlew src:go:test --build-cache --stacktrace
     # Publish the job artifacts
     - name: Publish the Nyx state and summary as job artifacts
@@ -768,6 +788,7 @@ jobs:
     - name: Grant execute permission for the gradlew executable
       # We also need to make Git ignore execute permission changes to avoid
       # false positives in change detection
+      shell: bash
       run: |
         git config core.fileMode false
         chmod +x gradlew
@@ -807,6 +828,7 @@ jobs:
     # Run the actual tasks for this job
     - name: Show current GitHub rate limits for test user nyxtest20200701
       if: ${{ matrix.os == 'ubuntu-latest' }} # This command is only supported on Linux
+      shell: bash
       run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
     - name: Run Go Integration Tests
       env:
@@ -821,9 +843,11 @@ jobs:
         ORG_GRADLE_PROJECT_gitLabTestUserPrivateKeyPassphrase: ${{ secrets.TEST_GITLAB_USER_PASSPHRASE }}                            # The test private key passphrase to test Nyx GitLab features
         ORG_GRADLE_PROJECT_gitLabTestUserPrivateKeyWithPassphrase: ${{ secrets.TEST_GITLAB_USER_PRIVATE_KEY_WITH_PASSPHRASE }}       # The test password protected private key to test Nyx GitHub features
         ORG_GRADLE_PROJECT_gitLabTestUserPrivateKeyWithoutPassphrase: ${{ secrets.TEST_GITLAB_USER_PRIVATE_KEY_WITHOUT_PASSPHRASE }} # The test unprotected private key to test Nyx GitHub features
+      shell: bash
       run: ./gradlew src:go:integrationTest --build-cache --stacktrace
     - name: Show current GitHub rate limits for test user nyxtest20200701
       if: ${{ matrix.os == 'ubuntu-latest' && always() }} # This command is only supported on Linux and needs to run even if previous jobs have failed
+      shell: bash
       run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
     # Publish the job artifacts
     - name: Publish the Nyx state and summary as job artifacts
@@ -868,6 +892,7 @@ jobs:
     - name: Grant execute permission for the gradlew executable
       # We also need to make Git ignore execute permission changes to avoid
       # false positives in change detection
+      shell: bash
       run: |
         git config core.fileMode false
         chmod +x gradlew
@@ -907,6 +932,7 @@ jobs:
     # Run the actual tasks for this job
     - name: Show current GitHub rate limits for test user nyxtest20200701
       if: ${{ matrix.os == 'ubuntu-latest' }} # This command is only supported on Linux
+      shell: bash
       run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
     # Add the -PquickTests=true option to the Gradle command line to narrow the number of tests
     - name: Run Go Functional Tests
@@ -922,9 +948,11 @@ jobs:
         ORG_GRADLE_PROJECT_gitLabTestUserPrivateKeyPassphrase: ${{ secrets.TEST_GITLAB_USER_PASSPHRASE }}                            # The test private key passphrase to test Nyx GitLab features
         ORG_GRADLE_PROJECT_gitLabTestUserPrivateKeyWithPassphrase: ${{ secrets.TEST_GITLAB_USER_PRIVATE_KEY_WITH_PASSPHRASE }}       # The test password protected private key to test Nyx GitHub features
         ORG_GRADLE_PROJECT_gitLabTestUserPrivateKeyWithoutPassphrase: ${{ secrets.TEST_GITLAB_USER_PRIVATE_KEY_WITHOUT_PASSPHRASE }} # The test unprotected private key to test Nyx GitHub features
+      shell: bash
       run: ./gradlew src:go:functionalTest --build-cache --stacktrace
     - name: Show current GitHub rate limits for test user nyxtest20200701
       if: ${{ matrix.os == 'ubuntu-latest' && always() }} # This command is only supported on Linux and needs to run even if previous jobs have failed
+      shell: bash
       run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
     # Publish the job artifacts
     - name: Publish the Nyx state and summary as job artifacts
@@ -966,6 +994,7 @@ jobs:
     - name: Grant execute permission for the gradlew executable
       # We also need to make Git ignore execute permission changes to avoid
       # false positives in change detection
+      shell: bash
       run: |
         git config core.fileMode false
         chmod +x gradlew
@@ -1004,6 +1033,7 @@ jobs:
         gradle-distribution-sha-256-sum-warning: false
     # Run the actual tasks for this job
     - name: Show current GitHub rate limits for test user nyxtest20200701
+      shell: bash
       run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
     # Add the -PquickTests=true option to the Gradle command line to narrow the number of tests
     - name: Run Docker Functional Tests
@@ -1019,9 +1049,11 @@ jobs:
         ORG_GRADLE_PROJECT_gitLabTestUserPrivateKeyPassphrase: ${{ secrets.TEST_GITLAB_USER_PASSPHRASE }}                            # The test private key passphrase to test Nyx GitLab features
         ORG_GRADLE_PROJECT_gitLabTestUserPrivateKeyWithPassphrase: ${{ secrets.TEST_GITLAB_USER_PRIVATE_KEY_WITH_PASSPHRASE }}       # The test password protected private key to test Nyx GitHub features
         ORG_GRADLE_PROJECT_gitLabTestUserPrivateKeyWithoutPassphrase: ${{ secrets.TEST_GITLAB_USER_PRIVATE_KEY_WITHOUT_PASSPHRASE }} # The test unprotected private key to test Nyx GitHub features
+      shell: bash
       run: ./gradlew src:docker:functionalTest --build-cache --stacktrace
     - name: Show current GitHub rate limits for test user nyxtest20200701
       if: ${{ always() }}
+      shell: bash
       run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
     # Publish the job artifacts
     - name: Publish the Nyx state and summary as job artifacts
@@ -1054,6 +1086,7 @@ jobs:
     - name: Grant execute permission for the gradlew executable
       # We also need to make Git ignore execute permission changes to avoid
       # false positives in change detection
+      shell: bash
       run: |
         git config core.fileMode false
         chmod +x gradlew
@@ -1091,6 +1124,7 @@ jobs:
         gradle-distribution-sha-256-sum-warning: false
     # Run the actual tasks for this job
     - name: Show current GitHub rate limits for test user nyxtest20200701
+      shell: bash
       run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
     - name: Publish
       env:
@@ -1107,9 +1141,11 @@ jobs:
         ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.GPC_PASSPHRASE }}
         ORG_GRADLE_PROJECT_gradlePublishKey: ${{ secrets.GRADLE_PLUGIN_PUBLISH_KEY }}
         ORG_GRADLE_PROJECT_gradlePublishSecret: ${{ secrets.GRADLE_PLUGIN_PUBLISH_SECRET }}
+      shell: bash
       run: ./gradlew nyxMake nyxMark nyxPublish publish --build-cache --stacktrace
     - name: Show current GitHub rate limits for test user nyxtest20200701
       if: ${{ always() }}
+      shell: bash
       run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
     # Publish the job artifacts
     - name: Publish the Nyx state and summary as job artifacts
@@ -1137,6 +1173,7 @@ jobs:
     - name: Grant execute permission for the gradlew executable
       # We also need to make Git ignore execute permission changes to avoid
       # false positives in change detection
+      shell: bash
       run: |
         git config core.fileMode false
         chmod +x gradlew
@@ -1174,6 +1211,7 @@ jobs:
         gradle-distribution-sha-256-sum-warning: false
     # Run the actual tasks for this job
     - name: Show current GitHub rate limits for test user nyxtest20200701
+      shell: bash
       run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
     - name: Release
       env:
@@ -1182,9 +1220,11 @@ jobs:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         ORG_GRADLE_PROJECT_gitHubUser: ${{ github.actor }}
         ORG_GRADLE_PROJECT_gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+      shell: bash
       run: ./gradlew release --build-cache --stacktrace
     - name: Show current GitHub rate limits for test user nyxtest20200701
       if: ${{ always() }}
+      shell: bash
       run: curl -i https://api.github.com/users/nyxtest20200701 | grep ratelimit
     # Publish the job artifacts
     - name: Publish the Nyx state and summary as job artifacts

@@ -410,6 +410,7 @@ jobs:
         swap-storage: ${{ inputs.delete-swap-storage }}
     - name: Log the warning message impairement about freeing disk space on the current runner
       if: runner.os != 'Linux' && (inputs.delete-tool-cache || inputs.delete-android || inputs.delete-dotnet || inputs.delete-haskell || inputs.delete-large-packages || inputs.delete-docker-images || inputs.delete-swap-storage)
+      shell: bash
       run: echo "::warning title=Unable to free disk space on ${{ runner.os }}::The job has been configured to delete preconfigured packages to free disk space but that feature is only supported on Linux (Ubuntu) runners, while this instance runs on ${{ runner.os }}."
     # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
     # with '@main' as soon as the branch has been merged to main.
@@ -474,6 +475,7 @@ jobs:
         # Restore the cache from the previous job to 'chain' the two caches
         cache-name-restore-suffix: ${{ inputs.gradle-cache-name-restore-suffix }}
     - name: Build the Docker images
+      shell: bash
       run: ./gradlew ${{ inputs.gradle-arguments }} ${{ secrets.gradle-secret-arguments }} ${{ env.GRADLE_EXTRA_OPTS }} ${{ inputs.gradle-tasks }}
     outputs:
       docker-cache-name-suffix: ${{ steps.docker.outputs.cache-name-suffix }}

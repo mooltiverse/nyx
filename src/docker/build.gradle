@@ -76,7 +76,7 @@ subprojects {
       return processBuilder.start().waitFor() == 0
     } catch (Exception e) {
       // In case of any exception we assume Docker is not installed
-      raturn false
+      return false
     }
   }
 

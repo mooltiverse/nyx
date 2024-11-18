@@ -137,10 +137,13 @@ jobs:
     # Produce annotation and log outputs
     - name: Log the cache selection warning message
       if: ${{ github.ref != 'refs/heads/main' }}
+      shell: bash
       run: echo "::notice title=Limited Gradle cache support::The Gradle cache support is limited when running in any branch other than 'main' so you may experience the same tasks to run multiple times when in different jobs."
     - name: Create 'Version' annotation
+      shell: bash
       run: echo "::notice title=Version=${{ steps.nyx.outputs.version }}::previous version=${{ steps.nyx.outputs.previousVersion }}, new version=${{ steps.nyx.outputs.newVersion }}, new release=${{ steps.nyx.outputs.newRelease }}, core version=${{ steps.nyx.outputs.coreVersion }}, latest version=${{ steps.nyx.outputs.latestVersion }}, timestamp=${{ steps.nyx.outputs.timestamp }}"
     - name: Create the 'Release' annotation
+      shell: bash
       run: |
         if [ "${{ steps.nyx.outputs.newRelease}}" = "true" ]; then
           echo "::notice title=Release=${{ steps.nyx.outputs.version }}::Release ${{ steps.nyx.outputs.version }} will be issued as part of this pipeline"
@@ -148,6 +151,7 @@ jobs:
           echo "::notice title=Release=n/a::No release will be issued as part of this pipeline"
         fi
     - name: Log the 'Version attributes'
+      shell: bash
       run: |
         echo "::group::Version attributes"
         echo "Version: ${{ steps.nyx.outputs.version }}"
@@ -159,6 +163,7 @@ jobs:
         echo "Is the latest version: ${{ steps.nyx.outputs.latestVersion }}"
         echo "::endgroup::"
     - name: Log the 'Probed features'
+      shell: bash
       run: |
         echo "::group::Probed features"
         echo "Go: ${{ steps.go.outputs.probed }}"
@@ -167,6 +172,7 @@ jobs:
         echo "Docusaurus: ${{ steps.docusaurus.outputs.probed }}"
         echo "::endgroup::"
     - name: Log the 'Changed files'
+      shell: bash
       run: |
         echo "::group::Changed files"
         echo "Go: ${{ steps.go.outputs.changed }}"

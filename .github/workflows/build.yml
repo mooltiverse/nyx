@@ -30,4 +30,5 @@ jobs:
     name: Build
     runs-on: ${{ inputs.runs-on }}
     steps:
-    - run: echo "Waypoint reached!"
+    - shell: bash
+      run: echo "Waypoint reached!"

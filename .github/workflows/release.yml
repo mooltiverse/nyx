@@ -364,13 +364,16 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         NYX_SERVICES_github_OPTIONS_AUTHENTICATION_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      shell: bash
       run: ./gradlew ${{ inputs.gradle-arguments }} ${{ secrets.gradle-secret-arguments }} ${{ env.GRADLE_EXTRA_OPTS }} ${{ inputs.gradle-tasks }}
     - name: Create the 'Release' annotation
       if: steps.nyx.outputs.newRelease == 'true'
+      shell: bash
       run: |
         echo "::notice title=Release=${{ steps.nyx.outputs.version }}::Release ${{ steps.nyx.outputs.version }} has been issued as part of this pipeline"
     - name: Create the 'Release' summary
       if: steps.nyx.outputs.newRelease == 'true'
+      shell: bash
       run: |
         echo "### Release [${{ steps.nyx.outputs.version }}](https://github.com/${{ github.repository }}/releases/tag/${{ steps.nyx.outputs.version }})" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY # this is a blank line

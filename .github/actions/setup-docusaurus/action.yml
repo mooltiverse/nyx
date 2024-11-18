@@ -178,7 +178,7 @@ runs:
   steps:
   - name: List contents used for probing the project
     if: ${{ inputs.verbosity == 'debug' }}
-    shell: sh
+    shell: bash
     continue-on-error: true
     run: |
       echo "::group::Contents used for probing the project"
@@ -200,7 +200,7 @@ runs:
       enableCrossOsArchive: true
   - name: List the cache contents
     if: ${{ inputs.enable-cache == 'true' && inputs.verbosity == 'debug' }}
-    shell: sh
+    shell: bash
     continue-on-error: true
     run: |
       echo "::group::Cache contents"
@@ -215,7 +215,7 @@ runs:
         ${{ inputs.changed-files-pattern }}
   - name: List changed files
     if: ${{ inputs.enable-changed-files-detection == 'true' && (inputs.verbosity == 'info' || inputs.verbosity == 'debug') }}
-    shell: sh
+    shell: bash
     continue-on-error: true
     env:
       ALL_CHANGED_FILES: ${{ steps.changes.outputs.all_changed_and_modified_files }}

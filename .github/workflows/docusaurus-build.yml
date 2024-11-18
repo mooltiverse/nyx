@@ -244,6 +244,7 @@ jobs:
         # Restore the cache from the previous job to 'chain' the two caches
         cache-name-restore-suffix: ${{ inputs.gradle-cache-name-restore-suffix }}
     - name: Build the Docusaurus sites
+      shell: bash
       run: ./gradlew ${{ inputs.gradle-arguments }} ${{ secrets.gradle-secret-arguments }} ${{ env.GRADLE_EXTRA_OPTS }} ${{ inputs.gradle-tasks }}
     outputs:
       docusaurus-cache-name-suffix: ${{ steps.docusaurus.outputs.cache-name-suffix }}
