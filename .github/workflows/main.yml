@@ -331,7 +331,7 @@ jobs:
       cancel-in-progress: false
     # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
     # with '@main' as soon as the branch has been merged to main.
-    uses: mooltiverse/nyx/.github/workflows/docker-test-sequence.yml@retrofitting
+    uses: mooltiverse/nyx/.github/workflows/docker-test-compact.yml@retrofitting
     with:
       verbosity: info
       install-jdk: true
