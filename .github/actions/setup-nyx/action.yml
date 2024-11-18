@@ -4,9 +4,13 @@ description: |-
   the environment from a previous job:
   - set up a Nyx cache for sharing the Nyx state files
   - publish the Nyx state files as GitHub Actions artifacts
-  Please note that this Action doesn't run and actual command or task other
+  Please note that this Action doesn't run any actual command or task other
   than those used to set up the environment. Build commands are to be executed
   after this Action completes.
+  Also note that this Action uses a Docker Action that is only supported on
+  Linux runners so in case you just need the cache to be restored you can
+  skip running the actual action by setting 'enable-action' to 'false'.
+  Most outputs won't be available when 'enable-action' is 'false'
 inputs:
   verbosity:
     description: |-
@@ -15,6 +19,17 @@ inputs:
       Default: quiet
     required: false
     default: 'quiet'
+  enable-action:
+    description: |-
+      Whether to enable running the underlying Action or not.
+      Consider that the underlying action is only supported on Linux runners
+      so disabling the Action might be useful when running on other runners
+      when you just need the other tasks to be performed (i.e. restoring
+      the cache).
+      Most outputs are only available when the Actions is enabled.
+      Default: true
+    required: false
+    default: 'true'
   enable-cache:
     description: |-
       Whether to enable the cache.
@@ -121,35 +136,35 @@ outputs:
     description: "The value of the 'cache-name-suffix'"
     value: ${{ inputs.cache-name-suffix }}
   branch:
-    description: "This string contains the current Git branch name"
-    value: ${{ steps.nyx.outputs.branch }}
+    description: "This string contains the current Git branch name. Only available when 'enable-action' is 'true.'"
+    value: ${{ inputs.enable-cache == 'true' && steps.nyx.outputs.branch || '' }}
   bump:
-    description: "This string contains the name of the identifier that has been bumped to create the new version"
-    value: ${{ steps.nyx.outputs.bump }}
+    description: "This string contains the name of the identifier that has been bumped to create the new version. Only available when 'enable-action' is 'true.'"
+    value: ${{ inputs.enable-cache == 'true' && steps.nyx.outputs.bump || '' }}
   coreVersion:
-    description: "This value is true when the version only uses core identifiers (i.e. is not a pre-release) according to the scheme"
-    value: ${{ steps.nyx.outputs.coreVersion }}
+    description: "This value is true when the version only uses core identifiers (i.e. is not a pre-release) according to the scheme. Only available when 'enable-action' is 'true.'"
+    value: ${{ inputs.enable-cache == 'true' && steps.nyx.outputs.coreVersion || '' }}
   latestVersion:
-    description: "This value is true when the version is the latest in the repository, meaning that, according to the scheme, there are no other tags in the Git repository representing any version greater than version"
-    value: ${{ steps.nyx.outputs.latestVersion }}
+    description: "This value is true when the version is the latest in the repository, meaning that, according to the scheme, there are no other tags in the Git repository representing any version greater than version. Only available when 'enable-action' is 'true.'"
+    value: ${{ inputs.enable-cache == 'true' && steps.nyx.outputs.latestVersion || '' }}
   newRelease:
-    description: "This value is true when the 'newVersion' is true and a new release with the current 'version' has to be issued"
-    value: ${{ steps.nyx.outputs.newRelease }}
+    description: "This value is true when the 'newVersion' is true and a new release with the current 'version' has to be issued. Only available when 'enable-action' is 'true.'"
+    value: ${{ inputs.enable-cache == 'true' && steps.nyx.outputs.newRelease || '' }}
   newVersion:
-    description: "This value is true when the 'version' is new and is basically a shorthand to testing if 'version' is different than the 'previousVersion'"
-    value: ${{ steps.nyx.outputs.newVersion }}
+    description: "This value is true when the 'version' is new and is basically a shorthand to testing if 'version' is different than the 'previousVersion'. Only available when 'enable-action' is 'true.'"
+    value: ${{ inputs.enable-cache == 'true' && steps.nyx.outputs.newVersion || '' }}
   previousVersion:
-    description: "The version that was released before the one being created"
-    value: ${{ steps.nyx.outputs.previousVersion }}
+    description: "The version that was released before the one being created. Only available when 'enable-action' is 'true.'"
+    value: ${{ inputs.enable-cache == 'true' && steps.nyx.outputs.previousVersion || '' }}
   primeVersion:
-    description: "The version that is used as the baseline when bumping version numbers when the release type uses collapsed versioning (the pre-release versioning)"
-    value: ${{ steps.nyx.outputs.primeVersion }}
+    description: "The version that is used as the baseline when bumping version numbers when the release type uses collapsed versioning (the pre-release versioning). Only available when 'enable-action' is 'true.'"
+    value: ${{ inputs.enable-cache == 'true' && steps.nyx.outputs.primeVersion || '' }}
   timestamp:
-    description: "The timestamp in the Unix format (seconds since Jan 01 1970. (UTC). Example: '1591802533'"
-    value: ${{ steps.nyx.outputs.timestamp }}
+    description: "The timestamp in the Unix format (seconds since Jan 01 1970. (UTC). Only available when 'enable-action' is 'true.'. Example: '1591802533'."
+    value: ${{ inputs.enable-cache == 'true' && steps.nyx.outputs.timestamp || '' }}
   version:
-    description: "The version that was inferred"
-    value: ${{ steps.nyx.outputs.version }}
+    description: "The version that was inferred. Only available when 'enable-action' is 'true.'"
+    value: ${{ inputs.enable-cache == 'true' && steps.nyx.outputs.version || '' }}
 runs:
   # Composite GitHub Actions actions require to set 'using': 'composite'
   using: "composite"
@@ -171,10 +186,16 @@ runs:
       echo "::group::Cache contents"
       ls -alR ${{ inputs.cache-contents }}
       echo "::endgroup::"
+  - name: Log the error message about the Docker Action not being supported on any runners other than Linux
+    if: ${{ runner.os != 'Linux' && inputs.enable-action == 'true' }}
+    shell: sh
+    continue-on-error: true
+    run: echo "::error title=The Nyx Action can't run on ${{ runner.os }} runners::Docker Actions are only supported on ${{ runner.os }} runners. Consider setting the 'enable-action' input to 'false' in case you just need the cache to be restored."
   - name: Run Nyx
     # By using the Nyx GitHub Action we are able to load its data that was stored
     # by the previous step into the build/.nyx-state.json and export it to outputs.
     id: nyx
+    if: ${{ inputs.enable-action == 'true' }}
     uses: mooltiverse/nyx-github-action@main
   - name: Publish the job artifacts with the Nyx state and summary
     uses: actions/upload-artifact@v4

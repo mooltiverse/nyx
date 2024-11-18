@@ -5,7 +5,7 @@ description: |-
   - set up the SDK
   - set up the distributed cache
   - detect file changes
-  Please note that this Action doesn't run and actual command or task other
+  Please note that this Action doesn't run any actual command or task other
   than those used to set up the environment. Build commands are to be executed
   after this Action completes.
 inputs:

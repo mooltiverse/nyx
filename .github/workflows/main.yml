@@ -93,7 +93,6 @@ jobs:
     # with '@main' as soon as the branch has been merged to main.
     uses: mooltiverse/nyx/.github/workflows/release.yml@retrofitting
     with:
-      # TODO: remove the verbosity override after testing
       verbosity: info
       install-jdk: true
       install-jdk-version: 20
@@ -118,7 +117,6 @@ jobs:
     # with '@main' as soon as the branch has been merged to main.
     uses: mooltiverse/nyx/.github/workflows/java-build.yml@retrofitting
     with:
-      # TODO: remove the verbosity override after testing
       verbosity: info
       install-jdk: true
       install-jdk-version: 20
@@ -147,7 +145,6 @@ jobs:
     # with '@main' as soon as the branch has been merged to main.
     uses: mooltiverse/nyx/.github/workflows/java-test-sequence.yml@retrofitting
     with:
-      # TODO: remove the verbosity override after testing
       verbosity: info
       install-jdk: true
       install-jdk-version: ${{ matrix.java }}
@@ -186,7 +183,6 @@ jobs:
     # with '@main' as soon as the branch has been merged to main.
     uses: mooltiverse/nyx/.github/workflows/java-publish.yml@retrofitting
     with:
-      # TODO: remove the verbosity override after testing
       verbosity: info
       install-jdk: true
       install-jdk-version: 20
@@ -223,7 +219,6 @@ jobs:
     # with '@main' as soon as the branch has been merged to main.
     uses: mooltiverse/nyx/.github/workflows/go-build.yml@retrofitting
     with:
-      # TODO: remove the verbosity override after testing
       verbosity: info
       install-go: true
       install-go-version: 1.22.4
@@ -248,7 +243,6 @@ jobs:
     # with '@main' as soon as the branch has been merged to main.
     uses: mooltiverse/nyx/.github/workflows/go-test-sequence.yml@retrofitting
     with:
-      # TODO: remove the verbosity override after testing
       verbosity: info
       runs-on: ${{ matrix.os }}
       install-go: true
@@ -290,7 +284,6 @@ jobs:
     # with '@main' as soon as the branch has been merged to main.
     uses: mooltiverse/nyx/.github/workflows/go-publish.yml@retrofitting
     with:
-      # TODO: remove the verbosity override after testing
       verbosity: info
       install-go: true
       install-go-version: 1.22.4
@@ -316,7 +309,6 @@ jobs:
     # with '@main' as soon as the branch has been merged to main.
     uses: mooltiverse/nyx/.github/workflows/docker-build.yml@retrofitting
     with:
-      # TODO: remove the verbosity override after testing
       verbosity: info
       install-jdk: true
       install-jdk-version: 20
@@ -341,7 +333,6 @@ jobs:
     # with '@main' as soon as the branch has been merged to main.
     uses: mooltiverse/nyx/.github/workflows/docker-test-sequence.yml@retrofitting
     with:
-      # TODO: remove the verbosity override after testing
       verbosity: info
       install-jdk: true
       install-jdk-version: 20
@@ -383,7 +374,6 @@ jobs:
     # with '@main' as soon as the branch has been merged to main.
     uses: mooltiverse/nyx/.github/workflows/docker-publish.yml@retrofitting
     with:
-      # TODO: remove the verbosity override after testing
       verbosity: info
       install-jdk: true
       install-jdk-version: 20
@@ -416,7 +406,6 @@ jobs:
     # with '@main' as soon as the branch has been merged to main.
     uses: mooltiverse/nyx/.github/workflows/docusaurus-build.yml@retrofitting
     with:
-      # TODO: remove the verbosity override after testing
       verbosity: info
       install-jdk: true
       install-jdk-version: 20
@@ -434,7 +423,6 @@ jobs:
     # with '@main' as soon as the branch has been merged to main.
     uses: mooltiverse/nyx/.github/workflows/docusaurus-publish.yml@retrofitting
     with:
-      # TODO: remove the verbosity override after testing
       verbosity: info
       install-jdk: true
       install-jdk-version: 20

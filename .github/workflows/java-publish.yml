@@ -192,6 +192,8 @@ jobs:
       # with '@main' as soon as the branch has been merged to main.
       uses: mooltiverse/nyx/.github/actions/setup-nyx@retrofitting
       with:
+        # Just restore the cache
+        enable-action: false
         verbosity: ${{ inputs.verbosity }}
         cache-name-restore-suffix: ${{ inputs.nyx-cache-name-restore-suffix }}
     - id: java
