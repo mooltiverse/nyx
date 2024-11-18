@@ -559,6 +559,15 @@ nexusStaging {
 /*------------------------------------------------------------------------------
   Additional tasks
 ------------------------------------------------------------------------------*/
+// Create an overall Java unit test lifecycle task to trigger all integration tests in subprojects 
+// This also acts as an alias to the 'test' task
+task unitTest() {
+    description 'Runs all Java unit tests and verification tasks'
+    group 'Verification'
+
+    dependsOn subprojects*.test
+}
+
 // Create an overall Java integration test lifecycle task to trigger all integration tests in subprojects 
 task integrationTest() {
     description 'Runs all Java integration tests and verification tasks'
