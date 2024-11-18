@@ -220,7 +220,7 @@ jobs:
         cache-name-restore-suffix: ${{ inputs.gradle-cache-name-restore-suffix }}
     - name: Publish the Java artifacts
       # Use the 'join' function to normalize each entry into a single line
-      run: ./gradlew ${{ join( inputs.gradle-arguments secrets.gradle-secret-arguments env.GRADLE_EXTRA_OPTS, ' ') }} ${{ inputs.gradle-tasks }}
+      run: ./gradlew ${{ inputs.gradle-arguments }} ${{ secrets.gradle-secret-arguments }} ${{ env.GRADLE_EXTRA_OPTS }} ${{ inputs.gradle-tasks }}
     outputs:
       java-cache-name-suffix: ${{ steps.java.outputs.cache-name-suffix }}
       gradle-cache-name-suffix: ${{ steps.gradle.outputs.cache-name-suffix }}

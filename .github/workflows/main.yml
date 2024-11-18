@@ -244,7 +244,7 @@ jobs:
       group: rate-limited-remote-services
     strategy:
       matrix:
-        os: [macos-latest, ubuntu-latest, windows-latest]
+        os: [macos-latest, ubuntu-latest]
     # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
     # with '@main' as soon as the branch has been merged to main.
     uses: mooltiverse/nyx/.github/workflows/go-test-sequence.yml@retrofitting

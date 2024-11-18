@@ -498,7 +498,7 @@ jobs:
         cache-name-restore-suffix: ${{ inputs.gradle-cache-name-restore-suffix }}
     - name: Run Unit Tests the on the Docker images
       # Use the 'join' function to normalize each entry into a single line
-      run: ./gradlew ${{ join( inputs.gradle-arguments secrets.gradle-secret-arguments env.GRADLE_EXTRA_OPTS, ' ') }} ${{ inputs.gradle-unit-test-tasks }}
+      run: ./gradlew ${{ inputs.gradle-arguments }} ${{ secrets.gradle-secret-arguments }} ${{ env.GRADLE_EXTRA_OPTS }} ${{ inputs.gradle-unit-test-tasks }}
     - name: Publish the unit test report artifacts
       uses: actions/upload-artifact@v4
       if: ${{ always() }}
@@ -598,7 +598,7 @@ jobs:
         cache-name-restore-suffix: ${{ needs.test-unit.outputs.gradle-cache-name-suffix }}
     - name: Run Integration Tests on the Docker images
       # Use the 'join' function to normalize each entry into a single line
-      run: ./gradlew ${{ join( inputs.gradle-arguments secrets.gradle-secret-arguments env.GRADLE_EXTRA_OPTS, ' ') }} ${{ inputs.gradle-integration-test-tasks }}
+      run: ./gradlew ${{ inputs.gradle-arguments }} ${{ secrets.gradle-secret-arguments }} ${{ env.GRADLE_EXTRA_OPTS }} ${{ inputs.gradle-integration-test-tasks }}
     - name: Publish the integration test report artifacts
       uses: actions/upload-artifact@v4
       if: ${{ always() }}
@@ -698,7 +698,7 @@ jobs:
         cache-name-restore-suffix: ${{ needs.test-integration.outputs.gradle-cache-name-suffix }}
     - name: Run Functional Tests on the Docker images
       # Use the 'join' function to normalize each entry into a single line
-      run: ./gradlew ${{ join( inputs.gradle-arguments secrets.gradle-secret-arguments env.GRADLE_EXTRA_OPTS, ' ') }} ${{ inputs.gradle-functional-test-tasks }}
+      run: ./gradlew ${{ inputs.gradle-arguments }} ${{ secrets.gradle-secret-arguments }} ${{ env.GRADLE_EXTRA_OPTS }} ${{ inputs.gradle-functional-test-tasks }}
     - name: Publish the functional test report artifacts
       uses: actions/upload-artifact@v4
       if: ${{ always() }}
