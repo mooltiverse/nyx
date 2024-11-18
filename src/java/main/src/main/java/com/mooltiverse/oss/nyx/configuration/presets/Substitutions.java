@@ -141,7 +141,7 @@ public class Substitutions {
     };
 
     /**
-     * Default constructor is hidden on purpose.
+     * Default constructor.
      */
     public Substitutions() {
         super();

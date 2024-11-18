@@ -242,7 +242,7 @@ public class ReleaseTypes {
     };
 
     /**
-     * Default constructor is hidden on purpose.
+     * Default constructor.
      */
     public ReleaseTypes() {
         super();

@@ -23,7 +23,7 @@ import com.mooltiverse.oss.nyx.entities.IllegalPropertyException;
  */
 public class Presets {
     /**
-     * Default constructor is hidden on purpose.
+     * Default constructor.
      */
     public Presets() {
         super();

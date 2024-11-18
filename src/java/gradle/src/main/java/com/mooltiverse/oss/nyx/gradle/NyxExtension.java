@@ -227,6 +227,13 @@ public abstract class NyxExtension {
     private final Property<String> verbosity = getObjectfactory().property(String.class);
 
     /**
+     * Default constructor.
+     */
+    public NyxExtension() {
+        super();
+    }
+
+    /**
      * Returns an object factory instance.
      * 
      * The instance is injected by Gradle as soon as this getter method is invoked.
@@ -668,6 +675,13 @@ public abstract class NyxExtension {
         private final MapProperty<String,String> substitutions = getObjectfactory().mapProperty(String.class, String.class);
 
         /**
+         * Default constructor.
+         */
+        public ChangelogConfiguration() {
+            super();
+        }
+
+        /**
          * Returns an object factory instance.
          * 
          * The instance is injected by Gradle as soon as this getter method is invoked.
@@ -776,6 +790,13 @@ public abstract class NyxExtension {
          * @see CommitMessageConvention
          */
         private NamedDomainObjectContainer<CommitMessageConvention> items = getObjectfactory().domainObjectContainer(CommitMessageConvention.class);
+
+        /**
+         * Default constructor.
+         */
+        public CommitMessageConventions() {
+            super();
+        }
 
         /**
          * Returns an object factory instance.
@@ -923,6 +944,13 @@ public abstract class NyxExtension {
          * @see GitRemoteConfiguration
          */
         private NamedDomainObjectContainer<GitRemoteConfiguration> remotes = getObjectfactory().domainObjectContainer(GitRemoteConfiguration.class);
+
+        /**
+         * Default constructor.
+         */
+        public GitConfiguration() {
+            super();
+        }
 
         /**
          * Returns an object factory instance.
@@ -1235,6 +1263,13 @@ public abstract class NyxExtension {
          * @see ReleaseType
          */
         private NamedDomainObjectContainer<ReleaseType> items = getObjectfactory().domainObjectContainer(ReleaseType.class);
+
+        /**
+         * Default constructor.
+         */
+        public ReleaseTypes() {
+            super();
+        }
 
         /**
          * Returns an object factory instance.
@@ -2012,6 +2047,13 @@ public abstract class NyxExtension {
          * @see Substitution
          */
         private NamedDomainObjectContainer<Substitution> items = getObjectfactory().domainObjectContainer(Substitution.class);
+
+        /**
+         * Default constructor.
+         */
+        public Substitutions() {
+            super();
+        }
 
         /**
          * Returns an object factory instance.

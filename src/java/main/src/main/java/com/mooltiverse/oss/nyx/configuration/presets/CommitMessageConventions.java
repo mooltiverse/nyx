@@ -66,7 +66,7 @@ public class CommitMessageConventions {
     };
 
     /**
-     * Default constructor is hidden on purpose.
+     * Default constructor.
      */
     public CommitMessageConventions() {
         super();

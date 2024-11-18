@@ -12,7 +12,7 @@ abstract class MavenVersion extends Version implements Comparable<MavenVersion> 
     private static final long serialVersionUID = 1L;
     
     /**
-     * Default constructor hidden on purpose
+     * Default constructor hidden on purpose.
      */
     private MavenVersion() {
         super();

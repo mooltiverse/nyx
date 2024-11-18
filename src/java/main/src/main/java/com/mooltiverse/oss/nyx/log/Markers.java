@@ -70,7 +70,7 @@ public class Markers {
     public static Marker STATE = MarkerFactory.getMarker("STATE");
 
     /**
-     * Default constructor is hidden on purpose
+     * Default constructor is hidden on purpose.
      */
     private Markers() {
         super();

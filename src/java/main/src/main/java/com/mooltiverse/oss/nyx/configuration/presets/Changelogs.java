@@ -54,7 +54,7 @@ public class Changelogs {
     };
 
     /**
-     * Default constructor is hidden on purpose.
+     * Default constructor.
      */
     public Changelogs() {
         super();

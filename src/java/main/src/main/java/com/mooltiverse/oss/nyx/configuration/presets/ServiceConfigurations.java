@@ -45,7 +45,7 @@ public class ServiceConfigurations {
     };
 
     /**
-     * Default constructor is hidden on purpose.
+     * Default constructor.
      */
     public ServiceConfigurations() {
         super();
