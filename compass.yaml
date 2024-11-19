@@ -17,26 +17,28 @@ description: |-
   Preset configuration values let you get started in minutes without digging into
   detailed settings.
 labels:
+  - github
   - docker
-  - github-actions
+  - tool
   - go
-  - gradle
   - java
   - oss
+  - gradle
+  - docusaurus
 links:
   - name: 'GitHub Issues'
     type: PROJECT
     url: 'https://github.com/mooltiverse/nyx/issues'
-  - name: 'GitHub Repository'
+  - name: 'Git Repository'
     type: REPOSITORY
     url: 'https://github.com/mooltiverse/nyx'
   - name: 'Documentation'
-    type: DOCUMENT
+    type: DOCUMENTATION
     url: 'https://mooltiverse.github.io/nyx/'
-  - name: 'GitHub Actions'
+  - name: 'CI/CD'
     type: DASHBOARD
     url: 'https://github.com/mooltiverse/nyx/actions'
-  - name: 'GitHub Insights'
+  - name: 'Code Insights'
     type: DASHBOARD
     url: 'https://github.com/mooltiverse/nyx/pulse'
 fields:
