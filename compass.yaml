@@ -33,7 +33,7 @@ links:
     type: REPOSITORY
     url: 'https://github.com/mooltiverse/nyx'
   - name: 'Documentation'
-    type: DOCUMENTATION
+    type: DOCUMENT
     url: 'https://mooltiverse.github.io/nyx/'
   - name: 'CI/CD'
     type: DASHBOARD
