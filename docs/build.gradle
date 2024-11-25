@@ -166,6 +166,7 @@ subprojects {
   }
 
   task docusaurusBuild(group: 'build', description: 'Renders the documentation site with Docusaurus') {
+    dependsOn rootProject.tasks.nyxMake
     dependsOn docusaurusInstall
     dependsOn importAPIDocumentation
 

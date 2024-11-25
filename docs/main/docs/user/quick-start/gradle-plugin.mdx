@@ -7,7 +7,7 @@ tags:
   - quick start
 ---
 
-import {siteVariables} from '@site/src/data/siteVariables';
+import {project} from '@site/src/data/projectVariables';
 
 # Gradle Plugin
 
@@ -22,7 +22,7 @@ First off, you need to apply the [plugin](https://plugins.gradle.org/plugin/com.
 <pre>
   <code>
 {`plugins {
-    id "com.mooltiverse.oss.nyx" version "${siteVariables.version}"
+    id "com.mooltiverse.oss.nyx" version "${project.version}"
 }`}
   </code>
 </pre>
@@ -40,7 +40,7 @@ Then you add the `nyx` configuration block to the same `settings.gradle`, like:
 <pre>
   <code>
 {`plugins {
-    id "com.mooltiverse.oss.nyx" version "${siteVariables.version}"
+    id "com.mooltiverse.oss.nyx" version "${project.version}"
 }
 
 // other definitions here like project name etc...

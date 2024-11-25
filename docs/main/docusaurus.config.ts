@@ -1,4 +1,6 @@
 import {themes as prismThemes} from 'prism-react-renderer';
+// Import the custom project variables
+import {project} from './src/data/projectVariables';
 
 export default {
   // These are the site global metadata attributes
@@ -301,7 +303,7 @@ export default {
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} <a target="_blank" href="https://www.mooltiverse.com/">Mooltiverse</a>. Built with <a target="_blank" href="https://docusaurus.io/">Docusaurus</a>.`,
+      copyright: `Copyright © ${new Date().getFullYear()} <a target="_blank" href="https://www.mooltiverse.com/">Mooltiverse</a>. Version ${project.version}. Built with <a target="_blank" href="https://docusaurus.io/">Docusaurus</a>.`,
     },
     prism: {
       theme: prismThemes.github,

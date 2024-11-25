@@ -9,6 +9,8 @@ tags:
   - command line
 ---
 
+import {project} from '@site/src/data/projectVariables';
+
 # Combined use examples
 
 Here are a few examples of using a [combination of Nyx flavors](../../user/introduction/combined-release-process.mdx#using-a-combination-of-nyx-flavors) together in the same build process.
@@ -32,11 +34,13 @@ here we just give the two options that are [relevant for a combined use](../../u
 
 Now take a look at the Gradle scripts. Here we [apply the plugin](../../user/introduction/usage.mdx#apply-the-plugin) to the `settings.gradle` file (using the `settings.gradle` runs [Infer](../../user/introduction/how-nyx-works.mdx#infer) implicitly in the early stage of the build):
 
-```groovy
-plugins {
-  id "com.mooltiverse.oss.nyx" version "{siteVariables.version}"
-}
-```
+<pre>
+  <code>
+{`plugins {
+    id "com.mooltiverse.oss.nyx" version "${project.version}"
+}`}
+  </code>
+</pre>
 
 and here in the `build.gradle` file we define a job that reads the [`version`](../../user/state-reference/global-attributes.mdx#version) attribute from the global project properties but runs only when a [new release](../../user/state-reference/global-attributes.mdx#new-release) has to be published (reading the flag from the [`nyxState`](../../user/introduction/usage.mdx#accessing-the-nyx-state-extra-project-property-from-build-scripts)):
 
@@ -214,11 +218,13 @@ stateFile: "build/.nyx-state.yml"
 
 `settings.gradle`:
 
-```groovy
-plugins {
-  id "com.mooltiverse.oss.nyx" version "{siteVariables.version}"
-}
-```
+<pre>
+  <code>
+{`plugins {
+    id "com.mooltiverse.oss.nyx" version "${project.version}"
+}`}
+  </code>
+</pre>
 
 `build.gradle`:
 

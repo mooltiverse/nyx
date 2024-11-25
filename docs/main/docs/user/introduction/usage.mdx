@@ -6,7 +6,7 @@ tags:
   - usage
 ---
 
-import {siteVariables} from '@site/src/data/siteVariables';
+import {project} from '@site/src/data/projectVariables';
 
 # Usage
 
@@ -44,7 +44,7 @@ Nyx comes with a whole lot of arguments that you can pass on the command line to
   <code>
 {`nyx --help
 
-Nyx version: ${siteVariables.version}
+Nyx version: ${project.version}
 
 Usage:
     nyx [arguments] [command]
@@ -249,7 +249,7 @@ When using Groovy you can use the same [plugin DSL](https://docs.gradle.org/curr
 <pre>
   <code>
 {`plugins {
-    id "com.mooltiverse.oss.nyx" version "${siteVariables.version}"
+    id "com.mooltiverse.oss.nyx" version "${project.version}"
 }`}
   </code>
 </pre>
@@ -261,7 +261,7 @@ If you're using Kotlin you can use this example for your `build.gradle.kts` or `
 <pre>
   <code>
 {`plugins {
-    id("com.mooltiverse.oss.nyx") version "${siteVariables.version}"
+    id("com.mooltiverse.oss.nyx") version "${project.version}"
 }`}
   </code>
 </pre>
@@ -287,7 +287,7 @@ When using Groovy the extension is a configuration block named `nyx` you add ins
 <pre>
   <code>
 {`plugins {
-    id "com.mooltiverse.oss.nyx" version "${siteVariables.version}"
+    id "com.mooltiverse.oss.nyx" version "${project.version}"
 }
 
 nyx {
@@ -309,7 +309,7 @@ Configuring the *project plugin* using Kotlin you add something like this to you
 <pre>
   <code>
 {`plugins {
-    id("com.mooltiverse.oss.nyx") version "${siteVariables.version}"
+    id("com.mooltiverse.oss.nyx") version "${project.version}"
 }
 
 nyx {
@@ -327,7 +327,7 @@ As you can see Kotlin uses a different way to set values. If, instead, you're co
 <pre>
   <code>
 {`plugins {
-    id("com.mooltiverse.oss.nyx") version "${siteVariables.version}"
+    id("com.mooltiverse.oss.nyx") version "${project.version}"
 }
 
 configure<com.mooltiverse.oss.nyx.gradle.NyxExtension> {

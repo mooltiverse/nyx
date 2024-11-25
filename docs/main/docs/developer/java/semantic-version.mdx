@@ -6,7 +6,7 @@ tags:
   - guide
 ---
 
-import {siteVariables} from '@site/src/data/siteVariables';
+import {project} from '@site/src/data/projectVariables';
 
 # Semantic Version
 
@@ -31,7 +31,7 @@ When using Maven just add the following dependency to your `POM`:
 {`<dependency>
     <groupId>com.mooltiverse.oss.nyx</groupId>
     <artifactId>version</artifactId>
-    <version>${siteVariables.version}</version>
+    <version>${project.version}</version>
 </dependency>`}
   </code>
 </pre>
@@ -46,7 +46,7 @@ When using Ivy just add the following dependency:
 
 <pre>
   <code>
-{`<dependency org="com.mooltiverse.oss.nyx" name="version" rev="${siteVariables.version}" />`}
+{`<dependency org="com.mooltiverse.oss.nyx" name="version" rev="${project.version}" />`}
   </code>
 </pre>
 
@@ -56,7 +56,7 @@ If you're using the Groovy DLS add this to the dependencies your script:
 
 <pre>
   <code>
-{`implementation 'com.mooltiverse.oss.nyx:version:${siteVariables.version}'`}
+{`implementation 'com.mooltiverse.oss.nyx:version:${project.version}'`}
   </code>
 </pre>
 
@@ -64,7 +64,7 @@ while if you're using the Kotlin DSL use this dependency:
 
 <pre>
   <code>
-{`implementation("com.mooltiverse.oss.nyx:version:${siteVariables.version}")`}
+{`implementation("com.mooltiverse.oss.nyx:version:${project.version}")`}
   </code>
 </pre>
 
