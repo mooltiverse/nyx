@@ -258,14 +258,6 @@ export default {
           title: 'Support',
           items: [
             {
-              label: 'User Guide',
-              href: 'docs/user/',
-            },
-            {
-              label: 'Developer Guide',
-              href: 'docs/developer/',
-            },
-            {
               label: 'Examples',
               to: 'docs/resources/examples/',
             },
