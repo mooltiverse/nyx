@@ -178,14 +178,14 @@ subprojects {
             // Pass the name of the configuration file examples to tests. These are passed as environment variables.
             // We use the same files used for the documentation here.
             def testEnvironmentVariables = [:]
-            testEnvironmentVariables['extendedJSONExampleConfigurationFile']=file("$rootDir/docs/_includes/.nyx-extended.json").absolutePath
-            testEnvironmentVariables['mediumJSONExampleConfigurationFile']=file("$rootDir/docs/_includes/.nyx-medium.json").absolutePath
-            testEnvironmentVariables['simpleJSONExampleConfigurationFile']=file("$rootDir/docs/_includes/.nyx-simple.json").absolutePath
-            testEnvironmentVariables['simplestJSONExampleConfigurationFile']=file("$rootDir/docs/_includes/.nyx-simplest.json").absolutePath
-            testEnvironmentVariables['extendedYAMLExampleConfigurationFile']=file("$rootDir/docs/_includes/.nyx-extended.yaml").absolutePath
-            testEnvironmentVariables['mediumYAMLExampleConfigurationFile']=file("$rootDir/docs/_includes/.nyx-medium.yaml").absolutePath
-            testEnvironmentVariables['simpleYAMLExampleConfigurationFile']=file("$rootDir/docs/_includes/.nyx-simple.yaml").absolutePath
-            testEnvironmentVariables['simplestYAMLExampleConfigurationFile']=file("$rootDir/docs/_includes/.nyx-simplest.yaml").absolutePath
+            testEnvironmentVariables['extendedJSONExampleConfigurationFile']=file("$rootDir/docs/main/docs/_includes/.nyx-extended.json").absolutePath
+            testEnvironmentVariables['mediumJSONExampleConfigurationFile']=file("$rootDir/docs/main/docs/_includes/.nyx-medium.json").absolutePath
+            testEnvironmentVariables['simpleJSONExampleConfigurationFile']=file("$rootDir/docs/main/docs/_includes/.nyx-simple.json").absolutePath
+            testEnvironmentVariables['simplestJSONExampleConfigurationFile']=file("$rootDir/docs/main/docs/_includes/.nyx-simplest.json").absolutePath
+            testEnvironmentVariables['extendedYAMLExampleConfigurationFile']=file("$rootDir/docs/main/docs/_includes/.nyx-extended.yaml").absolutePath
+            testEnvironmentVariables['mediumYAMLExampleConfigurationFile']=file("$rootDir/docs/main/docs/_includes/.nyx-medium.yaml").absolutePath
+            testEnvironmentVariables['simpleYAMLExampleConfigurationFile']=file("$rootDir/docs/main/docs/_includes/.nyx-simple.yaml").absolutePath
+            testEnvironmentVariables['simplestYAMLExampleConfigurationFile']=file("$rootDir/docs/main/docs/_includes/.nyx-simplest.yaml").absolutePath
 
             logger.info('Unit testing Go module '+modulePath)
             exec {

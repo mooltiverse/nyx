@@ -40,8 +40,8 @@ CHANGELOG.md
 **/charts/*.tgz
 
 # Generated docs for Helm and Terraform
-docs/_includes/helm
-docs/_includes/terraform
+docs/main/docs/_includes/helm
+docs/main/docs/_includes/terraform
 
 # Python files
 __pycache__

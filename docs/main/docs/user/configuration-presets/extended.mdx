@@ -1,0 +1,278 @@
+---
+sidebar_position: 2
+tags:
+  - user
+  - guide
+  - reference
+  - configuration
+  - presets
+---
+
+# Extended
+
+This preset can be used by setting the [`preset`](../configuration-reference/global-options.mdx#preset) global configuration option value to `extended` and brings rich standard configurations suitable for projects with several options in place.
+
+## Changelog
+
+A standard changelog configuration is included in this preset. The destination file is `CHANGELOG.md` (in the current working directory) and is rendered using the default template.
+
+The rendered changelog uses the default template so its content is flat and no links are produced to any specific hosting service. Sections include commits matched by both the [Conventional Commits](https://www.conventionalcommits.org/) and [gitmoji](https://gitmoji.dev/) conventions.
+
+This corresponds to the following configuration options:
+
+| Name                                            | Value                                                                                    |
+| ----------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| [`changelog/path`](../configuration-reference/changelog.mdx#path) | `CHANGELOG.md`                                                         |
+| [`changelog/sections/Added`](../configuration-reference/changelog.mdx#sections) | `"^(feat`&#124;`:boom:`&#124;`:sparkles:)$"`             |
+| [`changelog/sections/Fixed`](../configuration-reference/changelog.mdx#sections) | "`^(fix`&#124;`:bug:`&#124;`:ambulance:)$`"              |
+| [`changelog/sections/Removed`](../configuration-reference/changelog.mdx#sections) | "`^:fire:$`"                                           |
+| [`changelog/sections/Security`](../configuration-reference/changelog.mdx#sections) | "`^:lock:$`"                                          |
+
+## Commit message conventions
+
+The [*Conventional Commits*](https://www.conventionalcommits.org/), *Conventional Commits For Merge* and [*gitmoji*](https://gitmoji.dev/) conventions come with this preset. *Conventional Commits* and *gitmoji* are enabled by default, while *Conventional Commits For Merge* is not.
+
+:::warning
+The *Conventional Commits For Merge* convention is **not** compliant to *Conventional Commits* and is **not officially supported**. It is useful when parsing merge commits bringing details on multiple commits (usually [squashed](https://docs.gitlab.com/ee/user/project/merge_requests/squash_and_merge.html)), each one with it's message title listed in the body of the merge commit message. This convention is able to match the message multiple times, each time yielding to a (potentially) different bump identifier. If you want to use this convention and you're using this preset you need to [enable](http://localhost:4000/nyx/guide/user/configuration-reference/commit-message-conventions/#enabled) it explicitly, otherwise you can copy its configuration attributes below to your custom configuration.
+:::
+
+This corresponds to the following configuration options:
+
+| Name                                            | Value                                                                                    |
+| ----------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| [`commitMessageConventions/enabled`](../configuration-reference/commit-message-conventions.mdx#enabled) | ["`conventionalCommits`", "`gitmoji`"] |
+| [`commitMessageConventions/conventionalCommits/expression`](../configuration-reference/commit-message-conventions.mdx#expression) | "`(?m)^(?<type>[a-zA-Z0-9_]+)(\((?<scope>[a-z ]+)\))?(!)?:( (?<title>.+))$(?s).*`" |
+| [`commitMessageConventions/conventionalCommits/bumpExpressions`](../configuration-reference/commit-message-conventions.mdx#bump-expressions) | "`major`" = "`(?s)(?m)^[a-zA-Z0-9_]+(!: .*`&#124;`.*^(BREAKING( `&#124;`-)CHANGE: )).*`", "`minor`" = "`(?s)(?m)^feat(!{0})(\([a-z ]+\))?: (?!.*^(BREAKING( `&#124;`-)CHANGE: )).*`", "`patch`" = "`(?s)(?m)^fix(!{0})(\([a-z ]+\))?: (?!.*^(BREAKING( `&#124;`-)CHANGE: )).*`" |
+| [`commitMessageConventions/conventionalCommitsForMerge/expression`](../configuration-reference/commit-message-conventions.mdx#expression) | "`(?<type>[a-zA-Z0-9_]+)(!)?(\\((?<scope>[a-z ]+)\\))?:( (?<title>.+))`" |
+| [`commitMessageConventions/conventionalCommitsForMerge/bumpExpressions`](../configuration-reference/commit-message-conventions.mdx#bump-expressions) | "`major`" = "`(?s)(?m)[a-zA-Z0-9_]+(!: .*`&#124;`.*^(BREAKING( `&#124;`-)CHANGE: )).*`", "`minor`" = "`(?s)(?m)feat(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( `&#124;`-)CHANGE: )).*`", "`patch`" = "`(?s)(?m)fix(!{0})(\\([a-z ]+\\))?: (?!.*^(BREAKING( `&#124;`-)CHANGE: )).*`" |
+| [`commitMessageConventions/gitmoji/expression`](../configuration-reference/commit-message-conventions.mdx#expression) | "`(?m)^(:(?<type>[a-zA-Z0-9_]+):)( (?<title>.+))?$(?s).*`" |
+| [`commitMessageConventions/gitmoji/bumpExpressions`](../configuration-reference/commit-message-conventions.mdx#bump-expressions) | "`major`" = "`(?m)^:boom:(?s).*`", "`minor`" = "`(?m)^:sparkles:(?s).*`", "`patch`" = "`(?m)^:(zap`&#124;`bug`&#124;`ambulance`&#124;`lipstick`&#124;`lock`&#124;`arrow_down`&#124;`arrow_up`&#124;`pushpin`&#124;`chart_with_upwards_trend`&#124;`heavy_plus_sign`&#124;`heavy_minus_sign`&#124;`wrench`&#124;`globe_with_meridians`&#124;`pencil2`&#124;`rewind`&#124;`package`&#124;`alien`&#124;`bento`&#124;`wheelchair`&#124;`speech_balloon`&#124;`card_file_box`&#124;`children_crossing`&#124;`iphone`&#124;`egg`&#124;`alembic`&#124;`mag`&#124;`label`&#124;`triangular_flag_on_post`&#124;`goal_net`&#124;`dizzy`&#124;`wastebasket`&#124;`passport_control`&#124;`adhesive_bandage):(?s).*`" |
+
+Please note that *gitmoji* is listed **after** *Conventional Commits* so when a commit message is evaluated, *gitmoji* is only taken into account if matching it against *Conventional Commit* does not yield to a positive match.
+
+## Release types
+
+This preset comes with a set of release types, suitable for a [mainline](../best-practice/branching-models.mdx#mainline) branching model plus [integration](../best-practice/branching-models.mdx#integration-branches), [maturity](../best-practice/branching-models.mdx#maturity-branches), [feature](../best-practice/branching-models.mdx#feature-branches), fix, [hotfix](../best-practice/branching-models.mdx#hotfix-branches), [release](../best-practice/branching-models.mdx#release-branches) and [maintenance](../best-practice/branching-models.mdx#maintenance-branches). An additional release type called *internal* is configured as a fallback when the mainline isn't matched.
+
+You may notice that *fix* and *hotfix* are different types in that *hotfix* is meant to deliver (and publish) a new release while the (simple) *fix* is supposed to happen under regular conditions, with no need to issue a new release, and behaves pretty much like a *feature* release type with just a different prefix in branches and tags.
+
+:::info
+Please note that even if a release type has its [`publish`](../configuration-reference/release-types.mdx#publish) flag enabled, publication to remote services doesn't happen because no [service](../configuration-reference/services.mdx) is listed in the [`publicationServices`](../configuration-reference/release-types.mdx#publication-services) list. If you want to publish releases using this preset as a starting point you need to override the [`releaseTypes/publicationServices`](../configuration-reference/release-types.mdx#publication-services) with the services you want to use as target (which may be the ones configured in the preset [services](#services) or some custom one).
+:::
+
+This corresponds to the following configuration options:
+
+| Name                                            | Value                                                                                    |
+| ----------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| [`releaseTypes/enabled`](../configuration-reference/release-types.mdx#enabled) | ["`mainline`", "`integration`", "`maturity`", "`feature`", "`fix`", "`hotfix`", "`release`", "`maintenance`", "`internal`"] |
+| [`releaseTypes/publicationServices`](../configuration-reference/release-types.mdx#publication-services) | Empty                            |
+| [`releaseTypes/mainline/collapseVersions`](../configuration-reference/release-types.mdx#collapse-versions) | `false`                       |
+| [`releaseTypes/mainline/collapsedVersionQualifier`](../configuration-reference/release-types.mdx#collapsed-version-qualifier) | Empty      |
+| [`releaseTypes/mainline/description`](../configuration-reference/release-types.mdx#description) | Empty                                    |
+| [`releaseTypes/mainline/filterTags`](../configuration-reference/release-types.mdx#match-tags) | `"^({{configuration.releasePrefix}})?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)$"` |
+| [`releaseTypes/mainline/gitCommit`](../configuration-reference/release-types.mdx#git-commit) | `"false"`                                   |
+| [`releaseTypes/mainline/gitCommitMessage`](../configuration-reference/release-types.mdx#git-commit-message) | Empty (use default)          |
+| [`releaseTypes/mainline/gitPush`](../configuration-reference/release-types.mdx#git-push) | `"true"`                                        |
+| [`releaseTypes/mainline/gitTag`](../configuration-reference/release-types.mdx#git-tag) | `"true"`                                          |
+| [`releaseTypes/mainline/gitTagMessage`](../configuration-reference/release-types.mdx#git-tag-message) | Empty (use default)                |
+| [`releaseTypes/mainline/identifiers`](../configuration-reference/release-types.mdx#identifiers) | Empty                                    |
+| [`releaseTypes/mainline/matchBranches`](../configuration-reference/release-types.mdx#match-branches) | `"^(master`&#124;`main)$"`          |
+| [`releaseTypes/mainline/matchEnvironmentVariables`](../configuration-reference/release-types.mdx#match-environment-variables) | Empty      |
+| [`releaseTypes/mainline/matchWorkspaceStatus`](../configuration-reference/release-types.mdx#match-workspace-status) | `"CLEAN"`            |
+| [`releaseTypes/mainline/publish`](../configuration-reference/release-types.mdx#publish) | `"true"`                                         |
+| [`releaseTypes/mainline/versionRange`](../configuration-reference/release-types.mdx#version-range) | Empty                                 |
+| [`releaseTypes/mainline/versionRangeFromBranchName`](../configuration-reference/release-types.mdx#version-range-from-branch-name) | `false`|
+| [`releaseTypes/integration/collapseVersions`](../configuration-reference/release-types.mdx#collapse-versions) | `true`                     |
+| [`releaseTypes/integration/collapsedVersionQualifier`](../configuration-reference/release-types.mdx#collapsed-version-qualifier) | `"{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}"` |
+| [`releaseTypes/integration/description`](../configuration-reference/release-types.mdx#description) | Empty                                 |
+| [`releaseTypes/integration/filterTags`](../configuration-reference/release-types.mdx#match-tags) | `"^({{configuration.releasePrefix}})?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)(-(develop`&#124;`development`&#124;`integration`&#124;`latest)(\.([0-9]\d*))?)$"` |
+| [`releaseTypes/integration/gitCommit`](../configuration-reference/release-types.mdx#git-commit) | `"false"`                                |
+| [`releaseTypes/integration/gitCommitMessage`](../configuration-reference/release-types.mdx#git-commit-message) | Empty (use default)       |
+| [`releaseTypes/integration/gitPush`](../configuration-reference/release-types.mdx#git-push) | `"true"`                                     |
+| [`releaseTypes/integration/gitTag`](../configuration-reference/release-types.mdx#git-tag) | `"true"`                                       |
+| [`releaseTypes/integration/gitTagMessage`](../configuration-reference/release-types.mdx#git-tag-message) | Empty (use default)             |
+| [`releaseTypes/integration/identifiers`](../configuration-reference/release-types.mdx#identifiers) | Empty                                 |
+| [`releaseTypes/integration/matchBranches`](../configuration-reference/release-types.mdx#match-branches) | `"^(develop`&#124;`development`&#124;`integration`&#124;`latest)$"` |
+| [`releaseTypes/integration/matchEnvironmentVariables`](../configuration-reference/release-types.mdx#match-environment-variables) | Empty   |
+| [`releaseTypes/integration/matchWorkspaceStatus`](../configuration-reference/release-types.mdx#match-workspace-status) | `"CLEAN"`         |
+| [`releaseTypes/integration/publish`](../configuration-reference/release-types.mdx#publish) | `"true"`                                      |
+| [`releaseTypes/integration/versionRange`](../configuration-reference/release-types.mdx#version-range) | Empty                              |
+| [`releaseTypes/integration/versionRangeFromBranchName`](../configuration-reference/release-types.mdx#version-range-from-branch-name) | `false` |
+| [`releaseTypes/maturity/collapseVersions`](../configuration-reference/release-types.mdx#collapse-versions) | `true`                        |
+| [`releaseTypes/maturity/collapsedVersionQualifier`](../configuration-reference/release-types.mdx#collapsed-version-qualifier) | `"{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}"` |
+| [`releaseTypes/maturity/description`](../configuration-reference/release-types.mdx#description) | Empty                                    |
+| [`releaseTypes/maturity/filterTags`](../configuration-reference/release-types.mdx#match-tags) | `"^({{configuration.releasePrefix}})?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)(-(alpha`&#124;`beta`&#124;`gamma`&#124;`delta`&#124;`epsilon`&#124;`zeta`&#124;`eta`&#124;`theta`&#124;`iota`&#124;`kappa`&#124;`lambda`&#124;`mu`&#124;`nu`&#124;`xi`&#124;`omicron`&#124;`pi`&#124;`rho`&#124;`sigma`&#124;`tau`&#124;`upsilon`&#124;`phi`&#124;`chi`&#124;`psi`&#124;`omega)(\.([0-9]\d*))?)?$"` |
+| [`releaseTypes/maturity/gitCommit`](../configuration-reference/release-types.mdx#git-commit) | `"false"`                                   |
+| [`releaseTypes/maturity/gitCommitMessage`](../configuration-reference/release-types.mdx#git-commit-message) | Empty (use default)          |
+| [`releaseTypes/maturity/gitPush`](../configuration-reference/release-types.mdx#git-push) | `"true"`                                        |
+| [`releaseTypes/maturity/gitTag`](../configuration-reference/release-types.mdx#git-tag) | `"true"`                                          |
+| [`releaseTypes/maturity/gitTagMessage`](../configuration-reference/release-types.mdx#git-tag-message) | Empty (use default)                |
+| [`releaseTypes/maturity/identifiers`](../configuration-reference/release-types.mdx#identifiers) | Empty                                    |
+| [`releaseTypes/maturity/matchBranches`](../configuration-reference/release-types.mdx#match-branches) | `"^(alpha`&#124;`beta`&#124;`gamma`&#124;`delta`&#124;`epsilon`&#124;`zeta`&#124;`eta`&#124;`theta`&#124;`iota`&#124;`kappa`&#124;`lambda`&#124;`mu`&#124;`nu`&#124;`xi`&#124;`omicron`&#124;`pi`&#124;`rho`&#124;`sigma`&#124;`tau`&#124;`upsilon`&#124;`phi`&#124;`chi`&#124;`psi`&#124;`omega)$"` |
+| [`releaseTypes/maturity/matchEnvironmentVariables`](../configuration-reference/release-types.mdx#match-environment-variables) | Empty      |
+| [`releaseTypes/maturity/matchWorkspaceStatus`](../configuration-reference/release-types.mdx#match-workspace-status) | `"CLEAN"`            |
+| [`releaseTypes/maturity/publish`](../configuration-reference/release-types.mdx#publish) | `"true"`                                         |
+| [`releaseTypes/maturity/versionRange`](../configuration-reference/release-types.mdx#version-range) | Empty                                 |
+| [`releaseTypes/maturity/versionRangeFromBranchName`](../configuration-reference/release-types.mdx#version-range-from-branch-name) | `false`|
+| [`releaseTypes/feature/collapseVersions`](../configuration-reference/release-types.mdx#collapse-versions) | `true`                         |
+| [`releaseTypes/feature/collapsedVersionQualifier`](../configuration-reference/release-types.mdx#collapsed-version-qualifier) | `"{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}"` |
+| [`releaseTypes/feature/description`](../configuration-reference/release-types.mdx#description) | Empty                                     |
+| [`releaseTypes/feature/filterTags`](../configuration-reference/release-types.mdx#match-tags) | `"^({{configuration.releasePrefix}})?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)(-(feat`&#124;`feature)(([0-9a-zA-Z]*)(\.([0-9]\d*))?)?)$"` |
+| [`releaseTypes/feature/gitCommit`](../configuration-reference/release-types.mdx#git-commit) | `"false"`                                    |
+| [`releaseTypes/feature/gitCommitMessage`](../configuration-reference/release-types.mdx#git-commit-message) | Empty (use default)           |
+| [`releaseTypes/feature/gitPush`](../configuration-reference/release-types.mdx#git-push) | `"false"`                                        |
+| [`releaseTypes/feature/gitTag`](../configuration-reference/release-types.mdx#git-tag) | `"false"`                                          |
+| [`releaseTypes/feature/gitTagMessage`](../configuration-reference/release-types.mdx#git-tag-message) | Empty (use default)                 |
+| [`releaseTypes/feature/identifiers`](../configuration-reference/release-types.mdx#identifiers) | Empty                                     |
+| [`releaseTypes/feature/matchBranches`](../configuration-reference/release-types.mdx#match-branches) | `"^(feat`&#124;`feature)((-`&#124;`\\/)[0-9a-zA-Z-_]+)?$"` |
+| [`releaseTypes/feature/matchEnvironmentVariables`](../configuration-reference/release-types.mdx#match-environment-variables) | Empty       |
+| [`releaseTypes/feature/matchWorkspaceStatus`](../configuration-reference/release-types.mdx#match-workspace-status) | Empty                 |
+| [`releaseTypes/feature/publish`](../configuration-reference/release-types.mdx#publish) | `"false"`                                         |
+| [`releaseTypes/feature/versionRange`](../configuration-reference/release-types.mdx#version-range) | Empty                                  |
+| [`releaseTypes/feature/versionRangeFromBranchName`](../configuration-reference/release-types.mdx#version-range-from-branch-name) | `false` |
+| [`releaseTypes/fix/collapseVersions`](../configuration-reference/release-types.mdx#collapse-versions) | `true`                             |
+| [`releaseTypes/fix/collapsedVersionQualifier`](../configuration-reference/release-types.mdx#collapsed-version-qualifier) | `"{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}"` |
+| [`releaseTypes/fix/description`](../configuration-reference/release-types.mdx#description) | Empty                                         |
+| [`releaseTypes/fix/filterTags`](../configuration-reference/release-types.mdx#match-tags) | `"^({{configuration.releasePrefix}})?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)(-fix(([0-9a-zA-Z]*)(\.([0-9]\d*))?)?)$"` |
+| [`releaseTypes/fix/gitCommit`](../configuration-reference/release-types.mdx#git-commit) | `"false"`                                        |
+| [`releaseTypes/fix/gitCommitMessage`](../configuration-reference/release-types.mdx#git-commit-message) | Empty (use default)               |
+| [`releaseTypes/fix/gitPush`](../configuration-reference/release-types.mdx#git-push) | `"true"`                                             |
+| [`releaseTypes/fix/gitTag`](../configuration-reference/release-types.mdx#git-tag) | `"false"`                                              |
+| [`releaseTypes/fix/gitTagMessage`](../configuration-reference/release-types.mdx#git-tag-message) | Empty (use default)                     |
+| [`releaseTypes/fix/identifiers`](../configuration-reference/release-types.mdx#identifiers) | Empty                                         |
+| [`releaseTypes/fix/matchBranches`](../configuration-reference/release-types.mdx#match-branches) | `"^fix((-`&#124;`\/)[0-9a-zA-Z-_]+)?$"`  |
+| [`releaseTypes/fix/matchEnvironmentVariables`](../configuration-reference/release-types.mdx#match-environment-variables) | Empty           |
+| [`releaseTypes/fix/matchWorkspaceStatus`](../configuration-reference/release-types.mdx#match-workspace-status) | Empty                     |
+| [`releaseTypes/fix/publish`](../configuration-reference/release-types.mdx#publish) | `"false"`                                             |
+| [`releaseTypes/fix/versionRange`](../configuration-reference/release-types.mdx#version-range) | Empty                                      |
+| [`releaseTypes/fix/versionRangeFromBranchName`](../configuration-reference/release-types.mdx#version-range-from-branch-name) | `false`     |
+| [`releaseTypes/hotfix/collapseVersions`](../configuration-reference/release-types.mdx#collapse-versions) | `true`                          |
+| [`releaseTypes/hotfix/collapsedVersionQualifier`](../configuration-reference/release-types.mdx#collapsed-version-qualifier) | `"{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}"` |
+| [`releaseTypes/hotfix/description`](../configuration-reference/release-types.mdx#description) | Empty                                      |
+| [`releaseTypes/hotfix/filterTags`](../configuration-reference/release-types.mdx#match-tags) | `"^({{configuration.releasePrefix}})?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)(-hotfix(([0-9a-zA-Z]*)(\.([0-9]\d*))?)?)$"` |
+| [`releaseTypes/hotfix/gitCommit`](../configuration-reference/release-types.mdx#git-commit) | `"false"`                                     |
+| [`releaseTypes/hotfix/gitCommitMessage`](../configuration-reference/release-types.mdx#git-commit-message) | Empty (use default)            |
+| [`releaseTypes/hotfix/gitPush`](../configuration-reference/release-types.mdx#git-push) | `"true"`                                          |
+| [`releaseTypes/hotfix/gitTag`](../configuration-reference/release-types.mdx#git-tag) | `"true"`                                            |
+| [`releaseTypes/hotfix/gitTagMessage`](../configuration-reference/release-types.mdx#git-tag-message) | Empty (use default)                  |
+| [`releaseTypes/hotfix/identifiers`](../configuration-reference/release-types.mdx#identifiers) | Empty                                      |
+| [`releaseTypes/hotfix/matchBranches`](../configuration-reference/release-types.mdx#match-branches) | `"^hotfix((-`&#124;`\/)[0-9a-zA-Z-_]+)?$"` |
+| [`releaseTypes/hotfix/matchEnvironmentVariables`](../configuration-reference/release-types.mdx#match-environment-variables) | Empty        |
+| [`releaseTypes/hotfix/matchWorkspaceStatus`](../configuration-reference/release-types.mdx#match-workspace-status) | Empty                  |
+| [`releaseTypes/hotfix/publish`](../configuration-reference/release-types.mdx#publish) | `"true"`                                           |
+| [`releaseTypes/hotfix/versionRange`](../configuration-reference/release-types.mdx#version-range) | Empty                                   |
+| [`releaseTypes/hotfix/versionRangeFromBranchName`](../configuration-reference/release-types.mdx#version-range-from-branch-name) | `false`  |
+| [`releaseTypes/release/collapseVersions`](../configuration-reference/release-types.mdx#collapse-versions) | `true`                         |
+| [`releaseTypes/release/collapsedVersionQualifier`](../configuration-reference/release-types.mdx#collapsed-version-qualifier) | `"{{#firstLower}}{{branch}}{{/firstLower}}"` |
+| [`releaseTypes/release/description`](../configuration-reference/release-types.mdx#description) | Empty                                     |
+| [`releaseTypes/release/filterTags`](../configuration-reference/release-types.mdx#match-tags) | `"^({{configuration.releasePrefix}})?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)(-(rel`&#124;`release)((\.([0-9]\d*))?)?)$"` |
+| [`releaseTypes/release/gitCommit`](../configuration-reference/release-types.mdx#git-commit) | `"false"`                                    |
+| [`releaseTypes/release/gitCommitMessage`](../configuration-reference/release-types.mdx#git-commit-message) | Empty (use default)           |
+| [`releaseTypes/release/gitPush`](../configuration-reference/release-types.mdx#git-push) | `"true"`                                         |
+| [`releaseTypes/release/gitTag`](../configuration-reference/release-types.mdx#git-tag) | `"true"`                                           |
+| [`releaseTypes/release/gitTagMessage`](../configuration-reference/release-types.mdx#git-tag-message) | Empty (use default)                 |
+| [`releaseTypes/release/identifiers`](../configuration-reference/release-types.mdx#identifiers) | Empty                                     |
+| [`releaseTypes/release/matchBranches`](../configuration-reference/release-types.mdx#match-branches) | `"^(rel`&#124;`release)(-`&#124;`\/)({{configuration.releasePrefix}})?([0-9`&#124;`x]\d*)(\.([0-9`&#124;`x]\d*)(\.([0-9`&#124;`x]\d*))?)?$"` |
+| [`releaseTypes/release/matchEnvironmentVariables`](../configuration-reference/release-types.mdx#match-environment-variables) | Empty       |
+| [`releaseTypes/release/matchWorkspaceStatus`](../configuration-reference/release-types.mdx#match-workspace-status) | `"CLEAN"`             |
+| [`releaseTypes/release/publish`](../configuration-reference/release-types.mdx#publish) | `"false"`                                         |
+| [`releaseTypes/release/versionRange`](../configuration-reference/release-types.mdx#version-range) | Empty                                  |
+| [`releaseTypes/release/versionRangeFromBranchName`](../configuration-reference/release-types.mdx#version-range-from-branch-name) | `true`  |
+| [`releaseTypes/maintenance/collapseVersions`](../configuration-reference/release-types.mdx#collapse-versions) | `false`                    |
+| [`releaseTypes/maintenance/collapsedVersionQualifier`](../configuration-reference/release-types.mdx#collapsed-version-qualifier) | Empty   |
+| [`releaseTypes/maintenance/description`](../configuration-reference/release-types.mdx#description) | Empty                                 |
+| [`releaseTypes/maintenance/filterTags`](../configuration-reference/release-types.mdx#match-tags) | `"^({{configuration.releasePrefix}})?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)$"` |
+| [`releaseTypes/maintenance/gitCommit`](../configuration-reference/release-types.mdx#git-commit) | `"false"`                                |
+| [`releaseTypes/maintenance/gitCommitMessage`](../configuration-reference/release-types.mdx#git-commit-message) | Empty (use default)       |
+| [`releaseTypes/maintenance/gitPush`](../configuration-reference/release-types.mdx#git-push) | `"true"`                                     |
+| [`releaseTypes/maintenance/gitTag`](../configuration-reference/release-types.mdx#git-tag) | `"true"`                                       |
+| [`releaseTypes/maintenance/gitTagMessage`](../configuration-reference/release-types.mdx#git-tag-message) | Empty (use default)             |
+| [`releaseTypes/maintenance/identifiers`](../configuration-reference/release-types.mdx#identifiers) | Empty                                 |
+| [`releaseTypes/maintenance/matchBranches`](../configuration-reference/release-types.mdx#match-branches) | `"^[a-zA-Z]*([0-9|x]\d*)(\.([0-9|x]\d*)(\.([0-9|x]\d*))?)?$"` |
+| [`releaseTypes/maintenance/matchEnvironmentVariables`](../configuration-reference/release-types.mdx#match-environment-variables) | Empty   |
+| [`releaseTypes/maintenance/matchWorkspaceStatus`](../configuration-reference/release-types.mdx#match-workspace-status) | `"CLEAN"`         |
+| [`releaseTypes/maintenance/publish`](../configuration-reference/release-types.mdx#publish) | `"true"`                                      |
+| [`releaseTypes/maintenance/versionRange`](../configuration-reference/release-types.mdx#version-range) | Empty                              |
+| [`releaseTypes/maintenance/versionRangeFromBranchName`](../configuration-reference/release-types.mdx#version-range-from-branch-name)|`true`|
+| [`releaseTypes/internal/collapseVersions`](../configuration-reference/release-types.mdx#collapse-versions) | `true`                        |
+| [`releaseTypes/internal/collapsedVersionQualifier`](../configuration-reference/release-types.mdx#collapsed-version-qualifier) |`"internal"`|
+| [`releaseTypes/internal/description`](../configuration-reference/release-types.mdx#description) | Empty                                    |
+| [`releaseTypes/internal/filterTags`](../configuration-reference/release-types.mdx#match-tags) | Empty                                      |
+| [`releaseTypes/internal/gitCommit`](../configuration-reference/release-types.mdx#git-commit) | `"false"`                                   |
+| [`releaseTypes/internal/gitCommitMessage`](../configuration-reference/release-types.mdx#git-commit-message) | Empty (use default)          |
+| [`releaseTypes/internal/gitPush`](../configuration-reference/release-types.mdx#git-push) | `"false"`                                       |
+| [`releaseTypes/internal/gitTag`](../configuration-reference/release-types.mdx#git-tag) | `"false"`                                         |
+| [`releaseTypes/internal/gitTagMessage`](../configuration-reference/release-types.mdx#git-tag-message) | Empty (use default)                |
+| [`releaseTypes/internal/identifiers/0/position`](../configuration-reference/release-types.mdx#identifier-position) | `"BUILD"`             |
+| [`releaseTypes/internal/identifiers/0/qualifier`](../configuration-reference/release-types.mdx#identifier-qualifier) | "`timestamp`"       |
+| [`releaseTypes/internal/identifiers/0/value`](../configuration-reference/release-types.mdx#identifier-value) | `"{{#timestampYYYYMMDDHHMMSS}}{{timestamp}}{{/timestampYYYYMMDDHHMMSS}}"` |
+| [`releaseTypes/internal/matchBranches`](../configuration-reference/release-types.mdx#match-branches) | Empty                               |
+| [`releaseTypes/internal/matchEnvironmentVariables`](../configuration-reference/release-types.mdx#match-environment-variables) | Empty      |
+| [`releaseTypes/internal/matchWorkspaceStatus`](../configuration-reference/release-types.mdx#match-workspace-status) | Empty                |
+| [`releaseTypes/internal/publish`](../configuration-reference/release-types.mdx#publish) | `"false"`                                        |
+| [`releaseTypes/internal/versionRange`](../configuration-reference/release-types.mdx#version-range) | Empty                                 |
+| [`releaseTypes/internal/versionRangeFromBranchName`](../configuration-reference/release-types.mdx#version-range-from-branch-name) | `false`|
+
+## Services
+
+The [GitHub](https://github.com/) and [GitLab](https://gitlab.com/) services are available with this preset. They both use standard remote URIs so unless you use a privately hosted instance you don't need to change it. Authentication tokens are read from environment variables (`GITHUB_TOKEN` and `GITLAB_TOKEN`, respectively) so you can just set those variables to a valid Personal Access Token and you're set.
+
+You still need to set the remaining options.
+
+This corresponds to the following configuration options:
+
+| Name                                            | Value                                                                                    |
+| ----------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| [`services/github/type`](../configuration-reference/services.mdx#type) | `GITHUB`                                                          |
+| [`services/github/options/AUTHENTICATION_TOKEN`](../configuration-reference/services.mdx#options) | `"{{#environmentVariable}}GITHUB_TOKEN{{/environmentVariable}}"` |
+| [`services/github/options/REPOSITORY_NAME`](../configuration-reference/services.mdx#options) | Empty                                       |
+| [`services/github/options/REPOSITORY_OWNER`](../configuration-reference/services.mdx#options) | Empty                                      |
+| [`services/gitlab/type`](../configuration-reference/services.mdx#type) | `GITLAB`                                                          |
+| [`services/gitlab/options/AUTHENTICATION_TOKEN`](../configuration-reference/services.mdx#options) | `"{{#environmentVariable}}GITLAB_TOKEN{{/environmentVariable}}"` |
+| [`services/gitlab/options/REPOSITORY_NAME`](../configuration-reference/services.mdx#options) | Empty                                       |
+| [`services/gitlab/options/REPOSITORY_OWNER`](../configuration-reference/services.mdx#options) | Empty                                      |
+
+## Substitutions
+
+Substitutions for a commn set of technologies is provided with this preset (names are the rule names you can use to [enable](../configuration-reference/substitutions.mdx#enabled) the rules):
+
+* `cargo_version`: sets the version attribute in [`Cargo.toml`](https://doc.rust-lang.org/cargo/reference/manifest.html) files in the project directory, useful for Rust projects
+* `composer_version`: sets the version attribute in [`composer.json`](https://getcomposer.org/doc/01-basic-usage.mdx) files in the project directory, useful for PHP projects
+* `dart_version`: sets the version attribute in [`pubspec.yaml`](https://dart.dev/tools/pub/pubspec) files in the project directory, useful for Flutter and Dart projects
+* `elixir_version`: sets the version attribute in [`mix.exs`](https://elixir-lang.org/getting-started/mix-otp/introduction-to-mix.html) files in the project directory, useful for Elixir projects
+* `expo_version`: sets the version attribute in [`app.json` and `app.config.json`](https://docs.expo.dev/versions/latest/config/app/) files in the project directory, useful for React projects
+* `helm_version`: sets the version attribute in [`Chart.yaml`](https://v2.helm.sh/docs/developing_charts/#the-chart-yaml-file) files in the project directory, useful for Rust projects
+* `node_version`: sets the version attribute in [`package.json`](https://docs.npmjs.com/cli/v9/configuring-npm/package-json) files in the project directory, useful for Node projects
+* `text_version`: writes the version in `version.txt` files in the project directory, useful in many project automations
+
+All these presets replace the version number in files at any depth in the project layout so, for example, you can  have multiple `package.json` file in your project tree and they will all get the updated version number. If this behavior doesn't fit your needs you can just override the substitution rule and make the `files` attribute more specific.
+
+This corresponds to the following configuration options:
+
+| Name                                            | Value                                                                                    |
+| ----------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| [`substitutions/enabled`](../configuration-reference/substitutions.mdx#enabled) | none                                                     |
+| [`substitutions/cargo_version/files`](../configuration-reference/substitutions.mdx#files) | `**/Cargo.toml`                                |
+| [`substitutions/cargo_version/match`](../configuration-reference/substitutions.mdx#match) | `version(\\s)*=(\\s)*(\"`&#124;`')?(0`&#124;`[1-9]\\d*)\\.(0`&#124;`[1-9]\\d*)\\.(0`&#124;`[1-9]\\d*)(?:-((?:0`&#124;`[1-9]\\d*`&#124;`\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0`&#124;`[1-9]\\d*`&#124;`\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?(\"`&#124;`')?` |
+| [`substitutions/cargo_version/replace`](../configuration-reference/substitutions.mdx#replace) | `version = \"{{version}}\"`                |
+| [`substitutions/composer_version/files`](../configuration-reference/substitutions.mdx#files) | `**/composer.json`                          |
+| [`substitutions/composer_version/match`](../configuration-reference/substitutions.mdx#match) | `\"version\"(\\s)*:(\\s)*\"(0`&#124;`[1-9]\\d*)\\.(0`&#124;`[1-9]\\d*)\\.(0`&#124;`[1-9]\\d*)(?:-((?:0`&#124;`[1-9]\\d*`&#124;`\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0`&#124;`[1-9]\\d*`&#124;`\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?\"` |
+| [`substitutions/composer_version/replace`](../configuration-reference/substitutions.mdx#replace) | `\"version\": \"{{version}}\"`          |
+| [`substitutions/dart_version/files`](../configuration-reference/substitutions.mdx#files) | `**/pubspec.yaml`                               |
+| [`substitutions/dart_version/match`](../configuration-reference/substitutions.mdx#match) | `(\"`&#124;`')?version(\"`&#124;`')?(\\s)*:(\\s)*(\"`&#124;`')?(0`&#124;`[1-9]\\d*)\\.(0`&#124;`[1-9]\\d*)\\.(0`&#124;`[1-9]\\d*)(?:-((?:0`&#124;`[1-9]\\d*`&#124;`\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0`&#124;`[1-9]\\d*`&#124;`\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?(\"`&#124;`')?` |
+| [`substitutions/dart_version/replace`](../configuration-reference/substitutions.mdx#replace) | `version: \"{{version}}\"`                  |
+| [`substitutions/elixir_version/files`](../configuration-reference/substitutions.mdx#files) | `**/mix.exs`                                  |
+| [`substitutions/elixir_version/match`](../configuration-reference/substitutions.mdx#match) | `version(\\s)*:(\\s)*\"(0`&#124;`[1-9]\\d*)\\.(0`&#124;`[1-9]\\d*)\\.(0`&#124;`[1-9]\\d*)(?:-((?:0`&#124;`[1-9]\\d*`&#124;`\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0`&#124;`[1-9]\\d*`&#124;`\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?\"` |
+| [`substitutions/elixir_version/replace`](../configuration-reference/substitutions.mdx#replace) | `version: \"{{version}}\"`                |
+| [`substitutions/expo_version/files`](../configuration-reference/substitutions.mdx#files) | `**/{app,app.config}.json`                      |
+| [`substitutions/expo_version/match`](../configuration-reference/substitutions.mdx#match) | `\"version\"(\\s)*:(\\s)*\"(0`&#124;`[1-9]\\d*)\\.(0`&#124;`[1-9]\\d*)\\.(0`&#124;`[1-9]\\d*)(?:-((?:0`&#124;`[1-9]\\d*`&#124;`\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0`&#124;`[1-9]\\d*`&#124;`\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?\"` |
+| [`substitutions/expo_version/replace`](../configuration-reference/substitutions.mdx#replace) | `\"version\": \"{{version}}\"`              |
+| [`substitutions/helm_version/files`](../configuration-reference/substitutions.mdx#files) | `**/Chart.yaml`                                 |
+| [`substitutions/helm_version/match`](../configuration-reference/substitutions.mdx#match) | `(\"`&#124;`')?version(\"`&#124;`')?(\\s)*:(\\s)*(\"`&#124;`')?(0`&#124;`[1-9]\\d*)\\.(0`&#124;`[1-9]\\d*)\\.(0`&#124;`[1-9]\\d*)(?:-((?:0`&#124;`[1-9]\\d*`&#124;`\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0`&#124;`[1-9]\\d*`&#124;`\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?(\"`&#124;`')?` |
+| [`substitutions/helm_version/replace`](../configuration-reference/substitutions.mdx#replace) | `version: \"{{version}}\"`                  |
+| [`substitutions/node_version/files`](../configuration-reference/substitutions.mdx#files) | `**/package.json`                               |
+| [`substitutions/node_version/match`](../configuration-reference/substitutions.mdx#match) | `\"version\"(\\s)*:(\\s)*\"(0`&#124;`[1-9]\\d*)\\.(0`&#124;`[1-9]\\d*)\\.(0`&#124;`[1-9]\\d*)(?:-((?:0`&#124;`[1-9]\\d*`&#124;`\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0`&#124;`[1-9]\\d*`&#124;`\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?\"` |
+| [`substitutions/node_version/replace`](../configuration-reference/substitutions.mdx#replace) | `\"version\": \"{{version}}\"`              |
+| [`substitutions/text_version/files`](../configuration-reference/substitutions.mdx#files) | `**/version.txt`                                |
+| [`substitutions/text_version/match`](../configuration-reference/substitutions.mdx#match) | `(0`&#124;`[1-9]\\d*)\\.(0`&#124;`[1-9]\\d*)\\.(0`&#124;`[1-9]\\d*)(?:-((?:0`&#124;`[1-9]\\d*`&#124;`\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0`&#124;`[1-9]\\d*`&#124;`\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?` |
+| [`substitutions/text_version/replace`](../configuration-reference/substitutions.mdx#replace) | `{{version}}`                               |

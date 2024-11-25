@@ -63,14 +63,14 @@ testing {
                     testTask.configure {
                         // Pass the name of the configuration file examples to tests.
                         // We use the same files used for the documentation here.
-                        systemProperty 'extendedJSONExampleConfigurationFile', file("$rootDir/docs/_includes/.nyx-extended.json").absolutePath
-                        systemProperty 'mediumJSONExampleConfigurationFile', file("$rootDir/docs/_includes/.nyx-medium.json").absolutePath
-                        systemProperty 'simpleJSONExampleConfigurationFile', file("$rootDir/docs/_includes/.nyx-simple.json").absolutePath
-                        systemProperty 'simplestJSONExampleConfigurationFile', file("$rootDir/docs/_includes/.nyx-simplest.json").absolutePath
-                        systemProperty 'extendedYAMLExampleConfigurationFile', file("$rootDir/docs/_includes/.nyx-extended.yaml").absolutePath
-                        systemProperty 'mediumYAMLExampleConfigurationFile', file("$rootDir/docs/_includes/.nyx-medium.yaml").absolutePath
-                        systemProperty 'simpleYAMLExampleConfigurationFile', file("$rootDir/docs/_includes/.nyx-simple.yaml").absolutePath
-                        systemProperty 'simplestYAMLExampleConfigurationFile', file("$rootDir/docs/_includes/.nyx-simplest.yaml").absolutePath
+                        systemProperty 'extendedJSONExampleConfigurationFile', file("$rootDir/docs/main/docs/_includes/.nyx-extended.json").absolutePath
+                        systemProperty 'mediumJSONExampleConfigurationFile', file("$rootDir/docs/main/docs/_includes/.nyx-medium.json").absolutePath
+                        systemProperty 'simpleJSONExampleConfigurationFile', file("$rootDir/docs/main/docs/_includes/.nyx-simple.json").absolutePath
+                        systemProperty 'simplestJSONExampleConfigurationFile', file("$rootDir/docs/main/docs/_includes/.nyx-simplest.json").absolutePath
+                        systemProperty 'extendedYAMLExampleConfigurationFile', file("$rootDir/docs/main/docs/_includes/.nyx-extended.yaml").absolutePath
+                        systemProperty 'mediumYAMLExampleConfigurationFile', file("$rootDir/docs/main/docs/_includes/.nyx-medium.yaml").absolutePath
+                        systemProperty 'simpleYAMLExampleConfigurationFile', file("$rootDir/docs/main/docs/_includes/.nyx-simple.yaml").absolutePath
+                        systemProperty 'simplestYAMLExampleConfigurationFile', file("$rootDir/docs/main/docs/_includes/.nyx-simplest.yaml").absolutePath
                     }
                 }
             }

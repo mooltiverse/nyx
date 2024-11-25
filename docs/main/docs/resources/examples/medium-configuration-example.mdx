@@ -1,0 +1,40 @@
+---
+sidebar_position: 3
+tags:
+  - support
+  - examples
+  - configuration
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import CodeBlock from '@theme/CodeBlock';
+// Importing non-markdown snippets requires the 'raw-loader'. See:
+// - https://docusaurus.io/docs/markdown-features/react#importing-code-snippets
+import MediumJSON from '!!raw-loader!../../_includes/.nyx-medium.json';
+import MediumYAML from '!!raw-loader!../../_includes/.nyx-medium.yaml';
+import MediumGroovy from '!!raw-loader!../../_includes/.nyx-medium.groovy';
+
+# Medium configuration example
+
+Here you can find the example of a medium complexity configuration in the supported [`formats`](../../user/introduction/configuration-methods.mdx#supported-file-grammars).
+
+This configuration doesn't use any [preset](../../user/configuration-presets/index.md) but sets many [global configuration options](../../user/configuration-reference/global-options.mdx) explicitly along with [commit message conventions](../../user/configuration-reference/commit-message-conventions.mdx) and [release types](../../user/configuration-reference/release-types.mdx). Where allowed, [templates](../../user/configuration-reference/templates.mdx) are also used.
+
+<Tabs>
+  <TabItem value="json" label="JSON" default>
+    <CodeBlock language="json">{MediumJSON}</CodeBlock>
+
+    Source code for this file is available [here](https://raw.githubusercontent.com/mooltiverse/nyx/main/docs/main/docs/_includes/.nyx-medium.json).
+  </TabItem>
+  <TabItem value="yaml" label="YAML">
+    <CodeBlock language="yaml">{MediumYAML}</CodeBlock>
+
+    Source code for this file is available [here](https://raw.githubusercontent.com/mooltiverse/nyx/main/docs/main/docs/_includes/.nyx-medium.yaml).
+  </TabItem>
+  <TabItem value="groovy" label="Groovy (Gradle)">
+    <CodeBlock language="groovy">{MediumGroovy}</CodeBlock>
+
+    Source code for this file is available [here](https://raw.githubusercontent.com/mooltiverse/nyx/main/docs/main/docs/_includes/.nyx-medium.groovy).
+  </TabItem>
+</Tabs>

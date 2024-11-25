@@ -93,7 +93,7 @@ You can work on the project on any platform (Linux, Windows, Mac). You need to h
 * Java JDK or JRE version 17 or above, either from [Oracle](https://www.oracle.com/java/technologies/javase-downloads.html) or [OpenJDK](https://openjdk.java.net/install/)
 * [Gradle](https://gradle.org/install/) 7.x or above
 * [Docker CE](https://docs.docker.com/install/)
-* [Jekyll](https://jekyllrb.com/docs/installation/) 4.2.0 or above (also requires [Ruby](https://www.ruby-lang.org/en/downloads/) 2.4.0 or above)
+* [Node](https://nodejs.org/) 18.0 or above
 
 You also need a local copy of the repository that you can get by running:
 
@@ -116,10 +116,7 @@ nyx
 +-- .github                         
 |   \--- workflows                  # GitHub Actions worflows
 +-- docs                            # Documentation micro site
-|   +--- _data                      # Data files used by the documentation site
-|   +--- _pages                     # Documentation content pages
-|   +--- _posts                     # Documentation articles (i.e. examples)
-|   \--- _config.yml                # Jekyll configuration for the documentation site
+|   \--- main                       # The documentation site
 +-- gradle                          # Gradle wrapper files
 +-- src                             # Project sources
 |   +--- docker                     # Docker image sub module
@@ -191,28 +188,24 @@ After the above cleaning has been done the *Release* job can be re-launched from
 
 ### Contributing Documentation
 
-The documentation is under the `docs` directory and uses [GitHub Pages](https://help.github.com/en/github/working-with-github-pages/about-github-pages) for rendering. The documentation is a micro site written in [Markdown](https://en.wikipedia.org/wiki/Markdown) files and rendered using [Jekyll](https://jekyllrb.com/), the static web site generator supported by GitHub pages out of the box, along with the [Minimal Mistakes](https://mmistakes.github.io/minimal-mistakes/) theme. The site is available at [https://mooltiverse.github.io/nyx/](https://mooltiverse.github.io/nyx/).
+The documentation is under the `docs/main` directory and uses [GitHub Pages](https://help.github.com/en/github/working-with-github-pages/about-github-pages) for rendering. The documentation is a micro site written using [Docusaurus](https://docusaurus.io/). The site is available at [https://mooltiverse.github.io/nyx/](https://mooltiverse.github.io/nyx/).
 
-The regular content files are in the `docs/_pages` directory while the examples, F.A.Qq. and other post sources are in `docs/_posts`. The [navigation](https://mmistakes.github.io/minimal-mistakes/docs/navigation/) is modelled in the `docs/_data/navigation.yml` file and it defines the navigation items you see on top of the site and the [sidebar](https://mmistakes.github.io/minimal-mistakes/docs/layouts/#custom-sidebar-navigation-menu).
+The regular content files are in the `docs/main/docs` directory.
 
-Images are in `docs/assets` and vector graphics (`.svg`) are preferred over other formats. Diagrams and charts have been edited with [Lucid tools](https://lucid.app/) (*Lucidspark* and *Lucidchart*).
+Images are in `docs/main/static`. Diagrams and charts have been edited with [Lucid tools](https://lucid.app/) (*Lucidspark* and *Lucidchart*).
 
 When authoring content make sure that:
 
-* the [front matter](https://jekyllrb.com/docs/front-matter/) of your pages is properly defined, with special regards to the *title*, [*layout*](https://mmistakes.github.io/minimal-mistakes/docs/layouts/), [*permalink*](https://mmistakes.github.io/minimal-mistakes/docs/pages/) (for pages), [*tags* and *categories*](https://mmistakes.github.io/minimal-mistakes/docs/layouts/#taxonomy-archives) (for posts and examples)
-* content is properly formatted using the right [helpers](https://mmistakes.github.io/minimal-mistakes/docs/helpers/) and [utility classes](https://mmistakes.github.io/minimal-mistakes/docs/utility-classes/)
-* you have a basic knowledge of [Kramdown](https://kramdown.gettalong.org/), the Markdown superset used by Jekyll
+* the [front matter](https://docusaurus.io/docs/create-doc#doc-front-matter) of your pages is properly defined, with special regards to the *title* and [tags](https://docusaurus.io/docs/create-doc#doc-tags)
+* content is properly formatted using the right [features](https://docusaurus.io/docs/markdown-features)
 
-To test the site, get into the `docs` directory and run:
+To test the site, get into the `docs/main` directory and run:
 
 ```shell script
-$ bundle update
-$ bundle exec jekyll serve --watch
+$ npm run start
 ```
 
-then open a browser window to [http://localhost:4000/](http://localhost:4000/) to see the changes (other options are [available](https://jekyllrb.com/docs/configuration/options/)). Also make sure that running `./gradlew build test` doesn't break.
-
-To troubleshoot the documentation site or to set up your local environment it's worth knowing that the documentation site has been bootstrapped by installing Ruby and Jekyll by following the [Jekyll installation instructions](https://jekyllrb.com/docs/installation/) and [initialized using Bundler](https://jekyllrb.com/tutorials/using-jekyll-with-bundler/) then following the [Minimal Mistakes theme Quick Start Guide](https://mmistakes.github.io/minimal-mistakes/docs/quick-start-guide/).
+then open a browser window to [http://localhost:3000/](http://localhost:3000/) to see the changes. Also make sure that running `./gradlew docs:build` doesn't break.
 
 ### Contributing Code
 

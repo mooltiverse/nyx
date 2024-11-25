@@ -1,3 +1,0 @@
-nyx {
-  preset = 'simple'
-}

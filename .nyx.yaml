@@ -301,9 +301,9 @@ resume: true
 stateFile: "build/.nyx-state.json"
 substitutions: 
   enabled: 
-    - jekyll-data
+    - docusaurus
   items: 
-    jekyll-data: 
-      files: "docs/_data/nyx.yml"
-      match: "version(\\s)*:(\\s)*\"(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?\""
-      replace: "version: \"{{version}}\""
+    docusaurus: 
+      files: "docs/main/src/data/siteVariables.js"
+      match: "version(\\s)*:(\\s)*'(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?'"
+      replace: "version: '{{version}}'"

@@ -15,7 +15,8 @@ This release:
 * applied conventions and styling rules
   * the `modules` directory has been renamed to to `src`
   * GitHub Actions workflows have been refactored for reusability
-* SonarCloud and Codecov have been dismissed
+* dismissed SonarCloud and Codecov
+* converted the documentation microsite from Jekyll to Docusaurus
 
 ## 3.0.11
 

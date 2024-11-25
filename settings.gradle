@@ -15,6 +15,8 @@ plugins {
 ------------------------------------------------------------------------------*/
 rootProject.name = 'nyx'
 
+include 'docs'
+include 'docs:main'
 include 'src:docker'
 include 'src:docker:nyx'
 include 'src:go'

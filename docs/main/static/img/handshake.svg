@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<svg xmlns="http://www.w3.org/2000/svg" height="250" width="250" xmlns:xlink="http://www.w3.org/1999/xlink">
+<defs>
+	<linearGradient id="d" x1="90" xlink:href="#a" gradientUnits="userSpaceOnUse" x2="150" y1="125" y2="140"/>
+	<linearGradient id="c" gradientUnits="userSpaceOnUse" x2="2" x1="190">
+		<stop stop-color="#264" offset="0"/>
+		<stop stop-color="#40ae77" offset=".88"/>
+		<stop stop-color="#4a7" stop-opacity="0" offset="1"/>
+	</linearGradient>
+	<linearGradient id="e" x1="84" xlink:href="#a" gradientUnits="userSpaceOnUse" x2="154" y1="125" y2="145"/>
+	<linearGradient id="a">
+		<stop stop-color="#00679a" offset="0"/>
+		<stop stop-color="#004364" offset="1"/>
+	</linearGradient>
+	<linearGradient id="b" gradientUnits="userSpaceOnUse" x2="248" x1="150">
+		<stop stop-color="#004c76" offset="0"/>
+		<stop stop-color="#046" offset=".73"/>
+		<stop stop-color="#046" stop-opacity="0" offset="1"/>
+	</linearGradient>
+</defs>
+<g stroke-linejoin="round" stroke="#fff" stroke-linecap="round" stroke-width="5">
+	<path d="m246 78l-43.9 0.5c-18-11.9-42.5-25.5-58-27.7l-11.2 33.7 30 82s9.3-0.4 16.5 0c4.6 0.3 8.2-1.6 11.7-4.7 4.5-4.1 8.7-9 8.7-9l46 0.6" fill="url(#b)"/>
+	<path d="m3.7 76h47.7c12.3-13.9 24-14 38-18.5 33-10.3 53 21.3 61 27 1.2 0.8 1.8 1.4 2.7 2.4 14.4 16 16.8 17.7 26 27.5 6.9 7.1 9.3 8 9.4 19.5 0.1 12.8-1.4 31.6-1.4 31.6-2 6-8.2 9.4-13.5 9.6-5.5 6.1-10.7 7.3-17 5.4-2.7 5.8-8.1 9.1-15.7 8.7-4.4 4-6.8 4.1-13.6 2.8-42.6 2.6-63-18.7-82-40l-41.9 0.5" fill="url(#c)"/>
+	<g fill="url(#e)">
+		<path d="m47 163l17.6-16c7.7-1.5 13.4 7.1 10 13.2l-15.5 17.9c-8-0.3-14.4-7.9-12-15z"/>
+		<path d="m63 174c10.6-14.7 19.9-21.6 30.5-34.7 8.3-7.3 21 1.6 15.9 10.2-5.2 8.6-30.6 33.9-33 36-6 2.9-16-3.6-13.4-11.6z"/>
+		<path d="m141 189c0.7-10 1.1-19.4 0.5-25-3.5-6.3-17-15.8-27.8-23.7" fill="none"/>
+		<path d="m82 182c13.3-13.6 24.7-28.9 37.7-42.8 7.9-7.7 21.6 3.3 15.8 10.9-9 11.9-34 39.7-38.7 43.8-6.1 2.3-16-4-14.8-11.9z"/>
+		<path d="m145.3 50.95c-12.4 0-38.3 16.65-40.3 19.55-9.8 30.4-22 38-7.9 42.5s29-18 34.9-32.7l19.3 4.6" fill="url(#d)"/>
+		<path d="m103 191c0.9-1.6 20.5-25 29-33.7 7.2-7.1 20.2 4 12 13.7-10.4 12.3-17.6 21.3-26.8 28-5.9 1.6-15-2.4-14.3-8.1z"/>
+	</g>
+	<g fill="none">
+		<path d="m157 181l0.2-31-24.8-22.6"/>
+		<path d="m145.5 108.5c1.1 1.6 24 22.5 27 27 0.1 13.4 0.3 26.6 1.7 40"/>
+	</g>
+</g>
+</svg>

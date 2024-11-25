@@ -1,0 +1,179 @@
+---
+sidebar_position: 4
+tags:
+  - user
+  - guide
+  - reference
+  - state
+---
+
+# Release Scope
+
+## Release scope attributes
+
+The following attributes are children of the [`releaseScope`](../state-reference/global-attributes.mdx#release-scope) element:
+
+| Name                                                                | Type    | Values                                                    |
+| ------------------------------------------------------------------- | ------- | --------------------------------------------------------- |
+| [`releaseScope/commits`](#commits)                                  | list    | The [commits](#commit-objects) in the release scope       |
+| [`releaseScope/finalCommit`](#final-commit)                         | string  | The last [commit](#commit-objects) in the release scope   |
+| [`releaseScope/initialCommit`](#initial-commit)                     | string  | The first [commit](#commit-objects) in the release scope  |
+| [`releaseScope/previousVersion`](#previous-version)                 | string  | The previous version                                      |
+| [`releaseScope/previousVersionCommit`](#previous-version-commit)    | string  | The previous version [commit](#commit-objects)            |
+| [`releaseScope/primeVersion`](#prime-version)                       | string  | The prime version                                         |
+| [`releaseScope/primeVersionCommit`](#prime-version-commit)          | string  | The prime version [commit](#commit-objects)               |
+| [`releaseScope/significantCommits`](#significant-commits)           | list    | The significant [commits](#commit-objects)                |
+
+### Commits
+
+|                               |                                                                                          |
+| ----------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                          | `releaseScope/commits`                                                                   |
+| Type                          | list                                                                                     |
+| Related configuration options |                                                                                          |
+| Initialized by task           | <button class="button button--outline button--secondary">[infer](../introduction/how-nyx-works.mdx#infer)</button> <button class="button button--outline button--secondary">[mark](../introduction/how-nyx-works.mdx#mark)</button> |
+
+The ordered list of all [commits](#commit-objects) in the release scope. The list is reverse ordered, so the [newest commit](#final-commit) appears as the first element in the list, while the [oldest](#initial-commit) is the last in the list.
+
+This value may remain undefined when [inference](../introduction/how-nyx-works.mdx#infer) is skipped because the user overrides the [`version`](../configuration-reference/global-options.mdx#version).
+
+Furthermore this attribute may be changed by the [mark](../introduction/how-nyx-works.mdx#mark) task in case a new commit is added (i.e. to include generated release artifacts).
+
+### Final commit
+
+|                               |                                                                                          |
+| ----------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                          | `releaseScope/finalCommit`                                                               |
+| Type                          | string                                                                                   |
+| Related configuration options |                                                                                          |
+| Initialized by task           | <button class="button button--outline button--secondary">[infer](../introduction/how-nyx-works.mdx#infer)</button> <button class="button button--outline button--secondary">[mark](../introduction/how-nyx-works.mdx#mark)</button> |
+
+The last [commit](#commit-objects) in the release scope, which is to say the commit to be tagged upon release, the latest commit in the current branch (`HEAD`). This is the first element of the [`commits`](#commits) list.
+
+This value may remain undefined when [inference](../introduction/how-nyx-works.mdx#infer) is skipped because the user overrides the [`version`](../configuration-reference/global-options.mdx#version) or if there is no further commits after the [previous version](#previous-version-commit).
+
+Furthermore this attribute may be changed by the [mark](../introduction/how-nyx-works.mdx#mark) task in case a new commit is added (i.e. to include generated release artifacts).
+
+### Initial commit
+
+|                               |                                                                                          |
+| ----------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                          | `releaseScope/initialCommit`                                                             |
+| Type                          | string                                                                                   |
+| Related configuration options | <button class="button button--outline button--success">[releaseLenient](../configuration-reference/global-options.mdx#release-lenient)</button> <button class="button button--outline button--success">[releasePrefix](../configuration-reference/global-options.mdx#release-prefix)</button> <button class="button button--outline button--success">[scheme](../configuration-reference/global-options.mdx#scheme)</button> |
+| Initialized by task           | <button class="button button--outline button--secondary">[infer](../introduction/how-nyx-works.mdx#infer)</button> <button class="button button--outline button--secondary">[mark](../introduction/how-nyx-works.mdx#mark)</button> |
+
+The [commit](#commit-objects) that became right after the [`releaseScope/previousVersionCommit`](#previous-version-commit), so the first commit in the range of commits belonging to the release being prepared. This is the last element of the [`commits`](#commits) list.
+
+This value may remain undefined when [inference](../introduction/how-nyx-works.mdx#infer) is skipped because the user overrides the [`version`](../configuration-reference/global-options.mdx#version) or if there is no further commits after the [previous version](#previous-version-commit).
+
+If no [`releaseScope/previousVersion`](#previous-version) is detected this value will be the root commit in the Git repository.
+
+### Previous version
+
+|                               |                                                                                          |
+| ----------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                          | `releaseScope/previousVersion`                                                           |
+| Type                          | string                                                                                   |
+| Related configuration options | <button class="button button--outline button--success">[initialVersion](../configuration-reference/global-options.mdx#initial-version)</button> <button class="button button--outline button--success">[releaseLenient](../configuration-reference/global-options.mdx#release-lenient)</button> <button class="button button--outline button--success">[releasePrefix](../configuration-reference/global-options.mdx#release-prefix)</button> <button class="button button--outline button--success">[releaseTypes/ID/collapseVersions](../configuration-reference/release-types.mdx#collapse-versions)</button> <button class="button button--outline button--success">[releaseTypes/ID/collapsedVersionQualifier](../configuration-reference/release-types.mdx#collapsed-version-qualifier)</button> <button class="button button--outline button--success">[releaseTypes/ID/filterTags](../configuration-reference/release-types.mdx#filter-tags)</button> <button class="button button--outline button--success">[scheme](../configuration-reference/global-options.mdx#scheme)</button> <button class="button button--outline button--success">[version](../configuration-reference/global-options.mdx#version)</button> |
+| Initialized by task           | <button class="button button--outline button--secondary">[infer](../introduction/how-nyx-works.mdx#infer)</button> |
+
+The version that was released before the one being created. This is the value of the version tag applied to the [`releaseScope/previousVersionCommit`](#previous-version-commit) and is found by browsing the commit history backward (in Git's natural order) until this tag that successfully matches the [release types filter](../configuration-reference/release-types.mdx#filter-tags) is found. Upon merge commits only the [first parent](../../resources/faq/how-does-nyx-deal-with-merge-commits-when-scanning-the-commit-history.mdx) is considered. The search stops at the first tag that is valid according to:
+
+* the version [`scheme`](../configuration-reference/global-options.mdx#scheme)
+* optional prefixes, according to [`releaseLenient`](../configuration-reference/global-options.mdx#release-lenient)
+* the tag filter defined using the [`filterTags`](../configuration-reference/release-types.mdx#filter-tags) option in the [release type](../configuration-reference/release-types.mdx).
+
+This value remains undefined when [inference](../introduction/how-nyx-works.mdx#infer) is skipped because the user overrides the [`version`](../configuration-reference/global-options.mdx#version).
+
+### Previous version commit
+
+|                               |                                                                                          |
+| ----------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                          | `releaseScope/previousVersionCommit`                                                     |
+| Type                          | string                                                                                   |
+| Related configuration options | <button class="button button--outline button--success">[initialVersion](../configuration-reference/global-options.mdx#initial-version)</button> <button class="button button--outline button--success">[releaseLenient](../configuration-reference/global-options.mdx#release-lenient)</button> <button class="button button--outline button--success">[releasePrefix](../configuration-reference/global-options.mdx#release-prefix)</button> <button class="button button--outline button--success">[releaseTypes/ID/collapseVersions](../configuration-reference/release-types.mdx#collapse-versions)</button> <button class="button button--outline button--success">[releaseTypes/ID/collapsedVersionQualifier](../configuration-reference/release-types.mdx#collapsed-version-qualifier)</button> <button class="button button--outline button--success">[releaseTypes/ID/filterTags](../configuration-reference/release-types.mdx#filter-tags)</button> <button class="button button--outline button--success">[scheme](../configuration-reference/global-options.mdx#scheme)</button> <button class="button button--outline button--success">[version](../configuration-reference/global-options.mdx#version)</button> |
+| Initialized by task           | <button class="button button--outline button--secondary">[infer](../introduction/how-nyx-works.mdx#infer)</button> |
+
+The [commit](#commit-objects) that the [`previousVersion`](#previous-version) tag points to.
+
+This value remains undefined when no previous version can be found in the commit history or [inference](../introduction/how-nyx-works.mdx#infer) is skipped because the user overrides the [`version`](../configuration-reference/global-options.mdx#version).
+
+### Prime version
+
+|                               |                                                                                          |
+| ----------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                          | `releaseScope/primeVersion`                                                              |
+| Type                          | string                                                                                   |
+| Related configuration options | <button class="button button--outline button--success">[initialVersion](../configuration-reference/global-options.mdx#initial-version)</button> <button class="button button--outline button--success">[releaseLenient](../configuration-reference/global-options.mdx#release-lenient)</button> <button class="button button--outline button--success">[releasePrefix](../configuration-reference/global-options.mdx#release-prefix)</button> <button class="button button--outline button--success">[releaseTypes/ID/collapseVersions](../configuration-reference/release-types.mdx#collapse-versions)</button> <button class="button button--outline button--success">[releaseTypes/ID/collapsedVersionQualifier](../configuration-reference/release-types.mdx#collapsed-version-qualifier)</button> <button class="button button--outline button--success">[scheme](../configuration-reference/global-options.mdx#scheme)</button> <button class="button button--outline button--success">[version](../configuration-reference/global-options.mdx#version)</button> |
+| Initialized by task           | <button class="button button--outline button--secondary">[infer](../introduction/how-nyx-works.mdx#infer)</button> |
+
+The version that is used as the baseline when bumping version numbers when the release type uses [collapsed versioning](../configuration-reference/release-types.mdx#collapse-versions) (the *pre-release* versioning).
+
+This is the first version tag that is encountered browsing the commit history backwards that only has *core* identifiers. It is also the value of the version tag applied to the [`releaseScope/primeVersionCommit`](#prime-version-commit). Upon merge commits only the [first parent](../../resources/faq/how-does-nyx-deal-with-merge-commits-when-scanning-the-commit-history.mdx) is considered. The search stops at the first tag that is valid according to:
+
+* the version [`scheme`](../configuration-reference/global-options.mdx#scheme)
+* optional prefixes, according to [`releaseLenient`](../configuration-reference/global-options.mdx#release-lenient)
+
+This value remains undefined when [inference](../introduction/how-nyx-works.mdx#infer) is skipped because the user overrides the [`version`](../configuration-reference/global-options.mdx#version). It also remains undefined when not using collapsed versioning.
+
+Also see [this F.A.Q.](../../resources/faq/how-does-collapsed-versioning-work.mdx) and [this post](../../resources/faq/whats-the-difference-between-the-prime-version-and-the-previous-version.mdx) for more on the *previous* and *prime* versions.
+
+### Prime version commit
+
+|                               |                                                                                          |
+| ----------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                          | `releaseScope/primeVersionCommit`                                                        |
+| Type                          | string                                                                                   |
+| Related configuration options | <button class="button button--outline button--success">[initialVersion](../configuration-reference/global-options.mdx#initial-version)</button> <button class="button button--outline button--success">[releaseLenient](../configuration-reference/global-options.mdx#release-lenient)</button> <button class="button button--outline button--success">[releasePrefix](../configuration-reference/global-options.mdx#release-prefix)</button> <button class="button button--outline button--success">[releaseTypes/ID/collapseVersions](../configuration-reference/release-types.mdx#collapse-versions)</button> <button class="button button--outline button--success">[releaseTypes/ID/collapsedVersionQualifier](../configuration-reference/release-types.mdx#collapsed-version-qualifier)</button> <button class="button button--outline button--success">[releaseTypes/ID/filterTags](../configuration-reference/release-types.mdx#filter-tags)</button> <button class="button button--outline button--success">[scheme](../configuration-reference/global-options.mdx#scheme)</button> <button class="button button--outline button--success">[version](../configuration-reference/global-options.mdx#version)</button> |
+| Initialized by task           | <button class="button button--outline button--secondary">[infer](../introduction/how-nyx-works.mdx#infer)</button> |
+
+The [commit](#commit-objects) that the [`primeVersion`](#prime-version) tag points to.
+
+This value remains undefined when no previous or prime version can be found in the commit history or [inference](../introduction/how-nyx-works.mdx#infer) is skipped because the user overrides the [`version`](../configuration-reference/global-options.mdx#version). It also remains undefined when not using collapsed versioning.
+
+### Significant commits
+
+|                               |                                                                                          |
+| ----------------------------- | ---------------------------------------------------------------------------------------- |
+| Name                          | `releaseScope/significantCommits`                                                        |
+| Type                          | list                                                                                     |
+| Related configuration options | <button class="button button--outline button--success">[commitMessageConventions/ID/bumpExpressions](../configuration-reference/commit-message-conventions.mdx#bump-expressions)</button> |
+| Initialized by task           | <button class="button button--outline button--secondary">[infer](../introduction/how-nyx-works.mdx#infer)</button> |
+
+The ordered list of all significant [commits](#commit-objects) in the release scope, considering commits to be *significant* when they bring information about some version identifier to bump, according to [`commitMessageConventions/<ID>/bumpExpressions`](../configuration-reference/commit-message-conventions.mdx#bump-expressions). The list is reverse ordered, so the [newest commit](#final-commit) appears as the first element in the list, while the [oldest](#initial-commit) is the last in the list.
+
+When the [current release type](../state-reference/global-attributes.mdx#release-type) uses [collapsed versioning](../configuration-reference/release-types.mdx#collapse-versions) significant commits may also include commits up to the [prime version commit](#prime-version-commit).
+
+When this list is empty the scope has no new commits at all or the commits that have been found do not yield to a new version.
+
+This value may remain undefined when [inference](../introduction/how-nyx-works.mdx#infer) is skipped because the user overrides the [`version`](../configuration-reference/global-options.mdx#version).
+
+## Commit objects
+
+Each commit in the release scope has the following properties:
+
+| Name                                                                | Type    | Values                                                          |
+| ------------------------------------------------------------------- | ------- | --------------------------------------------------------------- |
+| `sha`                                                               | string  | The SHA-1 identifier of the commit                              |
+| `date`                                                              | integer | The integer representing the commit timestamp                   |
+| `parents`                                                           | list    | The list of SHA-1 identifiers of parent commits                 |
+| `authorAction`                                                      | object  | The container for the commit author fields (see below)          |
+| `authorAction/identity`                                             | object  | The container for the commit author identity fields (see below) |
+| `authorAction/identity/name`                                        | string  | The commit author name                                          |
+| `authorAction/identity/email`                                       | string  | The commit author email (optional)                              |
+| `authorAction/timeStamp`                                            | object  | The commit author timestamp (optional)                          |
+| `authorAction/timeStamp/timeStamp`                                  | date    | The actual commit author timestamp                              |
+| `authorAction/timeStamp/timeZone`                                   | string  | The commit author time zone (optional)                          |
+| `commitAction`                                                      | object  | The container for the committer fields (see below)              |
+| `commitAction/identity`                                             | object  | The container for the committer identity fields (see below)     |
+| `commitAction/identity/name`                                        | string  | The committer name                                              |
+| `commitAction/identity/email`                                       | string  | The committer email (optional)                                  |
+| `commitAction/timeStamp`                                            | object  | The committer timestamp (optional)                              |
+| `commitAction/timeStamp/timeStamp`                                  | date    | The actual committer timestamp                                  |
+| `commitAction/timeStamp/timeZone`                                   | string  | The committer time zone (optional)                              |
+| `message`                                                           | object  | The container for the commit message (see below)                |
+| `message/fullMessage`                                               | string  | The entire commit message                                       |
+| `message/shortMessage`                                              | string  | The first line of the commit message                            |
+| `message/footers`                                                   | map     | The commit footers, each modelled as a name and value pair      |
+| `tags`                                                              | list    | The list of tags applied to the commit                          |
