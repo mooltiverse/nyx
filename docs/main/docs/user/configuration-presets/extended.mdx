@@ -69,7 +69,7 @@ This corresponds to the following configuration options:
 | [`releaseTypes/mainline/collapseVersions`](../configuration-reference/release-types.mdx#collapse-versions) | `false`                       |
 | [`releaseTypes/mainline/collapsedVersionQualifier`](../configuration-reference/release-types.mdx#collapsed-version-qualifier) | Empty      |
 | [`releaseTypes/mainline/description`](../configuration-reference/release-types.mdx#description) | Empty                                    |
-| [`releaseTypes/mainline/filterTags`](../configuration-reference/release-types.mdx#match-tags) | `"^({{configuration.releasePrefix}})?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)$"` |
+| [`releaseTypes/mainline/filterTags`](../configuration-reference/release-types.mdx#filter-tags) | `"^({{configuration.releasePrefix}})?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)$"` |
 | [`releaseTypes/mainline/gitCommit`](../configuration-reference/release-types.mdx#git-commit) | `"false"`                                   |
 | [`releaseTypes/mainline/gitCommitMessage`](../configuration-reference/release-types.mdx#git-commit-message) | Empty (use default)          |
 | [`releaseTypes/mainline/gitPush`](../configuration-reference/release-types.mdx#git-push) | `"true"`                                        |
@@ -85,7 +85,7 @@ This corresponds to the following configuration options:
 | [`releaseTypes/integration/collapseVersions`](../configuration-reference/release-types.mdx#collapse-versions) | `true`                     |
 | [`releaseTypes/integration/collapsedVersionQualifier`](../configuration-reference/release-types.mdx#collapsed-version-qualifier) | `"{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}"` |
 | [`releaseTypes/integration/description`](../configuration-reference/release-types.mdx#description) | Empty                                 |
-| [`releaseTypes/integration/filterTags`](../configuration-reference/release-types.mdx#match-tags) | `"^({{configuration.releasePrefix}})?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)(-(develop`&#124;`development`&#124;`integration`&#124;`latest)(\.([0-9]\d*))?)$"` |
+| [`releaseTypes/integration/filterTags`](../configuration-reference/release-types.mdx#filter-tags) | `"^({{configuration.releasePrefix}})?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)(-(develop`&#124;`development`&#124;`integration`&#124;`latest)(\.([0-9]\d*))?)$"` |
 | [`releaseTypes/integration/gitCommit`](../configuration-reference/release-types.mdx#git-commit) | `"false"`                                |
 | [`releaseTypes/integration/gitCommitMessage`](../configuration-reference/release-types.mdx#git-commit-message) | Empty (use default)       |
 | [`releaseTypes/integration/gitPush`](../configuration-reference/release-types.mdx#git-push) | `"true"`                                     |
@@ -101,7 +101,7 @@ This corresponds to the following configuration options:
 | [`releaseTypes/maturity/collapseVersions`](../configuration-reference/release-types.mdx#collapse-versions) | `true`                        |
 | [`releaseTypes/maturity/collapsedVersionQualifier`](../configuration-reference/release-types.mdx#collapsed-version-qualifier) | `"{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}"` |
 | [`releaseTypes/maturity/description`](../configuration-reference/release-types.mdx#description) | Empty                                    |
-| [`releaseTypes/maturity/filterTags`](../configuration-reference/release-types.mdx#match-tags) | `"^({{configuration.releasePrefix}})?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)(-(alpha`&#124;`beta`&#124;`gamma`&#124;`delta`&#124;`epsilon`&#124;`zeta`&#124;`eta`&#124;`theta`&#124;`iota`&#124;`kappa`&#124;`lambda`&#124;`mu`&#124;`nu`&#124;`xi`&#124;`omicron`&#124;`pi`&#124;`rho`&#124;`sigma`&#124;`tau`&#124;`upsilon`&#124;`phi`&#124;`chi`&#124;`psi`&#124;`omega)(\.([0-9]\d*))?)?$"` |
+| [`releaseTypes/maturity/filterTags`](../configuration-reference/release-types.mdx#filter-tags) | `"^({{configuration.releasePrefix}})?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)(-(alpha`&#124;`beta`&#124;`gamma`&#124;`delta`&#124;`epsilon`&#124;`zeta`&#124;`eta`&#124;`theta`&#124;`iota`&#124;`kappa`&#124;`lambda`&#124;`mu`&#124;`nu`&#124;`xi`&#124;`omicron`&#124;`pi`&#124;`rho`&#124;`sigma`&#124;`tau`&#124;`upsilon`&#124;`phi`&#124;`chi`&#124;`psi`&#124;`omega)(\.([0-9]\d*))?)?$"` |
 | [`releaseTypes/maturity/gitCommit`](../configuration-reference/release-types.mdx#git-commit) | `"false"`                                   |
 | [`releaseTypes/maturity/gitCommitMessage`](../configuration-reference/release-types.mdx#git-commit-message) | Empty (use default)          |
 | [`releaseTypes/maturity/gitPush`](../configuration-reference/release-types.mdx#git-push) | `"true"`                                        |
@@ -117,7 +117,7 @@ This corresponds to the following configuration options:
 | [`releaseTypes/feature/collapseVersions`](../configuration-reference/release-types.mdx#collapse-versions) | `true`                         |
 | [`releaseTypes/feature/collapsedVersionQualifier`](../configuration-reference/release-types.mdx#collapsed-version-qualifier) | `"{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}"` |
 | [`releaseTypes/feature/description`](../configuration-reference/release-types.mdx#description) | Empty                                     |
-| [`releaseTypes/feature/filterTags`](../configuration-reference/release-types.mdx#match-tags) | `"^({{configuration.releasePrefix}})?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)(-(feat`&#124;`feature)(([0-9a-zA-Z]*)(\.([0-9]\d*))?)?)$"` |
+| [`releaseTypes/feature/filterTags`](../configuration-reference/release-types.mdx#filter-tags) | `"^({{configuration.releasePrefix}})?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)(-(feat`&#124;`feature)(([0-9a-zA-Z]*)(\.([0-9]\d*))?)?)$"` |
 | [`releaseTypes/feature/gitCommit`](../configuration-reference/release-types.mdx#git-commit) | `"false"`                                    |
 | [`releaseTypes/feature/gitCommitMessage`](../configuration-reference/release-types.mdx#git-commit-message) | Empty (use default)           |
 | [`releaseTypes/feature/gitPush`](../configuration-reference/release-types.mdx#git-push) | `"false"`                                        |
@@ -133,7 +133,7 @@ This corresponds to the following configuration options:
 | [`releaseTypes/fix/collapseVersions`](../configuration-reference/release-types.mdx#collapse-versions) | `true`                             |
 | [`releaseTypes/fix/collapsedVersionQualifier`](../configuration-reference/release-types.mdx#collapsed-version-qualifier) | `"{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}"` |
 | [`releaseTypes/fix/description`](../configuration-reference/release-types.mdx#description) | Empty                                         |
-| [`releaseTypes/fix/filterTags`](../configuration-reference/release-types.mdx#match-tags) | `"^({{configuration.releasePrefix}})?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)(-fix(([0-9a-zA-Z]*)(\.([0-9]\d*))?)?)$"` |
+| [`releaseTypes/fix/filterTags`](../configuration-reference/release-types.mdx#filter-tags) | `"^({{configuration.releasePrefix}})?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)(-fix(([0-9a-zA-Z]*)(\.([0-9]\d*))?)?)$"` |
 | [`releaseTypes/fix/gitCommit`](../configuration-reference/release-types.mdx#git-commit) | `"false"`                                        |
 | [`releaseTypes/fix/gitCommitMessage`](../configuration-reference/release-types.mdx#git-commit-message) | Empty (use default)               |
 | [`releaseTypes/fix/gitPush`](../configuration-reference/release-types.mdx#git-push) | `"true"`                                             |
@@ -149,7 +149,7 @@ This corresponds to the following configuration options:
 | [`releaseTypes/hotfix/collapseVersions`](../configuration-reference/release-types.mdx#collapse-versions) | `true`                          |
 | [`releaseTypes/hotfix/collapsedVersionQualifier`](../configuration-reference/release-types.mdx#collapsed-version-qualifier) | `"{{#sanitizeLower}}{{branch}}{{/sanitizeLower}}"` |
 | [`releaseTypes/hotfix/description`](../configuration-reference/release-types.mdx#description) | Empty                                      |
-| [`releaseTypes/hotfix/filterTags`](../configuration-reference/release-types.mdx#match-tags) | `"^({{configuration.releasePrefix}})?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)(-hotfix(([0-9a-zA-Z]*)(\.([0-9]\d*))?)?)$"` |
+| [`releaseTypes/hotfix/filterTags`](../configuration-reference/release-types.mdx#filter-tags) | `"^({{configuration.releasePrefix}})?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)(-hotfix(([0-9a-zA-Z]*)(\.([0-9]\d*))?)?)$"` |
 | [`releaseTypes/hotfix/gitCommit`](../configuration-reference/release-types.mdx#git-commit) | `"false"`                                     |
 | [`releaseTypes/hotfix/gitCommitMessage`](../configuration-reference/release-types.mdx#git-commit-message) | Empty (use default)            |
 | [`releaseTypes/hotfix/gitPush`](../configuration-reference/release-types.mdx#git-push) | `"true"`                                          |
@@ -165,7 +165,7 @@ This corresponds to the following configuration options:
 | [`releaseTypes/release/collapseVersions`](../configuration-reference/release-types.mdx#collapse-versions) | `true`                         |
 | [`releaseTypes/release/collapsedVersionQualifier`](../configuration-reference/release-types.mdx#collapsed-version-qualifier) | `"{{#firstLower}}{{branch}}{{/firstLower}}"` |
 | [`releaseTypes/release/description`](../configuration-reference/release-types.mdx#description) | Empty                                     |
-| [`releaseTypes/release/filterTags`](../configuration-reference/release-types.mdx#match-tags) | `"^({{configuration.releasePrefix}})?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)(-(rel`&#124;`release)((\.([0-9]\d*))?)?)$"` |
+| [`releaseTypes/release/filterTags`](../configuration-reference/release-types.mdx#filter-tags) | `"^({{configuration.releasePrefix}})?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)(-(rel`&#124;`release)((\.([0-9]\d*))?)?)$"` |
 | [`releaseTypes/release/gitCommit`](../configuration-reference/release-types.mdx#git-commit) | `"false"`                                    |
 | [`releaseTypes/release/gitCommitMessage`](../configuration-reference/release-types.mdx#git-commit-message) | Empty (use default)           |
 | [`releaseTypes/release/gitPush`](../configuration-reference/release-types.mdx#git-push) | `"true"`                                         |
@@ -181,7 +181,7 @@ This corresponds to the following configuration options:
 | [`releaseTypes/maintenance/collapseVersions`](../configuration-reference/release-types.mdx#collapse-versions) | `false`                    |
 | [`releaseTypes/maintenance/collapsedVersionQualifier`](../configuration-reference/release-types.mdx#collapsed-version-qualifier) | Empty   |
 | [`releaseTypes/maintenance/description`](../configuration-reference/release-types.mdx#description) | Empty                                 |
-| [`releaseTypes/maintenance/filterTags`](../configuration-reference/release-types.mdx#match-tags) | `"^({{configuration.releasePrefix}})?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)$"` |
+| [`releaseTypes/maintenance/filterTags`](../configuration-reference/release-types.mdx#filter-tags) | `"^({{configuration.releasePrefix}})?([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)$"` |
 | [`releaseTypes/maintenance/gitCommit`](../configuration-reference/release-types.mdx#git-commit) | `"false"`                                |
 | [`releaseTypes/maintenance/gitCommitMessage`](../configuration-reference/release-types.mdx#git-commit-message) | Empty (use default)       |
 | [`releaseTypes/maintenance/gitPush`](../configuration-reference/release-types.mdx#git-push) | `"true"`                                     |
@@ -197,7 +197,7 @@ This corresponds to the following configuration options:
 | [`releaseTypes/internal/collapseVersions`](../configuration-reference/release-types.mdx#collapse-versions) | `true`                        |
 | [`releaseTypes/internal/collapsedVersionQualifier`](../configuration-reference/release-types.mdx#collapsed-version-qualifier) |`"internal"`|
 | [`releaseTypes/internal/description`](../configuration-reference/release-types.mdx#description) | Empty                                    |
-| [`releaseTypes/internal/filterTags`](../configuration-reference/release-types.mdx#match-tags) | Empty                                      |
+| [`releaseTypes/internal/filterTags`](../configuration-reference/release-types.mdx#filter-tags) | Empty                                     |
 | [`releaseTypes/internal/gitCommit`](../configuration-reference/release-types.mdx#git-commit) | `"false"`                                   |
 | [`releaseTypes/internal/gitCommitMessage`](../configuration-reference/release-types.mdx#git-commit-message) | Empty (use default)          |
 | [`releaseTypes/internal/gitPush`](../configuration-reference/release-types.mdx#git-push) | `"false"`                                       |
