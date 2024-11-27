@@ -439,3 +439,4 @@ jobs:
       nyx-cache-name-restore-suffix: ${{ needs.initialize.outputs.nyx-cache-name-suffix }}
       gradle-cache-name-restore-suffix: ${{ needs.docusaurus-build.outputs.gradle-cache-name-suffix }}
       docusaurus-cache-name-restore-suffix: ${{ needs.docusaurus-build.outputs.docusaurus-cache-name-suffix }}
+      path: 'docs/main/build'

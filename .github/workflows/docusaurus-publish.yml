@@ -172,6 +172,27 @@ on:
         type: string
         required: false
         default: "${{ github.job }}"
+      path:
+        description: |-
+          The path, relative to the local repository, where the site artifacts
+          to publish are.
+          Note this must be the path of the built site, not the site source.
+          Default: docs
+        type: string
+        required: false
+        default: "docs"
+      enable-github-pages:
+        description: |-
+          Whether to deploy the site to GitHub pages or not.
+          GitHub pages must be enabled for the repository or the whole
+          organization in advance, through GitHub settings.
+          Sites are supposed to be published to GitHub pages only from the
+          'main' branch (default for this workflow), but you can override
+          this using this input value.
+          Default: \$\{\{ github.ref == 'refs/heads/main' \}\} (true when the current branch is 'main')
+        type: boolean
+        required: false
+        default: ${{ github.ref == 'refs/heads/main' }}
     secrets:
       gradle-secret-arguments:
         description: |-
@@ -204,6 +225,16 @@ jobs:
   publish:
     name: Publish
     runs-on: ${{ inputs.runs-on }}
+    permissions:
+      # Grant GITHUB_TOKEN the permissions required to make a Pages deployment.
+      # Here we need to grant the extra permissions 'pages' and 'id-token' in addition to the
+      # standard ones.
+      contents: read    # to fetch the Git repository contents
+      pages: write      # to deploy to Pages
+      id-token: write   # to verify the deployment originates from an appropriate source
+    #environment:
+    #  name: github-pages
+    #  url: ${{ steps.github-pages-deploy.outputs.page_url }}
     steps:
     # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
     # with '@main' as soon as the branch has been merged to main.
@@ -243,9 +274,19 @@ jobs:
         cache-name-prefix: ${{ inputs.gradle-cache-name-prefix }}
         # Restore the cache from the previous job to 'chain' the two caches
         cache-name-restore-suffix: ${{ inputs.gradle-cache-name-restore-suffix }}
-    - name: Publish the Docusaurus sites
+    - name: Publish the Docusaurus sites using Gradle scripts
       shell: bash
       run: ./gradlew ${{ inputs.gradle-arguments }} ${{ secrets.gradle-secret-arguments }} ${{ env.GRADLE_EXTRA_OPTS }} ${{ inputs.gradle-tasks }}
+    - id: github-pages-upload
+      name: Upload the Docusaurus site to GitHub Pages
+      if: ${{ inputs.enable-github-pages }}
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: ${{ inputs.path }}
+    - id: github-pages-deploy
+      name: Deploy the Docusaurus site to GitHub Pages
+      if: ${{ inputs.enable-github-pages }}
+      uses: actions/deploy-pages@v4
     outputs:
       docusaurus-cache-name-suffix: ${{ steps.docusaurus.outputs.cache-name-suffix }}
       gradle-cache-name-suffix: ${{ steps.gradle.outputs.cache-name-suffix }}
