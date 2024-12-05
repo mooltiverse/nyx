@@ -212,6 +212,12 @@ on:
         type: boolean
         required: false
         default: false
+      aws-region:
+        description: |-
+          The AWS region to use for remote API.
+          This is usually the value of the AWS_REGION environment variable.
+        type: string
+        required: false
       aws-access-key-id:
         description: |-
           The AWS access key ID to use for remote API.
@@ -323,15 +329,18 @@ jobs:
       name: Deploy the Docusaurus site to GitHub Pages
       if: ${{ inputs.enable-github-pages }}
       uses: actions/deploy-pages@v4
+    - name: Authenticating to AWS in region ${{ inputs.aws-region }} with access key ${{ inputs.aws-access-key-id }}
+      uses: aws-actions/configure-aws-credentials@v4
+      if: ${{ inputs.enable-s3-bucket }}
+      with:
+        aws-region: ${{ inputs.aws-region }}
+        aws-access-key-id: ${{ inputs.aws-access-key-id }}
+        aws-secret-access-key: ${{ secrets.aws-secret-access-key }}
     - id: s3-bucket-upload
       name: Upload the Docusaurus site to S3
       if: ${{ inputs.enable-s3-bucket }}
-      uses: shallwefootball/s3-upload-action@master
-      with:
-        aws_key_id: ${{ inputs.aws-access-key-id }}
-        aws_secret_access_key: ${{ secrets.aws-secret-access-key}}
-        aws_bucket: ${{ inputs.aws-s3-bucket }}
-        source_dir: ${{ inputs.path }}
+      shell: bash
+      run: aws s3 sync ${{ inputs.path }} s3://${{ inputs.aws-s3-bucket }} --delete
     outputs:
       docusaurus-cache-name-suffix: ${{ steps.docusaurus.outputs.cache-name-suffix }}
       gradle-cache-name-suffix: ${{ steps.gradle.outputs.cache-name-suffix }}
