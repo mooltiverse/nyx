@@ -32,6 +32,7 @@ bin/
 .nyx-state.json
 CHANGELOG.md
 .nyx-*.*
+!docs/main/docs/_includes/.nyx-*.*
 
 # MacOS files
 .DS_Store
