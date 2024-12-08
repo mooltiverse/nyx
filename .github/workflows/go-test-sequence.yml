@@ -273,7 +273,7 @@ jobs:
       if: ${{ always() }}
       with:
         name: go-unit-test-reports
-        path: src/go/**/build/test/reports/unit/
+        path: src/go/**/build/test/unit/
     outputs:
       go-cache-name-suffix: ${{ steps.go.outputs.cache-name-suffix }}
       gradle-cache-name-suffix: ${{ steps.gradle.outputs.cache-name-suffix }}
@@ -330,7 +330,7 @@ jobs:
       if: ${{ always() }}
       with:
         name: go-integration-test-reports
-        path: src/go/**/build/test/reports/integration/
+        path: src/go/**/build/test/integration/
     outputs:
       go-cache-name-suffix: ${{ steps.go.outputs.cache-name-suffix }}
       gradle-cache-name-suffix: ${{ steps.gradle.outputs.cache-name-suffix }}
@@ -387,7 +387,7 @@ jobs:
       if: ${{ always() }}
       with:
         name: go-functional-test-reports
-        path: src/go/**/build/test/reports/functional/
+        path: src/go/**/build/test/functional/
     outputs:
       go-cache-name-suffix: ${{ steps.go.outputs.cache-name-suffix }}
       gradle-cache-name-suffix: ${{ steps.gradle.outputs.cache-name-suffix }}

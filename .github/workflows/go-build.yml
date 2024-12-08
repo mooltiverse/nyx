@@ -245,6 +245,18 @@ jobs:
     - name: Build the Go code
       shell: bash
       run: ./gradlew ${{ inputs.gradle-arguments }} ${{ secrets.gradle-secret-arguments }} ${{ env.GRADLE_EXTRA_OPTS }} ${{ inputs.gradle-tasks }}
+    - name: Publish the Go binary artifacts
+      uses: actions/upload-artifact@v4
+      if: ${{ always() }}
+      with:
+        name: go-binaries
+        path: src/go/**/build/bin/
+    - name: Publish the Go documentation artifacts
+      uses: actions/upload-artifact@v4
+      if: ${{ always() }}
+      with:
+        name: go-documentation
+        path: src/go/**/build/docs/
     outputs:
       go-cache-name-suffix: ${{ steps.go.outputs.cache-name-suffix }}
       gradle-cache-name-suffix: ${{ steps.gradle.outputs.cache-name-suffix }}

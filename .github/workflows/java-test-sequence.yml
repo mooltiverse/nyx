@@ -249,7 +249,7 @@ jobs:
       if: ${{ always() }}
       with:
         name: java-unit-test-reports
-        path: src/java/**/build/test/reports/unit/
+        path: src/java/**/build/test/unit/
     outputs:
       java-cache-name-suffix: ${{ steps.java.outputs.cache-name-suffix }}
       gradle-cache-name-suffix: ${{ steps.gradle.outputs.cache-name-suffix }}
@@ -304,7 +304,7 @@ jobs:
       if: ${{ always() }}
       with:
         name: java-integration-test-reports
-        path: src/java/**/build/test/reports/integration/
+        path: src/java/**/build/test/integration/
     outputs:
       java-cache-name-suffix: ${{ steps.java.outputs.cache-name-suffix }}
       gradle-cache-name-suffix: ${{ steps.gradle.outputs.cache-name-suffix }}
@@ -359,7 +359,7 @@ jobs:
       if: ${{ always() }}
       with:
         name: java-functional-test-reports
-        path: src/java/**/build/test/reports/functional/
+        path: src/java/**/build/test/functional/
     outputs:
       java-cache-name-suffix: ${{ steps.java.outputs.cache-name-suffix }}
       gradle-cache-name-suffix: ${{ steps.gradle.outputs.cache-name-suffix }}
