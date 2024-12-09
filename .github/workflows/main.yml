@@ -146,7 +146,7 @@ jobs:
     uses: mooltiverse/nyx/.github/workflows/java-test-sequence.yml@retrofitting
     with:
       verbosity: info
-      artifacts-name-prefix: ${{ matrix.java }}
+      artifacts-name-prefix: java-${{ matrix.java }}
       install-jdk: true
       install-jdk-version: ${{ matrix.java }}
       # Restore the cache from the previous job to 'chain' caches
@@ -253,7 +253,7 @@ jobs:
     with:
       verbosity: info
       runs-on: ${{ matrix.os }}
-      artifacts-name-prefix: ${{ matrix.os }}
+      artifacts-name-prefix: go-${{ matrix.os }}
       install-go: true
       install-go-version: 1.22.4
       install-jdk: true
