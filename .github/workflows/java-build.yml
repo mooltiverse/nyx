@@ -243,7 +243,7 @@ jobs:
       if: ${{ always() }}
       with:
         name: ${{ inputs.artifacts-name-prefix }}-${{ github.job }}-documentation
-        path: src/java/**/build/docs/
+        path: src/java/**/build/api/docs/
     outputs:
       java-cache-name-suffix: ${{ steps.java.outputs.cache-name-suffix }}
       gradle-cache-name-suffix: ${{ steps.gradle.outputs.cache-name-suffix }}

@@ -541,7 +541,7 @@ subprojects {
     archiveVersion = project.version
     archiveClassifier = null
     archiveExtension = 'tar.gz'
-    destinationDirectory = file("${buildDir}/docs")
+    destinationDirectory = file("${buildDir}/archives")
     compression = Compression.GZIP
 
     from(goDocsOutputDirectory) {
