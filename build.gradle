@@ -175,7 +175,7 @@ task deleteGitLabTestProjects() {
   }
 }
 
-task testClean() {
+task deepClean() {
   description 'Deletes all local and remote contents created by tests'
   group 'Build'
 
