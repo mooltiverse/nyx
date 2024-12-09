@@ -1,0 +1,5 @@
+# Ignore all the generated .md files stored in this directory
+# except the index.md, which is authored by hand.
+*.md
+!index.md
+*/**
