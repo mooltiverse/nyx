@@ -30,7 +30,6 @@ import (
 	slices "golang.org/x/exp/slices" // https://pkg.go.dev/golang.org/x/exp/slices
 
 	err "github.com/mooltiverse/nyx/src/go/errors"
-	. "github.com/mooltiverse/nyx/src/go/nyx"
 	cmd "github.com/mooltiverse/nyx/src/go/nyx/command"
 	cnf "github.com/mooltiverse/nyx/src/go/nyx/configuration"
 )

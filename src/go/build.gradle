@@ -262,7 +262,7 @@ subprojects {
     def binaryFile = new File("${buildDir}/bin", binaryName)
 
     // Create one 'goBuild-<PLATFORM>' task for each platform.
-    tasks.create(group: 'build', name: "goBuild${platformSuffix}", description: "Builds the Go binary for the ${targetPlatform} platform") {
+    tasks.create(group: 'build', name: "goBuild-${platformSuffix}", description: "Builds the Go binary for the ${targetPlatform} platform") {
       // Task dependencies
       dependsOn goModUpdate
 
@@ -289,7 +289,7 @@ subprojects {
     }
 
     // Make the overall lifecycle tasks depend on the flavor specific build tasks
-    tasks.assemble.dependsOn tasks.named("goBuild${platformSuffix}")
+    tasks.assemble.dependsOn tasks.named("goBuild-${platformSuffix}")
   }
 
   // This is a lifecycle task that will depend on other dynamically created
