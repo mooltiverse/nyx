@@ -63,6 +63,17 @@ on:
         type: string
         required: false
         default: "src:java:functionalTest"
+      artifacts-name-prefix:
+        description: |-
+          The prefix to use for the name of artifacts published by
+          the workflow.
+          This might be useful when using this workflow with a matrix
+          strategy and you need to avoid overlapping names in artifact
+          names published by multiple instances of the workflow.
+          Default: java
+        type: string
+        required: false
+        default: "java"
       install-jdk:
         description: |-
           Whether to install the JDK or not.
@@ -248,7 +259,7 @@ jobs:
       uses: actions/upload-artifact@v4
       if: ${{ always() }}
       with:
-        name: java-unit-test-reports
+        name: ${{ inputs.artifacts-name-prefix }}-${{ github.job }}-reports
         path: src/java/**/build/test/unit/
     outputs:
       java-cache-name-suffix: ${{ steps.java.outputs.cache-name-suffix }}
@@ -303,7 +314,7 @@ jobs:
       uses: actions/upload-artifact@v4
       if: ${{ always() }}
       with:
-        name: java-integration-test-reports
+        name: ${{ inputs.artifacts-name-prefix }}-${{ github.job }}-reports
         path: src/java/**/build/test/integration/
     outputs:
       java-cache-name-suffix: ${{ steps.java.outputs.cache-name-suffix }}
@@ -358,7 +369,7 @@ jobs:
       uses: actions/upload-artifact@v4
       if: ${{ always() }}
       with:
-        name: java-functional-test-reports
+        name: ${{ inputs.artifacts-name-prefix }}-${{ github.job }}-reports
         path: src/java/**/build/test/functional/
     outputs:
       java-cache-name-suffix: ${{ steps.java.outputs.cache-name-suffix }}

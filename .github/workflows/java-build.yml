@@ -40,6 +40,17 @@ on:
         type: string
         required: false
         default: "src:java:assemble"
+      artifacts-name-prefix:
+        description: |-
+          The prefix to use for the name of artifacts published by
+          the workflow.
+          This might be useful when using this workflow with a matrix
+          strategy and you need to avoid overlapping names in artifact
+          names published by multiple instances of the workflow.
+          Default: java
+        type: string
+        required: false
+        default: "java"
       install-jdk:
         description: |-
           Whether to install the JDK or not.
@@ -225,13 +236,13 @@ jobs:
       uses: actions/upload-artifact@v4
       if: ${{ always() }}
       with:
-        name: java-binaries
+        name: ${{ inputs.artifacts-name-prefix }}-${{ github.job }}-binaries
         path: src/java/**/build/jar/
     - name: Publish the Java documentation artifacts
       uses: actions/upload-artifact@v4
       if: ${{ always() }}
       with:
-        name: java-documentation
+        name: ${{ inputs.artifacts-name-prefix }}-${{ github.job }}-documentation
         path: src/java/**/build/docs/
     outputs:
       java-cache-name-suffix: ${{ steps.java.outputs.cache-name-suffix }}

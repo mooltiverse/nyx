@@ -63,6 +63,17 @@ on:
         type: string
         required: false
         default: "src:go:functionalTest"
+      artifacts-name-prefix:
+        description: |-
+          The prefix to use for the name of artifacts published by
+          the workflow.
+          This might be useful when using this workflow with a matrix
+          strategy and you need to avoid overlapping names in artifact
+          names published by multiple instances of the workflow.
+          Default: go
+        type: string
+        required: false
+        default: "go"
       install-jdk:
         description: |-
           Whether to install the JDK or not.
@@ -272,7 +283,7 @@ jobs:
       uses: actions/upload-artifact@v4
       if: ${{ always() }}
       with:
-        name: go-unit-test-reports
+        name: ${{ inputs.artifacts-name-prefix }}-${{ github.job }}-reports
         path: src/go/**/build/test/unit/
     outputs:
       go-cache-name-suffix: ${{ steps.go.outputs.cache-name-suffix }}
@@ -329,7 +340,7 @@ jobs:
       uses: actions/upload-artifact@v4
       if: ${{ always() }}
       with:
-        name: go-integration-test-reports
+        name: ${{ inputs.artifacts-name-prefix }}-${{ github.job }}-reports
         path: src/go/**/build/test/integration/
     outputs:
       go-cache-name-suffix: ${{ steps.go.outputs.cache-name-suffix }}
@@ -386,7 +397,7 @@ jobs:
       uses: actions/upload-artifact@v4
       if: ${{ always() }}
       with:
-        name: go-functional-test-reports
+        name: ${{ inputs.artifacts-name-prefix }}-${{ github.job }}-reports
         path: src/go/**/build/test/functional/
     outputs:
       go-cache-name-suffix: ${{ steps.go.outputs.cache-name-suffix }}
