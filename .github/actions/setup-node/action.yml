@@ -119,12 +119,12 @@ inputs:
       You can use a multi-line value here to specify multiple entries.
       For more see: https://github.com/marketplace/actions/changed-files.
       Default:
-        - src/node/**
-        - !src/node/**/build
+        src/node/**
+        !src/node/**/build
     required: false
     default: |-
-      - src/node/**
-      - !src/node/**/build
+      src/node/**
+      !src/node/**/build
   install-node:
     description: |-
       Whether to install Node or not.

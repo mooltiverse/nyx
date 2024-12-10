@@ -1,8 +1,6 @@
 module github.com/mooltiverse/nyx/src/go/nyx
 
-go 1.21
-
-toolchain go1.22.4
+go 1.23.1
 
 replace github.com/mooltiverse/nyx/src/go/errors => ../errors
 
@@ -16,11 +14,11 @@ require (
 	github.com/dlclark/regexp2 v1.11.4
 	github.com/go-git/go-git/v5 v5.12.0
 	github.com/google/go-github v17.0.0+incompatible
-	github.com/mooltiverse/nyx/src/go/errors v0.0.0-20240820142118-4618e76f719a
-	github.com/mooltiverse/nyx/src/go/utils v0.0.0-20240820142118-4618e76f719a
-	github.com/mooltiverse/nyx/src/go/version v0.0.0-20240820142118-4618e76f719a
+	github.com/mooltiverse/nyx/src/go/errors v0.0.0-00010101000000-000000000000
+	github.com/mooltiverse/nyx/src/go/utils v0.0.0-00010101000000-000000000000
+	github.com/mooltiverse/nyx/src/go/version v0.0.0-00010101000000-000000000000
 	github.com/sirupsen/logrus v1.9.3
-	github.com/stretchr/testify v1.9.0
+	github.com/stretchr/testify v1.10.0
 	github.com/xanzy/go-gitlab v0.108.0
 	golang.org/x/crypto v0.26.0
 	golang.org/x/exp v0.0.0-20240823005443-9b4947da3948

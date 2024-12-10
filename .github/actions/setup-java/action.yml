@@ -121,12 +121,12 @@ inputs:
       You can use a multi-line value here to specify multiple entries.
       For more see: https://github.com/marketplace/actions/changed-files.
       Default:
-        - src/java/**
-        - !src/java/**/build
+        src/java/**
+        !src/java/**/build
     required: false
     default: |-
-      - src/java/**
-      - !src/java/**/build
+      src/java/**
+      !src/java/**/build
   install-jdk:
     description: |-
       Whether to install the JDK or not.

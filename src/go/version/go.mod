@@ -1,10 +1,10 @@
 module github.com/mooltiverse/nyx/src/go/version
 
-go 1.20
+go 1.23.1
 
 require (
 	github.com/dlclark/regexp2 v1.11.4
-	github.com/stretchr/testify v1.8.0
+	github.com/stretchr/testify v1.10.0
 )
 
 require (

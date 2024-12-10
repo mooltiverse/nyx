@@ -123,16 +123,16 @@ inputs:
       You can use a multi-line value here to specify multiple entries.
       For more see: https://github.com/marketplace/actions/changed-files.
       Default:
-        - docs/**
-        - !docs/**/build/
-        - !docs/**/.docusaurus
-        - !docs/**/node_modules
+        docs/**
+        !docs/**/build/
+        !docs/**/.docusaurus
+        !docs/**/node_modules
     required: false
     default: |-
-      - docs/**
-      - !docs/**/build/
-      - !docs/**/.docusaurus
-      - !docs/**/node_modules
+      docs/**
+      !docs/**/build/
+      !docs/**/.docusaurus
+      !docs/**/node_modules
   install-node:
     description: |-
       Whether to install Node or not.

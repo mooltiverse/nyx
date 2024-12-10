@@ -483,6 +483,13 @@ subprojects {
     Additional tasks
   ----------------------------------------------------------------------------*/
   // This is a lifecycle task that will depend on other dynamically created
+  // tasks. One task for each Dockerfile (plain or flavoured) is created below.
+  // Since concrete tasks are not known in advance, the dependencies of this
+  // task on others are defined when those tasks are created.
+  task dockerBuild(group: 'build', description: 'Builds the Docker images') {
+  }
+
+  // This is a lifecycle task that will depend on other dynamically created
   // tasks. One task for each Docker Compose file (either anonymous or containing
   // a test suite name in its name) is created below.
   // Since concrete tasks are not known in advance, the dependencies of this
@@ -519,6 +526,19 @@ subprojects {
   }
 
   // This is a lifecycle task that will depend on other dynamically created
+  // tasks. One task for each Dockerfile (plain or flavoured) is created below.
+  // Since concrete tasks are not known in advance, the dependencies of this
+  // task on others are defined when those tasks are created.
+  task publish(group: 'publishing', description: 'Pushes the Docker images to remote registries') {
+    // Only perform publishing if the Nyx release type enables publishing
+    onlyIf { rootProject.nyxState.newRelease }
+  }
+
+  task deepClean(group: 'build', description: 'Clean the reproducible and reusable artifacts including caches, dependencies etc') {
+    dependsOn clean
+  }
+
+  // This is a lifecycle task that will depend on other dynamically created
   // tasks. One task for each Docker Compose file (either named or anonymous)
   // is created below.
   // Since concrete tasks are not known in advance, the dependencies of this
@@ -535,10 +555,11 @@ subprojects {
   }
 
   // This is a lifecycle task that will depend on other dynamically created
-  // tasks. One task for each Dockerfile (plain or flavoured) is created below.
+  // tasks. One task for each Docker Compose file (either named or anonymous)
+  // is created below.
   // Since concrete tasks are not known in advance, the dependencies of this
   // task on others are defined when those tasks are created.
-  task publish(group: 'publishing', description: 'Pushes the Docker images to remote registries') {
+  task dockerClean(group: 'build', description: 'Cleans Docker files and cached files') {
   }
 
   // Create tasks for each specific Docker flavor (if any) and the plain
@@ -762,9 +783,9 @@ subprojects {
       }
     }
 
-    // Create one 'dockerClean-<FLAVOR>' task for each flavor or the
-    // 'dockerImage' for the plain Dockerfile (which has no flavors).
-    tasks.create(group: 'build', name: "dockerClean${flavorSuffix}", description: "Deletes the local Docker images built from the ${dockerfile}") {
+    // Create one 'dockerCleanImage-<FLAVOR>' task for each flavor or the
+    // 'dockerCleanImage' for the plain Dockerfile (which has no flavors).
+    tasks.create(group: 'build', name: "dockerCleanImage${flavorSuffix}", description: "Deletes the local Docker images built from the ${dockerfile}") {
       doLast {
         if (resolvedTags(flavor, false)) {
           // Prepare the dynamic list of command line arguments
@@ -797,9 +818,9 @@ subprojects {
     }
 
     // Make the overall lifecycle tasks depend on the flavor specific build tasks
-    tasks.assemble.dependsOn tasks.named("dockerImage${flavorSuffix}")
+    tasks.dockerBuild.dependsOn tasks.named("dockerImage${flavorSuffix}")
     tasks.publish.dependsOn tasks.named("dockerPush${flavorSuffix}")
-    tasks.clean.dependsOn tasks.named("dockerClean${flavorSuffix}")
+    tasks.dockerClean.dependsOn tasks.named("dockerCleanImage${flavorSuffix}")
   }
 
   // Create tasks for each specific Docker Compose environment (if any) and the
@@ -1162,7 +1183,7 @@ subprojects {
     }
   }
 
-  task apiDocumentation(type: Tar, group: 'build', description: 'Builds the API documentation for this project') {
+  task apiDocumentationArchive(type: Tar, group: 'build', description: 'Builds the API documentation archive for this project') {
     // This task is of type Tar so:
     // - we can reuse its outputs for the project artifacts
     // - we can inherit its copying features from its AbstractCopyTask
@@ -1186,19 +1207,18 @@ subprojects {
     }
   }
 
+  // This is a lifecycle task that will depend on other specific tasks.
   task documentation(group: 'build', description: 'Builds the documentation for this project') {
-    dependsOn apiDocumentation
-  }
-
-  task deepClean(group: 'build', description: 'Clean the reproducible and reusable artifacts including caches, dependencies etc') {
-    dependsOn clean
+    dependsOn apiDocumentationArchive
   }
 
   /*----------------------------------------------------------------------------
     Additional task dependencies
     ----------------------------------------------------------------------------*/
+  tasks.assemble.dependsOn dockerBuild
   tasks.build.dependsOn documentation
   tasks.check.dependsOn test
+  tasks.clean.dependsOn dockerClean
 
   /*----------------------------------------------------------------------------
     Artifacts published by this project
@@ -1211,9 +1231,9 @@ subprojects {
     // configurations so that they can be consumed by other projects.
 
     // Expose the API documentation.
-    // Here we associate the outputs from the 'apiDocumentation' task to the
-    // 'apiDocumentation' configuration.
-    apiDocumentation tasks.apiDocumentation
+    // Here we associate the outputs from the 'apiDocumentationArchive' task
+    //  to the 'apiDocumentation' configuration.
+    apiDocumentation tasks.apiDocumentationArchive
   }
 }
 
@@ -1241,13 +1261,8 @@ task test(group: 'verification', description: 'Runs all the tests for the Docker
 }
 
 // This is just a lifecycle task
-task setUp(group: 'runtime', description: 'Sets up the runtime environment for the Docker image') {
-  dependsOn subprojects*.setUp
-}
-
-// This is just a lifecycle task
-task tearDown(group: 'runtime', description: 'Tears down the runtime environment for the Docker image') {
-  dependsOn subprojects*.tearDown
+task documentation(group: 'build', description: 'Builds the documentation for this project') {
+  dependsOn subprojects*.documentation
 }
 
 // This is just a lifecycle task
@@ -1256,11 +1271,6 @@ task publish(group: 'publishing', description: 'Publishes artifacts produced by 
   onlyIf { nyxState.newRelease }
 
   dependsOn subprojects*.publish
-}
-
-// This is just a lifecycle task
-task documentation(group: 'build', description: 'Builds the documentation for this project') {
-  dependsOn subprojects*.documentation
 }
 
 task deepClean(group: 'build', description: 'Clean the reproducible and reusable artifacts including caches, dependencies etc') {
@@ -1281,6 +1291,16 @@ task deepClean(group: 'build', description: 'Clean the reproducible and reusable
       commandLine 'docker', 'buildx', 'rm', '--all-inactive'
     }
   }
+}
+
+// This is just a lifecycle task
+task setUp(group: 'runtime', description: 'Sets up the runtime environment for the Docker image') {
+  dependsOn subprojects*.setUp
+}
+
+// This is just a lifecycle task
+task tearDown(group: 'runtime', description: 'Tears down the runtime environment for the Docker image') {
+  dependsOn subprojects*.tearDown
 }
 
 /*------------------------------------------------------------------------------

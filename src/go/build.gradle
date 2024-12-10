@@ -38,6 +38,15 @@ subprojects {
       canBeConsumed = true
       canBeResolved = false
     }
+    binaries {
+      // The 'binaries' configuration exposes the generated binary files.
+      // This configuration is 'consumable' so it can be used by other
+      // 'consumer' projects.
+      // Artifacts are added to this configuration by means of the
+      // 'binaries' artifact in the 'artifacts' section.
+      canBeConsumed = true
+      canBeResolved = false
+    }
   }
 
   dependencies {
@@ -53,12 +62,11 @@ subprojects {
   // The 'modulePath' from the project properties
   ext.modulePath = project.getProperty("modulePath")
 
+  // The directory where Go binaries have to be stored.
+  ext.goBinOutputDirectory = new File(buildDir, "bin/")
+
   // The directory where Go docs have to be stored.
   ext.goDocsOutputDirectory = new File(buildDir, "api/docs/")
-
-  // Define the value to use for the GOPATH variable so it's set locally to
-  // the project instead of globally.
-  ext.goPath = new File(buildDir, '/go')
 
   // Define the value to use for the GOPATH variable when installing the tools
   // used to generate the documentation.
@@ -86,9 +94,61 @@ subprojects {
     } else return null
   }
 
+  // Returns the map of test groups for this project and their associated directories.
+  // Test groups may be: 'unit', 'integration', 'functional'.
+  ext.testGroups = {
+    return [ 'unit', 'integration', 'functional' ]
+  }
+
   /*----------------------------------------------------------------------------
     Additional tasks
   ----------------------------------------------------------------------------*/
+  // This is a lifecycle task that will depend on other dynamically created
+  // tasks.
+  // Since concrete tasks are not known in advance, the dependencies of this
+  // task on others are defined when those tasks are created.
+  task goBuild(group: 'build', description: 'Builds the Go binaries') {
+  }
+
+  // This is a lifecycle task that will depend on other dynamically created
+  // tasks.
+  // Since concrete tasks are not known in advance, the dependencies of this
+  // task on others are defined when those tasks are created.
+  task unitTest(group: 'verification', description: 'Runs the unit tests for the Go binaries') {
+  }
+
+  // This is a lifecycle task that will depend on other dynamically created
+  // tasks.
+  // Since concrete tasks are not known in advance, the dependencies of this
+  // task on others are defined when those tasks are created.
+  task integrationTest(group: 'verification', description: 'Runs the integration tests for the Go binaries') {
+    // When they are all in the execution plan, run faster tests first.
+    mustRunAfter unitTest
+  }
+
+  // This is a lifecycle task that will depend on other dynamically created
+  // tasks.
+  // Since concrete tasks are not known in advance, the dependencies of this
+  // task on others are defined when those tasks are created.
+  task functionalTest(group: 'verification', description: 'Runs the functional tests for the Go binaries') {
+    // When they are all in the execution plan, run faster tests first.
+    mustRunAfter unitTest
+    mustRunAfter integrationTest
+  }
+
+  // This is a lifecycle task that will depend on other specific test tasks.
+  task test(group: 'verification', description: 'Runs all the tests for the Go binaries') {
+    dependsOn unitTest
+    dependsOn integrationTest
+    dependsOn functionalTest
+  }
+
+  task deepClean(group: 'build', description: 'Clean the reproducible and reusable artifacts including caches, dependencies etc') {
+    dependsOn clean
+
+    // No other particular contents to clean so far in this task
+  }
+
   task goClean(group: 'build', description: 'Cleans Go object files and cached files') {
     // Declare inputs and outputs of this task
     inputs.dir(projectDir)
@@ -99,7 +159,7 @@ subprojects {
       exec {
         logging.captureStandardOutput LogLevel.QUIET
         logging.captureStandardError  LogLevel.ERROR
-        environment 'GOPATH', goPath.path
+        workingDir projectDir
         commandLine 'go', 'clean', '-r', '-cache', '-testcache', '-modcache'
       }
     }
@@ -125,7 +185,7 @@ subprojects {
       exec {
         logging.captureStandardOutput LogLevel.QUIET
         logging.captureStandardError  LogLevel.ERROR
-        environment 'GOPATH', goPath.path
+        workingDir projectDir
         commandLine 'go', 'mod', 'init', modulePath
       }
     }
@@ -146,8 +206,8 @@ subprojects {
       exec {
         logging.captureStandardOutput LogLevel.QUIET
         logging.captureStandardError  LogLevel.ERROR
-        environment 'GOPATH', goPath.path
-        commandLine 'go', 'mod', 'tidy', '-v', '-e'
+        workingDir projectDir
+        commandLine 'go', 'mod', 'tidy', '-v'
       }
     }
   }
@@ -167,7 +227,7 @@ subprojects {
       exec {
         logging.captureStandardOutput LogLevel.QUIET
         logging.captureStandardError  LogLevel.ERROR
-        environment 'GOPATH', goPath.path
+        workingDir projectDir
         commandLine 'go', 'get', '-u', '-v'
       }
     }
@@ -183,6 +243,7 @@ subprojects {
         logging.captureStandardOutput LogLevel.QUIET
         logging.captureStandardError  LogLevel.ERROR
         environment 'GOPATH', goDocPath.path
+        workingDir projectDir
         commandLine 'go', 'install', 'golang.org/x/tools/cmd/godoc@latest'
       }
     }
@@ -198,6 +259,7 @@ subprojects {
         logging.captureStandardOutput LogLevel.QUIET
         logging.captureStandardError  LogLevel.ERROR
         environment 'GOPATH', goDocPath.path
+        workingDir projectDir
         commandLine 'go', 'install', 'github.com/robertkrimen/godocdown/godocdown@latest'
       }
     }
@@ -221,6 +283,8 @@ subprojects {
       exec {
         logging.captureStandardOutput LogLevel.QUIET
         logging.captureStandardError  LogLevel.ERROR
+        environment 'GOPATH', goDocPath.path
+        workingDir projectDir
         commandLine goDocExecutable
       }
     }
@@ -247,6 +311,8 @@ subprojects {
       exec {
         logging.captureStandardOutput LogLevel.QUIET
         logging.captureStandardError  LogLevel.ERROR
+        environment 'GOPATH', goDocPath.path
+        workingDir projectDir
         commandLine goDocDownExecutable, '-plain', "-output=${outputFile}", '.'
       }
     }
@@ -259,7 +325,7 @@ subprojects {
     def extension = os == 'windows' ? '.exe' : ''
     def platformSuffix = "${os}-${arch}"
     def binaryName = (project.hasProperty("moduleName") ? project.getProperty("moduleName") : project.name) + '-' + platformSuffix + extension
-    def binaryFile = new File("${buildDir}/bin", binaryName)
+    def binaryFile = new File(goBinOutputDirectory, binaryName)
 
     // Create one 'goBuild-<PLATFORM>' task for each platform.
     tasks.create(group: 'build', name: "goBuild-${platformSuffix}", description: "Builds the Go binary for the ${targetPlatform} platform") {
@@ -276,193 +342,101 @@ subprojects {
       doLast {
         logger.quiet("Building the Go binary '${binaryName}' for the '${targetPlatform}' platform")
         exec {
+            logging.captureStandardOutput LogLevel.QUIET
+            logging.captureStandardError  LogLevel.ERROR
             environment 'GOOS', os
             environment 'GOARCH', arch
             environment 'CGO_ENABLED', "0" // use full static linking, which also makes it compatible with Alpine Linux
             workingDir projectDir
-            logging.captureStandardOutput LogLevel.QUIET
-            logging.captureStandardError  LogLevel.ERROR
-            environment 'GOPATH', goPath.path
             commandLine 'go', 'build', '-o', binaryFile, '-ldflags=.="-X=main.release='+rootProject.version+'"', modulePath
         }
       }
     }
 
     // Make the overall lifecycle tasks depend on the flavor specific build tasks
-    tasks.assemble.dependsOn tasks.named("goBuild-${platformSuffix}")
+    tasks.goBuild.dependsOn tasks.named("goBuild-${platformSuffix}")
   }
 
-  // This is a lifecycle task that will depend on other dynamically created
-  // tasks.
-  task unitTest(group: 'verification', description: 'Runs the unit tests for the Go binaries') {
-    // Task dependencies
-    dependsOn goModUpdate
+  // Create tasks for each specific test groups.
+  testGroups().each { group ->
+    // The test group name, capitalized
+    def groupCapitalized = group.capitalize()
 
-    def testOutputDir = new File(buildDir, 'test/unit')
-    def coverageProfileFile = new File(testOutputDir, 'coverageprofile.out')
-    def coverageReportFile = new File(testOutputDir, 'coveragereport.html')
-
-    // Declare inputs and outputs of this task
-    inputs.files(fileTree(projectDir).filter { File f ->
-      f.name.endsWith(".go") || f.name.endsWith(".mod") || f.name.endsWith(".sum")
-    })
-    outputs.file(coverageProfileFile)
-    outputs.file(coverageReportFile)
-
-    doLast {
-      // CUSTOMIZATIONS ON THE STANDARD BUILD SCRIPT - START
-      // Pass the name of the configuration file examples to tests. These are passed as environment variables.
-      // We use the same files used for the documentation here.
-      def testEnvironmentVariables = [:]
-      testEnvironmentVariables['extendedJSONExampleConfigurationFile']=file("$rootDir/docs/main/docs/_includes/.nyx-extended.json").absolutePath
-      testEnvironmentVariables['mediumJSONExampleConfigurationFile']=file("$rootDir/docs/main/docs/_includes/.nyx-medium.json").absolutePath
-      testEnvironmentVariables['simpleJSONExampleConfigurationFile']=file("$rootDir/docs/main/docs/_includes/.nyx-simple.json").absolutePath
-      testEnvironmentVariables['simplestJSONExampleConfigurationFile']=file("$rootDir/docs/main/docs/_includes/.nyx-simplest.json").absolutePath
-      testEnvironmentVariables['extendedYAMLExampleConfigurationFile']=file("$rootDir/docs/main/docs/_includes/.nyx-extended.yaml").absolutePath
-      testEnvironmentVariables['mediumYAMLExampleConfigurationFile']=file("$rootDir/docs/main/docs/_includes/.nyx-medium.yaml").absolutePath
-      testEnvironmentVariables['simpleYAMLExampleConfigurationFile']=file("$rootDir/docs/main/docs/_includes/.nyx-simple.yaml").absolutePath
-      testEnvironmentVariables['simplestYAMLExampleConfigurationFile']=file("$rootDir/docs/main/docs/_includes/.nyx-simplest.yaml").absolutePath
-      // CUSTOMIZATIONS ON THE STANDARD BUILD SCRIPT - END
-
-      logger.quiet("Running unit tests for Go module '${modulePath}'")
-      exec {
-        environment += testEnvironmentVariables // CUSTOMIZATIONS ON THE STANDARD BUILD SCRIPT
-        logging.captureStandardOutput LogLevel.QUIET
-        logging.captureStandardError  LogLevel.ERROR
-        environment 'GOPATH', goPath.path
-        // note that with '--tags=unit' we only run tests declared in files with the '+build unit' directive on top
-        commandLine 'go', 'test', '--tags=unit', '-coverpkg=./...', "-coverprofile=${coverageProfileFile}", '-v', '.'
+    // Create one 'go<GROUP>Test' task for each group.
+    // <GROUP> is replaced by the test group name (i.e. Unit, Integration,
+    // Functional).
+    tasks.create(group: 'verification', name: "go${groupCapitalized}Test", description: "Runs the ${group} tests for the Go binaries") {
+      // Task dependencies
+      dependsOn goModUpdate
+      if (group == 'functional') {
+        dependsOn goBuild
       }
 
-      logger.quiet("Rendering unit test coverage report for Go module '${modulePath}'")
-      exec {
-        logging.captureStandardOutput LogLevel.QUIET
-        logging.captureStandardError  LogLevel.ERROR
-        commandLine 'go', 'tool', 'cover', '-html', coverageProfileFile, '-o', coverageReportFile
+      def testOutputDir = new File(buildDir, "test/${group}")
+      def coverageProfileFile = new File(testOutputDir, 'coverageprofile.out')
+      def coverageReportFile = new File(testOutputDir, 'coveragereport.html')
+
+      // Declare inputs and outputs of this task
+      inputs.files(fileTree(projectDir).filter { File f ->
+        f.name.endsWith(".go") || f.name.endsWith(".mod") || f.name.endsWith(".sum")
+      })
+      outputs.file(coverageProfileFile)
+      outputs.file(coverageReportFile)
+
+      doLast {
+        // CUSTOMIZATIONS ON THE STANDARD BUILD SCRIPT - START
+        def testEnvironmentVariables = [:]
+        if (group == 'unit') {
+          // Pass the name of the configuration file examples to tests. These are passed as environment variables.
+          // We use the same files used for the documentation here.
+          // These are passed as environment variables and are only used for unit tests.
+          testEnvironmentVariables['extendedJSONExampleConfigurationFile']=file("$rootDir/docs/main/docs/_includes/.nyx-extended.json").absolutePath
+          testEnvironmentVariables['mediumJSONExampleConfigurationFile']=file("$rootDir/docs/main/docs/_includes/.nyx-medium.json").absolutePath
+          testEnvironmentVariables['simpleJSONExampleConfigurationFile']=file("$rootDir/docs/main/docs/_includes/.nyx-simple.json").absolutePath
+          testEnvironmentVariables['simplestJSONExampleConfigurationFile']=file("$rootDir/docs/main/docs/_includes/.nyx-simplest.json").absolutePath
+          testEnvironmentVariables['extendedYAMLExampleConfigurationFile']=file("$rootDir/docs/main/docs/_includes/.nyx-extended.yaml").absolutePath
+          testEnvironmentVariables['mediumYAMLExampleConfigurationFile']=file("$rootDir/docs/main/docs/_includes/.nyx-medium.yaml").absolutePath
+          testEnvironmentVariables['simpleYAMLExampleConfigurationFile']=file("$rootDir/docs/main/docs/_includes/.nyx-simple.yaml").absolutePath
+          testEnvironmentVariables['simplestYAMLExampleConfigurationFile']=file("$rootDir/docs/main/docs/_includes/.nyx-simplest.yaml").absolutePath
+        }
+        if (group == 'integration' || group == 'functional') {
+          // Pass the environment variables with credentials to access remote services.
+          // These are passed as environment variables and are only used for integration and functional tests.
+          testEnvironmentVariables['gitHubTestUserToken']=findProperty("gitHubTestUserToken")
+          testEnvironmentVariables['gitHubTestUserPublicKey']=findProperty("gitHubTestUserPublicKey")
+          testEnvironmentVariables['gitHubTestUserPrivateKeyPassphrase']=findProperty("gitHubTestUserPrivateKeyPassphrase")
+          testEnvironmentVariables['gitHubTestUserPrivateKeyWithPassphrase']=findProperty("gitHubTestUserPrivateKeyWithPassphrase")
+          testEnvironmentVariables['gitHubTestUserPrivateKeyWithoutPassphrase']=findProperty("gitHubTestUserPrivateKeyWithoutPassphrase")
+          testEnvironmentVariables['gitLabTestUserToken']=findProperty("gitLabTestUserToken")
+          testEnvironmentVariables['gitLabTestUserPublicKey']=findProperty("gitLabTestUserPublicKey")
+          testEnvironmentVariables['gitLabTestUserPrivateKeyPassphrase']=findProperty("gitLabTestUserPrivateKeyPassphrase")
+          testEnvironmentVariables['gitLabTestUserPrivateKeyWithPassphrase']=findProperty("gitLabTestUserPrivateKeyWithPassphrase")
+          testEnvironmentVariables['gitLabTestUserPrivateKeyWithoutPassphrase']=findProperty("gitLabTestUserPrivateKeyWithoutPassphrase")
+        }
+        // CUSTOMIZATIONS ON THE STANDARD BUILD SCRIPT - END
+
+        logger.quiet("Running ${group} tests for Go module '${modulePath}'")
+        exec {
+          environment += testEnvironmentVariables // CUSTOMIZATIONS ON THE STANDARD BUILD SCRIPT
+          logging.captureStandardOutput LogLevel.QUIET
+          logging.captureStandardError  LogLevel.ERROR
+          workingDir = projectDir
+          // note that with '--tags=<GROUP>' we only run tests declared in files with the '+build <GROUP>' directive on top
+          commandLine 'go', 'test', "--tags=${group}", '-coverpkg=./...', "-coverprofile=${coverageProfileFile}", '-v', './...'
+        }
+
+        logger.quiet("Rendering ${group} test coverage report for Go module '${modulePath}'")
+        exec {
+          logging.captureStandardOutput LogLevel.QUIET
+          logging.captureStandardError  LogLevel.ERROR
+          workingDir = projectDir
+          commandLine 'go', 'tool', 'cover', '-html', coverageProfileFile, '-o', coverageReportFile
+        }
       }
     }
-  }
 
-  // This is a lifecycle task that will depend on other dynamically created
-  // tasks.
-  task integrationTest(group: 'verification', description: 'Runs the integration tests for the Go binaries') {
-    // When they are all in the execution plan, run faster tests first.
-    mustRunAfter unitTest
-
-    // Task dependencies
-    dependsOn goModUpdate
-
-    def testOutputDir = new File(buildDir, 'test/integration')
-    def coverageProfileFile = new File(testOutputDir, 'coverageprofile.out')
-    def coverageReportFile = new File(testOutputDir, 'coveragereport.html')
-
-    // Declare inputs and outputs of this task
-    inputs.files(fileTree(projectDir).filter { File f ->
-      f.name.endsWith(".go") || f.name.endsWith(".mod") || f.name.endsWith(".sum")
-    })
-    outputs.file(coverageProfileFile)
-    outputs.file(coverageReportFile)
-
-    doLast {
-      // CUSTOMIZATIONS ON THE STANDARD BUILD SCRIPT - START
-      // Pass the name of the configuration file examples to tests. These are passed as environment variables.
-      // We use the same files used for the documentation here.
-      def testEnvironmentVariables = [:]
-      testEnvironmentVariables['gitHubTestUserToken']=findProperty("gitHubTestUserToken")
-      testEnvironmentVariables['gitHubTestUserPublicKey']=findProperty("gitHubTestUserPublicKey")
-      testEnvironmentVariables['gitHubTestUserPrivateKeyPassphrase']=findProperty("gitHubTestUserPrivateKeyPassphrase")
-      testEnvironmentVariables['gitHubTestUserPrivateKeyWithPassphrase']=findProperty("gitHubTestUserPrivateKeyWithPassphrase")
-      testEnvironmentVariables['gitHubTestUserPrivateKeyWithoutPassphrase']=findProperty("gitHubTestUserPrivateKeyWithoutPassphrase")
-      testEnvironmentVariables['gitLabTestUserToken']=findProperty("gitLabTestUserToken")
-      testEnvironmentVariables['gitLabTestUserPublicKey']=findProperty("gitLabTestUserPublicKey")
-      testEnvironmentVariables['gitLabTestUserPrivateKeyPassphrase']=findProperty("gitLabTestUserPrivateKeyPassphrase")
-      testEnvironmentVariables['gitLabTestUserPrivateKeyWithPassphrase']=findProperty("gitLabTestUserPrivateKeyWithPassphrase")
-      testEnvironmentVariables['gitLabTestUserPrivateKeyWithoutPassphrase']=findProperty("gitLabTestUserPrivateKeyWithoutPassphrase")
-      // CUSTOMIZATIONS ON THE STANDARD BUILD SCRIPT - END
-
-      logger.quiet("Running integration tests for Go module '${modulePath}'")
-      exec {
-        environment += testEnvironmentVariables // CUSTOMIZATIONS ON THE STANDARD BUILD SCRIPT
-        logging.captureStandardOutput LogLevel.QUIET
-        logging.captureStandardError  LogLevel.ERROR
-        environment 'GOPATH', goPath.path
-        // note that with '--tags=integration' we only run tests declared in files with the '+build integration' directive on top
-        commandLine 'go', 'test', '--tags=integration', '-coverpkg=./...', "-coverprofile=${coverageProfileFile}", '-v', '.'
-      }
-
-      logger.quiet("Rendering integration test coverage report for Go module '${modulePath}'")
-      exec {
-        logging.captureStandardOutput LogLevel.QUIET
-        logging.captureStandardError  LogLevel.ERROR
-        commandLine 'go', 'tool', 'cover', '-html', coverageProfileFile, '-o', coverageReportFile
-      }
-    }
-  }
-
-  // This is a lifecycle task that will depend on other dynamically created
-  // tasks.
-  task functionalTest(group: 'verification', description: 'Runs the functional tests for the Go binaries') {
-    // When they are all in the execution plan, run faster tests first.
-    mustRunAfter unitTest
-    mustRunAfter integrationTest
-
-    // Task dependencies
-    dependsOn goModUpdate
-
-    def testOutputDir = new File(buildDir, 'test/functional')
-    def coverageProfileFile = new File(testOutputDir, 'coverageprofile.out')
-    def coverageReportFile = new File(testOutputDir, 'coveragereport.html')
-
-    // Declare inputs and outputs of this task
-    inputs.files(fileTree(projectDir).filter { File f ->
-      f.name.endsWith(".go") || f.name.endsWith(".mod") || f.name.endsWith(".sum")
-    })
-    outputs.file(coverageProfileFile)
-    outputs.file(coverageReportFile)
-
-    doLast {
-      // CUSTOMIZATIONS ON THE STANDARD BUILD SCRIPT - START
-      // Pass the name of the configuration file examples to tests. These are passed as environment variables.
-      // We use the same files used for the documentation here.
-      def testEnvironmentVariables = [:]
-      testEnvironmentVariables['nyxBinDir']=file(buildDir.path+'/bin/').absolutePath // the path to the binaries
-      testEnvironmentVariables['quickTests']=findProperty("quickTests") // the flag to narrow the number of tests, added on the command line using the -PquickTests=true option
-      testEnvironmentVariables['gitHubTestUserToken']=findProperty("gitHubTestUserToken")
-      testEnvironmentVariables['gitHubTestUserPublicKey']=findProperty("gitHubTestUserPublicKey")
-      testEnvironmentVariables['gitHubTestUserPrivateKeyPassphrase']=findProperty("gitHubTestUserPrivateKeyPassphrase")
-      testEnvironmentVariables['gitHubTestUserPrivateKeyWithPassphrase']=findProperty("gitHubTestUserPrivateKeyWithPassphrase")
-      testEnvironmentVariables['gitHubTestUserPrivateKeyWithoutPassphrase']=findProperty("gitHubTestUserPrivateKeyWithoutPassphrase")
-      testEnvironmentVariables['gitLabTestUserToken']=findProperty("gitLabTestUserToken")
-      testEnvironmentVariables['gitLabTestUserPublicKey']=findProperty("gitLabTestUserPublicKey")
-      testEnvironmentVariables['gitLabTestUserPrivateKeyPassphrase']=findProperty("gitLabTestUserPrivateKeyPassphrase")
-      testEnvironmentVariables['gitLabTestUserPrivateKeyWithPassphrase']=findProperty("gitLabTestUserPrivateKeyWithPassphrase")
-      testEnvironmentVariables['gitLabTestUserPrivateKeyWithoutPassphrase']=findProperty("gitLabTestUserPrivateKeyWithoutPassphrase")
-      // CUSTOMIZATIONS ON THE STANDARD BUILD SCRIPT - END
-
-      logger.quiet("Running functional tests for Go module '${modulePath}'")
-      exec {
-        environment += testEnvironmentVariables // CUSTOMIZATIONS ON THE STANDARD BUILD SCRIPT
-        logging.captureStandardOutput LogLevel.QUIET
-        logging.captureStandardError  LogLevel.ERROR
-        environment 'GOPATH', goPath.path
-        // note that with '--tags=functional' we only run tests declared in files with the '+build functional' directive on top
-        commandLine 'go', 'test', '--tags=functional', '-coverpkg=./...', "-coverprofile=${coverageProfileFile}", '-v', '.'
-      }
-
-      logger.quiet("Rendering functional test coverage report for Go module '${modulePath}'")
-      exec {
-        logging.captureStandardOutput LogLevel.QUIET
-        logging.captureStandardError  LogLevel.ERROR
-        commandLine 'go', 'tool', 'cover', '-html', coverageProfileFile, '-o', coverageReportFile
-      }
-    }
-  }
-
-  // This is a lifecycle task that will depend on other specific test tasks.
-  task test(group: 'verification', description: 'Runs all the tests for the Go binaries') {
-    dependsOn unitTest
-    dependsOn integrationTest
-    dependsOn functionalTest
+    // Make the "[unit|integration|functional]Test" lifecycle task depend on this one
+    tasks.getByName("${group}Test").dependsOn tasks.named("go${groupCapitalized}Test")
   }
 
   task goPublishToGoPkg(group: 'publishing', description: 'Lists the module to https://pkg.go.dev/') {
@@ -482,7 +456,6 @@ subprojects {
       exec {
         ignoreExitValue = true // sometimes response is too slow to come and results in a timeout error
         environment 'GOPROXY', 'proxy.golang.org'
-        environment 'GOPATH', goPath.path
         workingDir = projectDir
         logging.captureStandardOutput LogLevel.INFO
         logging.captureStandardError  LogLevel.ERROR
@@ -523,7 +496,7 @@ subprojects {
     dependsOn goPublishToGoPkg, goPublishToGoDocs
   }
 
-  task apiDocumentation(type: Tar, group: 'build', description: 'Builds the API documentation for this project') {
+  task apiDocumentationArchive(type: Tar, group: 'build', description: 'Builds the API documentation archive for this project') {
     // Task dependencies
     dependsOn goDocDown
 
@@ -550,14 +523,35 @@ subprojects {
     }
   }
 
+  // This is a lifecycle task that will depend on other specific tasks.
   task documentation(group: 'build', description: 'Builds the documentation for this project') {
-    dependsOn apiDocumentation
+    dependsOn apiDocumentationArchive
   }
 
-  task deepClean(group: 'build', description: 'Clean the reproducible and reusable artifacts including caches, dependencies etc') {
-    dependsOn clean
+  task binariesArchive(type: Tar, group: 'build', description: 'Creates the archive containing the binaries for this project') {
+    // Task dependencies
+    dependsOn goBuild
 
-    // No other particular contents to clean so far in this task
+    // This task is of type Tar so:
+    // - we can reuse its outputs for the project artifacts
+    // - we can inherit its copying features from its AbstractCopyTask
+    //   superclass
+    // - we can reuse implicit inputs and outputs
+
+    // Simply copy the README.md, just renaming it to the image name,
+    // so when there are more than one they can be used as API docs
+    // and stored together in the same directory.
+    archiveBaseName = project.name
+    archiveAppendix = 'binaries'
+    archiveVersion = project.version
+    archiveClassifier = null
+    archiveExtension = 'tar.gz'
+    destinationDirectory = file("${buildDir}/archives")
+    compression = Compression.GZIP
+
+    from(goBinOutputDirectory) {
+      into("go/${project.name}/")
+    }
   }
 
   /*----------------------------------------------------------------------------
@@ -578,9 +572,14 @@ subprojects {
     // configurations so that they can be consumed by other projects.
 
     // Expose the API documentation.
-    // Here we associate the outputs from the 'apiDocumentation' task to the
-    // 'apiDocumentation' configuration.
-    apiDocumentation tasks.apiDocumentation
+    // Here we associate the outputs from the 'apiDocumentationArchive' task
+    //  to the 'apiDocumentation' configuration.
+    apiDocumentation tasks.apiDocumentationArchive
+
+    // Expose the binaries.
+    // Here we associate the outputs from the 'binariesArchive' task to the
+    // 'binaries' configuration.
+    binaries tasks.binariesArchive
   }
 }
 
@@ -608,16 +607,16 @@ task test(group: 'verification', description: 'Runs all the tests for the Go bin
 }
 
 // This is just a lifecycle task
+task documentation(group: 'build', description: 'Builds the documentation for this project') {
+  dependsOn subprojects*.documentation
+}
+
+// This is just a lifecycle task
 task publish(group: 'publishing', description: 'Publishes artifacts produced by this project') {
   // Only perform publishing if the Nyx release type enables publishing
   onlyIf { nyxState.newRelease }
 
   dependsOn subprojects*.publish
-}
-
-// This is just a lifecycle task
-task documentation(group: 'build', description: 'Builds the documentation for this project') {
-  dependsOn subprojects*.documentation
 }
 
 task deepClean(group: 'build', description: 'Clean the reproducible and reusable artifacts including caches, dependencies etc') {

@@ -121,8 +121,8 @@ inputs:
       You can use a multi-line value here to specify multiple entries.
       For more see: https://github.com/marketplace/actions/changed-files.
       Default:
-        - src/docker/**
-        - !src/docker/**/build
+        src/docker/**
+        !src/docker/**/build
     required: false
     default: |-
       src/docker/**

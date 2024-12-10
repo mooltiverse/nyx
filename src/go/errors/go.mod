@@ -1,3 +1,3 @@
 module github.com/mooltiverse/nyx/src/go/errors
 
-go 1.20
+go 1.23.1
