@@ -26,7 +26,7 @@ subprojects {
     //   artifacts
     // - expose artifacts produced by this project that can be used by others as
     //  dependencies
-    // Configurations can extend othe configurations from within the same
+    // Configurations can extend other configurations from within the same
     // project by means of 'extendsFrom'.
     // To add artifacts to configurations use the 'artifacts' section.
     apiDocumentation {
