@@ -22,7 +22,7 @@ WORKDIR /project
 VOLUME /project
 
 # Put the binary into the image
-COPY --from=bin nyx-linux-amd64 /usr/bin/nyx
+COPY --from=dependencies binaries/go/nyx/nyx-linux-amd64 /usr/bin/nyx
 
 # Also install Git, as it's required by the libraries used in Go
 RUN apk update && \
