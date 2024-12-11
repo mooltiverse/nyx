@@ -672,11 +672,12 @@ subprojects {
     // 'dockerBuildImage' for the plain Dockerfile (which has no flavors).
     tasks.create(group: 'build', name: "dockerBuildImage${flavorSuffix}", description: "Builds the Docker image from the ${dockerfile}") {
       // Task dependencies
-      dependsOn importDependencies
+      dependsOn importBinaryDependencies
       dependsOn tasks.named("dockerBuilder${flavorSuffix}")
 
       // Declare inputs and outputs of this task
       inputs.files(dockerfile)
+      inputs.files(importBinaryDependencies.outputs.files)
       outputs.files(dockerImageOCIFile(dockerfile, flavor))
       outputs.files(dockerStateIIDFile(dockerfile))
 
@@ -1230,7 +1231,7 @@ subprojects {
     }
   }
 
-  task apiDocumentationArchive(type: Tar, group: 'build', description: 'Builds the API documentation archive for this project') {
+  task exportAPIDocumentationArchive(type: Tar, group: 'build', description: 'Builds the API documentation archive for this project') {
     // This task is of type Tar so:
     // - we can reuse its outputs for the project artifacts
     // - we can inherit its copying features from its AbstractCopyTask
@@ -1256,7 +1257,7 @@ subprojects {
 
   // This is a lifecycle task that will depend on other specific tasks.
   task documentation(group: 'build', description: 'Builds the documentation for this project') {
-    dependsOn apiDocumentationArchive
+    dependsOn exportAPIDocumentationArchive
   }
 
   /*----------------------------------------------------------------------------
@@ -1278,9 +1279,9 @@ subprojects {
     // configurations so that they can be consumed by other projects.
 
     // Expose the API documentation.
-    // Here we associate the outputs from the 'apiDocumentationArchive' task
-    //  to the 'apiDocumentation' configuration.
-    apiDocumentation tasks.apiDocumentationArchive
+    // Here we associate the outputs from the 'exportAPIDocumentationArchive'
+    // task to the 'apiDocumentation' configuration.
+    apiDocumentation tasks.exportAPIDocumentationArchive
   }
 }
 

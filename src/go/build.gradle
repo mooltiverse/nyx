@@ -496,7 +496,7 @@ subprojects {
     dependsOn goPublishToGoPkg, goPublishToGoDocs
   }
 
-  task apiDocumentationArchive(type: Tar, group: 'build', description: 'Builds the API documentation archive for this project') {
+  task exportAPIDocumentationArchive(type: Tar, group: 'build', description: 'Builds the API documentation archive for this project') {
     // Task dependencies
     dependsOn goDocDown
 
@@ -525,10 +525,10 @@ subprojects {
 
   // This is a lifecycle task that will depend on other specific tasks.
   task documentation(group: 'build', description: 'Builds the documentation for this project') {
-    dependsOn apiDocumentationArchive
+    dependsOn exportAPIDocumentationArchive
   }
 
-  task binariesArchive(type: Tar, group: 'build', description: 'Creates the archive containing the binaries for this project') {
+  task exportBinariesArchive(type: Tar, group: 'build', description: 'Creates the archive containing the binaries for this project') {
     // Task dependencies
     dependsOn goBuild
 
@@ -572,14 +572,14 @@ subprojects {
     // configurations so that they can be consumed by other projects.
 
     // Expose the API documentation.
-    // Here we associate the outputs from the 'apiDocumentationArchive' task
-    //  to the 'apiDocumentation' configuration.
-    apiDocumentation tasks.apiDocumentationArchive
+    // Here we associate the outputs from the 'exportAPIDocumentationArchive'
+    // task to the 'apiDocumentation' configuration.
+    apiDocumentation tasks.exportAPIDocumentationArchive
 
     // Expose the binaries.
-    // Here we associate the outputs from the 'binariesArchive' task to the
-    // 'binaries' configuration.
-    binaries tasks.binariesArchive
+    // Here we associate the outputs from the 'exportBinariesArchive' task to
+    // the 'binaries' configuration.
+    binaries tasks.exportBinariesArchive
   }
 }
 
