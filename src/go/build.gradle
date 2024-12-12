@@ -68,18 +68,18 @@ subprojects {
   // The directory where Go docs have to be stored.
   ext.goDocsOutputDirectory = new File(buildDir, "api/docs/")
 
-  // Define the value to use for the GOPATH variable when installing the tools
+  // Define the value to use for the GOBIN variable when installing the tools
   // used to generate the documentation.
-  // We keep a separate GOPATH for those so we don't pollute the project path.
-  ext.goDocPath = new File(buildDir, '/godoc')
+  // We keep a separate GOBIN for those so we don't pollute the project path.
+  ext.goDocBin = new File(buildDir, '/go/bin/doc')
 
   // Define the full path to the 'godoc' executable, depending on the platform
   // (with or without the '.exe' extension)
-  ext.goDocExecutable = new File("${goDocPath}/bin/godoc"+(org.gradle.nativeplatform.platform.internal.DefaultNativePlatform.currentOperatingSystem.isWindows() ? '.exe' : ''))
+  ext.goDocExecutable = new File(goDocBin, 'godoc'+(org.gradle.nativeplatform.platform.internal.DefaultNativePlatform.currentOperatingSystem.isWindows() ? '.exe' : ''))
 
   // Define the full path to the 'godocdown' executable, depending on the platform
   // (with or without the '.exe' extension)
-  ext.goDocDownExecutable = new File("${goDocPath}/bin/godocdown"+(org.gradle.nativeplatform.platform.internal.DefaultNativePlatform.currentOperatingSystem.isWindows() ? '.exe' : ''))
+  ext.goDocDownExecutable = new File(goDocBin, 'godocdown'+(org.gradle.nativeplatform.platform.internal.DefaultNativePlatform.currentOperatingSystem.isWindows() ? '.exe' : ''))
 
   // Returns the list of target platforms to build the binary for, where each
   // entry is in the for OS/ARCH.
@@ -242,7 +242,7 @@ subprojects {
       exec {
         logging.captureStandardOutput LogLevel.QUIET
         logging.captureStandardError  LogLevel.ERROR
-        environment 'GOPATH', goDocPath.path
+        environment 'GOBIN', goDocBin.path
         workingDir projectDir
         commandLine 'go', 'install', 'golang.org/x/tools/cmd/godoc@latest'
       }
@@ -258,7 +258,7 @@ subprojects {
       exec {
         logging.captureStandardOutput LogLevel.QUIET
         logging.captureStandardError  LogLevel.ERROR
-        environment 'GOPATH', goDocPath.path
+        environment 'GOBIN', goDocBin.path
         workingDir projectDir
         commandLine 'go', 'install', 'github.com/robertkrimen/godocdown/godocdown@latest'
       }
@@ -283,7 +283,7 @@ subprojects {
       exec {
         logging.captureStandardOutput LogLevel.QUIET
         logging.captureStandardError  LogLevel.ERROR
-        environment 'GOPATH', goDocPath.path
+        environment 'GOBIN', goDocBin.path
         workingDir projectDir
         commandLine goDocExecutable
       }
@@ -311,7 +311,7 @@ subprojects {
       exec {
         logging.captureStandardOutput LogLevel.QUIET
         logging.captureStandardError  LogLevel.ERROR
-        environment 'GOPATH', goDocPath.path
+        environment 'GOBIN', goDocBin.path
         workingDir projectDir
         commandLine goDocDownExecutable, '-plain', "-output=${outputFile}", '.'
       }
