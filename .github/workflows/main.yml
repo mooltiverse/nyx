@@ -91,8 +91,7 @@ jobs:
     - go-publish
     - docker-publish
     - docusaurus-publish
-    # TODO: uncomment this conditional after testing
-    #if: needs.initialize.outputs.release == 'true'
+    if: needs.initialize.outputs.release == 'true'
     # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
     # with '@main' as soon as the branch has been merged to main.
     uses: mooltiverse/nyx/.github/workflows/release.yml@retrofitting
@@ -115,8 +114,7 @@ jobs:
     name: Java Build
     needs:
     - initialize
-    # TODO: uncomment this conditional after testing
-    #if: needs.initialize.outputs.javaChanged == 'true' || needs.initialize.outputs.release == 'true'
+    if: needs.initialize.outputs.javaChanged == 'true' || needs.initialize.outputs.release == 'true'
     # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
     # with '@main' as soon as the branch has been merged to main.
     uses: mooltiverse/nyx/.github/workflows/java-build.yml@retrofitting
@@ -132,8 +130,7 @@ jobs:
     needs:
     - initialize
     - java-build
-    # TODO: uncomment this conditional after testing
-    #if: needs.initialize.outputs.javaChanged == 'true' || needs.initialize.outputs.release == 'true'
+    if: needs.initialize.outputs.javaChanged == 'true' || needs.initialize.outputs.release == 'true'
     # Avoid jobs invoking remote services to run in parallel to avoid throttling down by those services (with consequent test failures).
     # See https://github.com/mooltiverse/nyx/issues/206 for more
     concurrency:
@@ -157,12 +154,6 @@ jobs:
       nyx-cache-name-restore-suffix: ${{ needs.initialize.outputs.nyx-cache-name-suffix }}
       gradle-cache-name-restore-suffix: ${{ needs.java-build.outputs.gradle-cache-name-suffix }}
       java-cache-name-restore-suffix: ${{ needs.java-build.outputs.java-cache-name-suffix }}
-      # TODO: remove the following two lines after testing.
-      # Here we simply avoid running integration and functional tests because
-      # they take a long time and they've already been tested ok.
-      # Once the workflow is tested we can restore the regular testing here.
-      gradle-integration-test-tasks: src:java:unitTest
-      gradle-functional-test-tasks: src:java:unitTest
     secrets:
       # Pass extra properties used by the Gradle scripts to run tests.
       # See the top level
@@ -189,8 +180,7 @@ jobs:
     - test
     - java-build
     - java-test
-    # TODO: uncomment this conditional after testing
-    #if: needs.initialize.outputs.javaChanged == 'true' || needs.initialize.outputs.release == 'true'
+    if: needs.initialize.outputs.javaChanged == 'true' || needs.initialize.outputs.release == 'true'
     # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
     # with '@main' as soon as the branch has been merged to main.
     uses: mooltiverse/nyx/.github/workflows/java-publish.yml@retrofitting
@@ -225,8 +215,7 @@ jobs:
     name: Go Build
     needs:
     - initialize
-    # TODO: uncomment this conditional after testing
-    #if: needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.release == 'true'
+    if: needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.release == 'true'
     # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
     # with '@main' as soon as the branch has been merged to main.
     uses: mooltiverse/nyx/.github/workflows/go-build.yml@retrofitting
@@ -244,8 +233,7 @@ jobs:
     needs:
     - initialize
     - go-build
-    # TODO: uncomment this conditional after testing
-    #if: needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.release == 'true'
+    if: needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.release == 'true'
     concurrency:
       group: rate-limited-remote-services
     strategy:
@@ -266,12 +254,6 @@ jobs:
       nyx-cache-name-restore-suffix: ${{ needs.initialize.outputs.nyx-cache-name-suffix }}
       gradle-cache-name-restore-suffix: ${{ needs.go-build.outputs.gradle-cache-name-suffix }}
       go-cache-name-restore-suffix: ${{ needs.go-build.outputs.go-cache-name-suffix }}
-      # TODO: remove the following two lines after testing.
-      # Here we simply avoid running integration and functional tests because
-      # they take a long time and they've already been tested ok.
-      # Once the workflow is tested we can restore the regular testing here.
-      gradle-integration-test-tasks: src:go:unitTest
-      gradle-functional-test-tasks: src:go:unitTest
     secrets:
       # Pass extra properties used by the Gradle scripts to run tests.
       # See the top level
@@ -298,8 +280,7 @@ jobs:
     - test
     - go-build
     - go-test
-    # TODO: uncomment this conditional after testing
-    #if: needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.release == 'true'
+    if: needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.release == 'true'
     # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
     # with '@main' as soon as the branch has been merged to main.
     uses: mooltiverse/nyx/.github/workflows/go-publish.yml@retrofitting
@@ -323,8 +304,7 @@ jobs:
     needs:
     - initialize
     - go-build
-    # TODO: uncomment this conditional after testing
-    #if: needs.initialize.outputs.dockerChanged == 'true' || needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.release == 'true'
+    if: needs.initialize.outputs.dockerChanged == 'true' || needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.release == 'true'
     # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
     # with '@main' as soon as the branch has been merged to main.
     uses: mooltiverse/nyx/.github/workflows/docker-build.yml@retrofitting
@@ -342,8 +322,7 @@ jobs:
     - initialize
     - go-build
     - docker-build
-    # TODO: uncomment this conditional after testing
-    #if: needs.initialize.outputs.dockerChanged == 'true' || needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.release == 'true'
+    if: needs.initialize.outputs.dockerChanged == 'true' || needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.release == 'true'
     # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
     # with '@main' as soon as the branch has been merged to main.
     uses: mooltiverse/nyx/.github/workflows/docker-test-compact.yml@retrofitting
@@ -383,8 +362,7 @@ jobs:
     - go-build
     - docker-build
     - docker-test
-    # TODO: uncomment this conditional after testing
-    #if: needs.initialize.outputs.dockerChanged == 'true' || needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.release == 'true'
+    if: needs.initialize.outputs.dockerChanged == 'true' || needs.initialize.outputs.goChanged == 'true' || needs.initialize.outputs.release == 'true'
     # TODO: WAIT FOR MERGE: replace the following tag '@retrofitting'
     # with '@main' as soon as the branch has been merged to main.
     uses: mooltiverse/nyx/.github/workflows/docker-publish.yml@retrofitting
